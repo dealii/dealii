@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// Copyright (C) 2010 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,8 +24,6 @@
 #include <vector>
 
 #include "../tests.h"
-
-using namespace std;
 
 template <int dim>
 void

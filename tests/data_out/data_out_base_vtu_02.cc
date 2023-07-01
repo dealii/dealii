@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2020 by the deal.II authors
+// Copyright (C) 2006 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,6 +67,7 @@ check_all(std::ostream &log)
 
   char                  name[100];
   DataOutBase::VtkFlags flags;
+  flags.compression_level = DataOutBase::CompressionLevel::best_compression;
   if (true)
     {
       sprintf(name, "%d%d.vtu", dim, spacedim);

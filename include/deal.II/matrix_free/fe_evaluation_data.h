@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -121,12 +121,13 @@ class FEEvaluationData
 public:
   static constexpr unsigned int dimension = dim;
 
-  using NumberType = Number;
-
+  using NumberType             = Number;
+  using shape_info_number_type = Number;
   using ScalarNumber =
     typename internal::VectorizedArrayTrait<Number>::value_type;
 
-  static constexpr unsigned int n_lanes = sizeof(Number) / sizeof(ScalarNumber);
+  static constexpr unsigned int n_lanes =
+    internal::VectorizedArrayTrait<Number>::width();
 
   /**
    * Constructor, taking a single ShapeInfo object to inject the capability
@@ -224,6 +225,14 @@ public:
    * the single normal vector.
    *
    * @note Only implemented in case `is_face == true`.
+   */
+  Tensor<1, dim, Number>
+  normal_vector(const unsigned int q_point) const;
+
+  /**
+   * Same as `normal_vector(const unsigned int q_point)`.
+   *
+   * @warning  This function will be deprecated!
    */
   Tensor<1, dim, Number>
   get_normal_vector(const unsigned int q_point) const;
@@ -560,9 +569,14 @@ public:
    * VectorizedArray fields of length MatrixFree::n_cell_batches() +
    * MatrixFree::n_ghost_cell_batches() for cell data. It is implemented
    * both for cells and faces (access data to the associated cell).
+   *
+   * The underlying type can be both the Number type as given by the class
+   * template (i.e., VectorizedArrayType) as well as std::array with as many
+   * entries as n_lanes.
    */
-  Number
-  read_cell_data(const AlignedVector<Number> &array) const;
+  template <typename T>
+  T
+  read_cell_data(const AlignedVector<T> &array) const;
 
   /**
    * Provides a unified interface to set data in a vector of
@@ -570,26 +584,9 @@ public:
    * MatrixFree::n_ghost_cell_batches() for cell data. It is implemented
    * both for cells and faces (access data to the associated cell).
    */
-  void
-  set_cell_data(AlignedVector<Number> &array, const Number &value) const;
-
-  /**
-   * The same as above, just for std::array of length of Number for
-   * arbitrary data type.
-   */
-  template <typename T>
-  std::array<T, Number::size()>
-  read_cell_data(
-    const AlignedVector<std::array<T, Number::size()>> &array) const;
-
-  /**
-   * The same as above, just for std::array of length of Number for
-   * arbitrary data type.
-   */
   template <typename T>
   void
-  set_cell_data(AlignedVector<std::array<T, Number::size()>> &array,
-                const std::array<T, Number::size()> &         value) const;
+  set_cell_data(AlignedVector<T> &array, const T &value) const;
 
   /**
    * Provides a unified interface to access data in a vector of
@@ -599,8 +596,9 @@ public:
    *
    * @note Only implemented for faces.
    */
-  Number
-  read_face_data(const AlignedVector<Number> &array) const;
+  template <typename T>
+  T
+  read_face_data(const AlignedVector<T> &array) const;
 
   /**
    * Provides a unified interface to set data in a vector of
@@ -610,26 +608,9 @@ public:
    *
    * @note Only implemented for faces.
    */
-  void
-  set_face_data(AlignedVector<Number> &array, const Number &value) const;
-
-  /**
-   * The same as above, just for std::array of length of Number for
-   * arbitrary data type.
-   */
-  template <typename T>
-  std::array<T, Number::size()>
-  read_face_data(
-    const AlignedVector<std::array<T, Number::size()>> &array) const;
-
-  /**
-   * The same as above, just for std::array of length of Number for
-   * arbitrary data type.
-   */
   template <typename T>
   void
-  set_face_data(AlignedVector<std::array<T, Number::size()>> &array,
-                const std::array<T, Number::size()> &         value) const;
+  set_face_data(AlignedVector<T> &array, const T &value) const;
 
   /** @} */
 
@@ -1287,7 +1268,7 @@ FEEvaluationData<dim, Number, is_face>::reinit_face(
 
 template <int dim, typename Number, bool is_face>
 inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
-FEEvaluationData<dim, Number, is_face>::get_normal_vector(
+FEEvaluationData<dim, Number, is_face>::normal_vector(
   const unsigned int q_point) const
 {
   AssertIndexRange(q_point, n_quadrature_points);
@@ -1298,6 +1279,17 @@ FEEvaluationData<dim, Number, is_face>::get_normal_vector(
     return normal_vectors[0];
   else
     return normal_vectors[q_point];
+}
+
+
+
+// This function is deprecated.
+template <int dim, typename Number, bool is_face>
+inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
+FEEvaluationData<dim, Number, is_face>::get_normal_vector(
+  const unsigned int q_point) const
+{
+  return normal_vector(q_point);
 }
 
 
@@ -1501,7 +1493,7 @@ FEEvaluationData<dim, Number, is_face>::get_cell_type() const
 
 
 template <int dim, typename Number, bool is_face>
-inline const internal::MatrixFreeFunctions::ShapeInfo<Number> &
+inline const typename FEEvaluationData<dim, Number, is_face>::ShapeInfoType &
 FEEvaluationData<dim, Number, is_face>::get_shape_info() const
 {
   Assert(data != nullptr, ExcInternalError());
@@ -1590,7 +1582,7 @@ FEEvaluationData<dim, Number, is_face>::get_scratch_data() const
 
 
 template <int dim, typename Number, bool is_face>
-std::uint8_t
+inline std::uint8_t
 FEEvaluationData<dim, Number, is_face>::get_face_no(const unsigned int v) const
 {
   Assert(is_face, ExcNotInitialized());
@@ -1616,7 +1608,7 @@ FEEvaluationData<dim, Number, is_face>::get_subface_index() const
 
 
 template <int dim, typename Number, bool is_face>
-std::uint8_t
+inline std::uint8_t
 FEEvaluationData<dim, Number, is_face>::get_face_orientation(
   const unsigned int v) const
 {
@@ -1663,13 +1655,13 @@ FEEvaluationData<dim, Number, is_face>::quadrature_point_indices() const
 namespace internal
 {
   template <std::size_t N,
-            typename VectorizedArrayType2,
-            typename GlobalVectorType,
+            typename VectorOfArrayType,
+            typename ArrayType,
             typename FU>
   inline void
   process_cell_or_face_data(const std::array<unsigned int, N> indices,
-                            GlobalVectorType &                array,
-                            VectorizedArrayType2 &            out,
+                            VectorOfArrayType &               array,
+                            ArrayType &                       out,
                             const FU &                        fu)
   {
     for (unsigned int i = 0; i < N; ++i)
@@ -1679,50 +1671,35 @@ namespace internal
           fu(out[i], array[indices[i] / N][indices[i] % N]);
         }
   }
+
+  template <std::size_t N, typename VectorOfArrayType, typename ArrayType>
+  inline void
+  set_valid_element_to_array(const std::array<unsigned int, N> indices,
+                             const VectorOfArrayType &         array,
+                             ArrayType &                       out)
+  {
+    AssertDimension(indices.size(), out.size());
+    AssertDimension(indices.size(), array[0].size());
+    // set all entries in array to a valid element
+    int index = 0;
+    for (; index < N; ++index)
+      if (indices[index] != numbers::invalid_unsigned_int)
+        break;
+    for (unsigned int i = 0; i < N; ++i)
+      out[i] = array[indices[index] / N][indices[index] % N];
+  }
 } // namespace internal
 
 
 
 template <int dim, typename Number, bool is_face>
-inline Number
+template <typename T>
+inline T
 FEEvaluationData<dim, Number, is_face>::read_cell_data(
-  const AlignedVector<Number> &array) const
+  const AlignedVector<T> &array) const
 {
-  Number out = Number(1.);
-  internal::process_cell_or_face_data(this->get_cell_ids(),
-                                      array,
-                                      out,
-                                      [](auto &local, const auto &global) {
-                                        local = global;
-                                      });
-  return out;
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-inline void
-FEEvaluationData<dim, Number, is_face>::set_cell_data(
-  AlignedVector<Number> &array,
-  const Number &         in) const
-{
-  internal::process_cell_or_face_data(this->get_cell_ids(),
-                                      array,
-                                      in,
-                                      [](const auto &local, auto &global) {
-                                        global = local;
-                                      });
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-template <typename T>
-inline std::array<T, Number::size()>
-FEEvaluationData<dim, Number, is_face>::read_cell_data(
-  const AlignedVector<std::array<T, Number::size()>> &array) const
-{
-  std::array<T, Number::size()> out;
+  T out;
+  internal::set_valid_element_to_array(this->get_cell_ids(), array, out);
   internal::process_cell_or_face_data(this->get_cell_ids(),
                                       array,
                                       out,
@@ -1737,9 +1714,8 @@ FEEvaluationData<dim, Number, is_face>::read_cell_data(
 template <int dim, typename Number, bool is_face>
 template <typename T>
 inline void
-FEEvaluationData<dim, Number, is_face>::set_cell_data(
-  AlignedVector<std::array<T, Number::size()>> &array,
-  const std::array<T, Number::size()> &         in) const
+FEEvaluationData<dim, Number, is_face>::set_cell_data(AlignedVector<T> &array,
+                                                      const T &in) const
 {
   internal::process_cell_or_face_data(this->get_cell_ids(),
                                       array,
@@ -1752,45 +1728,13 @@ FEEvaluationData<dim, Number, is_face>::set_cell_data(
 
 
 template <int dim, typename Number, bool is_face>
-inline Number
+template <typename T>
+inline T
 FEEvaluationData<dim, Number, is_face>::read_face_data(
-  const AlignedVector<Number> &array) const
+  const AlignedVector<T> &array) const
 {
-  Number out = Number(1.);
-  internal::process_cell_or_face_data(this->get_face_ids(),
-                                      array,
-                                      out,
-                                      [](auto &local, const auto &global) {
-                                        local = global;
-                                      });
-  return out;
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-inline void
-FEEvaluationData<dim, Number, is_face>::set_face_data(
-  AlignedVector<Number> &array,
-  const Number &         in) const
-{
-  internal::process_cell_or_face_data(this->get_face_ids(),
-                                      array,
-                                      in,
-                                      [](const auto &local, auto &global) {
-                                        global = local;
-                                      });
-}
-
-
-
-template <int dim, typename Number, bool is_face>
-template <typename T>
-inline std::array<T, Number::size()>
-FEEvaluationData<dim, Number, is_face>::read_face_data(
-  const AlignedVector<std::array<T, Number::size()>> &array) const
-{
-  std::array<T, Number::size()> out;
+  T out;
+  internal::set_valid_element_to_array(this->get_cell_ids(), array, out);
   internal::process_cell_or_face_data(this->get_face_ids(),
                                       array,
                                       out,
@@ -1805,9 +1749,8 @@ FEEvaluationData<dim, Number, is_face>::read_face_data(
 template <int dim, typename Number, bool is_face>
 template <typename T>
 inline void
-FEEvaluationData<dim, Number, is_face>::set_face_data(
-  AlignedVector<std::array<T, Number::size()>> &array,
-  const std::array<T, Number::size()> &         in) const
+FEEvaluationData<dim, Number, is_face>::set_face_data(AlignedVector<T> &array,
+                                                      const T &in) const
 {
   internal::process_cell_or_face_data(this->get_face_ids(),
                                       array,

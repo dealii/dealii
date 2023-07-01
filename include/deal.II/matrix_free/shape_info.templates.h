@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,6 +30,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q.h>
@@ -397,14 +398,12 @@ namespace internal
           return;
         }
       else if (quad_in.is_tensor_product() == false ||
-               dynamic_cast<const FE_SimplexP<dim> *>(
-                 &fe_in.base_element(base_element_number)) ||
-               dynamic_cast<const FE_SimplexDGP<dim> *>(
-                 &fe_in.base_element(base_element_number)) ||
-               dynamic_cast<const FE_WedgeP<dim> *>(
-                 &fe_in.base_element(base_element_number)) ||
-               dynamic_cast<const FE_PyramidP<dim> *>(
-                 &fe_in.base_element(base_element_number)))
+               dynamic_cast<const FE_SimplexPoly<dim, dim> *>(
+                 &fe_in.base_element(base_element_number)) != nullptr ||
+               dynamic_cast<const FE_WedgePoly<dim, dim> *>(
+                 &fe_in.base_element(base_element_number)) != nullptr ||
+               dynamic_cast<const FE_PyramidPoly<dim, dim> *>(
+                 &fe_in.base_element(base_element_number)) != nullptr)
         {
           // specialization for arbitrary finite elements and quadrature rules
           // as needed in the context, e.g., of simplices
@@ -583,7 +582,7 @@ namespace internal
 
           univariate_shape_data.nodal_at_cell_boundaries = true;
 
-          // TODO: setup face_to_cell_index_nodal, face_to_cell_index_hermite,
+          // TODO: set up face_to_cell_index_nodal, face_to_cell_index_hermite,
           //  face_orientations
 
           return;
@@ -1238,6 +1237,9 @@ namespace internal
       if (dim != spacedim)
         return false;
 
+      if (dynamic_cast<const FE_RaviartThomasNodal<dim> *>(&fe))
+        return true;
+
       for (unsigned int base = 0; base < fe.n_base_elements(); ++base)
         {
           const FiniteElement<dim, spacedim> *fe_ptr = &(fe.base_element(base));
@@ -1251,13 +1253,17 @@ namespace internal
                 dynamic_cast<const FE_Poly<dim, spacedim> *>(fe_ptr);
               // Simplices are a special case since the polynomial family is not
               // indicative of their support
-              if (dynamic_cast<const FE_SimplexP<dim> *>(fe_poly_ptr) ||
-                  dynamic_cast<const FE_SimplexDGP<dim> *>(fe_poly_ptr) ||
-                  dynamic_cast<const FE_WedgeP<dim> *>(fe_poly_ptr) ||
-                  dynamic_cast<const FE_PyramidP<dim> *>(fe_poly_ptr))
+              if (dynamic_cast<const FE_SimplexPoly<dim, dim> *>(fe_poly_ptr) !=
+                    nullptr ||
+                  dynamic_cast<const FE_WedgePoly<dim, dim> *>(fe_poly_ptr) !=
+                    nullptr ||
+                  dynamic_cast<const FE_PyramidPoly<dim, dim> *>(fe_poly_ptr) !=
+                    nullptr)
                 return true;
 
-              if (dynamic_cast<const TensorProductPolynomials<dim> *>(
+              if (dynamic_cast<const TensorProductPolynomials<
+                      dim,
+                      Polynomials::Polynomial<double>> *>(
                     &fe_poly_ptr->get_poly_space()) == nullptr &&
                   dynamic_cast<const TensorProductPolynomials<
                       dim,
@@ -1269,6 +1275,9 @@ namespace internal
                     nullptr)
                 return false;
             }
+          else if (dynamic_cast<const FE_Nothing<dim, spacedim> *>(fe_ptr) !=
+                   nullptr)
+            return true;
           else
             return false;
         }

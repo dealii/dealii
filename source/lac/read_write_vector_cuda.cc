@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,23 +23,23 @@ DEAL_II_NAMESPACE_OPEN
 namespace LinearAlgebra
 {
   template void
-  ReadWriteVector<float>::import(
+  ReadWriteVector<float>::import_elements(
     const CUDAWrappers::Vector<float> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<float>::import(
+  ReadWriteVector<float>::import_elements(
     const distributed::Vector<float, ::dealii::MemorySpace::CUDA> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 
   template void
-  ReadWriteVector<double>::import(
+  ReadWriteVector<double>::import_elements(
     const CUDAWrappers::Vector<double> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<double>::import(
+  ReadWriteVector<double>::import_elements(
     const distributed::Vector<double, ::dealii::MemorySpace::CUDA> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);

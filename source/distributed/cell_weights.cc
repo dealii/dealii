@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,8 +27,8 @@ namespace parallel
 {
   template <int dim, int spacedim>
   CellWeights<dim, spacedim>::CellWeights(
-    const dealii::DoFHandler<dim, spacedim> &dof_handler,
-    const WeightingFunction &                weighting_function)
+    const DoFHandler<dim, spacedim> &dof_handler,
+    const WeightingFunction &        weighting_function)
   {
     reinit(dof_handler, weighting_function);
   }

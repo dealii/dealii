@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -346,7 +346,7 @@ public:
    *   the destructor is called.
    */
   void
-  replicate_across_communicator(const MPI_Comm &   communicator,
+  replicate_across_communicator(const MPI_Comm     communicator,
                                 const unsigned int root_process);
 
   /**
@@ -1503,7 +1503,7 @@ AlignedVector<T>::fill(const T &value)
 
 template <class T>
 inline void
-AlignedVector<T>::replicate_across_communicator(const MPI_Comm &   communicator,
+AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
                                                 const unsigned int root_process)
 {
 #  ifdef DEAL_II_WITH_MPI

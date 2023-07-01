@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -402,7 +402,7 @@ namespace NonMatching
    *
    *  for (const auto &cell : dof_handler.active_cell_iterators())
    *    {
-   *      for (unsigned int face_index : cell->face_indices())
+   *      for (const unsigned int face_index : cell->face_indices())
    *        {
    *          if (cell->at_boundary(face_index))
    *            fe_interface_values.reinit(cell, face_index);

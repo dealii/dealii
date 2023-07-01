@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2021 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -51,7 +51,7 @@ list(APPEND DEAL_II_DEFINITIONS "NOMINMAX")
 # happening in debug mode with visual studio 2015
 enable_if_supported(DEAL_II_CXX_FLAGS "/bigobj")
 
-add_flags(DEAL_II_CXX_FLAGS "/W3")
+add_flags(DEAL_II_WARNING_FLAGS "/W3")
 
 #
 # Selectively disable a bunch of warnings:
@@ -69,23 +69,23 @@ add_flags(DEAL_II_CXX_FLAGS "/W3")
 # 4700 - uninitialized local variable
 # 4789 - destination of memory copy is too small
 # 4808 - case 'value' is not a valid value for switch condition of type 'bool
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4068")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4244")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4267")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4996")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4355")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4800")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4146")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4667")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4520")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4700")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4789")
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd4808")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4068")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4244")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4267")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4996")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4355")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4800")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4146")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4667")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4520")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4700")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4789")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd4808")
 
 
 # Bug in MSVC 2017: bogus warning C5037: an out-of-line definition of a member of a class template cannot have default arguments
 # see https://developercommunity.visualstudio.com/content/problem/81223/incorrect-error-c5037-with-permissive.html
-enable_if_supported(DEAL_II_CXX_FLAGS "/wd5037")
+enable_if_supported(DEAL_II_WARNING_FLAGS "/wd5037")
 
 #############################
 #                           #

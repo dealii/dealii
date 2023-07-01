@@ -1,0 +1,95 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2001 - 2023 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+// Validate grid_tools_cache for the creation of build global rtree
+
+
+#include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/distributed/shared_tria.h>
+#include <deal.II/distributed/tria.h>
+
+#include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
+#include <deal.II/grid/tria.h>
+
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/signals2.hpp>
+
+#include "../tests.h"
+
+
+namespace bg  = boost::geometry;
+namespace bgi = boost::geometry::index;
+
+
+template <int dim>
+void
+test()
+{
+  deallog << "Testing for dim = " << dim << std::endl;
+
+  // Creating a grid in the square [0,1]x[0,1]
+  parallel::shared::Triangulation<dim> tria(
+    MPI_COMM_WORLD,
+    Triangulation<dim>::none,
+    false,
+    parallel::shared::Triangulation<dim>::Settings::partition_zoltan);
+  GridGenerator::hyper_cube(tria, -3, -2);
+  tria.refine_global(std::max(8 - dim, 3));
+
+
+  GridTools::Cache<dim> cache(tria);
+
+  const auto &global_description = cache.get_covering_rtree();
+
+  // Extract from the cache a list of all bounding boxes with process owners:
+  std::vector<std::pair<BoundingBox<dim>, unsigned int>> test_results;
+  global_description.query(bgi::satisfies([](const auto &) { return true; }),
+                           std::back_inserter(test_results));
+
+  // Loop over all bounding boxes and output them. We expect this list
+  // to be identical on all processes, but do not actually check this
+  // (other than by the fact that the output file records this).
+  for (const auto &bb_and_owner : test_results)
+    {
+      const auto &bd_points = bb_and_owner.first.get_boundary_points();
+      deallog << "  Bounding box: p1 " << bd_points.first << " p2 "
+              << bd_points.second << " rank owner: " << bb_and_owner.second
+              << std::endl;
+    }
+}
+
+
+
+int
+main(int argc, char **argv)
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+#ifdef DEAL_II_WITH_MPI
+  MPILogInitAll log;
+#else
+  initlog();
+  deallog.push("0");
+#endif
+
+  test<1>();
+  test<2>();
+  test<3>();
+
+  return 0;
+}

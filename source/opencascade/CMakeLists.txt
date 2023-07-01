@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2020 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -12,8 +12,6 @@
 ## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
-
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 set(_src
   utilities.cc
@@ -29,5 +27,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/opencascade/*.h
   )
 
-deal_ii_add_library(obj_opencascade OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_opencascade "${_inst}")
+define_object_library(object_opencascade OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_opencascade "${_inst}")

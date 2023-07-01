@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1432,10 +1432,8 @@ namespace MGTools
          ++level)
       {
         std::sort(dofs_by_level[level].begin(), dofs_by_level[level].end());
-        boundary_indices[level].add_indices(
-          dofs_by_level[level].begin(),
-          std::unique(dofs_by_level[level].begin(),
-                      dofs_by_level[level].end()));
+        boundary_indices[level].add_indices(dofs_by_level[level].begin(),
+                                            dofs_by_level[level].end());
       }
   }
 
@@ -1521,8 +1519,7 @@ namespace MGTools
         interface_dofs[l].clear();
         std::sort(tmp_interface_dofs[l].begin(), tmp_interface_dofs[l].end());
         interface_dofs[l].add_indices(tmp_interface_dofs[l].begin(),
-                                      std::unique(tmp_interface_dofs[l].begin(),
-                                                  tmp_interface_dofs[l].end()));
+                                      tmp_interface_dofs[l].end());
         interface_dofs[l].compress();
       }
   }
@@ -1568,23 +1565,23 @@ namespace MGTools
       const std::vector<types::global_dof_index> &n_cells_on_levels,
       const MPI_Comm                              comm)
     {
-      std::vector<types::global_dof_index> n_cells_on_leves_max(
+      std::vector<types::global_dof_index> n_cells_on_levels_max(
         n_cells_on_levels.size());
-      std::vector<types::global_dof_index> n_cells_on_leves_sum(
+      std::vector<types::global_dof_index> n_cells_on_levels_sum(
         n_cells_on_levels.size());
 
-      Utilities::MPI::max(n_cells_on_levels, comm, n_cells_on_leves_max);
-      Utilities::MPI::sum(n_cells_on_levels, comm, n_cells_on_leves_sum);
+      Utilities::MPI::max(n_cells_on_levels, comm, n_cells_on_levels_max);
+      Utilities::MPI::sum(n_cells_on_levels, comm, n_cells_on_levels_sum);
 
       const unsigned int n_proc = Utilities::MPI::n_mpi_processes(comm);
 
-      const double ideal_work = std::accumulate(n_cells_on_leves_sum.begin(),
-                                                n_cells_on_leves_sum.end(),
+      const double ideal_work = std::accumulate(n_cells_on_levels_sum.begin(),
+                                                n_cells_on_levels_sum.end(),
                                                 0) /
                                 static_cast<double>(n_proc);
       const double workload_imbalance =
-        std::accumulate(n_cells_on_leves_max.begin(),
-                        n_cells_on_leves_max.end(),
+        std::accumulate(n_cells_on_levels_max.begin(),
+                        n_cells_on_levels_max.end(),
                         0) /
         ideal_work;
 

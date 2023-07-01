@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,7 +76,7 @@ namespace SUNDIALS
        *
        * @note This constructor is intended for the N_VClone() call of SUNDIALS.
        */
-      NVectorContent();
+      NVectorContent(const MPI_Comm comm);
 
       /**
        * Non-const access to the stored vector. Only allowed if a constructor
@@ -92,6 +92,21 @@ namespace SUNDIALS
       const VectorType *
       get() const;
 
+      /**
+       * Return a reference to a copy of the communicator the vector uses.
+       * This function exists because the N_Vector
+       * interface requires a function that returns a `void*` pointing
+       * to the communicator object -- so somewhere, we need to have an
+       * address to point to. The issue is that our vectors typically
+       * return a *copy* of the communicator, rather than a reference to
+       * the communicator they use, and so there is only a temporary
+       * object and no address we can point to. To work around this
+       * requirement, this class stores a copy of the communicator,
+       * and this function here returns a reference to this copy.
+       */
+      const MPI_Comm &
+      get_mpi_communicator() const;
+
     private:
       using PointerType =
         std::unique_ptr<VectorType, std::function<void(VectorType *)>>;
@@ -106,6 +121,18 @@ namespace SUNDIALS
        * Actually stored vector content.
        */
       PointerType vector;
+
+      /**
+       * A copy of the communicator the vector uses, initialized in the
+       * constructor of this class. We store this because the N_Vector
+       * interface requires a function that returns a `void*` pointing
+       * to the communicator object -- so somewhere, we need to have an
+       * address to point to. The issue is that our vectors typically
+       * return a *copy* of the communicator, rather than a reference to
+       * the communicator they use, and so there is only a temporary
+       * object and no address we can point to.
+       */
+      MPI_Comm comm;
 
       /**
        * Flag storing whether the stored pointer is to be treated as const. If
@@ -261,13 +288,7 @@ namespace SUNDIALS
       void
       add_constant(N_Vector x, realtype b, N_Vector z);
 
-      template <typename VectorType,
-                std::enable_if_t<!IsBlockVector<VectorType>::value, int> = 0>
-      const MPI_Comm &
-      get_communicator(N_Vector v);
-
-      template <typename VectorType,
-                std::enable_if_t<IsBlockVector<VectorType>::value, int> = 0>
+      template <typename VectorType>
       const MPI_Comm &
       get_communicator(N_Vector v);
 
@@ -275,16 +296,9 @@ namespace SUNDIALS
        * Sundials likes a void* but we want to use the above functions
        * internally with a safe type.
        */
-      template <typename VectorType,
-                std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
+      template <typename VectorType>
       inline void *
       get_communicator_as_void_ptr(N_Vector v);
-
-      template <typename VectorType,
-                std::enable_if_t<!is_serial_vector<VectorType>::value, int> = 0>
-      inline void *
-      get_communicator_as_void_ptr(N_Vector v);
-
     } // namespace NVectorOperations
   }   // namespace internal
 } // namespace SUNDIALS
@@ -297,18 +311,68 @@ namespace SUNDIALS
 {
   namespace internal
   {
+    namespace
+    {
+      template <typename VectorType,
+                std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
+      MPI_Comm
+      get_mpi_communicator_from_vector(const VectorType &)
+      {
+        return MPI_COMM_SELF;
+      }
+
+
+
+      template <typename VectorType,
+                std::enable_if_t<!is_serial_vector<VectorType>::value &&
+                                   !IsBlockVector<VectorType>::value,
+                                 int> = 0>
+      MPI_Comm
+      get_mpi_communicator_from_vector(const VectorType &v)
+      {
+#  ifndef DEAL_II_WITH_MPI
+        (void)v;
+        return MPI_COMM_SELF;
+#  else
+        return v.get_mpi_communicator();
+#  endif
+      }
+
+
+
+      template <typename VectorType,
+                std::enable_if_t<!is_serial_vector<VectorType>::value &&
+                                   IsBlockVector<VectorType>::value,
+                                 int> = 0>
+      MPI_Comm
+      get_mpi_communicator_from_vector(const VectorType &v)
+      {
+#  ifndef DEAL_II_WITH_MPI
+        (void)v;
+        return MPI_COMM_SELF;
+#  else
+        Assert(v.n_blocks() > 0,
+               ExcMessage("You cannot ask a block vector without blocks "
+                          "for its MPI communicator."));
+        return v.block(0).get_mpi_communicator();
+#  endif
+      }
+    } // namespace
+
+
     template <typename VectorType>
-    NVectorContent<VectorType>::NVectorContent()
+    NVectorContent<VectorType>::NVectorContent(const MPI_Comm comm)
       : vector(typename VectorMemory<VectorType>::Pointer(mem))
+      , comm(comm)
       , is_const(false)
     {}
-
 
 
     template <typename VectorType>
     NVectorContent<VectorType>::NVectorContent(VectorType *vector)
       : vector(vector,
                [](VectorType *) { /* not owning memory -> don't free*/ })
+      , comm(get_mpi_communicator_from_vector(*vector))
       , is_const(false)
     {}
 
@@ -318,6 +382,7 @@ namespace SUNDIALS
     NVectorContent<VectorType>::NVectorContent(const VectorType *vector)
       : vector(const_cast<VectorType *>(vector),
                [](VectorType *) { /* not owning memory -> don't free*/ })
+      , comm(get_mpi_communicator_from_vector(*vector))
       , is_const(true)
     {}
 
@@ -347,6 +412,14 @@ namespace SUNDIALS
       return vector.get();
     }
 
+
+
+    template <typename VectorType>
+    const MPI_Comm &
+    NVectorContent<VectorType>::get_mpi_communicator() const
+    {
+      return comm;
+    }
 
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
@@ -492,14 +565,17 @@ namespace SUNDIALS
       {
         N_Vector v = clone_empty(w);
 
-        // the corresponding delete is called in destroy()
-        auto  cloned   = new NVectorContent<VectorType>();
         auto *w_dealii = unwrap_nvector_const<VectorType>(w);
 
-        // reinit the cloned vector based on the layout of the source vector
-        cloned->get()->reinit(*w_dealii);
-        v->content = cloned;
+        // Create the vector; the corresponding delete is called in destroy()
+        auto cloned = new NVectorContent<VectorType>(
+          get_mpi_communicator_from_vector(*w_dealii));
 
+        // Then also copy the structure and values:
+        *cloned->get() = *w_dealii;
+
+        // Finally set the cloned object in 'v':
+        v->content = cloned;
         return v;
       }
 
@@ -528,41 +604,20 @@ namespace SUNDIALS
 
 
 
-      template <typename VectorType,
-                std::enable_if_t<IsBlockVector<VectorType>::value, int>>
+      template <typename VectorType>
       const MPI_Comm &
       get_communicator(N_Vector v)
       {
-        return unwrap_nvector_const<VectorType>(v)
-          ->block(0)
-          .get_mpi_communicator();
+        Assert(v != nullptr, ExcInternalError());
+        Assert(v->content != nullptr, ExcInternalError());
+        auto *pContent =
+          reinterpret_cast<NVectorContent<VectorType> *>(v->content);
+        return pContent->get_mpi_communicator();
       }
 
 
 
-      template <typename VectorType,
-                std::enable_if_t<!IsBlockVector<VectorType>::value, int>>
-      const MPI_Comm &
-      get_communicator(N_Vector v)
-      {
-        return unwrap_nvector_const<VectorType>(v)->get_mpi_communicator();
-      }
-
-
-
-      template <typename VectorType,
-                std::enable_if_t<is_serial_vector<VectorType>::value, int>>
-      void *get_communicator_as_void_ptr(N_Vector)
-      {
-        // required by SUNDIALS: MPI-unaware vectors should return the nullptr
-        // as comm
-        return nullptr;
-      }
-
-
-
-      template <typename VectorType,
-                std::enable_if_t<!is_serial_vector<VectorType>::value, int>>
+      template <typename VectorType>
       void *
       get_communicator_as_void_ptr(N_Vector v)
       {
@@ -570,8 +625,12 @@ namespace SUNDIALS
         (void)v;
         return nullptr;
 #  else
-        // We need to cast away const here, as SUNDIALS demands a pure `void *`.
-        return &(const_cast<MPI_Comm &>(get_communicator<VectorType>(v)));
+        if (is_serial_vector<VectorType>::value == false)
+          // We need to cast away const here, as SUNDIALS demands a pure
+          // `void*`.
+          return &(const_cast<MPI_Comm &>(get_communicator<VectorType>(v)));
+        else
+          return nullptr;
 #  endif
       }
 

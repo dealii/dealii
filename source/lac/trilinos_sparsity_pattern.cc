@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -141,7 +141,7 @@ namespace TrilinosWrappers
 
 
   SparsityPattern::SparsityPattern(const IndexSet &parallel_partitioning,
-                                   const MPI_Comm &communicator,
+                                   const MPI_Comm  communicator,
                                    const size_type n_entries_per_row)
   {
     reinit(parallel_partitioning,
@@ -154,7 +154,7 @@ namespace TrilinosWrappers
 
   SparsityPattern::SparsityPattern(
     const IndexSet &              parallel_partitioning,
-    const MPI_Comm &              communicator,
+    const MPI_Comm                communicator,
     const std::vector<size_type> &n_entries_per_row)
   {
     reinit(parallel_partitioning,
@@ -167,7 +167,7 @@ namespace TrilinosWrappers
 
   SparsityPattern::SparsityPattern(const IndexSet &row_parallel_partitioning,
                                    const IndexSet &col_parallel_partitioning,
-                                   const MPI_Comm &communicator,
+                                   const MPI_Comm  communicator,
                                    const size_type n_entries_per_row)
   {
     reinit(row_parallel_partitioning,
@@ -181,7 +181,7 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern(
     const IndexSet &              row_parallel_partitioning,
     const IndexSet &              col_parallel_partitioning,
-    const MPI_Comm &              communicator,
+    const MPI_Comm                communicator,
     const std::vector<size_type> &n_entries_per_row)
   {
     reinit(row_parallel_partitioning,
@@ -195,7 +195,7 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern(const IndexSet &row_parallel_partitioning,
                                    const IndexSet &col_parallel_partitioning,
                                    const IndexSet &writable_rows,
-                                   const MPI_Comm &communicator,
+                                   const MPI_Comm  communicator,
                                    const size_type n_max_entries_per_row)
   {
     reinit(row_parallel_partitioning,
@@ -245,10 +245,10 @@ namespace TrilinosWrappers
               Teuchos::RCP<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>> &graph,
               Teuchos::RCP<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>> &  nonlocal_graph)
     {
-      Assert(row_map.IsOneToOne(),
+      Assert(row_map->isOneToOne(),
              ExcMessage("Row map must be 1-to-1, i.e., no overlap between "
                         "the maps of different processors."));
-      Assert(col_map.IsOneToOne(),
+      Assert(col_map->isOneToOne(),
              ExcMessage("Column map must be 1-to-1, i.e., no overlap between "
                         "the maps of different processors."));
 
@@ -463,7 +463,7 @@ namespace TrilinosWrappers
 
   void
   SparsityPattern::reinit(const IndexSet &parallel_partitioning,
-                          const MPI_Comm &communicator,
+                          const MPI_Comm  communicator,
                           const size_type n_entries_per_row)
   {
     SparsityPatternBase::resize(parallel_partitioning.size(),
@@ -478,7 +478,7 @@ namespace TrilinosWrappers
 
   void
   SparsityPattern::reinit(const IndexSet &              parallel_partitioning,
-                          const MPI_Comm &              communicator,
+                          const MPI_Comm                communicator,
                           const std::vector<size_type> &n_entries_per_row)
   {
     SparsityPatternBase::resize(parallel_partitioning.size(),
@@ -494,7 +494,7 @@ namespace TrilinosWrappers
   void
   SparsityPattern::reinit(const IndexSet &row_parallel_partitioning,
                           const IndexSet &col_parallel_partitioning,
-                          const MPI_Comm &communicator,
+                          const MPI_Comm  communicator,
                           const size_type n_entries_per_row)
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
@@ -516,7 +516,7 @@ namespace TrilinosWrappers
   void
   SparsityPattern::reinit(const IndexSet &row_parallel_partitioning,
                           const IndexSet &col_parallel_partitioning,
-                          const MPI_Comm &communicator,
+                          const MPI_Comm  communicator,
                           const std::vector<size_type> &n_entries_per_row)
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
@@ -539,7 +539,7 @@ namespace TrilinosWrappers
   SparsityPattern::reinit(const IndexSet &row_parallel_partitioning,
                           const IndexSet &col_parallel_partitioning,
                           const IndexSet &writable_rows,
-                          const MPI_Comm &communicator,
+                          const MPI_Comm  communicator,
                           const size_type n_entries_per_row)
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
@@ -587,7 +587,7 @@ namespace TrilinosWrappers
     const IndexSet &           row_parallel_partitioning,
     const IndexSet &           col_parallel_partitioning,
     const SparsityPatternType &nontrilinos_sparsity_pattern,
-    const MPI_Comm &           communicator,
+    const MPI_Comm             communicator,
     const bool                 exchange_data)
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
@@ -612,7 +612,7 @@ namespace TrilinosWrappers
   SparsityPattern::reinit(
     const IndexSet &           parallel_partitioning,
     const SparsityPatternType &nontrilinos_sparsity_pattern,
-    const MPI_Comm &           communicator,
+    const MPI_Comm             communicator,
     const bool                 exchange_data)
   {
     AssertDimension(nontrilinos_sparsity_pattern.n_rows(),
@@ -1094,12 +1094,12 @@ namespace TrilinosWrappers
   template void
   SparsityPattern::reinit(const IndexSet &,
                           const dealii::SparsityPattern &,
-                          const MPI_Comm &,
+                          const MPI_Comm,
                           bool);
   template void
   SparsityPattern::reinit(const IndexSet &,
                           const dealii::DynamicSparsityPattern &,
-                          const MPI_Comm &,
+                          const MPI_Comm,
                           bool);
 
 
@@ -1107,13 +1107,13 @@ namespace TrilinosWrappers
   SparsityPattern::reinit(const IndexSet &,
                           const IndexSet &,
                           const dealii::SparsityPattern &,
-                          const MPI_Comm &,
+                          const MPI_Comm,
                           bool);
   template void
   SparsityPattern::reinit(const IndexSet &,
                           const IndexSet &,
                           const dealii::DynamicSparsityPattern &,
-                          const MPI_Comm &,
+                          const MPI_Comm,
                           bool);
 #  endif
 

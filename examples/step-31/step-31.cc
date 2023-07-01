@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2022 by the deal.II authors
+ * Copyright (C) 2007 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -959,7 +959,7 @@ namespace Step31
     }
 
     // The creation of the temperature matrix (or, rather, matrices, since we
-    // provide a temperature mass matrix and a temperature stiffness matrix,
+    // provide a temperature mass matrix and a temperature @ref GlossStiffnessMatrix "stiffness matrix",
     // that will be added together for time discretization) follows the
     // generation of the Stokes matrix &ndash; except that it is much easier
     // here since we do not need to take care of any blocks or coupling
@@ -1943,9 +1943,8 @@ namespace Step31
     // and temperature DoFHandler objects, by attaching them to the old dof
     // handlers. With this at place, we can prepare the triangulation and the
     // data vectors for refinement (in this order).
-    std::vector<TrilinosWrappers::MPI::Vector> x_temperature(2);
-    x_temperature[0]                            = temperature_solution;
-    x_temperature[1]                            = old_temperature_solution;
+    const std::vector<TrilinosWrappers::MPI::Vector> x_temperature = {
+      temperature_solution, old_temperature_solution};
     TrilinosWrappers::MPI::BlockVector x_stokes = stokes_solution;
 
     SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> temperature_trans(
@@ -1971,13 +1970,13 @@ namespace Step31
     triangulation.execute_coarsening_and_refinement();
     setup_dofs();
 
-    std::vector<TrilinosWrappers::MPI::Vector> tmp(2);
-    tmp[0].reinit(temperature_solution);
-    tmp[1].reinit(temperature_solution);
+    std::vector<TrilinosWrappers::MPI::Vector> tmp = {
+      TrilinosWrappers::MPI::Vector(temperature_solution),
+      TrilinosWrappers::MPI::Vector(temperature_solution)};
     temperature_trans.interpolate(x_temperature, tmp);
 
-    temperature_solution     = tmp[0];
-    old_temperature_solution = tmp[1];
+    temperature_solution     = std::move(tmp[0]);
+    old_temperature_solution = std::move(tmp[1]);
 
     // After the solution has been transferred we then enforce the constraints
     // on the transferred solution.

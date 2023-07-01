@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,9 +23,7 @@
 // e.g., MPI_Comm in the API.
 
 #if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #else
 // without MPI, we would still like to use
 // some constructs with MPI data

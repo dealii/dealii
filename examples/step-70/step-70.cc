@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * Copyright (C) 2020 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -638,8 +638,6 @@ namespace Step70
 
     DoFHandler<spacedim>      fluid_dh;
     DoFHandler<dim, spacedim> solid_dh;
-
-    std::unique_ptr<MappingFEField<dim, spacedim>> solid_mapping;
 
     // Similarly to how things are done in step-22, we use a block system to
     // treat the Stokes part of the problem, and follow very closely what was
@@ -1481,9 +1479,9 @@ namespace Step70
         Assert(pic.begin() == particle, ExcInternalError());
         for (const auto &p : pic)
           {
-            const auto &ref_q  = p.get_reference_location();
-            const auto &real_q = p.get_location();
-            const auto &JxW    = p.get_properties()[0];
+            const Point<spacedim> ref_q  = p.get_reference_location();
+            const Point<spacedim> real_q = p.get_location();
+            const double          JxW    = p.get_properties()[0];
 
             for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
               {
@@ -1527,7 +1525,7 @@ namespace Step70
   // This function solves the linear system with FGMRES with a block diagonal
   // preconditioner and an algebraic multigrid (AMG) method for the diagonal
   // blocks. The preconditioner applies a V cycle to the $(0,0)$ (i.e., the
-  // velocity-velocity) block and a CG with the mass matrix for the $(1,1)$
+  // velocity-velocity) block and a CG with the @ref GlossMassMatrix "mass matrix" for the $(1,1)$
   // block (which is our approximation to the Schur complement: the pressure
   // mass matrix assembled above).
   template <int dim, int spacedim>

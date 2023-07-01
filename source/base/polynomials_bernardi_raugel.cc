@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2020 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -121,7 +121,7 @@ PolynomialsBernardiRaugel<dim>::evaluate(
   // Normal vectors point in the +x, +y, and +z directions for
   // consistent orientation across edges
   std::vector<Tensor<1, dim>> normals;
-  for (unsigned int i : GeometryInfo<dim>::face_indices())
+  for (const unsigned int i : GeometryInfo<dim>::face_indices())
     {
       Tensor<1, dim> normal;
       normal[i / 2] = 1;

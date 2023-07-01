@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,9 +29,7 @@
 #include <deal.II/grid/tria_iterator_base.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <utility>
 
@@ -41,6 +39,7 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 #ifndef DOXYGEN
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class Triangulation;
 template <typename Accessor>
 class TriaRawIterator;
@@ -52,10 +51,12 @@ class TriaActiveIterator;
 namespace parallel
 {
   template <int dim, int spacedim>
+  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   class TriangulationBase;
 }
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
 template <int dim, int spacedim, bool lda>
 class DoFCellAccessor;
@@ -309,8 +310,9 @@ class TriaAccessorBase
 public:
   /**
    * Dimension of the space the object represented by this accessor lives in.
-   * For example, if this accessor represents a quad that is part of a two-
-   * dimensional surface in four-dimensional space, then this value is four.
+   * For example, if this accessor represents a quadrilateral that is part of
+   * a two-dimensional surface in four-dimensional space, then this value is
+   * four.
    */
   static constexpr unsigned int space_dimension = spacedim;
 
@@ -323,8 +325,8 @@ public:
 
   /**
    * Dimensionality of the current object represented by this accessor. For
-   * example, if it is line (irrespective of whether it is part of a quad or
-   * hex, and what dimension we are in), then this value equals 1.
+   * example, if it is line (irrespective of whether it is part of a 2d or 3d
+   * subobject), then this value equals 1.
    */
   static const unsigned int structure_dimension = structdim;
 
@@ -569,14 +571,37 @@ private:
  * @ingroup Accessors
  */
 template <int structdim, int dim, int spacedim = dim>
-class InvalidAccessor : public TriaAccessorBase<structdim, dim, spacedim>
+class InvalidAccessor
 {
 public:
   /**
-   * Propagate alias from base class to this class.
+   * Dimension of the space the object represented by this accessor lives in.
+   * For example, if this accessor represents a quadrilateral that is part of
+   * a two-dimensional surface in four-dimensional space, then this value is
+   * four.
    */
-  using AccessorData =
-    typename TriaAccessorBase<structdim, dim, spacedim>::AccessorData;
+  static constexpr unsigned int space_dimension = spacedim;
+
+  /**
+   * Dimensionality of the object that the thing represented by this accessor
+   * is part of. For example, if this accessor represents a line that is part
+   * of a hexahedron, then this value will be three.
+   */
+  static constexpr unsigned int dimension = dim;
+
+  /**
+   * Dimensionality of the current object represented by this accessor. For
+   * example, if it is line (irrespective of whether it is part of a 2d or 3d
+   * subobject), then this value equals 1.
+   */
+  static const unsigned int structure_dimension = structdim;
+
+  /**
+   * Declare the data type that this accessor class expects to get passed from
+   * the iterator classes. Since the pure triangulation iterators need no
+   * additional data, this data type is @p void.
+   */
+  using AccessorData = void;
 
   /**
    * Constructor.  This class is used for iterators that do not make
@@ -585,10 +610,10 @@ public:
    * semantic sense, and we generate an exception when such an object is
    * actually generated.
    */
-  InvalidAccessor(const Triangulation<dim, spacedim> *parent     = nullptr,
-                  const int                           level      = -1,
-                  const int                           index      = -1,
-                  const AccessorData *                local_data = nullptr);
+  InvalidAccessor(const void *        parent     = nullptr,
+                  const int           level      = -1,
+                  const int           index      = -1,
+                  const AccessorData *local_data = nullptr);
 
   /**
    * Copy constructor.  This class is used for iterators that do not make
@@ -627,6 +652,28 @@ public:
   operator++() const;
   void
   operator--() const;
+
+  /**
+   * Return the state of the iterator.  For the different states an accessor
+   * can be in, refer to the TriaRawIterator documentation.
+   */
+  static IteratorState::IteratorStates
+  state();
+
+
+  /**
+   * Level of this object. Vertices have no level, so this function always
+   * returns zero.
+   */
+  static int
+  level();
+
+  /**
+   * Index of this object. Returns the global index of the vertex this object
+   * points to.
+   */
+  static int
+  index();
 
   /**
    * Dummy function representing whether the accessor points to a used or an
@@ -676,17 +723,15 @@ public:
    * Dummy function to extract lines. Returns a default-constructed line
    * iterator.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::line_iterator
-    line(const unsigned int i) const;
+  void *
+  line(const unsigned int i) const;
 
   /**
    * Dummy function to extract quads. Returns a default-constructed quad
    * iterator.
    */
-  typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::quad_iterator
-    quad(const unsigned int i) const;
+  void *
+  quad(const unsigned int i) const;
 };
 
 
@@ -1698,9 +1743,13 @@ public:
   n_lines() const;
 
   /**
-   * Number of faces.
-   *
-   * @note Only implemented for cells (structdim==dim).
+   * Return the number of faces for a cell. This function is only
+   * implemented for cells (i.e., `structdim==dim`) to avoid the question
+   * of what exactly is meant in a construct such as
+   * `cell->face(f)->n_faces()`. If you want to ask how many bounding
+   * lines a face of a 3d cell has, use `cell->face(f)->n_lines()`; if
+   * you want to ask about the number of vertices of a face of a 2d cell,
+   * use `cell->face(f)->n_vertices()`.
    */
   unsigned int
   n_faces() const;
@@ -1829,8 +1878,7 @@ private:
   clear_children() const;
 
 private:
-  template <int, int>
-  friend class Triangulation;
+  friend class Triangulation<dim, spacedim>;
 
   friend struct dealii::internal::TriangulationImplementation::Implementation;
   friend struct dealii::internal::TriangulationImplementation::
@@ -2296,8 +2344,8 @@ public:
 
   /**
    * Dimensionality of the current object represented by this accessor. For
-   * example, if it is line (irrespective of whether it is part of a quad or
-   * hex, and what dimension we are in), then this value equals 1.
+   * example, if it is line (irrespective of whether it is part of a 2d or 3d
+   * subobject), then this value equals 1.
    */
   static const unsigned int structure_dimension = 0;
 
@@ -3510,8 +3558,8 @@ public:
   /**
    * Return whether the cell is at the boundary. Being at the boundary is
    * defined by one face being on the boundary. Note that this does not catch
-   * cases where only one vertex of a quad or of a hex is at the boundary, or
-   * where only one line of a hex is at the boundary while the interiors of
+   * cases where only one vertex of a 2d or 3d subobject is at the boundary,
+   * or where only one line of a hex is at the boundary while the interiors of
    * all faces are in the interior of the domain. For the latter case, the @p
    * has_boundary_lines function is the right one to ask.
    */
@@ -4129,11 +4177,9 @@ private:
   void
   set_direction_flag(const bool new_direction_flag) const;
 
-  template <int, int>
-  friend class Triangulation;
+  friend class Triangulation<dim, spacedim>;
 
-  template <int, int>
-  friend class parallel::TriangulationBase;
+  friend class parallel::TriangulationBase<dim, spacedim>;
 
   friend struct dealii::internal::TriangulationImplementation::Implementation;
   friend struct dealii::internal::TriangulationImplementation::
@@ -4250,6 +4296,6 @@ TriaAccessor<3, 3, 3>::set_all_manifold_ids(const types::manifold_id) const;
 DEAL_II_NAMESPACE_CLOSE
 
 // include more templates in debug and optimized mode
-#include "tria_accessor.templates.h"
+#include <deal.II/grid/tria_accessor.templates.h>
 
 #endif

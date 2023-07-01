@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,24 +19,26 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CUDA
+#include <deal.II/base/cuda_size.h>
+#include <deal.II/base/memory_space.h>
+#include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/partitioner.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 
-#  include <deal.II/base/cuda_size.h>
-#  include <deal.II/base/mpi_stub.h>
-#  include <deal.II/base/partitioner.h>
-#  include <deal.II/base/quadrature.h>
-#  include <deal.II/base/tensor.h>
+#include <deal.II/dofs/dof_handler.h>
 
-#  include <deal.II/dofs/dof_handler.h>
+#include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/mapping.h>
 
-#  include <deal.II/fe/fe_update_flags.h>
-#  include <deal.II/fe/mapping.h>
+#include <deal.II/grid/filtered_iterator.h>
 
-#  include <deal.II/grid/filtered_iterator.h>
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/cuda_vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
-#  include <deal.II/lac/affine_constraints.h>
-#  include <deal.II/lac/cuda_vector.h>
-#  include <deal.II/lac/la_parallel_vector.h>
+#include <Kokkos_Core.hpp>
 
 
 
@@ -54,13 +56,13 @@ namespace internal
 namespace CUDAWrappers
 {
   // forward declaration
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
   namespace internal
   {
     template <int dim, typename Number>
     class ReinitHelper;
   }
-#  endif
+#endif
 
   /**
    * This class collects all the data that is stored for the matrix free
@@ -79,7 +81,7 @@ namespace CUDAWrappers
    * write to vectors in parallel without having to explicitly synchronize
    * access to these vectors and matrices. This class does not implement any
    * shape values, all it does is to cache the respective data. To implement
-   * finite element operations, use the class CUDAWrappers::FEEvalutation.
+   * finite element operations, use the class CUDAWrappers::FEEvaluation.
    *
    * This class traverse the cells in a different order than the usual
    * Triangulation class in deal.II.
@@ -98,17 +100,6 @@ namespace CUDAWrappers
       FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>;
 
     /**
-     * Parallelization scheme used: parallel_in_elem (parallelism at the level
-     * of degrees of freedom) or parallel_over_elem (parallelism at the level of
-     * cells)
-     */
-    enum ParallelizationScheme
-    {
-      parallel_in_elem,
-      parallel_over_elem
-    };
-
-    /**
      * Standardized data struct to pipe additional data to MatrixFree.
      */
     struct AdditionalData
@@ -116,35 +107,27 @@ namespace CUDAWrappers
       /**
        * Constructor.
        */
-      AdditionalData(
-        const ParallelizationScheme parallelization_scheme = parallel_in_elem,
-        const UpdateFlags           mapping_update_flags   = update_gradients |
-                                                 update_JxW_values |
-                                                 update_quadrature_points,
-        const bool use_coloring                      = false,
-        const bool overlap_communication_computation = false)
-        : parallelization_scheme(parallelization_scheme)
-        , mapping_update_flags(mapping_update_flags)
+      AdditionalData(const UpdateFlags mapping_update_flags =
+                       update_gradients | update_JxW_values |
+                       update_quadrature_points,
+                     const bool use_coloring                      = false,
+                     const bool overlap_communication_computation = false)
+        : mapping_update_flags(mapping_update_flags)
         , use_coloring(use_coloring)
         , overlap_communication_computation(overlap_communication_computation)
       {
-#  ifndef DEAL_II_MPI_WITH_DEVICE_SUPPORT
+#ifndef DEAL_II_MPI_WITH_DEVICE_SUPPORT
         AssertThrow(
           overlap_communication_computation == false,
           ExcMessage(
             "Overlapping communication and computation requires CUDA-aware MPI."));
-#  endif
+#endif
         if (overlap_communication_computation == true)
           AssertThrow(
             use_coloring == false || overlap_communication_computation == false,
             ExcMessage(
               "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
       }
-      /**
-       * Parallelization scheme used, parallelization over degrees of freedom or
-       * over cells.
-       */
-      ParallelizationScheme parallelization_scheme;
       /**
        * This flag is used to determine which quantities should be cached. This
        * class can cache data needed for gradient computations (inverse
@@ -177,30 +160,58 @@ namespace CUDAWrappers
     struct Data
     {
       /**
-       * Pointer to the quadrature points.
+       * Kokkos::View of the quadrature points.
        */
-      point_type *q_points;
+      Kokkos::View<point_type **, MemorySpace::Default::kokkos_space> q_points;
 
       /**
        * Map the position in the local vector to the position in the global
        * vector.
        */
-      types::global_dof_index *local_to_global;
+      Kokkos::View<types::global_dof_index **,
+                   MemorySpace::Default::kokkos_space>
+        local_to_global;
 
       /**
-       * Pointer to the inverse Jacobian.
+       * Kokkos::View of the inverse Jacobian.
        */
-      Number *inv_jacobian;
+      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>
+        inv_jacobian;
 
       /**
-       * Pointer to the Jacobian times the weights.
+       * Kokkos::View of the Jacobian times the weights.
        */
-      Number *JxW;
+      Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
 
       /**
-       * ID of the associated MatrixFree object.
+       * Mask deciding where constraints are set on a given cell.
        */
-      unsigned int id;
+      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                   MemorySpace::Default::kokkos_space>
+        constraint_mask;
+
+      /**
+       * Values of the shape functions.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
+
+      /**
+       * Gradients of the shape functions.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        shape_gradients;
+
+      /**
+       * Gradients of the shape functions for collocation methods.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        co_shape_gradients;
+
+      /**
+       * Weights used when resolving hanginf nodes.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        constraint_weights;
 
       /**
        * Number of cells.
@@ -218,26 +229,40 @@ namespace CUDAWrappers
       unsigned int row_start;
 
       /**
-       * Mask deciding where constraints are set on a given cell.
-       */
-      dealii::internal::MatrixFreeFunctions::ConstraintKinds *constraint_mask;
-
-      /**
        * If true, use graph coloring has been used and we can simply add into
        * the destingation vector. Otherwise, use atomic operations.
        */
       bool use_coloring;
+
+      /**
+       * Return the quadrature point index local. The index is
+       * only unique for a given MPI process.
+       */
+      DEAL_II_HOST_DEVICE unsigned int
+      local_q_point_id(const unsigned int cell,
+                       const unsigned int n_q_points,
+                       const unsigned int q_point) const
+      {
+        return (row_start / padding_length + cell) * n_q_points + q_point;
+      }
+
+
+      /**
+       * Return the quadrature point.
+       */
+      DEAL_II_HOST_DEVICE
+      typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
+      get_quadrature_point(const unsigned int cell,
+                           const unsigned int q_point) const
+      {
+        return q_points(cell, q_point);
+      }
     };
 
     /**
      * Default constructor.
      */
     MatrixFree();
-
-    /**
-     * Destructor.
-     */
-    ~MatrixFree();
 
     /**
      * Return the length of the padding.
@@ -296,7 +321,7 @@ namespace CUDAWrappers
      *
      * @p func needs to define
      * \code
-     * __device__ void operator()(
+     * DEAL_II_HOST_DEVICE void operator()(
      *   const unsigned int                                          cell,
      *   const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
      *   CUDAWrappers::SharedData<dim, Number> *                     shared_data,
@@ -321,7 +346,7 @@ namespace CUDAWrappers
      *
      * @p func needs to define
      * \code
-     *  __device__ void operator()(
+     *  DEAL_II_HOST_DEVICE void operator()(
      *    const unsigned int                                          cell,
      *    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data);
      * static const unsigned int n_dofs_1d;
@@ -350,6 +375,7 @@ namespace CUDAWrappers
     void
     set_constrained_values(const Number val, VectorType &dst) const;
 
+#ifdef DEAL_II_WITH_CUDA
     /**
      * Initialize a serial vector. The size corresponds to the number of degrees
      * of freedom in the DoFHandler object.
@@ -357,6 +383,7 @@ namespace CUDAWrappers
     void
     initialize_dof_vector(
       LinearAlgebra::CUDAWrappers::Vector<Number> &vec) const;
+#endif
 
     /**
      * Initialize a distributed vector. The local elements correspond to the
@@ -365,7 +392,8 @@ namespace CUDAWrappers
      */
     void
     initialize_dof_vector(
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vec) const;
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &vec)
+      const;
 
     /**
      * Return the colored graph of locally owned active cells.
@@ -387,12 +415,6 @@ namespace CUDAWrappers
     get_vector_partitioner() const;
 
     /**
-     * Free all the memory allocated.
-     */
-    void
-    free();
-
-    /**
      * Return the DoFHandler.
      */
     const DoFHandler<dim> &
@@ -410,13 +432,13 @@ namespace CUDAWrappers
      */
     template <typename IteratorFiltersType>
     void
-    internal_reinit(const Mapping<dim> &             mapping,
-                    const DoFHandler<dim> &          dof_handler,
-                    const AffineConstraints<Number> &constraints,
-                    const Quadrature<1> &            quad,
-                    const IteratorFiltersType &      iterator_filter,
-                    std::shared_ptr<const MPI_Comm>  comm,
-                    const AdditionalData             additional_data);
+    internal_reinit(const Mapping<dim> &                   mapping,
+                    const DoFHandler<dim> &                dof_handler,
+                    const AffineConstraints<Number> &      constraints,
+                    const Quadrature<1> &                  quad,
+                    const IteratorFiltersType &            iterator_filter,
+                    const std::shared_ptr<const MPI_Comm> &comm,
+                    const AdditionalData                   additional_data);
 
     /**
      * Helper function. Loop over all the cells and apply the functor on each
@@ -435,10 +457,13 @@ namespace CUDAWrappers
     template <typename Functor>
     void
     distributed_cell_loop(
-      const Functor &                                                      func,
-      const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
+      const Functor &func,
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+        &                                                               src,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst)
+      const;
 
+#ifdef DEAL_II_WITH_CUDA
     /**
      * This function should never be called. Calling it results in an internal
      * error. This function exists only because cell_loop needs
@@ -450,74 +475,12 @@ namespace CUDAWrappers
       const Functor &                                    func,
       const LinearAlgebra::CUDAWrappers::Vector<Number> &src,
       LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
-
-    /**
-     * Helper function. Copy the values of the constrained entries of @p src to
-     * @p dst. This function is used when MPI is not used.
-     */
-    template <typename VectorType>
-    void
-    serial_copy_constrained_values(const VectorType &src,
-                                   VectorType &      dst) const;
-
-    /**
-     * Helper function. Copy the values of the constrained entries of @p src to
-     * @p dst. This function is used when MPI is used.
-     */
-    void
-    distributed_copy_constrained_values(
-      const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
-
-    /**
-     * This function should never be called. Calling it results in an internal
-     * error. This function exists only because copy_constrained_values needs
-     * distributed_copy_constrained_values() to exist for
-     * LinearAlgebra::CUDAWrappers::Vector.
-     */
-    void
-    distributed_copy_constrained_values(
-      const LinearAlgebra::CUDAWrappers::Vector<Number> &src,
-      LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
-
-    /**
-     * Helper function. Set the constrained entries of @p dst to @p val. This
-     * function is used when MPI is not used.
-     */
-    template <typename VectorType>
-    void
-    serial_set_constrained_values(const Number val, VectorType &dst) const;
-
-    /**
-     * Helper function. Set the constrained entries of @p dst to @p val. This
-     * function is used when MPI is used.
-     */
-    void
-    distributed_set_constrained_values(
-      const Number                                                   val,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const;
-
-    /**
-     * This function should never be called. Calling it results in an internal
-     * error. This function exists only because set_constrained_values needs
-     * distributed_set_constrained_values() to exist for
-     * LinearAlgebra::CUDAWrappers::Vector.
-     */
-    void
-    distributed_set_constrained_values(
-      const Number                                 val,
-      LinearAlgebra::CUDAWrappers::Vector<Number> &dst) const;
+#endif
 
     /**
      * Unique ID associated with the object.
      */
     int my_id;
-
-    /**
-     * Parallelization scheme used, parallelization over degrees of freedom or
-     * over cells.
-     */
-    ParallelizationScheme parallelization_scheme;
 
     /**
      * If true, use graph coloring. Otherwise, use atomic operations. Graph
@@ -568,51 +531,70 @@ namespace CUDAWrappers
     std::vector<unsigned int> n_cells;
 
     /**
-     * Vector of pointers to the quadrature points associated to the cells of
-     * each color.
+     * Vector of Kokkos::View to the quadrature points associated to the cells
+     * of each color.
      */
-    std::vector<point_type *> q_points;
+    std::vector<Kokkos::View<point_type **, MemorySpace::Default::kokkos_space>>
+      q_points;
 
     /**
      * Map the position in the local vector to the position in the global
      * vector.
      */
-    std::vector<types::global_dof_index *> local_to_global;
+    std::vector<Kokkos::View<types::global_dof_index **,
+                             MemorySpace::Default::kokkos_space>>
+      local_to_global;
 
     /**
-     * Vector of pointer to the inverse Jacobian associated to the cells of each
-     * color.
+     * Vector of Kokkos::View of the inverse Jacobian associated to the cells of
+     * each color.
      */
-    std::vector<Number *> inv_jacobian;
+    std::vector<
+      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>>
+      inv_jacobian;
 
     /**
-     * Vector of pointer to the Jacobian times the weights associated to the
-     * cells of each color.
+     * Vector of Kokkos::View to the Jacobian times the weights associated to
+     * the cells of each color.
      */
-    std::vector<Number *> JxW;
+    std::vector<Kokkos::View<Number **, MemorySpace::Default::kokkos_space>>
+      JxW;
 
     /**
-     * Pointer to the constrained degrees of freedom.
+     * Kokkos::View to the constrained degrees of freedom.
      */
-    types::global_dof_index *constrained_dofs;
+    Kokkos::View<types::global_dof_index *, MemorySpace::Default::kokkos_space>
+      constrained_dofs;
 
     /**
      * Mask deciding where constraints are set on a given cell.
      */
-    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds *>
+    std::vector<
+      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                   MemorySpace::Default::kokkos_space>>
       constraint_mask;
 
     /**
-     * Grid dimensions associated to the different colors. The grid dimensions
-     * are used to launch the CUDA kernels.
+     * Values of the shape functions.
      */
-    std::vector<dim3> grid_dim;
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
 
     /**
-     * Block dimensions associated to the different colors. The block dimensions
-     * are used to launch the CUDA kernels.
+     * Gradients of the shape functions.
      */
-    std::vector<dim3> block_dim;
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_gradients;
+
+    /**
+     * Gradients of the shape functions for collocation methods.
+     */
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+      co_shape_gradients;
+
+    /**
+     * Weights used when resolving hanginf nodes.
+     */
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+      constraint_weights;
 
     /**
      * Shared pointer to a Partitioner for distributed Vectors used in
@@ -620,22 +602,6 @@ namespace CUDAWrappers
      */
     std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
 
-    /**
-     * Cells per block (determined by the function cells_per_block_shmem() ).
-     */
-    unsigned int cells_per_block;
-
-    /**
-     * Grid dimensions used to launch the CUDA kernels
-     * in *_constrained_values-operations.
-     */
-    dim3 constraint_grid_dim;
-
-    /**
-     * Block dimensions used to launch the CUDA kernels
-     * in *_constrained_values-operations.
-     */
-    dim3 constraint_block_dim;
 
     /**
      * Length of the padding (closest power of two larger than or equal to
@@ -663,117 +629,47 @@ namespace CUDAWrappers
 
 
 
-  // TODO find a better place to put these things
-
-  /**
-   * Structure to pass the shared memory into a general user function.
-   */
   template <int dim, typename Number>
   struct SharedData
   {
-    /**
-     * Constructor.
-     */
-    __device__
-    SharedData(Number *vd, Number *gq[dim])
-      : values(vd)
-    {
-      for (unsigned int d = 0; d < dim; ++d)
-        gradients[d] = gq[d];
-    }
+    using TeamHandle = Kokkos::TeamPolicy<
+      MemorySpace::Default::kokkos_space::execution_space>::member_type;
+
+    using SharedView1D = Kokkos::View<
+      Number *,
+      MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+    using SharedView2D = Kokkos::View<
+      Number *[dim],
+      MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+
+    DEAL_II_HOST_DEVICE
+    SharedData(const TeamHandle &  team_member,
+               const SharedView1D &values,
+               const SharedView2D &gradients)
+      : team_member(team_member)
+      , values(values)
+      , gradients(gradients)
+    {}
 
     /**
-     * Shared memory for dof and quad values.
+     * TeamPolicy handle.
      */
-    Number *values;
+    TeamHandle team_member;
 
     /**
-     * Shared memory for computed gradients in reference coordinate system.
-     * The gradient in each direction is saved in a struct-of-array
-     * format, i.e. first, all gradients in the x-direction come...
+     * Memory for dof and quad values.
      */
-    Number *gradients[dim];
+    SharedView1D values;
+
+    /**
+     * Memory for computed gradients in reference coordinate system.
+     */
+    SharedView2D gradients;
   };
 
 
-
-  // This function determines the number of cells per block, possibly at compile
-  // time (by virtue of being 'constexpr')
-  // TODO this function should be rewritten using meta-programming
-  __host__ __device__ constexpr unsigned int
-  cells_per_block_shmem(int dim, int fe_degree)
-  {
-    /* clang-format off */
-    // We are limiting the number of threads according to the
-    // following formulas:
-    //  - in 2d: `threads = cells * (k+1)^d <= 4*CUDAWrappers::warp_size`
-    //  - in 3d: `threads = cells * (k+1)^d <= 2*CUDAWrappers::warp_size`
-    return dim==2 ? (fe_degree==1 ? CUDAWrappers::warp_size :    // 128
-                     fe_degree==2 ? CUDAWrappers::warp_size/4 :  //  72
-                     fe_degree==3 ? CUDAWrappers::warp_size/8 :  //  64
-                     fe_degree==4 ? CUDAWrappers::warp_size/8 :  // 100
-                     1) :
-           dim==3 ? (fe_degree==1 ? CUDAWrappers::warp_size/4 :  //  64
-                     fe_degree==2 ? CUDAWrappers::warp_size/16 : //  54
-                     1) : 1;
-    /* clang-format on */
-  }
-
-
-  /*----------------------- Helper functions ---------------------------------*/
-  /**
-   * Compute the quadrature point index in the local cell of a given thread.
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim>
-  __device__ inline unsigned int
-  q_point_id_in_cell(const unsigned int n_q_points_1d)
-  {
-    return (
-      dim == 1 ? threadIdx.x % n_q_points_1d :
-      dim == 2 ? threadIdx.x % n_q_points_1d + n_q_points_1d * threadIdx.y :
-                 threadIdx.x % n_q_points_1d +
-                   n_q_points_1d * (threadIdx.y + n_q_points_1d * threadIdx.z));
-  }
-
-
-
-  /**
-   * Return the quadrature point index local of a given thread. The index is
-   * only unique for a given MPI process.
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim, typename Number>
-  __device__ inline unsigned int
-  local_q_point_id(
-    const unsigned int                                          cell,
-    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
-    const unsigned int                                          n_q_points_1d,
-    const unsigned int                                          n_q_points)
-  {
-    return (data->row_start / data->padding_length + cell) * n_q_points +
-           q_point_id_in_cell<dim>(n_q_points_1d);
-  }
-
-
-
-  /**
-   * Return the quadrature point associated with a given thread.
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim, typename Number>
-  __device__ inline typename CUDAWrappers::MatrixFree<dim, Number>::point_type &
-  get_quadrature_point(
-    const unsigned int                                          cell,
-    const typename CUDAWrappers::MatrixFree<dim, Number>::Data *data,
-    const unsigned int                                          n_q_points_1d)
-  {
-    return *(data->q_points + data->padding_length * cell +
-             q_point_id_in_cell<dim>(n_q_points_1d));
-  }
 
   /**
    * Structure which is passed to the kernel. It is used to pass all the
@@ -783,30 +679,32 @@ namespace CUDAWrappers
   struct DataHost
   {
     /**
-     * Vector of quadrature points.
+     * Kokkos::View of quadrature points on the host.
      */
-    std::vector<Point<dim, Number>> q_points;
+    typename Kokkos::View<Point<dim, Number> **,
+                          MemorySpace::Default::kokkos_space>::HostMirror
+      q_points;
 
     /**
      * Map the position in the local vector to the position in the global
      * vector.
      */
-    std::vector<types::global_dof_index> local_to_global;
+    typename Kokkos::View<types::global_dof_index **,
+                          MemorySpace::Default::kokkos_space>::HostMirror
+      local_to_global;
 
     /**
-     * Vector of inverse Jacobians.
+     * Kokkos::View of inverse Jacobians on the host.
      */
-    std::vector<Number> inv_jacobian;
+    typename Kokkos::View<Number **[dim][dim],
+                          MemorySpace::Default::kokkos_space>::HostMirror
+      inv_jacobian;
 
     /**
-     * Vector of Jacobian times the weights.
+     * Kokkos::View of Jacobian times the weights on the host.
      */
-    std::vector<Number> JxW;
-
-    /**
-     * ID of the associated MatrixFree object.
-     */
-    unsigned int id;
+    typename Kokkos::View<Number **,
+                          MemorySpace::Default::kokkos_space>::HostMirror JxW;
 
     /**
      * Number of cells.
@@ -826,20 +724,46 @@ namespace CUDAWrappers
     /**
      * Mask deciding where constraints are set on a given cell.
      */
-    std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-      constraint_mask;
+    typename Kokkos::View<
+      dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+      MemorySpace::Default::kokkos_space>::HostMirror constraint_mask;
 
     /**
      * If true, use graph coloring has been used and we can simply add into
      * the destingation vector. Otherwise, use atomic operations.
      */
     bool use_coloring;
+
+
+
+    /**
+     * This function is the host version of local_q_point_id().
+     */
+    unsigned int
+    local_q_point_id(const unsigned int cell,
+                     const unsigned int n_q_points,
+                     const unsigned int q_point) const
+    {
+      return (row_start / padding_length + cell) * n_q_points + q_point;
+    }
+
+
+
+    /**
+     * This function is the host version of get_quadrature_point().
+     */
+    Point<dim, Number>
+    get_quadrature_point(const unsigned int cell,
+                         const unsigned int q_point) const
+    {
+      return q_points(cell, q_point);
+    }
   };
 
 
 
   /**
-   * Copy @p data from the device to the device. @p update_flags should be
+   * Copy @p data from the @ref GlossDevice "device" to the host. @p update_flags should be
    * identical to the one used in MatrixFree::AdditionalData.
    *
    * @relates CUDAWrappers::MatrixFree
@@ -852,83 +776,42 @@ namespace CUDAWrappers
   {
     DataHost<dim, Number> data_host;
 
-    data_host.id             = data.id;
     data_host.n_cells        = data.n_cells;
     data_host.padding_length = data.padding_length;
     data_host.row_start      = data.row_start;
     data_host.use_coloring   = data.use_coloring;
 
-    const unsigned int n_elements =
-      data_host.n_cells * data_host.padding_length;
     if (update_flags & update_quadrature_points)
       {
-        data_host.q_points.resize(n_elements);
-        Utilities::CUDA::copy_to_host(data.q_points, data_host.q_points);
+        data_host.q_points = Kokkos::create_mirror(data.q_points);
+        Kokkos::deep_copy(data_host.q_points, data.q_points);
       }
 
-    data_host.local_to_global.resize(n_elements);
-    Utilities::CUDA::copy_to_host(data.local_to_global,
-                                  data_host.local_to_global);
+    data_host.local_to_global = Kokkos::create_mirror(data.local_to_global);
+    Kokkos::deep_copy(data_host.local_to_global, data.local_to_global);
 
     if (update_flags & update_gradients)
       {
-        data_host.inv_jacobian.resize(n_elements * dim * dim);
-        Utilities::CUDA::copy_to_host(data.inv_jacobian,
-                                      data_host.inv_jacobian);
+        data_host.inv_jacobian = Kokkos::create_mirror(data.inv_jacobian);
+        Kokkos::deep_copy(data_host.inv_jacobian, data.inv_jacobian);
       }
 
     if (update_flags & update_JxW_values)
       {
-        data_host.JxW.resize(n_elements);
-        Utilities::CUDA::copy_to_host(data.JxW, data_host.JxW);
+        data_host.JxW = Kokkos::create_mirror(data.JxW);
+        Kokkos::deep_copy(data_host.JxW, data.JxW);
       }
 
-    data_host.constraint_mask.resize(data_host.n_cells);
-    Utilities::CUDA::copy_to_host(data.constraint_mask,
-                                  data_host.constraint_mask);
+    data_host.constraint_mask = Kokkos::create_mirror(data.constraint_mask);
+    Kokkos::deep_copy(data_host.constraint_mask, data.constraint_mask);
 
     return data_host;
   }
 
 
-
-  /**
-   * This function is the host version of local_q_point_id().
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim, typename Number>
-  inline unsigned int
-  local_q_point_id_host(const unsigned int           cell,
-                        const DataHost<dim, Number> &data,
-                        const unsigned int           n_q_points,
-                        const unsigned int           i)
-  {
-    return (data.row_start / data.padding_length + cell) * n_q_points + i;
-  }
-
-
-
-  /**
-   * This function is the host version of get_quadrature_point(). It assumes
-   * that the data in MatrixFree<dim, Number>::Data has been copied to the host
-   * using copy_mf_data_to_host().
-   *
-   * @relates CUDAWrappers::MatrixFree
-   */
-  template <int dim, typename Number>
-  inline Point<dim, Number>
-  get_quadrature_point_host(const unsigned int           cell,
-                            const DataHost<dim, Number> &data,
-                            const unsigned int           i)
-  {
-    return data.q_points[data.padding_length * cell + i];
-  }
-
-
   /*----------------------- Inline functions ---------------------------------*/
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 
   template <int dim, typename Number>
   inline const std::vector<std::vector<
@@ -958,11 +841,10 @@ namespace CUDAWrappers
     return *dof_handler;
   }
 
-#  endif
+#endif
 
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
 #endif

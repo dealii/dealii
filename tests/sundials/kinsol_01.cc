@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2021 by the deal.II authors
+//    Copyright (C) 2017 - 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -54,14 +54,14 @@ main()
   prm.parse_input(ifile);
 
   // Size of the problem
-  unsigned int N = 3;
+  const unsigned int N = 3;
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
 
   kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
 
   // Robert example
-  kinsol.iteration_function = [](const VectorType &u, VectorType &F) -> int {
+  kinsol.iteration_function = [](const VectorType &u, VectorType &F) {
     const double dstep = 0.1;
     const double y10   = 1.0;
     const double y20   = 0.0;
@@ -73,8 +73,6 @@ main()
     F[0] = yd1 + y10;
     F[1] = -yd1 - yd3 + y20;
     F[2] = yd3 + y30;
-
-    return 0;
   };
 
   VectorType v(N);

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2021 by the deal.II authors
+ * Copyright (C) 2000 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -308,7 +308,7 @@ namespace Step8
         mu.value_list(fe_values.get_quadrature_points(), mu_values);
         right_hand_side(fe_values.get_quadrature_points(), rhs_values);
 
-        // Then assemble the entries of the local stiffness matrix and right
+        // Then assemble the entries of the local @ref GlossStiffnessMatrix "stiffness matrix" and right
         // hand side vector. This follows almost one-to-one the pattern
         // described in the introduction of this example.  One of the few
         // comments in place is that we can compute the number
@@ -344,7 +344,7 @@ namespace Step8
                      fe_values.quadrature_point_indices())
                   {
                     cell_matrix(i, j) +=
-                      // The first term is $\lambda \partial_i u_i, \partial_j
+                      // The first term is $(\lambda \partial_i u_i, \partial_j
                       // v_j) + (\mu \partial_i u_j, \partial_j v_i)$. Note
                       // that <code>shape_grad(i,q_point)</code> returns the
                       // gradient of the only nonzero component of the i-th

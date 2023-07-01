@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,10 +22,7 @@
 #  include <deal.II/arborx/access_traits.h>
 
 #  include <ArborX_LinearBVH.hpp>
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Kokkos_Core.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

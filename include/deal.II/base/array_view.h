@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2021 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,6 +30,9 @@
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declaration
+template <class T>
+class AlignedVector;
+
 template <int N, typename T>
 class Table;
 
@@ -316,11 +319,17 @@ public:
   size() const;
 
   /**
+   * Return a bool whether the array view is empty.
+   */
+  bool
+  empty() const;
+
+  /**
    * Return a pointer to the underlying array serving as element storage.
    * In case the container is empty a nullptr is returned.
    */
-  value_type *
-  data() const noexcept;
+  DEAL_II_HOST_DEVICE value_type *
+                      data() const noexcept;
 
   /**
    * Return an iterator pointing to the beginning of the array view.
@@ -539,8 +548,9 @@ ArrayView<ElementType, MemorySpaceType>::operator!=(
 
 
 template <typename ElementType, typename MemorySpaceType>
-inline typename ArrayView<ElementType, MemorySpaceType>::value_type *
-ArrayView<ElementType, MemorySpaceType>::data() const noexcept
+inline DEAL_II_HOST_DEVICE
+  typename ArrayView<ElementType, MemorySpaceType>::value_type *
+  ArrayView<ElementType, MemorySpaceType>::data() const noexcept
 {
   if (n_elements == 0)
     return nullptr;
@@ -566,6 +576,15 @@ inline std::size_t
 ArrayView<ElementType, MemorySpaceType>::size() const
 {
   return n_elements;
+}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+inline bool
+ArrayView<ElementType, MemorySpaceType>::empty() const
+{
+  return n_elements == 0;
 }
 
 
@@ -686,7 +705,13 @@ make_array_view(const Iterator begin, const Iterator end)
 {
   static_assert(
     std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
-                 typename std::random_access_iterator_tag>::value,
+                 typename std::random_access_iterator_tag>::value
+#ifdef DEAL_II_HAVE_CXX20
+      ||
+      std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
+                   typename std::contiguous_iterator_tag>::value
+#endif
+    ,
     "The provided iterator needs to be a random access iterator.");
   Assert(begin <= end,
          ExcMessage(
@@ -1052,6 +1077,82 @@ inline ArrayView<const ElementType>
 make_array_view(const std::vector<ElementType> &vector,
                 const std::size_t               starting_index,
                 const std::size_t               size_of_view)
+{
+  Assert(starting_index + size_of_view <= vector.size(),
+         ExcMessage("The starting index and size of the view you want to "
+                    "create would lead to a view that extends beyond the end "
+                    "of the given vector."));
+  return ArrayView<const ElementType>(&vector[starting_index], size_of_view);
+}
+
+
+
+/**
+ * Create a writable view to an entire AlignedVector object. See the
+ * documentation of the corresponding overload for std::vector for more
+ * information.
+ *
+ * @relatesalso ArrayView
+ */
+template <typename ElementType>
+inline ArrayView<ElementType>
+make_array_view(AlignedVector<ElementType> &vector)
+{
+  return ArrayView<ElementType>(vector.data(), vector.size());
+}
+
+
+
+/**
+ * Create a read-only view to an entire AlignedVector object. See the
+ * documentation of the corresponding overload for std::vector for more
+ * information.
+ *
+ * @relatesalso ArrayView
+ */
+template <typename ElementType>
+inline ArrayView<const ElementType>
+make_array_view(const AlignedVector<ElementType> &vector)
+{
+  return ArrayView<const ElementType>(vector.data(), vector.size());
+}
+
+
+
+/**
+ * Create a writable view to a part of an AlignedVector object. See the
+ * documentation of the corresponding overload for std::vector for more
+ * information.
+ *
+ * @relatesalso ArrayView
+ */
+template <typename ElementType>
+inline ArrayView<ElementType>
+make_array_view(AlignedVector<ElementType> &vector,
+                const std::size_t           starting_index,
+                const std::size_t           size_of_view)
+{
+  Assert(starting_index + size_of_view <= vector.size(),
+         ExcMessage("The starting index and size of the view you want to "
+                    "create would lead to a view that extends beyond the end "
+                    "of the given vector."));
+  return ArrayView<ElementType>(&vector[starting_index], size_of_view);
+}
+
+
+
+/**
+ * Create a read-only view to a part of an AlignedVector object. See the
+ * documentation of the corresponding overload for std::vector for more
+ * information.
+ *
+ * @relatesalso ArrayView
+ */
+template <typename ElementType>
+inline ArrayView<const ElementType>
+make_array_view(const AlignedVector<ElementType> &vector,
+                const std::size_t                 starting_index,
+                const std::size_t                 size_of_view)
 {
   Assert(starting_index + size_of_view <= vector.size(),
          ExcMessage("The starting index and size of the view you want to "

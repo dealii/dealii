@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2021 by the deal.II authors
+// Copyright (C) 2009 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SLEPcWrappers
 {
-  SolverBase::SolverBase(SolverControl &cn, const MPI_Comm &mpi_communicator)
+  SolverBase::SolverBase(SolverControl &cn, const MPI_Comm mpi_communicator)
     : solver_control(cn)
     , mpi_communicator(mpi_communicator)
     , reason(EPS_CONVERGED_ITERATING)
@@ -360,7 +360,7 @@ namespace SLEPcWrappers
 
   /* ---------------------- SolverKrylovSchur ------------------------ */
   SolverKrylovSchur::SolverKrylovSchur(SolverControl &       cn,
-                                       const MPI_Comm &      mpi_communicator,
+                                       const MPI_Comm        mpi_communicator,
                                        const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
     , additional_data(data)
@@ -381,7 +381,7 @@ namespace SLEPcWrappers
 
 
   SolverArnoldi::SolverArnoldi(SolverControl &       cn,
-                               const MPI_Comm &      mpi_communicator,
+                               const MPI_Comm        mpi_communicator,
                                const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
     , additional_data(data)
@@ -408,7 +408,7 @@ namespace SLEPcWrappers
 
 
   SolverLanczos::SolverLanczos(SolverControl &       cn,
-                               const MPI_Comm &      mpi_communicator,
+                               const MPI_Comm        mpi_communicator,
                                const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
     , additional_data(data)
@@ -424,7 +424,7 @@ namespace SLEPcWrappers
 
   /* ----------------------- Power ------------------------- */
   SolverPower::SolverPower(SolverControl &       cn,
-                           const MPI_Comm &      mpi_communicator,
+                           const MPI_Comm        mpi_communicator,
                            const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
     , additional_data(data)
@@ -445,7 +445,7 @@ namespace SLEPcWrappers
 
   SolverGeneralizedDavidson::SolverGeneralizedDavidson(
     SolverControl &       cn,
-    const MPI_Comm &      mpi_communicator,
+    const MPI_Comm        mpi_communicator,
     const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
     , additional_data(data)
@@ -463,8 +463,8 @@ namespace SLEPcWrappers
 
 
   /* ------------------ Jacobi Davidson -------------------- */
-  SolverJacobiDavidson::SolverJacobiDavidson(SolverControl & cn,
-                                             const MPI_Comm &mpi_communicator,
+  SolverJacobiDavidson::SolverJacobiDavidson(SolverControl &cn,
+                                             const MPI_Comm mpi_communicator,
                                              const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
     , additional_data(data)
@@ -477,7 +477,7 @@ namespace SLEPcWrappers
 
   /* ---------------------- LAPACK ------------------------- */
   SolverLAPACK::SolverLAPACK(SolverControl &       cn,
-                             const MPI_Comm &      mpi_communicator,
+                             const MPI_Comm        mpi_communicator,
                              const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
     , additional_data(data)

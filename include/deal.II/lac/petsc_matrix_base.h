@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2022 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -679,10 +679,27 @@ namespace PETScWrappers
     in_local_range(const size_type index) const;
 
     /**
-     * Return a reference to the MPI communicator object in use with this
-     * matrix.
+     * Return the local number of columns stored on the present MPI process.
+     *
+     * To figure out which elements exactly are stored locally, use
+     * local_domain().
      */
-    const MPI_Comm &
+    size_type
+    local_domain_size() const;
+
+    /**
+     * Return a pair of indices indicating which columns of this matrix are
+     * stored locally. The first number is the index of the first column stored,
+     * the second the index of the one past the last one that is stored
+     * locally.
+     */
+    std::pair<size_type, size_type>
+    local_domain() const;
+
+    /**
+     * Return the underlying MPI communicator.
+     */
+    MPI_Comm
     get_mpi_communicator() const;
 
     /**
@@ -731,7 +748,7 @@ namespace PETScWrappers
      * Return the square of the norm of the vector $v$ with respect to the
      * norm induced by this matrix, i.e. $\left(v,Mv\right)$. This is useful,
      * e.g. in the finite element context, where the $L_2$ norm of a function
-     * equals the matrix norm with respect to the mass matrix of the vector
+     * equals the matrix norm with respect to the @ref GlossMassMatrix "mass matrix" of the vector
      * representing the nodal values of the finite element function.
      *
      * Obviously, the matrix needs to be quadratic for this operation.
@@ -1647,14 +1664,10 @@ namespace PETScWrappers
     prepare_action(VectorOperation::insert);
   }
 
-  inline const MPI_Comm &
+  inline MPI_Comm
   MatrixBase::get_mpi_communicator() const
   {
-    static MPI_Comm comm = PETSC_COMM_SELF;
-    MPI_Comm pcomm = PetscObjectComm(reinterpret_cast<PetscObject>(matrix));
-    if (pcomm != MPI_COMM_NULL)
-      comm = pcomm;
-    return comm;
+    return PetscObjectComm(reinterpret_cast<PetscObject>(matrix));
   }
 
 #  endif // DOXYGEN

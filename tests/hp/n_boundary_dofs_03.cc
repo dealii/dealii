@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,7 @@ test()
 
   dof_handler.distribute_dofs(fe);
 
-  for (types::boundary_id b : {12, 13, 14, 15})
+  for (const types::boundary_id b : {12, 13, 14, 15})
     {
       const unsigned int N =
         dof_handler.n_boundary_dofs(std::set<types::boundary_id>{b});

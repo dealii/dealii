@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,8 +44,8 @@ namespace parallel
   namespace fullydistributed
   {
     template <int dim, int spacedim>
-    Triangulation<dim, spacedim>::Triangulation(
-      const MPI_Comm &mpi_communicator)
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    Triangulation<dim, spacedim>::Triangulation(const MPI_Comm mpi_communicator)
       : parallel::DistributedTriangulationBase<dim, spacedim>(mpi_communicator)
       , settings(TriangulationDescription::Settings::default_setting)
       , partitioner([](dealii::Triangulation<dim, spacedim> &tria,
@@ -60,8 +60,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::create_triangulation(
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::create_triangulation(
       const TriangulationDescription::Description<dim, spacedim>
         &construction_data)
     {
@@ -217,8 +217,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::create_triangulation(
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::create_triangulation(
       const std::vector<Point<spacedim>> &      vertices,
       const std::vector<dealii::CellData<dim>> &cells,
       const SubCellData &                       subcelldata)
@@ -229,7 +229,7 @@ namespace parallel
           "You have called the method parallel::fullydistributed::Triangulation::create_triangulation() \n"
           "that takes 3 arguments. If you have not called this function directly, \n"
           "it might have been called via a function from the GridGenerator or GridIn \n"
-          "namespace. To be able to setup a fully-distributed Triangulation with these \n"
+          "namespace. To be able to set up a fully-distributed Triangulation with these \n"
           "utility functions nevertheless, please follow the following three steps:\n"
           "  1) call the utility function for a (serial) Triangulation, \n"
           "     a parallel::shared::Triangulation, or a parallel::distributed::Triangulation object,\n"
@@ -246,8 +246,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::copy_triangulation(
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {
       // pointer to the triangulation for which the construction data
@@ -295,8 +295,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::set_partitioner(
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::set_partitioner(
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
                                const unsigned int)> &partitioner,
       const TriangulationDescription::Settings &     settings)
@@ -308,8 +308,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::set_partitioner(
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::set_partitioner(
       const RepartitioningPolicyTools::Base<dim, spacedim> &partitioner,
       const TriangulationDescription::Settings &            settings)
     {
@@ -320,8 +320,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::repartition()
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::repartition()
     {
       // signal that repartitioning has started
       this->signals.pre_distributed_repartition();
@@ -348,8 +348,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
     {
       Assert(false, ExcNotImplemented());
     }
@@ -357,8 +357,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    bool
-    Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
     {
       Assert(
         currently_processing_prepare_coarsening_and_refinement_for_internal_usage,
@@ -371,8 +371,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    std::size_t
-    Triangulation<dim, spacedim>::memory_consumption() const
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    std::size_t Triangulation<dim, spacedim>::memory_consumption() const
     {
       const std::size_t mem =
         this->dealii::parallel::TriangulationBase<dim, spacedim>::
@@ -387,8 +387,9 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    bool
-    Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed() const
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    bool Triangulation<dim, spacedim>::is_multilevel_hierarchy_constructed()
+      const
     {
       return (
         settings &
@@ -398,9 +399,10 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    unsigned int
-    Triangulation<dim, spacedim>::coarse_cell_id_to_coarse_cell_index(
-      const types::coarse_cell_id coarse_cell_id) const
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    unsigned int Triangulation<dim, spacedim>::
+      coarse_cell_id_to_coarse_cell_index(
+        const types::coarse_cell_id coarse_cell_id) const
     {
       const auto coarse_cell_index = std::lower_bound(
         coarse_cell_id_to_coarse_cell_index_vector.begin(),
@@ -417,9 +419,10 @@ namespace parallel
 
 
     template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     types::coarse_cell_id
-    Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
-      const unsigned int coarse_cell_index) const
+      Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
+        const unsigned int coarse_cell_index) const
     {
       AssertIndexRange(coarse_cell_index,
                        coarse_cell_index_to_coarse_cell_id_vector.size());
@@ -433,8 +436,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::update_cell_relations()
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::update_cell_relations()
     {
       // Reorganize memory for local_cell_relations.
       this->local_cell_relations.clear();
@@ -449,8 +452,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::save(const std::string &filename) const
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::save(const std::string &filename) const
     {
 #ifdef DEAL_II_WITH_MPI
       AssertThrow(this->cell_attached_data.pack_callbacks_variable.size() == 0,
@@ -590,8 +593,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::load(const std::string &filename)
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::load(const std::string &filename)
     {
 #ifdef DEAL_II_WITH_MPI
       Assert(this->n_cells() == 0,
@@ -735,9 +738,9 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::load(const std::string &filename,
-                                       const bool         autopartition)
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::load(const std::string &filename,
+                                            const bool         autopartition)
     {
       (void)autopartition;
       load(filename);
@@ -746,8 +749,8 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    void
-    Triangulation<dim, spacedim>::update_number_cache()
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::update_number_cache()
     {
       dealii::parallel::TriangulationBase<dim, spacedim>::update_number_cache();
 

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * Copyright (C) 2020 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -548,7 +548,7 @@ namespace Euler_DG
   }
 
 
-  // Modified reinit() function to setup the internal data structures in
+  // Modified reinit() function to set up the internal data structures in
   // MatrixFree in a way that it is usable by the cell-centric loops and
   // the MPI-3.0 shared-memory capabilities are used:
   template <int dim, int degree, int n_points_1d>
@@ -812,7 +812,7 @@ namespace Euler_DG
                         const auto numerical_flux =
                           euler_numerical_flux<dim>(phi_m.get_value(q),
                                                     phi_p.get_value(q),
-                                                    phi_m.get_normal_vector(q));
+                                                    phi_m.normal_vector(q));
                         phi_m.submit_value(-numerical_flux, q);
                       }
                   }
@@ -825,7 +825,7 @@ namespace Euler_DG
                     for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
                       {
                         const auto w_m    = phi_m.get_value(q);
-                        const auto normal = phi_m.get_normal_vector(q);
+                        const auto normal = phi_m.normal_vector(q);
 
                         auto rho_u_dot_n = w_m[1] * normal[0];
                         for (unsigned int d = 1; d < dim; ++d)
@@ -918,15 +918,13 @@ namespace Euler_DG
               internal::EvaluatorQuantity::hessian,
               dim,
               degree + 1,
-              n_points_1d,
-              VectorizedArrayType,
-              VectorizedArrayType>::do_backward(dim + 2,
-                                                data.get_shape_info()
-                                                  .data[0]
-                                                  .inverse_shape_values_eo,
-                                                false,
-                                                phi.begin_values(),
-                                                phi.begin_dof_values());
+              n_points_1d>::do_backward(dim + 2,
+                                        data.get_shape_info()
+                                          .data[0]
+                                          .inverse_shape_values_eo,
+                                        false,
+                                        phi.begin_values(),
+                                        phi.begin_dof_values());
 
             // Perform Runge-Kutta update and write results back to global
             // vectors:
@@ -1262,24 +1260,24 @@ namespace Euler_DG
              dim + 2 + (do_schlieren_plot == true ? 1 : 0),
            ExcInternalError());
 
-    for (unsigned int q = 0; q < n_evaluation_points; ++q)
+    for (unsigned int p = 0; p < n_evaluation_points; ++p)
       {
         Tensor<1, dim + 2> solution;
         for (unsigned int d = 0; d < dim + 2; ++d)
-          solution[d] = inputs.solution_values[q](d);
+          solution[d] = inputs.solution_values[p](d);
 
         const double         density  = solution[0];
         const Tensor<1, dim> velocity = euler_velocity<dim>(solution);
         const double         pressure = euler_pressure<dim>(solution);
 
         for (unsigned int d = 0; d < dim; ++d)
-          computed_quantities[q](d) = velocity[d];
-        computed_quantities[q](dim)     = pressure;
-        computed_quantities[q](dim + 1) = std::sqrt(gamma * pressure / density);
+          computed_quantities[p](d) = velocity[d];
+        computed_quantities[p](dim)     = pressure;
+        computed_quantities[p](dim + 1) = std::sqrt(gamma * pressure / density);
 
         if (do_schlieren_plot == true)
-          computed_quantities[q](dim + 2) =
-            inputs.solution_gradients[q][0] * inputs.solution_gradients[q][0];
+          computed_quantities[p](dim + 2) =
+            inputs.solution_gradients[p][0] * inputs.solution_gradients[p][0];
       }
   }
 

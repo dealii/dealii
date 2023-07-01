@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2007 - 2022 by the deal.II authors
+// Copyright (C) 2007 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -116,8 +116,7 @@ DataPostprocessorScalar<dim>::get_needed_update_flags() const
 
 
 
-// -------------------------- DataPostprocessorVector
-// -------------------------
+// ------------------------- DataPostprocessorVector ------------------------
 
 template <int dim>
 DataPostprocessorVector<dim>::DataPostprocessorVector(
@@ -156,8 +155,7 @@ DataPostprocessorVector<dim>::get_needed_update_flags() const
 
 
 
-// -------------------------- DataPostprocessorTensor
-// -------------------------
+// ------------------------- DataPostprocessorTensor ------------------------
 
 template <int dim>
 DataPostprocessorTensor<dim>::DataPostprocessorTensor(
@@ -200,7 +198,7 @@ namespace DataPostprocessors
 {
   template <int dim>
   BoundaryIds<dim>::BoundaryIds()
-    : DataPostprocessorScalar<dim>("boundary_id", update_quadrature_points)
+    : DataPostprocessorScalar<dim>("boundary_id", update_default)
   {}
 
 

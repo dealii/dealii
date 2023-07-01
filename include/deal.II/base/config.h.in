@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2022 by the deal.II authors
+// Copyright (C) 2012 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -70,6 +70,7 @@
 #cmakedefine DEAL_II_WITH_TRILINOS
 #cmakedefine DEAL_II_WITH_UMFPACK
 #cmakedefine DEAL_II_FEATURE_UMFPACK_BUNDLED_CONFIGURED
+#cmakedefine DEAL_II_WITH_VTK
 #cmakedefine DEAL_II_WITH_ZLIB
 
 #ifdef DEAL_II_WITH_TBB
@@ -120,7 +121,7 @@
 /*
  * This sets the largest number of vectorization bits detected for the given
  * compiler flags and hardware (e.g. 256 for AVX on x86-64 architectures) for
- * use in deal.II's instrinsics-based VectorizedArray class.
+ * use in deal.II's intrinsics-based VectorizedArray class.
  */
 #define DEAL_II_VECTORIZATION_WIDTH_IN_BITS @DEAL_II_VECTORIZATION_WIDTH_IN_BITS@
 
@@ -150,6 +151,18 @@
 #cmakedefine DEAL_II_HAVE_CXX17
 #cmakedefine DEAL_II_HAVE_CXX20
 
+/**
+ * If we have C++20 available, we can have concepts and requires
+ * clauses. We want to avoid using too many `#ifdef` statements, so
+ * define a convenience macro that allows us to write a 'requires'
+ * clause that is simply removed when not using C++20.
+ */
+#if defined(DEAL_II_HAVE_CXX20) && !defined(DEAL_II_DOXYGEN_DO_NOT_PARSE_REQUIRES_CLAUSES)
+#  define DEAL_II_CXX20_REQUIRES(condition) requires(condition)
+#else
+#  define DEAL_II_CXX20_REQUIRES(condition)
+#endif
+
 #cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
 #cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #cmakedefine DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
@@ -174,9 +187,10 @@
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
-// defined for backwards compatibility with older deal.II versions
+// The following two are defined for backwards compatibility with older deal.II versions:
 #define DEAL_II_WITH_CXX11
 #define DEAL_II_WITH_CXX14
+
 #ifdef DEAL_II_HAVE_CXX17
 #  define DEAL_II_WITH_CXX17
 #endif

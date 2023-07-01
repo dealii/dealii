@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// Copyright (C) 2010 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,15 +32,13 @@
 
 #include "../tests.h"
 
-using namespace std;
-
 
 template <int s_dim, int spacedim>
 void
 test_vertices_orientation(
   const Triangulation<s_dim, spacedim> &boundary_mesh,
-  map<typename Triangulation<s_dim, spacedim>::cell_iterator,
-      typename Triangulation<s_dim + 1, spacedim>::face_iterator>
+  std::map<typename Triangulation<s_dim, spacedim>::cell_iterator,
+           typename Triangulation<s_dim + 1, spacedim>::face_iterator>
     &surface_to_volume_mapping)
 {
   typename Triangulation<s_dim, spacedim>::active_cell_iterator
@@ -98,10 +96,10 @@ main()
     // Extract the boundary of a hyper-sphere
 
     const int dim = 3;
-    deallog << "Testing hyper_cube in dim: " << dim << "..." << endl;
+    deallog << "Testing hyper_cube in dim: " << dim << "..." << std::endl;
 
-    map<Triangulation<dim - 1, dim>::cell_iterator,
-        Triangulation<dim, dim>::face_iterator>
+    std::map<Triangulation<dim - 1, dim>::cell_iterator,
+             Triangulation<dim, dim>::face_iterator>
                                  surface_to_volume_mapping;
     const SphericalManifold<dim> boundary_description;
     Triangulation<dim>           volume_mesh;
@@ -123,7 +121,7 @@ main()
     boundary_mesh.set_manifold(1, surface_description);
     boundary_mesh.set_manifold(0, surface_description);
 
-    set<types::boundary_id> boundary_ids;
+    std::set<types::boundary_id> boundary_ids;
     boundary_ids.insert(1);
 
     surface_to_volume_mapping =

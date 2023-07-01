@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 by the deal.II authors
+## Copyright (C) 2016 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,8 +16,6 @@
 # Expand instantiations in subdirectories
 add_subdirectory("elasticity")
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   transformations.cc
   )
@@ -30,5 +28,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/physics/*.h
   )
 
-deal_ii_add_library(obj_physics OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_physics "${_inst}")
+define_object_library(object_physics OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_physics "${_inst}")

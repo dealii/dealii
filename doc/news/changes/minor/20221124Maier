@@ -1,7 +1,0 @@
-Improved: The deal.II CMake project configuration and the
-deal_II_invoke_autopilot() CMake macro that is used in user projects now
-always export the <code>compile_commands.json</code> file used for various
-tooling (such as completion backends like clangd).
-<br>
-(Matthias Maier, 2022/11/24)
-

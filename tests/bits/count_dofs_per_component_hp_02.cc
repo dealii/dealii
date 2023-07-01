@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// Copyright (C) 2003 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,8 +37,6 @@
 // in contrast to the _01 test also check that this works if the element
 // collection has more than one element
 
-
-using namespace std;
 
 template <int dim>
 void

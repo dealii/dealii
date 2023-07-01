@@ -857,7 +857,7 @@ main()
       LaplaceProblem<3> laplace_problem;
       laplace_problem.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

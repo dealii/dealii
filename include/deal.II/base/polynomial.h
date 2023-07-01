@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2021 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -507,7 +507,7 @@ namespace Polynomials
    *
    * The degrees of freedom are the values at the vertices and the derivatives
    * at the midpoint. Currently, we do not scale the polynomials in any way,
-   * although better conditioning of the element stiffness matrix could
+   * although better conditioning of the element @ref GlossStiffnessMatrix "stiffness matrix" could
    * possibly be achieved with scaling.
    *
    * Calling the constructor with a given index <tt>p</tt> will generate the
@@ -661,7 +661,7 @@ namespace Polynomials
    * for <code>degree=2</code> are $p_0(x)=(1-x)^2$, $p_1(x)=2x(x-1)$, and
    * $p_2(x)=x^2$, in accordance with the construction principle for degree 3.
    *
-   * These two relaxations improve the condition number of the mass matrix
+   * These two relaxations improve the condition number of the @ref GlossMassMatrix "mass matrix"
    * (i.e., interpolation) significantly, as can be seen from the following
    * table:
    *
@@ -875,7 +875,7 @@ namespace Polynomials
           {
             default:
               for (unsigned int e = 0; e < n_entries; ++e)
-                values[0][e] = 1.;
+                values[0][e] = weight;
               for (unsigned int k = 1; k <= n_derivatives; ++k)
                 for (unsigned int e = 0; e < n_entries; ++e)
                   values[k][e] = 0.;
@@ -897,20 +897,14 @@ namespace Polynomials
                   for (unsigned int e = 0; e < n_entries; ++e)
                     values[0][e] *= v[e];
                 }
-              // finally, multiply by the weight in the Lagrange
-              // denominator. Could be done instead of setting values[0] = 1
-              // above, but that gives different accumulation of round-off
-              // errors (multiplication is not associative) compared to when we
-              // computed the weight, and hence a basis function might not be
-              // exactly one at the center point, which is nice to have. We also
-              // multiply derivatives by k! to transform the product p_n =
-              // p^(n)(x)/k! into the actual form of the derivative
+              // finally, multiply derivatives by k! to transform the product
+              // p_n = p^(n)(x)/k! into the actual form of the derivative
               {
-                number k_factorial = 1;
-                for (unsigned int k = 0; k <= n_derivatives; ++k)
+                number k_factorial = 2;
+                for (unsigned int k = 2; k <= n_derivatives; ++k)
                   {
                     for (unsigned int e = 0; e < n_entries; ++e)
-                      values[k][e] *= k_factorial * weight;
+                      values[k][e] *= k_factorial;
                     k_factorial *= static_cast<number>(k + 1);
                   }
               }
@@ -925,13 +919,13 @@ namespace Polynomials
               {
                 std::array<Number2, n_entries> value;
                 for (unsigned int e = 0; e < n_entries; ++e)
-                  value[e] = 1.;
+                  value[e] = weight;
                 for (unsigned int i = 0; i < n_supp; ++i)
                   for (unsigned int e = 0; e < n_entries; ++e)
                     value[e] *= (x[e] - lagrange_support_points[i]);
 
                 for (unsigned int e = 0; e < n_entries; ++e)
-                  values[0][e] = weight * value[e];
+                  values[0][e] = value[e];
                 break;
               }
 
@@ -939,7 +933,7 @@ namespace Polynomials
               {
                 std::array<Number2, n_entries> value, derivative = {};
                 for (unsigned int e = 0; e < n_entries; ++e)
-                  value[e] = 1.;
+                  value[e] = weight;
                 for (unsigned int i = 0; i < n_supp; ++i)
                   for (unsigned int e = 0; e < n_entries; ++e)
                     {
@@ -950,8 +944,8 @@ namespace Polynomials
 
                 for (unsigned int e = 0; e < n_entries; ++e)
                   {
-                    values[0][e] = weight * value[e];
-                    values[1][e] = weight * derivative[e];
+                    values[0][e] = value[e];
+                    values[1][e] = derivative[e];
                   }
                 break;
               }
@@ -961,7 +955,7 @@ namespace Polynomials
                 std::array<Number2, n_entries> value, derivative = {},
                                                       second = {};
                 for (unsigned int e = 0; e < n_entries; ++e)
-                  value[e] = 1.;
+                  value[e] = weight;
                 for (unsigned int i = 0; i < n_supp; ++i)
                   for (unsigned int e = 0; e < n_entries; ++e)
                     {
@@ -973,9 +967,9 @@ namespace Polynomials
 
                 for (unsigned int e = 0; e < n_entries; ++e)
                   {
-                    values[0][e] = weight * value[e];
-                    values[1][e] = weight * derivative[e];
-                    values[2][e] = static_cast<number>(2) * weight * second[e];
+                    values[0][e] = value[e];
+                    values[1][e] = derivative[e];
+                    values[2][e] = static_cast<number>(2) * second[e];
                   }
                 break;
               }

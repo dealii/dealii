@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,8 +23,6 @@
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
@@ -43,7 +41,7 @@ namespace Utilities
       void
       all_reduce(const MPI_Op &            mpi_op,
                  const ArrayView<const T> &values,
-                 const MPI_Comm &          mpi_communicator,
+                 const MPI_Comm            mpi_communicator,
                  const ArrayView<T> &      output)
       {
         AssertDimension(values.size(), output.size());
@@ -104,7 +102,7 @@ namespace Utilities
       void
       all_reduce(const MPI_Op &                          mpi_op,
                  const ArrayView<const std::complex<T>> &values,
-                 const MPI_Comm &                        mpi_communicator,
+                 const MPI_Comm                          mpi_communicator,
                  const ArrayView<std::complex<T>> &      output)
       {
         AssertDimension(values.size(), output.size());
@@ -143,7 +141,7 @@ namespace Utilities
 
     template <typename T>
     T
-    sum(const T &t, const MPI_Comm &mpi_communicator)
+    sum(const T &t, const MPI_Comm mpi_communicator)
     {
       T return_value{};
       internal::all_reduce(MPI_SUM,
@@ -157,7 +155,7 @@ namespace Utilities
 
     template <typename T, typename U>
     void
-    sum(const T &values, const MPI_Comm &mpi_communicator, U &sums)
+    sum(const T &values, const MPI_Comm mpi_communicator, U &sums)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
                                  typename std::decay<U>::type>::value,
@@ -175,7 +173,7 @@ namespace Utilities
     template <typename T>
     void
     sum(const ArrayView<const T> &values,
-        const MPI_Comm &          mpi_communicator,
+        const MPI_Comm            mpi_communicator,
         const ArrayView<T> &      sums)
     {
       internal::all_reduce(MPI_SUM, values, mpi_communicator, sums);
@@ -185,7 +183,7 @@ namespace Utilities
 
     template <int rank, int dim, typename Number>
     Tensor<rank, dim, Number>
-    sum(const Tensor<rank, dim, Number> &t, const MPI_Comm &mpi_communicator)
+    sum(const Tensor<rank, dim, Number> &t, const MPI_Comm mpi_communicator)
     {
       // Copy the tensor into a C-style array with which we can then
       // call the other sum() function.
@@ -206,7 +204,7 @@ namespace Utilities
     template <int rank, int dim, typename Number>
     SymmetricTensor<rank, dim, Number>
     sum(const SymmetricTensor<rank, dim, Number> &local,
-        const MPI_Comm &                          mpi_communicator)
+        const MPI_Comm                            mpi_communicator)
     {
       // Copy the tensor into a C-style array with which we can then
       // call the other sum() function.
@@ -234,7 +232,7 @@ namespace Utilities
     template <typename Number>
     void
     sum(const SparseMatrix<Number> &local,
-        const MPI_Comm &            mpi_communicator,
+        const MPI_Comm              mpi_communicator,
         SparseMatrix<Number> &      global)
     {
       Assert(
@@ -258,7 +256,7 @@ namespace Utilities
 
     template <typename T>
     T
-    max(const T &t, const MPI_Comm &mpi_communicator)
+    max(const T &t, const MPI_Comm mpi_communicator)
     {
       T return_value{};
       internal::all_reduce(MPI_MAX,
@@ -272,7 +270,7 @@ namespace Utilities
 
     template <typename T, typename U>
     void
-    max(const T &values, const MPI_Comm &mpi_communicator, U &maxima)
+    max(const T &values, const MPI_Comm mpi_communicator, U &maxima)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
                                  typename std::decay<U>::type>::value,
@@ -290,7 +288,7 @@ namespace Utilities
     template <typename T>
     void
     max(const ArrayView<const T> &values,
-        const MPI_Comm &          mpi_communicator,
+        const MPI_Comm            mpi_communicator,
         const ArrayView<T> &      maxima)
     {
       internal::all_reduce(MPI_MAX, values, mpi_communicator, maxima);
@@ -300,7 +298,7 @@ namespace Utilities
 
     template <typename T>
     T
-    min(const T &t, const MPI_Comm &mpi_communicator)
+    min(const T &t, const MPI_Comm mpi_communicator)
     {
       T return_value{};
       internal::all_reduce(MPI_MIN,
@@ -314,7 +312,7 @@ namespace Utilities
 
     template <typename T, typename U>
     void
-    min(const T &values, const MPI_Comm &mpi_communicator, U &minima)
+    min(const T &values, const MPI_Comm mpi_communicator, U &minima)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
                                  typename std::decay<U>::type>::value,
@@ -332,7 +330,7 @@ namespace Utilities
     template <typename T>
     void
     min(const ArrayView<const T> &values,
-        const MPI_Comm &          mpi_communicator,
+        const MPI_Comm            mpi_communicator,
         const ArrayView<T> &      minima)
     {
       internal::all_reduce(MPI_MIN, values, mpi_communicator, minima);
@@ -342,7 +340,7 @@ namespace Utilities
 
     template <typename T>
     T
-    logical_or(const T &t, const MPI_Comm &mpi_communicator)
+    logical_or(const T &t, const MPI_Comm mpi_communicator)
     {
       static_assert(std::is_integral<T>::value,
                     "The MPI_LOR operation only allows integral data types.");
@@ -359,7 +357,7 @@ namespace Utilities
 
     template <typename T, typename U>
     void
-    logical_or(const T &values, const MPI_Comm &mpi_communicator, U &results)
+    logical_or(const T &values, const MPI_Comm mpi_communicator, U &results)
     {
       static_assert(std::is_same<typename std::decay<T>::type,
                                  typename std::decay<U>::type>::value,
@@ -389,7 +387,7 @@ namespace Utilities
     template <typename T>
     void
     logical_or(const ArrayView<const T> &values,
-               const MPI_Comm &          mpi_communicator,
+               const MPI_Comm            mpi_communicator,
                const ArrayView<T> &      results)
     {
       static_assert(std::is_integral<T>::value,
@@ -403,12 +401,12 @@ namespace Utilities
     template <typename T>
     T
     reduce(const T &                                     vec,
-           const MPI_Comm &                              comm,
+           const MPI_Comm                                comm,
            const std::function<T(const T &, const T &)> &combiner,
            const unsigned int                            root_process)
     {
 #ifdef DEAL_II_WITH_MPI
-      if (job_supports_mpi() && n_mpi_processes(comm) > 1)
+      if (n_mpi_processes(comm) > 1)
         {
           // 1) perform custom reduction
           T result = vec;
@@ -487,10 +485,10 @@ namespace Utilities
     template <typename T>
     T
     all_reduce(const T &                                     vec,
-               const MPI_Comm &                              comm,
+               const MPI_Comm                                comm,
                const std::function<T(const T &, const T &)> &combiner)
     {
-      if (job_supports_mpi() && n_mpi_processes(comm) > 1)
+      if (n_mpi_processes(comm) > 1)
         {
           // 1) perform reduction
           const auto result = Utilities::MPI::reduce<T>(vec, comm, combiner);
@@ -505,7 +503,7 @@ namespace Utilities
 
     template <typename T>
     std::vector<T>
-    compute_set_union(const std::vector<T> &vec, const MPI_Comm &comm)
+    compute_set_union(const std::vector<T> &vec, const MPI_Comm comm)
     {
       return Utilities::MPI::all_reduce<std::vector<T>>(
         vec, comm, [](const auto &set_1, const auto &set_2) {
@@ -522,7 +520,7 @@ namespace Utilities
 
     template <typename T>
     std::set<T>
-    compute_set_union(const std::set<T> &set_in, const MPI_Comm &comm)
+    compute_set_union(const std::set<T> &set_in, const MPI_Comm comm)
     {
       // convert vector to set
       std::vector<T> vector_in(set_in.begin(), set_in.end());

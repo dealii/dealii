@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2022 by the deal.II authors
+//    Copyright (C) 2017 - 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -24,25 +24,48 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-// Static empty class list
-std::vector<SmartPointer<ParameterAcceptor>> ParameterAcceptor::class_list;
+namespace internal
+{
+  struct ParameterAcceptorCompare
+  {
+    bool
+    operator()(const ParameterAcceptor *p1, const ParameterAcceptor *p2) const
+    {
+      return p1->get_acceptor_id() < p2->get_acceptor_id();
+    }
+  };
+} // namespace internal
+
+
+// Static mutex for the class list
+std::mutex ParameterAcceptor::class_list_mutex;
+
+// Static empty class set
+std::set<ParameterAcceptor *, internal::ParameterAcceptorCompare>
+  ParameterAcceptor::class_list;
+
 // Static parameter handler
 ParameterHandler ParameterAcceptor::prm;
 
 ParameterAcceptor::ParameterAcceptor(const std::string &name)
-  : acceptor_id(class_list.size())
+  : acceptor_id(ParameterAcceptor::get_next_free_id())
   , section_name(name)
 {
-  SmartPointer<ParameterAcceptor> pt(
-    this, boost::core::demangle(typeid(*this).name()).c_str());
-  class_list.push_back(pt);
+  std::lock_guard<std::mutex> l(class_list_mutex);
+  class_list.insert(this);
 }
 
 
 
 ParameterAcceptor::~ParameterAcceptor()
 {
-  class_list[acceptor_id] = nullptr;
+  std::lock_guard<std::mutex> l(class_list_mutex);
+  // Notice that it is possible that the class is no longer in the static list.
+  // This happens when the clear() method has been called. We must guard that
+  // this is not the case, and therefore we only remove ourselves from the list
+  // if we are actually there.
+  if (class_list.find(this) != class_list.end())
+    class_list.erase(this);
 }
 
 
@@ -105,6 +128,7 @@ ParameterAcceptor::initialize(std::istream &input_stream, ParameterHandler &prm)
 void
 ParameterAcceptor::clear()
 {
+  std::lock_guard<std::mutex> l(class_list_mutex);
   class_list.clear();
   prm.clear();
 }
@@ -127,13 +151,12 @@ void
 ParameterAcceptor::parse_all_parameters(ParameterHandler &prm)
 {
   for (const auto &instance : class_list)
-    if (instance != nullptr)
-      {
-        instance->enter_my_subsection(prm);
-        instance->parse_parameters(prm);
-        instance->parse_parameters_call_back();
-        instance->leave_my_subsection(prm);
-      }
+    {
+      instance->enter_my_subsection(prm);
+      instance->parse_parameters(prm);
+      instance->parse_parameters_call_back();
+      instance->leave_my_subsection(prm);
+    }
 }
 
 
@@ -142,13 +165,12 @@ void
 ParameterAcceptor::declare_all_parameters(ParameterHandler &prm)
 {
   for (const auto &instance : class_list)
-    if (instance != nullptr)
-      {
-        instance->enter_my_subsection(prm);
-        instance->declare_parameters(prm);
-        instance->declare_parameters_call_back();
-        instance->leave_my_subsection(prm);
-      }
+    {
+      instance->enter_my_subsection(prm);
+      instance->declare_parameters(prm);
+      instance->declare_parameters_call_back();
+      instance->leave_my_subsection(prm);
+    }
 }
 
 
@@ -156,7 +178,6 @@ ParameterAcceptor::declare_all_parameters(ParameterHandler &prm)
 std::vector<std::string>
 ParameterAcceptor::get_section_path() const
 {
-  Assert(acceptor_id < class_list.size(), ExcInternalError());
   const auto my_section_name = get_section_name();
   const bool is_absolute     = (my_section_name.front() == sep);
 
@@ -174,22 +195,26 @@ ParameterAcceptor::get_section_path() const
       // to ours. This is tricky. If the previous class has a path with a
       // trailing /, then the full path is used, else only the path except the
       // last one
-      for (int i = acceptor_id - 1; i >= 0; --i)
-        if (class_list[i] != nullptr)
-          {
-            bool has_trailing = class_list[i]->get_section_name().back() == sep;
-            auto previous_path = class_list[i]->get_section_path();
+      for (auto acceptor_it = class_list.rbegin();
+           acceptor_it != class_list.rend();
+           ++acceptor_it)
+        {
+          const auto acceptor = *acceptor_it;
+          if (acceptor->get_acceptor_id() >= get_acceptor_id())
+            continue;
+          bool has_trailing  = acceptor->get_section_name().back() == sep;
+          auto previous_path = acceptor->get_section_path();
 
-            // See if we need to remove last piece of the path
-            if ((previous_path.size() > 0) && has_trailing == false)
-              previous_path.resize(previous_path.size() - 1);
+          // See if we need to remove last piece of the path
+          if ((previous_path.size() > 0) && has_trailing == false)
+            previous_path.resize(previous_path.size() - 1);
 
-            sections.insert(sections.begin(),
-                            previous_path.begin(),
-                            previous_path.end());
-            // Exit the for cycle
-            break;
-          }
+          sections.insert(sections.begin(),
+                          previous_path.begin(),
+                          previous_path.end());
+          // Exit the for cycle
+          break;
+        }
     }
   // Finally, insert the remaining subsections
   sections.insert(sections.end(), subsections.begin(), subsections.end());
@@ -245,6 +270,25 @@ ParameterAcceptor::leave_my_subsection(
     {
       prm.leave_subsection();
     }
+}
+
+
+
+inline unsigned int
+ParameterAcceptor::get_acceptor_id() const
+{
+  return acceptor_id;
+}
+
+
+
+unsigned int
+ParameterAcceptor::get_next_free_id()
+{
+  static std::mutex           id_mutex;
+  std::lock_guard<std::mutex> lock(id_mutex);
+  static int                  current_id = 0;
+  return current_id++;
 }
 
 DEAL_II_NAMESPACE_CLOSE

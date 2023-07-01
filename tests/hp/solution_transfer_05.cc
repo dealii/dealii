@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2021 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,12 +88,17 @@ main()
   Vector<double> new_solution(dof_handler.n_dofs());
   solultion_trans.interpolate(solution, new_solution);
 
+  // Define compression level for output data
+  DataOutBase::VtkFlags vtk_flags;
+  vtk_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+
   // a follow-up error to the one fixed with _04 was that DataOut also got
   // itself confused
   DataOut<2> data_out2;
   data_out2.attach_dof_handler(dof_handler);
   data_out2.add_data_vector(new_solution, "Solution");
   data_out2.build_patches();
+  data_out2.set_flags(vtk_flags);
   data_out2.write_vtu(deallog.get_file_stream());
 
   // we are good if we made it to here

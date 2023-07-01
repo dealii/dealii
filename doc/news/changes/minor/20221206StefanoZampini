@@ -1,4 +1,0 @@
-Fixed: The residual assembly in step-77 contained a bug that prevented
-the correct residual from being computed. This is now fixed.
-<br>
-(Stefano Zampini, 2022/12/06)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,4 +54,12 @@ main()
 
   test<2, 2>("hyper_ball_balanced", "0,0 : 1");
   test<3, 3>("hyper_ball_balanced", "0,0,0 : 1");
+
+  test<2, 2>("subdivided_hyper_cube_with_simplices", "2 : 0.0 : 1.0 : false");
+  test<3, 3>("subdivided_hyper_cube_with_simplices", "2 : 0.0 : 1.0 : false");
+
+  test<2, 2>("subdivided_hyper_rectangle_with_simplices",
+             "2, 2 : 0.0, 0.0 : 1.0, 2.0 : false");
+  test<3, 3>("subdivided_hyper_rectangle_with_simplices",
+             "2, 2, 3 : 0.0, 0.0, 1.0 : 1.0, 2.0, 3.0 : false");
 }

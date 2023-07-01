@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -43,6 +43,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 const types::fe_index DoFHandler<dim, spacedim>::default_fe_index;
 
 
@@ -1060,10 +1061,10 @@ namespace internal
          */
         template <int spacedim>
         static void
-        reserve_space(dealii::DoFHandler<1, spacedim> &dof_handler)
+        reserve_space(DoFHandler<1, spacedim> &dof_handler)
         {
           Assert(dof_handler.fe_collection.size() > 0,
-                 (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
+                 (typename DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
                  ExcMessage("The current Triangulation must not be empty."));
           Assert(dof_handler.tria->n_levels() ==
@@ -1085,10 +1086,10 @@ namespace internal
 
         template <int spacedim>
         static void
-        reserve_space(dealii::DoFHandler<2, spacedim> &dof_handler)
+        reserve_space(DoFHandler<2, spacedim> &dof_handler)
         {
           Assert(dof_handler.fe_collection.size() > 0,
-                 (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
+                 (typename DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
                  ExcMessage("The current Triangulation must not be empty."));
           Assert(dof_handler.tria->n_levels() ==
@@ -1112,10 +1113,10 @@ namespace internal
 
         template <int spacedim>
         static void
-        reserve_space(dealii::DoFHandler<3, spacedim> &dof_handler)
+        reserve_space(DoFHandler<3, spacedim> &dof_handler)
         {
           Assert(dof_handler.fe_collection.size() > 0,
-                 (typename dealii::DoFHandler<1, spacedim>::ExcNoFESelected()));
+                 (typename DoFHandler<1, spacedim>::ExcNoFESelected()));
           Assert(dof_handler.tria->n_levels() > 0,
                  ExcMessage("The current Triangulation must not be empty."));
           Assert(dof_handler.tria->n_levels() ==
@@ -1327,15 +1328,18 @@ namespace internal
               // to have functions that can pack and unpack the data we want to
               // transport -- namely, the single unsigned int active_fe_index
               // objects
-              auto pack = [](const typename dealii::DoFHandler<dim, spacedim>::
-                               active_cell_iterator &cell) -> types::fe_index {
+              auto pack =
+                [](
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    &cell) -> types::fe_index {
                 return cell->active_fe_index();
               };
 
-              auto unpack = [&dof_handler](
-                              const typename dealii::DoFHandler<dim, spacedim>::
-                                active_cell_iterator &cell,
-                              const types::fe_index   active_fe_index) -> void {
+              auto unpack =
+                [&dof_handler](
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    &                   cell,
+                  const types::fe_index active_fe_index) -> void {
                 // we would like to say
                 //   cell->set_active_fe_index(active_fe_index);
                 // but this is not allowed on cells that are not
@@ -1347,7 +1351,7 @@ namespace internal
 
               GridTools::exchange_cell_data_to_ghosts<
                 types::fe_index,
-                dealii::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
+                DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
             }
           else
             {
@@ -1413,17 +1417,19 @@ namespace internal
                            DistributedTriangulationBase<dim, spacedim> *>(
                          &dof_handler.get_triangulation()))
             {
-              auto pack = [&dof_handler](
-                            const typename dealii::DoFHandler<dim, spacedim>::
-                              active_cell_iterator &cell) -> types::fe_index {
+              auto pack =
+                [&dof_handler](
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    &cell) -> types::fe_index {
                 return dof_handler
                   .hp_cell_future_fe_indices[cell->level()][cell->index()];
               };
 
-              auto unpack = [&dof_handler](
-                              const typename dealii::DoFHandler<dim, spacedim>::
-                                active_cell_iterator &cell,
-                              const types::fe_index   future_fe_index) -> void {
+              auto unpack =
+                [&dof_handler](
+                  const typename DoFHandler<dim, spacedim>::active_cell_iterator
+                    &                   cell,
+                  const types::fe_index future_fe_index) -> void {
                 dof_handler
                   .hp_cell_future_fe_indices[cell->level()][cell->index()] =
                   future_fe_index;
@@ -1431,7 +1437,7 @@ namespace internal
 
               GridTools::exchange_cell_data_to_ghosts<
                 types::fe_index,
-                dealii::DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
+                DoFHandler<dim, spacedim>>(dof_handler, pack, unpack);
             }
           else
             {
@@ -1711,6 +1717,7 @@ namespace internal
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 DoFHandler<dim, spacedim>::DoFHandler()
   : hp_capability_enabled(true)
   , tria(nullptr, typeid(*this).name())
@@ -1720,6 +1727,7 @@ DoFHandler<dim, spacedim>::DoFHandler()
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
   : DoFHandler()
 {
@@ -1729,6 +1737,7 @@ DoFHandler<dim, spacedim>::DoFHandler(const Triangulation<dim, spacedim> &tria)
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 DoFHandler<dim, spacedim>::~DoFHandler()
 {
   // unsubscribe all attachments to signals of the underlying triangulation
@@ -1755,8 +1764,8 @@ DoFHandler<dim, spacedim>::~DoFHandler()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
 {
   //
   // call destructor
@@ -1795,8 +1804,9 @@ DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
 /*------------------------ Cell iterator functions ------------------------*/
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename DoFHandler<dim, spacedim>::cell_iterator
-DoFHandler<dim, spacedim>::begin(const unsigned int level) const
+  DoFHandler<dim, spacedim>::begin(const unsigned int level) const
 {
   typename Triangulation<dim, spacedim>::cell_iterator cell =
     this->get_triangulation().begin(level);
@@ -1808,8 +1818,9 @@ DoFHandler<dim, spacedim>::begin(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename DoFHandler<dim, spacedim>::active_cell_iterator
-DoFHandler<dim, spacedim>::begin_active(const unsigned int level) const
+  DoFHandler<dim, spacedim>::begin_active(const unsigned int level) const
 {
   // level is checked in begin
   cell_iterator i = begin(level);
@@ -1824,8 +1835,9 @@ DoFHandler<dim, spacedim>::begin_active(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename DoFHandler<dim, spacedim>::cell_iterator
-DoFHandler<dim, spacedim>::end() const
+  DoFHandler<dim, spacedim>::end() const
 {
   return cell_iterator(&this->get_triangulation(), -1, -1, this);
 }
@@ -1833,8 +1845,9 @@ DoFHandler<dim, spacedim>::end() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename DoFHandler<dim, spacedim>::cell_iterator
-DoFHandler<dim, spacedim>::end(const unsigned int level) const
+  DoFHandler<dim, spacedim>::end(const unsigned int level) const
 {
   typename Triangulation<dim, spacedim>::cell_iterator cell =
     this->get_triangulation().end(level);
@@ -1846,8 +1859,9 @@ DoFHandler<dim, spacedim>::end(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename DoFHandler<dim, spacedim>::active_cell_iterator
-DoFHandler<dim, spacedim>::end_active(const unsigned int level) const
+  DoFHandler<dim, spacedim>::end_active(const unsigned int level) const
 {
   typename Triangulation<dim, spacedim>::cell_iterator cell =
     this->get_triangulation().end_active(level);
@@ -1859,8 +1873,9 @@ DoFHandler<dim, spacedim>::end_active(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename DoFHandler<dim, spacedim>::level_cell_iterator
-DoFHandler<dim, spacedim>::begin_mg(const unsigned int level) const
+  DoFHandler<dim, spacedim>::begin_mg(const unsigned int level) const
 {
   Assert(this->has_level_dofs(),
          ExcMessage("You can only iterate over mg "
@@ -1875,8 +1890,9 @@ DoFHandler<dim, spacedim>::begin_mg(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename DoFHandler<dim, spacedim>::level_cell_iterator
-DoFHandler<dim, spacedim>::end_mg(const unsigned int level) const
+  DoFHandler<dim, spacedim>::end_mg(const unsigned int level) const
 {
   Assert(this->has_level_dofs(),
          ExcMessage("You can only iterate over mg "
@@ -1891,8 +1907,9 @@ DoFHandler<dim, spacedim>::end_mg(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename DoFHandler<dim, spacedim>::level_cell_iterator
-DoFHandler<dim, spacedim>::end_mg() const
+  DoFHandler<dim, spacedim>::end_mg() const
 {
   return level_cell_iterator(&this->get_triangulation(), -1, -1, this);
 }
@@ -1900,8 +1917,10 @@ DoFHandler<dim, spacedim>::end_mg() const
 
 
 template <int dim, int spacedim>
-IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
-DoFHandler<dim, spacedim>::cell_iterators() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator> DoFHandler<
+  dim,
+  spacedim>::cell_iterators() const
 {
   return IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>(
     begin(), end());
@@ -1910,8 +1929,10 @@ DoFHandler<dim, spacedim>::cell_iterators() const
 
 
 template <int dim, int spacedim>
-IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
-DoFHandler<dim, spacedim>::active_cell_iterators() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename DoFHandler<dim, spacedim>::
+                active_cell_iterator> DoFHandler<dim, spacedim>::
+  active_cell_iterators() const
 {
   return IteratorRange<
     typename DoFHandler<dim, spacedim>::active_cell_iterator>(begin_active(),
@@ -1921,8 +1942,10 @@ DoFHandler<dim, spacedim>::active_cell_iterators() const
 
 
 template <int dim, int spacedim>
-IteratorRange<typename DoFHandler<dim, spacedim>::level_cell_iterator>
-DoFHandler<dim, spacedim>::mg_cell_iterators() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<
+  typename DoFHandler<dim, spacedim>::
+    level_cell_iterator> DoFHandler<dim, spacedim>::mg_cell_iterators() const
 {
   return IteratorRange<typename DoFHandler<dim, spacedim>::level_cell_iterator>(
     begin_mg(), end_mg());
@@ -1931,9 +1954,10 @@ DoFHandler<dim, spacedim>::mg_cell_iterators() const
 
 
 template <int dim, int spacedim>
-IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>
-DoFHandler<dim, spacedim>::cell_iterators_on_level(
-  const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator> DoFHandler<
+  dim,
+  spacedim>::cell_iterators_on_level(const unsigned int level) const
 {
   return IteratorRange<typename DoFHandler<dim, spacedim>::cell_iterator>(
     begin(level), end(level));
@@ -1942,9 +1966,10 @@ DoFHandler<dim, spacedim>::cell_iterators_on_level(
 
 
 template <int dim, int spacedim>
-IteratorRange<typename DoFHandler<dim, spacedim>::active_cell_iterator>
-DoFHandler<dim, spacedim>::active_cell_iterators_on_level(
-  const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename DoFHandler<dim, spacedim>::
+                active_cell_iterator> DoFHandler<dim, spacedim>::
+  active_cell_iterators_on_level(const unsigned int level) const
 {
   return IteratorRange<
     typename DoFHandler<dim, spacedim>::active_cell_iterator>(
@@ -1954,9 +1979,10 @@ DoFHandler<dim, spacedim>::active_cell_iterators_on_level(
 
 
 template <int dim, int spacedim>
-IteratorRange<typename DoFHandler<dim, spacedim>::level_cell_iterator>
-DoFHandler<dim, spacedim>::mg_cell_iterators_on_level(
-  const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename DoFHandler<dim, spacedim>::
+                level_cell_iterator> DoFHandler<dim, spacedim>::
+  mg_cell_iterators_on_level(const unsigned int level) const
 {
   return IteratorRange<typename DoFHandler<dim, spacedim>::level_cell_iterator>(
     begin_mg(level), end_mg(level));
@@ -1969,8 +1995,8 @@ DoFHandler<dim, spacedim>::mg_cell_iterators_on_level(
 
 
 template <int dim, int spacedim>
-types::global_dof_index
-DoFHandler<dim, spacedim>::n_boundary_dofs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+types::global_dof_index DoFHandler<dim, spacedim>::n_boundary_dofs() const
 {
   Assert(!(dim == 2 && spacedim == 3) || hp_capability_enabled == false,
          ExcNotImplementedWithHP());
@@ -2018,8 +2044,8 @@ DoFHandler<dim, spacedim>::n_boundary_dofs() const
 
 
 template <int dim, int spacedim>
-types::global_dof_index
-DoFHandler<dim, spacedim>::n_boundary_dofs(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+types::global_dof_index DoFHandler<dim, spacedim>::n_boundary_dofs(
   const std::set<types::boundary_id> &boundary_ids) const
 {
   Assert(!(dim == 2 && spacedim == 3) || hp_capability_enabled == false,
@@ -2070,8 +2096,8 @@ DoFHandler<dim, spacedim>::n_boundary_dofs(
 
 
 template <int dim, int spacedim>
-std::size_t
-DoFHandler<dim, spacedim>::memory_consumption() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+std::size_t DoFHandler<dim, spacedim>::memory_consumption() const
 {
   std::size_t mem = MemoryConsumption::memory_consumption(this->tria) +
                     MemoryConsumption::memory_consumption(this->fe_collection) +
@@ -2114,8 +2140,8 @@ DoFHandler<dim, spacedim>::memory_consumption() const
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::distribute_dofs(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::distribute_dofs(
   const FiniteElement<dim, spacedim> &fe)
 {
   this->distribute_dofs(hp::FECollection<dim, spacedim>(fe));
@@ -2124,18 +2150,42 @@ DoFHandler<dim, spacedim>::distribute_dofs(
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::distribute_dofs(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::distribute_dofs(
   const hp::FECollection<dim, spacedim> &ff)
 {
-  Assert(
-    this->tria != nullptr,
-    ExcMessage(
-      "You need to set the Triangulation in the DoFHandler using reinit() or "
-      "in the constructor before you can distribute DoFs."));
+  Assert(this->tria != nullptr,
+         ExcMessage(
+           "You need to set the Triangulation in the DoFHandler using reinit() "
+           "or in the constructor before you can distribute DoFs."));
   Assert(this->tria->n_levels() > 0,
          ExcMessage("The Triangulation you are using is empty!"));
-  Assert(ff.size() > 0, ExcMessage("The hp::FECollection given is empty!"));
+
+  // verify size of provided FE collection
+  Assert(ff.size() > 0, ExcMessage("The given hp::FECollection is empty!"));
+  Assert((ff.size() <= std::numeric_limits<types::fe_index>::max()) &&
+           (ff.size() != numbers::invalid_fe_index),
+         ExcMessage("The given hp::FECollection contains more finite elements "
+                    "than the DoFHandler can cover with active FE indices."));
+
+#ifdef DEBUG
+  // make sure that the provided FE collection is large enough to
+  // cover all FE indices presently in use on the mesh
+  if ((hp_cell_active_fe_indices.size() > 0) &&
+      (hp_cell_future_fe_indices.size() > 0))
+    {
+      Assert(hp_capability_enabled, ExcInternalError());
+
+      for (const auto &cell :
+           this->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
+        {
+          Assert(cell->active_fe_index() < ff.size(),
+                 ExcInvalidFEIndex(cell->active_fe_index(), ff.size()));
+          Assert(cell->future_fe_index() < ff.size(),
+                 ExcInvalidFEIndex(cell->future_fe_index(), ff.size()));
+        }
+    }
+#endif
 
   //
   // register the new finite element collection
@@ -2184,22 +2234,6 @@ DoFHandler<dim, spacedim>::distribute_dofs(
       // on both its own cells and all ghost cells
       internal::hp::DoFHandlerImplementation::Implementation::
         communicate_active_fe_indices(*this);
-
-#ifdef DEBUG
-      // make sure that the FE collection is large enough to
-      // cover all FE indices presently in use on the mesh
-      for (const auto &cell : this->active_cell_iterators())
-        {
-          if (!cell->is_artificial())
-            Assert(cell->active_fe_index() < this->fe_collection.size(),
-                   ExcInvalidFEIndex(cell->active_fe_index(),
-                                     this->fe_collection.size()));
-          if (cell->is_locally_owned())
-            Assert(cell->future_fe_index() < this->fe_collection.size(),
-                   ExcInvalidFEIndex(cell->future_fe_index(),
-                                     this->fe_collection.size()));
-        }
-#endif
     }
 
   {
@@ -2255,8 +2289,8 @@ DoFHandler<dim, spacedim>::distribute_dofs(
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::distribute_mg_dofs()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::distribute_mg_dofs()
 {
   AssertThrow(hp_capability_enabled == false, ExcNotImplementedWithHP());
 
@@ -2287,8 +2321,8 @@ DoFHandler<dim, spacedim>::distribute_mg_dofs()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::initialize_local_block_info()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::initialize_local_block_info()
 {
   AssertThrow(hp_capability_enabled == false, ExcNotImplementedWithHP());
 
@@ -2298,8 +2332,8 @@ DoFHandler<dim, spacedim>::initialize_local_block_info()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::setup_policy()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::setup_policy()
 {
   // decide whether we need a sequential or a parallel distributed policy
   if (dynamic_cast<const dealii::parallel::shared::Triangulation<dim, spacedim>
@@ -2321,8 +2355,8 @@ DoFHandler<dim, spacedim>::setup_policy()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::clear()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::clear()
 {
   // release memory
   this->clear_space();
@@ -2332,8 +2366,8 @@ DoFHandler<dim, spacedim>::clear()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::clear_space()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::clear_space()
 {
   object_dof_indices.clear();
 
@@ -2348,8 +2382,8 @@ DoFHandler<dim, spacedim>::clear_space()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::clear_mg_space()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::clear_mg_space()
 {
   this->mg_levels.clear();
   this->mg_faces.reset();
@@ -2364,8 +2398,8 @@ DoFHandler<dim, spacedim>::clear_mg_space()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::renumber_dofs(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::renumber_dofs(
   const std::vector<types::global_dof_index> &new_numbers)
 {
   if (hp_capability_enabled)
@@ -2476,8 +2510,8 @@ DoFHandler<dim, spacedim>::renumber_dofs(
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::renumber_dofs(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::renumber_dofs(
   const unsigned int                          level,
   const std::vector<types::global_dof_index> &new_numbers)
 {
@@ -2519,8 +2553,9 @@ DoFHandler<dim, spacedim>::renumber_dofs(
 
 
 template <int dim, int spacedim>
-unsigned int
-DoFHandler<dim, spacedim>::max_couplings_between_boundary_dofs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int DoFHandler<dim, spacedim>::max_couplings_between_boundary_dofs()
+  const
 {
   Assert(this->fe_collection.size() > 0, ExcNoFESelected());
 
@@ -2553,8 +2588,8 @@ DoFHandler<dim, spacedim>::max_couplings_between_boundary_dofs() const
 
 
 template <int dim, int spacedim>
-unsigned int
-DoFHandler<dim, spacedim>::max_couplings_between_dofs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int DoFHandler<dim, spacedim>::max_couplings_between_dofs() const
 {
   Assert(this->fe_collection.size() > 0, ExcNoFESelected());
   return internal::DoFHandlerImplementation::Implementation::
@@ -2564,8 +2599,8 @@ DoFHandler<dim, spacedim>::max_couplings_between_dofs() const
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::set_active_fe_indices(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::set_active_fe_indices(
   const std::vector<types::fe_index> &active_fe_indices)
 {
   Assert(active_fe_indices.size() == this->get_triangulation().n_active_cells(),
@@ -2585,8 +2620,8 @@ DoFHandler<dim, spacedim>::set_active_fe_indices(
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::set_active_fe_indices(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::set_active_fe_indices(
   const std::vector<unsigned int> &active_fe_indices)
 {
   set_active_fe_indices(std::vector<types::fe_index>(active_fe_indices.begin(),
@@ -2596,8 +2631,9 @@ DoFHandler<dim, spacedim>::set_active_fe_indices(
 
 
 template <int dim, int spacedim>
-std::vector<types::fe_index>
-DoFHandler<dim, spacedim>::get_active_fe_indices() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+std::vector<types::fe_index> DoFHandler<dim, spacedim>::get_active_fe_indices()
+  const
 {
   std::vector<types::fe_index> active_fe_indices(
     this->get_triangulation().n_active_cells(), numbers::invalid_fe_index);
@@ -2615,8 +2651,8 @@ DoFHandler<dim, spacedim>::get_active_fe_indices() const
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::get_active_fe_indices(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::get_active_fe_indices(
   std::vector<unsigned int> &active_fe_indices) const
 {
   const std::vector<types::fe_index> indices = get_active_fe_indices();
@@ -2627,8 +2663,8 @@ DoFHandler<dim, spacedim>::get_active_fe_indices(
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::set_future_fe_indices(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::set_future_fe_indices(
   const std::vector<types::fe_index> &future_fe_indices)
 {
   Assert(future_fe_indices.size() == this->get_triangulation().n_active_cells(),
@@ -2650,8 +2686,9 @@ DoFHandler<dim, spacedim>::set_future_fe_indices(
 
 
 template <int dim, int spacedim>
-std::vector<types::fe_index>
-DoFHandler<dim, spacedim>::get_future_fe_indices() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+std::vector<types::fe_index> DoFHandler<dim, spacedim>::get_future_fe_indices()
+  const
 {
   std::vector<types::fe_index> future_fe_indices(
     this->get_triangulation().n_active_cells(), numbers::invalid_fe_index);
@@ -2669,8 +2706,8 @@ DoFHandler<dim, spacedim>::get_future_fe_indices() const
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
 {
   // make sure this is called during initialization in hp-mode
   Assert(hp_capability_enabled, ExcOnlyAvailableWithHP());
@@ -2761,8 +2798,8 @@ DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::create_active_fe_table()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::create_active_fe_table()
 {
   AssertThrow(hp_capability_enabled == true, ExcOnlyAvailableWithHP());
 
@@ -2812,8 +2849,8 @@ DoFHandler<dim, spacedim>::create_active_fe_table()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::update_active_fe_table()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::update_active_fe_table()
 {
   //  // Normally only one level is added, but if this Triangulation
   //  // is created by copy_triangulation, it can be more than one level.
@@ -2850,8 +2887,8 @@ DoFHandler<dim, spacedim>::update_active_fe_table()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::pre_transfer_action()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::pre_transfer_action()
 {
   Assert(this->active_fe_index_transfer == nullptr, ExcInternalError());
 
@@ -2864,8 +2901,8 @@ DoFHandler<dim, spacedim>::pre_transfer_action()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
 {
 #ifndef DEAL_II_WITH_P4EST
   Assert(false,
@@ -2931,8 +2968,8 @@ DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::post_transfer_action()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::post_transfer_action()
 {
   update_active_fe_table();
 
@@ -2954,8 +2991,8 @@ DoFHandler<dim, spacedim>::post_transfer_action()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::post_distributed_transfer_action()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::post_distributed_transfer_action()
 {
 #ifndef DEAL_II_WITH_P4EST
   Assert(false, ExcInternalError());
@@ -2986,8 +3023,8 @@ DoFHandler<dim, spacedim>::post_distributed_transfer_action()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
 {
 #ifndef DEAL_II_WITH_P4EST
   Assert(false,
@@ -3044,8 +3081,8 @@ DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::deserialize_active_fe_indices()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::deserialize_active_fe_indices()
 {
 #ifndef DEAL_II_WITH_P4EST
   Assert(false,
@@ -3108,6 +3145,7 @@ DoFHandler<dim, spacedim>::deserialize_active_fe_indices()
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs()
   : coarsest_level(numbers::invalid_unsigned_int)
   , finest_level(0)
@@ -3116,8 +3154,8 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs()
 
 
 template <int dim, int spacedim>
-void
-DoFHandler<dim, spacedim>::MGVertexDoFs::init(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void DoFHandler<dim, spacedim>::MGVertexDoFs::init(
   const unsigned int cl,
   const unsigned int fl,
   const unsigned int dofs_per_vertex)
@@ -3142,8 +3180,8 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::init(
 
 
 template <int dim, int spacedim>
-unsigned int
-DoFHandler<dim, spacedim>::MGVertexDoFs::get_coarsest_level() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_coarsest_level() const
 {
   return coarsest_level;
 }
@@ -3151,8 +3189,8 @@ DoFHandler<dim, spacedim>::MGVertexDoFs::get_coarsest_level() const
 
 
 template <int dim, int spacedim>
-unsigned int
-DoFHandler<dim, spacedim>::MGVertexDoFs::get_finest_level() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_finest_level() const
 {
   return finest_level;
 }

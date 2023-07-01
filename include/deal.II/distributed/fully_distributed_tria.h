@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,8 +105,11 @@ namespace parallel
      * @note Currently only simple periodicity conditions (i.e. without offsets
      *       and rotation matrices - see also the documentation of
      *       GridTools::collect_periodic_faces()) are supported.
+     *
+     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
      */
     template <int dim, int spacedim = dim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public parallel::DistributedTriangulationBase<dim, spacedim>
     {
@@ -126,7 +129,7 @@ namespace parallel
        * @param mpi_communicator The MPI communicator to be used for the
        *                         triangulation.
        */
-      explicit Triangulation(const MPI_Comm &mpi_communicator);
+      explicit Triangulation(const MPI_Comm mpi_communicator);
 
       /**
        * Destructor.

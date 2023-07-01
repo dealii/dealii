@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,6 +53,7 @@ namespace hp
   class FECollection;
 } // namespace hp
 template <class MeshType>
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 class InterGridMap;
 template <int dim, int spacedim>
 class Mapping;
@@ -134,7 +135,7 @@ namespace DoFTools
  * With this vector, one can get, for any given degree of freedom, a unique
  * number among those DoFs that sit on the boundary; or, if your DoF was
  * interior to the domain, the result would be numbers::invalid_dof_index.
- * We need this mapping, for example, to build the mass matrix on the boundary
+ * We need this mapping, for example, to build the @ref GlossMassMatrix "mass matrix" on the boundary
  * (for this, see make_boundary_sparsity_pattern() function, the corresponding
  * section below, as well as the MatrixCreator namespace documentation).
  *
@@ -626,8 +627,8 @@ namespace DoFTools
    * in the triangulation. By default flux couplings are added over all internal
    * faces. @p face_has_flux_coupling should be a function that takes an
    * active_cell_iterator and a face index and should return true if there is a
-   * flux coupling over the face. When using the ::dealii::DoFHandler we could,
-   * for example, use
+   * flux coupling over the face. When using DoFHandler we could, for example,
+   * use
    *
    * @code
    *  auto face_has_flux_coupling =
@@ -1029,9 +1030,9 @@ namespace DoFTools
   template <typename FaceIterator, typename number>
   void
   make_periodicity_constraints(
-    const FaceIterator &                         face_1,
-    const typename identity<FaceIterator>::type &face_2,
-    AffineConstraints<number> &                  constraints,
+    const FaceIterator &                            face_1,
+    const std_cxx20::type_identity_t<FaceIterator> &face_2,
+    AffineConstraints<number> &                     constraints,
     const ComponentMask &            component_mask   = ComponentMask(),
     const bool                       face_orientation = true,
     const bool                       face_flip        = false,
@@ -2126,7 +2127,7 @@ namespace DoFTools
    * vector.
    */
   template <int dim, int spacedim>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   get_active_fe_indices(const DoFHandler<dim, spacedim> &dof_handler,
                         std::vector<unsigned int> &      active_fe_indices);
 
@@ -2247,10 +2248,10 @@ namespace DoFTools
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points(
-    const dealii::hp::MappingCollection<dim, spacedim> &mapping,
-    const DoFHandler<dim, spacedim> &                   dof_handler,
-    std::vector<Point<spacedim>> &                      support_points,
-    const ComponentMask &                               mask = ComponentMask());
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof_handler,
+    std::vector<Point<spacedim>> &              support_points,
+    const ComponentMask &                       mask = ComponentMask());
 
   /**
    * This function is a version of the above map_dofs_to_support_points
@@ -2273,17 +2274,37 @@ namespace DoFTools
    * is of course dense, i.e., every DoF is to be found in it.
    *
    * @param[in] mapping The mapping from the reference cell to the real cell on
-   * which DoFs are defined.
+   *   which DoFs are defined.
    * @param[in] dof_handler The object that describes which DoF indices live on
-   * which cell of the triangulation.
-   * @param[in,out] support_points A map that for every locally relevant DoF
-   * index contains the corresponding location in real space coordinates.
-   * Previous content of this object is deleted in this function.
+   *   which cell of the triangulation.
    * @param[in] mask An optional component mask that restricts the
-   * components from which the support points are extracted.
+   *   components from which the support points are extracted.
+   * @return A map that for every locally relevant DoF
+   *   index contains the corresponding location in real space coordinates.
    */
   template <int dim, int spacedim>
-  void
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
+                             const DoFHandler<dim, spacedim> &dof_handler,
+                             const ComponentMask &mask = ComponentMask());
+
+  /**
+   * Same as the previous function but for the hp-case.
+   */
+  template <int dim, int spacedim>
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof_handler,
+    const ComponentMask &                       mask = ComponentMask());
+
+  /**
+   * A version of the function of same name that returns the map via its third
+   * argument. This function is deprecated.
+   * @deprecated Use the function that returns the `std::map` instead.
+   */
+  template <int dim, int spacedim>
+  DEAL_II_DEPRECATED void
   map_dofs_to_support_points(
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
@@ -2291,12 +2312,14 @@ namespace DoFTools
     const ComponentMask &                               mask = ComponentMask());
 
   /**
-   * Same as the previous function but for the hp-case.
+   * A version of the function of same name that returns the map via its third
+   * argument. This function is deprecated.
+   * @deprecated Use the function that returns the `std::map` instead.
    */
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   map_dofs_to_support_points(
-    const dealii::hp::MappingCollection<dim, spacedim> &mapping,
+    const hp::MappingCollection<dim, spacedim> &        mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
     const ComponentMask &                               mask = ComponentMask());
@@ -2379,7 +2402,8 @@ namespace DoFTools
    * given map @p support_points.  For each support point location, a string
    * label containing a list of all DoFs from the map is generated.  The map
    * can be generated with a call to map_dofs_to_support_points() and is useful
-   * to visualize location and global numbering of unknowns.
+   * to visualize location and global numbering of unknowns. This function is
+   * used in step-2.
    *
    * An example for the format of each line in the output is:
    * @code

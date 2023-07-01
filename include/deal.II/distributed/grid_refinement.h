@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2020 by the deal.II authors
+// Copyright (C) 2009 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,7 @@ namespace internal
         std::pair<number, number>
         compute_global_min_and_max_at_root(
           const dealii::Vector<number> &criteria,
-          const MPI_Comm &              mpi_communicator);
+          const MPI_Comm                mpi_communicator);
 
         namespace RefineAndCoarsenFixedNumber
         {
@@ -60,7 +60,7 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const types::global_cell_index   n_target_cells,
-                            const MPI_Comm &                 mpi_communicator);
+                            const MPI_Comm                   mpi_communicator);
         } // namespace RefineAndCoarsenFixedNumber
 
         namespace RefineAndCoarsenFixedFraction
@@ -68,7 +68,9 @@ namespace internal
           /**
            * Compute a threshold value so that the error accumulated over all
            * criteria[i] so that
+           * @code
            *     criteria[i] > threshold
+           * @endcode
            * is larger than target_error.
            */
           template <typename number>
@@ -76,7 +78,7 @@ namespace internal
           compute_threshold(const dealii::Vector<number> &   criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const double                     target_error,
-                            const MPI_Comm &                 mpi_communicator);
+                            const MPI_Comm                   mpi_communicator);
         } // namespace RefineAndCoarsenFixedFraction
       }   // namespace GridRefinement
     }     // namespace distributed

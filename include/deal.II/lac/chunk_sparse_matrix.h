@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -953,7 +953,7 @@ public:
    * Return the square of the norm of the vector $v$ with respect to the norm
    * induced by this matrix, i.e. $\left(v,Mv\right)$. This is useful, e.g. in
    * the finite element context, where the $L_2$ norm of a function equals the
-   * matrix norm with respect to the mass matrix of the vector representing
+   * matrix norm with respect to the @ref GlossMassMatrix "mass matrix" of the vector representing
    * the nodal values of the finite element function.
    *
    * Obviously, the matrix needs to be quadratic for this operation, and for

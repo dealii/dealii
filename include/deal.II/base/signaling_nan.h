@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,6 +78,18 @@ namespace numbers
         invalid_element()
         {
           return std::numeric_limits<double>::signaling_NaN();
+        }
+      };
+
+
+      template <typename T, size_t width>
+      struct NaNInitializer<VectorizedArray<T, width>>
+      {
+        static VectorizedArray<T, width>
+        invalid_element()
+        {
+          return VectorizedArray<T, width>(
+            NaNInitializer<T>::invalid_element());
         }
       };
 

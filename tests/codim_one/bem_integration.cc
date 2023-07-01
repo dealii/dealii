@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2021 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,9 +57,7 @@
 #include <iostream>
 #include <string>
 
-using namespace std;
-
-ofstream logfile("output");
+std::ofstream logfile("output");
 
 
 template <int dim>
@@ -74,7 +72,7 @@ public:
 
   void
   compute_SD_integral_on_cell(
-    vector<double> &                                         dst,
+    std::vector<double> &                                    dst,
     typename DoFHandler<dim, dim + 1>::active_cell_iterator &cell,
     const Point<dim + 1> &                                   point);
 
@@ -95,14 +93,14 @@ private:
 template <>
 LaplaceKernelIntegration<2>::LaplaceKernelIntegration()
 {
-  static FE_DGP<2, 3> fe(0);
-  vector<Point<2>>    qps(5);
+  static FE_DGP<2, 3>   fe(0);
+  std::vector<Point<2>> qps(5);
   qps[0] = Point<2>(0, 0);
   qps[1] = Point<2>(0, 1);
   qps[2] = Point<2>(1, 0);
   qps[3] = Point<2>(1, 1);
   qps[4] = Point<2>(.5, .5);
-  vector<double>       ws(5, 1.);
+  std::vector<double>  ws(5, 1.);
   static Quadrature<2> quadrature(qps, ws);
   fe_values = new FEValues<2, 3>(
     fe, quadrature, update_values | update_jacobians | update_normal_vectors);
@@ -120,22 +118,22 @@ LaplaceKernelIntegration<dim>::~LaplaceKernelIntegration()
 template <>
 void
 LaplaceKernelIntegration<2>::compute_SD_integral_on_cell(
-  vector<double> &                        dst,
+  std::vector<double> &                   dst,
   DoFHandler<2, 3>::active_cell_iterator &cell,
   const Point<3> &                        point)
 {
   Assert(dst.size() == 2, ExcDimensionMismatch(dst.size(), 2));
   fe_values->reinit(cell);
-  vector<DerivativeForm<1, 2, 3>> jacobians = fe_values->get_jacobians();
-  vector<Tensor<1, 3>>            normals   = fe_values->get_normal_vectors();
+  std::vector<DerivativeForm<1, 2, 3>> jacobians = fe_values->get_jacobians();
+  std::vector<Tensor<1, 3>> normals = fe_values->get_normal_vectors();
 
   Tensor<1, 3> n, n_c;
   Tensor<1, 3> r_c = point - cell->center();
   n_c              = normals[4];
 
-  double         rn_c = r_c * n_c;
-  vector<double> i_S(4);
-  vector<double> i_D(4);
+  double              rn_c = r_c * n_c;
+  std::vector<double> i_S(4);
+  std::vector<double> i_D(4);
   for (unsigned int q_point = 0; q_point < 4; ++q_point)
     {
       const Tensor<1, 3> r  = point - cell->vertex(q_point);
@@ -198,7 +196,7 @@ integration(Point<3> point)
   DoFHandler<2, 3>::active_cell_iterator cell = dof_handler.begin_active();
 
   LaplaceKernelIntegration<2> laplace;
-  vector<double>              integrals(2);
+  std::vector<double>         integrals(2);
   laplace.compute_SD_integral_on_cell(integrals, cell, point);
   return integrals[0];
 }
@@ -215,17 +213,17 @@ main()
   Point<3> point(.5, .5, 0);
   double   true_result = -3.163145629 / numbers::PI;
   deallog << "Error on  " << point << " : " << integration(point) - true_result
-          << endl;
+          << std::endl;
 
   point       = Point<3>(3, 3, 0);
   true_result = -.2306783616;
   deallog << "Error on  " << point << " : " << integration(point) - true_result
-          << endl;
+          << std::endl;
 
   point       = Point<3>(1.5, .5, 0);
   true_result = -1.006860525;
   deallog << "Error on  " << point << " : " << integration(point) - true_result
-          << endl;
+          << std::endl;
 
   return 0;
 }

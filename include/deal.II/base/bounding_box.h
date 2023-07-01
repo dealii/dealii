@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -143,6 +143,22 @@ public:
   BoundingBox() = default;
 
   /**
+   * Standard copy constructor operator.
+   */
+  BoundingBox(const BoundingBox<spacedim, Number> &box) = default;
+
+  /**
+   * Standard copy assignment operator.
+   */
+  BoundingBox<spacedim, Number> &
+  operator=(const BoundingBox<spacedim, Number> &t) = default;
+
+  /**
+   * Standard constructor for an empty box around a point @p point.
+   */
+  BoundingBox(const Point<spacedim, Number> &point);
+
+  /**
    * Standard constructor for non-empty boxes: it uses a pair of points
    * which describe the box: one for the bottom and one for the top
    * corner.
@@ -234,6 +250,29 @@ public:
   extend(const Number amount);
 
   /**
+   * The same as above with the difference that a new BoundingBox instance is
+   * created without changing the current object.
+   */
+  BoundingBox<spacedim, Number>
+  create_extended(const Number amount) const;
+
+  /**
+   * Increase (or decrease) each side of the bounding box by the given
+   * @p relative_amount.
+   *
+   * After calling this method, the lower left corner of the bounding box will
+   * have each coordinate decreased by @p relative_amount * side_length(direction),
+   * and the upper right corner of the bounding box will have each coordinate
+   * increased by @p relative_amount * side_length(direction).
+   *
+   * If you call this method with a negative number, and one of the axes of the
+   * original bounding box is smaller than relative_amount *
+   * side_length(direction) / 2, the method will trigger an assertion.
+   */
+  BoundingBox<spacedim, Number>
+  create_extended_relative(const Number relative_amount) const;
+
+  /**
    * Compute the volume (i.e. the dim-dimensional measure) of the BoundingBox.
    */
   double
@@ -314,6 +353,24 @@ public:
    */
   Point<spacedim, Number>
   unit_to_real(const Point<spacedim, Number> &point) const;
+  /**
+   * Returns the signed distance from a @p point orthogonal to the bounds of the
+   * box in @p direction. The signed distance is negative for points inside the
+   * interval described by the bounds of the rectangle in the respective
+   * direction, zero for points on the interval boundary and positive for points
+   * outside.
+   */
+  Number
+  signed_distance(const Point<spacedim, Number> &point,
+                  const unsigned int             direction) const;
+
+  /**
+   * Returns the signed distance from a @p point to the bounds of the box. The
+   * signed distance is negative for points inside the rectangle, zero for
+   * points on the rectangle and positive for points outside the rectangle.
+   */
+  Number
+  signed_distance(const Point<spacedim, Number> &point) const;
 
   /**
    * Write or read the data of this object to or from a stream for the
@@ -418,6 +475,14 @@ namespace internal
 
 template <int spacedim, typename Number>
 inline BoundingBox<spacedim, Number>::BoundingBox(
+  const Point<spacedim, Number> &p)
+  : BoundingBox({p, p})
+{}
+
+
+
+template <int spacedim, typename Number>
+inline BoundingBox<spacedim, Number>::BoundingBox(
   const std::pair<Point<spacedim, Number>, Point<spacedim, Number>>
     &boundary_points)
 {
@@ -510,6 +575,42 @@ BoundingBox<spacedim, Number>::extend(const Number amount)
                         "order should remain bottom left, top right."));
     }
 }
+
+
+
+template <int spacedim, typename Number>
+inline BoundingBox<spacedim, Number>
+BoundingBox<spacedim, Number>::create_extended(const Number amount) const
+{
+  // create and modify copy
+  auto bb = *this;
+  bb.extend(amount);
+
+  return bb;
+}
+
+
+
+template <int spacedim, typename Number>
+inline BoundingBox<spacedim, Number>
+BoundingBox<spacedim, Number>::create_extended_relative(
+  const Number relative_amount) const
+{
+  // create and modify copy
+  auto bb = *this;
+
+  for (unsigned int d = 0; d < spacedim; ++d)
+    {
+      bb.boundary_points.first[d] -= relative_amount * side_length(d);
+      bb.boundary_points.second[d] += relative_amount * side_length(d);
+      Assert(bb.boundary_points.first[d] <= bb.boundary_points.second[d],
+             ExcMessage("Bounding Box can't be shrunk this much: the points' "
+                        "order should remain bottom left, top right."));
+    }
+
+  return bb;
+}
+
 
 
 template <int spacedim, typename Number>

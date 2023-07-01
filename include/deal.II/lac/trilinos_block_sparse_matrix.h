@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -156,7 +156,7 @@ namespace TrilinosWrappers
     void
     reinit(const std::vector<IndexSet> &   input_maps,
            const BlockSparsityPatternType &block_sparsity_pattern,
-           const MPI_Comm &                communicator  = MPI_COMM_WORLD,
+           const MPI_Comm                  communicator  = MPI_COMM_WORLD,
            const bool                      exchange_data = false);
 
     /**
@@ -178,7 +178,7 @@ namespace TrilinosWrappers
     reinit(
       const std::vector<IndexSet> &              parallel_partitioning,
       const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
-      const MPI_Comm &                           communicator = MPI_COMM_WORLD,
+      const MPI_Comm                             communicator = MPI_COMM_WORLD,
       const double                               drop_tolerance = 1e-13);
 
     /**
@@ -223,7 +223,7 @@ namespace TrilinosWrappers
     n_nonzero_elements() const;
 
     /**
-     * Return the MPI communicator object in use with this matrix.
+     * Return the underlying MPI communicator.
      */
     MPI_Comm
     get_mpi_communicator() const;

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -112,6 +112,10 @@ do_test(const FiniteElement<dim> &fe_fine, const FiniteElement<dim> &fe_coarse)
                   constraint_fine,
                   constraint_coarse);
 
+  deallog << "test first time" << std::endl;
+  test_transfer_operator(transfer, dof_handler_fine, dof_handler_coarse);
+
+  deallog << "test second time" << std::endl;
   test_transfer_operator(transfer, dof_handler_fine, dof_handler_coarse);
 }
 

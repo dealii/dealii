@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ namespace Utilities
      * A shared pointer to this class is provided to ScaLAPACKMatrix matrices to
      * perform block-cyclic distribution.
      *
-     * Note that this class allows to setup a process grid which has fewer
+     * Note that this class allows to set up a process grid which has fewer
      * MPI cores than the total number of cores in the communicator.
      *
      * Currently the only place where one would use a ProcessGrid object is
@@ -71,7 +71,7 @@ namespace Utilities
        * number of cores
        * in the @p mpi_communicator.
        */
-      ProcessGrid(const MPI_Comm &   mpi_communicator,
+      ProcessGrid(const MPI_Comm     mpi_communicator,
                   const unsigned int n_rows,
                   const unsigned int n_columns);
 
@@ -92,7 +92,7 @@ namespace Utilities
        * and the @p mpi_communicator with 11 cores will result in the $3x3$
        * process grid.
        */
-      ProcessGrid(const MPI_Comm &   mpi_communicator,
+      ProcessGrid(const MPI_Comm     mpi_communicator,
                   const unsigned int n_rows_matrix,
                   const unsigned int n_columns_matrix,
                   const unsigned int row_block_size,
@@ -151,7 +151,7 @@ namespace Utilities
        * A private constructor which takes grid dimensions as an
        * <code>std::pair</code>.
        */
-      ProcessGrid(const MPI_Comm &                             mpi_communicator,
+      ProcessGrid(const MPI_Comm                               mpi_communicator,
                   const std::pair<unsigned int, unsigned int> &grid_dimensions);
 
       /**

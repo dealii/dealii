@@ -48,7 +48,7 @@ main(int argc, char **argv)
         v.print(deallog.get_file_stream(), 3, false, true);
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

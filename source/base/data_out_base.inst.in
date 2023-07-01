@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2020 by the deal.II authors
+// Copyright (C) 2013 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -160,20 +160,6 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
         const TecplotFlags &flags,
         std::ostream &      out);
 
-      template void
-      write_tecplot_binary(
-        const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
-          &                             patches,
-        const std::vector<std::string> &data_names,
-        const std::vector<
-          std::tuple<unsigned int,
-                     unsigned int,
-                     std::string,
-                     DataComponentInterpretation::DataComponentInterpretation>>
-          &                 nonscalar_data_ranges,
-        const TecplotFlags &flags,
-        std::ostream &      out);
-
 #  if deal_II_space_dimension > 1
       template void
       write_svg(
@@ -216,16 +202,17 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
           &                              nonscalar_data_ranges,
         const Deal_II_IntermediateFlags &flags,
         const std::string &              filename,
-        const MPI_Comm &                 comm,
+        const MPI_Comm                   comm,
         const CompressionLevel           compression);
 
       template void
       write_hdf5_parallel(
         const std::vector<Patch<deal_II_dimension, deal_II_space_dimension>>
-          &                  patches,
-        const DataOutFilter &data_filter,
-        const std::string &  filename,
-        const MPI_Comm &     comm);
+          &                           patches,
+        const DataOutFilter &         data_filter,
+        const DataOutBase::Hdf5Flags &flags,
+        const std::string &           filename,
+        const MPI_Comm                comm);
 
       template void
       write_filtered_data(

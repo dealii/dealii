@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,12 +30,14 @@
 #include <tuple>
 
 #ifdef DEAL_II_WITH_TBB
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <tbb/blocked_range.h>
 #  include <tbb/parallel_for.h>
 #  include <tbb/parallel_reduce.h>
 #  include <tbb/partitioner.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+#endif
+
+#ifdef DEAL_II_HAVE_CXX20
+#  include <concepts>
 #endif
 
 
@@ -109,7 +111,7 @@ namespace parallel
 
   /**
    * An algorithm that performs the action <code>*out++ =
-   * predicate(*in++)</code> where the <code>in</code> iterator ranges over
+   * function(*in++)</code> where the <code>in</code> iterator ranges over
    * the given input range.
    *
    * This algorithm does pretty much what std::transform does. The difference
@@ -129,14 +131,25 @@ namespace parallel
    * applicable, see the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function,
+   *    decltype(*std::declval<InputIterator>())> &&
+   *    std::assignable_from<decltype(*std::declval<OutputIterator>()),
+   *    std::invoke_result_t<Function,
+   * decltype(*std::declval<InputIterator>())>>)}
    */
-  template <typename InputIterator, typename OutputIterator, typename Predicate>
-  void
-  transform(const InputIterator &begin_in,
-            const InputIterator &end_in,
-            OutputIterator       out,
-            const Predicate &    predicate,
-            const unsigned int   grainsize)
+  template <typename InputIterator, typename OutputIterator, typename Function>
+  DEAL_II_CXX20_REQUIRES(
+    (std::invocable<Function, decltype(*std::declval<InputIterator>())> &&
+     std::assignable_from<
+       decltype(*std::declval<OutputIterator>()),
+       std::invoke_result_t<Function,
+                            decltype(*std::declval<InputIterator>())>>))
+  void transform(const InputIterator &begin_in,
+                 const InputIterator &end_in,
+                 OutputIterator       out,
+                 const Function &     function,
+                 const unsigned int   grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
@@ -144,7 +157,7 @@ namespace parallel
     (void)grainsize;
 
     for (OutputIterator in = begin_in; in != end_in;)
-      *out++ = predicate(*in++);
+      *out++ = function(*in++);
 #else
     using Iterators     = std::tuple<InputIterator, OutputIterator>;
     using SyncIterators = SynchronousIterators<Iterators>;
@@ -153,9 +166,9 @@ namespace parallel
     internal::parallel_for(
       SyncIterators(x_begin),
       SyncIterators(x_end),
-      [predicate](const auto &range) {
+      [function](const auto &range) {
         for (const auto &p : range)
-          *std::get<1>(p) = predicate(*std::get<0>(p));
+          *std::get<1>(p) = function(*std::get<0>(p));
       },
       grainsize);
 #endif
@@ -164,7 +177,7 @@ namespace parallel
 
 
   /**
-   * An algorithm that performs the action <code>*out++ = predicate(*in1++,
+   * An algorithm that performs the action <code>*out++ = function(*in1++,
    * *in2++)</code> where the <code>in1</code> iterator ranges over the given
    * input range, using the parallel for operator of tbb.
    *
@@ -185,18 +198,34 @@ namespace parallel
    * applicable, see the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function,
+   *    decltype(*std::declval<InputIterator1>()),
+   *    decltype(*std::declval<InputIterator2>())> &&
+   *    std::assignable_from<decltype(*std::declval<OutputIterator>()),
+   *    std::invoke_result_t<Function,
+   * decltype(*std::declval<InputIterator1>()),
+   *    decltype(*std::declval<InputIterator2>())>>)}
    */
   template <typename InputIterator1,
             typename InputIterator2,
             typename OutputIterator,
-            typename Predicate>
-  void
-  transform(const InputIterator1 &begin_in1,
-            const InputIterator1 &end_in1,
-            InputIterator2        in2,
-            OutputIterator        out,
-            const Predicate &     predicate,
-            const unsigned int    grainsize)
+            typename Function>
+  DEAL_II_CXX20_REQUIRES(
+    (std::invocable<Function,
+                    decltype(*std::declval<InputIterator1>()),
+                    decltype(*std::declval<InputIterator2>())> &&
+     std::assignable_from<
+       decltype(*std::declval<OutputIterator>()),
+       std::invoke_result_t<Function,
+                            decltype(*std::declval<InputIterator1>()),
+                            decltype(*std::declval<InputIterator2>())>>))
+  void transform(const InputIterator1 &begin_in1,
+                 const InputIterator1 &end_in1,
+                 InputIterator2        in2,
+                 OutputIterator        out,
+                 const Function &      function,
+                 const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
@@ -204,7 +233,7 @@ namespace parallel
     (void)grainsize;
 
     for (OutputIterator in1 = begin_in1; in1 != end_in1;)
-      *out++ = predicate(*in1++, *in2++);
+      *out++ = function(*in1++, *in2++);
 #else
     using Iterators =
       std::tuple<InputIterator1, InputIterator2, OutputIterator>;
@@ -214,9 +243,9 @@ namespace parallel
     internal::parallel_for(
       SyncIterators(x_begin),
       SyncIterators(x_end),
-      [predicate](const auto &range) {
+      [function](const auto &range) {
         for (const auto &p : range)
-          *std::get<2>(p) = predicate(*std::get<0>(p), *std::get<1>(p));
+          *std::get<2>(p) = function(*std::get<0>(p), *std::get<1>(p));
       },
       grainsize);
 #endif
@@ -225,7 +254,7 @@ namespace parallel
 
 
   /**
-   * An algorithm that performs the action <code>*out++ = predicate(*in1++,
+   * An algorithm that performs the action <code>*out++ = function(*in1++,
    * *in2++, *in3++)</code> where the <code>in1</code> iterator ranges over
    * the given input range.
    *
@@ -246,20 +275,40 @@ namespace parallel
    * applicable, see the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function,
+   *    decltype(*std::declval<InputIterator1>()),
+   *    decltype(*std::declval<InputIterator2>()),
+   *    decltype(*std::declval<InputIterator3>())> &&
+   *    std::assignable_from<decltype(*std::declval<OutputIterator>()),
+   *    std::invoke_result_t<Function,
+   * decltype(*std::declval<InputIterator1>()),
+   *    decltype(*std::declval<InputIterator2>()),
+   *    decltype(*std::declval<InputIterator3>())>>)}
    */
   template <typename InputIterator1,
             typename InputIterator2,
             typename InputIterator3,
             typename OutputIterator,
-            typename Predicate>
-  void
-  transform(const InputIterator1 &begin_in1,
-            const InputIterator1 &end_in1,
-            InputIterator2        in2,
-            InputIterator3        in3,
-            OutputIterator        out,
-            const Predicate &     predicate,
-            const unsigned int    grainsize)
+            typename Function>
+  DEAL_II_CXX20_REQUIRES(
+    (std::invocable<Function,
+                    decltype(*std::declval<InputIterator1>()),
+                    decltype(*std::declval<InputIterator2>()),
+                    decltype(*std::declval<InputIterator3>())> &&
+     std::assignable_from<
+       decltype(*std::declval<OutputIterator>()),
+       std::invoke_result_t<Function,
+                            decltype(*std::declval<InputIterator1>()),
+                            decltype(*std::declval<InputIterator2>()),
+                            decltype(*std::declval<InputIterator3>())>>))
+  void transform(const InputIterator1 &begin_in1,
+                 const InputIterator1 &end_in1,
+                 InputIterator2        in2,
+                 InputIterator3        in3,
+                 OutputIterator        out,
+                 const Function &      function,
+                 const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
@@ -267,7 +316,7 @@ namespace parallel
     (void)grainsize;
 
     for (OutputIterator in1 = begin_in1; in1 != end_in1;)
-      *out++ = predicate(*in1++, *in2++, *in3++);
+      *out++ = function(*in1++, *in2++, *in3++);
 #else
     using Iterators = std::
       tuple<InputIterator1, InputIterator2, InputIterator3, OutputIterator>;
@@ -280,10 +329,10 @@ namespace parallel
     internal::parallel_for(
       SyncIterators(x_begin),
       SyncIterators(x_end),
-      [predicate](const auto &range) {
+      [function](const auto &range) {
         for (const auto &p : range)
           *std::get<3>(p) =
-            predicate(*std::get<0>(p), *std::get<1>(p), *std::get<2>(p));
+            function(*std::get<0>(p), *std::get<1>(p), *std::get<2>(p));
       },
       grainsize);
 #endif
@@ -296,11 +345,13 @@ namespace parallel
     /**
      * Take a range argument and call the given function with its begin and
      * end.
+     *
+     * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator>)}
      */
-    template <typename RangeType, typename Function>
-    void
-    apply_to_subranges(const tbb::blocked_range<RangeType> &range,
-                       const Function &                     f)
+    template <typename Iterator, typename Function>
+    DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
+    void apply_to_subranges(const tbb::blocked_range<Iterator> &range,
+                            const Function &                    f)
     {
       f(range.begin(), range.end());
     }
@@ -376,13 +427,15 @@ namespace parallel
    * applicable, see also the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator>)}
    */
-  template <typename RangeType, typename Function>
-  void
-  apply_to_subranges(const RangeType &                         begin,
-                     const typename identity<RangeType>::type &end,
-                     const Function &                          f,
-                     const unsigned int                        grainsize)
+  template <typename Iterator, typename Function>
+  DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
+  void apply_to_subranges(const Iterator &                            begin,
+                          const std_cxx20::type_identity_t<Iterator> &end,
+                          const Function &                            f,
+                          const unsigned int                          grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
@@ -394,8 +447,8 @@ namespace parallel
     internal::parallel_for(
       begin,
       end,
-      [&f](const tbb::blocked_range<RangeType> &range) {
-        internal::apply_to_subranges<RangeType, Function>(range, f);
+      [&f](const tbb::blocked_range<Iterator> &range) {
+        internal::apply_to_subranges<Iterator, Function>(range, f);
       },
       grainsize);
 #endif
@@ -522,13 +575,21 @@ namespace parallel
    * applicable, see also the
    * @ref threads "Parallel computing with multiple processors"
    * module.
+   *
+   * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator> &&
+   *    std::convertible_to<std::invoke_result_t<Function, Iterator, Iterator>,
+   *    ResultType>)}
    */
-  template <typename ResultType, typename RangeType, typename Function>
+  template <typename ResultType, typename Iterator, typename Function>
+  DEAL_II_CXX20_REQUIRES(
+    (std::invocable<Function, Iterator, Iterator> &&
+     std::convertible_to<std::invoke_result_t<Function, Iterator, Iterator>,
+                         ResultType>))
   ResultType
-  accumulate_from_subranges(const Function &                          f,
-                            const RangeType &                         begin,
-                            const typename identity<RangeType>::type &end,
-                            const unsigned int                        grainsize)
+    accumulate_from_subranges(const Function &                            f,
+                              const Iterator &                            begin,
+                              const std_cxx20::type_identity_t<Iterator> &end,
+                              const unsigned int grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
     // make sure we don't get compiler
@@ -538,7 +599,7 @@ namespace parallel
     return f(begin, end);
 #else
     return tbb::parallel_reduce(
-      tbb::blocked_range<RangeType>(begin, end, grainsize),
+      tbb::blocked_range<Iterator>(begin, end, grainsize),
       ResultType(0),
       [f](const auto &range, const ResultType &starting_value) {
         ResultType value = starting_value;

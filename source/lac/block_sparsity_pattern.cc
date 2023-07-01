@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2021 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -556,7 +556,7 @@ namespace TrilinosWrappers
 
   BlockSparsityPattern::BlockSparsityPattern(
     const std::vector<IndexSet> &parallel_partitioning,
-    const MPI_Comm &             communicator)
+    const MPI_Comm               communicator)
     : BlockSparsityPatternBase<SparsityPattern>(parallel_partitioning.size(),
                                                 parallel_partitioning.size())
   {
@@ -574,7 +574,7 @@ namespace TrilinosWrappers
     const std::vector<IndexSet> &row_parallel_partitioning,
     const std::vector<IndexSet> &col_parallel_partitioning,
     const std::vector<IndexSet> &writable_rows,
-    const MPI_Comm &             communicator)
+    const MPI_Comm               communicator)
     : BlockSparsityPatternBase<SparsityPattern>(
         row_parallel_partitioning.size(),
         col_parallel_partitioning.size())
@@ -607,7 +607,7 @@ namespace TrilinosWrappers
   void
   BlockSparsityPattern::reinit(
     const std::vector<IndexSet> &parallel_partitioning,
-    const MPI_Comm &             communicator)
+    const MPI_Comm               communicator)
   {
     dealii::BlockSparsityPatternBase<SparsityPattern>::reinit(
       parallel_partitioning.size(), parallel_partitioning.size());
@@ -625,7 +625,7 @@ namespace TrilinosWrappers
   BlockSparsityPattern::reinit(
     const std::vector<IndexSet> &row_parallel_partitioning,
     const std::vector<IndexSet> &col_parallel_partitioning,
-    const MPI_Comm &             communicator)
+    const MPI_Comm               communicator)
   {
     dealii::BlockSparsityPatternBase<SparsityPattern>::reinit(
       row_parallel_partitioning.size(), col_parallel_partitioning.size());
@@ -644,7 +644,7 @@ namespace TrilinosWrappers
     const std::vector<IndexSet> &row_parallel_partitioning,
     const std::vector<IndexSet> &col_parallel_partitioning,
     const std::vector<IndexSet> &writable_rows,
-    const MPI_Comm &             communicator)
+    const MPI_Comm               communicator)
   {
     AssertDimension(writable_rows.size(), row_parallel_partitioning.size());
     dealii::BlockSparsityPatternBase<SparsityPattern>::reinit(

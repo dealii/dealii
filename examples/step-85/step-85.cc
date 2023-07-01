@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2021 - 2022 by the deal.II authors
+ * Copyright (C) 2021 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -481,7 +481,7 @@ namespace Step85
         // using FEInterfaceValues. Assembling in this we will traverse each
         // internal face in the mesh twice, so in order to get the penalty
         // constant we expect, we multiply the penalty term with a factor 1/2.
-        for (unsigned int f : cell->face_indices())
+        for (const unsigned int f : cell->face_indices())
           if (face_has_ghost_penalty(cell, f))
             {
               const unsigned int invalid_subface =
@@ -625,8 +625,8 @@ namespace Step85
     // We then iterate iterate over the cells that have LocationToLevelSetValue
     // value inside or intersected again. For each quadrature point, we compute
     // the pointwise error and use this to compute the integral.
-    const AnalyticalSolution<dim> analytical_solution;
-    double                        error_L2_squared = 0;
+    AnalyticalSolution<dim> analytical_solution;
+    double                  error_L2_squared = 0;
 
     for (const auto &cell :
          dof_handler.active_cell_iterators() |

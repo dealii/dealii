@@ -154,7 +154,7 @@ main()
     {
       test();
     }
-  catch (std::exception &e)
+  catch (const std::exception &e)
     {
       std::cerr << std::endl
                 << std::endl

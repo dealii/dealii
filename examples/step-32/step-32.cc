@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2022 by the deal.II authors
+ * Copyright (C) 2008 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -2457,7 +2457,7 @@ namespace Step32
   // having inhomogeneous boundary conditions, by just making a right hand
   // side at this point (compare the comments for the <code>project()</code>
   // function above): We create some matrix columns with exactly the values
-  // that would be entered for the temperature stiffness matrix, in case we
+  // that would be entered for the temperature @ref GlossStiffnessMatrix "stiffness matrix", in case we
   // have inhomogeneously constrained dofs. That will account for the correct
   // balance of the right hand side vector with the matrix system of
   // temperature.
@@ -3058,34 +3058,34 @@ namespace Step32
     const DataPostprocessorInputs::Vector<dim> &inputs,
     std::vector<Vector<double>> &               computed_quantities) const
   {
-    const unsigned int n_quadrature_points = inputs.solution_values.size();
-    Assert(inputs.solution_gradients.size() == n_quadrature_points,
+    const unsigned int n_evaluation_points = inputs.solution_values.size();
+    Assert(inputs.solution_gradients.size() == n_evaluation_points,
            ExcInternalError());
-    Assert(computed_quantities.size() == n_quadrature_points,
+    Assert(computed_quantities.size() == n_evaluation_points,
            ExcInternalError());
     Assert(inputs.solution_values[0].size() == dim + 2, ExcInternalError());
 
-    for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    for (unsigned int p = 0; p < n_evaluation_points; ++p)
       {
         for (unsigned int d = 0; d < dim; ++d)
-          computed_quantities[q](d) = (inputs.solution_values[q](d) *
+          computed_quantities[p](d) = (inputs.solution_values[p](d) *
                                        EquationData::year_in_seconds * 100);
 
         const double pressure =
-          (inputs.solution_values[q](dim) - minimal_pressure);
-        computed_quantities[q](dim) = pressure;
+          (inputs.solution_values[p](dim) - minimal_pressure);
+        computed_quantities[p](dim) = pressure;
 
-        const double temperature        = inputs.solution_values[q](dim + 1);
-        computed_quantities[q](dim + 1) = temperature;
+        const double temperature        = inputs.solution_values[p](dim + 1);
+        computed_quantities[p](dim + 1) = temperature;
 
         Tensor<2, dim> grad_u;
         for (unsigned int d = 0; d < dim; ++d)
-          grad_u[d] = inputs.solution_gradients[q][d];
+          grad_u[d] = inputs.solution_gradients[p][d];
         const SymmetricTensor<2, dim> strain_rate = symmetrize(grad_u);
-        computed_quantities[q](dim + 2) =
+        computed_quantities[p](dim + 2) =
           2 * EquationData::eta * strain_rate * strain_rate;
 
-        computed_quantities[q](dim + 3) = partition;
+        computed_quantities[p](dim + 3) = partition;
       }
   }
 
@@ -3294,12 +3294,10 @@ namespace Step32
       // remainder of the function further down below is then concerned with
       // setting up the data structures again after mesh refinement and
       // restoring the solution vectors on the new mesh.
-      std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature(2);
-      x_temperature[0] = &temperature_solution;
-      x_temperature[1] = &old_temperature_solution;
-      std::vector<const TrilinosWrappers::MPI::BlockVector *> x_stokes(2);
-      x_stokes[0] = &stokes_solution;
-      x_stokes[1] = &old_stokes_solution;
+      const std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature = {
+        &temperature_solution, &old_temperature_solution};
+      const std::vector<const TrilinosWrappers::MPI::BlockVector *> x_stokes = {
+        &stokes_solution, &old_stokes_solution};
 
       triangulation.prepare_coarsening_and_refinement();
 
@@ -3319,9 +3317,8 @@ namespace Step32
         TrilinosWrappers::MPI::Vector distributed_temp1(temperature_rhs);
         TrilinosWrappers::MPI::Vector distributed_temp2(temperature_rhs);
 
-        std::vector<TrilinosWrappers::MPI::Vector *> tmp(2);
-        tmp[0] = &(distributed_temp1);
-        tmp[1] = &(distributed_temp2);
+        std::vector<TrilinosWrappers::MPI::Vector *> tmp = {&distributed_temp1,
+                                                            &distributed_temp2};
         temperature_trans.interpolate(tmp);
 
         // enforce constraints to make the interpolated solution conforming on
@@ -3329,17 +3326,16 @@ namespace Step32
         temperature_constraints.distribute(distributed_temp1);
         temperature_constraints.distribute(distributed_temp2);
 
-        temperature_solution     = distributed_temp1;
-        old_temperature_solution = distributed_temp2;
+        temperature_solution     = std::move(distributed_temp1);
+        old_temperature_solution = std::move(distributed_temp2);
       }
 
       {
         TrilinosWrappers::MPI::BlockVector distributed_stokes(stokes_rhs);
         TrilinosWrappers::MPI::BlockVector old_distributed_stokes(stokes_rhs);
 
-        std::vector<TrilinosWrappers::MPI::BlockVector *> stokes_tmp(2);
-        stokes_tmp[0] = &(distributed_stokes);
-        stokes_tmp[1] = &(old_distributed_stokes);
+        std::vector<TrilinosWrappers::MPI::BlockVector *> stokes_tmp = {
+          &distributed_stokes, &old_distributed_stokes};
 
         stokes_trans.interpolate(stokes_tmp);
 
@@ -3348,8 +3344,8 @@ namespace Step32
         stokes_constraints.distribute(distributed_stokes);
         stokes_constraints.distribute(old_distributed_stokes);
 
-        stokes_solution     = distributed_stokes;
-        old_stokes_solution = old_distributed_stokes;
+        stokes_solution     = std::move(distributed_stokes);
+        old_stokes_solution = std::move(old_distributed_stokes);
       }
     }
   }

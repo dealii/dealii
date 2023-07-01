@@ -165,7 +165,7 @@ main()
           check_solve(cg, A, u, f, prec_ssor);
           deallog.pop();
         }
-      catch (std::exception &e)
+      catch (const std::exception &e)
         {
           std::cerr << "Exception: " << e.what() << std::endl;
         }

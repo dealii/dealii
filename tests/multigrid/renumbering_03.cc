@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2019 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +38,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim>
 void
@@ -62,8 +62,8 @@ check()
   mg_dof_handler.distribute_mg_dofs();
   for (unsigned int level = 0; level < tria.n_levels(); ++level)
     {
-      const types::global_dof_index   n_dofs = mg_dof_handler.n_dofs(level);
-      vector<types::global_dof_index> new_numbers(n_dofs);
+      const types::global_dof_index n_dofs = mg_dof_handler.n_dofs(level);
+      std::vector<types::global_dof_index> new_numbers(n_dofs);
       for (unsigned int i = 0; i < n_dofs; ++i)
         new_numbers[i] = n_dofs - 1 - i;
 
@@ -80,5 +80,5 @@ main()
   check<2>();
   check<3>();
 
-  deallog << "OK" << endl;
+  deallog << "OK" << std::endl;
 }

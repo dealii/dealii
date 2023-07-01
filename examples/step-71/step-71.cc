@@ -3799,9 +3799,9 @@ namespace Step71
       Coupled_Magnetomechanical_Constitutive_Law_Base<dim>
         &material_hand_calculated,
       Coupled_Magnetomechanical_Constitutive_Law_Base<dim>
-        &               material_assisted_computation,
-      TimerOutput &     timer,
-      const std::string filename)
+        &                material_assisted_computation,
+      TimerOutput &      timer,
+      const std::string &filename)
     {
       // We can take the hand-implemented constitutive law and compare the
       // results that we attain with it to those that we get using AD or SD.

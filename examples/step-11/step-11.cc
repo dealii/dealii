@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2001 - 2022 by the deal.II authors
+ * Copyright (C) 2001 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -159,7 +159,7 @@ namespace Step11
     // of what is to come later:
     mean_value_constraints.clear();
     mean_value_constraints.add_line(first_boundary_dof);
-    for (types::global_dof_index i : boundary_dofs)
+    for (const types::global_dof_index i : boundary_dofs)
       if (i != first_boundary_dof)
         mean_value_constraints.add_entry(first_boundary_dof, i, -1);
     mean_value_constraints.close();
@@ -266,7 +266,7 @@ namespace Step11
     // That's quite simple, right?
     //
     // Two remarks are in order, though: First, these functions are used in a
-    // lot of contexts. Maybe you want to create a Laplace or mass matrix for
+    // lot of contexts. Maybe you want to create a Laplace or @ref GlossMassMatrix "mass matrix" for
     // a vector values finite element; or you want to use the default Q1
     // mapping; or you want to assembled the matrix with a coefficient in the
     // Laplace operator. For this reason, there are quite a large number of
@@ -409,6 +409,13 @@ namespace Step11
   // class only prints curved faces for <i>boundary</i> cells by default, so we
   // need to ensure that also inner cells are printed in a curved representation
   // via the mapping.
+  //
+  // @note As of 2023, Visit 3.3.3 can still not deal with higher-order cells.
+  //   Rather, it simply reports that there is no data to show. To view the
+  //   results of this program with Visit, you will want to comment out the
+  //   line that sets `flags.write_higher_order_cells = true;`. On the other
+  //   hand, Paraview is able to understand VTU files with higher order cells
+  //   just fine.
   template <int dim>
   void LaplaceProblem<dim>::write_high_order_mesh(const unsigned cycle)
   {

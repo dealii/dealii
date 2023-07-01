@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,14 +45,12 @@
 #  include <hdf5.h>
 #endif
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #ifdef DEAL_II_WITH_ZLIB
 #  include <boost/iostreams/filter/zlib.hpp>
 #endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
@@ -704,11 +702,6 @@ namespace
   const char *ucd_cell_type[4] = {"pt", "line", "quad", "hex"};
 
   const char *tecplot_cell_type[4] = {"", "lineseg", "quadrilateral", "brick"};
-
-#ifdef DEAL_II_HAVE_TECPLOT
-  const unsigned int tecplot_binary_cell_type[4] = {0, 0, 1, 3};
-#endif
-
 
   /**
    * Return the tuple (vtk cell type, number of cells, number of nodes)
@@ -1782,7 +1775,7 @@ namespace DataOutBase
   // all the other data has a constructor of its own, except for the "neighbors"
   // field, which we set to invalid values.
   {
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (const unsigned int i : GeometryInfo<dim>::face_indices())
       neighbors[i] = no_neighbor;
 
     AssertIndexRange(dim, spacedim + 1);
@@ -1804,7 +1797,7 @@ namespace DataOutBase
       if (vertices[i].distance(patch.vertices[i]) > epsilon)
         return false;
 
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (const unsigned int i : GeometryInfo<dim>::face_indices())
       if (neighbors[i] != patch.neighbors[i])
         return false;
 
@@ -2407,6 +2400,10 @@ namespace DataOutBase
   }
 
 
+  Hdf5Flags::Hdf5Flags(const CompressionLevel compression_level)
+    : compression_level(compression_level)
+  {}
+
 
   TecplotFlags::TecplotFlags(const char *zone_name, const double solution_time)
     : zone_name(zone_name)
@@ -2466,9 +2463,6 @@ namespace DataOutBase
     if (format_name == "tecplot")
       return tecplot;
 
-    if (format_name == "tecplot_binary")
-      return tecplot_binary;
-
     if (format_name == "vtk")
       return vtk;
 
@@ -2494,7 +2488,7 @@ namespace DataOutBase
   std::string
   get_output_format_names()
   {
-    return "none|dx|ucd|gnuplot|povray|eps|gmv|tecplot|tecplot_binary|vtk|vtu|hdf5|svg|deal.II intermediate";
+    return "none|dx|ucd|gnuplot|povray|eps|gmv|tecplot|vtk|vtu|hdf5|svg|deal.II intermediate";
   }
 
 
@@ -2520,8 +2514,6 @@ namespace DataOutBase
           return ".gmv";
         case tecplot:
           return ".dat";
-        case tecplot_binary:
-          return ".plt";
         case vtk:
           return ".vtk";
         case vtu:
@@ -4375,7 +4367,7 @@ namespace DataOutBase
     float max_color_value = std::numeric_limits<float>::min();
 
     // Array for z-coordinates of points. The elevation determined by a function
-    // if spacedim=2 or the z-cooridate of the grid point if spacedim=3
+    // if spacedim=2 or the z-coordinate of the grid point if spacedim=3
     double heights[4] = {0, 0, 0, 0};
 
     // compute the cells for output and enter them into the set above note that
@@ -4937,399 +4929,6 @@ namespace DataOutBase
 
 
 
-  //---------------------------------------------------------------------------
-  // Macros for handling Tecplot API data
-
-#ifdef DEAL_II_HAVE_TECPLOT
-
-  namespace
-  {
-    class TecplotMacros
-    {
-    public:
-      TecplotMacros(const unsigned int n_nodes = 0,
-                    const unsigned int n_vars  = 0,
-                    const unsigned int n_cells = 0,
-                    const unsigned int n_vert  = 0);
-      ~TecplotMacros();
-      float &
-      nd(const unsigned int i, const unsigned int j);
-      int &
-                         cd(const unsigned int i, const unsigned int j);
-      std::vector<float> nodalData;
-      std::vector<int>   connData;
-
-    private:
-      unsigned int n_nodes;
-      unsigned int n_vars;
-      unsigned int n_cells;
-      unsigned int n_vert;
-    };
-
-
-    inline TecplotMacros::TecplotMacros(const unsigned int n_nodes,
-                                        const unsigned int n_vars,
-                                        const unsigned int n_cells,
-                                        const unsigned int n_vert)
-      : n_nodes(n_nodes)
-      , n_vars(n_vars)
-      , n_cells(n_cells)
-      , n_vert(n_vert)
-    {
-      nodalData.resize(n_nodes * n_vars);
-      connData.resize(n_cells * n_vert);
-    }
-
-
-
-    inline TecplotMacros::~TecplotMacros()
-    {}
-
-
-
-    inline float &
-    TecplotMacros::nd(const unsigned int i, const unsigned int j)
-    {
-      return nodalData[i * n_nodes + j];
-    }
-
-
-
-    inline int &
-    TecplotMacros::cd(const unsigned int i, const unsigned int j)
-    {
-      return connData[i + j * n_vert];
-    }
-
-  } // namespace
-
-
-#endif
-  //---------------------------------------------------------------------------
-
-
-
-  template <int dim, int spacedim>
-  void
-  write_tecplot_binary(
-    const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
-    const std::vector<
-      std::tuple<unsigned int,
-                 unsigned int,
-                 std::string,
-                 DataComponentInterpretation::DataComponentInterpretation>>
-      &                 nonscalar_data_ranges,
-    const TecplotFlags &flags,
-    std::ostream &      out)
-  {
-    // The FEBLOCK or FEPOINT formats of tecplot only allows full elements (e.g.
-    // triangles), not single points. Other tecplot format allow point output,
-    // but they are currently not implemented.
-    AssertThrow(dim > 0, ExcNotImplemented());
-
-#ifndef DEAL_II_HAVE_TECPLOT
-
-    // simply call the ASCII output function if the Tecplot API isn't present
-    write_tecplot(patches, data_names, nonscalar_data_ranges, flags, out);
-    return;
-
-#else
-
-    // Tecplot binary output only good for 2d & 3d
-    if (dim == 1)
-      {
-        write_tecplot(patches, data_names, nonscalar_data_ranges, flags, out);
-        return;
-      }
-
-    // if the user hasn't specified a file name we should call the ASCII
-    // function and use the ostream @p{out} instead of doing something silly
-    // later
-    char *file_name = (char *)flags.tecplot_binary_file_name;
-
-    if (file_name == nullptr)
-      {
-        // At least in debug mode we should tell users why they don't get
-        // tecplot binary output
-        Assert(false,
-               ExcMessage("Specify the name of the tecplot_binary"
-                          " file through the TecplotFlags interface."));
-        write_tecplot(patches, data_names, nonscalar_data_ranges, flags, out);
-        return;
-      }
-
-
-    AssertThrow(out.fail() == false, ExcIO());
-
-#  ifndef DEAL_II_WITH_MPI
-    // verify that there are indeed patches to be written out. most of the
-    // times, people just forget to call build_patches when there are no
-    // patches, so a warning is in order. that said, the assertion is disabled
-    // if we support MPI since then it can happen that on the coarsest mesh, a
-    // processor simply has no cells it actually owns, and in that case it is
-    // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
-#  else
-    if (patches.size() == 0)
-      return;
-#  endif
-
-    const unsigned int n_data_sets = data_names.size();
-    // check against # of data sets in first patch. checks against all other
-    // patches are made in write_gmv_reorder_data_vectors
-    Assert((patches[0].data.n_rows() == n_data_sets &&
-            !patches[0].points_are_available) ||
-             (patches[0].data.n_rows() == n_data_sets + spacedim &&
-              patches[0].points_are_available),
-           ExcDimensionMismatch(patches[0].points_are_available ?
-                                  (n_data_sets + spacedim) :
-                                  n_data_sets,
-                                patches[0].data.n_rows()));
-
-    // first count the number of cells and cells for later use
-    unsigned int n_nodes;
-    unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
-    // local variables only needed to write Tecplot binary output files
-    const unsigned int vars_per_node  = (spacedim + n_data_sets),
-                       nodes_per_cell = GeometryInfo<dim>::vertices_per_cell;
-
-    TecplotMacros tm(n_nodes, vars_per_node, n_cells, nodes_per_cell);
-
-    int is_double = 0, tec_debug = 0, cell_type = tecplot_binary_cell_type[dim];
-
-    std::string tec_var_names;
-    switch (spacedim)
-      {
-        case 2:
-          tec_var_names = "x y";
-          break;
-        case 3:
-          tec_var_names = "x y z";
-          break;
-        default:
-          Assert(false, ExcNotImplemented());
-      }
-
-    for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-      {
-        tec_var_names += " ";
-        tec_var_names += data_names[data_set];
-      }
-
-    // For the format we write here, we need to write all node values relating
-    // to one variable at a time. We could in principle do this by looping
-    // over all patches and extracting the values corresponding to the one
-    // variable we're dealing with right now, and then start the process over
-    // for the next variable with another loop over all patches.
-    //
-    // An easier way is to create a global table that for each variable
-    // lists all values. This copying of data vectors can be done in the
-    // background while we're already working on vertices and cells,
-    // so do this on a separate task and when wanting to write out the
-    // data, we wait for that task to finish.
-    Threads::Task<std::unique_ptr<Table<2, double>>>
-      create_global_data_table_task = Threads::new_task(
-        [&patches]() { return create_global_data_table(patches); });
-
-    //-----------------------------
-    // first make up a list of used vertices along with their coordinates
-    for (unsigned int d = 1; d <= spacedim; ++d)
-      {
-        unsigned int entry = 0;
-
-        for (const auto &patch : patches)
-          {
-            const unsigned int n_subdivisions = patch.n_subdivisions;
-
-            switch (dim)
-              {
-                case 2:
-                  {
-                    for (unsigned int j = 0; j < n_subdivisions + 1; ++j)
-                      for (unsigned int i = 0; i < n_subdivisions + 1; ++i)
-                        {
-                          const double x_frac = i * 1. / n_subdivisions,
-                                       y_frac = j * 1. / n_subdivisions;
-
-                          tm.nd((d - 1), entry) = static_cast<float>(
-                            (((patch.vertices[1](d - 1) * x_frac) +
-                              (patch.vertices[0](d - 1) * (1 - x_frac))) *
-                               (1 - y_frac) +
-                             ((patch.vertices[3](d - 1) * x_frac) +
-                              (patch.vertices[2](d - 1) * (1 - x_frac))) *
-                               y_frac));
-                          entry++;
-                        }
-                    break;
-                  }
-
-                case 3:
-                  {
-                    for (unsigned int j = 0; j < n_subdivisions + 1; ++j)
-                      for (unsigned int k = 0; k < n_subdivisions + 1; ++k)
-                        for (unsigned int i = 0; i < n_subdivisions + 1; ++i)
-                          {
-                            const double x_frac = i * 1. / n_subdivisions,
-                                         y_frac = k * 1. / n_subdivisions,
-                                         z_frac = j * 1. / n_subdivisions;
-
-                            // compute coordinates for this patch point
-                            tm.nd((d - 1), entry) = static_cast<float>(
-                              ((((patch.vertices[1](d - 1) * x_frac) +
-                                 (patch.vertices[0](d - 1) * (1 - x_frac))) *
-                                  (1 - y_frac) +
-                                ((patch.vertices[3](d - 1) * x_frac) +
-                                 (patch.vertices[2](d - 1) * (1 - x_frac))) *
-                                  y_frac) *
-                                 (1 - z_frac) +
-                               (((patch.vertices[5](d - 1) * x_frac) +
-                                 (patch.vertices[4](d - 1) * (1 - x_frac))) *
-                                  (1 - y_frac) +
-                                ((patch.vertices[7](d - 1) * x_frac) +
-                                 (patch.vertices[6](d - 1) * (1 - x_frac))) *
-                                  y_frac) *
-                                 z_frac));
-                            entry++;
-                          }
-                    break;
-                  }
-
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
-          }
-      }
-
-
-    //-------------------------------------
-    // Wait for the reordering to be done and retrieve the reordered data:
-    const Table<2, double> data_vectors =
-      std::move(*create_global_data_table_task.return_value());
-
-    // then write data.
-    for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
-      for (unsigned int entry = 0; entry < data_vectors[data_set].size();
-           entry++)
-        tm.nd((spacedim + data_set), entry) =
-          static_cast<float>(data_vectors[data_set][entry]);
-
-
-
-    //-------------------------------
-    // now for the cells. note that vertices are counted from 1 onwards
-    unsigned int first_vertex_of_patch = 0;
-    unsigned int elem                  = 0;
-
-    for (const auto &patch : patches)
-      {
-        const unsigned int n_subdivisions = patch.n_subdivisions;
-        const unsigned int n              = n_subdivisions + 1;
-        const unsigned int d1             = 1;
-        const unsigned int d2             = n;
-        const unsigned int d3             = n * n;
-        // write out the cells making up this patch
-        switch (dim)
-          {
-            case 2:
-              {
-                for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
-                  for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
-                    {
-                      tm.cd(0, elem) =
-                        first_vertex_of_patch + (i1)*d1 + (i2)*d2 + 1;
-                      tm.cd(1, elem) =
-                        first_vertex_of_patch + (i1 + 1) * d1 + (i2)*d2 + 1;
-                      tm.cd(2, elem) = first_vertex_of_patch + (i1 + 1) * d1 +
-                                       (i2 + 1) * d2 + 1;
-                      tm.cd(3, elem) =
-                        first_vertex_of_patch + (i1)*d1 + (i2 + 1) * d2 + 1;
-
-                      elem++;
-                    }
-                break;
-              }
-
-            case 3:
-              {
-                for (unsigned int i3 = 0; i3 < n_subdivisions; ++i3)
-                  for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
-                    for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
-                      {
-                        // note: vertex indices start with 1!
-
-
-                        tm.cd(0, elem) = first_vertex_of_patch + (i1)*d1 +
-                                         (i2)*d2 + (i3)*d3 + 1;
-                        tm.cd(1, elem) = first_vertex_of_patch + (i1 + 1) * d1 +
-                                         (i2)*d2 + (i3)*d3 + 1;
-                        tm.cd(2, elem) = first_vertex_of_patch + (i1 + 1) * d1 +
-                                         (i2 + 1) * d2 + (i3)*d3 + 1;
-                        tm.cd(3, elem) = first_vertex_of_patch + (i1)*d1 +
-                                         (i2 + 1) * d2 + (i3)*d3 + 1;
-                        tm.cd(4, elem) = first_vertex_of_patch + (i1)*d1 +
-                                         (i2)*d2 + (i3 + 1) * d3 + 1;
-                        tm.cd(5, elem) = first_vertex_of_patch + (i1 + 1) * d1 +
-                                         (i2)*d2 + (i3 + 1) * d3 + 1;
-                        tm.cd(6, elem) = first_vertex_of_patch + (i1 + 1) * d1 +
-                                         (i2 + 1) * d2 + (i3 + 1) * d3 + 1;
-                        tm.cd(7, elem) = first_vertex_of_patch + (i1)*d1 +
-                                         (i2 + 1) * d2 + (i3 + 1) * d3 + 1;
-
-                        elem++;
-                      }
-                break;
-              }
-
-            default:
-              Assert(false, ExcNotImplemented());
-          }
-
-
-        // finally update the number of the first vertex of this patch
-        first_vertex_of_patch += Utilities::fixed_power<dim>(n);
-      }
-
-
-    {
-      int ierr = 0, num_nodes = static_cast<int>(n_nodes),
-          num_cells = static_cast<int>(n_cells);
-
-      char dot[2] = {'.', 0};
-      // Unfortunately, TECINI takes a char *, but c_str() gives a const char *.
-      // As we don't do anything else with tec_var_names following const_cast is
-      // ok
-      char *var_names = const_cast<char *>(tec_var_names.c_str());
-      ierr = TECINI(nullptr, var_names, file_name, dot, &tec_debug, &is_double);
-
-      Assert(ierr == 0, ExcErrorOpeningTecplotFile(file_name));
-
-      char FEBLOCK[] = {'F', 'E', 'B', 'L', 'O', 'C', 'K', 0};
-      ierr =
-        TECZNE(nullptr, &num_nodes, &num_cells, &cell_type, FEBLOCK, nullptr);
-
-      Assert(ierr == 0, ExcTecplotAPIError());
-
-      int total = (vars_per_node * num_nodes);
-
-      ierr = TECDAT(&total, tm.nodalData.data(), &is_double);
-
-      Assert(ierr == 0, ExcTecplotAPIError());
-
-      ierr = TECNOD(tm.connData.data());
-
-      Assert(ierr == 0, ExcTecplotAPIError());
-
-      ierr = TECEND();
-
-      Assert(ierr == 0, ExcTecplotAPIError());
-    }
-#endif
-  }
-
-
-
   template <int dim, int spacedim>
   void
   write_vtk(
@@ -5483,7 +5082,9 @@ namespace DataOutBase
       {
         AssertThrow(std::get<3>(nonscalar_data_range) !=
                       DataComponentInterpretation::component_is_part_of_tensor,
-                    ExcNotImplemented());
+                    ExcMessage(
+                      "The VTK writer does not currently support outputting "
+                      "tensor data. Use the VTU writer instead."));
 
         AssertThrow(std::get<1>(nonscalar_data_range) >=
                       std::get<0>(nonscalar_data_range),
@@ -7809,7 +7410,7 @@ namespace DataOutBase
       &                              nonscalar_data_ranges,
     const Deal_II_IntermediateFlags &flags,
     const std::string &              filename,
-    const MPI_Comm &                 comm,
+    const MPI_Comm                   comm,
     const CompressionLevel           compression)
   {
 #ifndef DEAL_II_WITH_MPI
@@ -8115,7 +7716,7 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   const std::string &filename,
-  const MPI_Comm &   comm) const
+  const MPI_Comm     comm) const
 {
 #ifndef DEAL_II_WITH_MPI
   // without MPI fall back to the normal way to write a vtu file:
@@ -8256,7 +7857,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
   const std::string &directory,
   const std::string &filename_without_extension,
   const unsigned int counter,
-  const MPI_Comm &   mpi_communicator,
+  const MPI_Comm     mpi_communicator,
   const unsigned int n_digits_for_counter,
   const unsigned int n_groups) const
 {
@@ -8349,7 +7950,7 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_deal_II_intermediate_in_parallel(
   const std::string &                 filename,
-  const MPI_Comm &                    comm,
+  const MPI_Comm                      comm,
   const DataOutBase::CompressionLevel compression) const
 {
   DataOutBase::write_deal_II_intermediate_in_parallel(
@@ -8370,7 +7971,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const DataOutBase::DataOutFilter &data_filter,
   const std::string &               h5_filename,
   const double                      cur_time,
-  const MPI_Comm &                  comm) const
+  const MPI_Comm                    comm) const
 {
   return create_xdmf_entry(
     data_filter, h5_filename, h5_filename, cur_time, comm);
@@ -8385,7 +7986,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const std::string &               h5_mesh_filename,
   const std::string &               h5_solution_filename,
   const double                      cur_time,
-  const MPI_Comm &                  comm) const
+  const MPI_Comm                    comm) const
 {
   AssertThrow(spacedim == 2 || spacedim == 3,
               ExcMessage("XDMF only supports 2 or 3 space dimensions."));
@@ -8522,7 +8123,7 @@ void
 DataOutInterface<dim, spacedim>::write_xdmf_file(
   const std::vector<XDMFEntry> &entries,
   const std::string &           filename,
-  const MPI_Comm &              comm) const
+  const MPI_Comm                comm) const
 {
 #ifdef DEAL_II_WITH_MPI
   const int myrank = Utilities::MPI::this_mpi_process(comm);
@@ -8584,14 +8185,15 @@ namespace
   void
   do_write_hdf5(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
                 const DataOutBase::DataOutFilter &data_filter,
+                const DataOutBase::Hdf5Flags &    flags,
                 const bool                        write_mesh_file,
                 const std::string &               mesh_filename,
                 const std::string &               solution_filename,
-                const MPI_Comm &                  comm)
+                const MPI_Comm                    comm)
   {
     hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
     hid_t node_dataspace, node_dataset, node_file_dataspace,
-      node_memory_dataspace;
+      node_memory_dataspace, node_dataset_id;
     hid_t cell_dataspace, cell_dataset, cell_file_dataspace,
       cell_memory_dataspace;
     hid_t pt_data_dataspace, pt_data_dataset, pt_data_file_dataspace,
@@ -8617,6 +8219,10 @@ namespace
     status = H5Pset_fapl_mpio(file_plist_id, comm, MPI_INFO_NULL);
     AssertThrow(status >= 0, ExcIO());
 #    endif
+#  endif
+    // if zlib support is disabled flags are unused
+#  ifndef DEAL_II_WITH_ZLIB
+    (void)flags;
 #  endif
 
     // Compute the global total number of nodes/cells and determine the offset
@@ -8685,13 +8291,20 @@ namespace
                                  node_dataspace,
                                  H5P_DEFAULT);
 #  else
-        node_dataset    = H5Dcreate(h5_mesh_file_id,
+        node_dataset_id = H5Pcreate(H5P_DATASET_CREATE);
+#    ifdef DEAL_II_WITH_ZLIB
+        H5Pset_deflate(node_dataset_id,
+                       get_zlib_compression_level(flags.compression_level));
+        H5Pset_chunk(node_dataset_id, 2, node_ds_dim);
+#    endif
+        node_dataset = H5Dcreate(h5_mesh_file_id,
                                  "nodes",
                                  H5T_NATIVE_DOUBLE,
                                  node_dataspace,
                                  H5P_DEFAULT,
-                                 H5P_DEFAULT,
+                                 node_dataset_id,
                                  H5P_DEFAULT);
+        H5Pclose(node_dataset_id);
 #  endif
         AssertThrow(node_dataset >= 0, ExcIO());
 #  if H5Gcreate_vers == 1
@@ -8701,13 +8314,20 @@ namespace
                                  cell_dataspace,
                                  H5P_DEFAULT);
 #  else
-        cell_dataset    = H5Dcreate(h5_mesh_file_id,
+        node_dataset_id = H5Pcreate(H5P_DATASET_CREATE);
+#    ifdef DEAL_II_WITH_ZLIB
+        H5Pset_deflate(node_dataset_id,
+                       get_zlib_compression_level(flags.compression_level));
+        H5Pset_chunk(node_dataset_id, 2, cell_ds_dim);
+#    endif
+        cell_dataset = H5Dcreate(h5_mesh_file_id,
                                  "cells",
                                  H5T_NATIVE_UINT,
                                  cell_dataspace,
                                  H5P_DEFAULT,
-                                 H5P_DEFAULT,
+                                 node_dataset_id,
                                  H5P_DEFAULT);
+        H5Pclose(node_dataset_id);
 #  endif
         AssertThrow(cell_dataset >= 0, ExcIO());
 
@@ -8836,13 +8456,20 @@ namespace
                                     pt_data_dataspace,
                                     H5P_DEFAULT);
 #  else
+        node_dataset_id = H5Pcreate(H5P_DATASET_CREATE);
+#    ifdef DEAL_II_WITH_ZLIB
+        H5Pset_deflate(node_dataset_id,
+                       get_zlib_compression_level(flags.compression_level));
+        H5Pset_chunk(node_dataset_id, 2, node_ds_dim);
+#    endif
         pt_data_dataset = H5Dcreate(h5_solution_file_id,
                                     vector_name.c_str(),
                                     H5T_NATIVE_DOUBLE,
                                     pt_data_dataspace,
                                     H5P_DEFAULT,
-                                    H5P_DEFAULT,
+                                    node_dataset_id,
                                     H5P_DEFAULT);
+        H5Pclose(node_dataset_id);
 #  endif
         AssertThrow(pt_data_dataset >= 0, ExcIO());
 
@@ -9031,9 +8658,10 @@ void
 DataOutInterface<dim, spacedim>::write_hdf5_parallel(
   const DataOutBase::DataOutFilter &data_filter,
   const std::string &               filename,
-  const MPI_Comm &                  comm) const
+  const MPI_Comm                    comm) const
 {
-  DataOutBase::write_hdf5_parallel(get_patches(), data_filter, filename, comm);
+  DataOutBase::write_hdf5_parallel(
+    get_patches(), data_filter, hdf5_flags, filename, comm);
 }
 
 
@@ -9045,10 +8673,11 @@ DataOutInterface<dim, spacedim>::write_hdf5_parallel(
   const bool                        write_mesh_file,
   const std::string &               mesh_filename,
   const std::string &               solution_filename,
-  const MPI_Comm &                  comm) const
+  const MPI_Comm                    comm) const
 {
   DataOutBase::write_hdf5_parallel(get_patches(),
                                    data_filter,
+                                   hdf5_flags,
                                    write_mesh_file,
                                    mesh_filename,
                                    solution_filename,
@@ -9062,10 +8691,12 @@ void
 DataOutBase::write_hdf5_parallel(
   const std::vector<Patch<dim, spacedim>> &patches,
   const DataOutBase::DataOutFilter &       data_filter,
+  const DataOutBase::Hdf5Flags &           flags,
   const std::string &                      filename,
-  const MPI_Comm &                         comm)
+  const MPI_Comm                           comm)
 {
-  write_hdf5_parallel(patches, data_filter, true, filename, filename, comm);
+  write_hdf5_parallel(
+    patches, data_filter, flags, true, filename, filename, comm);
 }
 
 
@@ -9075,10 +8706,11 @@ void
 DataOutBase::write_hdf5_parallel(
   const std::vector<Patch<dim, spacedim>> &patches,
   const DataOutBase::DataOutFilter &       data_filter,
+  const DataOutBase::Hdf5Flags &           flags,
   const bool                               write_mesh_file,
   const std::string &                      mesh_filename,
   const std::string &                      solution_filename,
-  const MPI_Comm &                         comm)
+  const MPI_Comm                           comm)
 {
   AssertThrow(
     spacedim >= 2,
@@ -9086,13 +8718,12 @@ DataOutBase::write_hdf5_parallel(
       "DataOutBase was asked to write HDF5 output for a space dimension of 1. "
       "HDF5 only supports datasets that live in 2 or 3 dimensions."));
 
-  int ierr = 0;
-  (void)ierr;
 #ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make sure the compiler does not warn about
   // the now unused function arguments
   (void)patches;
   (void)data_filter;
+  (void)flags;
   (void)write_mesh_file;
   (void)mesh_filename;
   (void)solution_filename;
@@ -9138,13 +8769,14 @@ DataOutBase::write_hdf5_parallel(
     {
       do_write_hdf5<dim, spacedim>(patches,
                                    data_filter,
+                                   flags,
                                    write_mesh_file,
                                    mesh_filename,
                                    solution_filename,
                                    split_comm);
     }
 
-  ierr = MPI_Comm_free(&split_comm);
+  const int ierr = MPI_Comm_free(&split_comm);
   AssertThrowMPI(ierr);
 
 #endif
@@ -9244,6 +8876,8 @@ DataOutInterface<dim, spacedim>::set_flags(const FlagType &flags)
     eps_flags = *reinterpret_cast<const DataOutBase::EpsFlags *>(&flags);
   else if (typeid(flags) == typeid(gmv_flags))
     gmv_flags = *reinterpret_cast<const DataOutBase::GmvFlags *>(&flags);
+  else if (typeid(flags) == typeid(hdf5_flags))
+    hdf5_flags = *reinterpret_cast<const DataOutBase::Hdf5Flags *>(&flags);
   else if (typeid(flags) == typeid(tecplot_flags))
     tecplot_flags =
       *reinterpret_cast<const DataOutBase::TecplotFlags *>(&flags);
@@ -9313,6 +8947,10 @@ DataOutInterface<dim, spacedim>::declare_parameters(ParameterHandler &prm)
   DataOutBase::GmvFlags::declare_parameters(prm);
   prm.leave_subsection();
 
+  prm.enter_subsection("HDF5 output parameters");
+  DataOutBase::Hdf5Flags::declare_parameters(prm);
+  prm.leave_subsection();
+
   prm.enter_subsection("Tecplot output parameters");
   DataOutBase::TecplotFlags::declare_parameters(prm);
   prm.leave_subsection();
@@ -9361,6 +8999,10 @@ DataOutInterface<dim, spacedim>::parse_parameters(ParameterHandler &prm)
   gmv_flags.parse_parameters(prm);
   prm.leave_subsection();
 
+  prm.enter_subsection("HDF5 output parameters");
+  hdf5_flags.parse_parameters(prm);
+  prm.leave_subsection();
+
   prm.enter_subsection("Tecplot output parameters");
   tecplot_flags.parse_parameters(prm);
   prm.leave_subsection();
@@ -9387,6 +9029,7 @@ DataOutInterface<dim, spacedim>::memory_consumption() const
           MemoryConsumption::memory_consumption(povray_flags) +
           MemoryConsumption::memory_consumption(eps_flags) +
           MemoryConsumption::memory_consumption(gmv_flags) +
+          MemoryConsumption::memory_consumption(hdf5_flags) +
           MemoryConsumption::memory_consumption(tecplot_flags) +
           MemoryConsumption::memory_consumption(vtk_flags) +
           MemoryConsumption::memory_consumption(svg_flags) +
@@ -9700,7 +9343,7 @@ DataOutReader<dim, spacedim>::merge(const DataOutReader<dim, spacedim> &source)
 
   // adjust patch neighbors
   for (unsigned int i = old_n_patches; i < patches.size(); ++i)
-    for (unsigned int n : GeometryInfo<dim>::face_indices())
+    for (const unsigned int n : GeometryInfo<dim>::face_indices())
       if (patches[i].neighbors[n] !=
           dealii::DataOutBase::Patch<dim, spacedim>::no_neighbor)
         patches[i].neighbors[n] += old_n_patches;
@@ -10055,7 +9698,7 @@ namespace DataOutBase
       out << patch.vertices[i] << ' ';
     out << '\n';
 
-    for (unsigned int i : patch.reference_cell.face_indices())
+    for (const unsigned int i : patch.reference_cell.face_indices())
       out << patch.neighbors[i] << ' ';
     out << '\n';
 
@@ -10115,7 +9758,7 @@ namespace DataOutBase
     for (const unsigned int i : patch.reference_cell.vertex_indices())
       in >> patch.vertices[i];
 
-    for (unsigned int i : patch.reference_cell.face_indices())
+    for (const unsigned int i : patch.reference_cell.face_indices())
       in >> patch.neighbors[i];
 
     in >> patch.patch_index;

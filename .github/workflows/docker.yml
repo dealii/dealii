@@ -26,22 +26,26 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image of master 
+      - name: Build and push Docker image of master focal
         uses: docker/build-push-action@v4
         with:
           context: ./contrib/docker/
           cache-from: type=registry,ref=dealii/dependencies:focal
           cache-to: type=inline
+          build-args: |
+            VER=master
+            IMG=focal
           push: ${{github.ref_name == 'master'}}
           tags: dealii/dealii:master-focal
 
-      - name: Build and push Docker image of master with root user
+      - name: Build and push Docker image of master jammy
         uses: docker/build-push-action@v4
         with:
           context: ./contrib/docker/
-          file: ./contrib/docker/Dockerfile.root
-          cache-from: type=registry,ref=dealii/dealii:master-focal
+          cache-from: type=registry,ref=dealii/dependencies:jammy
           cache-to: type=inline
+          build-args: |
+            VER=master
+            IMG=jammy
           push: ${{github.ref_name == 'master'}}
-          tags: dealii/dealii:master-focal-root
-
+          tags: dealii/dealii:master-jammy

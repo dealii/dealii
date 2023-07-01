@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -117,7 +117,7 @@ namespace internal
        */
       std::vector<types::global_dof_index>
       get_n_locally_owned_dofs_per_processor(
-        const MPI_Comm &mpi_communicator) const;
+        const MPI_Comm mpi_communicator) const;
 
       /**
        * Return a representation of @p locally_owned_dofs_per_processor both
@@ -128,7 +128,7 @@ namespace internal
        */
       std::vector<IndexSet>
       get_locally_owned_dofs_per_processor(
-        const MPI_Comm &mpi_communicator) const;
+        const MPI_Comm mpi_communicator) const;
 
       /**
        * Total number of dofs, accumulated over all processors that may

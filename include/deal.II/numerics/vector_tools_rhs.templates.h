@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,8 +37,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace VectorTools
 {
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_boundary_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_boundary_right_hand_side(
     const Mapping<dim, spacedim> &                             mapping,
     const DoFHandler<dim, spacedim> &                          dof_handler,
     const Quadrature<dim - 1> &                                quadrature,
@@ -68,7 +68,7 @@ namespace VectorTools
         std::vector<double> rhs_values(n_q_points);
 
         for (const auto &cell : dof_handler.active_cell_iterators())
-          for (unsigned int face : cell->face_indices())
+          for (const unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -99,7 +99,7 @@ namespace VectorTools
                                                Vector<double>(n_components));
 
         for (const auto &cell : dof_handler.active_cell_iterators())
-          for (unsigned int face : cell->face_indices())
+          for (const unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -159,8 +159,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_boundary_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_boundary_right_hand_side(
     const DoFHandler<dim, spacedim> &                          dof_handler,
     const Quadrature<dim - 1> &                                quadrature,
     const Function<spacedim, typename VectorType::value_type> &rhs_function,
@@ -178,8 +178,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_boundary_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_boundary_right_hand_side(
     const hp::MappingCollection<dim, spacedim> &               mapping,
     const DoFHandler<dim, spacedim> &                          dof_handler,
     const hp::QCollection<dim - 1> &                           quadrature,
@@ -207,7 +207,7 @@ namespace VectorTools
         std::vector<double> rhs_values;
 
         for (const auto &cell : dof_handler.active_cell_iterators())
-          for (unsigned int face : cell->face_indices())
+          for (const unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -245,7 +245,7 @@ namespace VectorTools
         std::vector<Vector<double>> rhs_values;
 
         for (const auto &cell : dof_handler.active_cell_iterators())
-          for (unsigned int face : cell->face_indices())
+          for (const unsigned int face : cell->face_indices())
             if (cell->face(face)->at_boundary() &&
                 (boundary_ids.empty() ||
                  (boundary_ids.find(cell->face(face)->boundary_id()) !=
@@ -312,8 +312,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_boundary_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_boundary_right_hand_side(
     const DoFHandler<dim, spacedim> &                          dof_handler,
     const hp::QCollection<dim - 1> &                           quadrature,
     const Function<spacedim, typename VectorType::value_type> &rhs_function,
@@ -329,9 +329,11 @@ namespace VectorTools
       boundary_ids);
   }
 
+
+
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_right_hand_side(
     const Mapping<dim, spacedim> &                             mapping,
     const DoFHandler<dim, spacedim> &                          dof_handler,
     const Quadrature<dim> &                                    quadrature,
@@ -447,8 +449,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_right_hand_side(
     const DoFHandler<dim, spacedim> &                          dof_handler,
     const Quadrature<dim> &                                    quadrature,
     const Function<spacedim, typename VectorType::value_type> &rhs_function,
@@ -467,8 +469,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_right_hand_side(
     const hp::MappingCollection<dim, spacedim> &               mapping,
     const DoFHandler<dim, spacedim> &                          dof_handler,
     const hp::QCollection<dim> &                               quadrature,
@@ -603,8 +605,8 @@ namespace VectorTools
 
 
   template <int dim, int spacedim, typename VectorType>
-  void
-  create_right_hand_side(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void create_right_hand_side(
     const DoFHandler<dim, spacedim> &                          dof_handler,
     const hp::QCollection<dim> &                               quadrature,
     const Function<spacedim, typename VectorType::value_type> &rhs_function,

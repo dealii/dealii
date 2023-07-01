@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,23 +17,48 @@
 /**
  * @defgroup simplex Simplex support (experimental)
  *
- * @brief This module describes the experimental simplex support in deal.II.
+ * This module describes the experimental simplex support in deal.II.
  *
  * Simplex and mixed meshes in deal.II are still experimental, i.e., work
  * in progress. Large parts of the library have been ported to be able to
  * operate on such kind of meshes. However, there are still many functions
- * that need to be generalized. You can get a good overview of the ported
+ * that need to be generalized.
+ *
+ * @section simplex_functionality_list Important Simplex Functionality
+ *
+ * Here is an incomplete list of functionality related to simplex
+ * computations:
+ * - Mesh generation:
+ *   GridGenerator::implicit_function(),
+ *   GridGenerator::convert_hypercube_to_simplex_mesh(),
+ *   GridGenerator::subdivided_hyper_rectangle_with_simplices(),
+ *   GridGenerator::subdivided_hyper_cube_with_simplices()
+ * - Quadratures:
+ *   QGaussWedge, QGaussSimplex, QWitherdenVincentSimplex
+ * - FiniteElements:
+ *   FE_SimplexP, FE_SimplexDGP, FE_SimplexP_Bubbles
+ *   FE_PyramidP, FE_PyramidDGP, FE_WedgeP, FE_WedgeDGP
+ * - Mapping:
+ *   MappingFE
+ * - Other:
+ *   GridIn::read_vtk(), GridIn::read_msh(), GridIn::read_comsol_mphtxt()
+ *
+ *
+ *
+ * @section Examples
+ *
+ * You can get a good overview of the ported
  * functionalities by taking a look at the tests in the folder
  * "tests/simplex". In the following, we provide two very basic examples
- * to get started and provide some implementation details.
+ * to get you started and to provide some implementation details.
  *
- * @section simplex_reference_example_simplex Example: simplex mesh
+ * @subsection simplex_reference_example_simplex Example: simplex mesh
  *
  * The following code shows how to work with simplex meshes:
  *
  * @include step_3_simplex.cc
  *
- * @section simplex_reference_example_mixed Example: mixed mesh
+ * @subsection simplex_reference_example_mixed Example: mixed mesh
  *
  * The following code shows how to work with mixed meshes:
  *

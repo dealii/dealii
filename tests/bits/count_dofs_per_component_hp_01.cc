@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// Copyright (C) 2003 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,8 +30,6 @@
 //   count_dofs_per_component (...);
 // for the hp-case
 
-
-using namespace std;
 
 template <int dim>
 void

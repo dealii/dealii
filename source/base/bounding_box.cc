@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,6 +17,7 @@
 #include <deal.II/base/geometry_info.h>
 
 #include <limits>
+#include <numeric>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -331,6 +332,61 @@ BoundingBox<spacedim, Number>::unit_to_real(
   for (unsigned int d = 0; d < spacedim; ++d)
     real[d] += diag[d] * point[d];
   return real;
+}
+
+
+
+template <int spacedim, typename Number>
+Number
+BoundingBox<spacedim, Number>::signed_distance(
+  const Point<spacedim, Number> &point,
+  const unsigned int             direction) const
+{
+  const Number p1 = lower_bound(direction);
+  const Number p2 = upper_bound(direction);
+
+  if (point[direction] > p2)
+    return point[direction] - p2;
+  else if (point[direction] < p1)
+    return p1 - point[direction];
+  else
+    return -std::min(point[direction] - p1, p2 - point[direction]);
+}
+
+
+
+template <int spacedim, typename Number>
+Number
+BoundingBox<spacedim, Number>::signed_distance(
+  const Point<spacedim, Number> &point) const
+{
+  // calculate vector of orthogonal signed distances
+  std::array<Number, spacedim> distances;
+  for (unsigned int d = 0; d < spacedim; ++d)
+    distances[d] = signed_distance(point, d);
+
+  // determine the number of positive signed distances
+  const unsigned int n_positive_signed_distances =
+    std::count_if(distances.begin(), distances.end(), [](const auto &a) {
+      return a > 0.0;
+    });
+
+  if (n_positive_signed_distances <= 1)
+    // point is inside of bounding box (0: all signed distances are
+    // negative; find the index with the smallest absolute value)
+    // or next to a face (1: all signed distances are negative
+    // but one; find this index)
+    return *std::max_element(distances.begin(), distances.end());
+  else
+    // point is next to a corner (2D/3D: all signed distances are
+    // positive) or a line (3D: all signed distances are positive
+    // but one) -> take the l2-norm of all positive signed distances
+    return std::sqrt(std::accumulate(distances.begin(),
+                                     distances.end(),
+                                     0.0,
+                                     [](const auto &a, const auto &b) {
+                                       return a + (b > 0 ? b * b : 0.0);
+                                     }));
 }
 
 

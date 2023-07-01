@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,10 @@
 
 #include <deal.II/distributed/tria_base.h>
 
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/grid/filtered_iterator.h>
@@ -97,8 +101,8 @@ namespace VectorTools
 
 
   template <typename VectorType>
-  void
-  subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void subtract_mean_value(VectorType &v, const std::vector<bool> &p_select)
   {
     internal::subtract_mean_value(v, p_select);
   }
@@ -124,9 +128,171 @@ namespace VectorTools
     }
   } // namespace internal
 
+
+
+  template <class VectorType, int dim, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void add_constant(VectorType &                          solution,
+                    const DoFHandler<dim, spacedim> &     dof_handler,
+                    const unsigned int                    component,
+                    const typename VectorType::value_type constant_adjustment)
+  {
+    Assert(dof_handler.has_hp_capabilities() == false, ExcNotImplemented());
+
+    AssertDimension(solution.size(), dof_handler.n_dofs());
+    AssertIndexRange(component, dof_handler.get_fe().n_components());
+
+    const FiniteElement<dim, spacedim> &fe_system = dof_handler.get_fe();
+    const FiniteElement<dim, spacedim> &fe = fe_system.get_sub_fe(component, 1);
+
+    if ((dynamic_cast<const FE_DGP<dim, spacedim> *>(&fe) != nullptr))
+      {
+        // The FE to modify is an FE_DGP, which is not a nodal
+        // element. The first shape function of a DGP element happens
+        // to be the constant function, so we just have to adjust the
+        // corresponding DoF on each cell:
+        std::vector<types::global_dof_index> local_dof_indices(
+          dof_handler.get_fe().dofs_per_cell);
+
+        for (const auto &cell : dof_handler.active_cell_iterators())
+          if (cell->is_locally_owned())
+            {
+              cell->get_dof_indices(local_dof_indices);
+              const unsigned int first_pressure_dof =
+                fe_system.component_to_system_index(component, 0);
+
+              // Make sure that this DoF is really owned by the
+              // current processor:
+              Assert(dof_handler.locally_owned_dofs().is_element(
+                       local_dof_indices[first_pressure_dof]),
+                     ExcInternalError());
+
+              // Then adjust its value:
+              solution(local_dof_indices[first_pressure_dof]) +=
+                constant_adjustment;
+            }
+
+        solution.compress(VectorOperation::add);
+      }
+    else if ((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe) != nullptr) ||
+             (dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe) != nullptr))
+      {
+        // We need to make sure to not touch DoFs shared between cells more
+        // than once. Instead of counting or limiting the number of times
+        // we touch an individual vector entry, we make a copy of the vector
+        // and use that as the input and add the constant to it. This way
+        // it does not matter how often an individual entry is touched.
+
+        VectorType copy(solution);
+        copy = solution;
+
+        std::vector<types::global_dof_index> local_dof_indices(
+          dof_handler.get_fe().dofs_per_cell);
+
+        for (const auto &cell : dof_handler.active_cell_iterators())
+          if (cell->is_locally_owned())
+            {
+              cell->get_dof_indices(local_dof_indices);
+              for (unsigned i = 0; i < dof_handler.get_fe().dofs_per_cell; ++i)
+                {
+                  if (!fe_system.is_primitive(i))
+                    continue;
+
+                  const auto component_and_index =
+                    fe_system.system_to_component_index(i);
+                  if (component_and_index.first == component)
+                    {
+                      const types::global_dof_index idx = local_dof_indices[i];
+                      // Make sure that this DoF is really owned by the
+                      // current processor:
+                      if (!dof_handler.locally_owned_dofs().is_element(idx))
+                        continue;
+
+                      // Then adjust its value:
+                      solution(idx) =
+                        typename VectorType::value_type(copy(idx)) +
+                        constant_adjustment;
+                    }
+                }
+            }
+
+        solution.compress(VectorOperation::insert);
+      }
+    else if ((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&fe) != nullptr) ||
+             (dynamic_cast<const FE_SimplexDGP<dim, spacedim> *>(&fe) !=
+              nullptr))
+      {
+        // Add the constant to every single shape function per cell
+
+        std::vector<types::global_dof_index> local_dof_indices(
+          dof_handler.get_fe().dofs_per_cell);
+
+        for (const auto &cell : dof_handler.active_cell_iterators())
+          if (cell->is_locally_owned())
+            {
+              cell->get_dof_indices(local_dof_indices);
+              for (unsigned i = 0; i < dof_handler.get_fe().dofs_per_cell; ++i)
+                {
+                  if (!fe_system.is_primitive(i))
+                    continue;
+
+                  const auto component_and_index =
+                    fe_system.system_to_component_index(i);
+                  if (component_and_index.first == component)
+                    {
+                      // Make sure that this DoF is really owned by the
+                      // current processor:
+                      Assert(dof_handler.locally_owned_dofs().is_element(
+                               local_dof_indices[i]),
+                             ExcInternalError());
+
+                      // Then adjust its value:
+                      solution(local_dof_indices[i]) += constant_adjustment;
+                    }
+                }
+            }
+
+        solution.compress(VectorOperation::add);
+      }
+    else
+      AssertThrow(false, ExcNotImplemented());
+  }
+
+
+
+#ifdef DEAL_II_WITH_TRILINOS
+  template <int dim, int spacedim>
+  void
+  add_constant(LinearAlgebra::EpetraWrappers::Vector &,
+               const DoFHandler<dim, spacedim> &,
+               const unsigned int,
+               const double)
+  {
+    // TODO: no vector access using operator()
+    AssertThrow(false, ExcNotImplemented());
+  }
+
+
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template <int dim, int spacedim, typename ValueType>
+  void
+  add_constant(LinearAlgebra::TpetraWrappers::Vector<ValueType> &,
+               const DoFHandler<dim, spacedim> &,
+               const unsigned int,
+               const ValueType)
+  {
+    // TODO: no vector access using operator()
+    AssertThrow(false, ExcNotImplemented());
+  }
+#  endif
+#endif
+
+
+
   template <int dim, typename VectorType, int spacedim>
-  typename VectorType::value_type
-  compute_mean_value(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  typename VectorType::value_type compute_mean_value(
     const hp::MappingCollection<dim, spacedim> &mapping_collection,
     const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q_collection,
@@ -206,12 +372,13 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
   typename VectorType::value_type
-  compute_mean_value(const Mapping<dim, spacedim> &   mapping,
-                     const DoFHandler<dim, spacedim> &dof,
-                     const Quadrature<dim> &          quadrature,
-                     const VectorType &               v,
-                     const unsigned int               component)
+    compute_mean_value(const Mapping<dim, spacedim> &   mapping,
+                       const DoFHandler<dim, spacedim> &dof,
+                       const Quadrature<dim> &          quadrature,
+                       const VectorType &               v,
+                       const unsigned int               component)
   {
     return compute_mean_value(hp::MappingCollection<dim, spacedim>(mapping),
                               dof,
@@ -222,11 +389,12 @@ namespace VectorTools
 
 
   template <int dim, typename VectorType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
   typename VectorType::value_type
-  compute_mean_value(const DoFHandler<dim, spacedim> &dof,
-                     const Quadrature<dim> &          quadrature,
-                     const VectorType &               v,
-                     const unsigned int               component)
+    compute_mean_value(const DoFHandler<dim, spacedim> &dof,
+                       const Quadrature<dim> &          quadrature,
+                       const VectorType &               v,
+                       const unsigned int               component)
   {
     return compute_mean_value(get_default_linear_mapping(
                                 dof.get_triangulation()),

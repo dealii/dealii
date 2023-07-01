@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,12 +24,12 @@ namespace taskflow_v1
             typename ScratchData,
             typename CopyData>
   void
-  run(const Iterator &                         begin,
-      const typename identity<Iterator>::type &end,
-      Worker                                   worker,
-      Copier                                   copier,
-      const ScratchData &                      sample_scratch_data,
-      const CopyData &                         sample_copy_data,
+  run(const Iterator &                            begin,
+      const std_cxx20::type_identity_t<Iterator> &end,
+      Worker                                      worker,
+      Copier                                      copier,
+      const ScratchData &                         sample_scratch_data,
+      const CopyData &                            sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
       const unsigned int chunk_size   = 8)
   {
@@ -115,9 +115,9 @@ namespace taskflow_v1
             typename ScratchData,
             typename CopyData>
   void
-  run(const Iterator &                         begin,
-      const typename identity<Iterator>::type &end,
-      MainClass &                              main_object,
+  run(const Iterator &                            begin,
+      const std_cxx20::type_identity_t<Iterator> &end,
+      MainClass &                                 main_object,
       void (MainClass::*worker)(const Iterator &, ScratchData &, CopyData &),
       void (MainClass::*copier)(const CopyData &),
       const ScratchData &sample_scratch_data,

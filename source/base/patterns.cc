@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,14 +20,12 @@
 #include <deal.II/base/patterns.h>
 #include <deal.II/base/utilities.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/io/ios_state.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #undef BOOST_BIND_GLOBAL_PLACEHOLDERS
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cctype>
@@ -317,18 +315,18 @@ namespace Patterns
       {
         std::istringstream is(description);
 
-        if (is.str().size() > strlen(description_init) + 1)
+        if (is.str().size() > std::strlen(description_init) + 1)
           {
             // TODO: verify that description matches the pattern "^\[Integer
             // range \d+\.\.\.\d+\]$"
             int lower_bound, upper_bound;
 
-            is.ignore(strlen(description_init) + strlen(" range "));
+            is.ignore(std::strlen(description_init) + std::strlen(" range "));
 
             if (!(is >> lower_bound))
               return std::make_unique<Integer>();
 
-            is.ignore(strlen("..."));
+            is.ignore(std::strlen("..."));
 
             if (!(is >> upper_bound))
               return std::make_unique<Integer>();
@@ -782,23 +780,40 @@ namespace Patterns
       {
         unsigned int min_elements = 0, max_elements = 0;
 
-        std::istringstream is(description);
-        is.ignore(strlen(description_init) + strlen(" of <"));
+        std::string::const_iterator it = description.begin() +
+                                         std::strlen(description_init) +
+                                         std::strlen(" of <");
 
-        std::string str;
-        std::getline(is, str, '>');
+        int  n_open_angular = 1;
+        auto tmp_it         = it - 1;
+        while (n_open_angular > 0)
+          {
+            tmp_it = std::find_if(tmp_it + 1, description.end(), [](char c) {
+              return (c == '>' || c == '<');
+            });
+            AssertThrow(tmp_it != description.end(),
+                        ExcMessage(
+                          "Couldn't find a closing '>' in description!"));
+            if (*tmp_it == '<')
+              ++n_open_angular;
+            else
+              --n_open_angular;
+          }
 
-        std::unique_ptr<PatternBase> base_pattern(pattern_factory(str));
+        std::string                  base_pattern_string(it, tmp_it);
+        std::unique_ptr<PatternBase> base_pattern(
+          pattern_factory(base_pattern_string));
 
-        is.ignore(strlen(" of length "));
+        std::istringstream is(
+          std::string(tmp_it + std::strlen(" of length "), description.end()));
         if (!(is >> min_elements))
           return std::make_unique<List>(*base_pattern);
 
-        is.ignore(strlen("..."));
+        is.ignore(std::strlen("..."));
         if (!(is >> max_elements))
           return std::make_unique<List>(*base_pattern, min_elements);
 
-        is.ignore(strlen(" (inclusive) separated by <"));
+        is.ignore(std::strlen(" (inclusive) separated by <"));
         std::string separator;
         if (!is.eof())
           std::getline(is, separator, '>');
@@ -975,7 +990,7 @@ namespace Patterns
         unsigned int min_elements = 0, max_elements = 0;
 
         std::istringstream is(description);
-        is.ignore(strlen(description_init) + strlen(" of <"));
+        is.ignore(std::strlen(description_init) + std::strlen(" of <"));
 
         std::string key;
         std::getline(is, key, '>');
@@ -990,17 +1005,17 @@ namespace Patterns
         std::unique_ptr<PatternBase> key_pattern(pattern_factory(key));
         std::unique_ptr<PatternBase> value_pattern(pattern_factory(value));
 
-        is.ignore(strlen(" of length "));
+        is.ignore(std::strlen(" of length "));
         if (!(is >> min_elements))
           return std::make_unique<Map>(*key_pattern, *value_pattern);
 
-        is.ignore(strlen("..."));
+        is.ignore(std::strlen("..."));
         if (!(is >> max_elements))
           return std::make_unique<Map>(*key_pattern,
                                        *value_pattern,
                                        min_elements);
 
-        is.ignore(strlen(" (inclusive) separated by <"));
+        is.ignore(std::strlen(" (inclusive) separated by <"));
         std::string separator;
         if (!is.eof())
           std::getline(is, separator, '>');
@@ -1181,7 +1196,7 @@ namespace Patterns
         std::vector<std::unique_ptr<PatternBase>> patterns;
 
         std::istringstream is(description);
-        is.ignore(strlen(description_init) + strlen(" of <"));
+        is.ignore(std::strlen(description_init) + std::strlen(" of <"));
 
         std::string len;
         std::getline(is, len, '>');
@@ -1190,7 +1205,7 @@ namespace Patterns
                ExcMessage("Provide at least 1 element in the tuple."));
         patterns.resize(n_elements);
 
-        is.ignore(strlen(" elements <"));
+        is.ignore(std::strlen(" elements <"));
 
         std::string element;
         std::getline(is, element, '>');
@@ -1198,12 +1213,12 @@ namespace Patterns
 
         for (unsigned int i = 1; i < n_elements; ++i)
           {
-            is.ignore(strlen(", <"));
+            is.ignore(std::strlen(", <"));
             std::getline(is, element, '>');
             patterns[i] = pattern_factory(element);
           }
 
-        is.ignore(strlen(" separated by <"));
+        is.ignore(std::strlen(" separated by <"));
 
         std::string separator;
         if (!is.eof())
@@ -1577,7 +1592,7 @@ namespace Patterns
         std::string        file_type;
         FileType           type;
 
-        is.ignore(strlen(description_init) + strlen(" (Type:"));
+        is.ignore(std::strlen(description_init) + std::strlen(" (Type:"));
 
         is >> file_type;
 

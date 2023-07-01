@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -437,7 +437,7 @@ namespace internal
         Assert(fe_index_local_ptr !=
                  dof_handler.hp_object_fe_indices[structdim].begin() +
                    dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
-               ExcNotImplemented());
+               ExcMessage("Call distribute_dofs() first."));
 
         const types::fe_index fe_index_local =
           std::distance(dof_handler.hp_object_fe_indices[structdim].begin() +
@@ -516,9 +516,15 @@ namespace internal
         // determine range of dofs in global data structure
         const auto range =
           process_object_range(dof_handler, obj_level, obj_index, fe_index, dd);
+        if (range.second == 0)
+          return;
+
+        std::vector<types::global_dof_index> &object_dof_indices =
+          dof_handler
+            .object_dof_indices[structdim < dim ? 0 : obj_level][structdim];
+        AssertIndexRange(range.first, object_dof_indices.size());
         types::global_dof_index *DEAL_II_RESTRICT stored_indices =
-          &dof_handler.object_dof_indices[structdim < dim ? 0 : obj_level]
-                                         [structdim][range.first];
+          object_dof_indices.data() + range.first;
 
         // process dofs
         for (unsigned int i = 0; i < range.second; ++i, ++dof_indices_ptr)
@@ -824,7 +830,7 @@ namespace internal
         index_set.add_indices(cache_indices.begin(), cache_indices.end());
         index_set.compress();
         LinearAlgebra::ReadWriteVector<Number> read_write_vector(index_set);
-        read_write_vector.import(values, VectorOperation::insert);
+        read_write_vector.import_elements(values, VectorOperation::insert);
 
         // Copy the elements from read_write_vector and reorder them.
         for (unsigned int i = 0; i < cache_size; ++i, ++local_values_begin)
@@ -852,7 +858,7 @@ namespace internal
         index_set.add_indices(cache_indices.begin(), cache_indices.end());
         index_set.compress();
         LinearAlgebra::ReadWriteVector<double> read_write_vector(index_set);
-        read_write_vector.import(values, VectorOperation::insert);
+        read_write_vector.import_elements(values, VectorOperation::insert);
 
         // Copy the elements from read_write_vector and reorder them.
         for (unsigned int i = 0; i < cache_size; ++i, ++local_values_begin)
@@ -1083,11 +1089,11 @@ namespace internal
         // correct (cell-local) ordering. The same applies, if the face_rotation
         // or face_orientation is non-standard
         if (structdim == 3 && fe.max_dofs_per_quad() > 0)
-          for (const auto quad : accessor.face_indices())
+          for (const auto face_no : accessor.face_indices())
             {
               const auto combined_orientation = TriaAccessorImplementation::
-                Implementation::combined_face_orientation(accessor, quad);
-              const unsigned int quad_index = accessor.quad_index(quad);
+                Implementation::combined_face_orientation(accessor, face_no);
+              const unsigned int quad_index = accessor.quad_index(face_no);
               if (combined_orientation ==
                   ReferenceCell::default_combined_face_orientation())
                 dof_operation.process_dofs(
@@ -1108,10 +1114,10 @@ namespace internal
                   [&](const auto d) {
                     return fe.adjust_quad_dof_index_for_face_orientation(
                       d,
-                      quad,
-                      accessor.face_orientation(quad),
-                      accessor.face_flip(quad),
-                      accessor.face_rotation(quad));
+                      face_no,
+                      accessor.face_orientation(face_no),
+                      accessor.face_flip(face_no),
+                      accessor.face_rotation(face_no));
                   },
                   std::integral_constant<int, 2>(),
                   dof_indices_ptr,
@@ -1980,10 +1986,6 @@ template <int spacedim, bool level_dof_access>
 inline unsigned int
 DoFAccessor<0, 1, spacedim, level_dof_access>::n_active_fe_indices() const
 {
-  Assert((std::is_same<DoFHandler<1, spacedim>,
-                       dealii::DoFHandler<1, spacedim>>::value == true),
-         ExcNotImplemented());
-
   return 1;
 }
 
@@ -1994,10 +1996,6 @@ inline types::fe_index
 DoFAccessor<0, 1, spacedim, level_dof_access>::nth_active_fe_index(
   const unsigned int /*n*/) const
 {
-  Assert((std::is_same<DoFHandler<1, spacedim>,
-                       dealii::DoFHandler<1, spacedim>>::value == true),
-         ExcNotImplemented());
-
   return 0;
 }
 
@@ -2117,13 +2115,6 @@ namespace internal
 {
   namespace DoFCellAccessorImplementation
   {
-    // make sure we refer to class
-    // dealii::DoFCellAccessor, not
-    // namespace
-    // dealii::internal::DoFCellAccessor
-    using dealii::DoFCellAccessor;
-    using dealii::DoFHandler;
-
     /**
      * A class with the same purpose as the similarly named class of the
      * Triangulation class. See there for more information.
@@ -2140,8 +2131,7 @@ namespace internal
         const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
-          return 0; // ::DoFHandler only supports a single active FE with index
-                    // zero
+          return DoFHandler<dim, spacedim>::default_fe_index;
 
         Assert(
           accessor.dof_handler != nullptr,
@@ -2168,7 +2158,6 @@ namespace internal
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
           {
-            // ::DoFHandler only supports a single active FE with index zero
             AssertDimension(i, (DoFHandler<dim, spacedim>::default_fe_index));
             return;
           }
@@ -2199,10 +2188,7 @@ namespace internal
         const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
-          return DoFHandler<dim, spacedim>::
-            default_fe_index; // ::DoFHandler only supports
-                              // a single active FE with
-                              // index zero
+          return DoFHandler<dim, spacedim>::default_fe_index;
 
         Assert(
           accessor.dof_handler != nullptr,
@@ -2234,7 +2220,6 @@ namespace internal
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
           {
-            // ::DoFHandler only supports a single active FE with index zero
             AssertDimension(i, (DoFHandler<dim, spacedim>::default_fe_index));
             return;
           }
@@ -2265,8 +2250,7 @@ namespace internal
         const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
-          return false; // ::DoFHandler only supports a single active FE with
-                        // index zero
+          return false;
 
         Assert(
           accessor.dof_handler != nullptr,
@@ -2293,8 +2277,7 @@ namespace internal
         const DoFCellAccessor<dim, spacedim, level_dof_access> &accessor)
       {
         if (accessor.dof_handler->hp_capability_enabled == false)
-          return; // ::DoFHandler only supports a single active FE with index
-                  // zero
+          return;
 
         Assert(
           accessor.dof_handler != nullptr,
@@ -2504,7 +2487,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
     GeometryInfo<dimension_>::faces_per_cell>
     face_iterators(this->n_faces());
 
-  for (unsigned int i : this->face_indices())
+  for (const unsigned int i : this->face_indices())
     face_iterators[i] =
       dealii::internal::DoFCellAccessorImplementation::get_face(
         *this, i, std::integral_constant<int, dimension_>());
@@ -2852,6 +2835,12 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
   Assert(!this->has_children(), ExcMessage("Cell must be active"));
 
+  Assert(
+    internal::ArrayViewHelper::is_contiguous(local_source_begin,
+                                             local_source_end),
+    ExcMessage(
+      "This function can not be called with iterator types that do not point to contiguous memory."));
+
   const unsigned int n_dofs = local_source_end - local_source_begin;
 
   internal::DoFAccessorImplementation::Implementation::dof_index_vector_type
@@ -2860,7 +2849,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
     *this, dof_indices, this->active_fe_index());
 
   // distribute cell vector
-  global_destination.add(n_dofs, dof_indices.data(), local_source_begin);
+  global_destination.add(n_dofs, dof_indices.data(), &(*local_source_begin));
 }
 
 

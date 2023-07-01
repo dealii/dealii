@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,7 @@ template <int dim, int spacedim = dim>
 void
 test_hypercube(unsigned int ref, unsigned int max_bbox)
 {
-  const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
+  const MPI_Comm mpi_communicator = MPI_COMM_WORLD;
   deallog << "Testing hypercube for spacedim = " << spacedim
           << " refinement: " << ref << " max number of boxes: " << max_bbox
           << std::endl;

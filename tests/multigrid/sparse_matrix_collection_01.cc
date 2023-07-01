@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2018 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,8 +18,6 @@
 #include <algorithm>
 
 #include "../tests.h"
-
-using namespace std;
 
 
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,16 +84,14 @@ namespace internal
 
     std::vector<types::global_dof_index>
     NumberCache::get_n_locally_owned_dofs_per_processor(
-      const MPI_Comm &mpi_communicator) const
+      const MPI_Comm mpi_communicator) const
     {
       if (n_global_dofs == 0)
         return std::vector<types::global_dof_index>();
       else if (n_locally_owned_dofs_per_processor.empty() == false)
         {
           AssertDimension(n_locally_owned_dofs_per_processor.size(),
-                          (Utilities::MPI::job_supports_mpi() ?
-                             Utilities::MPI::n_mpi_processes(mpi_communicator) :
-                             1));
+                          Utilities::MPI::n_mpi_processes(mpi_communicator));
           return n_locally_owned_dofs_per_processor;
         }
       else
@@ -107,7 +105,7 @@ namespace internal
 
     std::vector<IndexSet>
     NumberCache::get_locally_owned_dofs_per_processor(
-      const MPI_Comm &mpi_communicator) const
+      const MPI_Comm mpi_communicator) const
     {
       AssertDimension(locally_owned_dofs.size(), n_global_dofs);
       if (n_global_dofs == 0)
@@ -115,9 +113,7 @@ namespace internal
       else if (locally_owned_dofs_per_processor.empty() == false)
         {
           AssertDimension(locally_owned_dofs_per_processor.size(),
-                          (Utilities::MPI::job_supports_mpi() ?
-                             Utilities::MPI::n_mpi_processes(mpi_communicator) :
-                             1));
+                          Utilities::MPI::n_mpi_processes(mpi_communicator));
           return locally_owned_dofs_per_processor;
         }
       else

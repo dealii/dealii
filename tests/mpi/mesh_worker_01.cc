@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2021 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -105,7 +105,7 @@ test_simple(DoFHandler<dim> &dofs, MeshWorker::LoopControl &lctrl)
   MeshWorker::DoFInfo<dim> dof_info(dofs.block_info());
 
   //  integration_loop(ITERATOR begin,
-  //                typename identity<ITERATOR>::type end,
+  //                std_cxx20::type_identity_t<ITERATOR> end,
   //                DOFINFO &dinfo,
   //                INFOBOX &info,
   //                const std::function<void (DOFINFO &, typename

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,6 +36,12 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
         const VEC &,
         const unsigned int);
 
+      template void
+      add_constant<>(VEC &                                      solution,
+                     const DoFHandler<deal_II_dimension,
+                                      deal_II_space_dimension> &dof_handler,
+                     const unsigned int                         component,
+                     const typename VEC::value_type constant_adjustment);
     \}
 #endif
   }

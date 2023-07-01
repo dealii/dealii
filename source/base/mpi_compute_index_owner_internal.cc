@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -165,12 +165,11 @@ namespace Utilities
 
 
         void
-        Dictionary::reinit(const IndexSet &owned_indices, const MPI_Comm &comm)
+        Dictionary::reinit(const IndexSet &owned_indices, const MPI_Comm comm)
         {
           // 1) set up the partition
           this->partition(owned_indices, comm);
 
-#ifdef DEAL_II_WITH_MPI
           unsigned int my_rank = this_mpi_process(comm);
 
           types::global_dof_index dic_local_received = 0;
@@ -217,14 +216,14 @@ namespace Utilities
 
                   Assert(next_index > index_range.first, ExcInternalError());
 
-#  ifdef DEBUG
+#ifdef DEBUG
                   // make sure that the owner is the same on the current
                   // interval
                   for (types::global_dof_index i = index_range.first + 1;
                        i < next_index;
                        ++i)
                     AssertDimension(owner, dof_to_dict_rank(i));
-#  endif
+#endif
 
                   // add the interval, either to the local range or into a
                   // buffer to be sent to another processor
@@ -245,6 +244,7 @@ namespace Utilities
                 }
             }
 
+#ifdef DEAL_II_WITH_MPI
           n_dict_procs_in_owned_indices = buffers.size();
           std::vector<MPI_Request> request;
 
@@ -421,8 +421,9 @@ namespace Utilities
             }
 
 #else
-          (void)owned_indices;
+          Assert(buffers.size() == 0, ExcInternalError());
           (void)comm;
+          (void)dic_local_received;
 #endif
         }
 
@@ -430,9 +431,8 @@ namespace Utilities
 
         void
         Dictionary::partition(const IndexSet &owned_indices,
-                              const MPI_Comm &comm)
+                              const MPI_Comm  comm)
         {
-#ifdef DEAL_II_WITH_MPI
           const unsigned int n_procs = n_mpi_processes(comm);
           const unsigned int my_rank = this_mpi_process(comm);
 
@@ -452,17 +452,13 @@ namespace Utilities
           local_range.second = get_index_offset(my_rank + 1);
 
           locally_owned_size = local_range.second - local_range.first;
-#else
-          (void)owned_indices;
-          (void)comm;
-#endif
         }
 
 
         ConsensusAlgorithmsPayload::ConsensusAlgorithmsPayload(
           const IndexSet &           owned_indices,
           const IndexSet &           indices_to_look_up,
-          const MPI_Comm &           comm,
+          const MPI_Comm             comm,
           std::vector<unsigned int> &owning_ranks,
           const bool                 track_index_requests)
           : owned_indices(owned_indices)

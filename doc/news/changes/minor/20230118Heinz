@@ -1,4 +1,0 @@
-Improved: Introduce a function that only checks if Bounding Boxes are overlapping.
-Fixed: If a 1D BBox is completely contained in another one, it was not recognized as mergable neighbor.
-<br>
-(Johannes Heinz, 2022/07/07)

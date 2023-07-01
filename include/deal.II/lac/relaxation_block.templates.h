@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -283,7 +283,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
               additional_data->relaxation * x_cell(row_cell);
         }
     }
-  dst.compress(dealii::VectorOperation::add);
+  dst.compress(VectorOperation::add);
 }
 
 

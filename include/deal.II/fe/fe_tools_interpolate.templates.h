@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -461,7 +461,7 @@ namespace FETools
     {
       if (u1.n_blocks() == 0)
         return;
-      const MPI_Comm &mpi_communicator = u1.block(0).get_mpi_communicator();
+      const MPI_Comm  mpi_communicator = u1.block(0).get_mpi_communicator();
       const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
       IndexSet        dof2_locally_relevant_dofs;
       DoFTools::extract_locally_relevant_dofs(dof2, dof2_locally_relevant_dofs);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,9 +22,7 @@
 #  include <deal.II/arborx/access_traits.h>
 
 #  include <ArborX_DistributedTree.hpp>
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <Kokkos_Core.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -46,7 +44,7 @@ namespace ArborXWrappers
      */
     template <int dim, typename Number>
     DistributedTree(
-      const MPI_Comm &                             comm,
+      const MPI_Comm                               comm,
       const std::vector<BoundingBox<dim, Number>> &bounding_boxes);
 
     /**
@@ -54,7 +52,7 @@ namespace ArborXWrappers
      * in @p points are local to the MPI process.
      */
     template <int dim, typename Number>
-    DistributedTree(const MPI_Comm &                       comm,
+    DistributedTree(const MPI_Comm                         comm,
                     const std::vector<Point<dim, Number>> &points);
 
     /**
@@ -84,7 +82,7 @@ namespace ArborXWrappers
 
   template <int dim, typename Number>
   DistributedTree::DistributedTree(
-    const MPI_Comm &                             comm,
+    const MPI_Comm                               comm,
     const std::vector<BoundingBox<dim, Number>> &bounding_boxes)
     : distributed_tree(comm,
                        Kokkos::DefaultHostExecutionSpace{},
@@ -95,7 +93,7 @@ namespace ArborXWrappers
 
   template <int dim, typename Number>
   DistributedTree::DistributedTree(
-    const MPI_Comm &                       comm,
+    const MPI_Comm                         comm,
     const std::vector<Point<dim, Number>> &points)
     : distributed_tree(comm, Kokkos::DefaultHostExecutionSpace{}, points)
   {}

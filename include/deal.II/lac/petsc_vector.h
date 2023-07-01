@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2021 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -189,7 +189,7 @@ namespace PETScWrappers
        * <tt>v=Vector@<number@>(0);</tt>, i.e. the vector is replaced by one
        * of length zero.
        */
-      explicit Vector(const MPI_Comm &communicator,
+      explicit Vector(const MPI_Comm  communicator,
                       const size_type n,
                       const size_type locally_owned_size);
 
@@ -204,7 +204,7 @@ namespace PETScWrappers
        * different parts of the vector shall communicate
        */
       template <typename Number>
-      explicit Vector(const MPI_Comm &              communicator,
+      explicit Vector(const MPI_Comm                communicator,
                       const dealii::Vector<Number> &v,
                       const size_type               locally_owned_size);
 
@@ -233,7 +233,7 @@ namespace PETScWrappers
        */
       Vector(const IndexSet &local,
              const IndexSet &ghost,
-             const MPI_Comm &communicator);
+             const MPI_Comm  communicator);
 
       /**
        * Construct a new parallel PETSc vector without ghost elements from an
@@ -246,7 +246,7 @@ namespace PETScWrappers
        * not reordered by component (use a PETScWrappers::BlockVector
        * otherwise).
        */
-      explicit Vector(const IndexSet &local, const MPI_Comm &communicator);
+      explicit Vector(const IndexSet &local, const MPI_Comm communicator);
 
       /**
        * Copy constructor.
@@ -308,7 +308,7 @@ namespace PETScWrappers
        * Otherwise, the elements are left an unspecified state.
        */
       void
-      reinit(const MPI_Comm &communicator,
+      reinit(const MPI_Comm  communicator,
              const size_type N,
              const size_type locally_owned_size,
              const bool      omit_zeroing_entries = false);
@@ -335,7 +335,7 @@ namespace PETScWrappers
       void
       reinit(const IndexSet &local,
              const IndexSet &ghost,
-             const MPI_Comm &communicator);
+             const MPI_Comm  communicator);
 
       /**
        * Reinit as a vector without ghost elements. See constructor with same
@@ -345,15 +345,19 @@ namespace PETScWrappers
        * @ref GlossGhostedVector "vectors with ghost elements"
        */
       void
-      reinit(const IndexSet &local, const MPI_Comm &communicator);
+      reinit(const IndexSet &local, const MPI_Comm communicator);
 
       /**
        * Initialize the vector given to the parallel partitioning described in
        * @p partitioner.
+       *
+       * You can decide whether your vector will contain ghost elements with
+       * @p make_ghosted.
        */
       void
       reinit(
-        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const bool make_ghosted = true);
 
       /**
        * Print to a stream. @p precision denotes the desired precision with
@@ -389,7 +393,7 @@ namespace PETScWrappers
        * locally.
        */
       virtual void
-      create_vector(const MPI_Comm &comm,
+      create_vector(const MPI_Comm  comm,
                     const size_type n,
                     const size_type locally_owned_size);
 
@@ -401,7 +405,7 @@ namespace PETScWrappers
        * you need to call update_ghost_values() before accessing those.
        */
       virtual void
-      create_vector(const MPI_Comm &comm,
+      create_vector(const MPI_Comm  comm,
                     const size_type n,
                     const size_type locally_owned_size,
                     const IndexSet &ghostnodes);
@@ -428,7 +432,7 @@ namespace PETScWrappers
 #  ifndef DOXYGEN
 
     template <typename number>
-    Vector::Vector(const MPI_Comm &              communicator,
+    Vector::Vector(const MPI_Comm                communicator,
                    const dealii::Vector<number> &v,
                    const size_type               locally_owned_size)
     {
@@ -484,7 +488,7 @@ namespace PETScWrappers
       for (size_type i = 0; i < v.size(); ++i)
         (*this)(i) = v(i);
 
-      compress(::dealii::VectorOperation::insert);
+      compress(VectorOperation::insert);
 
       return *this;
     }

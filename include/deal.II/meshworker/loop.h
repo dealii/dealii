@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2020 by the deal.II authors
+// Copyright (C) 2006 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -436,10 +436,10 @@ namespace MeshWorker
             class ASSEMBLER,
             class ITERATOR>
   void
-  loop(ITERATOR                          begin,
-       typename identity<ITERATOR>::type end,
-       DOFINFO &                         dinfo,
-       INFOBOX &                         info,
+  loop(ITERATOR                             begin,
+       std_cxx20::type_identity_t<ITERATOR> end,
+       DOFINFO &                            dinfo,
+       INFOBOX &                            info,
        const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
          &cell_worker,
        const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
@@ -454,7 +454,7 @@ namespace MeshWorker
     DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
 
     assembler.initialize_info(dof_info.cell, false);
-    for (unsigned int i : GeometryInfo<dim>::face_indices())
+    for (const unsigned int i : GeometryInfo<dim>::face_indices())
       {
         assembler.initialize_info(dof_info.interior[i], true);
         assembler.initialize_info(dof_info.exterior[i], true);
@@ -491,7 +491,7 @@ namespace MeshWorker
   template <int dim, int spacedim, class ITERATOR, class ASSEMBLER>
   void
   integration_loop(ITERATOR                              begin,
-                   typename identity<ITERATOR>::type     end,
+                   std_cxx20::type_identity_t<ITERATOR>  end,
                    DoFInfo<dim, spacedim> &              dof_info,
                    IntegrationInfoBox<dim, spacedim> &   box,
                    const LocalIntegrator<dim, spacedim> &integrator,

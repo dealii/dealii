@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -21,13 +21,15 @@
 // levels and solve for a Poisson problem with the performance-oriented
 // matrix-free framework.
 //
-// Status: experimental
+// Status: stable
+//
+// Note: this test is marked "stable" and used for performance
+// instrumentation in our testsuite, https://dealii.org/performance_tests
 //
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/tensor_function.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
 
@@ -38,7 +40,6 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
-#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -60,7 +61,6 @@
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/multigrid.h>
 
-#include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include <fstream>
@@ -173,7 +173,7 @@ LaplaceOperator<dim, fe_degree, number>::vmult(
   const LinearAlgebra::distributed::Vector<number> &src) const
 {
   this->data->cell_loop(&LaplaceOperator::local_apply, this, dst, src, true);
-  for (unsigned int i : this->data->get_constrained_dofs())
+  for (const unsigned int i : this->data->get_constrained_dofs())
     dst.local_element(i) = src.local_element(i);
 }
 
@@ -195,7 +195,7 @@ LaplaceOperator<dim, fe_degree, number>::vmult(
                         src,
                         operation_before_loop,
                         operation_after_loop);
-  for (unsigned int i : this->data->get_constrained_dofs())
+  for (const unsigned int i : this->data->get_constrained_dofs())
     dst.local_element(i) = src.local_element(i);
 }
 

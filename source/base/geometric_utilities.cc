@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2018 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,18 +46,22 @@ namespace GeometricUtilities
     std::array<double, dim>
     to_spherical(const Point<dim> &position)
     {
-      std::array<double, dim> scoord;
+      std::array<double, dim> scoord{};
+      Assert(dim > 1, ExcNotImplemented());
 
       // radius
-      scoord[0] = position.norm();
-      // azimuth angle \theta:
-      scoord[1] = std::atan2(position(1), position(0));
-      // correct to [0,2*pi)
-      if (scoord[1] < 0.0)
-        scoord[1] += 2.0 * numbers::PI;
+      if DEAL_II_CONSTEXPR_IN_CONDITIONAL (dim > 1)
+        {
+          scoord[0] = position.norm();
+          // azimuth angle \theta:
+          scoord[1] = std::atan2(position(1), position(0));
+          // correct to [0,2*pi)
+          if (scoord[1] < 0.0)
+            scoord[1] += 2.0 * numbers::PI;
+        }
 
       // polar angle \phi:
-      if (dim == 3)
+      if DEAL_II_CONSTEXPR_IN_CONDITIONAL (dim == 3)
         {
           // acos returns the angle in the range [0,\pi]
           if (scoord[0] > std::numeric_limits<double>::min())

@@ -1,7 +1,0 @@
-Improved: Added capability in the particle handler to generate ghost particles 
-in ghost cells close to periodic boundary conditions.
-<br>
-(Bruno Blais, Audrey Collard-Daigneault, 2022-11-18)
-
-
-

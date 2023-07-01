@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// Copyright (C) 2010 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,7 @@ namespace LocalIntegrators
   namespace L2
   {
     /**
-     * The mass matrix for scalar or vector values finite elements. \f[ \int_Z
+     * The @ref GlossMassMatrix "mass matrix" for scalar or vector values finite elements. \f[ \int_Z
      * uv\,dx \quad \text{or} \quad \int_Z \mathbf u\cdot \mathbf v\,dx \f]
      *
      * Likewise, this term can be used on faces, where it computes  the
@@ -89,7 +89,7 @@ namespace LocalIntegrators
     }
 
     /**
-     * The weighted mass matrix for scalar or vector values finite elements.
+     * The weighted @ref GlossMassMatrix "mass matrix" for scalar or vector values finite elements.
      * \f[ \int_Z \omega(x) uv\,dx \quad \text{or} \quad \int_Z \omega(x)
      * \mathbf u\cdot \mathbf v\,dx \f]
      *

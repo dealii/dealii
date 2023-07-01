@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -468,12 +468,9 @@ namespace Particles
         (components.size() == 0 ? ComponentMask(fe.n_components(), true) :
                                   components);
 
-      std::map<types::global_dof_index, Point<spacedim>> support_points_map;
-
-      DoFTools::map_dofs_to_support_points(mapping,
-                                           dof_handler,
-                                           support_points_map,
-                                           mask);
+      const std::map<types::global_dof_index, Point<spacedim>>
+        support_points_map =
+          DoFTools::map_dofs_to_support_points(mapping, dof_handler, mask);
 
       // Generate the vector of points from the map
       // Memory is reserved for efficiency reasons

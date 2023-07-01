@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,15 +24,20 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
+
 template <int dim, typename Number>
 class Function;
 template <int dim, int spacedim>
 class Mapping;
 template <int dim>
 class Quadrature;
+
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class Triangulation;
+
 namespace hp
 {
   template <int dim, int spacedim>
@@ -80,7 +85,7 @@ namespace VectorTools
    * @param[out] difference The vector of values $d_K$ computed as above.
    * @param[in] q The quadrature formula used to approximate the integral
    * shown above. Note that some quadrature formulas are more useful than
-   * other in integrating $u-u_h$. For example, it is known that the $Q_1$
+   * others in integrating $u-u_h$. For example, it is known that the $Q_1$
    * approximation $u_h$ to the exact solution $u$ of a Laplace equation is
    * particularly accurate (in fact, superconvergent, i.e. accurate to higher
    * order) at the 4 Gauss points of a cell in 2d (or 8 points in 3d) that
@@ -135,10 +140,14 @@ namespace VectorTools
    * the general documentation of the namespace), but only for InVectors as in
    * the documentation of the namespace, OutVector only Vector<double> and
    * Vector<float>.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<InVector>
+   *   &&concepts::is_writable_dealii_vector_type<OutVector>}
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const Mapping<dim, spacedim> &                           mapping,
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
@@ -152,10 +161,14 @@ namespace VectorTools
   /**
    * Call the integrate_difference() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<InVector>
+   *   &&concepts::is_writable_dealii_vector_type<OutVector>}
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
@@ -167,10 +180,14 @@ namespace VectorTools
 
   /**
    * Same as above for hp.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<InVector>
+   *   &&concepts::is_writable_dealii_vector_type<OutVector>}
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const hp::MappingCollection<dim, spacedim> &             mapping,
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
@@ -184,10 +201,14 @@ namespace VectorTools
   /**
    * Call the integrate_difference() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<InVector>
+   *   &&concepts::is_writable_dealii_vector_type<OutVector>}
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
@@ -221,13 +242,15 @@ namespace VectorTools
    * is chosen.
    *
    * @note Instantiated for type Vector<double> and Vector<float>.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<InVector>}
    */
   template <int dim, int spacedim, class InVector>
-  double
-  compute_global_error(const Triangulation<dim, spacedim> &tria,
-                       const InVector &                    cellwise_error,
-                       const NormType &                    norm,
-                       const double                        exponent = 2.);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector>)
+  double compute_global_error(const Triangulation<dim, spacedim> &tria,
+                              const InVector &cellwise_error,
+                              const NormType &norm,
+                              const double    exponent = 2.);
 
   /** @} */
 } // namespace VectorTools

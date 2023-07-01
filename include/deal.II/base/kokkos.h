@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,13 +33,6 @@ namespace internal
    */
   void
   ensure_kokkos_initialized();
-
-  /**
-   * Calls Kokkos::abort. This wrapper avoids including Kokkos_Core.hpp, which
-   * provides all of Kokkos' functionalities, on the call side.
-   */
-  KOKKOS_FUNCTION void
-  kokkos_abort(const char *error);
 
 } // namespace internal
 

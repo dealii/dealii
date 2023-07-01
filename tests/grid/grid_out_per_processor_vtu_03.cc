@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2018 by the deal.II authors
+// Copyright (C) 2009 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,8 +49,11 @@ test()
   GridGenerator::hyper_cube(tr);
   tr.refine_global(3);
 
-  std::string filename = "file" + Utilities::int_to_string(dim);
-  GridOut     grid_out;
+  std::string       filename = "file" + Utilities::int_to_string(dim);
+  GridOut           grid_out;
+  GridOutFlags::Vtu vtu_flags;
+  vtu_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+  grid_out.set_flags(vtu_flags);
   grid_out.write_mesh_per_processor_as_vtu(tr, filename, true);
 
   cat_file((std::string(filename) + ".vtu").c_str());

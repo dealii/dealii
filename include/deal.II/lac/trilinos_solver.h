@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2020 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -362,7 +362,6 @@ namespace TrilinosWrappers
                                  const Epetra_Operator &preconditioner);
 
 
-
   /**
    * An implementation of the solver interface using the Trilinos CG solver.
    *
@@ -372,18 +371,6 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-
-    struct AdditionalData : public SolverBase::AdditionalData
-    {
-      /**
-       * Set the additional data field to the desired output format.
-       */
-      explicit AdditionalData(const bool output_solver_details = false);
-    };
-
-    /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
      * give a vector memory object.
      *
@@ -391,12 +378,6 @@ namespace TrilinosWrappers
      * flags for tuning.
      */
     SolverCG(SolverControl &cn, const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 
@@ -410,17 +391,6 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData : public SolverBase::AdditionalData
-    {
-      /**
-       * Set the additional data field to the desired output format.
-       */
-      explicit AdditionalData(const bool output_solver_details = false);
-    };
-
-    /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
      * give a vector memory object.
      *
@@ -428,12 +398,6 @@ namespace TrilinosWrappers
      * flags for tuning.
      */
     SolverCGS(SolverControl &cn, const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 
@@ -446,19 +410,6 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData : public SolverBase::AdditionalData
-    {
-      /**
-       * Constructor. By default, set the number of temporary vectors to 30,
-       * i.e. do a restart every 30 iterations.
-       */
-      explicit AdditionalData(const bool         output_solver_details = false,
-                              const unsigned int restart_parameter     = 30);
-    };
-
-    /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
      * give a vector memory object.
      *
@@ -467,12 +418,6 @@ namespace TrilinosWrappers
      */
     SolverGMRES(SolverControl &       cn,
                 const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 
@@ -487,17 +432,6 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData : public SolverBase::AdditionalData
-    {
-      /**
-       * Set the additional data field to the desired output format.
-       */
-      explicit AdditionalData(const bool output_solver_details = false);
-    };
-
-    /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
      * give a vector memory object.
      *
@@ -506,12 +440,6 @@ namespace TrilinosWrappers
      */
     SolverBicgstab(SolverControl &       cn,
                    const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 
@@ -526,17 +454,6 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData : public SolverBase::AdditionalData
-    {
-      /**
-       * Set the additional data field to the desired output format.
-       */
-      explicit AdditionalData(const bool output_solver_details = false);
-    };
-
-    /**
      * Constructor. In contrast to deal.II's own solvers, there is no need to
      * give a vector memory object.
      *
@@ -545,12 +462,6 @@ namespace TrilinosWrappers
      */
     SolverTFQMR(SolverControl &       cn,
                 const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the flags for this particular solver.
-     */
-    const AdditionalData additional_data;
   };
 
 

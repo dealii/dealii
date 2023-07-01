@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2022 by the deal.II authors
+## Copyright (C) 2013 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -13,9 +13,8 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
+  cuda_matrix_free.cc
   dof_info.cc
   evaluation_template_factory.cc
   evaluation_template_factory_inst2.cc
@@ -54,15 +53,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.h
   )
 
-if(DEAL_II_WITH_CUDA)
-  set(_src
-    cuda_matrix_free.cc
-    ${_src}
-    )
-  set(_inst
-    ${_inst}
-    )
-endif()
-
-deal_ii_add_library(obj_matrix_free OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_matrix_free "${_inst}")
+define_object_library(object_matrix_free OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_matrix_free "${_inst}")

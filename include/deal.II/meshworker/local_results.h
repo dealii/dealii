@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2022 by the deal.II authors
+// Copyright (C) 2006 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -188,7 +188,7 @@ namespace MeshWorker
    * object is the result of an operation is determined by the Assembler using
    * them. It is also the assembler that determines <i>how many</i> of each
    * kind of object are produced (for example, an assembler may create
-   * both the local contributions to a mass and a stiffness matrix), and for
+   * both the local contributions to a mass and a @ref GlossStiffnessMatrix "stiffness matrix"), and for
    * setting the arrays of local results to the sizes needed.
    *
    * The interface of this class allows accessing all of this information

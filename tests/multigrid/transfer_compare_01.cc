@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2020 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,7 +42,6 @@
 
 #include "../tests.h"
 
-using namespace std;
 
 
 template <int dim, typename number, int spacedim>
@@ -144,7 +143,7 @@ check_block(const FiniteElement<dim> &fe)
     }
 
   // Store sizes
-  const vector<types::global_dof_index> ndofs =
+  const std::vector<types::global_dof_index> ndofs =
     DoFTools::count_dofs_per_fe_block(mgdof);
   std::vector<std::vector<types::global_dof_index>> mg_ndofs(
     mgdof.get_triangulation().n_levels(),
@@ -244,7 +243,7 @@ check_block(const FiniteElement<dim> &fe)
     }
   deallog << std::endl << "copy from mg ";
   // Now do the opposite: fill a
-  // multigrid vector counting the
+  // multigrid std::vector counting the
   // dofs and see where the numbers go
   u = 0.;
   for (unsigned int i = 0; i < v[2].size(); ++i)

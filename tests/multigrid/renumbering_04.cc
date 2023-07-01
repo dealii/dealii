@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim>
 void
@@ -125,5 +125,5 @@ main()
     check<3>(fe);
   }
 
-  deallog << "OK" << endl;
+  deallog << "OK" << std::endl;
 }

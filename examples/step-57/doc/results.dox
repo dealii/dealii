@@ -151,9 +151,11 @@ $\mathrm{Re}=400$.
 <img src="https://www.dealii.org/images/steps/developer/step-57.Re400_Streamline.png" alt="">
 
 Then the solution is compared with a reference solution
-from [4] and the reference solution data can be found in the file "ref_2d_ghia_u.txt".
+from @cite Ghia1982 and the reference solution data can be found in the file "ref_2d_ghia_u.txt".
 
 <img src="https://www.dealii.org/images/steps/developer/step-57.compare-Re400.svg" style="width:50%" alt="">
+
+
 
 <h3> Test case 2: High Reynolds Number </h3>
 
@@ -320,7 +322,7 @@ The sequence of generated grids looks like this:
     </td>
   </tr>
 </table>
-We compare our solution with reference solution from [5].
+We compare our solution with the reference solution from @cite Erturk2005 .
 <img src="https://www.dealii.org/images/steps/developer/step-57.compare-Re7500.svg" style="width:50%" alt="">
 The following picture presents the graphical result.
 <img src="https://www.dealii.org/images/steps/developer/step-57.Re7500_Streamline.png" alt="">
@@ -329,11 +331,12 @@ Furthermore, the error consists of the nonlinear error,
 which decreases as we perform Newton iterations, and the discretization error,
 which depends on the mesh size. That is why we have to refine the
 mesh and repeat Newton's iteration on the next finer mesh. From the table above, we can
-see that the residual (nonlinear error) is below 1e-12 on each mesh, but the
+see that the final residual (nonlinear error) is below $10^{-12}$ on each mesh, but the
 following picture shows us the difference between solutions on subsequently finer
-meshes.
+meshes:
 
 <img src="https://www.dealii.org/images/steps/developer/step-57.converge-Re7500.svg" style="width:50%" alt="">
+
 
 <a name="extensions"></a>
 
@@ -346,7 +349,7 @@ UMFPACK for the whole linear system. You need to remove the nullspace
 containing the constant pressures and it is done in step-56. More interesting
 is the comparison to other state of the art preconditioners like PCD. It turns
 out that the preconditioner here is very competitive, as can be seen in the
-paper [2].
+paper @cite HeisterRapin2013.
 
 The following table shows the timing results between our iterative approach
 (FGMRES) compared to a direct solver (UMFPACK) for the whole system
@@ -391,10 +394,10 @@ consumes less memory. This will be even more pronounced in 3d.
 <h4>3d computations</h4>
 
 The code is set up to also run in 3d. Of course the reference values are
-different, see [6] for example. High resolution computations are not doable
+different, see @cite Yang1998 for example. High resolution computations are not doable
 with this example as is, because a direct solver for the velocity block does
 not work well in 3d. Rather, a parallel solver based on algebraic or geometric
-multigrid is needed. See below.
+multigrid is needed -- see below.
 
 <h4>Parallelization</h4>
 

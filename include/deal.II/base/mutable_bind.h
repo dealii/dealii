@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -186,7 +186,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(ReturnType (*function)(FunctionArgs...),
-               typename identity<FunctionArgs>::type &&...arguments);
+               std_cxx20::type_identity_t<FunctionArgs> &&...arguments);
 
   /**
    * Same as above, using a std::function object.
@@ -194,7 +194,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(std::function<ReturnType(FunctionArgs...)>,
-               typename identity<FunctionArgs>::type &&...arguments);
+               std_cxx20::type_identity_t<FunctionArgs> &&...arguments);
 
   /**
    * Create a MutableBind object from a function pointer, with uninitialized
@@ -292,7 +292,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(ReturnType (*function)(FunctionArgs...),
-               typename identity<FunctionArgs>::type &&...arguments)
+               std_cxx20::type_identity_t<FunctionArgs> &&...arguments)
   {
     return MutableBind<ReturnType, FunctionArgs...>(function,
                                                     std::move(arguments)...);
@@ -312,7 +312,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
   mutable_bind(std::function<ReturnType(FunctionArgs...)> function,
-               typename identity<FunctionArgs>::type &&...arguments)
+               std_cxx20::type_identity_t<FunctionArgs> &&...arguments)
   {
     return MutableBind<ReturnType, FunctionArgs...>(function,
                                                     std::move(arguments)...);

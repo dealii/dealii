@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2020 - 2022 by the deal.II authors
+//    Copyright (C) 2020 - 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -77,13 +77,13 @@ namespace
    */
   template <typename VectorType>
   VectorType
-  create_test_vector(double value = 0.0);
+  create_test_vector(const double value = 0.0);
 
 
 
   template <>
   Vector<double>
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     Vector<double> vector(3 /*size*/);
     vector = value;
@@ -94,7 +94,7 @@ namespace
 
   template <>
   BlockVector<double>
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     const int           num_blocks = 2;
     const int           size_block = 3;
@@ -105,7 +105,7 @@ namespace
 
   template <>
   LinearAlgebra::distributed::Vector<double>
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     IndexSet local_dofs = create_parallel_index_set();
     LinearAlgebra::distributed::Vector<double> vector(local_dofs,
@@ -116,7 +116,7 @@ namespace
 
   template <>
   LinearAlgebra::distributed::BlockVector<double>
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     const unsigned n_processes =
       Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -130,10 +130,10 @@ namespace
     return vector;
   }
 
-
+#ifdef DEAL_II_WITH_TRILINOS
   template <>
   TrilinosWrappers::MPI::Vector
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     IndexSet local_dofs = create_parallel_index_set();
 
@@ -144,7 +144,7 @@ namespace
 
   template <>
   TrilinosWrappers::MPI::BlockVector
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     const unsigned n_processes =
       Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -156,10 +156,12 @@ namespace
     vector = value;
     return vector;
   }
+#endif
 
+#ifdef DEAL_II_WITH_PETSC
   template <>
   PETScWrappers::MPI::Vector
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     IndexSet local_dofs = create_parallel_index_set();
 
@@ -170,7 +172,7 @@ namespace
 
   template <>
   PETScWrappers::MPI::BlockVector
-  create_test_vector(double value)
+  create_test_vector(const double value)
   {
     const unsigned n_processes =
       Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
@@ -182,6 +184,7 @@ namespace
     vector = value;
     return vector;
   }
+#endif
 
   template <typename VectorType>
   bool
@@ -1008,18 +1011,21 @@ main(int argc, char **argv)
     "LinearAlgebra::distributed::Vector<double>");
   run_all_tests<LinearAlgebra::distributed::BlockVector<double>>(
     "LinearAlgebra::distributed::BlockVector<double>");
+#ifdef DEAL_II_WITH_TRILINOS
   run_all_tests<TrilinosWrappers::MPI::Vector>("TrilinosWrappers::MPI::Vector");
   run_all_tests<TrilinosWrappers::MPI::BlockVector>(
     "TrilinosWrappers::MPI::BlockVector");
+#endif
+#ifdef DEAL_II_WITH_PETSC
   run_all_tests<PETScWrappers::MPI::Vector>("PETScWrappers::MPI::Vector");
   run_all_tests<PETScWrappers::MPI::BlockVector>(
     "PETScWrappers::MPI::BlockVector");
-
   // although the memory would be cleared in ~MPI_InitFinalize it needs to be
   // done manually to satisfy the PETSc memory check inside ~MPILogInitAll,
   // which is invoked first
   GrowingVectorMemory<PETScWrappers::MPI::Vector>::release_unused_memory();
   GrowingVectorMemory<PETScWrappers::MPI::BlockVector>::release_unused_memory();
+#endif
 
 #if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   SUNContext_Free(&global_nvector_context);

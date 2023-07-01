@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2021 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,6 +32,8 @@ if(NOT DOXYGEN_FOUND)
   message(FATAL_ERROR
     "Could not find doxygen which is required for building the documentation"
     )
+else()
+  message(STATUS "Using doxygen version ${DOXYGEN_VERSION}")
 endif()
 
 
@@ -124,7 +126,7 @@ file(GLOB _source_files
 foreach (_source ${_source_files})
   file(READ "${_source}" contents)
   string(REGEX MATCH "Copyright .C. +([0-9]+ - )?([0-9]+)" _copyright "${contents}")
-  if (NOT _copright STREQUAL "")
+  if (NOT "${_copyright}" STREQUAL "")
     string(REGEX MATCH "[0-9]+\$" _year "${_copyright}")
 
     if (NOT _year STREQUAL ""   AND   _year GREATER _last_year)
@@ -282,6 +284,22 @@ if(NOT (${DOXYGEN_VERSION} VERSION_LESS 1.9))
     "
     )
   message(STATUS "Letting doxygen run with multiple threads")
+endif()
+
+
+# doxygen version 1.9.1 can not correctly parse C++20-style 'requires'
+# clauses and just drops certain classes and shows documentation for
+# DEAL_II_CXX20_REQUIRES instead. 1.9.7 gets this right, but has other
+# bugs. It's unclear for versions inbetween. Err on the safe side, and
+# only make them visible to doxygen if we have at least 1.9.8.
+if(${DOXYGEN_VERSION} VERSION_LESS 1.9.8)
+  message(STATUS "Suppressing 'requires' clause parsing because doxygen is too old")
+  file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
+    "
+    PREDEFINED += DEAL_II_DOXYGEN_DO_NOT_PARSE_REQUIRES_CLAUSES=1
+    PREDEFINED += DEAL_II_CXX20_REQUIRES(x)=
+    "
+    )
 endif()
 
 

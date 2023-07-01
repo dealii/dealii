@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2022 by the deal.II authors
+// Copyright (C) 2015 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ namespace LinearAlgebra
 
 
     Vector::Vector(const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
       : Subscriptor()
       , vector(new Epetra_FEVector(
           parallel_partitioner.make_trilinos_map(communicator, false)))
@@ -64,7 +64,7 @@ namespace LinearAlgebra
 
     void
     Vector::reinit(const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator,
+                   const MPI_Comm  communicator,
                    const bool      omit_zeroing_entries)
     {
       Epetra_Map input_map =
@@ -144,7 +144,7 @@ namespace LinearAlgebra
 
 
     void
-    Vector::import(
+    Vector::import_elements(
       const ReadWriteVector<double> &V,
       VectorOperation::values        operation,
       std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -178,21 +178,21 @@ namespace LinearAlgebra
               "LinearAlgebra::EpetraWrappers::CommunicationPattern."));
         }
 
-      Epetra_Import import(epetra_comm_pattern->get_epetra_import());
+      Epetra_Import import_map(epetra_comm_pattern->get_epetra_import());
 
       // The TargetMap and the SourceMap have their roles inverted.
-      Epetra_FEVector source_vector(import.TargetMap());
+      Epetra_FEVector source_vector(import_map.TargetMap());
       double *        values = source_vector.Values();
       std::copy(V.begin(), V.end(), values);
 
       if (operation == VectorOperation::insert)
-        vector->Export(source_vector, import, Insert);
+        vector->Export(source_vector, import_map, Insert);
       else if (operation == VectorOperation::add)
-        vector->Export(source_vector, import, Add);
+        vector->Export(source_vector, import_map, Add);
       else if (operation == VectorOperation::max)
-        vector->Export(source_vector, import, Epetra_Max);
+        vector->Export(source_vector, import_map, Epetra_Max);
       else if (operation == VectorOperation::min)
-        vector->Export(source_vector, import, Epetra_Min);
+        vector->Export(source_vector, import_map, Epetra_Min);
       else
         AssertThrow(false, ExcNotImplemented());
     }
@@ -661,7 +661,7 @@ namespace LinearAlgebra
 
     void
     Vector::create_epetra_comm_pattern(const IndexSet &source_index_set,
-                                       const MPI_Comm &mpi_comm)
+                                       const MPI_Comm  mpi_comm)
     {
       source_stored_elements = source_index_set;
       epetra_comm_pattern =

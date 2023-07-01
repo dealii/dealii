@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,12 +22,10 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/std_cxx17/variant.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/vector.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <fstream>
 #include <map>

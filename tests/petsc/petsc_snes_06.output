@@ -1,0 +1,35 @@
+
+DEAL::Solving with setjac 0
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Too large a step. Throwing a recoverable exception.
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=-0.00368463
+DEAL::Evaluating the residual at x=-0.00368465
+DEAL::Evaluating the residual at x=-0.00368465
+DEAL::Evaluating the residual at x=1.66749e-08
+DEAL::Evaluating the residual at x=3.15761e-08
+DEAL::Evaluating the residual at x=3.15761e-08
+DEAL::Evaluating the residual at x=-3.30872e-24
+DEAL::Found the solution x=-3.30872e-24 after 4 iterations.
+DEAL::Solving with setjac 1
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=1.00000
+DEAL::Evaluating the residual at x=-0.557408
+DEAL::Too large a step. Throwing a recoverable exception.
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=0.221296
+DEAL::Evaluating the residual at x=-0.00368463
+DEAL::Evaluating the residual at x=-0.00368465
+DEAL::Evaluating the residual at x=-0.00368465
+DEAL::Evaluating the residual at x=1.66749e-08
+DEAL::Evaluating the residual at x=3.15761e-08
+DEAL::Evaluating the residual at x=3.15761e-08
+DEAL::Evaluating the residual at x=-3.30872e-24
+DEAL::Found the solution x=-3.30872e-24 after 4 iterations.

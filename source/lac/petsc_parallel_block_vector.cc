@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -16,6 +16,8 @@
 #include <deal.II/lac/petsc_block_vector.h>
 
 #ifdef DEAL_II_WITH_PETSC
+
+#  include <deal.II/lac/petsc_compatibility.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -84,7 +86,17 @@ namespace PETScWrappers
           this->components[i].reinit(sv[i]);
         }
 
-      this->collect_sizes();
+      BlockVectorBase::collect_sizes();
+      if (!isnest)
+        setup_nest_vec();
+      else
+        {
+          ierr = PetscObjectReference(reinterpret_cast<PetscObject>(v));
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          PetscErrorCode ierr = VecDestroy(&petsc_nest_vector);
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+          petsc_nest_vector = v;
+        }
     }
 
     Vec &
@@ -103,6 +115,13 @@ namespace PETScWrappers
     {
       BlockVectorBase::collect_sizes();
       setup_nest_vec();
+    }
+
+    void
+    BlockVector::compress(VectorOperation::values operation)
+    {
+      BlockVectorBase::compress(operation);
+      petsc_increment_state_counter(petsc_nest_vector);
     }
 
     void

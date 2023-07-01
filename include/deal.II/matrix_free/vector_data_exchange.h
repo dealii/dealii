@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -264,7 +264,7 @@ namespace internal
       public:
         Full(
           const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-          const MPI_Comm &communicator_sm);
+          const MPI_Comm communicator_sm);
 
         unsigned int
         locally_owned_size() const override;
@@ -281,7 +281,7 @@ namespace internal
         virtual types::global_dof_index
         size() const override;
 
-        const MPI_Comm &
+        MPI_Comm
         get_sm_mpi_communicator() const;
 
         void

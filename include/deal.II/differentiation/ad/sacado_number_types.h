@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2020 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -67,22 +67,18 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_TRILINOS_WITH_SACADO
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <Sacado.hpp>
-// It appears that some versions of Trilinos do not directly or indirectly
-// include all the headers for all forward and reverse Sacado AD types.
-// So we directly include these both here as a precaution.
-// Standard forward AD classes (templated)
-#  include <Sacado_Fad_DFad.hpp>
-// Reverse AD classes (templated)
-#  include <Sacado_trad.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/numbers.h>
 
 #  include <deal.II/differentiation/ad/ad_number_traits.h>
 #  include <deal.II/differentiation/ad/ad_number_types.h>
+
+// It appears that some versions of Trilinos do not directly or indirectly
+// include all the headers for all forward and reverse Sacado AD types
+// in Sacado.hpp, so we also directly include these here as a precaution:
+#  include <Sacado.hpp>
+#  include <Sacado_Fad_DFad.hpp>
+#  include <Sacado_trad.hpp>
 
 #  include <complex>
 
@@ -295,7 +291,7 @@ namespace Differentiation
                              const unsigned int n_independent_variables,
                              ad_type &          out)
         {
-          // It is required that we first initialise the outer number before
+          // It is required that we first initialize the outer number before
           // any of the nested ones.
           out = ad_type(n_independent_variables, index, in);
 
@@ -341,7 +337,7 @@ namespace Differentiation
           // For Sacado::Rad::ADvar numbers, we have to initialize the
           // ADNumber with an already fully-configured value. This means
           // that if this nests another ADNumber then the nested number
-          // must already be setup and ready for use.
+          // must already be set up and ready for use.
 
           // Initialize potential nested directional derivatives
           derivative_type derivative_initializer;
@@ -905,17 +901,6 @@ namespace Differentiation
   } // namespace AD
 } // namespace Differentiation
 
-
-namespace numbers
-{
-  template <typename NumberType>
-  struct is_cuda_compatible<
-    NumberType,
-    std::enable_if_t<
-      dealii::Differentiation::AD::is_sacado_rad_number<NumberType>::value>>
-    : std::false_type
-  {};
-} // namespace numbers
 
 #  endif // DOXYGEN
 

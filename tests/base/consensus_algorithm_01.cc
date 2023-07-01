@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,7 @@
 
 
 void
-test(const MPI_Comm &comm)
+test(const MPI_Comm comm)
 {
   const unsigned int my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
   const unsigned int n_rank  = dealii::Utilities::MPI::n_mpi_processes(comm);

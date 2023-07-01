@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1168,7 +1168,7 @@ namespace Differentiation
      *       // Add contribution from external energy:
      *       // Loop over faces and accumulate external energy into cell
      *       // total energy.
-     *       for (unsigned int face : ...)
+     *       for (const unsigned int face : ...)
      *         if (cell->face(face)->at_boundary())
      *           energy_ad += ...
      *
@@ -1498,7 +1498,7 @@ namespace Differentiation
      *       // linearized.
      *       // Loop over faces and accumulate external contributions into the
      *       // cell total residual.
-     *       for (unsigned int face : ...)
+     *       for (const unsigned int face : ...)
      *         if (cell->face(face)->at_boundary())
      *           residual_ad[I] += ...
      *
@@ -2837,8 +2837,8 @@ namespace Differentiation
        * @note For taped AD numbers, this operation is only valid in recording mode.
        */
       template <typename ExtractorType>
-      typename internal::Extractor<dim,
-                                   ExtractorType>::template tensor_type<ad_type>
+      typename internal::Extractor<dim, ExtractorType>::template tensor_type<
+        typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type>
       get_sensitive_variables(const ExtractorType &extractor) const;
 
       /** @} */
@@ -3869,8 +3869,7 @@ namespace Differentiation
               typename ScalarType>
     template <typename ExtractorType>
     typename internal::Extractor<dim, ExtractorType>::template tensor_type<
-      typename PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
-        ad_type>
+      typename HelperBase<ADNumberTypeCode, ScalarType>::ad_type>
     PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
       get_sensitive_variables(const ExtractorType &extractor) const
     {

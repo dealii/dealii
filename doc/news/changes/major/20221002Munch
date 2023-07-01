@@ -1,4 +1,0 @@
-New: Add a wrapper to the non-linear solver NOX from the
-Trilinos library.
-<br>
-(Peter Munch, Vladimir Ivannikov, 2022/10/02)

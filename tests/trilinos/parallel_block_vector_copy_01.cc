@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    log;
 
-  const MPI_Comm &   mpi_communicator = MPI_COMM_WORLD;
+  const MPI_Comm     mpi_communicator = MPI_COMM_WORLD;
   const unsigned int this_mpi_process =
     Utilities::MPI::this_mpi_process(mpi_communicator);
   const unsigned int n_mpi_processes =

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -641,10 +641,9 @@ namespace SparsityTools
         std::sort(next_round_dofs.begin(), next_round_dofs.end());
 
         // delete multiple entries
-        std::vector<DynamicSparsityPattern::size_type>::iterator end_sorted;
-        end_sorted =
-          std::unique(next_round_dofs.begin(), next_round_dofs.end());
-        next_round_dofs.erase(end_sorted, next_round_dofs.end());
+        next_round_dofs.erase(std::unique(next_round_dofs.begin(),
+                                          next_round_dofs.end()),
+                              next_round_dofs.end());
 
         // eliminate dofs which are already numbered
         for (int s = next_round_dofs.size() - 1; s >= 0; --s)
@@ -914,7 +913,7 @@ namespace SparsityTools
   void
   gather_sparsity_pattern(DynamicSparsityPattern &dsp,
                           const IndexSet &        locally_owned_rows,
-                          const MPI_Comm &        mpi_comm,
+                          const MPI_Comm          mpi_comm,
                           const IndexSet &        locally_relevant_rows)
   {
     using map_vec_t =
@@ -1007,7 +1006,7 @@ namespace SparsityTools
   distribute_sparsity_pattern(
     DynamicSparsityPattern &                              dsp,
     const std::vector<DynamicSparsityPattern::size_type> &rows_per_cpu,
-    const MPI_Comm &                                      mpi_comm,
+    const MPI_Comm                                        mpi_comm,
     const IndexSet &                                      myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
@@ -1028,7 +1027,7 @@ namespace SparsityTools
   void
   distribute_sparsity_pattern(DynamicSparsityPattern &dsp,
                               const IndexSet &        locally_owned_rows,
-                              const MPI_Comm &        mpi_comm,
+                              const MPI_Comm          mpi_comm,
                               const IndexSet &        locally_relevant_rows)
   {
     IndexSet requested_rows(locally_relevant_rows);
@@ -1095,7 +1094,7 @@ namespace SparsityTools
   void
   distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
                               const std::vector<IndexSet> &owned_set_per_cpu,
-                              const MPI_Comm &             mpi_comm,
+                              const MPI_Comm               mpi_comm,
                               const IndexSet &             myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
@@ -1110,7 +1109,7 @@ namespace SparsityTools
   void
   distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
                               const IndexSet &             locally_owned_rows,
-                              const MPI_Comm &             mpi_comm,
+                              const MPI_Comm               mpi_comm,
                               const IndexSet &locally_relevant_rows)
   {
     using map_vec_t =

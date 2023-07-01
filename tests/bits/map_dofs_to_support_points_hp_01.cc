@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2022 by the deal.II authors
+// Copyright (C) 2003 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,8 +33,6 @@
 //   map_dofs_to_support_points(...);
 // for the hp-case
 
-
-using namespace std;
 
 template <int dim>
 void

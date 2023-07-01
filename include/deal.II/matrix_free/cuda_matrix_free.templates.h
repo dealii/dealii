@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,27 +19,26 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/cuda.h>
+#include <deal.II/base/cuda_size.h>
+#include <deal.II/base/graph_coloring.h>
+#include <deal.II/base/memory_space.h>
+
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q1.h>
+
+#include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
 #include <deal.II/matrix_free/cuda_matrix_free.h>
+#include <deal.II/matrix_free/shape_info.h>
 
-#ifdef DEAL_II_WITH_CUDA
+#include <Kokkos_Core.hpp>
 
-#  include <deal.II/base/cuda.h>
-#  include <deal.II/base/cuda_size.h>
-#  include <deal.II/base/graph_coloring.h>
-
-#  include <deal.II/dofs/dof_tools.h>
-
-#  include <deal.II/fe/fe_dgq.h>
-#  include <deal.II/fe/fe_values.h>
-#  include <deal.II/fe/mapping_q1.h>
-
-#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
-#  include <deal.II/matrix_free/shape_info.h>
-
-#  include <cuda_runtime_api.h>
-
-#  include <cmath>
-#  include <functional>
+#include <cmath>
+#include <functional>
+#include <string>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -48,150 +47,6 @@ namespace CUDAWrappers
 {
   namespace internal
   {
-    constexpr unsigned int data_array_size =
-      (mf_max_elem_degree + 1) * (mf_max_elem_degree + 1);
-
-    // Default initialized to false
-    extern std::array<std::atomic_bool, mf_n_concurrent_objects> used_objects;
-
-    template <typename NumberType>
-    using DataArray = NumberType[data_array_size];
-
-    // These variables are stored in the device constant memory.
-    // Shape values
-    __constant__ double global_shape_values_d[mf_n_concurrent_objects]
-                                             [data_array_size];
-    __constant__ float global_shape_values_f[mf_n_concurrent_objects]
-                                            [data_array_size];
-    // Shape gradients
-    __constant__ double global_shape_gradients_d[mf_n_concurrent_objects]
-                                                [data_array_size];
-    __constant__ float global_shape_gradients_f[mf_n_concurrent_objects]
-                                               [data_array_size];
-    // for collocation methods
-    __constant__ double global_co_shape_gradients_d[mf_n_concurrent_objects]
-                                                   [data_array_size];
-    __constant__ float global_co_shape_gradients_f[mf_n_concurrent_objects]
-                                                  [data_array_size];
-
-    template <typename Number>
-    __host__ __device__ inline DataArray<Number> &
-             get_global_shape_values(unsigned int i);
-
-    template <>
-    __host__ __device__ inline DataArray<double> &
-             get_global_shape_values<double>(unsigned int i)
-    {
-      return global_shape_values_d[i];
-    }
-
-    template <>
-    __host__ __device__ inline DataArray<float> &
-             get_global_shape_values<float>(unsigned int i)
-    {
-      return global_shape_values_f[i];
-    }
-
-    template <typename Number>
-    __host__ __device__ inline DataArray<Number> &
-             get_global_shape_gradients(unsigned int i);
-
-    template <>
-    __host__ __device__ inline DataArray<double> &
-             get_global_shape_gradients<double>(unsigned int i)
-    {
-      return global_shape_gradients_d[i];
-    }
-
-    template <>
-    __host__ __device__ inline DataArray<float> &
-             get_global_shape_gradients<float>(unsigned int i)
-    {
-      return global_shape_gradients_f[i];
-    }
-
-    // for collocation methods
-    template <typename Number>
-    __host__ __device__ inline DataArray<Number> &
-             get_global_co_shape_gradients(unsigned int i);
-
-    template <>
-    __host__ __device__ inline DataArray<double> &
-             get_global_co_shape_gradients<double>(unsigned int i)
-    {
-      return global_co_shape_gradients_d[i];
-    }
-
-    template <>
-    __host__ __device__ inline DataArray<float> &
-             get_global_co_shape_gradients<float>(unsigned int i)
-    {
-      return global_co_shape_gradients_f[i];
-    }
-
-    template <typename Number>
-    using CUDAVector = ::dealii::LinearAlgebra::CUDAWrappers::Vector<Number>;
-
-    /**
-     * Transpose a N x M matrix stored in a one-dimensional array to a M x N
-     * matrix stored in a one-dimensional array.
-     */
-    template <typename Number>
-    void
-    transpose(const unsigned int N,
-              const unsigned     M,
-              const Number *     src,
-              Number *           dst)
-    {
-      // src is N X M
-      // dst is M X N
-      for (unsigned int i = 0; i < N; ++i)
-        for (unsigned int j = 0; j < M; ++j)
-          dst[j * N + i] = src[i * M + j];
-    }
-
-
-
-    /**
-     * Same as above but the source and the destination are the same vector.
-     */
-    template <typename Number>
-    void
-    transpose_in_place(std::vector<Number> &array_host,
-                       const unsigned int   n,
-                       const unsigned int   m)
-    {
-      // convert to structure-of-array
-      std::vector<Number> old(array_host.size());
-      old.swap(array_host);
-
-      transpose(n, m, old.data(), array_host.data());
-    }
-
-
-
-    /**
-     * Allocate an array to the device and copy @p array_host to the device.
-     */
-    template <typename Number1>
-    void
-    alloc_and_copy(Number1 **array_device,
-                   const ArrayView<const Number1, MemorySpace::Host> array_host,
-                   const unsigned int                                n)
-    {
-      cudaError_t error_code = cudaMalloc(array_device, n * sizeof(Number1));
-      AssertCuda(error_code);
-      AssertDimension(array_host.size(), n);
-
-      error_code = cudaMemcpy(*array_device,
-                              array_host.data(),
-                              n * sizeof(Number1),
-                              cudaMemcpyHostToDevice);
-      AssertCuda(error_code);
-    }
-
-
-
     /**
      * Helper class to (re)initialize MatrixFree object.
      */
@@ -210,30 +65,17 @@ namespace CUDAWrappers
         const UpdateFlags &    update_flags);
 
       void
-      setup_color_arrays(const unsigned int n_colors);
-
-      void
-      setup_cell_arrays(const unsigned int color);
+      resize(const unsigned int n_colors);
 
       template <typename CellFilter>
       void
-      get_cell_data(
-        const CellFilter &                                        cell,
-        const unsigned int                                        cell_id,
+      fill_data(
+        const unsigned int                                        color,
+        const std::vector<CellFilter> &                           graph,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
-
-      void
-      alloc_and_copy_arrays(const unsigned int cell);
 
     private:
       MatrixFree<dim, Number> *data;
-      // Host data
-      std::vector<types::global_dof_index> local_to_global_host;
-      std::vector<Point<dim, Number>>      q_points_host;
-      std::vector<Number>                  JxW_host;
-      std::vector<Number>                  inv_jacobian_host;
-      std::vector<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-        constraint_mask_host;
       // Local buffer
       std::vector<types::global_dof_index> local_dof_indices;
       FEValues<dim>                        fe_values;
@@ -274,13 +116,6 @@ namespace CUDAWrappers
       , padding_length(data->get_padding_length())
       , hanging_nodes(dof_handler.get_triangulation())
     {
-      cudaError_t error_code = cudaMemcpyToSymbol(
-        constraint_weights,
-        shape_info.data.front().subface_interpolation_matrices[0].data(),
-        sizeof(double) *
-          shape_info.data.front().subface_interpolation_matrices[0].size());
-      AssertCuda(error_code);
-
       local_dof_indices.resize(data->dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
     }
@@ -289,13 +124,11 @@ namespace CUDAWrappers
 
     template <int dim, typename Number>
     void
-    ReinitHelper<dim, Number>::setup_color_arrays(const unsigned int n_colors)
+    ReinitHelper<dim, Number>::resize(const unsigned int n_colors)
     {
       // We need at least three colors when we are using CUDA-aware MPI and
       // overlapping the communication
       data->n_cells.resize(std::max(n_colors, 3U), 0);
-      data->grid_dim.resize(n_colors);
-      data->block_dim.resize(n_colors);
       data->local_to_global.resize(n_colors);
       data->constraint_mask.resize(n_colors);
 
@@ -314,196 +147,139 @@ namespace CUDAWrappers
 
 
     template <int dim, typename Number>
-    void
-    ReinitHelper<dim, Number>::setup_cell_arrays(const unsigned int color)
-    {
-      const unsigned int n_cells         = data->n_cells[color];
-      const unsigned int cells_per_block = data->cells_per_block;
-
-      // Setup kernel parameters
-      const double apply_n_blocks = std::ceil(
-        static_cast<double>(n_cells) / static_cast<double>(cells_per_block));
-      const auto apply_x_n_blocks =
-        static_cast<unsigned int>(std::round(std::sqrt(apply_n_blocks)));
-      const auto apply_y_n_blocks = static_cast<unsigned int>(
-        std::ceil(apply_n_blocks / static_cast<double>(apply_x_n_blocks)));
-
-      data->grid_dim[color] = dim3(apply_x_n_blocks, apply_y_n_blocks);
-
-      // TODO this should be a templated parameter.
-      const unsigned int n_dofs_1d = fe_degree + 1;
-
-      if (data->parallelization_scheme ==
-          MatrixFree<dim, Number>::parallel_in_elem)
-        {
-          if (dim == 1)
-            data->block_dim[color] = dim3(n_dofs_1d * cells_per_block);
-          else if (dim == 2)
-            data->block_dim[color] =
-              dim3(n_dofs_1d * cells_per_block, n_dofs_1d);
-          else
-            data->block_dim[color] =
-              dim3(n_dofs_1d * cells_per_block, n_dofs_1d, n_dofs_1d);
-        }
-      else
-        data->block_dim[color] = dim3(cells_per_block);
-
-      local_to_global_host.resize(n_cells * padding_length);
-
-      if (update_flags & update_quadrature_points)
-        q_points_host.resize(n_cells * padding_length);
-
-      if (update_flags & update_JxW_values)
-        JxW_host.resize(n_cells * padding_length);
-
-      if (update_flags & update_gradients)
-        inv_jacobian_host.resize(n_cells * padding_length * dim * dim);
-
-      constraint_mask_host.resize(n_cells);
-    }
-
-
-
-    template <int dim, typename Number>
     template <typename CellFilter>
     void
-    ReinitHelper<dim, Number>::get_cell_data(
-      const CellFilter &                                        cell,
-      const unsigned int                                        cell_id,
+    ReinitHelper<dim, Number>::fill_data(
+      const unsigned int                                        color,
+      const std::vector<CellFilter> &                           graph,
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
-    {
-      cell->get_dof_indices(local_dof_indices);
-      // When using MPI, we need to transform the local_dof_indices, which
-      // contains global dof indices, to get local (to the current MPI process)
-      // dof indices.
-      if (partitioner)
-        for (auto &index : local_dof_indices)
-          index = partitioner->global_to_local(index);
-
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        lexicographic_dof_indices[i] = local_dof_indices[lexicographic_inv[i]];
-
-      const ArrayView<dealii::internal::MatrixFreeFunctions::ConstraintKinds>
-        cell_id_view(constraint_mask_host[cell_id]);
-
-      hanging_nodes.setup_constraints(cell,
-                                      partitioner,
-                                      {lexicographic_inv},
-                                      lexicographic_dof_indices,
-                                      cell_id_view);
-
-      memcpy(&local_to_global_host[cell_id * padding_length],
-             lexicographic_dof_indices.data(),
-             dofs_per_cell * sizeof(types::global_dof_index));
-
-      fe_values.reinit(cell);
-
-      // Quadrature points
-      if (update_flags & update_quadrature_points)
-        {
-          const std::vector<Point<dim>> &q_points =
-            fe_values.get_quadrature_points();
-          std::copy(q_points.begin(),
-                    q_points.end(),
-                    &q_points_host[cell_id * padding_length]);
-        }
-
-      if (update_flags & update_JxW_values)
-        {
-          std::vector<double> JxW_values_double = fe_values.get_JxW_values();
-          const unsigned int  offset            = cell_id * padding_length;
-          for (unsigned int i = 0; i < q_points_per_cell; ++i)
-            JxW_host[i + offset] = static_cast<Number>(JxW_values_double[i]);
-        }
-
-      if (update_flags & update_gradients)
-        {
-          const std::vector<DerivativeForm<1, dim, dim>> &inv_jacobians =
-            fe_values.get_inverse_jacobians();
-          std::copy(&inv_jacobians[0][0][0],
-                    &inv_jacobians[0][0][0] +
-                      q_points_per_cell * sizeof(DerivativeForm<1, dim, dim>) /
-                        sizeof(double),
-                    &inv_jacobian_host[cell_id * padding_length * dim * dim]);
-        }
-    }
-
-
-
-    template <int dim, typename Number>
-    void
-    ReinitHelper<dim, Number>::alloc_and_copy_arrays(const unsigned int color)
     {
       const unsigned int n_cells = data->n_cells[color];
 
-      // Local-to-global mapping
-      if (data->parallelization_scheme ==
-          MatrixFree<dim, Number>::parallel_over_elem)
-        transpose_in_place(local_to_global_host, n_cells, padding_length);
+      // Create the Views
+      data->local_to_global[color] =
+        Kokkos::View<types::global_dof_index **,
+                     MemorySpace::Default::kokkos_space>(
+          Kokkos::view_alloc("local_to_global_" + std::to_string(color),
+                             Kokkos::WithoutInitializing),
+          n_cells,
+          dofs_per_cell);
 
-      alloc_and_copy(
-        &data->local_to_global[color],
-        ArrayView<const types::global_dof_index>(local_to_global_host.data(),
-                                                 local_to_global_host.size()),
-        n_cells * padding_length);
-
-      // Quadrature points
       if (update_flags & update_quadrature_points)
-        {
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
-            transpose_in_place(q_points_host, n_cells, padding_length);
+        data->q_points[color] =
+          Kokkos::View<Point<dim, Number> **,
+                       MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("q_points_" + std::to_string(color),
+                               Kokkos::WithoutInitializing),
+            n_cells,
+            q_points_per_cell);
 
-          alloc_and_copy(&data->q_points[color],
-                         ArrayView<const Point<dim, Number>>(
-                           q_points_host.data(), q_points_host.size()),
-                         n_cells * padding_length);
-        }
-
-      // Jacobian determinants/quadrature weights
       if (update_flags & update_JxW_values)
-        {
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
-            transpose_in_place(JxW_host, n_cells, padding_length);
+        data->JxW[color] =
+          Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("JxW_" + std::to_string(color),
+                               Kokkos::WithoutInitializing),
+            n_cells,
+            dofs_per_cell);
 
-          alloc_and_copy(&data->JxW[color],
-                         ArrayView<const Number>(JxW_host.data(),
-                                                 JxW_host.size()),
-                         n_cells * padding_length);
-        }
-
-      // Inverse jacobians
       if (update_flags & update_gradients)
+        data->inv_jacobian[color] =
+          Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
+                               Kokkos::WithoutInitializing),
+            n_cells,
+            dofs_per_cell);
+
+      // Initialize to zero, i.e., unconstrained cell
+      data->constraint_mask[color] =
+        Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                     MemorySpace::Default::kokkos_space>(
+          "constraint_mask_" + std::to_string(color), n_cells);
+
+      // Create the host mirrow Views and fill them
+      auto constraint_mask_host =
+        Kokkos::create_mirror_view(data->constraint_mask[color]);
+
+#if KOKKOS_VERSION >= 30600
+      auto local_to_global_host =
+        Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                   data->local_to_global[color]);
+      auto q_points_host =
+        Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                   data->q_points[color]);
+      auto JxW_host = Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                                 data->JxW[color]);
+      auto inv_jacobian_host =
+        Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                   data->inv_jacobian[color]);
+#else
+      auto local_to_global_host =
+        Kokkos::create_mirror_view(data->local_to_global[color]);
+      auto q_points_host = Kokkos::create_mirror_view(data->q_points[color]);
+      auto JxW_host      = Kokkos::create_mirror_view(data->JxW[color]);
+      auto inv_jacobian_host =
+        Kokkos::create_mirror_view(data->inv_jacobian[color]);
+#endif
+
+      auto cell = graph.cbegin(), end_cell = graph.cend();
+      for (unsigned int cell_id = 0; cell != end_cell; ++cell, ++cell_id)
         {
-          // Reorder so that all J_11 elements are together, all J_12 elements
-          // are together, etc., i.e., reorder indices from
-          // cell_id*q_points_per_cell*dim*dim + q*dim*dim +i to
-          // i*q_points_per_cell*n_cells + cell_id*q_points_per_cell+q
-          transpose_in_place(inv_jacobian_host,
-                             padding_length * n_cells,
-                             dim * dim);
+          (*cell)->get_dof_indices(local_dof_indices);
+          // When using MPI, we need to transform the local_dof_indices, which
+          // contain global numbers of dof indices in the MPI universe, to get
+          // local (to the current MPI process) dof indices.
+          if (partitioner)
+            for (auto &index : local_dof_indices)
+              index = partitioner->global_to_local(index);
 
-          // Transpose second time means we get the following index order:
-          // q*n_cells*dim*dim + i*n_cells + cell_id which is good for an
-          // element-level parallelization
-          if (data->parallelization_scheme ==
-              MatrixFree<dim, Number>::parallel_over_elem)
-            transpose_in_place(inv_jacobian_host,
-                               n_cells * dim * dim,
-                               padding_length);
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            lexicographic_dof_indices[i] =
+              local_dof_indices[lexicographic_inv[i]];
 
-          alloc_and_copy(&data->inv_jacobian[color],
-                         ArrayView<const Number>(inv_jacobian_host.data(),
-                                                 inv_jacobian_host.size()),
-                         n_cells * dim * dim * padding_length);
+          const ArrayView<
+            dealii::internal::MatrixFreeFunctions::ConstraintKinds>
+            cell_id_view(constraint_mask_host[cell_id]);
+
+          hanging_nodes.setup_constraints(*cell,
+                                          partitioner,
+                                          {lexicographic_inv},
+                                          lexicographic_dof_indices,
+                                          cell_id_view);
+
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            local_to_global_host(cell_id, i) = lexicographic_dof_indices[i];
+
+          fe_values.reinit(*cell);
+
+          // Quadrature points
+          if (update_flags & update_quadrature_points)
+            {
+              for (unsigned int i = 0; i < q_points_per_cell; ++i)
+                q_points_host(cell_id, i) = fe_values.quadrature_point(i);
+            }
+
+          if (update_flags & update_JxW_values)
+            {
+              for (unsigned int i = 0; i < q_points_per_cell; ++i)
+                JxW_host(cell_id, i) = fe_values.JxW(i);
+            }
+
+          if (update_flags & update_gradients)
+            {
+              for (unsigned int i = 0; i < q_points_per_cell; ++i)
+                for (unsigned int d = 0; d < dim; ++d)
+                  for (unsigned int e = 0; e < dim; ++e)
+                    inv_jacobian_host(cell_id, i, d, e) =
+                      fe_values.inverse_jacobian(i)[d][e];
+            }
         }
 
-      alloc_and_copy(
-        &data->constraint_mask[color],
-        ArrayView<const dealii::internal::MatrixFreeFunctions::ConstraintKinds>(
-          constraint_mask_host.data(), constraint_mask_host.size()),
-        n_cells);
+      // Copy the data to the device
+      Kokkos::deep_copy(data->constraint_mask[color], constraint_mask_host);
+      Kokkos::deep_copy(data->local_to_global[color], local_to_global_host);
+      Kokkos::deep_copy(data->q_points[color], q_points_host);
+      Kokkos::deep_copy(data->JxW[color], JxW_host);
+      Kokkos::deep_copy(data->inv_jacobian[color], inv_jacobian_host);
     }
 
 
@@ -525,96 +301,94 @@ namespace CUDAWrappers
 
 
 
-    template <typename Number>
-    __global__ void
-    copy_constrained_dofs(
-      const dealii::types::global_dof_index *constrained_dofs,
-      const unsigned int                     n_constrained_dofs,
-      const unsigned int                     size,
-      const Number *                         src,
-      Number *                               dst)
+    template <typename VectorType>
+    struct VectorLocalSize
     {
-      const unsigned int dof =
-        threadIdx.x + blockDim.x * (blockIdx.x + gridDim.x * blockIdx.y);
-      // When working with distributed vectors, the constrained dofs are
-      // computed for ghosted vectors but we want to copy the values of the
-      // constrained dofs of non-ghosted vectors.
-      if ((dof < n_constrained_dofs) && (constrained_dofs[dof] < size))
-        dst[constrained_dofs[dof]] = src[constrained_dofs[dof]];
-    }
+      static unsigned int
+      get(const VectorType &vec)
+      {
+        return vec.locally_owned_size();
+      }
+    };
 
-
-
-    template <typename Number>
-    __global__ void
-    set_constrained_dofs(
-      const dealii::types::global_dof_index *constrained_dofs,
-      const unsigned int                     n_constrained_dofs,
-      const unsigned int                     size,
-      Number                                 val,
-      Number *                               dst)
+#ifdef DEAL_II_WITH_CUDA
+    template <>
+    struct VectorLocalSize<LinearAlgebra::CUDAWrappers::Vector<double>>
     {
-      const unsigned int dof =
-        threadIdx.x + blockDim.x * (blockIdx.x + gridDim.x * blockIdx.y);
-      // When working with distributed vectors, the constrained dofs are
-      // computed for ghosted vectors but we want to set the values of the
-      // constrained dofs of non-ghosted vectors.
-      if ((dof < n_constrained_dofs) && (constrained_dofs[dof] < size))
-        dst[constrained_dofs[dof]] = val;
-    }
+      static unsigned int
+      get(const LinearAlgebra::CUDAWrappers::Vector<double> &vec)
+      {
+        return vec.size();
+      }
+    };
+
+    template <>
+    struct VectorLocalSize<LinearAlgebra::CUDAWrappers::Vector<float>>
+    {
+      static unsigned int
+      get(const LinearAlgebra::CUDAWrappers::Vector<float> &vec)
+      {
+        return vec.size();
+      }
+    };
+#endif
 
 
 
     template <int dim, typename Number, typename Functor>
-    __global__ void
-    apply_kernel_shmem(Functor                                      func,
-                       const typename MatrixFree<dim, Number>::Data gpu_data,
-                       const Number *                               src,
-                       Number *                                     dst)
+    struct ApplyKernel
     {
-      constexpr unsigned int cells_per_block =
-        cells_per_block_shmem(dim, Functor::n_dofs_1d - 1);
+      using TeamHandle = Kokkos::TeamPolicy<
+        MemorySpace::Default::kokkos_space::execution_space>::member_type;
+      using SharedView1D =
+        Kokkos::View<Number *,
+                     MemorySpace::Default::kokkos_space::execution_space::
+                       scratch_memory_space,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+      using SharedView2D =
+        Kokkos::View<Number *[dim],
+                     MemorySpace::Default::kokkos_space::execution_space::
+                       scratch_memory_space,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
-      constexpr unsigned int n_dofs_per_block =
-        cells_per_block * Functor::n_local_dofs;
-      constexpr unsigned int n_q_points_per_block =
-        cells_per_block * Functor::n_q_points;
-      // TODO make use of dynamically allocated shared memory
-      __shared__ Number values[n_dofs_per_block];
-      __shared__ Number gradients[dim][n_q_points_per_block];
+      ApplyKernel(Functor                                      func,
+                  const typename MatrixFree<dim, Number>::Data gpu_data,
+                  Number *const                                src,
+                  Number *                                     dst)
+        : func(func)
+        , gpu_data(gpu_data)
+        , src(src)
+        , dst(dst)
+      {}
 
-      const unsigned int local_cell = threadIdx.x / Functor::n_dofs_1d;
-      const unsigned int cell =
-        local_cell + cells_per_block * (blockIdx.x + gridDim.x * blockIdx.y);
-
-      Number *gq[dim];
-      for (unsigned int d = 0; d < dim; ++d)
-        gq[d] = &gradients[d][local_cell * Functor::n_q_points];
-
-      SharedData<dim, Number> shared_data(
-        &values[local_cell * Functor::n_local_dofs], gq);
-
-      if (cell < gpu_data.n_cells)
-        func(cell, &gpu_data, &shared_data, src, dst);
-    }
+      Functor                                      func;
+      const typename MatrixFree<dim, Number>::Data gpu_data;
+      Number *const                                src;
+      Number *                                     dst;
 
 
+      // Provide the shared memory capacity. This function takes the team_size
+      // as an argument, which allows team_size dependent allocations.
+      size_t
+      team_shmem_size(int /*team_size*/) const
+      {
+        return SharedView1D::shmem_size(Functor::n_local_dofs) +
+               SharedView2D::shmem_size(Functor::n_local_dofs);
+      }
 
-    template <int dim, typename Number, typename Functor>
-    __global__ void
-    evaluate_coeff(Functor                                      func,
-                   const typename MatrixFree<dim, Number>::Data gpu_data)
-    {
-      constexpr unsigned int cells_per_block =
-        cells_per_block_shmem(dim, Functor::n_dofs_1d - 1);
 
-      const unsigned int local_cell = threadIdx.x / Functor::n_dofs_1d;
-      const unsigned int cell =
-        local_cell + cells_per_block * (blockIdx.x + gridDim.x * blockIdx.y);
+      DEAL_II_HOST_DEVICE
+      void
+      operator()(const TeamHandle &team_member) const
+      {
+        // Get the scratch memory
+        SharedView1D values(team_member.team_shmem(), Functor::n_local_dofs);
+        SharedView2D gradients(team_member.team_shmem(), Functor::n_local_dofs);
 
-      if (cell < gpu_data.n_cells)
-        func(cell, &gpu_data);
-    }
+        SharedData<dim, Number> shared_data(team_member, values, gradients);
+        func(team_member.league_rank(), &gpu_data, &shared_data, src, dst);
+      }
+    };
   } // namespace internal
 
 
@@ -623,18 +397,9 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::MatrixFree()
     : my_id(-1)
     , n_dofs(0)
-    , constrained_dofs(nullptr)
     , padding_length(0)
     , dof_handler(nullptr)
   {}
-
-
-
-  template <int dim, typename Number>
-  MatrixFree<dim, Number>::~MatrixFree()
-  {
-    free();
-  }
 
 
 
@@ -718,47 +483,18 @@ namespace CUDAWrappers
       data_copy.inv_jacobian = inv_jacobian[color];
     if (JxW.size() > 0)
       data_copy.JxW = JxW[color];
-    data_copy.local_to_global = local_to_global[color];
-    data_copy.id              = my_id;
-    data_copy.n_cells         = n_cells[color];
-    data_copy.padding_length  = padding_length;
-    data_copy.row_start       = row_start[color];
-    data_copy.use_coloring    = use_coloring;
-    data_copy.constraint_mask = constraint_mask[color];
+    data_copy.local_to_global    = local_to_global[color];
+    data_copy.constraint_mask    = constraint_mask[color];
+    data_copy.shape_values       = shape_values;
+    data_copy.shape_gradients    = shape_gradients;
+    data_copy.co_shape_gradients = co_shape_gradients;
+    data_copy.constraint_weights = constraint_weights;
+    data_copy.n_cells            = n_cells[color];
+    data_copy.padding_length     = padding_length;
+    data_copy.row_start          = row_start[color];
+    data_copy.use_coloring       = use_coloring;
 
     return data_copy;
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::free()
-  {
-    for (auto &q_points_color_ptr : q_points)
-      Utilities::CUDA::free(q_points_color_ptr);
-    q_points.clear();
-
-    for (auto &local_to_global_color_ptr : local_to_global)
-      Utilities::CUDA::free(local_to_global_color_ptr);
-    local_to_global.clear();
-
-    for (auto &inv_jacobian_color_ptr : inv_jacobian)
-      Utilities::CUDA::free(inv_jacobian_color_ptr);
-    inv_jacobian.clear();
-
-    for (auto &JxW_color_ptr : JxW)
-      Utilities::CUDA::free(JxW_color_ptr);
-    JxW.clear();
-
-    for (auto &constraint_mask_color_ptr : constraint_mask)
-      Utilities::CUDA::free(constraint_mask_color_ptr);
-    constraint_mask.clear();
-
-    Utilities::CUDA::free(constrained_dofs);
-
-    internal::used_objects[my_id].store(false);
-    my_id = -1;
   }
 
 
@@ -772,10 +508,26 @@ namespace CUDAWrappers
     static_assert(
       std::is_same<Number, typename VectorType::value_type>::value,
       "VectorType::value_type and Number should be of the same type.");
-    if (partitioner)
-      distributed_copy_constrained_values(src, dst);
-    else
-      serial_copy_constrained_values(src, dst);
+    Assert(src.size() == dst.size(),
+           ExcMessage("src and dst vectors have different size."));
+    // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
+    // work-around can be removed.
+    auto               constr_dofs = constrained_dofs;
+    const unsigned int size = internal::VectorLocalSize<VectorType>::get(dst);
+    const Number *     src_ptr = src.get_values();
+    Number *           dst_ptr = dst.get_values();
+    Kokkos::parallel_for(
+      "dealii::copy_constrained_values",
+      Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
+        0, n_constrained_dofs),
+      KOKKOS_LAMBDA(int dof) {
+        // When working with distributed vectors, the constrained dofs are
+        // computed for ghosted vectors but we want to copy the values of the
+        // constrained dofs of non-ghosted vectors.
+        const auto constrained_dof = constr_dofs[dof];
+        if (constrained_dof < size)
+          dst_ptr[constrained_dof] = src_ptr[constrained_dof];
+      });
   }
 
 
@@ -789,14 +541,27 @@ namespace CUDAWrappers
     static_assert(
       std::is_same<Number, typename VectorType::value_type>::value,
       "VectorType::value_type and Number should be of the same type.");
-    if (partitioner)
-      distributed_set_constrained_values(val, dst);
-    else
-      serial_set_constrained_values(val, dst);
+    Number *dst_ptr = dst.get_values();
+    // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this
+    // work-around can be removed.
+    auto constr_dofs = constrained_dofs;
+    // When working with distributed vectors, the constrained dofs are
+    // computed for ghosted vectors but we want to set the values of the
+    // constrained dofs of non-ghosted vectors.
+    const unsigned int size =
+      partitioner ? dst.locally_owned_size() : dst.size();
+    Kokkos::parallel_for(
+      "dealii::set_constrained_values",
+      Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
+        0, n_constrained_dofs),
+      KOKKOS_LAMBDA(int dof) {
+        if (constr_dofs[dof] < size)
+          dst_ptr[constr_dofs[dof]] = val;
+      });
   }
 
 
-
+#ifdef DEAL_II_WITH_CUDA
   template <int dim, typename Number>
   void
   MatrixFree<dim, Number>::initialize_dof_vector(
@@ -804,13 +569,14 @@ namespace CUDAWrappers
   {
     vec.reinit(n_dofs);
   }
+#endif
 
 
 
   template <int dim, typename Number>
   void
   MatrixFree<dim, Number>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &vec) const
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &vec) const
   {
     if (partitioner)
       vec.reinit(partitioner);
@@ -852,9 +618,21 @@ namespace CUDAWrappers
     for (unsigned int i = 0; i < n_colors; ++i)
       if (n_cells[i] > 0)
         {
-          internal::evaluate_coeff<dim, Number, Functor>
-            <<<grid_dim[i], block_dim[i]>>>(func, get_data(i));
-          AssertCudaKernel();
+          MemorySpace::Default::kokkos_space::execution_space exec;
+          auto color_data = get_data(i);
+          Kokkos::parallel_for(
+            "dealii::MatrixFree::evaluate_coeff",
+            Kokkos::MDRangePolicy<
+              MemorySpace::Default::kokkos_space::execution_space,
+              Kokkos::Rank<2>>(
+#if KOKKOS_VERSION >= 20900
+              exec,
+#endif
+              {0, 0},
+              {n_cells[i], Functor::n_q_points}),
+            KOKKOS_LAMBDA(const int cell, const int q) {
+              func(&color_data, cell, q);
+            });
         }
   }
 
@@ -867,10 +645,10 @@ namespace CUDAWrappers
     // First compute the size of n_cells, row_starts, kernel launch parameters,
     // and constrained_dofs
     std::size_t bytes = n_cells.size() * sizeof(unsigned int) * 2 +
-                        2 * n_colors * sizeof(dim3) +
                         n_constrained_dofs * sizeof(unsigned int);
 
     // For each color, add local_to_global, inv_jacobian, JxW, and q_points.
+    // FIXME
     for (unsigned int i = 0; i < n_colors; ++i)
       {
         bytes += n_cells[i] * padding_length * sizeof(unsigned int) +
@@ -889,34 +667,23 @@ namespace CUDAWrappers
   template <typename IteratorFiltersType>
   void
   MatrixFree<dim, Number>::internal_reinit(
-    const Mapping<dim> &             mapping,
-    const DoFHandler<dim> &          dof_handler_,
-    const AffineConstraints<Number> &constraints,
-    const Quadrature<1> &            quad,
-    const IteratorFiltersType &      iterator_filter,
-    std::shared_ptr<const MPI_Comm>  comm,
-    const AdditionalData             additional_data)
+    const Mapping<dim> &                   mapping,
+    const DoFHandler<dim> &                dof_handler_,
+    const AffineConstraints<Number> &      constraints,
+    const Quadrature<1> &                  quad,
+    const IteratorFiltersType &            iterator_filter,
+    const std::shared_ptr<const MPI_Comm> &comm,
+    const AdditionalData                   additional_data)
   {
     dof_handler = &dof_handler_;
-
-    if (typeid(Number) == typeid(double))
-      cudaDeviceSetSharedMemConfig(cudaSharedMemBankSizeEightByte);
 
     UpdateFlags update_flags = additional_data.mapping_update_flags;
     if (update_flags & update_gradients)
       update_flags |= update_JxW_values;
 
-    if (additional_data.parallelization_scheme != parallel_over_elem &&
-        additional_data.parallelization_scheme != parallel_in_elem)
-      AssertThrow(false, ExcMessage("Invalid parallelization scheme."));
-
-    this->parallelization_scheme = additional_data.parallelization_scheme;
-    this->use_coloring           = additional_data.use_coloring;
+    this->use_coloring = additional_data.use_coloring;
     this->overlap_communication_computation =
       additional_data.overlap_communication_computation;
-
-    // TODO: only free if we actually need arrays of different length
-    free();
 
     n_dofs = dof_handler->n_dofs();
 
@@ -938,65 +705,60 @@ namespace CUDAWrappers
     dofs_per_cell     = fe.n_dofs_per_cell();
     q_points_per_cell = Utilities::fixed_power<dim>(n_q_points_1d);
 
-    const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(
-      quad, fe);
+    ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info(quad,
+                                                                          fe);
 
-    unsigned int size_shape_values = n_dofs_1d * n_q_points_1d * sizeof(Number);
+    unsigned int size_shape_values = n_dofs_1d * n_q_points_1d;
 
-    FE_DGQArbitraryNodes<1> fe_quad_co(quad);
-    const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
-      shape_info_co(quad, fe_quad_co);
-
-    unsigned int size_co_shape_values =
-      n_q_points_1d * n_q_points_1d * sizeof(Number);
-
-    // Check if we already a part of the constant memory allocated to us. If
-    // not, we try to get a block of memory.
-    bool found_id = false;
-    while (!found_id)
-      {
-        ++my_id;
-        Assert(
-          my_id < static_cast<int>(mf_n_concurrent_objects),
-          ExcMessage(
-            "Maximum number of concurrent MatrixFree objects reached. Increase mf_n_concurrent_objects"));
-        bool f = false;
-        found_id =
-          internal::used_objects[my_id].compare_exchange_strong(f, true);
-      }
-
-    cudaError_t cuda_error =
-      cudaMemcpyToSymbol(internal::get_global_shape_values<Number>(0),
-                         shape_info.data.front().shape_values.data(),
-                         size_shape_values,
-                         my_id * internal::data_array_size * sizeof(Number),
-                         cudaMemcpyHostToDevice);
-    AssertCuda(cuda_error);
+    shape_values = Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+      Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
+      size_shape_values);
+    Kokkos::deep_copy(shape_values,
+                      Kokkos::View<Number *, Kokkos::HostSpace>(
+                        shape_info.data.front().shape_values.data(),
+                        size_shape_values));
 
     if (update_flags & update_gradients)
       {
-        cuda_error =
-          cudaMemcpyToSymbol(internal::get_global_shape_gradients<Number>(0),
-                             shape_info.data.front().shape_gradients.data(),
-                             size_shape_values,
-                             my_id * internal::data_array_size * sizeof(Number),
-                             cudaMemcpyHostToDevice);
-        AssertCuda(cuda_error);
+        shape_gradients =
+          Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("shape_gradients", Kokkos::WithoutInitializing),
+            size_shape_values);
+        Kokkos::deep_copy(shape_gradients,
+                          Kokkos::View<Number *, Kokkos::HostSpace>(
+                            shape_info.data.front().shape_gradients.data(),
+                            size_shape_values));
 
-        cuda_error =
-          cudaMemcpyToSymbol(internal::get_global_co_shape_gradients<Number>(0),
-                             shape_info_co.data.front().shape_gradients.data(),
-                             size_co_shape_values,
-                             my_id * internal::data_array_size * sizeof(Number),
-                             cudaMemcpyHostToDevice);
-        AssertCuda(cuda_error);
+
+        co_shape_gradients =
+          Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("co_shape_gradients",
+                               Kokkos::WithoutInitializing),
+            n_q_points_1d * n_q_points_1d);
+        Kokkos::deep_copy(
+          co_shape_gradients,
+          Kokkos::View<Number *, Kokkos::HostSpace>(
+            shape_info.data.front().shape_gradients_collocation.data(),
+            n_q_points_1d * n_q_points_1d));
       }
-
-    // Setup the number of cells per CUDA thread block
-    cells_per_block = cells_per_block_shmem(dim, fe_degree);
 
     internal::ReinitHelper<dim, Number> helper(
       this, mapping, fe, quad, shape_info, *dof_handler, update_flags);
+
+    const unsigned int constraint_weights_size =
+      shape_info.data.front().subface_interpolation_matrices[0].size();
+    constraint_weights =
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+        Kokkos::view_alloc("constraint_weights", Kokkos::WithoutInitializing),
+        constraint_weights_size);
+    auto constraint_weights_host =
+      Kokkos::create_mirror_view(constraint_weights);
+    for (unsigned int i = 0; i < constraint_weights_size; ++i)
+      {
+        constraint_weights_host[i] =
+          shape_info.data.front().subface_interpolation_matrices[0][i];
+      }
+    Kokkos::deep_copy(constraint_weights, constraint_weights_host);
 
     // Create a graph coloring
     CellFilter begin(iterator_filter, dof_handler->begin_active());
@@ -1073,7 +835,7 @@ namespace CUDAWrappers
       }
     n_colors = graph.size();
 
-    helper.setup_color_arrays(n_colors);
+    helper.resize(n_colors);
 
     IndexSet locally_relevant_dofs;
     if (comm)
@@ -1086,13 +848,7 @@ namespace CUDAWrappers
     for (unsigned int i = 0; i < n_colors; ++i)
       {
         n_cells[i] = graph[i].size();
-        helper.setup_cell_arrays(i);
-        typename std::vector<CellFilter>::iterator cell     = graph[i].begin(),
-                                                   end_cell = graph[i].end();
-        for (unsigned int cell_id = 0; cell != end_cell; ++cell, ++cell_id)
-          helper.get_cell_data(*cell, cell_id, partitioner);
-
-        helper.alloc_and_copy_arrays(i);
+        helper.fill_data(i, graph[i], partitioner);
       }
 
     // Setup row starts
@@ -1106,19 +862,6 @@ namespace CUDAWrappers
 
     if (n_constrained_dofs != 0)
       {
-        const auto constraint_n_blocks = static_cast<unsigned int>(
-          std::ceil(static_cast<double>(n_constrained_dofs) /
-                    static_cast<double>(block_size)));
-        const auto constraint_x_n_blocks =
-          static_cast<unsigned int>(std::round(std::sqrt(constraint_n_blocks)));
-        const auto constraint_y_n_blocks = static_cast<unsigned int>(
-          std::ceil(static_cast<double>(constraint_n_blocks) /
-                    static_cast<double>(constraint_x_n_blocks)));
-
-        constraint_grid_dim =
-          dim3(constraint_x_n_blocks, constraint_y_n_blocks);
-        constraint_block_dim = dim3(block_size);
-
         std::vector<dealii::types::global_dof_index> constrained_dofs_host(
           n_constrained_dofs);
 
@@ -1152,17 +895,17 @@ namespace CUDAWrappers
               }
           }
 
-        cuda_error = cudaMalloc(&constrained_dofs,
-                                n_constrained_dofs *
-                                  sizeof(dealii::types::global_dof_index));
-        AssertCuda(cuda_error);
+        constrained_dofs = Kokkos::View<types::global_dof_index *,
+                                        MemorySpace::Default::kokkos_space>(
+          Kokkos::view_alloc("constrained_dofs", Kokkos::WithoutInitializing),
+          n_constrained_dofs);
 
-        cuda_error = cudaMemcpy(constrained_dofs,
-                                constrained_dofs_host.data(),
-                                n_constrained_dofs *
-                                  sizeof(dealii::types::global_dof_index),
-                                cudaMemcpyHostToDevice);
-        AssertCuda(cuda_error);
+        Kokkos::View<types::global_dof_index *,
+                     MemorySpace::Default::kokkos_space,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+          constrained_dofs_host_view(constrained_dofs_host.data(),
+                                     constrained_dofs_host.size());
+        Kokkos::deep_copy(constrained_dofs, constrained_dofs_host_view);
       }
   }
 
@@ -1176,16 +919,27 @@ namespace CUDAWrappers
                                             VectorType &      dst) const
   {
     // Execute the loop on the cells
-    for (unsigned int i = 0; i < n_colors; ++i)
-      if (n_cells[i] > 0)
+    for (unsigned int color = 0; color < n_colors; ++color)
+      if (n_cells[color] > 0)
         {
-          internal::apply_kernel_shmem<dim, Number, Functor>
-            <<<grid_dim[i], block_dim[i]>>>(func,
-                                            get_data(i),
-                                            src.get_values(),
-                                            dst.get_values());
-          AssertCudaKernel();
+          MemorySpace::Default::kokkos_space::execution_space exec;
+          Kokkos::TeamPolicy<
+            MemorySpace::Default::kokkos_space::execution_space>
+            team_policy(
+#if KOKKOS_VERSION >= 20900
+              exec,
+#endif
+              n_cells[color],
+              Kokkos::AUTO);
+
+          internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+            func, get_data(color), src.get_values(), dst.get_values());
+
+          Kokkos::parallel_for("dealii::MatrixFree::serial_cell_loop",
+                               team_policy,
+                               apply_kernel);
         }
+    Kokkos::fence();
   }
 
 
@@ -1194,10 +948,12 @@ namespace CUDAWrappers
   template <typename Functor>
   void
   MatrixFree<dim, Number>::distributed_cell_loop(
-    const Functor &                                                      func,
-    const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const
+    const Functor &func,
+    const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &src,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst) const
   {
+    MemorySpace::Default::kokkos_space::execution_space exec;
+
     // in case we have compatible partitioners, we can simply use the provided
     // vectors
     if (src.get_partitioner().get() == partitioner.get() &&
@@ -1207,16 +963,27 @@ namespace CUDAWrappers
         if (overlap_communication_computation)
           {
             src.update_ghost_values_start(0);
+
             // In parallel, it's possible that some processors do not own any
             // cells.
             if (n_cells[0] > 0)
               {
-                internal::apply_kernel_shmem<dim, Number, Functor>
-                  <<<grid_dim[0], block_dim[0]>>>(func,
-                                                  get_data(0),
-                                                  src.get_values(),
-                                                  dst.get_values());
-                AssertCudaKernel();
+                Kokkos::TeamPolicy<
+                  MemorySpace::Default::kokkos_space::execution_space>
+                  team_policy(
+#if KOKKOS_VERSION >= 20900
+                    exec,
+#endif
+                    n_cells[0],
+                    Kokkos::AUTO);
+
+                internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+                  func, get_data(0), src.get_values(), dst.get_values());
+
+                Kokkos::parallel_for(
+                  "dealii::MatrixFree::distributed_cell_loop_0",
+                  team_policy,
+                  apply_kernel);
               }
             src.update_ghost_values_finish();
 
@@ -1224,16 +991,27 @@ namespace CUDAWrappers
             // cells
             if (n_cells[1] > 0)
               {
-                internal::apply_kernel_shmem<dim, Number, Functor>
-                  <<<grid_dim[1], block_dim[1]>>>(func,
-                                                  get_data(1),
-                                                  src.get_values(),
-                                                  dst.get_values());
-                AssertCudaKernel();
+                Kokkos::TeamPolicy<
+                  MemorySpace::Default::kokkos_space::execution_space>
+                  team_policy(
+#if KOKKOS_VERSION >= 20900
+                    exec,
+#endif
+                    n_cells[1],
+                    Kokkos::AUTO);
+
+                internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+                  func, get_data(1), src.get_values(), dst.get_values());
+
+                Kokkos::parallel_for(
+                  "dealii::MatrixFree::distributed_cell_loop_1",
+                  team_policy,
+                  apply_kernel);
+
                 // We need a synchronization point because we don't want
                 // CUDA-aware MPI to start the MPI communication until the
                 // kernel is done.
-                cudaDeviceSynchronize();
+                Kokkos::fence();
               }
 
             dst.compress_start(0, VectorOperation::add);
@@ -1241,28 +1019,56 @@ namespace CUDAWrappers
             // not own any cells
             if (n_cells[2] > 0)
               {
-                internal::apply_kernel_shmem<dim, Number, Functor>
-                  <<<grid_dim[2], block_dim[2]>>>(func,
-                                                  get_data(2),
-                                                  src.get_values(),
-                                                  dst.get_values());
-                AssertCudaKernel();
+                Kokkos::TeamPolicy<
+                  MemorySpace::Default::kokkos_space::execution_space>
+                  team_policy(
+#if KOKKOS_VERSION >= 20900
+                    exec,
+#endif
+                    n_cells[2],
+                    Kokkos::AUTO);
+
+                internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+                  func, get_data(2), src.get_values(), dst.get_values());
+
+                Kokkos::parallel_for(
+                  "dealii::MatrixFree::distributed_cell_loop_2",
+                  team_policy,
+                  apply_kernel);
               }
             dst.compress_finish(VectorOperation::add);
           }
         else
           {
             src.update_ghost_values();
+            std::vector<
+              Kokkos::View<Number *, MemorySpace::Default::kokkos_space>>
+              values_colors(n_colors);
+            std::vector<
+              Kokkos::View<Number *[dim], MemorySpace::Default::kokkos_space>>
+              gradients_colors(n_colors);
 
             // Execute the loop on the cells
             for (unsigned int i = 0; i < n_colors; ++i)
               if (n_cells[i] > 0)
                 {
-                  internal::apply_kernel_shmem<dim, Number, Functor>
-                    <<<grid_dim[i], block_dim[i]>>>(func,
-                                                    get_data(i),
-                                                    src.get_values(),
-                                                    dst.get_values());
+                  Kokkos::TeamPolicy<
+                    MemorySpace::Default::kokkos_space::execution_space>
+                    team_policy(
+#if KOKKOS_VERSION >= 20900
+                      exec,
+#endif
+                      n_cells[i],
+                      Kokkos::AUTO);
+
+                  internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+                    func, get_data(i), src.get_values(), dst.get_values());
+
+                  Kokkos::parallel_for(
+                    "dealii::MatrixFree::distributed_cell_loop_" +
+                      std::to_string(i),
+                    team_policy,
+                    apply_kernel);
                 }
             dst.compress(VectorOperation::add);
           }
@@ -1271,23 +1077,38 @@ namespace CUDAWrappers
     else
       {
         // Create the ghosted source and the ghosted destination
-        LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
           ghosted_src(partitioner);
-        LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA>
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
           ghosted_dst(ghosted_src);
         ghosted_src = src;
         ghosted_dst = dst;
+        ghosted_dst.zero_out_ghost_values();
 
         // Execute the loop on the cells
         for (unsigned int i = 0; i < n_colors; ++i)
           if (n_cells[i] > 0)
             {
-              internal::apply_kernel_shmem<dim, Number, Functor>
-                <<<grid_dim[i], block_dim[i]>>>(func,
-                                                get_data(i),
-                                                ghosted_src.get_values(),
-                                                ghosted_dst.get_values());
-              AssertCudaKernel();
+              Kokkos::TeamPolicy<
+                MemorySpace::Default::kokkos_space::execution_space>
+                team_policy(
+#if KOKKOS_VERSION >= 20900
+                  exec,
+#endif
+                  n_cells[i],
+                  Kokkos::AUTO);
+
+              internal::ApplyKernel<dim, Number, Functor> apply_kernel(
+                func,
+                get_data(i),
+                ghosted_src.get_values(),
+                ghosted_dst.get_values());
+
+              Kokkos::parallel_for(
+                "dealii::MatrixFree::distributed_cell_loop_" +
+                  std::to_string(i),
+                team_policy,
+                apply_kernel);
             }
 
         // Add the ghosted values
@@ -1296,8 +1117,7 @@ namespace CUDAWrappers
       }
   }
 
-
-
+#ifdef DEAL_II_WITH_CUDA
   template <int dim, typename Number>
   template <typename Functor>
   void
@@ -1308,104 +1128,9 @@ namespace CUDAWrappers
   {
     Assert(false, ExcInternalError());
   }
-
-
-
-  template <int dim, typename Number>
-  template <typename VectorType>
-  void
-  MatrixFree<dim, Number>::serial_copy_constrained_values(const VectorType &src,
-                                                          VectorType &dst) const
-  {
-    Assert(src.size() == dst.size(),
-           ExcMessage("src and dst vectors have different size."));
-    internal::copy_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
-                                                      n_constrained_dofs,
-                                                      src.size(),
-                                                      src.get_values(),
-                                                      dst.get_values());
-    AssertCudaKernel();
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::distributed_copy_constrained_values(
-    const LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &src,
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const
-  {
-    Assert(src.size() == dst.size(),
-           ExcMessage("src and dst vectors have different local size."));
-    internal::copy_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
-                                                      n_constrained_dofs,
-                                                      src.locally_owned_size(),
-                                                      src.get_values(),
-                                                      dst.get_values());
-    AssertCudaKernel();
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::distributed_copy_constrained_values(
-    const LinearAlgebra::CUDAWrappers::Vector<Number> &,
-    LinearAlgebra::CUDAWrappers::Vector<Number> &) const
-  {
-    Assert(false, ExcInternalError());
-  }
-
-
-
-  template <int dim, typename Number>
-  template <typename VectorType>
-  void
-  MatrixFree<dim, Number>::serial_set_constrained_values(const Number val,
-                                                         VectorType & dst) const
-  {
-    internal::set_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
-                                                      n_constrained_dofs,
-                                                      dst.size(),
-                                                      val,
-                                                      dst.get_values());
-    AssertCudaKernel();
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::distributed_set_constrained_values(
-    const Number                                                   val,
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::CUDA> &dst) const
-  {
-    internal::set_constrained_dofs<Number>
-      <<<constraint_grid_dim, constraint_block_dim>>>(constrained_dofs,
-                                                      n_constrained_dofs,
-                                                      dst.locally_owned_size(),
-                                                      val,
-                                                      dst.get_values());
-    AssertCudaKernel();
-  }
-
-
-
-  template <int dim, typename Number>
-  void
-  MatrixFree<dim, Number>::distributed_set_constrained_values(
-    const Number,
-    LinearAlgebra::CUDAWrappers::Vector<Number> &) const
-  {
-    Assert(false, ExcInternalError());
-  }
+#endif
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif

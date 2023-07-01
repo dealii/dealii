@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -190,14 +190,14 @@ namespace internal
     inline std::vector<Point<2>>
     generate_simplex_evaluation_points(const unsigned int n_subdivisions)
     {
-      std::vector<Point<2>> evalution_points;
+      std::vector<Point<2>> evaluation_points;
 
       generate_simplex_evaluation_points_recursively(
         {{Point<2>(0.0, 0.0), Point<2>(1.0, 0.0), Point<2>(0.0, 1.0)}},
         n_subdivisions,
-        evalution_points);
+        evaluation_points);
 
-      return evalution_points;
+      return evaluation_points;
     }
 
 
@@ -881,13 +881,13 @@ namespace internal
       {
         LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp;
         temp.reinit(src.locally_owned_elements());
-        temp.import(src, VectorOperation::insert);
+        temp.import_elements(src, VectorOperation::insert);
 
         LinearAlgebra::ReadWriteVector<Number> temp2;
         temp2.reinit(temp, true);
         temp2 = temp;
 
-        dst.import(temp2, VectorOperation::insert);
+        dst.import_elements(temp2, VectorOperation::insert);
       }
 
 #ifdef DEAL_II_WITH_TRILINOS

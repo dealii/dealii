@@ -54,7 +54,7 @@ check_solve(SolverControl &     solver_control,
       deallog << "Success. ";
       success = true;
     }
-  catch (std::exception &e)
+  catch (const std::exception &e)
     {
       deallog << "Failure. ";
     }

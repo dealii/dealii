@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,11 +23,19 @@ namespace LinearAlgebra
 {
   namespace TpetraWrappers
   {
+#  ifdef HAVE_TPETRA_INST_FLOAT
     template class Vector<float>;
+#  endif
+#  ifdef HAVE_TPETRA_INST_DOUBLE
     template class Vector<double>;
+#  endif
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
+#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
     template class Vector<std::complex<float>>;
+#    endif
+#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
     template class Vector<std::complex<double>>;
+#    endif
 #  endif
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +20,6 @@
 
 #include <deal.II/base/exceptions.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Comm.h>
 #  include <Epetra_Map.h>
@@ -32,7 +31,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <Epetra_SerialComm.h>
 #  endif
 #endif
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 

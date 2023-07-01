@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2022 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -109,10 +109,9 @@ MGTransferMatrixFree<dim, Number>::build(
            "probably close to where you already call distribute_dofs()."));
   if (external_partitioners.size() > 0)
     {
-      Assert(
-        this->initialize_dof_vector == nullptr,
-        ExcMessage(
-          "A initialize_dof_vector function has already been registered in the constructor!"));
+      Assert(this->initialize_dof_vector == nullptr,
+             ExcMessage("An initialize_dof_vector function has already "
+                        "been registered in the constructor!"));
 
       this->initialize_dof_vector =
         [external_partitioners](
@@ -497,17 +496,15 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
               internal::EvaluatorQuantity::value,
               dim,
               degree + 1,
-              2 * degree + 1,
-              VectorizedArray<Number>,
-              VectorizedArray<Number>>::do_forward(1,
-                                                   prolongation_matrix_1d,
-                                                   evaluation_data.begin() +
-                                                     c * Utilities::fixed_power<
-                                                           dim>(degree_size),
-                                                   evaluation_data.begin() +
-                                                     c * n_scalar_cell_dofs,
-                                                   fe_degree + 1,
-                                                   2 * fe_degree + 1);
+              2 * degree + 1>::do_forward(1,
+                                          prolongation_matrix_1d,
+                                          evaluation_data.begin() +
+                                            c * Utilities::fixed_power<dim>(
+                                                  degree_size),
+                                          evaluation_data.begin() +
+                                            c * n_scalar_cell_dofs,
+                                          fe_degree + 1,
+                                          2 * fe_degree + 1);
           internal::weight_fe_q_dofs_by_entity<dim,
                                                degree != -1 ? 2 * degree + 1 :
                                                               -1,
@@ -525,17 +522,15 @@ MGTransferMatrixFree<dim, Number>::do_prolongate_add(
               internal::EvaluatorQuantity::value,
               dim,
               degree + 1,
-              2 * degree + 2,
-              VectorizedArray<Number>,
-              VectorizedArray<Number>>::do_forward(1,
-                                                   prolongation_matrix_1d,
-                                                   evaluation_data.begin() +
-                                                     c * Utilities::fixed_power<
-                                                           dim>(degree_size),
-                                                   evaluation_data.begin() +
-                                                     c * n_scalar_cell_dofs,
-                                                   fe_degree + 1,
-                                                   2 * fe_degree + 2);
+              2 * degree + 2>::do_forward(1,
+                                          prolongation_matrix_1d,
+                                          evaluation_data.begin() +
+                                            c * Utilities::fixed_power<dim>(
+                                                  degree_size),
+                                          evaluation_data.begin() +
+                                            c * n_scalar_cell_dofs,
+                                          fe_degree + 1,
+                                          2 * fe_degree + 2);
         }
 
       // write into dst vector
@@ -607,19 +602,16 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
               internal::EvaluatorQuantity::value,
               dim,
               degree + 1,
-              2 * degree + 1,
-              VectorizedArray<Number>,
-              VectorizedArray<Number>>::do_backward(1,
-                                                    prolongation_matrix_1d,
-                                                    false,
-                                                    evaluation_data.begin() +
-                                                      c * n_scalar_cell_dofs,
-                                                    evaluation_data.begin() +
-                                                      c *
-                                                        Utilities::fixed_power<
-                                                          dim>(degree_size),
-                                                    fe_degree + 1,
-                                                    2 * fe_degree + 1);
+              2 * degree + 1>::do_backward(1,
+                                           prolongation_matrix_1d,
+                                           false,
+                                           evaluation_data.begin() +
+                                             c * n_scalar_cell_dofs,
+                                           evaluation_data.begin() +
+                                             c * Utilities::fixed_power<dim>(
+                                                   degree_size),
+                                           fe_degree + 1,
+                                           2 * fe_degree + 1);
         }
       else
         {
@@ -629,19 +621,16 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
               internal::EvaluatorQuantity::value,
               dim,
               degree + 1,
-              2 * degree + 2,
-              VectorizedArray<Number>,
-              VectorizedArray<Number>>::do_backward(1,
-                                                    prolongation_matrix_1d,
-                                                    false,
-                                                    evaluation_data.begin() +
-                                                      c * n_scalar_cell_dofs,
-                                                    evaluation_data.begin() +
-                                                      c *
-                                                        Utilities::fixed_power<
-                                                          dim>(degree_size),
-                                                    fe_degree + 1,
-                                                    2 * fe_degree + 2);
+              2 * degree + 2>::do_backward(1,
+                                           prolongation_matrix_1d,
+                                           false,
+                                           evaluation_data.begin() +
+                                             c * n_scalar_cell_dofs,
+                                           evaluation_data.begin() +
+                                             c * Utilities::fixed_power<dim>(
+                                                   degree_size),
+                                           fe_degree + 1,
+                                           2 * fe_degree + 2);
         }
 
       // write into dst vector

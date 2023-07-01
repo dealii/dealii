@@ -992,7 +992,7 @@ main()
       SIPGLaplace<2> problem(test_case);
       problem.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

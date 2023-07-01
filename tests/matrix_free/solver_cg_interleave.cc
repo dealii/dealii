@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -85,7 +85,7 @@ public:
            const std::pair<unsigned int, unsigned int> &)>
       function = helmholtz_operator<dim, -1, VectorType, 0>;
     data.cell_loop(function, dst, src, true);
-    for (unsigned int i : data.get_constrained_dofs())
+    for (const unsigned int i : data.get_constrained_dofs())
       dst.local_element(i) = src.local_element(i);
   }
 
@@ -106,7 +106,7 @@ public:
       function = helmholtz_operator<dim, -1, VectorType, 0>;
     data.cell_loop(
       function, dst, src, operation_before_loop, operation_after_loop);
-    for (unsigned int i : data.get_constrained_dofs())
+    for (const unsigned int i : data.get_constrained_dofs())
       dst.local_element(i) = src.local_element(i);
   }
 

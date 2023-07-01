@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -795,7 +795,7 @@ public:
    * AffineConstraints was created for the DG case.
    */
   bool
-  is_closed(const MPI_Comm &comm) const;
+  is_closed(const MPI_Comm comm) const;
 
   /**
    * Merge the constraints represented by the object given as argument into
@@ -1231,7 +1231,7 @@ public:
    * situation could be where one wants to assemble of a right hand side
    * vector on a problem with inhomogeneous constraints, but the global matrix
    * has been assembled previously. A typical example of this is a time
-   * stepping algorithm where the stiffness matrix is assembled once, and the
+   * stepping algorithm where the @ref GlossStiffnessMatrix "stiffness matrix" is assembled once, and the
    * right hand side updated every time step. Note that, however, the entries
    * in the columns of the local matrix have to be exactly the same as those
    * that have been written into the global matrix. Otherwise, this function
@@ -1758,7 +1758,7 @@ public:
   bool
   is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
                             const IndexSet &             locally_active_dofs,
-                            const MPI_Comm &             mpi_communicator,
+                            const MPI_Comm               mpi_communicator,
                             const bool                   verbose = false) const;
 
   /**

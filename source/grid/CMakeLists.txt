@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -13,24 +13,22 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 #
 # Work around an issue where gcc emits a note that the warning
 # -Wmisleading-indentation will be disabled due to a humongous line of over
 # 100k characters produced by one of the CGAL headers. Unfortunately,
 # guarding the include by DEAL_II_DISABLE_EXTRA_DIAGNOSTICS is not enough
-# due to a longstanding bug in gcc. Thus, simply wet
+# due to a longstanding bug in gcc. Thus, simply set
 # -Wno-misleading-indentation on the command line for the
-# grid_generator_cgal.cc compilation unit.
+# grid_generator_cgal.cc and grid_tools.cc compilation units.
+# See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89549
 #
 if(DEAL_II_WITH_CGAL)
   enable_if_supported(_flag "-Wno-misleading-indentation")
-  set_property(SOURCE "grid_generator_cgal.cc"
-    APPEND_STRING PROPERTY COMPILE_FLAGS " ${_flag}"
+  set_property(SOURCE "grid_generator_cgal.cc" "grid_tools.cc"
+    APPEND PROPERTY COMPILE_OPTIONS "${_flag}"
     )
 endif()
-
 
 set(_unity_include_src
   cell_id.cc
@@ -97,5 +95,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/grid/*.h
   )
 
-deal_ii_add_library(obj_grid OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_grid "${_inst}")
+define_object_library(object_grid OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_grid "${_inst}")

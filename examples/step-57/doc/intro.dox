@@ -237,7 +237,7 @@ Instead of solving the above system, we can solve the equivalent system
 @f}
 
 with a parameter $\gamma$ and an invertible matrix $W$. Here
-$\gamma B^TW^{-1}B$ is the Augmented Lagrangian term; see [1] for details.
+$\gamma B^TW^{-1}B$ is the Augmented Lagrangian term; see @cite Benzi2006 for details.
 
 Denoting the system matrix of the new system by $G$ and the right-hand
 side by $b$, we solve it iteratively with right preconditioning
@@ -252,13 +252,13 @@ P^{-1} =
 
 with $\tilde{A} = A + \gamma B^TW^{-1}B$ and $\tilde{S}$ is the
 corresponding Schur complement $\tilde{S} = B^T \tilde{A}^{-1} B$. We
-let $W = M_p$ where $M_p$ is the pressure mass matrix, then
+let $W = M_p$ where $M_p$ is the pressure @ref GlossMassMatrix "mass matrix", then
 $\tilde{S}^{-1}$ can be approximated by
 @f{eqnarray*}
 \tilde{S}^{-1} \approx -(\nu+\gamma)M_p^{-1}.
 @f}
 
-See [1] for details.
+See @cite Benzi2006 for details.
 
 We decompose $P^{-1}$ as
 @f{eqnarray*}
@@ -278,18 +278,19 @@ P^{-1} =
 @f}
 
 Here two inexact solvers will be needed for $\tilde{A}^{-1}$ and
-$\tilde{S}^{-1}$, respectively (see [1]). Since the pressure mass
+$\tilde{S}^{-1}$, respectively (see @cite Benzi2006). Since the pressure mass
 matrix is symmetric and positive definite,
 CG with ILU as a preconditioner is appropriate to use for $\tilde{S}^{-1}$. For simplicity, we use
 the direct solver UMFPACK for $\tilde{A}^{-1}$. The last ingredient is a sparse
 matrix-vector product with $B^T$. Instead of computing the matrix product
 in the augmented Lagrangian term in $\tilde{A}$, we assemble Grad-Div stabilization
 $(\nabla \cdot \phi _{i}, \nabla \cdot \phi _{j}) \approx (B^T
-M_p^{-1}B)_{ij}$, as explained in [2].
+M_p^{-1}B)_{ij}$, as explained in @cite HeisterRapin2013.
 
 <h3> Test Case </h3>
 
-We use the lid driven cavity flow as our test case; see [3] for details.
+We use the lid driven cavity flow as our test case;
+see [this page](http://www.cfd-online.com/Wiki/Lid-driven_cavity_problem) for details.
 The computational domain is the unit square and the right-hand side is
 $f=0$. The boundary condition is
 @f{eqnarray*}
@@ -320,23 +321,12 @@ of the nonlinear residual down to 1e-14. Also, we use a simple line
 search algorithm for globalization of the Newton method.
 
 The cavity reference values for $\mathrm{Re}=400$ and $\mathrm{Re}=7500$ are
-from [4] and [5], respectively, where $\mathrm{Re}$ is the Reynolds number and
-can be located at [8]. Here the viscosity is defined by $1/\mathrm{Re}$.
+from @cite Ghia1982 and @cite Erturk2005, respectively, where $\mathrm{Re}$ is the
+[Reynolds number](https://en.wikipedia.org/wiki/Reynolds_number).
+Here the viscosity is defined by $1/\mathrm{Re}$.
 Even though we can still find a solution for $\mathrm{Re}=10000$ and the
-references contain results for comparison, we limit our discussion here to
+papers cited throughout this introduction contain results for comparison,
+we limit our discussion here to
 $\mathrm{Re}=7500$. This is because the solution is no longer stationary
-starting around $\mathrm{Re}=8000$ but instead becomes periodic, see [7] for
-details.
-
-<h3> References </h3>
-<ol>
-
-  <li>  An Augmented Lagrangian-Based Approach to the Oseen Problem, M. Benzi and M. Olshanskii, SIAM J. SCI. COMPUT. 2006
-  <li>  Efficient augmented Lagrangian-type preconditioning for the Oseen problem using Grad-Div stabilization, Timo Heister and Gerd Rapin
-  <li>  http://www.cfd-online.com/Wiki/Lid-driven_cavity_problem
-  <li>  High-Re solution for incompressible flow using the Navier-Stokes Equations and a Multigrid Method, U. Ghia, K. N. Ghia, and C. T. Shin
-  <li>  Numerical solutions of 2-D steady incompressible driven cavity flow at high Reynolds numbers, E. Erturk, T.C. Corke and C. Gokcol
-  <li> Implicit Weighted ENO Schemes for the Three-Dimensional Incompressible Navier-Stokes Equations, Yang et al, 1998
-  <li> The 2D lid-driven cavity problem revisited, C. Bruneau and M. Saad, 2006
-  <li> https://en.wikipedia.org/wiki/Reynolds_number
-</ol>
+starting around $\mathrm{Re}=8000$ but instead becomes periodic, see
+@cite Bruneau2006 for details.

@@ -224,7 +224,7 @@ As explained during the generation of the sparsity pattern, it is
 important to have the numbering of degrees of freedom in mind when
 using preconditioners like incomplete LU decompositions. This is most
 conveniently visualized using the distribution of nonzero elements in
-the stiffness matrix.
+the @ref GlossStiffnessMatrix "stiffness matrix".
 
 If we don't do anything special to renumber degrees of freedom (i.e.,
 without using DoFRenumbering::Cuthill_McKee, but with using

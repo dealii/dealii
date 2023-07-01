@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -229,7 +229,7 @@ namespace internal
        */
       void
       assign_ghosts(const std::vector<unsigned int> &boundary_cells,
-                    const MPI_Comm &                 communicator_sm,
+                    const MPI_Comm                   communicator_sm,
                     const bool use_vector_data_exchanger_full);
 
       /**
@@ -284,12 +284,12 @@ namespace internal
         const std::vector<FaceToCellTopology<1>> &inner_faces,
         const std::vector<FaceToCellTopology<1>> &ghosted_faces,
         const bool                                fill_cell_centric,
-        const MPI_Comm &                          communicator_sm,
+        const MPI_Comm                            communicator_sm,
         const bool use_vector_data_exchanger_full);
 
       /**
        * Given @p cell_indices_contiguous_sm containing the local index of
-       * cells of macro faces (inner/outer) and macro faces compute
+       * cells of face batches (inner/outer) and cell batches compute
        * dof_indices_contiguous_sm.
        */
       void
@@ -464,13 +464,6 @@ namespace internal
          */
         dof_access_cell = 2
       };
-
-      /**
-       * Stores the dimension of the underlying DoFHandler. Since the indices
-       * are not templated, this is the variable that makes the dimension
-       * accessible in the (rare) cases it is needed inside this class.
-       */
-      unsigned int dimension;
 
       /**
        * For efficiency reasons, always keep a fixed number of cells with

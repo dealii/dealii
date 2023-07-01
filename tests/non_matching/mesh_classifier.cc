@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,7 @@ print_cell_and_face_locations(
     classifier.location_to_level_set(cell);
   deallog << "cell " << location_to_string(cell_location) << std::endl;
 
-  for (unsigned int f : cell->face_indices())
+  for (const unsigned int f : cell->face_indices())
     {
       const NonMatching::LocationToLevelSet face_location =
         classifier.location_to_level_set(cell, f);

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,50 +30,305 @@ namespace internal
   {
     namespace
     {
-      Quadrature<2>
-      reflect(const Quadrature<2> &q)
+      std::vector<Point<2>>
+      reflect(const std::vector<Point<2>> &points)
       {
         // Take the points and reflect them by the diagonal
-        std::vector<Point<2>> q_points(q.get_points());
-        for (Point<2> &p : q_points)
-          std::swap(p[0], p[1]);
+        std::vector<Point<2>> q_points;
+        q_points.reserve(points.size());
+        for (const Point<2> &p : points)
+          q_points.emplace_back(p[1], p[0]);
 
-        return Quadrature<2>(q_points, q.get_weights());
+        return q_points;
       }
 
 
-      Quadrature<2>
-      rotate(const Quadrature<2> &q, const unsigned int n_times)
+      std::vector<Point<2>>
+      rotate(const std::vector<Point<2>> &points, const unsigned int n_times)
       {
-        std::vector<Point<2>> q_points(q.size());
-        for (unsigned int i = 0; i < q.size(); ++i)
+        std::vector<Point<2>> q_points;
+        q_points.reserve(points.size());
+        switch (n_times % 4)
           {
-            switch (n_times % 4)
-              {
-                case 0:
-                  // 0 degree. the point remains as it is.
-                  q_points[i] = q.point(i);
-                  break;
-
-                case 1:
-                  // 90 degree counterclockwise
-                  q_points[i][0] = 1.0 - q.point(i)[1];
-                  q_points[i][1] = q.point(i)[0];
-                  break;
-                case 2:
-                  // 180 degree counterclockwise
-                  q_points[i][0] = 1.0 - q.point(i)[0];
-                  q_points[i][1] = 1.0 - q.point(i)[1];
-                  break;
-                case 3:
-                  // 270 degree counterclockwise
-                  q_points[i][0] = q.point(i)[1];
-                  q_points[i][1] = 1.0 - q.point(i)[0];
-                  break;
-              }
+            case 0:
+              // 0 degree. the point remains as it is.
+              for (const Point<2> &p : points)
+                q_points.push_back(p);
+              break;
+            case 1:
+              // 90 degree counterclockwise
+              for (const Point<2> &p : points)
+                q_points.emplace_back(1.0 - p[1], p[0]);
+              break;
+            case 2:
+              // 180 degree counterclockwise
+              for (const Point<2> &p : points)
+                q_points.emplace_back(1.0 - p[0], 1.0 - p[1]);
+              break;
+            case 3:
+              // 270 degree counterclockwise
+              for (const Point<2> &p : points)
+                q_points.emplace_back(p[1], 1.0 - p[0]);
+              break;
           }
 
-        return Quadrature<2>(q_points, q.get_weights());
+        return q_points;
+      }
+
+      /**
+       * Internal function to translate a 2-dimensional quadrature formula to
+       * a 3-dimensional quadrature formula on hex elements, addressing both
+       * standard faces (FEFaceValues) and subfaces (FESubfaceValues),
+       * depending on the given refinement case and subface.
+       */
+      void
+      project_to_hex_face_and_append(
+        const std::vector<Point<2>> &points,
+        const unsigned int           face_no,
+        std::vector<Point<3>> &      q_points,
+        const RefinementCase<2> &ref_case   = RefinementCase<2>::no_refinement,
+        const unsigned int       subface_no = 0)
+      {
+        // one coordinate is at a const value. for faces 0, 2 and 4 this value
+        // is 0.0, for faces 1, 3 and 5 it is 1.0
+        const double const_value = face_no % 2;
+
+        // local 2d coordinates are xi and eta, global 3d coordinates are x, y
+        // and z. those have to be mapped. the following indices tell, which
+        // global coordinate (0->x, 1->y, 2->z) corresponds to which local one
+        const unsigned int xi_index    = (1 + face_no / 2) % 3,
+                           eta_index   = (2 + face_no / 2) % 3,
+                           const_index = face_no / 2;
+
+        // for a standard face (no refinement), we use the default values of
+        // the xi and eta scales and translations, otherwise the xi and eta
+        // values will be scaled (by factor 0.5 or factor 1.0) depending on
+        // the refinement case and translated (by 0.0 or 0.5) depending on the
+        // refinement case and subface_no
+        double xi_scale = 1.0, eta_scale = 1.0, xi_translation = 0.0,
+               eta_translation = 0.0;
+
+        // set the scale and translation parameter for individual subfaces
+        switch (ref_case)
+          {
+            case RefinementCase<2>::no_refinement:
+              break;
+            case RefinementCase<2>::cut_x:
+              xi_scale       = 0.5;
+              xi_translation = subface_no % 2 * 0.5;
+              break;
+            case RefinementCase<2>::cut_y:
+              eta_scale       = 0.5;
+              eta_translation = subface_no % 2 * 0.5;
+              break;
+            case RefinementCase<2>::cut_xy:
+              xi_scale        = 0.5;
+              eta_scale       = 0.5;
+              xi_translation  = int(subface_no % 2) * 0.5;
+              eta_translation = int(subface_no / 2) * 0.5;
+              break;
+            default:
+              Assert(false, ExcInternalError());
+              break;
+          }
+
+        // finally, compute the scaled, translated, projected quadrature
+        // points
+        for (const Point<2> &p : points)
+          {
+            Point<3> cell_point;
+            cell_point[xi_index]    = xi_scale * p(0) + xi_translation;
+            cell_point[eta_index]   = eta_scale * p(1) + eta_translation;
+            cell_point[const_index] = const_value;
+            q_points.push_back(cell_point);
+          }
+      }
+
+      std::vector<Point<2>>
+      mutate_points_with_offset(const std::vector<Point<2>> &points,
+                                const unsigned int           offset)
+      {
+        switch (offset)
+          {
+            case 0:
+              return points;
+            case 1:
+            case 2:
+            case 3:
+              return rotate(points, offset);
+            case 4:
+              return reflect(points);
+            case 5:
+            case 6:
+            case 7:
+              return rotate(reflect(points), 8 - offset);
+            default:
+              Assert(false, ExcInternalError());
+          }
+        return {};
+      }
+
+      Quadrature<2>
+      mutate_quadrature(const Quadrature<2> &quadrature,
+                        const bool           face_orientation,
+                        const bool           face_flip,
+                        const bool           face_rotation)
+      {
+        static const unsigned int offset[2][2][2] = {
+          {{4, 5},   // face_orientation=false; face_flip=false;
+                     // face_rotation=false and true
+           {6, 7}},  // face_orientation=false; face_flip=true;
+                     // face_rotation=false and true
+          {{0, 1},   // face_orientation=true;  face_flip=false;
+                     // face_rotation=false and true
+           {2, 3}}}; // face_orientation=true; face_flip=true;
+                     // face_rotation=false and true
+
+        return Quadrature<2>(
+          mutate_points_with_offset(
+            quadrature.get_points(),
+            offset[face_orientation][face_flip][face_rotation]),
+          quadrature.get_weights());
+      }
+
+      std::pair<unsigned int, RefinementCase<2>>
+      select_subface_no_and_refinement_case(
+        const unsigned int             subface_no,
+        const bool                     face_orientation,
+        const bool                     face_flip,
+        const bool                     face_rotation,
+        const internal::SubfaceCase<3> ref_case)
+      {
+        constexpr int dim = 3;
+        // for each subface of a given FaceRefineCase
+        // there is a corresponding equivalent
+        // subface number of one of the "standard"
+        // RefineCases (cut_x, cut_y, cut_xy). Map
+        // the given values to those equivalent
+        // ones.
+
+        // first, define an invalid number
+        static const unsigned int e = numbers::invalid_unsigned_int;
+
+        static const RefinementCase<dim - 1>
+          equivalent_refine_case[internal::SubfaceCase<dim>::case_isotropic + 1]
+                                [GeometryInfo<3>::max_children_per_face] = {
+                                  // case_none. there should be only
+                                  // invalid values here. However, as
+                                  // this function is also called (in
+                                  // tests) for cells which have no
+                                  // refined faces, use isotropic
+                                  // refinement instead
+                                  {RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy},
+                                  // case_x
+                                  {RefinementCase<dim - 1>::cut_x,
+                                   RefinementCase<dim - 1>::cut_x,
+                                   RefinementCase<dim - 1>::no_refinement,
+                                   RefinementCase<dim - 1>::no_refinement},
+                                  // case_x1y
+                                  {RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_x,
+                                   RefinementCase<dim - 1>::no_refinement},
+                                  // case_x2y
+                                  {RefinementCase<dim - 1>::cut_x,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::no_refinement},
+                                  // case_x1y2y
+                                  {RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy},
+                                  // case_y
+                                  {RefinementCase<dim - 1>::cut_y,
+                                   RefinementCase<dim - 1>::cut_y,
+                                   RefinementCase<dim - 1>::no_refinement,
+                                   RefinementCase<dim - 1>::no_refinement},
+                                  // case_y1x
+                                  {RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_y,
+                                   RefinementCase<dim - 1>::no_refinement},
+                                  // case_y2x
+                                  {RefinementCase<dim - 1>::cut_y,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::no_refinement},
+                                  // case_y1x2x
+                                  {RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy},
+                                  // case_xy (case_isotropic)
+                                  {RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy,
+                                   RefinementCase<dim - 1>::cut_xy}};
+
+        static const unsigned int
+          equivalent_subface_number[internal::SubfaceCase<dim>::case_isotropic +
+                                    1][GeometryInfo<3>::max_children_per_face] =
+            {// case_none, see above
+             {0, 1, 2, 3},
+             // case_x
+             {0, 1, e, e},
+             // case_x1y
+             {0, 2, 1, e},
+             // case_x2y
+             {0, 1, 3, e},
+             // case_x1y2y
+             {0, 2, 1, 3},
+             // case_y
+             {0, 1, e, e},
+             // case_y1x
+             {0, 1, 1, e},
+             // case_y2x
+             {0, 2, 3, e},
+             // case_y1x2x
+             {0, 1, 2, 3},
+             // case_xy (case_isotropic)
+             {0, 1, 2, 3}};
+
+        // If face-orientation or face_rotation are
+        // non-standard, cut_x and cut_y have to be
+        // exchanged.
+        static const RefinementCase<dim - 1> ref_case_permutation[4] = {
+          RefinementCase<dim - 1>::no_refinement,
+          RefinementCase<dim - 1>::cut_y,
+          RefinementCase<dim - 1>::cut_x,
+          RefinementCase<dim - 1>::cut_xy};
+
+        // set a corresponding (equivalent)
+        // RefineCase and subface number
+        const RefinementCase<dim - 1> equ_ref_case =
+          equivalent_refine_case[ref_case][subface_no];
+        const unsigned int equ_subface_no =
+          equivalent_subface_number[ref_case][subface_no];
+        // make sure, that we got a valid subface and RefineCase
+        Assert(equ_ref_case != RefinementCase<dim>::no_refinement,
+               ExcInternalError());
+        Assert(equ_subface_no != e, ExcInternalError());
+        // now, finally respect non-standard faces
+        const RefinementCase<dim - 1> final_ref_case =
+          (face_orientation == face_rotation ?
+             ref_case_permutation[equ_ref_case] :
+             equ_ref_case);
+
+        const unsigned int final_subface_no =
+          GeometryInfo<dim>::child_cell_on_face(RefinementCase<dim>(
+                                                  final_ref_case),
+                                                4,
+                                                equ_subface_no,
+                                                face_orientation,
+                                                face_flip,
+                                                face_rotation,
+                                                equ_ref_case);
+
+        return std::make_pair(final_subface_no, final_ref_case);
       }
     } // namespace
   }   // namespace QProjector
@@ -172,42 +427,45 @@ QProjector<3>::project_to_face(const ReferenceCell &  reference_cell,
   Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
   (void)reference_cell;
 
-  const unsigned int dim = 3;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
+  AssertIndexRange(face_no, GeometryInfo<3>::faces_per_cell);
   Assert(q_points.size() == quadrature.size(),
          ExcDimensionMismatch(q_points.size(), quadrature.size()));
+  q_points.clear();
+  internal::QProjector::project_to_hex_face_and_append(quadrature.get_points(),
+                                                       face_no,
+                                                       q_points);
+}
 
-  for (unsigned int p = 0; p < quadrature.size(); ++p)
-    switch (face_no)
-      {
-        case 0:
-          q_points[p] =
-            Point<dim>(0, quadrature.point(p)(0), quadrature.point(p)(1));
-          break;
-        case 1:
-          q_points[p] =
-            Point<dim>(1, quadrature.point(p)(0), quadrature.point(p)(1));
-          break;
-        case 2:
-          q_points[p] =
-            Point<dim>(quadrature.point(p)(1), 0, quadrature.point(p)(0));
-          break;
-        case 3:
-          q_points[p] =
-            Point<dim>(quadrature.point(p)(1), 1, quadrature.point(p)(0));
-          break;
-        case 4:
-          q_points[p] =
-            Point<dim>(quadrature.point(p)(0), quadrature.point(p)(1), 0);
-          break;
-        case 5:
-          q_points[p] =
-            Point<dim>(quadrature.point(p)(0), quadrature.point(p)(1), 1);
-          break;
 
-        default:
-          Assert(false, ExcInternalError());
-      }
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_oriented_face(const ReferenceCell &reference_cell,
+                                          const Quadrature<dim - 1> &quadrature,
+                                          const unsigned int         face_no,
+                                          const bool,
+                                          const bool,
+                                          const bool)
+{
+  return QProjector<dim>::project_to_face(reference_cell, quadrature, face_no);
+}
+
+
+
+template <>
+Quadrature<3>
+QProjector<3>::project_to_oriented_face(const ReferenceCell &reference_cell,
+                                        const Quadrature<2> &quadrature,
+                                        const unsigned int   face_no,
+                                        const bool           face_orientation,
+                                        const bool           face_flip,
+                                        const bool           face_rotation)
+{
+  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
+
+  const Quadrature<2> mutation = internal::QProjector::mutate_quadrature(
+    quadrature, face_orientation, face_flip, face_rotation);
+
+  return QProjector<3>::project_to_face(reference_cell, mutation, face_no);
 }
 
 
@@ -389,82 +647,70 @@ QProjector<3>::project_to_subface(const ReferenceCell &    reference_cell,
   Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
   (void)reference_cell;
 
-  const unsigned int dim = 3;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  AssertIndexRange(subface_no, GeometryInfo<dim>::max_children_per_face);
+  AssertIndexRange(face_no, GeometryInfo<3>::faces_per_cell);
+  AssertIndexRange(subface_no, GeometryInfo<3>::max_children_per_face);
   Assert(q_points.size() == quadrature.size(),
          ExcDimensionMismatch(q_points.size(), quadrature.size()));
 
-  // one coordinate is at a const value. for
-  // faces 0, 2 and 4 this value is 0.0, for
-  // faces 1, 3 and 5 it is 1.0
-  double const_value = face_no % 2;
-  // local 2d coordinates are xi and eta,
-  // global 3d coordinates are x, y and
-  // z. those have to be mapped. the following
-  // indices tell, which global coordinate
-  // (0->x, 1->y, 2->z) corresponds to which
-  // local one
-  unsigned int xi_index    = numbers::invalid_unsigned_int,
-               eta_index   = numbers::invalid_unsigned_int,
-               const_index = face_no / 2;
-  // the xi and eta values have to be scaled
-  // (by factor 0.5 or factor 1.0) depending on
-  // the refinement case and translated (by 0.0
-  // or 0.5) depending on the refinement case
-  // and subface_no.
-  double xi_scale = 1.0, eta_scale = 1.0, xi_translation = 0.0,
-         eta_translation = 0.0;
-  // set the index mapping between local and
-  // global coordinates
-  switch (face_no / 2)
-    {
-      case 0:
-        xi_index  = 1;
-        eta_index = 2;
-        break;
-      case 1:
-        xi_index  = 2;
-        eta_index = 0;
-        break;
-      case 2:
-        xi_index  = 0;
-        eta_index = 1;
-        break;
-    }
-  // set the scale and translation parameter
-  // for individual subfaces
-  switch (ref_case)
-    {
-      case RefinementCase<dim - 1>::cut_x:
-        xi_scale       = 0.5;
-        xi_translation = subface_no % 2 * 0.5;
-        break;
-      case RefinementCase<dim - 1>::cut_y:
-        eta_scale       = 0.5;
-        eta_translation = subface_no % 2 * 0.5;
-        break;
-      case RefinementCase<dim - 1>::cut_xy:
-        xi_scale        = 0.5;
-        eta_scale       = 0.5;
-        xi_translation  = int(subface_no % 2) * 0.5;
-        eta_translation = int(subface_no / 2) * 0.5;
-        break;
-      default:
-        Assert(false, ExcInternalError());
-        break;
-    }
-  // finally, compute the scaled, translated,
-  // projected quadrature points
-  for (unsigned int p = 0; p < quadrature.size(); ++p)
-    {
-      q_points[p][xi_index] =
-        xi_scale * quadrature.point(p)(0) + xi_translation;
-      q_points[p][eta_index] =
-        eta_scale * quadrature.point(p)(1) + eta_translation;
-      q_points[p][const_index] = const_value;
-    }
+  q_points.clear();
+  internal::QProjector::project_to_hex_face_and_append(
+    quadrature.get_points(), face_no, q_points, ref_case, subface_no);
 }
+
+
+
+template <int dim>
+Quadrature<dim>
+QProjector<dim>::project_to_oriented_subface(
+  const ReferenceCell &      reference_cell,
+  const Quadrature<dim - 1> &quadrature,
+  const unsigned int         face_no,
+  const unsigned int         subface_no,
+  const bool,
+  const bool,
+  const bool,
+  const internal::SubfaceCase<dim>)
+{
+  return QProjector<dim>::project_to_subface(
+    reference_cell,
+    quadrature,
+    face_no,
+    subface_no,
+    RefinementCase<dim - 1>::isotropic_refinement);
+}
+
+
+
+template <>
+Quadrature<3>
+QProjector<3>::project_to_oriented_subface(
+  const ReferenceCell &          reference_cell,
+  const Quadrature<2> &          quadrature,
+  const unsigned int             face_no,
+  const unsigned int             subface_no,
+  const bool                     face_orientation,
+  const bool                     face_flip,
+  const bool                     face_rotation,
+  const internal::SubfaceCase<3> ref_case)
+{
+  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
+
+  const Quadrature<2> mutation = internal::QProjector::mutate_quadrature(
+    quadrature, face_orientation, face_flip, face_rotation);
+
+  const std::pair<unsigned int, RefinementCase<2>>
+    final_subface_no_and_ref_case =
+      internal::QProjector::select_subface_no_and_refinement_case(
+        subface_no, face_orientation, face_flip, face_rotation, ref_case);
+
+  return QProjector<3>::project_to_subface(
+    reference_cell,
+    mutation,
+    face_no,
+    final_subface_no_and_ref_case.first,
+    final_subface_no_and_ref_case.second);
+}
+
 
 
 template <>
@@ -509,7 +755,7 @@ QProjector<1>::project_to_all_faces(const ReferenceCell &     reference_cell,
   Assert(q_points.size() == n_points * n_faces, ExcInternalError());
   Assert(weights.size() == n_points * n_faces, ExcInternalError());
 
-  return Quadrature<dim>(q_points, weights);
+  return Quadrature<dim>(std::move(q_points), std::move(weights));
 }
 
 
@@ -523,11 +769,12 @@ QProjector<2>::project_to_all_faces(const ReferenceCell &     reference_cell,
     {
       const auto support_points_line =
         [](const auto &face, const auto &orientation) -> std::vector<Point<2>> {
-        std::array<Point<2>, 2> vertices;
-        std::copy_n(face.first.begin(), face.first.size(), vertices.begin());
-        const auto temp =
-          ReferenceCells::Line.permute_according_orientation(vertices,
-                                                             orientation);
+        // MSVC struggles when using face.first.begin()
+        const Point<2, double> *  vertices_ptr = &face.first[0];
+        ArrayView<const Point<2>> vertices(vertices_ptr, face.first.size());
+        const auto                temp =
+          ReferenceCells::Line.permute_by_combined_orientation(vertices,
+                                                               orientation);
         return std::vector<Point<2>>(temp.begin(),
                                      temp.begin() + face.first.size());
       };
@@ -583,7 +830,7 @@ QProjector<2>::project_to_all_faces(const ReferenceCell &     reference_cell,
           }
 
       // construct new quadrature rule
-      return {points, weights};
+      return Quadrature<2>(std::move(points), std::move(weights));
     }
 
   Assert(reference_cell == ReferenceCells::Quadrilateral, ExcNotImplemented());
@@ -599,8 +846,8 @@ QProjector<2>::project_to_all_faces(const ReferenceCell &     reference_cell,
   else
     {
       AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
-      for (unsigned int i = 0; i < quadrature.size(); ++i)
-        n_points_total += quadrature[i].size();
+      for (const auto &q : quadrature)
+        n_points_total += q.size();
     }
 
   // first fix quadrature points
@@ -633,7 +880,7 @@ QProjector<2>::project_to_all_faces(const ReferenceCell &     reference_cell,
   Assert(q_points.size() == n_points_total, ExcInternalError());
   Assert(weights.size() == n_points_total, ExcInternalError());
 
-  return Quadrature<dim>(q_points, weights);
+  return Quadrature<dim>(std::move(q_points), std::move(weights));
 }
 
 
@@ -643,302 +890,169 @@ Quadrature<3>
 QProjector<3>::project_to_all_faces(const ReferenceCell &     reference_cell,
                                     const hp::QCollection<2> &quadrature)
 {
-  const auto support_points_tri =
-    [](const std::pair<std::vector<Point<3>>, double> &face,
-       const unsigned char orientation) -> std::vector<Point<3>> {
-    const boost::container::small_vector<Point<3>, 8> temp =
-      ReferenceCells::Triangle.permute_by_combined_orientation<Point<3>>(
-        face.first, orientation);
-    return std::vector<Point<3>>(temp.begin(), temp.end());
+  const auto process = [&](const std::vector<std::vector<Point<3>>> &faces) {
+    // new (projected) quadrature points and weights
+    std::vector<Point<3>> points;
+    std::vector<double>   weights;
+
+    const auto poly_tri = BarycentricPolynomials<2>::get_fe_p_basis(1);
+    const TensorProductPolynomials<2> poly_quad(
+      Polynomials::generate_complete_Lagrange_basis(
+        {Point<1>(0.0), Point<1>(1.0)}));
+
+    // loop over all faces (triangles) ...
+    for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
+      {
+        // We will use linear polynomials to map the reference quadrature
+        // points correctly to on faces. There are as many linear shape
+        // functions as there are vertices in the face.
+        const unsigned int n_linear_shape_functions = faces[face_no].size();
+        std::vector<Tensor<1, 2>> shape_derivatives;
+
+        const auto &poly =
+          (n_linear_shape_functions == 3 ?
+             static_cast<const ScalarPolynomialsBase<2> &>(poly_tri) :
+             static_cast<const ScalarPolynomialsBase<2> &>(poly_quad));
+
+        // ... and over all possible orientations
+        for (unsigned char orientation = 0;
+             orientation < reference_cell.n_face_orientations(face_no);
+             ++orientation)
+          {
+            const auto &face = faces[face_no];
+
+            const boost::container::small_vector<Point<3>, 8> support_points =
+              reference_cell.face_reference_cell(face_no)
+                .permute_by_combined_orientation<Point<3>>(face, orientation);
+
+            // the quadrature rule to be projected ...
+            const auto &sub_quadrature_points =
+              quadrature[quadrature.size() == 1 ? 0 : face_no].get_points();
+            const auto &sub_quadrature_weights =
+              quadrature[quadrature.size() == 1 ? 0 : face_no].get_weights();
+
+            // loop over all quadrature points
+            for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
+              {
+                Point<3> mapped_point;
+
+                // map reference quadrature point
+                for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
+                  mapped_point +=
+                    support_points[i] *
+                    poly.compute_value(i, sub_quadrature_points[j]);
+
+                points.push_back(mapped_point);
+
+                // scale quadrature weight
+                const double scaling = [&]() {
+                  const unsigned int dim_     = 2;
+                  const unsigned int spacedim = 3;
+
+                  Tensor<1, dim_, Tensor<1, spacedim>> DX_t;
+
+                  shape_derivatives.resize(n_linear_shape_functions);
+
+                  for (unsigned int i = 0; i < n_linear_shape_functions; ++i)
+                    shape_derivatives[i] =
+                      poly.compute_1st_derivative(i, sub_quadrature_points[j]);
+
+                  for (unsigned int k = 0; k < n_linear_shape_functions; ++k)
+                    for (unsigned int i = 0; i < spacedim; ++i)
+                      for (unsigned int j = 0; j < dim_; ++j)
+                        DX_t[j][i] +=
+                          shape_derivatives[k][j] * support_points[k][i];
+
+                  Tensor<2, dim_> G;
+                  for (unsigned int i = 0; i < dim_; ++i)
+                    for (unsigned int j = 0; j < dim_; ++j)
+                      G[i][j] = DX_t[i] * DX_t[j];
+
+                  return std::sqrt(determinant(G));
+                }();
+
+                weights.push_back(sub_quadrature_weights[j] * scaling);
+              }
+          }
+      }
+
+    // construct new quadrature rule
+    return Quadrature<3>(std::move(points), std::move(weights));
   };
 
-  const auto support_points_quad =
-    [](const std::pair<std::vector<Point<3>>, double> &face,
-       const unsigned char orientation) -> std::vector<Point<3>> {
-    const boost::container::small_vector<Point<3>, 8> temp =
-      ReferenceCells::Quadrilateral.permute_by_combined_orientation<Point<3>>(
-        face.first, orientation);
-    return std::vector<Point<3>>(temp.begin(), temp.end());
-  };
-
-  const auto process =
-    [&](const std::vector<std::pair<std::vector<Point<3>>, double>> &faces) {
-      // new (projected) quadrature points and weights
-      std::vector<Point<3>> points;
-      std::vector<double>   weights;
-
-      const auto poly_tri = BarycentricPolynomials<2>::get_fe_p_basis(1);
-      const TensorProductPolynomials<2> poly_quad(
-        Polynomials::generate_complete_Lagrange_basis(
-          {Point<1>(0.0), Point<1>(1.0)}));
-
-      // loop over all faces (triangles) ...
-      for (unsigned int face_no = 0; face_no < faces.size(); ++face_no)
+  if ((reference_cell == ReferenceCells::Tetrahedron) ||
+      (reference_cell == ReferenceCells::Wedge) ||
+      (reference_cell == ReferenceCells::Pyramid))
+    {
+      std::vector<std::vector<Point<3>>> face_vertex_locations(
+        reference_cell.n_faces());
+      for (const unsigned int f : reference_cell.face_indices())
         {
-          // linear polynomial to map the reference quadrature points correctly
-          // on faces
-          const unsigned int n_shape_functions = faces[face_no].first.size();
-
-          const auto &poly =
-            n_shape_functions == 3 ?
-              static_cast<const ScalarPolynomialsBase<2> &>(poly_tri) :
-              static_cast<const ScalarPolynomialsBase<2> &>(poly_quad);
-
-          // ... and over all possible orientations
-          for (unsigned char orientation = 0;
-               orientation < reference_cell.n_face_orientations(face_no);
-               ++orientation)
-            {
-              const auto &face = faces[face_no];
-
-              const auto support_points =
-                n_shape_functions == 3 ? support_points_tri(face, orientation) :
-                                         support_points_quad(face, orientation);
-
-              // the quadrature rule to be projected ...
-              const auto &sub_quadrature_points =
-                quadrature[quadrature.size() == 1 ? 0 : face_no].get_points();
-              const auto &sub_quadrature_weights =
-                quadrature[quadrature.size() == 1 ? 0 : face_no].get_weights();
-
-              // loop over all quadrature points
-              for (unsigned int j = 0; j < sub_quadrature_points.size(); ++j)
-                {
-                  Point<3> mapped_point;
-
-                  // map reference quadrature point
-                  for (unsigned int i = 0; i < n_shape_functions; ++i)
-                    mapped_point +=
-                      support_points[i] *
-                      poly.compute_value(i, sub_quadrature_points[j]);
-
-                  points.push_back(mapped_point);
-
-                  // scale quadrature weight
-                  const double scaling = [&]() {
-                    const auto &       supp_pts = support_points;
-                    const unsigned int dim_     = 2;
-                    const unsigned int spacedim = 3;
-
-                    double result[spacedim][dim_];
-
-                    std::vector<Tensor<1, dim_>> shape_derivatives(
-                      n_shape_functions);
-
-                    for (unsigned int i = 0; i < n_shape_functions; ++i)
-                      shape_derivatives[i] =
-                        poly.compute_1st_derivative(i,
-                                                    sub_quadrature_points[j]);
-
-                    for (unsigned int i = 0; i < spacedim; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        result[i][j] = shape_derivatives[0][j] * supp_pts[0][i];
-                    for (unsigned int k = 1; k < n_shape_functions; ++k)
-                      for (unsigned int i = 0; i < spacedim; ++i)
-                        for (unsigned int j = 0; j < dim_; ++j)
-                          result[i][j] +=
-                            shape_derivatives[k][j] * supp_pts[k][i];
-
-                    DerivativeForm<1, dim_, spacedim> contravariant;
-
-                    for (unsigned int i = 0; i < spacedim; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        contravariant[i][j] = result[i][j];
-
-
-                    Tensor<1, spacedim> DX_t[dim_];
-                    for (unsigned int i = 0; i < spacedim; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        DX_t[j][i] = contravariant[i][j];
-
-                    Tensor<2, dim_> G;
-                    for (unsigned int i = 0; i < dim_; ++i)
-                      for (unsigned int j = 0; j < dim_; ++j)
-                        G[i][j] = DX_t[i] * DX_t[j];
-
-                    return std::sqrt(determinant(G));
-                  }();
-
-                  weights.push_back(sub_quadrature_weights[j] * scaling);
-                }
-            }
+          face_vertex_locations[f].resize(
+            reference_cell.face_reference_cell(f).n_vertices());
+          for (const unsigned int v :
+               reference_cell.face_reference_cell(f).vertex_indices())
+            face_vertex_locations[f][v] =
+              reference_cell.face_vertex_location<3>(f, v);
         }
 
-      // construct new quadrature rule
-      return Quadrature<3>(points, weights);
-    };
-
-  if (reference_cell == ReferenceCells::Tetrahedron)
-    {
-      // reference faces (defined by its support points and its area)
-      // note: the area is later not used as a scaling factor but recomputed
-      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0)}},
-          0.5},
-         {{{Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5},
-         {{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5},
-         {{{Point<3>(0.0, 1.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          0.5 * sqrt(3.0) /*equilateral triangle*/}}};
-
-      return process(faces);
+      return process(face_vertex_locations);
     }
-  else if (reference_cell == ReferenceCells::Wedge)
-    {
-      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0)}},
-          0.5},
-         {{{Point<3>(0.0, 0.0, 1.0),
-            Point<3>(1.0, 0.0, 1.0),
-            Point<3>(0.0, 1.0, 1.0)}},
-          0.5},
-         {{{Point<3>(0.0, 0.0, 0.0),
-            Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 0.0, 1.0),
-            Point<3>(1.0, 0.0, 1.0)}},
-          1.0},
-         {{{Point<3>(1.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 0.0),
-            Point<3>(1.0, 0.0, 1.0),
-            Point<3>(0.0, 1.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(0.0, 1.0, 0.0),
-            Point<3>(0.0, 0.0, 0.0),
-            Point<3>(0.0, 1.0, 1.0),
-            Point<3>(0.0, 0.0, 1.0)}},
-          1.0}}};
-
-      return process(faces);
-    }
-  else if (reference_cell == ReferenceCells::Pyramid)
-    {
-      const std::vector<std::pair<std::vector<Point<3>>, double>> faces = {
-        {{{{Point<3>(-1.0, -1.0, 0.0),
-            Point<3>(+1.0, -1.0, 0.0),
-            Point<3>(-1.0, +1.0, 0.0),
-            Point<3>(+1.0, +1.0, 0.0)}},
-          4.0},
-         {{{Point<3>(-1.0, -1.0, 0.0),
-            Point<3>(-1.0, +1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(+1.0, +1.0, 0.0),
-            Point<3>(+1.0, -1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(+1.0, -1.0, 0.0),
-            Point<3>(-1.0, -1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)},
-         {{{Point<3>(-1.0, +1.0, 0.0),
-            Point<3>(+1.0, +1.0, 0.0),
-            Point<3>(+0.0, +0.0, 1.0)}},
-          std::sqrt(2.0)}}};
-
-      return process(faces);
-    }
-
-
-  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
-
-  const unsigned int dim = 3;
-
-  unsigned int n_points_total = 0;
-
-  if (quadrature.size() == 1)
-    n_points_total = quadrature[0].size() * GeometryInfo<dim>::faces_per_cell;
   else
     {
-      AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
-      for (unsigned int i = 0; i < quadrature.size(); ++i)
-        n_points_total += quadrature[i].size();
-    }
+      Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
-  n_points_total *= 8;
+      const unsigned int dim = 3;
 
-  // first fix quadrature points
-  std::vector<Point<dim>> q_points;
-  q_points.reserve(n_points_total);
-  std::vector<Point<dim>> help;
-  help.reserve(quadrature.max_n_quadrature_points());
+      unsigned int n_points_total = 0;
 
-  std::vector<double> weights;
-  weights.reserve(n_points_total);
-
-  // do the following for all possible
-  // mutations of a face (mutation==0
-  // corresponds to a face with standard
-  // orientation, no flip and no rotation)
-  for (unsigned int i = 0; i < 8; ++i)
-    {
-      // project to each face and append
-      // results
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      if (quadrature.size() == 1)
+        n_points_total =
+          quadrature[0].size() * GeometryInfo<dim>::faces_per_cell;
+      else
         {
-          SubQuadrature mutation;
-
-          const auto &quadrature_f =
-            quadrature[quadrature.size() == 1 ? 0 : face];
-          switch (i)
-            {
-              case 0:
-                mutation = quadrature_f;
-                break;
-              case 1:
-                mutation = internal::QProjector::rotate(quadrature_f, 1);
-                break;
-              case 2:
-                mutation = internal::QProjector::rotate(quadrature_f, 2);
-                break;
-              case 3:
-                mutation = internal::QProjector::rotate(quadrature_f, 3);
-                break;
-              case 4:
-                mutation = internal::QProjector::reflect(quadrature_f);
-                break;
-              case 5:
-                mutation = internal::QProjector::rotate(
-                  internal::QProjector::reflect(quadrature_f), 3);
-                break;
-              case 6:
-                mutation = internal::QProjector::rotate(
-                  internal::QProjector::reflect(quadrature_f), 2);
-                break;
-              case 7:
-                mutation = internal::QProjector::rotate(
-                  internal::QProjector::reflect(quadrature_f), 1);
-                break;
-              default:
-                Assert(false, ExcInternalError())
-            }
-
-          help.resize(quadrature[quadrature.size() == 1 ? 0 : face].size());
-          project_to_face(reference_cell, mutation, face, help);
-          std::copy(help.begin(), help.end(), std::back_inserter(q_points));
-
-          std::copy(mutation.get_weights().begin(),
-                    mutation.get_weights().end(),
-                    std::back_inserter(weights));
+          AssertDimension(quadrature.size(), GeometryInfo<dim>::faces_per_cell);
+          for (const auto &q : quadrature)
+            n_points_total += q.size();
         }
+
+      n_points_total *= 8;
+
+      // first fix quadrature points
+      std::vector<Point<dim>> q_points;
+      q_points.reserve(n_points_total);
+
+      std::vector<double> weights;
+      weights.reserve(n_points_total);
+
+      for (unsigned int offset = 0; offset < 8; ++offset)
+        {
+          const auto mutation = internal::QProjector::mutate_points_with_offset(
+            quadrature[0].get_points(), offset);
+          // project to each face and append results
+          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
+               ++face)
+            {
+              const unsigned int q_index = quadrature.size() == 1 ? 0 : face;
+
+              internal::QProjector::project_to_hex_face_and_append(
+                q_index > 0 ? internal::QProjector::mutate_points_with_offset(
+                                quadrature[face].get_points(), offset) :
+                              mutation,
+                face,
+                q_points);
+
+              std::copy(quadrature[q_index].get_weights().begin(),
+                        quadrature[q_index].get_weights().end(),
+                        std::back_inserter(weights));
+            }
+        }
+
+      Assert(q_points.size() == n_points_total, ExcInternalError());
+      Assert(weights.size() == n_points_total, ExcInternalError());
+
+      return Quadrature<dim>(std::move(q_points), std::move(weights));
     }
-
-
-  Assert(q_points.size() == n_points_total, ExcInternalError());
-  Assert(weights.size() == n_points_total, ExcInternalError());
-
-  return Quadrature<dim>(q_points, weights);
 }
 
 
@@ -985,7 +1099,7 @@ QProjector<1>::project_to_all_subfaces(const ReferenceCell &reference_cell,
   Assert(weights.size() == n_points * n_faces * subfaces_per_face,
          ExcInternalError());
 
-  return Quadrature<dim>(q_points, weights);
+  return Quadrature<dim>(std::move(q_points), std::move(weights));
 }
 
 
@@ -1036,7 +1150,7 @@ QProjector<2>::project_to_all_subfaces(const ReferenceCell &reference_cell,
   Assert(weights.size() == n_points * n_faces * subfaces_per_face,
          ExcInternalError());
 
-  return Quadrature<dim>(q_points, weights);
+  return Quadrature<dim>(std::move(q_points), std::move(weights));
 }
 
 
@@ -1052,16 +1166,7 @@ QProjector<3>::project_to_all_subfaces(const ReferenceCell &reference_cell,
 
   Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
 
-  const unsigned int dim         = 3;
-  SubQuadrature      q_reflected = internal::QProjector::reflect(quadrature);
-  SubQuadrature      q[8]        = {quadrature,
-                        internal::QProjector::rotate(quadrature, 1),
-                        internal::QProjector::rotate(quadrature, 2),
-                        internal::QProjector::rotate(quadrature, 3),
-                        q_reflected,
-                        internal::QProjector::rotate(q_reflected, 3),
-                        internal::QProjector::rotate(q_reflected, 2),
-                        internal::QProjector::rotate(q_reflected, 1)};
+  const unsigned int dim = 3;
 
   const unsigned int n_points = quadrature.size(),
                      n_faces  = GeometryInfo<dim>::faces_per_cell,
@@ -1070,19 +1175,19 @@ QProjector<3>::project_to_all_subfaces(const ReferenceCell &reference_cell,
   // first fix quadrature points
   std::vector<Point<dim>> q_points;
   q_points.reserve(n_points * n_faces * total_subfaces_per_face * 8);
-  std::vector<Point<dim>> help(n_points);
 
   std::vector<double> weights;
   weights.reserve(n_points * n_faces * total_subfaces_per_face * 8);
 
-  // do the following for all possible
-  // mutations of a face (mutation==0
-  // corresponds to a face with standard
-  // orientation, no flip and no rotation)
-  for (const auto &mutation : q)
+  // do the following for all possible mutations of a face (mutation==0
+  // corresponds to a face with standard orientation, no flip and no rotation)
+  for (unsigned int offset = 0; offset < 8; ++offset)
     {
-      // project to each face and copy
-      // results
+      const auto mutation =
+        internal::QProjector::mutate_points_with_offset(quadrature.get_points(),
+                                                        offset);
+
+      // project to each face and copy results
       for (unsigned int face = 0; face < n_faces; ++face)
         for (unsigned int ref_case = RefinementCase<dim - 1>::cut_xy;
              ref_case >= RefinementCase<dim - 1>::cut_x;
@@ -1092,27 +1197,18 @@ QProjector<3>::project_to_all_subfaces(const ReferenceCell &reference_cell,
                            RefinementCase<dim - 1>(ref_case));
                ++subface)
             {
-              project_to_subface(reference_cell,
-                                 mutation,
-                                 face,
-                                 subface,
-                                 help,
-                                 RefinementCase<dim - 1>(ref_case));
-              std::copy(help.begin(), help.end(), std::back_inserter(q_points));
-            }
+              internal::QProjector::project_to_hex_face_and_append(
+                mutation,
+                face,
+                q_points,
+                RefinementCase<dim - 1>(ref_case),
+                subface);
 
-      // next copy over weights
-      for (unsigned int face = 0; face < n_faces; ++face)
-        for (unsigned int ref_case = RefinementCase<dim - 1>::cut_xy;
-             ref_case >= RefinementCase<dim - 1>::cut_x;
-             --ref_case)
-          for (unsigned int subface = 0;
-               subface < GeometryInfo<dim - 1>::n_children(
-                           RefinementCase<dim - 1>(ref_case));
-               ++subface)
-            std::copy(mutation.get_weights().begin(),
-                      mutation.get_weights().end(),
-                      std::back_inserter(weights));
+              // next copy over weights
+              std::copy(quadrature.get_weights().begin(),
+                        quadrature.get_weights().end(),
+                        std::back_inserter(weights));
+            }
     }
 
   Assert(q_points.size() == n_points * n_faces * total_subfaces_per_face * 8,
@@ -1120,7 +1216,7 @@ QProjector<3>::project_to_all_subfaces(const ReferenceCell &reference_cell,
   Assert(weights.size() == n_points * n_faces * total_subfaces_per_face * 8,
          ExcInternalError());
 
-  return Quadrature<dim>(q_points, weights);
+  return Quadrature<dim>(std::move(q_points), std::move(weights));
 }
 
 
@@ -1590,161 +1686,14 @@ QProjector<3>::DataSetDescriptor::subface(
     0  // cut_xy
   };
 
-
-  // for each subface of a given FaceRefineCase
-  // there is a corresponding equivalent
-  // subface number of one of the "standard"
-  // RefineCases (cut_x, cut_y, cut_xy). Map
-  // the given values to those equivalent
-  // ones.
-
-  // first, define an invalid number
-  static const unsigned int e = numbers::invalid_unsigned_int;
-
-  static const RefinementCase<dim - 1>
-    equivalent_refine_case[internal::SubfaceCase<dim>::case_isotropic + 1]
-                          [GeometryInfo<3>::max_children_per_face] = {
-                            // case_none. there should be only
-                            // invalid values here. However, as
-                            // this function is also called (in
-                            // tests) for cells which have no
-                            // refined faces, use isotropic
-                            // refinement instead
-                            {RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy},
-                            // case_x
-                            {RefinementCase<dim - 1>::cut_x,
-                             RefinementCase<dim - 1>::cut_x,
-                             RefinementCase<dim - 1>::no_refinement,
-                             RefinementCase<dim - 1>::no_refinement},
-                            // case_x1y
-                            {RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_x,
-                             RefinementCase<dim - 1>::no_refinement},
-                            // case_x2y
-                            {RefinementCase<dim - 1>::cut_x,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::no_refinement},
-                            // case_x1y2y
-                            {RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy},
-                            // case_y
-                            {RefinementCase<dim - 1>::cut_y,
-                             RefinementCase<dim - 1>::cut_y,
-                             RefinementCase<dim - 1>::no_refinement,
-                             RefinementCase<dim - 1>::no_refinement},
-                            // case_y1x
-                            {RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_y,
-                             RefinementCase<dim - 1>::no_refinement},
-                            // case_y2x
-                            {RefinementCase<dim - 1>::cut_y,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::no_refinement},
-                            // case_y1x2x
-                            {RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy},
-                            // case_xy (case_isotropic)
-                            {RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy,
-                             RefinementCase<dim - 1>::cut_xy}};
-
-  static const unsigned int
-    equivalent_subface_number[internal::SubfaceCase<dim>::case_isotropic + 1]
-                             [GeometryInfo<3>::max_children_per_face] = {
-                               // case_none, see above
-                               {0, 1, 2, 3},
-                               // case_x
-                               {0, 1, e, e},
-                               // case_x1y
-                               {0, 2, 1, e},
-                               // case_x2y
-                               {0, 1, 3, e},
-                               // case_x1y2y
-                               {0, 2, 1, 3},
-                               // case_y
-                               {0, 1, e, e},
-                               // case_y1x
-                               {0, 1, 1, e},
-                               // case_y2x
-                               {0, 2, 3, e},
-                               // case_y1x2x
-                               {0, 1, 2, 3},
-                               // case_xy (case_isotropic)
-                               {0, 1, 2, 3}};
-
-  // If face-orientation or face_rotation are
-  // non-standard, cut_x and cut_y have to be
-  // exchanged.
-  static const RefinementCase<dim - 1> ref_case_permutation[4] = {
-    RefinementCase<dim - 1>::no_refinement,
-    RefinementCase<dim - 1>::cut_y,
-    RefinementCase<dim - 1>::cut_x,
-    RefinementCase<dim - 1>::cut_xy};
-
-  // set a corresponding (equivalent)
-  // RefineCase and subface number
-  const RefinementCase<dim - 1> equ_ref_case =
-    equivalent_refine_case[ref_case][subface_no];
-  const unsigned int equ_subface_no =
-    equivalent_subface_number[ref_case][subface_no];
-  // make sure, that we got a valid subface and RefineCase
-  Assert(equ_ref_case != RefinementCase<dim>::no_refinement,
-         ExcInternalError());
-  Assert(equ_subface_no != e, ExcInternalError());
-  // now, finally respect non-standard faces
-  const RefinementCase<dim - 1> final_ref_case =
-    (face_orientation == face_rotation ? ref_case_permutation[equ_ref_case] :
-                                         equ_ref_case);
-
-  // what we have now is the number of
-  // the subface in the natural
-  // orientation of the *face*. what we
-  // need to know is the number of the
-  // subface concerning the standard face
-  // orientation as seen from the *cell*.
-
-  // this mapping is not trivial, but we
-  // have done exactly this stuff in the
-  // child_cell_on_face function. in
-  // order to reduce the amount of code
-  // as well as to make maintaining the
-  // functionality easier we want to
-  // reuse that information. So we note
-  // that on the bottom face (face 4) of
-  // a hex cell the local x and y
-  // coordinates of the face and the cell
-  // coincide, thus also the refinement
-  // case of the face corresponds to the
-  // refinement case of the cell
-  // (ignoring cell refinement along the
-  // z direction). Using this knowledge
-  // we can (ab)use the
-  // child_cell_on_face function to do
-  // exactly the transformation we are in
-  // need of now
-  const unsigned int final_subface_no =
-    GeometryInfo<dim>::child_cell_on_face(RefinementCase<dim>(final_ref_case),
-                                          4,
-                                          equ_subface_no,
-                                          face_orientation,
-                                          face_flip,
-                                          face_rotation,
-                                          equ_ref_case);
+  const std::pair<unsigned int, RefinementCase<2>>
+    final_subface_no_and_ref_case =
+      internal::QProjector::select_subface_no_and_refinement_case(
+        subface_no, face_orientation, face_flip, face_rotation, ref_case);
 
   return (((face_no * total_subfaces_per_face +
-            ref_case_offset[final_ref_case - 1] + final_subface_no) +
+            ref_case_offset[final_subface_no_and_ref_case.second - 1] +
+            final_subface_no_and_ref_case.first) +
            orientation_offset[face_orientation][face_flip][face_rotation]) *
           n_quadrature_points);
 }

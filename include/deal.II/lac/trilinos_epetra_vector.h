@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2021 by the deal.II authors
+// Copyright (C) 2015 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -82,7 +82,7 @@ namespace LinearAlgebra
        * need to generate a %parallel vector.
        */
       explicit Vector(const IndexSet &parallel_partitioner,
-                      const MPI_Comm &communicator);
+                      const MPI_Comm  communicator);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -92,7 +92,7 @@ namespace LinearAlgebra
        */
       void
       reinit(const IndexSet &parallel_partitioner,
-             const MPI_Comm &communicator,
+             const MPI_Comm  communicator,
              const bool      omit_zeroing_entries = false);
 
       /**
@@ -127,10 +127,24 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
+      import_elements(
+        const ReadWriteVector<double> &V,
+        VectorOperation::values        operation,
+        std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          communication_pattern = {}) override;
+
+      /**
+       * @deprecated Use import_elements() instead.
+       */
+      DEAL_II_DEPRECATED
+      virtual void
       import(const ReadWriteVector<double> &V,
              VectorOperation::values        operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {}) override;
+               communication_pattern = {}) override
+      {
+        import_elements(V, operation, communication_pattern);
+      }
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -291,7 +305,7 @@ namespace LinearAlgebra
       locally_owned_size() const;
 
       /**
-       * Return the MPI communicator object in use with this object.
+       * Return the underlying MPI communicator.
        */
       MPI_Comm
       get_mpi_communicator() const;
@@ -370,7 +384,7 @@ namespace LinearAlgebra
        */
       void
       create_epetra_comm_pattern(const IndexSet &source_index_set,
-                                 const MPI_Comm &mpi_comm);
+                                 const MPI_Comm  mpi_comm);
 
       /**
        * Pointer to the actual Epetra vector object.

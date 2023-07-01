@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2021 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -763,8 +763,8 @@ public:
             phi.reinit(face);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
-                const auto beta_n = this->beta(phi.quadrature_point(q)) *
-                                    phi.get_normal_vector(q);
+                const auto beta_n =
+                  this->beta(phi.quadrature_point(q)) * phi.normal_vector(q);
                 const auto beta_n_m = (-std::abs(beta_n) + beta_n) * 0.5;
                 phi.submit_value(-beta_n_m * this->boundary_values(
                                                phi.quadrature_point(q)),
@@ -810,7 +810,7 @@ public:
             for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
               {
                 const auto beta_n = this->beta(phi_m.quadrature_point(q)) *
-                                    phi_m.get_normal_vector(q);
+                                    phi_m.normal_vector(q);
 
                 const auto u_m = phi_m.get_value(q);
                 const auto u_p = phi_p.get_value(q);
@@ -834,8 +834,8 @@ public:
             phi.gather_evaluate(src, true, false);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
-                const auto beta_n = this->beta(phi.quadrature_point(q)) *
-                                    phi.get_normal_vector(q);
+                const auto beta_n =
+                  this->beta(phi.quadrature_point(q)) * phi.normal_vector(q);
                 const auto beta_n_p = (std::abs(beta_n) + beta_n) * 0.5;
                 phi.submit_value(beta_n_p * phi.get_value(q), q);
               }
@@ -1119,7 +1119,7 @@ main()
           dgmethod.run();
         }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

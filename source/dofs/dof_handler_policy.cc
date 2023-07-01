@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,11 +50,6 @@ namespace internal
   {
     namespace Policy
     {
-      // use class dealii::DoFHandler instead
-      // of namespace internal::DoFHandler in
-      // the following
-      using dealii::DoFHandler;
-
       namespace
       {
         /**
@@ -3039,6 +3034,12 @@ namespace internal
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
 
+        AssertThrow((tr->is_multilevel_hierarchy_constructed()),
+                    ExcMessage(
+                      "Multigrid DoFs can only be distributed on a parallel "
+                      "Triangulation if the flag construct_multigrid_hierarchy "
+                      "is set in the constructor."));
+
         const unsigned int n_procs =
           Utilities::MPI::n_mpi_processes(tr->get_communicator());
         const unsigned int n_levels = tr->n_global_levels();
@@ -3430,11 +3431,21 @@ namespace internal
               0,
               DoFAccessorImplementation::Implementation::
                 MGDoFIndexProcessor<dim, spacedim>(cell->level()),
-              [&complete](auto &stored_index, auto received_index) {
-                if (*received_index != numbers::invalid_dof_index)
+
+              // Intel ICC 18 and earlier for some reason believe that
+              // numbers::invalid_dof_index is not a valid object
+              // inside the lambda function. Fix this by creating a
+              // local variable initialized by the global one.
+              //
+              // Intel ICC 19 and earlier have trouble with our Assert
+              // macros inside the lambda function. We disable the macro
+              // for these compilers.
+              [&complete, invalid_dof_index = numbers::invalid_dof_index](
+                auto &stored_index, auto received_index) {
+                if (*received_index != invalid_dof_index)
                   {
 #  if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
-                    Assert((stored_index == (numbers::invalid_dof_index)) ||
+                    Assert((stored_index == invalid_dof_index) ||
                              (stored_index == *received_index),
                            ExcInternalError());
 #  endif
@@ -3528,11 +3539,21 @@ namespace internal
               cell->active_fe_index(),
               DoFAccessorImplementation::Implementation::
                 DoFIndexProcessor<dim, spacedim>(),
-              [&complete](auto &stored_index, auto received_index) {
-                if (*received_index != numbers::invalid_dof_index)
+
+              // Intel ICC 18 and earlier for some reason believe that
+              // numbers::invalid_dof_index is not a valid object
+              // inside the lambda function. Fix this by creating a
+              // local variable initialized by the global one.
+              //
+              // Intel ICC 19 and earlier have trouble with our Assert
+              // macros inside the lambda function. We disable the macro
+              // for these compilers.
+              [&complete, invalid_dof_index = numbers::invalid_dof_index](
+                auto &stored_index, const auto received_index) {
+                if (*received_index != invalid_dof_index)
                   {
 #    if !defined(__INTEL_COMPILER) || __INTEL_COMPILER >= 1900
-                    Assert((stored_index == (numbers::invalid_dof_index)) ||
+                    Assert((stored_index == invalid_dof_index) ||
                              (stored_index == *received_index),
                            ExcInternalError());
 #    endif

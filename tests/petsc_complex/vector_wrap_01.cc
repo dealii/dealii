@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,15 +61,11 @@ main(int argc, char **argv)
         test(v, w);
       }
 
-#if DEAL_II_PETSC_VERSION_LT(3, 2, 0)
-      ierr = VecDestroy(vpetsc);
-#else
       ierr = VecDestroy(&vpetsc);
-#endif
 
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

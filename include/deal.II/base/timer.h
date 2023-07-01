@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -136,7 +136,7 @@ public:
    * communicator occurs; the extra cost of the synchronization is not
    * measured.
    */
-  Timer(const MPI_Comm &mpi_communicator, const bool sync_lap_times = false);
+  Timer(const MPI_Comm mpi_communicator, const bool sync_lap_times = false);
 
   /**
    * Return a reference to the data structure containing basic statistics on
@@ -711,7 +711,7 @@ public:
    * <code>MPI_Barrier</code> call before starting and stopping the timer for
    * each section.
    */
-  TimerOutput(const MPI_Comm &      mpi_comm,
+  TimerOutput(const MPI_Comm        mpi_comm,
               std::ostream &        stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
@@ -739,7 +739,7 @@ public:
    * <code>MPI_Barrier</code> call before starting and stopping the timer for
    * each section.)
    */
-  TimerOutput(const MPI_Comm &      mpi_comm,
+  TimerOutput(const MPI_Comm        mpi_comm,
               ConditionalOStream &  stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
@@ -795,8 +795,8 @@ public:
    * median is given).
    */
   void
-  print_wall_time_statistics(const MPI_Comm &mpi_comm,
-                             const double    print_quantile = 0.) const;
+  print_wall_time_statistics(const MPI_Comm mpi_comm,
+                             const double   print_quantile = 0.) const;
 
   /**
    * By calling this function, all output can be disabled. This function

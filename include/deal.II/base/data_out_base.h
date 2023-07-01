@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,20 +32,11 @@
 #include <boost/serialization/map.hpp>
 
 #include <limits>
+#include <ostream>
 #include <string>
 #include <tuple>
 #include <typeinfo>
 #include <vector>
-
-// Only include the Tecplot API header if the appropriate files
-// were detected by configure
-#ifdef DEAL_II_HAVE_TECPLOT
-#  include <string.h>
-
-#  include "TECIO.h"
-#endif
-
-#include <ostream>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -224,8 +215,7 @@ namespace DataOutBase
      */
     best_speed,
     /**
-     * Use the algorithm which results in the smallest compressed
-     * files. This is the default flag.
+     * Use the algorithm which results in the smallest compressed files.
      */
     best_compression,
     /**
@@ -1079,6 +1069,23 @@ namespace DataOutBase
   {};
 
   /**
+   * Flags controlling the details of output in HDF5 format.
+   *
+   * @ingroup output
+   */
+  struct Hdf5Flags : public OutputFlagsBase<Hdf5Flags>
+  {
+    /**
+     * Flag determining the compression level at which zlib, if available, is
+     * run. The default is <tt>best_speed</tt>.
+     */
+    DataOutBase::CompressionLevel compression_level;
+
+    explicit Hdf5Flags(
+      const CompressionLevel compression_level = CompressionLevel::best_speed);
+  };
+
+  /**
    * Flags controlling the details of output in Tecplot format.
    *
    * @ingroup output
@@ -1171,7 +1178,7 @@ namespace DataOutBase
 
     /**
      * Flag determining the compression level at which zlib, if available, is
-     * run. The default is <tt>best_compression</tt>.
+     * run. The default is <tt>best_speed</tt>.
      */
     DataOutBase::CompressionLevel compression_level;
 
@@ -1225,9 +1232,8 @@ namespace DataOutBase
       const double           time  = std::numeric_limits<double>::min(),
       const unsigned int     cycle = std::numeric_limits<unsigned int>::min(),
       const bool             print_date_and_time = true,
-      const CompressionLevel compression_level =
-        CompressionLevel::best_compression,
-      const bool write_higher_order_cells                      = false,
+      const CompressionLevel compression_level   = CompressionLevel::best_speed,
+      const bool             write_higher_order_cells          = false,
       const std::map<std::string, std::string> &physical_units = {});
   };
 
@@ -1650,14 +1656,6 @@ namespace DataOutBase
      * Output for Tecplot in text format.
      */
     tecplot,
-
-    /**
-     * Output for Tecplot in binary format. Faster and smaller than text
-     * format.
-     *
-     * @deprecated Using Tecplot binary output is deprecated.
-     */
-    tecplot_binary,
 
     /**
      * Output in VTK format.
@@ -2385,7 +2383,7 @@ namespace DataOutBase
       &                              nonscalar_data_ranges,
     const Deal_II_IntermediateFlags &flags,
     const std::string &              filename,
-    const MPI_Comm &                 comm,
+    const MPI_Comm                   comm,
     const CompressionLevel           compression);
 
   /**
@@ -2396,8 +2394,9 @@ namespace DataOutBase
   void
   write_hdf5_parallel(const std::vector<Patch<dim, spacedim>> &patches,
                       const DataOutFilter &                    data_filter,
+                      const DataOutBase::Hdf5Flags &           flags,
                       const std::string &                      filename,
-                      const MPI_Comm &                         comm);
+                      const MPI_Comm                           comm);
 
   /**
    * Write the data in @p data_filter to HDF5 file(s). If @p write_mesh_file is
@@ -2410,10 +2409,11 @@ namespace DataOutBase
   void
   write_hdf5_parallel(const std::vector<Patch<dim, spacedim>> &patches,
                       const DataOutFilter &                    data_filter,
+                      const DataOutBase::Hdf5Flags &           flags,
                       const bool                               write_mesh_file,
                       const std::string &                      mesh_filename,
                       const std::string &solution_filename,
-                      const MPI_Comm &   comm);
+                      const MPI_Comm     comm);
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
@@ -2481,7 +2481,6 @@ namespace DataOutBase
    * <li> <tt>eps</tt>: <tt>.eps</tt>
    * <li> <tt>gmv</tt>: <tt>.gmv</tt>
    * <li> <tt>tecplot</tt>: <tt>.dat</tt>
-   * <li> <tt>tecplot_binary</tt>: <tt>.plt</tt>
    * <li> <tt>vtk</tt>: <tt>.vtk</tt>
    * <li> <tt>vtu</tt>: <tt>.vtu</tt>
    * <li> <tt>svg</tt>: <tt>.svg</tt>
@@ -2744,8 +2743,7 @@ public:
    * DataOutInterface::write_vtu().
    */
   void
-  write_vtu_in_parallel(const std::string &filename,
-                        const MPI_Comm &   comm) const;
+  write_vtu_in_parallel(const std::string &filename, const MPI_Comm comm) const;
 
   /**
    * Some visualization programs, such as ParaView, can read several separate
@@ -2847,7 +2845,7 @@ public:
     const std::string &directory,
     const std::string &filename_without_extension,
     const unsigned int counter,
-    const MPI_Comm &   mpi_communicator,
+    const MPI_Comm     mpi_communicator,
     const unsigned int n_digits_for_counter = numbers::invalid_unsigned_int,
     const unsigned int n_groups             = 0) const;
 
@@ -2880,7 +2878,7 @@ public:
   void
   write_deal_II_intermediate_in_parallel(
     const std::string &                 filename,
-    const MPI_Comm &                    comm,
+    const MPI_Comm                      comm,
     const DataOutBase::CompressionLevel compression) const;
 
   /**
@@ -2892,7 +2890,7 @@ public:
   create_xdmf_entry(const DataOutBase::DataOutFilter &data_filter,
                     const std::string &               h5_filename,
                     const double                      cur_time,
-                    const MPI_Comm &                  comm) const;
+                    const MPI_Comm                    comm) const;
 
   /**
    * Create an XDMFEntry based on the data in the data_filter. This assumes
@@ -2904,7 +2902,7 @@ public:
                     const std::string &               h5_mesh_filename,
                     const std::string &               h5_solution_filename,
                     const double                      cur_time,
-                    const MPI_Comm &                  comm) const;
+                    const MPI_Comm                    comm) const;
 
   /**
    * Write an XDMF file based on the provided vector of XDMFEntry objects.
@@ -2933,7 +2931,7 @@ public:
   void
   write_xdmf_file(const std::vector<XDMFEntry> &entries,
                   const std::string &           filename,
-                  const MPI_Comm &              comm) const;
+                  const MPI_Comm                comm) const;
 
   /**
    * Write the data in @p data_filter to a single HDF5 file containing both the
@@ -2952,7 +2950,7 @@ public:
   void
   write_hdf5_parallel(const DataOutBase::DataOutFilter &data_filter,
                       const std::string &               filename,
-                      const MPI_Comm &                  comm) const;
+                      const MPI_Comm                    comm) const;
 
   /**
    * Write the data in data_filter to HDF5 file(s). If write_mesh_file is
@@ -2966,7 +2964,7 @@ public:
                       const bool                        write_mesh_file,
                       const std::string &               mesh_filename,
                       const std::string &               solution_filename,
-                      const MPI_Comm &                  comm) const;
+                      const MPI_Comm                    comm) const;
 
   /**
    * DataOutFilter is an intermediate data format that reduces the amount of
@@ -3157,6 +3155,12 @@ private:
    * changed by using the <tt>set_flags</tt> function.
    */
   DataOutBase::GmvFlags gmv_flags;
+
+  /**
+   * Flags to be used upon output of hdf5 data in one space dimension. Can be
+   * changed by using the <tt>set_flags</tt> function.
+   */
+  DataOutBase::Hdf5Flags hdf5_flags;
 
   /**
    * Flags to be used upon output of Tecplot data in one space dimension. Can

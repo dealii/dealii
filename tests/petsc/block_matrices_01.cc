@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,6 +78,7 @@ test()
   Assert(tmp2.n_block_cols() == pbsm.n_block_cols(), ExcInternalError());
   Assert(tmp2.m() == pbsm.m(), ExcInternalError());
   Assert(tmp2.n() == pbsm.n(), ExcInternalError());
+  Assert(tmp2.petsc_matrix() == pbsm.petsc_matrix(), ExcInternalError());
   for (unsigned int blr = 0; blr < 2; ++blr)
     {
       for (unsigned int blc = 0; blc < 2; ++blc)
@@ -90,6 +91,88 @@ test()
                    pbsm.block(blr, blc).petsc_matrix(),
                  ExcInternalError());
         }
+    }
+
+  // Extract the PETSc MATNEST, create an array of PETSc matrices and assign
+  // to a new BlockSparseMatrix
+  std::array<Mat, 2> arrayRows0 = {
+    {tmp2.block(0, 0).petsc_matrix(), tmp2.block(0, 1).petsc_matrix()}};
+  std::array<Mat, 2> arrayRows1 = {
+    {tmp2.block(1, 0).petsc_matrix(), tmp2.block(1, 1).petsc_matrix()}};
+  std::array<std::array<Mat, 2>, 2> arrayMat = {{arrayRows0, arrayRows1}};
+
+  PETScWrappers::MPI::BlockSparseMatrix tmp3(arrayMat);
+  Assert(tmp3.n_block_rows() == pbsm.n_block_rows(), ExcInternalError());
+  Assert(tmp3.n_block_cols() == pbsm.n_block_cols(), ExcInternalError());
+  Assert(tmp3.m() == pbsm.m(), ExcInternalError());
+  Assert(tmp3.n() == pbsm.n(), ExcInternalError());
+  for (unsigned int blr = 0; blr < 2; ++blr)
+    {
+      for (unsigned int blc = 0; blc < 2; ++blc)
+        {
+          Assert(tmp3.block(blr, blc).m() == pbsm.block(blr, blc).m(),
+                 ExcInternalError());
+          Assert(tmp3.block(blr, blc).n() == pbsm.block(blr, blc).n(),
+                 ExcInternalError());
+          Assert(tmp3.block(blr, blc).petsc_matrix() ==
+                   pbsm.block(blr, blc).petsc_matrix(),
+                 ExcInternalError());
+        }
+    }
+
+  // Now pass empty blocks
+  std::array<Mat, 2> arrayRows0Empty = {
+    {nullptr, tmp2.block(0, 1).petsc_matrix()}};
+  std::array<Mat, 2> arrayRows1Empty = {
+    {tmp2.block(1, 0).petsc_matrix(), nullptr}};
+  std::array<std::array<Mat, 2>, 2> arrayMatEmpty = {
+    {arrayRows0Empty, arrayRows1Empty}};
+
+  PETScWrappers::MPI::BlockSparseMatrix tmp4(arrayMatEmpty);
+  Assert(tmp4.n_block_rows() == pbsm.n_block_rows(), ExcInternalError());
+  Assert(tmp4.n_block_cols() == pbsm.n_block_cols(), ExcInternalError());
+  Assert(tmp4.m() == pbsm.m(), ExcInternalError());
+  Assert(tmp4.n() == pbsm.n(), ExcInternalError());
+  Assert(tmp4.block(0, 1).m() == pbsm.block(0, 1).m(), ExcInternalError());
+  Assert(tmp4.block(0, 1).n() == pbsm.block(0, 1).n(), ExcInternalError());
+  Assert(tmp4.block(0, 1).petsc_matrix() == pbsm.block(0, 1).petsc_matrix(),
+         ExcInternalError());
+  Assert(tmp4.block(1, 0).m() == pbsm.block(1, 0).m(), ExcInternalError());
+  Assert(tmp4.block(1, 0).n() == pbsm.block(1, 0).n(), ExcInternalError());
+  Assert(tmp4.block(1, 0).petsc_matrix() == pbsm.block(1, 0).petsc_matrix(),
+         ExcInternalError());
+
+  // Check the rectangular cases
+  std::array<std::array<Mat, 2>, 1> arrayMatRow = {{arrayRows0}};
+  std::array<std::array<Mat, 1>, 2> arrayMatCol = {
+    {{{arrayMat[0][0]}}, {{arrayMat[1][0]}}}};
+
+  PETScWrappers::MPI::BlockSparseMatrix tmp5(arrayMatRow);
+  Assert(tmp5.n_block_cols() == pbsm.n_block_cols(), ExcInternalError());
+  Assert(tmp5.n() == pbsm.n(), ExcInternalError());
+  for (unsigned int blc = 0; blc < 2; ++blc)
+    {
+      Assert(tmp5.block(0, blc).m() == pbsm.block(0, blc).m(),
+             ExcInternalError());
+      Assert(tmp5.block(0, blc).n() == pbsm.block(0, blc).n(),
+             ExcInternalError());
+      Assert(tmp5.block(0, blc).petsc_matrix() ==
+               pbsm.block(0, blc).petsc_matrix(),
+             ExcInternalError());
+    }
+
+  PETScWrappers::MPI::BlockSparseMatrix tmp6(arrayMatCol);
+  Assert(tmp6.n_block_rows() == pbsm.n_block_rows(), ExcInternalError());
+  Assert(tmp6.m() == pbsm.m(), ExcInternalError());
+  for (unsigned int blr = 0; blr < 2; ++blr)
+    {
+      Assert(tmp6.block(blr, 0).m() == pbsm.block(blr, 0).m(),
+             ExcInternalError());
+      Assert(tmp6.block(blr, 0).n() == pbsm.block(blr, 0).n(),
+             ExcInternalError());
+      Assert(tmp6.block(blr, 0).petsc_matrix() ==
+               pbsm.block(blr, 0).petsc_matrix(),
+             ExcInternalError());
     }
 }
 

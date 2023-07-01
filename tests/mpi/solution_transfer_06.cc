@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,7 @@
 
 template <int dim>
 void
-transfer(const MPI_Comm &comm)
+transfer(const MPI_Comm comm)
 {
   AssertDimension(Utilities::MPI::n_mpi_processes(comm), 1);
 

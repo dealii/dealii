@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,4 +56,12 @@ for (deal_II_space_dimension : DIMENSIONS)
   {
     template class TriaAccessor<0, 1, deal_II_space_dimension>;
     template class TriaIterator<TriaAccessor<0, 1, deal_II_space_dimension>>;
+  }
+
+for (deal_II_struct_dimension : DIMENSIONS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : DIMENSIONS)
+  {
+    template class InvalidAccessor<deal_II_struct_dimension,
+                                   deal_II_dimension,
+                                   deal_II_space_dimension>;
   }

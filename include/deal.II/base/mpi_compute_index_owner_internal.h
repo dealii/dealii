@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -171,7 +171,7 @@ namespace Utilities
            * ranges to the owner of the dictionary part.
            */
           void
-          reinit(const IndexSet &owned_indices, const MPI_Comm &comm);
+          reinit(const IndexSet &owned_indices, const MPI_Comm comm);
 
           /**
            * Translate a global dof index to the MPI rank in the dictionary
@@ -203,7 +203,7 @@ namespace Utilities
            * the number of ranks.
            */
           void
-          partition(const IndexSet &owned_indices, const MPI_Comm &comm);
+          partition(const IndexSet &owned_indices, const MPI_Comm comm);
         };
 
 
@@ -226,7 +226,7 @@ namespace Utilities
            */
           ConsensusAlgorithmsPayload(const IndexSet &owned_indices,
                                      const IndexSet &indices_to_look_up,
-                                     const MPI_Comm &comm,
+                                     const MPI_Comm  comm,
                                      std::vector<unsigned int> &owning_ranks,
                                      const bool track_index_requests = false);
 

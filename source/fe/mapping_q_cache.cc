@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -289,8 +289,8 @@ namespace
   {
     LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp;
     temp.reinit(vector.locally_owned_elements());
-    temp.import(vector, VectorOperation::insert);
-    vector_ghosted.import(temp, VectorOperation::insert);
+    temp.import_elements(vector, VectorOperation::insert);
+    vector_ghosted.import_elements(temp, VectorOperation::insert);
   }
 } // namespace
 

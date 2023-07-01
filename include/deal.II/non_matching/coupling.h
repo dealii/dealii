@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -131,7 +131,7 @@ namespace NonMatching
 
 
   /**
-   * Create a coupling mass matrix for non-matching, overlapping grids.
+   * Create a coupling @ref GlossMassMatrix "mass matrix" for non-matching, overlapping grids.
    *
    * Given two non-matching triangulations, representing the domains $\Omega$
    * and $B$, with $B \subseteq \Omega$, and two finite element spaces
@@ -276,7 +276,7 @@ namespace NonMatching
     const ComponentMask &            comps1       = ComponentMask());
 
   /**
-   * Create a coupling mass matrix for non-matching independent grids,
+   * Create a coupling @ref GlossMassMatrix "mass matrix" for non-matching independent grids,
    * using a convolution kernel with compact support.
    *
    * Given two non-matching triangulations, representing the domains

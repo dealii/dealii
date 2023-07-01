@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2022 by the deal.II authors
+// Copyright (C) 2015 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3014,7 +3014,6 @@ FE_NedelecSZ<dim, spacedim>::requires_update_flags(
            update_covariant_transformation;
 
   if (flags & update_hessians)
-    //     Assert (false, ExcNotImplemented());
     out |= update_hessians | update_values | update_gradients |
            update_jacobian_pushed_forward_grads |
            update_jacobian_pushed_forward_2nd_derivatives |

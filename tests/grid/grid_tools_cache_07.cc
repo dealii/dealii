@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@ template <int dim, int spacedim = dim>
 void
 test(unsigned int ref)
 {
-  const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
+  const MPI_Comm mpi_communicator = MPI_COMM_WORLD;
 
   parallel::distributed::Triangulation<dim, spacedim> tria(mpi_communicator);
   GridGenerator::hyper_ball(tria);

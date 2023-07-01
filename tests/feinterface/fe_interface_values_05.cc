@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,7 +22,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/mapping_q.h>
 
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria.h>
 
@@ -30,6 +29,8 @@
 #include <iostream>
 
 #include "../tests.h"
+
+#include "../test_grids.h"
 
 
 template <int dim>
@@ -67,41 +68,13 @@ inspect_fiv(FEInterfaceValues<dim> &fiv)
 }
 
 
-template <int dim>
-void
-make_2_cells(Triangulation<dim> &tria);
-
-template <>
-void
-make_2_cells<2>(Triangulation<2> &tria)
-{
-  const unsigned int        dim         = 2;
-  std::vector<unsigned int> repetitions = {2, 1};
-  Point<dim>                p1;
-  Point<dim>                p2(2.0, 1.0);
-
-  GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2);
-}
-
-template <>
-void
-make_2_cells<3>(Triangulation<3> &tria)
-{
-  const unsigned int        dim         = 3;
-  std::vector<unsigned int> repetitions = {2, 1, 1};
-  Point<dim>                p1;
-  Point<dim>                p2(2.0, 1.0, 1.0);
-
-  GridGenerator::subdivided_hyper_rectangle(tria, repetitions, p1, p2);
-}
-
 
 template <int dim>
 void
 test()
 {
   Triangulation<dim> tria;
-  make_2_cells(tria);
+  TestGrids::hyper_line(tria, 2);
 
   DoFHandler<dim> dofh(tria);
   FE_Q<dim>       fe(1);

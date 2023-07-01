@@ -509,7 +509,7 @@ by using the approximation $\frac 12 T^{n-1}+\frac 12 T^{n-2}$, which means
 that we calculate the nonlinear viscosity as a function of this
 intermediate temperature, $\nu_\alpha =
 \nu_\alpha\left(\frac 12 T^{n-1}+\frac 12 T^{n-2}\right)$. Note that this
-evaluation of the residual is nothing else than a Crank-Nicholson scheme,
+evaluation of the residual is nothing else than a Crank-Nicolson scheme,
 so we can be sure that now everything is alright. One might wonder whether
 it is a problem that the numerical viscosity now is not evaluated at
 time $n$ (as opposed to the rest of the equation). However, this offset
@@ -549,7 +549,7 @@ this yields for the simpler case of uniform time steps of size $k$:
 On the left side of this equation remains the term from the time
 derivative and the original (physical) diffusion which we treat
 implicitly (this is actually a nice term: the matrices that result
-from the left hand side are the mass matrix and a multiple of the
+from the left hand side are the @ref GlossMassMatrix "mass matrix" and a multiple of the
 Laplace matrix &mdash; both are positive definite and if the time step
 size $k$ is small, the sum is simple to invert). On the right hand
 side, the terms in the first line result from the time derivative; in
@@ -710,7 +710,7 @@ S^{-1}$ by a CG solver applied to the mass matrix on the pressure
 space was a good choice. In a small deviation from step-22, we
 here have a coefficient $\eta$ in the momentum equation, and by the same
 derivation as there we should arrive at the conclusion that it is the weighted
-mass matrix with entries $\tilde S_{ij}=(\eta^{-1}\varphi_i,\varphi_j)$ that
+@ref GlossMassMatrix "mass matrix" with entries $\tilde S_{ij}=(\eta^{-1}\varphi_i,\varphi_j)$ that
 we should be using.
 
 It was more complicated to come up with a good replacement $\tilde
@@ -830,7 +830,7 @@ scheme and the current and previous time step. This being the sum of a
 symmetric positive definite and a symmetric positive semidefinite matrix, the
 result is also symmetric positive definite. Furthermore, $\frac\beta\alpha$ is
 a number proportional to the time step, and so becomes small whenever the mesh
-is fine, damping the effect of the then ill-conditioned stiffness matrix.
+is fine, damping the effect of the then ill-conditioned @ref GlossStiffnessMatrix "stiffness matrix".
 
 As a consequence, inverting this matrix with the Conjugate Gradient algorithm,
 using a simple preconditioner, is trivial and very cheap compared to inverting

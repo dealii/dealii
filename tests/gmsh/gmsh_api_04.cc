@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -55,8 +55,10 @@ test(const std::uint8_t kind, const std::string out = "")
 }
 
 int
-main()
+main(int argc, char **argv)
 {
+  // gmsh might be build with mpi support enabled.
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   initlog();
 
   // Generate and print all reference cells

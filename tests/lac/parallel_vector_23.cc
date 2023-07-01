@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,7 @@ test()
   read_write_vector.local_element(0) = myid;
   read_write_vector(1)               = 2. * myid;
 
-  v.import(read_write_vector, VectorOperation::max);
+  v.import_elements(read_write_vector, VectorOperation::max);
   v.update_ghost_values();
 
   deallog << myid << ":"
@@ -80,7 +80,7 @@ test()
   if (myid == 0)
     read_write_vector(1) = -1.0;
 
-  v.import(read_write_vector, VectorOperation::min);
+  v.import_elements(read_write_vector, VectorOperation::min);
   v.update_ghost_values();
 
   deallog << myid << ":"

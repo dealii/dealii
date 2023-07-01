@@ -1,6 +1,0 @@
-Removed: A number of obscure CMake configuration options have been removed:
-<code>DEAL_II_PREFER_STATIC_LINKAGE</code>,
-<code>DEAL_II_STATIC_EXECUTABLE</code>,
-<code>DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS</code>.
-<br>
-(Matthias Maier, 2022/12/02)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -77,7 +77,7 @@
   \end{array}\right),
  * @f}
  * where $U,P$ are the values of velocity and pressure degrees of freedom,
- * respectively, $M$ is the mass matrix on the velocity space, $B$ corresponds to
+ * respectively, $M$ is the @ref GlossMassMatrix "mass matrix" on the velocity space, $B$ corresponds to
  * the negative divergence operator, and $B^T$ is its transpose and corresponds
  * to the negative gradient.
  *
@@ -354,6 +354,11 @@
  * has read in from the mesh file. This can be done by using the
  * DataPostprocessors::BoundaryIds class and the following small piece of code:
  * @code
+ *    #include <deal.II/numerics/data_out_faces.h>
+ *    #include <deal.II/numerics/data_postprocessor.h>
+ *
+ *    ...
+ *
  *    DataPostprocessors::BoundaryIds<dim> boundary_ids;
  *    DataOutFaces<dim> data_out_faces;
  *    FE_Q<dim>         dummy_fe(1);
@@ -725,6 +730,16 @@
  * template match a certain interface or behave in a certain way: such
  * constraints are called <em>concepts</em> in C++. See the discussion in
  * @ref Concepts for more information and a list of concepts in deal.II.
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossDevice <b>Device</b></dt>
+ *
+ * <dd> We commonly refer to GPUs as "devices" in deal.II. The context is
+ * always related to Kokkos or CUDA that motivated using this term.
+ * Occasionally, we also call data corresponding to MemorySpace::Default "device data"
+ * (even though it is allocated in CPU memory if Kokkos was configured without
+ * a GPU backend) to distinguish between MemorySpace::Default and MemorySpace::Host.
  * </dd>
  *
  *
@@ -1276,6 +1291,74 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossLumpedMassMatrix <b>Lumped mass matrix</b></dt>
+ * <dd>The @ref GlossMassMatrix "mass matrix" is a matrix of the form
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * It frequently appears in the solution of time dependent problems where, if
+ * one uses an explicit time stepping method, it then leads to the need
+ * to solve problems of the form
+ *   @f{align*}{
+ *     MU^n = MU^{n-1} + k_n BU^{n-1},
+ *   @f}
+ * in time step $n$, where $U^n$ is the solution to be computed, $U^{n-1}$ is the
+ * known solution from the first time step, and $B$ is a matrix related to the
+ * differential operator in the PDE. $k_n$ is the size of the time step. A similar
+ * linear system of equations also arises out of the discretization of second-order
+ * differential equations.
+ *
+ * The presence of the matrix $M$ on the left side is a nuisance because, even
+ * though we have used an explicit time stepping method, we still have to solve a
+ * linear system in each time step. It would be much preferable if the matrix were
+ * diagonal. "Lumping" the mass matrix is a strategy to replace $M$ by a matrix
+ * $M_\text{diagonal}$ that actually is diagonal, yet does not destroy the accuracy
+ * of the resulting solution.
+ *
+ * Historically, mass lumping was performed by adding the elements of a row
+ * together and setting the diagonal entries of $M_\text{diagonal}$ to that
+ * sum. This works for $Q_1$ and $P_1$ elements, for example, and can be
+ * understood mechanically by replacing the continuous medium we are
+ * discretizating by one where the continuous mass distribution is replaced by
+ * one where (finite amounts of) mass are located only at the nodes. That is,
+ * we are "lumping together" the mass of an element at its vertices, thus
+ * giving rise to the name "lumped mass matrix". A more mathematical perspective
+ * is to compute the integral above for $M_{ij}$ via special quadrature rules;
+ * in particular, we replace the computation of
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx
+ *            = \sum_K \int_K \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * by quadrature
+ *   @f{align*}{
+ *     (M_{\text{diagonal}})_{ij} = \sum_K \sum_q \varphi_i(\mathbf x_q^K) \varphi_j(\mathbf x_q^K)
+ *     |K| w_q,
+ *   @f}
+ * where we choose the quadrature points as the *nodes* at which the
+ * shape functions are defined. If we order the quadrature points in the
+ * same way as the shape functions, then
+ *   @f{align*}{
+ *     \varphi_i(\mathbf x_q^K) = \delta_{iq},
+ *   @f}
+ * and consequently
+ *   @f{align*}{
+ *     (M_{\text{diagonal}})_{ij} = \delta_{ij} \sum_{K, \text{supp}\varphi_i \cap K \neq \emptyset} |K| w_i,
+ *   @f}
+ * where the sum extends over those cells on which $\varphi_i$ is nonzero.
+ * The so-computed mass matrix is therefore diagonal.
+ *
+ * Whether or not this particular choice of quadrature formula is
+ * sufficient to retain the convergence rate of the discretization is
+ * a separate question. For the usual $Q_k$ finite elements
+ * (implemented by FE_Q and FE_DGQ), the appropriate quadrature
+ * formulas are of QGaussLobatto type. Mass lumping can also be done
+ * with FE_SimplexP_Bubbles, for example, if appropriate quadrature rules
+ * are chosen.
+ *
+ * For an example of where lumped mass matrices play a role, see step-69.
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossManifoldIndicator <b>%Manifold indicator</b></dt>
  *
  * <dd> Every object that makes up a Triangulation (cells, faces,
@@ -1320,6 +1403,59 @@
  * </dd>
  *
  * @see @ref manifold "The module on Manifolds"
+ *
+ *
+ * <dt class="glossary">@anchor GlossMassMatrix <b>Mass matrix</b></dt>
+ * <dd>The "mass matrix" is a matrix of the form
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * possibly with a coefficient inside the integral, and
+ * where $\varphi_i(\mathbf x)$ are the shape functions of a finite element.
+ * The origin of the term refers to the fact that in structural mechanics
+ * (where the finite element method originated), one often starts from the
+ * elastodynamics (wave) equation
+ *   @f{align*}{
+ *     \rho \frac{\partial^2 u}{\partial t^2}
+ *     -\nabla \cdot C \nabla u = f.
+ *   @f}
+ * If one multiplies this equation by a test function $\varphi_i$,
+ * integrates over $\Omega$, and then discretizes by the substitution
+ * $u(\mathbf x,t) \to u_h(\mathbf x)=\sum_j U_j(t) \varphi_j(\mathbf x)$,
+ * then the first term above results in
+ *   @f{align*}{
+ *     \sum_j \left[\int_\Omega \rho \varphi_i \varphi_j \right]
+ *     \frac{\partial^2 U_j(t)}{\partial t^2}
+ *   @f}
+ * which can be written as
+ *   @f{align*}{
+ *     M
+ *     \frac{\partial^2 U(t)}{\partial t^2}
+ *   @f}
+ * where
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \rho(\mathbf x)\varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx.
+ *   @f}
+ * Since the matrix entries are a (weighted) integral over a mass density, they
+ * have the units of "mass", giving the "mass matrix" its name.
+ *
+ * In mathematics, where we often consider non-dimensionalized equations, we
+ * end up with the case $\rho=1$, and as a consequence the matrix without
+ * the coefficient,
+ *   @f{align*}{
+ *     M_{ij} = \int_\Omega \varphi_i(\mathbf x) \varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * also carries the name "mass matrix".
+ *
+ * The mass matrix is almost always written with the symbol $M$. See, for example,
+ * step-23, step-26, and a number of the other time dependent equations solved by
+ * tutorial programs.
+ *
+ * The mass matrix is occasionally approximated by a diagonal matrix,
+ * see the glossary entry for @ref GlossLumpedMassMatrix "lumped mass matrix".
+ * See also the @ref GlossStiffnessMatrix "stiffness matrix"
+ * for a related case.
+ * </dt>
  *
  *
  * <dt class="glossary">@anchor GlossMaterialId <b>Material id</b></dt>
@@ -1747,6 +1883,73 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossStiffnessMatrix <b>Stiffness matrix</b></dt>
+ * <dd>The "stiffness matrix" is a matrix of the form
+ *   @f{align*}{
+ *     A_{ij} = \int_\Omega \nabla\varphi_i(\mathbf x)
+ *       \cdot \nabla\varphi_j(\mathbf x)\; dx,
+ *   @f}
+ * possibly with a coefficient inside the integral, and
+ * where $\varphi_i(\mathbf x)$ are the shape functions of a finite element.
+ * The term is also used for variations of the case above, for example
+ * replacing the gradient by the symmetric gradient in the case where
+ * the solution variable is vector-valued (e.g., in elasticity, or the
+ * Stokes equations). The key feature is that in the integral, first
+ * derivatives are applied to both the test and trial functions,
+ * $\varphi_i,\varphi_j$.
+ *
+ * The origin of the term refers to the fact that in structural mechanics
+ * (where the finite element method originated), one often starts from the
+ * elastostatics equation
+ *   @f{align*}{
+ *     -\nabla \cdot C \nabla u = f.
+ *   @f}
+ * In this equation, $C$ is the stress-strain tensor that, informally
+ * speaking, relates how much force one has to apply to obtain a
+ * unit displacement. In other words, it encodes the "stiffness" of
+ * the material: A large $C$, i.e., a large stiffness, means a large
+ * required force for a desired displacement and the other way around.
+ *
+ * If one multiplies this equation by a test function $\varphi_i$,
+ * integrates over $\Omega$, and then discretizes by the substitution
+ * $u(\mathbf x,t) \to u_h(\mathbf x)=\sum_j U_j(t) \varphi_j(\mathbf x)$,
+ * then after integration by parts one ends up with
+ *   @f{align*}{
+ *     \sum_j \left[\int_\Omega \nabla \varphi_i \cdot C \varphi_j \right]
+ *     U_j
+ *   @f}
+ * which can be written as
+ *   @f{align*}{
+ *     AU
+ *   @f}
+ * where
+ *   @f{align*}{
+ *     A_{ij} = \int_\Omega \nabla\varphi_i(\mathbf x) \cdot C \nabla \varphi_j(\mathbf x)\; dx.
+ *   @f}
+ * Since the matrix entries are (weighted) integrals of the stiffness
+ * coefficient, the resulting matrix is called the "stiffness matrix".
+ *
+ * In mathematics, where we often consider non-dimensionalized equations,
+ * we end up with the case $C=1$, and as a consequence the matrix without
+ * the coefficient,
+ *   @f{align*}{
+ *     A_{ij} = \int_\Omega \nabla\varphi_i(\mathbf x) \cdot \nabla\varphi_j(\mathbf x)\; dx
+ *   @f}
+ * which corresponds to the Laplace or Poisson equation,
+ *   @f{align*}{
+ *     -\Delta u = f,
+ *   @f}
+ * also carries the name "stiffness matrix".
+ *
+ * The stiffness matrix is almost always denotes by the symbol $A$. See, for example,
+ * step-4, step-6, as well as a number of the time dependent equations considered in
+ * programs such as step-23 or step-26.
+ *
+ * See also the @ref GlossStiffnessMatrix "stiffness matrix"
+ * for a related case.
+ * </dt>
+ *
+ *
  * <dt class="glossary">@anchor GlossSubdomainId <b>Subdomain id</b></dt>
  * <dd>Each cell of a triangulation has associated with it a property called
  * the "subdomain id" that can be queried using a call like
@@ -1944,6 +2147,97 @@
  *   @note The usual warning about the missing type safety of @p void pointers are
  *   obviously in place here; responsibility for correctness of types etc
  *   lies entirely with the user of the pointer.
+ * </dd>
+ *
+ *
+ * <dt class="glossary">@anchor GlossUserProvidedCallBack <b>User provided callbacks</b></dt>
+ * <dd>
+ *   Much functionality in deal.II under the hood uses external libraries that
+ *   operate by calling back into user-provided functions. Examples are
+ *   ODE solvers that solve differential equations of the form
+ *   @f[
+ *     \mathbf x'(t) = \mathbf f(t,\mathbf x(t)),
+ *   @f]
+ *   where users need to provide a function that, for a given time $t$ and vector
+ *   $\mathbf x$ returns the value of the right hand side $\mathbf f(t,\mathbf x)$.
+ *   Other examples are solvers for nonlinear systems
+ *   @f[
+ *     \mathbf F(\mathbf U) = 0,
+ *   @f]
+ *   where users need to provide functions that for a given vector $\mathbf U$ returns
+ *   the vector $\mathbf F(\mathbf U)$ and, in many cases, also the Jacobian
+ *   $\nabla \mathbf F(\mathbf U)$ as well as possibly other information about
+ *   the problem such as the relative scaling of solution variables within the
+ *   vector $\mathbf U$ that can be used to make the problem better conditioned.
+ *
+ *   These functions are often called "callbacks" because the ODE or nonlinear
+ *   solver libraries "call back" into user code. In code written in the C programming
+ *   language, these callbacks would often be described by pointers to user
+ *   functions handed to the solver library. Since deal.II is written in C++, we
+ *   typically instead use
+ *   [`std::function`](https://en.cppreference.com/w/cpp/utility/functional/function)
+ *   objects. Examples of classes that use this approach are SUNDIALS::KINSOL,
+ *   TrilinosWrappers::NOXSolver, PETScWrapper::NonlinearSolver, and
+ *   PETScWrappers::TimeStepper. step-77 illustrates how this can be used with
+ *   SUNDIALS::KINSOL.
+ *
+ *   Many of these libraries use a convention that comes from their origin in the
+ *   C programming language: User callbacks for the purposes of these libraries
+ *   return the data they are asked through one of their arguments, and indicate
+ *   success or failure by returning an `int` that needs to be zero if the function
+ *   returned successfully, and a nonzero value if the function failed for whatever
+ *   reason. (Examples of failures could include if the right hand side function
+ *   $\mathbf f(t,\mathbf x)$ contains a square root of one of the $x_i$, but that
+ *   $x_i$ is negative; or perhaps if a function requires table lookup for values
+ *   that are outside the range that is tabulated.)
+ *
+ *   The approach to return integer values is decidedly not in the spirit
+ *   of C++: If a function cannot complete the work it is asked to do, the C++ way
+ *   to deal with this is to throw an exception. As a consequence, for all of the
+ *   places where deal.II wraps external libraries and where user codes need to
+ *   provide callbacks, we adopt the following conventions that user callbacks
+ *   should follow:
+ *   - If a function successfully completes its operations, then it simply
+ *     returns as expected. If it is supposed to provide specific information,
+ *     then it should do so either via a regular return value, or via a non-`const`
+ *     argument, as appropriate for the specific callback.
+ *   - If a function cannot successfully complete its operation, it should
+ *     throw an exception as appropriate. If possible the classes wrapping
+ *     the external library (such as the KINSOL, NOX, or PETSc libraries mentioned
+ *     above) will then capture the exception, propagate an appropriate failure
+ *     code to the underlying library (say, a nonzero error code), which will
+ *     typically lead to some clean-up operations inside that external library,
+ *     and a return to the wrapper code. There, the originally thrown exception
+ *     will then be re-thrown and become visible again in the place where the
+ *     wrappers were thrown. In other words, for all practical purposes, it
+ *     looks like the exception thrown in the callback had simply propagated
+ *     all the way back to user code.
+ *   - There are some libraries that allow callbacks to indicate "recoverable
+ *     errors". For example, KINSOL can solve nonlinear systems
+ *     $\mathbf F(\mathbf U)=0$ and deal with situations where a function
+ *     evaluation for $\mathbf F$ is not possible -- for example the case above
+ *     one tries to take the square root of a negative value -- but where it
+ *     could then try again for a modified $\mathbf U$ for which evaluation
+ *     of the square root is possible. (This is often possible in
+ *     [line search algorithms](https://en.wikipedia.org/wiki/Line_search)
+ *     where using a shorter step length might actually succeed.) In such
+ *     cases, a user-provided callback function should throw an exception
+ *     of type RecoverableUserCallbackError, which will then internally be
+ *     translated into an appropriate code understandable by the underlying
+ *     library. It is worthwhile pointing out that a user callback throwing
+ *     a "recoverable" exception does not actually guarantee that the
+ *     underlying library can actually recover: For example, KINSOL will
+ *     eventually give up if for several shorter and shorter step lengths
+ *     the residual computation throws a "recoverable" exception, and
+ *     the nonlinear solver will then return to user space with an error
+ *     that the deal.II wrappers translate into an exception.
+ *
+ *   The purpose of these conventions is to provide a unified approach to user
+ *   callbacks that is independent of how the underlying library likes to
+ *   have errors reported. (That is, independent of whether the underlying
+ *   library uses nonzero return values, exceptions, or any other mechanism.)
+ *   As a consequence, all deal.II classes that require user callbacks try
+ *   to follow the convention above.
  * </dd>
  *
  *

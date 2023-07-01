@@ -1,4 +1,0 @@
-Improved: FEImmersedSurfaceValues can now be constructed using a MappingFEField.
-<br>
-(Marco Feder, 2022/10/31)
-

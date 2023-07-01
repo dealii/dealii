@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -522,13 +522,13 @@ namespace TriangulationDescription
      * @return Description to be used to set up a Triangulation.
      *
      * @note If construct_multigrid_hierarchy is set in the settings, the source
-     *   triangulation has to be setup with limit_level_difference_at_vertices.
+     *   triangulation has to be set up with limit_level_difference_at_vertices.
      */
     template <int dim, int spacedim = dim>
     Description<dim, spacedim>
     create_description_from_triangulation(
       const dealii::Triangulation<dim, spacedim> &tria,
-      const MPI_Comm &                            comm,
+      const MPI_Comm                              comm,
       const TriangulationDescription::Settings    settings =
         TriangulationDescription::Settings::default_setting,
       const unsigned int my_rank_in = numbers::invalid_unsigned_int);
@@ -641,9 +641,9 @@ namespace TriangulationDescription
       const std::function<void(dealii::Triangulation<dim, spacedim> &)>
         &                                            serial_grid_generator,
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
-                               const MPI_Comm &,
+                               const MPI_Comm,
                                const unsigned int)> &serial_grid_partitioner,
-      const MPI_Comm &                               comm,
+      const MPI_Comm                                 comm,
       const int                                      group_size = 1,
       const typename Triangulation<dim, spacedim>::MeshSmoothing smoothing =
         dealii::Triangulation<dim, spacedim>::none,

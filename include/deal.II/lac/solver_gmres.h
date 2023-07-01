@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,9 +24,11 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/vectorization.h>
 
+#include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/lapack_full_matrix.h>
+#include <deal.II/lac/orthogonalization.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/vector.h>
@@ -197,21 +199,6 @@ public:
    */
   struct AdditionalData
   {
-    enum class OrthogonalizationStrategy
-    {
-      /**
-       * Use modified Gram-Schmidt algorithm.
-       */
-      modified_gram_schmidt,
-      /**
-       * Use classical Gram-Schmidt algorithm. Since this approach works on
-       * multi-vectors and performs a global reduction only once, it is
-       * more efficient than the modified Gram-Schmidt algorithm.
-       * However, it might be numerically unstable.
-       */
-      classical_gram_schmidt
-    };
-
     /**
      * Constructor. By default, set the number of temporary vectors to 30,
      * i.e. do a restart every 28 iterations. Also set preconditioning from
@@ -220,13 +207,14 @@ public:
      * reduced functionality to track information is disabled by default.
      */
     explicit AdditionalData(
-      const unsigned int              max_n_tmp_vectors          = 30,
-      const bool                      right_preconditioning      = false,
-      const bool                      use_default_residual       = true,
-      const bool                      force_re_orthogonalization = false,
-      const bool                      batched_mode               = false,
-      const OrthogonalizationStrategy orthogonalization_strategy =
-        OrthogonalizationStrategy::modified_gram_schmidt);
+      const unsigned int max_n_tmp_vectors          = 30,
+      const bool         right_preconditioning      = false,
+      const bool         use_default_residual       = true,
+      const bool         force_re_orthogonalization = false,
+      const bool         batched_mode               = false,
+      const LinearAlgebra::OrthogonalizationStrategy
+        orthogonalization_strategy =
+          LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt);
 
     /**
      * Maximum number of temporary vectors. This parameter controls the size
@@ -269,7 +257,7 @@ public:
     /**
      * Strategy to orthogonalize vectors.
      */
-    OrthogonalizationStrategy orthogonalization_strategy;
+    LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
   };
 
   /**
@@ -519,14 +507,24 @@ public:
     /**
      * Constructor. By default, set the maximum basis size to 30.
      */
-    explicit AdditionalData(const unsigned int max_basis_size = 30)
+    explicit AdditionalData(
+      const unsigned int max_basis_size = 30,
+      const LinearAlgebra::OrthogonalizationStrategy
+        orthogonalization_strategy =
+          LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt)
       : max_basis_size(max_basis_size)
+      , orthogonalization_strategy(orthogonalization_strategy)
     {}
 
     /**
      * Maximum basis size.
      */
     unsigned int max_basis_size;
+
+    /**
+     * Strategy to orthogonalize vectors.
+     */
+    LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy;
   };
 
   /**
@@ -658,12 +656,12 @@ namespace internal
 
 template <class VectorType>
 inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
-  const unsigned int              max_n_tmp_vectors,
-  const bool                      right_preconditioning,
-  const bool                      use_default_residual,
-  const bool                      force_re_orthogonalization,
-  const bool                      batched_mode,
-  const OrthogonalizationStrategy orthogonalization_strategy)
+  const unsigned int                             max_n_tmp_vectors,
+  const bool                                     right_preconditioning,
+  const bool                                     use_default_residual,
+  const bool                                     force_re_orthogonalization,
+  const bool                                     batched_mode,
+  const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy)
   : max_n_tmp_vectors(max_n_tmp_vectors)
   , right_preconditioning(right_preconditioning)
   , use_default_residual(use_default_residual)
@@ -730,7 +728,109 @@ namespace internal
 {
   namespace SolverGMRESImplementation
   {
-    template <class VectorType>
+    template <typename VectorType, typename Enable = void>
+    struct is_dealii_compatible_distributed_vector;
+
+    template <typename VectorType>
+    struct is_dealii_compatible_distributed_vector<
+      VectorType,
+      typename std::enable_if<!internal::is_block_vector<VectorType>>::type>
+    {
+      static constexpr bool value = std::is_same<
+        VectorType,
+        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                           MemorySpace::Host>>::value;
+    };
+
+
+
+    template <typename VectorType>
+    struct is_dealii_compatible_distributed_vector<
+      VectorType,
+      typename std::enable_if<internal::is_block_vector<VectorType>>::type>
+    {
+      static constexpr bool value = std::is_same<
+        typename VectorType::BlockType,
+        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                           MemorySpace::Host>>::value;
+    };
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
+                * = nullptr>
+    unsigned int
+    n_blocks(const VectorType &)
+    {
+      return 1;
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<IsBlockVector<VectorType>::value, VectorType> * =
+                nullptr>
+    unsigned int
+    n_blocks(const VectorType &vector)
+    {
+      return vector.n_blocks();
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
+                * = nullptr>
+    VectorType &
+    block(VectorType &vector, const unsigned int b)
+    {
+      AssertDimension(b, 0);
+      (void)b;
+      return vector;
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
+                * = nullptr>
+    const VectorType &
+    block(const VectorType &vector, const unsigned int b)
+    {
+      AssertDimension(b, 0);
+      (void)b;
+      return vector;
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<IsBlockVector<VectorType>::value, VectorType> * =
+                nullptr>
+    typename VectorType::BlockType &
+    block(VectorType &vector, const unsigned int b)
+    {
+      return vector.block(b);
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<IsBlockVector<VectorType>::value, VectorType> * =
+                nullptr>
+    const typename VectorType::BlockType &
+    block(const VectorType &vector, const unsigned int b)
+    {
+      return vector.block(b);
+    }
+
+
+
+    template <class VectorType,
+              std::enable_if_t<
+                !is_dealii_compatible_distributed_vector<VectorType>::value,
+                VectorType> * = nullptr>
     void
     Tvmult_add(const unsigned int dim,
                const VectorType & vv,
@@ -744,75 +844,85 @@ namespace internal
 
 
 
-    template <class Number>
+    template <class VectorType,
+              std::enable_if_t<
+                is_dealii_compatible_distributed_vector<VectorType>::value,
+                VectorType> * = nullptr>
     void
-    Tvmult_add(
-      const unsigned int                                                   dim,
-      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &vv,
-      const internal::SolverGMRESImplementation::TmpVectors<
-        LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>
-        &             orthogonal_vectors,
-      Vector<double> &h)
+    Tvmult_add(const unsigned int dim,
+               const VectorType & vv,
+               const internal::SolverGMRESImplementation::TmpVectors<VectorType>
+                 &             orthogonal_vectors,
+               Vector<double> &h)
     {
-      unsigned int j = 0;
-
-      if (dim <= 128)
+      for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
-          // optimized path
-          static constexpr unsigned int n_lanes =
-            VectorizedArray<double>::size();
+          unsigned int j = 0;
 
-          VectorizedArray<double> hs[128];
-          for (unsigned int d = 0; d < dim; ++d)
-            hs[d] = 0.0;
+          if (dim <= 128)
+            {
+              // optimized path
+              static constexpr unsigned int n_lanes =
+                VectorizedArray<double>::size();
 
-          unsigned int c = 0;
+              VectorizedArray<double> hs[128];
+              for (unsigned int d = 0; d < dim; ++d)
+                hs[d] = 0.0;
 
-          for (; c < vv.locally_owned_size() / n_lanes / 4;
-               ++c, j += n_lanes * 4)
-            for (unsigned int i = 0; i < dim; ++i)
-              {
-                VectorizedArray<double> vvec[4];
-                for (unsigned int k = 0; k < 4; ++k)
-                  vvec[k].load(vv.begin() + j + k * n_lanes);
+              unsigned int c = 0;
 
-                for (unsigned int k = 0; k < 4; ++k)
+              for (; c < block(vv, b).locally_owned_size() / n_lanes / 4;
+                   ++c, j += n_lanes * 4)
+                for (unsigned int i = 0; i < dim; ++i)
                   {
-                    VectorizedArray<double> temp;
-                    temp.load(orthogonal_vectors[i].begin() + j + k * n_lanes);
-                    hs[i] += temp * vvec[k];
+                    VectorizedArray<double> vvec[4];
+                    for (unsigned int k = 0; k < 4; ++k)
+                      vvec[k].load(block(vv, b).begin() + j + k * n_lanes);
+
+                    for (unsigned int k = 0; k < 4; ++k)
+                      {
+                        VectorizedArray<double> temp;
+                        temp.load(block(orthogonal_vectors[i], b).begin() + j +
+                                  k * n_lanes);
+                        hs[i] += temp * vvec[k];
+                      }
                   }
-              }
 
-          c *= 4;
-          for (; c < vv.locally_owned_size() / n_lanes; ++c, j += n_lanes)
+              c *= 4;
+              for (; c < block(vv, b).locally_owned_size() / n_lanes;
+                   ++c, j += n_lanes)
+                for (unsigned int i = 0; i < dim; ++i)
+                  {
+                    VectorizedArray<double> vvec, temp;
+                    vvec.load(block(vv, b).begin() + j);
+                    temp.load(block(orthogonal_vectors[i], b).begin() + j);
+                    hs[i] += temp * vvec;
+                  }
+
+              for (unsigned int i = 0; i < dim; ++i)
+                for (unsigned int v = 0; v < n_lanes; ++v)
+                  h(i) += hs[i][v];
+            }
+
+          // remainder loop of optimized path or non-optimized path (if
+          // dim>128)
+          for (; j < block(vv, b).locally_owned_size(); ++j)
             for (unsigned int i = 0; i < dim; ++i)
-              {
-                VectorizedArray<double> vvec, temp;
-                vvec.load(vv.begin() + j);
-                temp.load(orthogonal_vectors[i].begin() + j);
-                hs[i] += temp * vvec;
-              }
-
-          for (unsigned int i = 0; i < dim; ++i)
-            for (unsigned int v = 0; v < n_lanes; ++v)
-              h(i) += hs[i][v];
+              h(i) += block(orthogonal_vectors[i], b).local_element(j) *
+                      block(vv, b).local_element(j);
         }
 
-      // remainder loop of optimized path or non-optimized path (if
-      // dim>128)
-      for (; j < vv.locally_owned_size(); ++j)
-        for (unsigned int i = 0; i < dim; ++i)
-          h(i) += orthogonal_vectors[i].local_element(j) * vv.local_element(j);
-
-      Utilities::MPI::sum(h, MPI_COMM_WORLD, h);
+      Utilities::MPI::sum(h, block(vv, 0).get_mpi_communicator(), h);
     }
 
 
 
-    template <class VectorType>
+    template <class VectorType,
+              std::enable_if_t<
+                !is_dealii_compatible_distributed_vector<VectorType>::value,
+                VectorType> * = nullptr>
     double
-    substract_and_norm(
+    subtract_and_norm(
       const unsigned int dim,
       const internal::SolverGMRESImplementation::TmpVectors<VectorType>
         &                   orthogonal_vectors,
@@ -829,84 +939,98 @@ namespace internal
 
 
 
-    template <class Number>
+    template <class VectorType,
+              std::enable_if_t<
+                is_dealii_compatible_distributed_vector<VectorType>::value,
+                VectorType> * = nullptr>
     double
-    substract_and_norm(
+    subtract_and_norm(
       const unsigned int dim,
-      const internal::SolverGMRESImplementation::TmpVectors<
-        LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>
+      const internal::SolverGMRESImplementation::TmpVectors<VectorType>
         &                   orthogonal_vectors,
       const Vector<double> &h,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &vv)
+      VectorType &          vv)
     {
       static constexpr unsigned int n_lanes = VectorizedArray<double>::size();
 
-      double                  norm_vv_temp            = 0.0;
-      VectorizedArray<double> norm_vv_temp_vectorized = 0.0;
+      double norm_vv_temp = 0.0;
 
-      unsigned int j = 0;
-      unsigned int c = 0;
-      for (; c < vv.locally_owned_size() / n_lanes / 4; ++c, j += n_lanes * 4)
+      for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
-          VectorizedArray<double> temp[4];
+          VectorizedArray<double> norm_vv_temp_vectorized = 0.0;
 
-          for (unsigned int k = 0; k < 4; ++k)
-            temp[k].load(vv.begin() + j + k * n_lanes);
-
-          for (unsigned int i = 0; i < dim; ++i)
+          unsigned int j = 0;
+          unsigned int c = 0;
+          for (; c < block(vv, b).locally_owned_size() / n_lanes / 4;
+               ++c, j += n_lanes * 4)
             {
-              const double factor = h(i);
+              VectorizedArray<double> temp[4];
+
               for (unsigned int k = 0; k < 4; ++k)
+                temp[k].load(block(vv, b).begin() + j + k * n_lanes);
+
+              for (unsigned int i = 0; i < dim; ++i)
+                {
+                  const double factor = h(i);
+                  for (unsigned int k = 0; k < 4; ++k)
+                    {
+                      VectorizedArray<double> vec;
+                      vec.load(block(orthogonal_vectors[i], b).begin() + j +
+                               k * n_lanes);
+                      temp[k] -= factor * vec;
+                    }
+                }
+
+              for (unsigned int k = 0; k < 4; ++k)
+                temp[k].store(block(vv, b).begin() + j + k * n_lanes);
+
+              norm_vv_temp_vectorized +=
+                (temp[0] * temp[0] + temp[1] * temp[1]) +
+                (temp[2] * temp[2] + temp[3] * temp[3]);
+            }
+
+          c *= 4;
+          for (; c < block(vv, b).locally_owned_size() / n_lanes;
+               ++c, j += n_lanes)
+            {
+              VectorizedArray<double> temp;
+              temp.load(block(vv, b).begin() + j);
+
+              for (unsigned int i = 0; i < dim; ++i)
                 {
                   VectorizedArray<double> vec;
-                  vec.load(orthogonal_vectors[i].begin() + j + k * n_lanes);
-                  temp[k] -= factor * vec;
+                  vec.load(block(orthogonal_vectors[i], b).begin() + j);
+                  temp -= h(i) * vec;
                 }
+
+              temp.store(block(vv, b).begin() + j);
+
+              norm_vv_temp_vectorized += temp * temp;
             }
 
-          for (unsigned int k = 0; k < 4; ++k)
-            temp[k].store(vv.begin() + j + k * n_lanes);
+          for (unsigned int v = 0; v < n_lanes; ++v)
+            norm_vv_temp += norm_vv_temp_vectorized[v];
 
-          norm_vv_temp_vectorized += (temp[0] * temp[0] + temp[1] * temp[1]) +
-                                     (temp[2] * temp[2] + temp[3] * temp[3]);
-        }
-
-      c *= 4;
-      for (; c < vv.locally_owned_size() / n_lanes; ++c, j += n_lanes)
-        {
-          VectorizedArray<double> temp;
-          temp.load(vv.begin() + j);
-
-          for (unsigned int i = 0; i < dim; ++i)
+          for (; j < block(vv, b).locally_owned_size(); ++j)
             {
-              VectorizedArray<double> vec;
-              vec.load(orthogonal_vectors[i].begin() + j);
-              temp -= h(i) * vec;
+              double temp = block(vv, b).local_element(j);
+              for (unsigned int i = 0; i < dim; ++i)
+                temp -= h(i) * block(orthogonal_vectors[i], b).local_element(j);
+              block(vv, b).local_element(j) = temp;
+
+              norm_vv_temp += temp * temp;
             }
-
-          temp.store(vv.begin() + j);
-
-          norm_vv_temp_vectorized += temp * temp;
         }
 
-      for (unsigned int v = 0; v < n_lanes; ++v)
-        norm_vv_temp += norm_vv_temp_vectorized[v];
-
-      for (; j < vv.locally_owned_size(); ++j)
-        {
-          double temp = vv.local_element(j);
-          for (unsigned int i = 0; i < dim; ++i)
-            temp -= h(i) * orthogonal_vectors[i].local_element(j);
-          vv.local_element(j) = temp;
-
-          norm_vv_temp += temp * temp;
-        }
-
-      return std::sqrt(Utilities::MPI::sum(norm_vv_temp, MPI_COMM_WORLD));
+      return std::sqrt(
+        Utilities::MPI::sum(norm_vv_temp, block(vv, 0).get_mpi_communicator()));
     }
 
 
-    template <class VectorType>
+    template <class VectorType,
+              std::enable_if_t<
+                !is_dealii_compatible_distributed_vector<VectorType>::value,
+                VectorType> * = nullptr>
     double
     sadd_and_norm(VectorType &      v,
                   const double      factor_a,
@@ -918,32 +1042,39 @@ namespace internal
     }
 
 
-    template <class Number>
+    template <class VectorType,
+              std::enable_if_t<
+                is_dealii_compatible_distributed_vector<VectorType>::value,
+                VectorType> * = nullptr>
     double
-    sadd_and_norm(
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &v,
-      const double                                                   factor_a,
-      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &b,
-      const double factor_b)
+    sadd_and_norm(VectorType &      v,
+                  const double      factor_a,
+                  const VectorType &w,
+                  const double      factor_b)
     {
       double norm = 0;
 
-      for (unsigned int j = 0; j < v.locally_owned_size(); ++j)
-        {
-          const double temp =
-            v.local_element(j) * factor_a + b.local_element(j) * factor_b;
+      for (unsigned int b = 0; b < n_blocks(v); ++b)
+        for (unsigned int j = 0; j < block(v, b).locally_owned_size(); ++j)
+          {
+            const double temp = block(v, b).local_element(j) * factor_a +
+                                block(w, b).local_element(j) * factor_b;
 
-          v.local_element(j) = temp;
+            block(v, b).local_element(j) = temp;
 
-          norm += temp * temp;
-        }
+            norm += temp * temp;
+          }
 
-      return std::sqrt(Utilities::MPI::sum(norm, MPI_COMM_WORLD));
+      return std::sqrt(
+        Utilities::MPI::sum(norm, block(v, 0).get_mpi_communicator()));
     }
 
 
 
-    template <class VectorType>
+    template <class VectorType,
+              std::enable_if_t<
+                !is_dealii_compatible_distributed_vector<VectorType>::value,
+                VectorType> * = nullptr>
     void
     add(VectorType &          p,
         const unsigned int    dim,
@@ -963,23 +1094,26 @@ namespace internal
 
 
 
-    template <class Number>
+    template <class VectorType,
+              std::enable_if_t<
+                is_dealii_compatible_distributed_vector<VectorType>::value,
+                VectorType> * = nullptr>
     void
-    add(LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &p,
-        const unsigned int                                             dim,
-        const Vector<double> &                                         h,
-        const internal::SolverGMRESImplementation::TmpVectors<
-          LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>
+    add(VectorType &          p,
+        const unsigned int    dim,
+        const Vector<double> &h,
+        const internal::SolverGMRESImplementation::TmpVectors<VectorType>
           &        tmp_vectors,
         const bool zero_out)
     {
-      for (unsigned int j = 0; j < p.locally_owned_size(); ++j)
-        {
-          double temp = zero_out ? 0 : p.local_element(j);
-          for (unsigned int i = 0; i < dim; ++i)
-            temp += tmp_vectors[i].local_element(j) * h(i);
-          p.local_element(j) = temp;
-        }
+      for (unsigned int b = 0; b < n_blocks(p); ++b)
+        for (unsigned int j = 0; j < block(p, b).locally_owned_size(); ++j)
+          {
+            double temp = zero_out ? 0 : block(p, b).local_element(j);
+            for (unsigned int i = 0; i < dim; ++i)
+              temp += block(tmp_vectors[i], b).local_element(j) * h(i);
+            block(p, b).local_element(j) = temp;
+          }
     }
 
 
@@ -998,8 +1132,7 @@ namespace internal
     template <class VectorType>
     inline double
     iterated_gram_schmidt(
-      const typename SolverGMRES<VectorType>::AdditionalData::
-        OrthogonalizationStrategy orthogonalization_strategy,
+      const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy,
       const internal::SolverGMRESImplementation::TmpVectors<VectorType>
         &                                       orthogonal_vectors,
       const unsigned int                        dim,
@@ -1030,8 +1163,7 @@ namespace internal
           double norm_vv = 0.0;
 
           if (orthogonalization_strategy ==
-              SolverGMRES<VectorType>::AdditionalData::
-                OrthogonalizationStrategy::modified_gram_schmidt)
+              LinearAlgebra::OrthogonalizationStrategy::modified_gram_schmidt)
             {
               double htmp = vv * orthogonal_vectors[0];
               h(0) += htmp;
@@ -1047,11 +1179,11 @@ namespace internal
                 vv.add_and_dot(-htmp, orthogonal_vectors[dim - 1], vv));
             }
           else if (orthogonalization_strategy ==
-                   SolverGMRES<VectorType>::AdditionalData::
-                     OrthogonalizationStrategy::classical_gram_schmidt)
+                   LinearAlgebra::OrthogonalizationStrategy::
+                     classical_gram_schmidt)
             {
               Tvmult_add(dim, vv, orthogonal_vectors, h);
-              norm_vv = substract_and_norm(dim, orthogonal_vectors, h, vv);
+              norm_vv = subtract_and_norm(dim, orthogonal_vectors, h, vv);
             }
           else
             {
@@ -1603,6 +1735,8 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
   // matrix used for the orthogonalization process later
   H.reinit(basis_size + 1, basis_size);
 
+  Vector<double> h(basis_size + 1);
+
   // Vectors for projected system
   Vector<double> projected_rhs;
   Vector<double> y;
@@ -1638,10 +1772,19 @@ SolverFGMRES<VectorType>::solve(const MatrixType &        A,
           A.vmult(*aux, z[j]);
 
           // Gram-Schmidt
-          H(0, j) = *aux * v[0];
-          for (unsigned int i = 1; i <= j; ++i)
-            H(i, j) = aux->add_and_dot(-H(i - 1, j), v[i - 1], v[i]);
-          H(j + 1, j) = a = std::sqrt(aux->add_and_dot(-H(j, j), v[j], *aux));
+          bool         re_orthogonalize = false;
+          const double s =
+            internal::SolverGMRESImplementation::iterated_gram_schmidt<
+              VectorType>(additional_data.orthogonalization_strategy,
+                          v,
+                          j + 1,
+                          0,
+                          *aux,
+                          h,
+                          re_orthogonalize);
+          for (unsigned int i = 0; i <= j; ++i)
+            H(i, j) = h(i);
+          H(j + 1, j) = a = s;
 
           // Compute projected solution
 

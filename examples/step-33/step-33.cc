@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2007 - 2021 by the deal.II authors
+ * Copyright (C) 2007 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -567,13 +567,13 @@ namespace Step33
     // this because we say so in the <code>get_needed_update_flags()</code>
     // function below). For the inner vectors, we check that at least the first
     // element of the outer vector has the correct inner size:
-    const unsigned int n_quadrature_points = inputs.solution_values.size();
+    const unsigned int n_evaluation_points = inputs.solution_values.size();
 
     if (do_schlieren_plot == true)
-      Assert(inputs.solution_gradients.size() == n_quadrature_points,
+      Assert(inputs.solution_gradients.size() == n_evaluation_points,
              ExcInternalError());
 
-    Assert(computed_quantities.size() == n_quadrature_points,
+    Assert(computed_quantities.size() == n_evaluation_points,
            ExcInternalError());
 
     Assert(inputs.solution_values[0].size() == n_components,
@@ -595,21 +595,21 @@ namespace Step33
     // variables in the input vector, using the
     // <code>first_momentum_component</code> and
     // <code>density_component</code> information:
-    for (unsigned int q = 0; q < n_quadrature_points; ++q)
+    for (unsigned int p = 0; p < n_evaluation_points; ++p)
       {
-        const double density = inputs.solution_values[q](density_component);
+        const double density = inputs.solution_values[p](density_component);
 
         for (unsigned int d = 0; d < dim; ++d)
-          computed_quantities[q](d) =
-            inputs.solution_values[q](first_momentum_component + d) / density;
+          computed_quantities[p](d) =
+            inputs.solution_values[p](first_momentum_component + d) / density;
 
-        computed_quantities[q](dim) =
-          compute_pressure(inputs.solution_values[q]);
+        computed_quantities[p](dim) =
+          compute_pressure(inputs.solution_values[p]);
 
         if (do_schlieren_plot == true)
-          computed_quantities[q](dim + 1) =
-            inputs.solution_gradients[q][density_component] *
-            inputs.solution_gradients[q][density_component];
+          computed_quantities[p](dim + 1) =
+            inputs.solution_gradients[p][density_component] *
+            inputs.solution_gradients[p][density_component];
       }
   }
 
@@ -2258,17 +2258,36 @@ namespace Step33
           cell->set_coarsen_flag();
       }
 
+    // The next step addresses a problem mentioned in a remark in the
+    // introduction: The SolutionTransfer class we want to use later on tests
+    // the assumption that the solution function is continuous at hanging
+    // nodes. This is not actually the case in this program because we chose
+    // (perhaps unwisely) to enforce hanging node constraints in a weak way,
+    // as one would for example do with discontinuous elements. But the elements
+    // we use here are continuous (namely, multiple copies of FE_Q), and so
+    // the assertion would fail and the program abort. To avoid the issue
+    // (without having to rewrite the whole program), we simply ensure that the
+    // solution *does* satisfy the hanging node constraints, but creating
+    // an AffineConstraint object that contains the hanging node constraints and
+    // applying the constraints to the two solution vectors we want the
+    // SolutionTransfer class to transfer to the next mesh:
+    {
+      AffineConstraints<double> hanging_node_constraints;
+      DoFTools::make_hanging_node_constraints(dof_handler,
+                                              hanging_node_constraints);
+      hanging_node_constraints.close();
+
+      hanging_node_constraints.distribute(old_solution);
+      hanging_node_constraints.distribute(predictor);
+    }
+
     // Then we need to transfer the various solution vectors from the old to
     // the new grid while we do the refinement. The SolutionTransfer class is
     // our friend here; it has a fairly extensive documentation, including
     // examples, so we won't comment much on the following code. The last
     // three lines simply re-set the sizes of some other vectors to the now
     // correct size:
-    std::vector<Vector<double>> transfer_in;
-    std::vector<Vector<double>> transfer_out;
-
-    transfer_in.push_back(old_solution);
-    transfer_in.push_back(predictor);
+    const std::vector<Vector<double>> transfer_in = {old_solution, predictor};
 
     triangulation.prepare_coarsening_and_refinement();
 
@@ -2280,26 +2299,17 @@ namespace Step33
     dof_handler.clear();
     dof_handler.distribute_dofs(fe);
 
-    {
-      Vector<double> new_old_solution(1);
-      Vector<double> new_predictor(1);
-
-      transfer_out.push_back(new_old_solution);
-      transfer_out.push_back(new_predictor);
-      transfer_out[0].reinit(dof_handler.n_dofs());
-      transfer_out[1].reinit(dof_handler.n_dofs());
-    }
-
+    std::vector<Vector<double>> transfer_out = {
+      Vector<double>(dof_handler.n_dofs()),
+      Vector<double>(dof_handler.n_dofs())};
     soltrans.interpolate(transfer_in, transfer_out);
 
-    old_solution.reinit(transfer_out[0].size());
-    old_solution = transfer_out[0];
-
-    predictor.reinit(transfer_out[1].size());
-    predictor = transfer_out[1];
+    old_solution = std::move(transfer_out[0]);
+    predictor    = std::move(transfer_out[1]);
 
     current_solution.reinit(dof_handler.n_dofs());
     current_solution = old_solution;
+
     right_hand_side.reinit(dof_handler.n_dofs());
   }
 
@@ -2368,7 +2378,6 @@ namespace Step33
       grid_in.read_ucd(input_file);
     }
 
-    dof_handler.clear();
     dof_handler.distribute_dofs(fe);
 
     // Size all of the fields.

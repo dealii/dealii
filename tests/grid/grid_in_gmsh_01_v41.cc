@@ -107,7 +107,7 @@ main()
       gmsh_grid<3>(SOURCE_DIR "/grids/grid_in_msh_01.3d_neg.msh",
                    SOURCE_DIR "/grids/grid_in_msh_01.3d_neg.v41.msh");
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

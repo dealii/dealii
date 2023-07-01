@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -469,6 +469,30 @@ public:
                         const unsigned char face_orientation) const;
 
   /**
+   * For a given face, in standard orientation, return the location of one
+   * of its vertices in the ambient space of the cell. For example, for a
+   * square or triangular 2d cell, the zeroth vertex of its zeroth face
+   * is located at $(0,0)$ -- a location in 2d space.
+   *
+   * @param[in] face The number of face. This number must be between zero
+   *   and `n_faces()`.
+   * @param[in] vertex The number of the vertex within the face. This number
+   *   must be between zero and `face_reference_cell(face).n_vertices()`.
+   * @return The location of the vertex so identified in `dim`-dimensional
+   *   space.
+   *
+   * @post The output of calling `reference_cell.face_vertex_location<dim>(f,v)`
+   *   is identical to calling
+   *   `reference_cell.vertex<dim>(
+   *       reference_cell.face_to_cell_vertices(
+                   f, v, ReferenceCell::default_combined_face_orientation()))`.
+   */
+  template <int dim>
+  Point<dim>
+  face_vertex_location(const unsigned int face,
+                       const unsigned int vertex) const;
+
+  /**
    * Correct vertex index depending on face orientation.
    */
   unsigned int
@@ -564,7 +588,15 @@ public:
   bool
   contains_point(const Point<dim> &p, const double tolerance = 0) const;
 
-  /*
+  /**
+   * Return the point on the surface of the reference cell closest (in the
+   * Euclidean norm) to @p p.
+   */
+  template <int dim>
+  Point<dim>
+  closest_point(const Point<dim> &p) const;
+
+  /**
    * Return $i$-th unit tangential vector of a face of the reference cell.
    * The vectors are arranged such that the
    * cross product between the two vectors returns the unit normal vector.
@@ -608,7 +640,7 @@ public:
    * @deprecated Use get_combined_orientation() instead.
    */
   template <typename T, std::size_t N>
-  DEAL_II_DEPRECATED_EARLY unsigned char
+  DEAL_II_DEPRECATED unsigned char
   compute_orientation(const std::array<T, N> &vertices_0,
                       const std::array<T, N> &vertices_1) const;
 
@@ -657,7 +689,7 @@ public:
    * @deprecated Use permute_by_combined_orientation() instead.
    */
   template <typename T, std::size_t N>
-  DEAL_II_DEPRECATED_EARLY std::array<T, N>
+  DEAL_II_DEPRECATED std::array<T, N>
   permute_according_orientation(const std::array<T, N> &vertices,
                                 const unsigned int      orientation) const;
 
@@ -1176,7 +1208,7 @@ ReferenceCell::n_lines() const
       case ReferenceCells::Tetrahedron:
         return 6;
       case ReferenceCells::Pyramid:
-        return 7;
+        return 8;
       case ReferenceCells::Wedge:
         return 9;
       case ReferenceCells::Hexahedron:
@@ -1202,7 +1234,7 @@ ReferenceCell::vertex(const unsigned int v) const
       case 0:
         {
           if (*this == ReferenceCells::Vertex)
-            return Point<dim>(0);
+            return Point<dim>();
           break;
         }
       case 1:
@@ -1797,7 +1829,7 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
              {{0, 6, 4, X}},
              {{1, 5, 7, X}},
              {{2, 4, 5, X}},
-             {{3, 7, 6, 2}}}};
+             {{3, 7, 6, X}}}};
 
           return table[face][standard_to_real_face_line(
             line, face, face_orientation)];
@@ -1920,6 +1952,212 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
     }
 
   return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int dim>
+Point<dim>
+ReferenceCell::face_vertex_location(const unsigned int face,
+                                    const unsigned int vertex) const
+{
+  AssertIndexRange(face, n_faces());
+  AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
+  AssertDimension(dim, this->get_dimension());
+
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        {
+          Assert(false, ExcNotImplemented());
+          break;
+        }
+      case ReferenceCells::Line:
+        {
+          if (face == 0)
+            return Point<dim>(0);
+          else
+            return Point<dim>(1);
+        }
+      case ReferenceCells::Triangle:
+        {
+          static const ndarray<Point<dim>, 3, 2> table = {
+            {{{Point<dim>(0, 0), Point<dim>(1, 0)}},
+             {{Point<dim>(1, 0), Point<dim>(0, 1)}},
+             {{Point<dim>(0, 1), Point<dim>(0, 0)}}}};
+
+          return table[face][vertex];
+        }
+      case ReferenceCells::Quadrilateral:
+        {
+          static const ndarray<Point<dim>, 4, 2> table = {
+            {{{Point<dim>(0, 0), Point<dim>(0, 1)}},
+             {{Point<dim>(1, 0), Point<dim>(1, 1)}},
+             {{Point<dim>(0, 0), Point<dim>(1, 0)}},
+             {{Point<dim>(0, 1), Point<dim>(1, 1)}}}};
+
+          return table[face][vertex];
+        }
+      case ReferenceCells::Tetrahedron:
+        {
+          static const ndarray<Point<dim>, 4, 3> table = {
+            {{{Point<dim>(0.0, 0.0, 0.0),
+               Point<dim>(1.0, 0.0, 0.0),
+               Point<dim>(0.0, 1.0, 0.0)}},
+             {{Point<dim>(1.0, 0.0, 0.0),
+               Point<dim>(0.0, 0.0, 0.0),
+               Point<dim>(0.0, 0.0, 1.0)}},
+             {{Point<dim>(0.0, 0.0, 0.0),
+               Point<dim>(0.0, 1.0, 0.0),
+               Point<dim>(0.0, 0.0, 1.0)}},
+             {{Point<dim>(0.0, 1.0, 0.0),
+               Point<dim>(1.0, 0.0, 0.0),
+               Point<dim>(0.0, 0.0, 1.0)}}}};
+
+          return table[face][vertex];
+        }
+      case ReferenceCells::Pyramid:
+        {
+          // We would like to use ndarray here as we do above, but
+          // not every face has the same number of vertices and so
+          // the inner array needs to be a dynamic vector:
+          static const std::array<std::vector<Point<dim>>, 5> table = {
+            {{{Point<dim>(-1.0, -1.0, 0.0),
+               Point<dim>(+1.0, -1.0, 0.0),
+               Point<dim>(-1.0, +1.0, 0.0),
+               Point<dim>(+1.0, +1.0, 0.0)}},
+             {{Point<dim>(-1.0, -1.0, 0.0),
+               Point<dim>(-1.0, +1.0, 0.0),
+               Point<dim>(+0.0, +0.0, 1.0)}},
+             {{Point<dim>(+1.0, +1.0, 0.0),
+               Point<dim>(+1.0, -1.0, 0.0),
+               Point<dim>(+0.0, +0.0, 1.0)}},
+             {{Point<dim>(+1.0, -1.0, 0.0),
+               Point<dim>(-1.0, -1.0, 0.0),
+               Point<dim>(+0.0, +0.0, 1.0)}},
+             {{Point<dim>(-1.0, +1.0, 0.0),
+               Point<dim>(+1.0, +1.0, 0.0),
+               Point<dim>(+0.0, +0.0, 1.0)}}}};
+
+          return table[face][vertex];
+        }
+      case ReferenceCells::Wedge:
+        {
+          // We would like to use ndarray here as we do above, but
+          // not every face has the same number of vertices and so
+          // the inner array needs to be a dynamic vector:
+          static const std::array<std::vector<Point<dim>>, 5> table = {
+            {{{Point<dim>(1.0, 0.0, 0.0),
+               Point<dim>(0.0, 0.0, 0.0),
+               Point<dim>(0.0, 1.0, 0.0)}},
+             {{Point<dim>(0.0, 0.0, 1.0),
+               Point<dim>(1.0, 0.0, 1.0),
+               Point<dim>(0.0, 1.0, 1.0)}},
+             {{Point<dim>(0.0, 0.0, 0.0),
+               Point<dim>(1.0, 0.0, 0.0),
+               Point<dim>(0.0, 0.0, 1.0),
+               Point<dim>(1.0, 0.0, 1.0)}},
+             {{Point<dim>(1.0, 0.0, 0.0),
+               Point<dim>(0.0, 1.0, 0.0),
+               Point<dim>(1.0, 0.0, 1.0),
+               Point<dim>(0.0, 1.0, 1.0)}},
+             {{Point<dim>(0.0, 1.0, 0.0),
+               Point<dim>(0.0, 0.0, 0.0),
+               Point<dim>(0.0, 1.0, 1.0),
+               Point<dim>(0.0, 0.0, 1.0)}}}};
+
+          return table[face][vertex];
+        }
+      case ReferenceCells::Hexahedron:
+        {
+          /*
+           * Follow these figures:
+           *
+           *  * <li> Faces 0 and 1:
+           *  @verbatim
+           *          Face 0           Face 1
+           *        *-------*        *-------*
+           *       /|       |       /       /|
+           *      3 1       |      /       3 1
+           *    y/  |       |     /      y/  |
+           *    *   |x      |    *-------*   |x
+           *    |   *-------*    |       |   *
+           *    0  /       /     |       0  /
+           *    | 2       /      |       | 2
+           *    |/       /       |       |/
+           *    *-------*        *-------*
+           *  @endverbatim
+           *
+           * <li> Faces 2 and 3:
+           *  @verbatim
+           *        x Face 3           Face 2
+           *        *---1---*        *-------*
+           *       /|       |       /       /|
+           *      / |       3      /       / |
+           *     /  2       |    x/       /  |
+           *    *   |       |    *---1---*   |
+           *    |   *---0---*y   |       |   *
+           *    |  /       /     |       3  /
+           *    | /       /      2       | /
+           *    |/       /       |       |/
+           *    *-------*        *---0---*y
+           *  @endverbatim
+           *
+           * <li> Faces 4 and 5:
+           *  @verbatim
+           *          Face 4         y Face 5
+           *        *-------*        *---3---*
+           *       /|       |       /       /|
+           *      / |       |      0       1 |
+           *     /  |       |     /       /  |
+           *    *   |y      |    *---2---* x |
+           *    |   *---3---*    |       |   *
+           *    |  /       /     |       |  /
+           *    | 0       1      |       | /
+           *    |/       /       |       |/
+           *    *---2---* x      *-------*
+           *  @endverbatim
+           * </ul>
+           */
+          static const ndarray<Point<dim>, 6, 4> table = {
+            {// Face 0:
+             {{Point<dim>(0, 0, 0),
+               Point<dim>(0, 1, 0),
+               Point<dim>(0, 0, 1),
+               Point<dim>(0, 1, 1)}},
+             // Face 1:
+             {{Point<dim>(1, 0, 0),
+               Point<dim>(1, 1, 0),
+               Point<dim>(1, 0, 1),
+               Point<dim>(1, 1, 1)}},
+             // Face 2:
+             {{Point<dim>(0, 0, 0),
+               Point<dim>(0, 0, 1),
+               Point<dim>(1, 0, 0),
+               Point<dim>(1, 0, 1)}},
+             // Face 3:
+             {{Point<dim>(0, 1, 0),
+               Point<dim>(0, 1, 1),
+               Point<dim>(1, 1, 0),
+               Point<dim>(1, 1, 1)}},
+             // Face 4:
+             {{Point<dim>(0, 0, 0),
+               Point<dim>(1, 0, 0),
+               Point<dim>(0, 1, 0),
+               Point<dim>(1, 1, 0)}},
+             // Face 5:
+             {{Point<dim>(0, 0, 1),
+               Point<dim>(1, 0, 1),
+               Point<dim>(0, 1, 1),
+               Point<dim>(1, 1, 1)}}}};
+
+          return table[face][vertex];
+        }
+      default:
+        Assert(false, ExcNotImplemented());
+    }
+
+  return {};
 }
 
 
@@ -2392,7 +2630,7 @@ ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
 
           // We are inside the pyramid if the distance from the axis is less
           // than (1-z)
-          return (distance_from_axis < 1 + tolerance - p[z_coordinate]);
+          return (distance_from_axis <= 1 + tolerance - p[z_coordinate]);
         }
       case ReferenceCells::Wedge:
         {

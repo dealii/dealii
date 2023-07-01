@@ -244,7 +244,7 @@ only holds for Cartesian cells and constant coefficients, which is a pretty
 narrow case, we refrain from pursuing this idea.
 
 Interestingly, the exact inverse of the matrix $L$ can be found through tensor
-products due to a method introduced by Lynch et al. @cite Lynch1964 from 1964,
+products due to a method introduced by Lynch et al. @cite Lynch1964 in 1964,
 @f{align*}{
 L^{-1} &= S_1 \otimes S_0 (\Lambda_1 \otimes I + I \otimes \Lambda_0)^{-1}
 S_1^\mathrm T \otimes S_0^\mathrm T,
@@ -271,9 +271,8 @@ edges of different refinement, as explained in step-39. One thing we do,
 however, is to still wrap our block-Jacobi preconditioner inside
 PreconditionChebyshev. That class relieves us from finding an appropriate
 relaxation parameter (which would be around 0.7 in 2D and 0.5 in 3D for the
-block-Jacobi smoother), and often increases smoothing efficiency a bit over
-plain Jacobi smoothing in that it enables lower the time to solution when
-setting the degree of the Chebyshev polynomial to one or two.
+block-Jacobi smoother), and often increases smoothing efficiency somewhat over
+plain Jacobi smoothing, especially when using several iterations.
 
 Note that the block-Jacobi smoother has an additional benefit: The fast
 diagonalization method can also be interpreted as a change from the
@@ -282,6 +281,6 @@ Laplacian is diagonal. Thus, it cancels the effect of the basis, and we get
 the same iteration counts irrespective of whether we use FE_DGQHermite or
 FE_DGQ. This is in contrast to using the PreconditionChebyshev class with only
 the diagonal (a point-Jacobi scheme), where FE_DGQ and FE_DGQHermite do indeed
-behave differently and FE_DGQ needs 2-5 less iterations than FE_DGQHermite,
+behave differently and FE_DGQ needs fewer iterations than FE_DGQHermite,
 despite the modification made to the Hermite-like shape functions to ensure a
 good conditioning.

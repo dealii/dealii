@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,9 +23,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/kokkos.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <Kokkos_Core.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <functional>
 #include <memory>
@@ -37,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace MemorySpace
 {
   /**
-   * Structure which stores data on the host or the device depending on the
+   * Structure which stores data on the host or the @ref GlossDevice "device" depending on the
    * template parameter @p MemorySpace. Valid choices are MemorySpace::Host,
    * MemorySpace::Default, and MemorySpace::CUDA (if CUDA was enabled in
    * deal.II). The data is copied into the structure which then owns the data
@@ -50,7 +48,7 @@ namespace MemorySpace
 
     /**
      * Copy the class member values to @p begin.
-     * If the data is on the device it is moved to the host.
+     * If the data is on the @ref GlossDevice "device" it is moved to the host.
      */
     void
     copy_to(T *begin, const std::size_t n_elements);
@@ -69,7 +67,7 @@ namespace MemorySpace
     Kokkos::View<T *, Kokkos::HostSpace> values_host_buffer;
 
     /**
-     * Kokkos View owning the data on the device (unless @p values_sm_ptr is used).
+     * Kokkos View owning the data on the @ref GlossDevice "device" (unless @p values_sm_ptr is used).
      */
     Kokkos::View<T *, typename MemorySpace::kokkos_space> values;
 
@@ -78,7 +76,7 @@ namespace MemorySpace
      * @p values when using shared memory and the memory space is
      * MemorySpace::Host. Otherwise it is not set.
      */
-    // This a shared pointer pointer so that MemorySpaceData can be copied and
+    // This a shared pointer so that MemorySpaceData can be copied and
     // MemorySpaceData::values can be used in Kokkos::parallel_for. This
     // pointer owns the data when using shared memory with MPI. In this case,
     // the Kokkos::View @p values is non-owning. When shared memory with MPI is

@@ -150,7 +150,7 @@ main(int argc, char **argv)
       MakeFlux<2> test;
       test.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

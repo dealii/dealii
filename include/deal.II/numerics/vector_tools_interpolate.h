@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -26,13 +26,17 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number>
 class AffineConstraints;
+
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
+
 template <typename number>
 class FullMatrix;
 template <int dim, typename Number>
 class Function;
 template <class MeshType>
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 class InterGridMap;
 template <int dim, int spacedim>
 class Mapping;
@@ -62,10 +66,12 @@ namespace VectorTools
    * continuous again.
    *
    * See the general documentation of this namespace for further information.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate(
     const Mapping<dim, spacedim> &                             mapping,
     const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
@@ -74,10 +80,12 @@ namespace VectorTools
 
   /**
    * Same as above but in an hp-context.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate(
     const hp::MappingCollection<dim, spacedim> &               mapping,
     const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
@@ -88,10 +96,12 @@ namespace VectorTools
   /**
    * Call the @p interpolate() function above with
    * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate(
     const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType &                                               vec,
@@ -114,14 +124,18 @@ namespace VectorTools
    * (see the general documentation of the namespace), but only the same
    * vector for InVector and OutVector. Other combinations must be
    * instantiated by hand.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<InVector>
+   *   &&concepts::is_writable_dealii_vector_type<OutVector>}
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  interpolate(const DoFHandler<dim, spacedim> &dof_1,
-              const DoFHandler<dim, spacedim> &dof_2,
-              const FullMatrix<double> &       transfer,
-              const InVector &                 data_1,
-              OutVector &                      data_2);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void interpolate(const DoFHandler<dim, spacedim> &dof_1,
+                   const DoFHandler<dim, spacedim> &dof_2,
+                   const FullMatrix<double> &       transfer,
+                   const InVector &                 data_1,
+                   OutVector &                      data_2);
 
   /**
    * This function is a kind of generalization or modification of the very
@@ -168,10 +182,12 @@ namespace VectorTools
    * these objects separately (the order depends on what you want to get
    * between cells), then each subsequent call will rewrite the intercell @p
    * dofs of the previous one.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate_based_on_material_id(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_based_on_material_id(
     const Mapping<dim, spacedim> &   mapping,
     const DoFHandler<dim, spacedim> &dof_handler,
     const std::map<types::material_id,
@@ -203,13 +219,15 @@ namespace VectorTools
    * only if the parallel partitioning is the same for both meshes (see the
    * parallel::distributed::Triangulation<dim>::no_automatic_repartitioning
    * flag).
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate_to_different_mesh(const DoFHandler<dim, spacedim> &dof1,
-                                const VectorType &               u1,
-                                const DoFHandler<dim, spacedim> &dof2,
-                                VectorType &                     u2);
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_different_mesh(const DoFHandler<dim, spacedim> &dof1,
+                                     const VectorType &               u1,
+                                     const DoFHandler<dim, spacedim> &dof2,
+                                     VectorType &                     u2);
 
   /**
    * Compute the interpolation of a @p dof1-function @p u1 to a @p dof2-function
@@ -223,10 +241,12 @@ namespace VectorTools
    * continuous elements on grids with hanging nodes (locally refined grids):
    * Without it - due to cellwise interpolation - the resulting output vector
    * does not necessarily respect continuity requirements at hanging nodes.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate_to_different_mesh(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_different_mesh(
     const DoFHandler<dim, spacedim> &                         dof1,
     const VectorType &                                        u1,
     const DoFHandler<dim, spacedim> &                         dof2,
@@ -239,10 +259,12 @@ namespace VectorTools
    *
    * @p intergridmap has to be initialized via InterGridMap::make_mapping
    * pointing from a source DoFHandler to a destination DoFHandler.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  interpolate_to_different_mesh(
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void interpolate_to_different_mesh(
     const InterGridMap<DoFHandler<dim, spacedim>> &           intergridmap,
     const VectorType &                                        u1,
     const AffineConstraints<typename VectorType::value_type> &constraints,
@@ -278,12 +300,14 @@ namespace VectorTools
    *
    * This function is only implemented for FiniteElements where the specified
    * components are primitive.
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  get_position_vector(const DoFHandler<dim, spacedim> &dh,
-                      VectorType &                     vector,
-                      const ComponentMask &            mask = ComponentMask());
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void get_position_vector(const DoFHandler<dim, spacedim> &dh,
+                           VectorType &                     vector,
+                           const ComponentMask &mask = ComponentMask());
 
   /**
    * Like the above function but also taking @p mapping as argument.
@@ -292,13 +316,15 @@ namespace VectorTools
    * degree of the finite element in the DoFHandler @p dh, but more
    * importantly it allows to fill location vectors for mappings that do not
    * preserve vertex locations (like Eulerian mappings).
+   *
+   * @dealiiConceptRequires{concepts::is_writable_dealii_vector_type<VectorType>}
    */
   template <int dim, int spacedim, typename VectorType>
-  void
-  get_position_vector(const Mapping<dim, spacedim> &   mapping,
-                      const DoFHandler<dim, spacedim> &dh,
-                      VectorType &                     vector,
-                      const ComponentMask &            mask = ComponentMask());
+  DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
+  void get_position_vector(const Mapping<dim, spacedim> &   mapping,
+                           const DoFHandler<dim, spacedim> &dh,
+                           VectorType &                     vector,
+                           const ComponentMask &mask = ComponentMask());
 
   /** @} */
 } // namespace VectorTools

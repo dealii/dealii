@@ -16,19 +16,19 @@ DEAL::  1 active cells
 DEAL::  hash=0
 DEAL::3d_test_cube_two_materials.inp
 DEAL::  8 active cells
-DEAL::  hash=179
+DEAL::  hash=124
 DEAL::3d_CC_cubit_old.inp
 DEAL::  16 active cells
-DEAL::  hash=920
+DEAL::  hash=793
 DEAL::3d_CC_cubit_new.inp
 DEAL::  16 active cells
-DEAL::  hash=920
+DEAL::  hash=793
 DEAL::3d_test_cube_pave_1.inp
 DEAL::  14 active cells
-DEAL::  hash=551
+DEAL::  hash=495
 DEAL::3d_other_simple.inp
 DEAL::  1 active cells
 DEAL::  hash=0
 DEAL::3d_test_abaqus.inp
 DEAL::  375 active cells
-DEAL::  hash=494873
+DEAL::  hash=492012

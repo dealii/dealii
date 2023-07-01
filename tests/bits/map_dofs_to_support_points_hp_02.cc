@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// Copyright (C) 2003 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,8 +35,6 @@
 // for the hp-case with different finite elements
 // on different cells.
 
-
-using namespace std;
 
 template <int dim>
 void

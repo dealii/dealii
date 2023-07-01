@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2022 by the deal.II authors
+//    Copyright (C) 2017 - 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -59,23 +59,22 @@ main()
   prm.parse_input(ifile);
 
   // Size of the problem
-  unsigned int N = 2;
+  const unsigned int N = 2;
 
   SUNDIALS::KINSOL<VectorType> kinsol(data);
 
   kinsol.reinit_vector = [N](VectorType &v) { v.reinit(N); };
 
-  kinsol.residual = [](const VectorType &u, VectorType &F) -> int {
+  kinsol.residual = [](const VectorType &u, VectorType &F) {
     deallog << "Evaluating the solution at u=(" << u[0] << ',' << u[1] << ')'
             << std::endl;
 
     F(0) = std::cos(u[0] + u[1]) - 1 + 2 * u[0];
     F(1) = std::sin(u[0] - u[1]) + 2 * u[1];
-    return 0;
   };
 
 
-  kinsol.iteration_function = [](const VectorType &u, VectorType &F) -> int {
+  kinsol.iteration_function = [](const VectorType &u, VectorType &F) {
     // We want a Newton-type scheme, not a fixed point iteration. So we
     // shouldn't get into this function.
     std::abort();
@@ -83,45 +82,40 @@ main()
     // But if anyone wanted to see how it would look like:
     F(0) = std::cos(u[0] + u[1]) - 1 + 2 * u[0] - u[0];
     F(1) = std::sin(u[0] - u[1]) + 2 * u[1] - u[1];
-    return 0;
   };
 
 
-  kinsol.setup_jacobian = [](const VectorType &u, const VectorType &F) -> int {
+  kinsol.setup_jacobian = [](const VectorType &u, const VectorType &F) {
     // We don't do any kind of set-up in this program, but we can at least
     // say that we're here
     deallog << "Setting up Jacobian system at u=(" << u[0] << ',' << u[1] << ')'
             << std::endl;
-    return 0;
   };
 
 
-  kinsol.solve_with_jacobian = [](const VectorType &rhs,
-                                  VectorType &      dst,
-                                  const double /*tolerance*/) -> int {
-    deallog << "Solving Jacobian system with rhs=(" << rhs[0] << ',' << rhs[1]
-            << ')' << std::endl;
+  kinsol.solve_with_jacobian =
+    [](const VectorType &rhs, VectorType &dst, const double /*tolerance*/) {
+      deallog << "Solving Jacobian system with rhs=(" << rhs[0] << ',' << rhs[1]
+              << ')' << std::endl;
 
-    // This isn't right for SUNDIALS >4.0: We don't actually get a valid
-    // 'u' vector, and so do the linearization of the problem around
-    // the zero vector. This *happens* to converge, but it isn't the
-    // right approach. Check the _04 test for a better approach.
-    VectorType u(2);
-    u[0] = u[1] = 0;
+      // This isn't right for SUNDIALS >4.0: We don't actually get a valid
+      // 'u' vector, and so do the linearization of the problem around
+      // the zero vector. This *happens* to converge, but it isn't the
+      // right approach. Check the _04 test for a better approach.
+      VectorType u(2);
+      u[0] = u[1] = 0;
 
-    FullMatrix<double> J(2, 2);
-    J(0, 0) = -std::sin(u[0] + u[1]) + 2;
-    J(0, 1) = -std::sin(u[0] + u[1]);
-    J(1, 0) = std::cos(u[0] - u[1]);
-    J(1, 1) = -std::cos(u[0] - u[1]) + 2;
+      FullMatrix<double> J(2, 2);
+      J(0, 0) = -std::sin(u[0] + u[1]) + 2;
+      J(0, 1) = -std::sin(u[0] + u[1]);
+      J(1, 0) = std::cos(u[0] - u[1]);
+      J(1, 1) = -std::cos(u[0] - u[1]) + 2;
 
-    FullMatrix<double> J_inverse(2, 2);
-    J_inverse.invert(J);
+      FullMatrix<double> J_inverse(2, 2);
+      J_inverse.invert(J);
 
-    J_inverse.vmult(dst, rhs);
-
-    return 0;
-  };
+      J_inverse.vmult(dst, rhs);
+    };
 
   VectorType v(N);
   v(0) = 0.5;

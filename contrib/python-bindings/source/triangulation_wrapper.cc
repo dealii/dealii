@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2021 by the deal.II authors
+// Copyright (C) 2016 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1191,7 +1191,7 @@ namespace python
     AssertThrow(
       spacedim == dim,
       ExcMessage(
-        "This function is only implementd for dim equal to spacedim."));
+        "This function is only implemented for dim equal to spacedim."));
     // Extract the PointWrapper object from the python list
     const int size = boost::python::len(vertices);
     AssertThrow(size > 0, ExcMessage("The vertices list is empty."));
@@ -1718,7 +1718,7 @@ namespace python
     else
       AssertThrow(false,
                   ExcMessage(
-                    "Thie combination of dim-spacedim is not supported."));
+                    "This combination of dim-spacedim is not supported."));
   }
 
 

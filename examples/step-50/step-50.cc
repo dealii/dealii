@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 - 2022 by the deal.II authors
+ * Copyright (C) 2019 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -105,13 +105,13 @@ namespace ChangeVectorTypes
             const LinearAlgebra::distributed::Vector<number> &in)
   {
     LinearAlgebra::ReadWriteVector<double> rwv(out.locally_owned_elements());
-    rwv.import(in, VectorOperation::insert);
+    rwv.import_elements(in, VectorOperation::insert);
 #ifdef USE_PETSC_LA
     AssertThrow(false,
                 ExcMessage("CopyVectorTypes::copy() not implemented for "
                            "PETSc vector types."));
 #else
-    out.import(rwv, VectorOperation::insert);
+    out.import_elements(rwv, VectorOperation::insert);
 #endif
   }
 
@@ -130,7 +130,7 @@ namespace ChangeVectorTypes
 #else
     rwv.reinit(in);
 #endif
-    out.import(rwv, VectorOperation::insert);
+    out.import_elements(rwv, VectorOperation::insert);
   }
 } // namespace ChangeVectorTypes
 
@@ -909,7 +909,7 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
 // This function has two parts in the integration loop: applying the negative
 // of matrix $A$ to $u_0$ by submitting the negative of the gradient, and adding
 // the right-hand side contribution by submitting the value $f$. We must be sure
-// to use `read_dof_values_plain()` for evaluating $u_0$ as `read_dof_vaues()`
+// to use `read_dof_values_plain()` for evaluating $u_0$ as `read_dof_values()`
 // would set all Dirichlet values to zero.
 //
 // Finally, the system_rhs vector is of type LA::MPI::Vector, but the
@@ -1461,7 +1461,7 @@ void LaplaceProblem<dim, degree>::output_results(const unsigned int cycle)
 // @sect4{LaplaceProblem::run()}
 
 // As in most tutorials, this function calls the various functions defined
-// above to setup, assemble, solve, and output the results.
+// above to set up, assemble, solve, and output the results.
 template <int dim, int degree>
 void LaplaceProblem<dim, degree>::run()
 {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// Copyright (C) 2010 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,15 +34,13 @@
 
 #include "../tests.h"
 
-using namespace std;
-
 
 template <int s_dim, int spacedim>
 bool
 test_vertices_orientation(
   const Triangulation<s_dim, spacedim> &boundary_mesh,
-  map<typename Triangulation<s_dim, spacedim>::cell_iterator,
-      typename Triangulation<s_dim + 1, spacedim>::face_iterator>
+  std::map<typename Triangulation<s_dim, spacedim>::cell_iterator,
+           typename Triangulation<s_dim + 1, spacedim>::face_iterator>
     &       surface_to_volume_mapping,
   const int verbosity = 1)
 {
@@ -55,13 +53,13 @@ test_vertices_orientation(
 
   if (verbosity > 1)
     {
-      deallog << "The last column should be 0" << endl;
+      deallog << "The last column should be 0" << std::endl;
       deallog << "Vol faces"
               << "\t\t"
               << "Surf cell"
               << "\t\t"
-              << "Distance" << endl
-              << endl;
+              << "Distance" << std::endl
+              << std::endl;
     }
 
   for (; cell != endc; ++cell)
@@ -73,7 +71,7 @@ test_vertices_orientation(
       if (verbosity > 1)
         {
           deallog << face->center() << "\t\t";
-          deallog << cell->center() << "\t\t\t" << diff.square() << endl;
+          deallog << cell->center() << "\t\t\t" << diff.square() << std::endl;
         }
       if (diff.square() > 0)
         {
@@ -81,7 +79,7 @@ test_vertices_orientation(
           break;
         }
       if (verbosity > 1)
-        deallog << endl;
+        deallog << std::endl;
     }
   return success;
 }
@@ -105,10 +103,10 @@ main()
     // Extract the boundary of a hyper-sphere
 
     const int dim = 3;
-    deallog << "Testing hyper_ball in dim: " << dim << "..." << endl;
+    deallog << "Testing hyper_ball in dim: " << dim << "..." << std::endl;
 
-    map<Triangulation<dim - 1, dim>::cell_iterator,
-        Triangulation<dim, dim>::face_iterator>
+    std::map<Triangulation<dim - 1, dim>::cell_iterator,
+             Triangulation<dim, dim>::face_iterator>
                        surface_to_volume_mapping;
     Triangulation<dim> volume_mesh;
     GridGenerator::hyper_ball(volume_mesh);

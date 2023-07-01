@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2022 by the deal.II authors
+## Copyright (C) 2022 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -13,16 +13,22 @@
 ##
 ## ---------------------------------------------------------------------
 
-
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
+#
+# We have to compile the "intersections.cc" file without the misleading
+# indentation warning enabled. Otherwise, we run into quite a number of
+# warnings with gcc, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89549
+#
+if(DEAL_II_WITH_CGAL)
+  enable_if_supported(_flag "-Wno-misleading-indentation")
+  set_property(SOURCE "intersections.cc"
+    APPEND PROPERTY COMPILE_OPTIONS "${_flag}"
+    )
+endif()
 
 set(_src
   surface_mesh.cc
   intersections.cc
 )
-
-
 
 set(_inst
 surface_mesh.inst.in
@@ -33,5 +39,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/cgal/*.h
   )
 
-deal_ii_add_library(obj_cgal OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_cgal "${_inst}")
+define_object_library(object_cgal OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_cgal "${_inst}")

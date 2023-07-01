@@ -39,7 +39,7 @@ main(int argc, char **argv)
         SOURCE_DIR "/prm/parameters-step-44.prm");
       solid.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

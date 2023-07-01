@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,7 +54,7 @@ check_solve(SolverControl &     solver_control,
       deallog << "Success. " << std::endl;
       success = true;
     }
-  catch (std::exception &e)
+  catch (const std::exception &e)
     {
       deallog << "Failure. " << std::endl;
     }

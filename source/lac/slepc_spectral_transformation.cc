@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2019 by the deal.II authors
+// Copyright (C) 2009 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SLEPcWrappers
 {
-  TransformationBase::TransformationBase(const MPI_Comm &mpi_communicator)
+  TransformationBase::TransformationBase(const MPI_Comm mpi_communicator)
   {
     const PetscErrorCode ierr = STCreate(mpi_communicator, &st);
     AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
@@ -55,7 +55,7 @@ namespace SLEPcWrappers
   void
   TransformationBase::set_solver(const PETScWrappers::SolverBase &solver)
   {
-    PetscErrorCode ierr = STSetKSP(st, solver.solver_data->ksp);
+    PetscErrorCode ierr = STSetKSP(st, solver);
     AssertThrow(ierr == 0, SolverBase::ExcSLEPcError(ierr));
   }
 
@@ -66,7 +66,7 @@ namespace SLEPcWrappers
     : shift_parameter(shift_parameter)
   {}
 
-  TransformationShift::TransformationShift(const MPI_Comm &mpi_communicator,
+  TransformationShift::TransformationShift(const MPI_Comm mpi_communicator,
                                            const AdditionalData &data)
     : TransformationBase(mpi_communicator)
     , additional_data(data)
@@ -86,7 +86,7 @@ namespace SLEPcWrappers
   {}
 
   TransformationShiftInvert::TransformationShiftInvert(
-    const MPI_Comm &      mpi_communicator,
+    const MPI_Comm        mpi_communicator,
     const AdditionalData &data)
     : TransformationBase(mpi_communicator)
     , additional_data(data)
@@ -106,7 +106,7 @@ namespace SLEPcWrappers
   {}
 
   TransformationSpectrumFolding::TransformationSpectrumFolding(
-    const MPI_Comm &      mpi_communicator,
+    const MPI_Comm        mpi_communicator,
     const AdditionalData &data)
     : TransformationBase(mpi_communicator)
     , additional_data(data)
@@ -128,7 +128,7 @@ namespace SLEPcWrappers
     , antishift_parameter(antishift_parameter)
   {}
 
-  TransformationCayley::TransformationCayley(const MPI_Comm &mpi_communicator,
+  TransformationCayley::TransformationCayley(const MPI_Comm mpi_communicator,
                                              const AdditionalData &data)
     : TransformationBase(mpi_communicator)
     , additional_data(data)

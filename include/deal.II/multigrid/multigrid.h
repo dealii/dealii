@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,7 +80,7 @@ namespace mg
      * is
      * false) the call to the coarse solver on @p level.
      *
-     * The coarse solve will be done with ``defect[leve]`` and returned in
+     * The coarse solve will be done with ``defect[level]`` and returned in
      * ``solution[level]``, which can be inspected by the user using this
      * signal.
      */
@@ -578,7 +578,7 @@ public:
   locally_owned_domain_indices(const unsigned int block = 0) const;
 
   /**
-   * Return the MPI communicator object in use with this preconditioner.
+   * Return the underlying MPI communicator.
    */
   MPI_Comm
   get_mpi_communicator() const;
@@ -709,15 +709,14 @@ namespace internal
               class TRANSFER,
               typename OtherVectorType>
     std::enable_if_t<TRANSFER::supports_dof_handler_vector>
-    vmult(
-      const std::vector<const dealii::DoFHandler<dim> *> &dof_handler_vector,
-      dealii::Multigrid<VectorType> &                     multigrid,
-      const TRANSFER &                                    transfer,
-      OtherVectorType &                                   dst,
-      const OtherVectorType &                             src,
-      const bool                          uses_dof_handler_vector,
-      const typename dealii::mg::Signals &signals,
-      int)
+    vmult(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
+          Multigrid<VectorType> &                     multigrid,
+          const TRANSFER &                            transfer,
+          OtherVectorType &                           dst,
+          const OtherVectorType &                     src,
+          const bool                                  uses_dof_handler_vector,
+          const typename dealii::mg::Signals &        signals,
+          int)
     {
       signals.transfer_to_mg(true);
       if (uses_dof_handler_vector)
@@ -741,15 +740,14 @@ namespace internal
               class TRANSFER,
               typename OtherVectorType>
     void
-    vmult(
-      const std::vector<const dealii::DoFHandler<dim> *> &dof_handler_vector,
-      dealii::Multigrid<VectorType> &                     multigrid,
-      const TRANSFER &                                    transfer,
-      OtherVectorType &                                   dst,
-      const OtherVectorType &                             src,
-      const bool                          uses_dof_handler_vector,
-      const typename dealii::mg::Signals &signals,
-      ...)
+    vmult(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
+          Multigrid<VectorType> &                     multigrid,
+          const TRANSFER &                            transfer,
+          OtherVectorType &                           dst,
+          const OtherVectorType &                     src,
+          const bool                                  uses_dof_handler_vector,
+          const typename dealii::mg::Signals &        signals,
+          ...)
     {
       (void)uses_dof_handler_vector;
       Assert(!uses_dof_handler_vector, ExcInternalError());
@@ -770,15 +768,14 @@ namespace internal
               class TRANSFER,
               typename OtherVectorType>
     std::enable_if_t<TRANSFER::supports_dof_handler_vector>
-    vmult_add(
-      const std::vector<const dealii::DoFHandler<dim> *> &dof_handler_vector,
-      dealii::Multigrid<VectorType> &                     multigrid,
-      const TRANSFER &                                    transfer,
-      OtherVectorType &                                   dst,
-      const OtherVectorType &                             src,
-      const bool                          uses_dof_handler_vector,
-      const typename dealii::mg::Signals &signals,
-      int)
+    vmult_add(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
+              Multigrid<VectorType> &                     multigrid,
+              const TRANSFER &                            transfer,
+              OtherVectorType &                           dst,
+              const OtherVectorType &                     src,
+              const bool                          uses_dof_handler_vector,
+              const typename dealii::mg::Signals &signals,
+              int)
     {
       signals.transfer_to_mg(true);
       if (uses_dof_handler_vector)
@@ -804,15 +801,14 @@ namespace internal
               class TRANSFER,
               typename OtherVectorType>
     void
-    vmult_add(
-      const std::vector<const dealii::DoFHandler<dim> *> &dof_handler_vector,
-      dealii::Multigrid<VectorType> &                     multigrid,
-      const TRANSFER &                                    transfer,
-      OtherVectorType &                                   dst,
-      const OtherVectorType &                             src,
-      const bool                          uses_dof_handler_vector,
-      const typename dealii::mg::Signals &signals,
-      ...)
+    vmult_add(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
+              Multigrid<VectorType> &                     multigrid,
+              const TRANSFER &                            transfer,
+              OtherVectorType &                           dst,
+              const OtherVectorType &                     src,
+              const bool                          uses_dof_handler_vector,
+              const typename dealii::mg::Signals &signals,
+              ...)
     {
       (void)uses_dof_handler_vector;
       Assert(!uses_dof_handler_vector, ExcInternalError());

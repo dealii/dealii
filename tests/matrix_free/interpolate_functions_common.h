@@ -1,6 +1,6 @@
 //------------------  interpolate_functions_common.h  ------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -162,7 +162,7 @@ public:
                 double normal_derivative = 0;
                 for (unsigned int d = 0; d < dim; ++d)
                   normal_derivative += function.gradient(p, 0)[d] *
-                                       fe_evalm.get_normal_vector(q)[d][j];
+                                       fe_evalm.normal_vector(q)[d][j];
                 facem_errors[3] += std::abs(
                   fe_evalm.get_normal_derivative(q)[j] - normal_derivative);
 
@@ -228,7 +228,7 @@ public:
                 double normal_derivative = 0;
                 for (unsigned int d = 0; d < dim; ++d)
                   normal_derivative += function.gradient(p, 0)[d] *
-                                       fe_evalm.get_normal_vector(q)[d][j];
+                                       fe_evalm.normal_vector(q)[d][j];
                 boundary_errors[3] += std::abs(
                   fe_evalm.get_normal_derivative(q)[j] - normal_derivative);
               }

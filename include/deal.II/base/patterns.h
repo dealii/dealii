@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -27,13 +27,11 @@
 
 #include <deal.II/fe/component_mask.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/archive/basic_archive.hpp>
 #include <boost/core/demangle.hpp>
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/serialization/split_member.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <array>

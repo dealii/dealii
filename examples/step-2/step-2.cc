@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2021 by the deal.II authors
+ * Copyright (C) 1999 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -22,6 +22,7 @@
 // require additional comments:
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
 
 // However, the next file is new. We need this include file for the
 // association of degrees of freedom ("DoF"s) to vertices, lines, and cells:
@@ -37,8 +38,11 @@
 // but also 1d and 3d.)
 #include <deal.II/fe/fe_q.h>
 // In the following file, several tools for manipulating degrees of freedom
-// can be found:
+// can be found, and the one after it is necessary to call one of the
+// functions imported from `dof_tools.h`:
 #include <deal.II/dofs/dof_tools.h>
+#include <deal.II/fe/mapping_q1.h>
+
 // We will use a sparse matrix to visualize the pattern of nonzero entries
 // resulting from the distribution of degrees of freedom on the grid. That
 // class can be found here:
@@ -58,11 +62,19 @@
 // scope:
 using namespace dealii;
 
+
 // @sect3{Mesh generation}
 
 // This is the function that produced the circular grid in the previous step-1
 // example program with fewer refinements steps. The sole difference is that it
 // returns the grid it produces via its argument.
+//
+// At the end of the function, we also output this mesh into a
+// file. We will use this as one piece of information when visualizing
+// the location of degrees of freedom. To output a mesh, we use the
+// GridOut class that you have already seen in step-1; the difference
+// is only that we use gnuplot rather than SVG format, because gnuplot
+// is the program we will use to visualize DoF locations.
 void make_grid(Triangulation<2> &triangulation)
 {
   const Point<2> center(1, 0);
@@ -88,7 +100,47 @@ void make_grid(Triangulation<2> &triangulation)
 
       triangulation.execute_coarsening_and_refinement();
     }
+
+  std::ofstream mesh_file("mesh.gnuplot");
+  GridOut().write_gnuplot(triangulation, mesh_file);
 }
+
+
+// @sect3{Outputting the location of degrees of freedom}
+
+// The next function outputs the locations of degrees of freedom for
+// later visualization. Where each DoF is located is something the
+// DoFHandler object knows, so that is one of the arguments to this
+// function. Since we want to do all of this twice (once for the
+// original enumeration and once for the renumbered set of degrees of
+// freedom), the function also takes as a second argument the name of
+// the file into which we want the output to be written.
+//
+// In order to learn deal.II, it is probably not terribly important to
+// understand exactly what this function does, and you can skip over
+// it. But if you would like to know anyway: We want to call the
+// function DoFTools::map_dofs_to_support_points() that returns a list
+// of locations. It does so in the form of a map through which we can
+// query (in a statement such as `dof_location_map[42]`) where the DoF
+// is located (in the example, where the 42nd DoF is). It puts this
+// information into the `dof_location_map` object.
+//
+// We then use the function
+// DoFTools::write_gnuplot_dof_support_point_info() to write this
+// information into a file in a format that is understandable to the
+// gnuplot program that we will use for visualization in the results
+// section.
+void write_dof_locations(const DoFHandler<2> &dof_handler,
+                         const std::string &  filename)
+{
+  std::map<types::global_dof_index, Point<2>> dof_location_map =
+    DoFTools::map_dofs_to_support_points(MappingQ1<2>(), dof_handler);
+
+  std::ofstream dof_location_file(filename);
+  DoFTools::write_gnuplot_dof_support_point_info(dof_location_file,
+                                                 dof_location_map);
+}
+
 
 // @sect3{Creation of a DoFHandler}
 
@@ -126,12 +178,15 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   const FE_Q<2> finite_element(1);
   dof_handler.distribute_dofs(finite_element);
 
-  // Now that we have associated a degree of freedom with a global number to
-  // each vertex, we wonder how to visualize this?  There is no simple way to
-  // directly visualize the DoF number associated with each vertex. However,
-  // such information would hardly ever be truly important, since the
-  // numbering itself is more or less arbitrary. There are more important
-  // factors, of which we will demonstrate one in the following.
+  // Now that we have associated a degree of freedom with a global
+  // number to each vertex, Let us output this information using the
+  // function above:
+  write_dof_locations(dof_handler, "dof-locations-1.gnuplot");
+
+  // In practice, we do not often care about where a degree of freedom
+  // is geometrically located, and so other than seeing it once via
+  // the call above is not practically useful. But where two degrees
+  // of freedom are in relation to each other matters in other ways.
   //
   // Associated with each vertex of the triangulation is a shape
   // function. Assume we want to solve something like Laplace's equation, then
@@ -181,7 +236,7 @@ void distribute_dofs(DoFHandler<2> &dof_handler)
   sparsity_pattern.copy_from(dynamic_sparsity_pattern);
 
   // With this, we can now write the results to a file:
-  std::ofstream out("sparsity_pattern1.svg");
+  std::ofstream out("sparsity-pattern-1.svg");
   sparsity_pattern.print_svg(out);
   // The result is stored in an <code>.svg</code> file, where each nonzero entry
   // in the matrix corresponds with a red square in the image. The output will
@@ -230,6 +285,9 @@ void renumber_dofs(DoFHandler<2> &dof_handler)
 {
   DoFRenumbering::Cuthill_McKee(dof_handler);
 
+  write_dof_locations(dof_handler, "dof-locations-2.gnuplot");
+
+
   DynamicSparsityPattern dynamic_sparsity_pattern(dof_handler.n_dofs(),
                                                   dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler, dynamic_sparsity_pattern);
@@ -237,7 +295,7 @@ void renumber_dofs(DoFHandler<2> &dof_handler)
   SparsityPattern sparsity_pattern;
   sparsity_pattern.copy_from(dynamic_sparsity_pattern);
 
-  std::ofstream out("sparsity_pattern2.svg");
+  std::ofstream out("sparsity-pattern-2.svg");
   sparsity_pattern.print_svg(out);
 }
 

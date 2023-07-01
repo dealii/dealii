@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -60,7 +60,7 @@ namespace LinearAlgebra
     template <typename Number>
     BlockVector<Number>::BlockVector(const std::vector<IndexSet> &local_ranges,
                                      const std::vector<IndexSet> &ghost_indices,
-                                     const MPI_Comm &             communicator)
+                                     const MPI_Comm               communicator)
     {
       reinit(local_ranges, ghost_indices, communicator);
     }
@@ -68,9 +68,20 @@ namespace LinearAlgebra
 
     template <typename Number>
     BlockVector<Number>::BlockVector(const std::vector<IndexSet> &local_ranges,
-                                     const MPI_Comm &             communicator)
+                                     const MPI_Comm               communicator)
     {
       reinit(local_ranges, communicator);
+    }
+
+
+
+    template <typename Number>
+    BlockVector<Number>::BlockVector(
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &             partitioners,
+      const MPI_Comm &comm_sm)
+    {
+      reinit(partitioners, comm_sm);
     }
 
 
@@ -149,7 +160,7 @@ namespace LinearAlgebra
     void
     BlockVector<Number>::reinit(const std::vector<IndexSet> &local_ranges,
                                 const std::vector<IndexSet> &ghost_indices,
-                                const MPI_Comm &             communicator)
+                                const MPI_Comm               communicator)
     {
       AssertDimension(local_ranges.size(), ghost_indices.size());
 
@@ -172,7 +183,7 @@ namespace LinearAlgebra
     template <typename Number>
     void
     BlockVector<Number>::reinit(const std::vector<IndexSet> &local_ranges,
-                                const MPI_Comm &             communicator)
+                                const MPI_Comm               communicator)
     {
       // update the number of blocks
       this->block_indices.reinit(local_ranges.size(), 0);
@@ -184,6 +195,40 @@ namespace LinearAlgebra
 
       // update block_indices content
       this->collect_sizes();
+    }
+
+
+
+    template <typename Number>
+    void
+    BlockVector<Number>::reinit(
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &             partitioners,
+      const MPI_Comm &comm_sm)
+    {
+      // update the number of blocks
+      this->block_indices.reinit(partitioners.size(), 0);
+
+      // initialize each block
+      this->components.resize(this->n_blocks());
+      for (unsigned int i = 0; i < this->n_blocks(); ++i)
+        this->components[i].reinit(partitioners[i], comm_sm);
+
+      // update block_indices content
+      this->collect_sizes();
+    }
+
+
+
+    template <typename Number>
+    void
+    BlockVector<Number>::reinit(
+      const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        &partitioners,
+      const bool /*make_ghosted*/,
+      const MPI_Comm &comm_sm)
+    {
+      reinit(partitioners, comm_sm);
     }
 
 
@@ -355,8 +400,9 @@ namespace LinearAlgebra
           IndexSet    combined_set = partitioner->locally_owned_range();
           combined_set.add_indices(partitioner->ghost_indices());
           ReadWriteVector<Number> rw_vector(combined_set);
-          rw_vector.import(trilinos_vec.block(i), VectorOperation::insert);
-          this->block(i).import(rw_vector, VectorOperation::insert);
+          rw_vector.import_elements(trilinos_vec.block(i),
+                                    VectorOperation::insert);
+          this->block(i).import_elements(rw_vector, VectorOperation::insert);
 
           if (this->block(i).has_ghost_elements() ||
               trilinos_vec.block(i).has_ghost_elements())
@@ -372,7 +418,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    BlockVector<Number>::compress(::dealii::VectorOperation::values operation)
+    BlockVector<Number>::compress(VectorOperation::values operation)
     {
       const unsigned int n_chunks =
         (this->n_blocks() + communication_block_size - 1) /
@@ -679,11 +725,7 @@ namespace LinearAlgebra
     {
       Assert(this->n_blocks() > 0, ExcEmptyObject());
 
-      // use int instead of bool. in order to make global reduction operations
-      // work also when MPI_Init was not called, only call MPI_Allreduce
-      // commands when there is more than one processor (note that reinit()
-      // functions handle this case correctly through the job_supports_mpi()
-      // query). this is the same in all the functions below
+      // use int instead of bool
       int local_result = -1;
       for (unsigned int i = 0; i < this->n_blocks(); ++i)
         local_result =
@@ -895,7 +937,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     inline void
-    BlockVector<Number>::import(
+    BlockVector<Number>::import_elements(
       const LinearAlgebra::ReadWriteVector<Number> &,
       VectorOperation::values,
       std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>)

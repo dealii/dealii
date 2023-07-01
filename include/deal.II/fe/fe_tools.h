@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -48,6 +48,7 @@ class Quadrature;
 template <int dim, int spacedim>
 class FiniteElement;
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
 template <int dim>
 class FiniteElementData;
@@ -456,7 +457,7 @@ namespace FETools
    * After these quadrature approximations, we end up with a nodal
    * representation <tt>V<sub>h</sub></tt> of <tt>v<sub>h</sub></tt> that
    * satisfies the following system of linear equations: <tt>M V<sub>h</sub> =
-   * Q U</tt>, where <tt>M<sub>ij</sub>=(phi_i,phi_j)</tt> is the mass matrix
+   * Q U</tt>, where <tt>M<sub>ij</sub>=(phi_i,phi_j)</tt> is the @ref GlossMassMatrix "mass matrix"
    * approximated by <tt>lhs_quadrature</tt>, and <tt>Q</tt> is the matrix
    * <tt>Q<sub>iq</sub>=phi<sub>i</sub>(x<sub>q</sub>) w<sub>q</sub></tt>
    * where <tt>w<sub>q</sub></tt> are quadrature weights; <tt>U</tt> is the
@@ -494,7 +495,7 @@ namespace FETools
    * with M>N unknowns is well-defined, but often yields funny and non-
    * intuitive results. Secondly, one would think that if the quadrature point
    * data is defined in the support points of the finite element, i.e. the
-   * quadrature points of <tt>ths_quadrature</tt> equal
+   * quadrature points of <tt>rhs_quadrature</tt> equal
    * <tt>fe.get_unit_support_points()</tt>, then the projection should be the
    * identity, i.e. each degree of freedom of the finite element equals the
    * value of the given data in the support point of the corresponding shape
@@ -766,7 +767,7 @@ namespace FETools
    *
    * The global projection can be computed by local matrices if the finite
    * element spaces are discontinuous. With continuous elements, this is
-   * impossible, since a global mass matrix must be inverted.
+   * impossible, since a global @ref GlossMassMatrix "mass matrix" must be inverted.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void

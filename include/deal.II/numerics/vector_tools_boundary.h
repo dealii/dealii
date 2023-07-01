@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,6 +30,7 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number>
 class AffineConstraints;
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
 template <int dim, typename Number>
 class Function;
@@ -51,19 +52,19 @@ namespace VectorTools
    * of Dirichlet boundary conditions.  This function creates a map of
    * degrees of freedom subject to Dirichlet boundary conditions and the
    * corresponding values to be assigned to them, by interpolation around the
-   * boundary. For each degree of freedom at the boundary, if its index
-   * already exists in @p boundary_values then its boundary value will be
-   * overwritten, otherwise a new entry with proper index and boundary value
-   * for this degree of freedom will be inserted into @p boundary_values.
+   * boundary. For each degree of freedom at the boundary, its boundary value
+   * will be overwritten if its index already exists in @p boundary_values.
+   * Otherwise, a new entry with proper index and boundary value for this
+   * degree of freedom will be inserted into @p boundary_values.
    *
    * The parameter @p function_map provides a list of boundary indicators to
    * be handled by this function and corresponding boundary value functions.
-   * The keys of this map correspond to the number @p boundary_id of the face.
+   * The key of this map corresponds to the number @p boundary_id of the face.
    * numbers::internal_face_boundary_id is an illegal value for this key since
    * it is reserved for interior faces. For an example of how to use this
    * argument with a non-empty map, see the step-16 tutorial program.
    *
-   * The flags in the last parameter, @p component_mask denote which
+   * The flags in the last parameter, @p component_mask, denote which
    * components of the finite element space shall be interpolated. If it is
    * left as specified by the default value (i.e. an empty array), all
    * components are interpolated. If it is different from the default value,
@@ -95,7 +96,16 @@ namespace VectorTools
    * Thus, the elements in the component mask corresponding to the components
    * of these non-primitive shape functions must be @p false.
    *
-   * See the general documentation of this namespace for more information.
+   * @note This function applies the same ComponentMask to all parts of
+   * the boundary indicated by keys of the `function_map` argument.
+   * If you want to apply different component masks to parts of the boundary
+   * represented by different boundary indicators, this function needs to be
+   * called multiple times. For performance reasons, it might be reasonable to
+   * use the present function by grouping together all boundary indicators with
+   * the same ComponentMask. An alternative is to use one of the other
+   * functions with this name, which take only one boundary indicator with
+   * corresponding boundary function, to be called separately for every
+   * boundary indicator.
    *
    * @note When solving a partial differential equation with boundary
    *   conditions $u|_{\partial\Omega}=g$ (or on *parts* of the boundary),
@@ -134,6 +144,8 @@ namespace VectorTools
    *   boundary. On the other hand, interpolation is only possible for
    *   "nodal" finite element spaces (such as FE_Q, but not
    *   FE_Q_Hierarchical), whereas the projection is always possible.
+   *
+   * See the general documentation of this namespace for more information.
    */
   template <int dim, int spacedim, typename number>
   void
@@ -160,10 +172,20 @@ namespace VectorTools
     const ComponentMask &component_mask = ComponentMask());
 
   /**
-   * Same function as above, but taking only one pair of boundary indicator
-   * and corresponding boundary function. The same comments apply as for the
-   * previous function, in particular about the use of the component mask and
-   * the requires size of the function object.
+   * Like the previous functions but without Mapping argument, using
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt> internally.
+   */
+  template <int dim, int spacedim, typename number>
+  void
+  interpolate_boundary_values(
+    const DoFHandler<dim, spacedim> &dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *>
+      &                                        function_map,
+    std::map<types::global_dof_index, number> &boundary_values,
+    const ComponentMask &component_mask = ComponentMask());
+
+  /**
+   * Take only one boundary indicator with corresponding boundary function.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -173,7 +195,7 @@ namespace VectorTools
   interpolate_boundary_values(
     const Mapping<dim, spacedim> &             mapping,
     const DoFHandler<dim, spacedim> &          dof,
-    const types::boundary_id                   boundary_component,
+    const types::boundary_id                   boundary_indicator,
     const Function<spacedim, number> &         boundary_function,
     std::map<types::global_dof_index, number> &boundary_values,
     const ComponentMask &component_mask = ComponentMask());
@@ -187,16 +209,14 @@ namespace VectorTools
   interpolate_boundary_values(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim> &           dof,
-    const types::boundary_id                    boundary_component,
+    const types::boundary_id                    boundary_indicator,
     const Function<spacedim, number> &          boundary_function,
     std::map<types::global_dof_index, number> & boundary_values,
     const ComponentMask &component_mask = ComponentMask());
 
   /**
-   * Call the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>. The same comments
-   * apply as for the previous function, in particular about the use of the
-   * component mask and the requires size of the function object.
+   * Like the previous functions but without Mapping argument, using
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt> internally.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -205,53 +225,35 @@ namespace VectorTools
   void
   interpolate_boundary_values(
     const DoFHandler<dim, spacedim> &          dof,
-    const types::boundary_id                   boundary_component,
+    const types::boundary_id                   boundary_indicator,
     const Function<spacedim, number> &         boundary_function,
     std::map<types::global_dof_index, number> &boundary_values,
     const ComponentMask &component_mask = ComponentMask());
 
 
   /**
-   * Call the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>. The same comments
-   * apply as for the previous function, in particular about the use of the
-   * component mask and the requires size of the function object.
-   */
-  template <int dim, int spacedim, typename number>
-  void
-  interpolate_boundary_values(
-    const DoFHandler<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                                        function_map,
-    std::map<types::global_dof_index, number> &boundary_values,
-    const ComponentMask &component_mask = ComponentMask());
-
-
-  /**
    * Insert the (algebraic) constraints due to Dirichlet boundary conditions
-   * into a AffineConstraints @p constraints. This function identifies the
+   * into an AffineConstraints object. This function identifies the
    * degrees of freedom subject to Dirichlet boundary conditions, adds them to
    * the list of constrained DoFs in @p constraints and sets the respective
    * inhomogeneity to the value interpolated around the boundary. If this
    * routine encounters a DoF that already is constrained (for instance by a
    * hanging node constraint, see below, or any other type of constraint, e.g.
-   * from periodic boundary conditions), the old setting of the constraint
-   * (dofs the entry is constrained to, inhomogeneities) is kept and nothing
-   * happens.
+   * from periodic boundary conditions), the old setting of the constraint is
+   * kept and nothing happens.
    *
    * @note When combining adaptively refined meshes with hanging node
    * constraints and boundary conditions like from the current function within
    * one AffineConstraints object, the hanging node constraints should always
-   * be set first, and then the boundary conditions since boundary conditions
+   * be set first and then the boundary conditions, since boundary conditions
    * are not set in the second operation on degrees of freedom that are
    * already constrained. This makes sure that the discretization remains
    * conforming as is needed. See the discussion on conflicting constraints in
-   * the module on
-   * @ref constraints.
+   * the module on @ref constraints.
    *
-   * This function is fundamentally equivalent to the ones above except that it
-   * puts its results into an AffineConstraint object rather than a `std::map`.
-   * See the functions above for more comments.
+   * For further information and details on the other function arguments, see
+   * the interpolate_boundary_values() function with `std::map` arguments and
+   * the general class documentation.
    *
    * @ingroup constraints
    */
@@ -268,6 +270,8 @@ namespace VectorTools
   /**
    * Like the previous function, but take a mapping collection to go with
    * DoFHandler objects with hp-capabilities.
+   *
+   * @ingroup constraints
    */
   template <int dim, int spacedim, typename number>
   void
@@ -280,10 +284,22 @@ namespace VectorTools
     const ComponentMask &      component_mask = ComponentMask());
 
   /**
-   * Same function as above, but taking only one pair of boundary indicator
-   * and corresponding boundary function. The same comments apply as for the
-   * previous function, in particular about the use of the component mask and
-   * the requires size of the function object.
+   * Like the previous functions but without Mapping argument, using
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt> internally.
+   *
+   * @ingroup constraints
+   */
+  template <int dim, int spacedim, typename number>
+  void
+  interpolate_boundary_values(
+    const DoFHandler<dim, spacedim> &dof,
+    const std::map<types::boundary_id, const Function<spacedim, number> *>
+      &                        function_map,
+    AffineConstraints<number> &constraints,
+    const ComponentMask &      component_mask = ComponentMask());
+
+  /**
+   * Take only one boundary indicator with corresponding boundary function.
    *
    * @ingroup constraints
    *
@@ -295,7 +311,7 @@ namespace VectorTools
   interpolate_boundary_values(
     const Mapping<dim, spacedim> &    mapping,
     const DoFHandler<dim, spacedim> & dof,
-    const types::boundary_id          boundary_component,
+    const types::boundary_id          boundary_indicator,
     const Function<spacedim, number> &boundary_function,
     AffineConstraints<number> &       constraints,
     const ComponentMask &             component_mask = ComponentMask());
@@ -303,22 +319,22 @@ namespace VectorTools
   /**
    * Like the previous function, but take a mapping collection to go with
    * DoFHandler objects with hp-capabilities.
+   *
+   * @ingroup constraints
    */
   template <int dim, int spacedim, typename number>
   void
   interpolate_boundary_values(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim> &           dof,
-    const types::boundary_id                    boundary_component,
+    const types::boundary_id                    boundary_indicator,
     const Function<spacedim, number> &          boundary_function,
     AffineConstraints<number> &                 constraints,
     const ComponentMask &component_mask = ComponentMask());
 
   /**
-   * Call the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>. The same comments
-   * apply as for the previous function, in particular about the use of the
-   * component mask and the requires size of the function object.
+   * Like the previous functions but without Mapping argument, using
+   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt> internally.
    *
    * @ingroup constraints
    *
@@ -329,28 +345,10 @@ namespace VectorTools
   void
   interpolate_boundary_values(
     const DoFHandler<dim, spacedim> & dof,
-    const types::boundary_id          boundary_component,
+    const types::boundary_id          boundary_indicator,
     const Function<spacedim, number> &boundary_function,
     AffineConstraints<number> &       constraints,
     const ComponentMask &             component_mask = ComponentMask());
-
-
-  /**
-   * Call the other interpolate_boundary_values() function, see above, with
-   * <tt>mapping=MappingQ@<dim,spacedim@>(1)</tt>. The same comments
-   * apply as for the previous function, in particular about the use of the
-   * component mask and the requires size of the function object.
-   *
-   * @ingroup constraints
-   */
-  template <int dim, int spacedim, typename number>
-  void
-  interpolate_boundary_values(
-    const DoFHandler<dim, spacedim> &dof,
-    const std::map<types::boundary_id, const Function<spacedim, number> *>
-      &                        function_map,
-    AffineConstraints<number> &constraints,
-    const ComponentMask &      component_mask = ComponentMask());
 
 
   /**
@@ -399,7 +397,7 @@ namespace VectorTools
    * The projection happens on only those parts of the boundary whose
    * indicators are represented in this map.
    * @param[in] q The face quadrature used in the integration necessary to
-   * compute the mass matrix and right hand side of the projection.
+   * compute the @ref GlossMassMatrix "mass matrix" and right hand side of the projection.
    * @param[out] boundary_values The result of this function. It is a map
    * containing all indices of degrees of freedom at the boundary (as covered
    * by the boundary parts in @p boundary_functions) and the computed dof

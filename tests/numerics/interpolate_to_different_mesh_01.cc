@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int spacedim>
 class F1 : public Function<spacedim>
@@ -75,9 +75,9 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
                                              dof_handler_2,
                                              u_2);
 
-  Point<spacedim>                 support_point, unit_support_point;
-  vector<types::global_dof_index> local_dof_indices(fe.n_dofs_per_cell());
-  deallog << "dof values of dof_handler_1:" << endl;
+  Point<spacedim>                      support_point, unit_support_point;
+  std::vector<types::global_dof_index> local_dof_indices(fe.n_dofs_per_cell());
+  deallog << "dof values of dof_handler_1:" << std::endl;
   for (const auto &cell : dof_handler_1.active_cell_iterators())
     {
       cell->get_dof_indices(local_dof_indices);
@@ -89,11 +89,11 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
           support_point =
             mapping.transform_unit_to_real_cell(cell, unit_support_point);
           deallog << ' ' << support_point << ":\n "
-                  << u_1[local_dof_indices[shapefun]] << endl
-                  << endl;
+                  << u_1[local_dof_indices[shapefun]] << std::endl
+                  << std::endl;
         }
     }
-  deallog << endl << "dof values of dof_handler_2:" << endl;
+  deallog << std::endl << "dof values of dof_handler_2:" << std::endl;
   for (const auto &cell : dof_handler_2.active_cell_iterators())
 
     {
@@ -106,8 +106,8 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
           support_point =
             mapping.transform_unit_to_real_cell(cell, unit_support_point);
           deallog << ' ' << support_point << ":\n "
-                  << u_2[local_dof_indices[shapefun]] << endl
-                  << endl;
+                  << u_2[local_dof_indices[shapefun]] << std::endl
+                  << std::endl;
         }
     }
 }
@@ -122,30 +122,30 @@ main(int argc, char **argv)
   deallog
     << "### 2D-Case, first cell refined once, second cell unrefined###\n\n";
   check<2>(1, 0);
-  deallog << endl;
+  deallog << std::endl;
 
   deallog
     << "### 2D-Case, first cell unrefined, second cell refined once###\n\n";
   check<2>(0, 1);
-  deallog << endl;
+  deallog << std::endl;
 
   deallog
     << "### 2D-Case, first cell refined once, second cell refined once###\n\n";
   check<2>(1, 1);
-  deallog << endl;
+  deallog << std::endl;
 
   deallog
     << "### 3D-Case, first cell refined once, second cell unrefined###\n\n";
   check<3>(1, 0);
-  deallog << endl;
+  deallog << std::endl;
 
   deallog
     << "### 3D-Case, first cell unrefined, second cell refined once###\n\n";
   check<3>(0, 1);
-  deallog << endl;
+  deallog << std::endl;
 
   deallog
     << "### 3D-Case, first cell refined once, second cell refined once###\n\n";
   check<3>(1, 1);
-  deallog << endl;
+  deallog << std::endl;
 }

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2018 by the deal.II authors
+// Copyright (C) 2002 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,7 +44,10 @@ test(std::ostream &logfile)
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
-  GridOut grid_out;
+  GridOut           grid_out;
+  GridOutFlags::Vtu vtu_flags;
+  vtu_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+  grid_out.set_flags(vtu_flags);
   grid_out.write_vtu(tria, logfile);
 }
 

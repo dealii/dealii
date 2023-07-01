@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 - 2022 by the deal.II authors
+## Copyright (C) 2016 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -23,7 +23,13 @@
 set(DEAL_II_WITH_CUDA FALSE CACHE BOOL "")
 
 macro(feature_cuda_find_external var)
-  if(NOT Kokkos_ENABLE_CUDA)
+  if(DEAL_II_FEATURE_KOKKOS_BUNDLED_CONFIGURED)
+    set(CUDA_ADDITIONAL_ERROR_STRING
+      ${CUDA_ADDITIONAL_ERROR_STRING}
+      "deal.II's bundled version of Kokkos only supports the Serial backend and therefore cannot be used with Cuda."
+      )
+    set(${var} FALSE)
+  elseif(NOT Kokkos_ENABLE_CUDA)
     set(CUDA_ADDITIONAL_ERROR_STRING
       ${CUDA_ADDITIONAL_ERROR_STRING}
       "deal.II can only be compiled with Cuda support if Kokkos was built with Cuda support!"
@@ -62,6 +68,16 @@ macro(feature_cuda_find_external var)
       endif()
 
       #
+      # We do not support CUDA 12.0 and newer:
+      #
+      if(CUDA_VERSION VERSION_GREATER_EQUAL 12.0)
+        message(FATAL_ERROR "\n"
+          "deal.II's own CUDA backend does not support CUDA version 12.0 or newer.\n"
+          "Instead, configure Kokkos with CUDA enabled."
+        )
+      endif()
+
+      #
       # CUDA Toolkit 10 is incompatible with C++17.
       # Make sure that deal.II is configured appropriately
       #
@@ -95,7 +111,7 @@ macro(feature_cuda_configure_external)
   # produces a lot of warnings when pedantic is enabled. So filter out the
   # flag:
   #
-  string(REPLACE "-pedantic" "" DEAL_II_CXX_FLAGS "${DEAL_II_CXX_FLAGS}")
+  string(REPLACE "-pedantic" "" DEAL_II_WARNING_FLAGS "${DEAL_II_WARNING_FLAGS}")
 endmacro()
 
 
@@ -103,7 +119,7 @@ macro(feature_cuda_error_message)
   message(FATAL_ERROR "\n"
     "Could not find any suitable cuda library!\n"
     ${CUDA_ADDITIONAL_ERROR_STRING}
-    "\nPlease ensure that a cuda library is installed on your computer\n"
+    "\nPlease ensure that a cuda library is installed on your computer and deal.II is configured to use an external Kokkos installation.\n"
     )
 endmacro()
 

@@ -786,7 +786,7 @@ main(int argc, char **argv)
       TopLevel<3>                      elastic_problem;
       elastic_problem.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

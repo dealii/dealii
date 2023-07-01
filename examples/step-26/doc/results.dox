@@ -182,7 +182,7 @@ translated it to the following ones:
   &
   \theta k \left| a_{ij} \right| &\geq m_{ij},\qquad j \neq i,
 @f}
-where $M = m_{ij}$ denotes the mass matrix and $A = a_{ij}$ the stiffness
+where $M = m_{ij}$ denotes the @ref GlossMassMatrix "mass matrix" and $A = a_{ij}$ the stiffness
 matrix with $a_{ij} \leq 0$ for $j \neq i$, respectively. With
 $a_{ij} \leq 0$, we can formulate bounds for the global time step $k$ as
 follows:

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -140,7 +140,7 @@ INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::SparseMatrix);
 INSTANTIATE_DLTG_MATRIX(TrilinosWrappers::BlockSparseMatrix);
 
 #  ifndef DOXYGEN
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    if defined(DEAL_II_TRILINOS_WITH_TPETRA) && defined(HAVE_TPETRA_INST_FLOAT)
 // FIXME: This mixed variant is needed for multigrid and matrix free.
 template void
 dealii::AffineConstraints<double>::distribute<

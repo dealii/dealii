@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,7 @@ namespace TrilinosWrappers
   BlockSparseMatrix::reinit(
     const std::vector<IndexSet> &   parallel_partitioning,
     const BlockSparsityPatternType &block_sparsity_pattern,
-    const MPI_Comm &                communicator,
+    const MPI_Comm                  communicator,
     const bool                      exchange_data)
   {
     std::vector<Epetra_Map> epetra_maps;
@@ -164,7 +164,7 @@ namespace TrilinosWrappers
   BlockSparseMatrix::reinit(
     const std::vector<IndexSet> &              parallel_partitioning,
     const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
-    const MPI_Comm &                           communicator,
+    const MPI_Comm                             communicator,
     const double                               drop_tolerance)
   {
     const size_type n_block_rows = parallel_partitioning.size();
@@ -326,7 +326,7 @@ namespace TrilinosWrappers
   template void
   BlockSparseMatrix::reinit(const std::vector<IndexSet> &,
                             const dealii::BlockDynamicSparsityPattern &,
-                            const MPI_Comm &,
+                            const MPI_Comm,
                             const bool);
 #  endif // DOXYGEN
 

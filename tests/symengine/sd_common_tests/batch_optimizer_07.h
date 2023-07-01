@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -376,7 +376,7 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
       using func_sd = CoupledFunction<dim, SDNumberType>;
 
       symb_psi = func_sd::psi(symb_t, symb_v, symb_s);
-#if DEBUG_EXTRA
+#ifdef DEBUG_EXTRA
       deallog << "symb_t: " << symb_t << std::endl;
       deallog << "symb_v: " << symb_v << std::endl;
       deallog << "symb_s: " << symb_s << std::endl;
@@ -397,7 +397,7 @@ evaluate_SD_SD_stored_symbols_optimisation(const Tensor<2, dim> &t,
       symb_d2psi_dt_ds = SD::differentiate(symb_dpsi_ds, symb_t);
       symb_d2psi_dv_ds = SD::differentiate(symb_dpsi_ds, symb_v);
       symb_d2psi_ds_ds = SD::differentiate(symb_dpsi_ds, symb_s);
-#if DEBUG_EXTRA
+#ifdef DEBUG_EXTRA
       print(deallog, "symb_psi", symb_psi);
       print(deallog, "symb_dpsi_dt", symb_dpsi_dt);
       print(deallog, "symb_dpsi_dv", symb_dpsi_dv);

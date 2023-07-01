@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2021 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -27,5 +27,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/trilinos/*.h
   )
 
-deal_ii_add_library(obj_trilinos OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_trilinos "${_inst}")
+define_object_library(object_trilinos OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_trilinos "${_inst}")

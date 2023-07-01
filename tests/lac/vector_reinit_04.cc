@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -114,5 +114,5 @@ main(int argc, char **argv)
   initlog();
 
   do_test<
-    LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::CUDA>>();
+    LinearAlgebra::distributed::Vector<double, dealii::MemorySpace::Default>>();
 }

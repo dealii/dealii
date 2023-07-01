@@ -888,7 +888,7 @@ public:
 
   /**
    * Release pointers to all input data elements, i.e. pointers to
-   * to the DoF handler object. This function may be useful when
+   * the DoF handler object. This function may be useful when
    * you have called the @p build_patches function of derived class, since
    * then the patches are built and the input data is no more needed, nor is
    * there a need to reference it. You can then output the patches detached
@@ -916,7 +916,7 @@ public:
    * previous state is overwritten, and the merged-in patches are lost.
    *
    * The second parameter allows to shift each node of the patches in the
-   * object passed in in the first parameter by a certain amount. This is
+   * object passed in the first parameter by a certain amount. This is
    * sometimes useful to generate "exploded" views of a collection of blocks.
    *
    * This function will fail if either this or the other object did not yet

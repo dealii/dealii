@@ -44,7 +44,7 @@ success(const std::string &filename)
     {
       prm.parse_input(filename, "", true, true);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << exc.what() << std::endl;
     }
@@ -74,7 +74,7 @@ fail(const std::string &filename)
     {
       prm.parse_input(filename, "", true, true);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << exc.what() << std::endl;
     }
@@ -95,7 +95,7 @@ main()
       success(source + "/prm/parameter_handler_26_success.prm");
       fail(source + "/prm/parameter_handler_26_fail.prm");
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << exc.what() << std::endl;
     }

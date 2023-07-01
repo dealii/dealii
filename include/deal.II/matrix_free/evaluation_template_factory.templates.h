@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,18 +29,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  struct FastEvaluationSupported
-  {
-    template <int fe_degree, int n_q_points_1d>
-    static bool
-    run()
-    {
-      return fe_degree != -1;
-    }
-  };
-
-
-
   template <int dim, typename Number>
   void
   FEEvaluationFactory<dim, Number>::evaluate(
@@ -49,7 +37,7 @@ namespace internal
     const Number *                         values_dofs,
     FEEvaluationData<dim, Number, false> & fe_eval)
   {
-    instantiation_helper_run<1, FEEvaluationImplEvaluateSelector<dim, Number>>(
+    instantiation_helper_run<1, FEEvaluationImplSelector<dim, Number, false>>(
       fe_eval.get_shape_info().data[0].fe_degree,
       fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
@@ -69,7 +57,7 @@ namespace internal
     FEEvaluationData<dim, Number, false> & fe_eval,
     const bool                             sum_into_values_array)
   {
-    instantiation_helper_run<1, FEEvaluationImplIntegrateSelector<dim, Number>>(
+    instantiation_helper_run<1, FEEvaluationImplSelector<dim, Number, true>>(
       fe_eval.get_shape_info().data[0].fe_degree,
       fe_eval.get_shape_info().data[0].n_q_points_1d,
       n_components,
@@ -81,6 +69,10 @@ namespace internal
 
 
 
+  // It is important that this file sits in the same compilation unit as the
+  // evaluate() and integrate() calls of this class, to ensure that all
+  // options choose the same code path when compiling FEFaceEvaluationFactory
+  // outside of deal.II.
   template <int dim, typename Number>
   bool
   FEEvaluationFactory<dim, Number>::fast_evaluation_supported(
@@ -112,20 +104,22 @@ namespace internal
   template <int dim, typename Number>
   void
   CellwiseInverseMassFactory<dim, Number>::apply(
-    const unsigned int           n_components,
-    const unsigned int           fe_degree,
-    const AlignedVector<Number> &inverse_shape,
-    const AlignedVector<Number> &inverse_coefficients,
-    const Number *               in_array,
-    Number *                     out_array)
+    const unsigned int                          n_components,
+    const FEEvaluationData<dim, Number, false> &fe_eval,
+    const ArrayView<const Number> &             inverse_coefficients,
+    const bool                                  dyadic_coefficients,
+    const Number *                              in_array,
+    Number *                                    out_array)
   {
+    const unsigned int fe_degree = fe_eval.get_shape_info().data[0].fe_degree;
     instantiation_helper_run<
       1,
       CellwiseInverseMassMatrixImplFlexible<dim, Number>>(fe_degree,
                                                           fe_degree + 1,
                                                           n_components,
-                                                          inverse_shape,
+                                                          fe_eval,
                                                           inverse_coefficients,
+                                                          dyadic_coefficients,
                                                           in_array,
                                                           out_array);
   }

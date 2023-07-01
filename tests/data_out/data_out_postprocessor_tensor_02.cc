@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2020 by the deal.II authors
+ * Copyright (C) 2000 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -362,6 +362,10 @@ namespace Step8
 
     StrainPostprocessor<dim> grad_u;
 
+    DataOutBase::VtkFlags vtk_flags;
+    vtk_flags.compression_level =
+      DataOutBase::CompressionLevel::best_compression;
+
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);
 
@@ -376,6 +380,7 @@ namespace Step8
                              data_component_interpretation);
     data_out.add_data_vector(solution, grad_u);
     data_out.build_patches();
+    data_out.set_flags(vtk_flags);
     data_out.write_vtu(deallog.get_file_stream());
   }
 

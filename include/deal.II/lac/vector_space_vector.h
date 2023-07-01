@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2021 by the deal.II authors
+// Copyright (C) 2015 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -107,6 +107,17 @@ namespace LinearAlgebra
      * communication pattern is used multiple times. This can be used to improve
      * performance.
      */
+    virtual void
+    import_elements(
+      const ReadWriteVector<Number> &V,
+      VectorOperation::values        operation,
+      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        communication_pattern = {}) = 0;
+
+    /**
+     * @deprecated Use import_elements() instead.
+     */
+    DEAL_II_DEPRECATED
     virtual void
     import(const ReadWriteVector<Number> &V,
            VectorOperation::values        operation,

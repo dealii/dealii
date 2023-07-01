@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2022 by the deal.II authors
+// Copyright (C) 2006 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,6 +35,17 @@
 #define DEAL_II_HOST_DEVICE KOKKOS_FUNCTION
 #define DEAL_II_CUDA_HOST_DEV DEAL_II_HOST_DEVICE
 #define DEAL_II_HOST_DEVICE_ALWAYS_INLINE KOKKOS_FORCEINLINE_FUNCTION
+
+// clang++ assumes that all constexpr functions are __host__ __device__ when
+// compiling CUDA code, i.e, when Kokkos was configured with CUDA support.
+// This is problematic when calling non-constexpr functions in constexpr
+// functions. Hence, we need a way to annotate functions explicitly as
+// host-only.
+#if defined(__clang__) && defined(__CUDA__)
+#  define DEAL_II_HOST __host__
+#else
+#  define DEAL_II_HOST
+#endif
 
 // Forward-declare the automatic differentiation types so we can add prototypes
 // for our own wrappers.
@@ -268,22 +279,6 @@ namespace numbers
   static constexpr double SQRT1_2 = 0.70710678118654752440;
 
   /**
-   * Check whether the given type can be used in CUDA device code.
-   * If not, DEAL_II_HOST_DEVICE needs to be disabled for functions
-   * that use this type.
-   */
-  template <typename Number, typename = void>
-  struct is_cuda_compatible : std::true_type
-  {};
-
-  /**
-   * std::complex cannot be used in CUDA device code.
-   */
-  template <typename Number>
-  struct is_cuda_compatible<std::complex<Number>, void> : std::false_type
-  {};
-
-  /**
    * Return @p true if the given value is a finite floating point number, i.e.
    * is neither plus or minus infinity nor NaN (not a number).
    *
@@ -331,7 +326,7 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  constexpr bool
+  constexpr DEAL_II_HOST_DEVICE bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2);
 
   /**
@@ -356,7 +351,7 @@ namespace numbers
    * by the input arguments.
    */
   template <typename Number>
-  constexpr bool
+  constexpr DEAL_II_HOST_DEVICE bool
   value_is_zero(const Number &value);
 
   /**
@@ -455,7 +450,7 @@ namespace numbers
      * template is selected if number is not a complex data type, this
      * function simply returns the given number.
      *
-     * @note This function can also be used in CUDA device code.
+     * @note This function can also be used in @ref GlossDevice "device" code.
      */
     static constexpr DEAL_II_HOST_DEVICE const number &
                                                conjugate(const number &x);
@@ -465,20 +460,10 @@ namespace numbers
      * general template is chosen for types not equal to std::complex, this
      * function simply returns the square of the given number.
      *
-     * @note If the template type can be used in CUDA device code, the same holds true
+     * @note If the template type can be used in @ref GlossDevice "device" code, the same holds true
      * for this function.
      */
-    template <typename Dummy = number>
-    static constexpr DEAL_II_HOST_DEVICE
-      std::enable_if_t<std::is_same<Dummy, number>::value &&
-                         is_cuda_compatible<Dummy>::value,
-                       real_type>
-      abs_square(const number &x);
-
-    template <typename Dummy = number>
-    static constexpr std::enable_if_t<std::is_same<Dummy, number>::value &&
-                                        !is_cuda_compatible<Dummy>::value,
-                                      real_type>
+    static constexpr DEAL_II_HOST_DEVICE real_type
     abs_square(const number &x);
 
     /**
@@ -595,23 +580,7 @@ namespace numbers
 
 
   template <typename number>
-  template <typename Dummy>
-  constexpr DEAL_II_HOST_DEVICE
-    std::enable_if_t<std::is_same<Dummy, number>::value &&
-                       is_cuda_compatible<Dummy>::value,
-                     typename NumberTraits<number>::real_type>
-    NumberTraits<number>::abs_square(const number &x)
-  {
-    return x * x;
-  }
-
-
-
-  template <typename number>
-  template <typename Dummy>
-  constexpr std::enable_if_t<std::is_same<Dummy, number>::value &&
-                               !is_cuda_compatible<Dummy>::value,
-                             typename NumberTraits<number>::real_type>
+  constexpr DEAL_II_HOST_DEVICE typename NumberTraits<number>::real_type
   NumberTraits<number>::abs_square(const number &x)
   {
     return x * x;
@@ -755,7 +724,7 @@ namespace internal
 
     // Type T is explicitly convertible (but not constructible) from F.
     template <typename F>
-    static constexpr DEAL_II_ALWAYS_INLINE T
+    static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE T
     value(const F &f,
           std::enable_if_t<!std::is_same<typename std::decay<T>::type,
                                          typename std::decay<F>::type>::value &&
@@ -950,7 +919,7 @@ namespace numbers
 
 
   template <typename Number1, typename Number2>
-  constexpr bool
+  constexpr DEAL_II_HOST_DEVICE bool
   values_are_equal(const Number1 &value_1, const Number2 &value_2)
   {
     return (value_1 == dealii::internal::NumberType<Number1>::value(value_2));
@@ -966,7 +935,7 @@ namespace numbers
 
 
   template <typename Number>
-  constexpr bool
+  constexpr DEAL_II_HOST_DEVICE bool
   value_is_zero(const Number &value)
   {
     return values_are_equal(value, 0.0);

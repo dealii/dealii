@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -271,8 +271,7 @@ public:
    * an empty function.
    */
   void
-  compress(::dealii::VectorOperation::values operation =
-             ::dealii::VectorOperation::unknown) const;
+  compress(VectorOperation::values operation = VectorOperation::unknown) const;
 
   /**
    * Change the dimension of the vector to @p N. The reserved memory for this
@@ -1326,7 +1325,7 @@ Vector<Number>::operator!=(const Vector<Number2> &v) const
 
 
 template <typename Number>
-inline void Vector<Number>::compress(::dealii::VectorOperation::values) const
+inline void Vector<Number>::compress(VectorOperation::values) const
 {}
 
 

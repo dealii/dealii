@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -80,7 +80,7 @@ namespace TrilinosWrappers
 
 
     Vector::Vector(const IndexSet &parallel_partitioning,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
       : Vector()
     {
       reinit(parallel_partitioning, communicator);
@@ -98,10 +98,11 @@ namespace TrilinosWrappers
 
 
 
-    Vector::Vector(Vector &&v) noexcept
+    Vector::Vector(Vector &&v) // NOLINT
       : Vector()
     {
       // initialize a minimal, valid object and swap
+      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
       swap(v);
     }
 
@@ -109,7 +110,7 @@ namespace TrilinosWrappers
 
     Vector::Vector(const IndexSet &parallel_partitioner,
                    const Vector &  v,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
       : Vector()
     {
       AssertThrow(parallel_partitioner.size() ==
@@ -128,7 +129,7 @@ namespace TrilinosWrappers
 
     Vector::Vector(const IndexSet &local,
                    const IndexSet &ghost,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
       : Vector()
     {
       reinit(local, ghost, communicator, false);
@@ -152,7 +153,7 @@ namespace TrilinosWrappers
 
     void
     Vector::reinit(const IndexSet &parallel_partitioner,
-                   const MPI_Comm &communicator,
+                   const MPI_Comm  communicator,
                    const bool /*omit_zeroing_entries*/)
     {
       nonlocal_vector.reset();
@@ -352,7 +353,7 @@ namespace TrilinosWrappers
     void
     Vector::reinit(const IndexSet &locally_owned_entries,
                    const IndexSet &ghost_entries,
-                   const MPI_Comm &communicator,
+                   const MPI_Comm  communicator,
                    const bool      vector_writable)
     {
       nonlocal_vector.reset();
@@ -410,12 +411,25 @@ namespace TrilinosWrappers
     void
     Vector::reinit(
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+      const bool                                                make_ghosted,
       const bool                                                vector_writable)
     {
-      this->reinit(partitioner->locally_owned_range(),
-                   partitioner->ghost_indices(),
-                   partitioner->get_mpi_communicator(),
-                   vector_writable);
+      if (make_ghosted)
+        {
+          Assert(partitioner->ghost_indices_initialized(),
+                 ExcMessage("You asked to create a ghosted vector, but the "
+                            "partitioner does not provide ghost indices."));
+
+          this->reinit(partitioner->locally_owned_range(),
+                       partitioner->ghost_indices(),
+                       partitioner->get_mpi_communicator(),
+                       vector_writable);
+        }
+      else
+        {
+          this->reinit(partitioner->locally_owned_range(),
+                       partitioner->get_mpi_communicator());
+        }
     }
 
 
@@ -499,6 +513,7 @@ namespace TrilinosWrappers
     Vector &
     Vector::operator=(Vector &&v) noexcept
     {
+      static_cast<Subscriptor &>(*this) = static_cast<Subscriptor &&>(v);
       swap(v);
       return *this;
     }
@@ -536,9 +551,9 @@ namespace TrilinosWrappers
              ExcMessage("The input vector has overlapping data, "
                         "which is not allowed."));
 
-      if (vector->Map().SameAs(m.trilinos_matrix().ColMap()) == false)
+      if (vector->Map().SameAs(m.trilinos_matrix().getColMap()) == false)
         vector =
-          std::make_unique<Epetra_FEVector>(m.trilinos_matrix().ColMap());
+          std::make_unique<Epetra_FEVector>(m.trilinos_matrix().getColMap());
 
       Epetra_Import data_exchange(vector->Map(), v.vector->Map());
       const int     ierr = vector->Import(*v.vector, data_exchange, Insert);
@@ -550,16 +565,16 @@ namespace TrilinosWrappers
 
 
     void
-    Vector::import(const LinearAlgebra::ReadWriteVector<double> &rwv,
-                   const VectorOperation::values                 operation)
+    Vector::import_elements(const LinearAlgebra::ReadWriteVector<double> &rwv,
+                            const VectorOperation::values operation)
     {
       Assert(
         this->size() == rwv.size(),
         ExcMessage(
-          "Both vectors need to have the same size for import() to work!"));
-      // TODO: a generic import() function should handle any kind of data layout
-      // in ReadWriteVector, but this function is of limited use as this class
-      // will (hopefully) be retired eventually.
+          "Both vectors need to have the same size for import_elements() to work!"));
+      // TODO: a generic import_elements() function should handle any kind of
+      // data layout in ReadWriteVector, but this function is of limited use as
+      // this class will (hopefully) be retired eventually.
       Assert(this->locally_owned_elements() == rwv.get_stored_elements(),
              ExcNotImplemented());
 
@@ -581,7 +596,7 @@ namespace TrilinosWrappers
 
 
     void
-    Vector::compress(::dealii::VectorOperation::values given_last_action)
+    Vector::compress(VectorOperation::values given_last_action)
     {
       // Select which mode to send to Trilinos. Note that we use last_action if
       // available and ignore what the user tells us to detect wrongly mixed
@@ -591,9 +606,9 @@ namespace TrilinosWrappers
       Epetra_CombineMode mode = last_action;
       if (last_action == Zero)
         {
-          if (given_last_action == ::dealii::VectorOperation::add)
+          if (given_last_action == VectorOperation::add)
             mode = Add;
-          else if (given_last_action == ::dealii::VectorOperation::insert)
+          else if (given_last_action == VectorOperation::insert)
             mode = Insert;
           else
             Assert(
@@ -605,9 +620,9 @@ namespace TrilinosWrappers
         {
           Assert(
             ((last_action == Add) &&
-             (given_last_action == ::dealii::VectorOperation::add)) ||
+             (given_last_action == VectorOperation::add)) ||
               ((last_action == Insert) &&
-               (given_last_action == ::dealii::VectorOperation::insert)),
+               (given_last_action == VectorOperation::insert)),
             ExcMessage(
               "The last operation on the Vector and the given last action in the compress() call do not agree!"));
         }

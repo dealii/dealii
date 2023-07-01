@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -582,7 +582,8 @@ namespace internal
       const unsigned int n_dofs_per_cell,
       const bool         apply_constraints) const
     {
-      if (apply_constraints == false)
+      if ((row_starts_plain_indices.empty() == false) &&
+          (apply_constraints == false))
         {
           for (unsigned int v = 0; v < n_cells; ++v)
             {

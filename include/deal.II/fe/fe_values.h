@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -2499,18 +2499,17 @@ public:
    * ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_value_component() function.
    *
-   * @param function_no Number of the shape function to be evaluated. Note
+   * @param i Number of the shape function $\varphi_i$ to be evaluated. Note
    * that this number runs from zero to dofs_per_cell, even in the case of an
    * FEFaceValues or FESubfaceValues object.
    *
-   * @param point_no Number of the quadrature point at which function is to be
+   * @param q_point Number of the quadrature point at which function is to be
    * evaluated
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
   const double &
-  shape_value(const unsigned int function_no,
-              const unsigned int point_no) const;
+  shape_value(const unsigned int i, const unsigned int q_point) const;
 
   /**
    * Compute one vector component of the value of a shape function at a
@@ -2523,9 +2522,9 @@ public:
    * shape function is not primitive, but then it is necessary since the other
    * function cannot be used.
    *
-   * @param function_no Number of the shape function to be evaluated.
+   * @param i Number of the shape function $\varphi_i$ to be evaluated.
    *
-   * @param point_no Number of the quadrature point at which function is to be
+   * @param q_point Number of the quadrature point at which function is to be
    * evaluated.
    *
    * @param component vector component to be evaluated.
@@ -2533,12 +2532,12 @@ public:
    * @dealiiRequiresUpdateFlags{update_values}
    */
   double
-  shape_value_component(const unsigned int function_no,
-                        const unsigned int point_no,
+  shape_value_component(const unsigned int i,
+                        const unsigned int q_point,
                         const unsigned int component) const;
 
   /**
-   * Compute the gradient of the <tt>function_no</tt>th shape function at the
+   * Compute the gradient of the <tt>i</tt>th shape function at the
    * <tt>quadrature_point</tt>th quadrature point with respect to real cell
    * coordinates.  If you want to get the derivative in one of the coordinate
    * directions, use the appropriate function of the Tensor class to extract
@@ -2555,16 +2554,15 @@ public:
    * The same holds for the arguments of this function as for the
    * shape_value() function.
    *
-   * @param function_no Number of the shape function to be evaluated.
+   * @param i Number of the shape function $\varphi_i$ to be evaluated.
    *
-   * @param quadrature_point Number of the quadrature point at which function
+   * @param q_point Number of the quadrature point at which function
    * is to be evaluated.
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
   const Tensor<1, spacedim> &
-  shape_grad(const unsigned int function_no,
-             const unsigned int quadrature_point) const;
+  shape_grad(const unsigned int i, const unsigned int q_point) const;
 
   /**
    * Return one vector component of the gradient of a shape function at a
@@ -2583,13 +2581,13 @@ public:
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
   Tensor<1, spacedim>
-  shape_grad_component(const unsigned int function_no,
-                       const unsigned int point_no,
+  shape_grad_component(const unsigned int i,
+                       const unsigned int q_point,
                        const unsigned int component) const;
 
   /**
-   * Second derivatives of the <tt>function_no</tt>th shape function at the
-   * <tt>point_no</tt>th quadrature point with respect to real cell
+   * Second derivatives of the <tt>i</tt>th shape function at the
+   * <tt>q_point</tt>th quadrature point with respect to real cell
    * coordinates. If you want to get the derivatives in one of the coordinate
    * directions, use the appropriate function of the Tensor class to extract
    * one component. Since only a reference to the hessian values is returned,
@@ -2607,8 +2605,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
   const Tensor<2, spacedim> &
-  shape_hessian(const unsigned int function_no,
-                const unsigned int point_no) const;
+  shape_hessian(const unsigned int i, const unsigned int q_point) const;
 
   /**
    * Return one vector component of the hessian of a shape function at a
@@ -2627,13 +2624,13 @@ public:
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
   Tensor<2, spacedim>
-  shape_hessian_component(const unsigned int function_no,
-                          const unsigned int point_no,
+  shape_hessian_component(const unsigned int i,
+                          const unsigned int q_point,
                           const unsigned int component) const;
 
   /**
-   * Third derivatives of the <tt>function_no</tt>th shape function at the
-   * <tt>point_no</tt>th quadrature point with respect to real cell
+   * Third derivatives of the <tt>i</tt>th shape function at the
+   * <tt>q_point</tt>th quadrature point with respect to real cell
    * coordinates. If you want to get the 3rd derivatives in one of the
    * coordinate directions, use the appropriate function of the Tensor class
    * to extract one component. Since only a reference to the 3rd derivative
@@ -2651,8 +2648,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
   const Tensor<3, spacedim> &
-  shape_3rd_derivative(const unsigned int function_no,
-                       const unsigned int point_no) const;
+  shape_3rd_derivative(const unsigned int i, const unsigned int q_point) const;
 
   /**
    * Return one vector component of the third derivative of a shape function
@@ -2671,8 +2667,8 @@ public:
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
   Tensor<3, spacedim>
-  shape_3rd_derivative_component(const unsigned int function_no,
-                                 const unsigned int point_no,
+  shape_3rd_derivative_component(const unsigned int i,
+                                 const unsigned int q_point,
                                  const unsigned int component) const;
 
   /** @} */
@@ -2680,16 +2676,30 @@ public:
   /** @{ */
 
   /**
-   * Return the values of a finite element function restricted to the current
-   * cell, face or subface selected the last time the <tt>reinit</tt> function
-   * of the derived class was called, at the quadrature points.
+   * Return the values of a finite element function at the quadrature points
+   * of the current cell, face, or subface (selected the last time the reinit()
+   * function was called). That is, if the first argument @p fe_function is a
+   * vector of nodal values of a finite element function $u_h(\mathbf x)$
+   * defined on a DoFHandler object, then the output vector (the second
+   * argument,
+   * @p values) is the vector of values $u_h(\mathbf x_q^K)$ where $x_q^K$ are
+   * the quadrature points on the current cell $K$.
+   * This function is first discussed in the Results
+   * section of step-4, and the related get_function_gradients() function
+   * is also used in step-15 along with numerous other
+   * tutorial programs.
    *
-   * If the present cell is not active then values are interpolated to the
-   * current cell and point values are computed from that.
+   * If the current cell is not active (i.e., it has children), then the finite
+   * element function is, strictly speaking, defined by shape functions
+   * that live on these child cells. Rather than evaluating the shape functions
+   * on the child cells, with the quadrature points defined on the current
+   * cell, this function first interpolates the finite element function to shape
+   * functions defined on the current cell, and then evaluates this interpolated
+   * function.
    *
    * This function may only be used if the finite element in use is a scalar
-   * one, i.e. has only one vector component.  To get values of multi-
-   * component elements, there is another get_function_values() below,
+   * one, i.e. has only one vector component.  To get values of multi-component
+   * elements, there is another get_function_values() below,
    * returning a vector of vectors of results.
    *
    * @param[in] fe_function A vector of values that describes (globally) the
@@ -2853,10 +2863,16 @@ public:
   /** @{ */
 
   /**
-   * Compute the gradients of a finite element at the quadrature points of a
-   * cell. This function is the equivalent of the corresponding
-   * get_function_values() function (see there for more information) but
-   * evaluates the finite element field's gradient instead of its value.
+   * Return the gradients of a finite element function at the quadrature points
+   * of the current cell, face, or subface (selected the last time the reinit()
+   * function was called). That is, if the first argument @p fe_function is a
+   * vector of nodal values of a finite element function $u_h(\mathbf x)$
+   * defined on a DoFHandler object, then the output vector (the second
+   * argument,
+   * @p values) is the vector of values $\nabla u_h(\mathbf x_q^K)$ where
+   * $x_q^K$ are the quadrature points on the current cell $K$. This function is
+   * first discussed in the Results section of step-4, and it is also used in
+   * step-15 along with numerous other tutorial programs.
    *
    * This function may only be used if the finite element in use is a scalar
    * one, i.e. has only one vector component. There is a corresponding
@@ -3345,7 +3361,7 @@ public:
    * defined by the finite element passed to `fe_values`, and `j` taking
    * on a specified subset of `i`'s range, starting at `i` itself and ending at
    * the number of cell degrees of freedom. In this way, we can construct the
-   * upper half and the diagonal of a stiffness matrix contribution (assuming it
+   * upper half and the diagonal of a @ref GlossStiffnessMatrix "stiffness matrix" contribution (assuming it
    * is symmetric, and that only one half of it needs to be computed), for
    * example.
    *
@@ -3379,7 +3395,7 @@ public:
    * defined by the finite element passed to `fe_values`, and `j` taking
    * on a specified subset of `i`'s range, starting at zero and ending at
    * `i` itself. In this way, we can construct the lower half and the
-   * diagonal of a stiffness matrix contribution (assuming it is symmetric, and
+   * diagonal of a @ref GlossStiffnessMatrix "stiffness matrix" contribution (assuming it is symmetric, and
    * that only one half of it needs to be computed), for example.
    *
    * @note If the @p end_dof_index is equal to zero, then the returned index
@@ -3417,12 +3433,13 @@ public:
   quadrature_point_indices() const;
 
   /**
-   * Position of the <tt>q</tt>th quadrature point in real space.
+   * Return the location of the <tt>q_point</tt>th quadrature point in
+   * real space.
    *
    * @dealiiRequiresUpdateFlags{update_quadrature_points}
    */
   const Point<spacedim> &
-  quadrature_point(const unsigned int q) const;
+  quadrature_point(const unsigned int q_point) const;
 
   /**
    * Return a reference to the vector of quadrature points in real space.
@@ -3435,7 +3452,8 @@ public:
   /**
    * Mapped quadrature weight. If this object refers to a volume evaluation
    * (i.e. the derived class is of type FEValues), then this is the Jacobi
-   * determinant times the weight of the *<tt>i</tt>th unit quadrature point.
+   * determinant times the weight of the <tt>q_point</tt>th unit quadrature
+   * point.
    *
    * For surface evaluations (i.e. classes FEFaceValues or FESubfaceValues),
    * it is the mapped surface element times the weight of the quadrature
@@ -3448,7 +3466,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_JxW_values}
    */
   double
-  JxW(const unsigned int quadrature_point) const;
+  JxW(const unsigned int q_point) const;
 
   /**
    * Return a reference to the array holding the values returned by JxW().
@@ -3463,7 +3481,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_jacobians}
    */
   const DerivativeForm<1, dim, spacedim> &
-  jacobian(const unsigned int quadrature_point) const;
+  jacobian(const unsigned int q_point) const;
 
   /**
    * Return a reference to the array holding the values returned by
@@ -3482,7 +3500,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_jacobian_grads}
    */
   const DerivativeForm<2, dim, spacedim> &
-  jacobian_grad(const unsigned int quadrature_point) const;
+  jacobian_grad(const unsigned int q_point) const;
 
   /**
    * Return a reference to the array holding the values returned by
@@ -3502,7 +3520,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_grads}
    */
   const Tensor<3, spacedim> &
-  jacobian_pushed_forward_grad(const unsigned int quadrature_point) const;
+  jacobian_pushed_forward_grad(const unsigned int q_point) const;
 
   /**
    * Return a reference to the array holding the values returned by
@@ -3521,7 +3539,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_jacobian_2nd_derivatives}
    */
   const DerivativeForm<3, dim, spacedim> &
-  jacobian_2nd_derivative(const unsigned int quadrature_point) const;
+  jacobian_2nd_derivative(const unsigned int q_point) const;
 
   /**
    * Return a reference to the array holding the values returned by
@@ -3542,8 +3560,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_2nd_derivatives}
    */
   const Tensor<4, spacedim> &
-  jacobian_pushed_forward_2nd_derivative(
-    const unsigned int quadrature_point) const;
+  jacobian_pushed_forward_2nd_derivative(const unsigned int q_point) const;
 
   /**
    * Return a reference to the array holding the values returned by
@@ -3563,7 +3580,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_jacobian_3rd_derivatives}
    */
   const DerivativeForm<4, dim, spacedim> &
-  jacobian_3rd_derivative(const unsigned int quadrature_point) const;
+  jacobian_3rd_derivative(const unsigned int q_point) const;
 
   /**
    * Return a reference to the array holding the values returned by
@@ -3584,8 +3601,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_jacobian_pushed_forward_3rd_derivatives}
    */
   const Tensor<5, spacedim> &
-  jacobian_pushed_forward_3rd_derivative(
-    const unsigned int quadrature_point) const;
+  jacobian_pushed_forward_3rd_derivative(const unsigned int q_point) const;
 
   /**
    * Return a reference to the array holding the values returned by
@@ -3603,7 +3619,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_inverse_jacobians}
    */
   const DerivativeForm<1, spacedim, dim> &
-  inverse_jacobian(const unsigned int quadrature_point) const;
+  inverse_jacobian(const unsigned int q_point) const;
 
   /**
    * Return a reference to the array holding the values returned by
@@ -3618,7 +3634,7 @@ public:
    * Return the normal vector at a quadrature point. If you call this
    * function for a face (i.e., when using a FEFaceValues or FESubfaceValues
    * object), then this function returns the outward normal vector to
-   * the cell at the <tt>i</tt>th quadrature point of the face.
+   * the cell at the <tt>q_point</tt>th quadrature point of the face.
    *
    * In contrast, if you call this function for a cell of codimension one
    * (i.e., when using a `FEValues<dim,spacedim>` object with
@@ -3634,7 +3650,7 @@ public:
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
   const Tensor<1, spacedim> &
-  normal_vector(const unsigned int i) const;
+  normal_vector(const unsigned int q_point) const;
 
   /**
    * Return the normal vectors at all quadrature points represented by
@@ -3954,7 +3970,6 @@ protected:
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     mapping_output;
 
-
   /**
    * A pointer to the finite element object associated with this FEValues
    * object.
@@ -4220,14 +4235,14 @@ public:
                    const hp::QCollection<dim - 1> &    quadrature);
 
   /**
-   * Boundary form of the transformation of the cell at the <tt>i</tt>th
+   * Boundary form of the transformation of the cell at the <tt>q_point</tt>th
    * quadrature point.  See
    * @ref GlossBoundaryForm.
    *
    * @dealiiRequiresUpdateFlags{update_boundary_forms}
    */
   const Tensor<1, spacedim> &
-  boundary_form(const unsigned int i) const;
+  boundary_form(const unsigned int q_point) const;
 
   /**
    * Return the list of outward normal vectors times the Jacobian of the
@@ -5570,7 +5585,7 @@ FEValuesBase<dim, spacedim>::operator[](
 template <int dim, int spacedim>
 inline const double &
 FEValuesBase<dim, spacedim>::shape_value(const unsigned int i,
-                                         const unsigned int j) const
+                                         const unsigned int q_point) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_values,
@@ -5580,7 +5595,7 @@ FEValuesBase<dim, spacedim>::shape_value(const unsigned int i,
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->finite_element_output.shape_values(i, j);
+    return this->finite_element_output.shape_values(i, q_point);
   else
     {
       // otherwise, use the mapping
@@ -5595,7 +5610,7 @@ FEValuesBase<dim, spacedim>::shape_value(const unsigned int i,
         this->finite_element_output
           .shape_function_to_row_table[i * fe->n_components() +
                                        fe->system_to_component_index(i).first];
-      return this->finite_element_output.shape_values(row, j);
+      return this->finite_element_output.shape_values(row, q_point);
     }
 }
 
@@ -5605,7 +5620,7 @@ template <int dim, int spacedim>
 inline double
 FEValuesBase<dim, spacedim>::shape_value_component(
   const unsigned int i,
-  const unsigned int j,
+  const unsigned int q_point,
   const unsigned int component) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
@@ -5626,7 +5641,7 @@ FEValuesBase<dim, spacedim>::shape_value_component(
   const unsigned int row =
     this->finite_element_output
       .shape_function_to_row_table[i * fe->n_components() + component];
-  return this->finite_element_output.shape_values(row, j);
+  return this->finite_element_output.shape_values(row, q_point);
 }
 
 
@@ -5634,7 +5649,7 @@ FEValuesBase<dim, spacedim>::shape_value_component(
 template <int dim, int spacedim>
 inline const Tensor<1, spacedim> &
 FEValuesBase<dim, spacedim>::shape_grad(const unsigned int i,
-                                        const unsigned int j) const
+                                        const unsigned int q_point) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_gradients,
@@ -5644,7 +5659,7 @@ FEValuesBase<dim, spacedim>::shape_grad(const unsigned int i,
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->finite_element_output.shape_gradients[i][j];
+    return this->finite_element_output.shape_gradients[i][q_point];
   else
     {
       // otherwise, use the mapping
@@ -5659,7 +5674,7 @@ FEValuesBase<dim, spacedim>::shape_grad(const unsigned int i,
         this->finite_element_output
           .shape_function_to_row_table[i * fe->n_components() +
                                        fe->system_to_component_index(i).first];
-      return this->finite_element_output.shape_gradients[row][j];
+      return this->finite_element_output.shape_gradients[row][q_point];
     }
 }
 
@@ -5669,7 +5684,7 @@ template <int dim, int spacedim>
 inline Tensor<1, spacedim>
 FEValuesBase<dim, spacedim>::shape_grad_component(
   const unsigned int i,
-  const unsigned int j,
+  const unsigned int q_point,
   const unsigned int component) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
@@ -5689,7 +5704,7 @@ FEValuesBase<dim, spacedim>::shape_grad_component(
   const unsigned int row =
     this->finite_element_output
       .shape_function_to_row_table[i * fe->n_components() + component];
-  return this->finite_element_output.shape_gradients[row][j];
+  return this->finite_element_output.shape_gradients[row][q_point];
 }
 
 
@@ -5697,7 +5712,7 @@ FEValuesBase<dim, spacedim>::shape_grad_component(
 template <int dim, int spacedim>
 inline const Tensor<2, spacedim> &
 FEValuesBase<dim, spacedim>::shape_hessian(const unsigned int i,
-                                           const unsigned int j) const
+                                           const unsigned int q_point) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_hessians,
@@ -5707,7 +5722,7 @@ FEValuesBase<dim, spacedim>::shape_hessian(const unsigned int i,
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->finite_element_output.shape_hessians[i][j];
+    return this->finite_element_output.shape_hessians[i][q_point];
   else
     {
       // otherwise, use the mapping
@@ -5722,7 +5737,7 @@ FEValuesBase<dim, spacedim>::shape_hessian(const unsigned int i,
         this->finite_element_output
           .shape_function_to_row_table[i * fe->n_components() +
                                        fe->system_to_component_index(i).first];
-      return this->finite_element_output.shape_hessians[row][j];
+      return this->finite_element_output.shape_hessians[row][q_point];
     }
 }
 
@@ -5732,7 +5747,7 @@ template <int dim, int spacedim>
 inline Tensor<2, spacedim>
 FEValuesBase<dim, spacedim>::shape_hessian_component(
   const unsigned int i,
-  const unsigned int j,
+  const unsigned int q_point,
   const unsigned int component) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
@@ -5752,15 +5767,16 @@ FEValuesBase<dim, spacedim>::shape_hessian_component(
   const unsigned int row =
     this->finite_element_output
       .shape_function_to_row_table[i * fe->n_components() + component];
-  return this->finite_element_output.shape_hessians[row][j];
+  return this->finite_element_output.shape_hessians[row][q_point];
 }
 
 
 
 template <int dim, int spacedim>
 inline const Tensor<3, spacedim> &
-FEValuesBase<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
-                                                  const unsigned int j) const
+FEValuesBase<dim, spacedim>::shape_3rd_derivative(
+  const unsigned int i,
+  const unsigned int q_point) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
   Assert(this->update_flags & update_3rd_derivatives,
@@ -5770,7 +5786,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
   // if the entire FE is primitive,
   // then we can take a short-cut:
   if (fe->is_primitive())
-    return this->finite_element_output.shape_3rd_derivatives[i][j];
+    return this->finite_element_output.shape_3rd_derivatives[i][q_point];
   else
     {
       // otherwise, use the mapping
@@ -5785,7 +5801,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
         this->finite_element_output
           .shape_function_to_row_table[i * fe->n_components() +
                                        fe->system_to_component_index(i).first];
-      return this->finite_element_output.shape_3rd_derivatives[row][j];
+      return this->finite_element_output.shape_3rd_derivatives[row][q_point];
     }
 }
 
@@ -5795,7 +5811,7 @@ template <int dim, int spacedim>
 inline Tensor<3, spacedim>
 FEValuesBase<dim, spacedim>::shape_3rd_derivative_component(
   const unsigned int i,
-  const unsigned int j,
+  const unsigned int q_point,
   const unsigned int component) const
 {
   AssertIndexRange(i, fe->n_dofs_per_cell());
@@ -5815,7 +5831,7 @@ FEValuesBase<dim, spacedim>::shape_3rd_derivative_component(
   const unsigned int row =
     this->finite_element_output
       .shape_function_to_row_table[i * fe->n_components() + component];
-  return this->finite_element_output.shape_3rd_derivatives[row][j];
+  return this->finite_element_output.shape_3rd_derivatives[row][q_point];
 }
 
 
@@ -5898,12 +5914,12 @@ FEValuesBase<dim, spacedim>::get_jacobian_grads() const
 template <int dim, int spacedim>
 inline const Tensor<3, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_pushed_forward_grad(
-  const unsigned int i) const
+  const unsigned int q_point) const
 {
   Assert(this->update_flags & update_jacobian_pushed_forward_grads,
          ExcAccessToUninitializedField("update_jacobian_pushed_forward_grads"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
-  return this->mapping_output.jacobian_pushed_forward_grads[i];
+  return this->mapping_output.jacobian_pushed_forward_grads[q_point];
 }
 
 
@@ -5922,12 +5938,13 @@ FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_grads() const
 
 template <int dim, int spacedim>
 inline const DerivativeForm<3, dim, spacedim> &
-FEValuesBase<dim, spacedim>::jacobian_2nd_derivative(const unsigned int i) const
+FEValuesBase<dim, spacedim>::jacobian_2nd_derivative(
+  const unsigned int q_point) const
 {
   Assert(this->update_flags & update_jacobian_2nd_derivatives,
          ExcAccessToUninitializedField("update_jacobian_2nd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
-  return this->mapping_output.jacobian_2nd_derivatives[i];
+  return this->mapping_output.jacobian_2nd_derivatives[q_point];
 }
 
 
@@ -5947,13 +5964,13 @@ FEValuesBase<dim, spacedim>::get_jacobian_2nd_derivatives() const
 template <int dim, int spacedim>
 inline const Tensor<4, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_pushed_forward_2nd_derivative(
-  const unsigned int i) const
+  const unsigned int q_point) const
 {
   Assert(this->update_flags & update_jacobian_pushed_forward_2nd_derivatives,
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_2nd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
-  return this->mapping_output.jacobian_pushed_forward_2nd_derivatives[i];
+  return this->mapping_output.jacobian_pushed_forward_2nd_derivatives[q_point];
 }
 
 
@@ -5973,12 +5990,13 @@ FEValuesBase<dim, spacedim>::get_jacobian_pushed_forward_2nd_derivatives() const
 
 template <int dim, int spacedim>
 inline const DerivativeForm<4, dim, spacedim> &
-FEValuesBase<dim, spacedim>::jacobian_3rd_derivative(const unsigned int i) const
+FEValuesBase<dim, spacedim>::jacobian_3rd_derivative(
+  const unsigned int q_point) const
 {
   Assert(this->update_flags & update_jacobian_3rd_derivatives,
          ExcAccessToUninitializedField("update_jacobian_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
-  return this->mapping_output.jacobian_3rd_derivatives[i];
+  return this->mapping_output.jacobian_3rd_derivatives[q_point];
 }
 
 
@@ -5998,13 +6016,13 @@ FEValuesBase<dim, spacedim>::get_jacobian_3rd_derivatives() const
 template <int dim, int spacedim>
 inline const Tensor<5, spacedim> &
 FEValuesBase<dim, spacedim>::jacobian_pushed_forward_3rd_derivative(
-  const unsigned int i) const
+  const unsigned int q_point) const
 {
   Assert(this->update_flags & update_jacobian_pushed_forward_3rd_derivatives,
          ExcAccessToUninitializedField(
            "update_jacobian_pushed_forward_3rd_derivatives"));
   Assert(present_cell.is_initialized(), ExcNotReinited());
-  return this->mapping_output.jacobian_pushed_forward_3rd_derivatives[i];
+  return this->mapping_output.jacobian_pushed_forward_3rd_derivatives[q_point];
 }
 
 
@@ -6078,85 +6096,85 @@ FEValuesBase<dim, spacedim>::quadrature_point_indices() const
 
 template <int dim, int spacedim>
 inline const Point<spacedim> &
-FEValuesBase<dim, spacedim>::quadrature_point(const unsigned int i) const
+FEValuesBase<dim, spacedim>::quadrature_point(const unsigned int q_point) const
 {
   Assert(this->update_flags & update_quadrature_points,
          ExcAccessToUninitializedField("update_quadrature_points"));
-  AssertIndexRange(i, this->mapping_output.quadrature_points.size());
+  AssertIndexRange(q_point, this->mapping_output.quadrature_points.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
 
-  return this->mapping_output.quadrature_points[i];
+  return this->mapping_output.quadrature_points[q_point];
 }
 
 
 
 template <int dim, int spacedim>
 inline double
-FEValuesBase<dim, spacedim>::JxW(const unsigned int i) const
+FEValuesBase<dim, spacedim>::JxW(const unsigned int q_point) const
 {
   Assert(this->update_flags & update_JxW_values,
          ExcAccessToUninitializedField("update_JxW_values"));
-  AssertIndexRange(i, this->mapping_output.JxW_values.size());
+  AssertIndexRange(q_point, this->mapping_output.JxW_values.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
 
-  return this->mapping_output.JxW_values[i];
+  return this->mapping_output.JxW_values[q_point];
 }
 
 
 
 template <int dim, int spacedim>
 inline const DerivativeForm<1, dim, spacedim> &
-FEValuesBase<dim, spacedim>::jacobian(const unsigned int i) const
+FEValuesBase<dim, spacedim>::jacobian(const unsigned int q_point) const
 {
   Assert(this->update_flags & update_jacobians,
          ExcAccessToUninitializedField("update_jacobians"));
-  AssertIndexRange(i, this->mapping_output.jacobians.size());
+  AssertIndexRange(q_point, this->mapping_output.jacobians.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
 
-  return this->mapping_output.jacobians[i];
+  return this->mapping_output.jacobians[q_point];
 }
 
 
 
 template <int dim, int spacedim>
 inline const DerivativeForm<2, dim, spacedim> &
-FEValuesBase<dim, spacedim>::jacobian_grad(const unsigned int i) const
+FEValuesBase<dim, spacedim>::jacobian_grad(const unsigned int q_point) const
 {
   Assert(this->update_flags & update_jacobian_grads,
          ExcAccessToUninitializedField("update_jacobians_grads"));
-  AssertIndexRange(i, this->mapping_output.jacobian_grads.size());
+  AssertIndexRange(q_point, this->mapping_output.jacobian_grads.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
 
-  return this->mapping_output.jacobian_grads[i];
+  return this->mapping_output.jacobian_grads[q_point];
 }
 
 
 
 template <int dim, int spacedim>
 inline const DerivativeForm<1, spacedim, dim> &
-FEValuesBase<dim, spacedim>::inverse_jacobian(const unsigned int i) const
+FEValuesBase<dim, spacedim>::inverse_jacobian(const unsigned int q_point) const
 {
   Assert(this->update_flags & update_inverse_jacobians,
          ExcAccessToUninitializedField("update_inverse_jacobians"));
-  AssertIndexRange(i, this->mapping_output.inverse_jacobians.size());
+  AssertIndexRange(q_point, this->mapping_output.inverse_jacobians.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
 
-  return this->mapping_output.inverse_jacobians[i];
+  return this->mapping_output.inverse_jacobians[q_point];
 }
 
 
 
 template <int dim, int spacedim>
 inline const Tensor<1, spacedim> &
-FEValuesBase<dim, spacedim>::normal_vector(const unsigned int i) const
+FEValuesBase<dim, spacedim>::normal_vector(const unsigned int q_point) const
 {
   Assert(this->update_flags & update_normal_vectors,
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_normal_vectors")));
-  AssertIndexRange(i, this->mapping_output.normal_vectors.size());
+  AssertIndexRange(q_point, this->mapping_output.normal_vectors.size());
   Assert(present_cell.is_initialized(), ExcNotReinited());
 
-  return this->mapping_output.normal_vectors[i];
+  return this->mapping_output.normal_vectors[q_point];
 }
 
 
@@ -6231,14 +6249,14 @@ FESubfaceValues<dim, spacedim>::get_present_fe_values() const
 
 template <int dim, int spacedim>
 inline const Tensor<1, spacedim> &
-FEFaceValuesBase<dim, spacedim>::boundary_form(const unsigned int i) const
+FEFaceValuesBase<dim, spacedim>::boundary_form(const unsigned int q_point) const
 {
-  AssertIndexRange(i, this->mapping_output.boundary_forms.size());
+  AssertIndexRange(q_point, this->mapping_output.boundary_forms.size());
   Assert(this->update_flags & update_boundary_forms,
          (typename FEValuesBase<dim, spacedim>::ExcAccessToUninitializedField(
            "update_boundary_forms")));
 
-  return this->mapping_output.boundary_forms[i];
+  return this->mapping_output.boundary_forms[q_point];
 }
 
 #endif // DOXYGEN

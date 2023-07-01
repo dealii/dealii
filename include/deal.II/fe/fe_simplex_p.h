@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note Only implemented for 2d and 3d.
  *
- * @relates simplex
+ * Also see
+ * @ref simplex "Simplex support".
  */
 template <int dim, int spacedim = dim>
 class FE_SimplexPoly : public dealii::FE_Poly<dim, spacedim>
@@ -121,7 +122,8 @@ protected:
  * the finite element space of continuous, piecewise polynomials of
  * degree $k$.
  *
- * @relates simplex
+ * Also see
+ * @ref simplex "Simplex support".
  */
 template <int dim, int spacedim = dim>
 class FE_SimplexP : public FE_SimplexPoly<dim, spacedim>
@@ -176,7 +178,8 @@ public:
  * element space of discontinuous, piecewise polynomials of degree
  * $k$.
  *
- * @relates simplex
+ * Also see
+ * @ref simplex "Simplex support".
  */
 template <int dim, int spacedim = dim>
 class FE_SimplexDGP : public FE_SimplexPoly<dim, spacedim>

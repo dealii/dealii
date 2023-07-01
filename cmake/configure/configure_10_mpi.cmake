@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -29,15 +29,6 @@ macro(feature_mpi_find_external var)
 
   if(MPI_FOUND)
     set(${var} TRUE)
-
-    if(NOT MPI_HAVE_MPI_SEEK_SET)
-      message(STATUS
-        "Could not find a sufficient MPI version: "
-        "Your MPI implementation must define MPI_SEEK_SET.")
-      set(MPI_ADDITIONAL_ERROR_STRING
-        "Your MPI implementation must define MPI_SEEK_SET.\n")
-      set(${var} FALSE)
-    endif()
 
     if(MPI_VERSION VERSION_LESS "3.0")
       message(STATUS

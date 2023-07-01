@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -145,7 +145,7 @@ namespace SparseMatrixTools
   {
     template <typename T>
     std::tuple<T, T>
-    compute_prefix_sum(const T &value, const MPI_Comm &comm)
+    compute_prefix_sum(const T &value, const MPI_Comm comm)
     {
 #  ifndef DEAL_II_WITH_MPI
       (void)comm;
@@ -231,7 +231,7 @@ namespace SparseMatrixTools
     extract_remote_rows(const SparseMatrixType &   system_matrix,
                         const SparsityPatternType &sparsity_pattern,
                         const IndexSet &           locally_active_dofs,
-                        const MPI_Comm &           comm)
+                        const MPI_Comm             comm)
     {
       std::vector<unsigned int> dummy(locally_active_dofs.n_elements());
 
@@ -499,10 +499,6 @@ namespace SparseMatrixTools
                                   i.end());
 
     std::sort(ghost_indices_vector.begin(), ghost_indices_vector.end());
-    ghost_indices_vector.erase(std::unique(ghost_indices_vector.begin(),
-                                           ghost_indices_vector.end()),
-                               ghost_indices_vector.end());
-
 
     IndexSet locally_active_dofs(std::get<1>(prefix_sum));
     locally_active_dofs.add_indices(ghost_indices_vector.begin(),

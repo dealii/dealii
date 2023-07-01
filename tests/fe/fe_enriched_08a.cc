@@ -107,7 +107,7 @@ main(int argc, char **argv)
     {
       test2cellsFESystem<2>(1, 2); // 1+0 vs 2+1
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2020 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,8 +66,8 @@ main(int argc, char *argv[])
 
         LinearAlgebra::ReadWriteVector<double> v_tmp(local_range);
         LinearAlgebra::EpetraWrappers::Vector  v2(local_range, MPI_COMM_WORLD);
-        v_tmp.import(v1, VectorOperation::insert);
-        v2.import(v_tmp, VectorOperation::insert);
+        v_tmp.import_elements(v1, VectorOperation::insert);
+        v2.import_elements(v_tmp, VectorOperation::insert);
         VectorTools::subtract_mean_value(v2);
         AssertThrow(std::fabs(v2.mean_value()) < 1e-10 * v2.l2_norm(),
                     ExcInternalError());
@@ -80,7 +80,7 @@ main(int argc, char *argv[])
         test(v);
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

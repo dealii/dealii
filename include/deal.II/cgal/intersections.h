@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
 #include <deal.II/base/point.h>
 
 #include <deal.II/fe/mapping.h>
@@ -60,21 +61,20 @@ namespace CGALWrappers
 
 
   /**
-   * Same function as above, but working directly with vertices.
+   * Same function as above, but working directly with vertices. It's assumed
+   * that the first vertices are coming from a Triangulation<dim0,spacedim>,
+   * while the other vertices are from a Triangulation<dim1,spacedim>, with
+   * @p dim0 > @p dim1.
+   *
+   * @note The vertices have to be given in CGAL order.
    */
-  template <int dim0, int dim1, int spacedim, int n_vertices0, int n_vertices1>
+  template <int dim0, int dim1, int spacedim>
   std::vector<std::array<Point<spacedim>, dim1 + 1>>
   compute_intersection_of_cells(
-    const std::array<Point<spacedim>, n_vertices0> &vertices0,
-    const std::array<Point<spacedim>, n_vertices1> &vertices1,
-    const double                                    tol = 1e-9)
-  {
-    (void)vertices0;
-    (void)vertices1;
-    (void)tol;
-    Assert(false, ExcMessage("No explicit template instantiation available"));
-    return {};
-  }
+    const ArrayView<const Point<spacedim>> &vertices0,
+    const ArrayView<const Point<spacedim>> &vertices1,
+    const double                            tol = 1e-9);
+
 } // namespace CGALWrappers
 
 DEAL_II_NAMESPACE_CLOSE

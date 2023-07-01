@@ -1,12 +1,18 @@
-FROM dealii/dependencies:focal
+ARG IMG=focal
+
+FROM dealii/dependencies:$IMG
 
 LABEL maintainer="luca.heltai@gmail.com"
 
+ARG VER=master
+
 USER root
-RUN cd /usr/src \
-    && git clone https://github.com/dealii/dealii \
-    && cd dealii && mkdir build && cd build \
-    && cmake -GNinja \
+RUN cd /usr/src && \
+    git clone https://github.com/dealii/dealii dealii-$VER && \
+    cd dealii-$VER && \
+    git checkout $VER && \
+    mkdir build && cd build && \
+    cmake -GNinja \
     -DCMAKE_PREFIX_PATH="/usr/lib/x86_64-linux-gnu/hdf5/openmpi;/usr/include/hdf5/openmpi" \
     -DDEAL_II_ALLOW_AUTODETECTION=OFF \
     -DDEAL_II_COMPILE_EXAMPLES=OFF \
@@ -41,6 +47,7 @@ RUN cd /usr/src \
     -DDEAL_II_WITH_TBB=ON \
     -DDEAL_II_WITH_TRILINOS=ON \
     -DDEAL_II_WITH_UMFPACK=ON \
+    -DDEAL_II_WITH_VTK=ON \
     -DDEAL_II_WITH_ZLIB=ON \
     .. \
     && ninja -j 2 install \

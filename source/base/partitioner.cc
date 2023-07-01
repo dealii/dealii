@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,7 +64,7 @@ namespace Utilities
 
     Partitioner::Partitioner(const types::global_dof_index local_size,
                              const types::global_dof_index ghost_size,
-                             const MPI_Comm &              communicator)
+                             const MPI_Comm                communicator)
       : global_size(Utilities::MPI::sum<types::global_dof_index>(local_size,
                                                                  communicator))
       , locally_owned_range_data(global_size)
@@ -100,7 +100,7 @@ namespace Utilities
 
     Partitioner::Partitioner(const IndexSet &locally_owned_indices,
                              const IndexSet &ghost_indices_in,
-                             const MPI_Comm &communicator_in)
+                             const MPI_Comm  communicator_in)
       : global_size(
           static_cast<types::global_dof_index>(locally_owned_indices.size()))
       , n_ghost_indices_data(0)
@@ -118,7 +118,7 @@ namespace Utilities
 
 
     Partitioner::Partitioner(const IndexSet &locally_owned_indices,
-                             const MPI_Comm &communicator_in)
+                             const MPI_Comm  communicator_in)
       : global_size(
           static_cast<types::global_dof_index>(locally_owned_indices.size()))
       , n_ghost_indices_data(0)
@@ -137,7 +137,7 @@ namespace Utilities
     void
     Partitioner::reinit(const IndexSet &vector_space_vector_index_set,
                         const IndexSet &read_write_vector_index_set,
-                        const MPI_Comm &communicator_in)
+                        const MPI_Comm  communicator_in)
     {
       have_ghost_indices = false;
       communicator       = communicator_in;
@@ -150,16 +150,8 @@ namespace Utilities
     void
     Partitioner::set_owned_indices(const IndexSet &locally_owned_indices)
     {
-      if (Utilities::MPI::job_supports_mpi() == true)
-        {
-          my_pid  = Utilities::MPI::this_mpi_process(communicator);
-          n_procs = Utilities::MPI::n_mpi_processes(communicator);
-        }
-      else
-        {
-          my_pid  = 0;
-          n_procs = 1;
-        }
+      my_pid  = Utilities::MPI::this_mpi_process(communicator);
+      n_procs = Utilities::MPI::n_mpi_processes(communicator);
 
       // set the local range
       Assert(locally_owned_indices.is_contiguous() == true,
@@ -314,7 +306,7 @@ namespace Utilities
       // find how much the individual processes that want import from me
       std::map<unsigned int, IndexSet> import_data = process.get_requesters();
 
-      // count import requests and setup the compressed indices
+      // count import requests and set up the compressed indices
       n_import_indices_data = 0;
       import_targets_data   = {};
       import_targets_data.reserve(import_data.size());
@@ -423,7 +415,7 @@ namespace Utilities
           // first translate tight ghost indices into indices within the large
           // set:
           std::vector<unsigned int> expanded_numbering;
-          for (dealii::IndexSet::size_type index : ghost_indices_data)
+          for (const dealii::IndexSet::size_type index : ghost_indices_data)
             {
               Assert(larger_ghost_index_set.is_element(index),
                      ExcMessage("The given larger ghost index set must contain "

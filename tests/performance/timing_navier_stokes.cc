@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,7 +24,10 @@
 // problem with periodic boundary conditions to avoid defining complicated
 // definitions of boundary data and inflow/outflow treatment.
 //
-// Status: experimental
+// Status: stable
+//
+// Note: this test is marked "stable" and used for performance
+// instrumentation in our testsuite, https://dealii.org/performance_tests
 //
 
 #include <deal.II/base/conditional_ostream.h>
@@ -845,9 +848,9 @@ namespace NavierStokes_DG
                                         EvaluationFlags::gradients);
 
                 const auto tau_ip =
-                  (std::abs((phi_m.get_normal_vector(0) *
+                  (std::abs((phi_m.normal_vector(0) *
                              phi_m.inverse_jacobian(0))[dim - 1]) +
-                   std::abs((phi_p.get_normal_vector(0) *
+                   std::abs((phi_p.normal_vector(0) *
                              phi_p.inverse_jacobian(0))[dim - 1])) *
                   Number(viscosity * (degree + 1) * (degree + 1));
 
@@ -855,7 +858,7 @@ namespace NavierStokes_DG
                   {
                     const auto w_m    = phi_m.get_value(q);
                     const auto w_p    = phi_p.get_value(q);
-                    const auto normal = phi_m.get_normal_vector(q);
+                    const auto normal = phi_m.normal_vector(q);
                     auto       numerical_flux =
                       -euler_numerical_flux<dim>(w_m, w_p, normal);
                     const auto grad_w_m = phi_m.get_gradient(q);
@@ -882,14 +885,14 @@ namespace NavierStokes_DG
             else
               {
                 const auto tau_ip =
-                  std::abs((phi_m.get_normal_vector(0) *
+                  std::abs((phi_m.normal_vector(0) *
                             phi_m.inverse_jacobian(0))[dim - 1]) *
                   Number(2. * viscosity * (degree + 1) * (degree + 1));
 
                 for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
                   {
                     const auto w_m      = phi_m.get_value(q);
-                    const auto normal   = phi_m.get_normal_vector(q);
+                    const auto normal   = phi_m.normal_vector(q);
                     const auto grad_w_m = phi_m.get_gradient(q);
                     const auto grad_w_p = grad_w_m;
 
@@ -1014,15 +1017,13 @@ namespace NavierStokes_DG
           internal::EvaluatorQuantity::hessian,
           dim,
           degree + 1,
-          n_points_1d,
-          VectorizedArrayType,
-          VectorizedArrayType>::do_backward(dim + 2,
-                                            data.get_shape_info()
-                                              .data[0]
-                                              .inverse_shape_values_eo,
-                                            false,
-                                            phi.begin_values(),
-                                            phi.begin_dof_values());
+          n_points_1d>::do_backward(dim + 2,
+                                    data.get_shape_info()
+                                      .data[0]
+                                      .inverse_shape_values_eo,
+                                    false,
+                                    phi.begin_values(),
+                                    phi.begin_dof_values());
 
         if (ai == Number())
           {
@@ -1227,9 +1228,9 @@ namespace NavierStokes_DG
                               EvaluationFlags::values |
                                 EvaluationFlags::gradients);
 
-        const auto tau_ip = (std::abs((phi_m.get_normal_vector(0) *
+        const auto tau_ip = (std::abs((phi_m.normal_vector(0) *
                                        phi_m.inverse_jacobian(0))[dim - 1]) +
-                             std::abs((phi_p.get_normal_vector(0) *
+                             std::abs((phi_p.normal_vector(0) *
                                        phi_p.inverse_jacobian(0))[dim - 1])) *
                             Number(viscosity * (degree + 1) * (degree + 1));
 
@@ -1237,7 +1238,7 @@ namespace NavierStokes_DG
           {
             const auto w_m      = phi_m.get_value(q);
             const auto w_p      = phi_p.get_value(q);
-            const auto normal   = phi_m.get_normal_vector(q);
+            const auto normal   = phi_m.normal_vector(q);
             auto numerical_flux = -euler_numerical_flux<dim>(w_m, w_p, normal);
             const auto grad_w_m = phi_m.get_gradient(q);
             const auto grad_w_p = phi_p.get_gradient(q);
@@ -1296,7 +1297,7 @@ namespace NavierStokes_DG
 
         const auto tau_ip =
           std::abs(
-            (phi_m.get_normal_vector(0) * phi_m.inverse_jacobian(0))[dim - 1]) *
+            (phi_m.normal_vector(0) * phi_m.inverse_jacobian(0))[dim - 1]) *
           Number(2. * viscosity * (degree + 1) * (degree + 1));
 
         const auto boundary_id = data.get_boundary_id(face);
@@ -1304,7 +1305,7 @@ namespace NavierStokes_DG
         for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
           {
             const auto w_m      = phi_m.get_value(q);
-            const auto normal   = phi_m.get_normal_vector(q);
+            const auto normal   = phi_m.normal_vector(q);
             const auto grad_w_m = phi_m.get_gradient(q);
             const auto grad_w_p = grad_w_m;
 
@@ -1887,7 +1888,7 @@ namespace NavierStokes_DG
 
     GridGenerator::hyper_rectangle(triangulation, lower_left, upper_right);
     for (const auto &cell : triangulation.cell_iterators())
-      for (unsigned int face : cell->face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->at_boundary(face))
           cell->face(face)->set_boundary_id(face);
     std::vector<

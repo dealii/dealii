@@ -49,15 +49,12 @@ jobs:
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -DDEAL_II_COMPONENT_PYTHON_BINDINGS=ON \
               ..
-    - name: archive detailed.log
-      uses: actions/upload-artifact@v3
-      with:
-        name: linux-serial-detailed.log
-        path: build/detailed.log
+    - name: print detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
         cd build
-        make -j 2
+        make VERBOSE=1 -j2
     - name: quicktest
       run: |
         cd build
@@ -68,23 +65,12 @@ jobs:
 
     name: linux debug parallel simplex
     runs-on: [ubuntu-22.04]
+    container:
+      image: dealii/dependencies:jammy
+      options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
     - uses: actions/checkout@v3
-    - name: modules
-      run: |
-        sudo apt-get install -y software-properties-common
-        sudo add-apt-repository -y ppa:ginggs/deal.ii-9.4.0-backports
-        sudo apt-get update
-        sudo apt-get install -yq --no-install-recommends \
-            numdiff \
-            libboost-all-dev \
-            libcgal-dev \
-            libp4est-dev \
-            trilinos-all-dev \
-            petsc-dev \
-            libmetis-dev \
-            libhdf5-mpi-dev
     - name: info
       run: |
         mpicc -v
@@ -102,17 +88,15 @@ jobs:
               -D DEAL_II_WITH_PETSC="ON" \
               -D DEAL_II_WITH_METIS="ON" \
               -D DEAL_II_WITH_HDF5="ON" \
+              -D DEAL_II_WITH_VTK="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
               ..
-    - name: archive detailed.log
-      uses: actions/upload-artifact@v3
-      with:
-        name: linux-simplex-detailed.log
-        path: build/detailed.log
+    - name: print detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
         cd build
-        make -j 2
+        make VERBOSE=1 -j2
     - name: test
       run: |
         # Remove warning: "A high-performance Open MPI point-to-point
@@ -121,8 +105,8 @@ jobs:
         export OMPI_MCA_btl_base_warn_component_unused='0'
 
         cd build
-        make -j 2 setup_tests_simplex
-        ctest --output-on-failure -j 2
+        make -j2 setup_tests_simplex setup_tests_vtk
+        ctest --output-on-failure -j2
     - name: failed test log
       if: ${{ failure() }}
       uses: actions/upload-artifact@v3
@@ -179,6 +163,7 @@ jobs:
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               -D Kokkos_ENABLE_CUDA=ON \
               -D Kokkos_ENABLE_CUDA_LAMBDA=ON \
+              -D Kokkos_ENABLE_CUDA_CONSTEXPR=ON \
               -D Kokkos_ARCH_VOLTA70=ON \
               ..
         make install
@@ -198,22 +183,102 @@ jobs:
               -D DEAL_II_WITH_P4EST="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="ON" \
               ..
+    - name: print detailed.log
+      run: cat build/detailed.log
+    - name: build deal.II
+      run: |
+        cd build
+        make VERBOSE=1 -j2
+    - name: build CUDA tests
+      run: |
+        cd build
+        make -j2 setup_tests_cuda
+        cd tests/cuda
+        make -j2 compile_test_executables
+
+
+  linux-debug-cuda-11-clang:
+    # simple parallel debug build using cuda-11 and clang
+
+    name: linux debug cuda-11 clang
+    runs-on: [ubuntu-20.04]
+
+    env:
+      CUDA_ROOT: /usr/local/cuda
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: modules
+      run: |
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
+        sudo mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+        sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /"
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.4.0-backports
+        sudo apt-get update
+        sudo apt-get install -yq --no-install-recommends \
+            cuda-toolkit-11-0 \
+            libp4est-dev \
+            libopenmpi-dev \
+            llvm \
+            numdiff \
+            openmpi-bin \
+            libboost-all-dev
+    - name: info
+      run: |
+        mpicc -v
+        cmake --version
+    - uses: actions/checkout@v3
+      with:
+        repository: kokkos/kokkos
+        ref: 3.7.00
+        path: kokkos
+    - name: compile and install kokkos
+      working-directory: kokkos
+      run: |
+        mkdir build
+        cd build
+        cmake -D BUILD_SHARED_LIBS=ON \
+              -D CMAKE_CXX_COMPILER=clang++ \
+              -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
+              -D Kokkos_ENABLE_CUDA=ON \
+              -D Kokkos_ARCH_VOLTA70=ON \
+              ..
+        make install
+    - name: configure deal.II
+      run: |
+        mkdir build
+        cd build
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_CXX_COMPILER=clang++ \
+              -D DEAL_II_FORCE_BUNDLED_BOOST=ON \
+              -D DEAL_II_CXX_FLAGS="-std=c++17" \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_CUDA="ON" \
+              -D DEAL_II_WITH_KOKKOS="ON" \
+              -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
+              -D DEAL_II_WITH_MPI="ON" \
+              -D DEAL_II_MPI_WITH_DEVICE_SUPPORT="OFF" \
+              -D DEAL_II_WITH_P4EST="ON" \
+              -D DEAL_II_COMPONENT_EXAMPLES="ON" \
+              ..
+        cat detailed.log
     - name: archive detailed.log
       uses: actions/upload-artifact@v3
       with:
-        name: linux-cuda-detailed.log
+        name: linux-cuda-clang-detailed.log
         path: build/detailed.log
     - name: build deal.II
       run: |
         cd build
-        make -j 2
+        make VERBOSE=1 -j 2
     - name: build CUDA tests
       run: |
         cd build
         make -j 2 setup_tests_cuda
         cd tests/cuda
         make -j2 compile_test_executables
-
 
   linux-debug-intel-oneapi:
     # parallel debug build with Intel oneAPI including MPI and MKL
@@ -236,7 +301,7 @@ jobs:
     - name: collect versioned dependencies of apt packages
       run : |
         # oneapi-ci/scripts/apt_depends.sh
-        apt-cache depends intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+        apt-cache depends intel-oneapi-compiler-dpcpp-cpp \
                           intel-oneapi-mpi-devel \
                           intel-oneapi-mkl-devel \
                           intel-oneapi-tbb-devel | tee dependencies.txt
@@ -250,7 +315,7 @@ jobs:
       if: steps.cache-install.outputs.cache-hit != 'true'
       run: |
         # oneapi-ci/scripts/install_linux_apt.sh
-        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic \
+        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp \
                                 intel-oneapi-mpi-devel \
                                 intel-oneapi-mkl-devel \
                                 intel-oneapi-tbb-devel
@@ -258,6 +323,7 @@ jobs:
     - name: info
       run: |
         source /opt/intel/oneapi/setvars.sh
+        export I_MPI_CXX=icpx
         mpiicpc -v
         cmake --version
     - name: configure deal.II
@@ -266,8 +332,8 @@ jobs:
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D CMAKE_CXX_COMPILER=icpc \
-              -D DEAL_II_CXX_FLAGS='-Werror' \
+              -D CMAKE_CXX_COMPILER=icpx \
+              -D DEAL_II_CXX_FLAGS='-Werror -Wno-error=tautological-constant-compare' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_MPI=ON \
               -D DEAL_II_WITH_LAPACK=ON \
@@ -277,16 +343,13 @@ jobs:
               -D LAPACK_DIR=${MKLROOT} \
               -D TBB_DIR=${TBBROOT} \
               ..
-    - name: archive detailed.log
-      uses: actions/upload-artifact@v3
-      with:
-        name: linux-intel-detailed.log
-        path: build/detailed.log
+    - name: print detailed.log
+      run: cat build/detailed.log
     - name: build
       run: |
         source /opt/intel/oneapi/setvars.sh
         cd build
-        make -j 2
+        make VERBOSE=1 -j2
     - name: quicktest
       run: |
         source /opt/intel/oneapi/setvars.sh

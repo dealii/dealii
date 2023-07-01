@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -154,8 +154,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
     \{
 
       template std::pair<
-        dealii::DoFHandler<deal_II_dimension,
-                           deal_II_space_dimension>::active_cell_iterator,
+        DoFHandler<deal_II_dimension,
+                   deal_II_space_dimension>::active_cell_iterator,
         Point<deal_II_dimension>>
       find_active_cell_around_point(
         const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
@@ -370,8 +370,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
-#  if deal_II_dimension >= 2
-
     namespace GridTools
     \{
       template void
@@ -391,7 +389,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                        deal_II_dimension,
                        deal_II_space_dimension>::space_dimension> &,
         const FullMatrix<double> &);
-
       template void
       collect_periodic_faces<
         parallel::shared::Triangulation<deal_II_dimension,
@@ -409,6 +406,5 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                        deal_II_space_dimension>::space_dimension> &,
         const FullMatrix<double> &);
     \}
-#  endif
 #endif
   }

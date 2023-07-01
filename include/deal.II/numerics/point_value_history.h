@@ -175,8 +175,8 @@ namespace internal
  * #include <deal.II/numerics/point_value_history.h>
  * //....
  *
- * //... code to setup Triangulation, perform any refinement necessary
- * // and setup DoFHandler, sizing solution Vectors etc
+ * //... code to set up Triangulation, perform any refinement necessary
+ * // and set up DoFHandler, sizing solution Vectors etc
  *
  * // just one independent value, which happens to be an input
  * unsigned int n_inputs = 1;
@@ -184,7 +184,7 @@ namespace internal
  * // call the constructor
  * PointValueHistory<dim> node_monitor(dof_handler, n_inputs);
  *
- * // setup fields and points required
+ * // set up fields and points required
  * node_monitor.add_field_name("Solution");
  * std::vector <Point <dim> > point_vector(2);
  * point_vector[0] = Point <dim>(0, 0);

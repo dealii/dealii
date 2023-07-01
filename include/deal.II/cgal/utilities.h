@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,11 @@
 #  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
 #  include <CGAL/Mesh_criteria_3.h>
 #  include <CGAL/Mesh_triangulation_3.h>
+// Disable a warnung that we get with gcc-13 about a potential unitialized
+// usage of an <anonymous> lambda function in this external CGAL header.
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Polygon_mesh_processing/corefinement.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Polygon_mesh_processing/measure.h>
 #  include <CGAL/Polygon_mesh_processing/remesh.h>
 #  include <CGAL/Polygon_mesh_processing/triangulate_faces.h>
@@ -221,7 +225,7 @@ namespace CGALWrappers
    * @param [in] bool_op The BooleanOperation to be performed.
    * @param [in] mapping0 Mapping object for the first cell.
    * @param [in] mapping1 Mapping object for the first cell.
-   * @return [out] Quadrature<spacedim> The global quadrature rule on the polygon/polyhedron.
+   * @return The global quadrature rule on the polygon/polyhedron.
    */
   template <int dim0, int dim1, int spacedim>
   dealii::Quadrature<spacedim>
@@ -250,7 +254,7 @@ namespace CGALWrappers
    * @param [in] mapping0 Mapping object for the first cell.
    * @param [in] mapping1 Mapping object for the first cell.
    * @param [in] degree The degree of accuracy you wish to get for the global quadrature formula.
-   * @return [out] Quadrature<spacedim> The global quadrature rule on the polygon/polyhedron.
+   * @return The global quadrature rule on the polygon/polyhedron.
    */
   template <int dim0, int dim1, int spacedim>
   dealii::Quadrature<spacedim>
@@ -594,6 +598,25 @@ namespace CGALWrappers
   }
 
 
+
+  /**
+   * Resort vertices in deal.II order to vertices in CGAL order.
+   *
+   * @param structdim Dimension of the entity which is described by the vertices.
+   * @param vertices Vertices in deal.II order which are resorted to CGAL order.
+   */
+  template <int spacedim>
+  void
+  resort_dealii_vertices_to_cgal_order(const unsigned int            structdim,
+                                       std::vector<Point<spacedim>> &vertices)
+  {
+    if (ReferenceCell::n_vertices_to_type(structdim, vertices.size()) ==
+        ReferenceCells::Quadrilateral)
+      std::swap(vertices[2], vertices[3]);
+  }
+
+
+
   /**
    * Get vertices of cell in CGAL ordering.
    *
@@ -601,29 +624,63 @@ namespace CGALWrappers
    * @param mapping Mapping object for the cell.
    * @return  Array of vertices in CGAL order.
    */
-  template <int n_vertices, int dim, int spacedim>
-  std::array<Point<spacedim>, n_vertices>
+  template <int dim, int spacedim>
+  std::vector<Point<spacedim>>
   get_vertices_in_cgal_order(
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
     const Mapping<dim, spacedim> &                                      mapping)
   {
     // Elements have to be rectangular or simplices
-    Assert(n_vertices == std::pow(2, dim) || n_vertices == dim + 1,
+    const unsigned int n_vertices = cell->n_vertices();
+    Assert((n_vertices == ReferenceCells::get_hypercube<dim>().n_vertices()) ||
+             (n_vertices == ReferenceCells::get_simplex<dim>().n_vertices()),
            ExcNotImplemented());
-    AssertDimension(mapping.get_vertices(cell).size(), n_vertices);
 
-    std::array<Point<spacedim>, n_vertices> vertices;
-
+    std::vector<Point<spacedim>> ordered_vertices(n_vertices);
     std::copy_n(mapping.get_vertices(cell).begin(),
-                vertices.size(),
-                vertices.begin());
+                n_vertices,
+                ordered_vertices.begin());
 
-    if (ReferenceCell::n_vertices_to_type(dim, n_vertices) ==
-        ReferenceCells::Quadrilateral)
-      std::swap(vertices[2], vertices[3]);
+    resort_dealii_vertices_to_cgal_order(dim, ordered_vertices);
 
-    return vertices;
+    return ordered_vertices;
   }
+
+
+
+  /**
+   * Get vertices of face in CGAL ordering
+   *
+   * @param cell A cell_iterator to a deal.II cell.
+   * @param face_no The face number within the given cell.
+   * @param mapping Mapping object for the cell.
+   * @return Array of vertices in CGAL order.
+   */
+  template <int dim, int spacedim>
+  std::vector<Point<spacedim>>
+  get_vertices_in_cgal_order(
+    const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
+    const unsigned int                                                  face_no,
+    const Mapping<dim, spacedim> &                                      mapping)
+  {
+    // Elements have to be rectangular or simplices
+    const unsigned int n_vertices = cell->face(face_no)->n_vertices();
+    Assert(
+      (n_vertices == ReferenceCells::get_hypercube<dim - 1>().n_vertices()) ||
+        (n_vertices == ReferenceCells::get_simplex<dim - 1>().n_vertices()),
+      ExcNotImplemented());
+
+    std::vector<Point<spacedim>> ordered_vertices(n_vertices);
+    std::copy_n(mapping.get_vertices(cell, face_no).begin(),
+                n_vertices,
+                ordered_vertices.begin());
+
+    resort_dealii_vertices_to_cgal_order(dim - 1, ordered_vertices);
+
+    return ordered_vertices;
+  }
+
+
 
 } // namespace CGALWrappers
 #  endif

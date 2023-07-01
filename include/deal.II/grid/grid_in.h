@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,8 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
 #ifndef DOXYGEN
-template <int dim, int space_dim>
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class Triangulation;
 template <int dim>
 struct CellData;
@@ -411,7 +412,8 @@ public:
    * The companion GridOut::write_vtk function can be used to write VTK files
    * compatible with this method.
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   void
   read_vtk(std::istream &in);
@@ -516,7 +518,8 @@ public:
    * Read grid data from an msh file. The %Gmsh formats are documented at
    * http://www.gmsh.info/.
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   void
   read_msh(std::istream &in);
@@ -575,7 +578,9 @@ public:
    * as a boundary or material id.  Physical surface numbers created in Gmsh,
    * which can be seen in the .geo file, become material IDs.
    *
-   * @relates simplex
+   *
+   * Also see
+   * @ref simplex "Simplex support".
    */
   void
   read_msh(const std::string &filename);
@@ -614,7 +619,8 @@ public:
    * @image html "comsol-mesh-boundary-lines.png"
    * @image html "comsol-mesh-boundary-triangles.png"
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   void
   read_comsol_mphtxt(std::istream &in);

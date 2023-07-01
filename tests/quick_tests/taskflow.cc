@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,9 +17,7 @@
 
 #include <deal.II/base/thread_management.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <taskflow/taskflow.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <iostream>
 

@@ -323,8 +323,6 @@ test_point_3d()
 int
 main(int argc, char **argv)
 {
-  // Initialize Kokkos
-  Kokkos::initialize(argc, argv);
   Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv);
 
   initlog();
@@ -334,6 +332,4 @@ main(int argc, char **argv)
   test_bounding_box_3d();
   test_point_2d();
   test_point_3d();
-
-  Kokkos::finalize();
 }

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2019 - 2022 by the deal.II authors
+ * Copyright (C) 2019 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -61,8 +61,8 @@ namespace Step64
   // an object of this type to a CUDAWrappers::MatrixFree
   // object that expects the class to have an `operator()` that fills the
   // values provided in the constructor for a given cell. This operator
-  // needs to run on the device, so it needs to be marked as `__device__`
-  // for the compiler.
+  // needs to run on the device, so it needs to be marked as
+  // `DEAL_II_HOST_DEVICE` for the compiler.
   template <int dim, int fe_degree>
   class VaryingCoefficientFunctor
   {
@@ -71,13 +71,15 @@ namespace Step64
       : coef(coefficient)
     {}
 
-    __device__ void operator()(
+    DEAL_II_HOST_DEVICE void operator()(
+      const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
       const unsigned int                                          cell,
-      const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data);
+      const unsigned int                                          q) const;
 
     // Since CUDAWrappers::MatrixFree::Data doesn't know about the size of its
-    // arrays, we need to store the number of quadrature points and the numbers
-    // of degrees of freedom in this class to do necessary index conversions.
+    // arrays, we need to store the number of quadrature points and the
+    // number of degrees of freedom in this class to do necessary index
+    // conversions.
     static const unsigned int n_dofs_1d    = fe_degree + 1;
     static const unsigned int n_local_dofs = Utilities::pow(n_dofs_1d, dim);
     static const unsigned int n_q_points   = Utilities::pow(n_dofs_1d, dim);
@@ -92,16 +94,14 @@ namespace Step64
   // the introduction that we have defined it as $a(\mathbf
   // x)=\frac{10}{0.05 + 2\|\mathbf x\|^2}$
   template <int dim, int fe_degree>
-  __device__ void VaryingCoefficientFunctor<dim, fe_degree>::operator()(
+  DEAL_II_HOST_DEVICE void
+  VaryingCoefficientFunctor<dim, fe_degree>::operator()(
+    const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
     const unsigned int                                          cell,
-    const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data)
+    const unsigned int                                          q) const
   {
-    const unsigned int pos = CUDAWrappers::local_q_point_id<dim, double>(
-      cell, gpu_data, n_dofs_1d, n_q_points);
-    const Point<dim> q_point =
-      CUDAWrappers::get_quadrature_point<dim, double>(cell,
-                                                      gpu_data,
-                                                      n_dofs_1d);
+    const unsigned int pos = gpu_data->local_q_point_id(cell, n_q_points, q);
+    const Point<dim>   q_point = gpu_data->get_quadrature_point(cell, q);
 
     double p_square = 0.;
     for (unsigned int i = 0; i < dim; ++i)
@@ -121,22 +121,31 @@ namespace Step64
   // step-37. In contrast to there, the actual quadrature point
   // index is treated implicitly by converting the current thread
   // index. As before, the functions of this class need to run on
-  // the device, so need to be marked as `__device__` for the
+  // the device, so need to be marked as `DEAL_II_HOST_DEVICE` for the
   // compiler.
   template <int dim, int fe_degree>
   class HelmholtzOperatorQuad
   {
   public:
-    __device__ HelmholtzOperatorQuad(double coef)
+    DEAL_II_HOST_DEVICE HelmholtzOperatorQuad(
+      const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
+      double *                                                    coef,
+      int                                                         cell)
       : coef(coef)
     {}
 
-    __device__ void operator()(
+    DEAL_II_HOST_DEVICE void operator()(
       CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
-        *fe_eval) const;
+        *       fe_eval,
+      const int q_point) const;
+
+    static const unsigned int n_q_points =
+      dealii::Utilities::pow(fe_degree + 1, dim);
 
   private:
-    double coef;
+    const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data;
+    double *                                                    coef;
+    int                                                         cell;
   };
 
 
@@ -148,12 +157,16 @@ namespace Step64
   // the two terms on the left-hand side correspond to the two function calls
   // here:
   template <int dim, int fe_degree>
-  __device__ void HelmholtzOperatorQuad<dim, fe_degree>::operator()(
+  DEAL_II_HOST_DEVICE void HelmholtzOperatorQuad<dim, fe_degree>::operator()(
     CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
-      *fe_eval) const
+      *       fe_eval,
+    const int q_point) const
   {
-    fe_eval->submit_value(coef * fe_eval->get_value());
-    fe_eval->submit_gradient(fe_eval->get_gradient());
+    const unsigned int pos =
+      gpu_data->local_q_point_id(cell, n_q_points, q_point);
+
+    fe_eval->submit_value(coef[pos] * fe_eval->get_value(q_point), q_point);
+    fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
   }
 
 
@@ -166,23 +179,25 @@ namespace Step64
   class LocalHelmholtzOperator
   {
   public:
+    // Again, the CUDAWrappers::MatrixFree object doesn't know about the number
+    // of degrees of freedom and the number of quadrature points so we need
+    // to store these for index calculations in the call operator.
+    static constexpr unsigned int n_dofs_1d = fe_degree + 1;
+    static constexpr unsigned int n_local_dofs =
+      Utilities::pow(fe_degree + 1, dim);
+    static constexpr unsigned int n_q_points =
+      Utilities::pow(fe_degree + 1, dim);
+
     LocalHelmholtzOperator(double *coefficient)
       : coef(coefficient)
     {}
 
-    __device__ void operator()(
+    DEAL_II_HOST_DEVICE void operator()(
       const unsigned int                                          cell,
       const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
       CUDAWrappers::SharedData<dim, double> *                     shared_data,
       const double *                                              src,
       double *                                                    dst) const;
-
-    // Again, the CUDAWrappers::MatrixFree object doesn't know about the number
-    // of degrees of freedom and the number of quadrature points so we need
-    // to store these for index calculations in the call operator.
-    static const unsigned int n_dofs_1d    = fe_degree + 1;
-    static const unsigned int n_local_dofs = Utilities::pow(fe_degree + 1, dim);
-    static const unsigned int n_q_points   = Utilities::pow(fe_degree + 1, dim);
 
   private:
     double *coef;
@@ -195,22 +210,19 @@ namespace Step64
   // vector and we write value and gradient information to the destination
   // vector.
   template <int dim, int fe_degree>
-  __device__ void LocalHelmholtzOperator<dim, fe_degree>::operator()(
+  DEAL_II_HOST_DEVICE void LocalHelmholtzOperator<dim, fe_degree>::operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
     CUDAWrappers::SharedData<dim, double> *                     shared_data,
     const double *                                              src,
     double *                                                    dst) const
   {
-    const unsigned int pos = CUDAWrappers::local_q_point_id<dim, double>(
-      cell, gpu_data, n_dofs_1d, n_q_points);
-
     CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
-      fe_eval(cell, gpu_data, shared_data);
+      fe_eval(gpu_data, shared_data);
     fe_eval.read_dof_values(src);
     fe_eval.evaluate(true, true);
     fe_eval.apply_for_each_quad_point(
-      HelmholtzOperatorQuad<dim, fe_degree>(coef[pos]));
+      HelmholtzOperatorQuad<dim, fe_degree>(gpu_data, coef, cell));
     fe_eval.integrate(true, true);
     fe_eval.distribute_local_to_global(dst);
   }
@@ -480,8 +492,8 @@ namespace Step64
     system_rhs_host.compress(VectorOperation::add);
 
     LinearAlgebra::ReadWriteVector<double> rw_vector(locally_owned_dofs);
-    rw_vector.import(system_rhs_host, VectorOperation::insert);
-    system_rhs_dev.import(rw_vector, VectorOperation::insert);
+    rw_vector.import_elements(system_rhs_host, VectorOperation::insert);
+    system_rhs_dev.import_elements(rw_vector, VectorOperation::insert);
   }
 
 
@@ -513,8 +525,8 @@ namespace Step64
           << std::endl;
 
     LinearAlgebra::ReadWriteVector<double> rw_vector(locally_owned_dofs);
-    rw_vector.import(solution_dev, VectorOperation::insert);
-    ghost_solution_host.import(rw_vector, VectorOperation::insert);
+    rw_vector.import_elements(solution_dev, VectorOperation::insert);
+    ghost_solution_host.import_elements(rw_vector, VectorOperation::insert);
 
     constraints.distribute(ghost_solution_host);
 

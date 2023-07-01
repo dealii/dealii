@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2006 - 2020 by the deal.II authors
+// Copyright (C) 2006 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -44,8 +44,6 @@
 #include "../tests.h"
 
 #include "../grid/mesh_3d.h"
-
-using namespace std;
 
 template <int dim>
 class F : public Function<dim>

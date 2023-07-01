@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -65,6 +65,19 @@ Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points,
                             const std::vector<double> &    weights)
   : quadrature_points(points)
   , weights(weights)
+  , is_tensor_product_flag(dim == 1)
+{
+  Assert(weights.size() == points.size(),
+         ExcDimensionMismatch(weights.size(), points.size()));
+}
+
+
+
+template <int dim>
+Quadrature<dim>::Quadrature(std::vector<Point<dim>> &&points,
+                            std::vector<double> &&    weights)
+  : quadrature_points(std::move(points))
+  , weights(std::move(weights))
   , is_tensor_product_flag(dim == 1)
 {
   Assert(weights.size() == points.size(),
@@ -587,7 +600,7 @@ QIterated<1>::QIterated(const Quadrature<1> &        base_quadrature,
     else if (std::abs(i[0] - 1.0) < 1e-12)
       i[0] = 1.0;
 
-#if DEBUG
+#ifdef DEBUG
   double sum_of_weights = 0;
   for (unsigned int i = 0; i < this->size(); ++i)
     sum_of_weights += this->weight(i);

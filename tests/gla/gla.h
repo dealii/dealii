@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2021 by the deal.II authors
+// Copyright (C) 2013 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,18 +53,18 @@ public:
       Vector()
       {}
 
-      Vector(const IndexSet local, const MPI_Comm &comm)
+      Vector(const IndexSet local, const MPI_Comm comm)
       {}
 
-      Vector(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &comm)
-      {}
-
-      void
-      reinit(const IndexSet local, const MPI_Comm &comm)
+      Vector(const IndexSet &local, const IndexSet &ghost, const MPI_Comm comm)
       {}
 
       void
-      reinit(const IndexSet local, const IndexSet &ghost, const MPI_Comm &comm)
+      reinit(const IndexSet local, const MPI_Comm comm)
+      {}
+
+      void
+      reinit(const IndexSet local, const IndexSet &ghost, const MPI_Comm comm)
       {}
 
       void
@@ -124,8 +124,8 @@ public:
       template <typename SP>
       SparseMatrix(const IndexSet &local,
                    const IndexSet &,
-                   SP &            sp,
-                   const MPI_Comm &comm = MPI_COMM_WORLD)
+                   SP &           sp,
+                   const MPI_Comm comm = MPI_COMM_WORLD)
       {}
 
       void

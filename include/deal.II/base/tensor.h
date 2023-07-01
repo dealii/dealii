@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,8 +38,11 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 template <typename ElementType, typename MemorySpace>
 class ArrayView;
+
 template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
 class Point;
+
 template <int rank_, int dim, typename Number = double>
 class Tensor;
 template <typename Number>
@@ -138,7 +141,7 @@ public:
   /**
    * Constructor. Set to zero.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE
   Tensor();
@@ -148,7 +151,7 @@ public:
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE
@@ -157,7 +160,7 @@ public:
   /**
    * Constructor, where the data is copied from a C-style array.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE
@@ -233,7 +236,7 @@ public:
    * This is the non-const conversion operator that returns a writable
    * reference.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE
   operator Number &();
@@ -244,7 +247,7 @@ public:
    *
    * This is the const conversion operator that returns a read-only reference.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE operator const Number &() const;
 
@@ -253,7 +256,7 @@ public:
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -266,7 +269,7 @@ public:
    * copy constructor for Sacado::Rad::ADvar types automatically.
    * See https://github.com/dealii/dealii/pull/5865.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor &
                                 operator=(const Tensor<0, dim, Number> &rhs);
@@ -284,11 +287,20 @@ public:
    * This operator assigns a scalar to a tensor. This obviously requires
    * that the @p OtherNumber type is convertible to @p Number.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
-                                operator=(const OtherNumber &d);
+                                operator=(const OtherNumber &d) &;
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  template <typename OtherNumber>
+  constexpr DEAL_II_HOST_DEVICE Tensor &
+                                operator=(const OtherNumber &d) && = delete;
 
   /**
    * Test for equality of two tensors.
@@ -307,7 +319,7 @@ public:
   /**
    * Add another scalar.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -316,7 +328,7 @@ public:
   /**
    * Subtract another scalar.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -325,7 +337,7 @@ public:
   /**
    * Multiply the scalar with a <tt>factor</tt>.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -334,7 +346,7 @@ public:
   /**
    * Divide the scalar by <tt>factor</tt>.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -343,7 +355,7 @@ public:
   /**
    * Tensor with inverted entries.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor
   operator-() const;
@@ -375,7 +387,7 @@ public:
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
    * absolute squares of all entries.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE real_type
   norm_square() const;
@@ -546,7 +558,7 @@ public:
   /**
    * Constructor. Initialize all entries to zero.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   Tensor();
@@ -554,7 +566,7 @@ public:
   /**
    * A constructor where the data is copied from a C-style array.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE explicit Tensor(const array_type &initializer);
 
@@ -563,13 +575,12 @@ public:
    * Obviously, the ArrayView object must represent a stretch of
    * data of size `dim`<sup>`rank`</sup>. The sequentially ordered elements
    * of the argument `initializer` are interpreted as described by
-   * unrolled_to_component_index().
+   * unrolled_to_component_indices().
    *
    * This constructor obviously requires that the @p ElementType type is
    * either equal to @p Number, or is convertible to @p Number.
-   * Number.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename ElementType, typename MemorySpace>
   constexpr DEAL_II_HOST_DEVICE explicit Tensor(
@@ -580,7 +591,7 @@ public:
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE
@@ -615,7 +626,7 @@ public:
   /**
    * Read-Write access operator.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE value_type &
                                 operator[](const unsigned int i);
@@ -623,7 +634,7 @@ public:
   /**
    * Read-only access operator.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE const value_type &
                                       operator[](const unsigned int i) const;
@@ -669,7 +680,7 @@ public:
    * This obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -681,8 +692,16 @@ public:
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
    */
-  constexpr Tensor &
-  operator=(const Number &d);
+  constexpr DEAL_II_HOST_DEVICE Tensor &
+                                operator=(const Number &d) &;
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  constexpr DEAL_II_HOST_DEVICE Tensor &
+                                operator=(const Number &d) && = delete;
 
 #ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
   /**
@@ -715,7 +734,7 @@ public:
   /**
    * Add another tensor.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -724,7 +743,7 @@ public:
   /**
    * Subtract another tensor.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -734,7 +753,7 @@ public:
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -743,7 +762,7 @@ public:
   /**
    * Scale the vector by <tt>1/factor</tt>.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -752,7 +771,7 @@ public:
   /**
    * Unary minus operator. Negate all entries of a tensor.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor
   operator-() const;
@@ -777,7 +796,7 @@ public:
    * the absolute squares of all entries. For the present case of rank-1
    * tensors, this equals the usual <tt>l<sub>2</sub></tt> norm of the vector.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE
   typename numbers::NumberTraits<Number>::real_type
@@ -787,7 +806,7 @@ public:
    * Return the square of the Frobenius-norm of a tensor, i.e. the sum of the
    * absolute squares of all entries.
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE
     typename numbers::NumberTraits<Number>::real_type
@@ -825,7 +844,7 @@ public:
    * Return an unrolled index in the range $[0,\text{dim}^{\text{rank}}-1]$
    * for the element of the tensor indexed by the argument to the function.
    */
-  static constexpr unsigned int
+  static constexpr DEAL_II_HOST_DEVICE unsigned int
   component_to_unrolled_index(const TableIndices<rank_> &indices);
 
   /**
@@ -833,7 +852,7 @@ public:
    * $[0, \text{dim}^{\text{rank}}-1]$, return which set of indices it would
    * correspond to.
    */
-  static constexpr TableIndices<rank_>
+  static constexpr DEAL_II_HOST_DEVICE TableIndices<rank_>
   unrolled_to_component_indices(const unsigned int i);
 
   /**
@@ -877,7 +896,7 @@ private:
    * This constructor is for internal use. It provides a way
    * to create constexpr constructors for Tensor<rank, dim, Number>
    *
-   * @note This function can also be used in CUDA device code.
+   * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename ArrayLike, std::size_t... Indices>
   constexpr DEAL_II_HOST_DEVICE
@@ -936,14 +955,15 @@ namespace internal
   template <int rank, int dim, typename T>
   struct NumberType<Tensor<rank, dim, T>>
   {
-    static constexpr DEAL_II_ALWAYS_INLINE const Tensor<rank, dim, T> &
-    value(const Tensor<rank, dim, T> &t)
+    static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE const
+      Tensor<rank, dim, T> &
+      value(const Tensor<rank, dim, T> &t)
     {
       return t;
     }
 
-    static constexpr DEAL_II_ALWAYS_INLINE Tensor<rank, dim, T>
-                                           value(const T &t)
+    static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE Tensor<rank, dim, T>
+                                                       value(const T &t)
     {
       Tensor<rank, dim, T> tmp;
       tmp = t;
@@ -1092,7 +1112,7 @@ Tensor<0, dim, Number>::operator=(Tensor<0, dim, Number> &&other) noexcept
 template <int dim, typename Number>
 template <typename OtherNumber>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE Tensor<0, dim, Number> &
-Tensor<0, dim, Number>::operator=(const OtherNumber &d)
+Tensor<0, dim, Number>::operator=(const OtherNumber &d) &
 {
   value = internal::NumberType<Number>::value(d);
   return *this;
@@ -1166,7 +1186,7 @@ namespace internal
       KOKKOS_IF_ON_DEVICE(({
         (void)val;
         (void)s;
-        dealii::internal::kokkos_abort(
+        Kokkos::abort(
           "This function is not implemented for std::complex<Number>!\n");
       }))
 #  else
@@ -1175,7 +1195,7 @@ namespace internal
 #    else
       (void)val;
       (void)s;
-      dealii::internal::kokkos_abort(
+      Kokkos::abort(
         "This function is not implemented for std::complex<Number>!\n");
 #    endif
 #  endif
@@ -1538,8 +1558,9 @@ Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, OtherNumber> &t)
 
 
 template <int rank_, int dim, typename Number>
-constexpr inline DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
-Tensor<rank_, dim, Number>::operator=(const Number &d)
+constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
+  Tensor<rank_, dim, Number> &
+  Tensor<rank_, dim, Number>::operator=(const Number &d) &
 {
   Assert(numbers::value_is_zero(d), ExcScalarAssignmentOnlyForZeroValue());
   (void)d;
@@ -1720,7 +1741,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 
 
 template <int rank_, int dim, typename Number>
-inline typename numbers::NumberTraits<Number>::real_type
+inline DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
 Tensor<rank_, dim, Number>::norm() const
 {
   // Make things work with AD types
@@ -1799,14 +1820,14 @@ namespace internal
   // and rank=2. Make sure we don't have compiler warnings.
 
   template <int dim>
-  inline constexpr unsigned int
+  DEAL_II_HOST_DEVICE inline constexpr unsigned int
   mod(const unsigned int x)
   {
     return x % dim;
   }
 
   template <>
-  inline unsigned int
+  DEAL_II_HOST_DEVICE inline unsigned int
   mod<0>(const unsigned int x)
   {
     Assert(false, ExcInternalError());
@@ -1814,14 +1835,14 @@ namespace internal
   }
 
   template <int dim>
-  inline constexpr unsigned int
+  DEAL_II_HOST_DEVICE inline constexpr unsigned int
   div(const unsigned int x)
   {
     return x / dim;
   }
 
   template <>
-  inline unsigned int
+  DEAL_II_HOST_DEVICE inline unsigned int
   div<0>(const unsigned int x)
   {
     Assert(false, ExcInternalError());
@@ -1836,7 +1857,10 @@ template <int rank_, int dim, typename Number>
 constexpr inline TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
 {
-  AssertIndexRange(i, n_independent_components);
+  // Work-around nvcc warning
+  unsigned int dummy = n_independent_components;
+  AssertIndexRange(i, dummy);
+  (void)dummy;
 
   TableIndices<rank_> indices;
 
@@ -1941,7 +1965,7 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -1961,7 +1985,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -1981,7 +2005,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * OtherNumber that are stored within the Tensor and multiplies them. It
  * returns an unwrapped number of product type.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -1999,7 +2023,7 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
 /**
  * Division of a tensor of rank 0 by a scalar number.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2018,7 +2042,7 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
 /**
  * Add two tensors of rank 0.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2035,7 +2059,7 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 /**
  * Subtract two tensors of rank 0.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2057,7 +2081,7 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2085,7 +2109,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2156,7 +2180,7 @@ namespace internal
  * discussion on operator*() above for more information about template
  * arguments and the return type.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2177,7 +2201,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  *
  * @tparam rank The rank of both tensors.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */
@@ -2201,7 +2225,7 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  *
  * @tparam rank The rank of both tensors.
  *
- * @note This function can also be used in CUDA device code.
+ * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
  */

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,6 +15,7 @@
 
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/vectorization.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -24,9 +25,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
 #include <cmath>
 #include <limits>
@@ -579,7 +578,7 @@ FlatManifold<dim, spacedim>::get_new_point(
 {
   Assert(std::abs(std::accumulate(weights.begin(), weights.end(), 0.0) - 1.0) <
            1e-10,
-         ExcMessage("The weights for the individual points should sum to 1!"));
+         ExcMessage("The weights for the new point should sum to 1!"));
 
   Point<spacedim> p;
 
@@ -642,74 +641,70 @@ FlatManifold<dim, spacedim>::get_new_points(
   AssertDimension(surrounding_points.size(), weights.size(1));
   if (weights.size(0) == 0)
     return;
+  AssertDimension(new_points.size(), weights.size(0));
 
   const std::size_t n_points = surrounding_points.size();
 
-  Tensor<1, spacedim> minP = periodicity;
-  for (unsigned int d = 0; d < spacedim; ++d)
-    if (periodicity[d] > 0)
-      for (unsigned int i = 0; i < n_points; ++i)
+  // if there is no periodicity, use an optimized implementation with
+  // VectorizedArray, otherwise go to the get_new_point function for adjusting
+  // the domain
+  if (periodicity == Tensor<1, spacedim>())
+    {
+      for (unsigned int row = 0; row < weights.size(0); ++row)
+        Assert(std::abs(std::accumulate(&weights(row, 0),
+                                        &weights(row, 0) + n_points,
+                                        0.0) -
+                        1.0) < 1e-10,
+               ExcMessage("The weights for each of the points should sum to "
+                          "1!"));
+
+      constexpr std::size_t n_lanes =
+        std::min<std::size_t>(VectorizedArray<double>::size(), 4);
+      using VectorizedArrayType        = VectorizedArray<double, n_lanes>;
+      const std::size_t n_regular_cols = (n_points / n_lanes) * n_lanes;
+      for (unsigned int row = 0; row < weights.size(0); row += n_lanes)
         {
-          minP[d] = std::min(minP[d], surrounding_points[i][d]);
-          Assert((surrounding_points[i][d] <
-                  periodicity[d] + tolerance * periodicity[d]) ||
-                   (surrounding_points[i][d] >= -tolerance * periodicity[d]),
-                 ExcPeriodicBox(d, surrounding_points[i], periodicity[i]));
+          std::array<unsigned int, n_lanes> offsets;
+          // ensure to not access out of bounds, possibly duplicating some
+          // entries
+          for (std::size_t i = 0; i < n_lanes; ++i)
+            offsets[i] =
+              std::min<unsigned int>((row + i) * n_points,
+                                     (weights.size(0) - 1) * n_points);
+          Point<spacedim, VectorizedArrayType> point;
+          for (std::size_t col = 0; col < n_regular_cols; col += n_lanes)
+            {
+              std::array<VectorizedArrayType, n_lanes> vectorized_weights;
+              vectorized_load_and_transpose(n_lanes,
+                                            &weights(0, 0) + col,
+                                            offsets.data(),
+                                            vectorized_weights.data());
+              for (std::size_t i = 0; i < n_lanes; ++i)
+                point += vectorized_weights[i] * surrounding_points[col + i];
+            }
+          for (std::size_t col = n_regular_cols; col < n_points; ++col)
+            {
+              VectorizedArrayType vectorized_weights;
+              vectorized_weights.gather(&weights(0, 0) + col, offsets.data());
+              point += vectorized_weights * surrounding_points[col];
+            }
+          for (unsigned int r = row;
+               r < std::min<unsigned int>(weights.size(0), row + n_lanes);
+               ++r)
+            {
+              // unpack and project to manifold
+              for (unsigned int d = 0; d < spacedim; ++d)
+                new_points[r][d] = point[d][r - row];
+              new_points[r] =
+                project_to_manifold(surrounding_points, new_points[r]);
+            }
         }
-
-  // check whether periodicity shifts some of the points. Only do this if
-  // necessary to avoid memory allocation
-  const Point<spacedim> *surrounding_points_start = surrounding_points.data();
-
-  boost::container::small_vector<Point<spacedim>, 200> modified_points;
-  bool adjust_periodicity = false;
-  for (unsigned int d = 0; d < spacedim; ++d)
-    if (periodicity[d] > 0)
-      for (unsigned int i = 0; i < n_points; ++i)
-        if ((surrounding_points[i][d] - minP[d]) > periodicity[d] / 2.0)
-          {
-            adjust_periodicity = true;
-            break;
-          }
-  if (adjust_periodicity == true)
-    {
-      modified_points.resize(surrounding_points.size());
-      std::copy(surrounding_points.begin(),
-                surrounding_points.end(),
-                modified_points.begin());
-      for (unsigned int d = 0; d < spacedim; ++d)
-        if (periodicity[d] > 0)
-          for (unsigned int i = 0; i < n_points; ++i)
-            if ((surrounding_points[i][d] - minP[d]) > periodicity[d] / 2.0)
-              modified_points[i][d] -= periodicity[d];
-      surrounding_points_start = modified_points.data();
     }
-
-  // Now perform the interpolation
-  for (unsigned int row = 0; row < weights.size(0); ++row)
-    {
-      Assert(
-        std::abs(
-          std::accumulate(&weights(row, 0), &weights(row, 0) + n_points, 0.0) -
-          1.0) < 1e-10,
-        ExcMessage("The weights for the individual points should sum to 1!"));
-      Point<spacedim> new_point;
-      for (unsigned int p = 0; p < n_points; ++p)
-        new_point += surrounding_points_start[p] * weights(row, p);
-
-      // if necessary, also adjust the weighted point by the periodicity
-      for (unsigned int d = 0; d < spacedim; ++d)
-        if (periodicity[d] > 0)
-          if (new_point[d] < 0)
-            new_point[d] += periodicity[d];
-
-      // TODO should this use surrounding_points_start or surrounding_points?
-      // The older version used surrounding_points
+  else
+    for (unsigned int row = 0; row < weights.size(0); ++row)
       new_points[row] =
-        project_to_manifold(make_array_view(surrounding_points.begin(),
-                                            surrounding_points.end()),
-                            new_point);
-    }
+        get_new_point(surrounding_points,
+                      ArrayView<const double>(&weights(row, 0), n_points));
 }
 
 

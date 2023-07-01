@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -109,8 +109,11 @@ DEAL_II_NAMESPACE_OPEN
  * equally well be Triangulation or PersistentTriangulation).
  *
  * @ingroup grid
+ *
+ * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
  */
 template <class MeshType>
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 class InterGridMap : public Subscriptor
 {
 public:

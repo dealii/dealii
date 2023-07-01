@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,6 +34,12 @@ test(const ReferenceCell &reference_cell)
 {
   unsigned int       n_samples_inside = 0;
   const unsigned int n_samples        = 200000;
+
+  // sanity check: does the reference cell contain its own nodes?
+  for (const unsigned int vertex_no : reference_cell.vertex_indices())
+    AssertThrow(reference_cell.contains_point(
+                  reference_cell.template vertex<dim>(vertex_no)),
+                ExcInternalError());
 
   for (unsigned int n = 0; n < n_samples; ++n)
     {

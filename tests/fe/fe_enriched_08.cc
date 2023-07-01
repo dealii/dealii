@@ -194,7 +194,7 @@ main(int argc, char **argv)
     {
       test2cells<2>(1, 2); // 1 vs 2+1
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

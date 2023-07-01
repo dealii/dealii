@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2021 by the deal.II authors
+ * Copyright (C) 2020 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -549,7 +549,7 @@ main(int argc, char *argv[])
       Step68::ParticleTracking<2> particle_tracking;
       particle_tracking.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

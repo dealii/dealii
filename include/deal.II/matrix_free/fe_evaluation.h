@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -295,7 +295,7 @@ public:
    * corresponds to the value of the integrated function with the test
    * function of the given index.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -308,7 +308,7 @@ public:
    * get_dof_value. Therefore, the original data that was read from a vector
    * is overwritten as soon as a value is submitted.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -323,7 +323,7 @@ public:
    * vector-valued, a vector-valued return argument is given. Note that when
    * vectorization is enabled, values from several cells are grouped together.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -338,7 +338,7 @@ public:
    * which is tested by all basis function on the current cell and integrated
    * over.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -351,7 +351,7 @@ public:
    * EvaluationFlags::gradients, or the value that has been stored there with
    * a call to FEEvaluationBase::submit_gradient().
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -365,10 +365,10 @@ public:
    * to the face: $\boldsymbol \nabla u(\mathbf x_q) \cdot \mathbf n(\mathbf
    * x_q)$
    *
-   * This call is equivalent to calling get_gradient() * get_normal_vector()
+   * This call is equivalent to calling get_gradient() * normal_vector()
    * but will use a more efficient internal representation of data.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -383,7 +383,7 @@ public:
    * this specifies what is tested by all basis function gradients on the
    * current cell and integrated over.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -420,7 +420,7 @@ public:
    * this specifies what is tested by the Hessians of all basis functions on the
    * current cell and integrated over.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -434,7 +434,7 @@ public:
    * or even the trace of the Hessian, the Laplacian, is needed, use the other
    * functions below.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -446,7 +446,7 @@ public:
    * quadrature point number @p q_point after a call to
    * FEEvaluation::evaluate(EvaluationFlags::hessians).
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -460,7 +460,7 @@ public:
    * when computing the full Hessian, some operations can be saved when only
    * the Laplacian is requested.
    *
-   * Note that the derived class FEEvaluationAccess overloads this operation
+   * @note The derived class FEEvaluationAccess overloads this operation
    * with specializations for the scalar case (n_components == 1) and for the
    * vector-valued case (n_components == dim).
    */
@@ -474,9 +474,9 @@ public:
 
   /**
    * Return the divergence of a vector-valued finite element at quadrature
-   * point number @p q_point after a call to @p evaluate(...,true,...).
+   * point number @p q_point after a call to @p evaluate(EvaluationFlags::gradients).
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    */
   VectorizedArrayType
   get_divergence(const unsigned int q_point) const;
@@ -484,19 +484,19 @@ public:
   /**
    * Return the symmetric gradient of a vector-valued finite element at
    * quadrature point number @p q_point after a call to @p
-   * evaluate(...,true,...). It corresponds to <tt>0.5
+   * evaluate(EvaluationFlags::gradients). It corresponds to <tt>0.5
    * (grad+grad<sup>T</sup>)</tt>.
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    */
   SymmetricTensor<2, dim, VectorizedArrayType>
   get_symmetric_gradient(const unsigned int q_point) const;
 
   /**
    * Return the curl of the vector field, $\nabla \times v$ after a call to @p
-   * evaluate(...,true,...).
+   * evaluate(EvaluationFlags::gradients).
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    */
   Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
   get_curl(const unsigned int q_point) const;
@@ -505,11 +505,11 @@ public:
    * Write a contribution that is tested by the divergence to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies what is
+   * the function @p integrate(EvaluationFlags::gradients) is called, this specifies what is
    * tested by all basis function gradients on the current cell and integrated
    * over.
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
    * submit_gradient(). As a consequence, only one of these two can be
@@ -524,11 +524,11 @@ public:
    * Write a contribution that is tested by the symmetric gradient to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_symmetric_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies the
+   * the function @p integrate(EvaluationFlags::gradients) is called, this specifies the
    * symmetric gradient which is tested by all basis function symmetric
    * gradients on the current cell and integrated over.
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
    * submit_gradient(). As a consequence, only one of these two can be
@@ -545,7 +545,7 @@ public:
    * Write the components of a curl containing the values on quadrature point
    * @p q_point. Access to the same data field as through @p get_gradient.
    *
-   * @note Only available for n_components_==dim.
+   * @note Only available for the vector-valued case (n_components == dim).
    *
    * @note This operation writes the data to the same field as
    * submit_gradient(). As a consequence, only one of these two can be
@@ -1020,7 +1020,7 @@ public:
 
   /**
    * Return the divergence of a vector-valued finite element at quadrature
-   * point number @p q_point after a call to @p evaluate(...,true,...).
+   * point number @p q_point after a call to @p evaluate(EvaluationFlags::gradients).
    */
   VectorizedArrayType
   get_divergence(const unsigned int q_point) const;
@@ -1028,7 +1028,7 @@ public:
   /**
    * Return the symmetric gradient of a vector-valued finite element at
    * quadrature point number @p q_point after a call to @p
-   * evaluate(...,true,...). It corresponds to <tt>0.5
+   * evaluate(EvaluationFlags::gradients). It corresponds to <tt>0.5
    * (grad+grad<sup>T</sup>)</tt>.
    */
   SymmetricTensor<2, dim, VectorizedArrayType>
@@ -1036,7 +1036,7 @@ public:
 
   /**
    * Return the curl of the vector field, $\nabla \times v$ after a call to @p
-   * evaluate(...,true,...).
+   * evaluate(EvaluationFlags::gradients).
    */
   Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
   get_curl(const unsigned int q_point) const;
@@ -1083,7 +1083,7 @@ public:
    * Write a contribution that is tested by the divergence to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies what is
+   * the function @p integrate(EvaluationFlags::gradients) is called, this specifies what is
    * tested by all basis function gradients on the current cell and integrated
    * over.
    */
@@ -1095,7 +1095,7 @@ public:
    * Write a contribution that is tested by the symmetric gradient to the field
    * containing the values on quadrature points with component @p q_point.
    * Access to the same field as through @p get_symmetric_gradient. If applied before
-   * the function @p integrate(...,true) is called, this specifies the
+   * the function @p integrate(EvaluationFlags::gradients) is called, this specifies the
    * symmetric gradient which is tested by all basis function symmetric
    * gradients on the current cell and integrated over.
    */
@@ -1709,9 +1709,17 @@ protected:
  * setting the macro `FE_EVAL_FACTORY_DEGREE_MAX` to the desired integer and
  * instantiating the classes FEEvaluationFactory and FEFaceEvaluationFactory
  * (the latter for FEFaceEvaluation) creates paths to templated functions for
- * a possibly larger set of degrees. You can check if fast
- * evaluation/integration for a given degree/n_quadrature_points pair by calling
- * FEEvaluation::fast_evaluation_supported() or
+ * a possibly larger set of degrees. This can both be set when configuring
+ * deal.II by passing the flag `-D FE_EVAL_FACTORY_DEGREE_MAX=8` (in case you
+ * want to compile all degrees up to eight; recommended setting) or by
+ * compiling `evaluation_template_factory.templates.h` and
+ * `evaluation_template_face_factory.templates.h` with the
+ * `FE_EVAL_FACTORY_DEGREE_MAX` overridden to the desired value. In the second
+ * option, symbols will be available twice, and it depends on your linker and
+ * dynamic library loader whether the user-specified setting takes precedence;
+ * use `LD_PRELOAD` to select the desired library. You can check if fast
+ * evaluation/integration for a given degree/n_quadrature_points pair by
+ * calling FEEvaluation::fast_evaluation_supported() or
  * FEFaceEvaluation::fast_evaluation_supported().
  *
  * <h3>Handling multi-component systems</h3>
@@ -1847,7 +1855,7 @@ protected:
  *
  * This observation also translates to the case when different differential
  * operators are implemented in a program, for example the action of a mass
- * matrix for one phase of the algorithm and the action of a stiffness matrix
+ * matrix for one phase of the algorithm and the action of a @ref GlossStiffnessMatrix "stiffness matrix"
  * in another one. Only a single MatrixFree object is necessary, maintaining
  * full efficiency by using different local functions with the respective
  * implementation in separate FEEvaluation objects. In other words, a user
@@ -1949,7 +1957,9 @@ public:
 
   /**
    * The static number of quadrature points determined from the given template
-   * argument `n_q_points_1d`. Note that the actual number of quadrature
+   * argument `n_q_points_1d`.
+   *
+   * @note The actual number of quadrature
    * points, `n_q_points`, can be different if `fe_degree=-1` is given and
    * run-time loop lengths are used rather than compile time ones.
    */
@@ -1958,7 +1968,9 @@ public:
 
   /**
    * The static number of degrees of freedom of a scalar component determined
-   * from the given template argument `fe_degree`. Note that the actual number
+   * from the given template argument `fe_degree`.
+   *
+   * @note The actual number
    * of degrees of freedom `dofs_per_component` can be different if
    * `fe_degree=-1` is given or if the underlying is of more complicated type
    * than the usual FE_Q or FE_DGQ ones, such as FE_DGP.
@@ -1968,7 +1980,9 @@ public:
 
   /**
    * The static number of degrees of freedom of all components determined from
-   * the given template argument `fe_degree`. Note that the actual number of
+   * the given template argument `fe_degree`.
+   *
+   * @note The actual number of
    * degrees of freedom `dofs_per_cell` can be different if `fe_degree=-1` is
    * given or if the underlying is of more complicated type than the usual
    * FE_Q or FE_DGQ ones, such as FE_DGP.
@@ -1978,7 +1992,9 @@ public:
 
   /**
    * The static number of degrees of freedom of all components determined from
-   * the given template argument `fe_degree`. Note that the actual number of
+   * the given template argument `fe_degree`.
+   *
+   * @note The actual number of
    * degrees of freedom `dofs_per_cell` can be different if `fe_degree=-1` is
    * given or if the underlying is of more complicated type than the usual
    * FE_Q or FE_DGQ ones, such as FE_DGP.
@@ -2166,11 +2182,11 @@ public:
   reinit(const typename Triangulation<dim>::cell_iterator &cell);
 
   /**
-   * Check if face evaluation/integration is supported.
+   * Check if fast evaluation/integration is supported.
    */
   static bool
   fast_evaluation_supported(const unsigned int given_degree,
-                            const unsigned int give_n_q_points_1d);
+                            const unsigned int given_n_q_points_1d);
 
   /**
    * Evaluate the function values, the gradients, and the Hessians of the
@@ -2452,7 +2468,9 @@ public:
 
   /**
    * The static number of quadrature points determined from the given template
-   * argument `n_q_points_1d` taken to the power of dim-1. Note that the actual
+   * argument `n_q_points_1d` taken to the power of dim-1.
+   *
+   * @note The actual
    * number of quadrature points, `n_q_points`, can be different if
    * `fe_degree=-1` is given and run-time loop lengths are used rather than
    * compile time ones.
@@ -2462,7 +2480,9 @@ public:
 
   /**
    * The static number of quadrature points on a cell with the same quadrature
-   * formula. Note that this value is only present for simpler comparison with
+   * formula.
+   *
+   * @note This value is only present for simpler comparison with
    * the cell quadrature, as the actual number of points is given to a face by
    * the `static_n_q_points` variable.
    */
@@ -2471,7 +2491,9 @@ public:
 
   /**
    * The static number of degrees of freedom of a scalar component determined
-   * from the given template argument `fe_degree`. Note that the actual number
+   * from the given template argument `fe_degree`.
+   *
+   * @note The actual number
    * of degrees of freedom `dofs_per_component` can be different if
    * `fe_degree=-1` is given.
    */
@@ -2480,7 +2502,9 @@ public:
 
   /**
    * The static number of degrees of freedom of all components determined from
-   * the given template argument `fe_degree`. Note that the actual number of
+   * the given template argument `fe_degree`.
+   *
+   * @note The actual number of
    * degrees of freedom `dofs_per_cell` can be different if `fe_degree=-1` is
    * given.
    */
@@ -2489,7 +2513,9 @@ public:
 
   /**
    * The static number of degrees of freedom of all components determined from
-   * the given template argument `fe_degree`. Note that the actual number of
+   * the given template argument `fe_degree`.
+   *
+   * @note The actual number of
    * degrees of freedom `dofs_per_cell` can be different if `fe_degree=-1` is
    * given.
    */
@@ -2586,11 +2612,11 @@ public:
   reinit(const unsigned int cell_batch_number, const unsigned int face_number);
 
   /**
-   * Check if face evaluation/integration is supported.
+   * Check if fast evaluation/integration is supported.
    */
   static bool
   fast_evaluation_supported(const unsigned int given_degree,
-                            const unsigned int give_n_q_points_1d);
+                            const unsigned int given_n_q_points_1d);
 
   /**
    * Evaluates the function values, the gradients, and the Laplacians of the
@@ -3359,11 +3385,40 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       AssertIndexRange(
         this->cell,
         dof_info.index_storage_variants[this->dof_access_index].size());
-      if (dof_info.index_storage_variants
-            [is_face ? this->dof_access_index :
-                       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
-            [this->cell] >= internal::MatrixFreeFunctions::DoFInfo::
-                              IndexStorageVariants::contiguous)
+
+      bool is_contiguous = true;
+      // check if exterior cells are not contiguous (ECL case)
+      if (is_face && !this->interior_face &&
+          (this->dof_access_index ==
+           internal::MatrixFreeFunctions::DoFInfo::dof_access_cell))
+        {
+          const std::array<unsigned int, VectorizedArrayType::size()> &cells =
+            this->get_cell_ids();
+          const unsigned int n_filled_lanes =
+            dof_info.n_vectorization_lanes_filled
+              [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+              [this->cell];
+          // we have to check all filled lanes which are active in the mask
+          for (unsigned int v = 0; v < n_filled_lanes; ++v)
+            if (mask[v] == true &&
+                dof_info.index_storage_variants
+                    [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+                    [cells[v] / VectorizedArrayType::size()] <
+                  internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
+                    contiguous)
+              is_contiguous = false;
+        } // or if cell/face batch is not contiguous
+      else if (dof_info.index_storage_variants
+                 [is_face ?
+                    this->dof_access_index :
+                    internal::MatrixFreeFunctions::DoFInfo::dof_access_cell]
+                 [this->cell] < internal::MatrixFreeFunctions::DoFInfo::
+                                  IndexStorageVariants::contiguous)
+        {
+          is_contiguous = false;
+        }
+
+      if (is_contiguous)
         {
           read_write_operation_contiguous(operation, src, src_sm, mask);
           return;
@@ -3404,9 +3459,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                          internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
-  const bool is_neighbor_cells = !is_face && !this->is_interior_face();
-  const bool use_vectorized_path =
-    !(masking_is_active || is_neighbor_cells || has_hn_constraints);
+  const bool use_vectorized_path = !(masking_is_active || has_hn_constraints);
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
   std::array<VectorizedArrayType *, n_components> values_dofs;
@@ -3855,7 +3908,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                    VectorizedArrayType::size()>
           vector_ptrs = {};
 
-        for (unsigned int v = 0; v < n_filled_lanes; ++v)
+        const auto upper_bound =
+          std::min<unsigned int>(n_filled_lanes, VectorizedArrayType::size());
+        for (unsigned int v = 0; v < upper_bound; ++v)
           {
             if (mask[v] == false)
               {
@@ -8639,14 +8694,14 @@ FEFaceEvaluation<dim,
 template <int dim,
           int fe_degree,
           int n_q_points_1d,
-          int n_components,
+          int n_components_,
           typename Number,
           typename VectorizedArrayType>
 inline void
 FEFaceEvaluation<dim,
                  fe_degree,
                  n_q_points_1d,
-                 n_components,
+                 n_components_,
                  Number,
                  VectorizedArrayType>::evaluate(const bool evaluate_values,
                                                 const bool evaluate_gradients)
@@ -8663,14 +8718,14 @@ FEFaceEvaluation<dim,
 template <int dim,
           int fe_degree,
           int n_q_points_1d,
-          int n_components,
+          int n_components_,
           typename Number,
           typename VectorizedArrayType>
 inline void
 FEFaceEvaluation<dim,
                  fe_degree,
                  n_q_points_1d,
-                 n_components,
+                 n_components_,
                  Number,
                  VectorizedArrayType>::
   evaluate(const EvaluationFlags::EvaluationFlags evaluation_flag)
@@ -8687,14 +8742,14 @@ FEFaceEvaluation<dim,
 template <int dim,
           int fe_degree,
           int n_q_points_1d,
-          int n_components,
+          int n_components_,
           typename Number,
           typename VectorizedArrayType>
 inline void
 FEFaceEvaluation<dim,
                  fe_degree,
                  n_q_points_1d,
-                 n_components,
+                 n_components_,
                  Number,
                  VectorizedArrayType>::evaluate(const VectorizedArrayType
                                                   *        values_array,
@@ -8714,14 +8769,14 @@ FEFaceEvaluation<dim,
 template <int dim,
           int fe_degree,
           int n_q_points_1d,
-          int n_components,
+          int n_components_,
           typename Number,
           typename VectorizedArrayType>
 inline void
 FEFaceEvaluation<dim,
                  fe_degree,
                  n_q_points_1d,
-                 n_components,
+                 n_components_,
                  Number,
                  VectorizedArrayType>::
   evaluate(const VectorizedArrayType *            values_array,
@@ -8771,14 +8826,14 @@ FEFaceEvaluation<dim,
 template <int dim,
           int fe_degree,
           int n_q_points_1d,
-          int n_components,
+          int n_components_,
           typename Number,
           typename VectorizedArrayType>
 inline void
 FEFaceEvaluation<dim,
                  fe_degree,
                  n_q_points_1d,
-                 n_components,
+                 n_components_,
                  Number,
                  VectorizedArrayType>::
   integrate(const EvaluationFlags::EvaluationFlags integration_flag)
@@ -8795,14 +8850,14 @@ FEFaceEvaluation<dim,
 template <int dim,
           int fe_degree,
           int n_q_points_1d,
-          int n_components,
+          int n_components_,
           typename Number,
           typename VectorizedArrayType>
 inline void
 FEFaceEvaluation<dim,
                  fe_degree,
                  n_q_points_1d,
-                 n_components,
+                 n_components_,
                  Number,
                  VectorizedArrayType>::integrate(const bool integrate_values,
                                                  const bool integrate_gradients)
@@ -8819,14 +8874,14 @@ FEFaceEvaluation<dim,
 template <int dim,
           int fe_degree,
           int n_q_points_1d,
-          int n_components,
+          int n_components_,
           typename Number,
           typename VectorizedArrayType>
 inline void
 FEFaceEvaluation<dim,
                  fe_degree,
                  n_q_points_1d,
-                 n_components,
+                 n_components_,
                  Number,
                  VectorizedArrayType>::integrate(const bool integrate_values,
                                                  const bool integrate_gradients,
@@ -8846,14 +8901,14 @@ FEFaceEvaluation<dim,
 template <int dim,
           int fe_degree,
           int n_q_points_1d,
-          int n_components,
+          int n_components_,
           typename Number,
           typename VectorizedArrayType>
 inline void
 FEFaceEvaluation<dim,
                  fe_degree,
                  n_q_points_1d,
-                 n_components,
+                 n_components_,
                  Number,
                  VectorizedArrayType>::
   integrate(const EvaluationFlags::EvaluationFlags integration_flag,
@@ -9175,11 +9230,11 @@ FEEvaluation<dim,
              Number,
              VectorizedArrayType>::
   fast_evaluation_supported(const unsigned int given_degree,
-                            const unsigned int give_n_q_points_1d)
+                            const unsigned int given_n_q_points_1d)
 {
   return fe_degree == -1 ?
            internal::FEEvaluationFactory<dim, VectorizedArrayType>::
-             fast_evaluation_supported(given_degree, give_n_q_points_1d) :
+             fast_evaluation_supported(given_degree, given_n_q_points_1d) :
            true;
 }
 
@@ -9199,11 +9254,11 @@ FEFaceEvaluation<dim,
                  Number,
                  VectorizedArrayType>::
   fast_evaluation_supported(const unsigned int given_degree,
-                            const unsigned int give_n_q_points_1d)
+                            const unsigned int given_n_q_points_1d)
 {
   return fe_degree == -1 ?
-           internal::FEEvaluationFactory<dim, VectorizedArrayType>::
-             fast_evaluation_supported(given_degree, give_n_q_points_1d) :
+           internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::
+             fast_evaluation_supported(given_degree, given_n_q_points_1d) :
            true;
 }
 

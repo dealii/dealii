@@ -25,15 +25,12 @@ jobs:
     - name: configure
       run: |
         cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON .
-    - name: archive
-      uses: actions/upload-artifact@v3
-      with:
-        name: serial-detailed.log
-        path: detailed.log
+    - name: print detailed.log
+      run: cat detailed.log
     - name: build
       run: |
-        make -j 2
-        make -j 2 test # quicktests
+        make VERBOSE=1 -j2
+        make -j2 test # quicktests
     - name: archive error 1
       uses: actions/upload-artifact@v3
       if: always()
@@ -71,15 +68,12 @@ jobs:
     - name: configure
       run: |
         CC=mpicc CXX=mpic++ cmake -D CMAKE_BUILD_TYPE=Debug -D DEAL_II_WITH_64BIT_INDICES=ON -D DEAL_II_CXX_FLAGS='-Werror' -D DEAL_II_EARLY_DEPRECATIONS=ON -D DEAL_II_WITH_MPI=on .
-    - name: archive
-      uses: actions/upload-artifact@v3
-      with:
-        name: parallel-detailed.log
-        path: detailed.log
+    - name: print detailed.log
+      run: cat detailed.log
     - name: build
       run: |
-        make -j 2
-        make -j 2 test #quicktests
+        make VERBOSE=1 -j2
+        make -j2 test #quicktests
     - name: archive error 1
       uses: actions/upload-artifact@v3
       if: always()

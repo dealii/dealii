@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -120,13 +120,10 @@ foreach(_file ${_configure_files})
   verbose_include(${_file})
 endforeach()
 
-#
-# Finalize the configuration:
-#
+verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_finalize.cmake)
+
 verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_cpack.cmake)
 verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_custom_targets.cmake)
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_finalize.cmake)
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_write_config.cmake)
 
 ########################################################################
 #                                                                      #
@@ -161,6 +158,8 @@ if(DEAL_II_HAVE_TESTS_DIRECTORY)
 endif()
 
 add_subdirectory(contrib/python-bindings) # has to be included after tests
+
+verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_write_config.cmake)
 
 #
 # And finally, print the configuration:

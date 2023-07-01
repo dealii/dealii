@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -861,8 +861,8 @@ namespace NonMatching
         , low_dim_algorithm(q_collection1D, additional_data)
         , up_through_dimension_creator(q_collection1D, additional_data)
       {
-        for (unsigned int i = 0; i < q_collection1D.size(); ++i)
-          tensor_products.push_back(Quadrature<dim>(q_collection1D[i]));
+        for (const auto &quadrature : q_collection1D)
+          tensor_products.push_back(quadrature);
       }
 
 
@@ -1516,13 +1516,12 @@ namespace NonMatching
         if (!poly.empty() && component == 0)
           {
             // TODO: this could be extended to a component that is not zero
-            return dealii::internal::evaluate_tensor_product_value_and_gradient(
-                     poly,
-                     local_dof_values,
-                     point,
-                     polynomials_are_hat_functions,
-                     renumber)
-              .first;
+            return dealii::internal::evaluate_tensor_product_value(
+              poly,
+              local_dof_values,
+              point,
+              polynomials_are_hat_functions,
+              renumber);
           }
         else
           {

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -95,6 +95,8 @@ namespace internal
            &info);
     }
 
+
+
     template <typename T>
     void
     geev_helper(const char                      vl,
@@ -125,10 +127,10 @@ namespace internal
         Assert(static_cast<std::size_t>(n_rows * n_rows) <=
                  right_eigenvectors.size(),
                ExcInternalError());
-      Assert(std::max<std::size_t>(1, work_flag) <= real_work.size(),
-             ExcInternalError());
       Assert(work_flag == -1 ||
-               std::max<long int>(1, 2 * n_rows) <= (work_flag),
+               std::max<std::size_t>(1, work_flag) <= real_work.size(),
+             ExcInternalError());
+      Assert(work_flag == -1 || std::max<long int>(1, 2 * n_rows) <= work_flag,
              ExcInternalError());
 
       geev(&vl,
@@ -240,12 +242,15 @@ namespace internal
   } // namespace LAPACKFullMatrixImplementation
 } // namespace internal
 
+
+
 template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type n)
   : TransposeTable<number>(n, n)
   , state(matrix)
   , property(general)
 {}
+
 
 
 template <typename number>
@@ -256,12 +261,14 @@ LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type m, const size_type n)
 {}
 
 
+
 template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix(const LAPACKFullMatrix &M)
   : TransposeTable<number>(M)
   , state(matrix)
   , property(general)
 {}
+
 
 
 template <typename number>
@@ -370,6 +377,7 @@ LAPACKFullMatrix<number>::reinit(const size_type m, const size_type n)
 }
 
 
+
 template <typename number>
 template <typename number2>
 LAPACKFullMatrix<number> &
@@ -385,6 +393,7 @@ LAPACKFullMatrix<number>::operator=(const FullMatrix<number2> &M)
   property = LAPACKSupport::general;
   return *this;
 }
+
 
 
 template <typename number>
@@ -404,6 +413,7 @@ LAPACKFullMatrix<number>::operator=(const SparseMatrix<number2> &M)
 }
 
 
+
 template <typename number>
 LAPACKFullMatrix<number> &
 LAPACKFullMatrix<number>::operator=(const number d)
@@ -417,6 +427,7 @@ LAPACKFullMatrix<number>::operator=(const number d)
   state = LAPACKSupport::matrix;
   return *this;
 }
+
 
 
 template <typename number>
@@ -445,6 +456,7 @@ LAPACKFullMatrix<number>::operator*=(const number factor)
 
   return *this;
 }
+
 
 
 template <typename number>
@@ -780,6 +792,7 @@ LAPACKFullMatrix<number>::vmult(Vector<number> &      w,
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
@@ -918,6 +931,7 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number> &      w,
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::vmult_add(Vector<number> &      w,
@@ -927,6 +941,7 @@ LAPACKFullMatrix<number>::vmult_add(Vector<number> &      w,
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::Tvmult_add(Vector<number> &      w,
@@ -934,6 +949,7 @@ LAPACKFullMatrix<number>::Tvmult_add(Vector<number> &      w,
 {
   Tvmult(w, v, true);
 }
+
 
 
 template <typename number>
@@ -968,6 +984,7 @@ LAPACKFullMatrix<number>::mmult(LAPACKFullMatrix<number> &      C,
        C.values.data(),
        &mm);
 }
+
 
 
 template <typename number>
@@ -1088,6 +1105,7 @@ LAPACKFullMatrix<number>::transpose(LAPACKFullMatrix<number> &B) const
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::scale_rows(const Vector<number> &V)
@@ -1162,6 +1180,7 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number> &      C,
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::Tmmult(FullMatrix<number> &            C,
@@ -1195,6 +1214,7 @@ LAPACKFullMatrix<number>::Tmmult(FullMatrix<number> &            C,
        &C(0, 0),
        &nn);
 }
+
 
 
 template <typename number>
@@ -1290,6 +1310,7 @@ LAPACKFullMatrix<number>::mTmult(FullMatrix<number> &            C,
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::TmTmult(LAPACKFullMatrix<number> &      C,
@@ -1322,6 +1343,7 @@ LAPACKFullMatrix<number>::TmTmult(LAPACKFullMatrix<number> &      C,
        C.values.data(),
        &mm);
 }
+
 
 
 template <typename number>
@@ -1357,6 +1379,7 @@ LAPACKFullMatrix<number>::TmTmult(FullMatrix<number> &            C,
        &C(0, 0),
        &nn);
 }
+
 
 
 template <typename number>
@@ -1647,6 +1670,7 @@ LAPACKFullMatrix<number>::compute_svd()
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
@@ -1876,6 +1900,7 @@ LAPACKFullMatrix<number>::determinant() const
 }
 
 
+
 template <typename number>
 void
 LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
@@ -1932,6 +1957,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
 
   // resize workspace array
   work.resize(lwork);
+  real_work.resize(lwork);
 
   // Finally compute the eigenvalues.
   internal::LAPACKFullMatrixImplementation::geev_helper(jobvl,
@@ -1948,12 +1974,130 @@ LAPACKFullMatrix<number>::compute_eigenvalues(const bool right, const bool left)
                                                         info);
 
   Assert(info >= 0, ExcInternalError());
-  // TODO:[GK] What if the QR method fails?
-  if (info != 0)
-    std::cerr << "LAPACK error in geev" << std::endl;
+  if (info < 0)
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in geev: the " +
+                             std::to_string(-info) +
+                             "-th"
+                             " parameter had an illegal value."));
+    }
+  else
+    {
+      AssertThrow(
+        info == 0,
+        ExcMessage(
+          "Lapack error in geev: the QR algorithm failed to compute "
+          "all the eigenvalues, and no eigenvectors have been computed."));
+    }
 
   state = LAPACKSupport::State(LAPACKSupport::eigenvalues | unusable);
 }
+
+
+
+namespace
+{
+  // This function extracts complex eigenvectors from the underlying 'number'
+  // array 'vr' of the LAPACK eigenvalue routine. For real-valued matrices
+  // addressed by this function specialization, we might get complex
+  // eigenvalues, which come in complex-conjugate pairs. In LAPACK, a compact
+  // storage scheme is applied that stores the real and imaginary part of
+  // eigenvectors only once, putting the real parts in one column and the
+  // imaginary part in the next of a real-valued array. Here, we do the
+  // unpacking into the usual complex values.
+  template <typename RealNumber>
+  void
+  unpack_lapack_eigenvector_and_increment_index(
+    const std::vector<RealNumber> &       vr,
+    const std::complex<RealNumber> &      eigenvalue,
+    FullMatrix<std::complex<RealNumber>> &result,
+    unsigned int &                        index)
+  {
+    const std::size_t n = result.n();
+    if (eigenvalue.imag() != 0.)
+      {
+        for (std::size_t j = 0; j < n; ++j)
+          {
+            result(j, index).real(vr[index * n + j]);
+            result(j, index + 1).real(vr[index * n + j]);
+            result(j, index).imag(vr[(index + 1) * n + j]);
+            result(j, index + 1).imag(-vr[(index + 1) * n + j]);
+          }
+
+        // we filled two columns with the complex-conjugate pair, so increment
+        // returned index by 2
+        index += 2;
+      }
+    else
+      {
+        for (unsigned int j = 0; j < n; ++j)
+          result(j, index).real(vr[index * n + j]);
+
+        // real-valued case, we only filled one column
+        ++index;
+      }
+  }
+
+  // This specialization fills the eigenvectors for complex-valued matrices,
+  // in which case we simply read off the entry in the 'vr' array.
+  template <typename ComplexNumber>
+  void
+  unpack_lapack_eigenvector_and_increment_index(
+    const std::vector<ComplexNumber> &vr,
+    const ComplexNumber &,
+    FullMatrix<ComplexNumber> &result,
+    unsigned int &             index)
+  {
+    const std::size_t n = result.n();
+    for (unsigned int j = 0; j < n; ++j)
+      result(j, index) = vr[index * n + j];
+
+    // complex-valued case always only fills a single column
+    ++index;
+  }
+} // namespace
+
+
+
+template <typename number>
+FullMatrix<std::complex<typename numbers::NumberTraits<number>::real_type>>
+LAPACKFullMatrix<number>::get_right_eigenvectors() const
+{
+  Assert(state & LAPACKSupport::eigenvalues, ExcInvalidState());
+  Assert(vr.size() == this->n_rows() * this->n_cols(),
+         ExcMessage("Right eigenvectors are not available! Did you "
+                    "set the associated flag in compute_eigenvalues()?"));
+
+  FullMatrix<std::complex<typename numbers::NumberTraits<number>::real_type>>
+    result(n(), n());
+
+  for (unsigned int i = 0; i < n();)
+    unpack_lapack_eigenvector_and_increment_index(vr, eigenvalue(i), result, i);
+
+  return result;
+}
+
+
+
+template <typename number>
+FullMatrix<std::complex<typename numbers::NumberTraits<number>::real_type>>
+LAPACKFullMatrix<number>::get_left_eigenvectors() const
+{
+  Assert(state & LAPACKSupport::eigenvalues, ExcInvalidState());
+  Assert(vl.size() == this->n_rows() * this->n_cols(),
+         ExcMessage("Left eigenvectors are not available! Did you "
+                    "set the associated flag in compute_eigenvalues()?"));
+
+  FullMatrix<std::complex<typename numbers::NumberTraits<number>::real_type>>
+    result(n(), n());
+
+  for (unsigned int i = 0; i < n();)
+    unpack_lapack_eigenvector_and_increment_index(vl, eigenvalue(i), result, i);
+
+  return result;
+}
+
 
 
 template <typename number>
@@ -2047,8 +2191,28 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
 
   // Negative return value implies a wrong argument. This should be internal.
   Assert(info >= 0, ExcInternalError());
-  if (info != 0)
-    std::cerr << "LAPACK error in syevx" << std::endl;
+  if (info < 0)
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in syevx: the " +
+                             std::to_string(-info) +
+                             "-th"
+                             " parameter had an illegal value."));
+    }
+  else if ((info > 0) && (info <= nn))
+    {
+      AssertThrow(info == 0,
+                  ExcMessage(
+                    "Lapack error in syevx: " + std::to_string(info) +
+                    " eigenvectors failed to converge."
+                    " (You may need to scale the abs_accuracy according"
+                    " to your matrix norm.)"));
+    }
+  else
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in syevx: unknown error."));
+    }
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.reinit(nn, n_eigenpairs, true);
@@ -2065,6 +2229,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
 
   state = LAPACKSupport::State(unusable);
 }
+
 
 
 template <typename number>
@@ -2171,8 +2336,40 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
 
   // Negative return value implies a wrong argument. This should be internal.
   Assert(info >= 0, ExcInternalError());
-  if (info != 0)
-    std::cerr << "LAPACK error in sygvx" << std::endl;
+  if (info < 0)
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in sygvx: the " +
+                             std::to_string(-info) +
+                             "-th"
+                             " parameter had an illegal value."));
+    }
+  else if ((info > 0) && (info <= nn))
+    {
+      AssertThrow(
+        info == 0,
+        ExcMessage(
+          "Lapack error in sygvx: ssyevx/dsyevx failed to converge, and " +
+          std::to_string(info) +
+          " eigenvectors failed to converge."
+          " (You may need to scale the abs_accuracy"
+          " according to the norms of matrices A and B.)"));
+    }
+  else if ((info > nn) && (info <= 2 * nn))
+    {
+      AssertThrow(info == 0,
+                  ExcMessage(
+                    "Lapack error in sygvx: the leading minor of order " +
+                    std::to_string(info - nn) +
+                    " of matrix B is not positive-definite."
+                    " The factorization of B could not be completed and"
+                    " no eigenvalues or eigenvectors were computed."));
+    }
+  else
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in sygvx: unknown error."));
+    }
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.resize(n_eigenpairs);
@@ -2190,6 +2387,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
 
   state = LAPACKSupport::State(unusable);
 }
+
 
 
 template <typename number>
@@ -2268,8 +2466,41 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   // Negative return value implies a wrong argument. This should be internal.
 
   Assert(info >= 0, ExcInternalError());
-  if (info != 0)
-    std::cerr << "LAPACK error in sygv" << std::endl;
+  if (info < 0)
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in sygv: the " +
+                             std::to_string(-info) +
+                             "-th"
+                             " parameter had an illegal value."));
+    }
+  else if ((info > 0) && (info <= nn))
+    {
+      AssertThrow(
+        info == 0,
+        ExcMessage(
+          "Lapack error in sygv: ssyev/dsyev failed to converge, and " +
+          std::to_string(info) +
+          " off-diagonal elements of an intermediate "
+          " tridiagonal did not converge to zero."
+          " (You may need to scale the abs_accuracy"
+          " according to the norms of matrices A and B.)"));
+    }
+  else if ((info > nn) && (info <= 2 * nn))
+    {
+      AssertThrow(info == 0,
+                  ExcMessage(
+                    "Lapack error in sygv: the leading minor of order " +
+                    std::to_string(info - nn) +
+                    " of matrix B is not positive-definite."
+                    " The factorization of B could not be completed and"
+                    " no eigenvalues or eigenvectors were computed."));
+    }
+  else
+    {
+      AssertThrow(info == 0,
+                  ExcMessage("Lapack error in sygv: unknown error."));
+    }
 
   for (size_type i = 0; i < eigenvectors.size(); ++i)
     {
@@ -2282,6 +2513,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
     }
   state = LAPACKSupport::State(LAPACKSupport::eigenvalues | unusable);
 }
+
 
 
 template <typename number>
@@ -2327,7 +2559,7 @@ LAPACKFullMatrix<number>::print_formatted(std::ostream &     out,
       for (size_type j = 0; j < nc; ++j)
         // we might have complex numbers, so use abs also to check for nan
         // since there is no isnan on complex numbers
-        if (std::isnan(std::abs((*this)(i, j))))
+        if (numbers::is_nan(std::abs((*this)(i, j))))
           out << std::setw(width) << (*this)(i, j) << ' ';
         else if (std::abs(this->el(i, j)) > threshold)
           out << std::setw(width) << this->el(i, j) * denominator << ' ';

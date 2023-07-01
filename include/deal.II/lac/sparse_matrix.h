@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ namespace Utilities
   {
     template <typename Number>
     void
-    sum(const SparseMatrix<Number> &, const MPI_Comm &, SparseMatrix<Number> &);
+    sum(const SparseMatrix<Number> &, const MPI_Comm, SparseMatrix<Number> &);
   }
 } // namespace Utilities
 #  endif
@@ -783,7 +783,7 @@ public:
   /**
    * Dummy function for compatibility with distributed, parallel matrices.
    */
-  void compress(::dealii::VectorOperation::values);
+  void compress(VectorOperation::values);
 
   /** @} */
   /**
@@ -906,8 +906,8 @@ public:
       const bool                    elide_zero_values = true);
 
   /**
-   * Set several elements in the specified row of the matrix with column
-   * indices as given by <tt>col_indices</tt> to the respective value.
+   * Add the provided values to several elements in the specified row of the
+   * matrix with column indices as given by <tt>col_indices</tt>.
    *
    * The optional parameter <tt>elide_zero_values</tt> can be used to specify
    * whether zero values should be added anyway or these should be filtered
@@ -1197,7 +1197,7 @@ public:
    * Return the square of the norm of the vector $v$ with respect to the norm
    * induced by this matrix, i.e. $\left(v,Mv\right)$. This is useful, e.g. in
    * the finite element context, where the $L_2$ norm of a function equals the
-   * matrix norm with respect to the mass matrix of the vector representing
+   * matrix norm with respect to the @ref GlossMassMatrix "mass matrix" of the vector representing
    * the nodal values of the finite element function.
    *
    * Obviously, the matrix needs to be quadratic for this operation, and for
@@ -1784,7 +1784,7 @@ private:
   template <typename Number>
   friend void
   Utilities::MPI::sum(const SparseMatrix<Number> &,
-                      const MPI_Comm &,
+                      const MPI_Comm,
                       SparseMatrix<Number> &);
 #endif
 };
@@ -1997,7 +1997,8 @@ SparseMatrix<number>::add(const size_type               row,
       col_indices.size(),
       col_indices.data(),
       values.data(),
-      elide_zero_values);
+      elide_zero_values,
+      std::is_sorted(col_indices.begin(), col_indices.end()));
 }
 
 

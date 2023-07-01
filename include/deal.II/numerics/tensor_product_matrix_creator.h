@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * A namespace with functions that create input for certain standard matrices
  * for the classes TensorProductMatrixSymmetricSum and
- * TensorProductMatrixSymmetricSumCache.
+ * TensorProductMatrixSymmetricSumCollection.
  */
 namespace TensorProductMatrixCreator
 {
@@ -54,7 +54,7 @@ namespace TensorProductMatrixCreator
   };
 
   /**
-   * Create 1d mass matrix and 1d derivative matrix for a scalar
+   * Create 1d @ref GlossMassMatrix "mass matrix" and 1d derivative matrix for a scalar
    * constant-coefficient
    * Laplacian for a @p dim dimensional Cartesian cell. Its boundary types
    * can be specified with @p boundary_ids. The cell extent (including the cell extent

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2022 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,7 +38,7 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector(const MPI_Comm &communicator,
+    Vector::Vector(const MPI_Comm  communicator,
                    const size_type n,
                    const size_type locally_owned_size)
     {
@@ -49,7 +49,7 @@ namespace PETScWrappers
 
     Vector::Vector(const IndexSet &local,
                    const IndexSet &ghost,
-                   const MPI_Comm &communicator)
+                   const MPI_Comm  communicator)
     {
       Assert(local.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
@@ -83,7 +83,7 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector(const IndexSet &local, const MPI_Comm &communicator)
+    Vector::Vector(const IndexSet &local, const MPI_Comm communicator)
     {
       Assert(local.is_ascending_and_one_to_one(communicator),
              ExcNotImplemented());
@@ -145,7 +145,7 @@ namespace PETScWrappers
 
 
     void
-    Vector::reinit(const MPI_Comm &communicator,
+    Vector::reinit(const MPI_Comm  communicator,
                    const size_type n,
                    const size_type local_sz,
                    const bool      omit_zeroing_entries)
@@ -211,7 +211,7 @@ namespace PETScWrappers
     void
     Vector::reinit(const IndexSet &local,
                    const IndexSet &ghost,
-                   const MPI_Comm &comm)
+                   const MPI_Comm  comm)
     {
       const PetscErrorCode ierr = VecDestroy(&vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -225,7 +225,7 @@ namespace PETScWrappers
     }
 
     void
-    Vector::reinit(const IndexSet &local, const MPI_Comm &comm)
+    Vector::reinit(const IndexSet &local, const MPI_Comm comm)
     {
       const PetscErrorCode ierr = VecDestroy(&vector);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -237,16 +237,29 @@ namespace PETScWrappers
 
     void
     Vector::reinit(
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
+      const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+      const bool                                                make_ghosted)
     {
-      this->reinit(partitioner->locally_owned_range(),
-                   partitioner->ghost_indices(),
-                   partitioner->get_mpi_communicator());
+      if (make_ghosted)
+        {
+          Assert(partitioner->ghost_indices_initialized(),
+                 ExcMessage("You asked to create a ghosted vector, but the "
+                            "partitioner does not provide ghost indices."));
+
+          this->reinit(partitioner->locally_owned_range(),
+                       partitioner->ghost_indices(),
+                       partitioner->get_mpi_communicator());
+        }
+      else
+        {
+          this->reinit(partitioner->locally_owned_range(),
+                       partitioner->get_mpi_communicator());
+        }
     }
 
 
     void
-    Vector::create_vector(const MPI_Comm &communicator,
+    Vector::create_vector(const MPI_Comm  communicator,
                           const size_type n,
                           const size_type locally_owned_size)
     {
@@ -266,7 +279,7 @@ namespace PETScWrappers
 
 
     void
-    Vector::create_vector(const MPI_Comm &communicator,
+    Vector::create_vector(const MPI_Comm  communicator,
                           const size_type n,
                           const size_type locally_owned_size,
                           const IndexSet &ghostnodes)
@@ -293,7 +306,7 @@ namespace PETScWrappers
 
       Assert(size() == n, ExcDimensionMismatch(size(), n));
 
-#  if DEBUG
+#  ifdef DEBUG
       {
         // test ghost allocation in debug mode
         PetscInt begin, end;

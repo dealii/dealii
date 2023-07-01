@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,9 +29,7 @@
 #include <deal.II/grid/tria_iterator.templates.h>
 #include <deal.II/grid/tria_levels.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <cmath>
 #include <limits>
@@ -377,11 +375,10 @@ TriaAccessorBase<structdim, dim, spacedim>::objects() const
 /*---------------------- Functions: InvalidAccessor -------------------------*/
 
 template <int structdim, int dim, int spacedim>
-InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
-  const Triangulation<dim, spacedim> *,
-  const int,
-  const int,
-  const AccessorData *)
+InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(const void *,
+                                                           const int,
+                                                           const int,
+                                                           const AccessorData *)
 {
   Assert(false,
          ExcMessage("You are attempting an invalid conversion between "
@@ -395,9 +392,7 @@ InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
 
 template <int structdim, int dim, int spacedim>
 InvalidAccessor<structdim, dim, spacedim>::InvalidAccessor(
-  const InvalidAccessor &i)
-  : TriaAccessorBase<structdim, dim, spacedim>(
-      static_cast<const TriaAccessorBase<structdim, dim, spacedim> &>(i))
+  const InvalidAccessor &)
 {
   Assert(false,
          ExcMessage("You are attempting an invalid conversion between "
@@ -548,27 +543,23 @@ InvalidAccessor<structdim, dim, spacedim>::vertex(const unsigned int) const
 
 
 template <int structdim, int dim, int spacedim>
-inline typename dealii::internal::TriangulationImplementation::
-  Iterators<dim, spacedim>::line_iterator
-  InvalidAccessor<structdim, dim, spacedim>::line(const unsigned int) const
+inline void *
+InvalidAccessor<structdim, dim, spacedim>::line(const unsigned int) const
 {
   // nothing to do here. we could throw an exception but we can't get here
   // without first creating an object which would have already thrown
-  return typename dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::line_iterator();
+  return nullptr;
 }
 
 
 
 template <int structdim, int dim, int spacedim>
-inline typename dealii::internal::TriangulationImplementation::
-  Iterators<dim, spacedim>::quad_iterator
-  InvalidAccessor<structdim, dim, spacedim>::quad(const unsigned int) const
+inline void *
+InvalidAccessor<structdim, dim, spacedim>::quad(const unsigned int) const
 {
   // nothing to do here. we could throw an exception but we can't get here
   // without first creating an object which would have already thrown
-  return dealii::internal::TriangulationImplementation::
-    Iterators<dim, spacedim>::quad_iterator();
+  return nullptr;
 }
 
 
@@ -988,7 +979,7 @@ namespace internal
         // For 2d cells the access cell->line_orientation() is already
         // efficient
         std::array<unsigned int, 4> line_indices = {};
-        for (unsigned int line : cell.line_indices())
+        for (const unsigned int line : cell.line_indices())
           line_indices[line] = cell.line_index(line);
         return line_indices;
       }
@@ -1105,7 +1096,7 @@ namespace internal
         // For 2d cells the access cell->line_orientation() is already
         // efficient
         std::array<bool, 4> line_orientations = {};
-        for (unsigned int line : cell.line_indices())
+        for (const unsigned int line : cell.line_indices())
           line_orientations[line] = cell.line_orientation(line);
         return line_orientations;
       }
@@ -2406,7 +2397,10 @@ template <int structdim, int dim, int spacedim>
 unsigned int
 TriaAccessor<structdim, dim, spacedim>::n_faces() const
 {
-  AssertDimension(structdim, dim);
+  Assert(structdim == dim,
+         ExcMessage("This function can only be used on objects "
+                    "that are cells, but not on faces or edges "
+                    "that bound cells."));
 
   return this->reference_cell().n_faces();
 }
@@ -3485,6 +3479,7 @@ template <int dim, int spacedim>
 inline TriaIterator<TriaAccessor<dim - 1, dim, spacedim>>
 CellAccessor<dim, spacedim>::face(const unsigned int i) const
 {
+  AssertIndexRange(i, this->n_faces());
   return dealii::internal::CellAccessorImplementation::get_face(*this, i);
 }
 
@@ -3517,7 +3512,7 @@ CellAccessor<dim, spacedim>::face_iterators() const
     GeometryInfo<dim>::faces_per_cell>
     face_iterators(this->n_faces());
 
-  for (unsigned int i : this->face_indices())
+  for (const unsigned int i : this->face_indices())
     face_iterators[i] =
       dealii::internal::CellAccessorImplementation::get_face(*this, i);
 

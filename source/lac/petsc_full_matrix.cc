@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@ namespace PETScWrappers
   {
     // get rid of old matrix and generate a
     // new one
-    const PetscErrorCode ierr = destroy_matrix(matrix);
+    const PetscErrorCode ierr = MatDestroy(&matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     do_reinit(m, n);

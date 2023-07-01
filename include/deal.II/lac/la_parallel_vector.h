@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -185,44 +185,45 @@ namespace LinearAlgebra
      * fail in some circumstances. Therefore, it is strongly recommended to
      * not rely on this class to automatically detect the unsupported case.
      *
-     * <h4>CUDA support</h4>
+     * <h4>GPU support</h4>
      *
-     * This vector class supports two different memory spaces: Host and CUDA. By
-     * default, the memory space is Host and all the data are allocated on the
-     * CPU. When the memory space is CUDA, all the data is allocated on the GPU.
-     * The operations on the vector are performed on the chosen memory space. *
-     * From the host, there are two methods to access the elements of the Vector
-     * when using the CUDA memory space:
+     * This vector class supports two different memory spaces: Host and Default.
+     * If the MemorySpace template argument is not specified, the memory space
+     * is Host and all the data is allocated on the CPU. When the memory space
+     * is Default, all the data is allocated on Kokkos' default memory space.
+     * That means that if Kokkos was configured with a GPU backend, the data is
+     * allocated on a GPU. The operations on the vector are performed on the
+     * chosen memory space. From the host, there are two methods to access the
+     * elements of the Vector when using the Default memory space:
      * <ul>
      * <li> use get_values():
      * @code
-     * Vector<double, MemorySpace::CUDA> vector(local_range, comm);
+     * Vector<double, MemorySpace::Default> vector(local_range, comm);
      * double* vector_dev = vector.get_values();
-     * std::vector<double> vector_host(local_range.n_elements(), 1.);
-     * Utilities::CUDA::copy_to_dev(vector_host, vector_dev);
+     * const int n_local_elements = local_range.n_elements();
+     * std::vector<double> vector_host(n_local_elements, 1.);
+     * Kokkos::deep_copy(Kokkos::View<double, Kokkos::HostSpace>(
+     *                     vector_host.data(), n_local_elements),
+     *                   Kokkos::View<double,
+     * MemorySpace::Default::kokkos_space>( vector_dev, n_local_elements));
      * @endcode
-     * <li> use import():
+     * <li> use import_elements():
      * @code
-     * Vector<double, MemorySpace::CUDA> vector(local_range, comm);
+     * Vector<double, MemorySpace::Default> vector(local_range, comm);
      * ReadWriteVector<double> rw_vector(local_range);
      * for (auto & val : rw_vector)
      *   val = 1.;
-     * vector.import(rw_vector, VectorOperations::insert);
+     * vector.import_elements(rw_vector, VectorOperations::insert);
      * @endcode
      * </ul>
      * The import method is a lot safer and will perform an MPI communication if
      * necessary. Since an MPI communication may be performed, import needs to
      * be called on all the processors.
      *
-     * @note By default, all the ranks will try to access the device 0. This is
-     * fine is if you have one rank per node and one gpu per node. If you
-     * have multiple GPUs on one node, we need each process to access a
-     * different GPU. If each node has the same number of GPUs, this can be done
-     * as follows:
-     * <code> int n_devices = 0; cudaGetDeviceCount(&n_devices); int
-     * device_id = my_rank % n_devices;
-     * cudaSetDevice(device_id);
-     * </code>
+     * @note By default, the GPU @ref GlossDevice "device" id is chosen in a round-robin fashion
+     * according to the local MPI rank id. To choose a different @ref GlossDevice "device", Kokkos
+     * has to be initialized explicitly providing the respective device id
+     * explicitly.
      *
      * <h4>MPI-3 shared-memory support</h4>
      *
@@ -244,8 +245,6 @@ namespace LinearAlgebra
      *   MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, rank, MPI_INFO_NULL,
      *                       &comm_sm);
      * @endcode
-     *
-     * @see CUDAWrappers
      */
     template <typename Number, typename MemorySpace = MemorySpace::Host>
     class Vector : public ::dealii::LinearAlgebra::VectorSpaceVector<Number>,
@@ -265,8 +264,8 @@ namespace LinearAlgebra
 
       static_assert(
         std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
-          std::is_same<MemorySpace, ::dealii::MemorySpace::CUDA>::value,
-        "MemorySpace should be Host or CUDA");
+          std::is_same<MemorySpace, ::dealii::MemorySpace::Default>::value,
+        "MemorySpace should be Host or Default");
 
       /**
        * @name 1: Basic Object-handling
@@ -318,12 +317,12 @@ namespace LinearAlgebra
        */
       Vector(const IndexSet &local_range,
              const IndexSet &ghost_indices,
-             const MPI_Comm &communicator);
+             const MPI_Comm  communicator);
 
       /**
        * Same constructor as above but without any ghost indices.
        */
-      Vector(const IndexSet &local_range, const MPI_Comm &communicator);
+      Vector(const IndexSet &local_range, const MPI_Comm communicator);
 
       /**
        * Create the vector based on the parallel partitioning described in @p
@@ -380,19 +379,19 @@ namespace LinearAlgebra
       void
       reinit(const IndexSet &local_range,
              const IndexSet &ghost_indices,
-             const MPI_Comm &communicator);
+             const MPI_Comm  communicator);
 
       /**
        * Same as above, but without ghost entries.
        */
       void
-      reinit(const IndexSet &local_range, const MPI_Comm &communicator);
+      reinit(const IndexSet &local_range, const MPI_Comm communicator);
 
       /**
        * Initialize the vector given to the parallel partitioning described in
        * @p partitioner. The input argument is a shared pointer, which stores
-       * the partitioner data only once and share it between several vectors
-       * with the same layout.
+       * the partitioner data only once and can be shared between several
+       * vectors with the same layout.
        *
        * The optional argument @p comm_sm, which consists of processes on
        * the same shared-memory domain, allows users have read-only access to
@@ -403,6 +402,18 @@ namespace LinearAlgebra
       void
       reinit(
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const MPI_Comm comm_sm = MPI_COMM_SELF);
+
+      /**
+       * This function exists purely for reasons of compatibility with the
+       * PETScWrappers::MPI::Vector and TrilinosWrappers::MPI::Vector classes.
+       *
+       * It calls the function above, and ignores the parameter @p make_ghosted.
+       */
+      void
+      reinit(
+        const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
+        const bool                                                make_ghosted,
         const MPI_Comm &comm_sm = MPI_COMM_SELF);
 
       /**
@@ -427,8 +438,8 @@ namespace LinearAlgebra
       void
       reinit(const types::global_dof_index local_size,
              const types::global_dof_index ghost_size,
-             const MPI_Comm &              comm,
-             const MPI_Comm &              comm_sm = MPI_COMM_SELF);
+             const MPI_Comm                comm,
+             const MPI_Comm                comm_sm = MPI_COMM_SELF);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could
@@ -444,6 +455,15 @@ namespace LinearAlgebra
        */
       void
       swap(Vector<Number, MemorySpace> &v);
+
+      /**
+       * Move assignment operator.
+       *
+       * @note This method may throw an exception (should an MPI check fail) and
+       * is consequently not `noexcept`.
+       */
+      Vector<Number, MemorySpace> &
+      operator=(Vector<Number, MemorySpace> &&in_vector); // NOLINT
 
       /**
        * Assigns the vector to the parallel partitioning of the input vector
@@ -516,7 +536,7 @@ namespace LinearAlgebra
        * after the second calculation will be zero.
        */
       virtual void
-      compress(::dealii::VectorOperation::values operation) override;
+      compress(VectorOperation::values operation) override;
 
       /**
        * Fills the data field for ghost indices with the values stored in the
@@ -560,9 +580,8 @@ namespace LinearAlgebra
        * LinearAlgebra::distributed::BlockVector).
        */
       void
-      compress_start(
-        const unsigned int                communication_channel = 0,
-        ::dealii::VectorOperation::values operation = VectorOperation::add);
+      compress_start(const unsigned int      communication_channel = 0,
+                     VectorOperation::values operation = VectorOperation::add);
 
       /**
        * For all requests that have been initiated in compress_start, wait for
@@ -579,11 +598,11 @@ namespace LinearAlgebra
        *
        * Must follow a call to the @p compress_start function.
        *
-       * When the MemorySpace is CUDA and MPI is not CUDA-aware, data changed on
-       * the device after the call to compress_start will be lost.
+       * When the MemorySpace is Default and MPI is not GPU-aware, data changed
+       * on the @ref GlossDevice "device" after the call to compress_start will be lost.
        */
       void
-      compress_finish(::dealii::VectorOperation::values operation);
+      compress_finish(VectorOperation::values operation);
 
       /**
        * Initiates communication for the @p update_ghost_values() function
@@ -678,15 +697,26 @@ namespace LinearAlgebra
        * VectorOperation::values @p operation is used to decide if the elements
        * in @p V should be added to the current vector or replace the current
        * elements. The main purpose of this function is to get data from one
-       * memory space, e.g. CUDA, to the other, e.g. the Host.
+       * memory space, e.g. Default, to the other, e.g. the Host.
        *
        * @note The partitioners of the two distributed vectors need to be the
        * same as no MPI communication is performed.
        */
       template <typename MemorySpace2>
       void
+      import_elements(const Vector<Number, MemorySpace2> &src,
+                      VectorOperation::values             operation);
+
+      /**
+       * @deprecated Use import_elements() instead.
+       */
+      template <typename MemorySpace2>
+      DEAL_II_DEPRECATED void
       import(const Vector<Number, MemorySpace2> &src,
-             VectorOperation::values             operation);
+             VectorOperation::values             operation)
+      {
+        import_elements(src, operation);
+      }
 
       /** @} */
 
@@ -735,14 +765,27 @@ namespace LinearAlgebra
        * communication pattern is used multiple times. This can be used to
        * improve performance.
        *
-       * @note If the MemorySpace is CUDA, the data in the ReadWriteVector will
-       * be moved to the device.
+       * @note If the MemorySpace is Default, the data in the ReadWriteVector will
+       * be moved to the @ref GlossDevice "device".
        */
       virtual void
+      import_elements(
+        const LinearAlgebra::ReadWriteVector<Number> &V,
+        VectorOperation::values                       operation,
+        std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          communication_pattern = {}) override;
+
+      /**
+       * @deprecated Use import_elements() instead.
+       */
+      DEAL_II_DEPRECATED virtual void
       import(const LinearAlgebra::ReadWriteVector<Number> &V,
              VectorOperation::values                       operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {}) override;
+               communication_pattern = {}) override
+      {
+        import_elements(V, operation, communication_pattern);
+      }
 
       /**
        * Return the scalar product of two vectors.
@@ -969,8 +1012,8 @@ namespace LinearAlgebra
        *
        * It holds that end() - begin() == locally_owned_size().
        *
-       * @note For the CUDA memory space, the iterator points to memory on the
-       * device.
+       * @note For the Default memory space, the iterator might point to memory
+       * on the @ref GlossDevice "device".
        */
       iterator
       begin();
@@ -979,8 +1022,8 @@ namespace LinearAlgebra
        * Return constant iterator to the start of the locally owned elements
        * of the vector.
        *
-       * @note For the CUDA memory space, the iterator points to memory on the
-       * device.
+       * @note For the Default memory space, the iterator might point to memory
+       * on the @ref GlossDevice "device".
        */
       const_iterator
       begin() const;
@@ -989,8 +1032,8 @@ namespace LinearAlgebra
        * Return an iterator pointing to the element past the end of the array
        * of locally owned entries.
        *
-       * @note For the CUDA memory space, the iterator points to memory on the
-       * device.
+       * @note For the Default memory space, the iterator might point to memory
+       * on the @ref GlossDevice "device".
        */
       iterator
       end();
@@ -999,8 +1042,8 @@ namespace LinearAlgebra
        * Return a constant iterator pointing to the element past the end of
        * the array of the locally owned entries.
        *
-       * @note For the CUDA memory space, the iterator points to memory on the
-       * device.
+       * @note For the Default memory space, the iterator might point to memory
+       * on the @ref GlossDevice "device".
        */
       const_iterator
       end() const;
@@ -1073,8 +1116,8 @@ namespace LinearAlgebra
       /**
        * Return the pointer to the underlying raw array.
        *
-       * @note For the CUDA memory space, the pointer points to memory on the
-       * device.
+       * @note For the Default memory space, the pointer might point to memory
+       * on the @ref GlossDevice "device".
        */
       Number *
       get_values() const;
@@ -1094,7 +1137,7 @@ namespace LinearAlgebra
        *
        * @pre The sizes of the @p indices and @p values arrays must be identical.
        *
-       * @note This function is not implemented for CUDA memory space.
+       * @note This function is not implemented for Default memory space.
        */
       template <typename OtherNumber>
       void
@@ -1161,10 +1204,9 @@ namespace LinearAlgebra
       /** @{ */
 
       /**
-       * Return a reference to the MPI communicator object in use with this
-       * vector.
+       * Return the underlying MPI communicator.
        */
-      const MPI_Comm &
+      MPI_Comm
       get_mpi_communicator() const;
 
       /**
@@ -1227,13 +1269,6 @@ namespace LinearAlgebra
        * @ingroup Exceptions
        */
       DeclException0(ExcVectorTypeNotCompatible);
-
-      /**
-       * Attempt to perform an operation not implemented on the device.
-       *
-       * @ingroup Exceptions
-       */
-      DeclException0(ExcNotAllowedForCuda);
 
       /**
        * Exception
@@ -1421,7 +1456,7 @@ namespace LinearAlgebra
        */
       void
       resize_val(const size_type new_allocated_size,
-                 const MPI_Comm &comm_sm = MPI_COMM_SELF);
+                 const MPI_Comm  comm_sm = MPI_COMM_SELF);
 
       // Make all other vector types friends.
       template <typename Number2, typename MemorySpace2>
@@ -1732,7 +1767,7 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
-    inline const MPI_Comm &
+    inline MPI_Comm
     Vector<Number, MemorySpace>::get_mpi_communicator() const
     {
       return partitioner->get_mpi_communicator();

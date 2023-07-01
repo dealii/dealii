@@ -1139,7 +1139,7 @@ main()
         flow_problem.run();
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

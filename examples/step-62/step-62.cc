@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2022 by the deal.II authors
+ * Copyright (C) 2018 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -911,7 +911,7 @@ namespace step62
                           const Tensor<2, dim> grad_phi_j =
                             fe_values[displacement].gradient(j, q);
 
-                          // calculate the values of the mass matrix.
+                          // calculate the values of the @ref GlossMassMatrix "mass matrix".
                           quadrature_data.mass_coefficient[i][j] =
                             rho_values[q] * xi * phi_i * phi_j;
 
@@ -1386,9 +1386,9 @@ int main(int argc, char *argv[])
 
       // Each of the simulations (displacement and calibration) is stored in a
       // separate HDF5 group:
-      const std::vector<std::string> group_names = {"displacement",
-                                                    "calibration"};
-      for (auto group_name : group_names)
+      const std::array<std::string, 2> group_names{
+        {"displacement", "calibration"}};
+      for (const std::string &group_name : group_names)
         {
           // For each of these two group names, we now create the group and put
           // attributes into these groups.
@@ -1420,7 +1420,7 @@ int main(int argc, char *argv[])
           group.set_attribute<double>("youngs_modulus", 270000000000.0);
           group.set_attribute<double>("material_a_rho", 3200);
 
-          if (group_name == std::string("displacement"))
+          if (group_name == "displacement")
             group.set_attribute<double>("material_b_rho", 2000);
           else
             group.set_attribute<double>("material_b_rho", 3200);

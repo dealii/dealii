@@ -21,7 +21,7 @@ solve nonlinear partial differential equations. Moreover, we have another look
 at the handling of constraints within the matrix-free framework.
 Finally, we will use an explicit time-stepping
 method to solve the problem and introduce Gauss-Lobatto finite elements that
-are very convenient in this case since their mass matrix can be accurately
+are very convenient in this case since their @ref GlossMassMatrix "mass matrix" can be accurately
 approximated by a diagonal, and thus trivially invertible, matrix. The two
 ingredients to this property are firstly a distribution of the nodal points of
 Lagrange polynomials according to the point distribution of the Gauss-Lobatto

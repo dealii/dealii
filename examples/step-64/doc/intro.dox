@@ -86,12 +86,12 @@ LinearAlgebra::CUDAWrappers::Vector:
 
   // Move the data to the device:
   LinearAlgebra::CUDAWrappers::Vector<double> vector_dev(size);
-  vector_dev.import(rw_vector, VectorOperations::insert);
+  vector_dev.import_elements(rw_vector, VectorOperations::insert);
 
   ...do some computations on the device...
 
   // Move the data back to the host:
-  rw_vector.import(vector_dev, VectorOperations::insert);
+  rw_vector.import_elements(vector_dev, VectorOperations::insert);
 @endcode
 Both of the vector classes used here only work on a single machine,
 i.e., one memory space on a host and one on a device.
@@ -113,7 +113,7 @@ which is similar but the `import()` stage may involve MPI communication:
   // Move the data to the device:
   LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
     distributed_vector_dev(locally_owned_dofs, MPI_COMM_WORLD);
-  distributed_vector_dev.import(owned_rw_vector, VectorOperations::insert);
+  distributed_vector_dev.import_elements(owned_rw_vector, VectorOperations::insert);
 
   ...do something with the dev_vector...
 
@@ -122,7 +122,7 @@ which is similar but the `import()` stage may involve MPI communication:
     relevant_rw_vector(locally_relevant_dofs);
 
   // Move the data to the host, possibly using MPI communication:
-  relevant_rw_vector.import(distributed_vector_dev, VectorOperations::insert);
+  relevant_rw_vector.import_elements(distributed_vector_dev, VectorOperations::insert);
 @endcode
 The `relevant_rw_vector` is an object that stores a subset of all
 elements of the vector. Typically, these are the

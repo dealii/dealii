@@ -1,0 +1,192 @@
+
+DEAL::Running with PETSc on 4 MPI rank(s)...
+DEAL::  Target_tolerance: 0.00100000
+DEAL::
+DEAL::  Computing residual vector... norm=0.170956
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.170956
+DEAL::  Computing residual vector... norm=0.129347
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.129347
+DEAL::  Computing residual vector... norm=0.100710
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.100710
+DEAL::  Computing residual vector... norm=0.0776513
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0776513
+DEAL::  Computing residual vector... norm=0.0593571
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0593571
+DEAL::  Computing residual vector... norm=0.0459878
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0459878
+DEAL::  Computing residual vector... norm=0.0355434
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0355434
+DEAL::  Computing residual vector... norm=0.0274503
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0274503
+DEAL::  Computing residual vector... norm=0.0212126
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0212126
+DEAL::  Computing residual vector... norm=0.0164293
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0164293
+DEAL::  Computing residual vector... norm=0.0127897
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0127897
+DEAL::  Computing residual vector... norm=0.0100451
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0100451
+DEAL::  Computing residual vector... norm=0.00798892
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00798892
+DEAL::  Computing residual vector... norm=0.00645103
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00645103
+DEAL::  Computing residual vector... norm=0.00529638
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00529638
+DEAL::  Computing residual vector... norm=0.00442194
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00442194
+DEAL::  Computing residual vector... norm=0.00375154
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00375154
+DEAL::  Computing residual vector... norm=0.00323013
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00323013
+DEAL::  Computing residual vector... norm=0.00281833
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00281834
+DEAL::  Computing residual vector... norm=0.00248811
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00248811
+DEAL::  Computing residual vector... norm=0.00221939
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00221939
+DEAL::  Computing residual vector... norm=0.00199769
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00199769
+DEAL::  Computing residual vector... norm=0.00181244
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00181244
+DEAL::  Computing residual vector... norm=0.00165582
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00165583
+DEAL::  Computing residual vector... norm=0.00152199
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00152199
+DEAL::  Computing residual vector... norm=0.00140649
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00140649
+DEAL::  Computing residual vector... norm=0.00130588
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00130589
+DEAL::  Computing residual vector... norm=0.00121752
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00121752
+DEAL::  Computing residual vector... norm=0.00113928
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00113929
+DEAL::  Computing residual vector... norm=0.00106952
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00106952
+DEAL::  Computing residual vector... norm=0.00100687
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.00100688
+DEAL::  Computing residual vector... norm=0.000950282
+DEAL::

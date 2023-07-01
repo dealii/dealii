@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,9 +24,7 @@
 
 #include <deal.II/grid/tria_accessor.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <set>
 #include <vector>
@@ -740,8 +738,7 @@ protected:
 private:
   // Make the DoFHandler class a friend so that it can call the set_xxx()
   // functions.
-  template <int, int>
-  friend class DoFHandler;
+  friend class DoFHandler<dim, spacedim>;
 
   friend struct dealii::internal::DoFHandlerImplementation::Policy::
     Implementation;
@@ -1210,8 +1207,7 @@ protected:
 
   // Make the DoFHandler class a friend so that it can call the set_xxx()
   // functions.
-  template <int, int>
-  friend class DoFHandler;
+  friend class DoFHandler<1, spacedim>;
 
   friend struct dealii::internal::DoFHandlerImplementation::Policy::
     Implementation;
@@ -1262,10 +1258,10 @@ public:
    * semantic sense, and we generate an exception when such an object is
    * actually generated.
    */
-  DoFInvalidAccessor(const Triangulation<dim, spacedim> *parent     = 0,
-                     const int                           level      = -1,
-                     const int                           index      = -1,
-                     const AccessorData *                local_data = 0);
+  DoFInvalidAccessor(const void *        parent     = nullptr,
+                     const int           level      = -1,
+                     const int           index      = -1,
+                     const AccessorData *local_data = nullptr);
 
   /**
    * Copy constructor.  This class is used for iterators that do not make
@@ -2145,7 +2141,7 @@ DoFInvalidAccessor<structdim, dim, spacedim>::DoFInvalidAccessor(
 DEAL_II_NAMESPACE_CLOSE
 
 // include more templates
-#include "dof_accessor.templates.h"
+#include <deal.II/dofs/dof_accessor.templates.h>
 
 
 #endif

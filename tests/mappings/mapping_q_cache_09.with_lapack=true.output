@@ -1,0 +1,22 @@
+
+DEAL:1d::Aspect ratios undeformed mesh: 
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL:1d::
+DEAL:1d::Aspect ratios deformed mesh: 
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL:1d::
+DEAL::
+DEAL:2d::Aspect ratios undeformed mesh: 
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL:2d::
+DEAL:2d::Aspect ratios deformed mesh: 
+1.320e+00 1.712e+00 1.242e+00 1.044e+00 1.900e+00 2.033e+00 1.159e+00 1.240e+00 1.528e+00 1.178e+00 1.750e+00 1.349e+00 1.061e+00 1.008e+00 1.215e+00 1.136e+00 
+DEAL:2d::
+DEAL::
+DEAL:3d::Aspect ratios undeformed mesh: 
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 
+DEAL:3d::
+DEAL:3d::Aspect ratios deformed mesh: 
+1.320e+00 1.712e+00 1.883e+00 1.883e+00 1.768e+00 1.768e+00 1.540e+00 1.187e+00 
+DEAL:3d::
+DEAL::

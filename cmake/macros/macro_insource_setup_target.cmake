@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2018 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -27,30 +27,29 @@ function(insource_setup_target _target _build)
   string(TOLOWER ${_build} _build_lowercase)
 
   set_target_properties(${_target} PROPERTIES
-    LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
     LINKER_LANGUAGE "CXX"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     )
+
+  target_compile_flags(${_target} PRIVATE
+    "${DEAL_II_WARNING_FLAGS} ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
+    )
+
+  get_property(_type TARGET ${_target} PROPERTY TYPE)
+  if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
+    target_link_flags(${_target} PRIVATE
+      "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+      )
+  endif()
 
   target_include_directories(${_target}
     PRIVATE
       "${CMAKE_BINARY_DIR}/include"
       "${CMAKE_SOURCE_DIR}/include"
+    SYSTEM PRIVATE
       ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-    )
-  target_include_directories(${_target} SYSTEM PRIVATE ${DEAL_II_INCLUDE_DIRS})
-
-  set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
-  separate_arguments(_flags)
-  target_compile_options(${_target} PUBLIC ${_flags})
-
-  target_compile_definitions(${_target}
-    PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
+      ${DEAL_II_INCLUDE_DIRS}
     )
 
-  get_property(_type TARGET ${_target} PROPERTY TYPE)
-  if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
-    target_link_libraries(${_target} ${DEAL_II_NAMESPACE}_${_build_lowercase})
-  endif()
-
+  target_link_libraries(${_target} ${DEAL_II_TARGET_NAME}_${_build_lowercase})
 endfunction()

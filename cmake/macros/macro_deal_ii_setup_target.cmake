@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2021 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,21 +21,9 @@
 #       deal_ii_setup_target(target)
 #       deal_ii_setup_target(target DEBUG|RELEASE)
 #
-# This appends necessary include directories, linker flags, compile flags
-# and compile definitions and the deal.II library link interface to the
-# given target. In particular:
-#
-# INCLUDE_DIRECTORIES is appended with
-#   "${DEAL_II_INCLUDE_DIRS}"
-#
-# COMPILE_FLAGS is appended with
-#   "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_<build type>}"
-#
-# LINK_FLAGS is appended with
-#   "${DEAL_II_LINKER_FLAGS ${DEAL_II_LINKER_FLAGS_<build type>}"
-#
-# COMPILE_DEFINITIONS is appended with
-#   "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_<build type>}"
+# This appends the deal.II target to the link interface of the specified
+# target, which in turn ensures that necessary include directories, linker
+# flags, compile flags and compile definitions are set.
 #
 # If no "DEBUG" or "RELEASE" keyword is specified after the target, the
 # current CMAKE_BUILD_TYPE is used instead. A CMAKE_BUILD_TYPE "Debug" is
@@ -69,6 +57,7 @@ macro(deal_ii_setup_target _target)
   # Set build type with the help of the specified keyword, or
   # CMAKE_BUILD_TYPE:
   #
+
   if("${ARGN}" MATCHES "^(DEBUG|RELEASE)$")
     set(_build "${ARGN}")
   elseif("${ARGN}" STREQUAL "")
@@ -93,42 +82,24 @@ macro(deal_ii_setup_target _target)
   endif()
 
   #
-  # We can only append DEBUG link flags and compile definitions if deal.II
-  # was built with the Debug or DebugRelease build type. So test for this:
+  # We can only append the debug or release interface if deal.II was built
+  # with the Debug or DebugRelease build type. So test for this:
   #
+
   if("${_build}" STREQUAL "DEBUG" AND NOT DEAL_II_BUILD_TYPE MATCHES "Debug")
     set(_build "RELEASE")
   endif()
 
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    # Intel (at least up to 19.0.5) confuses an external TBB installation with
-    # our selected one if we use -Isystem includes. Work around this by using
-    # normal includes.
-    # See https://github.com/dealii/dealii/issues/8374 for details.
-    target_include_directories(${_target} PRIVATE ${DEAL_II_INCLUDE_DIRS})
-  else()
-    target_include_directories(${_target} SYSTEM PRIVATE ${DEAL_II_INCLUDE_DIRS})
-  endif()
-
-  set_property(TARGET ${_target} APPEND_STRING PROPERTY
-    LINK_FLAGS " ${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+  target_compile_flags(${_target} PRIVATE "$<COMPILE_LANGUAGE:CXX>"
+    "${DEAL_II_WARNING_FLAGS} ${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}"
     )
 
-  set(_flags "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${_build}}")
-  separate_arguments(_flags)
-
-  target_compile_options(${_target} PUBLIC ${_flags})
-
-  target_compile_definitions(${_target}
-    PUBLIC ${DEAL_II_DEFINITIONS} ${DEAL_II_DEFINITIONS_${_build}}
-    )
-
-  #
-  # Set up the link interface:
-  #
   get_property(_type TARGET ${_target} PROPERTY TYPE)
   if(NOT "${_type}" STREQUAL "OBJECT_LIBRARY")
-    target_link_libraries(${_target} ${DEAL_II_TARGET_${_build}})
+    target_link_flags(${_target} PRIVATE
+      "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${_build}}"
+      )
   endif()
 
+  target_link_libraries(${_target} ${DEAL_II_TARGET_${_build}})
 endmacro()

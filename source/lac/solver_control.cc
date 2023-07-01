@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2018 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -89,7 +89,7 @@ SolverControl::check(const unsigned int step, const double check_value)
       return success;
     }
 
-  if ((step >= maxsteps) || std::isnan(check_value) ||
+  if ((step >= maxsteps) || numbers::is_nan(check_value) ||
       (check_failure && (check_value > failure_residual)))
     {
       if (m_log_result)

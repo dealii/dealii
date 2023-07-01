@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -129,8 +129,8 @@ namespace parallel
      * @param[in] weighting_function The function that determines each
      *    cell's weight during load balancing.
      */
-    CellWeights(const dealii::DoFHandler<dim, spacedim> &dof_handler,
-                const WeightingFunction &                weighting_function);
+    CellWeights(const DoFHandler<dim, spacedim> &dof_handler,
+                const WeightingFunction &        weighting_function);
 
     /**
      * Destructor.

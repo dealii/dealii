@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -30,7 +30,6 @@
 
 #include "../tests.h"
 
-using namespace std;
 
 
 template <int dim>
@@ -44,7 +43,7 @@ print_dof_numbers(const DoFHandler<dim> &dof)
       {
         cell->get_dof_indices(dof_indices);
         deallog << "cell " << cell->id() << ": ";
-        for (types::global_dof_index i : dof_indices)
+        for (const types::global_dof_index i : dof_indices)
           deallog << i << ' ';
         deallog << std::endl;
       }
@@ -56,7 +55,7 @@ print_dof_numbers(const DoFHandler<dim> &dof)
           {
             cell->get_mg_dof_indices(dof_indices);
             deallog << "cell " << cell->id() << ": ";
-            for (types::global_dof_index i : dof_indices)
+            for (const types::global_dof_index i : dof_indices)
               deallog << i << ' ';
             deallog << std::endl;
           }

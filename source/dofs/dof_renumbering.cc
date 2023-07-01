@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,7 +45,6 @@
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/multigrid/mg_tools.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/config.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -58,7 +57,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random/uniform_int_distribution.hpp>
 
 #undef BOOST_BIND_GLOBAL_PLACEHOLDERS
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cmath>
@@ -755,7 +753,7 @@ namespace DoFRenumbering
   types::global_dof_index
   compute_component_wise(std::vector<types::global_dof_index> &new_indices,
                          const CellIterator &                  start,
-                         const typename identity<CellIterator>::type &end,
+                         const std_cxx20::type_identity_t<CellIterator> &end,
                          const std::vector<unsigned int> &component_order_arg,
                          const bool                       is_level_operation)
   {
@@ -2768,7 +2766,7 @@ namespace DoFRenumbering
               // cell batch range that touched a particular dof)
               data.get_dof_info(component).get_dof_indices_on_cell_batch(
                 dofs_extracted, cell);
-              for (unsigned int dof_index : dofs_extracted)
+              for (const unsigned int dof_index : dofs_extracted)
                 if (dof_index < n_owned_dofs &&
                     last_touch_by_cell_batch_range[dof_index] !=
                       cell_range.first)
@@ -2849,7 +2847,7 @@ namespace DoFRenumbering
     // comparator for std::sort to then order the unknowns by the specified
     // matrix-free loop order
     const std::vector<unsigned int> &purely_local_dofs = dofs_by_rank_access[0];
-    for (unsigned int i : purely_local_dofs)
+    for (const unsigned int i : purely_local_dofs)
       if (local_numbering.second[i] == 1)
         new_numbers.push_back(i);
 

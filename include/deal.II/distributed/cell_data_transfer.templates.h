@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -50,7 +50,7 @@ namespace internal
         post_unpack_action(std::vector<VectorType *> &all_out)
         {
           for (auto &out : all_out)
-            out->compress(::dealii::VectorOperation::insert);
+            out->compress(VectorOperation::insert);
         }
 
         template <typename value_type>

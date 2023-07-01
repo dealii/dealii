@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2021 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -13,12 +13,9 @@
 ##
 ## ---------------------------------------------------------------------
 
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
-
 set(_src
   arkode.cc
   ida.cc
-  copy.cc
   kinsol.cc
   n_vector.cc
   sunlinsol_wrapper.cc
@@ -32,5 +29,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/sundials/*.h
   )
 
-deal_ii_add_library(obj_sundials OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_sundials "${_inst}")
+define_object_library(object_sundials OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_sundials "${_inst}")

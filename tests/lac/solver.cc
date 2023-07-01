@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2020 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,8 +101,8 @@ main()
   SolverFIRE<>                  fire(control, mem);
 
   SolverGMRES<>::AdditionalData data3(8);
-  data3.orthogonalization_strategy = SolverGMRES<>::AdditionalData::
-    OrthogonalizationStrategy::classical_gram_schmidt;
+  data3.orthogonalization_strategy =
+    LinearAlgebra::OrthogonalizationStrategy::classical_gram_schmidt;
   SolverGMRES<> gmresclassical(control, mem, data3);
 
   for (unsigned int size = 4; size <= 30; size *= 3)
@@ -255,7 +255,7 @@ main()
 
           deallog.pop();
         }
-      catch (std::exception &e)
+      catch (const std::exception &e)
         {
           std::cerr << "Exception: " << e.what() << std::endl;
         }

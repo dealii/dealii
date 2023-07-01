@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2013 - 2022 by the deal.II authors
+## Copyright (C) 2013 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -47,7 +47,7 @@ if(NOT DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
       )
   endif()
 
-  find_package(deal.II 9.3.0 REQUIRED HINTS ${DEAL_II_DIR})
+  find_package(deal.II 9.5.0 REQUIRED HINTS ${DEAL_II_DIR})
   deal_ii_initialize_cached_variables()
   project(TESTSUITE CXX)
   set(_options "-DDEAL_II_DIR=${DEAL_II_PATH}")
@@ -169,7 +169,7 @@ if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   add_dependencies(test setup_tests_quick_tests)
   foreach(_build ${DEAL_II_BUILD_TYPES})
     string(TOLOWER ${_build} _build_lowercase)
-    add_dependencies(test ${DEAL_II_NAMESPACE}_${_build_lowercase})
+    add_dependencies(test ${DEAL_II_TARGET_NAME}_${_build_lowercase})
   endforeach()
 
   #

@@ -7,7 +7,7 @@
     <title>The deal.II Readme</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link href="screen.css" rel="StyleSheet" />
-    <meta name="copyright" content="Copyright (C) 1998 - 2022 by the deal.II Authors" />
+    <meta name="copyright" content="Copyright (C) 1998 - 2023 by the deal.II Authors" />
     <meta name="keywords" content="deal.II" />
 </head>
 
@@ -649,11 +649,11 @@
             </dd>
 
             <dt><a name="Sundials"/>
-              <a href="https://computation.llnl.gov/projects/sundials" target="_top">SUNDIALS</a></dt>
+              <a href="https://computing.llnl.gov/projects/sundials" target="_top">SUNDIALS</a></dt>
             <dd>
                 <p>
-                    <a href="https://computation.llnl.gov/projects/sundials" target="_top">SUNDIALS</a> is a collection of solvers for nonlinear and differential/algebraic equations.
-                    <a href="https://computation.llnl.gov/projects/sundials" target="_top">SUNDIALS</a> should be readily packaged by most Linux distributions. To use a self compiled version,
+                    <a href="https://computing.llnl.gov/projects/sundials" target="_top">SUNDIALS</a> is a collection of solvers for nonlinear and differential/algebraic equations.
+                    <a href="https://computing.llnl.gov/projects/sundials" target="_top">SUNDIALS</a> should be readily packaged by most Linux distributions. To use a self compiled version,
                     specify
                     <code>-DSUNDIALS_DIR=/path/to/sundials</code> to the deal.II CMake call.
                 </p>
@@ -726,6 +726,23 @@
                 </p>
             </dd>
     </dl>
+
+    <dt><a name="vtk"/>
+        <a href="https://vtk.org/" target="_top">VTK</a></dt>
+    <dd>
+        <p>
+            The <a href="https://vtk.org/" target="_top">Visualization Toolkit (VTK)</a> is an open-source,
+            freely available software system for 3D computer graphics, modeling, image processing, volume rendering,
+            scientific visualization, and 2D plotting.
+
+            It supports a wide variety of visualization algorithms and advanced modeling techniques,
+            and it takes advantage of both threaded and distributed memory parallel processing for speed and scalability,
+            respectively.
+
+            In order to use VTK, add
+            <code>-DVTK_DIR=/path/to/vtk</code> to the deal.II CMake call.
+        </p>
+    </dd>
 
     <dt><a name="zlib"/>
               <a href="http://zlib.net/" target="_top">zlib</a></dt>

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,6 +38,7 @@
 
 #  include <deal.II/sundials/n_vector.h>
 #  include <deal.II/sundials/sunlinsol_wrapper.h>
+#  include <deal.II/sundials/utilities.h>
 
 #  include <arkode/arkode_arkstep.h>
 #  include <sunlinsol/sunlinsol_spgmr.h>
@@ -49,207 +50,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace SUNDIALS
 {
-  namespace
-  {
-    template <typename VectorType>
-    int
-    explicit_function_callback(realtype tt,
-                               N_Vector yy,
-                               N_Vector yp,
-                               void *   user_data)
-    {
-      Assert(user_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(user_data);
-
-      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
-      auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
-
-      return solver.explicit_function(tt, *src_yy, *dst_yp);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    implicit_function_callback(realtype tt,
-                               N_Vector yy,
-                               N_Vector yp,
-                               void *   user_data)
-    {
-      Assert(user_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(user_data);
-
-      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
-      auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
-
-      return solver.implicit_function(tt, *src_yy, *dst_yp);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    jacobian_times_vector_callback(N_Vector v,
-                                   N_Vector Jv,
-                                   realtype t,
-                                   N_Vector y,
-                                   N_Vector fy,
-                                   void *   user_data,
-                                   N_Vector)
-    {
-      Assert(user_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(user_data);
-
-      auto *src_v  = internal::unwrap_nvector_const<VectorType>(v);
-      auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
-      auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
-
-      auto *dst_Jv = internal::unwrap_nvector<VectorType>(Jv);
-
-      return solver.jacobian_times_vector(*src_v, *dst_Jv, t, *src_y, *src_fy);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    jacobian_times_vector_setup_callback(realtype t,
-                                         N_Vector y,
-                                         N_Vector fy,
-                                         void *   user_data)
-    {
-      Assert(user_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(user_data);
-
-      auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
-      auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
-
-      return solver.jacobian_times_setup(t, *src_y, *src_fy);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    solve_with_jacobian_callback(realtype t,
-                                 N_Vector y,
-                                 N_Vector fy,
-                                 N_Vector r,
-                                 N_Vector z,
-                                 realtype gamma,
-                                 realtype delta,
-                                 int      lr,
-                                 void *   user_data)
-    {
-      Assert(user_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(user_data);
-
-      auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
-      auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
-      auto *src_r  = internal::unwrap_nvector_const<VectorType>(r);
-
-      auto *dst_z = internal::unwrap_nvector<VectorType>(z);
-
-      return solver.jacobian_preconditioner_solve(
-        t, *src_y, *src_fy, *src_r, *dst_z, gamma, delta, lr);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    jacobian_solver_setup_callback(realtype     t,
-                                   N_Vector     y,
-                                   N_Vector     fy,
-                                   booleantype  jok,
-                                   booleantype *jcurPtr,
-                                   realtype     gamma,
-                                   void *       user_data)
-    {
-      Assert(user_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(user_data);
-
-      auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
-      auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
-
-      return solver.jacobian_preconditioner_setup(
-        t, *src_y, *src_fy, jok, *jcurPtr, gamma);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    mass_matrix_times_vector_callback(N_Vector v,
-                                      N_Vector Mv,
-                                      realtype t,
-                                      void *   mtimes_data)
-    {
-      Assert(mtimes_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(mtimes_data);
-
-      auto *src_v  = internal::unwrap_nvector_const<VectorType>(v);
-      auto *dst_Mv = internal::unwrap_nvector<VectorType>(Mv);
-
-      return solver.mass_times_vector(t, *src_v, *dst_Mv);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    mass_matrix_times_vector_setup_callback(realtype t, void *mtimes_data)
-    {
-      Assert(mtimes_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(mtimes_data);
-
-      return solver.mass_times_setup(t);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    solve_with_mass_matrix_callback(realtype t,
-                                    N_Vector r,
-                                    N_Vector z,
-                                    realtype delta,
-                                    int      lr,
-                                    void *   user_data)
-    {
-      Assert(user_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(user_data);
-
-      auto *src_r = internal::unwrap_nvector_const<VectorType>(r);
-      auto *dst_z = internal::unwrap_nvector<VectorType>(z);
-
-      return solver.mass_preconditioner_solve(t, *src_r, *dst_z, delta, lr);
-    }
-
-
-
-    template <typename VectorType>
-    int
-    mass_matrix_solver_setup_callback(realtype t, void *user_data)
-    {
-      Assert(user_data != nullptr, ExcInternalError());
-      ARKode<VectorType> &solver =
-        *static_cast<ARKode<VectorType> *>(user_data);
-
-      return solver.mass_preconditioner_setup(t);
-    }
-  } // namespace
-
-
   template <typename VectorType>
   ARKode<VectorType>::ARKode(const AdditionalData &data)
     : ARKode(data, MPI_COMM_SELF)
@@ -258,7 +58,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   ARKode<VectorType>::ARKode(const AdditionalData &data,
-                             const MPI_Comm &      mpi_comm)
+                             const MPI_Comm        mpi_comm)
     : data(data)
     , arkode_mem(nullptr)
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
@@ -266,6 +66,7 @@ namespace SUNDIALS
 #  endif
     , mpi_communicator(mpi_comm)
     , last_end_time(data.initial_time)
+    , pending_exception(nullptr)
   {
     set_functions_to_trigger_an_assert();
 
@@ -296,6 +97,8 @@ namespace SUNDIALS
     (void)status;
     AssertARKode(status);
 #  endif
+
+    Assert(pending_exception == nullptr, ExcInternalError());
   }
 
 
@@ -368,14 +171,41 @@ namespace SUNDIALS
       {
         time.set_desired_next_step_size(data.output_period);
 
-        // Let ARKode advance time by one period:
+        // Having set up all of the ancillary things, finally call the main
+        // ARKode function. One we return, check that what happened:
+        // - If we have a pending recoverable exception, ignore it if SUNDIAL's
+        //   return code was zero -- in that case, SUNDIALS managed to indeed
+        //   recover and we no longer need the exception
+        // - If we have any other exception, rethrow it
+        // - If no exception, test that SUNDIALS really did successfully return
+        Assert(pending_exception == nullptr, ExcInternalError());
         double     actual_next_time;
         const auto status = ARKStepEvolve(arkode_mem,
                                           time.get_next_time(),
                                           solution_nvector,
                                           &actual_next_time,
                                           ARK_NORMAL);
-        (void)status;
+        if (pending_exception)
+          {
+            try
+              {
+                std::rethrow_exception(pending_exception);
+              }
+            catch (const RecoverableUserCallbackError &exc)
+              {
+                pending_exception = nullptr;
+                if (status == 0)
+                  /* just eat the exception */;
+                else
+                  throw;
+              }
+            catch (...)
+              {
+                pending_exception = nullptr;
+                throw;
+              }
+          }
+
         AssertARKode(status);
 
         // Then reflect this time advancement in our own DiscreteTime object:
@@ -439,14 +269,50 @@ namespace SUNDIALS
     Assert(explicit_function || implicit_function,
            ExcFunctionNotProvided("explicit_function || implicit_function"));
 
-    arkode_mem = ARKStepCreate(
-      explicit_function ? &explicit_function_callback<VectorType> : nullptr,
-      implicit_function ? &implicit_function_callback<VectorType> : nullptr,
-      current_time,
-      initial_condition_nvector
+    auto explicit_function_callback =
+      [](realtype tt, N_Vector yy, N_Vector yp, void *user_data) -> int {
+      Assert(user_data != nullptr, ExcInternalError());
+      ARKode<VectorType> &solver =
+        *static_cast<ARKode<VectorType> *>(user_data);
+
+      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+      auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
+
+      return Utilities::call_and_possibly_capture_exception(
+        solver.explicit_function,
+        solver.pending_exception,
+        tt,
+        *src_yy,
+        *dst_yp);
+    };
+
+
+    auto implicit_function_callback =
+      [](realtype tt, N_Vector yy, N_Vector yp, void *user_data) -> int {
+      Assert(user_data != nullptr, ExcInternalError());
+      ARKode<VectorType> &solver =
+        *static_cast<ARKode<VectorType> *>(user_data);
+
+      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+      auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
+
+      return Utilities::call_and_possibly_capture_exception(
+        solver.implicit_function,
+        solver.pending_exception,
+        tt,
+        *src_yy,
+        *dst_yp);
+    };
+
+    arkode_mem = ARKStepCreate(explicit_function ? explicit_function_callback :
+                                                   ARKRhsFn(nullptr),
+                               implicit_function ? implicit_function_callback :
+                                                   ARKRhsFn(nullptr),
+                               current_time,
+                               initial_condition_nvector
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-      ,
-      arkode_ctx
+                               ,
+                               arkode_ctx
 #  endif
     );
     Assert(arkode_mem != nullptr, ExcInternalError());
@@ -513,7 +379,8 @@ namespace SUNDIALS
           {
             linear_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
-                solve_linearized_system
+                solve_linearized_system,
+                pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                 ,
                 arkode_ctx
@@ -546,21 +413,120 @@ namespace SUNDIALS
           }
         status = ARKStepSetLinearSolver(arkode_mem, sun_linear_solver, nullptr);
         AssertARKode(status);
-        status = ARKStepSetJacTimes(
-          arkode_mem,
-          jacobian_times_setup ?
-            jacobian_times_vector_setup_callback<VectorType> :
-            nullptr,
-          jacobian_times_vector_callback<VectorType>);
+
+        auto jacobian_times_vector_callback = [](N_Vector v,
+                                                 N_Vector Jv,
+                                                 realtype t,
+                                                 N_Vector y,
+                                                 N_Vector fy,
+                                                 void *   user_data,
+                                                 N_Vector) -> int {
+          Assert(user_data != nullptr, ExcInternalError());
+          ARKode<VectorType> &solver =
+            *static_cast<ARKode<VectorType> *>(user_data);
+
+          auto *src_v  = internal::unwrap_nvector_const<VectorType>(v);
+          auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
+          auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
+
+          auto *dst_Jv = internal::unwrap_nvector<VectorType>(Jv);
+
+          return Utilities::call_and_possibly_capture_exception(
+            solver.jacobian_times_vector,
+            solver.pending_exception,
+            *src_v,
+            *dst_Jv,
+            t,
+            *src_y,
+            *src_fy);
+        };
+
+        auto jacobian_times_vector_setup_callback =
+          [](realtype t, N_Vector y, N_Vector fy, void *user_data) -> int {
+          Assert(user_data != nullptr, ExcInternalError());
+          ARKode<VectorType> &solver =
+            *static_cast<ARKode<VectorType> *>(user_data);
+
+          auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
+          auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
+
+          return Utilities::call_and_possibly_capture_exception(
+            solver.jacobian_times_setup,
+            solver.pending_exception,
+            t,
+            *src_y,
+            *src_fy);
+        };
+        status = ARKStepSetJacTimes(arkode_mem,
+                                    jacobian_times_setup ?
+                                      jacobian_times_vector_setup_callback :
+                                      ARKLsJacTimesSetupFn(nullptr),
+                                    jacobian_times_vector_callback);
         AssertARKode(status);
         if (jacobian_preconditioner_solve)
           {
-            status = ARKStepSetPreconditioner(
-              arkode_mem,
-              jacobian_preconditioner_setup ?
-                jacobian_solver_setup_callback<VectorType> :
-                nullptr,
-              solve_with_jacobian_callback<VectorType>);
+            auto solve_with_jacobian_callback = [](realtype t,
+                                                   N_Vector y,
+                                                   N_Vector fy,
+                                                   N_Vector r,
+                                                   N_Vector z,
+                                                   realtype gamma,
+                                                   realtype delta,
+                                                   int      lr,
+                                                   void *   user_data) -> int {
+              Assert(user_data != nullptr, ExcInternalError());
+              ARKode<VectorType> &solver =
+                *static_cast<ARKode<VectorType> *>(user_data);
+
+              auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
+              auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
+              auto *src_r  = internal::unwrap_nvector_const<VectorType>(r);
+
+              auto *dst_z = internal::unwrap_nvector<VectorType>(z);
+
+              return Utilities::call_and_possibly_capture_exception(
+                solver.jacobian_preconditioner_solve,
+                solver.pending_exception,
+                t,
+                *src_y,
+                *src_fy,
+                *src_r,
+                *dst_z,
+                gamma,
+                delta,
+                lr);
+            };
+
+            auto jacobian_solver_setup_callback = [](realtype     t,
+                                                     N_Vector     y,
+                                                     N_Vector     fy,
+                                                     booleantype  jok,
+                                                     booleantype *jcurPtr,
+                                                     realtype     gamma,
+                                                     void *user_data) -> int {
+              Assert(user_data != nullptr, ExcInternalError());
+              ARKode<VectorType> &solver =
+                *static_cast<ARKode<VectorType> *>(user_data);
+
+              auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
+              auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
+
+              return Utilities::call_and_possibly_capture_exception(
+                solver.jacobian_preconditioner_setup,
+                solver.pending_exception,
+                t,
+                *src_y,
+                *src_fy,
+                jok,
+                *jcurPtr,
+                gamma);
+            };
+
+            status = ARKStepSetPreconditioner(arkode_mem,
+                                              jacobian_preconditioner_setup ?
+                                                jacobian_solver_setup_callback :
+                                                ARKLsPrecSetupFn(nullptr),
+                                              solve_with_jacobian_callback);
             AssertARKode(status);
           }
         if (data.implicit_function_is_linear)
@@ -615,7 +581,9 @@ namespace SUNDIALS
           {
             mass_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
-                solve_mass
+                solve_mass,
+
+                pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                 ,
                 arkode_ctx
@@ -651,23 +619,83 @@ namespace SUNDIALS
                                             nullptr,
                                             mass_time_dependent);
         AssertARKode(status);
-        status = ARKStepSetMassTimes(
-          arkode_mem,
-          mass_times_setup ?
-            mass_matrix_times_vector_setup_callback<VectorType> :
-            nullptr,
-          mass_matrix_times_vector_callback<VectorType>,
-          this);
+
+        auto mass_matrix_times_vector_setup_callback =
+          [](realtype t, void *mtimes_data) -> int {
+          Assert(mtimes_data != nullptr, ExcInternalError());
+          ARKode<VectorType> &solver =
+            *static_cast<ARKode<VectorType> *>(mtimes_data);
+
+          return Utilities::call_and_possibly_capture_exception(
+            solver.mass_times_setup, solver.pending_exception, t);
+        };
+
+        auto mass_matrix_times_vector_callback =
+          [](N_Vector v, N_Vector Mv, realtype t, void *mtimes_data) -> int {
+          Assert(mtimes_data != nullptr, ExcInternalError());
+          ARKode<VectorType> &solver =
+            *static_cast<ARKode<VectorType> *>(mtimes_data);
+
+          auto *src_v  = internal::unwrap_nvector_const<VectorType>(v);
+          auto *dst_Mv = internal::unwrap_nvector<VectorType>(Mv);
+
+          return Utilities::call_and_possibly_capture_exception(
+            solver.mass_times_vector,
+            solver.pending_exception,
+            t,
+            *src_v,
+            *dst_Mv);
+        };
+
+        status = ARKStepSetMassTimes(arkode_mem,
+                                     mass_times_setup ?
+                                       mass_matrix_times_vector_setup_callback :
+                                       ARKLsMassTimesSetupFn(nullptr),
+                                     mass_matrix_times_vector_callback,
+                                     this);
         AssertARKode(status);
 
         if (mass_preconditioner_solve)
           {
-            status = ARKStepSetMassPreconditioner(
-              arkode_mem,
-              mass_preconditioner_setup ?
-                mass_matrix_solver_setup_callback<VectorType> :
-                nullptr,
-              solve_with_mass_matrix_callback<VectorType>);
+            auto mass_matrix_solver_setup_callback =
+              [](realtype t, void *user_data) -> int {
+              Assert(user_data != nullptr, ExcInternalError());
+              ARKode<VectorType> &solver =
+                *static_cast<ARKode<VectorType> *>(user_data);
+
+              return Utilities::call_and_possibly_capture_exception(
+                solver.mass_preconditioner_setup, solver.pending_exception, t);
+            };
+
+            auto solve_with_mass_matrix_callback = [](realtype t,
+                                                      N_Vector r,
+                                                      N_Vector z,
+                                                      realtype delta,
+                                                      int      lr,
+                                                      void *user_data) -> int {
+              Assert(user_data != nullptr, ExcInternalError());
+              ARKode<VectorType> &solver =
+                *static_cast<ARKode<VectorType> *>(user_data);
+
+              auto *src_r = internal::unwrap_nvector_const<VectorType>(r);
+              auto *dst_z = internal::unwrap_nvector<VectorType>(z);
+
+              return Utilities::call_and_possibly_capture_exception(
+                solver.mass_preconditioner_solve,
+                solver.pending_exception,
+                t,
+                *src_r,
+                *dst_z,
+                delta,
+                lr);
+            };
+
+            status =
+              ARKStepSetMassPreconditioner(arkode_mem,
+                                           mass_preconditioner_setup ?
+                                             mass_matrix_solver_setup_callback :
+                                             ARKLsMassPrecSetupFn(nullptr),
+                                           solve_with_mass_matrix_callback);
             AssertARKode(status);
           }
       }

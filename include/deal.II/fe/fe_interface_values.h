@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1462,6 +1462,76 @@ public:
    * The arguments (including their order) are identical to the @p face_worker
    * arguments in MeshWorker::mesh_loop().
    *
+   * In order to do integration on a face or sub-face, this object will have to
+   * choose what quadrature formula to use. This is simple if you initialized
+   * the current FEInterfaceValues object with just a single FiniteElement and
+   * a single (face) Quadrature object, because in that case there is only one
+   * element and quadrature that will be used for all interfaces. But it is not
+   * so simple in the hp case where there may be different elements used on
+   * different cells, and different quadrature formulas should be used on
+   * different faces; one may also want to use a different mapping for different
+   * faces. As a consequence, you would have initialized the current object
+   * with a hp::FECollection, hp::QCollection, and possible an
+   * hp::MappingCollection object. The question then is: For a given face or
+   * subface, which quadrature and mapping should be used? The following
+   * decision tree will then be used:
+   * -# If the `q_index` and `mapping_index` arguments to this function are
+   *    explicitly specified (rather than leaving them at their default
+   *    values), then these indices will be used to select which element
+   *    of the hp::QCollection and hp::MappingCollection passed to the
+   *    constructor should serve as the quadrature and mapping to be used.
+   * -# If one of these arguments is left at its default value, then the
+   *    function will need to choose a quadrature and/or mapping that is
+   *    appropriate for the two finite element spaces used on the two cells
+   *    adjacent to the current interface. As the first choice, if the
+   *    quadrature or mapping collection we are considering has only one
+   *    element, then that is clearly the one that should be used.
+   * -# If the quadrature or mapping collection have multiple elements,
+   *    then we need to dig further. For quadrature objects, we can
+   *    compare whether the two quadrature objects that correspond to
+   *    the `active_fe_index` values of the two adjacent cells are
+   *    identical (i.e., have quadrature points at the same locations,
+   *    and have the same weights). If this is so, then it does not
+   *    matter which one of the two we take, and we choose one or the
+   *    other.
+   * -# If this has still not helped, we try to find out
+   *    which of the two finite element spaces on the two adjacent cells
+   *    is "larger" (say, if you had used $Q_2$
+   *    and $Q_4$ elements on the two adjacent cells, then the $Q_4$
+   *    element is the larger one); the determination of which space
+   *    is "larger" is made using the hp::FECollection::find_dominated_fe()
+   *    function, which is not necessarily intended for this kind of query,
+   *    but yields a result that serves just fine for our purposes here.
+   *    We then operate on the assumption that the quadrature object
+   *    associated with the "larger" of the two spaces is the appropriate
+   *    one to use for the face that separates these two spaces.
+   *    - If this function returns that one of the two elements in question
+   *      is dominated by the other, then presumably it is "larger" one and
+   *      we take the quadrature formula and mapping that corresponds
+   *      to this "larger" element is. For example, for the $Q_2$ element
+   *      mentioned above, one would generally use a QGauss(3) quadrature
+   *      formula, whereas for the $Q_4$ element, one would use QGauss(5).
+   *      To integrate jump and average terms on the interface between
+   *      cells using these two elements, QGauss(5) is appropriate. Because,
+   *      typically, people will order elements
+   *      in the hp::FECollection in the same order as the quadrature and
+   *      mapping objects in hp::QCollection and hp::MappingCollection, this
+   *      function will use the index of the "larger" element in the
+   *      hp::FECollection to also index into the hp::QCollection and
+   *      hp::MappingCollection to retrieve quadrature and mapping objects
+   *      appropriate for the current face.
+   *    - There are cases where neither element dominates the other. For
+   *      example, if one uses $Q_2\times Q_1$ and $Q_1\times Q_2$ elements on
+   *      neighboring cells, neither of the two spaces dominates the other --
+   *      or, in the context of the current function, neither space is "larger"
+   *      than the other. In that case, there is no way for the current function
+   *      to determine quadrature and mapping objects associated with the two
+   *      elements are the appropriate ones. If that happens, you will get an
+   *      error -- and the only way to avoid the error is to explicitly specify
+   *      for these interfaces which quadrature and mapping objects you want
+   *      to use, by providing non-default values for the @p q_index and
+   *      @p mapping_index arguments to this function.
+   *
    * @param[in] cell An iterator to the first cell adjacent to the interface.
    * @param[in] face_no An integer identifying which face of the first cell the
    *   interface is on.
@@ -1479,21 +1549,19 @@ public:
    *   cell.
    * @param[in] sub_face_no_neighbor Like `sub_face_no`, just for the
    *   neighboring cell.
-   * @param[in] q_index If left at its default, use the quadrature formula
-   * within the hp::QCollection passed to the constructor as given by the
-   * dominating finite element across the interface (only used if the
-   * FEInterface object is initialised with an hp::FECollection, an
-   * hp::QCollection, and possibly an hp::MappingCollection).
-   * @param[in] mapping_index If left at its default, use the mapping within the
-   * hp::MappingCollection passed to the constructor as given by the dominating
-   * finite element across the interface (only used if the FEInterface object
-   * is initialised with an hp::FECollection, an hp::QCollection, and possibly
-   * an hp::MappingCollection).
+   * @param[in] q_index The index of the quadrature object within the
+   *   hp::QCollection passed to the constructor to use on the current
+   *   interface. See the documentation above what happens if this argument
+   *   is not explicitly provided but left at its default value.
+   * @param[in] mapping_index The index of the mapping object within the
+   *   hp::MappingCollection passed to the constructor to use on the current
+   *   interface. See the documentation above what happens if this argument
+   *   is not explicitly provided but left at its default value.
    * @param[in] fe_index If left at its default, use the finite element within
-   * the hp::FECollection passed to the constructor as given by the dominating
-   * finite element across the interface (only used if the FEInterface object
-   * is initialised with an hp::FECollection, an hp::QCollection, and possibly
-   * an hp::MappingCollection).
+   *   the hp::FECollection passed to the constructor as given by the dominating
+   *   finite element across the interface (only used if the FEInterface object
+   *   is initialized with an hp::FECollection, an hp::QCollection, and possibly
+   *   an hp::MappingCollection).
    */
   template <class CellIteratorType, class CellNeighborIteratorType>
   void
@@ -1521,20 +1589,16 @@ public:
    * @param[in] cell An iterator to the first cell adjacent to the interface.
    * @param[in] face_no An integer identifying which face of the first cell the
    *   interface is on.
-   * @param[in] q_index If left at its default, use the quadrature formula
-   * within the hp::QCollection passed to the constructor as given by the
-   * dominating finite element across the interface (only used if the
-   * FEInterface object is initialised with an hp::FECollection, an
-   * hp::QCollection, and possibly an hp::MappingCollection).
-   * @param[in] mapping_index If left at its default, use the mapping within the
-   * hp::MappingCollection passed to the constructor as given by the dominating
-   * finite element across the interface (only used if the FEInterface object
-   * is initialised with an hp::FECollection, an hp::QCollection, and possibly
-   * an hp::MappingCollection).
+   * @param[in] q_index This argument selects which quadrature formula to use
+   *   See the discussion in the documentation of the other reinit() function
+   *   for what happens when this argument is left at its default value.
+   * @param[in] mapping_index This argument selects which mapping to use
+   *   See the discussion in the documentation of the other reinit() function
+   *   for what happens when this argument is left at its default value.
    * @param[in] fe_index If left at its default, use the finite element within
    * the hp::FECollection passed to the constructor as given by the dominating
    * finite element across the interface (only used if the FEInterface object
-   * is initialised with an hp::FECollection, an hp::QCollection, and possibly
+   * is initialized with an hp::FECollection, an hp::QCollection, and possibly
    * an hp::MappingCollection).
    */
   template <class CellIteratorType>
@@ -2091,7 +2155,7 @@ public:
 
   /**
    * Return the jump in the third derivatives of the
-   * the finite element function characterized by <tt>fe_function</tt> at
+   * finite element function characterized by <tt>fe_function</tt> at
    * the quadrature points of the cell interface selected the last time
    * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
    *
@@ -2127,7 +2191,7 @@ public:
 
   /**
    * Return the average of the gradients of the
-   * the finite element function characterized by <tt>fe_function</tt> at the
+   * finite element function characterized by <tt>fe_function</tt> at the
    * quadrature points of the cell interface selected the last time
    * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
    * @dealiiRequiresUpdateFlags{update_gradients}
@@ -2141,7 +2205,7 @@ public:
 
   /**
    * Return the average of the Hessians of the
-   * the finite element function characterized by <tt>fe_function</tt> at the
+   * finite element function characterized by <tt>fe_function</tt> at the
    * quadrature points of the cell interface selected the last time
    * the <tt>reinit</tt> function of the FEInterfaceValues object was called.
    * @dealiiRequiresUpdateFlags{update_hessians}
@@ -2491,16 +2555,64 @@ FEInterfaceValues<dim, spacedim>::reinit(
     }
   else if (internal_hp_fe_face_values)
     {
-      const unsigned int dominated_fe_index =
-        internal_hp_fe_face_values->get_fe_collection().find_dominated_fe(
-          {cell->active_fe_index(), cell_neighbor->active_fe_index()});
+      unsigned int used_q_index       = q_index;
+      unsigned int used_mapping_index = mapping_index;
 
-      const unsigned int used_q_index =
-        (q_index == numbers::invalid_unsigned_int ? dominated_fe_index :
-                                                    q_index);
-      const unsigned int used_mapping_index =
-        (mapping_index == numbers::invalid_unsigned_int ? dominated_fe_index :
-                                                          mapping_index);
+      // First check. If there is only one element in a collection, and if none
+      // had been specified explicitly, then that's clearly the one to take:
+      if (used_q_index == numbers::invalid_unsigned_int)
+        if (internal_hp_fe_face_values->get_quadrature_collection().size() == 1)
+          used_q_index = 0;
+
+      if (used_mapping_index == numbers::invalid_unsigned_int)
+        if (internal_hp_fe_face_values->get_mapping_collection().size() == 1)
+          used_mapping_index = 0;
+
+      // Second check: See if the two quadrature objects are the same, because
+      // in that case it does not matter which one we use. Unfortunately, we
+      // currently have no way of testing that two mapping objects are the
+      // same :-(
+      if (used_q_index == numbers::invalid_unsigned_int)
+        if (internal_hp_fe_face_values
+              ->get_quadrature_collection()[cell->active_fe_index()] ==
+            internal_hp_fe_face_values
+              ->get_quadrature_collection()[cell_neighbor->active_fe_index()])
+          used_q_index = cell->active_fe_index();
+
+      // Third check, if the above did not already suffice. We see if we
+      // can get somewhere via the dominated's finite element index.
+      const unsigned int dominated_fe_index =
+        ((used_q_index == numbers::invalid_unsigned_int) ||
+             (used_mapping_index == numbers::invalid_unsigned_int) ?
+           internal_hp_fe_face_values->get_fe_collection().find_dominated_fe(
+             {cell->active_fe_index(), cell_neighbor->active_fe_index()}) :
+           numbers::invalid_unsigned_int);
+
+      if (used_q_index == numbers::invalid_unsigned_int)
+        {
+          Assert(dominated_fe_index != numbers::invalid_fe_index,
+                 ExcMessage(
+                   "You called this function with 'q_index' left at its "
+                   "default value, but this can only work if one of "
+                   "the two finite elements adjacent to this face "
+                   "dominates the other. See the documentation "
+                   "of this function for more information of how "
+                   "to deal with this situation."));
+          used_q_index = dominated_fe_index;
+        }
+
+      if (used_mapping_index == numbers::invalid_unsigned_int)
+        {
+          Assert(dominated_fe_index != numbers::invalid_fe_index,
+                 ExcMessage(
+                   "You called this function with 'mapping_index' left "
+                   "at its default value, but this can only work if one "
+                   "of the two finite elements adjacent to this face "
+                   "dominates the other. See the documentation "
+                   "of this function for more information of how "
+                   "to deal with this situation."));
+          used_mapping_index = dominated_fe_index;
+        }
 
       // Same as if above, but when hp is enabled.
       if (sub_face_no == numbers::invalid_unsigned_int)
@@ -3377,7 +3489,7 @@ namespace FEInterfaceViews
 
     AssertDimension(interface_dof_indices.size(), local_dof_values.size());
 
-    for (unsigned int i : this->fe_interface->dof_indices())
+    for (const unsigned int i : this->fe_interface->dof_indices())
       local_dof_values[i] = dof_values(interface_dof_indices[i]);
   }
 
@@ -3932,7 +4044,7 @@ namespace FEInterfaceViews
   {
     AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
-    for (unsigned int dof_index : this->fe_interface->dof_indices())
+    for (const unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)
@@ -3976,7 +4088,7 @@ namespace FEInterfaceViews
     AssertDimension(third_derivatives.size(),
                     this->fe_interface->n_quadrature_points);
 
-    for (unsigned int dof_index : this->fe_interface->dof_indices())
+    for (const unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)
@@ -4569,7 +4681,7 @@ namespace FEInterfaceViews
   {
     AssertDimension(hessians.size(), this->fe_interface->n_quadrature_points);
 
-    for (unsigned int dof_index : this->fe_interface->dof_indices())
+    for (const unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)
@@ -4613,7 +4725,7 @@ namespace FEInterfaceViews
     AssertDimension(third_derivatives.size(),
                     this->fe_interface->n_quadrature_points);
 
-    for (unsigned int dof_index : this->fe_interface->dof_indices())
+    for (const unsigned int dof_index : this->fe_interface->dof_indices())
       for (const auto q_index : this->fe_interface->quadrature_point_indices())
         {
           if (dof_index == 0)

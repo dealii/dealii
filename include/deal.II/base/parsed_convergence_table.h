@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -106,7 +106,7 @@ class ParameterHandler;
  * By calling the method add_parameters() passing a ParameterHandler object,
  * the following options will be defined in the given ParameterHandler object
  * (in the current level of the ParameterHandler object, i.e., whatever level
- * you have entered with the ParamterHandler::enter_subsection() method),
+ * you have entered with the ParameterHandler::enter_subsection() method),
  * and can be modified at run time through a parameter file:
  * @code
  * set Enable computation of the errors = true
@@ -609,9 +609,9 @@ ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
             continue;
 
           auto components_expr = zero_components;
-          for (unsigned int i = 0; i < n_components; ++i)
-            if (mask[i] == true)
-              components_expr[i] = weight_components[i];
+          for (unsigned int j = 0; j < n_components; ++j)
+            if (mask[j] == true)
+              components_expr[j] = weight_components[j];
 
           FunctionFromFunctionObjects<spacedim> select_component(
             components_expr);

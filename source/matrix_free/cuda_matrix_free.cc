@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2020 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,19 +15,12 @@
 
 #include <deal.II/matrix_free/cuda_matrix_free.templates.h>
 
-#ifdef DEAL_II_WITH_CUDA
-
 DEAL_II_NAMESPACE_OPEN
 
 
 
 namespace CUDAWrappers
 {
-  namespace internal
-  {
-    std::array<std::atomic_bool, mf_n_concurrent_objects> used_objects;
-  }
-
   // Do not instantiate for dim = 1
   template class MatrixFree<2, float>;
   template class MatrixFree<2, double>;
@@ -36,5 +29,3 @@ namespace CUDAWrappers
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif

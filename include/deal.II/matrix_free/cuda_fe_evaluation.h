@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2021 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,18 +18,19 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_CUDA
+#include <deal.II/base/memory_space.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 
-#  include <deal.II/base/tensor.h>
-#  include <deal.II/base/utilities.h>
+#include <deal.II/lac/cuda_atomic.h>
+#include <deal.II/lac/cuda_vector.h>
 
-#  include <deal.II/lac/cuda_atomic.h>
-#  include <deal.II/lac/cuda_vector.h>
+#include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
+#include <deal.II/matrix_free/cuda_matrix_free.h>
+#include <deal.II/matrix_free/cuda_matrix_free.templates.h>
+#include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
 
-#  include <deal.II/matrix_free/cuda_hanging_nodes_internal.h>
-#  include <deal.II/matrix_free/cuda_matrix_free.h>
-#  include <deal.II/matrix_free/cuda_matrix_free.templates.h>
-#  include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
+#include <Kokkos_Core.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -38,24 +39,6 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace CUDAWrappers
 {
-  namespace internal
-  {
-    /**
-     * Compute the dof/quad index for a given thread id, dimension, and
-     * number of points in each space dimensions.
-     */
-    template <int dim, int n_points_1d>
-    __device__ inline unsigned int
-    compute_index()
-    {
-      return (dim == 1 ? threadIdx.x % n_points_1d :
-              dim == 2 ? threadIdx.x % n_points_1d + n_points_1d * threadIdx.y :
-                         threadIdx.x % n_points_1d +
-                           n_points_1d *
-                             (threadIdx.y + n_points_1d * threadIdx.z));
-    }
-  } // namespace internal
-
   /**
    * This class provides all the functions necessary to evaluate functions at
    * quadrature points and cell integrations. In functionality, this class is
@@ -129,10 +112,8 @@ namespace CUDAWrappers
     /**
      * Constructor.
      */
-    __device__
-    FEEvaluation(const unsigned int       cell_id,
-                 const data_type *        data,
-                 SharedData<dim, Number> *shdata);
+    DEAL_II_HOST_DEVICE
+    FEEvaluation(const data_type *data, SharedData<dim, Number> *shdata);
 
     /**
      * For the vector @p src, read out the values on the degrees of freedom of
@@ -140,9 +121,9 @@ namespace CUDAWrappers
      * the function DoFAccessor::get_interpolated_dof_values when no
      * constraints are present, but it also includes constraints from hanging
      * nodes, so once can see it as a similar function to
-     * AffineConstraints::read_dof_valuess as well.
+     * AffineConstraints::read_dof_values() as well.
      */
-    __device__ void
+    DEAL_II_HOST_DEVICE void
     read_dof_values(const Number *src);
 
     /**
@@ -151,7 +132,7 @@ namespace CUDAWrappers
      * during the write operation. The functionality is hence similar to the
      * function AffineConstraints::distribute_local_to_global.
      */
-    __device__ void
+    DEAL_II_HOST_DEVICE void
     distribute_local_to_global(Number *dst) const;
 
     /**
@@ -161,7 +142,7 @@ namespace CUDAWrappers
      * computed. This function needs to be called before the functions
      * @p get_value() or @p get_gradient() give useful information.
      */
-    __device__ void
+    DEAL_II_HOST_DEVICE void
     evaluate(const bool evaluate_val, const bool evaluate_grad);
 
     /**
@@ -171,50 +152,50 @@ namespace CUDAWrappers
      * @p integrate_val and @p integrate_grad are used to enable/disable some
      * of the values or the gradients.
      */
-    __device__ void
+    DEAL_II_HOST_DEVICE void
     integrate(const bool integrate_val, const bool integrate_grad);
 
     /**
      * Same as above, except that the quadrature point is computed from thread
      * id.
      */
-    __device__ value_type
-    get_value() const;
+    DEAL_II_HOST_DEVICE value_type
+    get_value(int q_point) const;
 
     /**
      * Same as above, except that the local dof index is computed from the
      * thread id.
      */
-    __device__ value_type
-    get_dof_value() const;
+    DEAL_II_HOST_DEVICE value_type
+    get_dof_value(int q_point) const;
 
     /**
      * Same as above, except that the quadrature point is computed from the
      * thread id.
      */
-    __device__ void
-    submit_value(const value_type &val_in);
+    DEAL_II_HOST_DEVICE void
+    submit_value(const value_type &val_in, int q_point);
 
     /**
      * Same as above, except that the local dof index is computed from the
      * thread id.
      */
-    __device__ void
-    submit_dof_value(const value_type &val_in);
+    DEAL_II_HOST_DEVICE void
+    submit_dof_value(const value_type &val_in, int q_point);
 
     /**
      * Same as above, except that the quadrature point is computed from the
      * thread id.
      */
-    __device__ gradient_type
-    get_gradient() const;
+    DEAL_II_HOST_DEVICE gradient_type
+    get_gradient(int q_point) const;
 
     /**
      * Same as above, except that the quadrature point is computed from the
      * thread id.
      */
-    __device__ void
-    submit_gradient(const gradient_type &grad_in);
+    DEAL_II_HOST_DEVICE void
+    submit_gradient(const gradient_type &grad_in, int q_point);
 
     // clang-format off
     /**
@@ -223,32 +204,19 @@ namespace CUDAWrappers
      *
      * @p func needs to define
      * \code
-     * __device__ void operator()(
+     * DEAL_II_HOST_DEVICE void operator()(
      *   CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> *fe_eval) const;
      * \endcode
      */
     // clang-format on
     template <typename Functor>
-    __device__ void
+    DEAL_II_HOST_DEVICE void
     apply_for_each_quad_point(const Functor &func);
 
   private:
-    types::global_dof_index *local_to_global;
-    unsigned int             n_cells;
-    unsigned int             padding_length;
-    const unsigned int       mf_object_id;
-
-    const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-      constraint_mask;
-
-    const bool use_coloring;
-
-    Number *inv_jac;
-    Number *JxW;
-
-    // Internal buffer
-    Number *values;
-    Number *gradients[dim];
+    const data_type *        data;
+    SharedData<dim, Number> *shared_data;
+    int                      cell_id;
   };
 
 
@@ -258,25 +226,13 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__
+  DEAL_II_HOST_DEVICE
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    FEEvaluation(const unsigned int       cell_id,
-                 const data_type *        data,
-                 SharedData<dim, Number> *shdata)
-    : n_cells(data->n_cells)
-    , padding_length(data->padding_length)
-    , mf_object_id(data->id)
-    , constraint_mask(data->constraint_mask[cell_id])
-    , use_coloring(data->use_coloring)
-    , values(shdata->values)
-  {
-    local_to_global = data->local_to_global + padding_length * cell_id;
-    inv_jac         = data->inv_jacobian + padding_length * cell_id;
-    JxW             = data->JxW + padding_length * cell_id;
-
-    for (unsigned int i = 0; i < dim; ++i)
-      gradients[i] = shdata->gradients[i];
-  }
+    FEEvaluation(const data_type *data, SharedData<dim, Number> *shdata)
+    : data(data)
+    , shared_data(shdata)
+    , cell_id(shared_data->team_member.league_rank())
+  {}
 
 
 
@@ -285,22 +241,26 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     read_dof_values(const Number *src)
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
-    const unsigned int idx = internal::compute_index<dim, n_q_points_1d>();
+    // Populate the scratch memory
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                 n_q_points),
+                         [&](const int &i) {
+                           shared_data->values(i) =
+                             src[data->local_to_global(cell_id, i)];
+                         });
+    shared_data->team_member.team_barrier();
 
-    const types::global_dof_index src_idx = local_to_global[idx];
-    // Use the read-only data cache.
-    values[idx] = __ldg(&src[src_idx]);
-
-    __syncthreads();
-
-    internal::resolve_hanging_nodes<dim, fe_degree, false>(constraint_mask,
-                                                           values);
+    internal::resolve_hanging_nodes<dim, fe_degree, false>(
+      shared_data->team_member,
+      data->constraint_weights,
+      data->constraint_mask(cell_id),
+      shared_data->values);
   }
 
 
@@ -310,23 +270,37 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     distribute_local_to_global(Number *dst) const
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
-    internal::resolve_hanging_nodes<dim, fe_degree, true>(constraint_mask,
-                                                          values);
 
-    const unsigned int idx = internal::compute_index<dim, n_q_points_1d>();
+    internal::resolve_hanging_nodes<dim, fe_degree, true>(
+      shared_data->team_member,
+      data->constraint_weights,
+      data->constraint_mask(cell_id),
+      shared_data->values);
 
-    const types::global_dof_index destination_idx = local_to_global[idx];
-
-    if (use_coloring)
-      dst[destination_idx] += values[idx];
+    if (data->use_coloring)
+      {
+        Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                     n_q_points),
+                             [&](const int &i) {
+                               dst[data->local_to_global(cell_id, i)] +=
+                                 shared_data->values(i);
+                             });
+      }
     else
-      atomicAdd(&dst[destination_idx], values[idx]);
+      {
+        Kokkos::parallel_for(
+          Kokkos::TeamThreadRange(shared_data->team_member, n_q_points),
+          [&](const int &i) {
+            Kokkos::atomic_add(&dst[data->local_to_global(cell_id, i)],
+                               shared_data->values(i));
+          });
+      }
   }
 
 
@@ -336,7 +310,7 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::evaluate(
     const bool evaluate_val,
     const bool evaluate_grad)
@@ -349,22 +323,26 @@ namespace CUDAWrappers
       fe_degree,
       n_q_points_1d,
       Number>
-      evaluator_tensor_product(mf_object_id);
+      evaluator_tensor_product(shared_data->team_member,
+                               data->shape_values,
+                               data->shape_gradients,
+                               data->co_shape_gradients);
     if (evaluate_val == true && evaluate_grad == true)
       {
-        evaluator_tensor_product.value_and_gradient_at_quad_pts(values,
-                                                                gradients);
-        __syncthreads();
+        evaluator_tensor_product.value_and_gradient_at_quad_pts(
+          shared_data->values, shared_data->gradients);
+        shared_data->team_member.team_barrier();
       }
     else if (evaluate_grad == true)
       {
-        evaluator_tensor_product.gradient_at_quad_pts(values, gradients);
-        __syncthreads();
+        evaluator_tensor_product.gradient_at_quad_pts(shared_data->values,
+                                                      shared_data->gradients);
+        shared_data->team_member.team_barrier();
       }
     else if (evaluate_val == true)
       {
-        evaluator_tensor_product.value_at_quad_pts(values);
-        __syncthreads();
+        evaluator_tensor_product.value_at_quad_pts(shared_data->values);
+        shared_data->team_member.team_barrier();
       }
   }
 
@@ -375,7 +353,7 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::integrate(
     const bool integrate_val,
     const bool integrate_grad)
@@ -386,22 +364,25 @@ namespace CUDAWrappers
       fe_degree,
       n_q_points_1d,
       Number>
-      evaluator_tensor_product(mf_object_id);
+      evaluator_tensor_product(shared_data->team_member,
+                               data->shape_values,
+                               data->shape_gradients,
+                               data->co_shape_gradients);
     if (integrate_val == true && integrate_grad == true)
       {
-        evaluator_tensor_product.integrate_value_and_gradient(values,
-                                                              gradients);
+        evaluator_tensor_product.integrate_value_and_gradient(
+          shared_data->values, shared_data->gradients);
       }
     else if (integrate_val == true)
       {
-        evaluator_tensor_product.integrate_value(values);
-        __syncthreads();
+        evaluator_tensor_product.integrate_value(shared_data->values);
+        shared_data->team_member.team_barrier();
       }
     else if (integrate_grad == true)
       {
-        evaluator_tensor_product.template integrate_gradient<false>(values,
-                                                                    gradients);
-        __syncthreads();
+        evaluator_tensor_product.template integrate_gradient<false>(
+          shared_data->values, shared_data->gradients);
+        shared_data->team_member.team_barrier();
       }
   }
 
@@ -412,16 +393,15 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ typename FEEvaluation<dim,
-                                   fe_degree,
-                                   n_q_points_1d,
-                                   n_components_,
-                                   Number>::value_type
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_value() const
+  DEAL_II_HOST_DEVICE typename FEEvaluation<dim,
+                                            fe_degree,
+                                            n_q_points_1d,
+                                            n_components_,
+                                            Number>::value_type
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::get_value(
+    int q_point) const
   {
-    const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
-    return values[q_point];
+    return shared_data->values(q_point);
   }
 
 
@@ -431,16 +411,15 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ typename FEEvaluation<dim,
-                                   fe_degree,
-                                   n_q_points_1d,
-                                   n_components_,
-                                   Number>::value_type
+  DEAL_II_HOST_DEVICE typename FEEvaluation<dim,
+                                            fe_degree,
+                                            n_q_points_1d,
+                                            n_components_,
+                                            Number>::value_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_dof_value() const
+    get_dof_value(int q_point) const
   {
-    const unsigned int dof = internal::compute_index<dim, fe_degree + 1>();
-    return values[dof];
+    return shared_data->values(q_point);
   }
 
 
@@ -450,12 +429,11 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_value(const value_type &val_in)
+    submit_value(const value_type &val_in, int q_point)
   {
-    const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
-    values[q_point]            = val_in * JxW[q_point];
+    shared_data->values(q_point) = val_in * data->JxW(cell_id, q_point);
   }
 
 
@@ -465,12 +443,11 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_dof_value(const value_type &val_in)
+    submit_dof_value(const value_type &val_in, int q_point)
   {
-    const unsigned int dof = internal::compute_index<dim, fe_degree + 1>();
-    values[dof]            = val_in;
+    shared_data->values(q_point) = val_in;
   }
 
 
@@ -480,27 +457,24 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ typename FEEvaluation<dim,
-                                   fe_degree,
-                                   n_q_points_1d,
-                                   n_components_,
-                                   Number>::gradient_type
+  DEAL_II_HOST_DEVICE typename FEEvaluation<dim,
+                                            fe_degree,
+                                            n_q_points_1d,
+                                            n_components_,
+                                            Number>::gradient_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_gradient() const
+    get_gradient(int q_point) const
   {
     static_assert(n_components_ == 1, "This function only supports FE with one \
                   components");
 
-    // TODO optimize if the mesh is uniform
-    const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
-    const Number *     inv_jacobian = &inv_jac[q_point];
-    gradient_type      grad;
+    gradient_type grad;
     for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
       {
         Number tmp = 0.;
         for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += inv_jacobian[padding_length * n_cells * (dim * d_2 + d_1)] *
-                 gradients[d_2][q_point];
+          tmp += data->inv_jacobian(cell_id, q_point, d_2, d_1) *
+                 shared_data->gradients(q_point, d_2);
         grad[d_1] = tmp;
       }
 
@@ -514,20 +488,17 @@ namespace CUDAWrappers
             int n_q_points_1d,
             int n_components_,
             typename Number>
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_gradient(const gradient_type &grad_in)
+    submit_gradient(const gradient_type &grad_in, int q_point)
   {
-    // TODO optimize if the mesh is uniform
-    const unsigned int q_point = internal::compute_index<dim, n_q_points_1d>();
-    const Number *     inv_jacobian = &inv_jac[q_point];
     for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
       {
         Number tmp = 0.;
         for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-          tmp += inv_jacobian[n_cells * padding_length * (dim * d_1 + d_2)] *
-                 grad_in[d_2];
-        gradients[d_1][q_point] = tmp * JxW[q_point];
+          tmp += data->inv_jacobian(cell_id, q_point, d_1, d_2) * grad_in[d_2];
+        shared_data->gradients(q_point, d_1) =
+          tmp * data->JxW(cell_id, q_point);
       }
   }
 
@@ -539,18 +510,30 @@ namespace CUDAWrappers
             int n_components_,
             typename Number>
   template <typename Functor>
-  __device__ void
+  DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     apply_for_each_quad_point(const Functor &func)
   {
-    func(this);
-
-    __syncthreads();
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
+                                                 n_q_points),
+                         [&](const int &i) { func(this, i); });
+    shared_data->team_member.team_barrier();
   }
+
+
+
+#ifndef DOXYGEN
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  constexpr unsigned int
+    FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+      n_q_points;
+#endif
 } // namespace CUDAWrappers
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif

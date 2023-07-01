@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -157,7 +157,7 @@ namespace internal
       static constexpr std::array<unsigned int, 8>
       ucd_to_deal()
       {
-        return {{0, 1, 5, 4, 2, 3, 7, 6}};
+        return {{0, 4, 5, 1, 2, 6, 7, 3}};
       }
 
       static constexpr std::array<unsigned int, 6>
@@ -819,7 +819,7 @@ public:
    * mapping from the symbolic flags defined in the RefinementPossibilities
    * base class to actual numerical values (the array indices).
    */
-  operator std::uint8_t() const;
+  DEAL_II_HOST_DEVICE operator std::uint8_t() const;
 
   /**
    * Return the union of the refinement flags represented by the current
@@ -2814,7 +2814,7 @@ inline RefinementCase<dim>::RefinementCase(const std::uint8_t refinement_case)
 
 
 template <int dim>
-inline RefinementCase<dim>::operator std::uint8_t() const
+inline DEAL_II_HOST_DEVICE RefinementCase<dim>::operator std::uint8_t() const
 {
   return value;
 }

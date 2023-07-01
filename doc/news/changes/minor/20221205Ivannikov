@@ -1,4 +1,0 @@
-Improved: The history of linear residuals norms inside classes SolverControl and
-ReductionControl is now cleared at the first step of the solution.
-<br>
-(Vladimir Ivannikov, 2022/12/05)

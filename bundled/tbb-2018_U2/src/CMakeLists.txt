@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2020 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,11 +14,11 @@
 ## ---------------------------------------------------------------------
 
 #
-# Remove -Wall and -pedantic from DEAL_II_CXX_FLAGS (in directory scope) to
+# Remove -Wall and -pedantic from DEAL_II_WARNING_FLAGS (in directory scope) to
 # avoid some annoying warnings...
 #
-strip_flag(DEAL_II_CXX_FLAGS "-Wall")
-strip_flag(DEAL_II_CXX_FLAGS "-pedantic")
+strip_flag(DEAL_II_WARNING_FLAGS "-Wall")
+strip_flag(DEAL_II_WARNING_FLAGS "-pedantic")
 
 #
 # As discussed in
@@ -36,15 +36,16 @@ enable_if_supported(DEAL_II_CXX_FLAGS "-flifetime-dse=1")
 #
 # Disable other warnings:
 #
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-implicit-fallthrough")
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-stringop-overflow")
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-deprecated-copy")
-enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-tautological-overlap-compare")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-implicit-fallthrough")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-stringop-overflow")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-deprecated-copy")
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-tautological-overlap-compare")
 
 
 
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}/../include/
   ${CMAKE_CURRENT_SOURCE_DIR}/rml/include
   )
 
@@ -89,14 +90,14 @@ set(src_tbb
   tbb/tbb_thread.cpp
   tbb/x86_rtm_rw_mutex.cpp
   )
-deal_ii_add_library(obj_tbb OBJECT ${src_tbb})
+define_object_library(bundled_tbb OBJECT ${src_tbb})
 
 #
 # Add necessary definitions:
 #
 
-deal_ii_add_definitions(obj_tbb "__TBB_BUILD=1")
-deal_ii_add_definitions(obj_tbb "USE_PTHREAD")
+deal_ii_add_definitions(bundled_tbb "__TBB_BUILD=1")
+deal_ii_add_definitions(bundled_tbb "USE_PTHREAD")
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  deal_ii_add_definitions(obj_tbb "DO_ITT_NOTIFY")
+  deal_ii_add_definitions(bundled_tbb "DO_ITT_NOTIFY")
 endif()

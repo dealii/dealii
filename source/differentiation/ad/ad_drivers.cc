@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,13 +31,9 @@
 #  include <deal.II/lac/vector.h>
 
 #  ifdef DEAL_II_WITH_ADOLC
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <adolc/adolc_fatalerror.h>
 #    include <adolc/drivers/drivers.h>
 #    include <adolc/taping.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
 #  endif // DEAL_II_WITH_ADOLC
 
 #  include <vector>

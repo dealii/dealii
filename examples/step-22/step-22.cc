@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2021 by the deal.II authors
+ * Copyright (C) 2008 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -202,7 +202,15 @@ namespace Step22
            ExcIndexRange(component, 0, this->n_components));
 
     if (component == 0)
-      return (p[0] < 0 ? -1 : (p[0] > 0 ? 1 : 0));
+      {
+        if (p[0] < 0)
+          return -1;
+        else if (p[0] > 0)
+          return 1;
+        else
+          return 0;
+      }
+
     return 0;
   }
 
@@ -815,7 +823,7 @@ namespace Step22
       SolverCG<Vector<double>> cg(solver_control);
 
       // Now to the preconditioner to the Schur complement. As explained in
-      // the introduction, the preconditioning is done by a mass matrix in the
+      // the introduction, the preconditioning is done by a @ref GlossMassMatrix "mass matrix" in the
       // pressure variable.
       //
       // Actually, the solver needs to have the preconditioner in the form

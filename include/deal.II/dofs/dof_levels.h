@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,7 @@ namespace internal
      * Note that vertices use a storage scheme that is entirely separate from
      * the one used for the cells. The indices of degrees of freedom located
      * on vertices are therefore not stored here, but rather in member
-     * variables of the dealii::DoFHandler class.
+     * variables of the DoFHandler class.
      *
      * The indices of degrees of freedom located on lower dimensional objects,
      * i.e. on lines for 2d and on quads and lines for 3d are treated
@@ -57,7 +57,7 @@ namespace internal
      * variables using the DoFHandler::get_dof_index() and corresponding
      * setter functions. Knowledge of the actual data format is therefore
      * encapsulated to the present hierarchy of classes as well as the
-     * dealii::DoFHandler class.
+     * DoFHandler class.
      */
     template <int dim>
     class DoFLevel

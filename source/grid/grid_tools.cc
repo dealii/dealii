@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2022 by the deal.II authors
+// Copyright (C) 2001 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,11 @@
 #include <deal.II/base/mpi_consensus_algorithms.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/thread_management.h>
+
+#ifdef DEAL_II_WITH_CGAL
+#  include <deal.II/cgal/intersections.h>
+#  include <deal.II/cgal/utilities.h>
+#endif
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/p4est_wrappers.h>
@@ -46,6 +51,7 @@
 
 #include <deal.II/lac/constrained_linear_operator.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -59,11 +65,8 @@
 
 #include <deal.II/physics/transformations.h>
 
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <array>
 #include <cmath>
@@ -608,7 +611,7 @@ namespace GridTools
                     line->manifold_id() != numbers::flat_manifold_id)
                   {
                     CellData<1> line_cell_data(line->n_vertices());
-                    for (unsigned int vertex_n : line->vertex_indices())
+                    for (const unsigned int vertex_n : line->vertex_indices())
                       line_cell_data.vertices[vertex_n] =
                         line->vertex_index(vertex_n);
                     line_cell_data.boundary_id = line->boundary_id();
@@ -2354,7 +2357,7 @@ namespace GridTools
       endc = tria.end();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int i : cell->face_indices())
+        for (const unsigned int i : cell->face_indices())
           {
             const typename Triangulation<dim, spacedim>::face_iterator &face =
               cell->face(i);
@@ -2600,10 +2603,11 @@ namespace GridTools
 
 
   template <int dim, template <int, int> class MeshType, int spacedim>
-  unsigned int
-  find_closest_vertex(const MeshType<dim, spacedim> &mesh,
-                      const Point<spacedim> &        p,
-                      const std::vector<bool> &      marked_vertices)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
+  unsigned int find_closest_vertex(const MeshType<dim, spacedim> &mesh,
+                                   const Point<spacedim> &        p,
+                                   const std::vector<bool> &marked_vertices)
   {
     // first get the underlying triangulation from the mesh and determine
     // vertices and used vertices
@@ -2666,11 +2670,12 @@ namespace GridTools
 
 
   template <int dim, template <int, int> class MeshType, int spacedim>
-  unsigned int
-  find_closest_vertex(const Mapping<dim, spacedim> & mapping,
-                      const MeshType<dim, spacedim> &mesh,
-                      const Point<spacedim> &        p,
-                      const std::vector<bool> &      marked_vertices)
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
+  unsigned int find_closest_vertex(const Mapping<dim, spacedim> & mapping,
+                                   const MeshType<dim, spacedim> &mesh,
+                                   const Point<spacedim> &        p,
+                                   const std::vector<bool> &marked_vertices)
   {
     // Take a shortcut in the simple case.
     if (mapping.preserves_vertex_locations() == true)
@@ -2717,140 +2722,6 @@ namespace GridTools
         }
 
     return find_closest_vertex(vertices, p);
-  }
-
-
-
-  template <int dim, template <int, int> class MeshType, int spacedim>
-#ifndef _MSC_VER
-  std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
-#else
-  std::vector<
-    typename dealii::internal::
-      ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>
-#endif
-  find_cells_adjacent_to_vertex(const MeshType<dim, spacedim> &mesh,
-                                const unsigned int             vertex)
-  {
-    // make sure that the given vertex is
-    // an active vertex of the underlying
-    // triangulation
-    AssertIndexRange(vertex, mesh.get_triangulation().n_vertices());
-    Assert(mesh.get_triangulation().get_used_vertices()[vertex],
-           ExcVertexNotUsed(vertex));
-
-    // use a set instead of a vector
-    // to ensure that cells are inserted only
-    // once
-    std::set<typename dealii::internal::
-               ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>
-      adjacent_cells;
-
-    // go through all active cells and look if the vertex is part of that cell
-    //
-    // in 1d, this is all we need to care about. in 2d/3d we also need to worry
-    // that the vertex might be a hanging node on a face or edge of a cell; in
-    // this case, we would want to add those cells as well on whose faces the
-    // vertex is located but for which it is not a vertex itself.
-    //
-    // getting this right is a lot simpler in 2d than in 3d. in 2d, a hanging
-    // node can only be in the middle of a face and we can query the neighboring
-    // cell from the current cell. on the other hand, in 3d a hanging node
-    // vertex can also be on an edge but there can be many other cells on
-    // this edge and we can not access them from the cell we are currently
-    // on.
-    //
-    // so, in the 3d case, if we run the algorithm as in 2d, we catch all
-    // those cells for which the vertex we seek is on a *subface*, but we
-    // miss the case of cells for which the vertex we seek is on a
-    // sub-edge for which there is no corresponding sub-face (because the
-    // immediate neighbor behind this face is not refined), see for example
-    // the bits/find_cells_adjacent_to_vertex_6 testcase. thus, if we
-    // haven't yet found the vertex for the current cell we also need to
-    // look at the mid-points of edges
-    //
-    // as a final note, deciding whether a neighbor is actually coarser is
-    // simple in the case of isotropic refinement (we just need to look at
-    // the level of the current and the neighboring cell). however, this
-    // isn't so simple if we have used anisotropic refinement since then
-    // the level of a cell is not indicative of whether it is coarser or
-    // not than the current cell. ultimately, we want to add all cells on
-    // which the vertex is, independent of whether they are coarser or
-    // finer and so in the 2d case below we simply add *any* *active* neighbor.
-    // in the worst case, we add cells multiple times to the adjacent_cells
-    // list, but std::set throws out those cells already entered
-    for (const auto &cell : mesh.active_cell_iterators())
-      {
-        for (const unsigned int v : cell->vertex_indices())
-          if (cell->vertex_index(v) == vertex)
-            {
-              // OK, we found a cell that contains
-              // the given vertex. We add it
-              // to the list.
-              adjacent_cells.insert(cell);
-
-              // as explained above, in 2+d we need to check whether
-              // this vertex is on a face behind which there is a
-              // (possibly) coarser neighbor. if this is the case,
-              // then we need to also add this neighbor
-              if (dim >= 2)
-                for (const auto face :
-                     cell->reference_cell().faces_for_given_vertex(v))
-                  if (!cell->at_boundary(face) &&
-                      cell->neighbor(face)->is_active())
-                    {
-                      // there is a (possibly) coarser cell behind a
-                      // face to which the vertex belongs. the
-                      // vertex we are looking at is then either a
-                      // vertex of that coarser neighbor, or it is a
-                      // hanging node on one of the faces of that
-                      // cell. in either case, it is adjacent to the
-                      // vertex, so add it to the list as well (if
-                      // the cell was already in the list then the
-                      // std::set makes sure that we get it only
-                      // once)
-                      adjacent_cells.insert(cell->neighbor(face));
-                    }
-
-              // in any case, we have found a cell, so go to the next cell
-              goto next_cell;
-            }
-
-        // in 3d also loop over the edges
-        if (dim >= 3)
-          {
-            for (unsigned int e = 0; e < cell->n_lines(); ++e)
-              if (cell->line(e)->has_children())
-                // the only place where this vertex could have been
-                // hiding is on the mid-edge point of the edge we
-                // are looking at
-                if (cell->line(e)->child(0)->vertex_index(1) == vertex)
-                  {
-                    adjacent_cells.insert(cell);
-
-                    // jump out of this tangle of nested loops
-                    goto next_cell;
-                  }
-          }
-
-        // in more than 3d we would probably have to do the same as
-        // above also for even lower-dimensional objects
-        Assert(dim <= 3, ExcNotImplemented());
-
-        // move on to the next cell if we have found the
-        // vertex on the current one
-      next_cell:;
-      }
-
-    // if this was an active vertex then there needs to have been
-    // at least one cell to which it is adjacent!
-    Assert(adjacent_cells.size() > 0, ExcInternalError());
-
-    // return the result as a vector, rather than the set we built above
-    return std::vector<
-      typename dealii::internal::
-        ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type>(
-      adjacent_cells.begin(), adjacent_cells.end());
   }
 
 
@@ -2913,6 +2784,8 @@ namespace GridTools
   } // namespace internal
 
   template <int dim, template <int, int> class MeshType, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifndef _MSC_VER
   std::pair<typename MeshType<dim, spacedim>::active_cell_iterator, Point<dim>>
 #else
@@ -2920,22 +2793,24 @@ namespace GridTools
               ActiveCellIterator<dim, spacedim, MeshType<dim, spacedim>>::type,
             Point<dim>>
 #endif
-  find_active_cell_around_point(
-    const Mapping<dim, spacedim> & mapping,
-    const MeshType<dim, spacedim> &mesh,
-    const Point<spacedim> &        p,
-    const std::vector<
-      std::set<typename MeshType<dim, spacedim>::active_cell_iterator>>
-      &                                                  vertex_to_cells,
-    const std::vector<std::vector<Tensor<1, spacedim>>> &vertex_to_cell_centers,
-    const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint,
-    const std::vector<bool> &                              marked_vertices,
-    const RTree<std::pair<Point<spacedim>, unsigned int>> &used_vertices_rtree,
-    const double                                           tolerance,
-    const RTree<
-      std::pair<BoundingBox<spacedim>,
-                typename Triangulation<dim, spacedim>::active_cell_iterator>>
-      *relevant_cell_bounding_boxes_rtree)
+    find_active_cell_around_point(
+      const Mapping<dim, spacedim> & mapping,
+      const MeshType<dim, spacedim> &mesh,
+      const Point<spacedim> &        p,
+      const std::vector<
+        std::set<typename MeshType<dim, spacedim>::active_cell_iterator>>
+        &vertex_to_cells,
+      const std::vector<std::vector<Tensor<1, spacedim>>>
+        &vertex_to_cell_centers,
+      const typename MeshType<dim, spacedim>::active_cell_iterator &cell_hint,
+      const std::vector<bool> &marked_vertices,
+      const RTree<std::pair<Point<spacedim>, unsigned int>>
+        &          used_vertices_rtree,
+      const double tolerance,
+      const RTree<
+        std::pair<BoundingBox<spacedim>,
+                  typename Triangulation<dim, spacedim>::active_cell_iterator>>
+        *relevant_cell_bounding_boxes_rtree)
   {
     std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
               Point<dim>>
@@ -3010,6 +2885,7 @@ namespace GridTools
                            return cell_marked(cell);
                          });
     };
+    (void)any_cell_marked;
 
     while (found_cell == false)
       {
@@ -3208,11 +3084,16 @@ namespace GridTools
     namespace BoundingBoxPredicate
     {
       template <class MeshType>
-      std::tuple<BoundingBox<MeshType::space_dimension>, bool>
-      compute_cell_predicate_bounding_box(
-        const typename MeshType::cell_iterator &parent_cell,
-        const std::function<
-          bool(const typename MeshType::active_cell_iterator &)> &predicate)
+      DEAL_II_CXX20_REQUIRES(
+        concepts::is_triangulation_or_dof_handler<MeshType>)
+      std::tuple<
+        BoundingBox<MeshType::space_dimension>,
+        bool> compute_cell_predicate_bounding_box(const typename MeshType::
+                                                    cell_iterator &parent_cell,
+                                                  const std::function<bool(
+                                                    const typename MeshType::
+                                                      active_cell_iterator &)>
+                                                    &predicate)
       {
         bool has_predicate =
           false; // Start assuming there's no cells with predicate inside
@@ -3261,14 +3142,15 @@ namespace GridTools
 
 
   template <class MeshType>
-  std::vector<BoundingBox<MeshType::space_dimension>>
-  compute_mesh_predicate_bounding_box(
-    const MeshType &mesh,
-    const std::function<bool(const typename MeshType::active_cell_iterator &)>
-      &                predicate,
-    const unsigned int refinement_level,
-    const bool         allow_merge,
-    const unsigned int max_boxes)
+  DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+  std::
+    vector<BoundingBox<MeshType::space_dimension>> compute_mesh_predicate_bounding_box(
+      const MeshType &mesh,
+      const std::function<bool(const typename MeshType::active_cell_iterator &)>
+        &                predicate,
+      const unsigned int refinement_level,
+      const bool         allow_merge,
+      const unsigned int max_boxes)
   {
     // Algorithm brief description: begin with creating bounding boxes of all
     // cells at refinement_level (and coarser levels if there are active cells)
@@ -3523,7 +3405,7 @@ namespace GridTools
     cell = triangulation.begin_active();
     for (; cell != endc; ++cell)
       {
-        for (unsigned int i : cell->face_indices())
+        for (const unsigned int i : cell->face_indices())
           {
             if ((cell->at_boundary(i) == false) &&
                 (cell->neighbor(i)->is_active()))
@@ -3661,7 +3543,7 @@ namespace GridTools
         // received.
         if (cell->is_ghost())
           {
-            for (unsigned int i : cell->face_indices())
+            for (const unsigned int i : cell->face_indices())
               {
                 if (cell->at_boundary(i) == false)
                   {
@@ -3783,6 +3665,11 @@ namespace GridTools
         AssertThrowMPI(ierr);
       }
 
+    // At this point, wait for all of the isend operations to finish:
+    MPI_Waitall(first_requests.size(),
+                first_requests.data(),
+                MPI_STATUSES_IGNORE);
+
 
     // Send second message
     std::vector<std::vector<char>> cellids_send_buffers(
@@ -3891,6 +3778,12 @@ namespace GridTools
               }
           }
       }
+
+    // At this point, wait for all of the isend operations of the second round
+    // to finish:
+    MPI_Waitall(second_requests.size(),
+                second_requests.data(),
+                MPI_STATUSES_IGNORE);
 #endif
 
     return local_to_global_vertex_index;
@@ -5817,7 +5710,9 @@ namespace GridTools
 
     // Check all points within a given pair of box and cell
     const auto check_all_points_within_box = [&](const auto &leaf) {
-      const auto &box       = leaf.first;
+      const double                relative_tolerance = 1e-12;
+      const BoundingBox<spacedim> box =
+        leaf.first.create_extended_relative(relative_tolerance);
       const auto &cell_hint = leaf.second;
 
       for (const auto &point_and_id :
@@ -5912,12 +5807,20 @@ namespace GridTools
     const GridTools::Cache<dim, spacedim> &                cache,
     const std::vector<Point<spacedim>> &                   points,
     const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
-    const double                                           tolerance)
+    const double                                           tolerance,
+    const std::vector<bool> &                              marked_vertices,
+    const bool enforce_unique_mapping)
   {
     // run internal function ...
-    const auto all = internal::distributed_compute_point_locations(
-                       cache, points, global_bboxes, {}, tolerance, false, true)
-                       .send_components;
+    const auto all =
+      internal::distributed_compute_point_locations(cache,
+                                                    points,
+                                                    global_bboxes,
+                                                    marked_vertices,
+                                                    tolerance,
+                                                    false,
+                                                    enforce_unique_mapping)
+        .send_components;
 
     // ... and reshuffle the data
     std::tuple<
@@ -5964,28 +5867,82 @@ namespace GridTools
 
   namespace internal
   {
-    template <int spacedim>
+    /**
+     * Determine for each rank which entry of @p entities it
+     * might own. The first entry of the returned tuple is a list of
+     * ranks and the second and third entry give CRS data
+     * structure (pointers within a list of indices).
+     */
+    template <int spacedim, typename T>
     std::tuple<std::vector<unsigned int>,
                std::vector<unsigned int>,
                std::vector<unsigned int>>
-    guess_point_owner(
+    guess_owners_of_entities(
+      const MPI_Comm                                         comm,
       const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
-      const std::vector<Point<spacedim>> &                   points,
+      const std::vector<T> &                                 entities,
       const double                                           tolerance)
     {
-      std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices;
-      ranks_and_indices.reserve(points.size());
+      std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes_temp;
+      auto *global_bboxes_to_be_used = &global_bboxes;
 
-      for (unsigned int i = 0; i < points.size(); ++i)
+      if (global_bboxes.size() == 1) // TODO: and not ArborX installed
         {
-          const auto &point = points[i];
-          for (unsigned rank = 0; rank < global_bboxes.size(); ++rank)
-            for (const auto &box : global_bboxes[rank])
-              if (box.point_inside(point, tolerance))
-                {
-                  ranks_and_indices.emplace_back(rank, i);
-                  break;
-                }
+          global_bboxes_temp =
+            Utilities::MPI::all_gather(comm, global_bboxes[0]);
+          global_bboxes_to_be_used = &global_bboxes_temp;
+        }
+
+      std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices;
+      ranks_and_indices.reserve(entities.size());
+
+      if (true)
+        {
+          // helper function to determine if a bounding box is valid
+          const auto is_valid = [](const auto &bb) {
+            for (unsigned int i = 0; i < spacedim; ++i)
+              if (bb.get_boundary_points().first[i] >
+                  bb.get_boundary_points().second[i])
+                return false;
+
+            return true;
+          };
+
+          // linearize vector of vectors
+          std::vector<std::pair<BoundingBox<spacedim>, unsigned int>>
+            boxes_and_ranks;
+
+          for (unsigned rank = 0; rank < global_bboxes_to_be_used->size();
+               ++rank)
+            for (const auto &box : (*global_bboxes_to_be_used)[rank])
+              if (is_valid(box))
+                boxes_and_ranks.emplace_back(box, rank);
+
+          // pack boxes into r-tree
+          const auto tree = pack_rtree(boxes_and_ranks);
+
+          // loop over all entities
+          for (unsigned int i = 0; i < entities.size(); ++i)
+            {
+              // create a bounding box with tolerance
+              const auto bb =
+                BoundingBox<spacedim>(entities[i]).create_extended(tolerance);
+
+              // determine ranks potentially owning point/bounding box
+              std::set<unsigned int> my_ranks;
+
+              for (const auto &box_and_rank :
+                   tree | boost::geometry::index::adaptors::queried(
+                            boost::geometry::index::intersects(bb)))
+                my_ranks.insert(box_and_rank.second);
+
+              for (const auto rank : my_ranks)
+                ranks_and_indices.emplace_back(rank, i);
+            }
+        }
+      else
+        {
+          // TODO: use ArborX
         }
 
       // convert to CRS
@@ -5995,14 +5952,14 @@ namespace GridTools
       std::vector<unsigned int> ptr;
       std::vector<unsigned int> indices;
 
-      unsigned int dummy_rank = numbers::invalid_unsigned_int;
+      unsigned int current_rank = numbers::invalid_unsigned_int;
 
-      for (const auto &i : ranks_and_indices)
+      for (const std::pair<unsigned int, unsigned int> &i : ranks_and_indices)
         {
-          if (dummy_rank != i.first)
+          if (current_rank != i.first)
             {
-              dummy_rank = i.first;
-              ranks.push_back(dummy_rank);
+              current_rank = i.first;
+              ranks.push_back(current_rank);
               ptr.push_back(indices.size());
             }
 
@@ -6010,9 +5967,7 @@ namespace GridTools
         }
       ptr.push_back(indices.size());
 
-      return std::make_tuple(std::move(ranks),
-                             std::move(ptr),
-                             std::move(indices));
+      return {std::move(ranks), std::move(ptr), std::move(indices)};
     }
 
 
@@ -6094,6 +6049,128 @@ namespace GridTools
         return locally_owned_active_cells_around_point;
     }
 
+    template <int dim, int spacedim>
+    DistributedComputePointLocationsInternal<dim, spacedim>::
+      DistributedComputePointLocationsInternal()
+      : n_searched_points(numbers::invalid_unsigned_int)
+    {}
+
+    template <int dim, int spacedim>
+    void
+    DistributedComputePointLocationsInternal<dim, spacedim>::finalize_setup()
+    {
+      // before reshuffeling the data check if data.recv_components and
+      // n_searched_points are in a valid state.
+      Assert(n_searched_points != numbers::invalid_unsigned_int,
+             ExcInternalError());
+      Assert(recv_components.empty() ||
+               std::get<1>(*std::max_element(recv_components.begin(),
+                                             recv_components.end(),
+                                             [](const auto &a, const auto &b) {
+                                               return std::get<1>(a) <
+                                                      std::get<1>(b);
+                                             })) < n_searched_points,
+             ExcInternalError());
+
+      send_ranks.clear();
+      recv_ranks.clear();
+      send_ptrs.clear();
+      recv_ptrs.clear();
+
+      if (true)
+        {
+          // sort according to rank (and point index and cell) -> make
+          // deterministic
+          std::sort(send_components.begin(),
+                    send_components.end(),
+                    [&](const auto &a, const auto &b) {
+                      if (std::get<1>(a) != std::get<1>(b)) // rank
+                        return std::get<1>(a) < std::get<1>(b);
+
+                      if (std::get<2>(a) != std::get<2>(b)) // point index
+                        return std::get<2>(a) < std::get<2>(b);
+
+                      return std::get<0>(a) < std::get<0>(b); // cell
+                    });
+
+          // perform enumeration and extract rank information
+          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
+               i < send_components.size();
+               ++i)
+            {
+              std::get<5>(send_components[i]) = i;
+
+              if (dummy != std::get<1>(send_components[i]))
+                {
+                  dummy = std::get<1>(send_components[i]);
+                  send_ranks.push_back(dummy);
+                  send_ptrs.push_back(i);
+                }
+            }
+          send_ptrs.push_back(send_components.size());
+
+          // sort according to cell, rank, point index (while keeping
+          // partial ordering)
+          std::sort(send_components.begin(),
+                    send_components.end(),
+                    [&](const auto &a, const auto &b) {
+                      if (std::get<0>(a) != std::get<0>(b))
+                        return std::get<0>(a) < std::get<0>(b); // cell
+
+                      if (std::get<1>(a) != std::get<1>(b))
+                        return std::get<1>(a) < std::get<1>(b); // rank
+
+                      if (std::get<2>(a) != std::get<2>(b))
+                        return std::get<2>(a) < std::get<2>(b); // point index
+
+                      return std::get<5>(a) < std::get<5>(b); // enumeration
+                    });
+        }
+
+      if (recv_components.size() > 0)
+        {
+          // sort according to rank (and point index) -> make deterministic
+          std::sort(recv_components.begin(),
+                    recv_components.end(),
+                    [&](const auto &a, const auto &b) {
+                      if (std::get<0>(a) != std::get<0>(b))
+                        return std::get<0>(a) < std::get<0>(b); // rank
+
+                      return std::get<1>(a) < std::get<1>(b); // point index
+                    });
+
+          // perform enumeration and extract rank information
+          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
+               i < recv_components.size();
+               ++i)
+            {
+              std::get<2>(recv_components[i]) = i;
+
+              if (dummy != std::get<0>(recv_components[i]))
+                {
+                  dummy = std::get<0>(recv_components[i]);
+                  recv_ranks.push_back(dummy);
+                  recv_ptrs.push_back(i);
+                }
+            }
+          recv_ptrs.push_back(recv_components.size());
+
+          // sort according to point index and rank (while keeping partial
+          // ordering)
+          std::sort(recv_components.begin(),
+                    recv_components.end(),
+                    [&](const auto &a, const auto &b) {
+                      if (std::get<1>(a) != std::get<1>(b))
+                        return std::get<1>(a) < std::get<1>(b); // point index
+
+                      if (std::get<0>(a) != std::get<0>(b))
+                        return std::get<0>(a) < std::get<0>(b); // rank
+
+                      return std::get<2>(a) < std::get<2>(b); // enumeration
+                    });
+        }
+    }
+
 
 
     template <int dim, int spacedim>
@@ -6108,16 +6185,15 @@ namespace GridTools
       const bool enforce_unique_mapping)
     {
       DistributedComputePointLocationsInternal<dim, spacedim> result;
+      result.n_searched_points = points.size();
 
       auto &send_components = result.send_components;
-      auto &send_ranks      = result.send_ranks;
-      auto &send_ptrs       = result.send_ptrs;
       auto &recv_components = result.recv_components;
-      auto &recv_ranks      = result.recv_ranks;
-      auto &recv_ptrs       = result.recv_ptrs;
 
-      const auto potential_owners =
-        internal::guess_point_owner(global_bboxes, points, tolerance);
+      const auto comm = cache.get_triangulation().get_communicator();
+
+      const auto potential_owners = internal::guess_owners_of_entities(
+        comm, global_bboxes, points, tolerance);
 
       const auto &potential_owners_ranks   = std::get<0>(potential_owners);
       const auto &potential_owners_ptrs    = std::get<1>(potential_owners);
@@ -6252,103 +6328,480 @@ namespace GridTools
         create_request,
         answer_request,
         process_answer,
-        cache.get_triangulation().get_communicator());
+        comm);
 
-      if (true)
-        {
-          // sort according to rank (and point index and cell) -> make
-          // deterministic
-          std::sort(send_components.begin(),
-                    send_components.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<1>(a) != std::get<1>(b)) // rank
-                        return std::get<1>(a) < std::get<1>(b);
-
-                      if (std::get<2>(a) != std::get<2>(b)) // point index
-                        return std::get<2>(a) < std::get<2>(b);
-
-                      return std::get<0>(a) < std::get<0>(b); // cell
-                    });
-
-          // perform enumeration and extract rank information
-          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
-               i < send_components.size();
-               ++i)
-            {
-              std::get<5>(send_components[i]) = i;
-
-              if (dummy != std::get<1>(send_components[i]))
-                {
-                  dummy = std::get<1>(send_components[i]);
-                  send_ranks.push_back(dummy);
-                  send_ptrs.push_back(i);
-                }
-            }
-          send_ptrs.push_back(send_components.size());
-
-          // sort according to cell, rank, point index (while keeping
-          // partial ordering)
-          std::sort(send_components.begin(),
-                    send_components.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<0>(a) != std::get<0>(b))
-                        return std::get<0>(a) < std::get<0>(b); // cell
-
-                      if (std::get<1>(a) != std::get<1>(b))
-                        return std::get<1>(a) < std::get<1>(b); // rank
-
-                      if (std::get<2>(a) != std::get<2>(b))
-                        return std::get<2>(a) < std::get<2>(b); // point index
-
-                      return std::get<5>(a) < std::get<5>(b); // enumeration
-                    });
-        }
-
-      if (perform_handshake)
-        {
-          // sort according to rank (and point index) -> make deterministic
-          std::sort(recv_components.begin(),
-                    recv_components.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<0>(a) != std::get<0>(b))
-                        return std::get<0>(a) < std::get<0>(b); // rank
-
-                      return std::get<1>(a) < std::get<1>(b); // point index
-                    });
-
-          // perform enumeration and extract rank information
-          for (unsigned int i = 0, dummy = numbers::invalid_unsigned_int;
-               i < recv_components.size();
-               ++i)
-            {
-              std::get<2>(recv_components[i]) = i;
-
-              if (dummy != std::get<0>(recv_components[i]))
-                {
-                  dummy = std::get<0>(recv_components[i]);
-                  recv_ranks.push_back(dummy);
-                  recv_ptrs.push_back(i);
-                }
-            }
-          recv_ptrs.push_back(recv_components.size());
-
-          // sort according to point index and rank (while keeping partial
-          // ordering)
-          std::sort(recv_components.begin(),
-                    recv_components.end(),
-                    [&](const auto &a, const auto &b) {
-                      if (std::get<1>(a) != std::get<1>(b))
-                        return std::get<1>(a) < std::get<1>(b); // point index
-
-                      if (std::get<0>(a) != std::get<0>(b))
-                        return std::get<0>(a) < std::get<0>(b); // rank
-
-                      return std::get<2>(a) < std::get<2>(b); // enumeration
-                    });
-        }
+      result.finalize_setup();
 
       return result;
     }
+
+
+
+    template <int structdim, int spacedim>
+    template <int dim>
+    DistributedComputePointLocationsInternal<dim, spacedim>
+    DistributedComputeIntersectionLocationsInternal<structdim, spacedim>::
+      convert_to_distributed_compute_point_locations_internal(
+        const unsigned int                  n_points_1D,
+        const Triangulation<dim, spacedim> &tria,
+        const Mapping<dim, spacedim> &      mapping,
+        const bool consistent_numbering_of_sender_and_receiver) const
+    {
+      using CellIterator =
+        typename Triangulation<dim, spacedim>::active_cell_iterator;
+
+      GridTools::internal::DistributedComputePointLocationsInternal<dim,
+                                                                    spacedim>
+        result;
+
+      // We need quadrature rules for the intersections. We are using a
+      // QGaussSimplex quadrature rule since CGAL always returns simplices
+      // as intersections.
+      const QGaussSimplex<structdim> quadrature(n_points_1D);
+
+      // Resulting quadrature points get different indices. In the case the
+      // requested intersections are unique also the resulting quadrature
+      // points are unique and we can simply number the points in an
+      // ascending way.
+      for (auto const &recv_component : recv_components)
+        {
+          // dependent on the size of the intersection an empty quadrature
+          // is returned. Therefore, we have to compute the quadrature also
+          // here.
+          const Quadrature<spacedim> &quad =
+            quadrature.compute_affine_transformation(
+              std::get<2>(recv_component));
+
+          for (unsigned int i = 0; i < quad.size(); ++i)
+            {
+              // the third component of result.recv_components is not needed
+              // before finalize_setup.
+              result.recv_components.emplace_back(
+                std::get<0>(recv_component),
+                result.recv_components.size(), // number of point
+                numbers::invalid_unsigned_int);
+            }
+        }
+
+      // since empty quadratures might be present we have to set the number
+      // of searched points after inserting the point indices into
+      // recv_components
+      result.n_searched_points = result.recv_components.size();
+
+      // send_ranks, counter, and indices_of_rank is only needed if
+      // consistent_numbering_of_sender_and_receiver==true
+      // indices_of_rank is always empty if deal.II is compiled without MPI
+      std::map<unsigned int, std::vector<unsigned int>> indices_of_rank;
+      std::map<unsigned int, unsigned int>              counter;
+      std::set<unsigned int>                            send_ranks;
+      if (consistent_numbering_of_sender_and_receiver)
+        {
+          for (const auto &sc : send_components)
+            send_ranks.insert(std::get<1>(sc));
+
+          for (const auto rank : send_ranks)
+            counter[rank] = 0;
+
+          // indices assigned at recv side needed to fill send_components
+          indices_of_rank = communicate_indices(result.recv_components,
+                                                tria.get_communicator());
+        }
+
+      for (const auto &send_component : send_components)
+        {
+          const CellIterator cell(&tria,
+                                  std::get<0>(send_component).first,
+                                  std::get<0>(send_component).second);
+
+          const Quadrature<spacedim> &quad =
+            quadrature.compute_affine_transformation(
+              std::get<3>(send_component));
+
+          const auto rank = std::get<1>(send_component);
+
+          for (unsigned int q = 0; q < quad.size(); ++q)
+            {
+              // the fifth component of result.send_components is filled
+              // during sorting the data and initializing the CRS structures
+              result.send_components.emplace_back(std::make_tuple(
+                std::get<0>(send_component),
+                rank,
+                indices_of_rank.empty() ?
+                  result.send_components.size() :
+                  indices_of_rank.at(rank)[counter.at(rank)],
+                mapping.transform_real_to_unit_cell(cell, quad.point(q)),
+                quad.point(q),
+                numbers::invalid_unsigned_int));
+
+              if (!indices_of_rank.empty())
+                ++counter[rank];
+            }
+        }
+
+      result.finalize_setup();
+
+      return result;
+    }
+
+
+
+    template <int structdim, int spacedim>
+    std::map<unsigned int, std::vector<unsigned int>>
+    DistributedComputeIntersectionLocationsInternal<structdim, spacedim>::
+      communicate_indices(
+        const std::vector<std::tuple<unsigned int, unsigned int, unsigned int>>
+          &            point_recv_components,
+        const MPI_Comm comm) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      Assert(false, ExcNeedsMPI());
+      (void)point_recv_components;
+      (void)comm;
+      return {};
+#else
+      // since we are converting to DistributedComputePointLocationsInternal
+      // we use the RPE tag
+      const auto mpi_tag =
+        Utilities::MPI::internal::Tags::remote_point_evaluation;
+
+      const unsigned int my_rank = Utilities::MPI::this_mpi_process(comm);
+
+      std::set<unsigned int> send_ranks;
+      for (const auto &sc : send_components)
+        send_ranks.insert(std::get<1>(sc));
+      std::set<unsigned int> recv_ranks;
+      for (const auto &rc : recv_components)
+        recv_ranks.insert(std::get<0>(rc));
+
+      std::vector<MPI_Request> requests;
+      requests.reserve(send_ranks.size());
+
+      // rank to used indices on the rank needed on sending side
+      std::map<unsigned int, std::vector<unsigned int>> indices_of_rank;
+      indices_of_rank[my_rank] = std::vector<unsigned int>();
+
+      // rank to used indices on the rank known on recv side
+      std::map<unsigned int, std::vector<unsigned int>> send_indices_of_rank;
+      for (const auto rank : recv_ranks)
+        if (rank != my_rank)
+          send_indices_of_rank[rank] = std::vector<unsigned int>();
+
+      // fill the maps
+      for (const auto &point_recv_component : point_recv_components)
+        {
+          const auto rank = std::get<0>(point_recv_component);
+          const auto idx  = std::get<1>(point_recv_component);
+
+          if (rank == my_rank)
+            indices_of_rank[rank].emplace_back(idx);
+          else
+            send_indices_of_rank[rank].emplace_back(idx);
+        }
+
+      // send indices to the ranks we normally receive from
+      for (const auto rank : recv_ranks)
+        {
+          if (rank == my_rank)
+            continue;
+
+          auto buffer = Utilities::pack(send_indices_of_rank[rank], false);
+
+          requests.push_back(MPI_Request());
+
+          const int ierr = MPI_Isend(buffer.data(),
+                                     buffer.size(),
+                                     MPI_CHAR,
+                                     rank,
+                                     mpi_tag,
+                                     comm,
+                                     &requests.back());
+          AssertThrowMPI(ierr);
+        }
+
+      // receive indices at the ranks we normally send from
+      for (const auto rank : send_ranks)
+        {
+          if (rank == my_rank)
+            continue;
+
+          MPI_Status status;
+          int        ierr = MPI_Probe(MPI_ANY_SOURCE, mpi_tag, comm, &status);
+          AssertThrowMPI(ierr);
+
+          int message_length;
+          ierr = MPI_Get_count(&status, MPI_CHAR, &message_length);
+          AssertThrowMPI(ierr);
+
+          std::vector<char> buffer(message_length);
+
+          ierr = MPI_Recv(buffer.data(),
+                          buffer.size(),
+                          MPI_CHAR,
+                          status.MPI_SOURCE,
+                          mpi_tag,
+                          comm,
+                          MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
+
+          indices_of_rank[status.MPI_SOURCE] =
+            Utilities::unpack<std::vector<unsigned int>>(buffer, false);
+        }
+
+      // make sure all messages have been sent
+      const int ierr =
+        MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
+
+      return indices_of_rank;
+#endif
+    }
+
+
+
+    template <int structdim, int dim, int spacedim>
+    DistributedComputeIntersectionLocationsInternal<structdim, spacedim>
+    distributed_compute_intersection_locations(
+      const Cache<dim, spacedim> &                     cache,
+      const std::vector<std::vector<Point<spacedim>>> &intersection_requests,
+      const std::vector<std::vector<BoundingBox<spacedim>>> &global_bboxes,
+      const std::vector<bool> &                              marked_vertices,
+      const double                                           tolerance)
+    {
+      using IntersectionRequest = std::vector<Point<spacedim>>;
+
+      using IntersectionAnswer =
+        typename DistributedComputeIntersectionLocationsInternal<
+          structdim,
+          spacedim>::IntersectionType;
+
+      const auto comm = cache.get_triangulation().get_communicator();
+
+      DistributedComputeIntersectionLocationsInternal<structdim, spacedim>
+        result;
+
+      auto &send_components = result.send_components;
+      auto &recv_components = result.recv_components;
+      auto &recv_ptrs       = result.recv_ptrs;
+
+      // search for potential owners
+      const auto potential_owners = internal::guess_owners_of_entities(
+        comm, global_bboxes, intersection_requests, tolerance);
+
+      const auto &potential_owners_ranks   = std::get<0>(potential_owners);
+      const auto &potential_owners_ptrs    = std::get<1>(potential_owners);
+      const auto &potential_owners_indices = std::get<2>(potential_owners);
+
+      const auto translate = [&](const unsigned int other_rank) {
+        const auto ptr = std::find(potential_owners_ranks.begin(),
+                                   potential_owners_ranks.end(),
+                                   other_rank);
+
+        Assert(ptr != potential_owners_ranks.end(), ExcInternalError());
+
+        const auto other_rank_index =
+          std::distance(potential_owners_ranks.begin(), ptr);
+
+        return other_rank_index;
+      };
+
+      Assert(
+        (marked_vertices.size() == 0) ||
+          (marked_vertices.size() == cache.get_triangulation().n_vertices()),
+        ExcMessage(
+          "The marked_vertices vector has to be either empty or its size has "
+          "to equal the number of vertices of the triangulation."));
+
+      // In the case that a marked_vertices vector has been given and none
+      // of its entries is true, we know that this process does not own
+      // any of the incoming points (and it will not send any data) so
+      // that we can take a short cut.
+      const bool has_relevant_vertices =
+        (marked_vertices.size() == 0) ||
+        (std::find(marked_vertices.begin(), marked_vertices.end(), true) !=
+         marked_vertices.end());
+
+      // intersection between two cells:
+      // One rank requests all intersections of owning cell:
+      // owning cell index, cgal vertices of cell
+      using RequestType =
+        std::vector<std::pair<unsigned int, IntersectionRequest>>;
+      // Other ranks send back all found intersections for requesting cell:
+      // requesting cell index, cgal vertices of found intersections
+      using AnswerType =
+        std::vector<std::pair<unsigned int, IntersectionAnswer>>;
+
+      const auto create_request = [&](const unsigned int other_rank) {
+        const auto other_rank_index = translate(other_rank);
+
+        RequestType request;
+        request.reserve(potential_owners_ptrs[other_rank_index + 1] -
+                        potential_owners_ptrs[other_rank_index]);
+
+        for (unsigned int i = potential_owners_ptrs[other_rank_index];
+             i < potential_owners_ptrs[other_rank_index + 1];
+             ++i)
+          request.emplace_back(
+            potential_owners_indices[i],
+            intersection_requests[potential_owners_indices[i]]);
+
+        return request;
+      };
+
+
+      // TODO: this is potentially useful in many cases and it would be nice to
+      // have cache.get_locally_owned_cell_bounding_boxes_rtree(marked_vertices)
+      const auto construct_locally_owned_cell_bounding_boxes_rtree =
+        [&cache](const std::vector<bool> &marked_verts) {
+          const auto cell_marked = [&marked_verts](const auto &cell) {
+            for (const unsigned int v : cell->vertex_indices())
+              if (marked_verts[cell->vertex_index(v)])
+                return true;
+            return false;
+          };
+
+          const auto &boxes_and_cells =
+            cache.get_locally_owned_cell_bounding_boxes_rtree();
+
+          if (marked_verts.size() == 0)
+            return boxes_and_cells;
+
+          std::vector<std::pair<
+            BoundingBox<spacedim>,
+            typename Triangulation<dim, spacedim>::active_cell_iterator>>
+            potential_boxes_and_cells;
+
+          for (const auto &box_and_cell : boxes_and_cells)
+            if (cell_marked(box_and_cell.second))
+              potential_boxes_and_cells.emplace_back(box_and_cell);
+
+          return pack_rtree(potential_boxes_and_cells);
+        };
+
+
+      RTree<
+        std::pair<BoundingBox<spacedim>,
+                  typename Triangulation<dim, spacedim>::active_cell_iterator>>
+        marked_cell_tree;
+
+      const auto answer_request =
+        [&](const unsigned int &other_rank,
+            const RequestType & request) -> AnswerType {
+        AnswerType answer;
+
+        if (has_relevant_vertices)
+          {
+            if (marked_cell_tree.empty())
+              {
+                marked_cell_tree =
+                  construct_locally_owned_cell_bounding_boxes_rtree(
+                    marked_vertices);
+              }
+
+            // process requests
+            for (unsigned int i = 0; i < request.size(); ++i)
+              {
+                // create a bounding box with tolerance
+                const auto bb = BoundingBox<spacedim>(request[i].second)
+                                  .create_extended(tolerance);
+
+                for (const auto &box_cell :
+                     marked_cell_tree |
+                       boost::geometry::index::adaptors::queried(
+                         boost::geometry::index::intersects(bb)))
+                  {
+#ifdef DEAL_II_WITH_CGAL
+                    const auto &cell                   = box_cell.second;
+                    const auto &request_index          = request[i].first;
+                    auto        requested_intersection = request[i].second;
+                    CGALWrappers::resort_dealii_vertices_to_cgal_order(
+                      structdim, requested_intersection);
+
+                    auto const &try_intersection =
+                      CGALWrappers::get_vertices_in_cgal_order(
+                        cell, cache.get_mapping());
+
+                    const auto &found_intersections = CGALWrappers::
+                      compute_intersection_of_cells<dim, structdim, spacedim>(
+                        try_intersection, requested_intersection, tolerance);
+
+                    if (found_intersections.size() > 0)
+                      {
+                        for (const auto &found_intersection :
+                             found_intersections)
+                          {
+                            answer.emplace_back(request_index,
+                                                found_intersection);
+
+                            send_components.emplace_back(
+                              std::make_pair(cell->level(), cell->index()),
+                              other_rank,
+                              request_index,
+                              found_intersection);
+                          }
+                      }
+#else
+                    (void)other_rank;
+                    (void)box_cell;
+                    Assert(false, ExcNeedsCGAL());
+#endif
+                  }
+              }
+          }
+
+        return answer;
+      };
+
+      const auto process_answer = [&](const unsigned int other_rank,
+                                      const AnswerType & answer) {
+        for (unsigned int i = 0; i < answer.size(); ++i)
+          recv_components.emplace_back(other_rank,
+                                       answer[i].first,
+                                       answer[i].second);
+      };
+
+      Utilities::MPI::ConsensusAlgorithms::selector<RequestType, AnswerType>(
+        potential_owners_ranks,
+        create_request,
+        answer_request,
+        process_answer,
+        comm);
+
+      // sort according to 1) intersection index and 2) rank (keeping the order
+      // of recv components with same indices and ranks)
+      std::stable_sort(recv_components.begin(),
+                       recv_components.end(),
+                       [&](const auto &a, const auto &b) {
+                         // intersection index
+                         if (std::get<1>(a) != std::get<1>(b))
+                           return std::get<1>(a) < std::get<1>(b);
+
+                         // rank
+                         return std::get<0>(a) < std::get<0>(b);
+                       });
+
+      // sort according to 1) rank and 2) intersection index (keeping the
+      // order of recv components with same indices and ranks)
+      std::stable_sort(send_components.begin(),
+                       send_components.end(),
+                       [&](const auto &a, const auto &b) {
+                         // rank
+                         if (std::get<1>(a) != std::get<1>(b))
+                           return std::get<1>(a) < std::get<1>(b);
+
+                         // intersection idx
+                         return std::get<2>(a) < std::get<2>(b);
+                       });
+
+      // construct recv_ptrs
+      recv_ptrs.assign(intersection_requests.size() + 1, 0);
+      for (const auto &rc : recv_components)
+        ++recv_ptrs[std::get<1>(rc) + 1];
+      for (unsigned int i = 0; i < intersection_requests.size(); ++i)
+        recv_ptrs[i + 1] += recv_ptrs[i];
+
+      return result;
+    }
+
   } // namespace internal
 
 
@@ -6421,7 +6874,7 @@ namespace GridTools
   std::vector<std::vector<BoundingBox<spacedim>>>
   exchange_local_bounding_boxes(
     const std::vector<BoundingBox<spacedim>> &local_bboxes,
-    const MPI_Comm &                          mpi_communicator)
+    const MPI_Comm                            mpi_communicator)
   {
 #ifndef DEAL_II_WITH_MPI
     (void)local_bboxes;
@@ -6517,7 +6970,7 @@ namespace GridTools
   RTree<std::pair<BoundingBox<spacedim>, unsigned int>>
   build_global_description_tree(
     const std::vector<BoundingBox<spacedim>> &local_description,
-    const MPI_Comm &                          mpi_communicator)
+    const MPI_Comm                            mpi_communicator)
   {
 #ifndef DEAL_II_WITH_MPI
     (void)mpi_communicator;
@@ -6724,7 +7177,7 @@ namespace GridTools
       for (const unsigned int v : cell->vertex_indices())
         vertex_of_own_cell[cell->vertex_index(v)] = true;
 
-    // 3) for each vertex belonging to a locally owned cell all ghost
+    // 3) for each vertex belonging to a locally owned cell, find all ghost
     //    neighbors (including the periodic own)
     std::map<unsigned int, std::set<types::subdomain_id>> result;
 

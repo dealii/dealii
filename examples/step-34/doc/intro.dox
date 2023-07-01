@@ -554,8 +554,8 @@ where
 \begin{aligned}
 \mathbf{A}_{ij}&=
 \alpha(\mathbf{x}_i) \psi_j(\mathbf{x}_i)
-= 1+\int_\Gamma
-\frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}\,ds_y
+= \left (1+\int_\Gamma
+\frac{\partial G(\mathbf{y}-\mathbf{x}_i)}{\partial \mathbf{n}_y}\,ds_y \right )
 \psi_j(\mathbf{x}_i)
 \\
 \mathbf{N}_{ij}&= - \int_\Gamma

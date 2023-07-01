@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2021 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -299,13 +299,13 @@ namespace MeshWorker
     const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
     const unsigned int chunk_size   = 8
 #else
-    const CellIteratorType &                         begin,
-    const typename identity<CellIteratorType>::type &end,
+    const CellIteratorType &                            begin,
+    const std_cxx20::type_identity_t<CellIteratorType> &end,
 
-    const typename identity<std::function<
-      void(const CellIteratorBaseType &, ScratchData &, CopyData &)>>::type
+    const std_cxx20::type_identity_t<std::function<
+      void(const CellIteratorBaseType &, ScratchData &, CopyData &)>>
       &cell_worker,
-    const typename identity<std::function<void(const CopyData &)>>::type
+    const std_cxx20::type_identity_t<std::function<void(const CopyData &)>>
       &copier,
 
     const ScratchData &sample_scratch_data,
@@ -313,31 +313,33 @@ namespace MeshWorker
 
     const AssembleFlags flags = assemble_own_cells,
 
-    const typename identity<std::function<void(const CellIteratorBaseType &,
-                                               const unsigned int,
-                                               ScratchData &,
-                                               CopyData &)>>::type
-      &boundary_worker = std::function<void(const CellIteratorBaseType &,
-                                            const unsigned int,
-                                            ScratchData &,
-                                            CopyData &)>(),
+    const std_cxx20::type_identity_t<
+      std::function<void(const CellIteratorBaseType &,
+                         const unsigned int,
+                         ScratchData &,
+                         CopyData &)>> &boundary_worker =
+      std::function<void(const CellIteratorBaseType &,
+                         const unsigned int,
+                         ScratchData &,
+                         CopyData &)>(),
 
-    const typename identity<std::function<void(const CellIteratorBaseType &,
-                                               const unsigned int,
-                                               const unsigned int,
-                                               const CellIteratorBaseType &,
-                                               const unsigned int,
-                                               const unsigned int,
-                                               ScratchData &,
-                                               CopyData &)>>::type
-      &face_worker = std::function<void(const CellIteratorBaseType &,
-                                        const unsigned int,
-                                        const unsigned int,
-                                        const CellIteratorBaseType &,
-                                        const unsigned int,
-                                        const unsigned int,
-                                        ScratchData &,
-                                        CopyData &)>(),
+    const std_cxx20::type_identity_t<
+      std::function<void(const CellIteratorBaseType &,
+                         const unsigned int,
+                         const unsigned int,
+                         const CellIteratorBaseType &,
+                         const unsigned int,
+                         const unsigned int,
+                         ScratchData &,
+                         CopyData &)>> &face_worker =
+      std::function<void(const CellIteratorBaseType &,
+                         const unsigned int,
+                         const unsigned int,
+                         const CellIteratorBaseType &,
+                         const unsigned int,
+                         const unsigned int,
+                         ScratchData &,
+                         CopyData &)>(),
 
     const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
     const unsigned int chunk_size   = 8
@@ -570,7 +572,10 @@ namespace MeshWorker
 
                     // Now neighbor is on the same refinement level.
                     // Double check.
-                    Assert(!cell->neighbor_is_coarser(face_no),
+                    Assert((!periodic_neighbor &&
+                            !cell->neighbor_is_coarser(face_no)) ||
+                             (periodic_neighbor &&
+                              !cell->periodic_neighbor_is_coarser(face_no)),
                            ExcInternalError());
 
                     // If we own both cells only do faces from one side (unless
@@ -710,10 +715,10 @@ namespace MeshWorker
   void
   mesh_loop(
     IteratorRange<CellIteratorType> iterator_range,
-    const typename identity<std::function<
-      void(const CellIteratorBaseType &, ScratchData &, CopyData &)>>::type
+    const std_cxx20::type_identity_t<std::function<
+      void(const CellIteratorBaseType &, ScratchData &, CopyData &)>>
       &cell_worker,
-    const typename identity<std::function<void(const CopyData &)>>::type
+    const std_cxx20::type_identity_t<std::function<void(const CopyData &)>>
       &copier,
 
     const ScratchData &sample_scratch_data,
@@ -721,31 +726,33 @@ namespace MeshWorker
 
     const AssembleFlags flags = assemble_own_cells,
 
-    const typename identity<std::function<void(const CellIteratorBaseType &,
-                                               const unsigned int,
-                                               ScratchData &,
-                                               CopyData &)>>::type
-      &boundary_worker = std::function<void(const CellIteratorBaseType &,
-                                            const unsigned int,
-                                            ScratchData &,
-                                            CopyData &)>(),
+    const std_cxx20::type_identity_t<
+      std::function<void(const CellIteratorBaseType &,
+                         const unsigned int,
+                         ScratchData &,
+                         CopyData &)>> &boundary_worker =
+      std::function<void(const CellIteratorBaseType &,
+                         const unsigned int,
+                         ScratchData &,
+                         CopyData &)>(),
 
-    const typename identity<std::function<void(const CellIteratorBaseType &,
-                                               const unsigned int,
-                                               const unsigned int,
-                                               const CellIteratorBaseType &,
-                                               const unsigned int,
-                                               const unsigned int,
-                                               ScratchData &,
-                                               CopyData &)>>::type
-      &face_worker = std::function<void(const CellIteratorBaseType &,
-                                        const unsigned int,
-                                        const unsigned int,
-                                        const CellIteratorBaseType &,
-                                        const unsigned int,
-                                        const unsigned int,
-                                        ScratchData &,
-                                        CopyData &)>(),
+    const std_cxx20::type_identity_t<
+      std::function<void(const CellIteratorBaseType &,
+                         const unsigned int,
+                         const unsigned int,
+                         const CellIteratorBaseType &,
+                         const unsigned int,
+                         const unsigned int,
+                         ScratchData &,
+                         CopyData &)>> &face_worker =
+      std::function<void(const CellIteratorBaseType &,
+                         const unsigned int,
+                         const unsigned int,
+                         const CellIteratorBaseType &,
+                         const unsigned int,
+                         const unsigned int,
+                         ScratchData &,
+                         CopyData &)>(),
 
     const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
     const unsigned int chunk_size   = 8)
@@ -831,9 +838,9 @@ namespace MeshWorker
             class CopyData,
             class MainClass>
   void
-  mesh_loop(const CellIteratorType &                         begin,
-            const typename identity<CellIteratorType>::type &end,
-            MainClass &                                      main_class,
+  mesh_loop(const CellIteratorType &                            begin,
+            const std_cxx20::type_identity_t<CellIteratorType> &end,
+            MainClass &                                         main_class,
             void (MainClass::*cell_worker)(const CellIteratorType &,
                                            ScratchData &,
                                            CopyData &),

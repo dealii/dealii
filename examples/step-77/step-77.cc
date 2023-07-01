@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2021 by the deal.II authors
+ * Copyright (C) 2021 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -334,6 +334,8 @@ namespace Step77
 
     std::cout << "  Computing residual vector..." << std::flush;
 
+    residual = 0.0;
+
     const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim>     fe_values(fe,
                             quadrature_formula,
@@ -572,10 +574,8 @@ namespace Step77
           // the SUNDIALS::KINSOL class that are of type `std::function`, i.e.,
           // they are objects to which we can assign a pointer to a function or,
           // as we do here, a "lambda function" that takes the appropriate
-          // arguments and returns the appropriate information. By convention,
-          // KINSOL wants that functions doing something nontrivial return an
-          // integer where zero indicates success. It turns out that we can do
-          // all of this in just 25 lines of code.
+          // arguments and returns the appropriate information. It turns out
+          // that we can do all of this in just over 20 lines of code.
           //
           // (If you're not familiar what "lambda functions" are, take
           // a look at step-12 or at the
@@ -592,7 +592,7 @@ namespace Step77
           //
           // At the very end of the code block we then tell KINSOL to go to work
           // and solve our problem. The member functions called from the
-          // 'residual', 'setup_jacobian', and 'solve_jacobian_system' functions
+          // 'residual', 'setup_jacobian', and 'solve_with_jacobian' functions
           // will then print output to screen that allows us to follow along
           // with the progress of the program.
           nonlinear_solver.reinit_vector = [&](Vector<double> &x) {
@@ -603,24 +603,18 @@ namespace Step77
             [&](const Vector<double> &evaluation_point,
                 Vector<double> &      residual) {
               compute_residual(evaluation_point, residual);
-
-              return 0;
             };
 
           nonlinear_solver.setup_jacobian =
             [&](const Vector<double> &current_u,
                 const Vector<double> & /*current_f*/) {
               compute_and_factorize_jacobian(current_u);
-
-              return 0;
             };
 
           nonlinear_solver.solve_with_jacobian = [&](const Vector<double> &rhs,
                                                      Vector<double> &      dst,
                                                      const double tolerance) {
-            this->solve(rhs, dst, tolerance);
-
-            return 0;
+            solve(rhs, dst, tolerance);
           };
 
           nonlinear_solver.solve(current_solution);

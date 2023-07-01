@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,7 +20,6 @@
 #include <deal.II/base/path_search.h>
 #include <deal.II/base/utilities.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <boost/algorithm/string.hpp>
 #include <boost/io/ios_state.hpp>
@@ -28,7 +27,6 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #undef BOOST_BIND_GLOBAL_PLACEHOLDERS
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <cctype>
@@ -874,7 +872,8 @@ ParameterHandler::declare_entry(const std::string &          entry,
 void
 ParameterHandler::add_action(
   const std::string &                             entry,
-  const std::function<void(const std::string &)> &action)
+  const std::function<void(const std::string &)> &action,
+  const bool                                      execute_action)
 {
   actions.push_back(action);
 
@@ -898,11 +897,12 @@ ParameterHandler::add_action(
     entries->put(get_current_full_path(entry) + path_separator + "actions",
                  Utilities::int_to_string(actions.size() - 1));
 
-
-  // as documented, run the action on the default value at the very end
-  const std::string default_value = entries->get<std::string>(
-    get_current_full_path(entry) + path_separator + "default_value");
-  action(default_value);
+  if (execute_action)
+    {
+      const std::string default_value = entries->get<std::string>(
+        get_current_full_path(entry) + path_separator + "default_value");
+      action(default_value);
+    }
 }
 
 

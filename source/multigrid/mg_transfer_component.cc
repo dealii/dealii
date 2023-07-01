@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// Copyright (C) 2003 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -79,7 +79,7 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector_by_components(
-    const dealii::DoFHandler<dim, spacedim> &          mg_dof,
+    const DoFHandler<dim, spacedim> &                  mg_dof,
     MGLevelObject<BlockVector<number>> &               v,
     const std::vector<bool> &                          sel,
     const std::vector<unsigned int> &                  target_comp,
@@ -178,7 +178,7 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector_by_components(
-    const dealii::DoFHandler<dim, spacedim> &          mg_dof,
+    const DoFHandler<dim, spacedim> &                  mg_dof,
     MGLevelObject<dealii::Vector<number>> &            v,
     const ComponentMask &                              component_mask,
     const std::vector<unsigned int> &                  target_component,

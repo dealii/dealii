@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2018 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,11 +34,7 @@ test(PETScWrappers::MPI::Vector &v)
     {
       const PetscScalar s(1. * k, 2. * k);
       v(k) = s;
-#if DEAL_II_PETSC_VERSION_LT(3, 7, 0)
-      norm += std::fabs(1. * k) + std::fabs(2. * k);
-#else
       norm += std::abs(s);
-#endif
     }
   v.compress(VectorOperation::insert);
 
@@ -63,7 +59,7 @@ main(int argc, char **argv)
         test(v);
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

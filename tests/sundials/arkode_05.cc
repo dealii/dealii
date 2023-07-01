@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2022 by the deal.II authors
+//    Copyright (C) 2017 - 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -74,21 +74,17 @@ main()
   // Explicit jacobian.
   FullMatrix<double> J(3, 3);
 
-  ode.implicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.implicit_function = [&](double, const VectorType &y, VectorType &ydot) {
     ydot[0] = 0;
     ydot[1] = 0;
     ydot[2] = -y[2] / eps;
-    return 0;
   };
 
 
-  ode.explicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) {
     ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
     ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
     ydot[2] = b / eps - y[2] * y[0];
-    return 0;
   };
 
 
@@ -97,14 +93,13 @@ main()
                            const double gamma,
                            const VectorType &,
                            const VectorType &,
-                           bool &j_is_current) -> int {
+                           bool &j_is_current) {
     J       = 0;
     J(0, 0) = 1;
     J(1, 1) = 1;
     J(2, 2) = 1 + gamma / eps;
     J.gauss_jordan();
     j_is_current = true;
-    return 0;
   };
 
   ode.solve_jacobian_system = [&](const double t,
@@ -112,23 +107,17 @@ main()
                                   const VectorType &,
                                   const VectorType &,
                                   const VectorType &src,
-                                  VectorType &      dst) -> int {
-    J.vmult(dst, src);
-    return 0;
-  };
+                                  VectorType &      dst) { J.vmult(dst, src); };
 
-  ode.output_step = [&](const double       t,
-                        const VectorType & sol,
-                        const unsigned int step_number) -> int {
-    deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol[2]
-            << std::endl;
-    return 0;
-  };
+  ode.output_step =
+    [&](const double t, const VectorType &sol, const unsigned int step_number) {
+      deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol[2]
+              << std::endl;
+    };
 
   Vector<double> y(3);
   y[0] = u0;
   y[1] = v0;
   y[2] = w0;
   ode.solve_ode(y);
-  return 0;
 }

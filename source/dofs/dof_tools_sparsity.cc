@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -852,9 +852,6 @@ namespace DoFTools
                         }
                       else
                         {
-                          if (!face_has_flux_coupling(cell, face_n))
-                            continue;
-
                           typename DoFHandler<dim,
                                               spacedim>::level_cell_iterator
                             neighbor =
@@ -887,6 +884,10 @@ namespace DoFTools
                                 !cell->periodic_neighbor_is_coarser(face_n))) &&
                               neighbor->is_locally_owned())
                             continue; // (the neighbor is finer)
+
+                          if (!face_has_flux_coupling(cell, face_n))
+                            continue;
+
 
                           const unsigned int neighbor_face_n =
                             periodic_neighbor ?
@@ -1184,8 +1185,7 @@ namespace DoFTools
                   // Loop over interior faces
                   for (const unsigned int face : cell->face_indices())
                     {
-                      const typename dealii::DoFHandler<dim,
-                                                        spacedim>::face_iterator
+                      const typename DoFHandler<dim, spacedim>::face_iterator
                         cell_face = cell->face(face);
 
                       const bool periodic_neighbor =
@@ -1193,12 +1193,10 @@ namespace DoFTools
 
                       if ((!cell->at_boundary(face)) || periodic_neighbor)
                         {
-                          typename dealii::DoFHandler<dim, spacedim>::
-                            level_cell_iterator neighbor =
+                          typename DoFHandler<dim,
+                                              spacedim>::level_cell_iterator
+                            neighbor =
                               cell->neighbor_or_periodic_neighbor(face);
-
-                          if (!face_has_flux_coupling(cell, face))
-                            continue;
 
                           // Like the non-hp-case: If the cells are on the same
                           // level (and both are active, locally-owned cells)
@@ -1229,6 +1227,10 @@ namespace DoFTools
                               neighbor->is_locally_owned())
                             continue; // (the neighbor is finer)
 
+
+                          if (!face_has_flux_coupling(cell, face))
+                            continue;
+
                           // In 1d, go straight to the cell behind this
                           // particular cell's most terminal cell. This makes us
                           // skip the if (neighbor->has_children()) section
@@ -1245,8 +1247,7 @@ namespace DoFTools
                                    sub_nr != cell_face->n_children();
                                    ++sub_nr)
                                 {
-                                  const typename dealii::DoFHandler<dim,
-                                                                    spacedim>::
+                                  const typename DoFHandler<dim, spacedim>::
                                     level_cell_iterator sub_neighbor =
                                       periodic_neighbor ?
                                         cell

@@ -1,4 +1,0 @@
-Moved: The functions in Utilities::Trilinos have been moved to a separate header,
-base/trilinos_utilities.h.
-<br>
-(David Wells, 08/16/2022)

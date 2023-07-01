@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,6 +40,41 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+/**
+ * Type trait indicating if a certain number type has been explicitly
+ * instantiated in Tpetra. deal.II only supports those number types in Tpetra
+ * wrapper classes.
+ */
+template <typename Number>
+struct is_tpetra_type : std::false_type
+{};
+
+#  ifdef HAVE_TPETRA_INST_FLOAT
+template <>
+struct is_tpetra_type<float> : std::true_type
+{};
+#  endif
+
+#  ifdef HAVE_TPETRA_INST_DOUBLE
+template <>
+struct is_tpetra_type<double> : std::true_type
+{};
+#  endif
+
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
+#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+template <>
+struct is_tpetra_type<std::complex<float>> : std::true_type
+{};
+#    endif
+
+#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+template <>
+struct is_tpetra_type<std::complex<double>> : std::true_type
+{};
+#    endif
+#  endif
+
 namespace LinearAlgebra
 {
   // Forward declaration
@@ -66,15 +101,13 @@ namespace LinearAlgebra
      * Tpetra uses Kokkos for thread-parallelism and chooses the execution and
      * memory space automatically depending on Kokkos configuration. The
      * priority is ranked from highest to lowest:
-     * - Kokkos::Cuda
-     * - Kokkos::OpenMP
-     * - Kokkos::Threads
+     * - GPU backend
+     * - host parallel backend
      * - Kokkos::Serial
      *
-     * In case Kokkos was configured with CUDA support, this class stores the
-     * values in unified virtual memory space and performs its action on the
-     * GPU. In particular, there is no need for manually synchronizing memory
-     * between host and device.
+     * In case Kokkos was configured with GPU support, this class performs its
+     * actions on the GPU. In particular, there is no need for manually
+     * synchronizing memory between host and @ref GlossDevice "device".
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
@@ -105,7 +138,7 @@ namespace LinearAlgebra
        * need to generate a %parallel vector.
        */
       explicit Vector(const IndexSet &parallel_partitioner,
-                      const MPI_Comm &communicator);
+                      const MPI_Comm  communicator);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -115,7 +148,7 @@ namespace LinearAlgebra
        */
       void
       reinit(const IndexSet &parallel_partitioner,
-             const MPI_Comm &communicator,
+             const MPI_Comm  communicator,
              const bool      omit_zeroing_entries = false);
 
       /**
@@ -150,10 +183,24 @@ namespace LinearAlgebra
        * improve performance.
        */
       virtual void
+      import_elements(
+        const ReadWriteVector<Number> &V,
+        VectorOperation::values        operation,
+        std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          communication_pattern = {}) override;
+
+      /**
+       * @deprecated Use import_elements() instead.
+       */
+      DEAL_II_DEPRECATED
+      virtual void
       import(const ReadWriteVector<Number> &V,
              VectorOperation::values        operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {}) override;
+               communication_pattern = {}) override
+      {
+        import_elements(V, operation, communication_pattern);
+      }
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -314,7 +361,7 @@ namespace LinearAlgebra
       locally_owned_size() const;
 
       /**
-       * Return the MPI communicator object in use with this object.
+       * Return the underlying MPI communicator.
        */
       MPI_Comm
       get_mpi_communicator() const;
@@ -393,7 +440,7 @@ namespace LinearAlgebra
        */
       void
       create_tpetra_comm_pattern(const IndexSet &source_index_set,
-                                 const MPI_Comm &mpi_comm);
+                                 const MPI_Comm  mpi_comm);
 
       /**
        * Pointer to the actual Tpetra vector object.

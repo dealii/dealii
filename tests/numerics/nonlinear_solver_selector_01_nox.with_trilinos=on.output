@@ -1,0 +1,18 @@
+
+DEAL::  Computing residual vector... norm=0.867975
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::  Computing residual vector... norm=0.212073
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::  Computing residual vector... norm=0.0189603
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::  Computing residual vector... norm=0.000314854
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::  Computing residual vector... norm=1.14048e-07

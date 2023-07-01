@@ -94,7 +94,7 @@ main(int argc, char **argv)
       test2cells<2>();
       test2cells<3>();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

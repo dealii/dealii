@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1734,9 +1734,9 @@ TriaAccessor<3, 3, 3>::set_all_manifold_ids(
   // for hexes also set manifold_id
   // of bounding quads and lines
 
-  for (unsigned int i : this->face_indices())
+  for (const unsigned int i : this->face_indices())
     this->quad(i)->set_manifold_id(manifold_ind);
-  for (unsigned int i : this->line_indices())
+  for (const unsigned int i : this->line_indices())
     this->line(i)->set_manifold_id(manifold_ind);
 }
 
@@ -3510,6 +3510,32 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
     }
 }
 
+
+
+template <int structdim, int dim, int spacedim>
+IteratorState::IteratorStates
+InvalidAccessor<structdim, dim, spacedim>::state()
+{
+  return IteratorState::invalid;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+int
+InvalidAccessor<structdim, dim, spacedim>::level()
+{
+  return -1;
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+int
+InvalidAccessor<structdim, dim, spacedim>::index()
+{
+  return -1;
+}
 
 
 // explicit instantiations

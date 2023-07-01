@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,6 +34,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <class MeshType>
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 InterGridMap<MeshType>::InterGridMap()
   : source_grid(nullptr, typeid(*this).name())
   , destination_grid(nullptr, typeid(*this).name())
@@ -42,9 +43,9 @@ InterGridMap<MeshType>::InterGridMap()
 
 
 template <class MeshType>
-void
-InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
-                                     const MeshType &destination_grid)
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+void InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
+                                          const MeshType &destination_grid)
 {
   // first delete all contents
   clear();
@@ -98,9 +99,9 @@ InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
 
 
 template <class MeshType>
-void
-InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell,
-                                    const cell_iterator &dst_cell)
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+void InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell,
+                                         const cell_iterator &dst_cell)
 {
   // first set the map for this cell
   mapping[src_cell->level()][src_cell->index()] = dst_cell;
@@ -137,9 +138,9 @@ InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell,
 
 
 template <class MeshType>
-void
-InterGridMap<MeshType>::set_entries_to_cell(const cell_iterator &src_cell,
-                                            const cell_iterator &dst_cell)
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+void InterGridMap<MeshType>::set_entries_to_cell(const cell_iterator &src_cell,
+                                                 const cell_iterator &dst_cell)
 {
   // first set the map for this cell
   mapping[src_cell->level()][src_cell->index()] = dst_cell;
@@ -153,8 +154,9 @@ InterGridMap<MeshType>::set_entries_to_cell(const cell_iterator &src_cell,
 
 
 template <class MeshType>
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 typename InterGridMap<MeshType>::cell_iterator
-InterGridMap<MeshType>::operator[](const cell_iterator &source_cell) const
+  InterGridMap<MeshType>::operator[](const cell_iterator &source_cell) const
 {
   Assert(source_cell.state() == IteratorState::valid,
          ExcInvalidKey(source_cell));
@@ -170,8 +172,8 @@ InterGridMap<MeshType>::operator[](const cell_iterator &source_cell) const
 
 
 template <class MeshType>
-void
-InterGridMap<MeshType>::clear()
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+void InterGridMap<MeshType>::clear()
 {
   mapping.clear();
   source_grid      = nullptr;
@@ -181,8 +183,8 @@ InterGridMap<MeshType>::clear()
 
 
 template <class MeshType>
-const MeshType &
-InterGridMap<MeshType>::get_source_grid() const
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+const MeshType &InterGridMap<MeshType>::get_source_grid() const
 {
   return *source_grid;
 }
@@ -190,8 +192,8 @@ InterGridMap<MeshType>::get_source_grid() const
 
 
 template <class MeshType>
-const MeshType &
-InterGridMap<MeshType>::get_destination_grid() const
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+const MeshType &InterGridMap<MeshType>::get_destination_grid() const
 {
   return *destination_grid;
 }
@@ -199,8 +201,8 @@ InterGridMap<MeshType>::get_destination_grid() const
 
 
 template <class MeshType>
-std::size_t
-InterGridMap<MeshType>::memory_consumption() const
+DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
+std::size_t InterGridMap<MeshType>::memory_consumption() const
 {
   return (MemoryConsumption::memory_consumption(mapping) +
           MemoryConsumption::memory_consumption(source_grid) +

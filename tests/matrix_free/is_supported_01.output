@@ -16,7 +16,7 @@ DEAL::FE_FaceP<2>(1) supported by MatrixFree: false
 DEAL::FE_FaceQ<2>(1) supported by MatrixFree: false
 DEAL::FE_P1NC supported by MatrixFree: false
 DEAL::FE_Nedelec<2>(1) supported by MatrixFree: false
-DEAL::FE_Nothing<2>() supported by MatrixFree: false
+DEAL::FE_Nothing<2>() supported by MatrixFree: true
 DEAL::FE_Q<1,2>(1) supported by MatrixFree: false
 DEAL::FE_Q<2>(1) supported by MatrixFree: true
 DEAL::FE_Q_Bubbles<2>(1) supported by MatrixFree: false
@@ -25,5 +25,5 @@ DEAL::FE_Q_Hierarchical<2>(1) supported by MatrixFree: true
 DEAL::FE_Q_iso_Q1<2>(1) supported by MatrixFree: true
 DEAL::FE_RannacherTurek<2>(0, 2) supported by MatrixFree: false
 DEAL::FE_RaviartThomas<2>(1) supported by MatrixFree: false
-DEAL::FE_RaviartThomasNodal<2>(1) supported by MatrixFree: false
+DEAL::FE_RaviartThomasNodal<2>(1) supported by MatrixFree: true
 DEAL::FE_TraceQ<2>(1) supported by MatrixFree: false

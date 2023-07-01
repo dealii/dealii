@@ -100,22 +100,23 @@ for (V : DEAL_II_VEC_TEMPLATES)
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
+#  ifndef DEAL_II_PETSC_WITH_COMPLEX
 // PETScWrappers Vector and BlockVector
 for (V : DEAL_II_VEC_TEMPLATES)
   {
     template SUNDIALS::internal::NVectorView<PETScWrappers::MPI::V>
     SUNDIALS::internal::make_nvector_view<>(PETScWrappers::MPI::V &
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
                                             ,
                                             SUNContext
-#  endif
+#    endif
     );
     template SUNDIALS::internal::NVectorView<const PETScWrappers::MPI::V>
     SUNDIALS::internal::make_nvector_view<>(const PETScWrappers::MPI::V &
-#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+#    if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
                                             ,
                                             SUNContext
-#  endif
+#    endif
     );
     template PETScWrappers::MPI::V
       *SUNDIALS::internal::unwrap_nvector<PETScWrappers::MPI::V>(N_Vector);
@@ -125,4 +126,5 @@ for (V : DEAL_II_VEC_TEMPLATES)
     template class SUNDIALS::internal::NVectorView<PETScWrappers::MPI::V>;
     template class SUNDIALS::internal::NVectorView<const PETScWrappers::MPI::V>;
   }
+#  endif
 #endif

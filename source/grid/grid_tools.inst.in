@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2022 by the deal.II authors
+// Copyright (C) 2001 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -137,7 +137,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const Cache<deal_II_dimension, deal_II_space_dimension> &,
         const std::vector<Point<deal_II_space_dimension>> &,
         const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &,
-        const double tolerance);
+        const double             tolerance,
+        const std::vector<bool> &marked_vertices,
+        const bool               enforce_unique_mapping);
+
+      template struct internal::DistributedComputePointLocationsInternal<
+        deal_II_dimension,
+        deal_II_space_dimension>;
 
       template internal::DistributedComputePointLocationsInternal<
         deal_II_dimension,
@@ -150,11 +156,63 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const double,
         const bool,
         const bool);
+
     \}
 
 #endif
   }
 
+
+for (deal_II_struct_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_struct_dimension <= deal_II_dimension && \
+  deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools
+    \{
+
+      template struct internal::DistributedComputeIntersectionLocationsInternal<
+        deal_II_struct_dimension,
+        deal_II_space_dimension>;
+
+    \}
+#endif
+  }
+
+
+for (deal_II_struct_dimension : DIMENSIONS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_struct_dimension <= deal_II_dimension && \
+  deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools
+    \{
+
+      template GridTools::internal::DistributedComputePointLocationsInternal<
+        deal_II_dimension,
+        deal_II_space_dimension>
+      internal::DistributedComputeIntersectionLocationsInternal<
+        deal_II_struct_dimension,
+        deal_II_space_dimension>::
+        convert_to_distributed_compute_point_locations_internal(
+          const unsigned int,
+          const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+          const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+          const bool) const;
+
+      template internal::DistributedComputeIntersectionLocationsInternal<
+        deal_II_struct_dimension,
+        deal_II_space_dimension>
+      internal::distributed_compute_intersection_locations(
+        const Cache<deal_II_dimension, deal_II_space_dimension> &,
+        const std::vector<std::vector<Point<deal_II_space_dimension>>> &,
+        const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>> &,
+        const std::vector<bool> &,
+        const double);
+
+    \}
+#endif
+  }
 
 
 for (deal_II_space_dimension : SPACE_DIMENSIONS)
@@ -175,7 +233,7 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     template std::vector<std::vector<BoundingBox<deal_II_space_dimension>>>
     GridTools::exchange_local_bounding_boxes(
       const std::vector<BoundingBox<deal_II_space_dimension>> &,
-      const MPI_Comm &);
+      const MPI_Comm);
 
     template std::tuple<std::vector<std::vector<unsigned int>>,
                         std::map<unsigned int, unsigned int>,
@@ -196,7 +254,7 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
       std::pair<BoundingBox<deal_II_space_dimension>, unsigned int>>
     GridTools::build_global_description_tree(
       const std::vector<BoundingBox<deal_II_space_dimension>> &,
-      const MPI_Comm &);
+      const MPI_Comm);
 
     template Vector<double> GridTools::compute_aspect_ratio_of_cells(
       const Mapping<deal_II_space_dimension> &,

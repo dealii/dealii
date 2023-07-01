@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,17 +20,6 @@
 
 #include <deal.II/base/exceptions.h>
 
-#include <cstddef>
-#include <functional>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <typeinfo>
-#include <utility>
-#include <vector>
-
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/core/demangle.hpp>
@@ -41,17 +30,25 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include <cstddef>
+#include <functional>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
+#include <vector>
+
 #ifdef DEAL_II_WITH_ZLIB
 #  include <boost/iostreams/filter/gzip.hpp>
 #endif
-
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
 // forward declare Point
 #ifndef DOXYGEN
 template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
 class Point;
 #endif
 
@@ -446,12 +443,27 @@ namespace Utilities
    * be an integer type and the exponent @p iexp must not be negative.
    */
   template <typename T>
-  constexpr T
+  constexpr DEAL_II_HOST_DEVICE T
   pow(const T base, const int iexp)
   {
 #if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
     // Up to __builtin_expect this is the same code as in the 'Assert' macro.
     // The call to __builtin_expect turns out to be problematic.
+#  if KOKKOS_VERSION >= 30600
+    KOKKOS_IF_ON_HOST(({
+      if (!(iexp >= 0))
+        ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
+          ::dealii::deal_II_exceptions::internals::ExceptionHandling::
+            abort_or_throw_on_exception,
+          __FILE__,
+          __LINE__,
+          __PRETTY_FUNCTION__,
+          "iexp>=0",
+          "ExcMessage(\"The exponent must not be negative!\")",
+          ExcMessage("The exponent must not be negative!"));
+    }))
+#  else
+#    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
     if (!(iexp >= 0))
       ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
         ::dealii::deal_II_exceptions::internals::ExceptionHandling::
@@ -462,6 +474,8 @@ namespace Utilities
         "iexp>=0",
         "ExcMessage(\"The exponent must not be negative!\")",
         ExcMessage("The exponent must not be negative!"));
+#    endif
+#  endif
 #endif
     // The "exponentiation by squaring" algorithm used below has to be
     // compressed to one statement due to C++11's restrictions on constexpr

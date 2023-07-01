@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2021 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -25,7 +25,6 @@
 #   MPI_VERSION_MAJOR
 #   MPI_VERSION_MINOR
 #   OMPI_VERSION
-#   MPI_HAVE_MPI_SEEK_SET
 #
 
 #
@@ -51,28 +50,6 @@ if(DEFINED ENV{MPIEXEC})
 endif()
 
 find_package(MPI)
-
-#
-# Older versions of MPI may not have MPI_SEEK_SET, which we
-# require. Strangely, unlike MPICH, OpenMPI needs the correct link libraries
-# for this to compile, not *just* the correct include directories.
-#
-
-clear_cmake_required()
-set(CMAKE_REQUIRED_FLAGS ${DEAL_II_CXX_FLAGS_SAVED} ${MPI_CXX_COMPILE_FLAGS} ${MPI_CXX_LINK_FLAGS})
-set(CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
-set(CMAKE_REQUIRED_LIBRARIES ${DEAL_II_LINKER_FLAGS_SAVED} ${MPI_LIBRARIES})
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  #include <mpi.h>
-  #ifndef MPI_SEEK_SET
-  #  error
-  #endif
-  int main() {}
-  "
-  MPI_HAVE_MPI_SEEK_SET
-  )
-reset_cmake_required()
 
 #
 # Newer versions of FindMPI.cmake only populate MPI_CXX_* (and MPI_C_*,
@@ -179,5 +156,4 @@ process_feature(MPI
     MPI_LIB
     MPI_LIBRARY
     MPI_MPI_H
-    MPI_HAVE_MPI_SEEK_SET
   )

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2019 by the deal.II authors
+// Copyright (C) 2013 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,13 +46,13 @@ test(LinearAlgebra::EpetraWrappers::Vector &v,
     read_write_v(i) = i;
 
   m.compress(VectorOperation::insert);
-  v.import(read_write_v, VectorOperation::insert);
+  v.import_elements(read_write_v, VectorOperation::insert);
 
   // w:=Mv
   m.Tvmult(w, v);
 
   // make sure we get the expected result
-  read_write_w.import(w, VectorOperation::insert);
+  read_write_w.import_elements(w, VectorOperation::insert);
   for (unsigned int i = 0; i < m.n(); ++i)
     {
       double result = 0;
@@ -63,7 +63,7 @@ test(LinearAlgebra::EpetraWrappers::Vector &v,
 
   m.Tvmult_add(w, v);
   // make sure we get the expected result
-  read_write_w.import(w, VectorOperation::insert);
+  read_write_w.import_elements(w, VectorOperation::insert);
   for (unsigned int i = 0; i < m.n(); ++i)
     {
       double result = 0;
@@ -96,7 +96,7 @@ main(int argc, char **argv)
         test(v, w);
       }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

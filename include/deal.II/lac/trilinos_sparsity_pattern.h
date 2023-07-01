@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -436,7 +436,7 @@ namespace TrilinosWrappers
      * the performance when creating the sparsity pattern.
      */
     SparsityPattern(const IndexSet &parallel_partitioning,
-                    const MPI_Comm &communicator      = MPI_COMM_WORLD,
+                    const MPI_Comm  communicator      = MPI_COMM_WORLD,
                     const size_type n_entries_per_row = 0);
 
     /**
@@ -450,7 +450,7 @@ namespace TrilinosWrappers
      * designed to describe.
      */
     SparsityPattern(const IndexSet &              parallel_partitioning,
-                    const MPI_Comm &              communicator,
+                    const MPI_Comm                communicator,
                     const std::vector<size_type> &n_entries_per_row);
 
     /**
@@ -469,7 +469,7 @@ namespace TrilinosWrappers
      */
     SparsityPattern(const IndexSet &row_parallel_partitioning,
                     const IndexSet &col_parallel_partitioning,
-                    const MPI_Comm &communicator      = MPI_COMM_WORLD,
+                    const MPI_Comm  communicator      = MPI_COMM_WORLD,
                     const size_type n_entries_per_row = 0);
 
     /**
@@ -485,7 +485,7 @@ namespace TrilinosWrappers
      */
     SparsityPattern(const IndexSet &              row_parallel_partitioning,
                     const IndexSet &              col_parallel_partitioning,
-                    const MPI_Comm &              communicator,
+                    const MPI_Comm                communicator,
                     const std::vector<size_type> &n_entries_per_row);
 
     /**
@@ -517,7 +517,7 @@ namespace TrilinosWrappers
     SparsityPattern(const IndexSet &row_parallel_partitioning,
                     const IndexSet &col_parallel_partitioning,
                     const IndexSet &writable_rows,
-                    const MPI_Comm &communicator      = MPI_COMM_WORLD,
+                    const MPI_Comm  communicator      = MPI_COMM_WORLD,
                     const size_type n_entries_per_row = 0);
 
     /**
@@ -537,7 +537,7 @@ namespace TrilinosWrappers
      */
     void
     reinit(const IndexSet &parallel_partitioning,
-           const MPI_Comm &communicator      = MPI_COMM_WORLD,
+           const MPI_Comm  communicator      = MPI_COMM_WORLD,
            const size_type n_entries_per_row = 0);
 
     /**
@@ -552,7 +552,7 @@ namespace TrilinosWrappers
      */
     void
     reinit(const IndexSet &              parallel_partitioning,
-           const MPI_Comm &              communicator,
+           const MPI_Comm                communicator,
            const std::vector<size_type> &n_entries_per_row);
 
     /**
@@ -574,7 +574,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &row_parallel_partitioning,
            const IndexSet &col_parallel_partitioning,
-           const MPI_Comm &communicator      = MPI_COMM_WORLD,
+           const MPI_Comm  communicator      = MPI_COMM_WORLD,
            const size_type n_entries_per_row = 0);
 
     /**
@@ -606,7 +606,7 @@ namespace TrilinosWrappers
     reinit(const IndexSet &row_parallel_partitioning,
            const IndexSet &col_parallel_partitioning,
            const IndexSet &writeable_rows,
-           const MPI_Comm &communicator      = MPI_COMM_WORLD,
+           const MPI_Comm  communicator      = MPI_COMM_WORLD,
            const size_type n_entries_per_row = 0);
 
     /**
@@ -616,7 +616,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &              row_parallel_partitioning,
            const IndexSet &              col_parallel_partitioning,
-           const MPI_Comm &              communicator,
+           const MPI_Comm                communicator,
            const std::vector<size_type> &n_entries_per_row);
 
     /**
@@ -633,7 +633,7 @@ namespace TrilinosWrappers
     reinit(const IndexSet &           row_parallel_partitioning,
            const IndexSet &           col_parallel_partitioning,
            const SparsityPatternType &nontrilinos_sparsity_pattern,
-           const MPI_Comm &           communicator  = MPI_COMM_WORLD,
+           const MPI_Comm             communicator  = MPI_COMM_WORLD,
            const bool                 exchange_data = false);
 
     /**
@@ -648,7 +648,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &           parallel_partitioning,
            const SparsityPatternType &nontrilinos_sparsity_pattern,
-           const MPI_Comm &           communicator  = MPI_COMM_WORLD,
+           const MPI_Comm             communicator  = MPI_COMM_WORLD,
            const bool                 exchange_data = false);
     /** @} */
     /**
@@ -814,10 +814,11 @@ namespace TrilinosWrappers
     range_partitioner() const;
 
     /**
-     * Return the MPI communicator object in use with this matrix.
+     * Return the underlying MPI communicator.
      */
     MPI_Comm
     get_mpi_communicator() const;
+
     /** @} */
 
     /**

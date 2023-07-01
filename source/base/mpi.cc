@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,8 +24,10 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/lapack_full_matrix.h>
 #include <deal.II/lac/vector_memory.h>
 
 #include <boost/serialization/utility.hpp>
@@ -119,7 +121,7 @@ namespace Utilities
 
 
     MinMaxAvg
-    min_max_avg(const double my_value, const MPI_Comm &mpi_communicator)
+    min_max_avg(const double my_value, const MPI_Comm mpi_communicator)
     {
       MinMaxAvg result;
       min_max_avg(ArrayView<const double>(my_value),
@@ -133,7 +135,7 @@ namespace Utilities
 
     std::vector<MinMaxAvg>
     min_max_avg(const std::vector<double> &my_values,
-                const MPI_Comm &           mpi_communicator)
+                const MPI_Comm             mpi_communicator)
     {
       std::vector<MinMaxAvg> results(my_values.size());
       min_max_avg(my_values, results, mpi_communicator);
@@ -145,31 +147,39 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
     unsigned int
-    n_mpi_processes(const MPI_Comm &mpi_communicator)
+    n_mpi_processes(const MPI_Comm mpi_communicator)
     {
-      int       n_jobs = 1;
-      const int ierr   = MPI_Comm_size(mpi_communicator, &n_jobs);
-      AssertThrowMPI(ierr);
-
-      return n_jobs;
+      if (job_supports_mpi())
+        {
+          int       n_jobs = 1;
+          const int ierr   = MPI_Comm_size(mpi_communicator, &n_jobs);
+          AssertThrowMPI(ierr);
+          return n_jobs;
+        }
+      else
+        return 1;
     }
 
 
     unsigned int
-    this_mpi_process(const MPI_Comm &mpi_communicator)
+    this_mpi_process(const MPI_Comm mpi_communicator)
     {
-      int       rank = 0;
-      const int ierr = MPI_Comm_rank(mpi_communicator, &rank);
-      AssertThrowMPI(ierr);
-
-      return rank;
+      if (job_supports_mpi())
+        {
+          int       rank = 0;
+          const int ierr = MPI_Comm_rank(mpi_communicator, &rank);
+          AssertThrowMPI(ierr);
+          return rank;
+        }
+      else
+        return 0;
     }
 
 
 
     const std::vector<unsigned int>
-    mpi_processes_within_communicator(const MPI_Comm &comm_large,
-                                      const MPI_Comm &comm_small)
+    mpi_processes_within_communicator(const MPI_Comm comm_large,
+                                      const MPI_Comm comm_small)
     {
       if (Utilities::MPI::job_supports_mpi() == false)
         return std::vector<unsigned int>{0};
@@ -188,7 +198,7 @@ namespace Utilities
 
 
     MPI_Comm
-    duplicate_communicator(const MPI_Comm &mpi_communicator)
+    duplicate_communicator(const MPI_Comm mpi_communicator)
     {
       MPI_Comm  new_communicator;
       const int ierr = MPI_Comm_dup(mpi_communicator, &new_communicator);
@@ -199,7 +209,7 @@ namespace Utilities
 
 
     void
-    free_communicator(MPI_Comm &mpi_communicator)
+    free_communicator(MPI_Comm mpi_communicator)
     {
       // MPI_Comm_free will set the argument to MPI_COMM_NULL automatically.
       const int ierr = MPI_Comm_free(&mpi_communicator);
@@ -209,7 +219,7 @@ namespace Utilities
 
 
     int
-    create_group(const MPI_Comm & comm,
+    create_group(const MPI_Comm   comm,
                  const MPI_Group &group,
                  const int        tag,
                  MPI_Comm *       new_comm)
@@ -223,7 +233,7 @@ namespace Utilities
 
     std::vector<IndexSet>
     create_ascending_partitioning(
-      const MPI_Comm &              comm,
+      const MPI_Comm                comm,
       const types::global_dof_index locally_owned_size)
     {
       static_assert(
@@ -252,7 +262,7 @@ namespace Utilities
 
     IndexSet
     create_evenly_distributed_partitioning(
-      const MPI_Comm &              comm,
+      const MPI_Comm                comm,
       const types::global_dof_index total_size)
     {
       const unsigned int this_proc = this_mpi_process(comm);
@@ -310,7 +320,7 @@ namespace Utilities
 
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern(
-      const MPI_Comm &                 mpi_comm,
+      const MPI_Comm                   mpi_comm,
       const std::vector<unsigned int> &destinations)
     {
       const unsigned int myid    = Utilities::MPI::this_mpi_process(mpi_comm);
@@ -425,7 +435,7 @@ namespace Utilities
 
     unsigned int
     compute_n_point_to_point_communications(
-      const MPI_Comm &                 mpi_comm,
+      const MPI_Comm                   mpi_comm,
       const std::vector<unsigned int> &destinations)
     {
       // Have a little function that checks if destinations provided
@@ -535,12 +545,11 @@ namespace Utilities
     void
     min_max_avg(const ArrayView<const double> &my_values,
                 const ArrayView<MinMaxAvg> &   result,
-                const MPI_Comm &               mpi_communicator)
+                const MPI_Comm                 mpi_communicator)
     {
       // If MPI was not started, we have a serial computation and cannot run
       // the other MPI commands
-      if (job_supports_mpi() == false ||
-          Utilities::MPI::n_mpi_processes(mpi_communicator) <= 1)
+      if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 1)
         {
           for (unsigned int i = 0; i < my_values.size(); ++i)
             {
@@ -653,7 +662,7 @@ namespace Utilities
 #else
 
     unsigned int
-    n_mpi_processes(const MPI_Comm &)
+    n_mpi_processes(const MPI_Comm)
     {
       return 1;
     }
@@ -661,7 +670,7 @@ namespace Utilities
 
 
     unsigned int
-    this_mpi_process(const MPI_Comm &)
+    this_mpi_process(const MPI_Comm)
     {
       return 0;
     }
@@ -669,7 +678,7 @@ namespace Utilities
 
 
     const std::vector<unsigned int>
-    mpi_processes_within_communicator(const MPI_Comm &, const MPI_Comm &)
+    mpi_processes_within_communicator(const MPI_Comm, const MPI_Comm)
     {
       return std::vector<unsigned int>{0};
     }
@@ -678,7 +687,7 @@ namespace Utilities
 
     std::vector<IndexSet>
     create_ascending_partitioning(
-      const MPI_Comm & /*comm*/,
+      const MPI_Comm /*comm*/,
       const types::global_dof_index locally_owned_size)
     {
       return std::vector<IndexSet>(1, complete_index_set(locally_owned_size));
@@ -686,7 +695,7 @@ namespace Utilities
 
     IndexSet
     create_evenly_distributed_partitioning(
-      const MPI_Comm & /*comm*/,
+      const MPI_Comm /*comm*/,
       const types::global_dof_index total_size)
     {
       return complete_index_set(total_size);
@@ -695,15 +704,14 @@ namespace Utilities
 
 
     MPI_Comm
-    duplicate_communicator(const MPI_Comm &mpi_communicator)
+    duplicate_communicator(const MPI_Comm mpi_communicator)
     {
       return mpi_communicator;
     }
 
 
 
-    void
-    free_communicator(MPI_Comm & /*mpi_communicator*/)
+    void free_communicator(MPI_Comm /*mpi_communicator*/)
     {}
 
 
@@ -711,7 +719,7 @@ namespace Utilities
     void
     min_max_avg(const ArrayView<const double> &my_values,
                 const ArrayView<MinMaxAvg> &   result,
-                const MPI_Comm &)
+                const MPI_Comm)
     {
       AssertDimension(my_values.size(), result.size());
 
@@ -776,7 +784,37 @@ namespace Utilities
 #endif
 
       // Initialize Kokkos
-      Kokkos::initialize(argc, argv);
+      {
+        // argv has argc+1 elements and the last one is a nullptr. For appending
+        // one element we thus create a new argv by copying the first argc
+        // elements, append the new option, and then a nullptr.
+        //
+        // We do get in trouble, though, if a user program is called with
+        // '--help' as a command line argument. This '--help' gets passed on to
+        // Kokkos, which promptly responds with a lengthy message that the user
+        // likely did not intend. As a consequence, filter out this specific
+        // flag.
+        std::vector<char *> argv_new;
+        for (const auto arg : make_array_view(&argv[0], &argv[0] + argc))
+          if (strcmp(arg, "--help") != 0)
+            argv_new.push_back(arg);
+
+        std::stringstream threads_flag;
+#if KOKKOS_VERSION >= 30700
+        threads_flag << "--kokkos-num-threads=" << MultithreadInfo::n_threads();
+#else
+        threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();
+#endif
+        const std::string threads_flag_string = threads_flag.str();
+        argv_new.push_back(const_cast<char *>(threads_flag_string.c_str()));
+        argv_new.push_back(nullptr);
+
+        // The first argument in Kokkos::initialize is of type int&. Hence, we
+        // need to define a new variable to pass to it (instead of using argc+1
+        // inline).
+        int argc_new = argv_new.size() - 1;
+        Kokkos::initialize(argc_new, argv_new.data());
+      }
 
       // we are allowed to call MPI_Init ourselves and PETScInitialize will
       // detect this. This allows us to use MPI_Init_thread instead.
@@ -1041,7 +1079,7 @@ namespace Utilities
     std::vector<unsigned int>
     compute_index_owner(const IndexSet &owned_indices,
                         const IndexSet &indices_to_look_up,
-                        const MPI_Comm &comm)
+                        const MPI_Comm  comm)
     {
       Assert(owned_indices.size() == indices_to_look_up.size(),
              ExcMessage("IndexSets have to have the same sizes."));
@@ -1142,7 +1180,7 @@ namespace Utilities
 
 
     void
-    CollectiveMutex::lock(const MPI_Comm &comm)
+    CollectiveMutex::lock(const MPI_Comm comm)
     {
       (void)comm;
 
@@ -1153,21 +1191,24 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
 
-      // TODO: For now, we implement this mutex with a blocking barrier
-      // in the lock and unlock. It needs to be tested, if we can move
-      // to a nonblocking barrier (code disabled below).
+      if (job_supports_mpi())
+        {
+          // TODO: For now, we implement this mutex with a blocking barrier in
+          // the lock and unlock. It needs to be tested, if we can move to a
+          // nonblocking barrier (code disabled below).
 
-      const int ierr = MPI_Barrier(comm);
-      AssertThrowMPI(ierr);
+          const int ierr = MPI_Barrier(comm);
+          AssertThrowMPI(ierr);
 
 #  if 0
-      // wait for non-blocking barrier to finish. This is a noop the
-      // first time we lock().
-      const int ierr = MPI_Wait(&request, MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
+          // wait for non-blocking barrier to finish. This is a noop the
+          // first time we lock().
+          const int ierr = MPI_Wait(&request, MPI_STATUS_IGNORE);
+          AssertThrowMPI(ierr);
 #  else
-      // nothing to do as blocking barrier already completed
+          // nothing to do as blocking barrier already completed
 #  endif
+        }
 #endif
 
       locked = true;
@@ -1176,7 +1217,7 @@ namespace Utilities
 
 
     void
-    CollectiveMutex::unlock(const MPI_Comm &comm)
+    CollectiveMutex::unlock(const MPI_Comm comm)
     {
       (void)comm;
 
@@ -1191,16 +1232,19 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
 
-      // TODO: For now, we implement this mutex with a blocking barrier
-      // in the lock and unlock. It needs to be tested, if we can move
-      // to a nonblocking barrier (code disabled below):
+      if (job_supports_mpi())
+        {
+          // TODO: For now, we implement this mutex with a blocking barrier
+          // in the lock and unlock. It needs to be tested, if we can move
+          // to a nonblocking barrier (code disabled below):
 #  if 0
       const int ierr = MPI_Ibarrier(comm, &request);
       AssertThrowMPI(ierr);
 #  else
-      const int ierr = MPI_Barrier(comm);
-      AssertThrowMPI(ierr);
+          const int ierr = MPI_Barrier(comm);
+          AssertThrowMPI(ierr);
 #  endif
+        }
 #endif
 
       locked = false;
@@ -1213,26 +1257,26 @@ namespace Utilities
     // booleans aren't in MPI_SCALARS
     template bool
     reduce(const bool &,
-           const MPI_Comm &,
+           const MPI_Comm,
            const std::function<bool(const bool &, const bool &)> &,
            const unsigned int);
 
     template std::vector<bool>
     reduce(const std::vector<bool> &,
-           const MPI_Comm &,
+           const MPI_Comm,
            const std::function<std::vector<bool>(const std::vector<bool> &,
                                                  const std::vector<bool> &)> &,
            const unsigned int);
 
     template bool
     all_reduce(const bool &,
-               const MPI_Comm &,
+               const MPI_Comm,
                const std::function<bool(const bool &, const bool &)> &);
 
     template std::vector<bool>
     all_reduce(
       const std::vector<bool> &,
-      const MPI_Comm &,
+      const MPI_Comm,
       const std::function<std::vector<bool>(const std::vector<bool> &,
                                             const std::vector<bool> &)> &);
 
@@ -1241,27 +1285,27 @@ namespace Utilities
     template void
     internal::all_reduce<bool>(const MPI_Op &,
                                const ArrayView<const bool> &,
-                               const MPI_Comm &,
+                               const MPI_Comm,
                                const ArrayView<bool> &);
 
 
     template bool
-    logical_or<bool>(const bool &, const MPI_Comm &);
+    logical_or<bool>(const bool &, const MPI_Comm);
 
 
     template void
     logical_or<bool>(const ArrayView<const bool> &,
-                     const MPI_Comm &,
+                     const MPI_Comm,
                      const ArrayView<bool> &);
 
 
     template std::vector<unsigned int>
     compute_set_union(const std::vector<unsigned int> &vec,
-                      const MPI_Comm &                 comm);
+                      const MPI_Comm                   comm);
 
 
     template std::set<unsigned int>
-    compute_set_union(const std::set<unsigned int> &set, const MPI_Comm &comm);
+    compute_set_union(const std::set<unsigned int> &set, const MPI_Comm comm);
 #endif
 
 #include "mpi.inst"

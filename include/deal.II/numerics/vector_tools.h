@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -81,7 +81,7 @@ DEAL_II_NAMESPACE_OPEN
  * (<i>f<sub>h</sub></i>,<i>v<sub>h</sub></i>)=(<i>f</i>,<i>v<sub>h</sub></i>)
  * for all discrete test functions <i>v<sub>h</sub></i>. This is done through
  * the solution of the linear system of equations <i> M v = f</i> where
- * <i>M</i> is the mass matrix $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$
+ * <i>M</i> is the @ref GlossMassMatrix "mass matrix" $m_{ij} = \int_\Omega \phi_i(x) \phi_j(x) dx$
  * and $f_i = \int_\Omega f(x) \phi_i(x) dx$. The solution vector $v$ then is
  * the nodal representation of the projection <i>f<sub>h</sub></i>. The
  * project() functions are used in the step-21 and step-23 tutorial programs.
@@ -204,7 +204,7 @@ DEAL_II_NAMESPACE_OPEN
  * The projection takes place on all boundary parts with boundary indicators
  * listed in the map (std::map<types::boundary_id, const
  * Function<spacedim,number>*>) of boundary functions. These boundary parts may
- * or may not be continuous. For these boundary parts, the mass matrix is
+ * or may not be continuous. For these boundary parts, the @ref GlossMassMatrix "mass matrix" is
  * assembled using the MatrixTools::create_boundary_mass_matrix() function, as
  * well as the appropriate right hand side. Then the resulting system of
  * equations is solved using a simple CG method (without preconditioning), which

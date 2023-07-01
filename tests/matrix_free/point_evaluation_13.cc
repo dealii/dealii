@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -132,8 +132,9 @@ test()
           evaluator.submit_gradient(evaluator.get_gradient(i), i);
         }
 
-      evaluator.integrate(solution_values,
-                          EvaluationFlags::values | EvaluationFlags::gradients);
+      evaluator.test_and_sum(solution_values,
+                             EvaluationFlags::values |
+                               EvaluationFlags::gradients);
 
       for (const auto i : solution_values)
         deallog << i << ' ';

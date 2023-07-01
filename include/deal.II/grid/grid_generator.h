@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -468,13 +468,15 @@ namespace GridGenerator
    * to the cylinder: see the mathematical definition given in
    * GridGenerator::concentric_hyper_shells.
    *
-   * @param colorize Assign different boundary ids if set to true. For more
+   * @param colorize If `true`, then assign different boundary ids to
+   * different parts of the boundary. For more
    * information on boundary indicators see
    * @ref GlossBoundaryIndicator "this glossary entry".
    * The left boundary (at $x = 0$) is assigned an id of $0$, the right
-   * boundary (at $x = 2.2$) is assigned an id of $1$, the cylinder boundary
-   * is assigned an id of $2$, and the channel walls are assigned an id of
-   * $3$.
+   * boundary (at $x = 2.2$) is assigned an id of $1$; the boundary of
+   * the obstacle in the middle (i.e., the circle in 2d or the cylinder
+   * walls in 3d) is assigned an id of $2$, and the channel walls are
+   * assigned an id of $3$.
    *
    * See the original paper for more information:
    * @code{.bib}
@@ -1792,7 +1794,8 @@ namespace GridGenerator
    *
    * @image html grid_generator_implicit_function_3d.png
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    *
    * @param[out] tria The output triangulation
    * @param[in] implicit_function The implicit function
@@ -2075,11 +2078,11 @@ namespace GridGenerator
 
   /**
    * Extrude the Triangulation @p input in the $z$ direction from $z = 0$ to $z =
-   * \text{height}$ and store it in @p result.
+   * \text{height}$ and store it in @p result. This is done by replicating the
+   * input triangulation `n_slices` times in $z$ direction, and then forming
+   * `(n_slices-1)` layers of cells out of these replicates.
    *
-   * The number of <em>slices</em>, or layers of cells
-   * perpendicular to the $z = 0$ plane, will be @p n_slices slices (minimum is
-   * 2). The boundary indicators of the faces of @p input will be assigned to
+   * The boundary indicators of the faces of @p input will be assigned to
    * the corresponding side walls in $z$ direction. The bottom and top get the
    * next two free boundary indicators: i.e., if @p input has boundary ids of
    * $0$, $1$, and $42$, then the $z = 0$ boundary id of @p result will be $43$
@@ -2119,6 +2122,17 @@ namespace GridGenerator
    * </ol>
    * Note that numbers::flat_manifold_id (should it be a manifold id of @p
    * input) will always be the last entry in the first category.
+   *
+   * @param[in] input A two-dimensional input triangulation.
+   * @param[in] n_slices The number of times the input triangulation will
+   *   be replicated in $z$ direction. These slices will then be connected
+   *   into `(n_slices-1)` layers of three-dimensional cells. Clearly,
+   *   `n_slices` must be at least two.
+   * @param[in] height The distance in $z$ direction between the individual
+   *   slices.
+   * @param[out] result The resulting three-dimensional triangulation.
+   * @param[in] copy_manifold_ids See the description above.
+   * @param[in] manifold_priorities See the description above.
    *
    * @pre The 2d input triangulation @p input must be a
    * @ref GlossCoarseMesh "coarse mesh",
@@ -2268,7 +2282,8 @@ namespace GridGenerator
    *     out_tria.set_manifold(i, in_tria.get_manifold(i));
    * @endcode
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   template <int dim, int spacedim>
   void
@@ -2487,7 +2502,8 @@ namespace GridGenerator
    *
    * @note Currently, this function only works for `dim==spacedim`.
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   template <int dim, int spacedim>
   void
@@ -2510,7 +2526,8 @@ namespace GridGenerator
    * quadrilateral/hexahedral cells and subdivides these into 2/5
    * triangular/tetrahedral cells.
    *
-   * @relates simplex
+   * Also see
+   * @ref simplex "Simplex support".
    */
   template <int dim, int spacedim>
   void
@@ -2537,6 +2554,8 @@ namespace GridGenerator
   // intermediate type. This is only used when using MS VC++ and uses
   // the direct way of doing it otherwise
   template <template <int, int> class MeshType, int dim, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   struct ExtractBoundaryMesh
   {
     using return_type =
@@ -2638,8 +2657,13 @@ namespace GridGenerator
    * dimensions no manifold objects are copied by this function: you must
    * attach new manifold objects to @p surface_mesh.
    *
+   *
+   * @dealiiConceptRequires{
+   *   concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>}
    */
   template <template <int, int> class MeshType, int dim, int spacedim>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
 #ifdef DOXYGEN
   return_type
 #else
@@ -2650,10 +2674,10 @@ namespace GridGenerator
   typename ExtractBoundaryMesh<MeshType, dim, spacedim>::return_type
 #  endif
 #endif
-  extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
-                        MeshType<dim - 1, spacedim> &       surface_mesh,
-                        const std::set<types::boundary_id> &boundary_ids =
-                          std::set<types::boundary_id>());
+    extract_boundary_mesh(const MeshType<dim, spacedim> &     volume_mesh,
+                          MeshType<dim - 1, spacedim> &       surface_mesh,
+                          const std::set<types::boundary_id> &boundary_ids =
+                            std::set<types::boundary_id>());
 
   //** @} */
 

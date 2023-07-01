@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -677,7 +677,7 @@ namespace Physics
 
         template <int dim>
         std::pair<unsigned int, unsigned int>
-        indices_from_component(const unsigned int component_n, const bool)
+        indices_from_component(const unsigned int /*component_n*/, const bool)
         {
           AssertThrow(false, ExcNotImplemented());
           return std::make_pair(0u, 0u);

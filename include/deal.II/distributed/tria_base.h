@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -76,6 +76,7 @@ namespace parallel
    * classes derived from the current one it actually is).
    */
   template <int dim, int spacedim = dim>
+  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   class TriangulationBase : public dealii::Triangulation<dim, spacedim>
   {
   public:
@@ -83,7 +84,7 @@ namespace parallel
      * Constructor.
      */
     TriangulationBase(
-      const MPI_Comm &mpi_communicator,
+      const MPI_Comm mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
       const bool check_for_distorted_cells = false);
@@ -428,8 +429,11 @@ namespace parallel
    *       return false;
    *   }
    * @endcode
+   *
+   * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
    */
   template <int dim, int spacedim = dim>
+  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   class DistributedTriangulationBase
     : public dealii::parallel::TriangulationBase<dim, spacedim>
   {
@@ -438,7 +442,7 @@ namespace parallel
      * Constructor.
      */
     DistributedTriangulationBase(
-      const MPI_Comm &mpi_communicator,
+      const MPI_Comm mpi_communicator,
       const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
                  smooth_grid = (dealii::Triangulation<dim, spacedim>::none),
       const bool check_for_distorted_cells = false);
@@ -773,7 +777,7 @@ namespace parallel
     class DataTransfer
     {
     public:
-      DataTransfer(const MPI_Comm &mpi_communicator);
+      DataTransfer(const MPI_Comm mpi_communicator);
 
       /**
        * Prepare data transfer by calling the pack callback functions on each

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -5708,7 +5708,11 @@ namespace internal
                   {
                     unsigned int k = 0;
 
-                    for (const unsigned int i : hex->vertex_indices())
+                    // avoid a compiler warning by fixing the max number of
+                    // loop iterations to 8
+                    const unsigned int n_vertices =
+                      std::min(hex->n_vertices(), 8u);
+                    for (unsigned int i = 0; i < n_vertices; ++i)
                       vertex_indices[k++] = hex->vertex_index(i);
 
                     const std::array<unsigned int, 12> line_indices =
@@ -10902,7 +10906,7 @@ namespace internal
           return true;
 
         const RefinementCase<dim> ref_case = cell->refinement_case();
-        for (unsigned int n : GeometryInfo<dim>::face_indices())
+        for (const unsigned int n : GeometryInfo<dim>::face_indices())
           {
             // if the cell is not refined along that face, coarsening
             // will not change anything, so do nothing. the same
@@ -11099,11 +11103,13 @@ namespace internal
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 const unsigned int Triangulation<dim, spacedim>::dimension;
 
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim>::Triangulation(
   const MeshSmoothing smooth_grid,
   const bool          check_for_distorted_cells)
@@ -11129,6 +11135,7 @@ Triangulation<dim, spacedim>::Triangulation(
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim>::Triangulation(
   Triangulation<dim, spacedim> &&tria) noexcept
   : Subscriptor(std::move(tria))
@@ -11155,8 +11162,8 @@ Triangulation<dim, spacedim>::Triangulation(
 
 
 template <int dim, int spacedim>
-Triangulation<dim, spacedim> &
-Triangulation<dim, spacedim>::operator=(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+Triangulation<dim, spacedim> &Triangulation<dim, spacedim>::operator=(
   Triangulation<dim, spacedim> &&tria) noexcept
 {
   Subscriptor::operator=(std::move(tria));
@@ -11186,6 +11193,7 @@ Triangulation<dim, spacedim>::operator=(
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim>::~Triangulation()
 {
   // notify listeners that the triangulation is going down...
@@ -11214,8 +11222,8 @@ Triangulation<dim, spacedim>::~Triangulation()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::clear()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::clear()
 {
   // notify listeners that the triangulation is going down...
   signals.clear();
@@ -11229,8 +11237,8 @@ Triangulation<dim, spacedim>::clear()
 
 
 template <int dim, int spacedim>
-MPI_Comm
-Triangulation<dim, spacedim>::get_communicator() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+MPI_Comm Triangulation<dim, spacedim>::get_communicator() const
 {
   return MPI_COMM_SELF;
 }
@@ -11238,8 +11246,10 @@ Triangulation<dim, spacedim>::get_communicator() const
 
 
 template <int dim, int spacedim>
-const std::weak_ptr<const Utilities::MPI::Partitioner>
-Triangulation<dim, spacedim>::global_active_cell_index_partitioner() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const std::weak_ptr<const Utilities::MPI::Partitioner> Triangulation<
+  dim,
+  spacedim>::global_active_cell_index_partitioner() const
 {
   return number_cache.active_cell_index_partitioner;
 }
@@ -11247,9 +11257,10 @@ Triangulation<dim, spacedim>::global_active_cell_index_partitioner() const
 
 
 template <int dim, int spacedim>
-const std::weak_ptr<const Utilities::MPI::Partitioner>
-Triangulation<dim, spacedim>::global_level_cell_index_partitioner(
-  const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const std::weak_ptr<const Utilities::MPI::Partitioner> Triangulation<
+  dim,
+  spacedim>::global_level_cell_index_partitioner(const unsigned int level) const
 {
   AssertIndexRange(level, this->n_levels());
 
@@ -11259,8 +11270,8 @@ Triangulation<dim, spacedim>::global_level_cell_index_partitioner(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::set_mesh_smoothing(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::set_mesh_smoothing(
   const MeshSmoothing mesh_smoothing)
 {
   Assert(n_levels() == 0,
@@ -11271,8 +11282,9 @@ Triangulation<dim, spacedim>::set_mesh_smoothing(
 
 
 template <int dim, int spacedim>
-const typename Triangulation<dim, spacedim>::MeshSmoothing &
-Triangulation<dim, spacedim>::get_mesh_smoothing() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const typename Triangulation<dim, spacedim>::MeshSmoothing
+  &Triangulation<dim, spacedim>::get_mesh_smoothing() const
 {
   return smooth_grid;
 }
@@ -11280,8 +11292,8 @@ Triangulation<dim, spacedim>::get_mesh_smoothing() const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::set_manifold(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::set_manifold(
   const types::manifold_id       m_number,
   const Manifold<dim, spacedim> &manifold_object)
 {
@@ -11293,8 +11305,9 @@ Triangulation<dim, spacedim>::set_manifold(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::reset_manifold(
+  const types::manifold_id m_number)
 {
   AssertIndexRange(m_number, numbers::flat_manifold_id);
 
@@ -11304,16 +11317,16 @@ Triangulation<dim, spacedim>::reset_manifold(const types::manifold_id m_number)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::reset_all_manifolds()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::reset_all_manifolds()
 {
   manifolds.clear();
 }
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::set_all_manifold_ids(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::set_all_manifold_ids(
   const types::manifold_id m_number)
 {
   Assert(
@@ -11327,8 +11340,8 @@ Triangulation<dim, spacedim>::set_all_manifold_ids(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
   const types::manifold_id m_number)
 {
   Assert(
@@ -11344,8 +11357,8 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
   const types::boundary_id b_id,
   const types::manifold_id m_number)
 {
@@ -11385,8 +11398,8 @@ Triangulation<dim, spacedim>::set_all_manifold_ids_on_boundary(
 
 
 template <int dim, int spacedim>
-const Manifold<dim, spacedim> &
-Triangulation<dim, spacedim>::get_manifold(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const Manifold<dim, spacedim> &Triangulation<dim, spacedim>::get_manifold(
   const types::manifold_id m_number) const
 {
   // look, if there is a manifold stored at
@@ -11408,8 +11421,9 @@ Triangulation<dim, spacedim>::get_manifold(
 
 
 template <int dim, int spacedim>
-std::vector<types::boundary_id>
-Triangulation<dim, spacedim>::get_boundary_ids() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+std::vector<types::boundary_id> Triangulation<dim, spacedim>::get_boundary_ids()
+  const
 {
   // in 1d, we store a map of all used boundary indicators. use it for
   // our purposes
@@ -11440,8 +11454,9 @@ Triangulation<dim, spacedim>::get_boundary_ids() const
 
 
 template <int dim, int spacedim>
-std::vector<types::manifold_id>
-Triangulation<dim, spacedim>::get_manifold_ids() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+std::vector<types::manifold_id> Triangulation<dim, spacedim>::get_manifold_ids()
+  const
 {
   std::set<types::manifold_id> m_ids;
   for (const auto &cell : active_cell_iterators())
@@ -11468,8 +11483,8 @@ Triangulation<dim, spacedim>::get_manifold_ids() const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::copy_triangulation(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::copy_triangulation(
   const Triangulation<dim, spacedim> &other_tria)
 {
   Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
@@ -11534,8 +11549,8 @@ Triangulation<dim, spacedim>::copy_triangulation(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::create_triangulation_compatibility(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::create_triangulation_compatibility(
   const std::vector<Point<spacedim>> &v,
   const std::vector<CellData<dim>> &  cells,
   const SubCellData &                 subcelldata)
@@ -11553,8 +11568,8 @@ Triangulation<dim, spacedim>::create_triangulation_compatibility(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::reset_policy()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::reset_policy()
 {
   this->update_reference_cells();
 
@@ -11579,8 +11594,8 @@ Triangulation<dim, spacedim>::reset_policy()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::create_triangulation(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::create_triangulation(
   const std::vector<Point<spacedim>> &v,
   const std::vector<CellData<dim>> &  cells,
   const SubCellData &                 subcelldata)
@@ -11764,8 +11779,8 @@ Triangulation<dim, spacedim>::create_triangulation(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::create_triangulation(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::create_triangulation(
   const TriangulationDescription::Description<dim, spacedim> &construction_data)
 {
   // 1) create coarse grid
@@ -11887,12 +11902,15 @@ Triangulation<dim, spacedim>::create_triangulation(
               cell->face(pair.first)->set_boundary_id(pair.second);
         }
     }
+
+  // inform all listeners that the triangulation has been created
+  signals.create();
 }
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::flip_all_direction_flags()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::flip_all_direction_flags()
 {
   AssertThrow(dim + 1 == spacedim,
               ExcMessage("Only works for dim == spacedim-1"));
@@ -11903,8 +11921,8 @@ Triangulation<dim, spacedim>::flip_all_direction_flags()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::set_all_refine_flags()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::set_all_refine_flags()
 {
   Assert(n_cells() > 0,
          ExcMessage("Error: An empty Triangulation can not be refined."));
@@ -11919,8 +11937,8 @@ Triangulation<dim, spacedim>::set_all_refine_flags()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::refine_global(const unsigned int times)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::refine_global(const unsigned int times)
 {
   for (unsigned int i = 0; i < times; ++i)
     {
@@ -11932,8 +11950,8 @@ Triangulation<dim, spacedim>::refine_global(const unsigned int times)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::coarsen_global(const unsigned int times)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::coarsen_global(const unsigned int times)
 {
   for (unsigned int i = 0; i < times; ++i)
     {
@@ -11952,8 +11970,8 @@ Triangulation<dim, spacedim>::coarsen_global(const unsigned int times)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_refine_flags(std::vector<bool> &v) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_refine_flags(std::vector<bool> &v) const
 {
   v.resize(dim * n_active_cells(), false);
   std::vector<bool>::iterator i = v.begin();
@@ -11969,8 +11987,8 @@ Triangulation<dim, spacedim>::save_refine_flags(std::vector<bool> &v) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_refine_flags(std::ostream &out) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_refine_flags(std::ostream &out) const
 {
   std::vector<bool> v;
   save_refine_flags(v);
@@ -11983,8 +12001,8 @@ Triangulation<dim, spacedim>::save_refine_flags(std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_refine_flags(std::istream &in)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_refine_flags(std::istream &in)
 {
   std::vector<bool> v;
   read_bool_vector(mn_tria_refine_flags_begin, v, mn_tria_refine_flags_end, in);
@@ -11994,8 +12012,8 @@ Triangulation<dim, spacedim>::load_refine_flags(std::istream &in)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
 {
   AssertThrow(v.size() == dim * n_active_cells(), ExcGridReadError());
 
@@ -12021,8 +12039,9 @@ Triangulation<dim, spacedim>::load_refine_flags(const std::vector<bool> &v)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_coarsen_flags(std::vector<bool> &v) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_coarsen_flags(
+  std::vector<bool> &v) const
 {
   v.resize(n_active_cells(), false);
   std::vector<bool>::iterator i = v.begin();
@@ -12038,8 +12057,8 @@ Triangulation<dim, spacedim>::save_coarsen_flags(std::vector<bool> &v) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_coarsen_flags(std::ostream &out) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_coarsen_flags(std::ostream &out) const
 {
   std::vector<bool> v;
   save_coarsen_flags(v);
@@ -12052,8 +12071,8 @@ Triangulation<dim, spacedim>::save_coarsen_flags(std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_coarsen_flags(std::istream &in)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_coarsen_flags(std::istream &in)
 {
   std::vector<bool> v;
   read_bool_vector(mn_tria_coarsen_flags_begin,
@@ -12066,8 +12085,9 @@ Triangulation<dim, spacedim>::load_coarsen_flags(std::istream &in)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_coarsen_flags(const std::vector<bool> &v)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_coarsen_flags(
+  const std::vector<bool> &v)
 {
   Assert(v.size() == n_active_cells(), ExcGridReadError());
 
@@ -12086,8 +12106,8 @@ Triangulation<dim, spacedim>::load_coarsen_flags(const std::vector<bool> &v)
 
 
 template <int dim, int spacedim>
-bool
-Triangulation<dim, spacedim>::get_anisotropic_refinement_flag() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+bool Triangulation<dim, spacedim>::get_anisotropic_refinement_flag() const
 {
   return anisotropic_refinement;
 }
@@ -12158,8 +12178,8 @@ namespace
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::clear_user_data()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::clear_user_data()
 {
   // let functions in anonymous namespace do their work
   dealii::clear_user_data(levels);
@@ -12197,8 +12217,8 @@ namespace
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::clear_user_flags_line()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::clear_user_flags_line()
 {
   dealii::clear_user_flags_line(dim, levels, faces.get());
 }
@@ -12237,8 +12257,8 @@ namespace
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::clear_user_flags_quad()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::clear_user_flags_quad()
 {
   dealii::clear_user_flags_quad(dim, levels, faces.get());
 }
@@ -12277,8 +12297,8 @@ namespace
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::clear_user_flags_hex()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::clear_user_flags_hex()
 {
   dealii::clear_user_flags_hex(dim, levels, faces.get());
 }
@@ -12286,8 +12306,8 @@ Triangulation<dim, spacedim>::clear_user_flags_hex()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::clear_user_flags()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::clear_user_flags()
 {
   clear_user_flags_line();
   clear_user_flags_quad();
@@ -12297,8 +12317,8 @@ Triangulation<dim, spacedim>::clear_user_flags()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_flags(std::ostream &out) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_flags(std::ostream &out) const
 {
   save_user_flags_line(out);
 
@@ -12315,8 +12335,8 @@ Triangulation<dim, spacedim>::save_user_flags(std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_flags(std::vector<bool> &v) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_flags(std::vector<bool> &v) const
 {
   // clear vector and append
   // all the stuff later on
@@ -12346,8 +12366,8 @@ Triangulation<dim, spacedim>::save_user_flags(std::vector<bool> &v) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_flags(std::istream &in)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_flags(std::istream &in)
 {
   load_user_flags_line(in);
 
@@ -12364,8 +12384,8 @@ Triangulation<dim, spacedim>::load_user_flags(std::istream &in)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_flags(const std::vector<bool> &v)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_flags(const std::vector<bool> &v)
 {
   Assert(v.size() == n_lines() + n_quads() + n_hexs(), ExcInternalError());
   std::vector<bool> tmp;
@@ -12401,8 +12421,9 @@ Triangulation<dim, spacedim>::load_user_flags(const std::vector<bool> &v)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_flags_line(std::vector<bool> &v) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_flags_line(
+  std::vector<bool> &v) const
 {
   v.resize(n_lines(), false);
   std::vector<bool>::iterator i    = v.begin();
@@ -12416,8 +12437,8 @@ Triangulation<dim, spacedim>::save_user_flags_line(std::vector<bool> &v) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_flags_line(std::ostream &out) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_flags_line(std::ostream &out) const
 {
   std::vector<bool> v;
   save_user_flags_line(v);
@@ -12430,8 +12451,8 @@ Triangulation<dim, spacedim>::save_user_flags_line(std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_flags_line(std::istream &in)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_flags_line(std::istream &in)
 {
   std::vector<bool> v;
   read_bool_vector(mn_tria_line_user_flags_begin,
@@ -12444,8 +12465,9 @@ Triangulation<dim, spacedim>::load_user_flags_line(std::istream &in)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_flags_line(const std::vector<bool> &v)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_flags_line(
+  const std::vector<bool> &v)
 {
   Assert(v.size() == n_lines(), ExcGridReadError());
 
@@ -12520,8 +12542,9 @@ namespace
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_flags_quad(std::vector<bool> &v) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_flags_quad(
+  std::vector<bool> &v) const
 {
   v.resize(n_quads(), false);
 
@@ -12539,8 +12562,8 @@ Triangulation<dim, spacedim>::save_user_flags_quad(std::vector<bool> &v) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_flags_quad(std::ostream &out) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_flags_quad(std::ostream &out) const
 {
   std::vector<bool> v;
   save_user_flags_quad(v);
@@ -12553,8 +12576,8 @@ Triangulation<dim, spacedim>::save_user_flags_quad(std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_flags_quad(std::istream &in)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_flags_quad(std::istream &in)
 {
   std::vector<bool> v;
   read_bool_vector(mn_tria_quad_user_flags_begin,
@@ -12567,8 +12590,9 @@ Triangulation<dim, spacedim>::load_user_flags_quad(std::istream &in)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_flags_quad(const std::vector<bool> &v)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_flags_quad(
+  const std::vector<bool> &v)
 {
   Assert(v.size() == n_quads(), ExcGridReadError());
 
@@ -12589,8 +12613,9 @@ Triangulation<dim, spacedim>::load_user_flags_quad(const std::vector<bool> &v)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_flags_hex(std::vector<bool> &v) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_flags_hex(
+  std::vector<bool> &v) const
 {
   v.resize(n_hexs(), false);
 
@@ -12608,8 +12633,8 @@ Triangulation<dim, spacedim>::save_user_flags_hex(std::vector<bool> &v) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_flags_hex(std::ostream &out) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_flags_hex(std::ostream &out) const
 {
   std::vector<bool> v;
   save_user_flags_hex(v);
@@ -12622,8 +12647,8 @@ Triangulation<dim, spacedim>::save_user_flags_hex(std::ostream &out) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_flags_hex(std::istream &in)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_flags_hex(std::istream &in)
 {
   std::vector<bool> v;
   read_bool_vector(mn_tria_hex_user_flags_begin,
@@ -12636,8 +12661,9 @@ Triangulation<dim, spacedim>::load_user_flags_hex(std::istream &in)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_flags_hex(const std::vector<bool> &v)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_flags_hex(
+  const std::vector<bool> &v)
 {
   Assert(v.size() == n_hexs(), ExcGridReadError());
 
@@ -12658,8 +12684,8 @@ Triangulation<dim, spacedim>::load_user_flags_hex(const std::vector<bool> &v)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_indices(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_indices(
   std::vector<unsigned int> &v) const
 {
   // clear vector and append all the
@@ -12690,8 +12716,8 @@ Triangulation<dim, spacedim>::save_user_indices(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_indices(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_indices(
   const std::vector<unsigned int> &v)
 {
   Assert(v.size() == n_lines() + n_quads() + n_hexs(), ExcInternalError());
@@ -12770,8 +12796,8 @@ namespace
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_indices_line(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_indices_line(
   std::vector<unsigned int> &v) const
 {
   v.resize(n_lines(), 0);
@@ -12784,8 +12810,8 @@ Triangulation<dim, spacedim>::save_user_indices_line(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_indices_line(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_indices_line(
   const std::vector<unsigned int> &v)
 {
   Assert(v.size() == n_lines(), ExcGridReadError());
@@ -12798,8 +12824,8 @@ Triangulation<dim, spacedim>::load_user_indices_line(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_indices_quad(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_indices_quad(
   std::vector<unsigned int> &v) const
 {
   v.resize(n_quads(), 0);
@@ -12816,8 +12842,8 @@ Triangulation<dim, spacedim>::save_user_indices_quad(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_indices_quad(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_indices_quad(
   const std::vector<unsigned int> &v)
 {
   Assert(v.size() == n_quads(), ExcGridReadError());
@@ -12833,8 +12859,8 @@ Triangulation<dim, spacedim>::load_user_indices_quad(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_indices_hex(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_indices_hex(
   std::vector<unsigned int> &v) const
 {
   v.resize(n_hexs(), 0);
@@ -12851,8 +12877,8 @@ Triangulation<dim, spacedim>::save_user_indices_hex(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_indices_hex(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_indices_hex(
   const std::vector<unsigned int> &v)
 {
   Assert(v.size() == n_hexs(), ExcGridReadError());
@@ -12914,8 +12940,9 @@ namespace
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_pointers(std::vector<void *> &v) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_pointers(
+  std::vector<void *> &v) const
 {
   // clear vector and append all the
   // stuff later on
@@ -12945,8 +12972,9 @@ Triangulation<dim, spacedim>::save_user_pointers(std::vector<void *> &v) const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_pointers(const std::vector<void *> &v)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_pointers(
+  const std::vector<void *> &v)
 {
   Assert(v.size() == n_lines() + n_quads() + n_hexs(), ExcInternalError());
   std::vector<void *> tmp;
@@ -12982,8 +13010,8 @@ Triangulation<dim, spacedim>::load_user_pointers(const std::vector<void *> &v)
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_pointers_line(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_pointers_line(
   std::vector<void *> &v) const
 {
   v.resize(n_lines(), nullptr);
@@ -12996,8 +13024,8 @@ Triangulation<dim, spacedim>::save_user_pointers_line(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_pointers_line(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_pointers_line(
   const std::vector<void *> &v)
 {
   Assert(v.size() == n_lines(), ExcGridReadError());
@@ -13011,8 +13039,8 @@ Triangulation<dim, spacedim>::load_user_pointers_line(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_pointers_quad(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_pointers_quad(
   std::vector<void *> &v) const
 {
   v.resize(n_quads(), nullptr);
@@ -13029,8 +13057,8 @@ Triangulation<dim, spacedim>::save_user_pointers_quad(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_pointers_quad(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_pointers_quad(
   const std::vector<void *> &v)
 {
   Assert(v.size() == n_quads(), ExcGridReadError());
@@ -13046,8 +13074,8 @@ Triangulation<dim, spacedim>::load_user_pointers_quad(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::save_user_pointers_hex(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save_user_pointers_hex(
   std::vector<void *> &v) const
 {
   v.resize(n_hexs(), nullptr);
@@ -13064,8 +13092,8 @@ Triangulation<dim, spacedim>::save_user_pointers_hex(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::load_user_pointers_hex(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load_user_pointers_hex(
   const std::vector<void *> &v)
 {
   Assert(v.size() == n_hexs(), ExcGridReadError());
@@ -13085,8 +13113,9 @@ Triangulation<dim, spacedim>::load_user_pointers_hex(
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::raw_cell_iterator
-Triangulation<dim, spacedim>::begin_raw(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_raw(const unsigned int level) const
 {
   switch (dim)
     {
@@ -13105,8 +13134,9 @@ Triangulation<dim, spacedim>::begin_raw(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::cell_iterator
-Triangulation<dim, spacedim>::begin(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin(const unsigned int level) const
 {
   switch (dim)
     {
@@ -13125,8 +13155,9 @@ Triangulation<dim, spacedim>::begin(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::active_cell_iterator
-Triangulation<dim, spacedim>::begin_active(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_active(const unsigned int level) const
 {
   switch (dim)
     {
@@ -13145,8 +13176,9 @@ Triangulation<dim, spacedim>::begin_active(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::cell_iterator
-Triangulation<dim, spacedim>::last() const
+  Triangulation<dim, spacedim>::last() const
 {
   const unsigned int level = levels.size() - 1;
   if (levels[level]->cells.n_objects() == 0)
@@ -13170,8 +13202,9 @@ Triangulation<dim, spacedim>::last() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::active_cell_iterator
-Triangulation<dim, spacedim>::last_active() const
+  Triangulation<dim, spacedim>::last_active() const
 {
   // get the last used cell
   cell_iterator cell = last();
@@ -13191,8 +13224,10 @@ Triangulation<dim, spacedim>::last_active() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::cell_iterator
-Triangulation<dim, spacedim>::create_cell_iterator(const CellId &cell_id) const
+  Triangulation<dim, spacedim>::create_cell_iterator(
+    const CellId &cell_id) const
 {
   cell_iterator cell(
     this, 0, coarse_cell_id_to_coarse_cell_index(cell_id.get_coarse_cell_id()));
@@ -13216,8 +13251,9 @@ Triangulation<dim, spacedim>::create_cell_iterator(const CellId &cell_id) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::cell_iterator
-Triangulation<dim, spacedim>::end() const
+  Triangulation<dim, spacedim>::end() const
 {
   return cell_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
                        -1,
@@ -13227,8 +13263,9 @@ Triangulation<dim, spacedim>::end() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::raw_cell_iterator
-Triangulation<dim, spacedim>::end_raw(const unsigned int level) const
+  Triangulation<dim, spacedim>::end_raw(const unsigned int level) const
 {
   // This function may be called on parallel triangulations on levels
   // that exist globally, but not on the local portion of the
@@ -13256,8 +13293,9 @@ Triangulation<dim, spacedim>::end_raw(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::cell_iterator
-Triangulation<dim, spacedim>::end(const unsigned int level) const
+  Triangulation<dim, spacedim>::end(const unsigned int level) const
 {
   // This function may be called on parallel triangulations on levels
   // that exist globally, but not on the local portion of the
@@ -13285,8 +13323,9 @@ Triangulation<dim, spacedim>::end(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::active_cell_iterator
-Triangulation<dim, spacedim>::end_active(const unsigned int level) const
+  Triangulation<dim, spacedim>::end_active(const unsigned int level) const
 {
   // This function may be called on parallel triangulations on levels
   // that exist globally, but not on the local portion of the
@@ -13313,8 +13352,10 @@ Triangulation<dim, spacedim>::end_active(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-IteratorRange<typename Triangulation<dim, spacedim>::cell_iterator>
-Triangulation<dim, spacedim>::cell_iterators() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename Triangulation<dim, spacedim>::
+                cell_iterator> Triangulation<dim, spacedim>::cell_iterators()
+  const
 {
   return IteratorRange<typename Triangulation<dim, spacedim>::cell_iterator>(
     begin(), end());
@@ -13322,8 +13363,10 @@ Triangulation<dim, spacedim>::cell_iterators() const
 
 
 template <int dim, int spacedim>
-IteratorRange<typename Triangulation<dim, spacedim>::active_cell_iterator>
-Triangulation<dim, spacedim>::active_cell_iterators() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename Triangulation<dim, spacedim>::
+                active_cell_iterator> Triangulation<dim, spacedim>::
+  active_cell_iterators() const
 {
   return IteratorRange<
     typename Triangulation<dim, spacedim>::active_cell_iterator>(begin_active(),
@@ -13333,9 +13376,10 @@ Triangulation<dim, spacedim>::active_cell_iterators() const
 
 
 template <int dim, int spacedim>
-IteratorRange<typename Triangulation<dim, spacedim>::cell_iterator>
-Triangulation<dim, spacedim>::cell_iterators_on_level(
-  const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename Triangulation<dim, spacedim>::
+                cell_iterator> Triangulation<dim, spacedim>::
+  cell_iterators_on_level(const unsigned int level) const
 {
   return IteratorRange<typename Triangulation<dim, spacedim>::cell_iterator>(
     begin(level), end(level));
@@ -13344,9 +13388,10 @@ Triangulation<dim, spacedim>::cell_iterators_on_level(
 
 
 template <int dim, int spacedim>
-IteratorRange<typename Triangulation<dim, spacedim>::active_cell_iterator>
-Triangulation<dim, spacedim>::active_cell_iterators_on_level(
-  const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename Triangulation<dim, spacedim>::
+                active_cell_iterator> Triangulation<dim, spacedim>::
+  active_cell_iterators_on_level(const unsigned int level) const
 {
   return IteratorRange<
     typename Triangulation<dim, spacedim>::active_cell_iterator>(
@@ -13358,8 +13403,9 @@ Triangulation<dim, spacedim>::active_cell_iterators_on_level(
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::face_iterator
-Triangulation<dim, spacedim>::begin_face() const
+  Triangulation<dim, spacedim>::begin_face() const
 {
   switch (dim)
     {
@@ -13379,8 +13425,9 @@ Triangulation<dim, spacedim>::begin_face() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::active_face_iterator
-Triangulation<dim, spacedim>::begin_active_face() const
+  Triangulation<dim, spacedim>::begin_active_face() const
 {
   switch (dim)
     {
@@ -13400,8 +13447,9 @@ Triangulation<dim, spacedim>::begin_active_face() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::face_iterator
-Triangulation<dim, spacedim>::end_face() const
+  Triangulation<dim, spacedim>::end_face() const
 {
   switch (dim)
     {
@@ -13421,8 +13469,10 @@ Triangulation<dim, spacedim>::end_face() const
 
 
 template <int dim, int spacedim>
-IteratorRange<typename Triangulation<dim, spacedim>::active_face_iterator>
-Triangulation<dim, spacedim>::active_face_iterators() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+IteratorRange<typename Triangulation<dim, spacedim>::
+                active_face_iterator> Triangulation<dim, spacedim>::
+  active_face_iterators() const
 {
   return IteratorRange<
     typename Triangulation<dim, spacedim>::active_face_iterator>(
@@ -13433,8 +13483,9 @@ Triangulation<dim, spacedim>::active_face_iterators() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::vertex_iterator
-Triangulation<dim, spacedim>::begin_vertex() const
+  Triangulation<dim, spacedim>::begin_vertex() const
 {
   vertex_iterator i =
     raw_vertex_iterator(const_cast<Triangulation<dim, spacedim> *>(this), 0, 0);
@@ -13450,8 +13501,9 @@ Triangulation<dim, spacedim>::begin_vertex() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::active_vertex_iterator
-Triangulation<dim, spacedim>::begin_active_vertex() const
+  Triangulation<dim, spacedim>::begin_active_vertex() const
 {
   // every vertex is active
   return begin_vertex();
@@ -13460,8 +13512,9 @@ Triangulation<dim, spacedim>::begin_active_vertex() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::vertex_iterator
-Triangulation<dim, spacedim>::end_vertex() const
+  Triangulation<dim, spacedim>::end_vertex() const
 {
   return raw_vertex_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
                              -1,
@@ -13475,8 +13528,9 @@ Triangulation<dim, spacedim>::end_vertex() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::raw_line_iterator
-Triangulation<dim, spacedim>::begin_raw_line(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_raw_line(const unsigned int level) const
 {
   // This function may be called on parallel triangulations on levels
   // that exist globally, but not on the local portion of the
@@ -13515,8 +13569,9 @@ Triangulation<dim, spacedim>::begin_raw_line(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::line_iterator
-Triangulation<dim, spacedim>::begin_line(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_line(const unsigned int level) const
 {
   // level is checked in begin_raw
   raw_line_iterator ri = begin_raw_line(level);
@@ -13531,8 +13586,10 @@ Triangulation<dim, spacedim>::begin_line(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::active_line_iterator
-Triangulation<dim, spacedim>::begin_active_line(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_active_line(
+    const unsigned int level) const
 {
   // level is checked in begin_raw
   line_iterator i = begin_line(level);
@@ -13547,8 +13604,9 @@ Triangulation<dim, spacedim>::begin_active_line(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::line_iterator
-Triangulation<dim, spacedim>::end_line() const
+  Triangulation<dim, spacedim>::end_line() const
 {
   return raw_line_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
                            -1,
@@ -13561,8 +13619,9 @@ Triangulation<dim, spacedim>::end_line() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::raw_quad_iterator
-Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
 {
   // This function may be called on parallel triangulations on levels
   // that exist globally, but not on the local portion of the
@@ -13615,8 +13674,9 @@ Triangulation<dim, spacedim>::begin_raw_quad(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::quad_iterator
-Triangulation<dim, spacedim>::begin_quad(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_quad(const unsigned int level) const
 {
   // level is checked in begin_raw
   raw_quad_iterator ri = begin_raw_quad(level);
@@ -13631,8 +13691,10 @@ Triangulation<dim, spacedim>::begin_quad(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::active_quad_iterator
-Triangulation<dim, spacedim>::begin_active_quad(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_active_quad(
+    const unsigned int level) const
 {
   // level is checked in begin_raw
   quad_iterator i = begin_quad(level);
@@ -13647,8 +13709,9 @@ Triangulation<dim, spacedim>::begin_active_quad(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::quad_iterator
-Triangulation<dim, spacedim>::end_quad() const
+  Triangulation<dim, spacedim>::end_quad() const
 {
   return raw_quad_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
                            -1,
@@ -13660,8 +13723,9 @@ Triangulation<dim, spacedim>::end_quad() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::raw_hex_iterator
-Triangulation<dim, spacedim>::begin_raw_hex(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_raw_hex(const unsigned int level) const
 {
   // This function may be called on parallel triangulations on levels
   // that exist globally, but not on the local portion of the
@@ -13706,8 +13770,9 @@ Triangulation<dim, spacedim>::begin_raw_hex(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::hex_iterator
-Triangulation<dim, spacedim>::begin_hex(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_hex(const unsigned int level) const
 {
   // level is checked in begin_raw
   raw_hex_iterator ri = begin_raw_hex(level);
@@ -13722,8 +13787,9 @@ Triangulation<dim, spacedim>::begin_hex(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::active_hex_iterator
-Triangulation<dim, spacedim>::begin_active_hex(const unsigned int level) const
+  Triangulation<dim, spacedim>::begin_active_hex(const unsigned int level) const
 {
   // level is checked in begin_raw
   hex_iterator i = begin_hex(level);
@@ -13738,8 +13804,9 @@ Triangulation<dim, spacedim>::begin_active_hex(const unsigned int level) const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::hex_iterator
-Triangulation<dim, spacedim>::end_hex() const
+  Triangulation<dim, spacedim>::end_hex() const
 {
   return raw_hex_iterator(const_cast<Triangulation<dim, spacedim> *>(this),
                           -1,
@@ -13804,37 +13871,39 @@ namespace internal
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_cells() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_cells() const
 {
   return internal::TriangulationImplementation::n_cells(number_cache);
 }
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_active_cells() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_active_cells() const
 {
   return internal::TriangulationImplementation::n_active_cells(number_cache);
 }
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 types::global_cell_index
-Triangulation<dim, spacedim>::n_global_active_cells() const
+  Triangulation<dim, spacedim>::n_global_active_cells() const
 {
   return n_active_cells();
 }
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 types::coarse_cell_id
-Triangulation<dim, spacedim>::n_global_coarse_cells() const
+  Triangulation<dim, spacedim>::n_global_coarse_cells() const
 {
   return n_cells(0);
 }
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_faces() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_faces() const
 {
   switch (dim)
     {
@@ -13852,8 +13921,8 @@ Triangulation<dim, spacedim>::n_faces() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_raw_faces() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_raw_faces() const
 {
   switch (dim)
     {
@@ -13871,8 +13940,8 @@ Triangulation<dim, spacedim>::n_raw_faces() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_active_faces() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_active_faces() const
 {
   switch (dim)
     {
@@ -13890,8 +13959,9 @@ Triangulation<dim, spacedim>::n_active_faces() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_raw_cells(const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_raw_cells(
+  const unsigned int level) const
 {
   switch (dim)
     {
@@ -13910,8 +13980,9 @@ Triangulation<dim, spacedim>::n_raw_cells(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_cells(const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_cells(
+  const unsigned int level) const
 {
   switch (dim)
     {
@@ -13930,8 +14001,9 @@ Triangulation<dim, spacedim>::n_cells(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_active_cells(const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_active_cells(
+  const unsigned int level) const
 {
   switch (dim)
     {
@@ -13949,8 +14021,8 @@ Triangulation<dim, spacedim>::n_active_cells(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-bool
-Triangulation<dim, spacedim>::has_hanging_nodes() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+bool Triangulation<dim, spacedim>::has_hanging_nodes() const
 {
   if (anisotropic_refinement == false)
     {
@@ -13970,8 +14042,8 @@ Triangulation<dim, spacedim>::has_hanging_nodes() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_lines() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_lines() const
 {
   return number_cache.n_lines;
 }
@@ -13979,8 +14051,9 @@ Triangulation<dim, spacedim>::n_lines() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_raw_lines(const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_raw_lines(
+  const unsigned int level) const
 {
   if (dim == 1)
     {
@@ -13994,8 +14067,8 @@ Triangulation<dim, spacedim>::n_raw_lines(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_raw_lines() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_raw_lines() const
 {
   if (dim == 1)
     {
@@ -14008,8 +14081,9 @@ Triangulation<dim, spacedim>::n_raw_lines() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_lines(const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_lines(
+  const unsigned int level) const
 {
   AssertIndexRange(level, number_cache.n_lines_level.size());
   Assert(dim == 1, ExcFacesHaveNoLevel());
@@ -14018,16 +14092,17 @@ Triangulation<dim, spacedim>::n_lines(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_active_lines() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_active_lines() const
 {
   return number_cache.n_active_lines;
 }
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_active_lines(const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_active_lines(
+  const unsigned int level) const
 {
   AssertIndexRange(level, number_cache.n_lines_level.size());
   Assert(dim == 1, ExcFacesHaveNoLevel());
@@ -14183,16 +14258,17 @@ Triangulation<1, 3>::n_active_quads() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_quads() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_quads() const
 {
   return number_cache.n_quads;
 }
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_quads(const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_quads(
+  const unsigned int level) const
 {
   Assert(dim == 2, ExcFacesHaveNoLevel());
   AssertIndexRange(level, number_cache.n_quads_level.size());
@@ -14231,8 +14307,8 @@ Triangulation<3, 3>::n_raw_quads(const unsigned int) const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_raw_quads() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_raw_quads() const
 {
   Assert(false, ExcNotImplemented());
   return 0;
@@ -14250,16 +14326,17 @@ Triangulation<3, 3>::n_raw_quads() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_active_quads() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_active_quads() const
 {
   return number_cache.n_active_quads;
 }
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_active_quads(const unsigned int level) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_active_quads(
+  const unsigned int level) const
 {
   AssertIndexRange(level, number_cache.n_quads_level.size());
   Assert(dim == 2, ExcFacesHaveNoLevel());
@@ -14269,8 +14346,8 @@ Triangulation<dim, spacedim>::n_active_quads(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_hexs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_hexs() const
 {
   return 0;
 }
@@ -14278,8 +14355,8 @@ Triangulation<dim, spacedim>::n_hexs() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_hexs(const unsigned int) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_hexs(const unsigned int) const
 {
   return 0;
 }
@@ -14287,16 +14364,16 @@ Triangulation<dim, spacedim>::n_hexs(const unsigned int) const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_raw_hexs(const unsigned int) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_raw_hexs(const unsigned int) const
 {
   return 0;
 }
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_active_hexs() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_active_hexs() const
 {
   return 0;
 }
@@ -14304,8 +14381,9 @@ Triangulation<dim, spacedim>::n_active_hexs() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_active_hexs(const unsigned int) const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_active_hexs(
+  const unsigned int) const
 {
   return 0;
 }
@@ -14361,8 +14439,8 @@ Triangulation<3, 3>::n_active_hexs(const unsigned int level) const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::n_used_vertices() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_used_vertices() const
 {
   return std::count(vertices_used.begin(), vertices_used.end(), true);
 }
@@ -14370,8 +14448,8 @@ Triangulation<dim, spacedim>::n_used_vertices() const
 
 
 template <int dim, int spacedim>
-const std::vector<bool> &
-Triangulation<dim, spacedim>::get_used_vertices() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const std::vector<bool> &Triangulation<dim, spacedim>::get_used_vertices() const
 {
   return vertices_used;
 }
@@ -14404,8 +14482,8 @@ Triangulation<1, 3>::max_adjacent_cells() const
 
 
 template <int dim, int spacedim>
-unsigned int
-Triangulation<dim, spacedim>::max_adjacent_cells() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::max_adjacent_cells() const
 {
   cell_iterator cell = begin(0),
                 endc = (n_levels() > 1 ? begin(1) : cell_iterator(end()));
@@ -14437,8 +14515,9 @@ Triangulation<dim, spacedim>::max_adjacent_cells() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 types::subdomain_id
-Triangulation<dim, spacedim>::locally_owned_subdomain() const
+  Triangulation<dim, spacedim>::locally_owned_subdomain() const
 {
   return numbers::invalid_subdomain_id;
 }
@@ -14446,8 +14525,8 @@ Triangulation<dim, spacedim>::locally_owned_subdomain() const
 
 
 template <int dim, int spacedim>
-Triangulation<dim, spacedim> &
-Triangulation<dim, spacedim>::get_triangulation()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+Triangulation<dim, spacedim> &Triangulation<dim, spacedim>::get_triangulation()
 {
   return *this;
 }
@@ -14455,8 +14534,9 @@ Triangulation<dim, spacedim>::get_triangulation()
 
 
 template <int dim, int spacedim>
-const Triangulation<dim, spacedim> &
-Triangulation<dim, spacedim>::get_triangulation() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const Triangulation<dim, spacedim>
+  &Triangulation<dim, spacedim>::get_triangulation() const
 {
   return *this;
 }
@@ -14464,8 +14544,8 @@ Triangulation<dim, spacedim>::get_triangulation() const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::add_periodicity(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::add_periodicity(
   const std::vector<GridTools::PeriodicFacePair<cell_iterator>>
     &periodicity_vector)
 {
@@ -14480,12 +14560,13 @@ Triangulation<dim, spacedim>::add_periodicity(
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 const typename std::map<
   std::pair<typename Triangulation<dim, spacedim>::cell_iterator, unsigned int>,
   std::pair<std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                       unsigned int>,
-            std::bitset<3>>> &
-Triangulation<dim, spacedim>::get_periodic_face_map() const
+            std::bitset<3>>>
+  &Triangulation<dim, spacedim>::get_periodic_face_map() const
 {
   return periodic_face_map;
 }
@@ -14493,8 +14574,8 @@ Triangulation<dim, spacedim>::get_periodic_face_map() const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
 {
   // Call our version of prepare_coarsening_and_refinement() even if a derived
   // class like parallel::distributed::Triangulation overrides it. Their
@@ -14543,8 +14624,8 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::reset_active_cell_indices()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::reset_active_cell_indices()
 {
   unsigned int active_cell_index = 0;
   for (raw_cell_iterator cell = begin_raw(); cell != end(); ++cell)
@@ -14562,8 +14643,8 @@ Triangulation<dim, spacedim>::reset_active_cell_indices()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::reset_global_cell_indices()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::reset_global_cell_indices()
 {
   {
     types::global_cell_index cell_index = 0;
@@ -14582,8 +14663,8 @@ Triangulation<dim, spacedim>::reset_global_cell_indices()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 {
   for (unsigned int l = 0; l < levels.size(); ++l)
     {
@@ -14656,8 +14737,8 @@ Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::update_periodic_face_map()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::update_periodic_face_map()
 {
   // first empty the currently stored objects
   periodic_face_map.clear();
@@ -14719,8 +14800,8 @@ Triangulation<dim, spacedim>::update_periodic_face_map()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::update_reference_cells()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::update_reference_cells()
 {
   std::set<ReferenceCell> reference_cells_set;
   for (auto cell : active_cell_iterators())
@@ -14735,8 +14816,9 @@ Triangulation<dim, spacedim>::update_reference_cells()
 
 
 template <int dim, int spacedim>
-const std::vector<ReferenceCell> &
-Triangulation<dim, spacedim>::get_reference_cells() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+const std::vector<ReferenceCell>
+  &Triangulation<dim, spacedim>::get_reference_cells() const
 {
   return this->reference_cells;
 }
@@ -14744,8 +14826,8 @@ Triangulation<dim, spacedim>::get_reference_cells() const
 
 
 template <int dim, int spacedim>
-bool
-Triangulation<dim, spacedim>::all_reference_cells_are_hyper_cube() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+bool Triangulation<dim, spacedim>::all_reference_cells_are_hyper_cube() const
 {
   Assert(this->reference_cells.size() > 0,
          ExcMessage("You can't ask about the kinds of reference "
@@ -14758,8 +14840,8 @@ Triangulation<dim, spacedim>::all_reference_cells_are_hyper_cube() const
 
 
 template <int dim, int spacedim>
-bool
-Triangulation<dim, spacedim>::all_reference_cells_are_simplex() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+bool Triangulation<dim, spacedim>::all_reference_cells_are_simplex() const
 {
   Assert(this->reference_cells.size() > 0,
          ExcMessage("You can't ask about the kinds of reference "
@@ -14772,8 +14854,8 @@ Triangulation<dim, spacedim>::all_reference_cells_are_simplex() const
 
 
 template <int dim, int spacedim>
-bool
-Triangulation<dim, spacedim>::is_mixed_mesh() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+bool Triangulation<dim, spacedim>::is_mixed_mesh() const
 {
   Assert(this->reference_cells.size() > 0,
          ExcMessage("You can't ask about the kinds of reference "
@@ -14787,8 +14869,8 @@ Triangulation<dim, spacedim>::is_mixed_mesh() const
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::clear_despite_subscriptions()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::clear_despite_subscriptions()
 {
   levels.clear();
   faces.reset();
@@ -14804,8 +14886,9 @@ Triangulation<dim, spacedim>::clear_despite_subscriptions()
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename Triangulation<dim, spacedim>::DistortedCellList
-Triangulation<dim, spacedim>::execute_refinement()
+  Triangulation<dim, spacedim>::execute_refinement()
 {
   const DistortedCellList cells_with_distorted_children =
     this->policy->execute_refinement(*this, check_for_distorted_cells);
@@ -14834,8 +14917,8 @@ Triangulation<dim, spacedim>::execute_refinement()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::execute_coarsening()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::execute_coarsening()
 {
   // first find out if there are any cells at all to be coarsened in the
   // loop below
@@ -14864,9 +14947,12 @@ Triangulation<dim, spacedim>::execute_coarsening()
           {
             const auto line_indices = internal::TriaAccessorImplementation::
               Implementation::get_line_indices_of_cell(*cell);
-            for (unsigned int l = 0; l < cell->n_lines(); ++l)
+            // avoid a compiler warning by fixing the max number of
+            // loop iterations to 12
+            const unsigned int n_lines = std::min(cell->n_lines(), 12u);
+            for (unsigned int l = 0; l < n_lines; ++l)
               ++line_cell_count[line_indices[l]];
-            for (unsigned int q : cell->face_indices())
+            for (const unsigned int q : cell->face_indices())
               ++quad_cell_count[cell->face_index(q)];
           }
         else
@@ -14915,8 +15001,8 @@ Triangulation<dim, spacedim>::execute_coarsening()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::fix_coarsen_flags()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::fix_coarsen_flags()
 {
   // copy a piece of code from prepare_coarsening_and_refinement that
   // ensures that the level difference at vertices is limited if so
@@ -15148,7 +15234,7 @@ namespace
     // count all neighbors that will be refined along the face of our
     // cell after the next step
     unsigned int count = 0;
-    for (unsigned int n : GeometryInfo<dim>::face_indices())
+    for (const unsigned int n : GeometryInfo<dim>::face_indices())
       {
         const typename Triangulation<dim, spacedim>::cell_iterator neighbor =
           cell->neighbor(n);
@@ -15317,8 +15403,8 @@ namespace
 
 
 template <int dim, int spacedim>
-bool
-Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
 {
   // save the flags to determine whether something was changed in the
   // course of this function
@@ -16326,8 +16412,8 @@ Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::write_bool_vector(
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::write_bool_vector(
   const unsigned int       magic_number1,
   const std::vector<bool> &v,
   const unsigned int       magic_number2,
@@ -16361,11 +16447,12 @@ Triangulation<dim, spacedim>::write_bool_vector(
 
 
 template <int dim, int spacedim>
-void
-Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
-                                               std::vector<bool> &v,
-                                               const unsigned int magic_number2,
-                                               std::istream &     in)
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::read_bool_vector(
+  const unsigned int magic_number1,
+  std::vector<bool> &v,
+  const unsigned int magic_number2,
+  std::istream &     in)
 {
   AssertThrow(in.fail() == false, ExcIO());
 
@@ -16399,8 +16486,8 @@ Triangulation<dim, spacedim>::read_bool_vector(const unsigned int magic_number1,
 
 
 template <int dim, int spacedim>
-std::size_t
-Triangulation<dim, spacedim>::memory_consumption() const
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+std::size_t Triangulation<dim, spacedim>::memory_consumption() const
 {
   std::size_t mem = 0;
   mem += sizeof(MeshSmoothing);
@@ -16424,6 +16511,7 @@ Triangulation<dim, spacedim>::memory_consumption() const
 
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList() noexcept =
   default;
 

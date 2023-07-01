@@ -15,7 +15,7 @@ here:
 
 Secondly, the program writes tables not only to disk, but also to the
 screen while running. The output looks like the following (recall that
-columns labeled as "<code>H1</code>" actually show the $H^1$ <i>semi-</i>norm
+columns labeled as "H1" actually show the $H^1$ <i>semi-</i>norm
 of the error, not the full $H^1$ norm):
 
 
@@ -187,7 +187,7 @@ here) that is written into a file in a way so that it could be
 copy-pasted into a LaTeX document.
 
 
-<h4> When is the error "small"? </h4>
+<h3> When is the error "small"? </h3>
 
 What we showed above is how to determine the size of the error
 $\|u-u_h\|$ in a number of different norms. We did this primarily
@@ -271,7 +271,7 @@ but it should not be very hard to get the program to work!
 
 <h4> Convergence Comparison </h4>
 
-Is Q1 or Q2 better? What about adaptive versus global refinement? A (somewhat
+Is $Q_1$ or $Q_2$ better? What about adaptive versus global refinement? A (somewhat
 unfair but typical) metric to compare them, is to look at the error as a
 function of the number of unknowns.
 
@@ -288,10 +288,17 @@ work than if we used global refinement. This is not a particularly
 surprising conclusion, but it's worth checking these sorts of
 assumptions in practice.
 
-Of course, a fairer comparison would be to plot runtime (switch to release
-mode first!) instead of number of unknowns on the $x$ axis. If you
-plotted run time against the number of unknowns by timing each
-refinement step (e.g., using the Timer class), you will notice that
-the linear solver is not perfect -- its run time grows faster than
-proportional to the linear system size -- and picking a better
-linear solver might be appropriate for this kind of comparison.
+Of course, a fairer comparison would be to plot runtime (switch to
+release mode first!) instead of number of unknowns on the $x$ axis. If
+you plotted run time (check out the Timer class!) against the number
+of unknowns by timing each refinement step, you will notice that the
+linear system solver we use in this program is not perfect -- its run
+time grows faster than proportional to the linear system size -- and
+picking a better linear solver might be appropriate for this kind of
+comparison.
+
+To see how a comparison of this kind could work, take a look at
+@cite KronbichlerWall2018 , and specifically Figure 5
+that illustrates the error as a function of compute time for
+a number of polynomial degrees (as well as a number of different ways
+to discretize the equation used there).

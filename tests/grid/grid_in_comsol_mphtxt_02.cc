@@ -86,7 +86,7 @@ main()
         "/grids/comsol/mesh_example_without_domain_geom_info.mphtxt");
       comsol_grid<3>(SOURCE_DIR "/grids/comsol/busbar_with_selections.mphtxt");
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

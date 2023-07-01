@@ -4,7 +4,7 @@
   <head>
     <title>Build system internals</title>
     <link href="../screen.css" rel="StyleSheet">
-    <meta name="copyright" content="Copyright (C) 2013 - 2020 by the deal.II Authors">
+    <meta name="copyright" content="Copyright (C) 2013 - 2023 by the deal.II Authors">
     <meta name="keywords" content="deal.II">
   </head>
 
@@ -96,7 +96,7 @@ list(APPEND CONFIG_LIBRARIES
   ${CONFIG_LIBRARIES_${_build}}
   )
 
-set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
+set_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase}
   PROPERTIES
   VERSION ${VERSION}
   SOVERSION ${VERSION}

@@ -1,0 +1,4 @@
+
+DEAL::w/o ghost indices: OK
+DEAL::w/  ghost indices: OK
+DEAL::partitioners: OK

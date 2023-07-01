@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2022 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -91,7 +91,8 @@ DEAL_II_NAMESPACE_OPEN
  * std::vector<Vector<double> > solutions(n_vectors, Vector<double> (n));
  * soltrans.refine_interpolate(solutions_old, solutions);
  * @endcode
- * This is used in several of the tutorial programs, for example step-31.
+ * This is used in several of the tutorial programs, for example step-31
+ * and step-33.
  *
  * <li> If the grid has cells that will be coarsened, then use @p
  * SolutionTransfer as follows:

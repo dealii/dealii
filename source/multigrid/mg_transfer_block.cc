@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// Copyright (C) 2003 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -52,7 +52,7 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector_by_blocks(
-    const dealii::DoFHandler<dim, spacedim> &          dof_handler,
+    const DoFHandler<dim, spacedim> &                  dof_handler,
     MGLevelObject<BlockVector<number>> &               v,
     const std::vector<bool> &                          sel,
     std::vector<std::vector<types::global_dof_index>> &ndofs)
@@ -98,7 +98,7 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector_by_blocks(
-    const dealii::DoFHandler<dim, spacedim> &          dof_handler,
+    const DoFHandler<dim, spacedim> &                  dof_handler,
     MGLevelObject<dealii::Vector<number>> &            v,
     const unsigned int                                 selected_block,
     std::vector<std::vector<types::global_dof_index>> &ndofs)

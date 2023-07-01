@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -130,6 +130,9 @@ namespace VectorTools
    *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
+   *
+   * @dealiiConceptRequires{(concepts::is_dealii_vector_type<VectorType> &&
+   *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
             template <int, int>
@@ -137,19 +140,25 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
                                spacedim,
-                               typename VectorType::value_type>::value_type>
-  point_values(
-    const Mapping<dim> &                                  mapping,
-    const MeshType<dim, spacedim> &                       mesh,
-    const VectorType &                                    vector,
-    const std::vector<Point<spacedim>> &                  evaluation_points,
-    Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg,
-    const unsigned int                     first_selected_component = 0);
+                               typename VectorType::value_type>::
+      value_type> point_values(const Mapping<dim> &           mapping,
+                               const MeshType<dim, spacedim> &mesh,
+                               const VectorType &             vector,
+                               const std::vector<Point<spacedim>>
+                                 &evaluation_points,
+                               Utilities::MPI::RemotePointEvaluation<dim,
+                                                                     spacedim>
+                                 &                                    cache,
+                               const EvaluationFlags::EvaluationFlags flags =
+                                 EvaluationFlags::avg,
+                               const unsigned int first_selected_component = 0);
 
   /**
    * Given a (distributed) solution vector @p vector, evaluate the values at
@@ -162,6 +171,9 @@ namespace VectorTools
    *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
+   *
+   * @dealiiConceptRequires{(concepts::is_dealii_vector_type<VectorType> &&
+   *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
             template <int, int>
@@ -169,17 +181,21 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
                                spacedim,
-                               typename VectorType::value_type>::value_type>
-  point_values(
-    const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-    const MeshType<dim, spacedim> &                             mesh,
-    const VectorType &                                          vector,
-    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg,
-    const unsigned int                     first_selected_component = 0);
+                               typename VectorType::value_type>::
+      value_type> point_values(const Utilities::MPI::
+                                 RemotePointEvaluation<dim, spacedim> &cache,
+                               const MeshType<dim, spacedim> &         mesh,
+                               const VectorType &                      vector,
+                               const EvaluationFlags::EvaluationFlags  flags =
+                                 EvaluationFlags::avg,
+                               const unsigned int first_selected_component = 0);
 
   /**
    * Given a (distributed) solution vector @p vector, evaluate the gradients at
@@ -190,6 +206,9 @@ namespace VectorTools
    *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
+   *
+   * @dealiiConceptRequires{(concepts::is_dealii_vector_type<VectorType> &&
+   *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
             template <int, int>
@@ -197,19 +216,26 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
                                spacedim,
-                               typename VectorType::value_type>::gradient_type>
-  point_gradients(
-    const Mapping<dim> &                                  mapping,
-    const MeshType<dim, spacedim> &                       mesh,
-    const VectorType &                                    vector,
-    const std::vector<Point<spacedim>> &                  evaluation_points,
-    Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg,
-    const unsigned int                     first_selected_component = 0);
+                               typename VectorType::value_type>::
+      gradient_type> point_gradients(const Mapping<dim> &           mapping,
+                                     const MeshType<dim, spacedim> &mesh,
+                                     const VectorType &             vector,
+                                     const std::vector<Point<spacedim>>
+                                       &evaluation_points,
+                                     Utilities::MPI::RemotePointEvaluation<
+                                       dim,
+                                       spacedim> &cache,
+                                     const EvaluationFlags::EvaluationFlags
+                                       flags = EvaluationFlags::avg,
+                                     const unsigned int
+                                       first_selected_component = 0);
 
   /**
    * Given a (distributed) solution vector @p vector, evaluate the gradients at
@@ -221,6 +247,9 @@ namespace VectorTools
    *
    * @warning This is a collective call that needs to be executed by all
    *   processors in the communicator.
+   *
+   * @dealiiConceptRequires{(concepts::is_dealii_vector_type<VectorType> &&
+   *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
             template <int, int>
@@ -228,17 +257,23 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
                                spacedim,
-                               typename VectorType::value_type>::gradient_type>
-  point_gradients(
-    const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-    const MeshType<dim, spacedim> &                             mesh,
-    const VectorType &                                          vector,
-    const EvaluationFlags::EvaluationFlags flags = EvaluationFlags::avg,
-    const unsigned int                     first_selected_component = 0);
+                               typename VectorType::value_type>::
+      gradient_type> point_gradients(const Utilities::MPI::
+                                       RemotePointEvaluation<dim, spacedim>
+                                         &                          cache,
+                                     const MeshType<dim, spacedim> &mesh,
+                                     const VectorType &             vector,
+                                     const EvaluationFlags::EvaluationFlags
+                                       flags = EvaluationFlags::avg,
+                                     const unsigned int
+                                       first_selected_component = 0);
 
 
 
@@ -252,18 +287,24 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   inline std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
                                spacedim,
-                               typename VectorType::value_type>::value_type>
-  point_values(const Mapping<dim> &                mapping,
-               const MeshType<dim, spacedim> &     mesh,
-               const VectorType &                  vector,
-               const std::vector<Point<spacedim>> &evaluation_points,
-               Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-               const EvaluationFlags::EvaluationFlags                flags,
-               const unsigned int first_selected_component)
+                               typename VectorType::value_type>::
+      value_type> point_values(const Mapping<dim> &           mapping,
+                               const MeshType<dim, spacedim> &mesh,
+                               const VectorType &             vector,
+                               const std::vector<Point<spacedim>>
+                                 &evaluation_points,
+                               Utilities::MPI::RemotePointEvaluation<dim,
+                                                                     spacedim>
+                                 &                                    cache,
+                               const EvaluationFlags::EvaluationFlags flags,
+                               const unsigned int first_selected_component)
   {
     cache.reinit(evaluation_points, mesh.get_triangulation(), mapping);
 
@@ -279,18 +320,26 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   inline std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
                                spacedim,
-                               typename VectorType::value_type>::gradient_type>
-  point_gradients(const Mapping<dim> &                mapping,
-                  const MeshType<dim, spacedim> &     mesh,
-                  const VectorType &                  vector,
-                  const std::vector<Point<spacedim>> &evaluation_points,
-                  Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-                  const EvaluationFlags::EvaluationFlags                flags,
-                  const unsigned int first_selected_component)
+                               typename VectorType::value_type>::
+      gradient_type> point_gradients(const Mapping<dim> &           mapping,
+                                     const MeshType<dim, spacedim> &mesh,
+                                     const VectorType &             vector,
+                                     const std::vector<Point<spacedim>>
+                                       &evaluation_points,
+                                     Utilities::MPI::RemotePointEvaluation<
+                                       dim,
+                                       spacedim> &cache,
+                                     const EvaluationFlags::EvaluationFlags
+                                       flags,
+                                     const unsigned int
+                                       first_selected_component)
   {
     cache.reinit(evaluation_points, mesh.get_triangulation(), mapping);
 
@@ -595,8 +644,10 @@ namespace VectorTools
               typename MeshType,
               typename VectorType,
               typename value_type>
-    inline std::vector<value_type>
-    evaluate_at_points(
+    DEAL_II_CXX20_REQUIRES(
+      concepts::is_dealii_vector_type<VectorType>
+        &&concepts::is_triangulation_or_dof_handler<MeshType>)
+    inline std::vector<value_type> evaluate_at_points(
       const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
       const MeshType &                                            mesh,
       const VectorType &                                          vector,
@@ -701,17 +752,20 @@ namespace VectorTools
             int dim,
             int spacedim,
             typename VectorType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   inline std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
                                spacedim,
-                               typename VectorType::value_type>::value_type>
-  point_values(
-    const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-    const MeshType<dim, spacedim> &                             mesh,
-    const VectorType &                                          vector,
-    const EvaluationFlags::EvaluationFlags                      flags,
-    const unsigned int first_selected_component)
+                               typename VectorType::value_type>::
+      value_type> point_values(const Utilities::MPI::
+                                 RemotePointEvaluation<dim, spacedim> &cache,
+                               const MeshType<dim, spacedim> &         mesh,
+                               const VectorType &                      vector,
+                               const EvaluationFlags::EvaluationFlags  flags,
+                               const unsigned int first_selected_component)
   {
     return internal::evaluate_at_points<
       n_components,
@@ -735,23 +789,31 @@ namespace VectorTools
       });
   }
 
+
+
   template <int n_components,
             template <int, int>
             class MeshType,
             int dim,
             int spacedim,
             typename VectorType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_vector_type<VectorType> &&
+     concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>))
   inline std::vector<
     typename FEPointEvaluation<n_components,
                                dim,
                                spacedim,
-                               typename VectorType::value_type>::gradient_type>
-  point_gradients(
-    const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-    const MeshType<dim, spacedim> &                             mesh,
-    const VectorType &                                          vector,
-    const EvaluationFlags::EvaluationFlags                      flags,
-    const unsigned int first_selected_component)
+                               typename VectorType::value_type>::
+      gradient_type> point_gradients(const Utilities::MPI::
+                                       RemotePointEvaluation<dim, spacedim>
+                                         &                          cache,
+                                     const MeshType<dim, spacedim> &mesh,
+                                     const VectorType &             vector,
+                                     const EvaluationFlags::EvaluationFlags
+                                       flags,
+                                     const unsigned int
+                                       first_selected_component)
   {
     return internal::evaluate_at_points<
       n_components,

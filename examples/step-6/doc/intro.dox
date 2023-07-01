@@ -101,7 +101,7 @@ that a cell can be only refined once more than its neighbors), but that we end
 up with these &ldquo;hanging nodes&rdquo; if we do this.
 
 
-<h3> Why adapatively refined meshes? </h3>
+<h3> Why adaptively refined meshes? </h3>
 
 Now that you have seen what these adaptively refined meshes look like,
 you should ask <i>why</i> we would want to do this. After all, we know from

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2022 by the deal.II authors
+// Copyright (C) 2009 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,9 +22,7 @@
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #include <boost/container/small_vector.hpp>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <algorithm>
 #include <vector>
@@ -181,6 +179,11 @@ public:
 
   /**
    * Add an individual index to the set of indices.
+   *
+   * If you have many indices to add to the set, consider calling the
+   * add_indices() function below. It is considerably more efficient,
+   * particularly if the indices to be added are stored in an array
+   * that is already sorted.
    */
   void
   add_index(const size_type index);
@@ -190,9 +193,24 @@ public:
    * the iterator range <code>[begin,end)</code>.
    *
    * @param[in] begin Iterator to the first element of range of indices to be
-   * added
+   * added.
    * @param[in] end The past-the-end iterator for the range of elements to be
-   * added. @pre The condition <code>begin@<=end</code> needs to be satisfied.
+   * added.
+   *
+   * @pre The condition <code>begin@<=end</code> needs to be satisfied. They
+   * also obviously have to point into the same container.
+   *
+   * @note The operations of this function are substantially more efficient
+   *   if the indices pointed to by the range of iterators are already sorted.
+   *   As a consequence, it is often highly beneficial to sort the range of
+   *   indices pointed to by the iterator range given by the arguments
+   *   before calling this function. Note also that the function deals
+   *   efficiently with sorted indices that contain duplicates (e.g., if
+   *   the iterator range points to the list `(1,1,1,2,2,4,6,8,8,8)`).
+   *   In other words, it is very useful to call `std::sort()` on the
+   *   range of indices you are about to add, but it is not necessary
+   *   to call the usual combination of `std::unique` and `std::erase`
+   *   to reduce the list of indices to only a set of unique elements.
    */
   template <typename ForwardIterator>
   void
@@ -246,7 +264,7 @@ public:
    * is complete.
    */
   bool
-  is_ascending_and_one_to_one(const MPI_Comm &communicator) const;
+  is_ascending_and_one_to_one(const MPI_Comm communicator) const;
 
   /**
    * Return the number of elements stored in this index set.
@@ -411,7 +429,7 @@ public:
    * This function is equivalent to calling get_index_vector() and
    * assigning the result to the @p indices argument.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED
   void
   fill_index_vector(std::vector<size_type> &indices) const;
 
@@ -497,19 +515,19 @@ public:
    * vector, e.g. for extracting only certain solution components.
    */
   Epetra_Map
-  make_trilinos_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
-                    const bool      overlapping  = false) const;
+  make_trilinos_map(const MPI_Comm communicator = MPI_COMM_WORLD,
+                    const bool     overlapping  = false) const;
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   Tpetra::Map<int, types::signed_global_dof_index>
-  make_tpetra_map(const MPI_Comm &communicator = MPI_COMM_WORLD,
-                  const bool      overlapping  = false) const;
+  make_tpetra_map(const MPI_Comm communicator = MPI_COMM_WORLD,
+                  const bool     overlapping  = false) const;
 #  endif
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
   IS
-  make_petsc_is(const MPI_Comm &communicator = MPI_COMM_WORLD) const;
+  make_petsc_is(const MPI_Comm communicator = MPI_COMM_WORLD) const;
 #endif
 
 
@@ -1733,24 +1751,45 @@ IndexSet::add_indices(const ForwardIterator &begin, const ForwardIterator &end)
   bool ranges_are_sorted = true;
   for (ForwardIterator p = begin; p != end;)
     {
+      // Starting with the current iterator 'p', find an iterator
+      // 'q' so that the indices pointed to by the iterators in
+      // the range [p,q) are consecutive. These indices then form
+      // a range that is contiguous, and that can be added all
+      // at once.
       const size_type begin_index = *p;
       size_type       end_index   = begin_index + 1;
-      ForwardIterator q           = p;
+
+      // Start looking at the position after 'p', and keep iterating while
+      // 'q' points to a duplicate of 'p':
+      ForwardIterator q = p;
       ++q;
+      while ((q != end) && (*q == *p))
+        ++q;
+
+      // Now we know that 'q' is either past the end, or points to a value
+      // other than 'p'. If it points to 'end_index', we are still good with
+      // a contiguous range; then increment the end index of that range, and
+      // move to the next iterator that is not a duplicate of what
+      // we were just looking at:
       while ((q != end) && (static_cast<size_type>(*q) == end_index))
         {
-          ++end_index;
           ++q;
+          while ((q != end) && (static_cast<size_type>(*q) == end_index))
+            ++q;
+
+          ++end_index;
         }
 
+      // Add this range:
       tmp_ranges.emplace_back(begin_index, end_index);
-      p = q;
 
-      // if the starting index of the next go-around of the for loop is less
+      // Then move on to the next element in the input range.
+      // If the starting index of the next go-around of the for loop is less
       // than the end index of the one just identified, then we will have at
       // least one pair of ranges that are not sorted, and consequently the
       // whole collection of ranges is not sorted.
-      if (p != end && static_cast<size_type>(*p) < end_index)
+      p = q;
+      if ((p != end) && (static_cast<size_type>(*p) < end_index))
         ranges_are_sorted = false;
     }
 

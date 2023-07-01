@@ -1,0 +1,16 @@
+
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(1)^2]
+DEAL:2d::Norm of difference: 4.55e-15
+DEAL:2d::
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(2)^2]
+DEAL:2d::Norm of difference: 2.16e-11
+DEAL:2d::
+DEAL:2d::Testing FESystem<2>[FE_DGQ<2>(4)^2]
+DEAL:2d::Norm of difference: 4.98e-11
+DEAL:2d::
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(1)^3]
+DEAL:3d::Norm of difference: 4.22e-11
+DEAL:3d::
+DEAL:3d::Testing FESystem<3>[FE_DGQ<3>(2)^3]
+DEAL:3d::Norm of difference: 2.12e-11
+DEAL:3d::

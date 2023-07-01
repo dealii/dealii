@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2020 - 2022 by the deal.II authors
+ * Copyright (C) 2020 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -1125,7 +1125,7 @@ namespace Euler_DG
             const auto numerical_flux =
               euler_numerical_flux<dim>(phi_m.get_value(q),
                                         phi_p.get_value(q),
-                                        phi_m.get_normal_vector(q));
+                                        phi_m.normal_vector(q));
             phi_m.submit_value(-numerical_flux, q);
             phi_p.submit_value(numerical_flux, q);
           }
@@ -1205,7 +1205,7 @@ namespace Euler_DG
         for (unsigned int q = 0; q < phi.n_q_points; ++q)
           {
             const auto w_m    = phi.get_value(q);
-            const auto normal = phi.get_normal_vector(q);
+            const auto normal = phi.normal_vector(q);
 
             auto rho_u_dot_n = w_m[1] * normal[0];
             for (unsigned int d = 1; d < dim; ++d)
@@ -1845,24 +1845,24 @@ namespace Euler_DG
              dim + 2 + (do_schlieren_plot == true ? 1 : 0),
            ExcInternalError());
 
-    for (unsigned int q = 0; q < n_evaluation_points; ++q)
+    for (unsigned int p = 0; p < n_evaluation_points; ++p)
       {
         Tensor<1, dim + 2> solution;
         for (unsigned int d = 0; d < dim + 2; ++d)
-          solution[d] = inputs.solution_values[q](d);
+          solution[d] = inputs.solution_values[p](d);
 
         const double         density  = solution[0];
         const Tensor<1, dim> velocity = euler_velocity<dim>(solution);
         const double         pressure = euler_pressure<dim>(solution);
 
         for (unsigned int d = 0; d < dim; ++d)
-          computed_quantities[q](d) = velocity[d];
-        computed_quantities[q](dim)     = pressure;
-        computed_quantities[q](dim + 1) = std::sqrt(gamma * pressure / density);
+          computed_quantities[p](d) = velocity[d];
+        computed_quantities[p](dim)     = pressure;
+        computed_quantities[p](dim + 1) = std::sqrt(gamma * pressure / density);
 
         if (do_schlieren_plot == true)
-          computed_quantities[q](dim + 2) =
-            inputs.solution_gradients[q][0] * inputs.solution_gradients[q][0];
+          computed_quantities[p](dim + 2) =
+            inputs.solution_gradients[p][0] * inputs.solution_gradients[p][0];
       }
   }
 
@@ -2081,6 +2081,13 @@ namespace Euler_DG
   // ignoring the (wrong) values in other entries. The fact that every process
   // submits a vector in which the correct subset of entries is correct is all
   // that is necessary.
+  //
+  // @note As of 2023, Visit 3.3.3 can still not deal with higher-order cells.
+  //   Rather, it simply reports that there is no data to show. To view the
+  //   results of this program with Visit, you will want to comment out the
+  //   line that sets `flags.write_higher_order_cells = true;`. On the other
+  //   hand, Paraview is able to understand VTU files with higher order cells
+  //   just fine.
   template <int dim>
   void EulerProblem<dim>::output_results(const unsigned int result_number)
   {

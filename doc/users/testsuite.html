@@ -5,7 +5,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>The deal.II Testsuite</title>
   <link href="../screen.css" rel="StyleSheet">
-  <meta name="copyright" content="Copyright (C) 1998 - 2022 by the deal.II Authors">
+  <meta name="copyright" content="Copyright (C) 1998 - 2023 by the deal.II Authors">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
   <meta http-equiv="content-language" content="en">
 </head>
@@ -111,7 +111,7 @@ SET(TARGET step-1)
 SET(TARGET_SRC step-1.cc)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.13.4)
-FIND_PACKAGE(deal.II 9.5.0 REQUIRED
+FIND_PACKAGE(deal.II 9.6.0 REQUIRED
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 
@@ -216,7 +216,7 @@ tests/support/my_test_2.output</pre>
 # top-level CMakelists.txt
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.13.4)
-FIND_PACKAGE(deal.II 9.5.0 REQUIRED
+FIND_PACKAGE(deal.II 9.6.0 REQUIRED
   HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
 

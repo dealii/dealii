@@ -115,7 +115,7 @@ Depending on how $\Omega$ is located relative to $\mathcal{T}_h$,
 a cut between a cell, $T \in \mathcal{T}_h$, and $\Omega$ can become arbitrarily small:
 $|\Omega \cap T | \rightarrow 0$.
 For Neumann boundary conditions,
-the consequence is that the stiffness matrix can become arbitrarily ill-conditioned
+the consequence is that the @ref GlossStiffnessMatrix "stiffness matrix" can become arbitrarily ill-conditioned
 as the cut-size approaches zero.
 For a Dirichlet condition, the situation is even worse.
 For any finite choice of Nitsche constant, $\gamma_D$,

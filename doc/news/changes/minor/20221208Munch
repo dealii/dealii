@@ -1,6 +1,0 @@
-New: SolverGMRES now also supports classical Gram-Schmidt orthonormalization
-alongside to the existing modified Gram-Schmidt algorithm. This
-allows to reduce the cost of vector operations in terms of
-communication latency and memory transfer significantly.
-<br>
-(Peter Munch, Martin Kronbichler, 2022/12/08)

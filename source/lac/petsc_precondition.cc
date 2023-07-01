@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2021 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  PreconditionBase::PreconditionBase(const MPI_Comm &comm)
+  PreconditionBase::PreconditionBase(const MPI_Comm comm)
     : pc(nullptr)
   {
     create_pc_with_comm(comm);
@@ -90,14 +90,10 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
-  const MPI_Comm &
+  MPI_Comm
   PreconditionBase::get_mpi_communicator() const
   {
-    static MPI_Comm comm  = PETSC_COMM_SELF;
-    MPI_Comm        pcomm = PetscObjectComm(reinterpret_cast<PetscObject>(pc));
-    if (pcomm != MPI_COMM_NULL)
-      comm = pcomm;
-    return comm;
+    return PetscObjectComm(reinterpret_cast<PetscObject>(pc));
   }
 
   void
@@ -114,16 +110,12 @@ namespace PETScWrappers
 
     create_pc_with_comm(comm);
 
-#  if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
-    ierr = PCSetOperators(pc, matrix, matrix, SAME_PRECONDITIONER);
-#  else
     ierr = PCSetOperators(pc, matrix, matrix);
-#  endif
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
   void
-  PreconditionBase::create_pc_with_comm(const MPI_Comm &comm)
+  PreconditionBase::create_pc_with_comm(const MPI_Comm comm)
   {
     clear();
     PetscErrorCode ierr = PCCreate(comm, &pc);
@@ -145,7 +137,7 @@ namespace PETScWrappers
 
 
 
-  PreconditionJacobi::PreconditionJacobi(const MPI_Comm &      comm,
+  PreconditionJacobi::PreconditionJacobi(const MPI_Comm        comm,
                                          const AdditionalData &additional_data_)
     : PreconditionBase(comm)
   {
@@ -202,7 +194,7 @@ namespace PETScWrappers
   {}
 
   PreconditionBlockJacobi::PreconditionBlockJacobi(
-    const MPI_Comm &      comm,
+    const MPI_Comm        comm,
     const AdditionalData &additional_data_)
     : PreconditionBase(comm)
   {
@@ -548,7 +540,7 @@ namespace PETScWrappers
 
 
   PreconditionBoomerAMG::PreconditionBoomerAMG(
-    const MPI_Comm &      comm,
+    const MPI_Comm        comm,
     const AdditionalData &additional_data_)
     : PreconditionBase(comm)
   {
@@ -1065,13 +1057,13 @@ namespace PETScWrappers
     initialize(matrix);
   }
 
-  PreconditionShell::PreconditionShell(const MPI_Comm &comm)
+  PreconditionShell::PreconditionShell(const MPI_Comm comm)
   {
     initialize(comm);
   }
 
   void
-  PreconditionShell::initialize(const MPI_Comm &comm)
+  PreconditionShell::initialize(const MPI_Comm comm)
   {
     PetscErrorCode ierr;
     if (pc)
@@ -1084,6 +1076,8 @@ namespace PETScWrappers
     ierr = PCSetType(pc, PCSHELL);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     ierr = PCShellSetContext(pc, static_cast<void *>(this));
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = PCShellSetSetUp(pc, PreconditionShell::pcsetup);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     ierr = PCShellSetApply(pc, PreconditionShell::pcapply);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -1098,51 +1092,110 @@ namespace PETScWrappers
   {
     initialize(matrix.get_mpi_communicator());
     PetscErrorCode ierr;
-#  if DEAL_II_PETSC_VERSION_LT(3, 5, 0)
-    ierr = PCSetOperators(pc, matrix, matrix, DIFFERENT_NONZERO_PATTERN);
-#  else
     ierr = PCSetOperators(pc, matrix, matrix);
-#  endif
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
-  int
+#  ifndef PetscCall
+#    define PetscCall(code)             \
+      do                                \
+        {                               \
+          PetscErrorCode ierr = (code); \
+          CHKERRQ(ierr);                \
+        }                               \
+      while (0)
+#  endif
+
+  PetscErrorCode
+  PreconditionShell::pcsetup(PC ppc)
+  {
+    PetscFunctionBeginUser;
+    // Failed reason is not reset uniformly within the
+    // interface code of PCSetUp in PETSc.
+    // We handle it here.
+    PetscCall(pc_set_failed_reason(ppc, PC_NOERROR));
+    PetscFunctionReturn(0);
+  }
+
+  PetscErrorCode
   PreconditionShell::pcapply(PC ppc, Vec x, Vec y)
   {
     void *ctx;
 
     PetscFunctionBeginUser;
-    PetscErrorCode ierr = PCShellGetContext(ppc, &ctx);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    PetscCall(PCShellGetContext(ppc, &ctx));
 
     auto user = static_cast<PreconditionShell *>(ctx);
-    AssertThrow(user->vmult,
-                StandardExceptions::ExcFunctionNotProvided(
-                  "std::function vmult"));
+    if (!user->vmult)
+      SETERRQ(
+        PetscObjectComm((PetscObject)ppc),
+        PETSC_ERR_LIB,
+        "Failure in dealii::PETScWrappers::PreconditionShell::pcapply. Missing std::function vmult");
 
     VectorBase src(x);
     VectorBase dst(y);
-    user->vmult(dst, src);
+    const int  lineno = __LINE__;
+    try
+      {
+        user->vmult(dst, src);
+      }
+    catch (const RecoverableUserCallbackError &)
+      {
+        PetscCall(pc_set_failed_reason(ppc, PC_SUBPC_ERROR));
+      }
+    catch (...)
+      {
+        return PetscError(
+          PetscObjectComm((PetscObject)ppc),
+          lineno + 3,
+          "vmult",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in pcapply from dealii::PETScWrappers::NonlinearSolver");
+      }
+    petsc_increment_state_counter(y);
     PetscFunctionReturn(0);
   }
 
-  int
+  PetscErrorCode
   PreconditionShell::pcapply_transpose(PC ppc, Vec x, Vec y)
   {
     void *ctx;
 
     PetscFunctionBeginUser;
-    PetscErrorCode ierr = PCShellGetContext(ppc, &ctx);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    PetscCall(PCShellGetContext(ppc, &ctx));
 
     auto user = static_cast<PreconditionShell *>(ctx);
-    AssertThrow(user->vmultT,
-                StandardExceptions::ExcFunctionNotProvided(
-                  "std::function vmultT"));
+    if (!user->vmultT)
+      SETERRQ(
+        PetscObjectComm((PetscObject)ppc),
+        PETSC_ERR_LIB,
+        "Failure in dealii::PETScWrappers::PreconditionShell::pcapply_transpose. Missing std::function vmultT");
 
     VectorBase src(x);
     VectorBase dst(y);
-    user->vmult(dst, src);
+    const int  lineno = __LINE__;
+    try
+      {
+        user->vmultT(dst, src);
+      }
+    catch (const RecoverableUserCallbackError &)
+      {
+        PetscCall(pc_set_failed_reason(ppc, PC_SUBPC_ERROR));
+      }
+    catch (...)
+      {
+        return PetscError(
+          PetscObjectComm((PetscObject)ppc),
+          lineno + 3,
+          "vmultT",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in pcapply_transpose from dealii::PETScWrappers::NonlinearSolver");
+      }
+    petsc_increment_state_counter(y);
     PetscFunctionReturn(0);
   }
 

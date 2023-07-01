@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2018 - 2022 by the deal.II authors
+ * Copyright (C) 2018 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -297,7 +297,7 @@ namespace Step37
     virtual ~PotentialBCFunction() = default;
 
     virtual double
-    value(const Point<dim> &p, const unsigned int) const
+    value(const Point<dim> &p, const unsigned int) const override
     {
       const double r = p.distance(x0);
       Assert(r > 0, ExcDivideByZero());
@@ -579,7 +579,7 @@ main(int argc, char *argv[])
       LaplaceProblem<dimension> laplace_problem;
       laplace_problem.run();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

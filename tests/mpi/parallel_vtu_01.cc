@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2020 by the deal.II authors
+// Copyright (C) 2009 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -64,10 +64,14 @@ test()
   x.reinit(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   x = 2.0;
 
+  DataOutBase::VtkFlags vtk_flags;
+  vtk_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+
   DataOut<dim> data_out;
   data_out.attach_dof_handler(dofh);
   data_out.add_data_vector(x, "x");
   data_out.build_patches();
+  data_out.set_flags(vtk_flags);
 
   data_out.write_vtu_in_parallel("output.vtu", MPI_COMM_WORLD);
   MPI_Barrier(MPI_COMM_WORLD);

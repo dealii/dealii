@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2012 - 2021 by the deal.II authors
+ * Copyright (C) 2012 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -164,7 +164,7 @@ namespace Step15
 
   // @sect4{MinimalSurfaceProblem::setup_system}
 
-  // As always in the setup-system function, we setup the variables of the
+  // As always in the setup-system function, we set up the variables of the
   // finite element method. There are same differences to step-6, because
   // there we start solving the PDE from scratch in every refinement cycle
   // whereas here we need to take the solution from the previous mesh onto the
@@ -561,7 +561,7 @@ namespace Step15
     // function from namespace DoFTools:
     hanging_node_constraints.condense(residual);
 
-    for (types::global_dof_index i :
+    for (const types::global_dof_index i :
          DoFTools::extract_boundary_dofs(dof_handler))
       residual(i) = 0;
 
@@ -683,7 +683,7 @@ namespace Step15
         ++refinement_cycle;
         std::cout << std::endl;
       }
-    while (last_residual_norm > 1e-3);
+    while (last_residual_norm > 1e-2);
   }
 } // namespace Step15
 

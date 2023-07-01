@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,7 +32,7 @@ namespace Utilities
     NoncontiguousPartitioner::NoncontiguousPartitioner(
       const IndexSet &indexset_has,
       const IndexSet &indexset_want,
-      const MPI_Comm &communicator)
+      const MPI_Comm  communicator)
     {
       this->reinit(indexset_has, indexset_want, communicator);
     }
@@ -42,7 +42,7 @@ namespace Utilities
     NoncontiguousPartitioner::NoncontiguousPartitioner(
       const std::vector<types::global_dof_index> &indices_has,
       const std::vector<types::global_dof_index> &indices_want,
-      const MPI_Comm &                            communicator)
+      const MPI_Comm                              communicator)
     {
       this->reinit(indices_has, indices_want, communicator);
     }
@@ -80,7 +80,7 @@ namespace Utilities
 
 
 
-    const MPI_Comm &
+    MPI_Comm
     NoncontiguousPartitioner::get_mpi_communicator() const
     {
       return communicator;
@@ -91,7 +91,7 @@ namespace Utilities
     void
     NoncontiguousPartitioner::reinit(const IndexSet &indexset_has,
                                      const IndexSet &indexset_want,
-                                     const MPI_Comm &communicator)
+                                     const MPI_Comm  communicator)
     {
       this->communicator = communicator;
 
@@ -105,7 +105,7 @@ namespace Utilities
       buffers.clear();
       requests.clear();
 
-      // setup communication pattern
+      // set up communication pattern
       std::vector<unsigned int> owning_ranks_of_ghosts(
         indexset_want.n_elements());
 
@@ -124,7 +124,7 @@ namespace Utilities
         consensus_algorithm;
       consensus_algorithm.run(process, communicator);
 
-      // setup map of processes from where this rank will receive values
+      // set up map of processes from where this rank will receive values
       {
         std::map<unsigned int, std::vector<types::global_dof_index>> recv_map;
 
@@ -169,7 +169,7 @@ namespace Utilities
     NoncontiguousPartitioner::reinit(
       const std::vector<types::global_dof_index> &indices_has,
       const std::vector<types::global_dof_index> &indices_want,
-      const MPI_Comm &                            communicator)
+      const MPI_Comm                              communicator)
     {
       // step 0) clean vectors from numbers::invalid_dof_index (indicating
       //         padding)
@@ -215,7 +215,7 @@ namespace Utilities
       index_set_want.add_indices(indices_want_clean.begin(),
                                  indices_want_clean.end());
 
-      // step 2) setup internal data structures with indexset
+      // step 2) set up internal data structures with indexset
       this->reinit(index_set_has, index_set_want, communicator);
 
       // step 3) fix inner data structures so that it is sorted as

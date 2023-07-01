@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -331,6 +331,88 @@ namespace Functions
         std::hypot(closest_point[0] - point[0], closest_point[1] - point[1]);
 
       return evaluate_ellipsoid(point) < 0.0 ? -distance : distance;
+    }
+
+
+
+    template <int dim>
+    Rectangle<dim>::Rectangle(const Point<dim> &bottom_left,
+                              const Point<dim> &top_right)
+      : bounding_box({bottom_left, top_right})
+    {}
+
+
+
+    template <int dim>
+    Rectangle<dim>::Rectangle(const BoundingBox<dim> bounding_box)
+      : bounding_box(bounding_box)
+    {}
+
+
+
+    template <int dim>
+    double
+    Rectangle<dim>::value(const Point<dim> & p,
+                          const unsigned int component) const
+    {
+      AssertDimension(component, 0);
+      (void)component;
+
+      return bounding_box.signed_distance(p);
+    }
+
+
+
+    template <int dim>
+    ZalesakDisk<dim>::ZalesakDisk(const Point<dim> &center,
+                                  const double      radius,
+                                  const double      notch_width,
+                                  const double      notch_height)
+      : sphere(center, radius)
+      , notch(// bottom left
+           (dim == 1) ?
+             Point<dim>(center[0] - 0.5 * notch_width) :
+           (dim == 2) ?
+             Point<dim>(center[0] - 0.5 * notch_width,
+                        std::numeric_limits<double>::lowest()) : /* notch is open in negative y-direction*/
+             Point<dim>(center[0] - 0.5 * notch_width,
+                        std::numeric_limits<
+                          double>::lowest() /* notch is open in negative y-direction*/,
+                        std::numeric_limits<double>::lowest()), /* notch is open in negative z-direction*/
+           // top right
+           (dim == 1) ?
+             Point<dim>(center[0] + 0.5 * notch_width) :
+           (dim == 2) ?
+             Point<dim>(center[0] + 0.5 * notch_width,
+                        center[1] + notch_height - radius) :
+             Point<dim>(center[0] + 0.5 * notch_width,
+                        std::numeric_limits<
+                          double>::max() /* notch is open in y-direction*/,
+                        center[2] + notch_height - radius))
+    {
+      Assert(
+        notch_width <= 2 * radius,
+        ExcMessage(
+          "The width of the notch must be less than the circle diameter."));
+      Assert(
+        notch_height <= 2 * radius,
+        ExcMessage(
+          "The height of the notch must be less than the circle diameter."));
+    }
+
+
+
+    template <int dim>
+    double
+    ZalesakDisk<dim>::value(const Point<dim> & p,
+                            const unsigned int component) const
+    {
+      (void)component;
+      AssertDimension(component, 0);
+
+      // calculate the set difference between the level set functions of the
+      // sphere and the notch
+      return std::max(sphere.value(p), -notch.value(p));
     }
   } // namespace SignedDistance
 } // namespace Functions

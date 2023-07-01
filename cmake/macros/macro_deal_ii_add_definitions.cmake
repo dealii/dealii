@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2017 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,7 +15,7 @@
 
 #
 # A small wrapper around
-# SET_TARget_property(... PROPERTIES COMPILE_DEFINITIONS ...)
+# set_target_property(... PROPERTIES COMPILE_DEFINITIONS ...)
 # to _add_ compile definitions to every target we have specified.
 #
 

@@ -323,7 +323,7 @@ system matrix $M$ in block form such that the product matrix
 is of a form that Krylov-based iterative solvers like GMRES can solve in a
 few iterations. We then replaced the exact inverse of $A$ by the action
 of an AMG preconditioner $\tilde{A}$ based on a vector Laplace matrix,
-approximated the Schur complement $S = B A^{-1} B^T$ by a mass matrix $M_p$
+approximated the Schur complement $S = B A^{-1} B^T$ by a @ref GlossMassMatrix "mass matrix" $M_p$
 on the pressure space and wrote an <tt>InverseMatrix</tt> class for
 implementing the action of $M_p^{-1}\approx S^{-1}$ on vectors. In the
 InverseMatrix class, we used a CG solve with an incomplete Cholesky (IC)

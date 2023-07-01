@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -25,13 +25,18 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
+
 template <int dim, typename Number>
 class Function;
 template <int dim, int spacedim>
 class Mapping;
+
 template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
 class Point;
+
 template <int rank_, int dim, typename Number>
 class Tensor;
 template <typename Number>
@@ -80,10 +85,12 @@ namespace VectorTools
    *   the other, you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_gradient(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_gradient(
     const DoFHandler<dim, spacedim> &dof,
     const VectorType &               fe_function,
     const Point<spacedim, double> &  point,
@@ -104,10 +111,12 @@ namespace VectorTools
    *   the other, you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_gradient(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_gradient(
     const DoFHandler<dim, spacedim> &dof,
     const VectorType &               fe_function,
     const Point<spacedim, double> &  point,
@@ -144,12 +153,15 @@ namespace VectorTools
    *   the other, you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
-  Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const DoFHandler<dim, spacedim> &dof,
-                 const VectorType &               fe_function,
-                 const Point<spacedim, double> &  point);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  Tensor<1, spacedim, typename VectorType::value_type> point_gradient(
+    const DoFHandler<dim, spacedim> &dof,
+    const VectorType &               fe_function,
+    const Point<spacedim, double> &  point);
 
   /**
    * Same as above for hp.
@@ -166,12 +178,15 @@ namespace VectorTools
    *   the other, you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
-  Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const DoFHandler<dim, spacedim> &dof,
-                 const VectorType &               fe_function,
-                 const Point<spacedim, double> &  point);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  Tensor<1, spacedim, typename VectorType::value_type> point_gradient(
+    const DoFHandler<dim, spacedim> &dof,
+    const VectorType &               fe_function,
+    const Point<spacedim, double> &  point);
 
   /**
    * Evaluate a possibly vector-valued finite element function defined by the
@@ -204,10 +219,12 @@ namespace VectorTools
    *   the other, you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_gradient(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_gradient(
     const Mapping<dim, spacedim> &   mapping,
     const DoFHandler<dim, spacedim> &dof,
     const VectorType &               fe_function,
@@ -229,10 +246,12 @@ namespace VectorTools
    *   the other, you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
-  void
-  point_gradient(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  void point_gradient(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim> &           dof,
     const VectorType &                          fe_function,
@@ -270,13 +289,16 @@ namespace VectorTools
    *   the other, you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
-  Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const Mapping<dim, spacedim> &   mapping,
-                 const DoFHandler<dim, spacedim> &dof,
-                 const VectorType &               fe_function,
-                 const Point<spacedim, double> &  point);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  Tensor<1, spacedim, typename VectorType::value_type> point_gradient(
+    const Mapping<dim, spacedim> &   mapping,
+    const DoFHandler<dim, spacedim> &dof,
+    const VectorType &               fe_function,
+    const Point<spacedim, double> &  point);
 
   /**
    * Same as above for hp.
@@ -293,13 +315,16 @@ namespace VectorTools
    *   the other, you will get unpredictable values for
    *   points on or close to the boundary of the cell, as one would expect
    *   when trying to evaluate point values of discontinuous functions.
+   *
+   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
   template <int dim, typename VectorType, int spacedim>
-  Tensor<1, spacedim, typename VectorType::value_type>
-  point_gradient(const hp::MappingCollection<dim, spacedim> &mapping,
-                 const DoFHandler<dim, spacedim> &           dof,
-                 const VectorType &                          fe_function,
-                 const Point<spacedim, double> &             point);
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
+  Tensor<1, spacedim, typename VectorType::value_type> point_gradient(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof,
+    const VectorType &                          fe_function,
+    const Point<spacedim, double> &             point);
 
   /** @} */
 } // namespace VectorTools

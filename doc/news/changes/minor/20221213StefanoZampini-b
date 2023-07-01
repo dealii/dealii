@@ -1,3 +1,0 @@
-Fixed: Add default MPI getter for PETSc Mat objects, that queries the underlying PETSc type.
-<br>
-(Stefano Zampini, 2022/12/13)

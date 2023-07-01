@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -35,33 +35,31 @@ set(HDF5_PREFER_PARALLEL TRUE)
 find_package(HDF5)
 
 set(_include_dirs "${HDF5_INCLUDE_DIRS}")
-set(_libraries "hdf5") #${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")
+set(_libraries_tmp "${HDF5_LIBRARIES};${HDF5_HL_LIBRARIES}")
 
-#
-# We'd like to have the full library names but the HDF5 package only
-# exports a list with short names. So check again for every lib and store
-# the full path:
-#
-#set(_libraries "")
-#foreach(_library hdf5 ${HDF5_LIBRARIES} ${HDF5_HL_LIBRARIES})
-#  list(APPEND _libraries HDF5_LIBRARY_${_library})
-#  deal_ii_find_library(HDF5_LIBRARY_${_library}
-#    NAMES ${_library}
-#    HINTS ${HDF5_INSTALL_LIBRARY_DIR}
-#    NO_DEFAULT_PATH
-#    NO_CMAKE_ENVIRONMENT_PATH
-#    NO_CMAKE_PATH
-#    NO_SYSTEM_ENVIRONMENT_PATH
-#    NO_CMAKE_SYSTEM_PATH
-#    NO_CMAKE_FIND_ROOT_PATH
-#    )
-#endforeach()
-bla
-MESSAGE(FATAL_ERROR "${_libraries}")
+# HDF5_LIBRARIES and HDF5_HL_LIBRARIES might contain targets or full paths to libraries
+# try to find full paths in the former case
+set(_libraries)
+foreach(_library ${_libraries_tmp})
+  if(TARGET ${_library})
+    get_target_property(_configurations ${_library} IMPORTED_CONFIGURATIONS)
+    if(_configurations)
+      foreach(_configuration ${_configurations})
+        get_target_property(_imported_location ${_library} IMPORTED_LOCATION_${_configuration})
+        list(APPEND _libraries ${_imported_location})
+      endforeach()
+    else()
+      get_target_property(_imported_location ${_library} IMPORTED_LOCATION)
+      list(APPEND _libraries ${_imported_location})
+    endif()
+  else()
+    list(APPEND _libraries ${_library})
+  endif()
+endforeach()
 
 process_feature(HDF5
   LIBRARIES
-    REQUIRED ${_libraries}
+    REQUIRED _libraries
     OPTIONAL MPI_C_LIBRARIES
   INCLUDE_DIRS
     REQUIRED _include_dirs

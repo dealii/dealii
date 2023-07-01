@@ -77,7 +77,7 @@ solved can be written as:
 \frac{dy}{dt} = g(t,y).
 @f}
 On the other hand, when using finite elements, discretized time derivatives always result in the
-presence of a mass matrix on the left hand side. This can easily be seen by
+presence of a @ref GlossMassMatrix "mass matrix" on the left hand side. This can easily be seen by
 considering that if the solution vector $y(t)$ in the equation above is in fact the vector
 of nodal coefficients $U(t)$ for a variable of the form
 @f{eqnarray*}

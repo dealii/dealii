@@ -1,7 +1,7 @@
 
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2013 - 2020 by the deal.II authors
+// Copyright (C) 2013 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -108,10 +108,10 @@ namespace GraphColoring
     template <typename Iterator>
     std::vector<std::vector<Iterator>>
     create_partitioning(
-      const Iterator &                         begin,
-      const typename identity<Iterator>::type &end,
+      const Iterator &                            begin,
+      const std_cxx20::type_identity_t<Iterator> &end,
       const std::function<std::vector<types::global_dof_index>(
-        const Iterator &)> &                   get_conflict_indices)
+        const Iterator &)> &                      get_conflict_indices)
     {
       // Number of iterators.
       unsigned int n_iterators = 0;
@@ -539,10 +539,10 @@ namespace GraphColoring
   template <typename Iterator>
   std::vector<std::vector<Iterator>>
   make_graph_coloring(
-    const Iterator &                               begin,
-    const typename identity<Iterator>::type &      end,
+    const Iterator &                                  begin,
+    const std_cxx20::type_identity_t<Iterator> &      end,
     const std::function<std::vector<types::global_dof_index>(
-      const typename identity<Iterator>::type &)> &get_conflict_indices)
+      const std_cxx20::type_identity_t<Iterator> &)> &get_conflict_indices)
   {
     Assert(begin != end,
            ExcMessage(

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2021 by the deal.II authors
+// Copyright (C) 2009 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The SLEPc solvers are intended to be used for solving the generalized
  * eigenspectrum problem $(A-\lambda B)x=0$, for $x\neq0$; where $A$ is a
- * system matrix, $B$ is a mass matrix, and $\lambda, x$ are a set of
+ * system matrix, $B$ is a @ref GlossMassMatrix "mass matrix", and $\lambda, x$ are a set of
  * eigenvalues and eigenvectors respectively. The emphasis is on methods and
  * techniques appropriate for problems in which the associated matrices are
  * sparse. Most of the methods offered by the SLEPc library are projection
@@ -150,7 +150,7 @@ namespace SLEPcWrappers
      * Constructor. Takes the MPI communicator over which parallel
      * computations are to happen.
      */
-    SolverBase(SolverControl &cn, const MPI_Comm &mpi_communicator);
+    SolverBase(SolverControl &cn, const MPI_Comm mpi_communicator);
 
     /**
      * Destructor.
@@ -405,7 +405,7 @@ namespace SLEPcWrappers
      * behavior as the PETScWrappers, but you can change that.
      */
     SolverKrylovSchur(SolverControl &       cn,
-                      const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                      const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
                       const AdditionalData &data = AdditionalData());
 
   protected:
@@ -456,7 +456,7 @@ namespace SLEPcWrappers
      * behavior as the PETScWrappers, but you can change that.
      */
     SolverArnoldi(SolverControl &       cn,
-                  const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                  const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
                   const AdditionalData &data             = AdditionalData());
 
   protected:
@@ -508,7 +508,7 @@ namespace SLEPcWrappers
      * behavior as the PETScWrappers, but you can change that.
      */
     SolverLanczos(SolverControl &       cn,
-                  const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                  const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
                   const AdditionalData &data             = AdditionalData());
 
   protected:
@@ -548,7 +548,7 @@ namespace SLEPcWrappers
      * behavior as the PETScWrappers, but you can change that.
      */
     SolverPower(SolverControl &       cn,
-                const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
                 const AdditionalData &data             = AdditionalData());
 
   protected:
@@ -597,10 +597,9 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behavior as the PETScWrappers, but you can change that.
      */
-    SolverGeneralizedDavidson(
-      SolverControl &       cn,
-      const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
-      const AdditionalData &data             = AdditionalData());
+    SolverGeneralizedDavidson(SolverControl &cn,
+                              const MPI_Comm mpi_communicator = PETSC_COMM_SELF,
+                              const AdditionalData &data = AdditionalData());
 
   protected:
     /**
@@ -638,9 +637,9 @@ namespace SLEPcWrappers
      * computations are parallelized. By default, this carries the same
      * behavior as the PETScWrappers, but you can change that.
      */
-    SolverJacobiDavidson(SolverControl & cn,
-                         const MPI_Comm &mpi_communicator = PETSC_COMM_SELF,
-                         const AdditionalData &data       = AdditionalData());
+    SolverJacobiDavidson(SolverControl &cn,
+                         const MPI_Comm mpi_communicator = PETSC_COMM_SELF,
+                         const AdditionalData &data      = AdditionalData());
 
   protected:
     /**
@@ -679,7 +678,7 @@ namespace SLEPcWrappers
      * behavior as the PETScWrappers, but you can change that.
      */
     SolverLAPACK(SolverControl &       cn,
-                 const MPI_Comm &      mpi_communicator = PETSC_COMM_SELF,
+                 const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
                  const AdditionalData &data             = AdditionalData());
 
   protected:

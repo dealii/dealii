@@ -65,7 +65,7 @@ where $\mathbf{u}(\textbf{x},t):\mathbb{R}^{d} \times \mathbb{R}
 dimension. We say that $\mathbf{u} \in \mathbb{R}^{d+2}$ is the state and
 $\mathbb{f}(\mathbf{u}) \in  \mathbb{R}^{(d+2) \times d}$ is the flux of
 the system. In the case of Euler's equations the state is given by
-$\textbf{u} = [\rho, \textbf{m},E]^{\top}$: where $\rho \in \mathbb{R}^+$
+$\textbf{u} = [\rho, \textbf{m}^\top,E]^{\top}$: where $\rho \in \mathbb{R}^+$
 denotes the density, $\textbf{m} \in \mathbb{R}^d$ is the momentum, and $E
 \in \mathbb{R}^+$ is the total energy of the system. The flux of the system
 $\mathbb{f}(\mathbf{u})$ is defined as
@@ -129,7 +129,7 @@ to satisfy the constraint $\textbf{u}(\mathbf{x},t) \in \mathcal{B}$ for
 all $\mathbf{x} \in \Omega$ and $t \geq 0$ where
 @f{align}
   \mathcal{B} = \big\{ \textbf{u} =
-  [\rho, \textbf{m},E]^{\top} \in \mathbb{R}^{d+2} \, \big |
+  [\rho, \textbf{m}^\top,E]^{\top} \in \mathbb{R}^{d+2} \, \big |
   \
   \rho > 0 \, ,
   \
@@ -267,7 +267,8 @@ the (explicit time stepping) scheme as:
 @f}
 where
   - $m_i \dealcoloneq \int_{\Omega} \phi_i \, \mathrm{d}\mathbf{x}$
-    is the lumped mass matrix
+    is the @ref GlossLumpedMassMatrix "lumped"
+    @ref GlossMassMatrix "mass matrix"
   - $\tau$ is the time step size
   - $\mathbf{c}_{ij} \dealcoloneq \int_{\Omega} \nabla\phi_j\phi_i \,
     \mathrm{d}\mathbf{x}$ (note that $\mathbf{c}_{ij}\in \mathbb{R}^d$)

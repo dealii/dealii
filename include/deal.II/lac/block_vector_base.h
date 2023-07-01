@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2022 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -141,6 +141,13 @@ namespace internal
        * by algorithms to enquire about the specifics of the iterators they
        * work on. (Example: `std::next()`, which needs to know about a local
        * type named `difference_type`.)
+       *
+       * As for the iterator_category, C++20 has a more specialized
+       * contiguous_iterator_tag, but the elements of block vectors are
+       * not stored in a contiguous manner. They can be accessed in a
+       * random access order, though, with O(1) effort as long as we
+       * assume that the number of blocks of a vector is a constant
+       * (even though the *size* of the vector is not).
        */
       using iterator_category = std::random_access_iterator_tag;
       using difference_type   = std::ptrdiff_t;
@@ -498,7 +505,7 @@ public:
   collect_sizes();
 
   /**
-   * Call the compress() function on all the subblocks of the matrix.
+   * Call the compress() function on all the subblocks of the vector.
    *
    * This functionality only needs to be called if using MPI based vectors and
    * exists in other objects for compatibility.
@@ -508,7 +515,7 @@ public:
    * for more information.
    */
   void
-  compress(::dealii::VectorOperation::values operation);
+  compress(VectorOperation::values operation);
 
   /**
    * Access to a single block.
@@ -1527,8 +1534,7 @@ BlockVectorBase<VectorType>::collect_sizes()
 
 template <class VectorType>
 inline void
-BlockVectorBase<VectorType>::compress(
-  ::dealii::VectorOperation::values operation)
+BlockVectorBase<VectorType>::compress(VectorOperation::values operation)
 {
   for (unsigned int i = 0; i < n_blocks(); ++i)
     block(i).compress(operation);

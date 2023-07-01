@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -173,7 +173,7 @@ Test<dim>::print_which_optionals_have_values_on_cell_0(
 {
   const auto cell = dof_handler.begin_active();
 
-  for (unsigned int face_index : cell->face_indices())
+  for (const unsigned int face_index : cell->face_indices())
     {
       deallog << "face " << face_index << std::endl;
 

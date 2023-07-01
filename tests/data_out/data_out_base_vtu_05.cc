@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,6 +53,7 @@ check(std::ostream &log, unsigned cell_order)
 
   DataOutBase::VtkFlags flags;
   flags.write_higher_order_cells = true;
+  flags.compression_level = DataOutBase::CompressionLevel::best_compression;
 
   DataOut<dim> data_out;
   data_out.set_flags(flags);

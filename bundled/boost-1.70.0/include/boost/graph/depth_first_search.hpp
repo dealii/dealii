@@ -156,7 +156,7 @@ namespace boost {
           ColorValue v_color = get(color, v);
           if (v_color == Color::white()) {
             vis.tree_edge(*ei, g);
-            src_e = *ei;
+            src_e = decltype(src_e)(*ei);
             stack.push_back(std::make_pair(u, std::make_pair(src_e, std::make_pair(++ei, ei_end))));
             u = v;
             put(color, u, Color::gray());

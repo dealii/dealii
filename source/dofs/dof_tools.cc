@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -506,11 +506,11 @@ namespace DoFTools
 
     // next set up a table for the degrees of freedom on each of the cells
     // whether it is something interesting or not
-    std::vector<unsigned char> local_component_asssociation =
+    std::vector<unsigned char> local_component_association =
       internal::get_local_component_association(fe, component_mask);
     std::vector<bool> local_selected_dofs(fe.n_dofs_per_cell());
     for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-      local_selected_dofs[i] = component_mask[local_component_asssociation[i]];
+      local_selected_dofs[i] = component_mask[local_component_association[i]];
 
     // then loop over all cells and do work
     std::vector<types::global_dof_index> indices(fe.n_dofs_per_cell());
@@ -901,8 +901,7 @@ namespace DoFTools
     {
       template <int spacedim>
       IndexSet
-      extract_hanging_node_dofs(
-        const dealii::DoFHandler<1, spacedim> &dof_handler)
+      extract_hanging_node_dofs(const DoFHandler<1, spacedim> &dof_handler)
       {
         // there are no hanging nodes in 1d
         return IndexSet(dof_handler.n_dofs());
@@ -911,8 +910,7 @@ namespace DoFTools
 
       template <int spacedim>
       IndexSet
-      extract_hanging_node_dofs(
-        const dealii::DoFHandler<2, spacedim> &dof_handler)
+      extract_hanging_node_dofs(const DoFHandler<2, spacedim> &dof_handler)
       {
         const unsigned int dim = 2;
 
@@ -928,8 +926,7 @@ namespace DoFTools
               for (const unsigned int face : cell->face_indices())
                 if (cell->face(face)->has_children())
                   {
-                    const typename dealii::DoFHandler<dim,
-                                                      spacedim>::line_iterator
+                    const typename DoFHandler<dim, spacedim>::line_iterator
                       line = cell->face(face);
 
                     for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
@@ -957,8 +954,7 @@ namespace DoFTools
 
       template <int spacedim>
       IndexSet
-      extract_hanging_node_dofs(
-        const dealii::DoFHandler<3, spacedim> &dof_handler)
+      extract_hanging_node_dofs(const DoFHandler<3, spacedim> &dof_handler)
       {
         const unsigned int dim = 3;
 
@@ -971,8 +967,8 @@ namespace DoFTools
           if (!cell->is_artificial())
             for (auto f : cell->face_indices())
               {
-                const typename dealii::DoFHandler<dim, spacedim>::face_iterator
-                  face = cell->face(f);
+                const typename DoFHandler<dim, spacedim>::face_iterator face =
+                  cell->face(f);
                 if (cell->face(f)->has_children())
                   {
                     for (unsigned int child = 0; child < 4; ++child)
@@ -1163,11 +1159,9 @@ namespace DoFTools
               dofs_on_ghosts.push_back(dof_index);
         }
 
-    // sort, compress out duplicates, fill into index set
+    // sort and put into an index set
     std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
-    dof_set.add_indices(dofs_on_ghosts.begin(),
-                        std::unique(dofs_on_ghosts.begin(),
-                                    dofs_on_ghosts.end()));
+    dof_set.add_indices(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
     dof_set.compress();
 
     return dof_set;
@@ -1221,12 +1215,9 @@ namespace DoFTools
             dofs_on_ghosts.push_back(dof_index);
       }
 
-    // sort, compress out duplicates, fill into index set
+    // sort and fill into an index set
     std::sort(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
-    dof_set.add_indices(dofs_on_ghosts.begin(),
-                        std::unique(dofs_on_ghosts.begin(),
-                                    dofs_on_ghosts.end()));
-
+    dof_set.add_indices(dofs_on_ghosts.begin(), dofs_on_ghosts.end());
     dof_set.compress();
 
     return dof_set;
@@ -1694,13 +1685,8 @@ namespace DoFTools
                                    local_dof_indices.begin(),
                                    local_dof_indices.end());
         }
-    // sort indices and remove duplicates
+    // sort indices and put into an index set:
     std::sort(subdomain_indices.begin(), subdomain_indices.end());
-    subdomain_indices.erase(std::unique(subdomain_indices.begin(),
-                                        subdomain_indices.end()),
-                            subdomain_indices.end());
-
-    // insert into IndexSet
     index_set.add_indices(subdomain_indices.begin(), subdomain_indices.end());
     index_set.compress();
 
@@ -2147,13 +2133,14 @@ namespace DoFTools
     namespace
     {
       template <int dim, int spacedim>
-      void
+      std::map<types::global_dof_index, Point<spacedim>>
       map_dofs_to_support_points(
-        const hp::MappingCollection<dim, spacedim> &        mapping,
-        const DoFHandler<dim, spacedim> &                   dof_handler,
-        std::map<types::global_dof_index, Point<spacedim>> &support_points,
-        const ComponentMask &                               in_mask)
+        const hp::MappingCollection<dim, spacedim> &mapping,
+        const DoFHandler<dim, spacedim> &           dof_handler,
+        const ComponentMask &                       in_mask)
       {
+        std::map<types::global_dof_index, Point<spacedim>> support_points;
+
         const hp::FECollection<dim, spacedim> &fe_collection =
           dof_handler.get_fe_collection();
         hp::QCollection<dim> q_coll_dummy;
@@ -2212,23 +2199,24 @@ namespace DoFTools
                     support_points[local_dof_indices[i]] = points[i];
                 }
             }
+
+        return support_points;
       }
 
 
       template <int dim, int spacedim>
-      void
-      map_dofs_to_support_points(
+      std::vector<Point<spacedim>>
+      map_dofs_to_support_points_vector(
         const hp::MappingCollection<dim, spacedim> &mapping,
         const DoFHandler<dim, spacedim> &           dof_handler,
-        std::vector<Point<spacedim>> &              support_points,
         const ComponentMask &                       mask)
       {
+        std::vector<Point<spacedim>> support_points(dof_handler.n_dofs());
+
         // get the data in the form of the map as above
-        std::map<types::global_dof_index, Point<spacedim>> x_support_points;
-        map_dofs_to_support_points(mapping,
-                                   dof_handler,
-                                   x_support_points,
-                                   mask);
+        const std::map<types::global_dof_index, Point<spacedim>>
+          x_support_points =
+            map_dofs_to_support_points(mapping, dof_handler, mask);
 
         // now convert from the map to the linear vector. make sure every
         // entry really appeared in the map
@@ -2237,11 +2225,14 @@ namespace DoFTools
             Assert(x_support_points.find(i) != x_support_points.end(),
                    ExcInternalError());
 
-            support_points[i] = x_support_points[i];
+            support_points[i] = x_support_points.find(i)->second;
           }
+
+        return support_points;
       }
     } // namespace
   }   // namespace internal
+
 
   template <int dim, int spacedim>
   void
@@ -2262,10 +2253,10 @@ namespace DoFTools
     // gets a MappingCollection
     const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
-    internal::map_dofs_to_support_points(mapping_collection,
-                                         dof_handler,
-                                         support_points,
-                                         mask);
+    support_points =
+      internal::map_dofs_to_support_points_vector(mapping_collection,
+                                                  dof_handler,
+                                                  mask);
   }
 
 
@@ -2287,15 +2278,14 @@ namespace DoFTools
 
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
-    internal::map_dofs_to_support_points(mapping,
-                                         dof_handler,
-                                         support_points,
-                                         mask);
+    support_points =
+      internal::map_dofs_to_support_points_vector(mapping, dof_handler, mask);
   }
 
 
+  // This function is deprecated:
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   map_dofs_to_support_points(
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
@@ -2308,15 +2298,15 @@ namespace DoFTools
     // gets a MappingCollection
     const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
 
-    internal::map_dofs_to_support_points(mapping_collection,
-                                         dof_handler,
-                                         support_points,
-                                         mask);
+    support_points = internal::map_dofs_to_support_points(mapping_collection,
+                                                          dof_handler,
+                                                          mask);
   }
 
 
+  // This function is deprecated:
   template <int dim, int spacedim>
-  void
+  DEAL_II_DEPRECATED void
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &        mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
@@ -2327,11 +2317,37 @@ namespace DoFTools
 
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
-    internal::map_dofs_to_support_points(mapping,
-                                         dof_handler,
-                                         support_points,
-                                         mask);
+    support_points =
+      internal::map_dofs_to_support_points(mapping, dof_handler, mask);
   }
+
+
+  template <int dim, int spacedim>
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
+                             const DoFHandler<dim, spacedim> &dof_handler,
+                             const ComponentMask &            mask)
+  {
+    // Let the internal function do all the work, just make sure that it
+    // gets a MappingCollection
+    const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
+
+    return internal::map_dofs_to_support_points(mapping_collection,
+                                                dof_handler,
+                                                mask);
+  }
+
+
+  template <int dim, int spacedim>
+  std::map<types::global_dof_index, Point<spacedim>>
+  map_dofs_to_support_points(
+    const hp::MappingCollection<dim, spacedim> &mapping,
+    const DoFHandler<dim, spacedim> &           dof_handler,
+    const ComponentMask &                       mask)
+  {
+    return internal::map_dofs_to_support_points(mapping, dof_handler, mask);
+  }
+
 
   template <int spacedim>
   void

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -20,18 +20,6 @@
 
 #ifdef DEAL_II_WITH_SYMENGINE
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-// Low level
-#  include <symengine/basic.h>
-#  include <symengine/dict.h>
-#  include <symengine/symengine_exception.h>
-#  include <symengine/symengine_rcp.h>
-
-// Visitor
-#  include <symengine/visitor.h>
-
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
-
 #  include <deal.II/base/exceptions.h>
 #  include <deal.II/base/numbers.h>
 
@@ -39,6 +27,12 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <deal.II/differentiation/sd/symengine_utilities.h>
 
 #  include <boost/serialization/split_member.hpp>
+
+#  include <symengine/basic.h>
+#  include <symengine/dict.h>
+#  include <symengine/symengine_exception.h>
+#  include <symengine/symengine_rcp.h>
+#  include <symengine/visitor.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -670,12 +664,12 @@ namespace Differentiation
 
         // ... followed by any intermediate evaluations due to the application
         // of CSE. These are fed directly back into the substitution map...
-        for (unsigned i = 0; i < intermediate_symbols_exprs.size(); ++i)
+        for (const auto &expression : intermediate_symbols_exprs)
           {
             const SymEngine::RCP<const SymEngine::Basic> &cse_symbol =
-              intermediate_symbols_exprs[i].first;
+              expression.first;
             const SymEngine::RCP<const SymEngine::Basic> &cse_expr =
-              intermediate_symbols_exprs[i].second;
+              expression.second;
             Assert(substitution_value_map.find(cse_symbol) ==
                      substitution_value_map.end(),
                    ExcMessage(

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -204,7 +204,7 @@ namespace parallel
 
 
         // Communicate the results.
-        out.compress(dealii::VectorOperation::insert);
+        out.compress(VectorOperation::insert);
 
         // Treat hanging nodes
         std::vector<types::global_dof_index> dof_indices;

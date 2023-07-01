@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -137,7 +137,7 @@ namespace Utilities
      * only one process and the function returns 1.
      */
     unsigned int
-    n_mpi_processes(const MPI_Comm &mpi_communicator);
+    n_mpi_processes(const MPI_Comm mpi_communicator);
 
     /**
      * Return the
@@ -148,15 +148,15 @@ namespace Utilities
      * than) the number of all processes (given by get_n_mpi_processes()).
      */
     unsigned int
-    this_mpi_process(const MPI_Comm &mpi_communicator);
+    this_mpi_process(const MPI_Comm mpi_communicator);
 
     /**
      * Return a vector of the ranks (within @p comm_large) of a subset of
      * processes specified by @p comm_small.
      */
     const std::vector<unsigned int>
-    mpi_processes_within_communicator(const MPI_Comm &comm_large,
-                                      const MPI_Comm &comm_small);
+    mpi_processes_within_communicator(const MPI_Comm comm_large,
+                                      const MPI_Comm comm_small);
 
     /**
      * Consider an unstructured communication pattern where every process in
@@ -181,7 +181,7 @@ namespace Utilities
      */
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern(
-      const MPI_Comm &                 mpi_comm,
+      const MPI_Comm                   mpi_comm,
       const std::vector<unsigned int> &destinations);
 
     /**
@@ -205,7 +205,7 @@ namespace Utilities
      */
     unsigned int
     compute_n_point_to_point_communications(
-      const MPI_Comm &                 mpi_comm,
+      const MPI_Comm                   mpi_comm,
       const std::vector<unsigned int> &destinations);
 
     /**
@@ -225,7 +225,7 @@ namespace Utilities
      * <code>MPI_Comm_dup(mpi_communicator, &return_value);</code>.
      */
     MPI_Comm
-    duplicate_communicator(const MPI_Comm &mpi_communicator);
+    duplicate_communicator(const MPI_Comm mpi_communicator);
 
     /**
      * Free the given
@@ -237,7 +237,7 @@ namespace Utilities
      * <code>MPI_Comm_free(&mpi_communicator);</code>.
      */
     void
-    free_communicator(MPI_Comm &mpi_communicator);
+    free_communicator(MPI_Comm mpi_communicator);
 
     /**
      * Helper class to automatically duplicate and free an MPI
@@ -257,7 +257,7 @@ namespace Utilities
       /**
        * Create a duplicate of the given @p communicator.
        */
-      explicit DuplicatedCommunicator(const MPI_Comm &communicator)
+      explicit DuplicatedCommunicator(const MPI_Comm communicator)
         : comm(duplicate_communicator(communicator))
       {}
 
@@ -277,7 +277,7 @@ namespace Utilities
       /**
        * Access the stored communicator.
        */
-      const MPI_Comm &
+      MPI_Comm
       operator*() const
       {
         return comm;
@@ -342,7 +342,7 @@ namespace Utilities
         /**
          * Constructor. Blocks until it can acquire the lock.
          */
-        explicit ScopedLock(CollectiveMutex &mutex, const MPI_Comm &comm)
+        explicit ScopedLock(CollectiveMutex &mutex, const MPI_Comm comm)
           : mutex(mutex)
           , comm(comm)
         {
@@ -385,7 +385,7 @@ namespace Utilities
        * in the communicator.
        */
       void
-      lock(const MPI_Comm &comm);
+      lock(const MPI_Comm comm);
 
       /**
        * Release the lock.
@@ -394,7 +394,7 @@ namespace Utilities
        * in the communicator.
        */
       void
-      unlock(const MPI_Comm &comm);
+      unlock(const MPI_Comm comm);
 
     private:
       /**
@@ -451,7 +451,7 @@ namespace Utilities
      *
      * This class models these two steps by taking two constructor
      * arguments that correspond to these two operations. It ensures
-     * that that upon destruction of the current object, both the
+     * that upon destruction of the current object, both the
      * wait and clean-up functions are called. Because the clean-up
      * function can only be called once, objects of the current
      * class can not be copied, but they can be moved.
@@ -573,7 +573,7 @@ namespace Utilities
      */
 #ifdef DEAL_II_WITH_MPI
     DEAL_II_DEPRECATED int
-    create_group(const MPI_Comm & comm,
+    create_group(const MPI_Comm   comm,
                  const MPI_Group &group,
                  const int        tag,
                  MPI_Comm *       new_comm);
@@ -589,7 +589,7 @@ namespace Utilities
      */
     std::vector<IndexSet>
     create_ascending_partitioning(
-      const MPI_Comm &              comm,
+      const MPI_Comm                comm,
       const types::global_dof_index locally_owned_size);
 
     /**
@@ -601,7 +601,7 @@ namespace Utilities
      */
     IndexSet
     create_evenly_distributed_partitioning(
-      const MPI_Comm &              comm,
+      const MPI_Comm                comm,
       const types::global_dof_index total_size);
 
 #ifdef DEAL_II_WITH_MPI
@@ -622,9 +622,9 @@ namespace Utilities
      */
     template <class Iterator, typename Number = long double>
     std::pair<Number, typename numbers::NumberTraits<Number>::real_type>
-    mean_and_standard_deviation(const Iterator  begin,
-                                const Iterator  end,
-                                const MPI_Comm &comm);
+    mean_and_standard_deviation(const Iterator begin,
+                                const Iterator end,
+                                const MPI_Comm comm);
 #endif
 
 
@@ -699,7 +699,7 @@ namespace Utilities
      */
     template <typename T>
     T
-    sum(const T &t, const MPI_Comm &mpi_communicator);
+    sum(const T &t, const MPI_Comm mpi_communicator);
 
     /**
      * Like the previous function, but take the sums over the elements of an
@@ -712,7 +712,7 @@ namespace Utilities
      */
     template <typename T, typename U>
     void
-    sum(const T &values, const MPI_Comm &mpi_communicator, U &sums);
+    sum(const T &values, const MPI_Comm mpi_communicator, U &sums);
 
     /**
      * Like the previous function, but take the sums over the elements of an
@@ -726,7 +726,7 @@ namespace Utilities
     template <typename T>
     void
     sum(const ArrayView<const T> &values,
-        const MPI_Comm &          mpi_communicator,
+        const MPI_Comm            mpi_communicator,
         const ArrayView<T> &      sums);
 
     /**
@@ -737,7 +737,7 @@ namespace Utilities
     template <int rank, int dim, typename Number>
     SymmetricTensor<rank, dim, Number>
     sum(const SymmetricTensor<rank, dim, Number> &local,
-        const MPI_Comm &                          mpi_communicator);
+        const MPI_Comm                            mpi_communicator);
 
     /**
      * Perform an MPI sum of the entries of a tensor.
@@ -747,7 +747,7 @@ namespace Utilities
     template <int rank, int dim, typename Number>
     Tensor<rank, dim, Number>
     sum(const Tensor<rank, dim, Number> &local,
-        const MPI_Comm &                 mpi_communicator);
+        const MPI_Comm                   mpi_communicator);
 
     /**
      * Perform an MPI sum of the entries of a SparseMatrix.
@@ -760,7 +760,7 @@ namespace Utilities
     template <typename Number>
     void
     sum(const SparseMatrix<Number> &local,
-        const MPI_Comm &            mpi_communicator,
+        const MPI_Comm              mpi_communicator,
         SparseMatrix<Number> &      global);
 
     /**
@@ -784,7 +784,7 @@ namespace Utilities
      */
     template <typename T>
     T
-    max(const T &t, const MPI_Comm &mpi_communicator);
+    max(const T &t, const MPI_Comm mpi_communicator);
 
     /**
      * Like the previous function, but take the maximum over the elements of an
@@ -797,7 +797,7 @@ namespace Utilities
      */
     template <typename T, typename U>
     void
-    max(const T &values, const MPI_Comm &mpi_communicator, U &maxima);
+    max(const T &values, const MPI_Comm mpi_communicator, U &maxima);
 
     /**
      * Like the previous function, but take the maximum over the elements of an
@@ -811,7 +811,7 @@ namespace Utilities
     template <typename T>
     void
     max(const ArrayView<const T> &values,
-        const MPI_Comm &          mpi_communicator,
+        const MPI_Comm            mpi_communicator,
         const ArrayView<T> &      maxima);
 
     /**
@@ -835,7 +835,7 @@ namespace Utilities
      */
     template <typename T>
     T
-    min(const T &t, const MPI_Comm &mpi_communicator);
+    min(const T &t, const MPI_Comm mpi_communicator);
 
     /**
      * Like the previous function, but take the minima over the elements of an
@@ -848,7 +848,7 @@ namespace Utilities
      */
     template <typename T, typename U>
     void
-    min(const T &values, const MPI_Comm &mpi_communicator, U &minima);
+    min(const T &values, const MPI_Comm mpi_communicator, U &minima);
 
     /**
      * Like the previous function, but take the minimum over the elements of an
@@ -862,7 +862,7 @@ namespace Utilities
     template <typename T>
     void
     min(const ArrayView<const T> &values,
-        const MPI_Comm &          mpi_communicator,
+        const MPI_Comm            mpi_communicator,
         const ArrayView<T> &      minima);
 
     /**
@@ -890,7 +890,7 @@ namespace Utilities
      */
     template <typename T>
     T
-    logical_or(const T &t, const MPI_Comm &mpi_communicator);
+    logical_or(const T &t, const MPI_Comm mpi_communicator);
 
     /**
      * Like the previous function, but performs the <i>logical or</i> operation
@@ -908,7 +908,7 @@ namespace Utilities
      */
     template <typename T, typename U>
     void
-    logical_or(const T &values, const MPI_Comm &mpi_communicator, U &results);
+    logical_or(const T &values, const MPI_Comm mpi_communicator, U &results);
 
     /**
      * Like the previous function, but performs the <i>logical or</i> operation
@@ -922,7 +922,7 @@ namespace Utilities
     template <typename T>
     void
     logical_or(const ArrayView<const T> &values,
-               const MPI_Comm &          mpi_communicator,
+               const MPI_Comm            mpi_communicator,
                const ArrayView<T> &      results);
 
     /**
@@ -1001,7 +1001,7 @@ namespace Utilities
      * everywhere.
      */
     MinMaxAvg
-    min_max_avg(const double my_value, const MPI_Comm &mpi_communicator);
+    min_max_avg(const double my_value, const MPI_Comm mpi_communicator);
 
     /**
      * Same as above but returning the sum, average, minimum, maximum,
@@ -1016,7 +1016,7 @@ namespace Utilities
      */
     std::vector<MinMaxAvg>
     min_max_avg(const std::vector<double> &my_value,
-                const MPI_Comm &           mpi_communicator);
+                const MPI_Comm             mpi_communicator);
 
 
     /**
@@ -1029,12 +1029,12 @@ namespace Utilities
      * @note This function performs a single reduction sweep.
      *
      * @pre Size of the input ArrayView has to be the same on all processes
-     *   and the input and output ArrayVew have to have the same size.
+     *   and the input and output ArrayView have to have the same size.
      */
     void
     min_max_avg(const ArrayView<const double> &my_values,
                 const ArrayView<MinMaxAvg> &   result,
-                const MPI_Comm &               mpi_communicator);
+                const MPI_Comm                 mpi_communicator);
 
 
     /**
@@ -1071,8 +1071,8 @@ namespace Utilities
      * processor. In most use cases, one will of course want to work
      * on all MPI processes using essentially the same program, and so
      * this is not an issue. But if you plan to run deal.II-based work
-     * on only a subset of MPI processes, using an @ ref
-     * GlossMPICommunicator "MPI communicator" that is a subset of
+     * on only a subset of MPI processes, using an
+     * @ref GlossMPICommunicator "MPI communicator" that is a subset of
      * `MPI_COMM_WORLD` (for example, in client-server settings where
      * only a subset of processes is responsible for the finite
      * element communications and the remaining processes do other
@@ -1244,7 +1244,7 @@ namespace Utilities
      */
     template <typename T>
     std::map<unsigned int, T>
-    some_to_some(const MPI_Comm &                 comm,
+    some_to_some(const MPI_Comm                   comm,
                  const std::map<unsigned int, T> &objects_to_send);
 
     /**
@@ -1262,7 +1262,7 @@ namespace Utilities
      */
     template <typename T>
     std::vector<T>
-    all_gather(const MPI_Comm &comm, const T &object_to_send);
+    all_gather(const MPI_Comm comm, const T &object_to_send);
 
     /**
      * A generalization of the classic MPI_Gather function, that accepts
@@ -1281,7 +1281,7 @@ namespace Utilities
      */
     template <typename T>
     std::vector<T>
-    gather(const MPI_Comm &   comm,
+    gather(const MPI_Comm     comm,
            const T &          object_to_send,
            const unsigned int root_process = 0);
 
@@ -1301,7 +1301,7 @@ namespace Utilities
      */
     template <typename T>
     T
-    scatter(const MPI_Comm &      comm,
+    scatter(const MPI_Comm        comm,
             const std::vector<T> &objects_to_send,
             const unsigned int    root_process = 0);
 
@@ -1342,7 +1342,7 @@ namespace Utilities
      */
     template <typename T>
     std::enable_if_t<is_mpi_type<T> == false, T>
-    broadcast(const MPI_Comm &   comm,
+    broadcast(const MPI_Comm     comm,
               const T &          object_to_send,
               const unsigned int root_process = 0);
 
@@ -1370,7 +1370,7 @@ namespace Utilities
      */
     template <typename T>
     std::enable_if_t<is_mpi_type<T> == true, T>
-    broadcast(const MPI_Comm &   comm,
+    broadcast(const MPI_Comm     comm,
               const T &          object_to_send,
               const unsigned int root_process = 0);
 
@@ -1395,7 +1395,7 @@ namespace Utilities
     broadcast(T *                buffer,
               const size_t       count,
               const unsigned int root,
-              const MPI_Comm &   comm);
+              const MPI_Comm     comm);
 
     /**
      * A function that combines values @p local_value from all processes
@@ -1412,7 +1412,7 @@ namespace Utilities
     template <typename T>
     T
     reduce(const T &                                     local_value,
-           const MPI_Comm &                              comm,
+           const MPI_Comm                                comm,
            const std::function<T(const T &, const T &)> &combiner,
            const unsigned int                            root_process = 0);
 
@@ -1428,7 +1428,7 @@ namespace Utilities
     template <typename T>
     T
     all_reduce(const T &                                     local_value,
-               const MPI_Comm &                              comm,
+               const MPI_Comm                                comm,
                const std::function<T(const T &, const T &)> &combiner);
 
 
@@ -1528,7 +1528,7 @@ namespace Utilities
     std::vector<unsigned int>
     compute_index_owner(const IndexSet &owned_indices,
                         const IndexSet &indices_to_look_up,
-                        const MPI_Comm &comm);
+                        const MPI_Comm  comm);
 
     /**
      * Compute the union of the input vectors @p vec of all processes in the
@@ -1539,14 +1539,14 @@ namespace Utilities
      */
     template <typename T>
     std::vector<T>
-    compute_set_union(const std::vector<T> &vec, const MPI_Comm &comm);
+    compute_set_union(const std::vector<T> &vec, const MPI_Comm comm);
 
     /**
      * The same as above but for std::set.
      */
     template <typename T>
     std::set<T>
-    compute_set_union(const std::set<T> &set, const MPI_Comm &comm);
+    compute_set_union(const std::set<T> &set, const MPI_Comm comm);
 
 
 
@@ -1741,7 +1741,7 @@ namespace Utilities
       void
       all_reduce(const MPI_Op &            mpi_op,
                  const ArrayView<const T> &values,
-                 const MPI_Comm &          mpi_communicator,
+                 const MPI_Comm            mpi_communicator,
                  const ArrayView<T> &      output);
     } // namespace internal
 
@@ -1804,7 +1804,7 @@ namespace Utilities
 
     template <typename T, unsigned int N>
     void
-    sum(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&sums)[N])
+    sum(const T (&values)[N], const MPI_Comm mpi_communicator, T (&sums)[N])
     {
       internal::all_reduce(MPI_SUM,
                            ArrayView<const T>(values, N),
@@ -1816,7 +1816,7 @@ namespace Utilities
 
     template <typename T, unsigned int N>
     void
-    max(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&maxima)[N])
+    max(const T (&values)[N], const MPI_Comm mpi_communicator, T (&maxima)[N])
     {
       internal::all_reduce(MPI_MAX,
                            ArrayView<const T>(values, N),
@@ -1828,7 +1828,7 @@ namespace Utilities
 
     template <typename T, unsigned int N>
     void
-    min(const T (&values)[N], const MPI_Comm &mpi_communicator, T (&minima)[N])
+    min(const T (&values)[N], const MPI_Comm mpi_communicator, T (&minima)[N])
     {
       internal::all_reduce(MPI_MIN,
                            ArrayView<const T>(values, N),
@@ -1841,7 +1841,7 @@ namespace Utilities
     template <typename T, unsigned int N>
     void
     logical_or(const T (&values)[N],
-               const MPI_Comm &mpi_communicator,
+               const MPI_Comm mpi_communicator,
                T (&results)[N])
     {
       static_assert(std::is_integral<T>::value,
@@ -1857,7 +1857,7 @@ namespace Utilities
 
     template <typename T>
     std::map<unsigned int, T>
-    some_to_some(const MPI_Comm &                 comm,
+    some_to_some(const MPI_Comm                   comm,
                  const std::map<unsigned int, T> &objects_to_send)
     {
 #  ifndef DEAL_II_WITH_MPI
@@ -1973,7 +1973,7 @@ namespace Utilities
 
     template <typename T>
     std::vector<T>
-    all_gather(const MPI_Comm &comm, const T &object)
+    all_gather(const MPI_Comm comm, const T &object)
     {
       if (job_supports_mpi() == false)
         return {object};
@@ -2036,7 +2036,7 @@ namespace Utilities
 
     template <typename T>
     std::vector<T>
-    gather(const MPI_Comm &   comm,
+    gather(const MPI_Comm     comm,
            const T &          object_to_send,
            const unsigned int root_process)
     {
@@ -2119,7 +2119,7 @@ namespace Utilities
 
     template <typename T>
     T
-    scatter(const MPI_Comm &      comm,
+    scatter(const MPI_Comm        comm,
             const std::vector<T> &objects_to_send,
             const unsigned int    root_process)
     {
@@ -2197,7 +2197,7 @@ namespace Utilities
     broadcast(T *                buffer,
               const size_t       count,
               const unsigned int root,
-              const MPI_Comm &   comm)
+              const MPI_Comm     comm)
     {
 #  ifndef DEAL_II_WITH_MPI
       (void)buffer;
@@ -2233,7 +2233,7 @@ namespace Utilities
 
     template <typename T>
     std::enable_if_t<is_mpi_type<T> == false, T>
-    broadcast(const MPI_Comm &   comm,
+    broadcast(const MPI_Comm     comm,
               const T &          object_to_send,
               const unsigned int root_process)
     {
@@ -2283,7 +2283,7 @@ namespace Utilities
 
     template <typename T>
     std::enable_if_t<is_mpi_type<T> == true, T>
-    broadcast(const MPI_Comm &   comm,
+    broadcast(const MPI_Comm     comm,
               const T &          object_to_send,
               const unsigned int root_process)
     {
@@ -2441,9 +2441,9 @@ namespace Utilities
 #  ifdef DEAL_II_WITH_MPI
     template <class Iterator, typename Number>
     std::pair<Number, typename numbers::NumberTraits<Number>::real_type>
-    mean_and_standard_deviation(const Iterator  begin,
-                                const Iterator  end,
-                                const MPI_Comm &comm)
+    mean_and_standard_deviation(const Iterator begin,
+                                const Iterator end,
+                                const MPI_Comm comm)
     {
       // below we do simple and straight-forward implementation. More elaborate
       // options are:

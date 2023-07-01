@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -73,7 +73,7 @@ DEAL_II_NAMESPACE_OPEN
  * MPI support (several processes access the same HDF5 file).
  * File::File(const std::string &, const FileAccessMode)
  * opens/creates an HDF5 file for serial operations.
- * File::File(const std::string &, const FileAccessMode, const MPI_Comm &)
+ * File::File(const std::string &, const FileAccessMode, const MPI_Comm )
  * creates or opens an HDF5 file in parallel using MPI. The HDF5 calls that
  * modify the structure of the file are always collective, whereas writing
  * and reading raw data in a dataset can be done independently or collectively.
@@ -399,7 +399,7 @@ namespace HDF5
 
   protected:
     /**
-     * Name of the HDF5Oject. In the case of File, @p name corresponds to the
+     * Name of the HDF5Object. In the case of File, @p name corresponds to the
      * file name. In the case of Group and DataSet @p name corresponds to the
      * name of the object in the HDF5 file.
      */
@@ -1105,12 +1105,12 @@ namespace HDF5
      */
     File(const std::string &  name,
          const FileAccessMode mode,
-         const MPI_Comm &     mpi_communicator);
+         const MPI_Comm       mpi_communicator);
 
   private:
     /**
      * Delegation internal constructor.
-     * File(const std::string &, const MPI_Comm &, const Mode);
+     * File(const std::string &, const MPI_Comm , const Mode);
      * and
      * File(const std::string &, const Mode)
      * should be used to open or create HDF5 files.
@@ -1118,7 +1118,7 @@ namespace HDF5
     File(const std::string &  name,
          const FileAccessMode mode,
          const bool           mpi,
-         const MPI_Comm &     mpi_communicator);
+         const MPI_Comm       mpi_communicator);
   };
 
   namespace internal

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2020 by the deal.II authors
+// Copyright (C) 2002 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,7 +71,10 @@ test()
 
   tria.refine_global(1);
 
-  GridOut grid_out;
+  GridOut           grid_out;
+  GridOutFlags::Vtu vtu_flags;
+  vtu_flags.compression_level = DataOutBase::CompressionLevel::best_compression;
+  grid_out.set_flags(vtu_flags);
   grid_out.write_vtu(tria, deallog.get_file_stream());
 }
 

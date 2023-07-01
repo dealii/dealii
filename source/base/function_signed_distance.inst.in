@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2021 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,4 +18,6 @@ for (deal_II_dimension : SPACE_DIMENSIONS)
     template class Functions::SignedDistance::Sphere<deal_II_dimension>;
     template class Functions::SignedDistance::Plane<deal_II_dimension>;
     template class Functions::SignedDistance::Ellipsoid<deal_II_dimension>;
+    template class Functions::SignedDistance::Rectangle<deal_II_dimension>;
+    template class Functions::SignedDistance::ZalesakDisk<deal_II_dimension>;
   }

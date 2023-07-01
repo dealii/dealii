@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -411,8 +411,15 @@ IndexSet::pop_front()
 void
 IndexSet::add_range_lower_bound(const Range &new_range)
 {
-  ranges.insert(Utilities::lower_bound(ranges.begin(), ranges.end(), new_range),
-                new_range);
+  // if the inserted range is already within the range we find by lower_bound,
+  // there is no need to do anything; we do not try to be clever here and
+  // leave all other work to compress().
+  const auto insert_position =
+    Utilities::lower_bound(ranges.begin(), ranges.end(), new_range);
+  if (insert_position == ranges.end() ||
+      insert_position->begin > new_range.begin ||
+      insert_position->end < new_range.end)
+    ranges.insert(insert_position, new_range);
 }
 
 
@@ -740,8 +747,8 @@ IndexSet::fill_index_vector(std::vector<size_type> &indices) const
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 Tpetra::Map<int, types::signed_global_dof_index>
-IndexSet::make_tpetra_map(const MPI_Comm &communicator,
-                          const bool      overlapping) const
+IndexSet::make_tpetra_map(const MPI_Comm communicator,
+                          const bool     overlapping) const
 {
   compress();
   (void)communicator;
@@ -809,8 +816,8 @@ IndexSet::make_tpetra_map(const MPI_Comm &communicator,
 
 
 Epetra_Map
-IndexSet::make_trilinos_map(const MPI_Comm &communicator,
-                            const bool      overlapping) const
+IndexSet::make_trilinos_map(const MPI_Comm communicator,
+                            const bool     overlapping) const
 {
   compress();
   (void)communicator;
@@ -878,7 +885,7 @@ IndexSet::make_trilinos_map(const MPI_Comm &communicator,
 
 #ifdef DEAL_II_WITH_PETSC
 IS
-IndexSet::make_petsc_is(const MPI_Comm &communicator) const
+IndexSet::make_petsc_is(const MPI_Comm communicator) const
 {
   std::vector<size_type> indices;
   fill_index_vector(indices);
@@ -898,7 +905,7 @@ IndexSet::make_petsc_is(const MPI_Comm &communicator) const
 
 
 bool
-IndexSet::is_ascending_and_one_to_one(const MPI_Comm &communicator) const
+IndexSet::is_ascending_and_one_to_one(const MPI_Comm communicator) const
 {
   // If the sum of local elements does not add up to the total size,
   // the IndexSet can't be complete.

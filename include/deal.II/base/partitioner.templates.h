@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,11 +18,9 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/cuda_size.h>
 #include <deal.II/base/mpi_tags.h>
 #include <deal.II/base/partitioner.h>
 
-#include <deal.II/lac/cuda_kernels.templates.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <limits>
@@ -132,7 +130,7 @@ namespace Utilities
               auto locally_owned_array_data = locally_owned_array.data();
               MemorySpace::Default::kokkos_space::execution_space exec;
               Kokkos::parallel_for(
-                "fill temp_array_ptr",
+                "dealii::fill temp_array_ptr",
                 Kokkos::RangePolicy<
                   MemorySpace::Default::kokkos_space::execution_space>(
                   exec, 0, chunk_size),
@@ -587,7 +585,7 @@ namespace Utilities
         initialize_import_indices_plain_dev();
 #    endif
 
-      if (vector_operation != dealii::VectorOperation::insert)
+      if (vector_operation != VectorOperation::insert)
         AssertDimension(n_ghost_targets + n_import_targets, requests.size());
       // first wait for the receive to complete
       if (requests.size() > 0 && n_import_targets > 0)
@@ -603,7 +601,7 @@ namespace Utilities
                                                  MemorySpaceType,
                                                  MemorySpace::Default>::value)
             {
-              if (vector_operation == dealii::VectorOperation::add)
+              if (vector_operation == VectorOperation::add)
                 {
                   for (auto const &import_indices_plain :
                        import_indices_plain_dev)
@@ -613,7 +611,7 @@ namespace Utilities
                       using IndexType = decltype(chunk_size);
                       MemorySpace::Default::kokkos_space::execution_space exec;
                       Kokkos::parallel_for(
-                        "fill locally_owned_array, add",
+                        "dealii::fill locally_owned_array, add",
                         Kokkos::RangePolicy<
                           MemorySpace::Default::kokkos_space::execution_space>(
                           exec, 0, chunk_size),
@@ -627,7 +625,7 @@ namespace Utilities
                       read_position += chunk_size;
                     }
                 }
-              else if (vector_operation == dealii::VectorOperation::min)
+              else if (vector_operation == VectorOperation::min)
                 {
                   for (auto const &import_indices_plain :
                        import_indices_plain_dev)
@@ -637,7 +635,7 @@ namespace Utilities
                       using IndexType = decltype(chunk_size);
                       MemorySpace::Default::kokkos_space::execution_space exec;
                       Kokkos::parallel_for(
-                        "fill locally_owned_array, min",
+                        "dealii::fill locally_owned_array, min",
                         Kokkos::RangePolicy<
                           MemorySpace::Default::kokkos_space::execution_space>(
                           exec, 0, chunk_size),
@@ -654,7 +652,7 @@ namespace Utilities
                       read_position += chunk_size;
                     }
                 }
-              else if (vector_operation == dealii::VectorOperation::max)
+              else if (vector_operation == VectorOperation::max)
                 {
                   for (auto const &import_indices_plain :
                        import_indices_plain_dev)
@@ -664,7 +662,7 @@ namespace Utilities
                       using IndexType = decltype(chunk_size);
                       MemorySpace::Default::kokkos_space::execution_space exec;
                       Kokkos::parallel_for(
-                        "fill locally_owned_array, max",
+                        "dealii::fill locally_owned_array, max",
                         Kokkos::RangePolicy<
                           MemorySpace::Default::kokkos_space::execution_space>(
                           exec, 0, chunk_size),
@@ -700,13 +698,13 @@ namespace Utilities
               // local values. For insert, nothing is done here (but in debug
               // mode we assert that the specified value is either zero or
               // matches with the ones already present
-              if (vector_operation == dealii::VectorOperation::add)
+              if (vector_operation == VectorOperation::add)
                 for (const auto &import_range : import_indices_data)
                   for (unsigned int j = import_range.first;
                        j < import_range.second;
                        j++)
                     locally_owned_array[j] += *read_position++;
-              else if (vector_operation == dealii::VectorOperation::min)
+              else if (vector_operation == VectorOperation::min)
                 for (const auto &import_range : import_indices_data)
                   for (unsigned int j = import_range.first;
                        j < import_range.second;
@@ -717,7 +715,7 @@ namespace Utilities
                                           locally_owned_array[j]);
                       read_position++;
                     }
-              else if (vector_operation == dealii::VectorOperation::max)
+              else if (vector_operation == VectorOperation::max)
                 for (const auto &import_range : import_indices_data)
                   for (unsigned int j = import_range.first;
                        j < import_range.second;

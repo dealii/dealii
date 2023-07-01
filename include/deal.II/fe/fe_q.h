@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2021 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,7 +75,7 @@ DEAL_II_NAMESPACE_OPEN
  * increases. In interpolation, this effect is known as the Runge
  * phenomenon. For Galerkin methods, the Runge phenomenon is typically not
  * visible in the solution quality but rather in the condition number of the
- * associated system matrices. For example, the elemental mass matrix of
+ * associated system matrices. For example, the elemental @ref GlossMassMatrix "mass matrix" of
  * equidistant points at degree 10 has condition number 2.6e6, whereas the
  * condition number for Gauss-Lobatto points is around 400.
  *
@@ -577,7 +577,7 @@ public:
    * different are the basis functions of this space. This is useful in
    * contexts where one wants to achieve certain properties of the matrices
    * that result from integrating bilinear forms of these shape functions.
-   * For example, when computing the mass matrix on cell $K$,
+   * For example, when computing the @ref GlossMassMatrix "mass matrix" on cell $K$,
    * @f[
    *   M_{ij}^K = \int_K \varphi_i(\mathbf x) \varphi_j(\mathbf x) \; dx
    * @f]

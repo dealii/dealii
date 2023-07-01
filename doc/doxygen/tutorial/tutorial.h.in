@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2022 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -299,7 +299,8 @@
  *   <tr valign="top">
  *       <td>step-23</td>
  *       <td> Finally a "real" time dependent problem, the wave equation.
- *       Fractional time stepping (explicit, fully implicit and Crank-Nicholson
+ *       Fractional time stepping (explicit, fully implicit and
+ *       [Crank](https://en.wikipedia.org/wiki/John_Crank)-[Nicolson](https://en.wikipedia.org/wiki/Phyllis_Nicolson)
  *       method).
  *       <br/> Keywords: MatrixCreator, VectorTools::project()
  *       </td></tr>
@@ -925,6 +926,7 @@
  *     </td>
  *     <td>
  *       step-12,
+ *       step-12b,
  *       step-21,
  *       step-39,
  *       step-46,

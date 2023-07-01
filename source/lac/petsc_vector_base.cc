@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2022 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -123,7 +123,7 @@ namespace PETScWrappers
   VectorBase::VectorBase()
     : vector(nullptr)
     , ghosted(false)
-    , last_action(::dealii::VectorOperation::unknown)
+    , last_action(VectorOperation::unknown)
   {}
 
 
@@ -132,7 +132,7 @@ namespace PETScWrappers
     : Subscriptor()
     , ghosted(v.ghosted)
     , ghost_indices(v.ghost_indices)
-    , last_action(::dealii::VectorOperation::unknown)
+    , last_action(VectorOperation::unknown)
   {
     PetscErrorCode ierr = VecDuplicate(v.vector, &vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -147,13 +147,13 @@ namespace PETScWrappers
     : Subscriptor()
     , vector(v)
     , ghosted(false)
-    , last_action(::dealii::VectorOperation::unknown)
+    , last_action(VectorOperation::unknown)
   {
-    /* TODO GHOSTED */
     const PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(vector));
     AssertNothrow(ierr == 0, ExcPETScError(ierr));
     (void)ierr;
+    this->determine_ghost_indices();
   }
 
 
@@ -170,8 +170,7 @@ namespace PETScWrappers
   void
   VectorBase::reinit(Vec v)
   {
-    /* TODO GHOSTED */
-    AssertThrow(last_action == ::dealii::VectorOperation::unknown,
+    AssertThrow(last_action == VectorOperation::unknown,
                 ExcMessage("Cannot assign a new Vec"));
     PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(v));
@@ -179,7 +178,169 @@ namespace PETScWrappers
     ierr = VecDestroy(&vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
     vector = v;
+    this->determine_ghost_indices();
   }
+
+
+
+  namespace
+  {
+    template <typename Iterator, typename OutType>
+    class ConvertingIterator
+    {
+      Iterator m_iterator;
+
+    public:
+      using difference_type =
+        typename std::iterator_traits<Iterator>::difference_type;
+      using value_type        = OutType;
+      using pointer           = OutType *;
+      using reference         = OutType &;
+      using iterator_category = std::forward_iterator_tag;
+
+      ConvertingIterator(const Iterator &iterator)
+        : m_iterator(iterator)
+      {}
+
+      OutType
+      operator*() const
+      {
+        return static_cast<OutType>(std::real(*m_iterator));
+      }
+
+      ConvertingIterator &
+      operator++()
+      {
+        ++m_iterator;
+        return *this;
+      }
+
+      ConvertingIterator
+      operator++(int)
+      {
+        ConvertingIterator old = *this;
+        ++m_iterator;
+        return old;
+      }
+
+      bool
+      operator==(const ConvertingIterator &other) const
+      {
+        return this->m_iterator == other.m_iterator;
+      }
+
+      bool
+      operator!=(const ConvertingIterator &other) const
+      {
+        return this->m_iterator != other.m_iterator;
+      }
+    };
+  } // namespace
+
+
+
+  void
+  VectorBase::determine_ghost_indices()
+  {
+    // Reset ghost data
+    ghosted = false;
+    ghost_indices.clear();
+
+    // There's no API to infer ghost indices from a PETSc Vec which
+    // unfortunately doesn't allow integer entries. We use the
+    // "ConvertingIterator" class above to do an implicit conversion when
+    // sorting and adding ghost indices below.
+    PetscErrorCode ierr;
+    Vec            ghosted_vec;
+    ierr = VecGhostGetLocalForm(vector, &ghosted_vec);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    if (ghosted_vec && ghosted_vec != vector)
+      {
+        Vec          tvector;
+        PetscScalar *array;
+        PetscInt     ghost_start_index, end_index, n_elements_stored_locally;
+
+        ierr = VecGhostRestoreLocalForm(vector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        ierr = VecGetOwnershipRange(vector, &ghost_start_index, &end_index);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecDuplicate(vector, &tvector);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetArray(tvector, &array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        // Store the indices we care about in the vector, so that we can then
+        // exchange this information between processes. It is unfortunate that
+        // we have to store integers in floating point numbers. Let's at least
+        // make sure we do that in a way that ensures that when we get these
+        // numbers back as integers later on, we get the same thing.
+        for (PetscInt i = 0; i < end_index - ghost_start_index; i++)
+          {
+            Assert(static_cast<PetscInt>(static_cast<PetscScalar>(
+                     ghost_start_index + i)) == (ghost_start_index + i),
+                   ExcInternalError());
+            array[i] = ghost_start_index + i;
+          }
+
+        ierr = VecRestoreArray(tvector, &array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostUpdateBegin(tvector, INSERT_VALUES, SCATTER_FORWARD);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostUpdateEnd(tvector, INSERT_VALUES, SCATTER_FORWARD);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostGetLocalForm(tvector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetLocalSize(ghosted_vec, &n_elements_stored_locally);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGetArrayRead(ghosted_vec, (const PetscScalar **)&array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        // Populate the 'ghosted' flag and the ghost_indices variable. The
+        // latter is an index set that is most efficiently filled by
+        // sorting the indices to add. At the same time, we don't want to
+        // sort the indices stored in a PETSc-owned array; so if the array
+        // is already sorted, pass that to the IndexSet variable, and if
+        // not then copy the indices, sort them, and then add those.
+        ghosted = true;
+        ghost_indices.set_size(this->size());
+
+        ConvertingIterator<PetscScalar *, types::global_dof_index> begin_ghosts(
+          &array[end_index - ghost_start_index]);
+        ConvertingIterator<PetscScalar *, types::global_dof_index> end_ghosts(
+          &array[n_elements_stored_locally]);
+        if (std::is_sorted(&array[end_index - ghost_start_index],
+                           &array[n_elements_stored_locally],
+                           [](PetscScalar left, PetscScalar right) {
+                             return static_cast<PetscInt>(std::real(left)) <
+                                    static_cast<PetscInt>(std::real(right));
+                           }))
+          {
+            ghost_indices.add_indices(begin_ghosts, end_ghosts);
+          }
+        else
+          {
+            std::vector<PetscInt> sorted_indices(begin_ghosts, end_ghosts);
+            std::sort(sorted_indices.begin(), sorted_indices.end());
+            ghost_indices.add_indices(sorted_indices.begin(),
+                                      sorted_indices.end());
+          }
+        ghost_indices.compress();
+
+        ierr = VecRestoreArrayRead(ghosted_vec, (const PetscScalar **)&array);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecGhostRestoreLocalForm(tvector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = VecDestroy(&tvector);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+    else
+      {
+        ierr = VecGhostRestoreLocalForm(vector, &ghosted_vec);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+  }
+
 
   void
   VectorBase::clear()
@@ -189,7 +350,7 @@ namespace PETScWrappers
 
     ghosted = false;
     ghost_indices.clear();
-    last_action = ::dealii::VectorOperation::unknown;
+    last_action = VectorOperation::unknown;
   }
 
 
@@ -407,8 +568,8 @@ namespace PETScWrappers
                                      get_mpi_communicator());
       AssertThrowMPI(ierr);
 
-      AssertThrow(all_int_last_action != (::dealii::VectorOperation::add |
-                                          ::dealii::VectorOperation::insert),
+      AssertThrow(all_int_last_action !=
+                    (VectorOperation::add | VectorOperation::insert),
                   ExcMessage("Error: not all processors agree on the last "
                              "VectorOperation before this compress() call."));
 #    endif
@@ -416,8 +577,7 @@ namespace PETScWrappers
     }
 
     AssertThrow(
-      last_action == ::dealii::VectorOperation::unknown ||
-        last_action == operation,
+      last_action == VectorOperation::unknown || last_action == operation,
       ExcMessage(
         "Missing compress() or calling with wrong VectorOperation argument."));
 
@@ -443,7 +603,7 @@ namespace PETScWrappers
     // reset the last action field to
     // indicate that we're back to a
     // pristine state
-    last_action = ::dealii::VectorOperation::unknown;
+    last_action = VectorOperation::unknown;
   }
 
 
@@ -822,7 +982,7 @@ namespace PETScWrappers
     AssertIsFinite(a);
 
     // there is nothing like a AXPAY
-    // operation in Petsc, so do it in two
+    // operation in PETSc, so do it in two
     // steps
     *this *= s;
     add(a, v);
@@ -848,13 +1008,8 @@ namespace PETScWrappers
 
     Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
 
-    // there is no simple operation for this
-    // in PETSc. there are multiple ways to
-    // emulate it, we choose this one:
-    const PetscErrorCode ierr = VecCopy(v.vector, vector);
+    const PetscErrorCode ierr = VecAXPBY(vector, a, 0.0, v.vector);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-
-    *this *= a;
   }
 
 
@@ -927,8 +1082,13 @@ namespace PETScWrappers
   void
   VectorBase::swap(VectorBase &v)
   {
-    const PetscErrorCode ierr = VecSwap(vector, v.vector);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    std::swap(this->vector, v.vector);
+    std::swap(this->ghosted, v.ghosted);
+    std::swap(this->last_action, v.last_action);
+    // missing swap for IndexSet
+    IndexSet t(this->ghost_indices);
+    this->ghost_indices = v.ghost_indices;
+    v.ghost_indices     = t;
   }
 
 
@@ -973,11 +1133,9 @@ namespace PETScWrappers
                                    const PetscScalar *values,
                                    const bool         add_values)
   {
-    ::dealii::VectorOperation::values action =
-      (add_values ? ::dealii::VectorOperation::add :
-                    ::dealii::VectorOperation::insert);
-    Assert((last_action == action) ||
-             (last_action == ::dealii::VectorOperation::unknown),
+    VectorOperation::values action =
+      (add_values ? VectorOperation::add : VectorOperation::insert);
+    Assert((last_action == action) || (last_action == VectorOperation::unknown),
            internal::VectorReference::ExcWrongMode(action, last_action));
     Assert(!has_ghost_elements(), ExcGhostsPresent());
     // VecSetValues complains if we

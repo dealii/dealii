@@ -1,0 +1,36 @@
+
+DEAL::Running with Trilinos on 4 MPI rank(s)...
+DEAL::  Target_tolerance: 0.00100000
+DEAL::
+DEAL::  Computing residual vector... norm=0.170956
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.129347
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.100710
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0776513
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0593571
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0459878
+DEAL::  Computing Jacobian matrix
+DEAL::  Factorizing Jacobian matrix
+DEAL::  Solving linear system
+DEAL::Solver stopped within 0 - 10 iterations
+DEAL::  Computing residual vector... norm=0.0355434
+DEAL::

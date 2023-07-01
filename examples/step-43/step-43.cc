@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2022 by the deal.II authors
+ * Copyright (C) 2010 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -794,7 +794,7 @@ namespace Step43
   // @sect4{TwoPhaseFlowProblem<dim>::assemble_darcy_preconditioner}
 
   // This function assembles the matrix we use for preconditioning the Darcy
-  // system. What we need are a vector mass matrix weighted by
+  // system. What we need are a vector @ref GlossMassMatrix "mass matrix" weighted by
   // $\left(\mathbf{K} \lambda_t\right)^{-1}$ on the velocity components and a
   // mass matrix weighted by $\left(\mathbf{K} \lambda_t\right)$ on the
   // pressure component. We start by generating a quadrature object of

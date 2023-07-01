@@ -36,7 +36,7 @@ template <int dim, int spacedim>
 std::string
 FE_DGNedelec<dim, spacedim>::get_name() const
 {
-  // note that the FETools::get_fe_by_nam function depends on the
+  // note that FETools::get_fe_by_name() depends on the
   // particular format of the string
   // this function returns, so they
   // have to be kept in synch

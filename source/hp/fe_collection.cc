@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2022 by the deal.II authors
+// Copyright (C) 2003 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -72,11 +72,6 @@ namespace hp
              new_fe.n_components() == this->operator[](0).n_components(),
            ExcMessage("All elements inside a collection need to have the "
                       "same number of vector components!"));
-
-    Assert(this->size() <= std::numeric_limits<types::fe_index>::max() &&
-             this->size() != numbers::invalid_fe_index,
-           ExcMessage(
-             "You reached the maximum possible number of finite elements."));
 
     Collection<FiniteElement<dim, spacedim>>::push_back(new_fe.clone());
   }
@@ -393,8 +388,8 @@ namespace hp
           if (fe_index_1 != fe_index_2)
             for (const auto &identity :
                  query_identities(fe_index_1, fe_index_2))
-              identities_graph.emplace(Edge(Node(fe_index_1, identity.first),
-                                            Node(fe_index_2, identity.second)));
+              identities_graph.emplace(Node(fe_index_1, identity.first),
+                                       Node(fe_index_2, identity.second));
 
 #ifdef DEBUG
       // Now verify that indeed the graph is symmetric: If one element
@@ -480,7 +475,7 @@ namespace hp
           for (const Edge &e : sub_graph)
             identities_graph.erase(e);
 
-#if DEBUG
+#ifdef DEBUG
           // There are three checks we ought to perform:
           // - That the sub-graph is undirected, i.e. that every edge appears
           //   in both directions

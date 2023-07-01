@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -401,7 +401,7 @@ public:
    * Return the square of the norm of the vector <tt>v</tt> induced by this
    * matrix, i.e. <i>(v,Mv)</i>. This is useful, e.g. in the finite element
    * context, where the <i>L<sup>2</sup></i> norm of a function equals the
-   * matrix norm with respect to the mass matrix of the vector representing
+   * matrix norm with respect to the @ref GlossMassMatrix "mass matrix" of the vector representing
    * the nodal values of the finite element function.
    *
    * Obviously, the matrix needs to be quadratic for this operation, and for
@@ -1187,6 +1187,66 @@ FullMatrix<number>::copy_from(const MatrixType &M)
            ++entry)
         this->el(row, entry->column()) = entry->value();
     }
+}
+
+
+
+template <typename number>
+template <int dim>
+void
+FullMatrix<number>::copy_from(const Tensor<2, dim> &T,
+                              const unsigned int    src_r_i,
+                              const unsigned int    src_r_j,
+                              const unsigned int    src_c_i,
+                              const unsigned int    src_c_j,
+                              const size_type       dst_r,
+                              const size_type       dst_c)
+{
+  Assert(!this->empty(), ExcEmptyMatrix());
+  AssertIndexRange(src_r_j - src_r_i, this->m() - dst_r);
+  AssertIndexRange(src_c_j - src_c_i, this->n() - dst_c);
+  AssertIndexRange(src_r_j, dim);
+  AssertIndexRange(src_c_j, dim);
+  AssertIndexRange(src_r_i, src_r_j + 1);
+  AssertIndexRange(src_c_i, src_c_j + 1);
+
+  for (size_type i = 0; i < src_r_j - src_r_i + 1; ++i)
+    for (size_type j = 0; j < src_c_j - src_c_i + 1; ++j)
+      {
+        const unsigned int src_r_index = static_cast<unsigned int>(i + src_r_i);
+        const unsigned int src_c_index = static_cast<unsigned int>(j + src_c_i);
+        (*this)(i + dst_r, j + dst_c)  = number(T[src_r_index][src_c_index]);
+      }
+}
+
+
+
+template <typename number>
+template <int dim>
+void
+FullMatrix<number>::copy_to(Tensor<2, dim> &   T,
+                            const size_type    src_r_i,
+                            const size_type    src_r_j,
+                            const size_type    src_c_i,
+                            const size_type    src_c_j,
+                            const unsigned int dst_r,
+                            const unsigned int dst_c) const
+{
+  Assert(!this->empty(), ExcEmptyMatrix());
+  AssertIndexRange(src_r_j - src_r_i, dim - dst_r);
+  AssertIndexRange(src_c_j - src_c_i, dim - dst_c);
+  AssertIndexRange(src_r_j, this->m());
+  AssertIndexRange(src_r_j, this->n());
+  AssertIndexRange(src_r_i, src_r_j + 1);
+  AssertIndexRange(src_c_j, src_c_j + 1);
+
+  for (size_type i = 0; i < src_r_j - src_r_i + 1; ++i)
+    for (size_type j = 0; j < src_c_j - src_c_i + 1; ++j)
+      {
+        const unsigned int dst_r_index = static_cast<unsigned int>(i + dst_r);
+        const unsigned int dst_c_index = static_cast<unsigned int>(j + dst_c);
+        T[dst_r_index][dst_c_index] = double((*this)(i + src_r_i, j + src_c_i));
+      }
 }
 
 

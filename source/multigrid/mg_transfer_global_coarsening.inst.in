@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,11 +14,19 @@
 // ---------------------------------------------------------------------
 
 
+for (S1 : REAL_SCALARS)
+  {
+    template class MGTwoLevelTransferBase<
+      LinearAlgebra::distributed::Vector<S1>>;
+  }
 
 for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
   {
     template class MGTwoLevelTransfer<deal_II_dimension,
                                       LinearAlgebra::distributed::Vector<S1>>;
+    template class MGTwoLevelTransferNonNested<
+      deal_II_dimension,
+      LinearAlgebra::distributed::Vector<S1>>;
     template class MGTransferBlockMatrixFreeBase<
       deal_II_dimension,
       S1,

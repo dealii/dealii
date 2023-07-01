@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2016 - 2021 by the deal.II authors
+## Copyright (C) 2016 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -16,10 +16,10 @@
 include_directories(
   ${CMAKE_BINARY_DIR}/include/
   ${CMAKE_SOURCE_DIR}/include/
-  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/contrib/python-bindings/include/
   SYSTEM
   ${DEAL_II_INCLUDE_DIRS}
+  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
   )
 
 #
@@ -71,7 +71,7 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
   endif()
 
   target_link_libraries(PyDealII_${_build_lowercase}
-    ${DEAL_II_NAMESPACE}_${_build_lowercase}
+    ${DEAL_II_TARGET_NAME}_${_build_lowercase}
     ${Boost_LIBRARIES}
     ${PYTHON_LIBRARIES}
     )

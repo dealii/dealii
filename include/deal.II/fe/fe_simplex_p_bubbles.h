@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
  * @brief Enriched version of FE_SimplexP that can be used with nodal
  * quadrature.
  *
- * Many explicit time integration schemes require solving a mass matrix at
+ * Many explicit time integration schemes require solving a @ref GlossMassMatrix "mass matrix" at
  * each time step. There are various ways around this requirement - for
  * example, step-48 replaces the mass matrix with a diagonal approximation,
  * which makes the solution step trivial. In step-48, and also commonly for

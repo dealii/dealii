@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2021 by the deal.II authors
+// Copyright (C) 2014 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -612,7 +612,7 @@ namespace OpenCASCADE
     unsigned int face_index;
 
     for (const auto &cell : triangulation.active_cell_iterators())
-      for (unsigned int f : GeometryInfo<2>::face_indices())
+      for (const unsigned int f : GeometryInfo<2>::face_indices())
         if (cell->face(f)->at_boundary())
           {
             // get global face and vertex indices
@@ -710,7 +710,12 @@ namespace OpenCASCADE
     double minDistance = 1e7;
     gp_Pnt tmp_proj(0.0, 0.0, 0.0);
 
-    unsigned int counter      = 0;
+#  ifdef DEAL_II_HAVE_CXX17
+    [[maybe_unused]] unsigned int counter = 0;
+#  else
+    unsigned int     counter = 0;
+    (void)counter;
+#  endif
     unsigned int face_counter = 0;
 
     TopoDS_Shape out_shape;

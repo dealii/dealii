@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2022 by the deal.II authors
+// Copyright (C) 2010 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,8 +35,6 @@
 
 #include "../tests.h"
 
-using namespace std;
-
 
 
 template <int dim, int spacedim>
@@ -56,7 +54,7 @@ main()
   // Extract the boundary of 3/4 of a sphere
   {
     const int dim = 3;
-    deallog << "Testing hyper_cube in dim: " << dim << "..." << endl;
+    deallog << "Testing hyper_cube in dim: " << dim << "..." << std::endl;
 
     const SphericalManifold<dim> boundary_description;
     Triangulation<dim>           volume_mesh;

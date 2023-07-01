@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note Only implemented for 3d.
  *
- * @relates simplex
+ * Also see
+ * @ref simplex "Simplex support".
  */
 template <int dim, int spacedim = dim>
 class FE_PyramidPoly : public dealii::FE_Poly<dim, spacedim>
@@ -59,7 +60,8 @@ public:
  * @note Currently, only linear polynomials (degree=1) are implemented. See
  * also the documentation of ScalarLagrangePolynomialPyramid.
  *
- * @relates simplex
+ * Also see
+ * @ref simplex "Simplex support".
  */
 template <int dim, int spacedim = dim>
 class FE_PyramidP : public FE_PyramidPoly<dim, spacedim>
@@ -121,7 +123,8 @@ public:
  * @note Currently, only linear polynomials (degree=1) are implemented. See
  * also the documentation of ScalarLagrangePolynomialPyramid.
  *
- * @relates simplex
+ * Also see
+ * @ref simplex "Simplex support".
  */
 template <int dim, int spacedim = dim>
 class FE_PyramidDGP : public FE_PyramidPoly<dim, spacedim>

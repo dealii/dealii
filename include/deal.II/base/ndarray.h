@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,7 +71,7 @@ namespace internal
 
 /**
  * A (variadic template) type alias for conveniently defining multidimensional
- * <a href="https://en.cppreference.com/w/cpp/container/array">std::array</a>s
+ * <a href="https://en.cppreference.com/w/cpp/container/array">std::array</a>s.
  *
  * The problem we try to address with the type alias is the following.
  * Suppose you want to create a multdimensional array of doubles of, for
@@ -80,9 +80,9 @@ namespace internal
  * @code
  *   double my_array[2][3][4] = { ... };
  * @endcode
- * Nowadays, there are a number of good reasons why using C-style arrays is
- * usually discouraged (ranging from incompatibilities with STL functions
- * requiring awkward wrappers, surprises when comparing for equality, etc.)
+ * There are a number of good reasons why using C-style arrays is
+ * generally discouraged (ranging from incompatibilities with STL functions
+ * requiring awkward wrappers, surprises when comparing for equality, etc.).
  * If you want to do the same, however, using the more modern (and
  * encouraged) `std::array` class, then you would have to declare
  * @code
@@ -97,7 +97,7 @@ namespace internal
  *   dealii::ndarray<double, 2, 3, 4> my_array = { ... };
  * @endcode
  *
- * @note dealii::ndarray is merely syntactic sugar in form of a
+ * @note dealii::ndarray is merely syntactic sugar in the form of a
  * <a href="https://en.cppreference.com/w/cpp/language/type_alias">type
  * alias</a>
  * (`using` declaration). It is not a deal.II specific class, but merely a

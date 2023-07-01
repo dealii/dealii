@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2021 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -97,7 +97,7 @@ main()
   initlog();
 
   deal_II_exceptions::disable_abort_on_exception();
-#if DEBUG
+#ifdef DEBUG
   // Asserts should be triggered
   const bool expected_result = false;
 #else

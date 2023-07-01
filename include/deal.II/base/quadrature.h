@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2022 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,12 +34,27 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
- * Base class for quadrature formulae in arbitrary dimensions. This class
- * stores quadrature points and weights in the coordinate system of
+ * Base class for quadrature formulae in arbitrary dimensions.
+ * [Quadrature](https://en.wikipedia.org/wiki/Numerical_integration)
+ * is a means to approximate an integral by evaluating the integrand
+ * at specific points $\mathbf x_q$ and summing the point values with
+ * specific weights $w_q$; that is, quadrature computes
+ * @f{align*}{
+ *   \int_K f(\mathbf x) \; dx
+ *   \approx
+ *   \sum_{q=0,\ldots,Q-1} f(\mathbf x_q) w_q.
+ * @f}
+ *
+ * This class stores quadrature points $\mathbf x_q$ and weights $w_q$
+ * for concrete "quadrature formulas" when $K$ (the domain we integrate
+ * over) is a reference cell. That is, points and weights are expressed
+ * in the coordinate system of
  * a reference cell (see the ReferenceCell class) and as such serves to
  * represent quadrature points and weights on the unit line segment
  * $[0,1]$ in 1d, on the unit square or unit triangle in 2d, as well as
  * the unit tetrahedron, cube, pyramid, and wedge reference cells in 3d.
+ * Integration over concrete cells is done by coordinate transformation
+ * to the reference cell represented by the current class.
  *
  * There are a number of derived classes, denoting concrete integration
  * formulae. Their names are prefixed by <tt>Q</tt>. Refer to the list of
@@ -74,15 +89,34 @@ DEAL_II_NAMESPACE_OPEN
  * in each space direction, but they are still only of <tt>(m+1)</tt>st order.
  *
  *
- * <h3>Implementation details</h3>
+ * <h3>Tensor product quadrature</h3>
  *
- * Most integration formulae in more than one space dimension are tensor
+ * At least for hypercube reference cells (i.e., squares and cubes),
+ * most integration formulae in more than one space dimension are tensor
  * products of quadrature formulae in one space dimension, or more generally
  * the tensor product of a formula in <tt>(dim-1)</tt> dimensions and one in
  * one dimension. There is a special constructor to generate a quadrature
  * formula from two others.  For example, the QGauss@<dim@> formulae include
  * <i>N<sup>dim</sup></i> quadrature points in <tt>dim</tt> dimensions, where
  * $N$ is the constructor parameter of QGauss.
+ *
+ *
+ * <h3>Other uses of this class</h3>
+ *
+ * Quadrature objects are used in a number of places within deal.II where
+ * integration is performed, most notably via the FEValues and related classes.
+ * Some of these classes are also used in contexts where no integrals
+ * are involved, but where functions need to be evaluated at specific
+ * points, for example to evaluate the solution at individual points
+ * or to create graphical output. Examples are the implementation of
+ * VectorTools::point_value() and the DataOut and related classes (in
+ * particular in connection with the DataPostprocessor class). In
+ * such contexts, one often creates specific "Quadrature" objects in
+ * which the "quadrature points" are simply the points (in the coordinate
+ * system of the reference cell) at which one wants to evaluate the
+ * solution. In these kinds of cases, the weights stored by the current
+ * class are not used and the name "quadrature object" is interpreted
+ * as "list of evaluation points".
  */
 template <int dim>
 class Quadrature : public Subscriptor
@@ -154,6 +188,13 @@ public:
    */
   Quadrature(const std::vector<Point<dim>> &points,
              const std::vector<double> &    weights);
+
+  /**
+   * Construct a quadrature formula from given vectors of quadrature points
+   * (which should really be in the unit cell) and the corresponding weights,
+   * moving the points and weights into the present object.
+   */
+  Quadrature(std::vector<Point<dim>> &&points, std::vector<double> &&weights);
 
   /**
    * Construct a dummy quadrature formula from a list of points, with weights

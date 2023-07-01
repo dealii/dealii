@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,7 @@ test()
   LinearAlgebra::ReadWriteVector<double>      read_write(size);
   for (unsigned int i = 0; i < size; ++i)
     read_write[i] = i;
-  a.import(read_write, VectorOperation::insert);
+  a.import_elements(read_write, VectorOperation::insert);
 
   a.reinit(size / 2);
   AssertThrow(a.l1_norm() == 0., ExcMessage("reinit did not zero the entry"));

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2022 by the deal.II authors
+//    Copyright (C) 2017 - 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -75,45 +75,36 @@ main()
   FullMatrix<double> J(3, 3);
   J(2, 2) = -1.0 / eps;
 
-  ode.implicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.implicit_function = [&](double, const VectorType &y, VectorType &ydot) {
     ydot[0] = 0;
     ydot[1] = 0;
     ydot[2] = -y[2] / eps;
-    return 0;
   };
 
 
-  ode.explicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) {
     ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
     ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
     ydot[2] = b / eps - y[2] * y[0];
-    return 0;
   };
 
   ode.jacobian_times_vector = [&](const VectorType &src,
                                   VectorType &      dst,
                                   double            t,
                                   const VectorType & /*y*/,
-                                  const VectorType & /*fy*/) -> int {
+                                  const VectorType & /*fy*/) {
     J.vmult(dst, src);
-
-    return 0;
   };
 
-  ode.output_step = [&](const double       t,
-                        const VectorType & sol,
-                        const unsigned int step_number) -> int {
-    deallog << std::setprecision(16) << t << ' ' << sol[0] << ' ' << sol[1]
-            << ' ' << sol[2] << std::endl;
-    return 0;
-  };
+  ode.output_step =
+    [&](const double t, const VectorType &sol, const unsigned int step_number) {
+      deallog << std::setprecision(16) << t << ' ' << sol[0] << ' ' << sol[1]
+              << ' ' << sol[2] << std::endl;
+    };
 
   Vector<double> y(3);
   y[0] = u0;
   y[1] = v0;
   y[2] = w0;
   ode.solve_ode(y);
-  return 0;
 }

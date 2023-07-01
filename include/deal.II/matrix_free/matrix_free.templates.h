@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,9 +49,7 @@
 #ifdef DEAL_II_WITH_TBB
 #  include <deal.II/base/parallel.h>
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <tbb/concurrent_unordered_map.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 #include <fstream>
@@ -443,24 +441,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
       task_info.allow_ghosted_vectors_in_loops =
         additional_data.allow_ghosted_vectors_in_loops;
 
-      // set variables that are independent of FE
-      if (Utilities::MPI::job_supports_mpi() == true)
-        {
-          task_info.communicator = dof_handler[0]->get_communicator();
-          task_info.my_pid =
-            Utilities::MPI::this_mpi_process(task_info.communicator);
-          task_info.n_procs =
-            Utilities::MPI::n_mpi_processes(task_info.communicator);
-
-          task_info.communicator_sm = additional_data.communicator_sm;
-        }
-      else
-        {
-          task_info.communicator    = MPI_COMM_SELF;
-          task_info.communicator_sm = MPI_COMM_SELF;
-          task_info.my_pid          = 0;
-          task_info.n_procs         = 1;
-        }
+      task_info.communicator    = dof_handler[0]->get_communicator();
+      task_info.communicator_sm = additional_data.communicator_sm;
+      task_info.my_pid =
+        Utilities::MPI::this_mpi_process(task_info.communicator);
+      task_info.n_procs =
+        Utilities::MPI::n_mpi_processes(task_info.communicator);
 
 #ifdef DEBUG
       for (const auto &constraint : constraints)
@@ -521,7 +507,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
         {
           Assert(dof_handler[i]->get_fe_collection().size() == 1,
                  ExcNotImplemented());
-          dof_info[i].dimension = dim;
           dof_info[i].n_base_elements =
             dof_handler[i]->get_fe(0).n_base_elements();
           dof_info[i].n_components.resize(dof_info[i].n_base_elements);
@@ -1086,7 +1071,8 @@ namespace internal
         connectivity_direct.add_entries(cell,
                                         new_indices.begin(),
                                         std::unique(new_indices.begin(),
-                                                    new_indices.end()));
+                                                    new_indices.end()),
+                                        true);
       }
   }
 
@@ -1118,7 +1104,8 @@ namespace internal
         connectivity.add_entries(block,
                                  new_indices.begin(),
                                  std::unique(new_indices.begin(),
-                                             new_indices.end()));
+                                             new_indices.end()),
+                                 true);
       }
   }
 
@@ -1128,9 +1115,9 @@ namespace internal
   std::vector<bool>
   compute_dof_info(
     const std::vector<const dealii::AffineConstraints<number> *> &constraint,
-    const std::vector<IndexSet> &locally_owned_dofs,
-    const std::vector<SmartPointer<const dealii::DoFHandler<dim>>> &dof_handler,
-    const Table<2, MatrixFreeFunctions::ShapeInfo<double>> &        shape_infos,
+    const std::vector<IndexSet> &                           locally_owned_dofs,
+    const std::vector<SmartPointer<const DoFHandler<dim>>> &dof_handler,
+    const Table<2, MatrixFreeFunctions::ShapeInfo<double>> &shape_infos,
     const unsigned int               cell_level_index_end_local,
     const unsigned int               mg_level,
     const bool                       hold_all_faces_to_owned_cells,
@@ -1228,7 +1215,6 @@ namespace internal
             dof_info[no].dofs_per_cell.push_back(fe.n_dofs_per_cell());
             dof_info[no].dofs_per_face.push_back(fe.n_dofs_per_face(
               0)); // we assume that all faces have the same number of dofs
-            dof_info[no].dimension       = dim;
             dof_info[no].n_base_elements = fe.n_base_elements();
             dof_info[no].n_components.resize(dof_info[no].n_base_elements);
             dof_info[no].start_components.resize(dof_info[no].n_base_elements +
@@ -1955,14 +1941,23 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
 
       std::vector<bool> hard_vectorization_boundary(
         task_info.face_partition_data.size(), false);
-      if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none &&
-          task_info.partition_row_index[2] <
-            task_info.face_partition_data.size())
-        hard_vectorization_boundary[task_info.partition_row_index[2]] = true;
+      if (task_info.scheme == internal::MatrixFreeFunctions::TaskInfo::none)
+        {
+          // In case we do an MPI data exchange, we must make sure to first
+          // complete all face integrals with results in the ghost range
+          if (task_info.partition_row_index[2] <
+              task_info.face_partition_data.size())
+            hard_vectorization_boundary[task_info.partition_row_index[2]] =
+              true;
+        }
       else
-        std::fill(hard_vectorization_boundary.begin(),
-                  hard_vectorization_boundary.end(),
-                  true);
+        {
+          // If we do threading, we need to strictly adhere to each partition,
+          // as we can't schedule work on conflicting face batches
+          std::fill(hard_vectorization_boundary.begin(),
+                    hard_vectorization_boundary.end(),
+                    true);
+        }
 
       internal::MatrixFreeFunctions::collect_faces_vectorization(
         face_setup.inner_faces,

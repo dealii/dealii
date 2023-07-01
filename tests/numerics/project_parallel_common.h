@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2021 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -112,9 +112,9 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
 
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
-  const MPI_Comm &mpi_communicator   = triangulation.get_communicator();
-  const IndexSet  locally_owned_dofs = dof_handler.locally_owned_dofs();
-  IndexSet        locally_relevant_dofs;
+  const MPI_Comm mpi_communicator   = triangulation.get_communicator();
+  const IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
+  IndexSet       locally_relevant_dofs;
   DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
 
   AffineConstraints<double> constraints;

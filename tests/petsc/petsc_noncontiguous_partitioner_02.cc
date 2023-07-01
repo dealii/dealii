@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 - 2022 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@
 
 template <int dim>
 void
-test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
+test(const MPI_Comm comm, const bool do_revert, const unsigned int dir)
 {
   const unsigned int degree           = 2;
   const unsigned int n_refinements    = 2;
@@ -144,7 +144,7 @@ test(const MPI_Comm &comm, const bool do_revert, const unsigned int dir)
 
 template <int dim>
 void
-test_dim(const MPI_Comm &comm, const bool do_revert)
+test_dim(const MPI_Comm comm, const bool do_revert)
 {
   for (int dir = 0; dir < dim; ++dir)
     test<dim>(comm, do_revert, dir);

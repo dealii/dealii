@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2022 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -416,28 +416,32 @@ namespace TrilinosWrappers
        * Comparison. True, if both iterators point to the same matrix
        * position.
        */
+      template <bool OtherConstness>
       bool
-      operator==(const Iterator<Constness> &) const;
+      operator==(const Iterator<OtherConstness> &) const;
 
       /**
        * Inverse of <tt>==</tt>.
        */
+      template <bool OtherConstness>
       bool
-      operator!=(const Iterator<Constness> &) const;
+      operator!=(const Iterator<OtherConstness> &) const;
 
       /**
        * Comparison operator. Result is true if either the first row number is
        * smaller or if the row numbers are equal and the first index is
        * smaller.
        */
+      template <bool OtherConstness>
       bool
-      operator<(const Iterator<Constness> &) const;
+      operator<(const Iterator<OtherConstness> &) const;
 
       /**
        * Comparison operator. The opposite of the previous operator
        */
+      template <bool OtherConstness>
       bool
-      operator>(const Iterator<Constness> &) const;
+      operator>(const Iterator<OtherConstness> &) const;
 
       /**
        * Exception
@@ -749,7 +753,7 @@ namespace TrilinosWrappers
      * use (in the compress() step).
      */
     SparseMatrix(const IndexSet &   parallel_partitioning,
-                 const MPI_Comm &   communicator          = MPI_COMM_WORLD,
+                 const MPI_Comm     communicator          = MPI_COMM_WORLD,
                  const unsigned int n_max_entries_per_row = 0);
 
     /**
@@ -760,7 +764,7 @@ namespace TrilinosWrappers
      * by the respective SparseMatrix::reinit call considerably faster.
      */
     SparseMatrix(const IndexSet &                 parallel_partitioning,
-                 const MPI_Comm &                 communicator,
+                 const MPI_Comm                   communicator,
                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
@@ -779,7 +783,7 @@ namespace TrilinosWrappers
      */
     SparseMatrix(const IndexSet &row_parallel_partitioning,
                  const IndexSet &col_parallel_partitioning,
-                 const MPI_Comm &communicator          = MPI_COMM_WORLD,
+                 const MPI_Comm  communicator          = MPI_COMM_WORLD,
                  const size_type n_max_entries_per_row = 0);
 
     /**
@@ -798,7 +802,7 @@ namespace TrilinosWrappers
      */
     SparseMatrix(const IndexSet &                 row_parallel_partitioning,
                  const IndexSet &                 col_parallel_partitioning,
-                 const MPI_Comm &                 communicator,
+                 const MPI_Comm                   communicator,
                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
@@ -825,7 +829,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &           parallel_partitioning,
            const SparsityPatternType &sparsity_pattern,
-           const MPI_Comm &           communicator  = MPI_COMM_WORLD,
+           const MPI_Comm             communicator  = MPI_COMM_WORLD,
            const bool                 exchange_data = false);
 
     /**
@@ -846,7 +850,7 @@ namespace TrilinosWrappers
     reinit(const IndexSet &           row_parallel_partitioning,
            const IndexSet &           col_parallel_partitioning,
            const SparsityPatternType &sparsity_pattern,
-           const MPI_Comm &           communicator  = MPI_COMM_WORLD,
+           const MPI_Comm             communicator  = MPI_COMM_WORLD,
            const bool                 exchange_data = false);
 
     /**
@@ -869,7 +873,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &                      parallel_partitioning,
            const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-           const MPI_Comm &                      communicator = MPI_COMM_WORLD,
+           const MPI_Comm                        communicator = MPI_COMM_WORLD,
            const double                          drop_tolerance    = 1e-13,
            const bool                            copy_values       = true,
            const ::dealii::SparsityPattern *     use_this_sparsity = nullptr);
@@ -892,7 +896,7 @@ namespace TrilinosWrappers
     reinit(const IndexSet &                      row_parallel_partitioning,
            const IndexSet &                      col_parallel_partitioning,
            const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
-           const MPI_Comm &                      communicator = MPI_COMM_WORLD,
+           const MPI_Comm                        communicator = MPI_COMM_WORLD,
            const double                          drop_tolerance    = 1e-13,
            const bool                            copy_values       = true,
            const ::dealii::SparsityPattern *     use_this_sparsity = nullptr);
@@ -974,7 +978,7 @@ namespace TrilinosWrappers
     memory_consumption() const;
 
     /**
-     * Return the MPI communicator object in use with this matrix.
+     * Return the underlying MPI communicator.
      */
     MPI_Comm
     get_mpi_communicator() const;
@@ -1035,7 +1039,7 @@ namespace TrilinosWrappers
      * for more information.
      */
     void
-    compress(::dealii::VectorOperation::values operation);
+    compress(VectorOperation::values operation);
 
     /**
      * Set the element (<i>i,j</i>) to @p value.
@@ -1514,7 +1518,7 @@ namespace TrilinosWrappers
      * Return the square of the norm of the vector $v$ with respect to the
      * norm induced by this matrix, i.e., $\left(v,Mv\right)$. This is useful,
      * e.g. in the finite element context, where the $L_2$ norm of a function
-     * equals the matrix norm with respect to the mass matrix of the vector
+     * equals the matrix norm with respect to the @ref GlossMassMatrix "mass matrix" of the vector
      * representing the nodal values of the finite element function.
      *
      * Obviously, the matrix needs to be quadratic for this operation.
@@ -2381,7 +2385,7 @@ namespace TrilinosWrappers
         TrilinosPayload(TpetraOpType &  op,
                         const bool      supports_inverse_operations,
                         const bool      use_transpose,
-                        const MPI_Comm &mpi_communicator,
+                        const MPI_Comm  mpi_communicator,
                         const IndexSet &locally_owned_domain_indices,
                         const IndexSet &locally_owned_range_indices);
 
@@ -2647,8 +2651,9 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
+    template <bool OtherConstness>
     inline bool
-    Iterator<Constness>::operator==(const Iterator<Constness> &other) const
+    Iterator<Constness>::operator==(const Iterator<OtherConstness> &other) const
     {
       return (accessor.a_row == other.accessor.a_row &&
               accessor.a_index == other.accessor.a_index);
@@ -2657,8 +2662,9 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
+    template <bool OtherConstness>
     inline bool
-    Iterator<Constness>::operator!=(const Iterator<Constness> &other) const
+    Iterator<Constness>::operator!=(const Iterator<OtherConstness> &other) const
     {
       return !(*this == other);
     }
@@ -2666,8 +2672,9 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
+    template <bool OtherConstness>
     inline bool
-    Iterator<Constness>::operator<(const Iterator<Constness> &other) const
+    Iterator<Constness>::operator<(const Iterator<OtherConstness> &other) const
     {
       return (accessor.row() < other.accessor.row() ||
               (accessor.row() == other.accessor.row() &&
@@ -2676,8 +2683,9 @@ namespace TrilinosWrappers
 
 
     template <bool Constness>
+    template <bool OtherConstness>
     inline bool
-    Iterator<Constness>::operator>(const Iterator<Constness> &other) const
+    Iterator<Constness>::operator>(const Iterator<OtherConstness> &other) const
     {
       return (other < *this);
     }
@@ -2944,7 +2952,7 @@ namespace TrilinosWrappers
   inline void
   SparseMatrix::reinit(const IndexSet &           parallel_partitioning,
                        const SparsityPatternType &sparsity_pattern,
-                       const MPI_Comm &           communicator,
+                       const MPI_Comm             communicator,
                        const bool                 exchange_data)
   {
     reinit(parallel_partitioning,
@@ -2960,7 +2968,7 @@ namespace TrilinosWrappers
   inline void
   SparseMatrix::reinit(const IndexSet &parallel_partitioning,
                        const ::dealii::SparseMatrix<number> &sparse_matrix,
-                       const MPI_Comm &                      communicator,
+                       const MPI_Comm                        communicator,
                        const double                          drop_tolerance,
                        const bool                            copy_values,
                        const ::dealii::SparsityPattern *     use_this_sparsity)
@@ -3033,7 +3041,7 @@ namespace TrilinosWrappers
         TpetraOpType &  op,
         const bool      supports_inverse_operations,
         const bool      use_transpose,
-        const MPI_Comm &mpi_communicator,
+        const MPI_Comm  mpi_communicator,
         const IndexSet &locally_owned_domain_indices,
         const IndexSet &locally_owned_range_indices)
         : use_transpose(use_transpose)

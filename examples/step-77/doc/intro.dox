@@ -8,6 +8,10 @@ Foundation grants OAC-1835673, DMS-1821210, and EAR-1925595;
 and by the Computational Infrastructure in
 Geodynamics initiative (CIG), through the National Science Foundation under
 Award No. EAR-1550901 and The University of California-Davis.
+
+Stefano Zampini (King Abdullah University of Science and Technology)
+contributed the results obtained with the PETSc variant of this program
+discussed in the <a href="#Results">results section</a> below.
 </i>
 <br>
 
@@ -155,6 +159,21 @@ provides a vast amount of finite-element functionality, %SUNDIALS'
 KINSOL package provides a vast amount of nonlinear solver
 functionality, and we better use it.
 
+@note While this program uses SUNDIAL's KINSOL package as the engine to
+  solve nonlinear problems, KINSOL is not the only option you have.
+  deal.II also has interfaces to PETSc's SNES collection of algorithms
+  (see the PETScWrappers::NonlinearSolver class) as well as to
+  the Trilinos NOX package (see the TrilinosWrappers::NOXSolver class)
+  that provide not only very similar functionality, but also a largely
+  identical interface. If you have installed a version of deal.II that
+  is configured to use either PETSc or Trilinos, but not SUNDIALS,
+  then it is not too difficult to switch this program to use either
+  of the former two packages instead: Basically everything that we
+  say and do below will also be true and work for these other packages!
+  (We will also come back to this point in the
+  <a href="#Results">results section</a>
+  below.)
+
 
 <h3> How deal.II interfaces with KINSOL </h3>
 
@@ -196,7 +215,7 @@ access are the
 SUNDIALS::KINSOL::reinit_vector,
 SUNDIALS::KINSOL::residual,
 SUNDIALS::KINSOL::setup_jacobian, and
-SUNDIALS::KINSOL::solve_jacobian_system
+SUNDIALS::KINSOL::solve_with_jacobian
 member variables. (See the documentation of these variables for their
 details.) In our implementation, we will use
 [lambda functions](https://en.cppreference.com/w/cpp/language/lambda)
@@ -237,7 +256,7 @@ problem as follows:
   independent, and can be broken into separate functions.
 
 There is an assumption here that whenever KINSOL asks for a linear
-solver with the (approximation of the) Jacobian, that this will be for
+solver with the (approximation of the) Jacobian, that this will be
 for an update $\delta U$ (which has zero boundary values), a multiple
 of which will be added to the solution (which already has the right
 boundary values).  This may not be true and if so, we might have to

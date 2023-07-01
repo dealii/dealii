@@ -1,6 +1,0 @@
-Deprecated: The functions ReferenceCell::compute_orientation() and
-ReferenceCell::permute_according_orientation() have been deprecated. Use
-ReferenceCell::get_orientation_index() and
-ReferenceCell::reorient_based_on_orientation_index() instead.
-<br>
-(Wolfgang Bangerth, 2023/01/09)

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2021 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * this class. Usage of the old-style numbering is deprecated.
  */
 template <int dim, int spacedim = dim>
-class DEAL_II_DEPRECATED GridReordering
+class GridReordering
 {
 public:
   /**

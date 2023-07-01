@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -114,8 +114,16 @@ enum UpdateFlags
    * flag to the FEValues constructor to make sure you can later
    * access them.
    *
-   * In the context of DataPostprocessor,
-   * DataPostprocessorInputs::CommonInputs::evaluation_points will be updated.
+   * There are contexts other than FEValues (and related classes) that
+   * take update flags. An example is the DataPostprocessor class
+   * (and derived classes). In these cases, the `update_quadrature_points`
+   * flag is generally understood to update the location of "evaluation
+   * points", i.e., the physical locations of the points at which
+   * the solution is evaluated. As a consequence, the flag is
+   * misnamed in these contexts: No quadrature (i.e., computation of
+   * integrals) is involved, and consequently what is being
+   * updated is, in the context of DataPostprocessor, the member variable
+   * DataPostprocessorInputs::CommonInputs::evaluation_points.
    */
   update_quadrature_points = 0x0020,
   //! Transformed quadrature weights

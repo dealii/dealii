@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2022 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -577,7 +577,7 @@ namespace DoFTools
 
     template <typename number>
     void
-    make_hp_hanging_node_constraints(const dealii::DoFHandler<1> &,
+    make_hp_hanging_node_constraints(const DoFHandler<1> &,
                                      AffineConstraints<number> &)
     {
       // nothing to do for regular dof handlers in 1d
@@ -586,7 +586,7 @@ namespace DoFTools
 
     template <typename number>
     void
-    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1> &,
+    make_oldstyle_hanging_node_constraints(const DoFHandler<1> &,
                                            AffineConstraints<number> &,
                                            std::integral_constant<int, 1>)
     {
@@ -596,7 +596,7 @@ namespace DoFTools
 
     template <typename number>
     void
-    make_hp_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
+    make_hp_hanging_node_constraints(const DoFHandler<1, 2> &,
                                      AffineConstraints<number> &)
     {
       // nothing to do for regular dof handlers in 1d
@@ -605,7 +605,7 @@ namespace DoFTools
 
     template <typename number>
     void
-    make_oldstyle_hanging_node_constraints(const dealii::DoFHandler<1, 2> &,
+    make_oldstyle_hanging_node_constraints(const DoFHandler<1, 2> &,
                                            AffineConstraints<number> &,
                                            std::integral_constant<int, 1>)
     {
@@ -616,7 +616,7 @@ namespace DoFTools
     template <typename number, int spacedim>
     void
     make_hp_hanging_node_constraints(
-      const dealii::DoFHandler<1, spacedim> & /*dof_handler*/,
+      const DoFHandler<1, spacedim> & /*dof_handler*/,
       AffineConstraints<number> & /*constraints*/)
     {
       // nothing to do for dof handlers in 1d
@@ -626,7 +626,7 @@ namespace DoFTools
     template <typename number, int spacedim>
     void
     make_oldstyle_hanging_node_constraints(
-      const dealii::DoFHandler<1, spacedim> & /*dof_handler*/,
+      const DoFHandler<1, spacedim> & /*dof_handler*/,
       AffineConstraints<number> & /*constraints*/,
       std::integral_constant<int, 1>)
     {
@@ -1839,15 +1839,15 @@ namespace DoFTools
     template <typename FaceIterator, typename number>
     void
     set_periodicity_constraints(
-      const FaceIterator &                         face_1,
-      const typename identity<FaceIterator>::type &face_2,
-      const FullMatrix<double> &                   transformation,
-      AffineConstraints<number> &                  affine_constraints,
-      const ComponentMask &                        component_mask,
-      const bool                                   face_orientation,
-      const bool                                   face_flip,
-      const bool                                   face_rotation,
-      const number                                 periodicity_factor)
+      const FaceIterator &                            face_1,
+      const std_cxx20::type_identity_t<FaceIterator> &face_2,
+      const FullMatrix<double> &                      transformation,
+      AffineConstraints<number> &                     affine_constraints,
+      const ComponentMask &                           component_mask,
+      const bool                                      face_orientation,
+      const bool                                      face_flip,
+      const bool                                      face_rotation,
+      const number                                    periodicity_factor)
     {
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
@@ -2290,16 +2290,16 @@ namespace DoFTools
   template <typename FaceIterator, typename number>
   void
   make_periodicity_constraints(
-    const FaceIterator &                         face_1,
-    const typename identity<FaceIterator>::type &face_2,
-    AffineConstraints<number> &                  affine_constraints,
-    const ComponentMask &                        component_mask,
-    const bool                                   face_orientation,
-    const bool                                   face_flip,
-    const bool                                   face_rotation,
-    const FullMatrix<double> &                   matrix,
-    const std::vector<unsigned int> &            first_vector_components,
-    const number                                 periodicity_factor)
+    const FaceIterator &                            face_1,
+    const std_cxx20::type_identity_t<FaceIterator> &face_2,
+    AffineConstraints<number> &                     affine_constraints,
+    const ComponentMask &                           component_mask,
+    const bool                                      face_orientation,
+    const bool                                      face_flip,
+    const bool                                      face_rotation,
+    const FullMatrix<double> &                      matrix,
+    const std::vector<unsigned int> &               first_vector_components,
+    const number                                    periodicity_factor)
   {
     static const int dim      = FaceIterator::AccessorType::dimension;
     static const int spacedim = FaceIterator::AccessorType::space_dimension;
@@ -2678,15 +2678,13 @@ namespace DoFTools
       template <int dim, int spacedim>
       void
       compute_intergrid_weights_3(
-        const typename dealii::DoFHandler<dim, spacedim>::active_cell_iterator
-          &cell,
+        const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
         const Assembler::Scratch &,
-        Assembler::CopyData<dim, spacedim> &copy_data,
-        const unsigned int                  coarse_component,
-        const FiniteElement<dim, spacedim> &coarse_fe,
-        const InterGridMap<dealii::DoFHandler<dim, spacedim>>
-          &                                        coarse_to_fine_grid_map,
-        const std::vector<dealii::Vector<double>> &parameter_dofs)
+        Assembler::CopyData<dim, spacedim> &           copy_data,
+        const unsigned int                             coarse_component,
+        const FiniteElement<dim, spacedim> &           coarse_fe,
+        const InterGridMap<DoFHandler<dim, spacedim>> &coarse_to_fine_grid_map,
+        const std::vector<dealii::Vector<double>> &    parameter_dofs)
       {
         // for each cell on the parameter grid: find out which degrees of
         // freedom on the fine grid correspond in which way to the degrees of
@@ -2847,12 +2845,11 @@ namespace DoFTools
       template <int dim, int spacedim>
       void
       compute_intergrid_weights_2(
-        const dealii::DoFHandler<dim, spacedim> &coarse_grid,
-        const unsigned int                       coarse_component,
-        const InterGridMap<dealii::DoFHandler<dim, spacedim>>
-          &                                         coarse_to_fine_grid_map,
-        const std::vector<dealii::Vector<double>> & parameter_dofs,
-        const std::vector<types::global_dof_index> &weight_mapping,
+        const DoFHandler<dim, spacedim> &              coarse_grid,
+        const unsigned int                             coarse_component,
+        const InterGridMap<DoFHandler<dim, spacedim>> &coarse_to_fine_grid_map,
+        const std::vector<dealii::Vector<double>> &    parameter_dofs,
+        const std::vector<types::global_dof_index> &   weight_mapping,
         std::vector<std::map<types::global_dof_index, float>> &weights)
       {
         Assembler::Scratch                 scratch;
@@ -2912,10 +2909,11 @@ namespace DoFTools
           [coarse_component,
            &coarse_grid,
            &coarse_to_fine_grid_map,
-           &parameter_dofs](const typename dealii::DoFHandler<dim, spacedim>::
-                              active_cell_iterator &            cell,
-                            const Assembler::Scratch &          scratch_data,
-                            Assembler::CopyData<dim, spacedim> &copy_data) {
+           &parameter_dofs](
+            const typename DoFHandler<dim, spacedim>::active_cell_iterator
+              &                                 cell,
+            const Assembler::Scratch &          scratch_data,
+            Assembler::CopyData<dim, spacedim> &copy_data) {
             compute_intergrid_weights_3<dim, spacedim>(cell,
                                                        scratch_data,
                                                        copy_data,
@@ -2964,12 +2962,11 @@ namespace DoFTools
       template <int dim, int spacedim>
       unsigned int
       compute_intergrid_weights_1(
-        const dealii::DoFHandler<dim, spacedim> &coarse_grid,
-        const unsigned int                       coarse_component,
-        const dealii::DoFHandler<dim, spacedim> &fine_grid,
-        const unsigned int                       fine_component,
-        const InterGridMap<dealii::DoFHandler<dim, spacedim>>
-          &coarse_to_fine_grid_map,
+        const DoFHandler<dim, spacedim> &              coarse_grid,
+        const unsigned int                             coarse_component,
+        const DoFHandler<dim, spacedim> &              fine_grid,
+        const unsigned int                             fine_component,
+        const InterGridMap<DoFHandler<dim, spacedim>> &coarse_to_fine_grid_map,
         std::vector<std::map<types::global_dof_index, float>> &weights,
         std::vector<types::global_dof_index> &                 weight_mapping)
       {

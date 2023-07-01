@@ -183,7 +183,7 @@ namespace LinearAlgebraTrilinos
   using SolverCG = TrilinosWrappers::SolverCG;
 
   /**
-   * Typdef for the GMRES solver type used.
+   * Typedef for the GMRES solver type used.
    */
   using SolverGMRES = TrilinosWrappers::SolverGMRES;
 

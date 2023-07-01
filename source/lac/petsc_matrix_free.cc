@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2012 - 2019 by the deal.II authors
+// Copyright (C) 2012 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,7 +33,7 @@ namespace PETScWrappers
 
 
 
-  MatrixFree::MatrixFree(const MPI_Comm &   communicator,
+  MatrixFree::MatrixFree(const MPI_Comm     communicator,
                          const unsigned int m,
                          const unsigned int n,
                          const unsigned int local_rows,
@@ -45,7 +45,7 @@ namespace PETScWrappers
 
 
   MatrixFree::MatrixFree(
-    const MPI_Comm &                 communicator,
+    const MPI_Comm                   communicator,
     const unsigned int               m,
     const unsigned int               n,
     const std::vector<unsigned int> &local_rows_per_process,
@@ -98,14 +98,14 @@ namespace PETScWrappers
 
 
   void
-  MatrixFree::reinit(const MPI_Comm &   communicator,
+  MatrixFree::reinit(const MPI_Comm     communicator,
                      const unsigned int m,
                      const unsigned int n,
                      const unsigned int local_rows,
                      const unsigned int local_columns)
   {
     // destroy the matrix and generate a new one
-    const PetscErrorCode ierr = destroy_matrix(matrix);
+    const PetscErrorCode ierr = MatDestroy(&matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     do_reinit(communicator, m, n, local_rows, local_columns);
@@ -114,7 +114,7 @@ namespace PETScWrappers
 
 
   void
-  MatrixFree::reinit(const MPI_Comm &                 communicator,
+  MatrixFree::reinit(const MPI_Comm                   communicator,
                      const unsigned int               m,
                      const unsigned int               n,
                      const std::vector<unsigned int> &local_rows_per_process,
@@ -126,7 +126,7 @@ namespace PETScWrappers
                                 local_columns_per_process.size()));
     Assert(this_process < local_rows_per_process.size(), ExcInternalError());
 
-    const PetscErrorCode ierr = destroy_matrix(matrix);
+    const PetscErrorCode ierr = MatDestroy(&matrix);
     AssertThrow(ierr != 0, ExcPETScError(ierr));
 
     do_reinit(communicator,
@@ -169,7 +169,7 @@ namespace PETScWrappers
   void
   MatrixFree::clear()
   {
-    const PetscErrorCode ierr = destroy_matrix(matrix);
+    const PetscErrorCode ierr = MatDestroy(&matrix);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     const int m = 0;
@@ -211,7 +211,7 @@ namespace PETScWrappers
 
 
   void
-  MatrixFree::do_reinit(const MPI_Comm &   communicator,
+  MatrixFree::do_reinit(const MPI_Comm     communicator,
                         const unsigned int m,
                         const unsigned int n,
                         const unsigned int local_rows,

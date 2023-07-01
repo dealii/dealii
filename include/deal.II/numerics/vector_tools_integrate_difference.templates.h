@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1998 - 2021 by the deal.II authors
+// Copyright (C) 1998 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -432,8 +432,10 @@ namespace VectorTools
 
 
     template <int dim, int spacedim, class InVector, class OutVector>
-    static void
-    do_integrate_difference(
+    DEAL_II_CXX20_REQUIRES(
+      concepts::is_dealii_vector_type<InVector>
+        &&concepts::is_writable_dealii_vector_type<OutVector>)
+    static void do_integrate_difference(
       const dealii::hp::MappingCollection<dim, spacedim> &     mapping,
       const DoFHandler<dim, spacedim> &                        dof,
       const InVector &                                         fe_function,
@@ -549,9 +551,12 @@ namespace VectorTools
 
   } // namespace internal
 
+
+
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const Mapping<dim, spacedim> &                           mapping,
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
@@ -576,8 +581,9 @@ namespace VectorTools
 
 
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
@@ -601,10 +607,11 @@ namespace VectorTools
 
 
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
     const dealii::hp::MappingCollection<dim, spacedim> &     mapping,
-    const dealii::DoFHandler<dim, spacedim> &                dof,
+    const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
     OutVector &                                              difference,
@@ -625,9 +632,10 @@ namespace VectorTools
   }
 
   template <int dim, class InVector, class OutVector, int spacedim>
-  void
-  integrate_difference(
-    const dealii::DoFHandler<dim, spacedim> &                dof,
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector> &&
+                           concepts::is_writable_dealii_vector_type<OutVector>)
+  void integrate_difference(
+    const DoFHandler<dim, spacedim> &                        dof,
     const InVector &                                         fe_function,
     const Function<spacedim, typename InVector::value_type> &exact_solution,
     OutVector &                                              difference,
@@ -649,11 +657,11 @@ namespace VectorTools
   }
 
   template <int dim, int spacedim, class InVector>
-  double
-  compute_global_error(const Triangulation<dim, spacedim> &tria,
-                       const InVector &                    cellwise_error,
-                       const NormType &                    norm,
-                       const double                        exponent)
+  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<InVector>)
+  double compute_global_error(const Triangulation<dim, spacedim> &tria,
+                              const InVector &cellwise_error,
+                              const NormType &norm,
+                              const double    exponent)
   {
     Assert(cellwise_error.size() == tria.n_active_cells(),
            ExcMessage("input vector cell_error has invalid size!"));

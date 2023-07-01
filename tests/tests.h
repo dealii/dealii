@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2022 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -461,7 +461,6 @@ namespace
   void
   check_petsc_allocations()
   {
-#  if DEAL_II_PETSC_VERSION_GTE(3, 2, 0)
     PetscStageLog stageLog;
     PetscLogGetStageLog(&stageLog);
 
@@ -492,7 +491,6 @@ namespace
 
     if (errors)
       throw dealii::ExcMessage("PETSc memory leak");
-#  endif
   }
 } // namespace
 #endif

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2021 by the deal.II authors
+ * Copyright (C) 2021 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -91,7 +91,7 @@ namespace Step82
 
     // As indicated by its name, the function
     // <code>assemble_local_matrix()</code> is used for the assembly of the
-    // (local) mass matrix used to compute the two lifting terms (see the matrix
+    // (local) @ref GlossMassMatrix "mass matrix" used to compute the two lifting terms (see the matrix
     // $\boldsymbol{M}_c$ introduced in the introduction when describing the
     // computation of $b_e$). The function
     // <code>compute_discrete_hessians()</code> computes the required discrete
@@ -435,7 +435,7 @@ namespace Step82
     // At the end of the function, we output this sparsity pattern as
     // a scalable vector graphic. You can visualize it by loading this
     // file in most web browsers:
-    std::ofstream out("sparsity_pattern.svg");
+    std::ofstream out("sparsity-pattern.svg");
     sparsity_pattern.print_svg(out);
   }
 
@@ -1351,7 +1351,7 @@ namespace Step82
     // neighboring <code>neighbor_cell</code> of <code>cell</code>, namely we
     // fill-in the variable <code>discrete_hessians_neigh[face_no][i][q]</code>.
     // For the lifting terms, we only need to add the contribution of the
-    // face adjecent to <code>cell</code> and <code>neighbor_cell</code>.
+    // face adjacent to <code>cell</code> and <code>neighbor_cell</code>.
     for (unsigned int face_no = 0; face_no < cell->n_faces(); ++face_no)
       {
         const typename DoFHandler<dim>::face_iterator face =

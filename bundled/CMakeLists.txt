@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2020 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,11 +18,6 @@
 #
 
 message(STATUS "Setting up bundled features")
-
-include_directories(
-  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-  ${DEAL_II_INCLUDE_DIRS}
-  )
 
 if(DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED)
   add_subdirectory(${BOOST_FOLDER}/libs/serialization/src)

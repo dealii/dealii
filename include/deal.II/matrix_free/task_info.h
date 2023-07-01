@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2021 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -223,7 +223,7 @@ namespace internal
        * This helper function determines a block size if the user decided not
        * to force a block size through MatrixFree::AdditionalData. This is
        * computed based on the number of hardware threads on the system and
-       * the number of macro cells that we should work on.
+       * the number of cell batches that we should work on.
        */
       void
       guess_block_size(const unsigned int dofs_per_cell);
@@ -578,13 +578,13 @@ namespace internal
 
       /**
        * Number of even partitions accumulated over the field @p
-       * partitions_even
+       * partition_evens
        */
       unsigned int evens;
 
       /**
        * Number of odd partitions accumulated over the field @p
-       * partitions_odd
+       * partition_odds
        */
       unsigned int odds;
 

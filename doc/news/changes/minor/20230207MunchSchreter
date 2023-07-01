@@ -1,5 +1,0 @@
-Fixed: Fix GridTools::find_all_active_cells_around_point() to return the correct cells
-if the requested point is located on a cell edge adjacent to neighbor cells at different 
-refinement levels.
-<br>
-(Peter Munch, Magdalena Schreter, 2023/02/07)

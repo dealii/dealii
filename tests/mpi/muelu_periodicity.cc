@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2008 - 2022 by the deal.II authors
+ * Copyright (C) 2008 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -187,7 +187,7 @@ namespace Step22
     InverseMatrix(const Matrix &        m,
                   const Preconditioner &preconditioner,
                   const IndexSet &      locally_owned,
-                  const MPI_Comm &      mpi_communicator);
+                  const MPI_Comm        mpi_communicator);
 
     void
     vmult(TrilinosWrappers::MPI::Vector &      dst,
@@ -197,7 +197,6 @@ namespace Step22
     const SmartPointer<const Matrix>         matrix;
     const SmartPointer<const Preconditioner> preconditioner;
 
-    const MPI_Comm *                      mpi_communicator;
     mutable TrilinosWrappers::MPI::Vector tmp;
   };
 
@@ -207,10 +206,9 @@ namespace Step22
     const Matrix &        m,
     const Preconditioner &preconditioner,
     const IndexSet &      locally_owned,
-    const MPI_Comm &      mpi_communicator)
+    const MPI_Comm        mpi_communicator)
     : matrix(&m)
     , preconditioner(&preconditioner)
-    , mpi_communicator(&mpi_communicator)
     , tmp(locally_owned, mpi_communicator)
   {}
 
@@ -245,7 +243,7 @@ namespace Step22
                                         Preconditioner> &      A_inverse,
                     const IndexSet &                           owned_pres,
                     const IndexSet &                           relevant_pres,
-                    const MPI_Comm &mpi_communicator);
+                    const MPI_Comm mpi_communicator);
 
     void
     vmult(TrilinosWrappers::MPI::Vector &      dst,
@@ -268,7 +266,7 @@ namespace Step22
       &             A_inverse,
     const IndexSet &owned_vel,
     const IndexSet &relevant_vel,
-    const MPI_Comm &mpi_communicator)
+    const MPI_Comm  mpi_communicator)
     : system_matrix(&system_matrix)
     , A_inverse(&A_inverse)
     , tmp1(owned_vel, mpi_communicator)
@@ -816,7 +814,7 @@ main(int argc, char *argv[])
           flow_problem.run();
         }
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

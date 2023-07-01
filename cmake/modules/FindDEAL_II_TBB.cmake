@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -20,7 +20,6 @@
 #
 #   TBB_LIBRARIES
 #   TBB_INCLUDE_DIRS
-#   TBB_WITH_DEBUGLIB
 #   TBB_WITH_ONEAPI
 #   TBB_VERSION
 #   TBB_VERSION_MAJOR
@@ -51,10 +50,12 @@ deal_ii_find_library(TBB_DEBUG_LIBRARY
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 if(NOT TBB_DEBUG_LIBRARY MATCHES "-NOTFOUND")
-  set(TBB_WITH_DEBUGLIB TRUE)
-  set(_libraries debug TBB_DEBUG_LIBRARY optimized TBB_LIBRARY)
+  set(_libraries
+    LIBRARIES_RELEASE REQUIRED TBB_LIBRARY
+    LIBRARIES_DEBUG REQUIRED TBB_DEBUG_LIBRARY
+    )
 else()
-  set(_libraries TBB_LIBRARY)
+  set(_libraries LIBRARIES REQUIRED TBB_LIBRARY)
 endif()
 
 #
@@ -115,7 +116,7 @@ else()
 endif()
 
 process_feature(TBB
-  LIBRARIES REQUIRED ${_libraries}
+  ${_libraries}
   INCLUDE_DIRS REQUIRED TBB_INCLUDE_DIR
   CLEAR TBB_DEBUG_LIBRARY TBB_LIBRARY TBB_INCLUDE_DIR
   )

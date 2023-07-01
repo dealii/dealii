@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2000 - 2021 by the deal.II authors
+ * Copyright (C) 2000 - 2023 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -45,7 +45,7 @@
 #include <fstream>
 
 // From the following include file we will import the declaration of
-// H1-conforming finite element shape functions. This family of finite
+// $H^1$-conforming finite element shape functions. This family of finite
 // elements is called <code>FE_Q</code>, and was used in all examples before
 // already to define the usual bi- or tri-linear elements, but we will now use
 // it for bi-quadratic elements:

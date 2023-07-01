@@ -1,6 +1,6 @@
 //-----------------------------------------------------------
 //
-//    Copyright (C) 2017 - 2022 by the deal.II authors
+//    Copyright (C) 2017 - 2023 by the deal.II authors
 //
 //    This file is part of the deal.II library.
 //
@@ -68,27 +68,22 @@ main()
 
   double kappa = 1.0;
 
-  ode.implicit_function =
-    [&](double, const VectorType &y, VectorType &ydot) -> int {
+  ode.implicit_function = [&](double, const VectorType &y, VectorType &ydot) {
     ydot[0] = y[1];
     ydot[1] = -kappa * kappa * y[0];
-    return 0;
   };
 
-  ode.output_step = [&](const double       t,
-                        const VectorType & sol,
-                        const unsigned int step_number) -> int {
-    // limit the output to every 10th step and increase the precision to make
-    // the test more robust
-    if (step_number % 10 == 0)
-      deallog << t << ' ' << std::setprecision(7) << sol[0] << ' ' << sol[1]
-              << std::endl;
-    return 0;
-  };
+  ode.output_step =
+    [&](const double t, const VectorType &sol, const unsigned int step_number) {
+      // limit the output to every 10th step and increase the precision to make
+      // the test more robust
+      if (step_number % 10 == 0)
+        deallog << t << ' ' << std::setprecision(7) << sol[0] << ' ' << sol[1]
+                << std::endl;
+    };
 
   Vector<double> y(2);
   y[0] = 0;
   y[1] = kappa;
   ode.solve_ode(y);
-  return 0;
 }

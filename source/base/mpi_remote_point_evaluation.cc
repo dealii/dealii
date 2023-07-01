@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2021 - 2022 by the deal.II authors
+// Copyright (C) 2021 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,9 +78,6 @@ namespace Utilities
       tria_signal =
         tria.signals.any_change.connect([&]() { this->ready_flag = false; });
 
-      this->tria    = &tria;
-      this->mapping = &mapping;
-
       std::vector<BoundingBox<spacedim>> local_boxes;
       for (const auto &cell :
            tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
@@ -90,12 +87,8 @@ namespace Utilities
       const auto local_tree = pack_rtree(local_boxes);
 
       // compress r-tree to a minimal set of bounding boxes
-      const auto local_reduced_box =
-        extract_rtree_level(local_tree, rtree_level);
-
-      // gather bounding boxes of other processes
-      const auto global_bboxes =
-        Utilities::MPI::all_gather(tria.get_communicator(), local_reduced_box);
+      std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes(1);
+      global_bboxes[0] = extract_rtree_level(local_tree, rtree_level);
 
       const GridTools::Cache<dim, spacedim> cache(tria, mapping);
 
@@ -109,6 +102,23 @@ namespace Utilities
           true,
           enforce_unique_mapping);
 
+      this->reinit(data, tria, mapping);
+#endif
+    }
+
+
+
+    template <int dim, int spacedim>
+    void
+    RemotePointEvaluation<dim, spacedim>::reinit(
+      const GridTools::internal::
+        DistributedComputePointLocationsInternal<dim, spacedim> &data,
+      const Triangulation<dim, spacedim> &                       tria,
+      const Mapping<dim, spacedim> &                             mapping)
+    {
+      this->tria    = &tria;
+      this->mapping = &mapping;
+
       this->recv_ranks = data.recv_ranks;
       this->recv_ptrs  = data.recv_ptrs;
 
@@ -117,7 +127,7 @@ namespace Utilities
 
       this->recv_permutation = {};
       this->recv_permutation.resize(data.recv_components.size());
-      this->point_ptrs.assign(points.size() + 1, 0);
+      this->point_ptrs.assign(data.n_searched_points + 1, 0);
       for (unsigned int i = 0; i < data.recv_components.size(); ++i)
         {
           AssertIndexRange(std::get<2>(data.recv_components[i]),
@@ -134,7 +144,7 @@ namespace Utilities
       std::tuple<unsigned int, unsigned int> n_owning_processes_local =
         n_owning_processes_default;
 
-      for (unsigned int i = 0; i < points.size(); ++i)
+      for (unsigned int i = 0; i < data.n_searched_points; ++i)
         {
           std::get<0>(n_owning_processes_local) =
             std::min(std::get<0>(n_owning_processes_local),
@@ -200,8 +210,17 @@ namespace Utilities
         cell_data.reference_point_values.size());
 
       this->ready_flag = true;
-#endif
     }
+
+
+
+    template <int dim, int spacedim>
+    const typename RemotePointEvaluation<dim, spacedim>::CellData &
+    RemotePointEvaluation<dim, spacedim>::get_cell_data() const
+    {
+      return cell_data;
+    }
+
 
 
     template <int dim, int spacedim>

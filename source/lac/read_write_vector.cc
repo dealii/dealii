@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2021 by the deal.II authors
+// Copyright (C) 2015 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,41 +42,75 @@ namespace LinearAlgebra
 
 #ifndef DOXYGEN
   template void
-  ReadWriteVector<float>::import(
+  ReadWriteVector<float>::import_elements(
     const distributed::Vector<float, ::dealii::MemorySpace::Host> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<float>::import(
+  ReadWriteVector<float>::import_elements(
     const distributed::Vector<float, ::dealii::MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 
   template void
-  ReadWriteVector<double>::import(
+  ReadWriteVector<double>::import_elements(
     const distributed::Vector<double, ::dealii::MemorySpace::Host> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
   template void
-  ReadWriteVector<double>::import(
+  ReadWriteVector<double>::import_elements(
     const distributed::Vector<double, ::dealii::MemorySpace::Default> &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
   template void
-  ReadWriteVector<std::complex<float>>::import(
+  ReadWriteVector<std::complex<float>>::import_elements(
     const distributed::Vector<std::complex<float>, ::dealii::MemorySpace::Host>
       &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 
   template void
-  ReadWriteVector<std::complex<double>>::import(
+  ReadWriteVector<std::complex<double>>::import_elements(
     const distributed::Vector<std::complex<double>, ::dealii::MemorySpace::Host>
       &,
     VectorOperation::values,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
 #  endif
+
+
+
+#  ifdef HAVE_TPETRA_INST_FLOAT
+  template void
+  ReadWriteVector<float>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<float> &,
+    VectorOperation::values,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
+#  endif
+#  ifdef HAVE_TPETRA_INST_DOUBLE
+  template void
+  ReadWriteVector<double>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<double> &,
+    VectorOperation::values,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
+#  endif
+#  ifdef DEAL_II_WITH_COMPLEX_VALUES
+#    ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+  template void
+  ReadWriteVector<std::complex<float>>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>> &,
+    VectorOperation::values,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
+#    endif
+#    ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+  template void
+  ReadWriteVector<std::complex<double>>::import_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>> &,
+    VectorOperation::values,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &);
+#    endif
+#  endif
+
 #endif
 } // namespace LinearAlgebra
 

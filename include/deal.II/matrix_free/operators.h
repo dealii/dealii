@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2011 - 2022 by the deal.II authors
+// Copyright (C) 2011 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -598,7 +598,7 @@ namespace MatrixFreeOperators
 
   /**
    * This class implements the operation of the action of the inverse of a
-   * mass matrix on an element for the special case of an evaluation object
+   * @ref GlossMassMatrix "mass matrix" on an element for the special case of an evaluation object
    * with as many quadrature points as there are cell degrees of freedom. It
    * uses algorithms from FEEvaluation and produces the exact mass matrix for
    * DGQ elements. This algorithm uses tensor products of inverse 1d shape
@@ -611,7 +611,8 @@ namespace MatrixFreeOperators
    * The equation may contain variable coefficients, so the user is required
    * to provide an array for the inverse of the local coefficient (this class
    * provide a helper method 'fill_inverse_JxW_values' to get the inverse of a
-   * constant-coefficient operator).
+   * constant-coefficient operator). The local coefficient can either be scalar
+   * in each component, or dyadic, i.e. couple between components.
    */
   template <int dim,
             int fe_degree,
@@ -637,12 +638,13 @@ namespace MatrixFreeOperators
                              VectorizedArrayType> &fe_eval);
 
     /**
-     * Applies the inverse mass matrix operation on an input array. It is
+     * Applies the inverse @ref GlossMassMatrix "mass matrix" operation on an input array. It is
      * assumed that the passed input and output arrays are of correct size,
      * namely FEEvaluation::dofs_per_cell long. The inverse of the
      * local coefficient (also containing the inverse JxW values) must be
      * passed as first argument. Passing more than one component in the
-     * coefficient is allowed.
+     * coefficient is allowed. The coefficients are interpreted as scalar
+     * in each component.
      */
     void
     apply(const AlignedVector<VectorizedArrayType> &inverse_coefficient,
@@ -651,18 +653,36 @@ namespace MatrixFreeOperators
           VectorizedArrayType *                     out_array) const;
 
     /**
-     * Applies the inverse mass matrix operation on an input array, using the
+     * Applies the inverse @ref GlossMassMatrix "mass matrix" operation on an input array, using the
      * inverse of the JxW values provided by the `fe_eval` argument passed to
      * the constructor of this class. Note that the user code must call
      * FEEvaluation::reinit() on the underlying evaluator to make the
      * FEEvaluationBase::JxW() method return the information of the correct
      * cell. It is assumed that the pointers of the input and output arrays
      * are valid over the length FEEvaluation::dofs_per_cell, which is the
-     * number of entries processed by this function. The `in_array` and
-     * `out_array` arguments may point to the same memory position.
+     * number of entries processed by this function. The @p in_array and
+     * @p out_array arguments may point to the same memory position.
      */
     void
     apply(const VectorizedArrayType *in_array,
+          VectorizedArrayType *      out_array) const;
+
+    /**
+     * This operation applies the inverse @ref GlossMassMatrix "mass matrix"
+     * operation on an input array with local dyadic-valued coefficients.
+     * The second-rank tensor at each quadrature point defines a linear operator
+     * on a vector holding the dof components. It is assumed that the passed
+     * input and output arrays are of correct size, namely
+     * FEEvaluation::dofs_per_cell long. The @p in_array and @p out_array
+     * arguments may point to the same memory position.
+     * @p inverse_dyadic_coefficients must be `dofs_per_component` long, and
+     * every element must be a second-rank tensor of dimension @p n_components.
+     * All entries should be multiplied with the inverse `JxW` values.
+     */
+    void
+    apply(const AlignedVector<Tensor<2, n_components, VectorizedArrayType>>
+            &                        inverse_dyadic_coefficients,
+          const VectorizedArrayType *in_array,
           VectorizedArrayType *      out_array) const;
 
     /**
@@ -726,7 +746,7 @@ namespace MatrixFreeOperators
 
 
   /**
-   * This class implements the operation of the action of a mass matrix.
+   * This class implements the operation of the action of a @ref GlossMassMatrix "mass matrix".
    *
    * @note This class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
@@ -766,7 +786,8 @@ namespace MatrixFreeOperators
     compute_diagonal() override;
 
     /**
-     * Compute the lumped mass matrix. This is equal to the mass matrix times a
+     * Compute the @ref GlossLumpedMassMatrix "lumped mass matrix".
+     * This is equal to the mass matrix times a
      * vector of all ones and is equivalent to approximating the mass matrix
      * with a nodal quadrature rule.
      *
@@ -797,7 +818,7 @@ namespace MatrixFreeOperators
 
   private:
     /**
-     * Applies the mass matrix operation on an input vector. It is
+     * Applies the @ref GlossMassMatrix "mass matrix" operation on an input vector. It is
      * assumed that the passed input and output vector are correctly initialized
      * using initialize_dof_vector().
      */
@@ -1032,8 +1053,12 @@ namespace MatrixFreeOperators
     fill_inverse_JxW_values(
       AlignedVector<VectorizedArrayType> &inverse_jxw) const
   {
-    constexpr unsigned int dofs_per_component_on_cell =
-      Utilities::pow(fe_degree + 1, dim);
+    const unsigned int dofs_per_component_on_cell =
+      (fe_degree > -1) ?
+        Utilities::pow(fe_degree + 1, dim) :
+        Utilities::pow(fe_eval.get_shape_info().data.front().fe_degree + 1,
+                       dim);
+
     Assert(inverse_jxw.size() > 0 &&
              inverse_jxw.size() % dofs_per_component_on_cell == 0,
            ExcMessage(
@@ -1090,23 +1115,63 @@ namespace MatrixFreeOperators
           const VectorizedArrayType *               in_array,
           VectorizedArrayType *                     out_array) const
   {
-    const unsigned int given_degree =
-      fe_eval.get_shape_info().data[0].fe_degree;
     if (fe_degree > -1)
-      internal::CellwiseInverseMassMatrixImplFlexible<dim,
-                                                      VectorizedArrayType>::
-        template run<fe_degree>(
-          n_actual_components,
-          fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-          inverse_coefficients,
-          in_array,
-          out_array);
+      internal::CellwiseInverseMassMatrixImplFlexible<
+        dim,
+        VectorizedArrayType>::template run<fe_degree>(n_actual_components,
+                                                      fe_eval,
+                                                      make_array_view(
+                                                        inverse_coefficients),
+                                                      false,
+                                                      in_array,
+                                                      out_array);
     else
       internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::apply(
         n_actual_components,
-        given_degree,
-        fe_eval.get_shape_info().data.front().inverse_shape_values_eo,
-        inverse_coefficients,
+        fe_eval,
+        make_array_view(inverse_coefficients),
+        false,
+        in_array,
+        out_array);
+  }
+
+  template <int dim,
+            int fe_degree,
+            int n_components,
+            typename Number,
+            typename VectorizedArrayType>
+  inline void
+  CellwiseInverseMassMatrix<dim,
+                            fe_degree,
+                            n_components,
+                            Number,
+                            VectorizedArrayType>::
+    apply(const AlignedVector<Tensor<2, n_components, VectorizedArrayType>>
+            &                        inverse_dyadic_coefficients,
+          const VectorizedArrayType *in_array,
+          VectorizedArrayType *      out_array) const
+  {
+    const unsigned int unrolled_size =
+      inverse_dyadic_coefficients.size() * (n_components * n_components);
+
+    if (fe_degree > -1)
+      internal::CellwiseInverseMassMatrixImplFlexible<dim,
+                                                      VectorizedArrayType>::
+        template run<fe_degree>(n_components,
+                                fe_eval,
+                                ArrayView<const VectorizedArrayType>(
+                                  &inverse_dyadic_coefficients[0][0][0],
+                                  unrolled_size),
+                                true,
+                                in_array,
+                                out_array);
+    else
+      internal::CellwiseInverseMassFactory<dim, VectorizedArrayType>::apply(
+        n_components,
+        fe_eval,
+        ArrayView<const VectorizedArrayType>(
+          &inverse_dyadic_coefficients[0][0][0], unrolled_size),
+        true,
         in_array,
         out_array);
   }
@@ -1858,8 +1923,6 @@ namespace MatrixFreeOperators
                VectorType,
                VectorizedArrayType>::compute_diagonal()
   {
-    using Number =
-      typename Base<dim, VectorType, VectorizedArrayType>::value_type;
     Assert((Base<dim, VectorType, VectorizedArrayType>::data.get() != nullptr),
            ExcNotInitialized());
     Assert(this->selected_rows == this->selected_columns,
@@ -1912,8 +1975,13 @@ namespace MatrixFreeOperators
     for (unsigned int i = 0; i < inverse_diagonal_vector.locally_owned_size();
          ++i)
       {
+#ifdef DEBUG
+        // only define the type alias in debug mode to avoid a warning
+        using Number =
+          typename Base<dim, VectorType, VectorizedArrayType>::value_type;
         Assert(diagonal_vector.local_element(i) > Number(0),
                ExcInternalError());
+#endif
         inverse_diagonal_vector.local_element(i) =
           1. / inverse_diagonal_vector.local_element(i);
       }

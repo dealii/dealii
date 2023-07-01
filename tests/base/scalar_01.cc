@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2009 - 2021 by the deal.II authors
+// Copyright (C) 2009 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -47,7 +47,11 @@ main()
   compare(static_cast<double>(t1), 13.);
   compare(static_cast<double &>(t1), 13.);
   compare((T() = t1), 13.);
-  compare((T() = 13.), 13.);
+  {
+    T t;
+    t = 13.;
+    compare(t, 13.);
+  }
   compare((t1 == t1), true);
   compare((t1 == t2), false);
   compare((t1 != t2), true);

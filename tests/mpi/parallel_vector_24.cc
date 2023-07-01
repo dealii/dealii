@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -107,7 +107,7 @@ test()
     {
       rw_vector.reinit(ghost_set);
     }
-  v.import(rw_vector, VectorOperation::add); // 60 + 6
+  v.import_elements(rw_vector, VectorOperation::add); // 60 + 6
   // compress(insert) used to leave ghosts un-touched which resulted in
   // the wrong 55+55 for this compress(add) operation.
 

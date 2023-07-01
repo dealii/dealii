@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2020 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -40,7 +40,7 @@
 
 #include "../tests.h"
 
-using namespace std;
+
 
 template <int dim, typename number, int spacedim>
 void
@@ -82,9 +82,9 @@ reinit_vector_by_blocks(
 
 template <int dim>
 void
-check_block(const FiniteElement<dim> &fe,
-            const vector<bool> &      selected,
-            const vector<double> &    factors)
+check_block(const FiniteElement<dim> & fe,
+            const std::vector<bool> &  selected,
+            const std::vector<double> &factors)
 {
   deallog << fe.get_name() << std::endl << "selected ";
   for (unsigned int i = 0; i < selected.size(); ++i)
@@ -100,7 +100,7 @@ check_block(const FiniteElement<dim> &fe,
   mgdof.distribute_dofs(fe);
   mgdof.distribute_mg_dofs();
   DoFRenumbering::component_wise(mgdof);
-  const vector<types::global_dof_index> ndofs =
+  const std::vector<types::global_dof_index> ndofs =
     DoFTools::count_dofs_per_fe_block(mgdof);
   Assert(ndofs.size() == fe.n_blocks(), ExcInternalError());
 
@@ -166,7 +166,7 @@ check_block(const FiniteElement<dim> &fe,
   deallog << std::endl;
 
   // Check copy to mg and back
-  // Fill a global vector by counting
+  // Fill a global std::vector by counting
   // from one up
   BlockVector<double> v;
   v.reinit(ndofs);
@@ -183,7 +183,7 @@ check_block(const FiniteElement<dim> &fe,
   deallog << std::endl;
 
   // Now do the opposite: fill a
-  // multigrid vector counting the
+  // multigrid std::vector counting the
   // dofs and see where the numbers go
   for (unsigned int i = 0; i < u[2].size(); ++i)
     u[2](i) = i + 1;
@@ -214,7 +214,7 @@ main()
   FESystem<2> fe0(rt1, 1, q1, 1);
   FESystem<2> fe1(rt0, 2, q0, 2);
 
-  vector<bool> s1(2, true);
+  std::vector<bool> s1(2, true);
   deallog << "All" << std::endl;
   check_block(fe0, s1, factors);
 

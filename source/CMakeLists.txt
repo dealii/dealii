@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -35,13 +35,12 @@ endif()
 # Compile the deal.II library
 #
 
-include_directories(
-  ${CMAKE_BINARY_DIR}/include/
-  ${CMAKE_SOURCE_DIR}/include/
-  ${DEAL_II_BUNDLED_INCLUDE_DIRS}
-  SYSTEM
-  ${DEAL_II_INCLUDE_DIRS}
-  )
+#
+# Automatically add the current source and binary directory as include
+# directory. The binary directory is needed in order to find the expanded
+# .inst include files.
+#
+set(CMAKE_INCLUDE_CURRENT_DIR true)
 
 #
 # List the directories where we have source files. the ones with the longest
@@ -53,6 +52,7 @@ include_directories(
 #
 add_subdirectory(numerics)
 add_subdirectory(fe)
+add_subdirectory(matrix_free)
 add_subdirectory(dofs)
 add_subdirectory(lac)
 add_subdirectory(base)
@@ -64,7 +64,6 @@ add_subdirectory(multigrid)
 add_subdirectory(distributed)
 add_subdirectory(algorithms)
 add_subdirectory(integrators)
-add_subdirectory(matrix_free)
 add_subdirectory(meshworker)
 add_subdirectory(opencascade)
 add_subdirectory(particles)
@@ -76,23 +75,70 @@ add_subdirectory(sundials)
 add_subdirectory(trilinos)
 add_subdirectory(arborx)
 
+#
+# Define a "dealii", i.e., "${DEAL_II_TARGET_NAME}", target that contains
+# DEAL_II_CXX_FLAGS[_DEBUG|_RELEASE] and otherwise aliases dealii_debug or
+# dealii_release depending on the downstream CMAKE_BUILD_TYPE.
+#
+
+add_library(${DEAL_II_TARGET_NAME} INTERFACE)
+target_compile_flags(${DEAL_II_TARGET_NAME} INTERFACE
+  "$<COMPILE_LANGUAGE:CXX>" "${DEAL_II_CXX_FLAGS}"
+  )
+target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE "${DEAL_II_LINKER_FLAGS}")
+
 foreach(build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER ${build} build_lowercase)
+  if("${build}" MATCHES "DEBUG")
+    set(build_camelcase "Debug")
+  elseif("${build}" MATCHES "RELEASE")
+    set(build_camelcase "Release")
+  endif()
 
   #
   # Combine all ${build} OBJECT targets to a ${build} library:
   #
 
-  get_property(_objects GLOBAL PROPERTY DEAL_II_OBJECTS_${build})
+  set(_object_files "")
+  if(NOT BUILD_SHARED_LIBS)
+    get_property(_object_targets GLOBAL PROPERTY DEAL_II_OBJECT_TARGETS_${build})
+    foreach(_target ${_object_targets})
+      list(APPEND _object_files "$<TARGET_OBJECTS:${_target}>")
+    endforeach()
+  endif()
 
-  add_library(${DEAL_II_NAMESPACE}_${build_lowercase}
-    dummy.cc # Workaround for a bug in the Xcode generator
-    ${_objects}
+  add_library(${DEAL_II_TARGET_NAME}_${build_lowercase} dummy.cc ${_object_files})
+  add_dependencies(library ${DEAL_II_TARGET_NAME}_${build_lowercase})
+
+  #
+  # Add compile flags, definitions and (public) feature (recorded in
+  # DEAL_II_TARGETS(|_DEBUG|_RELEASE)).
+  #
+  populate_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase} ${build})
+
+  #
+  # Record the expected C++ standard as a compile feature. This target
+  # property ensures that support for our expected C++ standard is always
+  # enabled in client user code irrespective of what compile flags/options
+  # they have set.
+  #
+  target_compile_features(${DEAL_II_TARGET_NAME}_${build_lowercase}
+    INTERFACE cxx_std_${CMAKE_CXX_STANDARD}
     )
-  add_dependencies(library ${DEAL_II_NAMESPACE}_${build_lowercase})
 
-  set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
+  if(BUILD_SHARED_LIBS)
+    #
+    # Add all object targets as private link targets
+    #
+    get_property(_object_targets GLOBAL PROPERTY DEAL_II_OBJECT_TARGETS_${build})
+    target_link_libraries(${DEAL_II_TARGET_NAME}_${build_lowercase}
+      PRIVATE ${_object_targets}
+      )
+  endif()
+
+  set_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase}
     PROPERTIES
+    LINKER_LANGUAGE "CXX"
     VERSION "${DEAL_II_PACKAGE_VERSION}"
     #
     # Sonaming: Well... we just use the version number.
@@ -100,10 +146,6 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     # a C++ library is still ABI backwards compatible :-]
     #
     SOVERSION "${DEAL_II_PACKAGE_VERSION}"
-    LINK_FLAGS "${DEAL_II_LINKER_FLAGS} ${DEAL_II_LINKER_FLAGS_${build}}"
-    LINKER_LANGUAGE "CXX"
-    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
-    COMPILE_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}}"
     ARCHIVE_OUTPUT_NAME "${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}"
     LIBRARY_OUTPUT_NAME "${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}"
     RUNTIME_OUTPUT_NAME "${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}"
@@ -112,8 +154,16 @@ foreach(build ${DEAL_II_BUILD_TYPES})
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
 
+  target_compile_flags(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<AND:$<CONFIG:${build_camelcase}>,$<COMPILE_LANGUAGE:CXX>>"
+    "${DEAL_II_CXX_FLAGS_${build}}"
+    )
+  target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<CONFIG:${build_camelcase}>" "${DEAL_II_LINKER_FLAGS_${build}}"
+    )
+
   if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
+    set_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase}
       PROPERTIES
       MACOSX_RPATH OFF
       BUILD_WITH_INSTALL_RPATH OFF
@@ -130,7 +180,7 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   # lib locations for _DEBUG (no support for dynamic linking, _RELEASE will be
   # ignored), but we do it anyhow.
   if (DEAL_II_MSVC)
-    set_target_properties(${DEAL_II_NAMESPACE}_${build_lowercase}
+    set_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase}
       PROPERTIES
       ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
       LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_LIBRARY_RELDIR}"
@@ -141,32 +191,43 @@ foreach(build ${DEAL_II_BUILD_TYPES})
       )
   endif()
 
-
-  target_link_libraries(${DEAL_II_NAMESPACE}_${build_lowercase}
-    ${DEAL_II_LIBRARIES_${build}}
-    ${DEAL_II_LIBRARIES}
-    )
-
-  file(MAKE_DIRECTORY
-    ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}
-    )
-  export(TARGETS ${DEAL_II_NAMESPACE}_${build_lowercase}
-    NAMESPACE "${DEAL_II_NAMESPACE}::"
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR})
+  export(TARGETS ${DEAL_II_TARGET_NAME}_${build_lowercase}
+    NAMESPACE "${DEAL_II_TARGET_NAME}::"
     FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
     APPEND
     )
 
-  install(TARGETS ${DEAL_II_NAMESPACE}_${build_lowercase}
+  install(TARGETS ${DEAL_II_TARGET_NAME}_${build_lowercase}
     COMPONENT library
     EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
     RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
     LIBRARY DESTINATION ${DEAL_II_LIBRARY_RELDIR}
     ARCHIVE DESTINATION ${DEAL_II_LIBRARY_RELDIR}
     )
+
+  target_link_libraries(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<$<CONFIG:${build_camelcase}>:${DEAL_II_TARGET_NAME}::${DEAL_II_TARGET_NAME}_${build_lowercase}>"
+    )
 endforeach()
 
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR})
+export(TARGETS ${DEAL_II_TARGET_NAME}
+  NAMESPACE "${DEAL_II_TARGET_NAME}::"
+  FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
+  APPEND
+)
+
+install(TARGETS ${DEAL_II_TARGET_NAME}
+  COMPONENT library
+  EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+  RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
+  LIBRARY DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+  ARCHIVE DESTINATION ${DEAL_II_LIBRARY_RELDIR}
+)
+
 install(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
-  NAMESPACE "${DEAL_II_NAMESPACE}::"
+  NAMESPACE "${DEAL_II_TARGET_NAME}::"
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
   )

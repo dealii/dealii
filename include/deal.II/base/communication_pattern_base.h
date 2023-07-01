@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2015 - 2021 by the deal.II authors
+// Copyright (C) 2015 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,12 +88,12 @@ namespace Utilities
       virtual void
       reinit(const IndexSet &locally_owned_indices,
              const IndexSet &ghost_indices,
-             const MPI_Comm &communicator) = 0;
+             const MPI_Comm  communicator) = 0;
 
       /**
-       * Return a constant reference to the underlying MPI communicator.
+       * Return the underlying MPI communicator.
        */
-      virtual const MPI_Comm &
+      virtual MPI_Comm
       get_mpi_communicator() const = 0;
     };
 

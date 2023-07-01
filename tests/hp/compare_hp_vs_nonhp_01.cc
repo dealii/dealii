@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2005 - 2020 by the deal.II authors
+// Copyright (C) 2005 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -78,7 +78,7 @@ namespace with_hp
   class LaplaceProblem
   {
   public:
-    LaplaceProblem<dim>();
+    LaplaceProblem();
 
     void
     run(Vector<double> &sol);
@@ -239,7 +239,7 @@ namespace without_hp
   class LaplaceProblem
   {
   public:
-    LaplaceProblem<dim>();
+    LaplaceProblem();
 
     void
     run(Vector<double> &sol);

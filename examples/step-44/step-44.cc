@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 2010 - 2022 by the deal.II authors and
+ * Copyright (C) 2010 - 2023 by the deal.II authors and
  *                              & Jean-Paul Pelteret and Andrew McBride
  *
  * This file is part of the deal.II library.
@@ -73,7 +73,7 @@
 
 // Defined in these two headers are some operations that are pertinent to
 // finite strain elasticity. The first will help us compute some kinematic
-// quantities, and the second provides some stanard tensor definitions.
+// quantities, and the second provides some standard tensor definitions.
 #include <deal.II/physics/elasticity/kinematics.h>
 #include <deal.II/physics/elasticity/standard_tensors.h>
 
@@ -1037,7 +1037,7 @@ namespace Step44
     // The Finite Element System is composed of dim continuous displacement
     // DOFs, and discontinuous pressure and dilatation DOFs. In an attempt to
     // satisfy the Babuska-Brezzi or LBB stability conditions (see Hughes
-    // (2000)), we setup a $Q_n \times DGP_{n-1} \times DGP_{n-1}$
+    // (2000)), we set up a $Q_n \times DGP_{n-1} \times DGP_{n-1}$
     // system. $Q_2 \times DGP_1 \times DGP_1$ elements satisfy this
     // condition, while $Q_1 \times DGP_0 \times DGP_0$ elements do
     // not. However, it has been shown that the latter demonstrate good
@@ -1237,7 +1237,7 @@ namespace Step44
   // matrix. Recall that we wish to solve for a displacement-based formulation.
   // We do the condensation at the element level as the $\widetilde{p}$ and
   // $\widetilde{J}$ fields are element-wise discontinuous.  As these operations
-  // are matrix-based, we need to setup a number of matrices to store the local
+  // are matrix-based, we need to set up a number of matrices to store the local
   // contributions from a number of the tangent matrix sub-blocks.  We place
   // these in the PerTaskData struct.
   //
@@ -1551,7 +1551,7 @@ namespace Step44
                                         triangulation.end(),
                                         n_q_points);
 
-    // Next we setup the initial quadrature point data.
+    // Next we set up the initial quadrature point data.
     // Note that when the quadrature point data is retrieved,
     // it is returned as a vector of smart pointers.
     for (const auto &cell : triangulation.active_cell_iterators())
@@ -2032,7 +2032,7 @@ namespace Step44
           }
       }
 
-    // Now we build the local cell stiffness matrix and RHS vector. Since the
+    // Now we build the local cell @ref GlossStiffnessMatrix "stiffness matrix" and RHS vector. Since the
     // global and local system matrices are symmetric, we can exploit this
     // property by building only the lower half of the local matrix and copying
     // the values to the upper half.  So we only assemble half of the
@@ -3179,6 +3179,13 @@ namespace Step44
   // Here we present how the results are written to file to be viewed
   // using ParaView or VisIt. The method is similar to that shown in previous
   // tutorials so will not be discussed in detail.
+  //
+  // @note As of 2023, Visit 3.3.3 can still not deal with higher-order cells.
+  //   Rather, it simply reports that there is no data to show. To view the
+  //   results of this program with Visit, you will want to comment out the
+  //   line that sets `output_flags.write_higher_order_cells = true;`. On the
+  //   other hand, Paraview is able to understand VTU files with higher order
+  //   cells just fine.
   template <int dim>
   void Solid<dim>::output_results() const
   {

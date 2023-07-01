@@ -155,7 +155,7 @@ main(int argc, char **argv)
     {
       test4<2>();
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

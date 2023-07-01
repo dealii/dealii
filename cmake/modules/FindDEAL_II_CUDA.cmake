@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2014 - 2022 by the deal.II authors
+## Copyright (C) 2014 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -40,9 +40,17 @@ if(CUDA_FOUND)
   message(STATUS "Configured to use CUDA installation at ${CUDA_TOOLKIT_ROOT_DIR}")
 endif()
 
+enable_if_supported(_cuda_flags "-Xcudafe --diag_suppress=unsigned_compare_with_zero")
+enable_if_supported(_cuda_flags "-Xcudafe --diag_suppress=integer_sign_change")
+enable_if_supported(_cuda_flags "-Xcudafe --diag_suppress=20208") # long double treated as double
+enable_if_supported(_cuda_flags "-Xcudafe --diag_suppress=1301")  # non-template friend
+enable_if_supported(_cuda_flags "-Wno-non-template-friend")
+enable_if_supported(_cuda_flags "-Xcudafe --diag_suppress=loop_not_reachable")
+
 process_feature(CUDA
   LIBRARIES REQUIRED CUDA_LIBRARIES CUDA_cusparse_LIBRARY CUDA_cusolver_LIBRARY
   INCLUDE_DIRS REQUIRED CUDA_INCLUDE_DIRS
+  CXX_FLAGS OPTIONAL _cuda_flags
   CLEAR
     CUDA_cublas_device_LIBRARY
     CUDA_cublas_LIBRARY

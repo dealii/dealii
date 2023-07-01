@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -69,7 +69,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     Vector<Number>::Vector(const IndexSet &parallel_partitioner,
-                           const MPI_Comm &communicator)
+                           const MPI_Comm  communicator)
       : Subscriptor()
       , vector(new Tpetra::Vector<Number, int, types::signed_global_dof_index>(
           Teuchos::rcp(new Tpetra::Map<int, types::signed_global_dof_index>(
@@ -81,7 +81,7 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Vector<Number>::reinit(const IndexSet &parallel_partitioner,
-                           const MPI_Comm &communicator,
+                           const MPI_Comm  communicator,
                            const bool      omit_zeroing_entries)
     {
       Tpetra::Map<int, types::signed_global_dof_index> input_map =
@@ -166,7 +166,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Vector<Number>::import(
+    Vector<Number>::import_elements(
       const ReadWriteVector<Number> &V,
       VectorOperation::values        operation,
       std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -208,17 +208,26 @@ namespace LinearAlgebra
         tpetra_export.getSourceMap());
 
       {
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+        auto x_2d = source_vector.template getLocalView<Kokkos::HostSpace>(
+          Tpetra::Access::ReadWrite);
+#  else
         source_vector.template sync<Kokkos::HostSpace>();
         auto x_2d = source_vector.template getLocalView<Kokkos::HostSpace>();
+#  endif
         auto x_1d = Kokkos::subview(x_2d, Kokkos::ALL(), 0);
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
         source_vector.template modify<Kokkos::HostSpace>();
+#  endif
         const size_t localLength = source_vector.getLocalLength();
         auto         values_it   = V.begin();
         for (size_t k = 0; k < localLength; ++k)
           x_1d(k) = *values_it++;
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
         source_vector.template sync<
           typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
             device_type::memory_space>();
+#  endif
       }
       if (operation == VectorOperation::insert)
         vector->doExport(source_vector, tpetra_export, Tpetra::REPLACE);
@@ -331,18 +340,27 @@ namespace LinearAlgebra
     {
       AssertIsFinite(a);
 
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWrite);
+#  else
       vector->template sync<Kokkos::HostSpace>();
       auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
+#  endif
       auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       vector->template modify<Kokkos::HostSpace>();
+#  endif
       const size_t localLength = vector->getLocalLength();
       for (size_t k = 0; k < localLength; ++k)
         {
           vector_1d(k) += a;
         }
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       vector->template sync<
         typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
           device_type::memory_space>();
+#  endif
     }
 
 
@@ -643,9 +661,14 @@ namespace LinearAlgebra
       else
         out.setf(std::ios::fixed, std::ios::floatfield);
 
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadOnly);
+#  else
       vector->template sync<Kokkos::HostSpace>();
       auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
-      auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+#  endif
+      auto         vector_1d    = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
       const size_t local_length = vector->getLocalLength();
 
       if (across)
@@ -677,7 +700,7 @@ namespace LinearAlgebra
     template <typename Number>
     void
     Vector<Number>::create_tpetra_comm_pattern(const IndexSet &source_index_set,
-                                               const MPI_Comm &mpi_comm)
+                                               const MPI_Comm  mpi_comm)
     {
       source_stored_elements = source_index_set;
       tpetra_comm_pattern =

@@ -18,6 +18,7 @@ Jenkinsfile export-ignore
 /tests/CMakeLists.txt -export-ignore
 /tests/quick_tests -export-ignore
 /tests/run_*.cmake -export-ignore
+/tests/setup_testsubproject.cmake -export-ignore
 /tests/tests.h -export-ignore
 
 #

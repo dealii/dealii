@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2010 - 2020 by the deal.II authors
+// Copyright (C) 2010 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -54,16 +54,16 @@ namespace Algorithms
    * Application class performing the theta timestepping scheme.
    *
    * The theta scheme is an abstraction of implicit and explicit Euler
-   * schemes, the Crank-Nicholson scheme and linear combinations of those. The
+   * schemes, the Crank-Nicolson scheme and linear combinations of those. The
    * choice of the actual scheme is controlled by the parameter #theta as
    * follows.
    * <ul>
    * <li> #theta=0: explicit Euler scheme
    * <li> #theta=1: implicit Euler scheme
-   * <li> #theta=½: Crank-Nicholson scheme
+   * <li> #theta=½: Crank-Nicolson scheme
    * </ul>
    *
-   * For fixed #theta, the Crank-Nicholson scheme is the only second order
+   * For fixed #theta, the Crank-Nicolson scheme is the only second order
    * scheme. Nevertheless, further stability may be achieved by choosing
    * #theta larger than ½, thereby introducing a first order error term. In
    * order to avoid a loss of convergence order, the adaptive theta scheme can
@@ -76,7 +76,7 @@ namespace Algorithms
    *   M u_{n+1} + \theta k F(u_{n+1})  = M u_n - (1-\theta)k F(u_n).
    * @f]
    *
-   * Here, <i>M</i> is the mass matrix. We see, that the right hand side
+   * Here, <i>M</i> is the @ref GlossMassMatrix "mass matrix". We see, that the right hand side
    * amounts to an explicit Euler step with modified step size in weak form
    * (up to inversion of M). The left hand side corresponds to an implicit
    * Euler step with modified step size (right hand side given). Thus, the
@@ -410,7 +410,7 @@ namespace Algorithms
      * step size from explicit_data().
      *
      * Its return value is $ Mu+cF(u) $, where $u$ is the current state
-     * vector, $M$ the mass matrix, $F$ the operator in space and $c$ is the
+     * vector, $M$ the @ref GlossMassMatrix "mass matrix", $F$ the operator in space and $c$ is the
      * adjusted time step size $(1-\theta) \Delta t$.
      */
     SmartPointer<OperatorBase, ThetaTimestepping<VectorType>> op_explicit;
@@ -422,7 +422,7 @@ namespace Algorithms
      *
      * Its return value is the solution <i>u</i> of <i>Mu-cF(u)=f</i>, where
      * <i>f</i> is the dual space vector found in the "Previous time" entry of
-     * the input data, <i>M</i> the mass matrix, <i>F</i> the operator in
+     * the input data, <i>M</i> the @ref GlossMassMatrix "mass matrix", <i>F</i> the operator in
      * space and <i>c</i> is the adjusted time step size $ \theta \Delta t$
      */
     SmartPointer<OperatorBase, ThetaTimestepping<VectorType>> op_implicit;

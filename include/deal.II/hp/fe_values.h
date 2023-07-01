@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2022 by the deal.II authors
+// Copyright (C) 2003 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -503,7 +503,10 @@ namespace hp
      * same as that used in the construction of the DoFHandler associated
      * with the present cell. On the other hand, if a value is given for this
      * argument, it overrides the choice of
-     * <code>cell-@>active_fe_index()</code>.
+     * <code>cell-@>active_fe_index()</code>. (This may or may not be very
+     * useful: If you are using a specific finite element on the current cell,
+     * why would you want to reinit() an object of the current type with a
+     * *different* finite element?)
      *
      * If the @p q_index argument is left at its default value, then we use
      * that quadrature formula within the hp::QCollection passed to the

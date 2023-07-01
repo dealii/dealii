@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2020 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -12,8 +12,6 @@
 ## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
-
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 set(_unity_include_src
   affine_constraints.cc
@@ -100,6 +98,8 @@ set(_inst
 if(DEAL_II_WITH_PETSC)
   set(_unity_include_src
     ${_unity_include_src}
+    petsc_communication_pattern.cc
+    petsc_compatibility.cc
     petsc_full_matrix.cc
     petsc_matrix_base.cc
     petsc_matrix_free.cc
@@ -108,8 +108,9 @@ if(DEAL_II_WITH_PETSC)
     petsc_parallel_sparse_matrix.cc
     petsc_parallel_vector.cc
     petsc_precondition.cc
+    petsc_snes.cc
     petsc_solver.cc
-    petsc_communication_pattern.cc
+    petsc_ts.cc
     petsc_sparse_matrix.cc
     petsc_vector_base.cc
   )
@@ -139,14 +140,14 @@ if(DEAL_II_WITH_TRILINOS)
     trilinos_block_vector.cc
     trilinos_epetra_communication_pattern.cc
     trilinos_epetra_vector.cc
-    trilinos_precondition.cc
-    trilinos_precondition_ml.cc
-    trilinos_solver.cc
+    #trilinos_precondition.cc
+    #trilinos_precondition_ml.cc
+    #trilinos_solver.cc
     trilinos_sparse_matrix.cc
-    trilinos_sparsity_pattern.cc
+    #trilinos_sparsity_pattern.cc
     trilinos_tpetra_communication_pattern.cc
     trilinos_tpetra_vector.cc
-    trilinos_vector.cc
+    #trilinos_vector.cc
   )
 
   set(_separate_src
@@ -192,5 +193,5 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/lac/*.h
   )
 
-deal_ii_add_library(obj_lac OBJECT ${_src} ${_header} ${_inst})
-expand_instantiations(obj_lac "${_inst}")
+define_object_library(object_lac OBJECT ${_src} ${_header} ${_inst})
+expand_instantiations(object_lac "${_inst}")

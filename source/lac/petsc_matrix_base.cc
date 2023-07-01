@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2022 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -92,18 +92,21 @@ namespace PETScWrappers
   void
   MatrixBase::reinit(Mat A)
   {
-    AssertThrow(last_action == ::dealii::VectorOperation::unknown,
+    AssertThrow(last_action == VectorOperation::unknown,
                 ExcMessage("Cannot assign a new Mat."));
     PetscErrorCode ierr =
       PetscObjectReference(reinterpret_cast<PetscObject>(A));
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-    destroy_matrix(matrix);
+    ierr = MatDestroy(&matrix);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
     matrix = A;
   }
 
   MatrixBase::~MatrixBase()
   {
-    destroy_matrix(matrix);
+    PetscErrorCode ierr = MatDestroy(&matrix);
+    (void)ierr;
+    AssertNothrow(ierr == 0, ExcPETScError(ierr));
   }
 
   void
@@ -111,7 +114,7 @@ namespace PETScWrappers
   {
     // destroy the matrix...
     {
-      const PetscErrorCode ierr = destroy_matrix(matrix);
+      const PetscErrorCode ierr = MatDestroy(&matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 
@@ -307,9 +310,9 @@ namespace PETScWrappers
   MatrixBase::size_type
   MatrixBase::local_size() const
   {
-    PetscInt n_rows, n_cols;
+    PetscInt n_rows;
 
-    const PetscErrorCode ierr = MatGetLocalSize(matrix, &n_rows, &n_cols);
+    const PetscErrorCode ierr = MatGetLocalSize(matrix, &n_rows, nullptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     return n_rows;
@@ -326,7 +329,36 @@ namespace PETScWrappers
       MatGetOwnershipRange(static_cast<const Mat &>(matrix), &begin, &end);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    return std::make_pair(begin, end);
+    return {begin, end};
+  }
+
+
+
+  MatrixBase::size_type
+  MatrixBase::local_domain_size() const
+  {
+    PetscInt n_cols;
+
+    const PetscErrorCode ierr = MatGetLocalSize(matrix, nullptr, &n_cols);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    return n_cols;
+  }
+
+
+
+  std::pair<MatrixBase::size_type, MatrixBase::size_type>
+  MatrixBase::local_domain() const
+  {
+    PetscInt begin, end;
+
+    const PetscErrorCode ierr =
+      MatGetOwnershipRangeColumn(static_cast<const Mat &>(matrix),
+                                 &begin,
+                                 &end);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    return {begin, end};
   }
 
 
@@ -596,7 +628,7 @@ namespace PETScWrappers
                             PETSC_DEFAULT,
                             &result.petsc_matrix());
           AssertThrow(ierr == 0, ExcPETScError(ierr));
-          ierr = PETScWrappers::destroy_matrix(tmp);
+          ierr = MatDestroy(&tmp);
           AssertThrow(ierr == 0, ExcPETScError(ierr));
         }
     }
@@ -735,7 +767,7 @@ namespace PETScWrappers
       }
     if (vmatrix != matrix)
       {
-        ierr = PETScWrappers::destroy_matrix(vmatrix);
+        ierr = MatDestroy(&vmatrix);
         AssertThrow(ierr == 0, ExcPETScError(ierr));
       }
     AssertThrow(out.fail() == false, ExcIO());

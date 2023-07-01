@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,19 +66,20 @@ namespace internal
     void
     select_apply_inverse(Number *                               dst,
                          const Number *                         src,
-                         AlignedVector<Number> &                tmp,
                          const unsigned int                     n_rows_1d,
                          const std::array<const Number *, dim> &eigenvectors,
-                         const std::array<const Number *, dim> &eigenvalues)
+                         const std::array<const Number *, dim> &eigenvalues,
+                         const Number *inverted_eigenvalues)
     {
       if (n_rows_1d_templated == n_rows_1d)
         apply_inverse<n_rows_1d_templated>(
-          dst, src, tmp, n_rows_1d, eigenvectors, eigenvalues);
+          dst, src, n_rows_1d, eigenvectors, eigenvalues, inverted_eigenvalues);
       else if (n_rows_1d_templated < FDM_N_ROWS_MAX)
         select_apply_inverse<std::min(n_rows_1d_templated + 1, FDM_N_ROWS_MAX)>(
-          dst, src, tmp, n_rows_1d, eigenvectors, eigenvalues);
+          dst, src, n_rows_1d, eigenvectors, eigenvalues, inverted_eigenvalues);
       else
-        apply_inverse<0>(dst, src, tmp, n_rows_1d, eigenvectors, eigenvalues);
+        apply_inverse<0>(
+          dst, src, n_rows_1d, eigenvectors, eigenvalues, inverted_eigenvalues);
     }
   } // namespace TensorProductMatrixSymmetricSum
 } // namespace internal

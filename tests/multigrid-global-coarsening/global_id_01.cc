@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,7 @@
 
 template <int dim, int spacedim>
 void
-test(const MPI_Comm &comm)
+test(const MPI_Comm comm)
 {
   Triangulation<dim> basetria;
   GridGenerator::subdivided_hyper_cube(basetria, 4);

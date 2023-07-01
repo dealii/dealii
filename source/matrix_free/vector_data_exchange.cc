@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -371,7 +371,7 @@ namespace internal
 
       Full::Full(
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
-        const MPI_Comm &communicator_sm)
+        const MPI_Comm communicator_sm)
         : comm(partitioner->get_mpi_communicator())
         , comm_sm(communicator_sm)
         , n_local_elements(partitioner->locally_owned_range().n_elements())
@@ -1100,7 +1100,7 @@ namespace internal
         (void)data_others;
         (void)operation;
 
-        Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
+        Assert(operation == VectorOperation::add, ExcNotImplemented());
 
         requests.resize(sm_ghost_ranks.size() + sm_import_ranks.size() +
                         ghost_targets_data.size() + import_targets_data.size());
@@ -1224,7 +1224,7 @@ namespace internal
 
         (void)operation;
 
-        Assert(operation == dealii::VectorOperation::add, ExcNotImplemented());
+        Assert(operation == VectorOperation::add, ExcNotImplemented());
 
         AssertDimension(requests.size(),
                         sm_ghost_ranks.size() + sm_import_ranks.size() +
@@ -1368,7 +1368,7 @@ namespace internal
 
 
 
-      const MPI_Comm &
+      MPI_Comm
       Full::get_sm_mpi_communicator() const
       {
         return this->comm_sm;

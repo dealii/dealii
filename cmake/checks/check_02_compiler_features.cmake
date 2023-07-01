@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2020 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -241,13 +241,13 @@ endif()
 
 
 #
-# Newer versions of GCC can pass a flag to the assembler to
-# compress debug sections. At the time of writing this test,
-# this can save around 230 MB of disk space on the object
-# files we produce (810MB down to 570MB for the debug versions
-# of object files). Unfortunately, the sections have to be
-# unpacked again when they are put into the shared libs, so
-# no savings there.
+# Newer versions of GCC can pass a flag to the assembler to compress
+# debug sections. At the time of writing this test, this can save
+# around 230 MB of disk space on the object files we produce (810MB
+# down to 570MB for the debug versions of object files). Regardless of
+# the setting, the linker will store the debug information
+# uncompressed by default. Fortunately, we can also enable compressed
+# output for the linker.
 #
 # The flag also doesn't appear to be working on Cygwin, as
 # per email by John Fowkes on the mailing list in Feb 2012,
@@ -267,6 +267,7 @@ if( (NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN") AND
     (NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel") )
   add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_DEBUG}")
   enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
+  enable_if_links(DEAL_II_LINKER_FLAGS_DEBUG "-Wl,--compress-debug-sections=zlib")
   reset_cmake_required()
 endif()
 

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -132,6 +132,6 @@ main()
   initlog();
   deallog << std::setprecision(10);
 
-  test<2, 2>(6, 1);
+  test<2, 2>(5, 1);
   test<3, 3>(4, 0);
 }

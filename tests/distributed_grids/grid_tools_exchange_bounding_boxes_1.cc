@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2018 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,9 +31,9 @@ test_exchange_bbox()
   // For process i the number of boxes n_bboxes[i%7] is created
   std::vector<unsigned int> n_bboxes = {2, 4, 3, 5, 1, 3, 8};
 
-  const MPI_Comm &mpi_communicator = MPI_COMM_WORLD;
-  unsigned int    n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
-  unsigned int    proc    = Utilities::MPI::this_mpi_process(mpi_communicator);
+  const MPI_Comm mpi_communicator = MPI_COMM_WORLD;
+  unsigned int   n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
+  unsigned int   proc    = Utilities::MPI::this_mpi_process(mpi_communicator);
 
   deallog << "Test for: dimension " << spacedim << std::endl;
   deallog << n_procs << "  mpi processes" << std::endl;

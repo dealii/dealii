@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2021 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -37,7 +37,7 @@ DEAL_II_NAMESPACE_OPEN
  * vector fields with normal components continuous between mesh cells. The
  * purpose of this finite element is in localizing the interactions
  * between degrees of freedom around the nodes when an appropriate quadrature
- * rule is used, leading to a block-diagonal mass matrix (even with full-tensor
+ * rule is used, leading to a block-diagonal @ref GlossMassMatrix "mass matrix" (even with full-tensor
  * coefficient).
  *
  * The elements are defined through enrichment of classical Raviart-Thomas

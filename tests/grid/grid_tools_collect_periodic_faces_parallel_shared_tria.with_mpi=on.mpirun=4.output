@@ -1,0 +1,7 @@
+
+DEAL::dim = 1
+DEAL::1
+DEAL::dim = 2
+DEAL::16
+DEAL::dim = 3
+DEAL::256

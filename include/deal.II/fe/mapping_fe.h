@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2021 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,7 +53,8 @@ DEAL_II_NAMESPACE_OPEN
  * @note Currently, only implemented for elements with tensor_degree==1 and
  *   n_components==1.
  *
- * @relates simplex
+ * Also see
+ * @ref simplex "Simplex support".
  */
 template <int dim, int spacedim = dim>
 class MappingFE : public Mapping<dim, spacedim>

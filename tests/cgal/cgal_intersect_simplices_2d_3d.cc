@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 
-// Copyright (C) 2022 by the deal.II authors
+// Copyright (C) 2022 - 2023 by the deal.II authors
 
 // This file is part of the deal.II library.
 //
@@ -58,10 +58,10 @@ test_intersection_inside(Triangulation<3> &tria0, Triangulation<2, 3> &tria1)
   {
     const double expected_measure = 0.36;
     const auto   vec_of_arrays =
-      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
-                                                           tria1.begin_active(),
-                                                           MappingQ1<3>(),
-                                                           MappingQ1<2, 3>());
+      CGALWrappers::compute_intersection_of_cells(tria0.begin_active(),
+                                                  tria1.begin_active(),
+                                                  MappingQ1<3>(),
+                                                  MappingQ1<2, 3>());
 
     const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
     const double sum =
@@ -73,10 +73,10 @@ test_intersection_inside(Triangulation<3> &tria0, Triangulation<2, 3> &tria1)
     GridTools::transform(swap_coordinates(1, 2), tria1);
     const double expected_measure = 0.36;
     const auto   vec_of_arrays =
-      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
-                                                           tria1.begin_active(),
-                                                           MappingQ1<3>(),
-                                                           MappingQ1<2, 3>());
+      CGALWrappers::compute_intersection_of_cells(tria0.begin_active(),
+                                                  tria1.begin_active(),
+                                                  MappingQ1<3>(),
+                                                  MappingQ1<2, 3>());
 
     const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
     const double sum =
@@ -88,10 +88,10 @@ test_intersection_inside(Triangulation<3> &tria0, Triangulation<2, 3> &tria1)
     GridTools::transform(swap_coordinates(0, 1), tria1);
     const double expected_measure = 0.36;
     const auto   vec_of_arrays =
-      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
-                                                           tria1.begin_active(),
-                                                           MappingQ1<3>(),
-                                                           MappingQ1<2, 3>());
+      CGALWrappers::compute_intersection_of_cells(tria0.begin_active(),
+                                                  tria1.begin_active(),
+                                                  MappingQ1<3>(),
+                                                  MappingQ1<2, 3>());
 
     const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
     const double sum =
@@ -112,10 +112,10 @@ test_intersection(Triangulation<3> &tria0, Triangulation<2, 3> &tria1)
   {
     const double expected_measure = 0.25;
     const auto   vec_of_arrays =
-      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
-                                                           tria1.begin_active(),
-                                                           MappingQ1<3>(),
-                                                           MappingQ1<2, 3>());
+      CGALWrappers::compute_intersection_of_cells(tria0.begin_active(),
+                                                  tria1.begin_active(),
+                                                  MappingQ1<3>(),
+                                                  MappingQ1<2, 3>());
 
     const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
     const double sum =
@@ -127,10 +127,10 @@ test_intersection(Triangulation<3> &tria0, Triangulation<2, 3> &tria1)
     GridTools::transform(swap_coordinates(1, 2), tria1);
     const double expected_measure = 0.25;
     const auto   vec_of_arrays =
-      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
-                                                           tria1.begin_active(),
-                                                           MappingQ1<3>(),
-                                                           MappingQ1<2, 3>());
+      CGALWrappers::compute_intersection_of_cells(tria0.begin_active(),
+                                                  tria1.begin_active(),
+                                                  MappingQ1<3>(),
+                                                  MappingQ1<2, 3>());
 
     const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
     const double sum =
@@ -142,10 +142,10 @@ test_intersection(Triangulation<3> &tria0, Triangulation<2, 3> &tria1)
     GridTools::transform(swap_coordinates(0, 1), tria1);
     const double expected_measure = 0.25;
     const auto   vec_of_arrays =
-      CGALWrappers::compute_intersection_of_cells<3, 2, 3>(tria0.begin_active(),
-                                                           tria1.begin_active(),
-                                                           MappingQ1<3>(),
-                                                           MappingQ1<2, 3>());
+      CGALWrappers::compute_intersection_of_cells(tria0.begin_active(),
+                                                  tria1.begin_active(),
+                                                  MappingQ1<3>(),
+                                                  MappingQ1<2, 3>());
 
     const auto   quad = QGaussSimplex<2>(1).mapped_quadrature(vec_of_arrays);
     const double sum =

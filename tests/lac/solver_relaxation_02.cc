@@ -149,7 +149,7 @@ main()
               deallog << "diff " << std::fabs(r1 - r2) / r1 << std::endl;
               deallog.pop();
             }
-          catch (std::exception &e)
+          catch (const std::exception &e)
             {
               std::cerr << "Exception: " << e.what() << std::endl;
             }

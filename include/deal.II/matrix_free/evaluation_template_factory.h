@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2020 - 2022 by the deal.II authors
+// Copyright (C) 2020 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -71,6 +71,10 @@ namespace internal
               const EvaluationFlags::EvaluationFlags integration_flag,
               Number *                               values_dofs,
               FEEvaluationData<dim, Number, true> &  fe_eval);
+
+    static bool
+    fast_evaluation_supported(const unsigned int given_degree,
+                              const unsigned int n_q_points_1d);
   };
 
 
@@ -105,12 +109,12 @@ namespace internal
           Number *                                    out_array);
 
     static void
-    apply(const unsigned int           n_components,
-          const unsigned int           fe_degree,
-          const AlignedVector<Number> &inverse_shape,
-          const AlignedVector<Number> &inverse_coefficients,
-          const Number *               in_array,
-          Number *                     out_array);
+    apply(const unsigned int                          n_components,
+          const FEEvaluationData<dim, Number, false> &fe_eval,
+          const ArrayView<const Number> &             inverse_coefficients,
+          const bool                                  dyadic_coefficients,
+          const Number *                              in_array,
+          Number *                                    out_array);
 
     static void
     transform_from_q_points_to_basis(

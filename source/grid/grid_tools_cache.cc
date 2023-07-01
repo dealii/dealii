@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2017 - 2022 by the deal.II authors
+// Copyright (C) 2017 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -130,10 +130,10 @@ namespace GridTools
         std::vector<std::pair<
           BoundingBox<spacedim>,
           typename Triangulation<dim, spacedim>::active_cell_iterator>>
-                     boxes(tria->n_active_cells());
-        unsigned int i = 0;
+          boxes;
+        boxes.reserve(tria->n_active_cells());
         for (const auto &cell : tria->active_cell_iterators())
-          boxes[i++] = std::make_pair(mapping->get_bounding_box(cell), cell);
+          boxes.emplace_back(mapping->get_bounding_box(cell), cell);
 
         cell_bounding_boxes_rtree = pack_rtree(boxes);
         update_flags = update_flags & ~update_cell_bounding_boxes_rtree;
@@ -155,7 +155,12 @@ namespace GridTools
           BoundingBox<spacedim>,
           typename Triangulation<dim, spacedim>::active_cell_iterator>>
           boxes;
-        boxes.reserve(tria->n_active_cells());
+        if (const parallel::TriangulationBase<dim, spacedim> *parallel_tria =
+              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+                &*tria))
+          boxes.reserve(parallel_tria->n_locally_owned_active_cells());
+        else
+          boxes.reserve(tria->n_active_cells());
         for (const auto &cell : tria->active_cell_iterators() |
                                   IteratorFilters::LocallyOwnedCell())
           boxes.emplace_back(mapping->get_bounding_box(cell), cell);
@@ -209,7 +214,7 @@ namespace GridTools
         for (const auto &cell : tria->active_cell_iterators())
           {
             if (cell->is_ghost())
-              for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+              for (const unsigned int v : cell->vertex_indices())
                 vertex_to_neighbor_subdomain[cell->vertex_index(v)].insert(
                   cell->subdomain_id());
           }

@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -37,7 +37,7 @@
 #
 # Information about paths, install locations and names:
 
-#     DEAL_II_NAMESPACE               *)
+#     DEAL_II_TARGET_NAME             *)
 #
 #     DEAL_II_PROJECT_CONFIG_NAME     *)
 #     DEAL_II_BASE_NAME               *)
@@ -70,7 +70,7 @@
 set_if_empty(DEAL_II_PACKAGE_NAME "deal.II")
 
 set_if_empty(DEAL_II_PACKAGE_VENDOR
-  "The deal.II Authors <http://www.dealii.org/>"
+  "The deal.II Authors <https://www.dealii.org/>"
   )
 set_if_empty(DEAL_II_PACKAGE_DESCRIPTION
   "Library for solving partial differential equations with the finite element method"
@@ -102,9 +102,9 @@ set(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR}.${DEAL_II_
 #                                                                      #
 ########################################################################
 
-string(REPLACE "." "" _namespace "${DEAL_II_PACKAGE_NAME}")
-string(TOLOWER "${_namespace}" _namespace)
-set_if_empty(DEAL_II_NAMESPACE "${_namespace}")
+string(REPLACE "." "" _name "${DEAL_II_PACKAGE_NAME}")
+string(TOLOWER "${_name}" _name)
+set_if_empty(DEAL_II_TARGET_NAME "${_name}")
 
 set_if_empty(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}")
 

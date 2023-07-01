@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2000 - 2022 by the deal.II authors
+// Copyright (C) 2000 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -34,10 +34,13 @@
 #include <utility>
 #include <vector>
 
+#ifdef DEAL_II_HAVE_CXX20
+#  include <concepts>
+#endif
+
+
 #ifdef DEAL_II_WITH_TBB
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <tbb/task_group.h>
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -236,6 +239,11 @@ namespace Threads
         value = std::move(v);
       }
 
+      /**
+       *  Set the value from the given `std::future` object. If the future
+       * object holds an exception, the set will not happen and this function
+       * instead throws the exception stored in the future object.
+       */
       inline void
       set_from(std::future<RT> &v)
       {
@@ -288,6 +296,11 @@ namespace Threads
         value = &v;
       }
 
+      /**
+       *  Set the value from the given `std::future` object. If the future
+       * object holds an exception, the set will not happen and this function
+       * instead throws the exception stored in the future object.
+       */
       inline void
       set_from(std::future<RT &> &v)
       {
@@ -324,6 +337,12 @@ namespace Threads
       {}
 
 
+      /**
+       * This function does nothing, because the `std::future` object
+       * does not actually hold a return value. However, if the future
+       * object holds an exception, the set will not happen and this function
+       * instead throws the exception stored in the future object.
+       */
       inline void
       set_from(std::future<void> &)
       {}
@@ -787,10 +806,12 @@ namespace Threads
    * @deprecated Use std::thread or std::jthread instead.
    *
    * @ingroup CPP11
+   *
+   * @dealiiConceptRequires{(std::invocable<FunctionObjectType>)}
    */
   template <typename FunctionObjectType>
-  DEAL_II_DEPRECATED inline auto
-  new_thread(FunctionObjectType function_object)
+  DEAL_II_CXX20_REQUIRES((std::invocable<FunctionObjectType>))
+  DEAL_II_DEPRECATED inline auto new_thread(FunctionObjectType function_object)
     -> Thread<decltype(function_object())>
   {
     // See the comment in the first new_thread() implementation
@@ -812,7 +833,7 @@ namespace Threads
    */
   template <typename RT, typename... Args>
   DEAL_II_DEPRECATED inline Thread<RT>
-  new_thread(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
+  new_thread(RT (*fun_ptr)(Args...), std_cxx20::type_identity_t<Args>... args)
   {
     // See the comment in the first new_thread() implementation
     DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -834,8 +855,8 @@ namespace Threads
   template <typename RT, typename C, typename... Args>
   DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(RT (C::*fun_ptr)(Args...),
-             typename identity<C>::type &c,
-             typename identity<Args>::type... args)
+             std_cxx20::type_identity_t<C> &c,
+             std_cxx20::type_identity_t<Args>... args)
   {
     // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_thread(std::function<RT()>(std::bind(
@@ -852,8 +873,8 @@ namespace Threads
   template <typename RT, typename C, typename... Args>
   DEAL_II_DEPRECATED inline Thread<RT>
   new_thread(RT (C::*fun_ptr)(Args...) const,
-             typename identity<const C>::type &c,
-             typename identity<Args>::type... args)
+             std_cxx20::type_identity_t<const C> &c,
+             std_cxx20::type_identity_t<Args>... args)
   {
     // See the comment in the first new_thread() implementation
     DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -913,10 +934,15 @@ namespace Threads
   {
     /**
      * Set the value of a std::promise object by evaluating the action.
+     *
+     * @dealiiConceptRequires{(std::invocable<Function> &&
+     *    std::convertible_to<std::invoke_result_t<Function>, RT>)}
      */
     template <typename RT, typename Function>
-    void
-    evaluate_and_set_promise(Function &function, std::promise<RT> &promise)
+    DEAL_II_CXX20_REQUIRES(
+      (std::invocable<Function> &&
+       std::convertible_to<std::invoke_result_t<Function>, RT>))
+    void evaluate_and_set_promise(Function &function, std::promise<RT> &promise)
     {
       promise.set_value(function());
     }
@@ -928,10 +954,13 @@ namespace Threads
      * for the case where the return type is `void`. Consequently, we
      * can't set a value. But we do evaluate the function object and
      * call `std::promise::set_value()` without argument.
+     *
+     * @dealiiConceptRequires{(std::invocable<Function>)}
      */
     template <typename Function>
-    void
-    evaluate_and_set_promise(Function &function, std::promise<void> &promise)
+    DEAL_II_CXX20_REQUIRES((std::invocable<Function>))
+    void evaluate_and_set_promise(Function &          function,
+                                  std::promise<void> &promise)
     {
       function();
       promise.set_value();
@@ -1384,9 +1413,26 @@ namespace Threads
             // to future.wait() in the set_from() function. Avoid the
             // issue by just explicitly calling future.wait() here.)
             future.wait();
-            returned_object.set_from(future);
 
-            // Now we can safely set the flag and return.
+            // Acquire the returned object. If the task ended in an
+            // exception, `set_from` will call `std::future::get`, which
+            // will throw an exception. This leaves `returned_object` in
+            // an undefined state, but moreover we would bypass setting
+            // `task_has_finished=true` below. So catch the exception
+            // for just long enough that we can set that flag, and then
+            // re-throw it:
+            try
+              {
+                returned_object.set_from(future);
+              }
+            catch (...)
+              {
+                task_has_finished = true;
+                throw;
+              }
+
+            // If we got here, the task has ended without an exception and
+            // we can safely set the flag and return.
             task_has_finished = true;
           }
       }
@@ -1560,10 +1606,12 @@ namespace Threads
    *   for more information.
    *
    * @ingroup CPP11
+   *
+   * @dealiiConceptRequires{(std::invocable<FunctionObjectType>)}
    */
   template <typename FunctionObjectType>
-  inline auto
-  new_task(FunctionObjectType function_object)
+  DEAL_II_CXX20_REQUIRES((std::invocable<FunctionObjectType>))
+  inline auto new_task(FunctionObjectType function_object)
     -> Task<decltype(function_object())>
   {
     using return_type = decltype(function_object());
@@ -1581,7 +1629,7 @@ namespace Threads
    */
   template <typename RT, typename... Args>
   inline Task<RT>
-  new_task(RT (*fun_ptr)(Args...), typename identity<Args>::type... args)
+  new_task(RT (*fun_ptr)(Args...), std_cxx20::type_identity_t<Args>... args)
   {
     auto dummy = std::make_tuple(internal::maybe_make_ref<Args>::act(args)...);
     return new_task(
@@ -1599,8 +1647,8 @@ namespace Threads
   template <typename RT, typename C, typename... Args>
   inline Task<RT>
   new_task(RT (C::*fun_ptr)(Args...),
-           typename identity<C>::type &c,
-           typename identity<Args>::type... args)
+           std_cxx20::type_identity_t<C> &c,
+           std_cxx20::type_identity_t<Args>... args)
   {
     // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_task(std::function<RT()>(std::bind(
@@ -1616,8 +1664,8 @@ namespace Threads
   template <typename RT, typename C, typename... Args>
   inline Task<RT>
   new_task(RT (C::*fun_ptr)(Args...) const,
-           typename identity<const C>::type &c,
-           typename identity<Args>::type... args)
+           std_cxx20::type_identity_t<const C> &c,
+           std_cxx20::type_identity_t<Args>... args)
   {
     // NOLINTNEXTLINE(modernize-avoid-bind) silence clang-tidy
     return new_task(std::function<RT()>(std::bind(

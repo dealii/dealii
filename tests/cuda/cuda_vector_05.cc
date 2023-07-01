@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// Copyright (C) 2019 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,8 +49,8 @@ test()
       b_host[i]       = 5. + i;
     }
 
-  a.import(read_write_1, VectorOperation::insert);
-  b.import(read_write_2, VectorOperation::insert);
+  a.import_elements(read_write_1, VectorOperation::insert);
+  b.import_elements(read_write_2, VectorOperation::insert);
   AssertThrow(a.add_and_dot(2., a, b) == a_host.add_and_dot(2., a_host, b_host),
               ExcMessage("Problem in add_and_dot"));
 }

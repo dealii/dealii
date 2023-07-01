@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2020 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -29,7 +29,7 @@
 
 template <int dim>
 void
-test(const MPI_Comm &mpi_communicator)
+test(const MPI_Comm mpi_communicator)
 {
   parallel::shared::Triangulation<dim> triangulation(
     mpi_communicator, Triangulation<dim>::limit_level_difference_at_vertices);
@@ -54,7 +54,7 @@ main(int argc, char *argv[])
       test<2>(MPI_COMM_WORLD);
       test<3>(MPI_COMM_WORLD);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       std::cerr << std::endl
                 << std::endl

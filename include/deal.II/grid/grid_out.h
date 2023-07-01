@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 1999 - 2021 by the deal.II authors
+// Copyright (C) 1999 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -32,6 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 class ParameterHandler;
 template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class Triangulation;
 template <int dim, int spacedim>
 class Mapping;
@@ -930,7 +931,7 @@ namespace GridOutFlags
  * if you know which format you want to have, or if you want the format to be
  * a runtime parameter, you can write
  * @code
- *   GridOut::OutputFormat grid_format =
+ *   GridOut::OutputFormat output_format =
  *     GridOut::parse_output_format(get_format_name_from_somewhere());
  *   std::ofstream output_file("some_filename"
  *                             + GridOut::default_suffix(output_format));

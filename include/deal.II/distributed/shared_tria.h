@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,8 +101,11 @@ namespace parallel
      * mesh.
      *
      * @ingroup distributed
+     *
+     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
      */
     template <int dim, int spacedim = dim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public dealii::parallel::TriangulationBase<dim, spacedim>
     {
@@ -254,7 +257,7 @@ namespace parallel
        * consider enabling artificial cells.
        */
       Triangulation(
-        const MPI_Comm &mpi_communicator,
+        const MPI_Comm mpi_communicator,
         const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing =
           (dealii::Triangulation<dim, spacedim>::none),
         const bool     allow_artificial_cells = false,
@@ -402,10 +405,13 @@ namespace parallel
         true_level_subdomain_ids_of_cells;
     };
 
+
+
     template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     template <class Archive>
-    void
-    Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int version)
+    void Triangulation<dim, spacedim>::load(Archive &          ar,
+                                            const unsigned int version)
     {
       dealii::Triangulation<dim, spacedim>::load(ar, version);
       partition();
@@ -426,8 +432,11 @@ namespace parallel
      * Since the constructor of this class is deleted, no such objects
      * can actually be created as this would be pointless given that
      * MPI is not available.
+     *
+     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
      */
     template <int dim, int spacedim = dim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public dealii::parallel::TriangulationBase<dim, spacedim>
     {

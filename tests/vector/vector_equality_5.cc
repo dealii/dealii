@@ -56,7 +56,7 @@ main()
       Vector<float>  w(100);
       test(v, w);
     }
-  catch (std::exception &exc)
+  catch (const std::exception &exc)
     {
       deallog << std::endl
               << std::endl

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -62,7 +62,7 @@ test()
       rw_vector(myid * 2 + 1) = myid * 2.0 + 1.0;
     }
 
-  v.import(rw_vector, VectorOperation::insert);
+  v.import_elements(rw_vector, VectorOperation::insert);
 
   if (myid == 0)
     deallog << "v has ghost elements: " << v.has_ghost_elements() << std::endl;

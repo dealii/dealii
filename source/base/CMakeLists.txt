@@ -1,6 +1,6 @@
 ## ---------------------------------------------------------------------
 ##
-## Copyright (C) 2012 - 2022 by the deal.II authors
+## Copyright (C) 2012 - 2023 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -12,8 +12,6 @@
 ## the top level directory of deal.II.
 ##
 ## ---------------------------------------------------------------------
-
-include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 #
 # All source/base files are sufficiently small that they may be added to the
@@ -73,6 +71,7 @@ set(_unity_include_src
   polynomials_bernstein.cc
   polynomials_bdm.cc
   polynomials_bernardi_raugel.cc
+  polynomials_hermite.cc
   polynomials_nedelec.cc
   polynomials_integrated_legendre_sz.cc
   polynomial_space.cc
@@ -155,7 +154,7 @@ file(GLOB _header
   ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
   )
 
-deal_ii_add_library(obj_base OBJECT ${_src} ${_header} ${_inst}
+define_object_library(object_base OBJECT ${_src} ${_header} ${_inst}
   ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
   )
-expand_instantiations(obj_base "${_inst}")
+expand_instantiations(object_base "${_inst}")

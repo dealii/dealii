@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2016 - 2021 by the deal.II authors
+// Copyright (C) 2016 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -345,7 +345,7 @@ namespace parallel
      * to the continuous space defined by a single FiniteElement @p projection_fe .
      * This is achieved using
      * FETools::compute_projection_from_quadrature_points_matrix(). In  doing so
-     * the mass matrix of this element is required, which will be calculated
+     * the @ref GlossMassMatrix "mass matrix" of this element is required, which will be calculated
      * with the @p mass_quadrature rule . Should the cell now belong to another processor,
      * the data is then sent to this processor. The class makes use of a feature
      * of p4est (and parallel::distributed::Triangulation) that allows one to
@@ -451,7 +451,7 @@ namespace parallel
 
       /**
        * Constructor which takes the FiniteElement @p projection_fe , the quadrature
-       * rule @p mass_quadrature used to integrate its local mass matrix and
+       * rule @p mass_quadrature used to integrate its local @ref GlossMassMatrix "mass matrix" and
        * finally the quadrature rule @p data_quadrature which is used to store @p DataType.
        *
        * @pre @p projection_fe has to be scalar-valued.

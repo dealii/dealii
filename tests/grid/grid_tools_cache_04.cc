@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2001 - 2021 by the deal.II authors
+// Copyright (C) 2001 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -75,7 +75,7 @@ test(unsigned int n_points)
     {
       // We know the owner as we're working on a shared triangulation
       unsigned int cell_owner = cells[c]->subdomain_id();
-      for (unsigned int idx : maps[c])
+      for (const unsigned int idx : maps[c])
         {
           std::vector<std::pair<BoundingBox<dim>, unsigned int>> test_results;
           global_description.query(bgi::intersects(points[idx]),

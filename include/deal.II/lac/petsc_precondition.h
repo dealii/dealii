@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2004 - 2021 by the deal.II authors
+// Copyright (C) 2004 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -63,7 +63,7 @@ namespace PETScWrappers
     /**
      * Constructor.
      */
-    explicit PreconditionBase(const MPI_Comm &mpi_communicator);
+    explicit PreconditionBase(const MPI_Comm mpi_communicator);
 
     /**
      * Constructor.
@@ -96,7 +96,7 @@ namespace PETScWrappers
     Tvmult(VectorBase &dst, const VectorBase &src) const;
 
     /**
-     * Explictly call setup. This is usually not needed since PETSc will
+     * Explicitly call setup. This is usually not needed since PETSc will
      * automatically call the setup function when needed.
      */
     void
@@ -109,9 +109,9 @@ namespace PETScWrappers
     get_pc() const;
 
     /**
-     * Return the MPI communicator object used by this preconditioner.
+     * Return the underlying MPI communicator.
      */
-    const MPI_Comm &
+    MPI_Comm
     get_mpi_communicator() const;
 
   protected:
@@ -131,7 +131,7 @@ namespace PETScWrappers
      * Internal function to create the PETSc preconditioner object.
      */
     void
-    create_pc_with_comm(const MPI_Comm &);
+    create_pc_with_comm(const MPI_Comm);
   };
 
 
@@ -175,7 +175,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionJacobi(
-      const MPI_Comm &      communicator,
+      const MPI_Comm        communicator,
       const AdditionalData &additional_data = AdditionalData());
 
     /**
@@ -257,7 +257,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionBlockJacobi(
-      const MPI_Comm &      communicator,
+      const MPI_Comm        communicator,
       const AdditionalData &additional_data = AdditionalData());
 
 
@@ -764,7 +764,7 @@ namespace PETScWrappers
      * Intended to be used with SLEPc objects.
      */
     PreconditionBoomerAMG(
-      const MPI_Comm &      communicator,
+      const MPI_Comm        communicator,
       const AdditionalData &additional_data = AdditionalData());
 
 
@@ -971,15 +971,21 @@ namespace PETScWrappers
    * PETSc (<a
    * href="https://petsc.org/release/docs/manualpages/PC/PCBDDC.html">PCBDDC</a>),
    * which is a two-level, substructuring, non-overlapping domain decomposition
-   * preconditioner. Details of the implementation can be found in "S Zampini,
-   * SISC (2016)". It mainly consists of two elements:
+   * preconditioner. Details of the implementation can be found in
+   * @cite zampini2016pcbddc. It mainly consists of two elements:
    *
    * <ul>
-   *   <li> Local solvers: Solvers for each subdomain. These are performed concurrently by each processor
-   *   <li> A coarse solver: Continuity between each subdomain is imposed in a small number of DoFs, referred to as <em>primal DoFs</em>. This solver solves such problem.
+   *   <li> Local solvers: Solvers for each subdomain. These are performed
+   *     concurrently by each processor</li>
+   *   <li> A coarse solver: Continuity between each subdomain is imposed in a
+   *     small number of DoFs, referred to as <em>primal DoFs</em>. This solver
+   *     solves such problem.</li>
    * </ul>
    *
-   * The size of the primal space is determined through the @p AdditionalData parameters. A thorough study of the performance of this solver in the context of cardiac mechanics, together with further details on this interface, is available in @cite Barnafi2022.
+   * The size of the primal space is determined through the @p AdditionalData
+   * parameters. A thorough study of the performance of this solver in the
+   * context of cardiac mechanics, together with further details on this
+   * interface, is available in @cite Barnafi2022.
    *
    * @ingroup PETScWrappers
    */
@@ -1097,17 +1103,27 @@ namespace PETScWrappers
     /**
      * Same as above but without setting a matrix to form the preconditioner.
      */
-    PreconditionShell(const MPI_Comm &communicator);
+    PreconditionShell(const MPI_Comm communicator);
 
     /**
      * The callback for the application of the preconditioner.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions.
      */
-    std::function<int(VectorBase &dst, const VectorBase &src)> vmult;
+    std::function<void(VectorBase &dst, const VectorBase &src)> vmult;
 
     /**
-     * The callback for the application of the transposed preconditioner.
+     * The callback for the transposed application of the preconditioner.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions.
      */
-    std::function<int(VectorBase &dst, const VectorBase &src)> vmultT;
+    std::function<void(VectorBase &dst, const VectorBase &src)> vmultT;
 
   protected:
     /**
@@ -1115,7 +1131,7 @@ namespace PETScWrappers
      * matrix. This function sets up the PCSHELL preconditioner
      */
     void
-    initialize(const MPI_Comm &comm);
+    initialize(const MPI_Comm comm);
 
     /**
      * Initialize the preconditioner object with a particular
@@ -1128,14 +1144,20 @@ namespace PETScWrappers
     /**
      * Callback-function invoked by PCApply
      */
-    static int
+    static PetscErrorCode
     pcapply(PC pc, Vec src, Vec dst);
 
     /**
      * Callback-function invoked by PCApplyTranspose
      */
-    static int
+    static PetscErrorCode
     pcapply_transpose(PC pc, Vec src, Vec dst);
+
+    /**
+     * Callback-function invoked by PCSetUp
+     */
+    static PetscErrorCode
+    pcsetup(PC pc);
   };
 
   /**

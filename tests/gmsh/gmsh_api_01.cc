@@ -22,8 +22,10 @@
 #include "../tests.h"
 
 int
-main()
+main(int argc, char **argv)
 {
+  // gmsh might be build with mpi support enabled.
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   initlog();
 
   const unsigned int dim      = 2;
