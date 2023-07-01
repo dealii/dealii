@@ -350,5 +350,7 @@ Comparison operator \"=\" expected for boolean match.\n"
 
   endforeach()
 
-  message(STATUS "Test category \"${_category}\": ${_number_of_tests} tests (and ${_number_of_test_dependencies} test dependencies)")
+  if(NOT "${_number_of_tests}" STREQUAL "0")
+    message(STATUS "Test category \"${_category}\": ${_number_of_tests} tests (and ${_number_of_test_dependencies} test dependencies)")
+  endif()
 endmacro()
