@@ -2261,7 +2261,7 @@ namespace Particles
     // First prepare container for insertion
     clear();
 
-#ifdef DEAL_II_WITH_P4EST
+//#ifdef DEAL_II_WITH_P4EST
     // If we are resuming from a checkpoint, we first have to register the
     // store function again, to set the triangulation to the same state as
     // before the serialization. Only afterwards we know how to deserialize the
@@ -2289,9 +2289,9 @@ namespace Particles
         handle = numbers::invalid_unsigned_int;
         update_cached_numbers();
       }
-#else
-    (void)serialization;
-#endif
+//#else
+//    (void)serialization;
+//#endif
   }
 
 

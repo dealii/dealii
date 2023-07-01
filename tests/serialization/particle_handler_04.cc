@@ -135,19 +135,21 @@ test()
             << " is in cell " << particle->get_surrounding_cell(tr)
             << std::endl;
 
-  // save data to archive
-  std::ostringstream oss;
-  {
-    //boost::archive::text_oarchive oa(oss, boost::archive::no_header);
+  particle_handler.prepare_for_serialization();
 
-    //oa << particle_handler;
-    particle_handler.prepare_for_serialization();
+  // save data to archive
+  std::ofstream oss("data.particles");
+  {
+    boost::archive::text_oarchive oa(oss, boost::archive::no_header);
+
+    oa << particle_handler;
     tr.save("checkpoint");
 
     // archive and stream closed when
     // destructors are called
   }
-  deallog << oss.str() << std::endl;
+  oss.close();
+  //deallog << oss.str() << std::endl;
 
   // Now remove all information in tr and particle_handler,
   // this is like creating new objects after a restart
@@ -169,10 +171,10 @@ test()
   // does not know if something was stored in the user data of the
   // triangulation).
   {
-  //  std::istringstream            iss(oss.str());
-   // boost::archive::text_iarchive ia(iss, boost::archive::no_header);
+    std::ifstream            iss("data.particles");
+    boost::archive::text_iarchive ia(iss, boost::archive::no_header);
 
-   // ia >> particle_handler;
+    ia >> particle_handler;
     tr.load("checkpoint");
     particle_handler.deserialize();
   }
