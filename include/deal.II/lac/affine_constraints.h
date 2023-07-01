@@ -1669,24 +1669,6 @@ public:
     operator=(const ConstraintLineType &other);
 
     /**
-     * This operator is a bit weird and unintuitive: it compares the line
-     * numbers of two lines. We need this to sort the lines; in fact we could
-     * do this using a comparison predicate.  However, this way, it is easier,
-     * albeit unintuitive since two lines really have no god-given order
-     * relation.
-     */
-    bool
-    operator<(const ConstraintLine &) const;
-
-    /**
-     * This operator is likewise weird: it checks whether the line indices of
-     * the two operands are equal, irrespective of the fact that the contents
-     * of the line may be different.
-     */
-    bool
-    operator==(const ConstraintLine &) const;
-
-    /**
      * Determine an estimate for the memory consumption (in bytes) of this
      * object.
      */
