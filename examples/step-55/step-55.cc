@@ -206,6 +206,7 @@ namespace Step55
     constexpr double pi  = numbers::PI;
     constexpr double pi2 = numbers::PI * numbers::PI;
 
+    // velocity
     values[0] = -1.0L / 2.0L * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0) *
                   std::exp(R_x * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0)) -
                 0.4 * pi2 * std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
@@ -219,7 +220,9 @@ namespace Step55
                 0.05 * std::pow(-std::sqrt(25.0 + 4 * pi2) + 5.0, 3) *
                   std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::sin(2 * R_y * pi) / pi;
-    values[2] = 0;
+
+    // pressure
+    values[dim] = 0;
   }
 
 
@@ -245,13 +248,16 @@ namespace Step55
     constexpr double pi  = numbers::PI;
     constexpr double pi2 = numbers::PI * numbers::PI;
 
+    // velocity
     values[0] = -std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::cos(2 * R_y * pi) +
                 1;
     values[1] = (1.0L / 2.0L) * (-std::sqrt(25.0 + 4 * pi2) + 5.0) *
                 std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                 std::sin(2 * R_y * pi) / pi;
-    values[2] =
+
+    // pressure
+    values[dim] =
       -1.0L / 2.0L * std::exp(R_x * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0)) -
       2.0 *
         (-6538034.74494422 +
