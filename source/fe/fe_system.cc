@@ -1431,39 +1431,29 @@ FESystem<dim, spacedim>::compute_fill(
         // static cast through the common base class:
         if (face_no == invalid_face_number)
           {
-            const Subscriptor *quadrature_base_pointer = &quadrature;
-            Assert(dynamic_cast<const Quadrature<dim> *>(
-                     quadrature_base_pointer) != nullptr,
-                   ExcInternalError());
-
             cell_quadrature =
-              static_cast<const Quadrature<dim> *>(quadrature_base_pointer);
+              dynamic_cast<const Quadrature<dim> *>(&quadrature);
+            Assert(cell_quadrature != nullptr, ExcInternalError());
             n_q_points = cell_quadrature->size();
           }
         else if (sub_no == invalid_face_number)
           {
-            const Subscriptor *quadrature_base_pointer = &quadrature;
-            Assert(dynamic_cast<const hp::QCollection<dim - 1> *>(
-                     quadrature_base_pointer) != nullptr,
-                   ExcInternalError());
-
             // If we don't have wedges or pyramids then there should only be one
             // quadrature rule here
-            face_quadrature = static_cast<const hp::QCollection<dim - 1> *>(
-              quadrature_base_pointer);
+            face_quadrature =
+              dynamic_cast<const hp::QCollection<dim - 1> *>(&quadrature);
+            Assert(face_quadrature != nullptr, ExcInternalError());
+
             n_q_points =
               (*face_quadrature)[face_quadrature->size() == 1 ? 0 : face_no]
                 .size();
           }
         else
           {
-            const Subscriptor *quadrature_base_pointer = &quadrature;
-            Assert(dynamic_cast<const Quadrature<dim - 1> *>(
-                     quadrature_base_pointer) != nullptr,
-                   ExcInternalError());
-
             sub_face_quadrature =
-              static_cast<const Quadrature<dim - 1> *>(quadrature_base_pointer);
+              dynamic_cast<const Quadrature<dim - 1> *>(&quadrature);
+            Assert(sub_face_quadrature != nullptr, ExcInternalError());
+
             n_q_points = sub_face_quadrature->size();
           }
         Assert(n_q_points != numbers::invalid_unsigned_int, ExcInternalError());
