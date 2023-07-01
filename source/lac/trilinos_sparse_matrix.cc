@@ -157,7 +157,7 @@ namespace TrilinosWrappers
         }
 
       // get a representation of the present row
-      int                               ncols;
+      size_t                               ncols;
       TrilinosWrappers::types::int_type colnums = matrix->n();
       if (value_cache.get() == nullptr)
         {
@@ -171,15 +171,23 @@ namespace TrilinosWrappers
           colnum_cache->resize(matrix->n());
         }
 
-      int ierr = matrix->trilinos_matrix().getGlobalRowCopy(
+      using matrix_type = Tpetra::CrsMatrix<double, int, dealii::types::signed_global_dof_index>;
+      using int_view_type = matrix_type::nonconst_global_inds_host_view_type;
+      using value_view_type = matrix_type::nonconst_values_host_view_type;
+
+      value_view_type value_cache_view;
+      int_view_type colnum_cache_view;
+
+      matrix->trilinos_matrix().getGlobalRowCopy(
         this->a_row,
-        value_cache->data(),
-        ncols,
-        reinterpret_cast<TrilinosWrappers::types::int_type *>(
-          colnum_cache->data()));
+colnum_cache_view,
+value_cache_view,
+        ncols);
       value_cache->resize(ncols);
       colnum_cache->resize(ncols);
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+
+      std::copy(colnum_cache_view.data(), colnum_cache_view.data()+ncols, colnum_cache->begin());
+      Kokkos::deep_copy(value_view_type(value_cache->data(), ncols), value_cache_view);
 
       // copy it into our caches if the
       // line isn't empty. if it is, then
@@ -203,13 +211,13 @@ namespace TrilinosWrappers
   // MPI will still get a parallel
   // interface.
   SparseMatrix::SparseMatrix()
-    : column_space_map(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(0, 0, Utilities::Trilinos::comm_self()))
+    : column_space_map(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(0, 0, Utilities::Trilinos::tpetra_comm_self()))
     , matrix(
         new Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>(View, *column_space_map, *column_space_map, 0))
-    , last_action(Zero)
+    , last_action(Tpetra::ZERO)
     , compressed(true)
   {
-    matrix->FillComplete();
+    matrix->fillComplete();
   }
 
 
@@ -220,7 +228,7 @@ namespace TrilinosWrappers
     : column_space_map(
         new Tpetra::Map<int, dealii::types::signed_global_dof_index>(static_cast<TrilinosWrappers::types::int_type>(n),
                        0,
-                       Utilities::Trilinos::comm_self()))
+                       Utilities::Trilinos::tpetra_comm_self()))
     ,
 
     // on one processor only, we know how the
@@ -235,11 +243,11 @@ namespace TrilinosWrappers
       Copy,
       Tpetra::Map<int, dealii::types::signed_global_dof_index>(static_cast<TrilinosWrappers::types::int_type>(m),
                  0,
-                 Utilities::Trilinos::comm_self()),
+                 Utilities::Trilinos::tpetra_comm_self()),
       *column_space_map,
       n_max_entries_per_row,
       false))
-    , last_action(Zero)
+    , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
 
@@ -251,17 +259,17 @@ namespace TrilinosWrappers
     : column_space_map(
         new Tpetra::Map<int, dealii::types::signed_global_dof_index>(static_cast<TrilinosWrappers::types::int_type>(n),
                        0,
-                       Utilities::Trilinos::comm_self()))
+                       Utilities::Trilinos::tpetra_comm_self()))
     , matrix(new Tpetra::FECrsMatrix<>(
         Copy,
         Tpetra::Map<int, dealii::types::signed_global_dof_index>(static_cast<TrilinosWrappers::types::int_type>(m),
                    0,
-                   Utilities::Trilinos::comm_self()),
+                   Utilities::Trilinos::tpetra_comm_self()),
         *column_space_map,
         reinterpret_cast<int *>(
           const_cast<unsigned int *>(n_entries_per_row.data())),
         false))
-    , last_action(Zero)
+    , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
 
@@ -276,7 +284,7 @@ namespace TrilinosWrappers
                                     *column_space_map,
                                     n_max_entries_per_row,
                                     false))
-    , last_action(Zero)
+    , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
 
@@ -293,7 +301,7 @@ namespace TrilinosWrappers
                                       const_cast<unsigned int *>(
                                         n_entries_per_row.data())),
                                     false))
-    , last_action(Zero)
+    , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
 
@@ -310,7 +318,7 @@ namespace TrilinosWrappers
         row_parallel_partitioning.make_trilinos_map(communicator, false),
         n_max_entries_per_row,
         false))
-    , last_action(Zero)
+    , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
 
@@ -328,7 +336,7 @@ namespace TrilinosWrappers
         reinterpret_cast<int *>(
           const_cast<unsigned int *>(n_entries_per_row.data())),
         false))
-    , last_action(Zero)
+    , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
 
@@ -340,7 +348,7 @@ namespace TrilinosWrappers
         new Tpetra::FECrsMatrix(Copy,
                                sparsity_pattern.trilinos_sparsity_pattern(),
                                false))
-    , last_action(Zero)
+    , last_action(Tpetra::ZERO)
     , compressed(true)
   {
     Assert(sparsity_pattern.trilinos_sparsity_pattern().Filled() == true,
@@ -359,7 +367,7 @@ namespace TrilinosWrappers
     , last_action(other.last_action)
     , compressed(other.compressed)
   {
-    other.last_action = Zero;
+    other.last_action = Tpetra::ZERO;
     other.compressed  = false;
   }
 
@@ -455,7 +463,7 @@ namespace TrilinosWrappers
                   std::unique_ptr<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &column_space_map,
                   std::unique_ptr<Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>> &matrix,
                   std::unique_ptr<Tpetra::CrsMatrix<double, int, types::signed_global_dof_index>> &  nonlocal_matrix,
-                  std::unique_ptr<Epetra_Export> &     nonlocal_matrix_exporter)
+                  std::unique_ptr<Tpetra::Export> &     nonlocal_matrix_exporter)
     {
       // release memory before reallocation
       matrix.reset();
@@ -516,14 +524,14 @@ namespace TrilinosWrappers
       // col_map that tells how the domain dofs of the matrix will be
       // distributed). for only one processor, we can directly assign the
       // columns as well. Compare this with bug # 4123 in the Sandia Bugzilla.
-      std::unique_ptr<Epetra_CrsGraph> graph;
+      std::unique_ptr<Tpetra::CrsGraph> graph;
       if (row_space_map.Comm().NumProc() > 1)
-        graph = std::make_unique<Epetra_CrsGraph>(Copy,
+        graph = std::make_unique<Tpetra::CrsGraph>(Copy,
                                                   row_space_map,
                                                   n_entries_per_row.data(),
                                                   true);
       else
-        graph = std::make_unique<Epetra_CrsGraph>(Copy,
+        graph = std::make_unique<Tpetra::CrsGraph>(Copy,
                                                   row_space_map,
                                                   *column_space_map,
                                                   n_entries_per_row.data(),
@@ -549,7 +557,7 @@ namespace TrilinosWrappers
             for (size_type col = 0; p != sparsity_pattern.end(row); ++p, ++col)
               row_indices[col] = p->column();
           }
-          graph->Epetra_CrsGraph::InsertGlobalIndices(row,
+          graph->Tpetra::CrsGraph::InsertGlobalIndices(row,
                                                       row_length,
                                                       row_indices.data());
         }
@@ -575,22 +583,22 @@ namespace TrilinosWrappers
     // for the non-local graph, we need to circumvent the problem that some
     // processors will not add into the non-local graph at all: We do not want
     // to insert dummy elements on >5000 processors because that gets very
-    // slow. Thus, we set a flag in Epetra_CrsGraph that sets the correct
+    // slow. Thus, we set a flag in Tpetra::CrsGraph that sets the correct
     // flag. Since it is protected, we need to expose this information by
-    // deriving a class from Epetra_CrsGraph for the purpose of creating the
+    // deriving a class from Tpetra::CrsGraph for the purpose of creating the
     // data structure
-    class Epetra_CrsGraphMod : public Epetra_CrsGraph
+    class Tpetra::CrsGraphMod : public Tpetra::CrsGraph
     {
     public:
-      Epetra_CrsGraphMod(const Tpetra::Map<int, dealii::types::signed_global_dof_index> &row_map,
+      Tpetra::CrsGraphMod(const Tpetra::Map<int, dealii::types::signed_global_dof_index> &row_map,
                          const int *       n_entries_per_row)
-        : Epetra_CrsGraph(Copy, row_map, n_entries_per_row, true)
+        : Tpetra::CrsGraph(Copy, row_map, n_entries_per_row, true)
       {}
 
       void
       SetIndicesAreGlobal()
       {
-        this->Epetra_CrsGraph::SetIndicesAreGlobal(true);
+        this->Tpetra::CrsGraph::SetIndicesAreGlobal(true);
       }
     };
 
@@ -608,7 +616,7 @@ namespace TrilinosWrappers
                   std::unique_ptr<Tpetra::Map<int, dealii::types::signed_global_dof_index>> & column_space_map,
                   std::unique_ptr<Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>> &matrix,
                   std::unique_ptr<Tpetra::CrsMatrix<double, int, types::signed_global_dof_index>> &  nonlocal_matrix,
-                  std::unique_ptr<Epetra_Export> &     nonlocal_matrix_exporter)
+                  std::unique_ptr<Tpetra::Export> &     nonlocal_matrix_exporter)
     {
       matrix.reset();
       nonlocal_matrix.reset();
@@ -685,24 +693,24 @@ namespace TrilinosWrappers
                                    0,
                                    row_space_map.Comm());
 
-      std::unique_ptr<Epetra_CrsGraph>    graph;
-      std::unique_ptr<Epetra_CrsGraphMod> nonlocal_graph;
+      std::unique_ptr<Tpetra::CrsGraph>    graph;
+      std::unique_ptr<Tpetra::CrsGraphMod> nonlocal_graph;
       if (row_space_map.Comm().NumProc() > 1)
         {
           graph =
-            std::make_unique<Epetra_CrsGraph>(Copy,
+            std::make_unique<Tpetra::CrsGraph>(Copy,
                                               row_space_map,
                                               (n_entries_per_row.size() > 0) ?
                                                 (n_entries_per_row.data()) :
                                                 nullptr,
                                               exchange_data ? false : true);
           if (have_ghost_rows == true)
-            nonlocal_graph = std::make_unique<Epetra_CrsGraphMod>(
+            nonlocal_graph = std::make_unique<Tpetra::CrsGraphMod>(
               off_processor_map, n_entries_per_ghost_row.data());
         }
       else
         graph =
-          std::make_unique<Epetra_CrsGraph>(Copy,
+          std::make_unique<Tpetra::CrsGraph>(Copy,
                                             row_space_map,
                                             *column_space_map,
                                             (n_entries_per_row.size() > 0) ?
@@ -754,7 +762,7 @@ namespace TrilinosWrappers
           // insert data from nonlocal graph into the final sparsity pattern
           if (exchange_data)
             {
-              Epetra_Export exporter(nonlocal_graph->RowMap(), row_space_map);
+              Tpetra::Export exporter(nonlocal_graph->RowMap(), row_space_map);
               int ierr = graph->Export(*nonlocal_graph, exporter, Add);
               (void)ierr;
               Assert(ierr == 0, ExcTrilinosError(ierr));
@@ -814,7 +822,7 @@ namespace TrilinosWrappers
 
     // In the end, the matrix needs to be compressed in order to be really
     // ready.
-    last_action = Zero;
+    last_action = Tpetra::ZERO;
     compress(VectorOperation::insert);
   }
 
@@ -839,7 +847,7 @@ namespace TrilinosWrappers
     else
       nonlocal_matrix.reset();
 
-    last_action = Zero;
+    last_action = Tpetra::ZERO;
     compress(VectorOperation::insert);
   }
 
@@ -864,7 +872,7 @@ namespace TrilinosWrappers
     else
       nonlocal_matrix.reset();
 
-    last_action = Zero;
+    last_action = Tpetra::ZERO;
     compress(VectorOperation::insert);
   }
 
@@ -1010,7 +1018,7 @@ namespace TrilinosWrappers
 
     column_space_map = std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(input_matrix.DomainMap());
 
-    const Epetra_CrsGraph *graph = &input_matrix.Graph();
+    const Tpetra::CrsGraph *graph = &input_matrix.Graph();
 
     nonlocal_matrix.reset();
     nonlocal_matrix_exporter.reset();
@@ -1029,7 +1037,7 @@ namespace TrilinosWrappers
         std::memcpy(values, in_values, my_nonzeros * sizeof(TrilinosScalar));
       }
 
-    last_action = Zero;
+    last_action = Tpetra::ZERO;
     compress(VectorOperation::insert);
   }
 
@@ -1038,8 +1046,8 @@ namespace TrilinosWrappers
   void
   SparseMatrix::compress(VectorOperation::values operation)
   {
-    Epetra_CombineMode mode = last_action;
-    if (last_action == Zero)
+    Tpetra::CombineMode mode = last_action;
+    if (last_action == Tpetra::ZERO)
       {
         if ((operation == VectorOperation::add) ||
             (operation == VectorOperation::unknown))
@@ -1069,7 +1077,7 @@ namespace TrilinosWrappers
         nonlocal_matrix->FillComplete(*column_space_map, matrix->RowMap());
         if (nonlocal_matrix_exporter.get() == nullptr)
           nonlocal_matrix_exporter =
-            std::make_unique<Epetra_Export>(nonlocal_matrix->RowMap(),
+            std::make_unique<Tpetra::Export>(nonlocal_matrix->RowMap(),
                                             matrix->RowMap());
         ierr =
           matrix->Export(*nonlocal_matrix, *nonlocal_matrix_exporter, mode);
@@ -1086,7 +1094,7 @@ namespace TrilinosWrappers
     ierr = matrix->OptimizeStorage();
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
-    last_action = Zero;
+    last_action = Tpetra::ZERO;
 
     compressed = true;
   }
@@ -1100,7 +1108,7 @@ namespace TrilinosWrappers
     // the pointer and generate an
     // empty matrix.
     column_space_map =
-      std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(0, 0, Utilities::Trilinos::comm_self());
+      std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(0, 0, Utilities::Trilinos::tpetra_comm_self());
     matrix = std::make_unique<Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>>(View, *column_space_map, 0);
     nonlocal_matrix.reset();
     nonlocal_matrix_exporter.reset();
@@ -1730,7 +1738,7 @@ namespace TrilinosWrappers
                         "")
                   << " has the following indices:" << std::endl;
         std::vector<TrilinosWrappers::types::int_type> indices;
-        const Epetra_CrsGraph *                        graph =
+        const Tpetra::CrsGraph *                        graph =
           (nonlocal_matrix.get() != nullptr &&
            matrix->RowMap().MyGID(
              static_cast<TrilinosWrappers::types::int_type>(row)) == false) ?
@@ -1759,7 +1767,7 @@ namespace TrilinosWrappers
   SparseMatrix &
   SparseMatrix::operator=(const double d)
   {
-    Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
+    Assert(d == 0, ExcScalarAssignmentOnlyForTpetra::ZEROValue());
     compress(VectorOperation::unknown); // TODO: why do we do this? Should we
                                         // not check for is_compressed?
 
@@ -1987,9 +1995,9 @@ namespace TrilinosWrappers
     const size_type src_local_size = internal::end(src) - internal::begin(src);
     AssertDimension(src_local_size, matrix->DomainMap().NumMyPoints());
 
-    Epetra_MultiVector tril_dst(
+    Tpetra::MultiVector tril_dst(
       View, matrix->RangeMap(), internal::begin(dst), dst_local_size, 1);
-    Epetra_MultiVector tril_src(View,
+    Tpetra::MultiVector tril_src(View,
                                 matrix->DomainMap(),
                                 const_cast<TrilinosScalar *>(
                                   internal::begin(src)),
@@ -2029,9 +2037,9 @@ namespace TrilinosWrappers
     const size_type src_local_size = internal::end(src) - internal::begin(src);
     AssertDimension(src_local_size, matrix->RangeMap().NumMyPoints());
 
-    Epetra_MultiVector tril_dst(
+    Tpetra::MultiVector tril_dst(
       View, matrix->DomainMap(), internal::begin(dst), dst_local_size, 1);
-    Epetra_MultiVector tril_src(View,
+    Tpetra::MultiVector tril_src(View,
                                 matrix->RangeMap(),
                                 const_cast<double *>(internal::begin(src)),
                                 src_local_size,
@@ -2305,8 +2313,8 @@ namespace TrilinosWrappers
   MPI_Comm
   SparseMatrix::get_mpi_communicator() const
   {
-    const Epetra_MpiComm *mpi_comm =
-      dynamic_cast<const Epetra_MpiComm *>(&matrix->RangeMap().Comm());
+    const Tpetra::MpiComm *mpi_comm =
+      dynamic_cast<const Tpetra::MpiComm *>(&matrix->RangeMap().Comm());
     Assert(mpi_comm != nullptr, ExcInternalError());
     return mpi_comm->Comm();
   }
@@ -2607,7 +2615,7 @@ namespace TrilinosWrappers
 
 
 
-      const Epetra_Comm &
+      const Tpetra::Comm &
       TrilinosPayload::Comm() const
       {
         return communicator;

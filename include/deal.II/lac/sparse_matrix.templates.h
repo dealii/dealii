@@ -439,7 +439,7 @@ SparseMatrix<number>::copy_from(const TrilinosWrappers::SparseMatrix &matrix)
       // resize arrays to the size actually used
       value_cache_vector.resize(ncols);
       colnum_cache_vector.resize(ncols);
-      std::copy(colnum_cache.data(), colnum_cache.data()+ncols, colnum_cache_vector.begin())l
+      std::copy(colnum_cache.data(), colnum_cache.data()+ncols, colnum_cache_vector.begin());
       Kokkos::deep_copy(value_view_type(value_cache_vector.data(), ncols), value_cache);
 
       // then copy everything in one swoop
