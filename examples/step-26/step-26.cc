@@ -567,9 +567,6 @@ namespace Step26
                           n_adaptive_pre_refinement_steps);
             ++pre_refinement_step;
 
-            tmp.reinit(solution.size());
-            forcing_terms.reinit(solution.size());
-
             std::cout << std::endl;
 
             goto start_time_iteration;
