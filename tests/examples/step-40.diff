@@ -1,0 +1,8 @@
+627c627
+<     const unsigned int n_cycles = 8;
+---
+>     const unsigned int n_cycles = 3;
+655c655
+<         computing_timer.print_summary();
+---
+>         // computing_timer.print_summary();
