@@ -138,17 +138,6 @@ template <int dim, int spacedim>
 void
 MappingQCache<dim, spacedim>::initialize(
   const Triangulation<dim, spacedim> &triangulation,
-  const MappingQ<dim, spacedim> &     mapping)
-{
-  this->initialize(mapping, triangulation);
-}
-
-
-
-template <int dim, int spacedim>
-void
-MappingQCache<dim, spacedim>::initialize(
-  const Triangulation<dim, spacedim> &triangulation,
   const std::function<std::vector<Point<spacedim>>(
     const typename Triangulation<dim, spacedim>::cell_iterator &)>
     &compute_points_on_cell)

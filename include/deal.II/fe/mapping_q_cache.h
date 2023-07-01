@@ -96,19 +96,6 @@ public:
              const Triangulation<dim, spacedim> &triangulation);
 
   /**
-   * Initialize the data cache by computing the mapping support points for all
-   * cells (on all levels) of the given triangulation.
-   *
-   * @note The cache is invalidated upon the signal
-   * Triangulation::Signals::any_change of the underlying triangulation.
-   *
-   * @deprecated Use initialize() version above instead.
-   */
-  DEAL_II_DEPRECATED void
-  initialize(const Triangulation<dim, spacedim> &triangulation,
-             const MappingQ<dim, spacedim> &     mapping);
-
-  /**
    * Initialize the data cache by letting the function given as an argument
    * provide the mapping support points for all cells (on all levels) of the
    * given triangulation. The function must return a vector of

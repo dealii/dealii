@@ -40,7 +40,7 @@ do_test(const unsigned int degree)
 
   MappingQ<dim>      mapping(degree);
   MappingQCache<dim> mapping_cache(degree);
-  mapping_cache.initialize(tria, mapping);
+  mapping_cache.initialize(mapping, tria);
 
   Point<dim> p1;
   for (unsigned int d = 0; d < dim; ++d)

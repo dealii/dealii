@@ -36,7 +36,7 @@ do_test(const unsigned int degree)
 
   MappingQ<dim>      mapping(degree);
   MappingQCache<dim> mapping_cache(degree);
-  mapping_cache.initialize(tria, mapping);
+  mapping_cache.initialize(mapping, tria);
 
   Point<dim> p1;
   for (unsigned int d = 0; d < dim; ++d)
@@ -65,7 +65,7 @@ do_test(const unsigned int degree)
   deallog << std::endl;
 
   tria.refine_global(1);
-  mapping_cache.initialize(tria, mapping);
+  mapping_cache.initialize(mapping, tria);
 
   deallog << "Testing degree " << degree << " in " << dim << 'D' << std::endl;
   for (const auto &cell : tria.active_cell_iterators())
