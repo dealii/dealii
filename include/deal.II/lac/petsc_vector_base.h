@@ -247,7 +247,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class VectorBase : public Subscriptor
+  class VectorBase : public virtual Subscriptor
   {
   public:
     /**

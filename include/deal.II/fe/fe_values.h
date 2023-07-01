@@ -2226,7 +2226,7 @@ namespace FEValuesViews
  * @ingroup feaccess
  */
 template <int dim, int spacedim>
-class FEValuesBase : public Subscriptor
+class FEValuesBase : public virtual Subscriptor
 {
 public:
   /**

@@ -394,7 +394,7 @@ namespace TrilinosWrappers
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public Subscriptor
+    class Vector : public virtual Subscriptor
     {
     public:
       /**

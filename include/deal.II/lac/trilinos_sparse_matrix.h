@@ -547,7 +547,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @ingroup Matrix1
    */
-  class SparseMatrix : public Subscriptor
+  class SparseMatrix : public virtual Subscriptor
   {
   public:
     /**

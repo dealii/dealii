@@ -164,7 +164,7 @@ dseupd_(int *         rvec,
  * @ref step_36 "step-36"
  * for an example.
  */
-class ArpackSolver : public Subscriptor
+class ArpackSolver : public virtual Subscriptor
 {
 public:
   /**

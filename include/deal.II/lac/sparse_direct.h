@@ -84,7 +84,7 @@ namespace types
  *
  * @ingroup Solvers Preconditioners
  */
-class SparseDirectUMFPACK : public Subscriptor
+class SparseDirectUMFPACK : public virtual Subscriptor
 {
 public:
   /**

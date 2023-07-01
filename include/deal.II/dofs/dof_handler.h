@@ -314,7 +314,7 @@ namespace parallel
  */
 template <int dim, int spacedim = dim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-class DoFHandler : public Subscriptor
+class DoFHandler : public virtual Subscriptor
 {
   using ActiveSelector =
     dealii::internal::DoFHandlerImplementation::Iterators<dim, spacedim, false>;

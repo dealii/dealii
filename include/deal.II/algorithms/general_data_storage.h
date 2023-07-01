@@ -51,7 +51,7 @@ DEAL_II_NAMESPACE_OPEN
  *  Year = {2018}}
  * @endcode
  */
-class GeneralDataStorage : public Subscriptor
+class GeneralDataStorage : public virtual Subscriptor
 {
 public:
   /**

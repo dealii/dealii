@@ -438,7 +438,7 @@ namespace internal
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <class VectorType>
-class BlockVectorBase : public Subscriptor
+class BlockVectorBase : public virtual Subscriptor
 {
 public:
   /**

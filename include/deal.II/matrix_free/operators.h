@@ -185,7 +185,7 @@ namespace MatrixFreeOperators
             typename VectorType = LinearAlgebra::distributed::Vector<double>,
             typename VectorizedArrayType =
               VectorizedArray<typename VectorType::value_type>>
-  class Base : public Subscriptor
+  class Base : public virtual Subscriptor
   {
   public:
     /**
@@ -535,7 +535,7 @@ namespace MatrixFreeOperators
    * prolongation phase.
    */
   template <typename OperatorType>
-  class MGInterfaceOperator : public Subscriptor
+  class MGInterfaceOperator : public virtual Subscriptor
   {
   public:
     /**

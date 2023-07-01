@@ -133,7 +133,7 @@ namespace LinearAlgebra
    * get the first index of the largest range.
    */
   template <typename Number>
-  class ReadWriteVector : public Subscriptor
+  class ReadWriteVector : public virtual Subscriptor
   {
   public:
     /**

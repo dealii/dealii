@@ -852,7 +852,7 @@ class MultipleParameterLoop;
  *
  * @ingroup input
  */
-class ParameterHandler : public Subscriptor
+class ParameterHandler : public virtual Subscriptor
 {
 public:
   /**

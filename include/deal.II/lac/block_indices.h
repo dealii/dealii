@@ -57,7 +57,7 @@ DEAL_II_NAMESPACE_OPEN
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"
  */
-class BlockIndices : public Subscriptor
+class BlockIndices : public virtual Subscriptor
 {
 public:
   /**

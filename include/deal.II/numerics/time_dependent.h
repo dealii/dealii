@@ -660,7 +660,7 @@ private:
  * following grids, and some functions to be called before a new loop over all
  * time steps is started.
  */
-class TimeStepBase : public Subscriptor
+class TimeStepBase : public virtual Subscriptor
 {
 public:
   /**

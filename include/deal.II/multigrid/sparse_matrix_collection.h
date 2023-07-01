@@ -39,7 +39,7 @@ namespace mg
    * multigrid with local refinement.
    */
   template <typename number>
-  class SparseMatrixCollection : public Subscriptor
+  class SparseMatrixCollection : public virtual Subscriptor
   {
   public:
     void

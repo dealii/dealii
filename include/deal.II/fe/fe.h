@@ -652,7 +652,7 @@ class FESystem;
  * @ingroup febase fe
  */
 template <int dim, int spacedim = dim>
-class FiniteElement : public Subscriptor, public FiniteElementData<dim>
+class FiniteElement : public virtual Subscriptor, public FiniteElementData<dim>
 {
 public:
   /**

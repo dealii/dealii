@@ -161,7 +161,7 @@ namespace MGTransferGlobalCoarseningTools
  * Abstract base class for transfer operators between two multigrid levels.
  */
 template <typename VectorType>
-class MGTwoLevelTransferBase : public Subscriptor
+class MGTwoLevelTransferBase : public virtual Subscriptor
 {
 public:
   /**
@@ -213,7 +213,7 @@ public:
  */
 template <typename Number>
 class MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>
-  : public Subscriptor
+  : public virtual Subscriptor
 {
 public:
   using VectorType = LinearAlgebra::distributed::Vector<Number>;

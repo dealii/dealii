@@ -515,7 +515,7 @@ namespace internal
        * for more information about artificial cells.
        */
       template <int dim, int spacedim = dim>
-      class TemporarilyRestoreSubdomainIds : public Subscriptor
+      class TemporarilyRestoreSubdomainIds : public virtual Subscriptor
       {
       public:
         /**

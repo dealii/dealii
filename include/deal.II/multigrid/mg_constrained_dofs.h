@@ -44,7 +44,7 @@ class DoFHandler;
  *
  * @ingroup mg
  */
-class MGConstrainedDoFs : public Subscriptor
+class MGConstrainedDoFs : public virtual Subscriptor
 {
 public:
   using size_dof = std::vector<std::set<types::global_dof_index>>::size_type;

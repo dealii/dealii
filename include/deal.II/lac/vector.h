@@ -105,7 +105,7 @@ namespace parallel
  * in the manual).
  */
 template <typename Number>
-class Vector : public Subscriptor
+class Vector : public virtual Subscriptor
 {
 public:
   /**

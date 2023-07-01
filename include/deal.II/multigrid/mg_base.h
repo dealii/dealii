@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * of matrices, will be sufficient for applications.
  */
 template <typename VectorType>
-class MGMatrixBase : public Subscriptor
+class MGMatrixBase : public virtual Subscriptor
 {
 public:
   /*
@@ -105,7 +105,7 @@ public:
  * will be done by derived classes.
  */
 template <typename VectorType>
-class MGCoarseGridBase : public Subscriptor
+class MGCoarseGridBase : public virtual Subscriptor
 {
 public:
   /**
@@ -169,7 +169,7 @@ public:
  * needed.
  */
 template <typename VectorType>
-class MGTransferBase : public Subscriptor
+class MGTransferBase : public virtual Subscriptor
 {
 public:
   /**
@@ -249,7 +249,7 @@ public:
  * in the vector @p u given the right hand side, which is done by smooth().
  */
 template <typename VectorType>
-class MGSmootherBase : public Subscriptor
+class MGSmootherBase : public virtual Subscriptor
 {
 public:
   /**

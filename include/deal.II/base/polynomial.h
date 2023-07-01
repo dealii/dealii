@@ -62,7 +62,7 @@ namespace Polynomials
    * TensorProductPolynomials class.
    */
   template <typename number>
-  class Polynomial : public Subscriptor
+  class Polynomial : public virtual Subscriptor
   {
   public:
     /**

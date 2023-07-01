@@ -91,7 +91,7 @@ namespace CUDAWrappers
    * @ingroup CUDAWrappers
    */
   template <int dim, typename Number = double>
-  class MatrixFree : public Subscriptor
+  class MatrixFree : public virtual Subscriptor
   {
   public:
     using jacobian_type = Tensor<2, dim, Tensor<1, dim, Number>>;

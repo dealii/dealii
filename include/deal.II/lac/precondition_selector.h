@@ -98,7 +98,7 @@ class SparseMatrix;
  */
 template <typename MatrixType = SparseMatrix<double>,
           typename VectorType = dealii::Vector<double>>
-class PreconditionSelector : public Subscriptor
+class PreconditionSelector : public virtual Subscriptor
 {
 public:
   /**

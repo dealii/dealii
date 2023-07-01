@@ -242,7 +242,7 @@ namespace ChunkSparsityPatternIterators
  *
  * The use of this class is demonstrated in step-51.
  */
-class ChunkSparsityPattern : public Subscriptor
+class ChunkSparsityPattern : public virtual Subscriptor
 {
 public:
   /**

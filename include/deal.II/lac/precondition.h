@@ -80,7 +80,7 @@ namespace LinearAlgebra
  * Alternatively, the IdentityMatrix class can be used to precondition in this
  * way.
  */
-class PreconditionIdentity : public Subscriptor
+class PreconditionIdentity : public virtual Subscriptor
 {
 public:
   /**
@@ -195,7 +195,7 @@ private:
  * multiplied. Still, this class is useful in multigrid smoother objects
  * (MGSmootherRelaxation).
  */
-class PreconditionRichardson : public Subscriptor
+class PreconditionRichardson : public virtual Subscriptor
 {
 public:
   /**
@@ -359,7 +359,7 @@ private:
  */
 template <typename MatrixType = SparseMatrix<double>,
           class VectorType    = Vector<double>>
-class PreconditionUseMatrix : public Subscriptor
+class PreconditionUseMatrix : public virtual Subscriptor
 {
 public:
   /**
@@ -403,7 +403,7 @@ private:
  */
 template <typename MatrixType         = SparseMatrix<double>,
           typename PreconditionerType = IdentityMatrix>
-class PreconditionRelaxation : public Subscriptor
+class PreconditionRelaxation : public virtual Subscriptor
 {
 public:
   /**
@@ -1929,7 +1929,7 @@ public:
 template <typename MatrixType         = SparseMatrix<double>,
           typename VectorType         = Vector<double>,
           typename PreconditionerType = DiagonalMatrix<VectorType>>
-class PreconditionChebyshev : public Subscriptor
+class PreconditionChebyshev : public virtual Subscriptor
 {
 public:
   /**

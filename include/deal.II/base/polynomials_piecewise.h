@@ -61,7 +61,7 @@ namespace Polynomials
    * @ingroup Polynomials
    */
   template <typename number>
-  class PiecewisePolynomial : public Subscriptor
+  class PiecewisePolynomial : public virtual Subscriptor
   {
   public:
     /**

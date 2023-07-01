@@ -337,7 +337,7 @@ class Vector;
  * @ingroup Solvers
  */
 template <class VectorType = Vector<double>>
-class SolverBase : public Subscriptor
+class SolverBase : public virtual Subscriptor
 {
 public:
   /**

@@ -113,7 +113,7 @@ namespace LinearAlgebra
      * @ingroup Vectors
      */
     template <typename Number>
-    class Vector : public VectorSpaceVector<Number>, public Subscriptor
+    class Vector : public VectorSpaceVector<Number>, public virtual Subscriptor
     {
     public:
       using value_type = Number;

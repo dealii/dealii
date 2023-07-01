@@ -87,7 +87,7 @@ namespace FESeries
    * $ \bf k $ .
    */
   template <int dim, int spacedim = dim>
-  class Fourier : public Subscriptor
+  class Fourier : public virtual Subscriptor
   {
   public:
     using CoefficientType = typename std::complex<double>;
@@ -257,7 +257,7 @@ namespace FESeries
    * $ \widetilde P_m(x) $ using tensor product rule.
    */
   template <int dim, int spacedim = dim>
-  class Legendre : public Subscriptor
+  class Legendre : public virtual Subscriptor
   {
   public:
     using CoefficientType = double;

@@ -438,7 +438,7 @@ namespace internal
  * @ingroup data
  */
 template <int N, typename T>
-class TableBase : public Subscriptor
+class TableBase : public virtual Subscriptor
 {
 public:
   using value_type = T;

@@ -62,7 +62,7 @@ namespace Particles
    * @ingroup Particle
    */
   template <int dim, int spacedim = dim>
-  class ParticleHandler : public Subscriptor
+  class ParticleHandler : public virtual Subscriptor
   {
   public:
     /**

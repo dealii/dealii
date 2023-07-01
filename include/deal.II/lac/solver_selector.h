@@ -88,7 +88,7 @@ DEAL_II_NAMESPACE_OPEN
  * access to that new solver.
  */
 template <typename VectorType = Vector<double>>
-class SolverSelector : public Subscriptor
+class SolverSelector : public virtual Subscriptor
 {
 public:
   /**

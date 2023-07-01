@@ -357,7 +357,7 @@ namespace internal
  *
  * See the tutorial program step-60 for an example on how to use this class.
  */
-class ParameterAcceptor : public Subscriptor
+class ParameterAcceptor : public virtual Subscriptor
 {
 public:
   /**

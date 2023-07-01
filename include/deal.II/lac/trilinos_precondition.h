@@ -74,7 +74,7 @@ namespace TrilinosWrappers
    * @ingroup TrilinosWrappers
    * @ingroup Preconditioners
    */
-  class PreconditionBase : public Subscriptor
+  class PreconditionBase : public virtual Subscriptor
   {
   public:
     /**

@@ -119,7 +119,7 @@ DEAL_II_NAMESPACE_OPEN
  * as "list of evaluation points".
  */
 template <int dim>
-class Quadrature : public Subscriptor
+class Quadrature : public virtual Subscriptor
 {
 public:
   /**

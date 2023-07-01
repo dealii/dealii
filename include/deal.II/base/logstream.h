@@ -78,7 +78,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup textoutput
  */
-class LogStream : public Subscriptor
+class LogStream : public virtual Subscriptor
 {
 public:
   /**

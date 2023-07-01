@@ -61,7 +61,7 @@ namespace LinearAlgebra
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public VectorSpaceVector<double>, public Subscriptor
+    class Vector : public VectorSpaceVector<double>, public virtual Subscriptor
     {
     public:
       /**

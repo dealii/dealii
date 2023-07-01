@@ -313,7 +313,7 @@ enum MappingKind
  * @ingroup mapping
  */
 template <int dim, int spacedim = dim>
-class Mapping : public Subscriptor
+class Mapping : public virtual Subscriptor
 {
 public:
   /**

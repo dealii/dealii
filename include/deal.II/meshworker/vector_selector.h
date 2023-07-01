@@ -48,7 +48,7 @@ namespace MeshWorker
    *
    * @ingroup MeshWorker
    */
-  class VectorSelector : public Subscriptor
+  class VectorSelector : public virtual Subscriptor
   {
   public:
     /**

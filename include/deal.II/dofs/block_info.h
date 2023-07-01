@@ -92,7 +92,7 @@ class DoFHandler;
  *
  * @ingroup dofs
  */
-class BlockInfo : public Subscriptor
+class BlockInfo : public virtual Subscriptor
 {
 public:
   /**

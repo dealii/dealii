@@ -248,7 +248,7 @@ namespace LinearAlgebra
      */
     template <typename Number, typename MemorySpace = MemorySpace::Host>
     class Vector : public ::dealii::LinearAlgebra::VectorSpaceVector<Number>,
-                   public Subscriptor
+                   public virtual Subscriptor
     {
     public:
       using memory_space    = MemorySpace;

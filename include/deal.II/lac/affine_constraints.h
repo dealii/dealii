@@ -511,7 +511,7 @@ namespace internal
  * @ingroup constraints
  */
 template <typename number = double>
-class AffineConstraints : public Subscriptor
+class AffineConstraints : public virtual Subscriptor
 {
 public:
   /**

@@ -55,7 +55,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int rank, int dim, typename Number = double>
 class TensorFunction
   : public FunctionTime<typename numbers::NumberTraits<Number>::real_type>,
-    public Subscriptor
+    public virtual Subscriptor
 {
 public:
   /**

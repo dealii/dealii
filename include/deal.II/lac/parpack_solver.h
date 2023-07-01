@@ -208,7 +208,7 @@ extern "C"
  * PARPACK manual.
  */
 template <typename VectorType>
-class PArpackSolver : public Subscriptor
+class PArpackSolver : public virtual Subscriptor
 {
 public:
   /**

@@ -114,7 +114,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <class MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
-class InterGridMap : public Subscriptor
+class InterGridMap : public virtual Subscriptor
 {
 public:
   /**

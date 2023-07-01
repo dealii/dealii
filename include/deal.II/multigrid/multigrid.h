@@ -160,7 +160,7 @@ namespace mg
  * MGTransferBase.
  */
 template <typename VectorType>
-class Multigrid : public Subscriptor
+class Multigrid : public virtual Subscriptor
 {
 public:
   /**
@@ -498,7 +498,7 @@ private:
  * to be initialized with a separate DoFHandler for each block.
  */
 template <int dim, typename VectorType, class TRANSFER>
-class PreconditionMG : public Subscriptor
+class PreconditionMG : public virtual Subscriptor
 {
 public:
   /**

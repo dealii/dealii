@@ -78,7 +78,7 @@ public:
    * structure in #block_list and an optional ordering of the blocks in
    * #order.
    */
-  class AdditionalData : public Subscriptor
+  class AdditionalData : public virtual Subscriptor
   {
   public:
     /**
