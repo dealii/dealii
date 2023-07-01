@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13.4)
-include(../setup_testsubproject.cmake)
+include(../scripts/setup_testsubproject.cmake)
 project(testsuite CXX)
 if(DEAL_II_WITH_PETSC AND NOT DEAL_II_PETSC_WITH_COMPLEX)
   deal_ii_pickup_tests()
