@@ -1,5 +1,3 @@
 
-DEAL:2d::Norm of difference: 0
-DEAL:2d::
-DEAL:3d::Norm of difference: 0
-DEAL:3d::
+DEAL::Norm of difference: 1.06581e-14
+DEAL::

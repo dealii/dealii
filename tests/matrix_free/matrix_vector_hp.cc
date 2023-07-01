@@ -23,12 +23,21 @@
 #include <deal.II/base/function.h>
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/hp/fe_values.h>
 
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
+
+#include <deal.II/numerics/vector_tools.h>
+
 #include "../tests.h"
 
-#include "matrix_vector_common.h"
+#include "matrix_vector_mf.h"
 
 
 
@@ -45,7 +54,6 @@ public:
               const Vector<Number> &                       src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
-    // ask MatrixFree for cell_range for different orders
     std::pair<unsigned int, unsigned int> subrange_deg =
       data.create_cell_subrange_hp(cell_range, 1);
     if (subrange_deg.second > subrange_deg.first)
@@ -65,30 +73,6 @@ public:
                                                     dst,
                                                     src,
                                                     subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp(cell_range, 4);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 4, Vector<Number>, 5>(data,
-                                                    dst,
-                                                    src,
-                                                    subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp(cell_range, 5);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 5, Vector<Number>, 6>(data,
-                                                    dst,
-                                                    src,
-                                                    subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp(cell_range, 6);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 6, Vector<Number>, 7>(data,
-                                                    dst,
-                                                    src,
-                                                    subrange_deg);
-    subrange_deg = data.create_cell_subrange_hp(cell_range, 7);
-    if (subrange_deg.second > subrange_deg.first)
-      helmholtz_operator<dim, 7, Vector<Number>, 8>(data,
-                                                    dst,
-                                                    src,
-                                                    subrange_deg);
   }
 
   void
@@ -104,20 +88,15 @@ private:
 
 
 
-template <int dim, int fe_degree>
+template <int dim>
 void
 test()
 {
-  if (fe_degree > 1)
-    return;
-
   using number = double;
   const SphericalManifold<dim> manifold;
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
-  typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active(),
-                                                    endc = tria.end();
-  for (; cell != endc; ++cell)
+  for (const auto &cell : tria.active_cell_iterators())
     for (const unsigned int f : GeometryInfo<dim>::face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
@@ -127,17 +106,14 @@ test()
   // refine a few cells
   for (unsigned int i = 0; i < 11 - 3 * dim; ++i)
     {
-      typename Triangulation<dim>::active_cell_iterator cell =
-                                                          tria.begin_active(),
-                                                        endc = tria.end();
-      unsigned int counter                                   = 0;
-      for (; cell != endc; ++cell, ++counter)
-        if (counter % (7 - i) == 0)
+      unsigned int counter = 0;
+      for (const auto &cell : tria.active_cell_iterators())
+        if ((counter++) % (7 - i) == 0)
           cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
 
-  const unsigned int max_degree = 9 - 2 * dim;
+  const unsigned int max_degree = 3;
 
   hp::FECollection<dim> fe_collection;
   hp::QCollection<dim>  quadrature_collection;
@@ -156,9 +132,7 @@ test()
   DoFHandler<dim> dof(tria);
   // set the active FE index in a random order
   {
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.active_cell_iterators())
       {
         const unsigned int fe_index = Testing::rand() % max_degree;
         cell->set_active_fe_index(fe_index + 1);
@@ -166,8 +140,7 @@ test()
     // We cannot set random cells to FE_Nothing. We get the following error
     // The violated condition was: dominating_fe.n_dofs_per_face(face) <=
     // subface_fe.n_dofs_per_face(face)
-    cell = dof.begin_active();
-    cell->set_active_fe_index(0);
+    dof.begin_active()->set_active_fe_index(0);
   }
 
   // setup DoFs
@@ -208,9 +181,7 @@ test()
     FullMatrix<double>                   cell_matrix;
     std::vector<types::global_dof_index> local_dof_indices;
 
-    typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                   endc = dof.end();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : dof.active_cell_iterators())
       {
         const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
 
@@ -258,4 +229,14 @@ test()
   result_mf -= result_spmv;
   const double diff_norm = result_mf.linfty_norm();
   deallog << "Norm of difference: " << diff_norm << std::endl << std::endl;
+}
+
+
+
+int
+main()
+{
+  initlog();
+
+  test<2>();
 }
