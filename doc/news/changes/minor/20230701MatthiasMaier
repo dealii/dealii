@@ -1,0 +1,7 @@
+Fixed: All deal.II classes now use virtual inheritance for the Subscriptor
+class. This ensures that after inheriting from these classes only one
+Subscriptor copy remains in the object. This in turn enables the use of a
+SmartPointer with classes that inherit two or more deal.II classes that
+inherited from Subscriptor.
+<br>
+(Matthias Maier, 2023/07/01)
