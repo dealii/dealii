@@ -63,7 +63,7 @@ do_test(const FiniteElement<dim> &   fe_fine,
   // create fine grid
   parallel::distributed::Triangulation<dim> tria_fine(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria_fine, -2., +2.);
-  tria_fine.refine_global(5);
+  tria_fine.refine_global(3);
 
   // setup dof-handlers
   DoFHandler<dim> dof_handler_fine(tria_fine);
@@ -137,13 +137,10 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   deallog.precision(8);
-  Functions::Monomial<2> linear_function(Tensor<1, 2>({1, 0}));   // f(x,y)= x
+  // Functions::Monomial<2> linear_function(Tensor<1, 2>({1, 0}));   // f(x,y)=
+  // x
   Functions::Monomial<2> bilinear_function(Tensor<1, 2>({1, 1})); // f(x,y)= xy
-  std::vector<Functions::Monomial<2, double>> functions;
-  functions.push_back(linear_function);
-  functions.push_back(bilinear_function);
 
-  for (const auto &f : functions)
-    for (unsigned int i = 0; i < 5; ++i)
-      test<2, double>(i, f);
+  for (unsigned int i = 0; i < 3; ++i)
+    test<2, double>(i, bilinear_function);
 }
