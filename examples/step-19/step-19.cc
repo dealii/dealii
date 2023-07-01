@@ -969,14 +969,13 @@ namespace Step19
 
   // The last member function of the principal class of this program is then the
   // driver. At the top, it refines the mesh a number of times by solving the
-  // problem (with not particles yet created) on a sequence of finer and finer
+  // problem (with no particles yet created) on a sequence of finer and finer
   // meshes.
   template <int dim>
   void CathodeRaySimulator<dim>::run()
   {
     make_grid();
 
-    // do a few refinement cycles up front
     const unsigned int n_pre_refinement_cycles = 3;
     for (unsigned int refinement_cycle = 0;
          refinement_cycle < n_pre_refinement_cycles;
