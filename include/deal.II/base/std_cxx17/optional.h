@@ -17,20 +17,12 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_HAVE_CXX17
-#  include <optional>
-#else
-#  include <boost/optional.hpp>
-#endif
+#include <optional>
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17
 {
-#ifndef DEAL_II_HAVE_CXX17
-  using boost::optional;
-#else
   using std::optional;
-#endif
 } // namespace std_cxx17
 DEAL_II_NAMESPACE_CLOSE
 
