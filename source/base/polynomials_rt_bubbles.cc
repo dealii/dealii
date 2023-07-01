@@ -109,14 +109,14 @@ PolynomialsRT_Bubbles<dim>::evaluate(
   double             monoval_i[dim][n_derivatives + 1];
 
 
-  if DEAL_II_CONSTEXPR_IN_CONDITIONAL (dim <= 1)
+  if constexpr (dim <= 1)
     {
       (void)monoval_plus;
       (void)monoval_i;
     }
 
   unsigned int start = n_sub;
-  if DEAL_II_CONSTEXPR_IN_CONDITIONAL (dim == 2)
+  if constexpr (dim == 2)
     {
       // In 2d the curl part of the space is spanned by the vectors
       // of two types. The first one is
@@ -199,7 +199,7 @@ PolynomialsRT_Bubbles<dim>::evaluate(
         }
       Assert(start == this->n() - my_degree - 1, ExcInternalError());
     }
-  else if DEAL_II_CONSTEXPR_IN_CONDITIONAL (dim == 3)
+  else if constexpr (dim == 3)
     {
       double monoval[dim][n_derivatives + 1];
       double monoval_j[dim][n_derivatives + 1];

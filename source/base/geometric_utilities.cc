@@ -50,7 +50,7 @@ namespace GeometricUtilities
       Assert(dim > 1, ExcNotImplemented());
 
       // radius
-      if DEAL_II_CONSTEXPR_IN_CONDITIONAL (dim > 1)
+      if constexpr (dim > 1)
         {
           scoord[0] = position.norm();
           // azimuth angle \theta:
@@ -61,7 +61,7 @@ namespace GeometricUtilities
         }
 
       // polar angle \phi:
-      if DEAL_II_CONSTEXPR_IN_CONDITIONAL (dim == 3)
+      if constexpr (dim == 3)
         {
           // acos returns the angle in the range [0,\pi]
           if (scoord[0] > std::numeric_limits<double>::min())
