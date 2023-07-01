@@ -23,11 +23,11 @@
 
 macro(enable_if_supported _variable _flag)
   # First check if we can use -Werror
-  CHECK_CXX_COMPILER_FLAG("-Werror" DEAL_II_HAVE_FLAG_werror)
+  CHECK_CXX_COMPILER_FLAG("-Werror" DEAL_II_HAVE_FLAG_Werror)
 
   string(STRIP "${_flag}" _flag_stripped)
 
-  if(DEAL_II_HAVE_FLAG_werror)
+  if(DEAL_II_HAVE_FLAG_Werror)
     set(CMAKE_REQUIRED_FLAGS "-Werror")
   endif()
 
