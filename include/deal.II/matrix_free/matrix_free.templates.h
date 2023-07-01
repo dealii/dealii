@@ -1959,12 +1959,13 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                     true);
         }
 
-      internal::MatrixFreeFunctions::collect_faces_vectorization(
-        face_setup.inner_faces,
-        hard_vectorization_boundary,
-        task_info.face_partition_data,
-        face_info.faces,
-        dof_info[0].cell_active_fe_index);
+      if (additional_data.mapping_update_flags_inner_faces != update_default)
+        internal::MatrixFreeFunctions::collect_faces_vectorization(
+          face_setup.inner_faces,
+          hard_vectorization_boundary,
+          task_info.face_partition_data,
+          face_info.faces,
+          dof_info[0].cell_active_fe_index);
 
       // on boundary faces, we must also respect the vectorization boundary of
       // the inner faces because we might have dependencies on ghosts of
