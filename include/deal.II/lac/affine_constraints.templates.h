@@ -648,7 +648,7 @@ AffineConstraints<number>::close()
         new_lines[calculate_line_index(line.index)] = counter;
         ++counter;
       }
-    std::swap(lines_cache, new_lines);
+    lines_cache = std::move(new_lines);
   }
 
   // in debug mode: check whether we really set the pointers correctly.
