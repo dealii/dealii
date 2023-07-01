@@ -1,66 +1,98 @@
 Now running with Multigrid
 Refinement cycle 0
    Set-up...
-	Number of active cells: 64
-	Number of degrees of freedom: 2312 (2187+125)
+	Number of active cells: 16
+	Number of degrees of freedom: 187 (162+25)
    Assembling...
    Assembling Multigrid...
    Solving...
-	Number of FGMRES iterations: 22
-	Total number of iterations used for approximation of A inverse: 69
-	Total number of iterations used for approximation of S inverse: 23
+	Number of FGMRES iterations: 14
+	Total number of iterations used for approximation of A inverse: 45
+	Total number of iterations used for approximation of S inverse: 15
 
-   Note: The mean value was adjusted by -3.36485e-15
+   Note: The mean value was adjusted by 8.38229e-15
 
-   Velocity L2 Error: 0.00539774
-   Pressure L2 Error: 0.019341
-   Velocity H1 Error: 0.165265
+   Velocity L2 Error: 0.00340778
+   Pressure L2 Error: 0.017624
+   Velocity H1 Error: 0.105243
 Refinement cycle 1
    Set-up...
-	Number of active cells: 512
-	Number of degrees of freedom: 15468 (14739+729)
+	Number of active cells: 64
+	Number of degrees of freedom: 659 (578+81)
    Assembling...
    Assembling Multigrid...
    Solving...
-	Number of FGMRES iterations: 21
-	Total number of iterations used for approximation of A inverse: 67
-	Total number of iterations used for approximation of S inverse: 22
+	Number of FGMRES iterations: 16
+	Total number of iterations used for approximation of A inverse: 52
+	Total number of iterations used for approximation of S inverse: 17
 
-   Note: The mean value was adjusted by -1.51964e-13
+   Note: The mean value was adjusted by -1.75663e-14
 
-   Velocity L2 Error: 0.000670888
-   Pressure L2 Error: 0.0036533
-   Velocity H1 Error: 0.0414704
+   Velocity L2 Error: 0.000426317
+   Pressure L2 Error: 0.00414007
+   Velocity H1 Error: 0.0264094
+Refinement cycle 2
+   Set-up...
+	Number of active cells: 256
+	Number of degrees of freedom: 2467 (2178+289)
+   Assembling...
+   Assembling Multigrid...
+   Solving...
+	Number of FGMRES iterations: 16
+	Total number of iterations used for approximation of A inverse: 52
+	Total number of iterations used for approximation of S inverse: 17
+
+   Note: The mean value was adjusted by -2.40243e-14
+
+   Velocity L2 Error: 5.33246e-05
+   Pressure L2 Error: 0.00102063
+   Velocity H1 Error: 0.00660864
 Now running with ILU
 Refinement cycle 0
    Set-up...
-	Number of active cells: 64
-	Number of degrees of freedom: 2312 (2187+125)
+	Number of active cells: 16
+	Number of degrees of freedom: 187 (162+25)
    Assembling...
    Solving...   Computing preconditioner...
 
-	Number of FGMRES iterations: 22
-	Total number of iterations used for approximation of A inverse: 113
-	Total number of iterations used for approximation of S inverse: 23
+	Number of FGMRES iterations: 14
+	Total number of iterations used for approximation of A inverse: 75
+	Total number of iterations used for approximation of S inverse: 15
 
-   Note: The mean value was adjusted by 1.55695e-14
+   Note: The mean value was adjusted by 3.10407e-15
 
-   Velocity L2 Error: 0.00539774
-   Pressure L2 Error: 0.019341
-   Velocity H1 Error: 0.165265
+   Velocity L2 Error: 0.00340778
+   Pressure L2 Error: 0.017624
+   Velocity H1 Error: 0.105243
 Refinement cycle 1
    Set-up...
-	Number of active cells: 512
-	Number of degrees of freedom: 15468 (14739+729)
+	Number of active cells: 64
+	Number of degrees of freedom: 659 (578+81)
    Assembling...
    Solving...   Computing preconditioner...
 
-	Number of FGMRES iterations: 21
-	Total number of iterations used for approximation of A inverse: 180
-	Total number of iterations used for approximation of S inverse: 22
+	Number of FGMRES iterations: 16
+	Total number of iterations used for approximation of A inverse: 134
+	Total number of iterations used for approximation of S inverse: 17
 
-   Note: The mean value was adjusted by -1.52194e-13
+   Note: The mean value was adjusted by -3.36177e-15
 
-   Velocity L2 Error: 0.000670888
-   Pressure L2 Error: 0.0036533
-   Velocity H1 Error: 0.0414704
+   Velocity L2 Error: 0.000426317
+   Pressure L2 Error: 0.00414007
+   Velocity H1 Error: 0.0264094
+Refinement cycle 2
+   Set-up...
+	Number of active cells: 256
+	Number of degrees of freedom: 2467 (2178+289)
+   Assembling...
+   Solving...   Computing preconditioner...
+
+	Number of FGMRES iterations: 16
+	Total number of iterations used for approximation of A inverse: 229
+	Total number of iterations used for approximation of S inverse: 17
+
+   Note: The mean value was adjusted by -1.16485e-15
+
+   Velocity L2 Error: 5.33247e-05
+   Pressure L2 Error: 0.00102063
+   Velocity H1 Error: 0.00660864

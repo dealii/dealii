@@ -1,0 +1,29 @@
+1057c1057
+<     triangulation.refine_global(6 - dim);
+---
+>     triangulation.refine_global(2);
+1097c1097
+<         std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
+---
+>         // std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
+1099c1099
+<         computing_timer.print_summary();
+---
+>         // computing_timer.print_summary();
+1113c1113
+<       const int dim    = 3;
+---
+>       const int dim    = 2;
+1115,1117c1115,1122
+<       StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
+< 
+<       flow_problem.run();
+---
+>       {
+>         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
+>         flow_problem.run();
+>       }
+>       {
+>         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_ILU);
+>         flow_problem.run();
+>       }
