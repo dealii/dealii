@@ -248,15 +248,21 @@ namespace Utilities
                   const MPI_Comm  communicator_in);
 
       /**
-       * Reinitialize the communication pattern. The first argument
-       * `vector_space_vector_index_set` is the index set associated to a
-       * VectorSpaceVector object. The second argument
-       * `read_write_vector_index_set` is the index set associated to a
-       * ReadWriteVector object.
+       * Reinitialize the communication pattern.
+       *
+       * @param[in] locally_owned_indices The set of indices of elements
+       *   in the array mentioned in the class documentation that are
+       *   stored on the current process.
+       * @param[in] ghost_indices The set of indices of elements in the
+       *   array mentioned in the class documentation that the current
+       *   process will need to be able to import.
+       * @param[in] communicator The MPI communicator used to describe the
+       *   entire set of processes that participate in the storage and
+       *   access to elements of the array.
        */
       virtual void
-      reinit(const IndexSet &vector_space_vector_index_set,
-             const IndexSet &read_write_vector_index_set,
+      reinit(const IndexSet &locally_owned_indices,
+             const IndexSet &ghost_indices,
              const MPI_Comm  communicator) override;
 
       /**
