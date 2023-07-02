@@ -89,7 +89,7 @@ private:
  */
 template <typename VectorType,
           class SolverType,
-          class MatrixType,
+          typename MatrixType,
           class PreconditionerType>
 class MGCoarseGridIterativeSolver : public MGCoarseGridBase<VectorType>
 {
@@ -290,7 +290,7 @@ MGCoarseGridApplySmoother<VectorType>::operator()(const unsigned int level,
 
 template <typename VectorType,
           class SolverType,
-          class MatrixType,
+          typename MatrixType,
           class PreconditionerType>
 MGCoarseGridIterativeSolver<VectorType,
                             SolverType,
@@ -305,7 +305,7 @@ MGCoarseGridIterativeSolver<VectorType,
 
 template <typename VectorType,
           class SolverType,
-          class MatrixType,
+          typename MatrixType,
           class PreconditionerType>
 MGCoarseGridIterativeSolver<VectorType,
                             SolverType,
@@ -323,7 +323,7 @@ MGCoarseGridIterativeSolver<VectorType,
 
 template <typename VectorType,
           class SolverType,
-          class MatrixType,
+          typename MatrixType,
           class PreconditionerType>
 void
 MGCoarseGridIterativeSolver<
@@ -343,7 +343,7 @@ MGCoarseGridIterativeSolver<
 
 template <typename VectorType,
           class SolverType,
-          class MatrixType,
+          typename MatrixType,
           class PreconditionerType>
 void
 MGCoarseGridIterativeSolver<VectorType,
@@ -365,7 +365,7 @@ namespace internal
     template <
       typename VectorType,
       class SolverType,
-      class MatrixType,
+      typename MatrixType,
       class PreconditionerType,
       std::enable_if_t<
         std::is_same<VectorType, typename SolverType::vector_type>::value,
@@ -383,7 +383,7 @@ namespace internal
     template <
       typename VectorType,
       class SolverType,
-      class MatrixType,
+      typename MatrixType,
       class PreconditionerType,
       std::enable_if_t<
         !std::is_same<VectorType, typename SolverType::vector_type>::value,
@@ -412,7 +412,7 @@ namespace internal
 
 template <typename VectorType,
           class SolverType,
-          class MatrixType,
+          typename MatrixType,
           class PreconditionerType>
 void
                        MGCoarseGridIterativeSolver<
