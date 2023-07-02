@@ -83,9 +83,10 @@ namespace CGALWrappers
 
   struct FaceInfo2
   {
-    FaceInfo2()
-    {}
+    FaceInfo2() = default;
+
     int nesting_level;
+
     bool
     in_domain()
     {
