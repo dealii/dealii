@@ -1,8 +1,75 @@
-627c627
-<     const unsigned int n_cycles = 8;
----
->     const unsigned int n_cycles = 3;
-655c655
-<         computing_timer.print_summary();
----
->         // computing_timer.print_summary();
+*** /home/tamiko/workspace/dealii/tests/examples/../../examples/step-40/step-40.cc	2023-06-30 07:12:37.000000000 -0500
+--- step-40.cc	2023-07-02 21:45:20.777870229 -0500
+***************
+*** 18,23 ****
+--- 18,24 ----
+   *         Timo Heister, University of Goettingen, 2009, 2010
+   */
+  
++ #include "../example_test.h"
+  
+  // @sect3{Include files}
+  //
+***************
+*** 493,505 ****
+      LA::MPI::PreconditionAMG preconditioner;
+      preconditioner.initialize(system_matrix, data);
+  
+!     solver.solve(system_matrix,
+!                  completely_distributed_solution,
+!                  system_rhs,
+!                  preconditioner);
+! 
+!     pcout << "   Solved in " << solver_control.last_step() << " iterations."
+!           << std::endl;
+  
+      constraints.distribute(completely_distributed_solution);
+  
+--- 494,506 ----
+      LA::MPI::PreconditionAMG preconditioner;
+      preconditioner.initialize(system_matrix, data);
+  
+!     check_solver_within_range(solver.solve(system_matrix,
+!                                            completely_distributed_solution,
+!                                            system_rhs,
+!                                            preconditioner),
+!                               solver_control.last_step(),
+!                               8,
+!                               15);
+  
+      constraints.distribute(completely_distributed_solution);
+  
+***************
+*** 624,630 ****
+            << " on " << Utilities::MPI::n_mpi_processes(mpi_communicator)
+            << " MPI rank(s)..." << std::endl;
+  
+!     const unsigned int n_cycles = 8;
+      for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
+        {
+          pcout << "Cycle " << cycle << ':' << std::endl;
+--- 625,631 ----
+            << " on " << Utilities::MPI::n_mpi_processes(mpi_communicator)
+            << " MPI rank(s)..." << std::endl;
+  
+!     const unsigned int n_cycles = 3;
+      for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
+        {
+          pcout << "Cycle " << cycle << ':' << std::endl;
+***************
+*** 652,658 ****
+            output_results(cycle);
+          }
+  
+!         computing_timer.print_summary();
+          computing_timer.reset();
+  
+          pcout << std::endl;
+--- 653,659 ----
+            output_results(cycle);
+          }
+  
+!         // computing_timer.print_summary();
+          computing_timer.reset();
+  
+          pcout << std::endl;

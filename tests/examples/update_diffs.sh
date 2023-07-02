@@ -22,7 +22,7 @@ for file in ${diff_files}; do
   # Check if the corresponding .cc file exists
   if [[ -f "${source_file}" && -f "${modified_file}" ]]; then
     echo diff "${source_file}" "${modified_file}" "${file}"
-    diff -Nur "${source_file}" "${modified_file}" > "${file}"
+    diff -c "${source_file}" "${modified_file}" > "${file}"
     echo success
   else
     echo "No matching .cc files found for ${file}"

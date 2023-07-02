@@ -17,7 +17,7 @@ if (EXISTS "${DEAL_II_SOURCE_DIR}/examples")
   message(STATUS "Temporary binary directory: ${_binary_directory}")
   file(MAKE_DIRECTORY "${_source_directory}")
   file(WRITE "${_source_directory}/CMakeLists.txt" "deal_ii_pickup_tests(examples)")
-  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/../tests.h" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/example_test.h" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
   enable_testing()
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CTestFile.cmake" "subdirs(binary)")
