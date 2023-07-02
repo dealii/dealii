@@ -212,19 +212,6 @@ public:
       &construction_data) override;
 
   /**
-   * An overload of the respective function of the base class.
-   *
-   * Throw an error, since this function is not useful in the context of this
-   * class.
-   */
-  DEAL_II_DEPRECATED
-  virtual void
-  create_triangulation_compatibility(
-    const std::vector<Point<spacedim>> &vertices,
-    const std::vector<CellData<dim>> &  cells,
-    const SubCellData &                 subcelldata) override;
-
-  /**
    * Write all refine and coarsen flags to the ostream @p out.
    */
   virtual void

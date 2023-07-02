@@ -139,9 +139,7 @@ create_two_cubes_rotation(Triangulation<3> & coarse_grid,
     }
   // finally generate a triangulation
   // out of this
-  coarse_grid.create_triangulation_compatibility(vertices,
-                                                 cells,
-                                                 SubCellData());
+  coarse_grid.create_triangulation(vertices, cells, SubCellData());
 }
 
 

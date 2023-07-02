@@ -60,19 +60,19 @@ create_grid(Triangulation<2> &tria)
   std::vector<CellData<2>> cells(2);
   cells[0].vertices[0] = 0;
   cells[0].vertices[1] = 1;
-  cells[0].vertices[2] = 2;
-  cells[0].vertices[3] = 3;
+  cells[0].vertices[2] = 3;
+  cells[0].vertices[3] = 2;
   cells[1].vertices[0] = 0;
   cells[1].vertices[1] = 4;
-  cells[1].vertices[2] = 2;
-  cells[1].vertices[3] = 1;
+  cells[1].vertices[2] = 1;
+  cells[1].vertices[3] = 2;
 
   // generate a triangulation
   // out of this
   GridTools::consistently_order_cells(cells);
   try
     {
-      tria.create_triangulation_compatibility(vertices, cells, SubCellData());
+      tria.create_triangulation(vertices, cells, SubCellData());
     }
   catch (Triangulation<2>::DistortedCellList &dcv)
     {

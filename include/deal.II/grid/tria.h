@@ -1894,21 +1894,6 @@ public:
       &construction_data);
 
   /**
-   * For backward compatibility, only. This function takes the cell data in
-   * the ordering as requested by deal.II versions up to 5.2, converts it to
-   * the new (lexicographic) ordering and calls create_triangulation().
-   *
-   * @note This function internally calls create_triangulation and therefore
-   * can throw the same exception as the other function.
-   */
-  DEAL_II_DEPRECATED
-  virtual void
-  create_triangulation_compatibility(
-    const std::vector<Point<spacedim>> &vertices,
-    const std::vector<CellData<dim>> &  cells,
-    const SubCellData &                 subcelldata);
-
-  /**
    * Revert or flip the direction_flags of a dim<spacedim triangulation, see
    * @ref GlossDirectionFlag.
    *
