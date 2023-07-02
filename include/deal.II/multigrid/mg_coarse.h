@@ -90,7 +90,7 @@ private:
 template <typename VectorType,
           typename SolverType,
           typename MatrixType,
-          class PreconditionerType>
+          typename PreconditionerType>
 class MGCoarseGridIterativeSolver : public MGCoarseGridBase<VectorType>
 {
 public:
@@ -291,7 +291,7 @@ MGCoarseGridApplySmoother<VectorType>::operator()(const unsigned int level,
 template <typename VectorType,
           typename SolverType,
           typename MatrixType,
-          class PreconditionerType>
+          typename PreconditionerType>
 MGCoarseGridIterativeSolver<VectorType,
                             SolverType,
                             MatrixType,
@@ -306,7 +306,7 @@ MGCoarseGridIterativeSolver<VectorType,
 template <typename VectorType,
           typename SolverType,
           typename MatrixType,
-          class PreconditionerType>
+          typename PreconditionerType>
 MGCoarseGridIterativeSolver<VectorType,
                             SolverType,
                             MatrixType,
@@ -324,7 +324,7 @@ MGCoarseGridIterativeSolver<VectorType,
 template <typename VectorType,
           typename SolverType,
           typename MatrixType,
-          class PreconditionerType>
+          typename PreconditionerType>
 void
 MGCoarseGridIterativeSolver<
   VectorType,
@@ -344,7 +344,7 @@ MGCoarseGridIterativeSolver<
 template <typename VectorType,
           typename SolverType,
           typename MatrixType,
-          class PreconditionerType>
+          typename PreconditionerType>
 void
 MGCoarseGridIterativeSolver<VectorType,
                             SolverType,
@@ -366,7 +366,7 @@ namespace internal
       typename VectorType,
       typename SolverType,
       typename MatrixType,
-      class PreconditionerType,
+      typename PreconditionerType,
       std::enable_if_t<
         std::is_same<VectorType, typename SolverType::vector_type>::value,
         VectorType> * = nullptr>
@@ -384,7 +384,7 @@ namespace internal
       typename VectorType,
       typename SolverType,
       typename MatrixType,
-      class PreconditionerType,
+      typename PreconditionerType,
       std::enable_if_t<
         !std::is_same<VectorType, typename SolverType::vector_type>::value,
         VectorType> * = nullptr>
@@ -413,7 +413,7 @@ namespace internal
 template <typename VectorType,
           typename SolverType,
           typename MatrixType,
-          class PreconditionerType>
+          typename PreconditionerType>
 void
                        MGCoarseGridIterativeSolver<
                          VectorType,
