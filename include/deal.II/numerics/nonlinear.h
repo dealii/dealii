@@ -302,7 +302,7 @@ public:
   /**
    * A function object that users may supply and that is intended to
    * prepare the linear solver for subsequent calls to
-   * solve_jacobian_system().
+   * solve_with_jacobian).
    *
    * The job of setup_jacobian() is to prepare the linear solver for
    * subsequent calls to solve_with_jacobian(), in the solution of linear

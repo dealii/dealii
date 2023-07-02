@@ -96,11 +96,6 @@ public:
       Jinv.invert(J);
     };
 
-    // Used only in ver < 4.0.0
-    time_stepper.solve_jacobian_system =
-      [&](const VectorType &src, VectorType &dst) { Jinv.vmult(dst, src); };
-
-    // Used in ver >= 4.0.0
     time_stepper.solve_with_jacobian =
       [&](const VectorType &src, VectorType &dst, const double) {
         Jinv.vmult(dst, src);
