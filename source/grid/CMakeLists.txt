@@ -33,7 +33,6 @@ endif()
 set(_unity_include_src
   cell_id.cc
   grid_refinement.cc
-  grid_reordering.cc
   intergrid_map.cc
   manifold.cc
   manifold_lib.cc

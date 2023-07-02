@@ -25,7 +25,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>

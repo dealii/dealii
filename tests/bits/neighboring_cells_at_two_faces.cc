@@ -16,7 +16,7 @@
 
 #include <deal.II/base/geometry_info.h>
 
-#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -69,7 +69,7 @@ create_grid(Triangulation<2> &tria)
 
   // generate a triangulation
   // out of this
-  GridReordering<2>::reorder_cells(cells);
+  GridTools::consistently_order_cells(cells);
   try
     {
       tria.create_triangulation_compatibility(vertices, cells, SubCellData());

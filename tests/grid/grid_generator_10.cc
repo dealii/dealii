@@ -15,10 +15,10 @@
 
 
 
-// Test GridReordering<3>::reorder_cells
+// Test GridTools::consistently_order_cells
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
 
@@ -76,7 +76,7 @@ my_cylinder(Triangulation<3> &tria,
       cells[i].material_id = 0;
     };
 
-  GridReordering<3>::reorder_cells(cells);
+  GridTools::consistently_order_cells(cells);
   tria.create_triangulation(std::vector<Point<3>>(&vertices[0], &vertices[16]),
                             cells,
                             SubCellData()); // no boundary information

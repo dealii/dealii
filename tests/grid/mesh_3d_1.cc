@@ -22,7 +22,7 @@
 // coarsening_3d), but we can check this fact much earlier already (done
 // here)
 
-#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>

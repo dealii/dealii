@@ -3827,22 +3827,18 @@ namespace GridTools
                  << "The given vertex with index " << arg1
                  << " is not used in the given triangulation.");
 
+  /**
+   * An exception that is thrown whenever the edges of a mesh are not
+   * orientable.
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(ExcMeshNotOrientable,
+                   "The edges of the mesh are not consistently orientable.");
+
   /** @} */
 
 } /*namespace GridTools*/
-
-
-/**
- * An exception that is thrown whenever the edges of a mesh are not
- * orientable.
- *
- * @note for backwards compatibility with the old GridReordering class this
- * exception is not in the GridTools namespace.
- *
- * @ingroup Exceptions
- */
-DeclExceptionMsg(ExcMeshNotOrientable,
-                 "The edges of the mesh are not consistently orientable.");
 
 
 

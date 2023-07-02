@@ -29,7 +29,7 @@
 #include <deal.II/fe/fe_values.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -69,7 +69,7 @@ create_two_cubes(Triangulation<3> &coarse_grid)
 
   // finally generate a triangulation
   // out of this
-  GridReordering<3>::reorder_cells(cells);
+  GridTools::consistently_order_cells(cells);
   coarse_grid.create_triangulation_compatibility(vertices,
                                                  cells,
                                                  SubCellData());

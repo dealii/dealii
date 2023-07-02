@@ -278,11 +278,11 @@ struct CellData;
  * have orientations that need to be taken care of.
  *
  * For this reason, the <tt>read_*</tt> functions of this class that read in
- * grids in various input formats call the GridReordering class to bring the
- * order of vertices that define the cells into an ordering that satisfies the
- * requirements of the Triangulation class. Be sure to read the documentation
- * of that class if you experience unexpected problems when reading grids
- * through this class.
+ * grids in various input formats call the GridTools::consistently_order_cells()
+ * function to bring the order of vertices that define the cells into an
+ * ordering that satisfies the requirements of the Triangulation class. Be sure
+ * to read the documentation of that class if you experience unexpected problems
+ * when reading grids through this class.
  *
  *
  * <h3>Dealing with distorted mesh cells</h3>

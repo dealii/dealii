@@ -41,7 +41,6 @@
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/filtered_iterator.h>
-#include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 #include <deal.II/grid/manifold.h>

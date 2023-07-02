@@ -23,7 +23,7 @@
 // this test just checks that such a mesh can be created. further
 // tests check that we are still producing consistent states with this
 
-#include <deal.II/grid/grid_reordering.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>

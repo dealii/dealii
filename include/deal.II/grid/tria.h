@@ -555,9 +555,9 @@ namespace internal
  * numbering within cells. They do not only hold for the data read from an UCD
  * or any other input file, but also for the data passed to
  * create_triangulation(). See the documentation for the GridIn class for more
- * details on this, and above all to the GridReordering class that explains
- * many of the problems and an algorithm to reorder cells such that they
- * satisfy the conditions outlined above.
+ * details on this, and above all to the GridTools::consistently_order_cells()
+ * function that explains many of the problems and an algorithm to reorder cells
+ * such that they satisfy the conditions outlined above.
  *
  * <li> Copying a triangulation: when computing on time dependent meshes or
  * when using adaptive refinement, you will often want to create a new
@@ -1838,7 +1838,8 @@ public:
    * constraints; see the general class documentation for this.
    *
    * For conditions when this function can generate a valid triangulation, see
-   * the documentation of this class, and the GridIn and GridReordering class.
+   * the documentation of this class, and the GridIn and
+   * GridTools::consistently_order_cells() function.
    *
    * If the <code>check_for_distorted_cells</code> flag was specified upon
    * creation of this object, at the very end of its operation, the current
