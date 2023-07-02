@@ -1846,158 +1846,119 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    all;
+
+  /*
+   * Case 1: single source with known solution
+   */
   {
-    /*
-     * Case 1: single source with known solution
-     */
-    {
-      ParameterCollection prm(
-        2,     // dimension
-        2,     // domain size
-        1,     // cube shape
-        3,     // global refinement
-        5,     // num of cycles grid is refined and solved again
-        1,     // fe base degree
-        1,     // fe enriched degree
-        50000, // max iterations
-        1e-9,  // tolerance
-        // rhs value
-        "-(exp(-(x*x + y*y)/(2*sigma*sigma))*(- 2*sigma*sigma + x*x + y*y))/(2*sigma*sigma*sigma*sigma*sigma*sigma*pi)",
-        // boundary value
-        "1.0/(2*pi*sigma*sigma)*exp(-(x*x + y*y)/(2*sigma*sigma))",
-        // rhs value for radial problem solved to find enrichment function
-        "-(exp(-(x*x)/(2*sigma*sigma))*(- 2*sigma*sigma + x*x))/(2*sigma*sigma*sigma*sigma*sigma*sigma*pi)",
-        // boundary value for radial problem
-        "1.0/(2*pi*sigma*sigma)*exp(-(x*x)/(2*sigma*sigma))",
-        // exact solution expression. If null nothing is done
-        "1.0/(2*pi*sigma*sigma)*exp(-(x*x + y*y)/(2*sigma*sigma))",
-        1, // patches
-        1, // debug level
-        1, // num enrichments
-        // enrichment points interpreted 2 at a time if dimension is 2
-        {0, 0},
-        // radii defining different predicates
-        {0.4},
-        // sigmas defining different predicates
-        {0.1});
+    ParameterCollection prm(
+      2,     // dimension
+      2,     // domain size
+      1,     // cube shape
+      3,     // global refinement
+      2,     // num of cycles grid is refined and solved again
+      1,     // fe base degree
+      1,     // fe enriched degree
+      50000, // max iterations
+      1e-9,  // tolerance
+      // rhs value
+      "-(exp(-(x*x + y*y)/(2*sigma*sigma))*(- 2*sigma*sigma + x*x + y*y))/(2*sigma*sigma*sigma*sigma*sigma*sigma*pi)",
+      // boundary value
+      "1.0/(2*pi*sigma*sigma)*exp(-(x*x + y*y)/(2*sigma*sigma))",
+      // rhs value for radial problem solved to find enrichment function
+      "-(exp(-(x*x)/(2*sigma*sigma))*(- 2*sigma*sigma + x*x))/(2*sigma*sigma*sigma*sigma*sigma*sigma*pi)",
+      // boundary value for radial problem
+      "1.0/(2*pi*sigma*sigma)*exp(-(x*x)/(2*sigma*sigma))",
+      // exact solution expression. If null nothing is done
+      "1.0/(2*pi*sigma*sigma)*exp(-(x*x + y*y)/(2*sigma*sigma))",
+      1, // patches
+      1, // debug level
+      1, // num enrichments
+      // enrichment points interpreted 2 at a time if dimension is 2
+      {0, 0},
+      // radii defining different predicates
+      {0.4},
+      // sigmas defining different predicates
+      {0.1});
+
+    LaplaceProblem<2> problem(prm);
+    problem.run();
+  }
+
+  /*
+   * Case 2: 3 sources
+   */
+  {
+    ParameterCollection prm(
+      2,     // dimension
+      4,     // domain size
+      1,     // cube shape
+      3,     // global refinement
+      1,     // num of cycles grid is refined and solved again
+      1,     // fe base degree
+      1,     // fe enriched degree
+      50000, // max iterations
+      1e-9,  // tolerance
+      // rhs value
+      "1.0/(2*pi*sigma*sigma)*exp(-(x*x + y*y)/(2*sigma*sigma))",
+      // boundary value
+      "0",
+      // rhs value for radial problem solved to find enrichment function
+      "1.0/(2*pi*sigma*sigma)*exp(-(x*x)/(2*sigma*sigma))",
+      // boundary value for radial problem
+      "0",
+      // exact solution expression. If null nothing is done
+      "",
+      1, // patches
+      1, // debug level
+      3, // num enrichments
+      // enrichment points interpreted 2 at a time if dimension is 2
+      {0.5, 0.5, 0, 0, -1, -1},
+      // radii defining different predicates
+      {0.4, 0.4, 0.4},
+      // sigmas defining different predicates
+      {0.1, 0.1, 0.1});
 
 
-      if (prm.dim == 2)
-        {
-          LaplaceProblem<2> problem(prm);
-          problem.run();
-        }
-      else if (prm.dim == 3)
-        {
-          LaplaceProblem<3> problem(prm);
-          problem.run();
-        }
-      else
-        AssertThrow(false,
-                    ExcMessage("Dimension incorrect. dim can be 2 or 3"));
-    }
+    LaplaceProblem<2> problem(prm);
+    problem.run();
+  }
 
+  /*
+   * Case 3: five sources 3d
+   */
+  {
+    ParameterCollection prm(
+      3,     // dimension
+      8,     // domain size
+      1,     // cube shape
+      4,     // global refinement
+      0,     // num of cycles grid is refined and solved again
+      1,     // fe base degree
+      1,     // fe enriched degree
+      50000, // max iterations
+      1e-9,  // tolerance
+      // rhs value
+      "1.0/(2*pi*sigma*sigma)*exp(-(x*x + y*y + z*z)/(2*sigma*sigma))",
+      // boundary value
+      "0",
+      // rhs value for radial problem solved to find enrichment function
+      "1.0/(2*pi*sigma*sigma)*exp(-(x*x)/(2*sigma*sigma))",
+      // boundary value for radial problem
+      "0",
+      // exact solution expression. If null nothing is done
+      "",
+      1, // patches
+      1, // debug level
+      5, // num enrichments
+      // enrichment points interpreted 3 at a time if dimension is 3
+      {1.5, 1.5, 1.5, 1, 1, 1, 0, 0, 0, -1, -1, -1, 1, -1, -1},
+      // radii defining different predicates
+      {0.45, 0.45, 0.45, 0.45, 0.45},
+      // sigmas defining different predicates
+      {0.1, 0.1, 0.1, 0.1, 0.1});
 
-
-    /*
-     * Case 2: 3 sources
-     */
-    {
-      ParameterCollection prm(
-        2,     // dimension
-        4,     // domain size
-        1,     // cube shape
-        3,     // global refinement
-        4,     // num of cycles grid is refined and solved again
-        1,     // fe base degree
-        1,     // fe enriched degree
-        50000, // max iterations
-        1e-9,  // tolerance
-        // rhs value
-        "1.0/(2*pi*sigma*sigma)*exp(-(x*x + y*y)/(2*sigma*sigma))",
-        // boundary value
-        "0",
-        // rhs value for radial problem solved to find enrichment function
-        "1.0/(2*pi*sigma*sigma)*exp(-(x*x)/(2*sigma*sigma))",
-        // boundary value for radial problem
-        "0",
-        // exact solution expression. If null nothing is done
-        "",
-        1, // patches
-        1, // debug level
-        3, // num enrichments
-        // enrichment points interpreted 2 at a time if dimension is 2
-        {0.5, 0.5, 0, 0, -1, -1},
-        // radii defining different predicates
-        {0.4, 0.4, 0.4},
-        // sigmas defining different predicates
-        {0.1, 0.1, 0.1});
-
-
-      if (prm.dim == 2)
-        {
-          LaplaceProblem<2> problem(prm);
-          problem.run();
-        }
-      else if (prm.dim == 3)
-        {
-          LaplaceProblem<3> problem(prm);
-          problem.run();
-        }
-      else
-        AssertThrow(false,
-                    ExcMessage("Dimension incorrect. dim can be 2 or 3"));
-    }
-
-
-    /*
-     * Case 3: five sources 3d
-     */
-    {
-      ParameterCollection prm(
-        3,     // dimension
-        8,     // domain size
-        1,     // cube shape
-        4,     // global refinement
-        2,     // num of cycles grid is refined and solved again
-        1,     // fe base degree
-        1,     // fe enriched degree
-        50000, // max iterations
-        1e-9,  // tolerance
-        // rhs value
-        "1.0/(2*pi*sigma*sigma)*exp(-(x*x + y*y + z*z)/(2*sigma*sigma))",
-        // boundary value
-        "0",
-        // rhs value for radial problem solved to find enrichment function
-        "1.0/(2*pi*sigma*sigma)*exp(-(x*x)/(2*sigma*sigma))",
-        // boundary value for radial problem
-        "0",
-        // exact solution expression. If null nothing is done
-        "",
-        1, // patches
-        1, // debug level
-        5, // num enrichments
-        // enrichment points interpreted 3 at a time if dimension is 3
-        {1.5, 1.5, 1.5, 1, 1, 1, 0, 0, 0, -1, -1, -1, 1, -1, -1},
-        // radii defining different predicates
-        {0.45, 0.45, 0.45, 0.45, 0.45},
-        // sigmas defining different predicates
-        {0.1, 0.1, 0.1, 0.1, 0.1});
-
-
-      if (prm.dim == 2)
-        {
-          LaplaceProblem<2> problem(prm);
-          problem.run();
-        }
-      else if (prm.dim == 3)
-        {
-          LaplaceProblem<3> problem(prm);
-          problem.run();
-        }
-      else
-        AssertThrow(false,
-                    ExcMessage("Dimension incorrect. dim can be 2 or 3"));
-    }
+    LaplaceProblem<3> problem(prm);
+    problem.run();
   }
 }
