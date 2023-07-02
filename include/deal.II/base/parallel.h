@@ -34,6 +34,8 @@
 #  include <tbb/parallel_for.h>
 #  include <tbb/parallel_reduce.h>
 #  include <tbb/partitioner.h>
+#else
+#  include <boost/range/iterator_range.hpp>
 #endif
 
 #ifdef DEAL_II_HAVE_CXX20
@@ -106,6 +108,22 @@ namespace parallel
                         functor,
                         *partitioner);
     }
+
+#else
+
+    /**
+     * Just execute things sequentially.
+     */
+    template <typename Iterator, typename Functor>
+    void
+    parallel_for(Iterator       x_begin,
+                 Iterator       x_end,
+                 const Functor &functor,
+                 const unsigned int)
+    {
+      functor(boost::iterator_range<Iterator>(x_begin, x_end));
+    }
+
 #endif
   } // namespace internal
 
