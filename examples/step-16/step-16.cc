@@ -273,7 +273,7 @@ namespace Step16
     // complete, inclusive range here (not a starting index and size), so the
     // finest level is <code>n_levels-1</code>. We first have to resize the
     // container holding the SparseMatrix classes, since they have to release
-    // their SparsityPattern before the can be destroyed upon resizing.
+    // their SparsityPattern before they can be destroyed upon resizing.
     const unsigned int n_levels = triangulation.n_levels();
 
     mg_interface_matrices.resize(0, n_levels - 1);
