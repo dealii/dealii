@@ -873,9 +873,9 @@ private:
     {{{0, 2, 1}},
      {{0, 1, 2}},
      {{2, 1, 0}},
-     {{1, 2, 0}},
+     {{2, 0, 1}},
      {{1, 0, 2}},
-     {{2, 0, 1}}}};
+     {{1, 2, 0}}}};
 
   /**
    * Table containing all vertex permutations for a quadrilateral.
@@ -2023,9 +2023,9 @@ ReferenceCell::standard_to_real_face_line(
   static constexpr ndarray<unsigned int, 6, 3> triangle_table = {{{{2, 1, 0}},
                                                                   {{0, 1, 2}},
                                                                   {{1, 0, 2}},
-                                                                  {{1, 2, 0}},
+                                                                  {{2, 0, 1}},
                                                                   {{0, 2, 1}},
-                                                                  {{2, 0, 1}}}};
+                                                                  {{1, 2, 0}}}};
 
 
   switch (this->kind)
@@ -2752,11 +2752,11 @@ ReferenceCell::get_combined_orientation(
           return 1;
 
         // face_orientation=true, face_rotation=true, face_flip=false
-        if (v0_equals({vertices_1[2], vertices_1[0], vertices_1[1]}))
+        if (v0_equals({vertices_1[1], vertices_1[2], vertices_1[0]}))
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
-        if (v0_equals({vertices_1[1], vertices_1[2], vertices_1[0]}))
+        if (v0_equals({vertices_1[2], vertices_1[0], vertices_1[1]}))
           return 5;
 
         // face_orientation=false, face_rotation=false, face_flip=false
@@ -2879,9 +2879,9 @@ ReferenceCell::permute_by_combined_orientation(
             case 1:
               return {vertices[0], vertices[1], vertices[2]};
             case 3:
-              return {vertices[2], vertices[0], vertices[1]};
-            case 5:
               return {vertices[1], vertices[2], vertices[0]};
+            case 5:
+              return {vertices[2], vertices[0], vertices[1]};
             case 0:
               return {vertices[0], vertices[2], vertices[1]};
             case 2:
