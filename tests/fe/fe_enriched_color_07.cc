@@ -1339,12 +1339,15 @@ LaplaceProblem<dim>::build_fe_space()
   pcout << "...building fe space" << std::endl;
 
   make_enrichment_functions();
-  static ColorEnriched::Helper<dim> fe_space(fe_base,
-                                             fe_enriched,
-                                             vec_predicates,
-                                             vec_enrichments);
+
+  static std::unique_ptr<ColorEnriched::Helper<dim>> fe_space;
+  fe_space = std::make_unique<ColorEnriched::Helper<dim>>(fe_base,
+                                                          fe_enriched,
+                                                          vec_predicates,
+                                                          vec_enrichments);
+
   fe_collection = std::make_shared<const hp::FECollection<dim>>(
-    fe_space.build_fe_collection(dof_handler));
+    fe_space->build_fe_collection(dof_handler));
   pcout << "size of fe collection: " << fe_collection->size() << std::endl;
 
   if (prm.debug_level == 9)
