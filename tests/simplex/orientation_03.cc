@@ -29,11 +29,9 @@
 
 template <int dim>
 void
-test()
+test(const unsigned int orientation)
 {
   Triangulation<dim> tria;
-
-  const unsigned int orientation = 3; // 3, 5
 
   if (false)
     {
@@ -214,7 +212,9 @@ main()
 {
   initlog();
   // test<2>();
-  test<3>();
+
+  for (unsigned int o = 0; o < 6; ++o)
+    test<3>(o);
 
   deallog << "OK!" << std::endl;
 }
