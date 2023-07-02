@@ -45,18 +45,18 @@ namespace LinearAlgebra
 
 
     void
-    CommunicationPattern::reinit(const IndexSet &vector_space_vector_index_set,
-                                 const IndexSet &read_write_vector_index_set,
+    CommunicationPattern::reinit(const IndexSet &locally_owned_indices,
+                                 const IndexSet &ghost_indices,
                                  const MPI_Comm  communicator)
     {
       comm = std::make_shared<const MPI_Comm>(communicator);
 
       auto vector_space_vector_map =
         Teuchos::rcp(new Tpetra::Map<int, types::signed_global_dof_index>(
-          vector_space_vector_index_set.make_tpetra_map(*comm, false)));
+          locally_owned_indices.make_tpetra_map(*comm, false)));
       auto read_write_vector_map =
         Teuchos::rcp(new Tpetra::Map<int, types::signed_global_dof_index>(
-          read_write_vector_index_set.make_tpetra_map(*comm, true)));
+          ghost_indices.make_tpetra_map(*comm, true)));
 
       // Target map is read_write_vector_map
       // Source map is vector_space_vector_map. This map must have uniquely
