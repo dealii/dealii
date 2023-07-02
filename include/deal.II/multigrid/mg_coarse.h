@@ -88,7 +88,7 @@ private:
  * matrix and preconditioner as a coarse grid operator.
  */
 template <typename VectorType,
-          class SolverType,
+          typename SolverType,
           typename MatrixType,
           class PreconditionerType>
 class MGCoarseGridIterativeSolver : public MGCoarseGridBase<VectorType>
@@ -289,7 +289,7 @@ MGCoarseGridApplySmoother<VectorType>::operator()(const unsigned int level,
 /* ------------------ Functions for MGCoarseGridIterativeSolver ------------ */
 
 template <typename VectorType,
-          class SolverType,
+          typename SolverType,
           typename MatrixType,
           class PreconditionerType>
 MGCoarseGridIterativeSolver<VectorType,
@@ -304,7 +304,7 @@ MGCoarseGridIterativeSolver<VectorType,
 
 
 template <typename VectorType,
-          class SolverType,
+          typename SolverType,
           typename MatrixType,
           class PreconditionerType>
 MGCoarseGridIterativeSolver<VectorType,
@@ -322,7 +322,7 @@ MGCoarseGridIterativeSolver<VectorType,
 
 
 template <typename VectorType,
-          class SolverType,
+          typename SolverType,
           typename MatrixType,
           class PreconditionerType>
 void
@@ -342,7 +342,7 @@ MGCoarseGridIterativeSolver<
 
 
 template <typename VectorType,
-          class SolverType,
+          typename SolverType,
           typename MatrixType,
           class PreconditionerType>
 void
@@ -364,7 +364,7 @@ namespace internal
   {
     template <
       typename VectorType,
-      class SolverType,
+      typename SolverType,
       typename MatrixType,
       class PreconditionerType,
       std::enable_if_t<
@@ -382,7 +382,7 @@ namespace internal
 
     template <
       typename VectorType,
-      class SolverType,
+      typename SolverType,
       typename MatrixType,
       class PreconditionerType,
       std::enable_if_t<
@@ -411,7 +411,7 @@ namespace internal
 
 
 template <typename VectorType,
-          class SolverType,
+          typename SolverType,
           typename MatrixType,
           class PreconditionerType>
 void
