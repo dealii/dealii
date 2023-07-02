@@ -447,15 +447,15 @@ namespace LaplaceSolver
                                                    dof_handler.end(),
                                                    n_threads);
 
-    Threads::Mutex         mutex;
-    Threads::ThreadGroup<> threads;
+    Threads::Mutex           mutex;
+    std::vector<std::thread> threads;
     for (unsigned int thread = 0; thread < n_threads; ++thread)
-      threads += Threads::new_thread(&Solver<dim>::assemble_matrix,
-                                     *this,
-                                     linear_system,
-                                     thread_ranges[thread].first,
-                                     thread_ranges[thread].second,
-                                     mutex);
+      threads.emplace_back(&Solver<dim>::assemble_matrix,
+                           std::ref(*this),
+                           std::ref(linear_system),
+                           std::ref(thread_ranges[thread].first),
+                           std::ref(thread_ranges[thread].second),
+                           std::ref(mutex));
 
     assemble_rhs(linear_system.rhs);
     linear_system.hanging_node_constraints.condense(linear_system.rhs);
@@ -532,8 +532,7 @@ namespace LaplaceSolver
     void (*mhnc_p)(const DoFHandler<dim> &, AffineConstraints<double> &) =
       &DoFTools::make_hanging_node_constraints;
 
-    Threads::Thread<> mhnc_thread =
-      Threads::new_thread(mhnc_p, dof_handler, hanging_node_constraints);
+    std::thread mhnc_thread(mhnc_p, dof_handler, hanging_node_constraints);
 
     sparsity_pattern.reinit(dof_handler.n_dofs(),
                             dof_handler.n_dofs(),
@@ -1526,12 +1525,11 @@ namespace LaplaceSolver
   void
   WeightedResidual<dim>::solve_problem()
   {
-    Threads::ThreadGroup<> threads;
-    threads +=
-      Threads::new_thread(&WeightedResidual<dim>::solve_primal_problem, *this);
-    threads +=
-      Threads::new_thread(&WeightedResidual<dim>::solve_dual_problem, *this);
-    threads.join_all();
+    std::vector<std::thread> threads;
+    threads.emplace_back(&WeightedResidual<dim>::solve_primal_problem, *this);
+    threads.emplace_back(&WeightedResidual<dim>::solve_dual_problem, *this);
+    threads[0].join();
+    threads[1].join();
   }
 
 
@@ -1663,18 +1661,19 @@ namespace LaplaceSolver
     error_indicators.reinit(
       dual_solver.dof_handler.get_triangulation().n_active_cells());
 
-    const unsigned int     n_threads = MultithreadInfo::n_threads();
-    Threads::ThreadGroup<> threads;
+    const unsigned int       n_threads = MultithreadInfo::n_threads();
+    std::vector<std::thread> threads;
     for (unsigned int i = 0; i < n_threads; ++i)
-      threads += Threads::new_thread(&WeightedResidual<dim>::estimate_some,
-                                     *this,
-                                     primal_solution,
-                                     dual_weights,
-                                     n_threads,
-                                     i,
-                                     error_indicators,
-                                     face_integrals);
-    threads.join_all();
+      threads.emplace_back(&WeightedResidual<dim>::estimate_some,
+                           *this,
+                           primal_solution,
+                           dual_weights,
+                           n_threads,
+                           i,
+                           error_indicators,
+                           face_integrals);
+    for (auto &thread : threads)
+      thread.join();
 
     unsigned int present_cell = 0;
     for (active_cell_iterator cell = dual_solver.dof_handler.begin_active();

@@ -200,10 +200,14 @@ curved_grid(std::ostream &out)
   for (unsigned int i = 0; i < 2; ++i)
     us[i].reinit(dof_handler.n_dofs());
   // solve linear systems in parallel
-  Threads::ThreadGroup<> threads;
+  std::vector<std::thread> threads;
   for (unsigned int i = 0; i < 2; ++i)
-    threads += Threads::new_thread(&laplace_solve, S, m[i], us[i]);
-  threads.join_all();
+    threads.emplace_back(&laplace_solve,
+                         std::ref(S),
+                         std::ref(m[i]),
+                         std::ref(us[i]));
+  threads[0].join();
+  threads[1].join();
   // create a new DoFHandler for the combined
   // system
   FESystem<2>   cfe(FE_Q<2>(2), 2);
