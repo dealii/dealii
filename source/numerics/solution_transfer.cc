@@ -583,6 +583,11 @@ SolutionTransfer<dim, VectorType, spacedim>::interpolate(
             Assert(false, ExcInternalError());
         }
     }
+
+  // We have written into the output vectors. If this was a PETSc vector, for
+  // example, then we need to compress these to make future operations safe:
+  for (auto &vec : all_out)
+    vec.compress(VectorOperation::insert);
 }
 
 
