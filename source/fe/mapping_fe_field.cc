@@ -2252,11 +2252,7 @@ MappingFEField<dim, spacedim, VectorType>::transform_real_to_unit_cell(
         initial_p_unit[d] = 0.5;
     }
 
-  // TODO
-  initial_p_unit = GeometryInfo<dim>::project_to_unit_cell(initial_p_unit);
-
-  // for (unsigned int d=0; d<dim; ++d)
-  //   initial_p_unit[d] = 0.;
+  initial_p_unit = cell->reference_cell().closest_point(initial_p_unit);
 
   const Quadrature<dim> point_quadrature(initial_p_unit);
 
