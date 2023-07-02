@@ -963,8 +963,6 @@ namespace LinearAlgebra
       Kokkos::pair<size_type, size_type> range(
         partitioner->locally_owned_size(),
         partitioner->locally_owned_size() + partitioner->n_ghost_indices());
-      if (data.values_host_buffer.size() > 0)
-        Kokkos::deep_copy(Kokkos::subview(data.values_host_buffer, range), 0);
       if (data.values.size() > 0)
         Kokkos::deep_copy(Kokkos::subview(data.values, range), 0);
 
@@ -1015,8 +1013,13 @@ namespace LinearAlgebra
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
           data.values_host_buffer =
+#    if KOKKOS_VERSION < 40000
             Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
                                                 data.values);
+#    else
+            Kokkos::create_mirror_view_and_copy(Kokkos::SharedHostPinnedSpace{},
+                                                data.values);
+#    endif
           partitioner->import_from_ghosted_array_start(
             operation,
             communication_channel,
@@ -1158,8 +1161,13 @@ namespace LinearAlgebra
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
           data.values_host_buffer =
+#    if KOKKOS_VERSION < 40000
             Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
                                                 data.values);
+#    else
+            Kokkos::create_mirror_view_and_copy(Kokkos::SharedHostPinnedSpace{},
+                                                data.values);
+#    endif
 
           partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
             communication_channel,
