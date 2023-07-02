@@ -15,7 +15,10 @@
 
 
 // check and illustrate the serialization process for ParticleHandler
-
+// when the triangulation is fully distributed.
+// In this case, find_active_cell_around_point() currently cannot be used to
+// locate the cells around the particles and so we use a more naive insertion
+// mechanism.
 #include <deal.II/distributed/fully_distributed_tria.h>
 
 #include <deal.II/fe/mapping_q.h>

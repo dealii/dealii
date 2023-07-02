@@ -15,7 +15,9 @@
 
 
 // check and illustrate the serialization process for ParticleHandler
-
+// when the triangulation is a serial triangulation. Currently
+// this test cannot work since serial triangulation do not allow
+// for particle serialization.
 #include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
