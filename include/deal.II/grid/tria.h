@@ -2033,6 +2033,7 @@ public:
    * @{
    */
 
+  using CellStatus = ::dealii::CellStatus;
 
   /**
    * A structure used to accumulate the results of the `weight` signal slot
@@ -3685,7 +3686,7 @@ protected:
   std::vector<typename DataTransfer<dim, spacedim>::cell_relation_t>
     local_cell_relations;
 
-  std::unique_ptr<DataTransfer<dim, spacedim>> data_transfer;
+  DataTransfer<dim, spacedim> data_transfer;
   /**
    * @}
    */
