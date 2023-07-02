@@ -694,9 +694,8 @@ namespace Step36
   EigenvalueProblem<dim>::estimate_error()
   {
     {
-      std::vector<const PETScWrappers::MPI::Vector *> sol(
-        number_of_eigenvalues);
-      std::vector<dealii::Vector<float> *> error(number_of_eigenvalues);
+      std::vector<const ReadVector<PetscScalar> *> sol(number_of_eigenvalues);
+      std::vector<Vector<float> *>                 error(number_of_eigenvalues);
 
       for (unsigned int i = 0; i < number_of_eigenvalues; ++i)
         {
@@ -708,12 +707,15 @@ namespace Step36
       face_quadrature_formula.push_back(dealii::QGauss<dim - 1>(3));
       face_quadrature_formula.push_back(dealii::QGauss<dim - 1>(3));
 
+      ArrayView<const ReadVector<PetscScalar> *> sol_view =
+        make_array_view(sol);
+      ArrayView<Vector<float> *> error_view = make_array_view(error);
       KellyErrorEstimator<dim>::estimate(
         dof_handler,
         face_quadrature_formula,
         std::map<types::boundary_id, const Function<dim> *>(),
-        sol,
-        error);
+        sol_view,
+        error_view);
     }
 
     // sum up for a global:
