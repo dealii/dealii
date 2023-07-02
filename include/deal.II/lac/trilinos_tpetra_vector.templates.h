@@ -120,7 +120,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Vector::extract_subvector_to(
+    Vector<Number>::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
       ArrayView<Number> &                             elements) const
     {
