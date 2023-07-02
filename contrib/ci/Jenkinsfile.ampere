@@ -101,7 +101,7 @@ pipeline
                     export CC=clang-15
                     cmake \
                       -D DEAL_II_WITH_MPI=OFF \
-                      -D DEAL_II_CXX_FLAGS="--std=c++17" \
+                      -D DEAL_II_CXX_FLAGS="--std=c++17 -Werror" \
                       -D DEAL_II_EARLY_DEPRECATIONS=ON \
                       -D CMAKE_BUILD_TYPE=Debug \
 		      -G Ninja \
