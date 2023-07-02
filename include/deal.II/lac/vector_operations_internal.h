@@ -88,110 +88,6 @@ namespace internal
 
 
 
-#ifdef DEAL_II_WITH_TBB
-    /**
-     * This struct takes the loop range from the tbb parallel for loop and
-     * translates it to the actual ranges of the for loop within the vector. It
-     * encodes the grain size but might choose larger values of chunks than the
-     * minimum grain size. The minimum grain size given to tbb is then simple
-     * 1. For affinity reasons, the layout in this loop must be kept in sync
-     * with the respective class for reductions further down.
-     */
-    template <typename Functor>
-    struct TBBForFunctor
-    {
-      TBBForFunctor(Functor &       functor,
-                    const size_type start,
-                    const size_type end)
-        : functor(functor)
-        , start(start)
-        , end(end)
-      {
-        const size_type vec_size = end - start;
-        // set chunk size for sub-tasks
-        const unsigned int gs =
-          internal::VectorImplementation::minimum_parallel_grain_size;
-        n_chunks =
-          std::min(static_cast<size_type>(4 * MultithreadInfo::n_threads()),
-                   vec_size / gs);
-        chunk_size = vec_size / n_chunks;
-
-        // round to next multiple of 512 (or minimum grain size if that happens
-        // to be smaller). this is advantageous because our accumulation
-        // algorithms favor lengths of a power of 2 due to pairwise summation ->
-        // at most one 'oddly' sized chunk
-        if (chunk_size > 512)
-          chunk_size = ((chunk_size + 511) / 512) * 512;
-        n_chunks = (vec_size + chunk_size - 1) / chunk_size;
-        AssertIndexRange((n_chunks - 1) * chunk_size, vec_size);
-        AssertIndexRange(vec_size, n_chunks * chunk_size + 1);
-      }
-
-      void
-      operator()(const tbb::blocked_range<size_type> &range) const
-      {
-        const size_type r_begin = start + range.begin() * chunk_size;
-        const size_type r_end = std::min(start + range.end() * chunk_size, end);
-        functor(r_begin, r_end);
-      }
-
-      Functor &       functor;
-      const size_type start;
-      const size_type end;
-      unsigned int    n_chunks;
-      size_type       chunk_size;
-    };
-#endif
-
-    template <typename Functor>
-    void
-    parallel_for(
-      Functor &       functor,
-      const size_type start,
-      const size_type end,
-      const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-        &partitioner)
-    {
-#ifdef DEAL_II_WITH_TBB
-      const size_type vec_size = end - start;
-      // only go to the parallel function in case there are at least 4 parallel
-      // items, otherwise the overhead is too large
-      if (vec_size >=
-            4 * internal::VectorImplementation::minimum_parallel_grain_size &&
-          MultithreadInfo::n_threads() > 1)
-        {
-          Assert(partitioner.get() != nullptr,
-                 ExcInternalError(
-                   "Unexpected initialization of Vector that does "
-                   "not set the TBB partitioner to a usable state."));
-          std::shared_ptr<tbb::affinity_partitioner> tbb_partitioner =
-            partitioner->acquire_one_partitioner();
-
-          TBBForFunctor<Functor> generic_functor(functor, start, end);
-          // We use a minimum grain size of 1 here since the grains at this
-          // stage of dividing the work refer to the number of vector chunks
-          // that are processed by (possibly different) threads in the
-          // parallelized for loop (i.e., they do not refer to individual
-          // vector entries). The number of chunks here is calculated inside
-          // TBBForFunctor. See also GitHub issue #2496 for further discussion
-          // of this strategy.
-          ::dealii::parallel::internal::parallel_for(
-            static_cast<size_type>(0),
-            static_cast<size_type>(generic_functor.n_chunks),
-            generic_functor,
-            1,
-            tbb_partitioner);
-          partitioner->release_one_partitioner(tbb_partitioner);
-        }
-      else if (vec_size > 0)
-        functor(start, end);
-#else
-      functor(start, end);
-      (void)partitioner;
-#endif
-    }
-
-
     // Define the functors necessary to use SIMD with TBB. we also include the
     // simple copy and set operations
 
@@ -1465,999 +1361,252 @@ namespace internal
     template <typename Number, typename Number2, typename MemorySpace>
     struct functions
     {
-      static void
-      copy(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {
-        static_assert(
-          std::is_same<MemorySpace, ::dealii::MemorySpace::Default>::value &&
-            std::is_same<Number, Number2>::value,
-          "For the Default MemorySpace Number and Number2 should be the same type");
-      }
-
-      static void
-      set(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*s*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      add_vector(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      subtract_vector(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      add_factor(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        Number /*a*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      add_av(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*a*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      add_avpbw(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*a*/,
-        const Number /*b*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*w_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      sadd_xv(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*x*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      sadd_xav(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*x*/,
-        const Number /*a*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      sadd_xavbw(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*x*/,
-        const Number /*a*/,
-        const Number /*b*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*w_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      multiply_factor(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*factor*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      scale(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      equ_au(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*a*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static void
-      equ_aubv(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*a*/,
-        const Number /*b*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*w_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static Number
-      dot(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {
-        return Number();
-      }
-
-      template <typename real_type>
-      static void
-      norm_2(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        real_type & /*sum*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static Number
-      mean_value(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*data*/)
-      {
-        return Number();
-      }
-
-      template <typename real_type>
-      static void
-      norm_1(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        real_type & /*sum*/,
-        Number * /*values*/,
-        Number * /*values*/)
-      {}
-
-      template <typename real_type>
-      static void
-      norm_p(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        real_type & /*sum*/,
-        real_type /*p*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-
-      static Number
-      add_and_dot(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const Number /*a*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*v_data*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace>
-          & /*w_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {
-        return Number();
-      }
-
       template <typename MemorySpace2>
       static void
-      import_elements(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        VectorOperation::values /*operation*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
-      {}
-    };
-
-
-
-    template <typename Number, typename Number2>
-    struct functions<Number, Number2, ::dealii::MemorySpace::Host>
-    {
-      static void
-      copy(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-             &             thread_loop_partitioner,
-           const size_type size,
-           const ::dealii::MemorySpace::
-             MemorySpaceData<Number2, ::dealii::MemorySpace::Host> &v_data,
-           ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                  ::dealii::MemorySpace::Host>
-             &data)
-      {
-        Vector_copy<Number, Number2> copier(v_data.values.data(),
-                                            data.values.data());
-        parallel_for(copier, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      set(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-            &             thread_loop_partitioner,
-          const size_type size,
-          const Number    s,
-          ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::Host>
-            &data)
-      {
-        Vector_set<Number> setter(s, data.values.data());
-        parallel_for(setter, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      add_vector(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Vectorization_add_v<Number> vector_add(data.values.data(),
-                                               v_data.values.data());
-        parallel_for(vector_add, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      subtract_vector(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Vectorization_subtract_v<Number> vector_subtract(data.values.data(),
-                                                         v_data.values.data());
-        parallel_for(vector_subtract, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      add_factor(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        Number          a,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Vectorization_add_factor<Number> vector_add(data.values.data(), a);
-        parallel_for(vector_add, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      add_av(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &             thread_loop_partitioner,
-             const size_type size,
-             const Number    a,
-             const ::dealii::MemorySpace::
-               MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::Host>
-               &data)
-      {
-        Vectorization_add_av<Number> vector_add(data.values.data(),
-                                                v_data.values.data(),
-                                                a);
-        parallel_for(vector_add, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      add_avpbw(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const Number    a,
-        const Number    b,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Vectorization_add_avpbw<Number> vector_add(
-          data.values.data(), v_data.values.data(), w_data.values.data(), a, b);
-        parallel_for(vector_add, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      sadd_xv(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const Number    x,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Vectorization_sadd_xv<Number> vector_sadd(data.values.data(),
-                                                  v_data.values.data(),
-                                                  x);
-        parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      sadd_xav(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const Number    x,
-        const Number    a,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Vectorization_sadd_xav<Number> vector_sadd(data.values.data(),
-                                                   v_data.values.data(),
-                                                   a,
-                                                   x);
-        parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      sadd_xavbw(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const Number    x,
-        const Number    a,
-        const Number    b,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Vectorization_sadd_xavbw<Number> vector_sadd(data.values.data(),
-                                                     v_data.values.data(),
-                                                     w_data.values.data(),
-                                                     x,
-                                                     a,
-                                                     b);
-        parallel_for(vector_sadd, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      multiply_factor(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const Number    factor,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Vectorization_multiply_factor<Number> vector_multiply(
-          data.values.data(), factor);
-        parallel_for(vector_multiply, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      scale(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-              &             thread_loop_partitioner,
-            const size_type size,
-            const ::dealii::MemorySpace::
-              MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-            ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                   ::dealii::MemorySpace::Host>
-              &data)
-      {
-        Vectorization_scale<Number> vector_scale(data.values.data(),
-                                                 v_data.values.data());
-        parallel_for(vector_scale, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      equ_au(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &             thread_loop_partitioner,
-             const size_type size,
-             const Number    a,
-             const ::dealii::MemorySpace::
-               MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::Host>
-               &data)
-      {
-        Vectorization_equ_au<Number> vector_equ(data.values.data(),
-                                                v_data.values.data(),
-                                                a);
-        parallel_for(vector_equ, 0, size, thread_loop_partitioner);
-      }
-
-      static void
-      equ_aubv(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const Number    a,
-        const Number    b,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Vectorization_equ_aubv<Number> vector_equ(
-          data.values.data(), v_data.values.data(), w_data.values.data(), a, b);
-        parallel_for(vector_equ, 0, size, thread_loop_partitioner);
-      }
-
-      static Number
-      dot(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-            &             thread_loop_partitioner,
-          const size_type size,
-          const ::dealii::MemorySpace::
-            MemorySpaceData<Number2, ::dealii::MemorySpace::Host> &v_data,
-          ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::Host>
-            &data)
-      {
-        Number                                                   sum;
-        dealii::internal::VectorOperations::Dot<Number, Number2> dot(
-          data.values.data(), v_data.values.data());
-        dealii::internal::VectorOperations::parallel_reduce(
-          dot, 0, size, sum, thread_loop_partitioner);
-        AssertIsFinite(sum);
-
-        return sum;
-      }
-
-      template <typename real_type>
-      static void
-      norm_2(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &             thread_loop_partitioner,
-             const size_type size,
-             real_type &     sum,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::Host>
-               &data)
-      {
-        Norm2<Number, real_type> norm2(data.values.data());
-        parallel_reduce(norm2, 0, size, sum, thread_loop_partitioner);
-      }
-
-      static Number
-      mean_value(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data)
-      {
-        Number            sum;
-        MeanValue<Number> mean(data.values.data());
-        parallel_reduce(mean, 0, size, sum, thread_loop_partitioner);
-
-        return sum;
-      }
-
-      template <typename real_type>
-      static void
-      norm_1(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &             thread_loop_partitioner,
-             const size_type size,
-             real_type &     sum,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::Host>
-               &data)
-      {
-        Norm1<Number, real_type> norm1(data.values.data());
-        parallel_reduce(norm1, 0, size, sum, thread_loop_partitioner);
-      }
-
-      template <typename real_type>
-      static void
-      norm_p(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &             thread_loop_partitioner,
-             const size_type size,
-             real_type &     sum,
-             const real_type p,
-             ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                    ::dealii::MemorySpace::Host>
-               &data)
-      {
-        NormP<Number, real_type> normp(data.values.data(), p);
-        parallel_reduce(normp, 0, size, sum, thread_loop_partitioner);
-      }
-
-      static Number
-      add_and_dot(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &             thread_loop_partitioner,
-        const size_type size,
-        const Number    a,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &v_data,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Host> &w_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data)
-      {
-        Number            sum;
-        AddAndDot<Number> adder(data.values.data(),
-                                v_data.values.data(),
-                                w_data.values.data(),
-                                a);
-        parallel_reduce(adder, 0, size, sum, thread_loop_partitioner);
-
-        return sum;
-      }
-
-      template <typename MemorySpace2>
-      static void
-      import_elements(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &                     thread_loop_partitioner,
-        const size_type         size,
-        VectorOperation::values operation,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-          &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data,
-        std::enable_if_t<
-          std::is_same<MemorySpace2, dealii::MemorySpace::Host>::value,
-          int> = 0)
-      {
-        if (operation == VectorOperation::insert)
-          {
-            copy(thread_loop_partitioner, size, v_data, data);
-          }
-        else if (operation == VectorOperation::add)
-          {
-            add_vector(thread_loop_partitioner, size, v_data, data);
-          }
-        else
-          {
-            AssertThrow(false, ExcNotImplemented());
-          }
-      }
-
-      template <typename MemorySpace2>
-      static void
-      import_elements(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          & /*thread_loop_partitioner*/,
-        const size_type         size,
-        VectorOperation::values operation,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-          &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Host>
-          &data,
-        std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::Default>::value,
-          int> = 0)
-      {
-        if (operation == VectorOperation::insert)
-          {
-            Kokkos::deep_copy(
-              Kokkos::subview(data.values,
-                              Kokkos::pair<size_type, size_type>(0, size)),
-              Kokkos::subview(v_data.values,
-                              Kokkos::pair<size_type, size_type>(0, size)));
-          }
-        else
-          {
-            AssertThrow(false, ExcNotImplemented());
-          }
-      }
-    };
-
-
-
-    template <typename Number>
-    struct functions<Number, Number, ::dealii::MemorySpace::Default>
-    {
-      static void
-      copy(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      copy(const size_type                                            size,
+           const Kokkos::View<const Number2 *,
+                              typename MemorySpace2::kokkos_space> &  v_data,
+           Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         Kokkos::deep_copy(
-          Kokkos::subview(data.values,
-                          Kokkos::pair<size_type, size_type>(0, size)),
-          Kokkos::subview(v_data.values,
-                          Kokkos::pair<size_type, size_type>(0, size)));
+          Kokkos::subview(data, Kokkos::pair<size_type, size_type>(0, size)),
+          Kokkos::subview(v_data, Kokkos::pair<size_type, size_type>(0, size)));
       }
 
       static void
-      set(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-          const size_type size,
-          const Number    s,
-          ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::Default>
-            &data)
+      set(const size_type                                            size,
+          const Number                                               s,
+          Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         Kokkos::deep_copy(
-          Kokkos::subview(data.values,
-                          Kokkos::pair<size_type, size_type>(0, size)),
+          Kokkos::subview(data, Kokkos::pair<size_type, size_type>(0, size)),
           s);
       }
 
       static void
       add_vector(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
+          &                                                        v_data,
+        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::add_vector",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(int i) { data.values(i) += v_data.values(i); });
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(int i) { data(i) += v_data(i); });
         exec.fence();
       }
 
       static void
       subtract_vector(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
+          &                                                        v_data,
+        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::subtract_vector",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i) { data.values(i) -= v_data.values(i); });
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i) { data(i) -= v_data(i); });
         exec.fence();
       }
 
       static void
       add_factor(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        Number          a,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+        const size_type                                            size,
+        Number                                                     a,
+        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::add_factor",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i) { data.values(i) += a; });
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i) { data(i) += a; });
         exec.fence();
       }
 
       static void
-      add_av(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    a,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      add_av(const size_type                                            size,
+             const Number                                               a,
+             const Kokkos::View<const Number *,
+                                typename MemorySpace::kokkos_space> &   v_data,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::add_av",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i) {
-            data.values(i) += a * v_data.values(i);
-          });
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i) { data(i) += a * v_data(i); });
         exec.fence();
       }
 
       static void
-      add_avpbw(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    a,
-        const Number    b,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &w_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      add_avpbw(const size_type                                         size,
+                const Number                                            a,
+                const Number                                            b,
+                const Kokkos::View<const Number *,
+                                   typename MemorySpace::kokkos_space> &v_data,
+                const Kokkos::View<const Number *,
+                                   typename MemorySpace::kokkos_space> &w_data,
+                Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::add_avpbw",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
-            data.values(i) += a * v_data.values(i) + b * w_data.values(i);
+            data(i) += a * v_data(i) + b * w_data(i);
           });
         exec.fence();
       }
 
       static void
-      sadd_xv(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    x,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      sadd_xv(const size_type                                            size,
+              const Number                                               x,
+              const Kokkos::View<const Number *,
+                                 typename MemorySpace::kokkos_space> &   v_data,
+              Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::sadd_xv",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i) {
-            data.values(i) = x * data.values(i) + v_data.values(i);
-          });
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i) { data(i) = x * data(i) + v_data(i); });
         exec.fence();
       }
 
       static void
-      sadd_xav(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    x,
-        const Number    a,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      sadd_xav(const size_type                                         size,
+               const Number                                            x,
+               const Number                                            a,
+               const Kokkos::View<const Number *,
+                                  typename MemorySpace::kokkos_space> &v_data,
+               Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::sadd_xav",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
-            data.values(i) = x * data.values(i) + a * v_data.values(i);
+            data(i) = x * data(i) + a * v_data(i);
           });
         exec.fence();
       }
 
       static void
       sadd_xavbw(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const Number    x,
         const Number    a,
         const Number    b,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &w_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
+          &v_data,
+        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
+          &                                                        w_data,
+        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::sadd_xavbw",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
-            data.values(i) =
-              x * data.values(i) + a * v_data.values(i) + b * w_data.values(i);
+            data(i) = x * data(i) + a * v_data(i) + b * w_data(i);
           });
         exec.fence();
       }
 
       static void
       multiply_factor(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    factor,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+        const size_type                                            size,
+        const Number                                               factor,
+        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::multiply_factor",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i) { data.values(i) *= factor; });
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i) { data(i) *= factor; });
         exec.fence();
       }
 
       static void
-      scale(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      scale(const size_type                                            size,
+            const Kokkos::View<const Number *,
+                               typename MemorySpace::kokkos_space> &   v_data,
+            Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::scale",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i) { data.values(i) *= v_data.values(i); });
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i) { data(i) *= v_data(i); });
         exec.fence();
       }
 
       static void
-      equ_au(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    a,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      equ_au(const size_type                                            size,
+             const Number                                               a,
+             const Kokkos::View<const Number *,
+                                typename MemorySpace::kokkos_space> &   v_data,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::equ_au",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i) {
-            data.values(i) = a * v_data.values(i);
-          });
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i) { data(i) = a * v_data(i); });
         exec.fence();
       }
 
       static void
-      equ_aubv(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const Number    a,
-        const Number    b,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &w_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      equ_aubv(const size_type                                         size,
+               const Number                                            a,
+               const Number                                            b,
+               const Kokkos::View<const Number *,
+                                  typename MemorySpace::kokkos_space> &v_data,
+               const Kokkos::View<const Number *,
+                                  typename MemorySpace::kokkos_space> &w_data,
+               Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_for(
           "dealii::equ_aubv",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
           KOKKOS_LAMBDA(size_type i) {
-            data.values(i) = a * v_data.values(i) + b * w_data.values(i);
+            data(i) = a * v_data(i) + b * w_data(i);
           });
         exec.fence();
       }
 
       static Number
-      dot(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-          const size_type size,
-          const ::dealii::MemorySpace::
-            MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-          ::dealii::MemorySpace::MemorySpaceData<Number,
-                                                 ::dealii::MemorySpace::Default>
-            &data)
+      dot(const size_type size,
+          const Kokkos::View<Number2 *, typename MemorySpace::kokkos_space>
+            &                                                        v_data,
+          Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         Number result;
 
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_reduce(
           "dealii::dot",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
-            update += data.values(i) * v_data.values(i);
+            update += data(i) * v_data(i);
           },
           result);
 
@@ -2467,35 +1616,34 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_2(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-               &             thread_loop_partitioner,
-             const size_type size,
-             real_type &     sum,
-             ::dealii::MemorySpace::
-               MemorySpaceData<Number, ::dealii::MemorySpace::Default> &data)
+      norm_2(const size_type                                            size,
+             real_type &                                                sum,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        sum = dot(thread_loop_partitioner, size, data, data);
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
+        Kokkos::parallel_reduce(
+          "norm_2",
+          Kokkos::RangePolicy<
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i, real_type & update) {
+            update += numbers::NumberTraits<Number>::abs_square(data(i));
+          },
+          sum);
       }
 
       static Number
-      mean_value(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &data)
+      mean_value(const size_type                                         size,
+                 const Kokkos::View<const Number *,
+                                    typename MemorySpace::kokkos_space> &data)
       {
         Number result;
 
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_reduce(
           "dealii::mean_value",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i, Number & update) {
-            update += data.values(i);
-          },
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i, Number & update) { update += data(i); },
           result);
 
         AssertIsFinite(result);
@@ -2504,59 +1652,43 @@ namespace internal
 
       template <typename real_type>
       static void
-      norm_1(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        real_type &     sum,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      norm_1(const size_type                                            size,
+             real_type &                                                sum,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_reduce(
           "dealii::norm_1",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i, Number & update) {
-#if KOKKOS_VERSION < 30400
-            update += std::abs(data.values(i));
-#elif KOKKOS_VERSION < 30700
-            update += Kokkos::Experimental::fabs(data.values(i));
-#else
-            update += Kokkos::abs(data.values(i));
-#endif
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i, real_type & update) {
+            update += numbers::NumberTraits<Number>::abs(data(i));
           },
           sum);
       }
 
       template <typename real_type>
       static void
-      norm_p(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
-        const size_type size,
-        real_type &     sum,
-        real_type       exp,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+      norm_p(const size_type                                            size,
+             real_type &                                                sum,
+             real_type                                                  exp,
+             Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_reduce(
           "dealii::norm_p",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i, Number & update) {
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
+          KOKKOS_LAMBDA(size_type i, real_type & update) {
 #if KOKKOS_VERSION < 30400
-            update += std::pow(fabs(data.values(i)), exp);
+            update +=
+              std::pow(numbers::NumberTraits<Number>::abs(data(i)), exp);
 #elif KOKKOS_VERSION < 30700
             update += Kokkos::Experimental::pow(
-              Kokkos::Experimental::fabs(data.values(i)), exp);
+              numbers::NumberTraits<Number>::abs(data(i)), exp);
 #else
-            update += Kokkos::pow(Kokkos::abs(data.values(i)), exp);
+            update +=
+              Kokkos::pow(numbers::NumberTraits<Number>::abs(data(i)), exp);
 #endif
           },
           sum);
@@ -2564,31 +1696,26 @@ namespace internal
 
       static Number
       add_and_dot(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &,
         const size_type size,
         const Number    a,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &v_data,
-        const ::dealii::MemorySpace::
-          MemorySpaceData<Number, ::dealii::MemorySpace::Default> &w_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data)
+        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
+          &v_data,
+        const Kokkos::View<const Number *, typename MemorySpace::kokkos_space>
+          &                                                        w_data,
+        Kokkos::View<Number *, typename MemorySpace::kokkos_space> data)
       {
         Number res;
 
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
+        auto exec = typename MemorySpace::kokkos_space::execution_space{};
         Kokkos::parallel_reduce(
           "dealii::add_and_dot",
           Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
+            typename MemorySpace::kokkos_space::execution_space>(exec, 0, size),
           KOKKOS_LAMBDA(size_type i, Number & update) {
-            data.values(i) += a * v_data.values(i);
+            data(i) += a * v_data(i);
             update +=
-              data.values(i) * Number(numbers::NumberTraits<Number>::conjugate(
-                                 w_data.values(i)));
+              data(i) *
+              Number(numbers::NumberTraits<Number>::conjugate(w_data(i)));
           },
           res);
 
@@ -2598,26 +1725,21 @@ namespace internal
       template <typename MemorySpace2>
       static void
       import_elements(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          &                     thread_loop_partitioner,
         const size_type         size,
         VectorOperation::values operation,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-          &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data,
-        std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::Default>::value,
-          int> = 0)
+        const Kokkos::View<const Number *, typename MemorySpace2::kokkos_space>
+          &                                                         v_data,
+        Kokkos::View<Number *, typename MemorySpace::kokkos_space> &data,
+        std::enable_if_t<std::is_same<MemorySpace, MemorySpace2>::value> * =
+          nullptr)
       {
         if (operation == VectorOperation::insert)
           {
-            copy(thread_loop_partitioner, size, v_data, data);
+            copy<MemorySpace2>(size, v_data, data);
           }
         else if (operation == VectorOperation::add)
           {
-            add_vector(thread_loop_partitioner, size, v_data, data);
+            add_vector(size, v_data, data);
           }
         else
           {
@@ -2628,26 +1750,17 @@ namespace internal
       template <typename MemorySpace2>
       static void
       import_elements(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner>
-          & /*thread_loop_partitioner*/,
         const size_type         size,
         VectorOperation::values operation,
-        const ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace2>
-          &v_data,
-        ::dealii::MemorySpace::MemorySpaceData<Number,
-                                               ::dealii::MemorySpace::Default>
-          &data,
-        std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
-          int> = 0)
+        const Kokkos::View<const Number *, typename MemorySpace2::kokkos_space>
+          &                                                         v_data,
+        Kokkos::View<Number *, typename MemorySpace::kokkos_space> &data,
+        std::enable_if_t<!std::is_same<MemorySpace, MemorySpace2>::value> * =
+          nullptr)
       {
         if (operation == VectorOperation::insert)
           {
-            Kokkos::deep_copy(
-              Kokkos::subview(data.values,
-                              Kokkos::pair<size_type, size_type>(0, size)),
-              Kokkos::subview(v_data.values,
-                              Kokkos::pair<size_type, size_type>(0, size)));
+            copy<MemorySpace2>(size, v_data, data);
           }
         else
           {

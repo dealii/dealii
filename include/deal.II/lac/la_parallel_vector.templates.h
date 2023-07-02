@@ -897,11 +897,10 @@ namespace LinearAlgebra
       if (partitioner->locally_owned_size() > 0)
         {
           dealii::internal::VectorOperations::
-            functions<Number, Number2, MemorySpaceType>::copy(
-              thread_loop_partitioner,
-              partitioner->locally_owned_size(),
-              src.data,
-              data);
+            functions<Number, Number2, MemorySpaceType>::template copy<
+              MemorySpaceType>(partitioner->locally_owned_size(),
+                               src.data.values,
+                               data.values);
         }
     }
 
@@ -921,8 +920,11 @@ namespace LinearAlgebra
       Assert(partitioner->ghost_indices() == src.partitioner->ghost_indices(),
              ExcMessage("Ghost indices should be identical."));
       ::dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpaceType>::import_elements(
-          thread_loop_partitioner, allocated_size, operation, src.data, data);
+        functions<Number, Number, MemorySpaceType>::template import_elements<
+          MemorySpaceType2>(allocated_size,
+                            operation,
+                            src.data.values,
+                            data.values);
     }
 
 
@@ -1160,7 +1162,6 @@ namespace LinearAlgebra
           data.values_host_buffer =
             Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
                                                 data.values);
-
           partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
             communication_channel,
             ArrayView<const Number, MemorySpace::Host>(
@@ -1410,8 +1411,9 @@ namespace LinearAlgebra
       if (this_size > 0)
         {
           dealii::internal::VectorOperations::
-            functions<Number, Number, MemorySpaceType>::set(
-              thread_loop_partitioner, this_size, s, data);
+            functions<Number, Number, MemorySpaceType>::set(this_size,
+                                                            s,
+                                                            data.values);
         }
 
       // if we call Vector::operator=0, we want to zero out all the entries
@@ -1455,10 +1457,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::add_vector(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          v.data,
-          data);
+          partitioner->locally_owned_size(), v.data.values, data.values);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1483,10 +1482,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::subtract_vector(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          v.data,
-          data);
+          partitioner->locally_owned_size(), v.data.values, data.values);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1504,7 +1500,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::add_factor(
-          thread_loop_partitioner, partitioner->locally_owned_size(), a, data);
+          partitioner->locally_owned_size(), a, data.values);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1533,11 +1529,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::add_av(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          a,
-          v.data,
-          data);
+          partitioner->locally_owned_size(), a, v.data.values, data.values);
     }
 
 
@@ -1579,13 +1571,12 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::add_avpbw(
-          thread_loop_partitioner,
           partitioner->locally_owned_size(),
           a,
           b,
-          v.data,
-          w.data,
-          data);
+          v.data.values,
+          w.data.values,
+          data.values);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1617,11 +1608,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::sadd_xv(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          x,
-          v.data,
-          data);
+          partitioner->locally_owned_size(), x, v.data.values, data.values);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1648,12 +1635,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::sadd_xav(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          x,
-          a,
-          v.data,
-          data);
+          partitioner->locally_owned_size(), x, a, v.data.values, data.values);
     }
 
 
@@ -1680,10 +1662,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::multiply_factor(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          factor,
-          data);
+          partitioner->locally_owned_size(), factor, data.values);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1716,8 +1695,9 @@ namespace LinearAlgebra
       AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
-        functions<Number, Number, MemorySpaceType>::scale(
-          thread_loop_partitioner, locally_owned_size(), v.data, data);
+        functions<Number, Number, MemorySpaceType>::scale(locally_owned_size(),
+                                                          v.data.values,
+                                                          data.values);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1741,12 +1721,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::equ_au(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          a,
-          v.data,
-          data);
-
+          partitioner->locally_owned_size(), a, v.data.values, data.values);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1793,10 +1768,7 @@ namespace LinearAlgebra
 
       return dealii::internal::VectorOperations::
         functions<Number, Number2, MemorySpaceType>::dot(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          v.data,
-          data);
+          partitioner->locally_owned_size(), v.data.values, data.values);
     }
 
 
@@ -1830,10 +1802,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::norm_2(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          sum,
-          data);
+          partitioner->locally_owned_size(), sum, data.values);
 
       AssertIsFinite(sum);
 
@@ -1853,7 +1822,7 @@ namespace LinearAlgebra
 
       Number sum = ::dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::mean_value(
-          thread_loop_partitioner, partitioner->locally_owned_size(), data);
+          partitioner->locally_owned_size(), data.values);
 
       return sum / real_type(partitioner->locally_owned_size());
     }
@@ -1885,10 +1854,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::norm_1(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          sum,
-          data);
+          partitioner->locally_owned_size(), sum, data.values);
 
       return sum;
     }
@@ -1940,11 +1906,7 @@ namespace LinearAlgebra
 
       dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::norm_p(
-          thread_loop_partitioner,
-          partitioner->locally_owned_size(),
-          sum,
-          p,
-          data);
+          partitioner->locally_owned_size(), sum, p, data.values);
 
       return std::pow(sum, 1. / p);
     }
@@ -2010,7 +1972,7 @@ namespace LinearAlgebra
 
       Number sum = dealii::internal::VectorOperations::
         functions<Number, Number, MemorySpaceType>::add_and_dot(
-          thread_loop_partitioner, vec_size, a, v.data, w.data, data);
+          vec_size, a, v.data.values, w.data.values, data.values);
 
       AssertIsFinite(sum);
 
