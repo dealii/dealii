@@ -1,12 +1,16 @@
 #
-# Parse all diff files...
+# We now parse all diff files and create rules to generate the step-*.cc
+# files.
+#
+# Here, ${_base_directory} points to the base "tests/examples" directory,
+# and ${DEAL_II_SOURCE_DIR} points to the deal.II main repository root.
 #
 
 file(GLOB _diff_files "${_base_directory}/*.diff")
 foreach(_diff_file ${_diff_files})
   get_filename_component(_step "${_diff_file}" NAME_WLE)
   set(_source_file "${DEAL_II_SOURCE_DIR}/examples/${_step}/${_step}.cc")
-  set(_output_file "${_source_directory}/${_step}.cc")
+  set(_output_file "${CMAKE_CURRENT_SOURCE_DIR}/${_step}.cc")
 
   # ... and create a rule that updates all diff files if necessary during
   # testsuite invocation:
@@ -24,7 +28,7 @@ foreach(_diff_file ${_diff_files})
   file(GLOB _output_files "${_base_directory}/${_step}*.output*")
   foreach(_file ${_output_files})
     get_filename_component(_destination "${_file}" NAME)
-    set(_destination "${_source_directory}/${_destination}")
+    set(_destination "${CMAKE_CURRENT_SOURCE_DIR}/${_destination}")
     file(CREATE_LINK ${_file} ${_destination} SYMBOLIC)
   endforeach()
 endforeach()

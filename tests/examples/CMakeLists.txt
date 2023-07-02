@@ -21,7 +21,7 @@ if (EXISTS "${DEAL_II_SOURCE_DIR}/examples")
   #
   # Create CMake file structure in the current binary dir:
   #
-  set(_base_directory "${CMAKE_CURRENT_SOURCE_DIR}")
+  set(_base_directory   "${CMAKE_CURRENT_SOURCE_DIR}")
   set(_source_directory "${CMAKE_CURRENT_BINARY_DIR}/source")
   set(_binary_directory "${CMAKE_CURRENT_BINARY_DIR}/binary")
   message(STATUS "Temporary source directory: ${_source_directory}")
@@ -37,7 +37,8 @@ if (EXISTS "${DEAL_II_SOURCE_DIR}/examples")
   enable_testing()
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CTestFile.cmake" "subdirs(binary)")
 
-  # and now call into the second half of our setup in the writable "source"
-  # directory:
+  #
+  # and call into the freshly created "source" directory:
+  #
   add_subdirectory(${_source_directory} ${_binary_directory})
 endif()
