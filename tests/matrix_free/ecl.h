@@ -186,9 +186,9 @@ test(const unsigned int geometry      = 0,
               phi_m.submit_value(average_valgrad, q);
               phi_p.submit_value(-average_valgrad, q);
             }
-          phi_m.integrate(true, true);
+          phi_m.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
           phi_m.distribute_local_to_global(dst);
-          phi_p.integrate(true, true);
+          phi_p.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
           phi_p.distribute_local_to_global(dst);
         }
     },

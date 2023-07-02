@@ -804,9 +804,9 @@ public:
              ++cell)
           {
             phi_m.reinit(cell);
-            phi_m.gather_evaluate(src, true, false);
+            phi_m.gather_evaluate(src, EvaluationFlags::values);
             phi_p.reinit(cell);
-            phi_p.gather_evaluate(src, true, false);
+            phi_p.gather_evaluate(src, EvaluationFlags::values);
             for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
               {
                 const auto beta_n = this->beta(phi_m.quadrature_point(q)) *
