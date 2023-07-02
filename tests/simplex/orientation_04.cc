@@ -35,7 +35,7 @@ test(const ReferenceCell type, const unsigned int n_orientations)
 
       const auto permuted = type.permute_according_orientation(origin, o);
       const unsigned int origin_back =
-        type.compute_orientation(permuted, origin);
+        type.compute_orientation(origin, permuted);
 
       // AssertDimension(o, origin_back);
       deallog << o << " " << origin_back << std::endl;
@@ -58,7 +58,7 @@ test(const ReferenceCell type, const unsigned int n_orientations)
         permuted[permutedi[i]] = origin[i];
 
       const unsigned int origin_back =
-        type.compute_orientation(origin, permuted);
+        type.compute_orientation(permuted, origin);
 
       // AssertDimension(o, origin_back);
       deallog << o << " " << origin_back << std::endl;

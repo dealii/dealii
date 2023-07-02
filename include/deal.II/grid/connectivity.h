@@ -1168,11 +1168,11 @@ namespace internal
                 offset_i,
                 ad_entity_types[offset_i]
                   .template get_combined_orientation<unsigned int>(
-                    make_array_view(ref_indices.begin(),
-                                    ref_indices.begin() +
-                                      ad_entity_types[offset_i].n_vertices()),
                     make_array_view(ad_entity_vertices[offset_i].begin(),
                                     ad_entity_vertices[offset_i].begin() +
+                                      ad_entity_types[offset_i].n_vertices()),
+                    make_array_view(ref_indices.begin(),
+                                    ref_indices.begin() +
                                       ad_entity_types[offset_i].n_vertices())));
             }
           col_d[offset_i] = counter;

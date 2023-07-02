@@ -23,7 +23,7 @@ POINTS 10 double
 CELLS 3 21
 8 0 1 3 2 4 5 7 6
 5 4 5 7 6 8
-5 3 7 5 1 9
+5 5 1 3 7 9
 
 CELL_TYPES 3
 12 14 14 

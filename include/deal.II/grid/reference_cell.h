@@ -2753,11 +2753,11 @@ ReferenceCell::get_combined_orientation(
 
         // face_orientation=true, face_rotation=true, face_flip=false
         if (v0_equals({vertices_1[1], vertices_1[2], vertices_1[0]}))
-          return 3;
+          return 5;
 
         // face_orientation=true, face_rotation=false, face_flip=true
         if (v0_equals({vertices_1[2], vertices_1[0], vertices_1[1]}))
-          return 5;
+          return 3;
 
         // face_orientation=false, face_rotation=false, face_flip=false
         if (v0_equals({vertices_1[0], vertices_1[2], vertices_1[1]}))
