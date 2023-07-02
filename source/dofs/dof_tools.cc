@@ -554,8 +554,8 @@ namespace DoFTools
              "This function can not be used with distributed triangulations. "
              "See the documentation for more information."));
 
-    IndexSet indices;
-    extract_boundary_dofs(dof_handler, component_mask, indices, boundary_ids);
+    IndexSet indices =
+      extract_boundary_dofs(dof_handler, component_mask, boundary_ids);
 
     // clear and reset array by default values
     selected_dofs.clear();

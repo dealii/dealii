@@ -140,14 +140,10 @@ namespace Step11
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
-    std::vector<bool> boundary_dofs(dof_handler.n_dofs(), false);
-    DoFTools::extract_boundary_dofs(dof_handler,
-                                    ComponentMask(),
-                                    boundary_dofs);
+    const IndexSet boundary_dofs =
+      DoFTools::extract_boundary_dofs(dof_handler, ComponentMask());
 
-    const unsigned int first_boundary_dof = std::distance(
-      boundary_dofs.begin(),
-      std::find(boundary_dofs.begin(), boundary_dofs.end(), true));
+    const unsigned int first_boundary_dof = *boundary_dofs.begin();
 
     // Then generate a constraints object with just this one constraint. First
     // clear all previous content (which might reside there from the previous
@@ -160,7 +156,7 @@ namespace Step11
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     constraints.add_line(first_boundary_dof);
     for (unsigned int i = first_boundary_dof + 1; i < dof_handler.n_dofs(); ++i)
-      if (boundary_dofs[i] == true)
+      if (boundary_dofs.is_element(i))
         constraints.add_entry(first_boundary_dof, i, -1);
     constraints.close();
 

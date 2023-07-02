@@ -180,16 +180,15 @@ ImposeBC<dim>::test_extract_boundary_DoFs()
   bc_component_select[1] = true;
   bc_component_select[2] = false;
 
-  std::vector<bool>                  ned_boundary_dofs(dof_handler.n_dofs());
   const std::set<types::boundary_id> boundary_ids = {0};
-  DoFTools::extract_boundary_dofs(dof_handler,
-                                  bc_component_select,
-                                  ned_boundary_dofs,
-                                  boundary_ids);
+  const IndexSet                     ned_boundary_dofs =
+    DoFTools::extract_boundary_dofs(dof_handler,
+                                    bc_component_select,
+                                    boundary_ids);
 
 
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
-    if (ned_boundary_dofs[i] == true)
+    if (ned_boundary_dofs.is_element(i))
       boundary_values[i] = 0.;
 }
 
@@ -218,12 +217,11 @@ ImposeBC<dim>::test_interpolate_BC()
   // check
   // (the pressure is assumed to be set to 1
   // on the boundary)
-  std::vector<bool>                  p_boundary_dofs(dof_handler.n_dofs());
   const std::set<types::boundary_id> boundary_ids = {0};
-  DoFTools::extract_boundary_dofs(dof_handler,
-                                  bc_component_select,
-                                  p_boundary_dofs,
-                                  boundary_ids);
+  const IndexSet                     p_boundary_dofs =
+    DoFTools::extract_boundary_dofs(dof_handler,
+                                    bc_component_select,
+                                    boundary_ids);
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
     {
       // error: pressure boundary DoF
@@ -235,8 +233,9 @@ ImposeBC<dim>::test_interpolate_BC()
       // nedelec boundary DoF i has
       // wrongly been set to some
       // value
-      AssertThrow((p_boundary_dofs[i] && boundary_values[i] == 1.) ||
-                    (!(p_boundary_dofs[i]) && boundary_values[i] != 1.),
+      AssertThrow((p_boundary_dofs.is_element(i) && boundary_values[i] == 1.) ||
+                    (!(p_boundary_dofs.is_element(i)) &&
+                     boundary_values[i] != 1.),
                   ExcInternalError());
 
       deallog << boundary_values[i] << ' ';

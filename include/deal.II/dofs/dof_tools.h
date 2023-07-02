@@ -1263,67 +1263,6 @@ namespace DoFTools
   /**
    * Extract all degrees of freedom which are at the boundary and belong to
    * specified components of the solution. The function returns its results in
-   * the last non-default-valued parameter which contains @p true if a degree
-   * of freedom is at the boundary and belongs to one of the selected
-   * components, and @p false otherwise.
-   *
-   * By specifying the @p boundary_ids variable, you can select which boundary
-   * indicators the faces have to have on which the degrees of freedom are
-   * located that shall be extracted. If it is an empty list, then all
-   * boundary indicators are accepted.
-   *
-   * The size of @p component_mask (see
-   * @ref GlossComponentMask)
-   * shall equal the number of components in the finite element used by @p
-   * dof. The size of @p selected_dofs shall equal
-   * <tt>dof_handler.n_dofs()</tt>. Previous contents of this array are
-   * overwritten.
-   *
-   * Using the usual convention, if a shape function is non-zero in more than
-   * one component (i.e. it is non-primitive), then the element in the
-   * component mask is used that corresponds to the first non-zero components.
-   * Elements in the mask corresponding to later components are ignored.
-   *
-   * @deprecated This function will not work for DoFHandler objects that are built
-   * on a parallel::distributed::Triangulation object. The reasons is that the
-   * output argument @p selected_dofs has to have a length equal to <i>all</i>
-   * global degrees of freedom. Consequently, this does not scale to very
-   * large problems, and this is also why the function is deprecated. If you
-   * need the functionality of this function for
-   * parallel triangulations, then you need to use the other
-   * DoFTools::extract_boundary_dofs() function that returns its information
-   * via an IndexSet object.
-   *
-   * @param[in] dof_handler The object that describes which degrees of freedom
-   * live on which cell.
-   * @param[in] component_mask A mask denoting the vector components of the
-   * finite element that should be considered (see also
-   * @ref GlossComponentMask).
-   * @param[out] selected_dofs A vector of booleans that is returned and for
-   * which
-   * an element will be @p true if the corresponding index is a
-   * degree of freedom that is located on the
-   * boundary (and correspond to the selected vector components and boundary
-   * indicators, depending on the values of the @p component_mask and @p
-   * boundary_ids arguments).
-   * @param[in] boundary_ids If empty, this function extracts the indices of the
-   * degrees of freedom for all parts of the boundary. If it is a non- empty
-   * list, then the function only considers boundary faces with the boundary
-   * indicators listed in this argument.
-   *
-   * @see
-   * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
-                        const ComponentMask &               component_mask,
-                        std::vector<bool> &                 selected_dofs,
-                        const std::set<types::boundary_id> &boundary_ids = {});
-
-  /**
-   * Extract all degrees of freedom which are at the boundary and belong to
-   * specified components of the solution. The function returns its results in
    * the form of an IndexSet that contains those entries that correspond to
    * these selected degrees of freedom, i.e., which are at the boundary and
    * belong to one of the selected components.
@@ -1367,19 +1306,6 @@ namespace DoFTools
   IndexSet
   extract_boundary_dofs(const DoFHandler<dim, spacedim> &dof_handler,
                         const ComponentMask &component_mask = ComponentMask(),
-                        const std::set<types::boundary_id> &boundary_ids = {});
-
-  /**
-   * The same as the previous function, except that it returns its information
-   * via the third argument.
-   *
-   * @deprecated Use the previous function instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
-                        const ComponentMask &               component_mask,
-                        IndexSet &                          selected_dofs,
                         const std::set<types::boundary_id> &boundary_ids = {});
 
   /**
