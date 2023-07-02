@@ -41,12 +41,12 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim, bool lda>
-template <class InputVector, typename number>
+template <typename Number>
 void
 DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
-  const InputVector &   values,
-  Vector<number> &      interpolated_values,
-  const types::fe_index fe_index_) const
+  const ReadVector<Number> &values,
+  Vector<Number> &          interpolated_values,
+  const types::fe_index     fe_index_) const
 {
   const types::fe_index fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
@@ -78,7 +78,7 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
             }
           else
             {
-              Vector<number> tmp(dofs_per_cell);
+              Vector<Number> tmp(dofs_per_cell);
               this->get_dof_values(values, tmp);
 
               FullMatrix<double> interpolation(
@@ -130,8 +130,8 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
       // anyway (and in fact is of size zero, see the assertion above)
       if (fe.n_dofs_per_cell() > 0)
         {
-          Vector<number> tmp1(dofs_per_cell);
-          Vector<number> tmp2(dofs_per_cell);
+          Vector<Number> tmp1(dofs_per_cell);
+          Vector<Number> tmp2(dofs_per_cell);
 
           interpolated_values = 0;
 
@@ -177,7 +177,7 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 if (fe.restriction_is_additive(i))
                   interpolated_values(i) += tmp2(i);
-                else if (tmp2(i) != number())
+                else if (tmp2(i) != Number())
                   interpolated_values(i) = tmp2(i);
             }
         }

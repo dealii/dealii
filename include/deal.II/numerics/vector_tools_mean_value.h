@@ -19,6 +19,8 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/lac/read_vector.h>
+
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -161,47 +163,39 @@ namespace VectorTools
    * finite element function with mean value zero. In fact, it only works for
    * Lagrangian elements. For all other elements, you will need to compute the
    * mean value and subtract it right inside the evaluation routine.
-   *
-   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
-  template <int dim, typename VectorType, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
-  typename VectorType::value_type compute_mean_value(
+  template <int dim, typename Number, int spacedim>
+  Number
+  compute_mean_value(
     const hp::MappingCollection<dim, spacedim> &mapping_collection,
     const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q_collection,
-    const VectorType &                          v,
+    const ReadVector<Number> &                  v,
     const unsigned int                          component);
 
   /**
    * Calls the other compute_mean_value() function, see above, for the non-hp
    * case. That means, it requires a single FiniteElement, a single Quadrature,
    * and a single Mapping object.
-   *
-   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
-  template <int dim, typename VectorType, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
-  typename VectorType::value_type
-    compute_mean_value(const Mapping<dim, spacedim> &   mapping,
-                       const DoFHandler<dim, spacedim> &dof,
-                       const Quadrature<dim> &          quadrature,
-                       const VectorType &               v,
-                       const unsigned int               component);
+  template <int dim, typename Number, int spacedim>
+  Number
+  compute_mean_value(const Mapping<dim, spacedim> &   mapping,
+                     const DoFHandler<dim, spacedim> &dof,
+                     const Quadrature<dim> &          quadrature,
+                     const ReadVector<Number> &       v,
+                     const unsigned int               component);
 
   /**
    * Call the other compute_mean_value() function, see above, with
    * <tt>mapping=MappingQ@<dim@>(1)</tt>.
-   *
-   * @dealiiConceptRequires{concepts::is_dealii_vector_type<VectorType>}
    */
-  template <int dim, typename VectorType, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
-  typename VectorType::value_type
-    compute_mean_value(const DoFHandler<dim, spacedim> &dof,
-                       const Quadrature<dim> &          quadrature,
-                       const VectorType &               v,
-                       const unsigned int               component);
+  template <int dim, typename Number, int spacedim>
+  Number
+  compute_mean_value(const DoFHandler<dim, spacedim> &dof,
+                     const Quadrature<dim> &          quadrature,
+                     const ReadVector<Number> &       v,
+                     const unsigned int               component);
   /** @} */
 } // namespace VectorTools
 

@@ -558,6 +558,22 @@ Vector<Number>::add_and_dot(const Number          a,
 
 
 template <typename Number>
+void
+Vector<Number>::extract_subvector_to(
+  const ArrayView<const types::global_dof_index> &indices,
+  ArrayView<Number> &                             elements) const
+{
+  AssertDimension(indices.size(), elements.size());
+  for (unsigned int i = 0; i < indices.size(); ++i)
+    {
+      AssertIndexRange(indices[i], size());
+      elements[i] = (*this)[indices[i]];
+    }
+}
+
+
+
+template <typename Number>
 Vector<Number> &
 Vector<Number>::operator+=(const Vector<Number> &v)
 {

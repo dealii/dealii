@@ -24,6 +24,8 @@
 
 #include <deal.II/grid/tria_accessor.h>
 
+#include <deal.II/lac/read_vector.h>
+
 #include <boost/container/small_vector.hpp>
 
 #include <set>
@@ -1589,11 +1591,11 @@ public:
    * caller to assure that the types of the numbers stored in input and output
    * vectors are compatible and with similar accuracy.
    */
-  template <class InputVector, typename ForwardIterator>
+  template <typename Number, typename ForwardIterator>
   void
-  get_dof_values(const InputVector &values,
-                 ForwardIterator    local_values_begin,
-                 ForwardIterator    local_values_end) const;
+  get_dof_values(const ReadVector<Number> &values,
+                 ForwardIterator           local_values_begin,
+                 ForwardIterator           local_values_end) const;
 
   /**
    * Collect the values of the given vector restricted to the dofs of this cell
@@ -1683,12 +1685,12 @@ public:
    * interpolation is presently only provided for cells by the finite element
    * classes.
    */
-  template <class InputVector, typename number>
+  template <typename Number>
   void
   get_interpolated_dof_values(
-    const InputVector &   values,
-    Vector<number> &      interpolated_values,
-    const types::fe_index fe_index = numbers::invalid_fe_index) const;
+    const ReadVector<Number> &values,
+    Vector<Number> &          interpolated_values,
+    const types::fe_index     fe_index = numbers::invalid_fe_index) const;
 
   /**
    * This function is the counterpart to get_interpolated_dof_values(): you

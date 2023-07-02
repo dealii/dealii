@@ -290,17 +290,15 @@ namespace VectorTools
 
 
 
-  template <int dim, typename VectorType, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
-  typename VectorType::value_type compute_mean_value(
+  template <int dim, typename Number, int spacedim>
+  Number
+  compute_mean_value(
     const hp::MappingCollection<dim, spacedim> &mapping_collection,
     const DoFHandler<dim, spacedim> &           dof,
     const hp::QCollection<dim> &                q_collection,
-    const VectorType &                          v,
+    const ReadVector<Number> &                  v,
     const unsigned int                          component)
   {
-    using Number = typename VectorType::value_type;
-
     const hp::FECollection<dim, spacedim> &fe_collection =
       dof.get_fe_collection();
     const unsigned int n_components = fe_collection.n_components();
@@ -371,14 +369,13 @@ namespace VectorTools
   }
 
 
-  template <int dim, typename VectorType, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
-  typename VectorType::value_type
-    compute_mean_value(const Mapping<dim, spacedim> &   mapping,
-                       const DoFHandler<dim, spacedim> &dof,
-                       const Quadrature<dim> &          quadrature,
-                       const VectorType &               v,
-                       const unsigned int               component)
+  template <int dim, typename Number, int spacedim>
+  Number
+  compute_mean_value(const Mapping<dim, spacedim> &   mapping,
+                     const DoFHandler<dim, spacedim> &dof,
+                     const Quadrature<dim> &          quadrature,
+                     const ReadVector<Number> &       v,
+                     const unsigned int               component)
   {
     return compute_mean_value(hp::MappingCollection<dim, spacedim>(mapping),
                               dof,
@@ -388,13 +385,12 @@ namespace VectorTools
   }
 
 
-  template <int dim, typename VectorType, int spacedim>
-  DEAL_II_CXX20_REQUIRES(concepts::is_dealii_vector_type<VectorType>)
-  typename VectorType::value_type
-    compute_mean_value(const DoFHandler<dim, spacedim> &dof,
-                       const Quadrature<dim> &          quadrature,
-                       const VectorType &               v,
-                       const unsigned int               component)
+  template <int dim, typename Number, int spacedim>
+  Number
+  compute_mean_value(const DoFHandler<dim, spacedim> &dof,
+                     const Quadrature<dim> &          quadrature,
+                     const ReadVector<Number> &       v,
+                     const unsigned int               component)
   {
     return compute_mean_value(get_default_linear_mapping(
                                 dof.get_triangulation()),

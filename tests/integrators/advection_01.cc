@@ -63,7 +63,7 @@ test_cell(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(u, indices, uval, true);
+        fev.get_function_values(u, indices, make_array_view(uval), true);
         cell_residual(w, fev, uval, vel);
         M.vmult(v, u);
         w.add(-1., v);
@@ -118,7 +118,7 @@ test_boundary(const FEValuesBase<dim> &fev)
         u    = 0.;
         u(i) = 1.;
         w    = 0.;
-        fev.get_function_values(u, indices, uval, true);
+        fev.get_function_values(u, indices, make_array_view(uval), true);
         upwind_value_residual(w, fev, uval, null_val, vel);
         M.vmult(v, u);
         w.add(-1., v);
@@ -191,7 +191,7 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
         u1(i1) = 1.;
         w1     = 0.;
         w2     = 0.;
-        fev1.get_function_values(u1, indices1, u1val, true);
+        fev1.get_function_values(u1, indices1, make_array_view(u1val), true);
         upwind_face_residual(w1, w2, fev1, fev2, u1val, nullval, vel);
         M11.vmult(v1, u1);
         w1.add(-1., v1);
@@ -213,7 +213,7 @@ test_face(const FEValuesBase<dim> &fev1, const FEValuesBase<dim> &fev2)
           }
         w1 = 0.;
         w2 = 0.;
-        fev2.get_function_values(u1, indices2, u1val, true);
+        fev2.get_function_values(u1, indices2, make_array_view(u1val), true);
         upwind_face_residual(w1, w2, fev1, fev2, nullval, u1val, vel);
         M12.vmult(v1, u1);
         w1.add(-1., v1);

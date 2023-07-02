@@ -25,6 +25,7 @@
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/subscriptor.h>
 
+#  include <deal.II/lac/read_vector.h>
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_space_vector.h>
@@ -61,9 +62,14 @@ namespace LinearAlgebra
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public VectorSpaceVector<double>, public Subscriptor
+    class Vector : public VectorSpaceVector<double>,
+                   public ReadVector<double>,
+                   public Subscriptor
     {
     public:
+      using value_type = double;
+      using size_type  = types::global_dof_index;
+
       /**
        * Constructor. Create a vector of dimension zero.
        */
@@ -102,6 +108,14 @@ namespace LinearAlgebra
       virtual void
       reinit(const VectorSpaceVector<double> &V,
              const bool omit_zeroing_entries = false) override;
+
+      /**
+       * Extract a range of elements all at once.
+       */
+      virtual void
+      extract_subvector_to(
+        const ArrayView<const types::global_dof_index> &indices,
+        ArrayView<double> &elements) const override;
 
       /**
        * Copy function. This function takes a Vector and copies all the
