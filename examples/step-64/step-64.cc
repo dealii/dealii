@@ -131,7 +131,9 @@ namespace Step64
       const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
       double *                                                    coef,
       int                                                         cell)
-      : coef(coef)
+      : gpu_data(gpu_data)
+      , coef(coef)
+      , cell(cell)
     {}
 
     DEAL_II_HOST_DEVICE void operator()(
@@ -244,16 +246,17 @@ namespace Step64
                       const AffineConstraints<double> &constraints);
 
     void
-    vmult(LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &dst,
-          const LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
+    vmult(LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &dst,
+          const LinearAlgebra::distributed::Vector<double, MemorySpace::Default>
             &src) const;
 
     void initialize_dof_vector(
-      LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &vec) const;
+      LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &vec)
+      const;
 
   private:
-    CUDAWrappers::MatrixFree<dim, double>       mf_data;
-    LinearAlgebra::CUDAWrappers::Vector<double> coef;
+    CUDAWrappers::MatrixFree<dim, double>                            mf_data;
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Default> coef;
   };
 
 
@@ -307,8 +310,8 @@ namespace Step64
   // destination vector afterwards.
   template <int dim, int fe_degree>
   void HelmholtzOperator<dim, fe_degree>::vmult(
-    LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &      dst,
-    const LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &src)
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &      dst,
+    const LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &src)
     const
   {
     dst = 0.;
@@ -322,7 +325,7 @@ namespace Step64
 
   template <int dim, int fe_degree>
   void HelmholtzOperator<dim, fe_degree>::initialize_dof_vector(
-    LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> &vec) const
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &vec) const
   {
     mf_data.initialize_dof_vector(vec);
   }
@@ -379,8 +382,9 @@ namespace Step64
     // can view and display the solution as usual.
     LinearAlgebra::distributed::Vector<double, MemorySpace::Host>
       ghost_solution_host;
-    LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA> solution_dev;
-    LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Default>
+      solution_dev;
+    LinearAlgebra::distributed::Vector<double, MemorySpace::Default>
       system_rhs_dev;
 
     ConditionalOStream pcout;
@@ -517,8 +521,8 @@ namespace Step64
 
     SolverControl solver_control(system_rhs_dev.size(),
                                  1e-12 * system_rhs_dev.l2_norm());
-    SolverCG<LinearAlgebra::distributed::Vector<double, MemorySpace::CUDA>> cg(
-      solver_control);
+    SolverCG<LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>
+      cg(solver_control);
     cg.solve(*system_matrix_dev, solution_dev, system_rhs_dev, preconditioner);
 
     pcout << "  Solved in " << solver_control.last_step() << " iterations."
@@ -632,15 +636,6 @@ int main(int argc, char *argv[])
       using namespace Step64;
 
       Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv, 1);
-
-      int         n_devices       = 0;
-      cudaError_t cuda_error_code = cudaGetDeviceCount(&n_devices);
-      AssertCuda(cuda_error_code);
-      const unsigned int my_mpi_id =
-        Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-      const int device_id = my_mpi_id % n_devices;
-      cuda_error_code     = cudaSetDevice(device_id);
-      AssertCuda(cuda_error_code);
 
       HelmholtzProblem<3, 3> helmholtz_problem;
       helmholtz_problem.run();
