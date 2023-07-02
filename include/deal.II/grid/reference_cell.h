@@ -25,6 +25,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/grid/tria_orientation.h>
+
 #include <boost/container/small_vector.hpp>
 
 #include <iosfwd>
@@ -1521,12 +1523,8 @@ ReferenceCell::child_cell_on_face(
         }
       case ReferenceCells::Quadrilateral:
         {
-          const bool face_orientation =
-            Utilities::get_bit(combined_face_orientation, 0);
-          const bool face_flip =
-            Utilities::get_bit(combined_face_orientation, 2);
-          const bool face_rotation =
-            Utilities::get_bit(combined_face_orientation, 1);
+          const auto [face_orientation, face_rotation, face_flip] =
+            internal::split_face_orientation(combined_face_orientation);
 
           return GeometryInfo<2>::child_cell_on_face(
             RefinementCase<2>(RefinementPossibilities<2>::isotropic_refinement),
@@ -1545,12 +1543,8 @@ ReferenceCell::child_cell_on_face(
         }
       case ReferenceCells::Hexahedron:
         {
-          const bool face_orientation =
-            Utilities::get_bit(combined_face_orientation, 0);
-          const bool face_flip =
-            Utilities::get_bit(combined_face_orientation, 2);
-          const bool face_rotation =
-            Utilities::get_bit(combined_face_orientation, 1);
+          const auto [face_orientation, face_rotation, face_flip] =
+            internal::split_face_orientation(combined_face_orientation);
 
           return GeometryInfo<3>::child_cell_on_face(
             RefinementCase<3>(RefinementPossibilities<3>::isotropic_refinement),
@@ -1776,9 +1770,10 @@ ReferenceCell::line_to_cell_vertices(const unsigned int line,
 
 
 inline unsigned int
-ReferenceCell::face_to_cell_lines(const unsigned int  face,
-                                  const unsigned int  line,
-                                  const unsigned char face_orientation) const
+ReferenceCell::face_to_cell_lines(
+  const unsigned int  face,
+  const unsigned int  line,
+  const unsigned char combined_face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(line, face_reference_cell(face).n_lines());
@@ -1794,12 +1789,11 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
         }
       case ReferenceCells::Line:
         {
+          const auto [face_orientation, face_rotation, face_flip] =
+            internal::split_face_orientation(combined_face_orientation);
+
           return GeometryInfo<1>::face_to_cell_lines(
-            face,
-            line,
-            Utilities::get_bit(face_orientation, 0),
-            Utilities::get_bit(face_orientation, 2),
-            Utilities::get_bit(face_orientation, 1));
+            face, line, face_orientation, face_flip, face_rotation);
         }
       case ReferenceCells::Triangle:
         {
@@ -1807,12 +1801,11 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
         }
       case ReferenceCells::Quadrilateral:
         {
+          const auto [face_orientation, face_rotation, face_flip] =
+            internal::split_face_orientation(combined_face_orientation);
+
           return GeometryInfo<2>::face_to_cell_lines(
-            face,
-            line,
-            Utilities::get_bit(face_orientation, 0),
-            Utilities::get_bit(face_orientation, 2),
-            Utilities::get_bit(face_orientation, 1));
+            face, line, face_orientation, face_flip, face_rotation);
         }
       case ReferenceCells::Tetrahedron:
         {
@@ -1820,7 +1813,7 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
             {{{0, 1, 2}}, {{0, 3, 4}}, {{2, 5, 3}}, {{1, 4, 5}}}};
 
           return table[face][standard_to_real_face_line(
-            line, face, face_orientation)];
+            line, face, combined_face_orientation)];
         }
       case ReferenceCells::Pyramid:
         {
@@ -1832,7 +1825,7 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
              {{3, 7, 6, X}}}};
 
           return table[face][standard_to_real_face_line(
-            line, face, face_orientation)];
+            line, face, combined_face_orientation)];
         }
       case ReferenceCells::Wedge:
         {
@@ -1844,16 +1837,15 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
              {{8, 6, 5, 2}}}};
 
           return table[face][standard_to_real_face_line(
-            line, face, face_orientation)];
+            line, face, combined_face_orientation)];
         }
       case ReferenceCells::Hexahedron:
         {
+          const auto [face_orientation, face_rotation, face_flip] =
+            internal::split_face_orientation(combined_face_orientation);
+
           return GeometryInfo<3>::face_to_cell_lines(
-            face,
-            line,
-            Utilities::get_bit(face_orientation, 0),
-            Utilities::get_bit(face_orientation, 2),
-            Utilities::get_bit(face_orientation, 1));
+            face, line, face_orientation, face_flip, face_rotation);
         }
       default:
         Assert(false, ExcNotImplemented());
@@ -1865,9 +1857,10 @@ ReferenceCell::face_to_cell_lines(const unsigned int  face,
 
 
 inline unsigned int
-ReferenceCell::face_to_cell_vertices(const unsigned int  face,
-                                     const unsigned int  vertex,
-                                     const unsigned char face_orientation) const
+ReferenceCell::face_to_cell_vertices(
+  const unsigned int  face,
+  const unsigned int  vertex,
+  const unsigned char combined_face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
@@ -1881,28 +1874,29 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
         }
       case ReferenceCells::Line:
         {
+          const auto [face_orientation, face_rotation, face_flip] =
+            internal::split_face_orientation(combined_face_orientation);
+
           return GeometryInfo<1>::face_to_cell_vertices(
-            face,
-            vertex,
-            Utilities::get_bit(face_orientation, 0),
-            Utilities::get_bit(face_orientation, 2),
-            Utilities::get_bit(face_orientation, 1));
+            face, vertex, face_orientation, face_flip, face_rotation);
         }
       case ReferenceCells::Triangle:
         {
           static constexpr ndarray<unsigned int, 3, 2> table = {
             {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
-          return table[face][face_orientation != 0u ? vertex : (1 - vertex)];
+          return table[face][combined_face_orientation !=
+                                 reversed_combined_line_orientation() ?
+                               vertex :
+                               (1 - vertex)];
         }
       case ReferenceCells::Quadrilateral:
         {
+          const auto [face_orientation, face_rotation, face_flip] =
+            internal::split_face_orientation(combined_face_orientation);
+
           return GeometryInfo<2>::face_to_cell_vertices(
-            face,
-            vertex,
-            Utilities::get_bit(face_orientation, 0),
-            Utilities::get_bit(face_orientation, 2),
-            Utilities::get_bit(face_orientation, 1));
+            face, vertex, face_orientation, face_flip, face_rotation);
         }
       case ReferenceCells::Tetrahedron:
         {
@@ -1910,7 +1904,7 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
             {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
 
           return table[face][standard_to_real_face_vertex(
-            vertex, face, face_orientation)];
+            vertex, face, combined_face_orientation)];
         }
       case ReferenceCells::Pyramid:
         {
@@ -1923,7 +1917,7 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
              {{2, 3, 4, X}}}};
 
           return table[face][standard_to_real_face_vertex(
-            vertex, face, face_orientation)];
+            vertex, face, combined_face_orientation)];
         }
       case ReferenceCells::Wedge:
         {
@@ -1936,16 +1930,15 @@ ReferenceCell::face_to_cell_vertices(const unsigned int  face,
              {{2, 0, 5, 3}}}};
 
           return table[face][standard_to_real_face_vertex(
-            vertex, face, face_orientation)];
+            vertex, face, combined_face_orientation)];
         }
       case ReferenceCells::Hexahedron:
         {
+          const auto [face_orientation, face_rotation, face_flip] =
+            internal::split_face_orientation(combined_face_orientation);
+
           return GeometryInfo<3>::face_to_cell_vertices(
-            face,
-            vertex,
-            Utilities::get_bit(face_orientation, 0),
-            Utilities::get_bit(face_orientation, 2),
-            Utilities::get_bit(face_orientation, 1));
+            face, vertex, face_orientation, face_flip, face_rotation);
         }
       default:
         Assert(false, ExcNotImplemented());
@@ -2015,7 +2008,7 @@ inline unsigned int
 ReferenceCell::standard_to_real_face_line(
   const unsigned int  line,
   const unsigned int  face,
-  const unsigned char face_orientation) const
+  const unsigned char combined_face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(line, face_reference_cell(face).n_lines());
@@ -2037,31 +2030,35 @@ ReferenceCell::standard_to_real_face_line(
         Assert(false, ExcNotImplemented());
         break;
       case ReferenceCells::Tetrahedron:
-        return triangle_table[face_orientation][line];
+        return triangle_table[combined_face_orientation][line];
       case ReferenceCells::Pyramid:
         if (face == 0) // The quadrilateral face
           {
-            return GeometryInfo<3>::standard_to_real_face_line(
-              line,
-              Utilities::get_bit(face_orientation, 0),
-              Utilities::get_bit(face_orientation, 2),
-              Utilities::get_bit(face_orientation, 1));
+            const auto [face_orientation, face_rotation, face_flip] =
+              internal::split_face_orientation(combined_face_orientation);
+
+            return GeometryInfo<3>::standard_to_real_face_line(line,
+                                                               face_orientation,
+                                                               face_flip,
+                                                               face_rotation);
           }
         else // One of the triangular faces
           {
-            return triangle_table[face_orientation][line];
+            return triangle_table[combined_face_orientation][line];
           }
       case ReferenceCells::Wedge:
         if (face > 1) // One of the quadrilateral faces
           {
-            return GeometryInfo<3>::standard_to_real_face_line(
-              line,
-              Utilities::get_bit(face_orientation, 0),
-              Utilities::get_bit(face_orientation, 2),
-              Utilities::get_bit(face_orientation, 1));
+            const auto [face_orientation, face_rotation, face_flip] =
+              internal::split_face_orientation(combined_face_orientation);
+
+            return GeometryInfo<3>::standard_to_real_face_line(line,
+                                                               face_orientation,
+                                                               face_flip,
+                                                               face_rotation);
           }
         else // One of the triangular faces
-          return triangle_table[face_orientation][line];
+          return triangle_table[combined_face_orientation][line];
       case ReferenceCells::Hexahedron:
         {
           static constexpr ndarray<unsigned int, 8, 4> table = {
@@ -2073,7 +2070,7 @@ ReferenceCell::standard_to_real_face_line(
              {{1, 0, 3, 2}},
              {{1, 0, 2, 3}},
              {{2, 3, 1, 0}}}};
-          return table[face_orientation][line];
+          return table[combined_face_orientation][line];
         }
       default:
         Assert(false, ExcNotImplemented());

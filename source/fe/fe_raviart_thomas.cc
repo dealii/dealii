@@ -341,75 +341,85 @@ FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
       // We have 8 cases that are all treated the same way. Note that the
       // corresponding case to case_no is just its binary representation.
       // The above example of (false | true | true) would be case_no=3
-      for (unsigned int case_no = 0; case_no < 8; ++case_no)
-        {
-          // Get the binary representation of the case
-          const bool face_orientation = Utilities::get_bit(case_no, 2);
-          const bool face_flip        = Utilities::get_bit(case_no, 1);
-          const bool face_rotation    = Utilities::get_bit(case_no, 0);
+      for (const bool face_orientation : {false, true})
+        for (const bool face_flip : {false, true})
+          for (const bool face_rotation : {false, true})
+            {
+              const auto case_no =
+                internal::combined_face_orientation(face_orientation,
+                                                    face_rotation,
+                                                    face_flip);
 
-          if (((!face_orientation) && (!face_rotation)) ||
-              ((face_orientation) && (face_rotation)))
-            {
-              // We flip across the diagonal
-              // This is the local face dof offset
-              this->adjust_quad_dof_index_for_face_orientation_table[face_no](
-                local_face_dof, case_no) = j + i * n - local_face_dof;
-            }
-          else
-            {
-              // Offset is zero
-              this->adjust_quad_dof_index_for_face_orientation_table[face_no](
-                local_face_dof, case_no) = 0;
-            } // if face needs dof permutation
+              if (((!face_orientation) && (!face_rotation)) ||
+                  ((face_orientation) && (face_rotation)))
+                {
+                  // We flip across the diagonal
+                  // This is the local face dof offset
+                  this
+                    ->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                      local_face_dof, case_no) = j + i * n - local_face_dof;
+                }
+              else
+                {
+                  // Offset is zero
+                  this
+                    ->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                      local_face_dof, case_no) = 0;
+                } // if face needs dof permutation
 
-          // Get new local face_dof by adding offset
-          const unsigned int new_local_face_dof =
-            local_face_dof +
-            this->adjust_quad_dof_index_for_face_orientation_table[face_no](
-              local_face_dof, case_no);
-          // compute new row and column index
-          i = new_local_face_dof % n;
-          j = new_local_face_dof / n;
+              // Get new local face_dof by adding offset
+              const unsigned int new_local_face_dof =
+                local_face_dof +
+                this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+                  local_face_dof, case_no);
+              // compute new row and column index
+              i = new_local_face_dof % n;
+              j = new_local_face_dof / n;
 
-          /*
-           * Now compute if a sign change is necessary. This is done for the
-           * case of face_orientation==true
-           */
-          // flip = false, rotation=true
-          if (!face_flip && face_rotation)
-            {
-              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
-                local_face_dof, case_no) = ((j % 2) == 1);
-            }
-          // flip = true, rotation=false
-          else if (face_flip && !face_rotation)
-            {
-              // This case is symmetric (although row and column may be
-              // switched)
-              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
-                local_face_dof, case_no) = ((j % 2) == 1) != ((i % 2) == 1);
-            }
-          // flip = true, rotation=true
-          else if (face_flip && face_rotation)
-            {
-              this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
-                local_face_dof, case_no) = ((i % 2) == 1);
-            }
-          /*
-           * flip = false, rotation=false => nothing to do
-           */
+              /*
+               * Now compute if a sign change is necessary. This is done for the
+               * case of face_orientation==true
+               */
+              // flip = false, rotation=true
+              if (!face_flip && face_rotation)
+                {
+                  this
+                    ->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                      local_face_dof, case_no) = ((j % 2) == 1);
+                }
+              // flip = true, rotation=false
+              else if (face_flip && !face_rotation)
+                {
+                  // This case is symmetric (although row and column may be
+                  // switched)
+                  this
+                    ->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                      local_face_dof, case_no) =
+                    ((j % 2) == 1) != ((i % 2) == 1);
+                }
+              // flip = true, rotation=true
+              else if (face_flip && face_rotation)
+                {
+                  this
+                    ->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                      local_face_dof, case_no) = ((i % 2) == 1);
+                }
+              /*
+               * flip = false, rotation=false => nothing to do
+               */
 
-          /*
-           * If face_orientation==false the sign flip is exactly the opposite.
-           */
-          if (!face_orientation)
-            this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
-              local_face_dof, case_no) =
-              !this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
-                local_face_dof, case_no);
-        } // case_no
-    }     // local_face_dof
+              /*
+               * If face_orientation==false the sign flip is exactly the
+               * opposite.
+               */
+              if (!face_orientation)
+                this->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                  local_face_dof, case_no) =
+                  !this
+                     ->adjust_quad_dof_sign_for_face_orientation_table[face_no](
+                       local_face_dof, case_no);
+            } // case_no
+    }         // local_face_dof
 }
 
 
