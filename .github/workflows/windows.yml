@@ -38,13 +38,13 @@ jobs:
     - name: build library
       shell: bash
       run: |
-        cmake --build build  --target install -- -m
+        cmake --build build --parallel 2 --target install
         cd c:/project
         7z a dealii-windows.zip *
     - name: test library
       shell: bash
       run: |
-        cmake --build build  --target test -- -m
+        cmake --build build --parallel 2 --target test
     - name: archive library
       # run only if a PR is merged into master
       if: github.ref == 'refs/heads/master'
