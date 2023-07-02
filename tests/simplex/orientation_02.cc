@@ -47,11 +47,8 @@ test(const unsigned int orientation)
     const auto &face = dummy.begin()->face(face_no);
     const auto  permuted =
       ReferenceCell(ReferenceCells::Triangle)
-        .permute_according_orientation(
-          std::array<unsigned int, 3>{{face->vertex_index(0),
-                                       face->vertex_index(1),
-                                       face->vertex_index(2)}},
-          orientation);
+        .permute_according_orientation(std::array<unsigned int, 3>{{0, 1, 2}},
+                                       orientation);
 
     auto direction =
       cross_product_3d(vertices[permuted[1]] - vertices[permuted[0]],
@@ -61,7 +58,12 @@ test(const unsigned int orientation)
     vertices.push_back(face->center() + direction);
 
     CellData<3> cell;
-    cell.vertices = {permuted[0], permuted[1], permuted[2], 4u};
+    cell.vertices.resize(4);
+
+    cell.vertices[permuted[0]] = face->vertex_index(0);
+    cell.vertices[permuted[1]] = face->vertex_index(1);
+    cell.vertices[permuted[2]] = face->vertex_index(2);
+    cell.vertices[3]           = 4;
 
     cell.material_id = 1;
     cells.push_back(cell);
@@ -73,10 +75,8 @@ test(const unsigned int orientation)
   cell++;
 
   // check orientation
-  deallog << "face orientation: " << orientation << ' ' << std::endl;
-  AssertDimension(orientation,
-                  (cell->face_orientation(0) * 1 + cell->face_rotation(0) * 2 +
-                   cell->face_flip(0) * 4));
+  deallog << "face orientation: " << orientation << ' '
+          << int(cell->combined_face_orientation(0)) << ' ' << std::endl;
 
   // check vertices
   {
