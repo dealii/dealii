@@ -1651,22 +1651,32 @@ public:
     /**
      * Default constructor.
      */
-    ConstraintLine(const size_type &index         = numbers::invalid_dof_index,
-                   const Entries &  entries       = {},
-                   const number &   inhomogeneity = 0.0);
+    ConstraintLine(const size_type &index = numbers::invalid_dof_index,
+                   const typename AffineConstraints<
+                     number>::ConstraintLine::Entries &entries       = {},
+                   const number                        inhomogeneity = 0.0);
 
     /**
      * Copy constructor.
      */
-    template <typename ConstraintLineType>
-    ConstraintLine(const ConstraintLineType &other);
+    ConstraintLine(const ConstraintLine &other) = default;
+
+    /**
+     * Move constructor.
+     */
+    ConstraintLine(ConstraintLine &&other) noexcept = default;
 
     /**
      * Copy assignment.
      */
-    template <typename ConstraintLineType>
     ConstraintLine &
-    operator=(const ConstraintLineType &other);
+    operator=(const ConstraintLine &other) = default;
+
+    /**
+     * Move assignment.
+     */
+    ConstraintLine &
+    operator=(ConstraintLine &&other) noexcept = default;
 
     /**
      * Determine an estimate for the memory consumption (in bytes) of this
@@ -2444,7 +2454,14 @@ AffineConstraints<number>::copy_from(
   const AffineConstraints<other_number> &other)
 {
   lines.clear();
-  lines.insert(lines.begin(), other.lines.begin(), other.lines.end());
+  lines.reserve(other.lines.size());
+
+  for (const auto l : other.lines)
+    lines.emplace_back(l.index,
+                       typename ConstraintLine::Entries(l.entries.begin(),
+                                                        l.entries.end()),
+                       l.inhomogeneity);
+
   lines_cache = other.lines_cache;
   local_lines = other.local_lines;
   sorted      = other.sorted;
@@ -2508,44 +2525,13 @@ template <typename number>
 inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
   const size_type &                                                  index,
   const typename AffineConstraints<number>::ConstraintLine::Entries &entries,
-  const number &inhomogeneity)
+  const number inhomogeneity)
   : index(index)
   , entries(entries)
   , inhomogeneity(inhomogeneity)
 {}
 
 
-
-template <typename number>
-template <typename ConstraintLineType>
-inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
-  const ConstraintLineType &other)
-{
-  this->index = other.index;
-
-  entries.clear();
-  entries.insert(entries.begin(), other.entries.begin(), other.entries.end());
-
-  this->inhomogeneity = other.inhomogeneity;
-}
-
-
-
-template <typename number>
-template <typename ConstraintLineType>
-inline typename AffineConstraints<number>::ConstraintLine &
-AffineConstraints<number>::ConstraintLine::operator=(
-  const ConstraintLineType &other)
-{
-  this->index = other.index;
-
-  entries.clear();
-  entries.insert(entries.begin(), other.entries.begin(), other.entries.end());
-
-  this->inhomogeneity = other.inhomogeneity;
-
-  return *this;
-}
 
 DEAL_II_NAMESPACE_CLOSE
 
