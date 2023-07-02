@@ -126,7 +126,7 @@ namespace LinearAlgebra
     {
       AssertDimension(indices.size(), elements.size());
       const auto &vector = trilinos_vector();
-      const auto &map    = vector.Map();
+      const auto &map    = vector.getMap();
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>(
@@ -140,7 +140,7 @@ namespace LinearAlgebra
       for (unsigned int i = 0; i < indices.size(); ++i)
         {
           AssertIndexRange(indices[i], size());
-          const trilinos_i = map->getLocalElement(
+          const auto trilinos_i = map->getLocalElement(
             static_cast<TrilinosWrappers::types::int_type>(indices[i]));
           elements[i] = vector_1d(trilinos_i);
         }
