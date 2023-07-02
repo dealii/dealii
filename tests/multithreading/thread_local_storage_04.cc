@@ -50,14 +50,12 @@ test()
 {
   X x;
   {
-    Threads::Thread<int> t;
-    t = Threads::new_thread(&X::f, x);
-    AssertThrow(t.return_value() == 10, ExcInternalError());
+    auto future = std::async(&X::f, x);
+    AssertThrow(future.get() == 10, ExcInternalError());
   }
   {
-    Threads::Thread<int> t;
-    t = Threads::new_thread(&X::f, x);
-    AssertThrow(t.return_value() == 11, ExcInternalError());
+    auto future = std::async(&X::f, x);
+    AssertThrow(future.get() == 11, ExcInternalError());
   }
 
   AssertThrow(counter == 12, ExcInternalError());

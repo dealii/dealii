@@ -13,6 +13,29 @@
 //
 // ---------------------------------------------------------------------
 
+for (S : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace VectorTools
+    \{
+      template S
+      compute_mean_value(
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Quadrature<deal_II_dimension> &,
+        const ReadVector<S> &,
+        const unsigned int);
+
+      template S
+      compute_mean_value(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const Quadrature<deal_II_dimension> &,
+        const ReadVector<S> &,
+        const unsigned int);
+    \}
+#endif
+  }
 
 for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
      deal_II_space_dimension : SPACE_DIMENSIONS)
@@ -20,28 +43,12 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS;
 #if deal_II_dimension <= deal_II_space_dimension
     namespace VectorTools
     \{
-
-      template VEC::value_type
-      compute_mean_value<deal_II_dimension>(
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const Quadrature<deal_II_dimension> &,
-        const VEC &,
-        const unsigned int);
-
-      template VEC::value_type
-      compute_mean_value<deal_II_dimension>(
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        const Quadrature<deal_II_dimension> &,
-        const VEC &,
-        const unsigned int);
-
       template void
-      add_constant<>(VEC &                                      solution,
-                     const DoFHandler<deal_II_dimension,
-                                      deal_II_space_dimension> &dof_handler,
-                     const unsigned int                         component,
-                     const typename VEC::value_type constant_adjustment);
+      add_constant(VEC &solution,
+                   const DoFHandler<deal_II_dimension, deal_II_space_dimension>
+                     &                            dof_handler,
+                   const unsigned int             component,
+                   const typename VEC::value_type constant_adjustment);
     \}
 #endif
   }

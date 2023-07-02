@@ -78,13 +78,14 @@ test()
 
   BlockSparseMatrix<double> bsm(bsp);
 
-  Threads::ThreadGroup<> tg;
+  std::vector<std::thread> tg;
   for (unsigned int i = 0; i < 100; ++i)
     {
-      tg += Threads::new_thread(&do_add, true, bsm);
-      tg += Threads::new_thread(&do_add, false, bsm);
+      tg.emplace_back(&do_add, true, std::ref(bsm));
+      tg.emplace_back(&do_add, false, std::ref(bsm));
     }
-  tg.join_all();
+  for (auto &thread : tg)
+    thread.join();
 
   // divide whole matrix by 100 to get back to the effect of a single set
   bsm /= 100;

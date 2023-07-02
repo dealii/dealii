@@ -247,7 +247,7 @@ namespace PETScWrappers
    *
    * @ingroup PETScWrappers
    */
-  class VectorBase : public Subscriptor
+  class VectorBase : public ReadVector<PetscScalar>, public Subscriptor
   {
   public:
     /**
@@ -355,7 +355,7 @@ namespace PETScWrappers
      * Return the global dimension of the vector.
      */
     size_type
-    size() const;
+    size() const override;
 
     /**
      * Return the local dimension of the vector, i.e. the number of elements
@@ -493,6 +493,14 @@ namespace PETScWrappers
     void
     extract_subvector_to(const std::vector<size_type> &indices,
                          std::vector<PetscScalar> &    values) const;
+
+    /**
+     * Extract a range of elements all at once.
+     */
+    virtual void
+    extract_subvector_to(
+      const ArrayView<const types::global_dof_index> &indices,
+      ArrayView<PetscScalar> &                        elements) const override;
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -1191,6 +1199,16 @@ namespace PETScWrappers
            ExcDimensionMismatch(indices.size(), values.size()));
     extract_subvector_to(indices.begin(), indices.end(), values.begin());
   }
+
+  inline void
+  VectorBase::extract_subvector_to(
+    const ArrayView<const types::global_dof_index> &indices,
+    ArrayView<PetscScalar> &                        elements) const
+  {
+    AssertDimension(indices.size(), elements.size());
+    extract_subvector_to(indices.begin(), indices.end(), elements.begin());
+  }
+
 
   template <typename ForwardIterator, typename OutputIterator>
   inline void

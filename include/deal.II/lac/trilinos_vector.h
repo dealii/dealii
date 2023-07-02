@@ -26,6 +26,7 @@
 #  include <deal.II/base/subscriptor.h>
 
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/read_vector.h>
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
@@ -394,7 +395,7 @@ namespace TrilinosWrappers
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public Subscriptor
+    class Vector : public Subscriptor, public ReadVector<TrilinosScalar>
     {
     public:
       /**
@@ -760,7 +761,7 @@ namespace TrilinosWrappers
        * Return the global dimension of the vector.
        */
       size_type
-      size() const;
+      size() const override;
 
       /**
        * Return the local dimension of the vector, i.e. the number of elements
@@ -1011,6 +1012,13 @@ namespace TrilinosWrappers
       void
       extract_subvector_to(const std::vector<size_type> &indices,
                            std::vector<TrilinosScalar> & values) const;
+
+      /**
+       * Extract a range of elements all at once.
+       */
+      virtual void
+      extract_subvector_to(const ArrayView<const size_type> &indices,
+                           ArrayView<TrilinosScalar> &elements) const override;
 
       /**
        * Instead of getting individual elements of a vector via operator(),
@@ -1556,6 +1564,20 @@ namespace TrilinosWrappers
     {
       for (size_type i = 0; i < indices.size(); ++i)
         values[i] = operator()(indices[i]);
+    }
+
+
+
+    inline void
+    Vector::extract_subvector_to(const ArrayView<const size_type> &indices,
+                                 ArrayView<TrilinosScalar> &elements) const
+    {
+      AssertDimension(indices.size(), elements.size());
+      for (unsigned int i = 0; i < indices.size(); ++i)
+        {
+          AssertIndexRange(indices[i], size());
+          elements[i] = (*this)[indices[i]];
+        }
     }
 
 

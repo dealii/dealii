@@ -54,23 +54,17 @@ main()
   initlog();
 
   // create 4 threads, run the test function on them
-  Threads::Thread<std::pair<double, double>> tg[4];
-  tg[0] = Threads::new_thread(&test);
-  tg[1] = Threads::new_thread(&test);
-  tg[2] = Threads::new_thread(&test);
-  tg[3] = Threads::new_thread(&test);
-
-  tg[0].join();
-  tg[1].join();
-  tg[2].join();
-  tg[3].join();
-
+  std::vector<std::future<std::pair<double, double>>> tg;
+  tg.push_back(std::async(&test));
+  tg.push_back(std::async(&test));
+  tg.push_back(std::async(&test));
+  tg.push_back(std::async(&test));
 
   // the random number generator is thread-local, so we should get the
   // same result every time
-  deallog << tg[0].return_value().first << ' ' << tg[0].return_value().second
-          << std::endl;
-  AssertThrow(tg[1].return_value() == tg[0].return_value(), ExcInternalError());
-  AssertThrow(tg[2].return_value() == tg[0].return_value(), ExcInternalError());
-  AssertThrow(tg[3].return_value() == tg[0].return_value(), ExcInternalError());
+  auto t0_result = tg[0].get();
+  deallog << t0_result.first << ' ' << t0_result.second << std::endl;
+  AssertThrow(tg[1].get() == t0_result, ExcInternalError());
+  AssertThrow(tg[2].get() == t0_result, ExcInternalError());
+  AssertThrow(tg[3].get() == t0_result, ExcInternalError());
 }

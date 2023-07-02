@@ -41,6 +41,8 @@
 
 #include <deal.II/hp/q_collection.h>
 
+#include <deal.II/lac/read_vector.h>
+
 #include <algorithm>
 #include <memory>
 #include <type_traits>
@@ -369,12 +371,10 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    template <class InputVector>
+    template <typename Number>
     void
-    get_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
+    get_function_values(const ReadVector<Number> &                fe_function,
+                        std::vector<solution_value_type<Number>> &values) const;
 
     /**
      * Same as above, but using a vector of local degree-of-freedom values. In
@@ -434,12 +434,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_gradients(
-      const InputVector &fe_function,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
+      const ReadVector<Number> &                   fe_function,
+      std::vector<solution_gradient_type<Number>> &gradients) const;
 
     /**
      * This function relates to get_function_gradients() in the same way
@@ -471,12 +470,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_hessians(
-      const InputVector &fe_function,
-      std::vector<solution_hessian_type<typename InputVector::value_type>>
-        &hessians) const;
+      const ReadVector<Number> &                  fe_function,
+      std::vector<solution_hessian_type<Number>> &hessians) const;
 
     /**
      * This function relates to get_function_hessians() in the same way
@@ -510,12 +508,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_laplacians(
-      const InputVector &fe_function,
-      std::vector<solution_laplacian_type<typename InputVector::value_type>>
-        &laplacians) const;
+      const ReadVector<Number> &                    fe_function,
+      std::vector<solution_laplacian_type<Number>> &laplacians) const;
 
     /**
      * This function relates to get_function_laplacians() in the same way
@@ -549,13 +546,12 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_third_derivatives}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_third_derivatives(
-      const InputVector &fe_function,
-      std::vector<
-        solution_third_derivative_type<typename InputVector::value_type>>
-        &third_derivatives) const;
+      const ReadVector<Number> &                           fe_function,
+      std::vector<solution_third_derivative_type<Number>> &third_derivatives)
+      const;
 
     /**
      * This function relates to get_function_third_derivatives() in the same way
@@ -984,12 +980,10 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    template <class InputVector>
+    template <typename Number>
     void
-    get_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
+    get_function_values(const ReadVector<Number> &                fe_function,
+                        std::vector<solution_value_type<Number>> &values) const;
 
     /**
      * Same as above, but using a vector of local degree-of-freedom values. In
@@ -1049,12 +1043,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_gradients(
-      const InputVector &fe_function,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
+      const ReadVector<Number> &                   fe_function,
+      std::vector<solution_gradient_type<Number>> &gradients) const;
 
     /**
      * This function relates to get_function_gradients() in the same way
@@ -1092,12 +1085,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_symmetric_gradients(
-      const InputVector &fe_function,
-      std::vector<
-        solution_symmetric_gradient_type<typename InputVector::value_type>>
+      const ReadVector<Number> &fe_function,
+      std::vector<solution_symmetric_gradient_type<Number>>
         &symmetric_gradients) const;
 
     /**
@@ -1132,12 +1124,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_divergences(
-      const InputVector &fe_function,
-      std::vector<solution_divergence_type<typename InputVector::value_type>>
-        &divergences) const;
+      const ReadVector<Number> &                     fe_function,
+      std::vector<solution_divergence_type<Number>> &divergences) const;
 
     /**
      * This function relates to get_function_divergences() in the same way
@@ -1170,12 +1161,10 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
-    get_function_curls(
-      const InputVector &fe_function,
-      std::vector<solution_curl_type<typename InputVector::value_type>> &curls)
-      const;
+    get_function_curls(const ReadVector<Number> &               fe_function,
+                       std::vector<solution_curl_type<Number>> &curls) const;
 
     /**
      * This function relates to get_function_curls() in the same way
@@ -1207,12 +1196,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_hessians(
-      const InputVector &fe_function,
-      std::vector<solution_hessian_type<typename InputVector::value_type>>
-        &hessians) const;
+      const ReadVector<Number> &                  fe_function,
+      std::vector<solution_hessian_type<Number>> &hessians) const;
 
     /**
      * This function relates to get_function_hessians() in the same way
@@ -1245,12 +1233,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_hessians}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_laplacians(
-      const InputVector &fe_function,
-      std::vector<solution_laplacian_type<typename InputVector::value_type>>
-        &laplacians) const;
+      const ReadVector<Number> &                    fe_function,
+      std::vector<solution_laplacian_type<Number>> &laplacians) const;
 
     /**
      * This function relates to get_function_laplacians() in the same way
@@ -1283,13 +1270,12 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_third_derivatives}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_third_derivatives(
-      const InputVector &fe_function,
-      std::vector<
-        solution_third_derivative_type<typename InputVector::value_type>>
-        &third_derivatives) const;
+      const ReadVector<Number> &                           fe_function,
+      std::vector<solution_third_derivative_type<Number>> &third_derivatives)
+      const;
 
     /**
      * This function relates to get_function_third_derivatives() in the same way
@@ -1532,12 +1518,10 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    template <class InputVector>
+    template <typename Number>
     void
-    get_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
+    get_function_values(const ReadVector<Number> &                fe_function,
+                        std::vector<solution_value_type<Number>> &values) const;
 
     /**
      * Same as above, but using a vector of local degree-of-freedom values. In
@@ -1601,12 +1585,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_divergences(
-      const InputVector &fe_function,
-      std::vector<solution_divergence_type<typename InputVector::value_type>>
-        &divergences) const;
+      const ReadVector<Number> &                     fe_function,
+      std::vector<solution_divergence_type<Number>> &divergences) const;
 
     /**
      * This function relates to get_function_divergences() in the same way
@@ -1874,12 +1857,10 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_values}
      */
-    template <class InputVector>
+    template <typename Number>
     void
-    get_function_values(
-      const InputVector &fe_function,
-      std::vector<solution_value_type<typename InputVector::value_type>>
-        &values) const;
+    get_function_values(const ReadVector<Number> &                fe_function,
+                        std::vector<solution_value_type<Number>> &values) const;
 
     /**
      * Same as above, but using a vector of local degree-of-freedom values. In
@@ -1943,12 +1924,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_divergences(
-      const InputVector &fe_function,
-      std::vector<solution_divergence_type<typename InputVector::value_type>>
-        &divergences) const;
+      const ReadVector<Number> &                     fe_function,
+      std::vector<solution_divergence_type<Number>> &divergences) const;
 
     /**
      * This function relates to get_function_divergences() in the same way
@@ -1979,12 +1959,11 @@ namespace FEValuesViews
      *
      * @dealiiRequiresUpdateFlags{update_gradients}
      */
-    template <class InputVector>
+    template <typename Number>
     void
     get_function_gradients(
-      const InputVector &fe_function,
-      std::vector<solution_gradient_type<typename InputVector::value_type>>
-        &gradients) const;
+      const ReadVector<Number> &                   fe_function,
+      std::vector<solution_gradient_type<Number>> &gradients) const;
 
     /**
      * This function relates to get_function_gradients() in the same way
@@ -2533,19 +2512,12 @@ public:
    * @post <code>values[q]</code> will contain the value of the field
    * described by fe_function at the $q$th quadrature point.
    *
-   * @note The actual data type of the input vector may be either a
-   * Vector&lt;T&gt;, BlockVector&lt;T&gt;, or one of the PETSc or Trilinos
-   * vector wrapper classes. It represents a global vector of DoF values
-   * associated with the DoFHandler object with which this FEValues object was
-   * last initialized.
-   *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                            fe_function,
-    std::vector<typename InputVector::value_type> &values) const;
+  get_function_values(const ReadVector<Number> &fe_function,
+                      std::vector<Number> &     values) const;
 
   /**
    * This function does the same as the other get_function_values(), but
@@ -2560,11 +2532,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                                    fe_function,
-    std::vector<Vector<typename InputVector::value_type>> &values) const;
+  get_function_values(const ReadVector<Number> &   fe_function,
+                      std::vector<Vector<Number>> &values) const;
 
   /**
    * Generate function values from an arbitrary vector. This function
@@ -2622,12 +2593,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                             fe_function,
-    const ArrayView<const types::global_dof_index> &indices,
-    std::vector<typename InputVector::value_type> & values) const;
+  get_function_values(const ReadVector<Number> &fe_function,
+                      const ArrayView<const types::global_dof_index> &indices,
+                      std::vector<Number> &values) const;
 
   /**
    * Generate vector function values from an arbitrary vector.
@@ -2637,12 +2607,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                                    fe_function,
-    const ArrayView<const types::global_dof_index> &       indices,
-    std::vector<Vector<typename InputVector::value_type>> &values) const;
+  get_function_values(const ReadVector<Number> &fe_function,
+                      const ArrayView<const types::global_dof_index> &indices,
+                      std::vector<Vector<Number>> &values) const;
 
 
   /**
@@ -2666,13 +2635,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_values}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_values(
-    const InputVector &                                      fe_function,
-    const ArrayView<const types::global_dof_index> &         indices,
-    ArrayView<std::vector<typename InputVector::value_type>> values,
-    const bool quadrature_points_fastest) const;
+  get_function_values(const ReadVector<Number> &fe_function,
+                      const ArrayView<const types::global_dof_index> &indices,
+                      ArrayView<std::vector<Number>>                  values,
+                      const bool quadrature_points_fastest) const;
 
   /** @} */
   /// @name Access to derivatives of global finite element fields
@@ -2720,12 +2688,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_gradients(
-    const InputVector &fe_function,
-    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
-      &gradients) const;
+    const ReadVector<Number> &                fe_function,
+    std::vector<Tensor<1, spacedim, Number>> &gradients) const;
 
   /**
    * This function does the same as the other get_function_gradients(), but
@@ -2743,13 +2710,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_gradients(
-    const InputVector &fe_function,
-    std::vector<
-      std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
-      &gradients) const;
+    const ReadVector<Number> &                             fe_function,
+    std::vector<std::vector<Tensor<1, spacedim, Number>>> &gradients) const;
 
   /**
    * This function relates to the first of the get_function_gradients() function
@@ -2759,13 +2724,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_gradients(
-    const InputVector &                             fe_function,
+    const ReadVector<Number> &                      fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<Tensor<1, spacedim, typename InputVector::value_type>>
-      &gradients) const;
+    std::vector<Tensor<1, spacedim, Number>> &      gradients) const;
 
   /**
    * This function relates to the first of the get_function_gradients() function
@@ -2775,14 +2739,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_gradients}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_gradients(
-    const InputVector &                             fe_function,
-    const ArrayView<const types::global_dof_index> &indices,
-    ArrayView<
-      std::vector<Tensor<1, spacedim, typename InputVector::value_type>>>
-               gradients,
+    const ReadVector<Number> &                          fe_function,
+    const ArrayView<const types::global_dof_index> &    indices,
+    ArrayView<std::vector<Tensor<1, spacedim, Number>>> gradients,
     const bool quadrature_points_fastest = false) const;
 
   /** @} */
@@ -2828,12 +2790,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_hessians(
-    const InputVector &fe_function,
-    std::vector<Tensor<2, spacedim, typename InputVector::value_type>>
-      &hessians) const;
+    const ReadVector<Number> &                fe_function,
+    std::vector<Tensor<2, spacedim, Number>> &hessians) const;
 
   /**
    * This function does the same as the other get_function_hessians(), but
@@ -2852,13 +2813,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_hessians(
-    const InputVector &fe_function,
-    std::vector<
-      std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
-      &        hessians,
+    const ReadVector<Number> &                             fe_function,
+    std::vector<std::vector<Tensor<2, spacedim, Number>>> &hessians,
     const bool quadrature_points_fastest = false) const;
 
   /**
@@ -2869,13 +2828,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_hessians(
-    const InputVector &                             fe_function,
+    const ReadVector<Number> &                      fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<Tensor<2, spacedim, typename InputVector::value_type>>
-      &hessians) const;
+    std::vector<Tensor<2, spacedim, Number>> &      hessians) const;
 
   /**
    * This function relates to the first of the get_function_hessians() function
@@ -2885,14 +2843,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_hessians(
-    const InputVector &                             fe_function,
-    const ArrayView<const types::global_dof_index> &indices,
-    ArrayView<
-      std::vector<Tensor<2, spacedim, typename InputVector::value_type>>>
-               hessians,
+    const ReadVector<Number> &                          fe_function,
+    const ArrayView<const types::global_dof_index> &    indices,
+    ArrayView<std::vector<Tensor<2, spacedim, Number>>> hessians,
     const bool quadrature_points_fastest = false) const;
 
   /**
@@ -2935,11 +2891,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_laplacians(
-    const InputVector &                            fe_function,
-    std::vector<typename InputVector::value_type> &laplacians) const;
+  get_function_laplacians(const ReadVector<Number> &fe_function,
+                          std::vector<Number> &     laplacians) const;
 
   /**
    * This function does the same as the other get_function_laplacians(), but
@@ -2960,11 +2915,10 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector>
+  template <typename Number>
   void
-  get_function_laplacians(
-    const InputVector &                                    fe_function,
-    std::vector<Vector<typename InputVector::value_type>> &laplacians) const;
+  get_function_laplacians(const ReadVector<Number> &   fe_function,
+                          std::vector<Vector<Number>> &laplacians) const;
 
   /**
    * This function relates to the first of the get_function_laplacians()
@@ -2974,12 +2928,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_laplacians(
-    const InputVector &                             fe_function,
+    const ReadVector<Number> &                      fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<typename InputVector::value_type> & laplacians) const;
+    std::vector<Number> &                           laplacians) const;
 
   /**
    * This function relates to the first of the get_function_laplacians()
@@ -2989,12 +2943,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_laplacians(
-    const InputVector &                                    fe_function,
-    const ArrayView<const types::global_dof_index> &       indices,
-    std::vector<Vector<typename InputVector::value_type>> &laplacians) const;
+    const ReadVector<Number> &                      fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
+    std::vector<Vector<Number>> &                   laplacians) const;
 
   /**
    * This function relates to the first of the get_function_laplacians()
@@ -3004,12 +2958,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_hessians}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_laplacians(
-    const InputVector &                                         fe_function,
-    const ArrayView<const types::global_dof_index> &            indices,
-    std::vector<std::vector<typename InputVector::value_type>> &laplacians,
+    const ReadVector<Number> &                      fe_function,
+    const ArrayView<const types::global_dof_index> &indices,
+    std::vector<std::vector<Number>> &              laplacians,
     const bool quadrature_points_fastest = false) const;
 
   /** @} */
@@ -3054,12 +3008,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_third_derivatives(
-    const InputVector &fe_function,
-    std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
-      &third_derivatives) const;
+    const ReadVector<Number> &                fe_function,
+    std::vector<Tensor<3, spacedim, Number>> &third_derivatives) const;
 
   /**
    * This function does the same as the other
@@ -3079,13 +3032,11 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_third_derivatives(
-    const InputVector &fe_function,
-    std::vector<
-      std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
-      &        third_derivatives,
+    const ReadVector<Number> &                             fe_function,
+    std::vector<std::vector<Tensor<3, spacedim, Number>>> &third_derivatives,
     const bool quadrature_points_fastest = false) const;
 
   /**
@@ -3096,13 +3047,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_third_derivatives(
-    const InputVector &                             fe_function,
+    const ReadVector<Number> &                      fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<Tensor<3, spacedim, typename InputVector::value_type>>
-      &third_derivatives) const;
+    std::vector<Tensor<3, spacedim, Number>> &      third_derivatives) const;
 
   /**
    * This function relates to the first of the get_function_third_derivatives()
@@ -3112,14 +3062,12 @@ public:
    *
    * @dealiiRequiresUpdateFlags{update_3rd_derivatives}
    */
-  template <class InputVector>
+  template <typename Number>
   void
   get_function_third_derivatives(
-    const InputVector &                             fe_function,
-    const ArrayView<const types::global_dof_index> &indices,
-    ArrayView<
-      std::vector<Tensor<3, spacedim, typename InputVector::value_type>>>
-               third_derivatives,
+    const ReadVector<Number> &                          fe_function,
+    const ArrayView<const types::global_dof_index> &    indices,
+    ArrayView<std::vector<Tensor<3, spacedim, Number>>> third_derivatives,
     const bool quadrature_points_fastest = false) const;
   /** @} */
 
@@ -3698,11 +3646,10 @@ protected:
      * Call @p get_interpolated_dof_values of the iterator with the
      * given arguments.
      */
-    template <typename VectorType>
+    template <typename Number>
     void
-    get_interpolated_dof_values(
-      const VectorType &                       in,
-      Vector<typename VectorType::value_type> &out) const;
+    get_interpolated_dof_values(const ReadVector<Number> &in,
+                                Vector<Number> &          out) const;
 
     /**
      * Call @p get_interpolated_dof_values of the iterator with the

@@ -27,6 +27,7 @@
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/lac/read_vector.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_space_vector.h>
 #include <deal.II/lac/vector_type_traits.h>
@@ -248,6 +249,7 @@ namespace LinearAlgebra
      */
     template <typename Number, typename MemorySpace = MemorySpace::Host>
     class Vector : public ::dealii::LinearAlgebra::VectorSpaceVector<Number>,
+                   public ::dealii::ReadVector<Number>,
                    public Subscriptor
     {
     public:
@@ -1143,6 +1145,14 @@ namespace LinearAlgebra
       void
       extract_subvector_to(const std::vector<size_type> &indices,
                            std::vector<OtherNumber> &    values) const;
+
+      /**
+       * Extract a range of elements all at once.
+       */
+      virtual void
+      extract_subvector_to(
+        const ArrayView<const types::global_dof_index> &indices,
+        ArrayView<Number> &elements) const override;
 
       /**
        * Instead of getting individual elements of a vector via operator(),

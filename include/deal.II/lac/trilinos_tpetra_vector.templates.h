@@ -119,6 +119,36 @@ namespace LinearAlgebra
 
 
     template <typename Number>
+    void
+    Vector::extract_subvector_to(
+      const ArrayView<const types::global_dof_index> &indices,
+      ArrayView<Number> &                             elements) const
+    {
+      AssertDimension(indices.size(), elements.size());
+      const auto &vector = trilinos_vector();
+      const auto &map    = vector.Map();
+
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadOnly);
+#  else
+      vector.template sync<Kokkos::HostSpace>();
+      auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
+#  endif
+      auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+
+      for (unsigned int i = 0; i < indices.size(); ++i)
+        {
+          AssertIndexRange(indices[i], size());
+          const trilinos_i = map->getLocalElement(
+            static_cast<TrilinosWrappers::types::int_type>(indices[i]));
+          elements[i] = vector_1d(trilinos_i);
+        }
+    }
+
+
+
+    template <typename Number>
     Vector<Number> &
     Vector<Number>::operator=(const Vector<Number> &V)
     {

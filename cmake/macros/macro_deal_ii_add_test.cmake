@@ -325,6 +325,14 @@ function(deal_ii_add_test _category _test_name _comparison_file)
 
   foreach(_build ${_build_types})
     #
+    # Increment the _number_of_tests counter by one in the parent scope.
+    # Note that the variable can be undefined initially. In this case we
+    # simply store "1" in the first iteration.
+    #
+    math(EXPR _number_of_tests "${_number_of_tests} + 1")
+    set(_number_of_tests "${_number_of_tests}" PARENT_SCOPE)
+
+    #
     # Obey "debug" and "release" keywords in the output file:
     #
     item_matches(_match "${_build}" ${_configuration})
@@ -483,6 +491,17 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       #
 
       if(_shared_target AND NOT TARGET ${_test_executable_target})
+        #
+        # Increment the _number_of_test_dependencies counter by one in the
+        # parent scope. Test dependencies are all tests where we have split
+        # out compiling and linking of an executable into a separate
+        # "test_dependency/" test. Note that the variable can be undefined
+        # initially. In this case we simply store "1" in the first
+        # iteration.
+        #
+        math(EXPR _number_of_test_dependencies "${_number_of_test_dependencies} + 1")
+        set(_number_of_test_dependencies "${_number_of_test_dependencies}" PARENT_SCOPE)
+
         add_custom_target(${_test_executable_target}
           COMMAND echo "${_test_executable_full}: BUILD successful."
           COMMAND echo "${_test_executable_full}: RUN skipped."

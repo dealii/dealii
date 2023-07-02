@@ -2524,12 +2524,12 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
 
 
 template <int dimension_, int space_dimension_, bool level_dof_access>
-template <class InputVector, typename ForwardIterator>
+template <typename Number, typename ForwardIterator>
 inline void
 DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
-  const InputVector &values,
-  ForwardIterator    local_values_begin,
-  ForwardIterator    local_values_end) const
+  const ReadVector<Number> &values,
+  ForwardIterator           local_values_begin,
+  ForwardIterator           local_values_end) const
 {
   (void)local_values_end;
   Assert(this->is_artificial() == false,
@@ -2547,11 +2547,17 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
     dof_indices(this->get_fe().n_dofs_per_cell());
   internal::DoFAccessorImplementation::get_cell_dof_indices(
     *this, dof_indices, this->active_fe_index());
-  dealii::internal::DoFAccessorImplementation::Implementation::
-    extract_subvector_to(values,
-                         dof_indices.data(),
-                         dof_indices.data() + dof_indices.size(),
-                         local_values_begin);
+
+  boost::container::small_vector<Number, 27> values_temp(local_values_end -
+                                                         local_values_begin);
+  auto view = make_array_view(values_temp.begin(), values_temp.end());
+  values.extract_subvector_to(make_array_view(dof_indices.begin(),
+                                              dof_indices.end()),
+                              view);
+  using view_type = std::remove_reference_t<decltype(*local_values_begin)>;
+  ArrayView<view_type> values_view2(&*local_values_begin,
+                                    local_values_end - local_values_begin);
+  std::copy(values_temp.begin(), values_temp.end(), values_view2.begin());
 }
 
 

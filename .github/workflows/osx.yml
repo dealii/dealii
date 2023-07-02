@@ -30,7 +30,7 @@ jobs:
     - name: build
       run: |
         make VERBOSE=1 -j2
-        make -j2 test # quicktests
+        make -j3 test # quicktests
     - name: archive error 1
       uses: actions/upload-artifact@v3
       if: always()
@@ -73,7 +73,7 @@ jobs:
     - name: build
       run: |
         make VERBOSE=1 -j2
-        make -j2 test #quicktests
+        make -j3 test #quicktests
     - name: archive error 1
       uses: actions/upload-artifact@v3
       if: always()

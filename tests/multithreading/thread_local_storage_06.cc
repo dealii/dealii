@@ -81,11 +81,11 @@ test()
   Threads::Mutex     m[N];
 
   // start N threads with mutexes locked
-  Threads::ThreadGroup<> tg;
+  std::vector<std::thread> tg;
   for (unsigned int i = 0; i < N; ++i)
     {
       m[i].lock();
-      tg += Threads::new_thread(execute, m[i]);
+      tg.emplace_back(execute, std::ref(m[i]));
     }
 
   // let threads work through their first part
@@ -98,7 +98,8 @@ test()
     m[i].unlock();
 
   // now make sure the threads all finish
-  tg.join_all();
+  for (auto &thread : tg)
+    thread.join();
 
   deallog << "OK" << std::endl;
 }

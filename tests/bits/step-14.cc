@@ -521,8 +521,9 @@ namespace LaplaceSolver
     void (*mhnc_p)(const DoFHandler<dim> &, AffineConstraints<double> &) =
       &DoFTools::make_hanging_node_constraints;
 
-    Threads::Thread<> mhnc_thread =
-      Threads::new_thread(mhnc_p, dof_handler, hanging_node_constraints);
+    std::thread mhnc_thread(mhnc_p,
+                            std::ref(dof_handler),
+                            std::ref(hanging_node_constraints));
 
     sparsity_pattern.reinit(dof_handler.n_dofs(),
                             dof_handler.n_dofs(),

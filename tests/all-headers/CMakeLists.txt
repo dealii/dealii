@@ -14,7 +14,7 @@
 ## ---------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.13.4)
-include(../setup_testsubproject.cmake)
+include(../scripts/setup_testsubproject.cmake)
 project(testsuite CXX)
 
 #

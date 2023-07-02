@@ -41,11 +41,12 @@ main()
 {
   initlog();
 
-  Threads::ThreadGroup<double> tg;
-  tg += Threads::new_thread(std::bind(test, 1));
-  tg += Threads::new_thread([]() { return test(2); });
+  std::vector<std::thread> tg;
+  tg.emplace_back(std::bind(test, 1));
+  tg.emplace_back([]() { return test(2); });
 
-  tg.join_all();
+  tg[0].join();
+  tg[1].join();
 
   deallog << "OK" << std::endl;
 

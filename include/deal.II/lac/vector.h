@@ -25,6 +25,7 @@
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/lac/read_vector.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
@@ -105,7 +106,7 @@ namespace parallel
  * in the manual).
  */
 template <typename Number>
-class Vector : public Subscriptor
+class Vector : public Subscriptor, public ReadVector<Number>
 {
 public:
   /**
@@ -663,6 +664,13 @@ public:
                        std::vector<OtherNumber> &    values) const;
 
   /**
+   * Extract a range of elements all at once.
+   */
+  virtual void
+  extract_subvector_to(const ArrayView<const types::global_dof_index> &indices,
+                       ArrayView<Number> &elements) const override;
+
+  /**
    * Instead of getting individual elements of a vector via operator(),
    * this function allows getting a whole set of elements at once. In
    * contrast to the previous function, this function obtains the
@@ -958,8 +966,8 @@ public:
   /**
    * Return dimension of the vector.
    */
-  size_type
-  size() const;
+  virtual size_type
+  size() const override;
 
   /**
    * Return local dimension of the vector. Since this vector does not support
