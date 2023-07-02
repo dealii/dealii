@@ -60,27 +60,6 @@ for (X : TRIANGULATIONS; deal_II_dimension : DIMENSIONS;
   }
 
 
-// instantiate find_active_cell_around_point for
-// parallel::fullydistributed::Triangulation
-for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
-  {
-#if deal_II_dimension <= deal_II_space_dimension
-    namespace GridTools
-    \{
-      parallel::fullydistributed::Triangulation<
-        deal_II_dimension,
-        deal_II_space_dimension>::active_cell_iterator
-      find_active_cell_around_point(
-        const parallel::fullydistributed::Triangulation<deal_II_dimension,
-                                                        deal_II_space_dimension>
-          &,
-        const Point<deal_II_space_dimension> &p);
-    \}
-
-#endif
-  }
-
-
 // now also instantiate a few additional functions for
 // parallel::distributed::Triangulation
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
