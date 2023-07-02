@@ -1,0 +1,41 @@
+#
+# Parse all diff files...
+#
+
+file(GLOB _diff_files "${_base_directory}/*.diff")
+foreach(_diff_file ${_diff_files})
+  get_filename_component(_step "${_diff_file}" NAME_WLE)
+  set(_source_file "${DEAL_II_SOURCE_DIR}/examples/${_step}/${_step}.cc")
+  set(_output_file "${_source_directory}/${_step}.cc")
+
+  # ... and create a rule that updates all diff files if necessary during
+  # testsuite invocation:
+  add_custom_command(OUTPUT ${_output_file}
+    COMMAND patch ${_source_file} ${_diff_file} -o ${_output_file}
+    DEPENDS ${_source_file} ${_diff_file}
+    COMMENT "Patching ${_output_file}"
+    )
+
+  execute_process(
+    COMMAND patch ${_source_file} ${_diff_file} -o ${_output_file}
+    )
+
+  # Create symbolic links to the output files:
+  file(GLOB _output_files "${_base_directory}/${_step}*.output*")
+  foreach(_file ${_output_files})
+    get_filename_component(_destination "${_file}" NAME)
+    set(_destination "${_source_directory}/${_destination}")
+    file(CREATE_LINK ${_file} ${_destination} SYMBOLIC)
+  endforeach()
+endforeach()
+
+#
+# Create a top-level diff target:
+#
+
+add_custom_target(update_diffs
+  COMMAND "${_base_directory}/update_diffs.sh" "${DEAL_II_SOURCE_DIR}" "${_base_directory}"
+  WORKING_DIRECTORY "${_source_directory}"
+  )
+
+deal_ii_pickup_tests(examples)
