@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -u
 
 DEAL_II_SOURCE_DIR="${1}"
 shift
@@ -7,7 +7,7 @@ CMAKE_CURRENT_SOURCE_DIR="${1}"
 shift
 
 #
-# use .diff files to create .cc files
+# update .diff files from current .cc files
 #
 
 # Find all *.diff files in the current directory
@@ -17,16 +17,15 @@ for file in ${diff_files}; do
   # Extract the filename without the extension
   filename="$(basename "${file}" ".diff")"
   source_file="${DEAL_II_SOURCE_DIR}/examples/${filename}/${filename}.cc"
-  output_files="${CMAKE_CURRENT_SOURCE_DIR}/${filename}*.output*"
+  modified_file="${filename}.cc"
 
   # Check if the corresponding .cc file exists
-  if [[ -f "${source_file}" ]]; then
-    # Apply the diff and save it to a new file
-    patch "${source_file}" -o "${filename}.cc" < "${file}"
-    echo "copying file(s) ${output_files}"
-    cp ${output_files} .
+  if [[ -f "${source_file}" && -f "${modified_file}" ]]; then
+    echo diff "${source_file}" "${modified_file}" "${file}"
+    diff -Nur "${source_file}" "${modified_file}" > "${file}"
+    echo success
   else
-    echo "No matching .cc file found for ${file}"
+    echo "No matching .cc files found for ${file}"
     exit 1
   fi
 done
