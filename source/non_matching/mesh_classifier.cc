@@ -61,7 +61,7 @@ namespace NonMatching
        * vector are negative/positive, otherwise return
        * LocationToLevelSet::intersected.
        */
-      template <class VectorType>
+      template <typename VectorType>
       LocationToLevelSet
       location_from_dof_signs(const VectorType &local_levelset_values)
       {
@@ -83,7 +83,7 @@ namespace NonMatching
        * The concrete LevelSetDescription used when the level set function is
        * described as a (DoFHandler, Vector)-pair.
        */
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       class DiscreteLevelSetDescription : public LevelSetDescription<dim>
       {
       public:
@@ -132,7 +132,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       DiscreteLevelSetDescription<dim, VectorType>::DiscreteLevelSetDescription(
         const DoFHandler<dim> &dof_handler,
         const VectorType &     level_set)
@@ -142,7 +142,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       const hp::FECollection<dim> &
       DiscreteLevelSetDescription<dim, VectorType>::get_fe_collection() const
       {
@@ -151,7 +151,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       void
       DiscreteLevelSetDescription<dim, VectorType>::get_local_level_set_values(
         const typename Triangulation<dim>::active_cell_iterator &cell,
@@ -179,7 +179,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       unsigned int
       DiscreteLevelSetDescription<dim, VectorType>::active_fe_index(
         const typename Triangulation<dim>::active_cell_iterator &cell) const
@@ -311,7 +311,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <class VectorType>
+  template <typename VectorType>
   MeshClassifier<dim>::MeshClassifier(const DoFHandler<dim> &dof_handler,
                                       const VectorType &     level_set)
     : triangulation(&dof_handler.get_triangulation())

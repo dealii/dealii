@@ -253,7 +253,7 @@ public:
    * MatrixType. No index computations are done, thus, the vectors need to
    * have sizes matching #matrix.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   vmult(VectorType &w, const VectorType &v) const;
 
@@ -262,7 +262,7 @@ public:
    * MatrixType. No index computations are done, thus, the vectors need to
    * have sizes matching #matrix.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   vmult_add(VectorType &w, const VectorType &v) const;
 
@@ -271,7 +271,7 @@ public:
    * MatrixType. No index computations are done, thus, the vectors need to
    * have sizes matching #matrix.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   Tvmult(VectorType &w, const VectorType &v) const;
 
@@ -280,7 +280,7 @@ public:
    * MatrixType. No index computations are done, thus, the vectors need to
    * have sizes matching #matrix.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   Tvmult_add(VectorType &w, const VectorType &v) const;
 
@@ -796,7 +796,7 @@ MatrixBlock<MatrixType>::add(const size_type               row,
 
 
 template <typename MatrixType>
-template <class VectorType>
+template <typename VectorType>
 inline void
 MatrixBlock<MatrixType>::vmult(VectorType &w, const VectorType &v) const
 {
@@ -805,7 +805,7 @@ MatrixBlock<MatrixType>::vmult(VectorType &w, const VectorType &v) const
 
 
 template <typename MatrixType>
-template <class VectorType>
+template <typename VectorType>
 inline void
 MatrixBlock<MatrixType>::vmult_add(VectorType &w, const VectorType &v) const
 {
@@ -814,7 +814,7 @@ MatrixBlock<MatrixType>::vmult_add(VectorType &w, const VectorType &v) const
 
 
 template <typename MatrixType>
-template <class VectorType>
+template <typename VectorType>
 inline void
 MatrixBlock<MatrixType>::Tvmult(VectorType &w, const VectorType &v) const
 {
@@ -823,7 +823,7 @@ MatrixBlock<MatrixType>::Tvmult(VectorType &w, const VectorType &v) const
 
 
 template <typename MatrixType>
-template <class VectorType>
+template <typename VectorType>
 inline void
 MatrixBlock<MatrixType>::Tvmult_add(VectorType &w, const VectorType &v) const
 {

@@ -2009,7 +2009,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
 
 
 template <int dim, int patch_dim, int spacedim, int patch_spacedim>
-template <class VectorType>
+template <typename VectorType>
 void
 DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
   const DoFHandler<dim, spacedim> &dof_handler,
@@ -2024,7 +2024,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
 
 
 template <int dim, int patch_dim, int spacedim, int patch_spacedim>
-template <class VectorType>
+template <typename VectorType>
 void
 DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
   const DoFHandler<dim, spacedim> &dof_handler,

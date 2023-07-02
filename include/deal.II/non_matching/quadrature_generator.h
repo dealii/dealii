@@ -500,7 +500,7 @@ namespace NonMatching
      * class. The hp::QCollection<1> and AdditionalData is passed to the
      * QuadratureGenerator class.
      */
-    template <class VectorType>
+    template <typename VectorType>
     DiscreteQuadratureGenerator(
       const hp::QCollection<1> &quadratures1D,
       const DoFHandler<dim> &   dof_handler,
@@ -556,7 +556,7 @@ namespace NonMatching
      * class. The hp::QCollection<1> and AdditionalData is passed to the
      * QuadratureGenerator class.
      */
-    template <class VectorType>
+    template <typename VectorType>
     DiscreteFaceQuadratureGenerator(
       const hp::QCollection<1> &quadratures1D,
       const DoFHandler<dim> &   dof_handler,

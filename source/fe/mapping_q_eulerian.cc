@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
 // .... MAPPING Q EULERIAN CONSTRUCTOR
 
 
-template <int dim, class VectorType, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
   const unsigned int               degree,
   const DoFHandler<dim, spacedim> &euler_dof_handler,
@@ -62,7 +62,7 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
 
 
 
-template <int dim, class VectorType, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQEulerian<dim, VectorType, spacedim>::clone() const
 {
@@ -74,7 +74,7 @@ MappingQEulerian<dim, VectorType, spacedim>::clone() const
 
 // .... SUPPORT QUADRATURE CONSTRUCTOR
 
-template <int dim, class VectorType, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::SupportQuadrature::
   SupportQuadrature(const unsigned int map_degree)
   : Quadrature<dim>(Utilities::fixed_power<dim>(map_degree + 1))
@@ -99,7 +99,7 @@ MappingQEulerian<dim, VectorType, spacedim>::SupportQuadrature::
 
 // .... COMPUTE MAPPING SUPPORT POINTS
 
-template <int dim, class VectorType, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 boost::container::small_vector<Point<spacedim>,
                                GeometryInfo<dim>::vertices_per_cell>
 MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
@@ -118,7 +118,7 @@ MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
 
 
 
-template <int dim, class VectorType, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 std::vector<Point<spacedim>>
 MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
@@ -191,7 +191,7 @@ MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
 
 
 
-template <int dim, class VectorType, int spacedim>
+template <int dim, typename VectorType, int spacedim>
 CellSimilarity::Similarity
 MappingQEulerian<dim, VectorType, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,

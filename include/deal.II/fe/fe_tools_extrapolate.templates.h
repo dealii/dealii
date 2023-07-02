@@ -1458,23 +1458,23 @@ namespace FETools
     }
 #endif // DEAL_II_WITH_P4EST
 
-    template <class VectorType, typename dummy = void>
+    template <typename VectorType, typename dummy = void>
     struct BlockTypeHelper
     {
       using type = VectorType;
     };
 
-    template <class VectorType>
+    template <typename VectorType>
     struct BlockTypeHelper<VectorType,
                            std::enable_if_t<IsBlockVector<VectorType>::value>>
     {
       using type = typename VectorType::BlockType;
     };
 
-    template <class VectorType>
+    template <typename VectorType>
     using BlockType = typename BlockTypeHelper<VectorType>::type;
 
-    template <class VectorType, class DH>
+    template <typename VectorType, class DH>
     void
     reinit_distributed(const DH &dh, VectorType &vector)
     {
@@ -1568,7 +1568,7 @@ namespace FETools
 
 
 
-    template <class VectorType, class DH>
+    template <typename VectorType, class DH>
     void
     reinit_ghosted(const DH & /*dh*/, VectorType & /*vector*/)
     {

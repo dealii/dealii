@@ -1761,7 +1761,7 @@ AffineConstraints<number>::condense(
 
 
 template <typename number>
-template <class VectorType>
+template <typename VectorType>
 void
 AffineConstraints<number>::condense(const VectorType &vec_ghosted,
                                     VectorType &      vec) const
@@ -1806,7 +1806,7 @@ AffineConstraints<number>::condense(const VectorType &vec_ghosted,
 
 
 template <typename number>
-template <class VectorType>
+template <typename VectorType>
 void
 AffineConstraints<number>::condense(VectorType &vec) const
 {
@@ -1816,7 +1816,7 @@ AffineConstraints<number>::condense(VectorType &vec) const
 
 
 template <typename number>
-template <class VectorType>
+template <typename VectorType>
 void
 AffineConstraints<number>::condense(SparseMatrix<number> &uncondensed,
                                     VectorType &          vec) const
@@ -1989,7 +1989,7 @@ AffineConstraints<number>::condense(SparseMatrix<number> &uncondensed,
 
 
 template <typename number>
-template <class BlockVectorType>
+template <typename BlockVectorType>
 void
 AffineConstraints<number>::condense(BlockSparseMatrix<number> &uncondensed,
                                     BlockVectorType &          vec) const
@@ -2185,7 +2185,7 @@ namespace internal
   {
     using size_type = types::global_dof_index;
 
-    template <class VectorType>
+    template <typename VectorType>
     void
     set_zero_parallel(const std::vector<size_type> &cm,
                       VectorType &                  vec,
@@ -2272,7 +2272,7 @@ namespace internal
       vec.zero_out_ghost_values();
     }
 
-    template <class VectorType>
+    template <typename VectorType>
     void
     set_zero_in_parallel(const std::vector<size_type> &cm,
                          VectorType &                  vec,
@@ -2282,7 +2282,7 @@ namespace internal
     }
 
     // in parallel for BlockVectors
-    template <class VectorType>
+    template <typename VectorType>
     void
     set_zero_in_parallel(const std::vector<size_type> &cm,
                          VectorType &                  vec,
@@ -2296,7 +2296,7 @@ namespace internal
         }
     }
 
-    template <class VectorType>
+    template <typename VectorType>
     void
     set_zero_serial(const std::vector<size_type> &cm, VectorType &vec)
     {
@@ -2304,7 +2304,7 @@ namespace internal
         vec(index) = 0.;
     }
 
-    template <class VectorType>
+    template <typename VectorType>
     void
     set_zero_all(const std::vector<size_type> &cm, VectorType &vec)
     {
@@ -2535,7 +2535,7 @@ namespace internal
   }
 
   // for block vectors, simply dispatch to the individual blocks
-  template <class VectorType>
+  template <typename VectorType>
   void
   import_vector_with_ghost_elements(
     const VectorType &vec,
@@ -2565,7 +2565,7 @@ namespace internal
 } // namespace internal
 
 template <typename number>
-template <class VectorType>
+template <typename VectorType>
 void
 AffineConstraints<number>::distribute(VectorType &vec) const
 {

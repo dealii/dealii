@@ -180,7 +180,7 @@ namespace internal
    * Default implementation for serial vectors. Here we don't need to make a
    * copy into a ghosted vector, so just return a reference to @p prev.
    */
-  template <class VectorType>
+  template <typename VectorType>
   const VectorType &
   prepare_ghost_vector(const VectorType &prev, VectorType *other)
   {

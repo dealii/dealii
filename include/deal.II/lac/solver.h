@@ -336,7 +336,7 @@ class Vector;
  *
  * @ingroup Solvers
  */
-template <class VectorType = Vector<double>>
+template <typename VectorType = Vector<double>>
 class SolverBase : public Subscriptor
 {
 public:
@@ -475,7 +475,7 @@ protected:
 /*-------------------------------- Inline functions ------------------------*/
 
 
-template <class VectorType>
+template <typename VectorType>
 inline SolverControl::State
 SolverBase<VectorType>::StateCombiner::operator()(
   const SolverControl::State state1,
@@ -491,7 +491,7 @@ SolverBase<VectorType>::StateCombiner::operator()(
 }
 
 
-template <class VectorType>
+template <typename VectorType>
 template <typename Iterator>
 inline SolverControl::State
 SolverBase<VectorType>::StateCombiner::operator()(const Iterator begin,
@@ -511,7 +511,7 @@ SolverBase<VectorType>::StateCombiner::operator()(const Iterator begin,
 }
 
 
-template <class VectorType>
+template <typename VectorType>
 inline SolverBase<VectorType>::SolverBase(
   SolverControl &           solver_control,
   VectorMemory<VectorType> &vector_memory)
@@ -530,7 +530,7 @@ inline SolverBase<VectorType>::SolverBase(
 
 
 
-template <class VectorType>
+template <typename VectorType>
 inline SolverBase<VectorType>::SolverBase(SolverControl &solver_control)
   : // use the static memory object this class owns
   memory(static_vector_memory)
@@ -548,7 +548,7 @@ inline SolverBase<VectorType>::SolverBase(SolverControl &solver_control)
 
 
 
-template <class VectorType>
+template <typename VectorType>
 inline boost::signals2::connection
 SolverBase<VectorType>::connect(
   const std::function<SolverControl::State(const unsigned int iteration,

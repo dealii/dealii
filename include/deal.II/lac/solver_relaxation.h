@@ -85,7 +85,7 @@ public:
 
 //----------------------------------------------------------------------//
 
-template <class VectorType>
+template <typename VectorType>
 SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
                                                const AdditionalData &)
   : SolverBase<VectorType>(cn)
@@ -93,7 +93,7 @@ SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 template <typename MatrixType, class RelaxationType>
 void
 SolverRelaxation<VectorType>::solve(const MatrixType &    A,

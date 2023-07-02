@@ -560,7 +560,7 @@ BaseQR<VectorType>::multiply_with_colsT(Vector<Number> &  y,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 boost::signals2::connection
 BaseQR<VectorType>::connect_givens_slot(
   const std::function<void(const unsigned int i,
@@ -572,7 +572,7 @@ BaseQR<VectorType>::connect_givens_slot(
 
 
 
-template <class VectorType>
+template <typename VectorType>
 boost::signals2::connection
 ImplicitQR<VectorType>::connect_append_column_slot(
   const std::function<bool(const Vector<Number> &u,

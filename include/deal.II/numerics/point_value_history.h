@@ -332,7 +332,7 @@ public:
    * called for each dataset (time step, iteration, etc) for each vector_name,
    * otherwise a @p ExcDataLostSync error can occur.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   evaluate_field(const std::string &name, const VectorType &solution);
 
@@ -354,7 +354,7 @@ public:
    * method must be called for each dataset (time step, iteration, etc) for
    * each vector_name, otherwise a @p ExcDataLostSync error can occur.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   evaluate_field(const std::vector<std::string> &names,
                  const VectorType &              solution,
@@ -366,7 +366,7 @@ public:
    * call the above function. The above function is more efficient if multiple
    * fields use the same @p DataPostprocessor object.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   evaluate_field(const std::string &           name,
                  const VectorType &            solution,
@@ -386,7 +386,7 @@ public:
    * called for each dataset (time step, iteration, etc) for each vector_name,
    * otherwise a @p ExcDataLostSync error can occur.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   evaluate_field_at_requested_location(const std::string &name,
                                        const VectorType & solution);

@@ -671,7 +671,7 @@ public:
    * Adding Matrix-vector multiplication. Add $M*src$ on $dst$ with $M$ being
    * this matrix.
    */
-  template <class BlockVectorType>
+  template <typename BlockVectorType>
   void
   vmult_add(BlockVectorType &dst, const BlockVectorType &src) const;
 
@@ -680,7 +680,7 @@ public:
    * <i>dst</i> with <i>M</i> being this matrix. This function does the same
    * as vmult_add() but takes the transposed matrix.
    */
-  template <class BlockVectorType>
+  template <typename BlockVectorType>
   void
   Tvmult_add(BlockVectorType &dst, const BlockVectorType &src) const;
 
@@ -696,7 +696,7 @@ public:
    *
    * Obviously, the matrix needs to be square for this operation.
    */
-  template <class BlockVectorType>
+  template <typename BlockVectorType>
   value_type
   matrix_norm_square(const BlockVectorType &v) const;
 
@@ -710,7 +710,7 @@ public:
   /**
    * Compute the matrix scalar product $\left(u,Mv\right)$.
    */
-  template <class BlockVectorType>
+  template <typename BlockVectorType>
   value_type
   matrix_scalar_product(const BlockVectorType &u,
                         const BlockVectorType &v) const;
@@ -718,7 +718,7 @@ public:
   /**
    * Compute the residual <i>r=b-Ax</i>. Write the residual into <tt>dst</tt>.
    */
-  template <class BlockVectorType>
+  template <typename BlockVectorType>
   value_type
   residual(BlockVectorType &      dst,
            const BlockVectorType &x,
@@ -884,7 +884,7 @@ protected:
    * calls to the implementations provided here under a unique name for which
    * template arguments can be derived by the compiler.
    */
-  template <class BlockVectorType>
+  template <typename BlockVectorType>
   void
   vmult_block_block(BlockVectorType &dst, const BlockVectorType &src) const;
 
@@ -898,7 +898,7 @@ protected:
    * calls to the implementations provided here under a unique name for which
    * template arguments can be derived by the compiler.
    */
-  template <class BlockVectorType, class VectorType>
+  template <typename BlockVectorType, typename VectorType>
   void
   vmult_block_nonblock(BlockVectorType &dst, const VectorType &src) const;
 
@@ -912,7 +912,7 @@ protected:
    * calls to the implementations provided here under a unique name for which
    * template arguments can be derived by the compiler.
    */
-  template <class BlockVectorType, class VectorType>
+  template <typename BlockVectorType, typename VectorType>
   void
   vmult_nonblock_block(VectorType &dst, const BlockVectorType &src) const;
 
@@ -926,7 +926,7 @@ protected:
    * calls to the implementations provided here under a unique name for which
    * template arguments can be derived by the compiler.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   vmult_nonblock_nonblock(VectorType &dst, const VectorType &src) const;
 
@@ -941,7 +941,7 @@ protected:
    * calls to the implementations provided here under a unique name for which
    * template arguments can be derived by the compiler.
    */
-  template <class BlockVectorType>
+  template <typename BlockVectorType>
   void
   Tvmult_block_block(BlockVectorType &dst, const BlockVectorType &src) const;
 
@@ -955,7 +955,7 @@ protected:
    * calls to the implementations provided here under a unique name for which
    * template arguments can be derived by the compiler.
    */
-  template <class BlockVectorType, class VectorType>
+  template <typename BlockVectorType, typename VectorType>
   void
   Tvmult_block_nonblock(BlockVectorType &dst, const VectorType &src) const;
 
@@ -969,7 +969,7 @@ protected:
    * calls to the implementations provided here under a unique name for which
    * template arguments can be derived by the compiler.
    */
-  template <class BlockVectorType, class VectorType>
+  template <typename BlockVectorType, typename VectorType>
   void
   Tvmult_nonblock_block(VectorType &dst, const BlockVectorType &src) const;
 
@@ -983,7 +983,7 @@ protected:
    * calls to the implementations provided here under a unique name for which
    * template arguments can be derived by the compiler.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   Tvmult_nonblock_nonblock(VectorType &dst, const VectorType &src) const;
 
@@ -2207,7 +2207,7 @@ BlockMatrixBase<MatrixType>::get_column_indices() const
 
 
 template <class MatrixType>
-template <class BlockVectorType>
+template <typename BlockVectorType>
 void
 BlockMatrixBase<MatrixType>::vmult_block_block(BlockVectorType &      dst,
                                                const BlockVectorType &src) const
@@ -2228,7 +2228,7 @@ BlockMatrixBase<MatrixType>::vmult_block_block(BlockVectorType &      dst,
 
 
 template <class MatrixType>
-template <class BlockVectorType, class VectorType>
+template <typename BlockVectorType, typename VectorType>
 void
 BlockMatrixBase<MatrixType>::vmult_nonblock_block(
   VectorType &           dst,
@@ -2246,7 +2246,7 @@ BlockMatrixBase<MatrixType>::vmult_nonblock_block(
 
 
 template <class MatrixType>
-template <class BlockVectorType, class VectorType>
+template <typename BlockVectorType, typename VectorType>
 void
 BlockMatrixBase<MatrixType>::vmult_block_nonblock(BlockVectorType & dst,
                                                   const VectorType &src) const
@@ -2262,7 +2262,7 @@ BlockMatrixBase<MatrixType>::vmult_block_nonblock(BlockVectorType & dst,
 
 
 template <class MatrixType>
-template <class VectorType>
+template <typename VectorType>
 void
 BlockMatrixBase<MatrixType>::vmult_nonblock_nonblock(
   VectorType &      dst,
@@ -2277,7 +2277,7 @@ BlockMatrixBase<MatrixType>::vmult_nonblock_nonblock(
 
 
 template <class MatrixType>
-template <class BlockVectorType>
+template <typename BlockVectorType>
 void
 BlockMatrixBase<MatrixType>::vmult_add(BlockVectorType &      dst,
                                        const BlockVectorType &src) const
@@ -2295,7 +2295,7 @@ BlockMatrixBase<MatrixType>::vmult_add(BlockVectorType &      dst,
 
 
 template <class MatrixType>
-template <class BlockVectorType>
+template <typename BlockVectorType>
 void
 BlockMatrixBase<MatrixType>::Tvmult_block_block(
   BlockVectorType &      dst,
@@ -2318,7 +2318,7 @@ BlockMatrixBase<MatrixType>::Tvmult_block_block(
 
 
 template <class MatrixType>
-template <class BlockVectorType, class VectorType>
+template <typename BlockVectorType, typename VectorType>
 void
 BlockMatrixBase<MatrixType>::Tvmult_block_nonblock(BlockVectorType & dst,
                                                    const VectorType &src) const
@@ -2336,7 +2336,7 @@ BlockMatrixBase<MatrixType>::Tvmult_block_nonblock(BlockVectorType & dst,
 
 
 template <class MatrixType>
-template <class BlockVectorType, class VectorType>
+template <typename BlockVectorType, typename VectorType>
 void
 BlockMatrixBase<MatrixType>::Tvmult_nonblock_block(
   VectorType &           dst,
@@ -2355,7 +2355,7 @@ BlockMatrixBase<MatrixType>::Tvmult_nonblock_block(
 
 
 template <class MatrixType>
-template <class VectorType>
+template <typename VectorType>
 void
 BlockMatrixBase<MatrixType>::Tvmult_nonblock_nonblock(
   VectorType &      dst,
@@ -2370,7 +2370,7 @@ BlockMatrixBase<MatrixType>::Tvmult_nonblock_nonblock(
 
 
 template <class MatrixType>
-template <class BlockVectorType>
+template <typename BlockVectorType>
 void
 BlockMatrixBase<MatrixType>::Tvmult_add(BlockVectorType &      dst,
                                         const BlockVectorType &src) const
@@ -2388,7 +2388,7 @@ BlockMatrixBase<MatrixType>::Tvmult_add(BlockVectorType &      dst,
 
 
 template <class MatrixType>
-template <class BlockVectorType>
+template <typename BlockVectorType>
 typename BlockMatrixBase<MatrixType>::value_type
 BlockMatrixBase<MatrixType>::matrix_norm_square(const BlockVectorType &v) const
 {
@@ -2432,7 +2432,7 @@ BlockMatrixBase<MatrixType>::frobenius_norm() const
 
 
 template <class MatrixType>
-template <class BlockVectorType>
+template <typename BlockVectorType>
 typename BlockMatrixBase<MatrixType>::value_type
 BlockMatrixBase<MatrixType>::matrix_scalar_product(
   const BlockVectorType &u,
@@ -2454,7 +2454,7 @@ BlockMatrixBase<MatrixType>::matrix_scalar_product(
 
 
 template <class MatrixType>
-template <class BlockVectorType>
+template <typename BlockVectorType>
 typename BlockMatrixBase<MatrixType>::value_type
 BlockMatrixBase<MatrixType>::residual(BlockVectorType &      dst,
                                       const BlockVectorType &x,

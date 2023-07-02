@@ -66,7 +66,7 @@ DEAL_II_NAMESPACE_OPEN
  * Solver base class to determine convergence. This mechanism can also be used
  * to observe the progress of the iteration.
  */
-template <class VectorType = Vector<double>>
+template <typename VectorType = Vector<double>>
 class SolverMinRes : public SolverBase<VectorType>
 {
 public:
@@ -149,7 +149,7 @@ protected:
 
 #ifndef DOXYGEN
 
-template <class VectorType>
+template <typename VectorType>
 SolverMinRes<VectorType>::SolverMinRes(SolverControl &           cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData &)
@@ -159,7 +159,7 @@ SolverMinRes<VectorType>::SolverMinRes(SolverControl &           cn,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 SolverMinRes<VectorType>::SolverMinRes(SolverControl &cn,
                                        const AdditionalData &)
   : SolverBase<VectorType>(cn)
@@ -168,7 +168,7 @@ SolverMinRes<VectorType>::SolverMinRes(SolverControl &cn,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 double
 SolverMinRes<VectorType>::criterion()
 {
@@ -176,7 +176,7 @@ SolverMinRes<VectorType>::criterion()
 }
 
 
-template <class VectorType>
+template <typename VectorType>
 void
 SolverMinRes<VectorType>::print_vectors(const unsigned int,
                                         const VectorType &,
@@ -186,7 +186,7 @@ SolverMinRes<VectorType>::print_vectors(const unsigned int,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
 SolverMinRes<VectorType>::solve(const MatrixType &        A,

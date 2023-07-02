@@ -228,7 +228,7 @@ namespace PETScWrappers
    * methods:
    *
    * @code
-   * class VectorType : public Subscriptor
+   * typename VectorType : public Subscriptor
    *    ...
    *    explicit VectorType(Vec);
    *    ...
