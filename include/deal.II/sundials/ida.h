@@ -69,10 +69,7 @@ namespace SUNDIALS
    *  - reinit_vector;
    *  - residual;
    *  - setup_jacobian;
-   *  - solve_jacobian_system/solve_with_jacobian;
-   *
-   * The function solve_jacobian_system() is deprecated. You should use
-   * solve_with_jacobian() to leverage better non-linear algorithms.
+   *  - solve_with_jacobian;
    *
    * Optionally, also the following functions could be provided. By default
    * they do nothing, or are not required. If you call the constructor in a way
@@ -217,8 +214,8 @@ namespace SUNDIALS
    *   Jinv.invert(J);
    * };
    *
-   * time_stepper.solve_jacobian_system = [&](const VectorType &src,
-   *                                          VectorType &dst)
+   * time_stepper.solve_with_jacobian_system = [&](const VectorType &src,
+   *                                               VectorType &dst, double)
    * {
    *   Jinv.vmult(dst,src);
    * };
@@ -665,8 +662,7 @@ namespace SUNDIALS
      * Compute Jacobian. This function is called by IDA any time a Jacobian
      * update is required. The user should compute the Jacobian (or update all
      * the variables that allow the application of the Jacobian). This function
-     * is called by IDA once, before any call to solve_jacobian_system() or
-     * solve_with_jacobian().
+     * is called by IDA once, before any call to solve_with_jacobian().
      *
      * The Jacobian $J$ should be a (possibly inexact) computation of
      * \f[
@@ -677,15 +673,13 @@ namespace SUNDIALS
      * If the user uses a matrix based computation of the Jacobian, then this
      * is the right place where an assembly routine should be called to
      * assemble both a matrix and a preconditioner for the Jacobian system.
-     * Subsequent calls (possibly more than one) to solve_jacobian_system() or
-     * solve_with_jacobian() can assume that this function has
-     * been called at least once.
+     * Subsequent calls (possibly more than one) to solve_with_jacobian() can
+     * assume that this function has been called at least once.
      *
      * Notice that no assumption is made by this interface on what the user
      * should do in this function. IDA only assumes that after a call to
-     * setup_jacobian() it is possible to call solve_jacobian_system() or
-     * solve_with_jacobian() to obtain a solution $x$ to the
-     * system $J x = b$.
+     * setup_jacobian() it is possible to call solve_with_jacobian() to obtain a
+     * solution $x$ to the system $J x = b$.
      *
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
@@ -699,41 +693,6 @@ namespace SUNDIALS
                        const VectorType &y_dot,
                        const double      alpha)>
       setup_jacobian;
-
-    /**
-     * Solve the Jacobian linear system. This function will be called by IDA
-     * (possibly several times) after setup_jacobian() has been called at least
-     * once. IDA tries to do its best to call setup_jacobian() the minimum
-     * amount of times. If convergence can be achieved without updating the
-     * Jacobian, then IDA does not call setup_jacobian() again. If, on the
-     * contrary, internal IDA convergence tests fail, then IDA calls again
-     * setup_jacobian() with updated vectors and coefficients so that successive
-     * calls to solve_jacobian_systems() lead to better convergence in the
-     * Newton process.
-     *
-     * The jacobian $J$ should be (an approximation of) the system Jacobian
-     * \f[
-     *   J=\dfrac{\partial G}{\partial y} = \dfrac{\partial F}{\partial y} +
-     *  \alpha \dfrac{\partial F}{\partial \dot y}.
-     * \f]
-     *
-     * A call to this function should store in `dst` the result of $J^{-1}$
-     * applied to `src`, i.e., `J*dst = src`. It is the users responsibility
-     * to set up proper solvers and preconditioners inside this function.
-     *
-     * @note This variable represents a
-     * @ref GlossUserProvidedCallBack "user provided callback".
-     * See there for a description of how to deal with errors and other
-     * requirements and conventions. In particular, IDA can deal
-     * with "recoverable" errors in some circumstances, so callbacks
-     * can throw exceptions of type RecoverableUserCallbackError.
-     *
-     * @deprecated Use solve_with_jacobian() instead which also uses a numerical
-     * tolerance.
-     */
-    DEAL_II_DEPRECATED
-    std::function<void(const VectorType &rhs, VectorType &dst)>
-      solve_jacobian_system;
 
     /**
      * Solve the Jacobian linear system up to a specified tolerance. This

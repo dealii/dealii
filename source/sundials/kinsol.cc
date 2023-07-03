@@ -195,9 +195,8 @@ namespace SUNDIALS
     else
       {
         Assert(residual, ExcFunctionNotProvided("residual"));
-        Assert(solve_jacobian_system || solve_with_jacobian,
-               ExcFunctionNotProvided(
-                 "solve_jacobian_system || solve_with_jacobian"));
+        Assert(solve_with_jacobian,
+               ExcFunctionNotProvided("solve_with_jacobian"));
       }
 
     // Create a new solver object:
@@ -326,9 +325,8 @@ namespace SUNDIALS
     SUNMatrix       J  = nullptr;
     SUNLinearSolver LS = nullptr;
 
-    if (solve_jacobian_system ||
-        solve_with_jacobian) // user assigned a function
-                             // object to the solver slot
+    // user assigned a function object to the solver slot
+    if (solve_with_jacobian)
       {
         // Set the operations we care for in the sun_linear_solver object
         // and attach it to the KINSOL object. The functions that will get
@@ -373,52 +371,19 @@ namespace SUNDIALS
           const KINSOL<VectorType> &solver =
             *static_cast<const KINSOL<VectorType> *>(LS->content);
 
-          // This is where we have to make a decision about which of the two
-          // signals to call. Let's first check the more modern one:
-          if (solver.solve_with_jacobian)
-            {
-              auto src_b = internal::unwrap_nvector_const<VectorType>(b);
-              auto dst_x = internal::unwrap_nvector<VectorType>(x);
+          Assert(solver.solve_with_jacobian, ExcInternalError());
 
-              const int err = Utilities::call_and_possibly_capture_exception(
-                solver.solve_with_jacobian,
-                solver.pending_exception,
-                *src_b,
-                *dst_x,
-                tol);
+          auto src_b = internal::unwrap_nvector_const<VectorType>(b);
+          auto dst_x = internal::unwrap_nvector<VectorType>(x);
 
-              return err;
-            }
-          else
-            {
-              // User has not provided the modern callback, so the fact that
-              // we are here means that they must have given us something for
-              // the old signal. Check this.
-              Assert(solver.solve_jacobian_system, ExcInternalError());
+          const int err = Utilities::call_and_possibly_capture_exception(
+            solver.solve_with_jacobian,
+            solver.pending_exception,
+            *src_b,
+            *dst_x,
+            tol);
 
-              // Allocate temporary (deal.II-type) dummy vectors
-              GrowingVectorMemory<VectorType>            mem;
-              typename VectorMemory<VectorType>::Pointer src_ycur(mem);
-              typename VectorMemory<VectorType>::Pointer src_fcur(mem);
-
-              auto src_b = internal::unwrap_nvector_const<VectorType>(b);
-              auto dst_x = internal::unwrap_nvector<VectorType>(x);
-
-              // Call the user-provided setup function with these arguments.
-              // Note that Sundials 4.x and later no longer provide values for
-              // src_ycur and src_fcur, and so we simply pass dummy vector in.
-              // These vectors will have zero lengths because we don't reinit
-              // them above.
-              const int err = Utilities::call_and_possibly_capture_exception(
-                solver.solve_jacobian_system,
-                solver.pending_exception,
-                *src_ycur,
-                *src_fcur,
-                *src_b,
-                *dst_x);
-
-              return err;
-            }
+          return err;
         };
 
         // Even though we don't use it, KINSOL still wants us to set some

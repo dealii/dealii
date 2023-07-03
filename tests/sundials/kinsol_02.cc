@@ -73,11 +73,6 @@ main()
   kinsol.solve_with_jacobian =
     [&](const VectorType &rhs, VectorType &dst, double) { dst = rhs; };
 
-  kinsol.solve_jacobian_system = [&](const VectorType &,
-                                     const VectorType &,
-                                     const VectorType &rhs,
-                                     VectorType &      dst) { dst = rhs; };
-
   VectorType v(N);
 
   auto niter = kinsol.solve(v);

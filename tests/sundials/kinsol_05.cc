@@ -113,15 +113,13 @@ main()
   };
 
 
-  kinsol.solve_jacobian_system = [&J_inverse](const VectorType &u,
-                                              const VectorType &,
-                                              const VectorType &rhs,
-                                              VectorType &      dst) {
-    deallog << "Solving Jacobian system with rhs=(" << rhs[0] << ',' << rhs[1]
-            << ')' << std::endl;
+  kinsol.solve_with_jacobian =
+    [&J_inverse](const VectorType &rhs, VectorType &dst, double) {
+      deallog << "Solving Jacobian system with rhs=(" << rhs[0] << ',' << rhs[1]
+              << ')' << std::endl;
 
-    J_inverse.vmult(dst, rhs);
-  };
+      J_inverse.vmult(dst, rhs);
+    };
 
   VectorType v(N);
   v(0) = 0.5;

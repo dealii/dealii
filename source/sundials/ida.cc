@@ -337,9 +337,8 @@ namespace SUNDIALS
       return 0;
     };
 
-    AssertThrow(solve_jacobian_system || solve_with_jacobian,
-                ExcFunctionNotProvided(
-                  "solve_jacobian_system or solve_with_jacobian"));
+    AssertThrow(solve_with_jacobian,
+                ExcFunctionNotProvided("solve_with_jacobian"));
     LS->ops->solve = [](SUNLinearSolver LS,
                         SUNMatrix /*ignored*/,
                         N_Vector x,
@@ -349,25 +348,12 @@ namespace SUNDIALS
 
       auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
       auto *dst_x = internal::unwrap_nvector<VectorType>(x);
-      if (solver.solve_with_jacobian)
-        return Utilities::call_and_possibly_capture_exception(
-          solver.solve_with_jacobian,
-          solver.pending_exception,
-          *src_b,
-          *dst_x,
-          tol);
-      else if (solver.solve_jacobian_system)
-        return Utilities::call_and_possibly_capture_exception(
-          solver.solve_jacobian_system,
-          solver.pending_exception,
-          *src_b,
-          *dst_x);
-      else
-        {
-          // We have already checked this outside, so we should never get here.
-          Assert(false, ExcInternalError());
-          return -1;
-        }
+      return Utilities::call_and_possibly_capture_exception(
+        solver.solve_with_jacobian,
+        solver.pending_exception,
+        *src_b,
+        *dst_x,
+        tol);
     };
 
     // When we set an iterative solver IDA requires that resid is provided. From
