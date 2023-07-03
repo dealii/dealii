@@ -9,13 +9,13 @@ subsection Particle Tracking Problem
   set Output directory              = ./
 
   # Iteration frequency at which output results are written
-  set Output inverse frequency              = 10
+  set Output interval               = 10
 
   # Refinement of the volumetric mesh used to insert the particles
   set Particle insertion refinement = 3
 
   # Iteration frequency at which the mesh is load balanced
-  set Repartition inverse frequency         = 5
+  set Repartition interval          = 5
   set Time step                     = 0.002
   set Velocity degree               = 1
 end

@@ -100,15 +100,15 @@ namespace Step68
     // describe the details of the particle tracking simulation and its
     // discretization. The following parameters are about where output should
     // written to, the spatial discretization of the velocity (the default is
-    // $Q_1$), the time step and the output inverse frequency (how many time
+    // $Q_1$), the time step and the output interval (how many time
     // steps should elapse before we generate graphical output again):
     std::string output_directory = "./";
 
-    unsigned int velocity_degree               = 1;
-    double       time_step                     = 0.002;
-    double       final_time                    = 4.0;
-    unsigned int output_inverse_frequency      = 10;
-    unsigned int repartition_inverse_frequency = 5;
+    unsigned int velocity_degree      = 1;
+    double       time_step            = 0.002;
+    double       final_time           = 4.0;
+    unsigned int output_interval      = 10;
+    unsigned int repartition_interval = 5;
 
     // We allow every grid to be refined independently. In this tutorial, no
     // physics is resolved on the fluid grid, and its velocity is calculated
@@ -128,19 +128,17 @@ namespace Step68
     add_parameter(
       "Velocity degree", velocity_degree, "", prm, Patterns::Integer(1));
 
-    add_parameter(
-      "Output inverse frequency",
-      output_inverse_frequency,
-      "Iteration inverse frequency at which output results are written",
-      prm,
-      Patterns::Integer(1));
+    add_parameter("Output interval",
+                  output_interval,
+                  "Iteration interval between which output results are written",
+                  prm,
+                  Patterns::Integer(1));
 
-    add_parameter(
-      "Repartition inverse frequency",
-      repartition_inverse_frequency,
-      "Iteration inverse frequency at which the mesh is load balanced",
-      prm,
-      Patterns::Integer(1));
+    add_parameter("Repartition interval",
+                  repartition_interval,
+                  "Iteration interval at which the mesh is load balanced",
+                  prm,
+                  Patterns::Integer(1));
 
     add_parameter("Output directory", output_directory);
 
@@ -720,8 +718,7 @@ namespace Step68
         discrete_time.advance_time();
         velocity.set_time(discrete_time.get_previous_time());
 
-        if ((discrete_time.get_step_number() %
-             par.repartition_inverse_frequency) == 0)
+        if ((discrete_time.get_step_number() % par.repartition_interval) == 0)
           {
             particle_handler.prepare_for_coarsening_and_refinement();
             background_triangulation.repartition();
@@ -744,8 +741,7 @@ namespace Step68
         // <code>sort_particles_into_subdomains_and_cells</code>
         particle_handler.sort_particles_into_subdomains_and_cells();
 
-        if ((discrete_time.get_step_number() % par.output_inverse_frequency) ==
-            0)
+        if ((discrete_time.get_step_number() % par.output_interval) == 0)
           {
             output_particles(discrete_time.get_step_number());
             if (interpolated_velocity)
