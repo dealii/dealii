@@ -157,4 +157,33 @@ namespace TestGrids
     GridGenerator::subdivided_hyper_rectangle(tr, repetitions, p1, p2);
     Assert(tr.n_global_active_cells() == n_cells, ExcInternalError());
   }
+
+  /**
+   * In the past, we used a different ordering for the vertices in a hex
+   * cell than we do now. We provide a conversion function to facilitate
+   * updating tests that are using the old ordering.
+   */
+  constexpr std::array<unsigned int, 8> local_vertex_numbering{
+    {0, 1, 5, 4, 2, 3, 7, 6}};
+
+  inline void
+  reorder_old_to_new_style(std::vector<CellData<3>> &cells)
+  {
+    // undo the ordering above
+    unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
+    for (auto &cell : cells)
+      {
+        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
+          tmp[i] = cell.vertices[i];
+        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
+          cell.vertices[local_vertex_numbering[i]] = tmp[i];
+      }
+  }
+
+  inline void
+  reorder_old_to_new_style(std::vector<CellData<2>> &cells)
+  {
+    for (auto &cell : cells)
+      std::swap(cell.vertices[2], cell.vertices[3]);
+  }
 } // namespace TestGrids
