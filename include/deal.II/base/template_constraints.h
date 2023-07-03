@@ -165,15 +165,6 @@ namespace internal
 {
   namespace TemplateConstraints
   {
-    // TODO: Once we are able to use DEAL_II_HAVE_CXX17, the following classes
-    // can be made much simpler with the help of fold expressions, see
-    // https://en.cppreference.com/w/cpp/language/fold
-
-    // helper struct for is_base_of_all and all_same_as
-    template <bool... Values>
-    struct BoolStorage;
-
-
     /**
      * A helper class whose `value` member is true or false depending on
      * whether all of the given boolean template arguments are `true`.
@@ -185,9 +176,7 @@ namespace internal
     template <bool... Values>
     struct all_true
     {
-      static constexpr bool value =
-        std::is_same<BoolStorage<Values..., true>,
-                     BoolStorage<true, Values...>>::value;
+      static constexpr bool value = (Values && ...);
     };
 
 
@@ -196,20 +185,9 @@ namespace internal
      * boolean template arguments are true.
      */
     template <bool... Values>
-    struct any_true;
-
-
-    template <bool V1, bool... Values>
-    struct any_true<V1, Values...>
+    struct any_true
     {
-      static constexpr bool value = V1 || any_true<Values...>::value;
-    };
-
-
-    template <>
-    struct any_true<>
-    {
-      static constexpr bool value = false;
+      static constexpr bool value = (Values || ...);
     };
   } // namespace TemplateConstraints
 } // namespace internal
