@@ -15,7 +15,7 @@
 
 
 
-// Test GridReordering<3>::reorder_cells
+// Test GridTools::consistently_order_cells
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>

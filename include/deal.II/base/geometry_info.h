@@ -1633,9 +1633,10 @@ struct GeometryInfo<0>
  * Before a list of cells is passed to an object of the Triangulation class
  * for creation of a triangulation, you therefore have to make sure that cells
  * are oriented in a compatible fashion, so that edge directions are globally
- * according to above convention. However, the GridReordering class can do
- * this for you, by reorienting cells and edges of an arbitrary list of input
- * cells that need not be already sorted.
+ * according to above convention. However, the
+ * GridTools::consistently_order_cells() function can do this for you, by
+ * reorienting cells and edges of an arbitrary list of input cells that need not
+ * be already sorted.
  *
  * <h4>Faces</h4>
  *

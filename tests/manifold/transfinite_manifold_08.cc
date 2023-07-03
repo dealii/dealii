@@ -17,7 +17,6 @@
 // This test verifies that the transfinite interpolation works on a cylinder
 // with oblique faces
 
-#include <deal.II/grid/grid_reordering.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/manifold_lib.h>
 #include <deal.II/grid/tria.h>
