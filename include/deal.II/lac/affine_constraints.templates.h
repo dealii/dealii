@@ -914,9 +914,8 @@ AffineConstraints<number>::close()
                             {
                               // make sure that entry->first is not the index of
                               // a line itself
-                              const bool is_circle =
-                                is_constrained(entry.first);
-                              if (is_circle)
+                              const bool is_cycle = is_constrained(entry.first);
+                              if (is_cycle)
                                 return true;
                             }
                         return false;
