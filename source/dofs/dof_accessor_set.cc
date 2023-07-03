@@ -25,7 +25,6 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
@@ -81,9 +80,6 @@ namespace internal
                  dealii::Vector<typename VectorType::value_type>>::value ||
     std::is_same<VectorType,
                  dealii::BlockVector<typename VectorType::value_type>>::value ||
-    std::is_same<
-      VectorType,
-      dealii::LinearAlgebra::Vector<typename VectorType::value_type>>::value ||
     std::is_same<VectorType,
                  dealii::LinearAlgebra::distributed::Vector<
                    typename VectorType::value_type>>::value ||

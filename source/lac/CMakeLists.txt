@@ -24,7 +24,6 @@ set(_unity_include_src
   dynamic_sparsity_pattern.cc
   exceptions.cc
   scalapack.cc
-  la_vector.cc
   la_parallel_vector.cc
   la_parallel_block_vector.cc
   matrix_out.cc
@@ -74,7 +73,6 @@ set(_inst
   chunk_sparse_matrix.inst.in
   full_matrix.inst.in
   lapack_full_matrix.inst.in
-  la_vector.inst.in
   la_parallel_vector.inst.in
   la_parallel_block_vector.inst.in
   precondition_block.inst.in

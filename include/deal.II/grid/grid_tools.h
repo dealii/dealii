@@ -39,7 +39,6 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/trilinos_vector.h>

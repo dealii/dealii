@@ -20,7 +20,6 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/vector.h>
 
 #include "../tests.h"
@@ -58,25 +57,6 @@ test()
 
   deallog << "OK" << std::endl << std::endl;
 
-
-  // make sure that is_serial_vector< dealii::LinearAlgebra::Vector<Number> > is
-  // working
-  Assert(is_serial_vector<dealii::LinearAlgebra::Vector<double>>::value == true,
-         ExcInternalError());
-
-  deallog << is_serial_vector<dealii::LinearAlgebra::Vector<float>>::value
-          << std::endl;
-  deallog << is_serial_vector<dealii::LinearAlgebra::Vector<double>>::value
-          << std::endl;
-
-  deallog << is_serial_vector<
-               dealii::LinearAlgebra::Vector<std::complex<float>>>::value
-          << std::endl;
-  deallog << is_serial_vector<
-               dealii::LinearAlgebra::Vector<std::complex<double>>>::value
-          << std::endl;
-
-  deallog << "OK" << std::endl << std::endl;
 
   // make sure that dealii::LinearAlgebra::distributed::Vector<Number> > is
   // working

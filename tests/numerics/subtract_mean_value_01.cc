@@ -18,7 +18,6 @@
 // check VectorTools::subtract_mean_value() for deal.II serial vectors
 
 #include <deal.II/lac/block_vector.h>
-#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
@@ -73,16 +72,6 @@ main()
 
       {
         BlockVector<float> v(std::vector<types::global_dof_index>(1, 10));
-        test(v);
-      }
-
-      {
-        LinearAlgebra::Vector<double> v(10);
-        test(v);
-      }
-
-      {
-        LinearAlgebra::Vector<float> v(10);
         test(v);
       }
     }
