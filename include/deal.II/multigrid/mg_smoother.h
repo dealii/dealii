@@ -215,10 +215,10 @@ namespace mg
      * common range is utilized. This way, smoothing can be restricted to
      * certain levels even if the matrix was generated for all levels.
      */
-    template <typename MatrixType2, class DATA>
+    template <typename MatrixType2, typename DataType>
     void
     initialize(const MGLevelObject<MatrixType2> &matrices,
-               const MGLevelObject<DATA> &       additional_data);
+               const MGLevelObject<DataType> &   additional_data);
 
     /**
      * Empty all vectors.
@@ -326,10 +326,10 @@ public:
    * @p additional_data is an object of type @p RelaxationType::AdditionalData
    * and is handed to the initialization function of the relaxation method.
    */
-  template <typename MatrixType2, class DATA>
+  template <typename MatrixType2, typename DataType>
   void
   initialize(const MGLevelObject<MatrixType2> &matrices,
-             const MGLevelObject<DATA> &       additional_data);
+             const MGLevelObject<DataType> &   additional_data);
 
   /**
    * Initialize for single blocks of matrices. Of this block matrix, the block
@@ -340,10 +340,10 @@ public:
    * @p additional_data is an object of type @p RelaxationType::AdditionalData
    * and is handed to the initialization function of the relaxation method.
    */
-  template <typename MatrixType2, class DATA>
+  template <typename MatrixType2, typename DataType>
   void
   initialize(const MGLevelObject<MatrixType2> &matrices,
-             const DATA &                      additional_data,
+             const DataType &                  additional_data,
              const unsigned int                block_row,
              const unsigned int                block_col);
 
@@ -356,10 +356,10 @@ public:
    * @p additional_data is an object of type @p RelaxationType::AdditionalData
    * and is handed to the initialization function of the relaxation method.
    */
-  template <typename MatrixType2, class DATA>
+  template <typename MatrixType2, typename DataType>
   void
   initialize(const MGLevelObject<MatrixType2> &matrices,
-             const MGLevelObject<DATA> &       additional_data,
+             const MGLevelObject<DataType> &   additional_data,
              const unsigned int                block_row,
              const unsigned int                block_col);
 
@@ -489,10 +489,10 @@ public:
    * PreconditionerType::AdditionalData and is handed to the initialization
    * function of the relaxation method.
    */
-  template <typename MatrixType2, class DATA>
+  template <typename MatrixType2, typename DataType>
   void
   initialize(const MGLevelObject<MatrixType2> &matrices,
-             const MGLevelObject<DATA> &       additional_data);
+             const MGLevelObject<DataType> &   additional_data);
 
   /**
    * Initialize for single blocks of matrices. Of this block matrix, the block
@@ -504,10 +504,10 @@ public:
    * PreconditionerType::AdditionalData and is handed to the initialization
    * function of the relaxation method.
    */
-  template <typename MatrixType2, class DATA>
+  template <typename MatrixType2, typename DataType>
   void
   initialize(const MGLevelObject<MatrixType2> &matrices,
-             const DATA &                      additional_data,
+             const DataType &                  additional_data,
              const unsigned int                block_row,
              const unsigned int                block_col);
 
@@ -521,10 +521,10 @@ public:
    * PreconditionerType::AdditionalData and is handed to the initialization
    * function of the relaxation method.
    */
-  template <typename MatrixType2, class DATA>
+  template <typename MatrixType2, typename DataType>
   void
   initialize(const MGLevelObject<MatrixType2> &matrices,
-             const MGLevelObject<DATA> &       additional_data,
+             const MGLevelObject<DataType> &   additional_data,
              const unsigned int                block_row,
              const unsigned int                block_col);
 
@@ -694,11 +694,11 @@ namespace mg
 
 
   template <typename RelaxationType, typename VectorType>
-  template <typename MatrixType2, class DATA>
+  template <typename MatrixType2, typename DataType>
   inline void
   SmootherRelaxation<RelaxationType, VectorType>::initialize(
     const MGLevelObject<MatrixType2> &m,
-    const MGLevelObject<DATA> &       data)
+    const MGLevelObject<DataType> &   data)
   {
     const unsigned int min = std::max(m.min_level(), data.min_level());
     const unsigned int max = std::min(m.max_level(), data.max_level());
@@ -839,11 +839,11 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
 }
 
 template <typename MatrixType, typename RelaxationType, typename VectorType>
-template <typename MatrixType2, class DATA>
+template <typename MatrixType2, typename DataType>
 inline void
 MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
   const MGLevelObject<MatrixType2> &m,
-  const MGLevelObject<DATA> &       data)
+  const MGLevelObject<DataType> &   data)
 {
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
@@ -866,11 +866,11 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
 }
 
 template <typename MatrixType, typename RelaxationType, typename VectorType>
-template <typename MatrixType2, class DATA>
+template <typename MatrixType2, typename DataType>
 inline void
 MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
   const MGLevelObject<MatrixType2> &m,
-  const DATA &                      data,
+  const DataType &                  data,
   const unsigned int                row,
   const unsigned int                col)
 {
@@ -892,11 +892,11 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
 }
 
 template <typename MatrixType, typename RelaxationType, typename VectorType>
-template <typename MatrixType2, class DATA>
+template <typename MatrixType2, typename DataType>
 inline void
 MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
   const MGLevelObject<MatrixType2> &m,
-  const MGLevelObject<DATA> &       data,
+  const MGLevelObject<DataType> &   data,
   const unsigned int                row,
   const unsigned int                col)
 {
@@ -1080,11 +1080,11 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::
 
 
 template <typename MatrixType, typename PreconditionerType, typename VectorType>
-template <typename MatrixType2, class DATA>
+template <typename MatrixType2, typename DataType>
 inline void
 MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
   const MGLevelObject<MatrixType2> &m,
-  const MGLevelObject<DATA> &       data)
+  const MGLevelObject<DataType> &   data)
 {
   const unsigned int min = m.min_level();
   const unsigned int max = m.max_level();
@@ -1110,11 +1110,11 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
 
 
 template <typename MatrixType, typename PreconditionerType, typename VectorType>
-template <typename MatrixType2, class DATA>
+template <typename MatrixType2, typename DataType>
 inline void
 MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
   const MGLevelObject<MatrixType2> &m,
-  const DATA &                      data,
+  const DataType &                  data,
   const unsigned int                row,
   const unsigned int                col)
 {
@@ -1134,11 +1134,11 @@ MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
 
 
 template <typename MatrixType, typename PreconditionerType, typename VectorType>
-template <typename MatrixType2, class DATA>
+template <typename MatrixType2, typename DataType>
 inline void
 MGSmootherPrecondition<MatrixType, PreconditionerType, VectorType>::initialize(
   const MGLevelObject<MatrixType2> &m,
-  const MGLevelObject<DATA> &       data,
+  const MGLevelObject<DataType> &   data,
   const unsigned int                row,
   const unsigned int                col)
 {
