@@ -2826,7 +2826,7 @@ namespace DataOutBase
   }
 
 
-  template <int dim, int spacedim, class StreamType>
+  template <int dim, int spacedim, typename StreamType>
   void
   write_data(const std::vector<Patch<dim, spacedim>> &patches,
              unsigned int                             n_data_sets,

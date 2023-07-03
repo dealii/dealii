@@ -62,7 +62,7 @@ namespace hp
 
   // -------------------------- FEValuesBase -------------------------
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
     const MappingCollection<dim, FEValuesType::space_dimension>
       &                                                     mapping_collection,
@@ -82,7 +82,7 @@ namespace hp
     , update_flags(update_flags)
   {}
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
     const MappingCollection<dim, FEValuesType::space_dimension>
       &                                                     mapping_collection,
@@ -103,7 +103,7 @@ namespace hp
   {}
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
     const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
     const QCollection<q_dim> &                              q_collection,
@@ -117,7 +117,7 @@ namespace hp
   {}
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
     const FECollection<dim, FEValuesType::space_dimension> &fe_collection,
     const std::vector<QCollection<q_dim>> &                 q_collection,
@@ -132,7 +132,7 @@ namespace hp
 
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   FEValuesBase<dim, q_dim, FEValuesType>::FEValuesBase(
     const FEValuesBase<dim, q_dim, FEValuesType> &other)
     : Subscriptor(other)
@@ -171,7 +171,7 @@ namespace hp
 
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   FEValuesType &
   FEValuesBase<dim, q_dim, FEValuesType>::select_fe_values(
     const unsigned int fe_index,
@@ -201,7 +201,7 @@ namespace hp
 
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   void
   FEValuesBase<dim, q_dim, FEValuesType>::precalculate_fe_values(
     const std::vector<unsigned int> &fe_indices,
@@ -238,7 +238,7 @@ namespace hp
 
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   void
   FEValuesBase<dim, q_dim, FEValuesType>::precalculate_fe_values()
   {

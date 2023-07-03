@@ -28,7 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 FE_PolyFace<PolynomialType, dim, spacedim>::FE_PolyFace(
   const PolynomialType &        poly_space,
   const FiniteElementData<dim> &fe_data,
@@ -43,7 +43,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::FE_PolyFace(
 }
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 unsigned int
 FE_PolyFace<PolynomialType, dim, spacedim>::get_degree() const
 {
@@ -56,7 +56,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::get_degree() const
 //---------------------------------------------------------------------------
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 UpdateFlags
 FE_PolyFace<PolynomialType, dim, spacedim>::requires_update_flags(
   const UpdateFlags flags) const
@@ -76,7 +76,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::requires_update_flags(
 //---------------------------------------------------------------------------
 // Fill data of FEValues
 //---------------------------------------------------------------------------
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 void
 FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
@@ -105,7 +105,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_values(
 
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 void
 FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
@@ -198,7 +198,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
 }
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 void
 FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_subface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &,

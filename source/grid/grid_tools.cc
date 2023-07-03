@@ -495,7 +495,7 @@ namespace GridTools
       /**
        * Store the data about the given face @p face.
        */
-      template <class FaceIteratorType>
+      template <typename FaceIteratorType>
       void
       insert_face_data(const FaceIteratorType &face)
       {
@@ -534,7 +534,7 @@ namespace GridTools
     class FaceDataHelper<1>
     {
     public:
-      template <class FaceIteratorType>
+      template <typename FaceIteratorType>
       void
       insert_face_data(const FaceIteratorType &)
       {}
@@ -3083,7 +3083,7 @@ namespace GridTools
   {
     namespace BoundingBoxPredicate
     {
-      template <class MeshType>
+      template <typename MeshType>
       DEAL_II_CXX20_REQUIRES(
         concepts::is_triangulation_or_dof_handler<MeshType>)
       std::tuple<
@@ -3141,7 +3141,7 @@ namespace GridTools
 
 
 
-  template <class MeshType>
+  template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   std::
     vector<BoundingBox<MeshType::space_dimension>> compute_mesh_predicate_bounding_box(

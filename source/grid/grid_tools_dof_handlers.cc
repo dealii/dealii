@@ -189,7 +189,7 @@ namespace GridTools
 
 
 
-  template <class MeshType>
+  template <typename MeshType>
   DEAL_II_CXX20_REQUIRES((concepts::is_triangulation_or_dof_handler<MeshType>))
 #ifndef _MSC_VER
   std::vector<typename MeshType::active_cell_iterator>
@@ -761,7 +761,7 @@ namespace GridTools
 
 
 
-  template <class MeshType>
+  template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   std::
     vector<typename MeshType::active_cell_iterator> compute_active_cell_halo_layer(
@@ -799,7 +799,7 @@ namespace GridTools
 
 
 
-  template <class MeshType>
+  template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   std::
     vector<typename MeshType::cell_iterator> compute_cell_halo_layer_on_level(
@@ -844,7 +844,7 @@ namespace GridTools
 
   namespace
   {
-    template <class MeshType>
+    template <typename MeshType>
     DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
     bool contains_locally_owned_cells(
       const std::vector<typename MeshType::active_cell_iterator> &cells)
@@ -861,7 +861,7 @@ namespace GridTools
       return false;
     }
 
-    template <class MeshType>
+    template <typename MeshType>
     DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
     bool contains_artificial_cells(
       const std::vector<typename MeshType::active_cell_iterator> &cells)
@@ -881,7 +881,7 @@ namespace GridTools
 
 
 
-  template <class MeshType>
+  template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   std::vector<
     typename MeshType::
@@ -905,7 +905,7 @@ namespace GridTools
 
 
 
-  template <class MeshType>
+  template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   std::
     vector<typename MeshType::active_cell_iterator> compute_active_cell_layer_within_distance(
@@ -1050,7 +1050,7 @@ namespace GridTools
 
 
 
-  template <class MeshType>
+  template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   std::vector<
     typename MeshType::
@@ -1090,7 +1090,7 @@ namespace GridTools
 
 
 
-  template <class MeshType>
+  template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   std::pair<
     Point<MeshType::space_dimension>,
@@ -1426,7 +1426,7 @@ namespace GridTools
   }
 
 
-  template <class MeshType>
+  template <typename MeshType>
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   std::vector<typename MeshType::active_cell_iterator> get_patch_around_cell(
     const typename MeshType::active_cell_iterator &cell)

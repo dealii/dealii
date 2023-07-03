@@ -478,7 +478,7 @@ private:
    */
   SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_up;
 
-  template <int dim, class OtherVectorType, class TRANSFER>
+  template <int dim, typename OtherVectorType, class TRANSFER>
   friend class PreconditionMG;
 };
 
@@ -529,7 +529,7 @@ public:
    *
    * This is the operator used by LAC iterative solvers.
    */
-  template <class OtherVectorType>
+  template <typename OtherVectorType>
   void
   vmult(OtherVectorType &dst, const OtherVectorType &src) const;
 
@@ -537,7 +537,7 @@ public:
    * Preconditioning operator. Calls the @p vcycle function of the @p MG
    * object passed to the constructor.
    */
-  template <class OtherVectorType>
+  template <typename OtherVectorType>
   void
   vmult_add(OtherVectorType &dst, const OtherVectorType &src) const;
 
@@ -546,7 +546,7 @@ public:
    *
    * Not implemented, but the definition may be needed.
    */
-  template <class OtherVectorType>
+  template <typename OtherVectorType>
   void
   Tvmult(OtherVectorType &dst, const OtherVectorType &src) const;
 
@@ -555,7 +555,7 @@ public:
    *
    * Not implemented, but the definition may be needed.
    */
-  template <class OtherVectorType>
+  template <typename OtherVectorType>
   void
   Tvmult_add(OtherVectorType &dst, const OtherVectorType &src) const;
 
@@ -866,7 +866,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::empty() const
 }
 
 template <int dim, typename VectorType, class TRANSFER>
-template <class OtherVectorType>
+template <typename OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::vmult(
   OtherVectorType &      dst,
@@ -940,7 +940,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::connect_transfer_to_global(
 
 
 template <int dim, typename VectorType, class TRANSFER>
-template <class OtherVectorType>
+template <typename OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::vmult_add(
   OtherVectorType &      dst,
@@ -958,7 +958,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult_add(
 
 
 template <int dim, typename VectorType, class TRANSFER>
-template <class OtherVectorType>
+template <typename OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::Tvmult(OtherVectorType &,
                                                   const OtherVectorType &) const
@@ -968,7 +968,7 @@ PreconditionMG<dim, VectorType, TRANSFER>::Tvmult(OtherVectorType &,
 
 
 template <int dim, typename VectorType, class TRANSFER>
-template <class OtherVectorType>
+template <typename OtherVectorType>
 void
 PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add(
   OtherVectorType &,

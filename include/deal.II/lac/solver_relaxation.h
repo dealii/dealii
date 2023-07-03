@@ -75,7 +75,7 @@ public:
    * R(x_k,b)$. The matrix <i>A</i> itself is only used to compute the
    * residual.
    */
-  template <typename MatrixType, class RelaxationType>
+  template <typename MatrixType, typename RelaxationType>
   void
   solve(const MatrixType &    A,
         VectorType &          x,
@@ -94,7 +94,7 @@ SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
 
 
 template <typename VectorType>
-template <typename MatrixType, class RelaxationType>
+template <typename MatrixType, typename RelaxationType>
 void
 SolverRelaxation<VectorType>::solve(const MatrixType &    A,
                                     VectorType &          x,

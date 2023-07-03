@@ -241,7 +241,7 @@ enum UpdateFlags
  *
  * @ref UpdateFlags
  */
-template <class StreamType>
+template <typename StreamType>
 inline StreamType &
 operator<<(StreamType &s, const UpdateFlags u)
 {

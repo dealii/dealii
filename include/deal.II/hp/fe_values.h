@@ -64,7 +64,7 @@ namespace hp
    *
    * @ingroup hp
    */
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   class FEValuesBase : public Subscriptor
   {
   public:
@@ -690,7 +690,7 @@ namespace hp
 
 namespace hp
 {
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   inline const FEValuesType &
   FEValuesBase<dim, q_dim, FEValuesType>::get_present_fe_values() const
   {
@@ -699,7 +699,7 @@ namespace hp
 
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   inline const FECollection<dim, FEValuesType::space_dimension> &
   FEValuesBase<dim, q_dim, FEValuesType>::get_fe_collection() const
   {
@@ -708,7 +708,7 @@ namespace hp
 
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   inline const MappingCollection<dim, FEValuesType::space_dimension> &
   FEValuesBase<dim, q_dim, FEValuesType>::get_mapping_collection() const
   {
@@ -717,7 +717,7 @@ namespace hp
 
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   inline const QCollection<q_dim> &
   FEValuesBase<dim, q_dim, FEValuesType>::get_quadrature_collection() const
   {
@@ -726,7 +726,7 @@ namespace hp
 
 
 
-  template <int dim, int q_dim, class FEValuesType>
+  template <int dim, int q_dim, typename FEValuesType>
   inline UpdateFlags
   FEValuesBase<dim, q_dim, FEValuesType>::get_update_flags() const
   {

@@ -32,7 +32,7 @@ DEAL_II_NAMESPACE_OPEN
 // TODO:[GK] deg+1 is wrong here and should be fixed after FiniteElementData was
 // cleaned up
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,
                                                         MappingKind        map)
   : FE_PolyTensor<dim, spacedim>(
@@ -57,7 +57,7 @@ FE_DGVector<PolynomialType, dim, spacedim>::FE_DGVector(const unsigned int deg,
 }
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_DGVector<PolynomialType, dim, spacedim>::clone() const
 {
@@ -65,7 +65,7 @@ FE_DGVector<PolynomialType, dim, spacedim>::clone() const
 }
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 std::string
 FE_DGVector<PolynomialType, dim, spacedim>::get_name() const
 {
@@ -76,7 +76,7 @@ FE_DGVector<PolynomialType, dim, spacedim>::get_name() const
 }
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 std::vector<unsigned int>
 FE_DGVector<PolynomialType, dim, spacedim>::get_dpo_vector(
   const unsigned int deg)
@@ -88,7 +88,7 @@ FE_DGVector<PolynomialType, dim, spacedim>::get_dpo_vector(
 }
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 bool
 FE_DGVector<PolynomialType, dim, spacedim>::has_support_on_face(
   const unsigned int,
@@ -98,7 +98,7 @@ FE_DGVector<PolynomialType, dim, spacedim>::has_support_on_face(
 }
 
 
-template <class PolynomialType, int dim, int spacedim>
+template <typename PolynomialType, int dim, int spacedim>
 std::size_t
 FE_DGVector<PolynomialType, dim, spacedim>::memory_consumption() const
 {

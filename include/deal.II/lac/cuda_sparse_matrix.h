@@ -159,7 +159,7 @@ namespace CUDAWrappers
      * quadratic matrices are printed first in their row. If it is false,
      * the elements in a row are written in ascending column order.
      */
-    template <class StreamType>
+    template <typename StreamType>
     void
     print(StreamType &out,
           const bool  across         = false,
@@ -404,7 +404,7 @@ namespace CUDAWrappers
 
 
   template <typename Number>
-  template <class StreamType>
+  template <typename StreamType>
   inline void
   SparseMatrix<Number>::print(StreamType &out,
                               const bool  across,

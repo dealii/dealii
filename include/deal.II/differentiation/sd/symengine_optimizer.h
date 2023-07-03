@@ -116,7 +116,7 @@ namespace Differentiation
     /**
      * Output operator that outputs the selected optimizer type.
      */
-    template <class StreamType>
+    template <typename StreamType>
     inline StreamType &
     operator<<(StreamType &s, OptimizerType o)
     {
@@ -268,7 +268,7 @@ namespace Differentiation
      * Output operator that outputs optimization flags as a set of or'd
      * text values.
      */
-    template <class StreamType>
+    template <typename StreamType>
     inline StreamType &
     operator<<(StreamType &s, OptimizationFlags o)
     {

@@ -235,7 +235,7 @@ struct is_base_of_all
  * parameter pack are equal to the `Type` given as first template
  * argument. The result is stored in the member variable `value`.
  */
-template <class Type, class... Types>
+template <typename Type, class... Types>
 struct all_same_as
 {
   static constexpr bool value = internal::TemplateConstraints::all_true<
@@ -250,7 +250,7 @@ struct all_same_as
  * parameter pack are equal to the `Type` given as first template
  * argument. The result is stored in the member variable `value`.
  */
-template <class Type, class... Types>
+template <typename Type, class... Types>
 struct is_same_as_any_of
 {
   static constexpr bool value = internal::TemplateConstraints::any_true<

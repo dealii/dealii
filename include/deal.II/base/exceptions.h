@@ -1421,7 +1421,7 @@ namespace deal_II_exceptions
      *
      * @ref ExceptionBase
      */
-    template <class ExceptionType>
+    template <typename ExceptionType>
     [[noreturn]] void
     issue_error_noreturn(ExceptionHandling handling,
                          const char *      file,
@@ -1471,7 +1471,7 @@ namespace deal_II_exceptions
      * @note This function is defined with a template for the same reasons as
      * issue_error_noreturn().
      */
-    template <class ExceptionType>
+    template <typename ExceptionType>
     void
     issue_error_nothrow(const char *  file,
                         int           line,

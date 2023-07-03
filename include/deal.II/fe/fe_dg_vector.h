@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup febase
  */
-template <class PolynomialType, int dim, int spacedim = dim>
+template <typename PolynomialType, int dim, int spacedim = dim>
 class FE_DGVector : public FE_PolyTensor<dim, spacedim>
 {
 public:

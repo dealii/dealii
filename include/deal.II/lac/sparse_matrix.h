@@ -1577,7 +1577,7 @@ public:
    * internal storage scheme. If it is false, the elements in a row are
    * written in ascending column order.
    */
-  template <class StreamType>
+  template <typename StreamType>
   void
   print(StreamType &out,
         const bool  across         = false,
@@ -2506,7 +2506,7 @@ SparseMatrix<number>::end(const size_type r)
 
 
 template <typename number>
-template <class StreamType>
+template <typename StreamType>
 inline void
 SparseMatrix<number>::print(StreamType &out,
                             const bool  across,

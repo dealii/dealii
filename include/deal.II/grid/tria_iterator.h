@@ -478,7 +478,7 @@ public:
    * Print the iterator to a stream <code>out</code>. The format is
    * <tt>level.index</tt>.
    */
-  template <class StreamType>
+  template <typename StreamType>
   void
   print(StreamType &out) const;
 
@@ -1118,7 +1118,7 @@ TriaRawIterator<Accessor>::operator--()
 
 
 template <typename Accessor>
-template <class StreamType>
+template <typename StreamType>
 inline void
 TriaRawIterator<Accessor>::print(StreamType &out) const
 {
