@@ -1592,8 +1592,18 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
       int         liwork = -1;
       NumberType *eigenvectors_loc =
         (compute_eigenvectors ? eigenvectors->values.data() : nullptr);
-      work.resize(1);
-      iwork.resize(1);
+      /*
+       * According to the official "documentation" found on the internet
+       * (aka source file ppsyevx.f [1]) the work array has to have a
+       * minimal size of max(3, lwork). Because we query for optimal size
+       * (lwork == -1) we have to guarantee at least three doubles. The
+       * necessary size of iwork is not specified, so let's use three as
+       * well.
+       * [1]
+       * https://netlib.org/scalapack/explore-html/df/d1a/pdsyevx_8f_source.html
+       */
+      work.resize(3);
+      iwork.resize(3);
 
       if (all_eigenpairs)
         {
