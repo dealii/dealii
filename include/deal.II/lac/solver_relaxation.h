@@ -62,7 +62,17 @@ public:
    * no data in here for relaxation methods.
    */
   struct AdditionalData
-  {};
+  {
+    /**
+     * Constructor.
+     */
+    AdditionalData(const double relaxation = 1.0);
+
+    /**
+     * Relaxation parameter.
+     */
+    double relaxation;
+  };
 
   /**
    * Constructor.
@@ -72,34 +82,106 @@ public:
 
   /**
    * Solve the system $Ax = b$ using the relaxation method $x_{k+1} =
-   * R(x_k,b)$. The matrix <i>A</i> itself is only used to compute the
-   * residual.
+   * preconditioner(x_k,b)$. The matrix @p A itself is only used to
+   * compute the residual.
    */
-  template <typename MatrixType, class RelaxationType>
+  template <typename MatrixType, class PreconditionerType>
   void
-  solve(const MatrixType &    A,
-        VectorType &          x,
-        const VectorType &    b,
-        const RelaxationType &R);
+  solve(const MatrixType &        A,
+        VectorType &              x,
+        const VectorType &        b,
+        const PreconditionerType &preconditioner);
+
+private:
+  /**
+   * Relaxation parameter.
+   */
+  const double relaxation;
 };
 
 //----------------------------------------------------------------------//
 
 template <class VectorType>
-SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &cn,
-                                               const AdditionalData &)
+SolverRelaxation<VectorType>::SolverRelaxation(SolverControl &       cn,
+                                               const AdditionalData &data)
   : SolverBase<VectorType>(cn)
+  , relaxation(data.relaxation)
+{}
+
+
+
+namespace internal
+{
+  namespace SolverRelaxation
+  {
+    template <typename T, typename VectorType>
+    using step_t = decltype(
+      std::declval<T const>().step(std::declval<VectorType &>(),
+                                   std::declval<const VectorType &>()));
+
+    template <typename T, typename VectorType>
+    constexpr bool has_step = is_supported_operation<step_t, T, VectorType>;
+
+    template <class VectorType,
+              typename MatrixType,
+              class PreconditionerType,
+              std::enable_if_t<has_step<PreconditionerType, VectorType>,
+                               PreconditionerType> * = nullptr>
+    void
+    step(const MatrixType &,
+         const PreconditionerType &preconditioner,
+         VectorType &              x,
+         const VectorType &        b,
+         const double              relaxation,
+         VectorType &,
+         VectorType &)
+    {
+      AssertThrow(relaxation == 1.0, ExcNotImplemented());
+
+      preconditioner.step(x, b);
+    }
+
+    template <class VectorType,
+              typename MatrixType,
+              class PreconditionerType,
+              std::enable_if_t<!has_step<PreconditionerType, VectorType>,
+                               PreconditionerType> * = nullptr>
+    void
+    step(const MatrixType &        A,
+         const PreconditionerType &preconditioner,
+         VectorType &              x,
+         const VectorType &        b,
+         const double              relaxation,
+         VectorType &              r,
+         VectorType &              d)
+    {
+      A.vmult(r, x);
+      r.sadd(-1.0, 1.0, b);
+
+      preconditioner.vmult(d, r);
+      x.add(relaxation, d);
+    }
+
+  } // namespace SolverRelaxation
+} // namespace internal
+
+
+
+template <class VectorType>
+SolverRelaxation<VectorType>::AdditionalData::AdditionalData(
+  const double relaxation)
+  : relaxation(relaxation)
 {}
 
 
 
 template <class VectorType>
-template <typename MatrixType, class RelaxationType>
+template <typename MatrixType, class PreconditionerType>
 void
-SolverRelaxation<VectorType>::solve(const MatrixType &    A,
-                                    VectorType &          x,
-                                    const VectorType &    b,
-                                    const RelaxationType &R)
+SolverRelaxation<VectorType>::solve(const MatrixType &        A,
+                                    VectorType &              x,
+                                    const VectorType &        b,
+                                    const PreconditionerType &preconditioner)
 {
   GrowingVectorMemory<VectorType> mem;
   SolverControl::State            conv = SolverControl::iterate;
@@ -130,7 +212,9 @@ SolverRelaxation<VectorType>::solve(const MatrixType &    A,
       conv = this->iteration_status(iter, r.l2_norm(), x);
       if (conv != SolverControl::iterate)
         break;
-      R.step(x, b);
+
+      internal::SolverRelaxation::step(
+        A, preconditioner, x, b, relaxation, r, d);
     }
 
   // in case of failure: throw exception
