@@ -406,6 +406,13 @@ inconvenience this causes.
 <ol>
 
  <li>
+  Fixed: An out-of-bounds write due to an insufficiently sized buffer in
+  the Scalapack wrappers has been fixed.
+  <br>
+  (Matthias Maier, 2023/07/03)
+ </li>
+
+ <li>
   Fixed: With some compilers, calling Threads::Task::Task() with a
   function object that ends with an exception lead to a segmentation
   fault. This is now fixed.
