@@ -1,6 +1,12 @@
 name: github-OSX
 
-on: [pull_request]
+on:
+  pull_request:
+    types:
+    - opened
+    - reopened
+    - synchronize
+    - ready_for_review
 
 concurrency:
   group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
@@ -15,6 +21,9 @@ jobs:
 
     name: OSX serial
     runs-on: [macos-latest]
+
+    # only run on 'push' or if the 'pull_request' is not a draft:
+    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
     - uses: actions/checkout@v3
@@ -51,6 +60,9 @@ jobs:
 
     name: OSX parallel 64bit
     runs-on: [macos-latest]
+
+    # only run on 'push' or if the 'pull_request' is not a draft:
+    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
     - uses: actions/checkout@v3
