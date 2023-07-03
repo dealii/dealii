@@ -50,7 +50,7 @@ public:
     , testerrrecoverable(_testerrrec)
     , testcase(_testcase)
   {
-    bool throw_error = false;
+    throw_error = false;
 
     time_stepper.explicit_function =
       [&](const real_type t, const VectorType &y, VectorType &res) -> void {
@@ -197,6 +197,7 @@ private:
   bool        testerr;
   bool        testerrrecoverable;
   int         testcase;
+  bool        throw_error;
 };
 
 
