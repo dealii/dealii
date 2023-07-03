@@ -85,7 +85,7 @@ public:
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_value(1.0, q);
 
-            phi.integrate_scatter(true, false, dst);
+            phi.integrate_scatter(EvaluationFlags::values, dst);
           }
       },
       vec,
@@ -100,10 +100,14 @@ public:
     matrix_free.template cell_loop<VectorType, VectorType>(
       [&](const auto &, auto &dst, const auto &src, const auto cells) {
         FEEvaluation<dim, -1, 0, 1, double> phi(matrix_free);
+        EvaluationFlags::EvaluationFlags    fe_eval_flags =
+          EvaluationFlags::gradients;
+        if (do_helmholtz)
+          fe_eval_flags |= EvaluationFlags::values;
         for (unsigned int cell = cells.first; cell < cells.second; ++cell)
           {
             phi.reinit(cell);
-            phi.gather_evaluate(src, do_helmholtz, true);
+            phi.gather_evaluate(src, fe_eval_flags);
 
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
@@ -113,7 +117,7 @@ public:
                 phi.submit_gradient(phi.get_gradient(q), q);
               }
 
-            phi.integrate_scatter(do_helmholtz, true, dst);
+            phi.integrate_scatter(fe_eval_flags, dst);
           }
       },
       dst,

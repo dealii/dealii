@@ -125,7 +125,7 @@ public:
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_value(1.0, q);
 
-            phi.integrate_scatter(true, false, dst);
+            phi.integrate_scatter(EvaluationFlags::values, dst);
           }
       },
       vec,

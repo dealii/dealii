@@ -746,7 +746,7 @@ public:
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_value(0.0, q);
 
-            phi.integrate_scatter(true, false, dst);
+            phi.integrate_scatter(EvaluationFlags::values, dst);
           }
       },
       [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
@@ -771,7 +771,7 @@ public:
                                  q);
               }
 
-            phi.integrate_scatter(true, false, dst);
+            phi.integrate_scatter(EvaluationFlags::values, dst);
           }
       },
       vec,
@@ -789,12 +789,12 @@ public:
              ++cell)
           {
             phi.reinit(cell);
-            phi.gather_evaluate(src, true, false);
+            phi.gather_evaluate(src, EvaluationFlags::values);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               phi.submit_gradient(-this->beta(phi.quadrature_point(q)) *
                                     phi.get_value(q),
                                   q);
-            phi.integrate_scatter(false, true, dst);
+            phi.integrate_scatter(EvaluationFlags::gradients, dst);
           }
       },
       [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
@@ -831,7 +831,7 @@ public:
              ++cell)
           {
             phi.reinit(cell);
-            phi.gather_evaluate(src, true, false);
+            phi.gather_evaluate(src, EvaluationFlags::values);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
               {
                 const auto beta_n =

@@ -2201,15 +2201,6 @@ public:
   evaluate(const EvaluationFlags::EvaluationFlags evaluation_flag);
 
   /**
-   * Like above but with separate bool flags.
-   * @deprecated use evaluate() with the EvaluationFlags argument.
-   */
-  DEAL_II_DEPRECATED void
-  evaluate(const bool evaluate_values,
-           const bool evaluate_gradients,
-           const bool evaluate_hessians = false);
-
-  /**
    * Evaluate the function values, the gradients, and the Hessians of the
    * polynomial interpolation from the DoF values in the input array @p
    * values_array to the quadrature points on the unit cell. If multiple
@@ -2224,16 +2215,6 @@ public:
   void
   evaluate(const VectorizedArrayType *            values_array,
            const EvaluationFlags::EvaluationFlags evaluation_flag);
-
-  /**
-   * Like above but using separate bool flags.
-   * @deprecated use evaluate() with the EvaluationFlags argument.
-   */
-  DEAL_II_DEPRECATED void
-  evaluate(const VectorizedArrayType *values_array,
-           const bool                 evaluate_values,
-           const bool                 evaluate_gradients,
-           const bool                 evaluate_hessians = false);
 
   /**
    * Read from the input vector and evaluates the function values, the
@@ -2254,16 +2235,6 @@ public:
                   const EvaluationFlags::EvaluationFlags evaluation_flag);
 
   /**
-   * @deprecated Please use the gather_evaluate() function with the EvaluationFlags argument.
-   */
-  template <typename VectorType>
-  DEAL_II_DEPRECATED void
-  gather_evaluate(const VectorType &input_vector,
-                  const bool        evaluate_values,
-                  const bool        evaluate_gradients,
-                  const bool        evaluate_hessians = false);
-
-  /**
    * This function takes the values and/or gradients that are stored on
    * quadrature points, tests them by all the basis functions/gradients on the
    * cell and performs the cell integration. The two function arguments
@@ -2275,12 +2246,6 @@ public:
    */
   void
   integrate(const EvaluationFlags::EvaluationFlags integration_flag);
-
-  /**
-   * @deprecated Please use the integrate() function with the EvaluationFlags argument.
-   */
-  DEAL_II_DEPRECATED void
-  integrate(const bool integrate_values, const bool integrate_gradients);
 
   /**
    * This function takes the values and/or gradients that are stored on
@@ -2299,14 +2264,6 @@ public:
             const bool                             sum_into_values = false);
 
   /**
-   * @deprecated Please use the integrate() function with the EvaluationFlags argument.
-   */
-  DEAL_II_DEPRECATED void
-  integrate(const bool           integrate_values,
-            const bool           integrate_gradients,
-            VectorizedArrayType *values_array);
-
-  /**
    * This function takes the values and/or gradients that are stored on
    * quadrature points, tests them by all the basis functions/gradients on the
    * cell, performs the cell integration, and adds the result into the global
@@ -2323,15 +2280,6 @@ public:
   void
   integrate_scatter(const EvaluationFlags::EvaluationFlags integration_flag,
                     VectorType &                           output_vector);
-
-  /**
-   * @deprecated Please use the integrate_scatter() function with the EvaluationFlags argument.
-   */
-  template <typename VectorType>
-  DEAL_II_DEPRECATED void
-  integrate_scatter(const bool  integrate_values,
-                    const bool  integrate_gradients,
-                    VectorType &output_vector);
 
   /**
    * Return an object that can be thought of as an array containing all indices
@@ -2632,12 +2580,6 @@ public:
   evaluate(const EvaluationFlags::EvaluationFlags evaluation_flag);
 
   /**
-   * @deprecated Please use the evaluate() function with the EvaluationFlags argument.
-   */
-  DEAL_II_DEPRECATED void
-  evaluate(const bool evaluate_values, const bool evaluate_gradients);
-
-  /**
    * Evaluates the function values, the gradients, and the Laplacians of the
    * FE function given at the DoF values in the input array `values_array` at
    * the quadrature points on the unit cell. If multiple components are
@@ -2652,14 +2594,6 @@ public:
   void
   evaluate(const VectorizedArrayType *            values_array,
            const EvaluationFlags::EvaluationFlags evaluation_flag);
-
-  /**
-   * @deprecated Please use the evaluate() function with the EvaluationFlags argument.
-   */
-  DEAL_II_DEPRECATED void
-  evaluate(const VectorizedArrayType *values_array,
-           const bool                 evaluate_values,
-           const bool                 evaluate_gradients);
 
   /**
    * Reads from the input vector and evaluates the function values, the
@@ -7827,33 +7761,6 @@ FEEvaluation<dim,
              n_q_points_1d,
              n_components_,
              Number,
-             VectorizedArrayType>::evaluate(const bool evaluate_values,
-                                            const bool evaluate_gradients,
-                                            const bool evaluate_hessians)
-{
-#  ifdef DEBUG
-  Assert(this->dof_values_initialized == true,
-         internal::ExcAccessToUninitializedField());
-#  endif
-  evaluate(this->values_dofs,
-           evaluate_values,
-           evaluate_gradients,
-           evaluate_hessians);
-}
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-inline void
-FEEvaluation<dim,
-             fe_degree,
-             n_q_points_1d,
-             n_components_,
-             Number,
              VectorizedArrayType>::
   evaluate(const EvaluationFlags::EvaluationFlags evaluation_flags)
 {
@@ -7862,36 +7769,6 @@ FEEvaluation<dim,
          internal::ExcAccessToUninitializedField());
 #  endif
   evaluate(this->values_dofs, evaluation_flags);
-}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-inline void
-FEEvaluation<dim,
-             fe_degree,
-             n_q_points_1d,
-             n_components_,
-             Number,
-             VectorizedArrayType>::evaluate(const VectorizedArrayType
-                                              *        values_array,
-                                            const bool evaluate_values,
-                                            const bool evaluate_gradients,
-                                            const bool evaluate_hessians)
-{
-  const EvaluationFlags::EvaluationFlags flag =
-    ((evaluate_values) ? EvaluationFlags::values : EvaluationFlags::nothing) |
-    ((evaluate_gradients) ? EvaluationFlags::gradients :
-                            EvaluationFlags::nothing) |
-    ((evaluate_hessians) ? EvaluationFlags::hessians :
-                           EvaluationFlags::nothing);
-
-  evaluate(values_array, flag);
 }
 
 
@@ -7947,37 +7824,6 @@ FEEvaluation<dim,
   if (evaluation_flag_actual & EvaluationFlags::hessians)
     this->hessians_quad_initialized = true;
 #  endif
-}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-template <typename VectorType>
-inline void
-FEEvaluation<
-  dim,
-  fe_degree,
-  n_q_points_1d,
-  n_components_,
-  Number,
-  VectorizedArrayType>::gather_evaluate(const VectorType &input_vector,
-                                        const bool        evaluate_values,
-                                        const bool        evaluate_gradients,
-                                        const bool        evaluate_hessians)
-{
-  const EvaluationFlags::EvaluationFlags flag =
-    ((evaluate_values) ? EvaluationFlags::values : EvaluationFlags::nothing) |
-    ((evaluate_gradients) ? EvaluationFlags::gradients :
-                            EvaluationFlags::nothing) |
-    ((evaluate_hessians) ? EvaluationFlags::hessians :
-                           EvaluationFlags::nothing);
-
-  gather_evaluate(input_vector, flag);
 }
 
 
@@ -8097,30 +7943,6 @@ FEEvaluation<dim,
              n_q_points_1d,
              n_components_,
              Number,
-             VectorizedArrayType>::integrate(const bool integrate_values,
-                                             const bool integrate_gradients)
-{
-  integrate(integrate_values, integrate_gradients, this->values_dofs);
-
-#  ifdef DEBUG
-  this->dof_values_initialized = true;
-#  endif
-}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-inline void
-FEEvaluation<dim,
-             fe_degree,
-             n_q_points_1d,
-             n_components_,
-             Number,
              VectorizedArrayType>::
   integrate(const EvaluationFlags::EvaluationFlags integration_flag)
 {
@@ -8129,31 +7951,6 @@ FEEvaluation<dim,
 #  ifdef DEBUG
   this->dof_values_initialized = true;
 #  endif
-}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-inline void
-FEEvaluation<dim,
-             fe_degree,
-             n_q_points_1d,
-             n_components_,
-             Number,
-             VectorizedArrayType>::integrate(const bool integrate_values,
-                                             const bool integrate_gradients,
-                                             VectorizedArrayType *values_array)
-{
-  EvaluationFlags::EvaluationFlags flag =
-    (integrate_values ? EvaluationFlags::values : EvaluationFlags::nothing) |
-    (integrate_gradients ? EvaluationFlags::gradients :
-                           EvaluationFlags::nothing);
-  integrate(flag, values_array);
 }
 
 
@@ -8256,34 +8053,6 @@ FEEvaluation<dim,
 #  ifdef DEBUG
   this->dof_values_initialized = true;
 #  endif
-}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-template <typename VectorType>
-inline void
-FEEvaluation<
-  dim,
-  fe_degree,
-  n_q_points_1d,
-  n_components_,
-  Number,
-  VectorizedArrayType>::integrate_scatter(const bool  integrate_values,
-                                          const bool  integrate_gradients,
-                                          VectorType &destination)
-{
-  const EvaluationFlags::EvaluationFlags flag =
-    ((integrate_values) ? EvaluationFlags::values : EvaluationFlags::nothing) |
-    ((integrate_gradients) ? EvaluationFlags::gradients :
-                             EvaluationFlags::nothing);
-
-  integrate_scatter(flag, destination);
 }
 
 
@@ -8680,30 +8449,6 @@ FEFaceEvaluation<dim,
                  n_q_points_1d,
                  n_components_,
                  Number,
-                 VectorizedArrayType>::evaluate(const bool evaluate_values,
-                                                const bool evaluate_gradients)
-{
-#  ifdef DEBUG
-  Assert(this->dof_values_initialized, ExcNotInitialized());
-#  endif
-
-  evaluate(this->values_dofs, evaluate_values, evaluate_gradients);
-}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-inline void
-FEFaceEvaluation<dim,
-                 fe_degree,
-                 n_q_points_1d,
-                 n_components_,
-                 Number,
                  VectorizedArrayType>::
   evaluate(const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
@@ -8712,33 +8457,6 @@ FEFaceEvaluation<dim,
 #  endif
 
   evaluate(this->values_dofs, evaluation_flag);
-}
-
-
-
-template <int dim,
-          int fe_degree,
-          int n_q_points_1d,
-          int n_components_,
-          typename Number,
-          typename VectorizedArrayType>
-inline void
-FEFaceEvaluation<dim,
-                 fe_degree,
-                 n_q_points_1d,
-                 n_components_,
-                 Number,
-                 VectorizedArrayType>::evaluate(const VectorizedArrayType
-                                                  *        values_array,
-                                                const bool evaluate_values,
-                                                const bool evaluate_gradients)
-{
-  const EvaluationFlags::EvaluationFlags flag =
-    ((evaluate_values) ? EvaluationFlags::values : EvaluationFlags::nothing) |
-    ((evaluate_gradients) ? EvaluationFlags::gradients :
-                            EvaluationFlags::nothing);
-
-  evaluate(values_array, flag);
 }
 
 
