@@ -493,13 +493,14 @@ namespace parallel
     /**
      * Load the triangulation saved with save() back in. Cell-based data that
      * was saved with register_data_attach() can be read in with
-     * notify_ready_to_unpack() after calling load().
+     * notify_ready_to_unpack() after calling Triangulation<dim,
+     * spacedim>::load.
      */
     using Triangulation<dim, spacedim>::load;
 
 
     /**
-     * @copydoc load()
+     * Same as the function above.
      *
      * @deprecated The autopartition parameter has been removed.
      */
