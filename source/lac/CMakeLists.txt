@@ -143,10 +143,10 @@ if(DEAL_II_WITH_TRILINOS)
     #trilinos_precondition.cc
     #trilinos_precondition_ml.cc
     #trilinos_solver.cc
-    trilinos_sparse_matrix.cc
-    #trilinos_sparsity_pattern.cc
-    trilinos_tpetra_communication_pattern.cc
-    trilinos_tpetra_vector.cc
+    #trilinos_sparse_matrix.cc
+    trilinos_sparsity_pattern.cc
+    #trilinos_tpetra_communication_pattern.cc
+    #trilinos_tpetra_vector.cc
     #trilinos_vector.cc
   )
 

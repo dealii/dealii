@@ -213,7 +213,7 @@ value_cache_view,
   SparseMatrix::SparseMatrix()
     : column_space_map(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(0, 0, Utilities::Trilinos::tpetra_comm_self()))
     , matrix(
-        new Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>(View, *column_space_map, *column_space_map, 0))
+        new Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>(Teuchos::rcp(new Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(column_space_map, column_space_map, 0))))
     , last_action(Tpetra::ZERO)
     , compressed(true)
   {
@@ -351,7 +351,7 @@ value_cache_view,
     , last_action(Tpetra::ZERO)
     , compressed(true)
   {
-    Assert(sparsity_pattern.trilinos_sparsity_pattern().Filled() == true,
+    Assert(sparsity_pattern.trilinos_sparsity_pattern().isFillComplete() == true,
            ExcMessage(
              "The Trilinos sparsity pattern has not been compressed."));
     compress(VectorOperation::insert);
@@ -386,9 +386,9 @@ value_cache_view,
     // different maps or if we detect a row where the columns of the two
     // matrices do not match)
     bool needs_deep_copy =
-      !matrix->RowMap().SameAs(rhs.matrix->RowMap()) ||
-      !matrix->ColMap().SameAs(rhs.matrix->ColMap()) ||
-      !matrix->DomainMap().SameAs(rhs.matrix->DomainMap()) ||
+      !matrix->getRowMap()->isSameAs(*rhs.matrix->getRowMap()) ||
+      !matrix->getColMap()->isSameAs(*rhs.matrix->getColMap()) ||
+      !matrix->getDomainMap()->isSameAs(*rhs.matrix->getDomainMap()) ||
       n_nonzero_elements() != rhs.n_nonzero_elements();
     if (!needs_deep_copy)
       {
@@ -397,7 +397,7 @@ value_cache_view,
         // away the matrix.
         for (const auto row : locally_owned_range_indices())
           {
-            const int row_local = matrix->RowMap().LID(
+            const int row_local = matrix->getRowMap()->getLocalElement(
               static_cast<TrilinosWrappers::types::int_type>(row));
             Assert((row_local >= 0), ExcAccessToNonlocalRow(row));
 
@@ -434,12 +434,12 @@ value_cache_view,
     if (needs_deep_copy)
       {
         column_space_map =
-          std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(rhs.trilinos_matrix().DomainMap());
+          std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(rhs.trilinos_matrix().getDomainMap());
 
         // release memory before reallocation
         matrix = std::make_unique<Tpetra::FECrsMatrix>(*rhs.matrix);
 
-        matrix->FillComplete(*column_space_map, matrix->RowMap());
+        matrix->isFillComplete(*column_space_map, matrix->getRowMap());
       }
 
     if (rhs.nonlocal_matrix.get() != nullptr)
@@ -762,7 +762,7 @@ value_cache_view,
           // insert data from nonlocal graph into the final sparsity pattern
           if (exchange_data)
             {
-              Tpetra::Export exporter(nonlocal_graph->RowMap(), row_space_map);
+              Tpetra::Export exporter(nonlocal_graph->getRowMap(), row_space_map);
               int ierr = graph->Export(*nonlocal_graph, exporter, Add);
               (void)ierr;
               Assert(ierr == 0, ExcTrilinosError(ierr));
@@ -860,7 +860,7 @@ value_cache_view,
       return;
 
     column_space_map =
-      std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(sparse_matrix.trilinos_matrix().DomainMap());
+      std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(sparse_matrix.trilinos_matrix().getDomainMap());
     matrix.reset();
     nonlocal_matrix_exporter.reset();
     matrix = std::make_unique<Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>>(
@@ -1013,10 +1013,10 @@ value_cache_view,
   SparseMatrix::reinit(const Tpetra::CrsMatrix<double, int, types::signed_global_dof_index> &input_matrix,
                        const bool              copy_values)
   {
-    Assert(input_matrix.Filled() == true,
+    Assert(input_matrix.isFillComplete() == true,
            ExcMessage("Input CrsMatrix has not called FillComplete()!"));
 
-    column_space_map = std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(input_matrix.DomainMap());
+    column_space_map = std::make_unique<Tpetra::Map<int, dealii::types::signed_global_dof_index>>(input_matrix.getDomainMap());
 
     const Tpetra::CrsGraph *graph = &input_matrix.Graph();
 
@@ -1074,20 +1074,20 @@ value_cache_view,
       {
         // do only export in case of an add() operation, otherwise the owning
         // processor must have set the correct entry
-        nonlocal_matrix->FillComplete(*column_space_map, matrix->RowMap());
+        nonlocal_matrix->FillComplete(*column_space_map, matrix->getRowMap());
         if (nonlocal_matrix_exporter.get() == nullptr)
           nonlocal_matrix_exporter =
-            std::make_unique<Tpetra::Export>(nonlocal_matrix->RowMap(),
-                                            matrix->RowMap());
+            std::make_unique<Tpetra::Export>(nonlocal_matrix->getRowMap(),
+                                            matrix->getRowMap());
         ierr =
           matrix->Export(*nonlocal_matrix, *nonlocal_matrix_exporter, mode);
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-        ierr = matrix->FillComplete(*column_space_map, matrix->RowMap());
+        ierr = matrix->FillComplete(*column_space_map, matrix->getRowMap());
         nonlocal_matrix->PutScalar(0);
       }
     else
       ierr =
-        matrix->GlobalAssemble(*column_space_map, matrix->RowMap(), true, mode);
+        matrix->GlobalAssemble(*column_space_map, matrix->getRowMap(), true, mode);
 
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
@@ -1124,7 +1124,7 @@ value_cache_view,
   SparseMatrix::clear_row(const size_type      row,
                           const TrilinosScalar new_diag_value)
   {
-    Assert(matrix->Filled() == true, ExcMatrixNotCompressed());
+    Assert(matrix->isFillComplete() == true, ExcMatrixNotCompressed());
 
     // Only do this on the rows owned
     // locally on this processor.
@@ -1194,7 +1194,7 @@ value_cache_view,
         // Check whether the matrix has
         // already been transformed to local
         // indices.
-        Assert(matrix->Filled(), ExcMatrixNotCompressed());
+        Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
 
         // Prepare pointers for extraction
         // of a view of the row.
@@ -1270,7 +1270,7 @@ value_cache_view,
         // Check whether the matrix
         // already is transformed to
         // local indices.
-        Assert(matrix->Filled(), ExcMatrixNotCompressed());
+        Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
 
         // Prepare pointers for extraction
         // of a view of the row.
@@ -1417,7 +1417,7 @@ value_cache_view,
     if (last_action == Add)
       {
         ierr =
-          matrix->GlobalAssemble(*column_space_map, matrix->RowMap(), true);
+          matrix->GlobalAssemble(*column_space_map, matrix->getRowMap(), true);
 
         Assert(ierr == 0, ExcTrilinosError(ierr));
       }
@@ -1477,10 +1477,10 @@ value_cache_view,
     // one is when the pattern is already fixed. In the former case, we add
     // the possibility to insert new values, and in the second we just replace
     // data.
-    if (matrix->RowMap().MyGID(
+    if (matrix->getRowMap().MyGID(
           static_cast<TrilinosWrappers::types::int_type>(row)) == true)
       {
-        if (matrix->Filled() == false)
+        if (matrix->isFillComplete() == false)
           {
             ierr = matrix->Tpetra::CrsMatrix<double, int, types::signed_global_dof_index>::InsertGlobalValues(
               row, static_cast<int>(n_columns), col_value_ptr, col_index_ptr);
@@ -1507,7 +1507,7 @@ value_cache_view,
         // a time).
         compressed = false;
 
-        if (matrix->Filled() == false)
+        if (matrix->isFillComplete() == false)
           {
             ierr = matrix->InsertGlobalValues(1,
                                               &trilinos_row,
@@ -1611,7 +1611,7 @@ value_cache_view,
         // TODO: this could lead to a dead lock when only one processor
         // calls GlobalAssemble.
         ierr =
-          matrix->GlobalAssemble(*column_space_map, matrix->RowMap(), false);
+          matrix->GlobalAssemble(*column_space_map, matrix->getRowMap(), false);
 
         AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       }
@@ -1675,7 +1675,7 @@ value_cache_view,
     // If the calling processor owns the row to which we want to add values, we
     // can directly call the Tpetra::CrsMatrix<double, int, types::signed_global_dof_index> input function, which is much
     // faster than the Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index> function.
-    if (matrix->RowMap().MyGID(
+    if (matrix->getRowMap().MyGID(
           static_cast<TrilinosWrappers::types::int_type>(row)) == true)
       {
         ierr = matrix->Tpetra::CrsMatrix<double, int, types::signed_global_dof_index>::SumIntoGlobalValues(row,
@@ -1690,7 +1690,7 @@ value_cache_view,
         // this is the case when we have explicitly set the off-processor rows
         // and want to create a separate matrix object for them (to retain
         // thread-safety)
-        Assert(nonlocal_matrix->RowMap().LID(
+        Assert(nonlocal_matrix->getRowMap().getLocalElement(
                  static_cast<TrilinosWrappers::types::int_type>(row)) != -1,
                ExcMessage("Attempted to write into off-processor matrix row "
                           "that has not be specified as being writable upon "
@@ -1725,13 +1725,13 @@ value_cache_view,
       {
         std::cout << "------------------------------------------" << std::endl;
         std::cout << "Got error " << ierr << " in row " << row << " of proc "
-                  << matrix->RowMap().Comm().MyPID()
+                  << matrix->getRowMap().Comm().MyPID()
                   << " when trying to add the columns:" << std::endl;
         for (TrilinosWrappers::types::int_type i = 0; i < n_columns; ++i)
           std::cout << col_index_ptr[i] << " ";
         std::cout << std::endl << std::endl;
         std::cout << "Matrix row "
-                  << (matrix->RowMap().MyGID(
+                  << (matrix->getRowMap().MyGID(
                         static_cast<TrilinosWrappers::types::int_type>(row)) ==
                           false ?
                         "(nonlocal part)" :
@@ -1740,7 +1740,7 @@ value_cache_view,
         std::vector<TrilinosWrappers::types::int_type> indices;
         const Tpetra::CrsGraph *                        graph =
           (nonlocal_matrix.get() != nullptr &&
-           matrix->RowMap().MyGID(
+           matrix->getRowMap().MyGID(
              static_cast<TrilinosWrappers::types::int_type>(row)) == false) ?
                                     &nonlocal_matrix->Graph() :
                                     &matrix->Graph();
@@ -1788,17 +1788,17 @@ value_cache_view,
     AssertDimension(rhs.n(), n());
     AssertDimension(rhs.local_range().first, local_range().first);
     AssertDimension(rhs.local_range().second, local_range().second);
-    Assert(matrix->RowMap().SameAs(rhs.matrix->RowMap()),
+    Assert(matrix->getRowMap().SameAs(rhs.matrix->getRowMap()),
            ExcMessage("Can only add matrices with same distribution of rows"));
-    Assert(matrix->Filled() && rhs.matrix->Filled(),
+    Assert(matrix->isFillComplete() && rhs.matrix->isFillComplete(),
            ExcMessage("Addition of matrices only allowed if matrices are "
                       "filled, i.e., compress() has been called"));
 
-    const bool same_col_map = matrix->ColMap().SameAs(rhs.matrix->ColMap());
+    const bool same_col_map = matrix->getColMap().SameAs(rhs.matrix->getColMap());
 
     for (const auto row : locally_owned_range_indices())
       {
-        const int row_local = matrix->RowMap().LID(
+        const int row_local = matrix->getRowMap().getLocalElement(
           static_cast<TrilinosWrappers::types::int_type>(row));
         Assert((row_local >= 0), ExcAccessToNonlocalRow(row));
 
@@ -1843,7 +1843,7 @@ value_cache_view,
                   continue;
                 const TrilinosWrappers::types::int_type rhs_global_col =
                   global_column_index(*rhs.matrix, rhs_index_ptr[i]);
-                int  local_col   = matrix->ColMap().LID(rhs_global_col);
+                int  local_col   = matrix->getColMap()->getLocalElement(rhs_global_col);
                 int *local_index = Utilities::lower_bound(index_ptr,
                                                           index_ptr + n_entries,
                                                           local_col);
@@ -1917,7 +1917,7 @@ value_cache_view,
   TrilinosScalar
   SparseMatrix::l1_norm() const
   {
-    Assert(matrix->Filled(), ExcMatrixNotCompressed());
+    Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
     return matrix->NormOne();
   }
 
@@ -1926,7 +1926,7 @@ value_cache_view,
   TrilinosScalar
   SparseMatrix::linfty_norm() const
   {
-    Assert(matrix->Filled(), ExcMatrixNotCompressed());
+    Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
     return matrix->NormInf();
   }
 
@@ -1935,7 +1935,7 @@ value_cache_view,
   TrilinosScalar
   SparseMatrix::frobenius_norm() const
   {
-    Assert(matrix->Filled(), ExcMatrixNotCompressed());
+    Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
     return matrix->NormFrobenius();
   }
 
@@ -1957,7 +1957,7 @@ value_cache_view,
                                 const TrilinosWrappers::MPI::Vector &in,
                                 const TrilinosWrappers::MPI::Vector &out)
       {
-        Assert(in.trilinos_partitioner().SameAs(m.DomainMap()) == true,
+        Assert(in.trilinos_partitioner().SameAs(m.getDomainMap()) == true,
                ExcMessage("The column partitioning of a matrix does not match "
                           "the partitioning of a vector you are trying to "
                           "multiply it with. Are you multiplying the "
@@ -1983,7 +1983,7 @@ value_cache_view,
   SparseMatrix::vmult(VectorType &dst, const VectorType &src) const
   {
     Assert(&src != &dst, ExcSourceEqualsDestination());
-    Assert(matrix->Filled(), ExcMatrixNotCompressed());
+    Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
     (void)src;
     (void)dst;
 
@@ -1993,12 +1993,12 @@ value_cache_view,
     const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
     AssertDimension(dst_local_size, matrix->RangeMap().NumMyPoints());
     const size_type src_local_size = internal::end(src) - internal::begin(src);
-    AssertDimension(src_local_size, matrix->DomainMap().NumMyPoints());
+    AssertDimension(src_local_size, matrix->getDomainMap().NumMyPoints());
 
     Tpetra::MultiVector tril_dst(
       View, matrix->RangeMap(), internal::begin(dst), dst_local_size, 1);
     Tpetra::MultiVector tril_src(View,
-                                matrix->DomainMap(),
+                                matrix->getDomainMap(),
                                 const_cast<TrilinosScalar *>(
                                   internal::begin(src)),
                                 src_local_size,
@@ -2027,18 +2027,18 @@ value_cache_view,
   SparseMatrix::Tvmult(VectorType &dst, const VectorType &src) const
   {
     Assert(&src != &dst, ExcSourceEqualsDestination());
-    Assert(matrix->Filled(), ExcMatrixNotCompressed());
+    Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
 
     internal::SparseMatrixImplementation::check_vector_map_equality(*matrix,
                                                                     dst,
                                                                     src);
     const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
-    AssertDimension(dst_local_size, matrix->DomainMap().NumMyPoints());
+    AssertDimension(dst_local_size, matrix->getDomainMap().NumMyPoints());
     const size_type src_local_size = internal::end(src) - internal::begin(src);
     AssertDimension(src_local_size, matrix->RangeMap().NumMyPoints());
 
     Tpetra::MultiVector tril_dst(
-      View, matrix->DomainMap(), internal::begin(dst), dst_local_size, 1);
+      View, matrix->getDomainMap(), internal::begin(dst), dst_local_size, 1);
     Tpetra::MultiVector tril_src(View,
                                 matrix->RangeMap(),
                                 const_cast<double *>(internal::begin(src)),
@@ -2097,7 +2097,7 @@ value_cache_view,
   TrilinosScalar
   SparseMatrix::matrix_norm_square(const MPI::Vector &v) const
   {
-    Assert(matrix->RowMap().SameAs(matrix->DomainMap()), ExcNotQuadratic());
+    Assert(matrix->getRowMap().SameAs(matrix->getDomainMap()), ExcNotQuadratic());
 
     MPI::Vector temp_vector;
     temp_vector.reinit(v, true);
@@ -2112,7 +2112,7 @@ value_cache_view,
   SparseMatrix::matrix_scalar_product(const MPI::Vector &u,
                                       const MPI::Vector &v) const
   {
-    Assert(matrix->RowMap().SameAs(matrix->DomainMap()), ExcNotQuadratic());
+    Assert(matrix->getRowMap().SameAs(matrix->getDomainMap()), ExcNotQuadratic());
 
     MPI::Vector temp_vector;
     temp_vector.reinit(v, true);
@@ -2153,7 +2153,7 @@ value_cache_view,
         {
           Assert(inputleft.n() == inputright.m(),
                  ExcDimensionMismatch(inputleft.n(), inputright.m()));
-          Assert(inputleft.trilinos_matrix().DomainMap().SameAs(
+          Assert(inputleft.trilinos_matrix().getDomainMap().SameAs(
                    inputright.trilinos_matrix().RangeMap()),
                  ExcMessage("Parallel partitioning of A and B does not fit."));
         }
@@ -2186,7 +2186,7 @@ value_cache_view,
           mod_B = Teuchos::rcp(
             new Tpetra::CrsMatrix<double, int, types::signed_global_dof_index>(Copy, inputright.trilinos_sparsity_pattern()),
             true);
-          mod_B->FillComplete(inputright.trilinos_matrix().DomainMap(),
+          mod_B->FillComplete(inputright.trilinos_matrix().getDomainMap(),
                               inputright.trilinos_matrix().RangeMap());
           Assert(inputright.local_range() == V.local_range(),
                  ExcMessage("Parallel distribution of matrix B and vector V "

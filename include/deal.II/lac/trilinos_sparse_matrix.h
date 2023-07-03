@@ -1937,7 +1937,7 @@ namespace TrilinosWrappers
      * Pointer to the user-supplied Tpetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
      */
-    std::unique_ptr<Tpetra::Map<int, dealii::types::signed_global_dof_index>> column_space_map;
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> column_space_map;
 
     /**
      * A sparse matrix object in Trilinos to be used for finite element based
