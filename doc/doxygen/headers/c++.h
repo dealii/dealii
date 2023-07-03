@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2014 - 2022 by the deal.II authors
+// Copyright (C) 2014 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -17,8 +17,8 @@
 /**
  * @defgroup CPP11 deal.II and Modern C++ standards
  *
- * Since version 9.3, deal.II requires a compiler that supports at least
- * <a href="http://en.wikipedia.org/wiki/C%2B%2B14">C++14</a>. Large parts
+ * Since version 9.6, deal.II requires a compiler that supports at least
+ * <a href="http://en.wikipedia.org/wiki/C%2B%2B17">C++17</a>. Large parts
  * of the library now depend on modern language constructs which are
  * documented here.
  *
@@ -106,7 +106,7 @@
 
 
 /**
- * Previously, deal.II did not require C++14 and provided implementations of some
+ * Previously, deal.II did not require C++17 and provided implementations of some
  * useful C++14 features in this namespace. Presently, as the library now requires
  * C++14, usage of this namespace is deprecated.
  *
@@ -119,23 +119,12 @@ namespace std_cxx14
 
 
 /**
- * deal.II currently only requires a C++14-conforming compiler, but there are a
- * number of functions and classes from the C++17 standard that are easy to
- * provide also in case the compiler only supports C++14. These are collected
- * in the current namespace.
+ * Similarly, deal.II defined the C++17 library features it used before
+ * requiring C++17 in this namespac.
  *
  * The most notable example is the <a
  * href="https://en.cppreference.com/w/cpp/utility/optional">`std::optional`</a> class
  * that was introduced to C++ starting with the C++17 standard.
- *
- * There are other small additions in this namespace that allow us to
- * use C++17 features at this point already, even though we don't
- * require a C++17-compliant compiler.
- *
- * @note If the compiler in use actually does support C++17, then the
- *   contents of this namespace are simply imported classes and
- *   functions from namespace `std`. That is, we fall back to what the
- *   compiler provides, rather than our own implementations.
  */
 namespace std_cxx17
 {}
@@ -143,9 +132,9 @@ namespace std_cxx17
 
 
 /**
- * deal.II currently only requires a C++14-conforming compiler, but there are a
+ * deal.II currently only requires a C++17-conforming compiler, but there are a
  * number of functions and classes from the C++20 standard that are easy to
- * provide also in case the compiler only supports C++14. These are collected
+ * provide also in case the compiler only supports C++17. These are collected
  * in the current namespace.
  *
  * One example is the <a
