@@ -1486,10 +1486,11 @@ namespace internal
         }
     }
 
-    bool hp_functionality_enabled = false;
-    for (const auto &dh : dof_handler)
-      if (dh->get_fe_collection().size() > 1)
-        hp_functionality_enabled = true;
+    const bool hp_functionality_enabled =
+      std::any_of(dof_handler.begin(), dof_handler.end(), [](const auto &dh) {
+        return (dh->get_fe_collection().size() > 1);
+      });
+
     const unsigned int         n_lanes = task_info.vectorization_length;
     std::vector<unsigned int>  renumbering;
     std::vector<unsigned char> irregular_cells;
