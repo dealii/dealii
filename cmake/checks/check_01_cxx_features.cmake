@@ -242,6 +242,7 @@ macro(_test_cxx17_support)
     }
     "
     DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
+  _set_up_cmake_required()
 
   # Check some generic C++11 features
   CHECK_CXX_SOURCE_COMPILES(
@@ -307,9 +308,9 @@ endmacro()
 _set_up_cmake_required()
 _test_cxx17_support()
 
-if(NOT DEAL_II_HAVE_CXX14)
+if(NOT DEAL_II_HAVE_CXX17)
   #
-  # We failed to detect C++14 support. Let's make an attempt to set the
+  # We failed to detect C++17 support. Let's make an attempt to set the
   # -std= compiler flag. (But in order to minimize confusion let's not
   # override any manually specified -std= flag or CMAKE_CXX_STANDARD
   # variable set by the user.)
@@ -333,7 +334,6 @@ if(NOT DEAL_II_HAVE_CXX17)
     )
 endif()
 
-_test_cxx17_support()
 _test_cxx20_support()
 
 set_if_empty(CMAKE_CXX_STANDARD "${_cxx_standard}")
