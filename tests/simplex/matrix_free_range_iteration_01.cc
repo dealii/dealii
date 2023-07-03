@@ -54,9 +54,9 @@ test()
 
   unsigned int counter = 0;
 
-  for (auto &cell : dof_handler)
+  for (auto &cell : dof_handler.cell_iterators())
     if (counter++ < tria.n_cells() / 2)
-      cell.set_active_fe_index(1);
+      cell->set_active_fe_index(1);
 
   dof_handler.distribute_dofs(fe);
 

@@ -120,8 +120,8 @@ test()
       DoFHandler<3> dof_handler(tria);
       dof_handler.distribute_dofs(fe);
 
-      for (auto &cell : tria)
-        for (auto &face : cell.face_iterators())
+      for (auto &cell : tria.cell_iterators())
+        for (auto &face : cell->face_iterators())
           {
             if (std::abs(face->center()[2] - 0.0) < 10e-6)
               face->set_boundary_id(4);
