@@ -82,12 +82,12 @@ test()
                                       n_components,
                                       Number,
                                       VectorizedArrayType> &phi) {
-    phi.evaluate(false, true, false);
+    phi.evaluate(EvaluationFlags::gradients);
     for (unsigned int q = 0; q < phi.n_q_points; ++q)
       {
         phi.submit_symmetric_gradient(2.0 * phi.get_symmetric_gradient(q), q);
       }
-    phi.integrate(false, true);
+    phi.integrate(EvaluationFlags::gradients);
   };
 
   LinearAlgebra::distributed::Vector<Number> diagonal_global;

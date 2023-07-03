@@ -76,10 +76,10 @@ test()
                          n_components,
                          Number,
                          VectorizedArrayType> &phi) {
-           phi.evaluate(false, true);
+           phi.evaluate(EvaluationFlags::gradients);
            for (unsigned int q = 0; q < phi.n_q_points; ++q)
              phi.submit_gradient(phi.get_gradient(q), q);
-           phi.integrate(false, true);
+           phi.integrate(EvaluationFlags::gradients);
          });
 
   test.do_test();

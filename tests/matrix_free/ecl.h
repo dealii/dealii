@@ -149,10 +149,10 @@ test(const unsigned int geometry      = 0,
         {
           phi.reinit(cell);
           phi.read_dof_values(src);
-          phi.evaluate(false, true, false);
+          phi.evaluate(EvaluationFlags::gradients);
           for (unsigned int q = 0; q < phi.n_q_points; ++q)
             phi.submit_gradient(phi.get_gradient(q), q);
-          phi.integrate(false, true);
+          phi.integrate(EvaluationFlags::gradients);
           phi.set_dof_values(dst);
         }
     },
@@ -163,9 +163,9 @@ test(const unsigned int geometry      = 0,
           phi_p.reinit(face);
 
           phi_m.read_dof_values(src);
-          phi_m.evaluate(true, true);
+          phi_m.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
           phi_p.read_dof_values(src);
-          phi_p.evaluate(true, true);
+          phi_p.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
           VectorizedArrayType sigmaF =
             (std::abs(
                (phi_m.normal_vector(0) * phi_m.inverse_jacobian(0))[dim - 1]) +
@@ -186,9 +186,9 @@ test(const unsigned int geometry      = 0,
               phi_m.submit_value(average_valgrad, q);
               phi_p.submit_value(-average_valgrad, q);
             }
-          phi_m.integrate(true, true);
+          phi_m.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
           phi_m.distribute_local_to_global(dst);
-          phi_p.integrate(true, true);
+          phi_p.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
           phi_p.distribute_local_to_global(dst);
         }
     },
@@ -240,10 +240,10 @@ test(const unsigned int geometry      = 0,
         {
           phi.reinit(cell);
           phi.read_dof_values(src);
-          phi.evaluate(false, true, false);
+          phi.evaluate(EvaluationFlags::gradients);
           for (unsigned int q = 0; q < phi.n_q_points; ++q)
             phi.submit_gradient(phi.get_gradient(q), q);
-          phi.integrate(false, true);
+          phi.integrate(EvaluationFlags::gradients);
 
           for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
                ++face)

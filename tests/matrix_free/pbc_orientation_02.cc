@@ -186,9 +186,9 @@ test()
                   continue;
 
                 eval_minus.reinit(cell, face);
-                eval_minus.gather_evaluate(src, true, false);
+                eval_minus.gather_evaluate(src, EvaluationFlags::values);
                 eval_plus.reinit(cell, face);
-                eval_plus.gather_evaluate(src, true, false);
+                eval_plus.gather_evaluate(src, EvaluationFlags::values);
 
                 for (unsigned int q = 0; q < eval_minus.n_q_points; ++q)
                   {
