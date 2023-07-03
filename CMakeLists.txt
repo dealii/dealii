@@ -111,6 +111,9 @@ foreach(_file ${_check_files})
   verbose_include(${_file})
 endforeach()
 
+# include setup_finalize.cmake before any target definitions
+verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_finalize.cmake)
+
 #
 # Feature configuration:
 #
@@ -120,8 +123,7 @@ foreach(_file ${_configure_files})
   verbose_include(${_file})
 endforeach()
 
-verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_finalize.cmake)
-
+verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_sanity_checks.cmake)
 verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_cpack.cmake)
 verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_custom_targets.cmake)
 
