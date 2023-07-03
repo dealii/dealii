@@ -17,7 +17,7 @@
 
 #include <deal.II/base/geometry_info.h>
 
-#include <deal.II/grid/data_transfer.h>
+#include <deal.II/grid/data_serializer.h>
 #include <deal.II/grid/tria_accessor.h>
 
 #include <utility>
@@ -27,20 +27,22 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-DataTransfer<dim, spacedim>::DataTransfer(const MPI_Comm &mpi_communicator)
+CellAttachedDataSerializer<dim, spacedim>::CellAttachedDataSerializer()
   : variable_size_data_stored(false)
-  , mpi_communicator(mpi_communicator)
 {}
 
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void DataTransfer<dim, spacedim>::pack_data(
+void CellAttachedDataSerializer<dim, spacedim>::pack_data(
   const std::vector<cell_relation_t> &cell_relations,
-  const std::vector<typename CellAttachedData<dim, spacedim>::pack_callback_t>
+  const std::vector<
+    typename internal::CellAttachedData<dim, spacedim>::pack_callback_t>
     &pack_callbacks_fixed,
-  const std::vector<typename CellAttachedData<dim, spacedim>::pack_callback_t>
-    &pack_callbacks_variable)
+  const std::vector<
+    typename internal::CellAttachedData<dim, spacedim>::pack_callback_t>
+    &             pack_callbacks_variable,
+  const MPI_Comm &mpi_communicator)
 {
   Assert(src_data_fixed.size() == 0,
          ExcMessage("Previously packed data has not been released yet!"));
@@ -94,14 +96,14 @@ void DataTransfer<dim, spacedim>::pack_data(
         // Assertions about the tree structure.
         switch (cell_status)
           {
-            case CELL_PERSIST:
-            case CELL_REFINE:
+            case CellStatus::cell_will_persist:
+            case CellStatus::cell_will_be_refined:
               // double check the condition that we will only ever attach
               // data to active cells when we get here
               Assert(dealii_cell->is_active(), ExcInternalError());
               break;
 
-            case CELL_COARSEN:
+            case CellStatus::children_will_be_coarsened:
               // double check the condition that we will only ever attach
               // data to cells with children when we get here. however, we
               // can only tolerate one level of coarsening at a time, so
@@ -113,7 +115,7 @@ void DataTransfer<dim, spacedim>::pack_data(
                 Assert(dealii_cell->child(c)->is_active(), ExcInternalError());
               break;
 
-            case CELL_INVALID:
+            case CellStatus::cell_invalid:
               // do nothing on invalid cells
               break;
 
@@ -128,10 +130,10 @@ void DataTransfer<dim, spacedim>::pack_data(
         // room for an array that holds information about how many
         // bytes each of the variable size callback functions will
         // write.
-        // On cells flagged with CELL_INVALID, only its CellStatus
+        // On cells flagged with CellStatus::cell_invalid, only its CellStatus
         // will be stored.
         const unsigned int n_fixed_size_data_sets_on_cell =
-          1 + ((cell_status == CELL_INVALID) ?
+          1 + ((cell_status == CellStatus::cell_invalid) ?
                  0 :
                  ((variable_size_data_stored ? 1 : 0) + n_callbacks_fixed));
         data_cell_fixed_it->resize(n_fixed_size_data_sets_on_cell);
@@ -147,8 +149,8 @@ void DataTransfer<dim, spacedim>::pack_data(
         ++data_fixed_it;
 
         // Proceed with all registered callback functions.
-        // Skip cells with the CELL_INVALID flag.
-        if (cell_status != CELL_INVALID)
+        // Skip cells with the CellStatus::cell_invalid flag.
+        if (cell_status != CellStatus::cell_invalid)
           {
             // Pack fixed size data.
             for (auto callback_it = pack_callbacks_fixed.cbegin();
@@ -165,7 +167,9 @@ void DataTransfer<dim, spacedim>::pack_data(
             if (variable_size_data_stored)
               {
                 const unsigned int n_variable_size_data_sets_on_cell =
-                  ((cell_status == CELL_INVALID) ? 0 : n_callbacks_variable);
+                  ((cell_status == CellStatus::cell_invalid) ?
+                     0 :
+                     n_callbacks_variable);
                 data_cell_variable_it->resize(
                   n_variable_size_data_sets_on_cell);
 
@@ -225,7 +229,7 @@ void DataTransfer<dim, spacedim>::pack_data(
   // Generate a vector which stores the sizes of each callback function,
   // including the packed CellStatus transfer.
   // Find the very first cell that we wrote to with all callback
-  // functions (i.e. a cell that was not flagged with CELL_INVALID)
+  // functions (i.e. a cell that was not flagged with CellStatus::cell_invalid)
   // and store the sizes of each buffer.
   //
   // To deal with the case that at least one of the processors does not
@@ -264,9 +268,7 @@ void DataTransfer<dim, spacedim>::pack_data(
   // of all callback functions across all processors, in case one
   // of them does not own any cells at all.
   std::vector<unsigned int> global_sizes_fixed(local_sizes_fixed.size());
-  Utilities::MPI::max(local_sizes_fixed,
-                      this->mpi_communicator,
-                      global_sizes_fixed);
+  Utilities::MPI::max(local_sizes_fixed, mpi_communicator, global_sizes_fixed);
 
   // Construct cumulative sizes, since this is the only information
   // we need from now on.
@@ -315,7 +317,7 @@ void DataTransfer<dim, spacedim>::pack_data(
                   std::back_inserter(src_data_fixed));
 
       // If we only packed the CellStatus information
-      // (i.e. encountered a cell flagged CELL_INVALID),
+      // (i.e. encountered a cell flagged CellStatus::cell_invalid),
       // fill the remaining space with invalid entries.
       // We can skip this if there is nothing else to pack.
       if ((data_cell_fixed.size() == 1) && (sizes_fixed_cumulative.size() > 1))
@@ -355,8 +357,9 @@ void DataTransfer<dim, spacedim>::pack_data(
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void DataTransfer<dim, spacedim>::unpack_cell_status(
-  std::vector<typename DataTransfer<dim, spacedim>::cell_relation_t>
+void CellAttachedDataSerializer<dim, spacedim>::unpack_cell_status(
+  std::vector<
+    typename CellAttachedDataSerializer<dim, spacedim>::cell_relation_t>
     &cell_relations) const
 {
   Assert(sizes_fixed_cumulative.size() > 0,
@@ -390,8 +393,9 @@ void DataTransfer<dim, spacedim>::unpack_cell_status(
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void DataTransfer<dim, spacedim>::unpack_data(
-  const std::vector<typename DataTransfer<dim, spacedim>::cell_relation_t>
+void CellAttachedDataSerializer<dim, spacedim>::unpack_data(
+  const std::vector<
+    typename CellAttachedDataSerializer<dim, spacedim>::cell_relation_t>
     &                cell_relations,
   const unsigned int handle,
   const std::function<
@@ -489,7 +493,7 @@ void DataTransfer<dim, spacedim>::unpack_data(
           // of the current cell.
           data_increment = *dest_sizes_it;
 
-          if (cell_status != CELL_INVALID)
+          if (cell_status != CellStatus::cell_invalid)
             {
               // Extract the corresponding values for offset and size from
               // the cumulative sizes array stored in the fixed size
@@ -521,22 +525,22 @@ void DataTransfer<dim, spacedim>::unpack_data(
 
       switch (cell_status)
         {
-          case CELL_PERSIST:
-          case CELL_COARSEN:
+          case CellStatus::cell_will_persist:
+          case CellStatus::children_will_be_coarsened:
             unpack_callback(dealii_cell,
                             cell_status,
                             boost::make_iterator_range(dest_data_it,
                                                        dest_data_it + size));
             break;
 
-          case CELL_REFINE:
+          case CellStatus::cell_will_be_refined:
             unpack_callback(dealii_cell->parent(),
                             cell_status,
                             boost::make_iterator_range(dest_data_it,
                                                        dest_data_it + size));
             break;
 
-          case CELL_INVALID:
+          case CellStatus::cell_invalid:
             // Skip this cell.
             break;
 
@@ -554,9 +558,11 @@ void DataTransfer<dim, spacedim>::unpack_data(
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void DataTransfer<dim, spacedim>::save(const unsigned int global_first_cell,
-                                       const unsigned int global_num_cells,
-                                       const std::string &filename) const
+void CellAttachedDataSerializer<dim, spacedim>::save(
+  const unsigned int global_first_cell,
+  const unsigned int global_num_cells,
+  const std::string &filename,
+  const MPI_Comm &   mpi_communicator) const
 {
   Assert(sizes_fixed_cumulative.size() > 0,
          ExcMessage("No data has been packed!"));
@@ -778,13 +784,14 @@ void DataTransfer<dim, spacedim>::save(const unsigned int global_first_cell,
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void DataTransfer<dim, spacedim>::load(
+void CellAttachedDataSerializer<dim, spacedim>::load(
   const unsigned int global_first_cell,
   const unsigned int global_num_cells,
   const unsigned int local_num_cells,
   const std::string &filename,
   const unsigned int n_attached_deserialize_fixed,
-  const unsigned int n_attached_deserialize_variable)
+  const unsigned int n_attached_deserialize_variable,
+  const MPI_Comm &   mpi_communicator)
 {
   Assert(dest_data_fixed.size() == 0,
          ExcMessage("Previously loaded data has not been released yet!"));
@@ -994,7 +1001,7 @@ void DataTransfer<dim, spacedim>::load(
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void DataTransfer<dim, spacedim>::clear()
+void CellAttachedDataSerializer<dim, spacedim>::clear()
 {
   variable_size_data_stored = false;
 
@@ -1024,6 +1031,6 @@ void DataTransfer<dim, spacedim>::clear()
 }
 
 // explicit instantiations
-#include "data_transfer.inst"
+#include "data_serializer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

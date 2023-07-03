@@ -62,7 +62,7 @@ pack_function(
           << std::accumulate(some_vector.begin(), some_vector.end(), 0)
           << std::endl;
 
-  Assert((status == CELL_PERSIST), ExcInternalError());
+  Assert((status == CellStatus::cell_will_persist), ExcInternalError());
 
   ++some_number;
   return buffer;
@@ -100,7 +100,7 @@ unpack_function(
           << std::accumulate(intdatavector.begin(), intdatavector.end(), 0)
           << std::endl;
 
-  Assert((status == CELL_PERSIST), ExcInternalError());
+  Assert((status == CellStatus::cell_will_persist), ExcInternalError());
 }
 
 

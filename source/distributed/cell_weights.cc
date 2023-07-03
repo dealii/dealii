@@ -189,13 +189,13 @@ namespace parallel
     unsigned int fe_index = numbers::invalid_unsigned_int;
     switch (status)
       {
-        case CELL_PERSIST:
-        case CELL_REFINE:
-        case CELL_INVALID:
+        case CellStatus::cell_will_persist:
+        case CellStatus::cell_will_be_refined:
+        case CellStatus::cell_invalid:
           fe_index = cell->future_fe_index();
           break;
 
-        case CELL_COARSEN:
+        case CellStatus::children_will_be_coarsened:
 #ifdef DEBUG
           for (const auto &child : cell->child_iterators())
             Assert(child->is_active() && child->coarsen_flag_set(),

@@ -3914,7 +3914,7 @@ namespace GridTools
         for (const auto &cell : triangulation.active_cell_iterators())
           if (cell->is_locally_owned())
             cell_weights[cell->active_cell_index()] =
-              triangulation.signals.weight(cell, CELL_PERSIST);
+              triangulation.signals.weight(cell, CellStatus::cell_will_persist);
 
         // If this is a parallel triangulation, we then need to also
         // get the weights for all other cells. We have asserted above
@@ -4014,7 +4014,7 @@ namespace GridTools
         for (const auto &cell : triangulation.active_cell_iterators() |
                                   IteratorFilters::LocallyOwnedCell())
           cell_weights[cell->active_cell_index()] =
-            triangulation.signals.weight(cell, CELL_PERSIST);
+            triangulation.signals.weight(cell, CellStatus::cell_will_persist);
 
         // If this is a parallel triangulation, we then need to also
         // get the weights for all other cells. We have asserted above

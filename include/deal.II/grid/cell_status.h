@@ -21,31 +21,32 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Used to inform functions in derived classes how the cell with the given
- * cell_iterator is going to change. Note that this may me different than
- * the refine_flag() and coarsen_flag() in the cell_iterator in parallel
- * calculations because of refinement constraints that this machine does not
- * see.
+ * The elements of this `enum` are used to inform functions how a specific cell
+ * is going to change. This is used in the course of transferring data from one
+ * mesh to a refined or coarsened version of the mesh, for example. Note that
+ * this may me different than the refine_flag() and coarsen_flag() set on a
+ * cell, for example in parallel calculations, because of refinement constraints
+ * that an individual machine does not see.
  */
-enum CellStatus
+enum class CellStatus : unsigned int
 {
   /**
    * The cell will not be refined or coarsened and might or might not move
    * to a different processor.
    */
-  CELL_PERSIST,
+  cell_will_persist,
   /**
    * The cell will be or was refined.
    */
-  CELL_REFINE,
+  cell_will_be_refined,
   /**
    * The children of this cell will be or were coarsened into this cell.
    */
-  CELL_COARSEN,
+  children_will_be_coarsened,
   /**
    * Invalid status. Will not occur for the user.
    */
-  CELL_INVALID
+  cell_invalid
 };
 
 DEAL_II_NAMESPACE_CLOSE

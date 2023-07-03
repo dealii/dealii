@@ -57,15 +57,15 @@ pack_function(
           << " with data size =" << buffer.size() << " accumulated data="
           << std::accumulate(some_vector.begin(), some_vector.end(), 0)
           << " status=";
-  if (status == CELL_PERSIST)
+  if (status == CellStatus::cell_will_persist)
     deallog << "PERSIST";
-  else if (status == CELL_REFINE)
+  else if (status == CellStatus::cell_will_be_refined)
     deallog << "REFINE";
-  else if (status == CELL_COARSEN)
+  else if (status == CellStatus::children_will_be_coarsened)
     deallog << "COARSEN";
   deallog << std::endl;
 
-  if (status == CELL_COARSEN)
+  if (status == CellStatus::children_will_be_coarsened)
     {
       Assert(cell->has_children(), ExcInternalError());
     }
@@ -107,15 +107,15 @@ unpack_function(
           << " accumulated data="
           << std::accumulate(intdatavector.begin(), intdatavector.end(), 0)
           << " status=";
-  if (status == CELL_PERSIST)
+  if (status == CellStatus::cell_will_persist)
     deallog << "PERSIST";
-  else if (status == CELL_REFINE)
+  else if (status == CellStatus::cell_will_be_refined)
     deallog << "REFINE";
-  else if (status == CELL_COARSEN)
+  else if (status == CellStatus::children_will_be_coarsened)
     deallog << "COARSEN";
   deallog << std::endl;
 
-  if (status == CELL_REFINE)
+  if (status == CellStatus::cell_will_be_refined)
     {
       Assert(cell->has_children(), ExcInternalError());
     }

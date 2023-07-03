@@ -273,21 +273,21 @@ namespace Step68
     const unsigned int particle_weight = 10;
 
     // This example does not use adaptive refinement, therefore every cell
-    // should have the status `CELL_PERSIST`. However this function can also
-    // be used to distribute load during refinement, therefore we consider
-    // refined or coarsened cells as well.
+    // should have the status `CellStatus::cell_will_persist`. However this
+    // function can also be used to distribute load during refinement, therefore
+    // we consider refined or coarsened cells as well.
     unsigned int n_particles_in_cell = 0;
     switch (status)
       {
-        case CELL_PERSIST:
-        case CELL_REFINE:
+        case CellStatus::cell_will_persist:
+        case CellStatus::cell_will_be_refined:
           n_particles_in_cell = particle_handler.n_particles_in_cell(cell);
           break;
 
-        case CELL_INVALID:
+        case CellStatus::cell_invalid:
           break;
 
-        case CELL_COARSEN:
+        case CellStatus::children_will_be_coarsened:
           for (const auto &child : cell->child_iterators())
             n_particles_in_cell += particle_handler.n_particles_in_cell(child);
           break;

@@ -993,7 +993,8 @@ namespace parallel
       const boost::iterator_range<std::vector<char>::const_iterator>
         &data_range)
     {
-      Assert((status != CELL_COARSEN), ExcNotImplemented());
+      Assert((status != CellStatus::children_will_be_coarsened),
+             ExcNotImplemented());
       (void)status;
 
       matrix_dofs =

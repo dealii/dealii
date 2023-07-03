@@ -94,7 +94,8 @@ test()
   std::vector<unsigned int> integrated_weights(numproc, 0);
   for (const auto &cell :
        tr.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
-    integrated_weights[myid] += cell_weight<dim>(cell, CELL_PERSIST);
+    integrated_weights[myid] +=
+      cell_weight<dim>(cell, CellStatus::cell_will_persist);
 
   Utilities::MPI::sum(integrated_weights, MPI_COMM_WORLD, integrated_weights);
   if (myid == 0)

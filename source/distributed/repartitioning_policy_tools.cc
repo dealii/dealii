@@ -296,7 +296,7 @@ namespace RepartitioningPolicyTools
     for (const auto &cell :
          tria->active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
       weights[partitioner->global_to_local(cell->global_active_cell_index())] =
-        weighting_function(cell, CELL_PERSIST);
+        weighting_function(cell, CellStatus::cell_will_persist);
 
     // determine weight of all the cells locally owned by this process
     std::uint64_t process_local_weight = 0;

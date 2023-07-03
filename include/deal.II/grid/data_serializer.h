@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_tria_data_transfer_h
-#define dealii_tria_data_transfer_h
+#ifndef dealii_tria_data_serializer_h
+#define dealii_tria_data_serializer_h
 
 #include <deal.II/base/config.h>
 
@@ -35,49 +35,54 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim = dim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-struct CellAttachedData
+namespace internal
 {
-  using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
-
   /**
-   * Number of functions that get attached to the Triangulation through
-   * register_data_attach() for example SolutionTransfer.
+   * A structure that binds information about data attached to cells.
    */
-  unsigned int n_attached_data_sets;
+  template <int dim, int spacedim = dim>
+  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+  struct CellAttachedData
+  {
+    using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
 
-  /**
-   * Number of functions that need to unpack their data after a call from
-   * load().
-   */
-  unsigned int n_attached_deserialize;
+    /**
+     * Number of functions that get attached to the Triangulation through
+     * register_data_attach() for example SolutionTransfer.
+     */
+    unsigned int n_attached_data_sets;
 
-  using pack_callback_t =
-    std::function<std::vector<char>(cell_iterator, CellStatus)>;
+    /**
+     * Number of functions that need to unpack their data after a call from
+     * load().
+     */
+    unsigned int n_attached_deserialize;
 
-  /**
-   * These callback functions will be stored in the order in which they
-   * have been registered with the register_data_attach() function.
-   */
-  std::vector<pack_callback_t> pack_callbacks_fixed;
-  std::vector<pack_callback_t> pack_callbacks_variable;
-};
+    using pack_callback_t =
+      std::function<std::vector<char>(cell_iterator, CellStatus)>;
+
+    /**
+     * These callback functions will be stored in the order in which they
+     * have been registered with the register_data_attach() function.
+     */
+    std::vector<pack_callback_t> pack_callbacks_fixed;
+    std::vector<pack_callback_t> pack_callbacks_variable;
+  };
+} // namespace internal
 
 /**
  * A structure that stores information about the data that has been, or
  * will be, attached to cells via the register_data_attach() function
  * and later retrieved via notify_ready_to_unpack().
  *
- * This class in the private scope of parallel::DistributedTriangulationBase
- * is dedicated to the data transfer across repartitioned meshes
- * and to/from the file system.
+ * This internalclass is dedicated to the data serialization and transfer across
+ * repartitioned meshes and to/from the file system.
  *
- * It is designed to store all data buffers intended for transfer.
+ * It is designed to store all data buffers intended for serialization.
  */
 template <int dim, int spacedim = dim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-class DataTransfer
+class CellAttachedDataSerializer
 {
 public:
   using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
@@ -89,10 +94,10 @@ public:
    */
   using cell_relation_t = typename std::pair<cell_iterator, CellStatus>;
 
-  DataTransfer(const MPI_Comm &mpi_communicator);
+  CellAttachedDataSerializer();
 
   /**
-   * Prepare data transfer by calling the pack callback functions on each
+   * Prepare data serialization by calling the pack callback functions on each
    * cell in @p cell_relations.
    *
    * All registered callback functions in @p pack_callbacks_fixed will write
@@ -102,23 +107,26 @@ public:
   void
   pack_data(
     const std::vector<cell_relation_t> &cell_relations,
-    const std::vector<typename CellAttachedData<dim, spacedim>::pack_callback_t>
+    const std::vector<
+      typename internal::CellAttachedData<dim, spacedim>::pack_callback_t>
       &pack_callbacks_fixed,
-    const std::vector<typename CellAttachedData<dim, spacedim>::pack_callback_t>
-      &pack_callbacks_variable);
+    const std::vector<
+      typename internal::CellAttachedData<dim, spacedim>::pack_callback_t>
+      &             pack_callbacks_variable,
+    const MPI_Comm &mpi_communicator);
 
   /**
    * Unpack the CellStatus information on each entry of
    * @p cell_relations.
    *
    * Data has to be previously transferred with execute_transfer()
-   * or read from the file system via load().
+   * or deserialized from the file system via load().
    */
   void
   unpack_cell_status(std::vector<cell_relation_t> &cell_relations) const;
 
   /**
-   * Unpack previously transferred data on each cell registered in
+   * Unpack previously serialized data on each cell registered in
    * @p cell_relations with the provided @p unpack_callback function.
    *
    * The parameter @p handle corresponds to the position where the
@@ -127,7 +135,7 @@ public:
    * function that has been registered previously.
    *
    * Data has to be previously transferred with execute_transfer()
-   * or read from the file system via load().
+   * or deserialized from the file system via load().
    */
   void
   unpack_data(
@@ -140,7 +148,7 @@ public:
       &unpack_callback) const;
 
   /**
-   * Transfer data to file system.
+   * Serialize data to file system.
    *
    * The data will be written in a separate file, whose name
    * consists of the stem @p filename and an attached identifier
@@ -156,10 +164,11 @@ public:
   void
   save(const unsigned int global_first_cell,
        const unsigned int global_num_cells,
-       const std::string &filename) const;
+       const std::string &filename,
+       const MPI_Comm &   mpi_communicator) const;
 
   /**
-   * Transfer data from file system.
+   * Deserialize data from file system.
    *
    * The data will be read from separate file, whose name
    * consists of the stem @p filename and an attached identifier
@@ -182,7 +191,8 @@ public:
        const unsigned int local_num_cells,
        const std::string &filename,
        const unsigned int n_attached_deserialize_fixed,
-       const unsigned int n_attached_deserialize_variable);
+       const unsigned int n_attached_deserialize_variable,
+       const MPI_Comm &   mpi_communicator);
 
   /**
    * Clears all containers and associated data, and resets member
@@ -211,23 +221,20 @@ public:
   std::vector<unsigned int> sizes_fixed_cumulative;
 
   /**
-   * Consecutive buffers designed for the fixed size transfer
+   * Consecutive buffers designed for the fixed size serialization
    * functions.
    */
   std::vector<char> src_data_fixed;
   std::vector<char> dest_data_fixed;
 
   /**
-   * Consecutive buffers designed for the variable size transfer
+   * Consecutive buffers designed for the variable size serialization
    * functions.
    */
   std::vector<int>  src_sizes_variable;
   std::vector<int>  dest_sizes_variable;
   std::vector<char> src_data_variable;
   std::vector<char> dest_data_variable;
-
-private:
-  const MPI_Comm &mpi_communicator;
 };
 
 DEAL_II_NAMESPACE_CLOSE

@@ -2299,8 +2299,8 @@ namespace Particles
 
     switch (status)
       {
-        case CELL_PERSIST:
-        case CELL_REFINE:
+        case CellStatus::cell_will_persist:
+        case CellStatus::cell_will_be_refined:
           // If the cell persist or is refined store all particles of the
           // current cell.
           {
@@ -2315,7 +2315,7 @@ namespace Particles
           }
           break;
 
-        case CELL_COARSEN:
+        case CellStatus::children_will_be_coarsened:
           // If this cell is the parent of children that will be coarsened,
           // collect the particles of all children.
           {
@@ -2356,7 +2356,7 @@ namespace Particles
       return;
 
     const auto cell_to_store_particles =
-      (status != CELL_REFINE) ? cell : cell->child(0);
+      (status != CellStatus::cell_will_be_refined) ? cell : cell->child(0);
 
     // deserialize particles and insert into local storage
     if (data_range.begin() != data_range.end())
@@ -2380,13 +2380,13 @@ namespace Particles
     // now update particle storage location and properties if necessary
     switch (status)
       {
-        case CELL_PERSIST:
+        case CellStatus::cell_will_persist:
           {
             // all particles are correctly inserted
           }
           break;
 
-        case CELL_COARSEN:
+        case CellStatus::children_will_be_coarsened:
           {
             // all particles are in correct cell, but their reference location
             // has changed
@@ -2400,7 +2400,7 @@ namespace Particles
           }
           break;
 
-        case CELL_REFINE:
+        case CellStatus::cell_will_be_refined:
           {
             // we need to find the correct child to store the particles and
             // their reference location has changed

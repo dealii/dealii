@@ -42,15 +42,15 @@ pack_function(
   static int some_number = 0;
   deallog << "packing cell " << cell->id() << " with data=" << some_number
           << " status=";
-  if (status == CELL_PERSIST)
+  if (status == CellStatus::cell_will_persist)
     deallog << "PERSIST";
-  else if (status == CELL_REFINE)
+  else if (status == CellStatus::cell_will_be_refined)
     deallog << "REFINE";
-  else if (status == CELL_COARSEN)
+  else if (status == CellStatus::children_will_be_coarsened)
     deallog << "COARSEN";
   deallog << std::endl;
 
-  if (status == CELL_COARSEN)
+  if (status == CellStatus::children_will_be_coarsened)
     {
       Assert(cell->has_children(), ExcInternalError());
     }
@@ -76,15 +76,15 @@ unpack_function(
 
   deallog << "unpacking cell " << cell->id() << " with data=" << intdata
           << " status=";
-  if (status == CELL_PERSIST)
+  if (status == CellStatus::cell_will_persist)
     deallog << "PERSIST";
-  else if (status == CELL_REFINE)
+  else if (status == CellStatus::cell_will_be_refined)
     deallog << "REFINE";
-  else if (status == CELL_COARSEN)
+  else if (status == CellStatus::children_will_be_coarsened)
     deallog << "COARSEN";
   deallog << std::endl;
 
-  if (status == CELL_REFINE)
+  if (status == CellStatus::cell_will_be_refined)
     {
       Assert(cell->has_children(), ExcInternalError());
     }

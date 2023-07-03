@@ -11065,7 +11065,6 @@ Triangulation<dim, spacedim>::Triangulation(
   const MeshSmoothing smooth_grid,
   const bool          check_for_distorted_cells)
   : cell_attached_data({0, 0, {}, {}})
-  , data_transfer(get_communicator())
   , smooth_grid(smooth_grid)
   , anisotropic_refinement(false)
   , check_for_distorted_cells(check_for_distorted_cells)
@@ -11092,7 +11091,6 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim>::Triangulation(
   Triangulation<dim, spacedim> &&tria) noexcept
   : Subscriptor(std::move(tria))
-  , data_transfer(get_communicator())
   , smooth_grid(tria.smooth_grid)
   , reference_cells(std::move(tria.reference_cells))
   , periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0))
@@ -11189,7 +11187,7 @@ void Triangulation<dim, spacedim>::clear()
   reference_cells.clear();
 
   cell_attached_data = {0, 0, {}, {}};
-  data_transfer.clear();
+  data_serializer.clear();
 }
 
 
@@ -14826,7 +14824,8 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::register_data_attach(
   const std::function<std::vector<char>(const cell_iterator &,
-                                        const CellStatus)> &pack_callback,
+                                        const ::dealii::CellStatus)>
+    &        pack_callback,
   const bool returns_variable_size_data)
 {
   unsigned int handle = numbers::invalid_unsigned_int;
@@ -14858,14 +14857,14 @@ void Triangulation<dim, spacedim>::notify_ready_to_unpack(
   const unsigned int handle,
   const std::function<
     void(const cell_iterator &,
-         const CellStatus,
+         const ::dealii::CellStatus,
          const boost::iterator_range<std::vector<char>::const_iterator> &)>
     &unpack_callback)
 {
   // perform unpacking
-  this->data_transfer.unpack_data(this->local_cell_relations,
-                                  handle,
-                                  unpack_callback);
+  this->data_serializer.unpack_data(this->local_cell_relations,
+                                    handle,
+                                    unpack_callback);
 
   // decrease counters
   --this->cell_attached_data.n_attached_data_sets;
@@ -14885,11 +14884,11 @@ void Triangulation<dim, spacedim>::notify_ready_to_unpack(
       // everybody got their data, time for cleanup!
       this->cell_attached_data.pack_callbacks_fixed.clear();
       this->cell_attached_data.pack_callbacks_variable.clear();
-      this->data_transfer.clear();
+      this->data_serializer.clear();
 
       // reset all cell_status entries after coarsening/refinement
       for (auto &cell_rel : this->local_cell_relations)
-        cell_rel.second = CELL_PERSIST;
+        cell_rel.second = ::dealii::CellStatus::cell_will_persist;
     }
 }
 
@@ -14908,16 +14907,20 @@ void Triangulation<dim, spacedim>::save_attached_data(
   if (this->cell_attached_data.n_attached_data_sets > 0)
     {
       // pack attached data first
-      tria->data_transfer.pack_data(
+      tria->data_serializer.pack_data(
         tria->local_cell_relations,
         tria->cell_attached_data.pack_callbacks_fixed,
-        tria->cell_attached_data.pack_callbacks_variable);
+        tria->cell_attached_data.pack_callbacks_variable,
+        this->get_communicator());
 
       // then store buffers in file
-      tria->data_transfer.save(global_first_cell, global_num_cells, filename);
+      tria->data_serializer.save(global_first_cell,
+                                 global_num_cells,
+                                 filename,
+                                 this->get_communicator());
 
       // and release the memory afterwards
-      tria->data_transfer.clear();
+      tria->data_serializer.clear();
     }
 
   // clear all of the callback data, as explained in the documentation of
@@ -14943,21 +14946,23 @@ void Triangulation<dim, spacedim>::load_attached_data(
   // load saved data, if any was stored
   if (this->cell_attached_data.n_attached_deserialize > 0)
     {
-      this->data_transfer.load(global_first_cell,
-                               global_num_cells,
-                               local_num_cells,
-                               filename,
-                               n_attached_deserialize_fixed,
-                               n_attached_deserialize_variable);
+      this->data_serializer.load(global_first_cell,
+                                 global_num_cells,
+                                 local_num_cells,
+                                 filename,
+                                 n_attached_deserialize_fixed,
+                                 n_attached_deserialize_variable,
+                                 this->get_communicator());
 
-      this->data_transfer.unpack_cell_status(this->local_cell_relations);
+      this->data_serializer.unpack_cell_status(this->local_cell_relations);
 
-      // the CellStatus of all stored cells should always be CELL_PERSIST.
+      // the CellStatus of all stored cells should always be
+      // CellStatus::cell_will_persist.
       for (const auto &cell_rel : this->local_cell_relations)
         {
           (void)cell_rel;
           Assert((cell_rel.second == // cell_status
-                  CELL_PERSIST),
+                  ::dealii::CellStatus::cell_will_persist),
                  ExcInternalError());
         }
     }

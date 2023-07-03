@@ -28,7 +28,7 @@
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/cell_status.h>
-#include <deal.II/grid/data_transfer.h>
+#include <deal.II/grid/data_serializer.h>
 #include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_iterator_selector.h>
 #include <deal.II/grid/tria_levels.h>
@@ -2033,7 +2033,27 @@ public:
    * @{
    */
 
-  using CellStatus = ::dealii::CellStatus;
+  /**
+   * Alias for backward compatibility.
+   *
+   * @deprecated This enumeration has been moved to the global namespace.
+   * Use ::dealii::CellStatus instead. Also, its values have been renamed
+   * (CELL_PERSIST -> cell_will_persist,
+   * CELL_REFINE -> cell_will_be_refined,
+   * CELL_COARSEN -> children_will_be_coarsened,
+   * CELL_INVALID -> cell_invalid).
+   */
+  enum CellStatus
+  {
+    CELL_PERSIST DEAL_II_DEPRECATED =
+      static_cast<unsigned int>(::dealii::CellStatus::cell_will_persist),
+    CELL_REFINE DEAL_II_DEPRECATED =
+      static_cast<unsigned int>(::dealii::CellStatus::cell_will_be_refined),
+    CELL_COARSEN DEAL_II_DEPRECATED = static_cast<unsigned int>(
+      ::dealii::CellStatus::children_will_be_coarsened),
+    CELL_INVALID DEAL_II_DEPRECATED =
+      static_cast<unsigned int>(::dealii::CellStatus::cell_invalid)
+  };
 
   /**
    * A structure used to accumulate the results of the `weight` signal slot
@@ -2176,7 +2196,8 @@ public:
      * load of this cell.
      *
      * In serial and parallel shared applications, partitioning happens after
-     * refinement. So all cells will have the `CELL_PERSIST` status.
+     * refinement. So all cells will have the `CellStatus::cell_will_persist`
+     * status.
      *
      * In parallel distributed applications, partitioning happens during
      * refinement. If this cell is going to be coarsened, the signal is called
@@ -2199,7 +2220,7 @@ public:
      * parallel::CellWeights class.
      */
     boost::signals2::signal<unsigned int(const cell_iterator &,
-                                         const CellStatus),
+                                         const ::dealii::CellStatus),
                             CellWeightSum<unsigned int>>
       weight;
 
@@ -3515,32 +3536,31 @@ public:
    *
    * Specifically, the values for this argument mean the following:
    *
-   * - `CELL_PERSIST`: The cell won't be refined/coarsened, but might be
-   * moved to a different processor. If this is the case, the callback
+   * - `CellStatus::cell_will_persist`: The cell won't be refined/coarsened, but
+   * might be moved to a different processor. If this is the case, the callback
    * will want to pack up the data on this cell into an array and store
    * it at the provided address for later unpacking wherever this cell
    * may land.
-   * - `CELL_REFINE`: This cell will be refined into 4 or 8 cells (in 2d
-   * and 3d, respectively). However, because these children don't exist
-   * yet, you cannot access them at the time when the callback is
-   * called. Thus, in local_cell_relations, the corresponding
-   * p4est quadrants of the children cells are linked to the deal.II
-   * cell which is going to be refined. To be specific, only the very
-   * first child is marked with `CELL_REFINE`, whereas the others will be
-   * marked with `CELL_INVALID`, which indicates that these cells will be
+   * - `CellStatus::cell_will_be_refined`: This cell will be refined into 4 or 8
+   * cells (in 2d and 3d, respectively). However, because these children don't
+   * exist yet, you cannot access them at the time when the callback is called.
+   * Thus, in local_cell_relations, the corresponding p4est quadrants of the
+   * children cells are linked to the deal.II cell which is going to be refined.
+   * To be specific, only the very first child is marked with
+   * `CellStatus::cell_will_be_refined`, whereas the others will be marked with
+   * `CellStatus::cell_invalid`, which indicates that these cells will be
    * ignored by default during the packing or unpacking process. This
    * ensures that data is only transferred once onto or from the parent
-   * cell. If the callback is called with `CELL_REFINE`, the callback
-   * will want to pack up the data on this cell into an array and store
-   * it at the provided address for later unpacking in a way so that
-   * it can then be transferred to the children of the cell that will
-   * then be available. In other words, if the data the callback
-   * will want to pack up corresponds to a finite element field, then
-   * the prolongation from parent to (new) children will have to happen
-   * during unpacking.
-   * - `CELL_COARSEN`: The children of this cell will be coarsened into the
-   * given cell. These children still exist, so if this is the value
-   * given to the callback as second argument, the callback will want
+   * cell. If the callback is called with `CellStatus::cell_will_be_refined`,
+   * the callback will want to pack up the data on this cell into an array and
+   * store it at the provided address for later unpacking in a way so that it
+   * can then be transferred to the children of the cell that will then be
+   * available. In other words, if the data the callback will want to pack up
+   * corresponds to a finite element field, then the prolongation from parent to
+   * (new) children will have to happen during unpacking.
+   * - `CellStatus::children_will_be_coarsened`: The children of this cell will
+   * be coarsened into the given cell. These children still exist, so if this is
+   * the value given to the callback as second argument, the callback will want
    * to transfer data from the children to the current parent cell and
    * pack it up so that it can later be unpacked again on a cell that
    * then no longer has any children (and may also be located on a
@@ -3548,11 +3568,11 @@ public:
    * will want to pack up corresponds to a finite element field, then
    * it will need to do the restriction from children to parent at
    * this point.
-   * - `CELL_INVALID`: See `CELL_REFINE`.
+   * - `CellStatus::cell_invalid`: See `CellStatus::cell_will_be_refined`.
    *
    * @note If this function is used for serialization of data
    *   using save() and load(), then the cell status argument with which
-   *   the callback is called will always be `CELL_PERSIST`.
+   *   the callback is called will always be `CellStatus::cell_will_persist`.
    *
    * The callback function is expected to return a memory chunk of the
    * format `std::vector<char>`, representing the packed data on a
@@ -3575,7 +3595,8 @@ public:
   unsigned int
   register_data_attach(
     const std::function<std::vector<char>(const cell_iterator &,
-                                          const CellStatus)> &pack_callback,
+                                          const ::dealii::CellStatus)>
+      &        pack_callback,
     const bool returns_variable_size_data);
 
   /**
@@ -3615,8 +3636,9 @@ public:
    * locally owned cell (if the cell was not refined), or the immediate
    * parent if it was refined during execute_coarsening_and_refinement().
    * Therefore, contrary to during register_data_attach(), you can now
-   * access the children if the status is `CELL_REFINE` but no longer for
-   * callbacks with status `CELL_COARSEN`.
+   * access the children if the status is `CellStatus::cell_will_be_refined` but
+   * no longer for callbacks with status
+   * `CellStatus::children_will_be_coarsened`.
    *
    * The first argument to this function, `handle`, corresponds to
    * the return value of register_data_attach(). (The precise
@@ -3631,11 +3653,11 @@ public:
     const unsigned int handle,
     const std::function<
       void(const cell_iterator &,
-           const CellStatus,
+           const ::dealii::CellStatus,
            const boost::iterator_range<std::vector<char>::const_iterator> &)>
       &unpack_callback);
 
-  CellAttachedData<dim, spacedim> cell_attached_data;
+  internal::CellAttachedData<dim, spacedim> cell_attached_data;
 
 protected:
   /**
@@ -3683,10 +3705,11 @@ protected:
    * respective CellStatus. To update its contents, use the
    * update_cell_relations() member function.
    */
-  std::vector<typename DataTransfer<dim, spacedim>::cell_relation_t>
+  std::vector<
+    typename CellAttachedDataSerializer<dim, spacedim>::cell_relation_t>
     local_cell_relations;
 
-  DataTransfer<dim, spacedim> data_transfer;
+  CellAttachedDataSerializer<dim, spacedim> data_serializer;
   /**
    * @}
    */

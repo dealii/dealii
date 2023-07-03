@@ -445,7 +445,8 @@ namespace parallel
 
       for (const auto &cell : this->active_cell_iterators())
         if (cell->is_locally_owned())
-          this->local_cell_relations.emplace_back(cell, CELL_PERSIST);
+          this->local_cell_relations.emplace_back(
+            cell, ::dealii::CellStatus::cell_will_persist);
     }
 
 

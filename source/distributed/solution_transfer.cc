@@ -324,14 +324,14 @@ namespace parallel
         {
           switch (status)
             {
-              case CELL_PERSIST:
-              case CELL_REFINE:
+              case CellStatus::cell_will_persist:
+              case CellStatus::cell_will_be_refined:
                 {
                   fe_index = cell->future_fe_index();
                   break;
                 }
 
-              case CELL_COARSEN:
+              case CellStatus::children_will_be_coarsened:
                 {
                   // In case of coarsening, we need to find a suitable FE index
                   // for the parent cell. We choose the 'least dominant fe'
@@ -392,14 +392,14 @@ namespace parallel
         {
           switch (status)
             {
-              case CELL_PERSIST:
-              case CELL_COARSEN:
+              case CellStatus::cell_will_persist:
+              case CellStatus::children_will_be_coarsened:
                 {
                   fe_index = cell->active_fe_index();
                   break;
                 }
 
-              case CELL_REFINE:
+              case CellStatus::cell_will_be_refined:
                 {
                   // After refinement, this particular cell is no longer active,
                   // and its children have inherited its FE index. However, to

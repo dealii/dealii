@@ -78,15 +78,15 @@ test()
       unsigned int n_particles_in_cell = 0;
       switch (status)
         {
-          case CELL_PERSIST:
-          case CELL_REFINE:
+          case CellStatus::cell_will_persist:
+          case CellStatus::cell_will_be_refined:
             n_particles_in_cell = particle_handler.n_particles_in_cell(cell);
             break;
 
-          case CELL_INVALID:
+          case CellStatus::cell_invalid:
             break;
 
-          case CELL_COARSEN:
+          case CellStatus::children_will_be_coarsened:
             for (const auto &child : cell->child_iterators())
               n_particles_in_cell +=
                 particle_handler.n_particles_in_cell(child);

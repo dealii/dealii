@@ -256,14 +256,14 @@ namespace parallel
         {
           switch (status)
             {
-              case CELL_PERSIST:
-              case CELL_REFINE:
+              case CellStatus::cell_will_persist:
+              case CellStatus::cell_will_be_refined:
                 // Cell either persists, or will be refined, and its children do
                 // not exist yet in the latter case.
                 *it_output = (**it_input)[cell->active_cell_index()];
                 break;
 
-              case CELL_COARSEN:
+              case CellStatus::children_will_be_coarsened:
                 {
                   // Cell is parent whose children will get coarsened to.
                   // Decide data to store on parent by provided strategy.
@@ -335,14 +335,14 @@ namespace parallel
       for (; it_input != cell_data.cend(); ++it_input, ++it_output)
         switch (status)
           {
-            case CELL_PERSIST:
-            case CELL_COARSEN:
+            case CellStatus::cell_will_persist:
+            case CellStatus::children_will_be_coarsened:
               // Cell either persists, or has been coarsened.
               // Thus, cell has no (longer) children.
               (**it_output)[cell->active_cell_index()] = *it_input;
               break;
 
-            case CELL_REFINE:
+            case CellStatus::cell_will_be_refined:
               {
                 // Cell has been refined, and is now parent of its children.
                 // Thus, distribute parent's data on its children.

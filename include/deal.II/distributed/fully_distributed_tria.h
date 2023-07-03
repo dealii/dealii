@@ -282,7 +282,7 @@ namespace parallel
        * will change in the private member vector local_cell_relations.
        *
        * As no adaptive mesh refinement is supported at the moment for this
-       * class, all cells will be flagged with the CellStatus CELL_PERSIST.
+       * class, all cells will be flagged with CellStatus::cell_will_persist.
        * These relations will currently only be used for serialization.
        *
        * The stored vector will have a size equal to the number of locally owned
