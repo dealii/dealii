@@ -248,13 +248,13 @@ TestPointValueHistory<dim>::run()
     node_monitor.add_field_name(
       "Post Processed Vector"); // not sensitive to spaces
     node_monitor.add_field_name("Pressure", 1);
-    std::vector<bool> component_mask(1, true);
+    ComponentMask component_mask(1, true);
     node_monitor.add_field_name("Req_sol", component_mask);
-    component_mask    = std::vector<bool>(2, false);
-    component_mask[0] = true;
+    component_mask = ComponentMask(2, false);
+    component_mask.set(0, true);
     node_monitor.add_field_name("X_gradient", component_mask);
-    component_mask    = std::vector<bool>(2, false);
-    component_mask[1] = true;
+    component_mask = ComponentMask(2, false);
+    component_mask.set(1, true);
     node_monitor.add_field_name("X_hessian", component_mask);
     std::vector<std::string> indep_names;
     indep_names.push_back("Input");
