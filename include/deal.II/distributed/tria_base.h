@@ -487,16 +487,16 @@ namespace parallel
      * into this file. Additional cell-based data can be saved using
      * register_data_attach().
      */
-    virtual void
-    save(const std::string &filename) const = 0;
+    using Triangulation<dim, spacedim>::save;
+
 
     /**
      * Load the triangulation saved with save() back in. Cell-based data that
      * was saved with register_data_attach() can be read in with
      * notify_ready_to_unpack() after calling load().
      */
-    virtual void
-    load(const std::string &filename) = 0;
+    using Triangulation<dim, spacedim>::load;
+
 
     /**
      * @copydoc load()
