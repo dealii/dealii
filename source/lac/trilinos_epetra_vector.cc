@@ -82,18 +82,10 @@ namespace LinearAlgebra
 
 
     void
-    Vector::reinit(const VectorSpaceVector<double> &V,
-                   const bool                       omit_zeroing_entries)
+    Vector::reinit(const Vector &V, const bool omit_zeroing_entries)
     {
-      // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
-
-      // Downcast V. If fails, throws an exception.
-      const Vector &down_V = dynamic_cast<const Vector &>(V);
-
-      reinit(down_V.locally_owned_elements(),
-             down_V.get_mpi_communicator(),
+      reinit(V.locally_owned_elements(),
+             V.get_mpi_communicator(),
              omit_zeroing_entries);
     }
 
@@ -243,30 +235,23 @@ namespace LinearAlgebra
 
 
     Vector &
-    Vector::operator+=(const VectorSpaceVector<double> &V)
+    Vector::operator+=(const Vector &V)
     {
-      // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
-
-      // Downcast V. If fails, throws an exception.
-      const Vector &down_V = dynamic_cast<const Vector &>(V);
       // If the maps are the same we can Update right away.
-      if (vector->Map().SameAs(down_V.trilinos_vector().Map()))
+      if (vector->Map().SameAs(V.trilinos_vector().Map()))
         {
-          const int ierr = vector->Update(1., down_V.trilinos_vector(), 1.);
+          const int ierr = vector->Update(1., V.trilinos_vector(), 1.);
           Assert(ierr == 0, ExcTrilinosError(ierr));
           (void)ierr;
         }
       else
         {
-          Assert(this->size() == down_V.size(),
-                 ExcDimensionMismatch(this->size(), down_V.size()));
+          Assert(this->size() == V.size(),
+                 ExcDimensionMismatch(this->size(), V.size()));
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(11, 11, 0)
-          Epetra_Import data_exchange(vector->Map(),
-                                      down_V.trilinos_vector().Map());
-          const int     ierr = vector->Import(down_V.trilinos_vector(),
+          Epetra_Import data_exchange(vector->Map(), V.trilinos_vector().Map());
+          const int     ierr = vector->Import(V.trilinos_vector(),
                                           data_exchange,
                                           Epetra_AddLocalAlso);
           Assert(ierr == 0, ExcTrilinosError(ierr));
@@ -276,11 +261,9 @@ namespace LinearAlgebra
           // adding Hence, we provide a workaround in this case
 
           Epetra_MultiVector dummy(vector->Map(), 1, false);
-          Epetra_Import      data_exchange(dummy.Map(),
-                                      down_V.trilinos_vector().Map());
+          Epetra_Import data_exchange(dummy.Map(), V.trilinos_vector().Map());
 
-          int ierr =
-            dummy.Import(down_V.trilinos_vector(), data_exchange, Insert);
+          int ierr = dummy.Import(V.trilinos_vector(), data_exchange, Insert);
           Assert(ierr == 0, ExcTrilinosError(ierr));
 
           ierr = vector->Update(1.0, dummy, 1.0);
@@ -295,7 +278,7 @@ namespace LinearAlgebra
 
 
     Vector &
-    Vector::operator-=(const VectorSpaceVector<double> &V)
+    Vector::operator-=(const Vector &V)
     {
       this->add(-1., V);
 
@@ -305,21 +288,15 @@ namespace LinearAlgebra
 
 
     double
-    Vector::operator*(const VectorSpaceVector<double> &V) const
+    Vector::operator*(const Vector &V) const
     {
-      // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
-
-      // Downcast V. If fails, throws an exception.
-      const Vector &down_V = dynamic_cast<const Vector &>(V);
-      Assert(this->size() == down_V.size(),
-             ExcDimensionMismatch(this->size(), down_V.size()));
-      Assert(vector->Map().SameAs(down_V.trilinos_vector().Map()),
+      Assert(this->size() == V.size(),
+             ExcDimensionMismatch(this->size(), V.size()));
+      Assert(vector->Map().SameAs(V.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
 
       double    result(0.);
-      const int ierr = vector->Dot(down_V.trilinos_vector(), &result);
+      const int ierr = vector->Dot(V.trilinos_vector(), &result);
       Assert(ierr == 0, ExcTrilinosError(ierr));
       (void)ierr;
 
@@ -340,19 +317,13 @@ namespace LinearAlgebra
 
 
     void
-    Vector::add(const double a, const VectorSpaceVector<double> &V)
+    Vector::add(const double a, const Vector &V)
     {
-      // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
-
-      // Downcast V. If fails, throws an exception.
-      const Vector &down_V = dynamic_cast<const Vector &>(V);
       AssertIsFinite(a);
-      Assert(vector->Map().SameAs(down_V.trilinos_vector().Map()),
+      Assert(vector->Map().SameAs(V.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
 
-      const int ierr = vector->Update(a, down_V.trilinos_vector(), 1.);
+      const int ierr = vector->Update(a, V.trilinos_vector(), 1.);
       Assert(ierr == 0, ExcTrilinosError(ierr));
       (void)ierr;
     }
@@ -360,31 +331,20 @@ namespace LinearAlgebra
 
 
     void
-    Vector::add(const double                     a,
-                const VectorSpaceVector<double> &V,
-                const double                     b,
-                const VectorSpaceVector<double> &W)
+    Vector::add(const double  a,
+                const Vector &V,
+                const double  b,
+                const Vector &W)
     {
-      // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
-      // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&W) != nullptr,
-             ExcVectorTypeNotCompatible());
-
-      // Downcast V. If fails, throws an exception.
-      const Vector &down_V = dynamic_cast<const Vector &>(V);
-      // Downcast W. If fails, throws an exception.
-      const Vector &down_W = dynamic_cast<const Vector &>(W);
-      Assert(vector->Map().SameAs(down_V.trilinos_vector().Map()),
+      Assert(vector->Map().SameAs(V.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
-      Assert(vector->Map().SameAs(down_W.trilinos_vector().Map()),
+      Assert(vector->Map().SameAs(W.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
       AssertIsFinite(a);
       AssertIsFinite(b);
 
-      const int ierr = vector->Update(
-        a, down_V.trilinos_vector(), b, down_W.trilinos_vector(), 1.);
+      const int ierr =
+        vector->Update(a, V.trilinos_vector(), b, W.trilinos_vector(), 1.);
       Assert(ierr == 0, ExcTrilinosError(ierr));
       (void)ierr;
     }
@@ -392,18 +352,10 @@ namespace LinearAlgebra
 
 
     void
-    Vector::sadd(const double                     s,
-                 const double                     a,
-                 const VectorSpaceVector<double> &V)
+    Vector::sadd(const double s, const double a, const Vector &V)
     {
-      // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
-
       *this *= s;
-      // Downcast V. It fails, throws an exception.
-      const Vector &down_V = dynamic_cast<const Vector &>(V);
-      Vector        tmp(down_V);
+      Vector tmp(V);
       tmp *= a;
       *this += tmp;
     }
@@ -411,22 +363,13 @@ namespace LinearAlgebra
 
 
     void
-    Vector::scale(const VectorSpaceVector<double> &scaling_factors)
+    Vector::scale(const Vector &scaling_factors)
     {
-      // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&scaling_factors) != nullptr,
-             ExcVectorTypeNotCompatible());
-
-      // Downcast scaling_factors. If fails, throws an exception.
-      const Vector &down_scaling_factors =
-        dynamic_cast<const Vector &>(scaling_factors);
-      Assert(vector->Map().SameAs(down_scaling_factors.trilinos_vector().Map()),
+      Assert(vector->Map().SameAs(scaling_factors.trilinos_vector().Map()),
              ExcDifferentParallelPartitioning());
 
-      const int ierr = vector->Multiply(1.0,
-                                        down_scaling_factors.trilinos_vector(),
-                                        *vector,
-                                        0.0);
+      const int ierr =
+        vector->Multiply(1.0, scaling_factors.trilinos_vector(), *vector, 0.0);
       Assert(ierr == 0, ExcTrilinosError(ierr));
       (void)ierr;
     }
@@ -434,21 +377,15 @@ namespace LinearAlgebra
 
 
     void
-    Vector::equ(const double a, const VectorSpaceVector<double> &V)
+    Vector::equ(const double a, const Vector &V)
     {
-      // Check that casting will work.
-      Assert(dynamic_cast<const Vector *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
-
-      // Downcast V. If fails, throws an exception.
-      const Vector &down_V = dynamic_cast<const Vector &>(V);
       // If we don't have the same map, copy.
-      if (vector->Map().SameAs(down_V.trilinos_vector().Map()) == false)
+      if (vector->Map().SameAs(V.trilinos_vector().Map()) == false)
         this->sadd(0., a, V);
       else
         {
           // Otherwise, just update
-          int ierr = vector->Update(a, down_V.trilinos_vector(), 0.);
+          int ierr = vector->Update(a, V.trilinos_vector(), 0.);
           Assert(ierr == 0, ExcTrilinosError(ierr));
           (void)ierr;
         }
@@ -539,9 +476,7 @@ namespace LinearAlgebra
 
 
     double
-    Vector::add_and_dot(const double                     a,
-                        const VectorSpaceVector<double> &V,
-                        const VectorSpaceVector<double> &W)
+    Vector::add_and_dot(const double a, const Vector &V, const Vector &W)
     {
       this->add(a, V);
 
@@ -612,6 +547,11 @@ namespace LinearAlgebra
 
       return is;
     }
+
+
+    void
+    Vector::compress(const VectorOperation::values /*operation*/)
+    {}
 
 
 

@@ -54,17 +54,13 @@ namespace LinearAlgebra
   {
     /**
      * This class implements a wrapper to the Trilinos distributed vector
-     * class Epetra_FEVector. This class is derived from the
-     * LinearAlgebra::VectorSpaceVector class. Note however that Epetra only
-     * works with Number = double. This class requires Trilinos to be compiled
+     * class Epetra_FEVector. This class requires Trilinos to be compiled
      * with MPI support.
      *
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public VectorSpaceVector<double>,
-                   public ReadVector<double>,
-                   public Subscriptor
+    class Vector : public ReadVector<double>, public Subscriptor
     {
     public:
       using value_type = double;
@@ -105,9 +101,8 @@ namespace LinearAlgebra
        * Change the dimension to that of the vector @p V. The elements of @p V are not
        * copied.
        */
-      virtual void
-      reinit(const VectorSpaceVector<double> &V,
-             const bool omit_zeroing_entries = false) override;
+      void
+      reinit(const Vector &V, const bool omit_zeroing_entries = false);
 
       /**
        * Extract a range of elements all at once.
@@ -129,8 +124,8 @@ namespace LinearAlgebra
        * Sets all elements of the vector to the scalar @p s. This operation is
        * only allowed if @p s is equal to zero.
        */
-      virtual Vector &
-      operator=(const double s) override;
+      Vector &
+      operator=(const double s);
 
       /**
        * Imports all the elements present in the vector's IndexSet from the
@@ -140,22 +135,22 @@ namespace LinearAlgebra
        * communication pattern is used multiple times. This can be used to
        * improve performance.
        */
-      virtual void
+      void
       import_elements(
         const ReadWriteVector<double> &V,
         VectorOperation::values        operation,
         std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          communication_pattern = {}) override;
+          communication_pattern = {});
 
       /**
        * @deprecated Use import_elements() instead.
        */
       DEAL_II_DEPRECATED
-      virtual void
+      void
       import(const ReadWriteVector<double> &V,
              VectorOperation::values        operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {}) override
+               communication_pattern = {})
       {
         import_elements(V, operation, communication_pattern);
       }
@@ -163,65 +158,60 @@ namespace LinearAlgebra
       /**
        * Multiply the entire vector by a fixed factor.
        */
-      virtual Vector &
-      operator*=(const double factor) override;
+      Vector &
+      operator*=(const double factor);
 
       /**
        * Divide the entire vector by a fixed factor.
        */
-      virtual Vector &
-      operator/=(const double factor) override;
+      Vector &
+      operator/=(const double factor);
 
       /**
        * Add the vector @p V to the present one.
        */
-      virtual Vector &
-      operator+=(const VectorSpaceVector<double> &V) override;
+      Vector &
+      operator+=(const Vector &V);
 
       /**
        * Subtract the vector @p V from the present one.
        */
-      virtual Vector &
-      operator-=(const VectorSpaceVector<double> &V) override;
+      Vector &
+      operator-=(const Vector &V);
 
       /**
        * Return the scalar product of two vectors. The vectors need to have the
        * same layout.
        */
-      virtual double
-      operator*(const VectorSpaceVector<double> &V) const override;
+      double
+      operator*(const Vector &V) const;
 
       /**
        * Add @p a to all components. Note that @p is a scalar not a vector.
        */
-      virtual void
-      add(const double a) override;
+      void
+      add(const double a);
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this +=
        * a*V</tt>. The vectors need to have the same layout.
        */
-      virtual void
-      add(const double a, const VectorSpaceVector<double> &V) override;
+      void
+      add(const double a, const Vector &V);
 
       /**
        * Multiple addition of multiple of a vector, i.e. <tt>*this> +=
        * a*V+b*W</tt>. The vectors need to have the same layout.
        */
-      virtual void
-      add(const double                     a,
-          const VectorSpaceVector<double> &V,
-          const double                     b,
-          const VectorSpaceVector<double> &W) override;
+      void
+      add(const double a, const Vector &V, const double b, const Vector &W);
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this
        * = s*(*this)+a*V</tt>.
        */
-      virtual void
-      sadd(const double                     s,
-           const double                     a,
-           const VectorSpaceVector<double> &V) override;
+      void
+      sadd(const double s, const double a, const Vector &V);
 
       /**
        * Scale each element of this vector by the corresponding element in the
@@ -229,47 +219,47 @@ namespace LinearAlgebra
        * (and immediate re-assignment) by a diagonal scaling matrix. The
        * vectors need to have the same layout.
        */
-      virtual void
-      scale(const VectorSpaceVector<double> &scaling_factors) override;
+      void
+      scale(const Vector &scaling_factors);
 
       /**
        * Assignment <tt>*this = a*V</tt>.
        */
-      virtual void
-      equ(const double a, const VectorSpaceVector<double> &V) override;
+      void
+      equ(const double a, const Vector &V);
 
       /**
        * Return whether the vector contains only elements with value zero.
        */
-      virtual bool
-      all_zero() const override;
+      bool
+      all_zero() const;
 
       /**
        * Return the mean value of the element of this vector.
        */
-      virtual double
-      mean_value() const override;
+      double
+      mean_value() const;
 
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
        */
-      virtual double
-      l1_norm() const override;
+      double
+      l1_norm() const;
 
       /**
        * Return the l<sub>2</sub> norm of the vector (i.e., the square root of
        * the sum of the square of all entries among all processors).
        */
-      virtual double
-      l2_norm() const override;
+      double
+      l2_norm() const;
 
       /**
        * Return the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
        */
-      virtual double
-      linfty_norm() const override;
+      double
+      linfty_norm() const;
 
       /**
        * Performs a combined operation of a vector addition and a subsequent
@@ -293,10 +283,8 @@ namespace LinearAlgebra
        * implemented as
        * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
-      virtual double
-      add_and_dot(const double                     a,
-                  const VectorSpaceVector<double> &V,
-                  const VectorSpaceVector<double> &W) override;
+      double
+      add_and_dot(const double a, const Vector &V, const Vector &W);
       /**
        * This function always returns false and is present only for backward
        * compatibility.
@@ -335,8 +323,21 @@ namespace LinearAlgebra
        *  vec.locally_owned_elements() == complete_index_set(vec.size())
        * @endcode
        */
-      virtual ::dealii::IndexSet
-      locally_owned_elements() const override;
+      ::dealii::IndexSet
+      locally_owned_elements() const;
+
+      /**
+       * Compress the underlying representation of the Trilinos object, i.e.
+       * flush the buffers of the vector object if it has any. This function is
+       * necessary after writing into a vector element-by-element and before
+       * anything else can be done on it.
+       *
+       * See
+       * @ref GlossCompress "Compressing distributed objects"
+       * for more information.
+       */
+      void
+      compress(const VectorOperation::values operation);
 
       /**
        * Return a const reference to the underlying Trilinos
@@ -355,17 +356,17 @@ namespace LinearAlgebra
       /**
        * Prints the vector to the output stream @p out.
        */
-      virtual void
+      void
       print(std::ostream &     out,
             const unsigned int precision  = 3,
             const bool         scientific = true,
-            const bool         across     = true) const override;
+            const bool         across     = true) const;
 
       /**
        * Return the memory consumption of this class in bytes.
        */
-      virtual std::size_t
-      memory_consumption() const override;
+      std::size_t
+      memory_consumption() const;
 
       /**
        * The vectors have different partitioning, i.e. their IndexSet objects
