@@ -2179,11 +2179,12 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::register_data_attach()
   {
-    parallel::distributed::Triangulation<dim, spacedim>
+    parallel::DistributedTriangulationBase<dim, spacedim>
       *distributed_triangulation =
-        const_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-          dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                         *>(&(*triangulation)));
+        const_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+          dynamic_cast<
+            const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+            &(*triangulation)));
     (void)distributed_triangulation;
 
     Assert(
@@ -2193,7 +2194,6 @@ namespace Particles
         "by the ParticleHandler class. Either insert particles after mesh "
         "creation and do not refine afterwards, or use a distributed triangulation."));
 
-#ifdef DEAL_II_WITH_P4EST
     const auto callback_function =
       [this](
         const typename Triangulation<dim, spacedim>::cell_iterator
@@ -2204,7 +2204,6 @@ namespace Particles
 
     handle = distributed_triangulation->register_data_attach(
       callback_function, /*returns_variable_size_data=*/true);
-#endif
   }
 
 
@@ -2243,11 +2242,12 @@ namespace Particles
   ParticleHandler<dim, spacedim>::notify_ready_to_unpack(
     const bool serialization)
   {
-    parallel::distributed::Triangulation<dim, spacedim>
+    parallel::DistributedTriangulationBase<dim, spacedim>
       *distributed_triangulation =
-        const_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
-          dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim>
-                         *>(&(*triangulation)));
+        const_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+          dynamic_cast<
+            const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+            &(*triangulation)));
     (void)distributed_triangulation;
 
     Assert(
@@ -2260,7 +2260,6 @@ namespace Particles
     // First prepare container for insertion
     clear();
 
-#ifdef DEAL_II_WITH_P4EST
     // If we are resuming from a checkpoint, we first have to register the
     // store function again, to set the triangulation to the same state as
     // before the serialization. Only afterwards we know how to deserialize the
@@ -2288,9 +2287,6 @@ namespace Particles
         handle = numbers::invalid_unsigned_int;
         update_cached_numbers();
       }
-#else
-    (void)serialization;
-#endif
   }
 
 
