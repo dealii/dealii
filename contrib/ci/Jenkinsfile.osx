@@ -99,6 +99,7 @@ pipeline
                     mkdir build && cd build
                     cmake \
                       -D DEAL_II_WITH_MPI=OFF \
+                      -D DEAL_II_WITH_TASKFLOW=ON \
                       -D DEAL_II_CXX_FLAGS='-Werror' \
                       -D DEAL_II_EARLY_DEPRECATIONS=ON \
                       -D CMAKE_BUILD_TYPE=Debug \
