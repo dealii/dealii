@@ -132,7 +132,16 @@ namespace LinearAlgebra
       auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadOnly);
 #  else
-      vector.template sync<Kokkos::HostSpace>();
+      /*
+       * For Trilinos older than 13.2 we would normally have to call
+       * vector.template sync<Kokkos::HostSpace>() at this place in order
+       * to sync between memory spaces. This is necessary for GPU support.
+       * Unfortunately, we are in a const context here and cannot call to
+       * sync() (which is a non-const member function).
+       *
+       * Let us choose to simply ignore this problem for such an old
+       * Trilinos version.
+       */
       auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
 #  endif
       auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
