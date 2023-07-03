@@ -1,6 +1,6 @@
 name: github-linux
 
-on: [push, pull_request]
+on: [pull_request]
 
 concurrency:
   group: ${ {github.event_name }}-${{ github.workflow }}-${{ github.ref }}
