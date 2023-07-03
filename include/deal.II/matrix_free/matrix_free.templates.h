@@ -1488,7 +1488,7 @@ namespace internal
 
     const bool hp_functionality_enabled =
       std::any_of(dof_handlers.begin(), dof_handlers.end(), [](const auto &dh) {
-        return (dh->get_fe_collection().size() > 1);
+        return dh->has_hp_capabilities();
       });
 
     const unsigned int         n_lanes = task_info.vectorization_length;
