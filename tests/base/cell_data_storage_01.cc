@@ -102,9 +102,9 @@ check_qph(Triangulation<dim> &tr,
         const std::vector<std::shared_ptr<DATA>> qpd = manager.get_data(cell);
         const std::vector<std::shared_ptr<const DATA>> qpd_const =
           manager_const.get_data(cell);
-        const std_cxx17::optional<std::vector<std::shared_ptr<DATA>>>
-          qpd_optional = manager.try_get_data(cell);
-        const std_cxx17::optional<std::vector<std::shared_ptr<const DATA>>>
+        const std::optional<std::vector<std::shared_ptr<DATA>>> qpd_optional =
+          manager.try_get_data(cell);
+        const std::optional<std::vector<std::shared_ptr<const DATA>>>
           qpd_const_optional = manager_const.try_get_data(cell);
         AssertThrow(qpd_optional, ExcInternalError());
         AssertThrow(qpd_const_optional, ExcInternalError());
@@ -177,7 +177,7 @@ test()
             next_cell++;
             if (next_cell != tr.end())
               {
-                const std_cxx17::optional<std::vector<std::shared_ptr<MyQData>>>
+                const std::optional<std::vector<std::shared_ptr<MyQData>>>
                   nonexisting_data = data_storage.try_get_data(next_cell);
                 AssertThrow(!nonexisting_data, ExcInternalError());
               }

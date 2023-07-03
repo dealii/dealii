@@ -93,13 +93,13 @@ namespace GridGenerator
     else if constexpr (dim == 2)
       {
         // default triangulation for Surface_mesher
-        using Tr       = CGAL::Surface_mesh_default_triangulation_3;
-        using C2t3     = CGAL::Complex_2_in_triangulation_3<Tr>;
-        using GT       = Tr::Geom_traits;
-        using Sphere_3 = GT::Sphere_3;
-        using Point_3  = GT::Point_3;
-        using FT       = GT::FT;
-        typedef FT (*Function)(Point_3);
+        using Tr           = CGAL::Surface_mesh_default_triangulation_3;
+        using C2t3         = CGAL::Complex_2_in_triangulation_3<Tr>;
+        using GT           = Tr::Geom_traits;
+        using Sphere_3     = GT::Sphere_3;
+        using Point_3      = GT::Point_3;
+        using FT           = GT::FT;
+        using Function     = FT (*)(Point_3);
         using Surface_3    = CGAL::Implicit_surface_3<GT, Function>;
         using Surface_mesh = CGAL::Surface_mesh<Point_3>;
 

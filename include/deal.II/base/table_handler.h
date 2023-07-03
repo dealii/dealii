@@ -20,7 +20,6 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/std_cxx17/variant.h>
 
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/split_member.hpp>
@@ -31,6 +30,7 @@
 #include <map>
 #include <ostream>
 #include <string>
+#include <variant>
 #include <vector>
 
 
@@ -149,7 +149,7 @@ namespace internal
      * Abbreviation for the data type stored by this object.
      */
     using value_type =
-      std_cxx17::variant<int, unsigned int, std::uint64_t, double, std::string>;
+      std::variant<int, unsigned int, std::uint64_t, double, std::string>;
 
     /**
      * Stored value.
@@ -818,13 +818,13 @@ namespace internal
   {
     // we don't quite know the data type in 'value', but
     // it must be one of the ones in the type list of the
-    // std_cxx17::variant. so if T is not in the list, or if
+    // std::variant. so if T is not in the list, or if
     // the data stored in the TableEntry is not of type
     // T, then we will get an exception that we can
     // catch and produce an error message
     try
       {
-        return std_cxx17::get<T>(value);
+        return std::get<T>(value);
       }
     catch (...)
       {
@@ -844,33 +844,33 @@ namespace internal
     // write first an identifier for the kind
     // of data stored and then the actual
     // data, in its correct data type
-    if (std_cxx17::holds_alternative<int>(value))
+    if (std::holds_alternative<int>(value))
       {
-        const int p = std_cxx17::get<int>(value);
+        const int p = std::get<int>(value);
         char      c = 'i';
         ar &c &p;
       }
-    else if (std_cxx17::holds_alternative<unsigned int>(value))
+    else if (std::holds_alternative<unsigned int>(value))
       {
-        const unsigned int p = std_cxx17::get<unsigned int>(value);
+        const unsigned int p = std::get<unsigned int>(value);
         char               c = 'u';
         ar &c &p;
       }
-    else if (std_cxx17::holds_alternative<double>(value))
+    else if (std::holds_alternative<double>(value))
       {
-        const double p = std_cxx17::get<double>(value);
+        const double p = std::get<double>(value);
         char         c = 'd';
         ar &c &p;
       }
-    else if (std_cxx17::holds_alternative<std::string>(value))
+    else if (std::holds_alternative<std::string>(value))
       {
-        const std::string p = std_cxx17::get<std::string>(value);
+        const std::string p = std::get<std::string>(value);
         char              c = 's';
         ar &c &p;
       }
-    else if (std_cxx17::holds_alternative<std::uint64_t>(value))
+    else if (std::holds_alternative<std::uint64_t>(value))
       {
-        const std::uint64_t p = std_cxx17::get<std::uint64_t>(value);
+        const std::uint64_t p = std::get<std::uint64_t>(value);
         char                c = 'l';
         ar &c &p;
       }

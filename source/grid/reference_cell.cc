@@ -16,7 +16,6 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx17/algorithm.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/fe/fe_pyramid_p.h>
@@ -31,6 +30,7 @@
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 
@@ -1075,45 +1075,43 @@ ReferenceCell::closest_point(const Point<dim> &p) const
           case ReferenceCells::Quadrilateral:
           case ReferenceCells::Hexahedron:
             for (unsigned int d = 0; d < dim; ++d)
-              result[d] = std_cxx17::clamp(result[d], 0.0, 1.0);
+              result[d] = std::clamp(result[d], 0.0, 1.0);
             // simplices can use the standard definition of a simplex:
             break;
           case ReferenceCells::Triangle:
-            result[x_index] = std_cxx17::clamp(result[x_index], 0.0, 1.0);
+            result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
             result[y_index] =
-              std_cxx17::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+              std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
             break;
           case ReferenceCells::Tetrahedron:
-            result[x_index] = std_cxx17::clamp(result[x_index], 0.0, 1.0);
+            result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
             result[y_index] =
-              std_cxx17::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+              std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
             result[z_index] =
-              std_cxx17::clamp(result[z_index],
-                               0.0,
-                               1.0 - result[x_index] - result[y_index]);
+              std::clamp(result[z_index],
+                         0.0,
+                         1.0 - result[x_index] - result[y_index]);
             break;
           // wedges and pyramids are more ad-hoc:
           case ReferenceCells::Wedge:
-            result[x_index] = std_cxx17::clamp(result[x_index], 0.0, 1.0);
+            result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
             result[y_index] =
-              std_cxx17::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
-            result[z_index] = std_cxx17::clamp(result[z_index], 0.0, 1.0);
+              std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+            result[z_index] = std::clamp(result[z_index], 0.0, 1.0);
             break;
           case ReferenceCells::Pyramid:
             {
-              result[x_index] = std_cxx17::clamp(result[x_index], -1.0, 1.0);
-              result[y_index] = std_cxx17::clamp(result[y_index], -1.0, 1.0);
+              result[x_index] = std::clamp(result[x_index], -1.0, 1.0);
+              result[y_index] = std::clamp(result[y_index], -1.0, 1.0);
               // It suffices to transform everything to the first quadrant to
               // adjust z:
               const auto x_abs = std::abs(result[x_index]);
               const auto y_abs = std::abs(result[y_index]);
 
               if (y_abs <= x_abs)
-                result[z_index] =
-                  std_cxx17::clamp(result[z_index], 0.0, 1.0 - x_abs);
+                result[z_index] = std::clamp(result[z_index], 0.0, 1.0 - x_abs);
               else
-                result[z_index] =
-                  std_cxx17::clamp(result[z_index], 0.0, 1.0 - y_abs);
+                result[z_index] = std::clamp(result[z_index], 0.0, 1.0 - y_abs);
             }
             break;
           default:

@@ -9743,16 +9743,8 @@ namespace DataOutBase
     }
 
     // First import what kind of reference cell we are looking at:
-#ifdef DEAL_II_HAVE_CXX17
     if constexpr (dim > 0)
       in >> patch.reference_cell;
-#else
-    // If we can't use 'if constexpr', work around the fact that we can't
-    // write to a 'const' variable by using a const_cast that is a no-op
-    // whenever the code is actually executed
-    if (dim > 0)
-      in >> const_cast<ReferenceCell &>(patch.reference_cell);
-#endif
 
     // then read all the data that is in this patch
     for (const unsigned int i : patch.reference_cell.vertex_indices())
@@ -9767,16 +9759,8 @@ namespace DataOutBase
     // in dim==1, this is a const variable equal to one that can't be changed.
     unsigned int n_subdivisions;
     in >> n_subdivisions;
-#ifdef DEAL_II_HAVE_CXX17
     if constexpr (dim > 1)
       patch.n_subdivisions = n_subdivisions;
-#else
-    // If we can't use 'if constexpr', work around the fact that we can't
-    // write to a 'const' variable by using a const_cast that is a no-op
-    // whenever the code is actually executed
-    if (dim > 1)
-      const_cast<unsigned int &>(patch.n_subdivisions) = n_subdivisions;
-#endif
 
     in >> patch.points_are_available;
 

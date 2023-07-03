@@ -219,7 +219,7 @@ SparseMatrix<number>::operator=(const double d)
       grain_size);
   else if (matrix_size > 0)
     {
-      if DEAL_II_CONSTEXPR_IN_CONDITIONAL (std::is_trivial<number>::value)
+      if constexpr (std::is_trivial<number>::value)
         std::memset(val.get(), 0, matrix_size * sizeof(number));
       else
         std::fill(val.get(), val.get() + matrix_size, 0);

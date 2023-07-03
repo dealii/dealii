@@ -36,13 +36,13 @@ namespace internal
   {
     // we don't quite know the data type in 'value', but
     // it must be one of the ones in the type list of the
-    // std_cxx17::variant. Go through this list and return
+    // std::variant. Go through this list and return
     // the value if this happens to be a number
     //
     // first try with int
     try
       {
-        return std_cxx17::get<int>(value);
+        return std::get<int>(value);
       }
     catch (...)
       {}
@@ -51,7 +51,7 @@ namespace internal
     // ... then with unsigned int...
     try
       {
-        return std_cxx17::get<unsigned int>(value);
+        return std::get<unsigned int>(value);
       }
     catch (...)
       {}
@@ -59,7 +59,7 @@ namespace internal
     // ... then with std::uint64_t...
     try
       {
-        return std_cxx17::get<std::uint64_t>(value);
+        return std::get<std::uint64_t>(value);
       }
     catch (...)
       {}
@@ -67,7 +67,7 @@ namespace internal
     // ...and finally with double precision:
     try
       {
-        return std_cxx17::get<double>(value);
+        return std::get<double>(value);
       }
     catch (...)
       {
@@ -91,11 +91,7 @@ namespace internal
     else
       ss.setf(std::ios::fixed, std::ios::floatfield);
 
-#ifdef DEAL_II_HAVE_CXX17
     std::visit([&ss](auto &v) { ss << v; }, value);
-#else
-    ss << value;
-#endif
 
     cached_value = ss.str();
     if (cached_value.size() == 0)
@@ -108,38 +104,16 @@ namespace internal
     return cached_value;
   }
 
-
-#ifndef DEAL_II_HAVE_CXX17
-  namespace Local
-  {
-    // see which type we can cast to, then use this type to create
-    // a default constructed object
-    struct SetValueToDefault : public boost::static_visitor<>
-    {
-      template <typename T>
-      void
-      operator()(T &operand) const
-      {
-        operand = T();
-      }
-    };
-  } // namespace Local
-#endif
-
   TableEntry
   TableEntry::get_default_constructed_copy() const
   {
     TableEntry new_entry = *this;
-#ifndef DEAL_II_HAVE_CXX17
-    boost::apply_visitor(Local::SetValueToDefault(), new_entry.value);
-#else
     // Let std::visit figure out which data type is actually stored,
     // and then set the object so stored to a default-constructed
     // one.
     std::visit([](
                  auto &arg) { arg = std::remove_reference_t<decltype(arg)>(); },
                new_entry.value);
-#endif
 
     return new_entry;
   }
@@ -728,11 +702,7 @@ TableHandler::write_tex(std::ostream &out, const bool with_header) const
           else
             out.setf(std::ios::fixed, std::ios::floatfield);
 
-#ifdef DEAL_II_HAVE_CXX17
           std::visit([&out](auto &v) { out << v; }, column.entries[i].value);
-#else
-          out << column.entries[i].value;
-#endif
 
           if (j < n_cols - 1)
             out << " & ";

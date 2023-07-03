@@ -17,37 +17,15 @@
 
 #include <deal.II/base/config.h>
 
+DEAL_II_WARNING(
+  "This file is deprecated. Simply use the corresponding C++14 header <tuple>.")
+
 #include <tuple>
 
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx17
 {
-#ifndef DEAL_II_HAVE_CXX17
-  template <typename F, typename Tuple, size_t... S>
-  auto
-  apply_impl(F &&fn, Tuple &&t, std::index_sequence<S...>)
-    -> decltype(std::forward<F>(fn)(std::get<S>(std::forward<Tuple>(t))...))
-  {
-    return std::forward<F>(fn)(std::get<S>(std::forward<Tuple>(t))...);
-  }
-
-  template <typename F, typename Tuple>
-  auto
-  apply(F &&fn, Tuple &&t) -> decltype(apply_impl(
-    std::forward<F>(fn),
-    std::forward<Tuple>(t),
-    std::make_index_sequence<
-      std::tuple_size<typename std::remove_reference<Tuple>::type>::value>()))
-  {
-    std::size_t constexpr tSize =
-      std::tuple_size<typename std::remove_reference<Tuple>::type>::value;
-    return apply_impl(std::forward<F>(fn),
-                      std::forward<Tuple>(t),
-                      std::make_index_sequence<tSize>());
-  }
-#else
   using std::apply;
-#endif
 } // namespace std_cxx17
 DEAL_II_NAMESPACE_CLOSE
 

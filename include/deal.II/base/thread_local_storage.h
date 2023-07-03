@@ -251,11 +251,7 @@ namespace Threads
      * readers-writer lock
      * (https://en.wikipedia.org/wiki/Readers%E2%80%93writer_lock).
      */
-#  ifdef DEAL_II_HAVE_CXX17
     mutable std::shared_mutex insertion_mutex;
-#  else
-    mutable std::shared_timed_mutex insertion_mutex;
-#  endif
 
     /**
      * An exemplar for creating a new (thread specific) copy.

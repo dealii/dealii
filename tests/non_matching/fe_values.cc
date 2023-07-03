@@ -16,7 +16,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function_signed_distance.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx17/optional.h>
 
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -27,6 +26,8 @@
 #include <deal.II/non_matching/fe_values.h>
 
 #include <deal.II/numerics/vector_tools.h>
+
+#include <optional>
 
 #include "../tests.h"
 
@@ -48,7 +49,7 @@ assert_cells_are_the_same(
 // Assert that the incoming optional does not have a value.
 template <class FEVALUES>
 void
-assert_doesnt_have_value(const std_cxx17::optional<FEVALUES> &fe_values)
+assert_doesnt_have_value(const std::optional<FEVALUES> &fe_values)
 {
   AssertThrow(!fe_values, ExcInternalError());
   deallog << "OK" << std::endl;
@@ -67,7 +68,7 @@ assert_doesnt_have_value(const std_cxx17::optional<FEVALUES> &fe_values)
 // Test the following:
 // 1. That we can construct a NonMatching::FEValues object.
 // 2. That when we call reinit on each cell in the triangulation,
-// the std_cxx17::optionals that we get from
+// the std::optionals that we get from
 // get_inside/outside/surface_fe_values are set up correctly. That is, the
 // optionals that should contain a value do and the ones that should not contain
 // a value do not.

@@ -395,7 +395,7 @@ namespace Step85
         // produces anything useful. It can happen that the algorithm produces 0
         // quadrature points. When this happens, the returned optional will not
         // contain a value, even if the cell is formally intersected.
-        const std_cxx17::optional<FEValues<dim>> &inside_fe_values =
+        const std::optional<FEValues<dim>> &inside_fe_values =
           non_matching_fe_values.get_inside_fe_values();
 
         if (inside_fe_values)
@@ -433,7 +433,7 @@ namespace Step85
         // An additional benefit of std::optional is that we do not need any
         // other check for whether we are on intersected cells: In case we are
         // on an inside cell, we get an empty object here.
-        const std_cxx17::optional<NonMatching::FEImmersedSurfaceValues<dim>>
+        const std::optional<NonMatching::FEImmersedSurfaceValues<dim>>
           &surface_fe_values = non_matching_fe_values.get_surface_fe_values();
 
         if (surface_fe_values)
@@ -634,7 +634,7 @@ namespace Step85
       {
         non_matching_fe_values.reinit(cell);
 
-        const std_cxx17::optional<FEValues<dim>> &fe_values =
+        const std::optional<FEValues<dim>> &fe_values =
           non_matching_fe_values.get_inside_fe_values();
 
         if (fe_values)

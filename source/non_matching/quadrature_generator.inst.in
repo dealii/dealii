@@ -53,7 +53,7 @@ for (deal_II_dimension : DIMENSIONS)
 // gcc is wrong. We don't need the function when dim = 1, so we avoid
 // instantiating it.
 #if 1 < deal_II_dimension
-          template std_cxx17::optional<HeightDirectionData>
+          template std::optional<HeightDirectionData>
           find_best_height_direction(
             const std::vector<FunctionBounds<deal_II_dimension>> &);
 #endif

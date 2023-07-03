@@ -140,7 +140,8 @@ foreach(_file ${_files})
   file(APPEND ${_file}
     "set(DEAL_II_WITH_CXX11 ON)\n"
     "set(DEAL_II_WITH_CXX14 ON)\n"
-    "set(DEAL_II_WITH_CXX17 ${DEAL_II_HAVE_CXX17})\n"
+    "set(DEAL_II_WITH_CXX17 ON)\n"
+    "set(DEAL_II_WITH_CXX20 ${DEAL_II_HAVE_CXX20})\n"
     "set(DEAL_II_WITH_THREADS ON)\n"
     )
 endforeach()

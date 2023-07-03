@@ -271,13 +271,13 @@ namespace NonMatching
 
 
       template <int dim>
-      std_cxx17::optional<HeightDirectionData>
+      std::optional<HeightDirectionData>
       find_best_height_direction(
         const std::vector<FunctionBounds<dim>> &all_function_bounds)
       {
         // Minimum (taken over the indefinite functions) on the lower bound on
         // each component of the gradient.
-        std_cxx17::optional<std::array<double, dim>> min_lower_abs_grad;
+        std::optional<std::array<double, dim>> min_lower_abs_grad;
 
         for (const FunctionBounds<dim> &bounds : all_function_bounds)
           {
@@ -320,7 +320,7 @@ namespace NonMatching
             return data;
           }
 
-        return std_cxx17::optional<HeightDirectionData>();
+        return std::optional<HeightDirectionData>();
       }
 
 
@@ -920,7 +920,7 @@ namespace NonMatching
           }
         else
           {
-            const std_cxx17::optional<HeightDirectionData> data =
+            const std::optional<HeightDirectionData> data =
               find_best_height_direction(all_function_bounds);
 
             // Check larger than a constant to avoid that min_abs_dfdx is only
@@ -955,7 +955,7 @@ namespace NonMatching
        * will be non-set.
        */
       template <int dim>
-      std_cxx17::optional<unsigned int>
+      std::optional<unsigned int>
       direction_of_largest_extent(const BoundingBox<dim> &box)
       {
         // Get the side lengths for each direction and sort them.
@@ -972,7 +972,7 @@ namespace NonMatching
         // function isn't called in 1d, so the (dim - 2)-element exists.
         if (boost::math::epsilon_difference(side_lengths[dim - 1].first,
                                             side_lengths[dim - 2].first) < 100)
-          return std_cxx17::optional<unsigned int>();
+          return std::optional<unsigned int>();
 
         return side_lengths.back().second;
       }
@@ -993,10 +993,10 @@ namespace NonMatching
       template <int dim>
       unsigned int
       compute_split_direction(
-        const BoundingBox<dim> &                        box,
-        const std_cxx17::optional<HeightDirectionData> &height_direction_data)
+        const BoundingBox<dim> &                  box,
+        const std::optional<HeightDirectionData> &height_direction_data)
       {
-        const std_cxx17::optional<unsigned int> direction =
+        const std::optional<unsigned int> direction =
           direction_of_largest_extent(box);
 
         if (direction)
@@ -1055,10 +1055,10 @@ namespace NonMatching
       void
       QGenerator<dim, spacedim>::split_box_and_recurse(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                                             level_sets,
-        const BoundingBox<dim> &                        box,
-        const std_cxx17::optional<HeightDirectionData> &direction_data,
-        const unsigned int                              n_box_splits)
+          &                                       level_sets,
+        const BoundingBox<dim> &                  box,
+        const std::optional<HeightDirectionData> &direction_data,
+        const unsigned int                        n_box_splits)
       {
         if (this->additional_data.split_in_half)
           {

@@ -27,7 +27,6 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/function_signed_distance.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/base/std_cxx17/optional.h>
 
 #include <deal.II/fe/fe_q.h>
 
@@ -38,6 +37,7 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include <bitset>
+#include <optional>
 
 #include "../tests.h"
 

@@ -18,7 +18,6 @@
 #
 # This file sets up
 #
-#   DEAL_II_HAVE_CXX14
 #   DEAL_II_HAVE_CXX17
 #   DEAL_II_HAVE_CXX20
 #
@@ -126,6 +125,10 @@ macro(_test_cxx17_support)
     "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
     DEAL_II_HAVE_CXX17_FEATURES
     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK
+    DEAL_II_HAVE_CXX14_FEATURES
+    DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
+    DEAL_II_HAVE_CXX11_FEATURES
+    DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
     )
 
   CHECK_CXX_SOURCE_COMPILES(
@@ -195,30 +198,6 @@ macro(_test_cxx17_support)
     }
     "
     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK)
-
-  if(DEAL_II_HAVE_CXX17_FEATURES AND
-     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK)
-    message(STATUS "C++17 support is enabled.")
-    set(DEAL_II_HAVE_CXX17 TRUE)
-    set(_cxx_standard 17)
-  else()
-    message(STATUS "C++17 support is disabled.")
-    set(DEAL_II_HAVE_CXX17 FALSE)
-  endif()
-endmacro()
-
-
-#
-# Wrap the following checks into a macro to make it easier to rerun them.
-#
-macro(_test_cxx14_support)
-  unset_if_changed(CHECK_CXX14_FEATURES_FLAGS_SAVED
-    "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
-    DEAL_II_HAVE_CXX14_FEATURES
-    DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
-    DEAL_II_HAVE_CXX11_FEATURES
-    DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
-    )
 
   # Check some generic C++14 features
   CHECK_CXX_SOURCE_COMPILES(
@@ -305,16 +284,18 @@ macro(_test_cxx14_support)
     "
     DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
 
-  if(DEAL_II_HAVE_CXX14_FEATURES AND
+  if(DEAL_II_HAVE_CXX17_FEATURES AND
+     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK AND
+     DEAL_II_HAVE_CXX14_FEATURES AND
      DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK AND
      DEAL_II_HAVE_CXX11_FEATURES AND
      DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
-    message(STATUS "C++14 support is enabled.")
-    set(DEAL_II_HAVE_CXX14 TRUE)
-    set(_cxx_standard 14)
+    message(STATUS "C++17 support is enabled.")
+    set(DEAL_II_HAVE_CXX17 TRUE)
+    set(_cxx_standard 17)
   else()
-    message(STATUS "C++14 support is disabled.")
-    set(DEAL_II_HAVE_CXX14 FALSE)
+    message(STATUS "C++17 support is disabled.")
+    set(DEAL_II_HAVE_CXX17 FALSE)
   endif()
 endmacro()
 
@@ -324,7 +305,7 @@ endmacro()
 #
 
 _set_up_cmake_required()
-_test_cxx14_support()
+_test_cxx17_support()
 
 if(NOT DEAL_II_HAVE_CXX14)
   #
@@ -334,21 +315,21 @@ if(NOT DEAL_II_HAVE_CXX14)
   # variable set by the user.)
   #
   if(NOT "${DEAL_II_CXX_FLAGS_SAVED}" MATCHES "-std=" AND "${CMAKE_CXX_STANDARD}" STREQUAL "")
-    message(STATUS "C++14 support not available. Try to set -std=c++14 explicitly")
-    set(CMAKE_CXX_STANDARD 14) # manually set the C++ standard
+    message(STATUS "C++17 support not available. Try to set -std=c++17 explicitly")
+    set(CMAKE_CXX_STANDARD 17) # manually set the C++ standard
     _set_up_cmake_required()
-    _test_cxx14_support()
+    _test_cxx17_support()
   endif()
 endif()
 
-if(NOT DEAL_II_HAVE_CXX14)
+if(NOT DEAL_II_HAVE_CXX17)
   message(FATAL_ERROR
     "\nThe current version of deal.II requires a compiler with enabled "
-    "C++14 support. Make sure to use a modern enough compiler (GCC version "
-    "5 onwards, Clang version 4 onwards, or Microsoft MS VS 2015 onwards) "
+    "C++17 support. Make sure to use a modern enough compiler (GCC version "
+    "8 onwards, Clang version 8 onwards, or Microsoft MS VS 2019 onwards) "
     "and check that the compiler flag \"-std=\" is either unset, or set to "
-    "at least c++14. Similarly, please make sure that the CMake variable "
-    "CMAKE_CXX_STANDARD is either unset, or set at least to 14.\n\n"
+    "at least c++17. Similarly, please make sure that the CMake variable "
+    "CMAKE_CXX_STANDARD is either unset, or set at least to 17.\n\n"
     )
 endif()
 
