@@ -472,7 +472,8 @@ namespace Step26
     // Recall that it contains the term $MU^{n-1}-(1-\theta)k_n AU^{n-1}$.
     // We put these terms into the variable system_rhs, with the
     // help of a temporary vector:
-    while (time <= 0.5)
+    const double end_time = 0.5;
+    while (time <= end_time)
       {
         time += time_step;
         ++timestep_number;
