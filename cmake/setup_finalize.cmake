@@ -50,16 +50,6 @@ foreach(_flag ${DEAL_II_REMOVED_FLAGS})
   endif()
 endforeach()
 
-
-#
-# Clean up deal.IITargets.cmake in the build directory:
-#
-
-file(REMOVE
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
-  )
-
-
 ########################################################################
 #                                                                      #
 #                Query for git repository information:                 #

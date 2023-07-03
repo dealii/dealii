@@ -146,17 +146,6 @@ function(define_interface_target _feature)
       copy_target_properties(${_interface_target} ${${_feature}_TARGETS} ${${_feature}_TARGETS_${_build}})
     endif()
 
-    export(TARGETS ${_interface_target}
-      NAMESPACE "${DEAL_II_TARGET_NAME}::"
-      FILE ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Targets.cmake
-      APPEND
-      )
-
-    install(TARGETS ${_interface_target}
-      COMPONENT library
-      EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
-      )
-
     if(${_feature}_SPLIT_CONFIGURATION)
       # Future FIXME: change to block(PARENT_SCOPE)/endblock() (CMake 3.25)
       list(APPEND DEAL_II_TARGETS_${_build} ${_interface_target})
