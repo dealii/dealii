@@ -410,7 +410,7 @@ namespace internal
 {
   namespace AffineConstraintsImplementation
   {
-    template <class VectorType>
+    template <typename VectorType>
     void
     set_zero_all(const std::vector<types::global_dof_index> &cm,
                  VectorType &                                vec);
@@ -1089,7 +1089,7 @@ public:
    * @note This function does not work for MPI vectors. Use condense() with
    * two vector arguments instead.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   condense(VectorType &vec) const;
 
@@ -1099,7 +1099,7 @@ public:
    * called in parallel, @p vec_ghosted is supposed to contain ghost elements
    * while @p output should not.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   condense(const VectorType &vec_ghosted, VectorType &output) const;
 
@@ -1115,7 +1115,7 @@ public:
    * See the general documentation of this class for more detailed
    * information.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   condense(SparseMatrix<number> &matrix, VectorType &vector) const;
 
@@ -1123,7 +1123,7 @@ public:
    * Same function as above, but condenses square block sparse matrices and
    * vectors.
    */
-  template <class BlockVectorType>
+  template <typename BlockVectorType>
   void
   condense(BlockSparseMatrix<number> &matrix, BlockVectorType &vector) const;
 
@@ -1133,7 +1133,7 @@ public:
    * BlockVector<tt><...></tt>, a PETSc or Trilinos vector wrapper class, or
    * any other type having the same interface.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   set_zero(VectorType &vec) const;
 
@@ -1284,7 +1284,7 @@ public:
   /**
    * Enter a single value into a result vector, obeying constraints.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   distribute_local_to_global(const size_type index,
                              const number    value,
@@ -1324,7 +1324,7 @@ public:
    */
   template <typename ForwardIteratorVec,
             typename ForwardIteratorInd,
-            class VectorType>
+            typename VectorType>
   void
   distribute_local_to_global(ForwardIteratorVec local_vector_begin,
                              ForwardIteratorVec local_vector_end,
@@ -1580,7 +1580,7 @@ public:
    */
   template <typename ForwardIteratorVec,
             typename ForwardIteratorInd,
-            class VectorType>
+            typename VectorType>
   void
   get_dof_values(const VectorType & global_vector,
                  ForwardIteratorInd local_indices_begin,
@@ -1608,7 +1608,7 @@ public:
    * @note If this function is called with a parallel vector @p vec, then the
    * vector must not contain ghost elements.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   distribute(VectorType &vec) const;
 
@@ -2136,7 +2136,7 @@ AffineConstraints<number>::set_inhomogeneity(
 
 
 template <typename number>
-template <class VectorType>
+template <typename VectorType>
 inline void
 AffineConstraints<number>::set_zero(VectorType &vec) const
 {
@@ -2268,7 +2268,7 @@ AffineConstraints<number>::get_local_lines() const
 }
 
 template <typename number>
-template <class VectorType>
+template <typename VectorType>
 inline void
 AffineConstraints<number>::distribute_local_to_global(
   const size_type index,
@@ -2292,7 +2292,7 @@ AffineConstraints<number>::distribute_local_to_global(
 template <typename number>
 template <typename ForwardIteratorVec,
           typename ForwardIteratorInd,
-          class VectorType>
+          typename VectorType>
 inline void
 AffineConstraints<number>::distribute_local_to_global(
   ForwardIteratorVec local_vector_begin,
@@ -2340,7 +2340,7 @@ AffineConstraints<number>::distribute_local_to_global(
 template <typename number>
 template <typename ForwardIteratorVec,
           typename ForwardIteratorInd,
-          class VectorType>
+          typename VectorType>
 inline void
 AffineConstraints<number>::get_dof_values(
   const VectorType & global_vector,

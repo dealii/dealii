@@ -194,14 +194,14 @@ namespace internal
    * by seeing whether the `is_serial_vector` type is declared for the
    * given vector type.
    */
-  template <class VectorType>
+  template <typename VectorType>
   using is_vector_type = decltype(is_serial_vector<VectorType>::value);
 
   /**
    * A predicate stating whether something is a vector type and is
    * indeed a serial vector.
    */
-  template <class VectorType>
+  template <typename VectorType>
   using is_serial_vector_type =
     decltype(std::enable_if_t<is_serial_vector<VectorType>::value, int>());
 
@@ -210,7 +210,7 @@ namespace internal
    * a vector type at all, or (ii) if it is a vector type,
    * that it is not a parallel vector type.
    */
-  template <class VectorType>
+  template <typename VectorType>
   constexpr bool is_not_parallel_vector =
     (is_supported_operation<is_vector_type, VectorType> == false) ||
     (is_supported_operation<is_serial_vector_type, VectorType> == true);

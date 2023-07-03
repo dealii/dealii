@@ -297,7 +297,7 @@ public:
    *
    * All diagonal blocks must be square matrices for this operation.
    */
-  template <class BlockVectorType>
+  template <typename BlockVectorType>
   void
   precondition_Jacobi(BlockVectorType &      dst,
                       const BlockVectorType &src,
@@ -479,7 +479,7 @@ BlockSparseMatrix<number>::Tvmult(Vector<nonblock_number> &      dst,
 
 
 template <typename number>
-template <class BlockVectorType>
+template <typename BlockVectorType>
 inline void
 BlockSparseMatrix<number>::precondition_Jacobi(BlockVectorType &      dst,
                                                const BlockVectorType &src,

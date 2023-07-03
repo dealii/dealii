@@ -1308,7 +1308,7 @@ namespace NonMatching
        * function must be called to specify which cell the function should be
        * evaluated on.
        */
-      template <int dim, class VectorType = Vector<double>>
+      template <int dim, typename VectorType = Vector<double>>
       class RefSpaceFEFieldFunction : public CellWiseFunction<dim>
       {
       public:
@@ -1417,7 +1417,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       RefSpaceFEFieldFunction<dim, VectorType>::RefSpaceFEFieldFunction(
         const DoFHandler<dim> &dof_handler,
         const VectorType &     dof_values)
@@ -1430,7 +1430,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       void
       RefSpaceFEFieldFunction<dim, VectorType>::set_active_cell(
         const typename Triangulation<dim>::active_cell_iterator &cell)
@@ -1493,7 +1493,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       bool
       RefSpaceFEFieldFunction<dim, VectorType>::cell_is_set() const
       {
@@ -1504,7 +1504,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       double
       RefSpaceFEFieldFunction<dim, VectorType>::value(
         const Point<dim> & point,
@@ -1536,7 +1536,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       Tensor<1, dim>
       RefSpaceFEFieldFunction<dim, VectorType>::gradient(
         const Point<dim> & point,
@@ -1569,7 +1569,7 @@ namespace NonMatching
 
 
 
-      template <int dim, class VectorType>
+      template <int dim, typename VectorType>
       SymmetricTensor<2, dim>
       RefSpaceFEFieldFunction<dim, VectorType>::hessian(
         const Point<dim> & point,
@@ -1873,7 +1873,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <class VectorType>
+  template <typename VectorType>
   DiscreteQuadratureGenerator<dim>::DiscreteQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
     const DoFHandler<dim> &   dof_handler,
@@ -1906,7 +1906,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <class VectorType>
+  template <typename VectorType>
   DiscreteFaceQuadratureGenerator<dim>::DiscreteFaceQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
     const DoFHandler<dim> &   dof_handler,

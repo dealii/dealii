@@ -240,7 +240,7 @@ private:
 #ifndef DOXYGEN
 
 
-template <class VectorType>
+template <typename VectorType>
 SolverQMRS<VectorType>::IterationResult::IterationResult(
   const SolverControl::State state,
   const double               last_residual)
@@ -250,7 +250,7 @@ SolverQMRS<VectorType>::IterationResult::IterationResult(
 
 
 
-template <class VectorType>
+template <typename VectorType>
 SolverQMRS<VectorType>::SolverQMRS(SolverControl &           cn,
                                    VectorMemory<VectorType> &mem,
                                    const AdditionalData &    data)
@@ -259,7 +259,7 @@ SolverQMRS<VectorType>::SolverQMRS(SolverControl &           cn,
   , step(0)
 {}
 
-template <class VectorType>
+template <typename VectorType>
 SolverQMRS<VectorType>::SolverQMRS(SolverControl &       cn,
                                    const AdditionalData &data)
   : SolverBase<VectorType>(cn)
@@ -267,7 +267,7 @@ SolverQMRS<VectorType>::SolverQMRS(SolverControl &       cn,
   , step(0)
 {}
 
-template <class VectorType>
+template <typename VectorType>
 void
 SolverQMRS<VectorType>::print_vectors(const unsigned int,
                                       const VectorType &,
@@ -275,7 +275,7 @@ SolverQMRS<VectorType>::print_vectors(const unsigned int,
                                       const VectorType &) const
 {}
 
-template <class VectorType>
+template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
 SolverQMRS<VectorType>::solve(const MatrixType &        A,
@@ -323,7 +323,7 @@ SolverQMRS<VectorType>::solve(const MatrixType &        A,
   // otherwise exit as normal
 }
 
-template <class VectorType>
+template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 typename SolverQMRS<VectorType>::IterationResult
 SolverQMRS<VectorType>::iterate(const MatrixType &        A,

@@ -115,7 +115,7 @@ namespace internal
  * these steps is stored and therefore there will be multiple values per
  * iteration.
  */
-template <class VectorType = Vector<double>>
+template <typename VectorType = Vector<double>>
 class SolverIDR : public SolverBase<VectorType>
 {
 public:
@@ -192,7 +192,7 @@ namespace internal
 {
   namespace SolverIDRImplementation
   {
-    template <class VectorType>
+    template <typename VectorType>
     inline TmpVectors<VectorType>::TmpVectors(const unsigned int        s_param,
                                               VectorMemory<VectorType> &vmem)
       : mem(vmem)
@@ -201,7 +201,7 @@ namespace internal
 
 
 
-    template <class VectorType>
+    template <typename VectorType>
     inline VectorType &
     TmpVectors<VectorType>::operator[](const unsigned int i) const
     {
@@ -213,7 +213,7 @@ namespace internal
 
 
 
-    template <class VectorType>
+    template <typename VectorType>
     inline VectorType &
     TmpVectors<VectorType>::operator()(const unsigned int i,
                                        const VectorType & temp)
@@ -278,7 +278,7 @@ namespace internal
 
 
 
-template <class VectorType>
+template <typename VectorType>
 SolverIDR<VectorType>::SolverIDR(SolverControl &           cn,
                                  VectorMemory<VectorType> &mem,
                                  const AdditionalData &    data)
@@ -288,7 +288,7 @@ SolverIDR<VectorType>::SolverIDR(SolverControl &           cn,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 SolverIDR<VectorType>::SolverIDR(SolverControl &cn, const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
@@ -296,7 +296,7 @@ SolverIDR<VectorType>::SolverIDR(SolverControl &cn, const AdditionalData &data)
 
 
 
-template <class VectorType>
+template <typename VectorType>
 void
 SolverIDR<VectorType>::print_vectors(const unsigned int,
                                      const VectorType &,
@@ -306,7 +306,7 @@ SolverIDR<VectorType>::print_vectors(const unsigned int,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
 SolverIDR<VectorType>::solve(const MatrixType &        A,

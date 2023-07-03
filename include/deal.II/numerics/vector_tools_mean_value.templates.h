@@ -130,7 +130,7 @@ namespace VectorTools
 
 
 
-  template <class VectorType, int dim, int spacedim>
+  template <typename VectorType, int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void add_constant(VectorType &                          solution,
                     const DoFHandler<dim, spacedim> &     dof_handler,

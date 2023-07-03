@@ -45,7 +45,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <class VectorType>
+  template <typename VectorType>
   FEValues<dim>::FEValues(const hp::FECollection<dim> &fe_collection,
                           const Quadrature<1> &        quadrature,
                           const RegionUpdateFlags      region_update_flags,
@@ -75,7 +75,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <class VectorType>
+  template <typename VectorType>
   FEValues<dim>::FEValues(const hp::MappingCollection<dim> &mapping_collection,
                           const hp::FECollection<dim> &     fe_collection,
                           const hp::QCollection<dim> &      q_collection,
@@ -270,7 +270,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <class VectorType>
+  template <typename VectorType>
   FEInterfaceValues<dim>::FEInterfaceValues(
     const hp::FECollection<dim> &fe_collection,
     const Quadrature<1> &        quadrature,
@@ -301,7 +301,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <class VectorType>
+  template <typename VectorType>
   FEInterfaceValues<dim>::FEInterfaceValues(
     const hp::MappingCollection<dim> &mapping_collection,
     const hp::FECollection<dim> &     fe_collection,

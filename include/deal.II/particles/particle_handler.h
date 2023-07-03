@@ -480,7 +480,7 @@ namespace Particles
      * be interpreted as a displacement vector, or a vector of absolute
      * positions.
      */
-    template <class VectorType>
+    template <typename VectorType>
     std::enable_if_t<
       std::is_convertible<VectorType *, Function<spacedim> *>::value == false>
     set_particle_positions(const VectorType &input_vector,
@@ -560,7 +560,7 @@ namespace Particles
      * @param[in] add_to_output_vector Control if the function should set the
      * entries of the @p output_vector or if should add to them.
      */
-    template <class VectorType>
+    template <typename VectorType>
     void
     get_particle_positions(VectorType &output_vector,
                            const bool  add_to_output_vector = false);
@@ -1330,7 +1330,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  template <class VectorType>
+  template <typename VectorType>
   inline std::enable_if_t<
     std::is_convertible<VectorType *, Function<spacedim> *>::value == false>
   ParticleHandler<dim, spacedim>::set_particle_positions(
@@ -1354,7 +1354,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  template <class VectorType>
+  template <typename VectorType>
   inline void
   ParticleHandler<dim, spacedim>::get_particle_positions(
     VectorType &output_vector,

@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  * Solver base class to determine convergence. This mechanism can also be used
  * to observe the progress of the iteration.
  */
-template <class VectorType = Vector<double>>
+template <typename VectorType = Vector<double>>
 class SolverRichardson : public SolverBase<VectorType>
 {
 public:
@@ -163,7 +163,7 @@ protected:
 
 #ifndef DOXYGEN
 
-template <class VectorType>
+template <typename VectorType>
 inline SolverRichardson<VectorType>::AdditionalData::AdditionalData(
   const double omega,
   const bool   use_preconditioned_residual)
@@ -172,7 +172,7 @@ inline SolverRichardson<VectorType>::AdditionalData::AdditionalData(
 {}
 
 
-template <class VectorType>
+template <typename VectorType>
 SolverRichardson<VectorType>::SolverRichardson(SolverControl &           cn,
                                                VectorMemory<VectorType> &mem,
                                                const AdditionalData &    data)
@@ -182,7 +182,7 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl &           cn,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 SolverRichardson<VectorType>::SolverRichardson(SolverControl &       cn,
                                                const AdditionalData &data)
   : SolverBase<VectorType>(cn)
@@ -191,7 +191,7 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl &       cn,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
 SolverRichardson<VectorType>::solve(const MatrixType &        A,
@@ -248,7 +248,7 @@ SolverRichardson<VectorType>::solve(const MatrixType &        A,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
 SolverRichardson<VectorType>::Tsolve(const MatrixType &        A,
@@ -302,7 +302,7 @@ SolverRichardson<VectorType>::Tsolve(const MatrixType &        A,
 }
 
 
-template <class VectorType>
+template <typename VectorType>
 void
 SolverRichardson<VectorType>::print_vectors(const unsigned int,
                                             const VectorType &,
@@ -312,7 +312,7 @@ SolverRichardson<VectorType>::print_vectors(const unsigned int,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 inline typename VectorType::value_type
 SolverRichardson<VectorType>::criterion(const VectorType &r,
                                         const VectorType &d) const
@@ -324,7 +324,7 @@ SolverRichardson<VectorType>::criterion(const VectorType &r,
 }
 
 
-template <class VectorType>
+template <typename VectorType>
 inline void
 SolverRichardson<VectorType>::set_omega(const double om)
 {

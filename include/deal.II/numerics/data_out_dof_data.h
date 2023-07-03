@@ -726,7 +726,7 @@ public:
    * which FEValues can extract values on a cell using the
    * FEValuesBase::get_function_values() function.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   add_data_vector(
     const VectorType &              data,
@@ -751,7 +751,7 @@ public:
    * which FEValues can extract values on a cell using the
    * FEValuesBase::get_function_values() function.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   add_data_vector(
     const VectorType &   data,
@@ -775,7 +775,7 @@ public:
    * represents dof data, the data vector type argument present in the other
    * methods above is not necessary.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   add_data_vector(
     const DoFHandler<dim, spacedim> &dof_handler,
@@ -789,7 +789,7 @@ public:
    * This function is an abbreviation of the function above with only a scalar
    * @p dof_handler given and a single data name.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   add_data_vector(
     const DoFHandler<dim, spacedim> &dof_handler,
@@ -824,7 +824,7 @@ public:
    * error by declaring the data postprocessor variable before the DataOut
    * variable as objects are destroyed in reverse order of declaration.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   add_data_vector(const VectorType &                 data,
                   const DataPostprocessor<spacedim> &data_postprocessor);
@@ -835,7 +835,7 @@ public:
    * postprocessor can only read data from the given DoFHandler and solution
    * vector, not other solution vectors or DoFHandlers.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   add_data_vector(const DoFHandler<dim, spacedim> &  dof_handler,
                   const VectorType &                 data,
@@ -858,7 +858,7 @@ public:
    * The handling of @p names and @p data_component_interpretation is identical
    * to the add_data_vector() function.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   add_mg_data_vector(
     const DoFHandler<dim, spacedim> &dof_handler,
@@ -871,7 +871,7 @@ public:
   /**
    * Scalar version of the function above.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   add_mg_data_vector(const DoFHandler<dim, spacedim> &dof_handler,
                      const MGLevelObject<VectorType> &data,
@@ -1030,7 +1030,7 @@ private:
   /**
    * Common function called by the four public add_data_vector methods.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   add_data_vector_internal(
     const DoFHandler<dim, spacedim> *dof_handler,

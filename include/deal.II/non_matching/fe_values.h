@@ -167,7 +167,7 @@ namespace NonMatching
      * and @p level_set are stored internally, so these need to have a longer life
      * span than the instance of this class.
      */
-    template <class VectorType>
+    template <typename VectorType>
     FEValues(const hp::FECollection<dim> &fe_collection,
              const Quadrature<1> &        quadrature,
              const RegionUpdateFlags      region_update_flags,
@@ -202,7 +202,7 @@ namespace NonMatching
      * internally, so these need to have a longer life span than the instance of
      * this class.
      */
-    template <class VectorType>
+    template <typename VectorType>
     FEValues(const hp::MappingCollection<dim> &mapping_collection,
              const hp::FECollection<dim> &     fe_collection,
              const hp::QCollection<dim> &      q_collection,
@@ -461,7 +461,7 @@ namespace NonMatching
      * and @p level_set are stored internally, so these need to have a longer life
      * span than the instance of this class.
      */
-    template <class VectorType>
+    template <typename VectorType>
     FEInterfaceValues(const hp::FECollection<dim> &fe_collection,
                       const Quadrature<1> &        quadrature,
                       const RegionUpdateFlags      region_update_flags,
@@ -496,7 +496,7 @@ namespace NonMatching
      * internally, so these need to have a longer life span than the instance of
      * this class.
      */
-    template <class VectorType>
+    template <typename VectorType>
     FEInterfaceValues(const hp::MappingCollection<dim> &mapping_collection,
                       const hp::FECollection<dim> &     fe_collection,
                       const hp::QCollection<dim - 1> &  q_collection,

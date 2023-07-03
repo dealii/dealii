@@ -203,7 +203,7 @@ SolverBFGS<VectorType>::SolverBFGS(SolverControl &       solver_control,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 boost::signals2::connection
 SolverBFGS<VectorType>::connect_line_search_slot(
   const std::function<
@@ -216,7 +216,7 @@ SolverBFGS<VectorType>::connect_line_search_slot(
 
 
 
-template <class VectorType>
+template <typename VectorType>
 boost::signals2::connection
 SolverBFGS<VectorType>::connect_preconditioner_slot(
   const std::function<void(VectorType &                         g,

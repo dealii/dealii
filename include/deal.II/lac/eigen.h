@@ -193,7 +193,7 @@ protected:
 //---------------------------------------------------------------------------
 
 
-template <class VectorType>
+template <typename VectorType>
 EigenPower<VectorType>::EigenPower(SolverControl &           cn,
                                    VectorMemory<VectorType> &mem,
                                    const AdditionalData &    data)
@@ -203,7 +203,7 @@ EigenPower<VectorType>::EigenPower(SolverControl &           cn,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 template <typename MatrixType>
 void
 EigenPower<VectorType>::solve(double &value, const MatrixType &A, VectorType &x)
@@ -276,7 +276,7 @@ EigenPower<VectorType>::solve(double &value, const MatrixType &A, VectorType &x)
 
 //---------------------------------------------------------------------------
 
-template <class VectorType>
+template <typename VectorType>
 EigenInverse<VectorType>::EigenInverse(SolverControl &           cn,
                                        VectorMemory<VectorType> &mem,
                                        const AdditionalData &    data)
@@ -286,7 +286,7 @@ EigenInverse<VectorType>::EigenInverse(SolverControl &           cn,
 
 
 
-template <class VectorType>
+template <typename VectorType>
 template <typename MatrixType>
 void
 EigenInverse<VectorType>::solve(double &          value,

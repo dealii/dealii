@@ -131,7 +131,7 @@ public:
    * A wrapper to least_squares(), implementing the standard MatrixType
    * interface.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   vmult(VectorType &dst, const VectorType &src) const;
 
@@ -139,7 +139,7 @@ public:
    * A wrapper to least_squares() that implements multiplication with
    * the transpose matrix.
    */
-  template <class VectorType>
+  template <typename VectorType>
   void
   Tvmult(VectorType &dst, const VectorType &src) const;
 
@@ -330,7 +330,7 @@ Householder<number>::least_squares(BlockVector<number2> &      dst,
 
 
 template <typename number>
-template <class VectorType>
+template <typename VectorType>
 void
 Householder<number>::vmult(VectorType &dst, const VectorType &src) const
 {
@@ -339,7 +339,7 @@ Householder<number>::vmult(VectorType &dst, const VectorType &src) const
 
 
 template <typename number>
-template <class VectorType>
+template <typename VectorType>
 void
 Householder<number>::Tvmult(VectorType &, const VectorType &) const
 {
