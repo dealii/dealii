@@ -379,7 +379,7 @@ public:
    * existence of this function, see the general documentation of this class.
    *
    * Since we do not want to force the user of this function to copy around
-   * their solution vectors, the vector of solution vectors takes pointers to
+   * their solution vectors, the ArrayView of solution vectors takes pointers to
    * the solutions, rather than being a vector of vectors. This makes it
    * simpler to have the solution vectors somewhere in memory, rather than to
    * have them collected somewhere special. (Note that it is not possible to
@@ -393,9 +393,9 @@ public:
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                            neumann_bc,
-    const std::vector<const ReadVector<Number> *> &solutions,
-    std::vector<Vector<float> *> &                 errors,
+      &                                          neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *> &                 errors,
     const ComponentMask &     component_mask = ComponentMask(),
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
@@ -413,9 +413,9 @@ public:
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim - 1> &      quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                            neumann_bc,
-    const std::vector<const ReadVector<Number> *> &solutions,
-    std::vector<Vector<float> *> &                 errors,
+      &                                          neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *> &                 errors,
     const ComponentMask &     component_mask = ComponentMask(),
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
@@ -478,9 +478,9 @@ public:
     const DoFHandler<dim, spacedim> &dof,
     const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                            neumann_bc,
-    const std::vector<const ReadVector<Number> *> &solutions,
-    std::vector<Vector<float> *> &                 errors,
+      &                                          neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *> &                 errors,
     const ComponentMask &     component_mask = ComponentMask(),
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
@@ -499,9 +499,9 @@ public:
     const DoFHandler<dim, spacedim> &dof,
     const hp::QCollection<dim - 1> & quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                            neumann_bc,
-    const std::vector<const ReadVector<Number> *> &solutions,
-    std::vector<Vector<float> *> &                 errors,
+      &                                          neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *> &                 errors,
     const ComponentMask &     component_mask = ComponentMask(),
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
@@ -677,9 +677,9 @@ public:
     const DoFHandler<1, spacedim> &dof,
     const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                            neumann_bc,
-    const std::vector<const ReadVector<Number> *> &solutions,
-    std::vector<Vector<float> *> &                 errors,
+      &                                          neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *> &                 errors,
     const ComponentMask &     component_mask = ComponentMask(),
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
@@ -699,9 +699,9 @@ public:
     const DoFHandler<1, spacedim> &dof,
     const Quadrature<0> &          quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                            neumann_bc,
-    const std::vector<const ReadVector<Number> *> &solutions,
-    std::vector<Vector<float> *> &                 errors,
+      &                                          neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *> &                 errors,
     const ComponentMask &     component_mask = ComponentMask(),
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
@@ -767,9 +767,9 @@ public:
     const DoFHandler<1, spacedim> &dof,
     const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                            neumann_bc,
-    const std::vector<const ReadVector<Number> *> &solutions,
-    std::vector<Vector<float> *> &                 errors,
+      &                                          neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *> &                 errors,
     const ComponentMask &     component_mask = ComponentMask(),
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
@@ -789,9 +789,9 @@ public:
     const DoFHandler<1, spacedim> &dof,
     const hp::QCollection<0> &     quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                            neumann_bc,
-    const std::vector<const ReadVector<Number> *> &solutions,
-    std::vector<Vector<float> *> &                 errors,
+      &                                          neumann_bc,
+    const ArrayView<const ReadVector<Number> *> &solutions,
+    ArrayView<Vector<float> *> &                 errors,
     const ComponentMask &     component_mask = ComponentMask(),
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,

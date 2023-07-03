@@ -74,14 +74,15 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Strategy            strategy)
 {
   // just pass on to the other function
-  const std::vector<const ReadVector<Number> *> solutions(1, &solution);
-  std::vector<Vector<float> *>                  errors(1, &error);
+  std::vector<const ReadVector<Number> *> solutions(1, &solution);
+  std::vector<Vector<float> *>            errors(1, &error);
+  ArrayView<Vector<float> *>              error_view = make_array_view(errors);
   estimate(mapping,
            dof_handler,
            quadrature,
            neumann_bc,
-           solutions,
-           errors,
+           make_array_view(solutions),
+           error_view,
            component_mask,
            coefficients,
            n_threads,
@@ -133,15 +134,15 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandler<1, spacedim> &dof_handler,
   const Quadrature<0> &          quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
-    &                                            neumann_bc,
-  const std::vector<const ReadVector<Number> *> &solutions,
-  std::vector<Vector<float> *> &                 errors,
-  const ComponentMask &                          component_mask,
-  const Function<spacedim> *                     coefficients,
-  const unsigned int                             n_threads,
-  const types::subdomain_id                      subdomain_id,
-  const types::material_id                       material_id,
-  const Strategy                                 strategy)
+    &                                          neumann_bc,
+  const ArrayView<const ReadVector<Number> *> &solutions,
+  ArrayView<Vector<float> *> &                 errors,
+  const ComponentMask &                        component_mask,
+  const Function<spacedim> *                   coefficients,
+  const unsigned int                           n_threads,
+  const types::subdomain_id                    subdomain_id,
+  const types::material_id                     material_id,
+  const Strategy                               strategy)
 {
   const auto reference_cell = ReferenceCells::Line;
   estimate(reference_cell.template get_default_linear_mapping<1, spacedim>(),
@@ -179,14 +180,15 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const Strategy            strategy)
 {
   // just pass on to the other function
-  const std::vector<const ReadVector<Number> *> solutions(1, &solution);
-  std::vector<Vector<float> *>                  errors(1, &error);
+  std::vector<const ReadVector<Number> *> solutions(1, &solution);
+  std::vector<Vector<float> *>            errors(1, &error);
+  ArrayView<Vector<float> *>              error_view = make_array_view(errors);
   estimate(mapping,
            dof_handler,
            quadrature,
            neumann_bc,
-           solutions,
-           errors,
+           make_array_view(solutions),
+           error_view,
            component_mask,
            coefficients,
            n_threads,
@@ -238,15 +240,15 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandler<1, spacedim> &dof_handler,
   const hp::QCollection<0> &     quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
-    &                                            neumann_bc,
-  const std::vector<const ReadVector<Number> *> &solutions,
-  std::vector<Vector<float> *> &                 errors,
-  const ComponentMask &                          component_mask,
-  const Function<spacedim> *                     coefficients,
-  const unsigned int                             n_threads,
-  const types::subdomain_id                      subdomain_id,
-  const types::material_id                       material_id,
-  const Strategy                                 strategy)
+    &                                          neumann_bc,
+  const ArrayView<const ReadVector<Number> *> &solutions,
+  ArrayView<Vector<float> *> &                 errors,
+  const ComponentMask &                        component_mask,
+  const Function<spacedim> *                   coefficients,
+  const unsigned int                           n_threads,
+  const types::subdomain_id                    subdomain_id,
+  const types::material_id                     material_id,
+  const Strategy                               strategy)
 {
   const auto reference_cell = ReferenceCells::Line;
   estimate(reference_cell.template get_default_linear_mapping<1, spacedim>(),
@@ -273,11 +275,11 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandler<1, spacedim> &dof_handler,
   const hp::QCollection<0> &,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
-    &                                            neumann_bc,
-  const std::vector<const ReadVector<Number> *> &solutions,
-  std::vector<Vector<float> *> &                 errors,
-  const ComponentMask &                          component_mask,
-  const Function<spacedim> *                     coefficient,
+    &                                          neumann_bc,
+  const ArrayView<const ReadVector<Number> *> &solutions,
+  ArrayView<Vector<float> *> &                 errors,
+  const ComponentMask &                        component_mask,
+  const Function<spacedim> *                   coefficient,
   const unsigned int,
   const types::subdomain_id subdomain_id_,
   const types::material_id  material_id,
@@ -530,15 +532,15 @@ KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandler<1, spacedim> &dof_handler,
   const Quadrature<0> &          quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
-    &                                            neumann_bc,
-  const std::vector<const ReadVector<Number> *> &solutions,
-  std::vector<Vector<float> *> &                 errors,
-  const ComponentMask &                          component_mask,
-  const Function<spacedim> *                     coefficients,
-  const unsigned int                             n_threads,
-  const types::subdomain_id                      subdomain_id,
-  const types::material_id                       material_id,
-  const Strategy                                 strategy)
+    &                                          neumann_bc,
+  const ArrayView<const ReadVector<Number> *> &solutions,
+  ArrayView<Vector<float> *> &                 errors,
+  const ComponentMask &                        component_mask,
+  const Function<spacedim> *                   coefficients,
+  const unsigned int                           n_threads,
+  const types::subdomain_id                    subdomain_id,
+  const types::material_id                     material_id,
+  const Strategy                               strategy)
 {
   const hp::QCollection<0> quadrature_collection(quadrature);
   estimate(mapping,
