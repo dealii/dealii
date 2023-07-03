@@ -88,6 +88,56 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
 endforeach()
 
 #
+# Collect feature configuration that will be added to the configuration files:
+#
+
+set(FEATURE_CONFIGURATION_STRING "
+#
+# Feature configuration:
+#
+
+set(DEAL_II_WITH_CXX11 ON)
+set(DEAL_II_WITH_CXX14 ON)
+set(DEAL_II_WITH_CXX17 ON)
+set(DEAL_II_WITH_CXX20 ${DEAL_II_HAVE_CXX20})
+set(DEAL_II_WITH_THREADS ON)\n"
+  )
+
+set(_additional_config_variables)
+get_cmake_property(_res VARIABLES)
+foreach(_var ${_res})
+  if(_var MATCHES "DEAL_II_.*(WITH|FEATURE.*BUNDLED)")
+    list(APPEND _additional_config_variables ${_var})
+  endif()
+endforeach()
+
+set(_deal_ii_features_sorted ${DEAL_II_FEATURES})
+list(SORT _deal_ii_features_sorted)
+foreach(_name ${_deal_ii_features_sorted})
+  set(_var DEAL_II_WITH_${_name})
+
+  string(APPEND FEATURE_CONFIGURATION_STRING "set(${_var} ${${_var}})\n")
+  #
+  # Do not pollute deal.IIConfig.cmake with package details of
+  # unconfigured features.
+  #
+  if(${_var})
+    if(NOT "${${_name}_VERSION}" STREQUAL "")
+      string(APPEND FEATURE_CONFIGURATION_STRING
+        "set(DEAL_II_${_name}_VERSION \"${${_name}_VERSION}\")\n"
+        )
+    endif()
+    foreach(_additional ${_additional_config_variables})
+      if(_additional MATCHES "(DEAL_II_${_name}_WITH|DEAL_II_FEATURE_${_name})")
+        string(APPEND FEATURE_CONFIGURATION_STRING
+          "set(${_additional} ${${_additional}})\n"
+          )
+      endif()
+    endforeach()
+  endif()
+endforeach()
+
+#
 # For binary dir:
 #
 
@@ -126,59 +176,6 @@ install(FILES
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
   )
-
-#
-# Append feature configuration to all configuration files:
-#
-
-set(_files
-  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
-  )
-foreach(_file ${_files})
-  file(APPEND ${_file} "\n\n#\n# Feature configuration:\n#\n\n")
-  file(APPEND ${_file}
-    "set(DEAL_II_WITH_CXX11 ON)\n"
-    "set(DEAL_II_WITH_CXX14 ON)\n"
-    "set(DEAL_II_WITH_CXX17 ON)\n"
-    "set(DEAL_II_WITH_CXX20 ${DEAL_II_HAVE_CXX20})\n"
-    "set(DEAL_II_WITH_THREADS ON)\n"
-    )
-endforeach()
-
-get_cmake_property(_res VARIABLES)
-foreach(_var ${_res})
-  if(_var MATCHES "DEAL_II_.*(WITH|FEATURE.*BUNDLED)")
-    list(APPEND _additional_config_variables ${_var})
-  endif()
-endforeach()
-
-set(_deal_ii_features_sorted ${DEAL_II_FEATURES})
-list(SORT _deal_ii_features_sorted)
-foreach(_name ${_deal_ii_features_sorted})
-  set(_var DEAL_II_WITH_${_name})
-
-  foreach(_file ${_files})
-    file(APPEND ${_file} "set(${_var} ${${_var}})\n")
-    #
-    # Do not pollute deal.IIConfig.cmake with package details of
-    # unconfigured features.
-    #
-    if(${_var})
-      if(NOT "${${_name}_VERSION}" STREQUAL "")
-        file(APPEND ${_file}
-          "set(DEAL_II_${_name}_VERSION \"${${_name}_VERSION}\")\n"
-          )
-      endif()
-
-      foreach(_additional ${_additional_config_variables})
-        if(_additional MATCHES "(DEAL_II_${_name}_WITH|DEAL_II_FEATURE_${_name})")
-          file(APPEND ${_file} "set(${_additional} ${${_additional}})\n")
-        endif()
-      endforeach()
-    endif()
-  endforeach()
-endforeach()
 
 #
 # Job's done.

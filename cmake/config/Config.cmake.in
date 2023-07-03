@@ -185,3 +185,5 @@ set(DEAL_II_TARGET_RELEASE "@CONFIG_TARGET_RELEASE@")
 
 # Full list of targets with "debug" and "optimized" keywords for easy use with TARGET_LINK_LIBRARIES:
 set(DEAL_II_TARGET "@CONFIG_TARGET@")
+
+@FEATURE_CONFIGURATION_STRING@
