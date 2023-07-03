@@ -12,8 +12,13 @@ permissions:
 jobs:
   windows-serial:
     # Serial build on Windows
+    #
     name: Windows Serial
     runs-on: ${{ matrix.os }}
+
+    # only run on 'push' or if the 'pull_request' is not a draft:
+    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
     strategy:
       fail-fast: false
       matrix:

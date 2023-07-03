@@ -1,7 +1,7 @@
 name: github-docker
 
-on: 
-  push: 
+on:
+  push:
     branches:
       - 'docker*'
       - 'master'
@@ -13,7 +13,7 @@ permissions:
 jobs:
   build-master-docker:
     runs-on: ubuntu-latest
-    steps:          
+    steps:
       - name: Checkout code
         uses: actions/checkout@v3
 

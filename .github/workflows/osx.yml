@@ -16,6 +16,9 @@ jobs:
     name: OSX serial
     runs-on: [macos-latest]
 
+    # only run on 'push' or if the 'pull_request' is not a draft:
+    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
     steps:
     - uses: actions/checkout@v3
     - name: info
@@ -51,6 +54,9 @@ jobs:
 
     name: OSX parallel 64bit
     runs-on: [macos-latest]
+
+    # only run on 'push' or if the 'pull_request' is not a draft:
+    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
     - uses: actions/checkout@v3
