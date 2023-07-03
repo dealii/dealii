@@ -218,18 +218,26 @@ namespace Threads
     struct return_value
     {
     private:
-      RT value;
+      RT   value;
+      bool value_is_initialized;
 
     public:
       using reference_type = RT &;
 
       inline return_value()
         : value()
+        , value_is_initialized(false)
       {}
 
       inline reference_type
       get()
       {
+        Assert(
+          value_is_initialized,
+          ExcMessage(
+            "You cannot read the return value of a thread or task "
+            "if that value has not been set. This happens, for example, if "
+            "a task or thread threw an exception."));
         return value;
       }
 
@@ -240,14 +248,19 @@ namespace Threads
       }
 
       /**
-       *  Set the value from the given `std::future` object. If the future
+       * Set the value from the given `std::future` object. If the future
        * object holds an exception, the set will not happen and this function
        * instead throws the exception stored in the future object.
        */
       inline void
       set_from(std::future<RT> &v)
       {
-        value = std::move(v.get());
+        // Get the value from the std::future object. If the future holds
+        // an exception, then the assignment fails, we exit the function via the
+        // exception right away, and value_is_initialized is not set to true --
+        // that's something we can check later on.
+        value                = std::move(v.get());
+        value_is_initialized = true;
       }
     };
 
@@ -275,18 +288,26 @@ namespace Threads
     struct return_value<RT &>
     {
     private:
-      RT *value;
+      RT * value;
+      bool value_is_initialized;
 
     public:
       using reference_type = RT &;
 
       inline return_value()
         : value(nullptr)
+        , value_is_initialized(false)
       {}
 
       inline reference_type
       get() const
       {
+        Assert(
+          value_is_initialized,
+          ExcMessage(
+            "You cannot read the return value of a thread or task "
+            "if that value has not been set. This happens, for example, if "
+            "a task or thread threw an exception."));
         return *value;
       }
 
@@ -304,7 +325,12 @@ namespace Threads
       inline void
       set_from(std::future<RT &> &v)
       {
-        value = &v.get();
+        // Get the value from the std::future object. If the future holds
+        // an exception, then the assignment fails, we exit the function via the
+        // exception right away, and value_is_initialized is not set to true --
+        // that's something we can check later on.
+        value                = &v.get();
+        value_is_initialized = true;
       }
     };
 
