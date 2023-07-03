@@ -292,15 +292,15 @@ endif()
 # DEAL_II_CXX20_REQUIRES instead. 1.9.7 gets this right, but has other
 # bugs. It's unclear for versions inbetween. Err on the safe side, and
 # only make them visible to doxygen if we have at least 1.9.8.
-if(${DOXYGEN_VERSION} VERSION_LESS 1.9.8)
-  message(STATUS "Suppressing 'requires' clause parsing because doxygen is too old")
-  file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
-    "
-    PREDEFINED += DEAL_II_DOXYGEN_DO_NOT_PARSE_REQUIRES_CLAUSES=1
-    PREDEFINED += DEAL_II_CXX20_REQUIRES(x)=
-    "
-    )
-endif()
+#
+# For the 9.5 release branch, we had some trouble with this logic. Simply
+# disable parsing 'requires' clauses unconditionally on the release branch.
+file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
+  "
+  PREDEFINED += DEAL_II_DOXYGEN_DO_NOT_PARSE_REQUIRES_CLAUSES=1
+  PREDEFINED += DEAL_II_CXX20_REQUIRES(x)=
+  "
+  )
 
 
 
