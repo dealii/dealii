@@ -159,8 +159,8 @@ namespace LinearAlgebra
     Vector::import_elements(
       const ReadWriteVector<double> &V,
       VectorOperation::values        operation,
-      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-        communication_pattern)
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern)
     {
       // If no communication pattern is given, create one. Otherwise, use the
       // one given.

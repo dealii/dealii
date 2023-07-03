@@ -139,8 +139,8 @@ namespace LinearAlgebra
       import_elements(
         const ReadWriteVector<double> &V,
         VectorOperation::values        operation,
-        std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          communication_pattern = {});
+        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          &communication_pattern = {});
 
       /**
        * @deprecated Use import_elements() instead.
