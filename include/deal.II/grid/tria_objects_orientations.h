@@ -36,34 +36,7 @@ namespace internal
      * Class storing orientation information for various objects in a
      * Triangulation.
      *
-     * In deal.II, we express the orientation of an object with three Booleans:
-     * orientation, rotate, and flip. The default values for these are true,
-     * false, and false. These are represented either as individual booleans or
-     * as a 'combined' orientation: the combined format places orientation in
-     * the least significant bit, then rotate, then flip.
-     *
-     * For a quadrilateral, these values correspond to
-     * - *orientation* : `true` is the default orientation and `false` means
-     *   vertices 1 and 2 are swapped.
-     * - *rotation* : all vertices are rotated by 90 degrees clockwise.
-     * - *flip* : all vertices are rotated by 180 degrees clockwise.
-     *
-     * For a triangle, these values correspond to
-     * - *orientation* : `true` is the default orientation and `false` means
-     *   vertices 1 and 2 are swapped.
-     * - *rotate* : all vertices are rotated by 60 degrees clockwise.
-     * - *flip* : all vertices are rotated by 120 degrees clockwise.
-     *
-     * Here, 'clockwise' is relative to the vector defined by the cross
-     * product of two lines in their standard orientation (which, e.g., points
-     * into the hexahedron for face 0 but out of the hexahedron for face 1).
-     *
-     * For triangles, to enable indexing from the combined orientation, we do
-     * not consider flip-rotate or flip-orient-rotate as those cases are
-     * equivalent, respectively, to the identity operation or the orientation =
-     * `true` case as flip-rotate is equal to the identity operation. This
-     * choice ensures that the integer value of the combined orientation is in
-     * $[0, 5]$.
+     * @ingroup reordering
      */
     class TriaObjectsOrientations
     {

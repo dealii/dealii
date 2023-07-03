@@ -214,7 +214,8 @@ namespace internal
        * In effect, this field has <code>6*n_cells</code> elements, being the
        * number of cells times the six faces each has.
        *
-       * @note Only needed for dim=3.
+       * @note This array is only used in dim == 2 or dim == 3: for dim == 1
+       * meshes consist purely of lines which are always consistently oriented.
        */
       TriaObjectsOrientations face_orientations;
 

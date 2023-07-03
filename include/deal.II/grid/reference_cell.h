@@ -92,7 +92,7 @@ namespace internal
  * @ref GlossReferenceCell "reference cell"
  * glossary entry.
  *
- * @ingroup grid geomprimitives aniso
+ * @ingroup grid geomprimitives aniso reordering
  */
 class ReferenceCell
 {
