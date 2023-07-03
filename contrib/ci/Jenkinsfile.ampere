@@ -1,0 +1,133 @@
+#!groovy
+
+/*
+
+This Jenkins job runs a build on Ampere ARM64 with Ubuntu
+
+See https://ci.tjhei.info/job/dealii-ampere/ for details.
+
+*/
+
+/*
+Settings to apply inside Jenkins:
+  - discover pull requests (remove branches/master)
+  - Strategy: merged PR
+  - enable "Disable GitHub Multibranch Status Plugin"
+  - trigger build on pull request comment: .* /rebuild.* (without space!)
+  - Jenkinsfile: choose contrib/ci/Jenkinsfile.ampere
+  - scan: every 4 hours
+  - discard: 5+ items
+*/
+
+// load library https://github.com/tjhei/jenkins-stuff to provide
+// killold.killOldBuilds() function:
+@Library('tjhei') _
+
+pipeline
+{
+  agent none
+
+  stages
+  {
+    stage("abort old")
+    {
+      agent none
+      steps
+      {
+        githubNotify context: 'Jenkins: ampere', description: 'initializing...',  status: 'PENDING'
+        // kill older builds in this PR:
+        script { killold.killOldBuilds() }
+      }
+    }
+
+    stage("main")
+    {
+      agent
+      {
+        node
+        {
+          label 'ampere'
+        }
+      }
+
+      post { cleanup { cleanWs() } }
+
+      stages
+      {
+        stage("check")
+        {
+          when {
+            not {
+              anyOf {
+                branch 'master'
+                branch pattern: "dealii-*", comparator: "GLOB"
+              }
+            }
+          }
+
+          steps
+          {
+            githubNotify context: 'Jenkins: ampere', description: 'pending...',  status: 'PENDING'
+            sh '''
+               wget -q -O - https://api.github.com/repos/dealii/dealii/issues/${CHANGE_ID}/labels | grep 'ready to test' || \
+               { echo "This commit will only be tested when it has the label 'ready to test'. Trigger a rebuild by adding a comment that contains '/rebuild'..."; exit 1; }
+               '''
+          }
+          post
+          {
+            failure
+            {
+              githubNotify context: 'Jenkins: ampere', description: 'need ready to test label and /rebuild',  status: 'PENDING'
+              script
+              {
+                currentBuild.result='NOT_BUILT'
+              }
+            }
+          }
+        }
+
+        stage('build')
+        {
+          steps
+          {
+            timeout(time: 2, unit: 'HOURS')
+            {
+              sh "echo \"building on node ${env.NODE_NAME}\""
+              sh '''#!/bin/bash
+                    set -e
+                    set -x
+                    mkdir build && cd build
+                    export CXX=clang++-15
+                    export CC=clang-15
+                    cmake \
+                      -D DEAL_II_WITH_MPI=OFF \
+                      -D DEAL_II_CXX_FLAGS="--std=c++17 -Werror" \
+                      -D DEAL_II_EARLY_DEPRECATIONS=ON \
+                      -D CMAKE_BUILD_TYPE=Debug \
+		      -G Ninja \
+                      $WORKSPACE/
+		    ninja
+                    ninja test # quicktests
+                 '''
+              githubNotify context: 'Jenkins: ampere', description: 'OK',  status: 'SUCCESS'
+            }
+          }
+
+          post
+          {
+            always
+            {
+              archiveArtifacts artifacts: 'build/detailed.log', fingerprint: true
+            }
+
+            failure
+            {
+              githubNotify context: 'Jenkins: ampere', description: 'build failed',  status: 'FAILURE'
+            }
+          }
+        }
+
+      }
+    }
+  }
+}
