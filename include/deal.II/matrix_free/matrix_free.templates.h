@@ -1116,7 +1116,7 @@ namespace internal
   compute_dof_info(
     const std::vector<const dealii::AffineConstraints<number> *> &constraint,
     const std::vector<IndexSet> &                           locally_owned_dofs,
-    const std::vector<SmartPointer<const DoFHandler<dim>>> &dof_handler,
+    const std::vector<SmartPointer<const DoFHandler<dim>>> &dof_handlers,
     const Table<2, MatrixFreeFunctions::ShapeInfo<double>> &shape_infos,
     const unsigned int               cell_level_index_end_local,
     const unsigned int               mg_level,
@@ -1134,16 +1134,16 @@ namespace internal
     const bool use_vector_data_exchanger_full)
   {
     if (do_face_integrals)
-      face_setup.initialize(dof_handler[0]->get_triangulation(),
+      face_setup.initialize(dof_handlers[0]->get_triangulation(),
                             mg_level,
                             hold_all_faces_to_owned_cells,
                             build_inner_faces,
                             cell_level_index);
 
-    const unsigned int n_dof_handlers = dof_handler.size();
+    const unsigned int n_dof_handlers = dof_handlers.size();
     const unsigned int n_active_cells = cell_level_index.size();
 
-    const Triangulation<dim> &tria = dof_handler[0]->get_triangulation();
+    const Triangulation<dim> &tria = dof_handlers[0]->get_triangulation();
 
     AssertDimension(n_dof_handlers, locally_owned_dofs.size());
     AssertDimension(n_dof_handlers, constraint.size());
@@ -1174,7 +1174,7 @@ namespace internal
       for (unsigned int no = 0; no < n_dof_handlers; ++no)
         {
           const dealii::hp::FECollection<dim> &fes =
-            dof_handler[no]->get_fe_collection();
+            dof_handlers[no]->get_fe_collection();
 
           use_fast_hanging_node_algorithm &=
             std::all_of(fes.begin(), fes.end(), [&fes](const auto &fe) {
@@ -1187,7 +1187,7 @@ namespace internal
     for (unsigned int no = 0; no < n_dof_handlers; ++no)
       {
         const dealii::hp::FECollection<dim> &fes =
-          dof_handler[no]->get_fe_collection();
+          dof_handlers[no]->get_fe_collection();
 
         if (fes.size() > 1)
           {
@@ -1312,7 +1312,7 @@ namespace internal
 
             dof_info[no].hanging_node_constraint_masks_comp =
               hanging_nodes->compute_supported_components(
-                dof_handler[no]->get_fe_collection());
+                dof_handlers[no]->get_fe_collection());
 
             if ([](const auto &supported_components) {
                   return std::none_of(supported_components.begin(),
@@ -1335,7 +1335,7 @@ namespace internal
 
         for (unsigned int no = 0; no < n_dof_handlers; ++no)
           {
-            const DoFHandler<dim> &dofh = *dof_handler[no];
+            const DoFHandler<dim> &dofh = *dof_handlers[no];
             bool                   cell_has_hanging_node_constraints = false;
 
             // read indices from active cells
@@ -1460,7 +1460,7 @@ namespace internal
               std::vector<types::global_dof_index> dof_indices;
               if (mg_level + 1 < tria.n_global_levels())
                 for (const auto &cell :
-                     dof_handler[no]->cell_iterators_on_level(mg_level + 1))
+                     dof_handlers[no]->cell_iterators_on_level(mg_level + 1))
                   if (cell->level_subdomain_id() == task_info.my_pid)
                     for (const unsigned int f : cell->face_indices())
                       if ((cell->at_boundary(f) == false ||
@@ -1487,7 +1487,7 @@ namespace internal
     }
 
     const bool hp_functionality_enabled =
-      std::any_of(dof_handler.begin(), dof_handler.end(), [](const auto &dh) {
+      std::any_of(dof_handlers.begin(), dof_handlers.end(), [](const auto &dh) {
         return (dh->get_fe_collection().size() > 1);
       });
 
