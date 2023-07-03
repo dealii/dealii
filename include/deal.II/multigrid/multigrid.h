@@ -478,7 +478,7 @@ private:
    */
   SmartPointer<const MGMatrixBase<VectorType>, Multigrid<VectorType>> edge_up;
 
-  template <int dim, typename OtherVectorType, class TRANSFER>
+  template <int dim, typename OtherVectorType, typename TransferType>
   friend class PreconditionMG;
 };
 
@@ -493,11 +493,11 @@ private:
  * <tt>void copy_from_mg(VectorType&)</tt> to store the result of the v-cycle
  * in @p dst.
  *
- * If VectorType is in fact a block vector and the TRANSFER object supports
- * use of a separate DoFHandler for each block, this class also allows
+ * If VectorType is in fact a block vector and the `TransferType` object
+ * supports use of a separate DoFHandler for each block, this class also allows
  * to be initialized with a separate DoFHandler for each block.
  */
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 class PreconditionMG : public Subscriptor
 {
 public:
@@ -507,7 +507,7 @@ public:
    */
   PreconditionMG(const DoFHandler<dim> &dof_handler,
                  Multigrid<VectorType> &mg,
-                 const TRANSFER &       transfer);
+                 const TransferType &   transfer);
 
   /**
    * Same as above in case every component of a block vector
@@ -515,7 +515,7 @@ public:
    */
   PreconditionMG(const std::vector<const DoFHandler<dim> *> &dof_handler,
                  Multigrid<VectorType> &                     mg,
-                 const TRANSFER &                            transfer);
+                 const TransferType &                        transfer);
 
   /**
    * Dummy function needed by other classes.
@@ -612,7 +612,7 @@ private:
    * Associated @p DoFHandler.
    */
   std::vector<SmartPointer<const DoFHandler<dim>,
-                           PreconditionMG<dim, VectorType, TRANSFER>>>
+                           PreconditionMG<dim, VectorType, TransferType>>>
     dof_handler_vector;
 
   /**
@@ -624,13 +624,15 @@ private:
   /**
    * The multigrid object.
    */
-  SmartPointer<Multigrid<VectorType>, PreconditionMG<dim, VectorType, TRANSFER>>
+  SmartPointer<Multigrid<VectorType>,
+               PreconditionMG<dim, VectorType, TransferType>>
     multigrid;
 
   /**
    * Object for grid transfer.
    */
-  SmartPointer<const TRANSFER, PreconditionMG<dim, VectorType, TRANSFER>>
+  SmartPointer<const TransferType,
+               PreconditionMG<dim, VectorType, TransferType>>
     transfer;
 
   /**
@@ -706,12 +708,12 @@ namespace internal
   {
     template <int dim,
               typename VectorType,
-              class TRANSFER,
+              typename TransferType,
               typename OtherVectorType>
-    std::enable_if_t<TRANSFER::supports_dof_handler_vector>
+    std::enable_if_t<TransferType::supports_dof_handler_vector>
     vmult(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
           Multigrid<VectorType> &                     multigrid,
-          const TRANSFER &                            transfer,
+          const TransferType &                        transfer,
           OtherVectorType &                           dst,
           const OtherVectorType &                     src,
           const bool                                  uses_dof_handler_vector,
@@ -737,12 +739,12 @@ namespace internal
 
     template <int dim,
               typename VectorType,
-              class TRANSFER,
+              typename TransferType,
               typename OtherVectorType>
     void
     vmult(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
           Multigrid<VectorType> &                     multigrid,
-          const TRANSFER &                            transfer,
+          const TransferType &                        transfer,
           OtherVectorType &                           dst,
           const OtherVectorType &                     src,
           const bool                                  uses_dof_handler_vector,
@@ -765,12 +767,12 @@ namespace internal
 
     template <int dim,
               typename VectorType,
-              class TRANSFER,
+              typename TransferType,
               typename OtherVectorType>
-    std::enable_if_t<TRANSFER::supports_dof_handler_vector>
+    std::enable_if_t<TransferType::supports_dof_handler_vector>
     vmult_add(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
               Multigrid<VectorType> &                     multigrid,
-              const TRANSFER &                            transfer,
+              const TransferType &                        transfer,
               OtherVectorType &                           dst,
               const OtherVectorType &                     src,
               const bool                          uses_dof_handler_vector,
@@ -798,12 +800,12 @@ namespace internal
 
     template <int dim,
               typename VectorType,
-              class TRANSFER,
+              typename TransferType,
               typename OtherVectorType>
     void
     vmult_add(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
               Multigrid<VectorType> &                     multigrid,
-              const TRANSFER &                            transfer,
+              const TransferType &                        transfer,
               OtherVectorType &                           dst,
               const OtherVectorType &                     src,
               const bool                          uses_dof_handler_vector,
@@ -828,11 +830,11 @@ namespace internal
   } // namespace PreconditionMGImplementation
 } // namespace internal
 
-template <int dim, typename VectorType, class TRANSFER>
-PreconditionMG<dim, VectorType, TRANSFER>::PreconditionMG(
+template <int dim, typename VectorType, typename TransferType>
+PreconditionMG<dim, VectorType, TransferType>::PreconditionMG(
   const DoFHandler<dim> &dof_handler,
   Multigrid<VectorType> &mg,
-  const TRANSFER &       transfer)
+  const TransferType &   transfer)
   : dof_handler_vector(1, &dof_handler)
   , dof_handler_vector_raw(1, &dof_handler)
   , multigrid(&mg)
@@ -840,11 +842,11 @@ PreconditionMG<dim, VectorType, TRANSFER>::PreconditionMG(
   , uses_dof_handler_vector(false)
 {}
 
-template <int dim, typename VectorType, class TRANSFER>
-PreconditionMG<dim, VectorType, TRANSFER>::PreconditionMG(
+template <int dim, typename VectorType, typename TransferType>
+PreconditionMG<dim, VectorType, TransferType>::PreconditionMG(
   const std::vector<const DoFHandler<dim> *> &dof_handler,
   Multigrid<VectorType> &                     mg,
-  const TRANSFER &                            transfer)
+  const TransferType &                        transfer)
   : dof_handler_vector(dof_handler.size())
   , dof_handler_vector_raw(dof_handler.size())
   , multigrid(&mg)
@@ -858,17 +860,17 @@ PreconditionMG<dim, VectorType, TRANSFER>::PreconditionMG(
     }
 }
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 inline bool
-PreconditionMG<dim, VectorType, TRANSFER>::empty() const
+PreconditionMG<dim, VectorType, TransferType>::empty() const
 {
   return false;
 }
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 template <typename OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::vmult(
+PreconditionMG<dim, VectorType, TransferType>::vmult(
   OtherVectorType &      dst,
   const OtherVectorType &src) const
 {
@@ -883,9 +885,9 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult(
 }
 
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 IndexSet
-PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_range_indices(
+PreconditionMG<dim, VectorType, TransferType>::locally_owned_range_indices(
   const unsigned int block) const
 {
   AssertIndexRange(block, dof_handler_vector.size());
@@ -893,9 +895,9 @@ PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_range_indices(
 }
 
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 IndexSet
-PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices(
+PreconditionMG<dim, VectorType, TransferType>::locally_owned_domain_indices(
   const unsigned int block) const
 {
   AssertIndexRange(block, dof_handler_vector.size());
@@ -904,9 +906,9 @@ PreconditionMG<dim, VectorType, TRANSFER>::locally_owned_domain_indices(
 
 
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 MPI_Comm
-PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
+PreconditionMG<dim, VectorType, TransferType>::get_mpi_communicator() const
 {
   // currently parallel GMG works with parallel triangulations only,
   // so it should be a safe bet to use it to query MPI communicator:
@@ -919,9 +921,9 @@ PreconditionMG<dim, VectorType, TRANSFER>::get_mpi_communicator() const
 
 
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 boost::signals2::connection
-PreconditionMG<dim, VectorType, TRANSFER>::connect_transfer_to_mg(
+PreconditionMG<dim, VectorType, TransferType>::connect_transfer_to_mg(
   const std::function<void(bool)> &slot)
 {
   return this->signals.transfer_to_mg.connect(slot);
@@ -929,9 +931,9 @@ PreconditionMG<dim, VectorType, TRANSFER>::connect_transfer_to_mg(
 
 
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 boost::signals2::connection
-PreconditionMG<dim, VectorType, TRANSFER>::connect_transfer_to_global(
+PreconditionMG<dim, VectorType, TransferType>::connect_transfer_to_global(
   const std::function<void(bool)> &slot)
 {
   return this->signals.transfer_to_global.connect(slot);
@@ -939,10 +941,10 @@ PreconditionMG<dim, VectorType, TRANSFER>::connect_transfer_to_global(
 
 
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 template <typename OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::vmult_add(
+PreconditionMG<dim, VectorType, TransferType>::vmult_add(
   OtherVectorType &      dst,
   const OtherVectorType &src) const
 {
@@ -957,20 +959,10 @@ PreconditionMG<dim, VectorType, TRANSFER>::vmult_add(
 }
 
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 template <typename OtherVectorType>
 void
-PreconditionMG<dim, VectorType, TRANSFER>::Tvmult(OtherVectorType &,
-                                                  const OtherVectorType &) const
-{
-  Assert(false, ExcNotImplemented());
-}
-
-
-template <int dim, typename VectorType, class TRANSFER>
-template <typename OtherVectorType>
-void
-PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add(
+PreconditionMG<dim, VectorType, TransferType>::Tvmult(
   OtherVectorType &,
   const OtherVectorType &) const
 {
@@ -978,17 +970,28 @@ PreconditionMG<dim, VectorType, TRANSFER>::Tvmult_add(
 }
 
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
+template <typename OtherVectorType>
+void
+PreconditionMG<dim, VectorType, TransferType>::Tvmult_add(
+  OtherVectorType &,
+  const OtherVectorType &) const
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template <int dim, typename VectorType, typename TransferType>
 Multigrid<VectorType> &
-PreconditionMG<dim, VectorType, TRANSFER>::get_multigrid()
+PreconditionMG<dim, VectorType, TransferType>::get_multigrid()
 {
   return *this->multigrid;
 }
 
 
-template <int dim, typename VectorType, class TRANSFER>
+template <int dim, typename VectorType, typename TransferType>
 const Multigrid<VectorType> &
-PreconditionMG<dim, VectorType, TRANSFER>::get_multigrid() const
+PreconditionMG<dim, VectorType, TransferType>::get_multigrid() const
 {
   return *this->multigrid;
 }
