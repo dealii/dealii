@@ -99,6 +99,11 @@ configure_file(
   @ONLY
   )
 configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/ConfigGit.cmake.in
+  ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigGit.cmake
+  @ONLY
+  )
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   @ONLY
@@ -116,12 +121,18 @@ configure_file(
   @ONLY
   )
 configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/ConfigGit.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigGit.cmake
+  @ONLY
+  )
+configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/ConfigVersion.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   @ONLY
   )
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigGit.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_NAME}ConfigVersion.cmake
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
