@@ -27,6 +27,9 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * @brief Library of integrals over cells and faces
  *
+ * @note The contents of this namespace are deprecated and will be removed in
+ *   one of the next releases.
+ *
  * This namespace contains application specific local integrals for bilinear
  * forms, forms and error estimates. It is a collection of functions organized
  * into namespaces devoted to certain applications. For instance, the

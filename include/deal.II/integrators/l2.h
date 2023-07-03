@@ -53,7 +53,7 @@ namespace LocalIntegrators
      * @param factor A constant that multiplies the mass matrix.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED_EARLY void
     mass_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const double             factor = 1.)
@@ -104,7 +104,7 @@ namespace LocalIntegrators
      * quadrature points in the element).
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED_EARLY void
     weighted_mass_matrix(FullMatrix<double>        &M,
                          const FEValuesBase<dim>   &fe,
                          const std::vector<double> &weights)
@@ -155,7 +155,7 @@ namespace LocalIntegrators
      * @param factor A constant that multiplies the result.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED_EARLY void
     L2(Vector<number>            &result,
        const FEValuesBase<dim>   &fe,
        const std::vector<double> &input,
@@ -185,7 +185,7 @@ namespace LocalIntegrators
      * @param factor A constant that multiplies the result.
      */
     template <int dim, typename number>
-    void
+    DEAL_II_DEPRECATED_EARLY void
     L2(Vector<number>                             &result,
        const FEValuesBase<dim>                    &fe,
        const ArrayView<const std::vector<double>> &input,
@@ -233,7 +233,7 @@ namespace LocalIntegrators
      * second cell.
      */
     template <int dim>
-    void
+    DEAL_II_DEPRECATED_EARLY void
     jump_matrix(FullMatrix<double>      &M11,
                 FullMatrix<double>      &M12,
                 FullMatrix<double>      &M21,
