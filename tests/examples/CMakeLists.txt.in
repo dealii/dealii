@@ -20,10 +20,6 @@ foreach(_diff_file ${_diff_files})
     COMMENT "Patching ${_output_file}"
     )
 
-  execute_process(
-    COMMAND patch ${_source_file} ${_diff_file} -o ${_output_file}
-    )
-
   # Create symbolic links to the output files:
   file(GLOB _output_files "${_base_directory}/${_step}*.output*")
   foreach(_file ${_output_files})
