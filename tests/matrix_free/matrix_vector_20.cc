@@ -195,7 +195,7 @@ test()
   out.collect_sizes();
   mf_data.initialize_dof_vector(ref);
 
-  for (unsigned int i = 0; i < in.block(0).local_size(); ++i)
+  for (unsigned int i = 0; i < in.block(0).locally_owned_size(); ++i)
     {
       if (constraints.is_constrained(
             dof.locally_owned_dofs().index_within_set(i)))

@@ -173,7 +173,7 @@ test()
   mf_data.initialize_dof_vector(vec2);
   mf_data.initialize_dof_vector(vec3);
 
-  for (unsigned int i = 0; i < vec1.local_size(); ++i)
+  for (unsigned int i = 0; i < vec1.locally_owned_size(); ++i)
     {
       // Multiply by 0.01 to make float error with roundoff less than the
       // numdiff absolute tolerance

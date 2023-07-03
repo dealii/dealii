@@ -1658,7 +1658,7 @@ namespace Euler_DG
     FEEvaluation<dim, degree, degree + 1, dim + 2, Number> phi(data, 0, 1);
     MatrixFreeOperators::CellwiseInverseMassMatrix<dim, degree, dim + 2, Number>
       inverse(phi);
-    solution.zero_out_ghosts();
+    solution.zero_out_ghost_values();
     for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
       {
         phi.reinit(cell);

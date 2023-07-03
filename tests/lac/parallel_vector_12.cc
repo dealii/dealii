@@ -93,10 +93,10 @@ test()
   v0_rw.import_elements(v0, VectorOperation::insert);
   LinearAlgebra::ReadWriteVector<double> v1_rw(local_owned1);
   v1_rw.import_elements(v1, VectorOperation::insert);
-  for (unsigned int i = 0; i < v0.local_size(); ++i)
+  for (unsigned int i = 0; i < v0.locally_owned_size(); ++i)
     AssertThrow(v0_rw.local_element(i) == 1.,
                 ExcNonEqual(v0_rw.local_element(i), 1.));
-  for (unsigned int i = 0; i < v1.local_size(); ++i)
+  for (unsigned int i = 0; i < v1.locally_owned_size(); ++i)
     AssertThrow(v1_rw.local_element(i) == 2.,
                 ExcNonEqual(v1_rw.local_element(i), 2.));
 
@@ -123,8 +123,8 @@ test()
 
   // now swap v1 and v0
   v0.swap(v1);
-  AssertDimension(v0.local_size(), local_size1);
-  AssertDimension(v1.local_size(), actual_local_size0);
+  AssertDimension(v0.locally_owned_size(), local_size1);
+  AssertDimension(v1.locally_owned_size(), actual_local_size0);
   AssertDimension(v0.size(), global_size1);
   AssertDimension(v1.size(), global_size0);
   v1_rw.import_elements(v0, VectorOperation::insert);
@@ -183,7 +183,7 @@ test()
   v2.swap(v0);
   AssertDimension(v0.size(), 0);
   AssertDimension(v2.size(), global_size1);
-  AssertDimension(v2.local_size(), local_size1);
+  AssertDimension(v2.locally_owned_size(), local_size1);
   v1_rw.import_elements(v2, VectorOperation::insert);
   for (int i = my_start1; i < my_end1; ++i)
     AssertThrow(v1_rw(i) == 7., ExcNonEqual(v1_rw(i), 7.));

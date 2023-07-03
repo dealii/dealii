@@ -187,7 +187,8 @@ test()
       // matrix-vector product for reference
       for (unsigned int block = 0; block < n_blocks; ++block)
         {
-          for (unsigned int i = 0; i < in.block(block).local_size(); ++i)
+          for (unsigned int i = 0; i < in.block(block).locally_owned_size();
+               ++i)
             {
               const unsigned int glob_index = owned_set.nth_index_in_set(i);
               if (constraints.is_constrained(glob_index))

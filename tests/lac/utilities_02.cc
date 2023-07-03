@@ -150,7 +150,7 @@ test()
         fe_eval.distribute_local_to_global(inv_mass_matrix);
       }
     inv_mass_matrix.compress(VectorOperation::add);
-    for (unsigned int k = 0; k < inv_mass_matrix.local_size(); ++k)
+    for (unsigned int k = 0; k < inv_mass_matrix.locally_owned_size(); ++k)
       if (inv_mass_matrix.local_element(k) > 1e-15)
         {
           inv_mass_matrix.local_element(k) =

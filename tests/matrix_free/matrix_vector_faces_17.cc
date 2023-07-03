@@ -108,7 +108,7 @@ test()
 
   // Set random seed for reproducibility
   Testing::srand(42);
-  for (unsigned int i = 0; i < in_orig.local_size(); ++i)
+  for (unsigned int i = 0; i < in_orig.locally_owned_size(); ++i)
     {
       const double entry       = Testing::rand() / (double)RAND_MAX;
       in_orig.local_element(i) = entry;
@@ -131,7 +131,7 @@ test()
     mf2(mf_data);
   mf2.vmult(out, in);
 
-  for (unsigned int i = 0; i < out.local_size(); ++i)
+  for (unsigned int i = 0; i < out.locally_owned_size(); ++i)
     out(renumbering[i]) -= out_orig.local_element(i);
 
   double diff_norm = out.linfty_norm() / out_orig.linfty_norm();
@@ -140,7 +140,7 @@ test()
   // test again, now doing matrix-vector product twice
   mf2.vmult(out, in);
   mf2.vmult(out, in);
-  for (unsigned int i = 0; i < out.local_size(); ++i)
+  for (unsigned int i = 0; i < out.locally_owned_size(); ++i)
     out(renumbering[i]) -= out_orig.local_element(i);
   diff_norm = out.linfty_norm() / out_orig.linfty_norm();
   deallog << diff_norm << std::endl;

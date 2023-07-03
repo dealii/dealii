@@ -125,7 +125,7 @@ test()
     owned_set, MPI_COMM_WORLD);
 
   LinearAlgebra::ReadWriteVector<Number> rw_in(owned_set);
-  for (unsigned int i = 0; i < in_dev.local_size(); ++i)
+  for (unsigned int i = 0; i < in_dev.locally_owned_size(); ++i)
     {
       const unsigned int glob_index = owned_set.nth_index_in_set(i);
       if (constraints.is_constrained(glob_index))

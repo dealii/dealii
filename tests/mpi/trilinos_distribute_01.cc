@@ -50,7 +50,7 @@ test()
     is.add_range(100 * myid, 100 * myid + 100);
     vec.reinit(is, MPI_COMM_WORLD);
   }
-  AssertThrow(vec.local_size() == 100, ExcInternalError());
+  AssertThrow(vec.locally_owned_size() == 100, ExcInternalError());
   AssertThrow(vec.local_range().first == 100 * myid, ExcInternalError());
   AssertThrow(vec.local_range().second == 100 * myid + 100, ExcInternalError());
   for (unsigned int i = vec.local_range().first; i < vec.local_range().second;

@@ -66,7 +66,7 @@ do_test(const unsigned int n_refine, const bool overlap_communication)
 
   LinearAlgebra::distributed::Vector<double> in, ref, test;
   matrix_free.initialize_dof_vector(in);
-  for (unsigned int i = 0; i < in.get_partitioner()->local_size(); ++i)
+  for (unsigned int i = 0; i < in.get_partitioner()->locally_owned_size(); ++i)
     in.local_element(i) = in.get_partitioner()->local_to_global(i);
   matrix_free.initialize_dof_vector(ref);
   matrix_free.initialize_dof_vector(test);

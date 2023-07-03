@@ -160,7 +160,7 @@ test()
   matrix_free->initialize_dof_vector(dst3);
   matrix_free->initialize_dof_vector(dst4);
 
-  for (unsigned int i = 0; i < src.local_size(); ++i)
+  for (unsigned int i = 0; i < src.locally_owned_size(); ++i)
     src.local_element(i) = random_value<NumberType>();
 
   MatrixFreeOperators::MassOperator<

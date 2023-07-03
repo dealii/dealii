@@ -91,7 +91,7 @@ test()
 
   // Set random seed for reproducibility
   Testing::srand(42);
-  for (unsigned int i = 0; i < in.local_size(); ++i)
+  for (unsigned int i = 0; i < in.locally_owned_size(); ++i)
     {
       const double entry  = Testing::rand() / (double)RAND_MAX;
       in.local_element(i) = entry;
@@ -108,14 +108,14 @@ test()
   mf_data.reinit(MappingQ1<mydim>{}, dof, constraints, quad, data);
   mf_data.initialize_dof_vector(in2);
   mf_data.initialize_dof_vector(out2);
-  for (unsigned int i = 0; i < in.local_size(); ++i)
+  for (unsigned int i = 0; i < in.locally_owned_size(); ++i)
     {
       in2(renumbering[i]) = in.local_element(i);
     }
 
   mf.vmult(out2, in2);
 
-  for (unsigned int i = 0; i < in.local_size(); ++i)
+  for (unsigned int i = 0; i < in.locally_owned_size(); ++i)
     out2(renumbering[i]) -= out.local_element(i);
 
   double diff_norm = out2.linfty_norm() / out.linfty_norm();

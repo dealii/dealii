@@ -190,7 +190,7 @@ test()
     }
   mf_data.initialize_dof_vector(ref);
 
-  for (unsigned int i = 0; i < in[0].local_size(); ++i)
+  for (unsigned int i = 0; i < in[0].locally_owned_size(); ++i)
     {
       const unsigned int glob_index = owned_set.nth_index_in_set(i);
       if (constraints.is_constrained(glob_index))

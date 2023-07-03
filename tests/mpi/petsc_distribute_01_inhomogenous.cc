@@ -37,7 +37,7 @@ test()
 
   // create a vector that consists of elements indexed from 0 to n
   PETScWrappers::MPI::Vector vec(MPI_COMM_WORLD, 100 * n_processes, 100);
-  AssertThrow(vec.local_size() == 100, ExcInternalError());
+  AssertThrow(vec.locally_owned_size() == 100, ExcInternalError());
   AssertThrow(vec.local_range().first == 100 * myid, ExcInternalError());
   AssertThrow(vec.local_range().second == 100 * myid + 100, ExcInternalError());
   for (unsigned int i = vec.local_range().first; i < vec.local_range().second;

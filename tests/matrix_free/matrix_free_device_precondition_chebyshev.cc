@@ -108,13 +108,13 @@ test()
 
   MappingQ<dim>                         mapping(fe_degree);
   CUDAWrappers::MatrixFree<dim, Number> mf_data;
-  const QGauss<1>                       quad(fe_degree + 1);
+  const QGauss<1>                       uad(fe_degree + 1);
   typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
     additional_data;
   additional_data.mapping_update_flags = update_values | update_gradients |
                                          update_JxW_values |
                                          update_quadrature_points;
-  mf_data.reinit(mapping, dof, constraints, quad, additional_data);
+  mf_data.reinit(mapping, dof, constraints, uad, additional_data);
 
   const unsigned int coef_size =
     tria.n_locally_owned_active_cells() * std::pow(fe_degree + 1, dim);
@@ -131,7 +131,7 @@ test()
     owned_set, MPI_COMM_WORLD);
 
   LinearAlgebra::ReadWriteVector<Number> rw_in(owned_set);
-  for (unsigned int i = 0; i < in_dev.local_size(); ++i)
+  for (unsigned int i = 0; i < in_dev.locally_owned_size(); ++i)
     {
       const unsigned int glob_index = owned_set.nth_index_in_set(i);
       if (constraints.is_constrained(glob_index))

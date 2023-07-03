@@ -306,7 +306,7 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
                                                 hanging_node_constraints);
         hanging_node_constraints.close();
 
-        for (unsigned int i = 0; i < in.block(b).local_size(); ++i)
+        for (unsigned int i = 0; i < in.block(b).locally_owned_size(); ++i)
           if (!hanging_node_constraints.is_constrained(
                 in.block(b).get_partitioner()->local_to_global(i)))
             in.block(b).local_element(i) = 1.;

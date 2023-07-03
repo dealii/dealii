@@ -296,19 +296,6 @@ namespace Utilities
        * i.e., local_range().second minus local_range().first.
        * The returned numbers need to add up to the total number of indices when
        * summed over all processes
-       *
-       * @deprecated Use the more clearly named function locally_owned_size()
-       * instead.
-       */
-      DEAL_II_DEPRECATED
-      unsigned int
-      local_size() const;
-
-      /**
-       * Return the number of locally owned indices,
-       * i.e., local_range().second minus local_range().first.
-       * The returned numbers need to add up to the total number of indices when
-       * summed over all processes
        */
       unsigned int
       locally_owned_size() const;
@@ -828,14 +815,6 @@ namespace Utilities
     Partitioner::local_range() const
     {
       return local_range_data;
-    }
-
-
-
-    inline unsigned int
-    Partitioner::local_size() const
-    {
-      return locally_owned_size();
     }
 
 

@@ -72,7 +72,7 @@ main(int argc, char *argv[])
   LinearAlgebra::distributed::Vector<double> solution(
     dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
   const double old_value = 10.;
-  for (unsigned int i = 0; i < solution.local_size(); ++i)
+  for (unsigned int i = 0; i < solution.locally_owned_size(); ++i)
     solution.local_element(i) = old_value;
 
   parallel::distributed::experimental::
@@ -108,13 +108,13 @@ main(int argc, char *argv[])
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   if (myid == 0)
     {
-      for (unsigned int i = 0; i < new_solution.local_size(); ++i)
+      for (unsigned int i = 0; i < new_solution.locally_owned_size(); ++i)
         AssertThrow(new_solution.local_element(i) == old_value,
                     ExcInternalError());
     }
   else if (myid == 1)
     {
-      for (unsigned int i = 0; i < new_solution.local_size(); ++i)
+      for (unsigned int i = 0; i < new_solution.locally_owned_size(); ++i)
         AssertThrow(new_solution.local_element(i) == new_value,
                     ExcInternalError());
     }

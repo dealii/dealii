@@ -364,20 +364,6 @@ namespace PETScWrappers
      *
      * To figure out which elements exactly are stored locally, use
      * local_range() or locally_owned_elements().
-     *
-     * @deprecated use locally_owned_size() instead.
-     */
-    DEAL_II_DEPRECATED
-    size_type
-    local_size() const;
-
-    /**
-     * Return the local dimension of the vector, i.e. the number of elements
-     * stored on the present MPI process. For sequential vectors, this number
-     * is the same as size(), but for parallel vectors it may be smaller.
-     *
-     * To figure out which elements exactly are stored locally, use
-     * local_range() or locally_owned_elements().
      */
     size_type
     locally_owned_size() const;
@@ -636,46 +622,12 @@ namespace PETScWrappers
     add_and_dot(const PetscScalar a, const VectorBase &V, const VectorBase &W);
 
     /**
-     * Return the value of the vector element with the largest negative value.
-     *
-     * @deprecated This function has been deprecated to improve compatibility
-     * with other classes inheriting from VectorSpaceVector. If you need to
-     * use this functionality then use the PETSc function VecMin instead.
-     */
-    DEAL_II_DEPRECATED
-    real_type
-    min() const;
-
-    /**
-     * Return the value of the vector element with the largest positive value.
-     *
-     * @deprecated This function has been deprecated to improve compatibility
-     * with other classes inheriting from VectorSpaceVector. If you need to
-     * use this functionality then use the PETSc function VecMax instead.
-     */
-    DEAL_II_DEPRECATED
-    real_type
-    max() const;
-
-    /**
      * Return whether the vector contains only elements with value zero. This
      * is a collective operation. This function is expensive, because
      * potentially all elements have to be checked.
      */
     bool
     all_zero() const;
-
-    /**
-     * Return @p true if the vector has no negative entries, i.e. all entries
-     * are zero or positive. This function is used, for example, to check
-     * whether refinement indicators are really all positive (or zero).
-     *
-     * @deprecated This function has been deprecated to improve compatibility
-     * with other classes inheriting from VectorSpaceVector.
-     */
-    DEAL_II_DEPRECATED
-    bool
-    is_non_negative() const;
 
     /**
      * Multiply the entire vector by a fixed factor.

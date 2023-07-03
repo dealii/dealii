@@ -45,12 +45,12 @@ test()
   vec.block(0).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.block(1).reinit(MPI_COMM_WORLD, 100 * n_processes, 100);
   vec.collect_sizes();
-  AssertThrow(vec.block(0).local_size() == 100, ExcInternalError());
+  AssertThrow(vec.block(0).locally_owned_size() == 100, ExcInternalError());
   AssertThrow(vec.block(0).local_range().first == 100 * myid,
               ExcInternalError());
   AssertThrow(vec.block(0).local_range().second == 100 * myid + 100,
               ExcInternalError());
-  AssertThrow(vec.block(1).local_size() == 100, ExcInternalError());
+  AssertThrow(vec.block(1).locally_owned_size() == 100, ExcInternalError());
   AssertThrow(vec.block(1).local_range().first == 100 * myid,
               ExcInternalError());
   AssertThrow(vec.block(1).local_range().second == 100 * myid + 100,

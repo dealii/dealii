@@ -195,7 +195,7 @@ do_test(const DoFHandler<dim> &dof)
     DoFTools::make_hanging_node_constraints(dof, hanging_node_constraints);
     hanging_node_constraints.close();
 
-    for (unsigned int i = 0; i < in.local_size(); ++i)
+    for (unsigned int i = 0; i < in.locally_owned_size(); ++i)
       if (!hanging_node_constraints.is_constrained(
             in.get_partitioner()->local_to_global(i)))
         in.local_element(i) = 1.;

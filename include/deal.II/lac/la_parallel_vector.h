@@ -645,19 +645,6 @@ namespace LinearAlgebra
        * After calling this method, read access to ghost elements of the
        * vector is forbidden and an exception is thrown. Only write access to
        * ghost elements is allowed in this state.
-       *
-       * @deprecated Use zero_out_ghost_values() instead.
-       */
-      DEAL_II_DEPRECATED void
-      zero_out_ghosts() const;
-
-      /**
-       * This method zeros the entries on ghost dofs, but does not touch
-       * locally owned DoFs.
-       *
-       * After calling this method, read access to ghost elements of the
-       * vector is forbidden and an exception is thrown. Only write access to
-       * ghost elements is allowed in this state.
        */
       void
       zero_out_ghost_values() const;
@@ -982,16 +969,6 @@ namespace LinearAlgebra
        * @name 5: Entry access and local data representation
        */
       /** @{ */
-
-      /**
-       * Return the local size of the vector, i.e., the number of indices
-       * owned locally.
-       *
-       * @deprecated Use locally_owned_size() instead.
-       */
-      DEAL_II_DEPRECATED
-      size_type
-      local_size() const;
 
       /**
        * Return the local size of the vector, i.e., the number of indices
@@ -1497,15 +1474,6 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::size() const
     {
       return partitioner->size();
-    }
-
-
-
-    template <typename Number, typename MemorySpace>
-    inline typename Vector<Number, MemorySpace>::size_type
-    Vector<Number, MemorySpace>::local_size() const
-    {
-      return locally_owned_size();
     }
 
 

@@ -29,10 +29,10 @@ test()
   is.add_range(1, 3);
   is.add_index(7);
   LinearAlgebra::ReadWriteVector<double> vec(is);
-  deallog << "size: " << vec.n_elements() << std::endl;
+  deallog << "size: " << vec.locally_owned_size() << std::endl;
 
   vec = 0.;
-  for (unsigned int i = 0; i < vec.n_elements(); ++i)
+  for (unsigned int i = 0; i < vec.locally_owned_size(); ++i)
     vec.local_element(i) += i;
 
   vec.print(deallog.get_file_stream());

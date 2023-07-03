@@ -692,9 +692,10 @@ namespace StokesClass
                           dummy);
 
     this->set_constrained_entries_to_one(diagonal);
-    inverse_diagonal              = diagonal;
-    const unsigned int local_size = inverse_diagonal.local_size();
-    for (unsigned int i = 0; i < local_size; ++i)
+    inverse_diagonal = diagonal;
+    const unsigned int locally_owned_size =
+      inverse_diagonal.locally_owned_size();
+    for (unsigned int i = 0; i < locally_owned_size; ++i)
       {
         Assert(inverse_diagonal.local_element(i) > 0.,
                ExcMessage("No diagonal entry in a positive definite operator "
@@ -866,7 +867,7 @@ namespace StokesClass
 
     this->set_constrained_entries_to_one(inverse_diagonal);
 
-    for (unsigned int i = 0; i < inverse_diagonal.local_size(); ++i)
+    for (unsigned int i = 0; i < inverse_diagonal.locally_owned_size(); ++i)
       {
         Assert(inverse_diagonal.local_element(i) > 0.,
                ExcMessage("No diagonal entry in a positive definite operator "

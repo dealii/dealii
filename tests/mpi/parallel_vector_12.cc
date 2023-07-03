@@ -89,10 +89,10 @@ test()
   v0 = 1;
   v1 = 2;
   // check assignment in initial state
-  for (unsigned int i = 0; i < v0.local_size(); ++i)
+  for (unsigned int i = 0; i < v0.locally_owned_size(); ++i)
     AssertThrow(v0.local_element(i) == 1.,
                 ExcNonEqual(v0.local_element(i), 1.));
-  for (unsigned int i = 0; i < v1.local_size(); ++i)
+  for (unsigned int i = 0; i < v1.locally_owned_size(); ++i)
     AssertThrow(v1.local_element(i) == 2.,
                 ExcNonEqual(v1.local_element(i), 2.));
 
@@ -115,8 +115,8 @@ test()
 
   // now swap v1 and v0
   v0.swap(v1);
-  AssertDimension(v0.local_size(), local_size1);
-  AssertDimension(v1.local_size(), actual_local_size0);
+  AssertDimension(v0.locally_owned_size(), local_size1);
+  AssertDimension(v1.locally_owned_size(), actual_local_size0);
   AssertDimension(v0.size(), global_size1);
   AssertDimension(v1.size(), global_size0);
   for (unsigned int i = 0; i < local_size1; ++i)
@@ -166,7 +166,7 @@ test()
   v2.swap(v0);
   AssertDimension(v0.size(), 0);
   AssertDimension(v2.size(), global_size1);
-  AssertDimension(v2.local_size(), local_size1);
+  AssertDimension(v2.locally_owned_size(), local_size1);
   for (int i = my_start1; i < my_end1; ++i)
     AssertThrow(v2(i) == 7., ExcNonEqual(v2(i), 7.));
   if (myid == 0)

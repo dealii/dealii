@@ -160,10 +160,11 @@ private:
         this->data->get_dof_info(0).vector_partitioner.get())
       return;
 
-    Assert(vec.get_partitioner()->local_size() ==
-             this->data->get_dof_info(0).vector_partitioner->local_size(),
-           ExcMessage("The vector passed to the vmult() function does not have "
-                      "the correct size for compatibility with MatrixFree."));
+    Assert(
+      vec.get_partitioner()->locally_owned_size() ==
+        this->data->get_dof_info(0).vector_partitioner->locally_owned_size(),
+      ExcMessage("The vector passed to the vmult() function does not have "
+                 "the correct size for compatibility with MatrixFree."));
     LinearAlgebra::distributed::Vector<Number> copy_vec(vec);
     this->data->initialize_dof_vector(
       const_cast<LinearAlgebra::distributed::Vector<Number> &>(vec), 0);
@@ -270,7 +271,7 @@ do_test(const DoFHandler<dim> &dof)
     DoFTools::make_hanging_node_constraints(dof, hanging_node_constraints);
     hanging_node_constraints.close();
 
-    for (unsigned int i = 0; i < in.local_size(); ++i)
+    for (unsigned int i = 0; i < in.locally_owned_size(); ++i)
       if (!hanging_node_constraints.is_constrained(
             in.get_partitioner()->local_to_global(i)))
         in.local_element(i) = 1.;

@@ -541,17 +541,6 @@ namespace LinearAlgebra
     size() const override;
 
     /**
-     * This function returns the number of elements stored. It is smaller or
-     * equal to the dimension of the vector space that is modeled by an object
-     * of this kind. This dimension is return by size().
-     *
-     * @deprecated use locally_owned_size() instead.
-     */
-    DEAL_II_DEPRECATED
-    size_type
-    n_elements() const;
-
-    /**
      * Return the local size of the vector, i.e., the number of indices
      * owned locally.
      */
@@ -973,15 +962,6 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::size() const
   {
     return stored_elements.size();
-  }
-
-
-
-  template <typename Number>
-  inline typename ReadWriteVector<Number>::size_type
-  ReadWriteVector<Number>::n_elements() const
-  {
-    return stored_elements.n_elements();
   }
 
 

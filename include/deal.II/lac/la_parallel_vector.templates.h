@@ -949,15 +949,6 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::zero_out_ghosts() const
-    {
-      this->zero_out_ghost_values();
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
-    void
     Vector<Number, MemorySpaceType>::zero_out_ghost_values() const
     {
       Kokkos::pair<size_type, size_type> range(
