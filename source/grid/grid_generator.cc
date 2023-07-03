@@ -977,21 +977,21 @@ namespace GridGenerator
                                                 std::sin(gamma) * edge_length);
 
           // loop over vertices of all cells
-          for (auto &cell : tria)
+          for (auto &cell : tria.cell_iterators())
             for (const unsigned int v : GeometryInfo<2>::vertex_indices())
               {
                 // vertex has been already processed: nothing to do
-                if (vertex_processed[cell.vertex_index(v)])
+                if (vertex_processed[cell->vertex_index(v)])
                   continue;
 
                 // mark vertex as processed
-                vertex_processed[cell.vertex_index(v)] = true;
+                vertex_processed[cell->vertex_index(v)] = true;
 
-                auto &node = cell.vertex(v);
+                auto &node = cell->vertex(v);
 
                 // distinguish blocks
-                if (cell.material_id() == id_block_1 ||
-                    cell.material_id() == id_block_4) // block 1 and 4
+                if (cell->material_id() == id_block_1 ||
+                    cell->material_id() == id_block_4) // block 1 and 4
                   {
                     // step 1: rotate block 1 clockwise by gamma and move block
                     // 1 so that A(0) is on y-axis so that faces AD and BC are
@@ -1000,7 +1000,7 @@ namespace GridGenerator
                     // positive) Move trapeze to be in first quadrant by adding
                     // trapeze_offset
                     Point<2, double> node_;
-                    if (cell.material_id() == id_block_1)
+                    if (cell->material_id() == id_block_1)
                       {
                         node_ = Point<2, double>(rotation_matrix_1 *
                                                    (node - horizontal_offset) +
@@ -1009,7 +1009,7 @@ namespace GridGenerator
                     // step 1: rotate block 4 counterclockwise and move down so
                     // that trapeze is located in fourth quadrant (subtracting
                     // trapeze_offset)
-                    else if (cell.material_id() == id_block_4)
+                    else if (cell->material_id() == id_block_4)
                       {
                         node_ = Point<2, double>(rotation_matrix_2 *
                                                    (node - horizontal_offset) -
@@ -1053,19 +1053,19 @@ namespace GridGenerator
                         bias_alpha(1 - (1.0 * iy) / n_cells_y);
                       const double   theta = node_(0);
                       const Point<2> p(-height * std::cos(theta) + center_mesh,
-                                       ((cell.material_id() == id_block_1) ?
+                                       ((cell->material_id() == id_block_1) ?
                                           (height) :
                                           (-height)) *
                                          std::sin(theta));
-                      node =
-                        airfoil_1D[(
-                          (cell.material_id() == id_block_1) ? (0) : (1))][ix] *
-                          alpha +
-                        p * (1 - alpha);
+                      node = airfoil_1D[(
+                               (cell->material_id() == id_block_1) ? (0) : (1))]
+                                       [ix] *
+                               alpha +
+                             p * (1 - alpha);
                     }
                   }
-                else if (cell.material_id() == id_block_2 ||
-                         cell.material_id() == id_block_5) // block 2 and 5
+                else if (cell->material_id() == id_block_2 ||
+                         cell->material_id() == id_block_5) // block 2 and 5
                   {
                     // geometric parameters and indices for interpolation
                     Assert(
@@ -1093,19 +1093,19 @@ namespace GridGenerator
                     const Point<2> p(ix * dx + center_mesh +
                                        incline_factor * length_b2 * ix /
                                          n_cells_x_1,
-                                     ((cell.material_id() == id_block_2) ?
+                                     ((cell->material_id() == id_block_2) ?
                                         (height) :
                                         (-height)));
                     // interpolate between y = height and upper airfoil points
                     // (block2) or y = -height and lower airfoil points (block5)
                     node = airfoil_1D[(
-                             (cell.material_id() == id_block_2) ? (0) : (1))]
+                             (cell->material_id() == id_block_2) ? (0) : (1))]
                                      [n_cells_x_0 + ix] *
                              alpha +
                            p * (1 - alpha);
                   }
-                else if (cell.material_id() == id_block_3 ||
-                         cell.material_id() == id_block_6) // block 3 and 6
+                else if (cell->material_id() == id_block_3 ||
+                         cell->material_id() == id_block_6) // block 3 and 6
                   {
                     // compute indices ix and iy
                     const double dx = length_b2 / n_cells_x_2;
@@ -1123,7 +1123,7 @@ namespace GridGenerator
                     // points G and H to the right
                     const Point<2> p1(J(0) - (1 - incline_factor) * length_b2 *
                                                (alpha_x),
-                                      ((cell.material_id() == id_block_3) ?
+                                      ((cell->material_id() == id_block_3) ?
                                          (height) :
                                          (-height)));
                     // define points on HJ but use tail_y as y-coordinate, in
@@ -1134,7 +1134,7 @@ namespace GridGenerator
                 else
                   {
                     Assert(false,
-                           ExcIndexRange(cell.material_id(),
+                           ExcIndexRange(cell->material_id(),
                                          id_block_1,
                                          id_block_6));
                   }
@@ -7999,22 +7999,22 @@ namespace GridGenerator
     // (ii) create new midpoint vertex locations for each face (and record their
     // new indices in the 'face_to_new_vertex_indices' vector),
     // (iii) create new midpoint vertex locations for each cell (dim = 2 only)
-    for (const auto &cell : ref_tria)
+    for (const auto &cell : ref_tria.cell_iterators())
       {
         // temporary array storing the global indices of each cell entity in the
         // sequence: vertices, edges/faces, cell
         std::array<unsigned int, dim == 2 ? 9 : 14> local_vertex_indices;
 
         // (i) copy the existing vertex locations
-        for (const auto v : cell.vertex_indices())
+        for (const auto v : cell->vertex_indices())
           {
-            const auto v_global = cell.vertex_index(v);
+            const auto v_global = cell->vertex_index(v);
 
             if (old_to_new_vertex_indices[v_global] ==
                 numbers::invalid_unsigned_int)
               {
                 old_to_new_vertex_indices[v_global] = vertices.size();
-                vertices.push_back(cell.vertex(v));
+                vertices.push_back(cell->vertex(v));
               }
 
             AssertIndexRange(v, local_vertex_indices.size());
@@ -8022,32 +8022,32 @@ namespace GridGenerator
           }
 
         // (ii) create new midpoint vertex locations for each face
-        for (const auto f : cell.face_indices())
+        for (const auto f : cell->face_indices())
           {
-            const auto f_global = cell.face_index(f);
+            const auto f_global = cell->face_index(f);
 
             if (face_to_new_vertex_indices[f_global] ==
                 numbers::invalid_unsigned_int)
               {
                 face_to_new_vertex_indices[f_global] = vertices.size();
                 vertices.push_back(
-                  cell.face(f)->center(/*respect_manifold*/ true));
+                  cell->face(f)->center(/*respect_manifold*/ true));
               }
 
-            AssertIndexRange(cell.n_vertices() + f,
+            AssertIndexRange(cell->n_vertices() + f,
                              local_vertex_indices.size());
-            local_vertex_indices[cell.n_vertices() + f] =
+            local_vertex_indices[cell->n_vertices() + f] =
               face_to_new_vertex_indices[f_global];
           }
 
         // (iii) create new midpoint vertex locations for each cell
         if (dim == 2)
           {
-            AssertIndexRange(cell.n_vertices() + cell.n_faces(),
+            AssertIndexRange(cell->n_vertices() + cell->n_faces(),
                              local_vertex_indices.size());
-            local_vertex_indices[cell.n_vertices() + cell.n_faces()] =
+            local_vertex_indices[cell->n_vertices() + cell->n_faces()] =
               vertices.size();
-            vertices.push_back(cell.center(/*respect_manifold*/ true));
+            vertices.push_back(cell->center(/*respect_manifold*/ true));
           }
 
         // helper function for creating cells and subcells
@@ -8138,13 +8138,13 @@ namespace GridGenerator
             }
         };
 
-        const auto material_id_cell = cell.material_id();
+        const auto material_id_cell = cell->material_id();
 
         // create cells one by one
         if (dim == 2)
           {
             // get cell-manifold id from current quad cell
-            const auto manifold_id_cell = cell.manifold_id();
+            const auto manifold_id_cell = cell->manifold_id();
             // inherit cell manifold
             for (const auto &cell_vertices : table_2D_cell)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
@@ -8162,7 +8162,7 @@ namespace GridGenerator
         else if (dim == 3)
           {
             // get cell-manifold id from current quad cell
-            const auto manifold_id_cell = cell.manifold_id();
+            const auto manifold_id_cell = cell->manifold_id();
             // inherit cell manifold
             for (const auto &cell_vertices : vertex_ids_for_cells_3d)
               add_cell(dim, cell_vertices, material_id_cell, manifold_id_cell);
@@ -8187,10 +8187,10 @@ namespace GridGenerator
           Assert(false, ExcNotImplemented());
 
         // Set up sub-cell data.
-        for (const auto f : cell.face_indices())
+        for (const auto f : cell->face_indices())
           {
-            const auto bid = cell.face(f)->boundary_id();
-            const auto mid = cell.face(f)->manifold_id();
+            const auto bid = cell->face(f)->boundary_id();
+            const auto mid = cell->face(f)->manifold_id();
 
             // process boundary-faces: set boundary and manifold ids
             if (dim == 2) // 2d boundary-faces
@@ -8220,9 +8220,9 @@ namespace GridGenerator
         // triangulation.
         if (dim == 3)
           {
-            for (const auto e : cell.line_indices())
+            for (const auto e : cell->line_indices())
               {
-                auto edge = cell.line(e);
+                auto edge = cell->line(e);
                 // Rather than use add_cell(), which does additional index
                 // translation, just add edges directly into subcell_data since
                 // we already know the correct global vertex indices.
