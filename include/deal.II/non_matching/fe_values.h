@@ -519,7 +519,7 @@ namespace NonMatching
      * implemented, the passed values of these must equal
      * numbers::invalid_unsigned_int.
      */
-    template <class CellIteratorType, class CellNeighborIteratorType>
+    template <typename CellIteratorType, typename CellNeighborIteratorType>
     void
     reinit(const CellIteratorType &        cell,
            const unsigned int              face_no,
@@ -536,7 +536,7 @@ namespace NonMatching
      * FEInterfaceValues object can be retrieved for each region using the
      * functions get_inside_fe_values() or get_outside_fe_values().
      */
-    template <class CellIteratorType>
+    template <typename CellIteratorType>
     void
     reinit(const CellIteratorType &cell, const unsigned int face_no);
 
@@ -687,7 +687,7 @@ namespace NonMatching
   /*---------------------- Inline functions ---------------------*/
 
   template <int dim>
-  template <class CellIteratorType>
+  template <typename CellIteratorType>
   inline void
   FEInterfaceValues<dim>::reinit(const CellIteratorType &cell,
                                  const unsigned int      face_no)
@@ -705,7 +705,7 @@ namespace NonMatching
 
 
   template <int dim>
-  template <class CellIteratorType, class CellNeighborIteratorType>
+  template <typename CellIteratorType, typename CellNeighborIteratorType>
   inline void
   FEInterfaceValues<dim>::reinit(const CellIteratorType &        cell,
                                  const unsigned int              face_no,

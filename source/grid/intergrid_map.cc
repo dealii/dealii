@@ -34,7 +34,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <class MeshType>
+template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 InterGridMap<MeshType>::InterGridMap()
   : source_grid(nullptr, typeid(*this).name())
@@ -43,7 +43,7 @@ InterGridMap<MeshType>::InterGridMap()
 
 
 
-template <class MeshType>
+template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 void InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
                                           const MeshType &destination_grid)
@@ -99,7 +99,7 @@ void InterGridMap<MeshType>::make_mapping(const MeshType &source_grid,
 
 
 
-template <class MeshType>
+template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 void InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell,
                                          const cell_iterator &dst_cell)
@@ -138,7 +138,7 @@ void InterGridMap<MeshType>::set_mapping(const cell_iterator &src_cell,
 
 
 
-template <class MeshType>
+template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 void InterGridMap<MeshType>::set_entries_to_cell(const cell_iterator &src_cell,
                                                  const cell_iterator &dst_cell)
@@ -154,7 +154,7 @@ void InterGridMap<MeshType>::set_entries_to_cell(const cell_iterator &src_cell,
 }
 
 
-template <class MeshType>
+template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 typename InterGridMap<MeshType>::cell_iterator
   InterGridMap<MeshType>::operator[](const cell_iterator &source_cell) const
@@ -172,7 +172,7 @@ typename InterGridMap<MeshType>::cell_iterator
 
 
 
-template <class MeshType>
+template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 void InterGridMap<MeshType>::clear()
 {
@@ -183,7 +183,7 @@ void InterGridMap<MeshType>::clear()
 
 
 
-template <class MeshType>
+template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 const MeshType &InterGridMap<MeshType>::get_source_grid() const
 {
@@ -192,7 +192,7 @@ const MeshType &InterGridMap<MeshType>::get_source_grid() const
 
 
 
-template <class MeshType>
+template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 const MeshType &InterGridMap<MeshType>::get_destination_grid() const
 {
@@ -201,7 +201,7 @@ const MeshType &InterGridMap<MeshType>::get_destination_grid() const
 
 
 
-template <class MeshType>
+template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 std::size_t InterGridMap<MeshType>::memory_consumption() const
 {

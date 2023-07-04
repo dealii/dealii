@@ -47,7 +47,7 @@ DEAL_II_NAMESPACE_OPEN
  * smoother object. Therefore, the smoother object for each level must be
  * constructed by hand.
  */
-template <typename MatrixType, class RelaxationType, typename number>
+template <typename MatrixType, typename RelaxationType, typename number>
 class MGSmootherBlock : public MGSmoother<BlockVector<number>>
 {
 public:
@@ -73,7 +73,7 @@ public:
    * This function stores pointers to the level matrices and smoothing
    * operator for each level.
    */
-  template <class MGMatrixType, class MGRelaxationType>
+  template <typename MGMatrixType, typename MGRelaxationType>
   void
   initialize(const MGMatrixType &matrices, const MGRelaxationType &smoothers);
 
@@ -135,7 +135,7 @@ private:
 
 #ifndef DOXYGEN
 
-template <typename MatrixType, class RelaxationType, typename number>
+template <typename MatrixType, typename RelaxationType, typename number>
 inline MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock(
   const unsigned int steps,
   const bool         variable,
@@ -148,7 +148,7 @@ inline MGSmootherBlock<MatrixType, RelaxationType, number>::MGSmootherBlock(
 {}
 
 
-template <typename MatrixType, class RelaxationType, typename number>
+template <typename MatrixType, typename RelaxationType, typename number>
 inline void
 MGSmootherBlock<MatrixType, RelaxationType, number>::clear()
 {
@@ -161,8 +161,8 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::clear()
 }
 
 
-template <typename MatrixType, class RelaxationType, typename number>
-template <class MGMatrixType, class MGRelaxationType>
+template <typename MatrixType, typename RelaxationType, typename number>
+template <typename MGMatrixType, typename MGRelaxationType>
 inline void
 MGSmootherBlock<MatrixType, RelaxationType, number>::initialize(
   const MGMatrixType &    m,
@@ -186,7 +186,7 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::initialize(
 }
 
 
-template <typename MatrixType, class RelaxationType, typename number>
+template <typename MatrixType, typename RelaxationType, typename number>
 inline void
 MGSmootherBlock<MatrixType, RelaxationType, number>::set_reverse(
   const bool flag)
@@ -195,7 +195,7 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::set_reverse(
 }
 
 
-template <typename MatrixType, class RelaxationType, typename number>
+template <typename MatrixType, typename RelaxationType, typename number>
 inline std::size_t
 MGSmootherBlock<MatrixType, RelaxationType, number>::memory_consumption() const
 {
@@ -205,7 +205,7 @@ MGSmootherBlock<MatrixType, RelaxationType, number>::memory_consumption() const
 }
 
 
-template <typename MatrixType, class RelaxationType, typename number>
+template <typename MatrixType, typename RelaxationType, typename number>
 inline void
 MGSmootherBlock<MatrixType, RelaxationType, number>::smooth(
   const unsigned int         level,

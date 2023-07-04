@@ -21,7 +21,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase()
   : block_rows(0)
   , block_columns(0)
@@ -29,7 +29,7 @@ BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase()
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
   const size_type block_rows,
   const size_type block_columns)
@@ -40,7 +40,7 @@ BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
   const BlockSparsityPatternBase &s)
   : BlockSparsityPatternBase()
@@ -55,7 +55,7 @@ BlockSparsityPatternBase<SparsityPatternType>::BlockSparsityPatternBase(
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::reinit(
   const size_type new_block_rows,
@@ -73,7 +73,7 @@ BlockSparsityPatternBase<SparsityPatternType>::reinit(
 }
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 BlockSparsityPatternBase<SparsityPatternType> &
 BlockSparsityPatternBase<SparsityPatternType>::operator=(
   const BlockSparsityPatternBase<SparsityPatternType> &bsp)
@@ -92,7 +92,7 @@ BlockSparsityPatternBase<SparsityPatternType>::operator=(
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 typename BlockSparsityPatternBase<SparsityPatternType>::size_type
 BlockSparsityPatternBase<SparsityPatternType>::compute_n_rows() const
 {
@@ -106,7 +106,7 @@ BlockSparsityPatternBase<SparsityPatternType>::compute_n_rows() const
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 typename BlockSparsityPatternBase<SparsityPatternType>::size_type
 BlockSparsityPatternBase<SparsityPatternType>::compute_n_cols() const
 {
@@ -120,7 +120,7 @@ BlockSparsityPatternBase<SparsityPatternType>::compute_n_cols() const
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::collect_sizes()
 {
@@ -165,7 +165,7 @@ BlockSparsityPatternBase<SparsityPatternType>::collect_sizes()
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::compress()
 {
@@ -176,7 +176,7 @@ BlockSparsityPatternBase<SparsityPatternType>::compress()
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 bool
 BlockSparsityPatternBase<SparsityPatternType>::empty() const
 {
@@ -189,7 +189,7 @@ BlockSparsityPatternBase<SparsityPatternType>::empty() const
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 typename BlockSparsityPatternBase<SparsityPatternType>::size_type
 BlockSparsityPatternBase<SparsityPatternType>::max_entries_per_row() const
 {
@@ -208,7 +208,7 @@ BlockSparsityPatternBase<SparsityPatternType>::max_entries_per_row() const
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 typename BlockSparsityPatternBase<SparsityPatternType>::size_type
 BlockSparsityPatternBase<SparsityPatternType>::n_nonzero_elements() const
 {
@@ -221,7 +221,7 @@ BlockSparsityPatternBase<SparsityPatternType>::n_nonzero_elements() const
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::print(std::ostream &out) const
 {
@@ -278,7 +278,7 @@ BlockSparsityPatternBase<DynamicSparsityPattern>::print(std::ostream &out) const
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::print_gnuplot(
   std::ostream &out) const
@@ -305,7 +305,7 @@ BlockSparsityPatternBase<SparsityPatternType>::print_gnuplot(
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::print_svg(
   std::ostream &out) const
@@ -346,7 +346,7 @@ BlockSparsityPatternBase<SparsityPatternType>::print_svg(
 
 
 
-template <class SparsityPatternType>
+template <typename SparsityPatternType>
 std::size_t
 BlockSparsityPatternBase<SparsityPatternType>::memory_consumption() const
 {

@@ -150,14 +150,14 @@ namespace MeshWorker
     /**
      * Print the contents of the selection to the stream.
      */
-    template <class StreamType, typename DATA>
+    template <typename StreamType, typename DATA>
     void
     print(StreamType &s, const AnyData &v) const;
 
     /**
      * Print the number of selections to the stream.
      */
-    template <class StreamType>
+    template <typename StreamType>
     void
     print(StreamType &s) const;
 
@@ -521,7 +521,7 @@ namespace MeshWorker
   }
 
 
-  template <class StreamType>
+  template <typename StreamType>
   inline void
   VectorSelector::print(StreamType &s) const
   {
@@ -530,7 +530,7 @@ namespace MeshWorker
   }
 
 
-  template <class StreamType, typename DATA>
+  template <typename StreamType, typename DATA>
   inline void
   VectorSelector::print(StreamType &s, const AnyData &v) const
   {

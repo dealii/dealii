@@ -1195,7 +1195,7 @@ public:
    * successfully can be queried by the functions get_entries_wrongly_not_set()
    * and assert_that_entries_have_been_set().
    */
-  template <class ParameterType>
+  template <typename ParameterType>
   void
   add_parameter(const std::string &          entry,
                 ParameterType &              parameter,
@@ -2331,7 +2331,7 @@ ParameterHandler::load(Archive &ar, const unsigned int)
 }
 
 
-template <class ParameterType>
+template <typename ParameterType>
 void
 ParameterHandler::add_parameter(const std::string &          entry,
                                 ParameterType &              parameter,

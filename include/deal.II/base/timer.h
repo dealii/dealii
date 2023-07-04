@@ -160,7 +160,7 @@ public:
    * Print the data returned by Timer::get_last_lap_wall_time_data() to the
    * given stream.
    */
-  template <class StreamType>
+  template <typename StreamType>
   void
   print_last_lap_wall_time_data(StreamType &stream) const;
 
@@ -168,7 +168,7 @@ public:
    * Print the data returned by Timer::get_accumulated_wall_time_data() to the
    * given stream.
    */
-  template <class StreamType>
+  template <typename StreamType>
   void
   print_accumulated_wall_time_data(StreamType &stream) const;
 
@@ -918,7 +918,7 @@ Timer::get_accumulated_wall_time_data() const
 
 
 
-template <class StreamType>
+template <typename StreamType>
 inline void
 Timer::print_last_lap_wall_time_data(StreamType &stream) const
 {
@@ -930,7 +930,7 @@ Timer::print_last_lap_wall_time_data(StreamType &stream) const
 
 
 
-template <class StreamType>
+template <typename StreamType>
 inline void
 Timer::print_accumulated_wall_time_data(StreamType &stream) const
 {

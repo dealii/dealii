@@ -520,7 +520,7 @@ public:
    * See the documentation of ParameterHandler::add_parameter() for more
    * information.
    */
-  template <class ParameterType>
+  template <typename ParameterType>
   void
   add_parameter(const std::string &          entry,
                 ParameterType &              parameter,
@@ -724,7 +724,7 @@ public:
 
 
 // Inline and template functions
-template <class ParameterType>
+template <typename ParameterType>
 void
 ParameterAcceptor::add_parameter(const std::string &          entry,
                                  ParameterType &              parameter,

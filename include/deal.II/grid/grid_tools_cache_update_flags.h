@@ -102,7 +102,7 @@ namespace GridTools
    *
    * @ref CacheUpdateFlags
    */
-  template <class StreamType>
+  template <typename StreamType>
   inline StreamType &
   operator<<(StreamType &s, const CacheUpdateFlags u)
   {

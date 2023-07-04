@@ -111,7 +111,7 @@ namespace MeshWorker
    *
    * @ref AssembleFlags
    */
-  template <class StreamType>
+  template <typename StreamType>
   inline StreamType &
   operator<<(StreamType &s, AssembleFlags u)
   {

@@ -1443,7 +1443,7 @@ public:
    *   is initialized with an hp::FECollection, an hp::QCollection, and possibly
    *   an hp::MappingCollection).
    */
-  template <class CellIteratorType, class CellNeighborIteratorType>
+  template <typename CellIteratorType, typename CellNeighborIteratorType>
   void
   reinit(const CellIteratorType &        cell,
          const unsigned int              face_no,
@@ -1481,7 +1481,7 @@ public:
    * is initialized with an hp::FECollection, an hp::QCollection, and possibly
    * an hp::MappingCollection).
    */
-  template <class CellIteratorType>
+  template <typename CellIteratorType>
   void
   reinit(const CellIteratorType &cell,
          const unsigned int      face_no,
@@ -2308,7 +2308,7 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
 
 
 template <int dim, int spacedim>
-template <class CellIteratorType, class CellNeighborIteratorType>
+template <typename CellIteratorType, typename CellNeighborIteratorType>
 void
 FEInterfaceValues<dim, spacedim>::reinit(
   const CellIteratorType &        cell,
@@ -2510,7 +2510,7 @@ FEInterfaceValues<dim, spacedim>::reinit(
 
 
 template <int dim, int spacedim>
-template <class CellIteratorType>
+template <typename CellIteratorType>
 void
 FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
                                          const unsigned int      face_no,

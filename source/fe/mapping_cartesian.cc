@@ -48,7 +48,7 @@ DeclExceptionMsg(
  * checking if the smallest BoundingBox that encloses the cell has the same
  * vertices as the cell itself.
  */
-template <class CellType>
+template <typename CellType>
 bool
 is_cartesian(const CellType &cell)
 {

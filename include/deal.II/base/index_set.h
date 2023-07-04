@@ -448,7 +448,7 @@ public:
    * Output a text representation of this IndexSet to the given stream. Used
    * for testing.
    */
-  template <class StreamType>
+  template <typename StreamType>
   void
   print(StreamType &out) const;
 
@@ -1960,7 +1960,7 @@ IndexSet::fill_binary_vector(Vector &vector) const
 
 
 
-template <class StreamType>
+template <typename StreamType>
 inline void
 IndexSet::print(StreamType &out) const
 {

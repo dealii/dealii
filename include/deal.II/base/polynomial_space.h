@@ -117,7 +117,7 @@ public:
   /**
    * Prints the list of the indices to <tt>out</tt>.
    */
-  template <class StreamType>
+  template <typename StreamType>
   void
   output_indices(StreamType &out) const;
 
@@ -313,7 +313,7 @@ PolynomialSpace<dim>::name() const
 
 
 template <int dim>
-template <class StreamType>
+template <typename StreamType>
 void
 PolynomialSpace<dim>::output_indices(StreamType &out) const
 {

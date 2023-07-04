@@ -92,21 +92,21 @@ namespace Utilities
      * Construct a MutableBind object specifying the function, and
      * each arguments separately.
      */
-    template <class FunctionType>
+    template <typename FunctionType>
     MutableBind(FunctionType function, FunctionArgs &&...arguments);
 
     /**
      * Construct a MutableBind object specifying the function, and
      * the arguments as a tuple.
      */
-    template <class FunctionType>
+    template <typename FunctionType>
     MutableBind(FunctionType function, TupleType &&arguments);
 
     /**
      * Construct a MutableBind object specifying only the function. By default,
      * the arguments are left to their default constructor values.
      */
-    template <class FunctionType>
+    template <typename FunctionType>
     MutableBind(FunctionType function);
 
     /**
@@ -220,7 +220,7 @@ namespace Utilities
 
 #ifndef DOXYGEN
   template <typename ReturnType, class... FunctionArgs>
-  template <class FunctionType>
+  template <typename FunctionType>
   MutableBind<ReturnType, FunctionArgs...>::MutableBind(
     FunctionType function,
     FunctionArgs &&...arguments)
@@ -231,7 +231,7 @@ namespace Utilities
 
 
   template <typename ReturnType, class... FunctionArgs>
-  template <class FunctionType>
+  template <typename FunctionType>
   MutableBind<ReturnType, FunctionArgs...>::MutableBind(FunctionType function,
                                                         TupleType && arguments)
     : function(function)
@@ -241,7 +241,7 @@ namespace Utilities
 
 
   template <typename ReturnType, class... FunctionArgs>
-  template <class FunctionType>
+  template <typename FunctionType>
   MutableBind<ReturnType, FunctionArgs...>::MutableBind(FunctionType function)
     : function(function)
   {}

@@ -149,7 +149,7 @@ public:
   /**
    * Show the paths and suffixes used for this object.
    */
-  template <class StreamType>
+  template <typename StreamType>
   void
   show(StreamType &stream) const;
 
@@ -258,7 +258,7 @@ private:
 /* ----------------------------- inline functions ------------------------- */
 
 
-template <class StreamType>
+template <typename StreamType>
 inline void
 PathSearch::show(StreamType &out) const
 {

@@ -186,7 +186,7 @@ public:
   is_type(const unsigned int i) const;
 
   /// List the contents to a stream
-  template <class StreamType>
+  template <typename StreamType>
   void
   list(StreamType &os) const;
 
@@ -448,7 +448,7 @@ AnyData::merge(const AnyData &other)
 }
 
 
-template <class StreamType>
+template <typename StreamType>
 inline void
 AnyData::list(StreamType &os) const
 {

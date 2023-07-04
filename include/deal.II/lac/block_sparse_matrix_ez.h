@@ -241,7 +241,7 @@ public:
    * existing row lengths and allocated row lengths. Otherwise, just the
    * relation of allocated and used entries is shown.
    */
-  template <class StreamType>
+  template <typename StreamType>
   void
   print_statistics(StreamType &s, bool full = false);
 
@@ -442,7 +442,7 @@ BlockSparseMatrixEZ<Number>::Tvmult_add(
 
 
 template <typename number>
-template <class StreamType>
+template <typename StreamType>
 inline void
 BlockSparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
 {

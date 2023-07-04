@@ -3148,7 +3148,7 @@ namespace internal
     // able to use functions like vector.block(1)(block_local_id), instead of
     // vector(global_id). This avoids transforming indices one-by-one later
     // on.
-    template <typename number, class BlockType>
+    template <typename number, typename BlockType>
     inline void
     make_block_starts(const BlockType &            block_object,
                       GlobalRowsFromLocal<number> &global_rows,
@@ -3185,7 +3185,7 @@ namespace internal
 
     // same as before, but for std::vector<uint> instead of
     // GlobalRowsFromLocal. Used in functions for sparsity patterns.
-    template <class BlockType>
+    template <typename BlockType>
     inline void
     make_block_starts(const BlockType &       block_object,
                       std::vector<size_type> &row_indices,

@@ -51,7 +51,7 @@ namespace MeshWorker
      * A helper class to provide a type definition for the underlying cell
      * iterator type.
      */
-    template <class CellIteratorType>
+    template <typename CellIteratorType>
     struct CellIteratorBaseType
     {
       /**
@@ -67,7 +67,7 @@ namespace MeshWorker
      * This specialization is for IteratorRange, which may have either a
      * TriaActiveIterator or a FilteredIterator as its base type.
      */
-    template <class CellIteratorType>
+    template <typename CellIteratorType>
     struct CellIteratorBaseType<IteratorOverIterators<CellIteratorType>>
     {
       /**
@@ -87,7 +87,7 @@ namespace MeshWorker
      * TriaActiveIterator as its base type, or may be nested with another
      * FilteredIterator as the type to iterate over.
      */
-    template <class CellIteratorType>
+    template <typename CellIteratorType>
     struct CellIteratorBaseType<FilteredIterator<CellIteratorType>>
     {
       /**
@@ -273,10 +273,10 @@ namespace MeshWorker
    *
    * @ingroup MeshWorker
    */
-  template <class CellIteratorType,
+  template <typename CellIteratorType,
             class ScratchData,
             class CopyData,
-            class CellIteratorBaseType =
+            typename CellIteratorBaseType =
               typename internal::CellIteratorBaseType<CellIteratorType>::type>
   void
   mesh_loop(
@@ -707,10 +707,10 @@ namespace MeshWorker
    *
    * @ingroup MeshWorker
    */
-  template <class CellIteratorType,
+  template <typename CellIteratorType,
             class ScratchData,
             class CopyData,
-            class CellIteratorBaseType =
+            typename CellIteratorBaseType =
               typename internal::CellIteratorBaseType<CellIteratorType>::type>
   void
   mesh_loop(
@@ -833,7 +833,7 @@ namespace MeshWorker
    *
    * @ingroup MeshWorker
    */
-  template <class CellIteratorType,
+  template <typename CellIteratorType,
             class ScratchData,
             class CopyData,
             class MainClass>
@@ -1013,11 +1013,11 @@ namespace MeshWorker
    *
    * @ingroup MeshWorker
    */
-  template <class CellIteratorType,
+  template <typename CellIteratorType,
             class ScratchData,
             class CopyData,
             class MainClass,
-            class CellIteratorBaseType =
+            typename CellIteratorBaseType =
               typename internal::CellIteratorBaseType<CellIteratorType>::type>
   void
   mesh_loop(IteratorRange<CellIteratorType> iterator_range,

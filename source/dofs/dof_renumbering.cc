@@ -1265,7 +1265,7 @@ namespace DoFRenumbering
     // cell, renumbers DoF indices on it. The function starts renumbering with
     // 'next_free_dof_index' and returns the first still unused DoF index at the
     // end of its operation.
-    template <int dim, class CellIteratorType>
+    template <int dim, typename CellIteratorType>
     types::global_dof_index
     compute_hierarchical_recursive(
       const types::global_dof_index         next_free_dof_offset,

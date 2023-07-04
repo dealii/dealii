@@ -1177,7 +1177,7 @@ namespace TrilinosWrappers
      * operators/preconditioners. For details, see
      * https://docs.trilinos.org/latest-release/packages/belos/doc/html/classBelos_1_1Operator.html.
      */
-    template <class OperatorType, typename VectorType>
+    template <typename OperatorType, typename VectorType>
     class OperatorWrapper
       : public Belos::Operator<typename VectorType::value_type>
     {

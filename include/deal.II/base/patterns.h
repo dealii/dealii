@@ -1904,7 +1904,7 @@ namespace Patterns
     };
 
     // std::array
-    template <class ValueType, std::size_t N>
+    template <typename ValueType, std::size_t N>
     struct Convert<std::array<ValueType, N>>
     {
       using T = std::array<ValueType, N>;

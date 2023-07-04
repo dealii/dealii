@@ -385,7 +385,7 @@ namespace MeshWorker
     void
     reinit(const BlockIndices &local_sizes);
 
-    template <class StreamType>
+    template <typename StreamType>
     void
     print_debug(StreamType &os) const;
 
@@ -659,7 +659,7 @@ namespace MeshWorker
 
 
   template <typename number>
-  template <class StreamType>
+  template <typename StreamType>
   void
   LocalResults<number>::print_debug(StreamType &os) const
   {
