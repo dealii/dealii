@@ -782,8 +782,6 @@ AffineConstraints<number>::close()
                     ++n_replacements;
                     Assert(n_replacements / 2 < largest_idx,
                            ExcMessage("Cycle in constraints detected!"));
-                    if (n_replacements / 2 >= largest_idx)
-                      return; // this enables us to test for this Exception.
 #endif
                   }
                 else
