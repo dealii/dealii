@@ -319,8 +319,9 @@ public:
    */
   /** @{ */
   /**
-   * Dereferencing operator, returns a reference to an accessor. Usage is thus
-   * like <tt>(*i).index ();</tt>
+   * Dereferencing operator, returns a copy of the underlying accessor for
+   * the cell pointed to by the iterator. Usage is thus like
+   * <tt>(*i).index();</tt>
    *
    * This function has to be specialized explicitly for the different @p
    * Pointers, to allow an
@@ -330,18 +331,13 @@ public:
    *
    * You must not dereference invalid or past the end iterators.
    */
-  const Accessor &
+  Accessor
   operator*() const;
 
   /**
-   * Dereferencing operator, non-@p const version.
-   */
-  Accessor &
-  operator*();
-
-  /**
-   * Dereferencing operator, returns a reference of the cell pointed to. Usage
-   * is thus like <tt>i->index ();</tt>
+   * Dereferencing operator, returns a reference of the internal accessor
+   * for the cell pointed to by the iterator. Usage is thus like
+   * <tt>i->index();</tt>
    *
    * There is a @p const and a non-@p const version.
    */
@@ -992,24 +988,8 @@ inline TriaRawIterator<Accessor>::TriaRawIterator(
 
 
 template <typename Accessor>
-inline const Accessor &
+inline Accessor
 TriaRawIterator<Accessor>::operator*() const
-{
-  Assert(Accessor::structure_dimension != Accessor::dimension ||
-           state() == IteratorState::valid,
-         ExcDereferenceInvalidCell(accessor));
-  Assert(Accessor::structure_dimension == Accessor::dimension ||
-           state() == IteratorState::valid,
-         ExcDereferenceInvalidObject(accessor));
-
-  return accessor;
-}
-
-
-
-template <typename Accessor>
-inline Accessor &
-TriaRawIterator<Accessor>::operator*()
 {
   Assert(Accessor::structure_dimension != Accessor::dimension ||
            state() == IteratorState::valid,
@@ -1036,7 +1016,7 @@ template <typename Accessor>
 inline const Accessor *
 TriaRawIterator<Accessor>::operator->() const
 {
-  return &(this->operator*());
+  return &accessor;
 }
 
 
@@ -1045,7 +1025,7 @@ template <typename Accessor>
 inline Accessor *
 TriaRawIterator<Accessor>::operator->()
 {
-  return &(this->operator*());
+  return &accessor;
 }
 
 
