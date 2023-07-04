@@ -415,59 +415,6 @@ namespace
 
 
   /**
-   * A set of three functions that
-   * reorder the data given to
-   * create_triangulation_compatibility
-   * from the "classic" to the
-   * "current" format of vertex
-   * numbering of cells and
-   * faces. These functions do the
-   * reordering of their arguments
-   * in-place.
-   */
-  void
-  reorder_compatibility(const std::vector<CellData<1>> &, const SubCellData &)
-  {
-    // nothing to do here: the format
-    // hasn't changed for 1d
-  }
-
-
-  void
-  reorder_compatibility(std::vector<CellData<2>> &cells, const SubCellData &)
-  {
-    for (auto &cell : cells)
-      if (cell.vertices.size() == GeometryInfo<2>::vertices_per_cell)
-        std::swap(cell.vertices[2], cell.vertices[3]);
-  }
-
-
-  void
-  reorder_compatibility(std::vector<CellData<3>> &cells,
-                        SubCellData &             subcelldata)
-  {
-    unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
-    static constexpr std::array<unsigned int,
-                                GeometryInfo<3>::vertices_per_cell>
-      local_vertex_numbering{{0, 1, 5, 4, 2, 3, 7, 6}};
-    for (auto &cell : cells)
-      if (cell.vertices.size() == GeometryInfo<3>::vertices_per_cell)
-        {
-          for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-            tmp[i] = cell.vertices[i];
-          for (const unsigned int i : GeometryInfo<3>::vertex_indices())
-            cell.vertices[local_vertex_numbering[i]] = tmp[i];
-        }
-
-    // now points in boundary quads
-    for (auto &boundary_quad : subcelldata.boundary_quads)
-      if (boundary_quad.vertices.size() == GeometryInfo<2>::vertices_per_cell)
-        std::swap(boundary_quad.vertices[2], boundary_quad.vertices[3]);
-  }
-
-
-
-  /**
    * Return the index of the vertex
    * in the middle of this object,
    * if it exists. In order to
@@ -11546,25 +11493,6 @@ void Triangulation<dim, spacedim>::copy_triangulation(
   // subscriptor!
 }
 
-
-
-template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void Triangulation<dim, spacedim>::create_triangulation_compatibility(
-  const std::vector<Point<spacedim>> &v,
-  const std::vector<CellData<dim>> &  cells,
-  const SubCellData &                 subcelldata)
-{
-  std::vector<CellData<dim>> reordered_cells(cells);             // NOLINT
-  SubCellData                reordered_subcelldata(subcelldata); // NOLINT
-
-  // in-place reordering of data
-  reorder_compatibility(reordered_cells, reordered_subcelldata);
-
-  // now create triangulation from
-  // reordered data
-  create_triangulation(v, reordered_cells, reordered_subcelldata);
-}
 
 
 template <int dim, int spacedim>

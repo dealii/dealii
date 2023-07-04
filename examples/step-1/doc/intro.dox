@@ -17,8 +17,8 @@ different levels:
   every single (member) function in deal.II. You get there if, for
   example, you click on the "Main page" or "Classes" tab at the top of
   this page. This is the place where you would look up what the second
-  argument of Triangulation::create_triangulation_compatibility means,
-  to give just one slightly obscure example. You need this level of
+  argument of Triangulation::create_triangulation means,
+  to give just one example. You need this level of
   documentation for when you know what you want to do, but forgot how
   exactly the function was named, what its arguments are, or what it
   returns. Note that you also get into the manual whenever you read

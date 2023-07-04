@@ -559,7 +559,7 @@ namespace GridGenerator
    * vectors. Colorizing is done according to hyper_rectangle().
    *
    * @note This function silently reorders the vertices on the cells to
-   * lexicographic ordering (see <code>GridReordering::reorder_grid</code>).
+   * lexicographic ordering (see GridTools::consistently_order_cells()).
    * In other words, if reordering of the vertices does occur, the ordering of
    * vertices in the array of <code>corners</code> will no longer refer to the
    * same triangulation.

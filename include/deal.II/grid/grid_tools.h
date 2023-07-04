@@ -255,23 +255,6 @@ namespace GridTools
 
   /**
    * Given a list of vertices (typically obtained using
-   * Triangulation::get_vertices) as the first, and a list of vertex indices
-   * that characterize a single cell as the second argument, return the
-   * measure (area, volume) of this cell. If this is a real cell, then you can
-   * get the same result using <code>cell-@>measure()</code>, but this
-   * function also works for cells that do not exist except that you make it
-   * up by naming its vertices from the list.
-   *
-   * @deprecated Use the more general function which takes an ArrayView instead.
-   */
-  template <int dim>
-  DEAL_II_DEPRECATED double
-  cell_measure(
-    const std::vector<Point<dim>> &all_vertices,
-    const unsigned int (&vertex_indices)[GeometryInfo<dim>::vertices_per_cell]);
-
-  /**
-   * Given a list of vertices (typically obtained using
    * Triangulation::get_vertices()) as the first, and a list of vertex indices
    * that characterize a single cell as the second argument, return the
    * measure (area, volume) of this cell. If this is a real cell, then you can
@@ -3843,8 +3826,6 @@ namespace GridTools
   /** @} */
 
 } /*namespace GridTools*/
-
-
 
 /* ----------------- Template function --------------- */
 

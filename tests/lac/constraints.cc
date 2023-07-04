@@ -36,6 +36,8 @@
 
 #include "../tests.h"
 
+#include "../tests/test_grids.h"
+
 
 
 void
@@ -72,10 +74,11 @@ make_tria(Triangulation<3> &tria, int step)
           cells[0].material_id = 0;
           cells[1].material_id = 0;
 
-          tria.create_triangulation_compatibility(
-            std::vector<Point<3>>(&vertices[0], &vertices[12]),
-            cells,
-            SubCellData()); // no boundary information
+          reorder_old_to_new_style(cells);
+          tria.create_triangulation(std::vector<Point<3>>(&vertices[0],
+                                                          &vertices[12]),
+                                    cells,
+                                    SubCellData()); // no boundary information
 
           if (step == 0)
             tria.last_active()->set_refine_flag();
@@ -115,10 +118,11 @@ make_tria(Triangulation<3> &tria, int step)
           cells[0].material_id = 0;
           cells[1].material_id = 0;
 
-          tria.create_triangulation_compatibility(
-            std::vector<Point<3>>(&vertices[0], &vertices[12]),
-            cells,
-            SubCellData()); // no boundary information
+          reorder_old_to_new_style(cells);
+          tria.create_triangulation(std::vector<Point<3>>(&vertices[0],
+                                                          &vertices[12]),
+                                    cells,
+                                    SubCellData()); // no boundary information
 
           if (step == 2)
             tria.last_active()->set_refine_flag();
@@ -158,10 +162,11 @@ make_tria(Triangulation<3> &tria, int step)
           cells[0].material_id = 0;
           cells[1].material_id = 0;
 
-          tria.create_triangulation_compatibility(
-            std::vector<Point<3>>(&vertices[0], &vertices[12]),
-            cells,
-            SubCellData()); // no boundary information
+          reorder_old_to_new_style(cells);
+          tria.create_triangulation(std::vector<Point<3>>(&vertices[0],
+                                                          &vertices[12]),
+                                    cells,
+                                    SubCellData()); // no boundary information
 
           if (step == 4)
             tria.last_active()->set_refine_flag();
@@ -215,10 +220,11 @@ make_tria(Triangulation<3> &tria, int step)
           cells[2].material_id = 0;
           cells[3].material_id = 0;
 
-          tria.create_triangulation_compatibility(
-            std::vector<Point<3>>(&vertices[0], &vertices[18]),
-            cells,
-            SubCellData()); // no boundary information
+          reorder_old_to_new_style(cells);
+          tria.create_triangulation(std::vector<Point<3>>(&vertices[0],
+                                                          &vertices[18]),
+                                    cells,
+                                    SubCellData()); // no boundary information
 
           switch (step)
             {

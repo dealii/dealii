@@ -1159,12 +1159,6 @@ namespace PETScWrappers
     static PetscErrorCode
     pcsetup(PC pc);
   };
-
-  /**
-   * Alias for backwards-compatibility.
-   * @deprecated Use PETScWrappers::PreconditionBase instead.
-   */
-  using PreconditionerBase DEAL_II_DEPRECATED = PreconditionBase;
 } // namespace PETScWrappers
 
 

@@ -36,7 +36,7 @@
 
 #include "../tests.h"
 
-
+#include "../tests/test_grids.h"
 
 void
 create_two_cubes(Triangulation<3> &coarse_grid)
@@ -69,10 +69,9 @@ create_two_cubes(Triangulation<3> &coarse_grid)
 
   // finally generate a triangulation
   // out of this
+  reorder_old_to_new_style(cells);
   GridTools::consistently_order_cells(cells);
-  coarse_grid.create_triangulation_compatibility(vertices,
-                                                 cells,
-                                                 SubCellData());
+  coarse_grid.create_triangulation(vertices, cells, SubCellData());
 }
 
 

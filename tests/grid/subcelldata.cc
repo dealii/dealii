@@ -22,6 +22,7 @@
 
 #include "../tests.h"
 
+#include "../tests/test_grids.h"
 
 
 static unsigned subcells[6][4] = {{0, 1, 2, 3},
@@ -93,8 +94,9 @@ test()
         }
     }
 
+  reorder_old_to_new_style(cells);
   Triangulation<dim> tria;
-  tria.create_triangulation_compatibility(vertices, cells, subcelldata);
+  tria.create_triangulation(vertices, cells, subcelldata);
 
   GridOutFlags::Ucd ucd_flags(true, true);
   GridOut           grid_out;

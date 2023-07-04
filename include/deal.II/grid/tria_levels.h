@@ -201,7 +201,7 @@ namespace internal
        * parallel normal vectors. (For both things, see the paper by
        * Agelek, Anderson, Bangerth, Barth in the ACM Transactions on
        * Mathematical Software mentioned in the documentation of the
-       * GridReordering class.)
+       * GridTools::consistently_order_cells() function.)
        *
        * The problem is that we originally had another condition, namely that
        * faces 0, 2 and 4 have normals that point into the cell, while the

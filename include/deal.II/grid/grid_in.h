@@ -234,7 +234,7 @@ struct CellData;
  *
  * </ul>
  *
- * <h3>Structure of input grid data. The GridReordering class</h3>
+ * <h3>Structure of input grid data.</h3>
  *
  * It is your duty to use a correct numbering of vertices in the cell list,
  * i.e. for lines in 1d, you have to first give the vertex with the lower
@@ -897,7 +897,7 @@ protected:
    * requirements of the ordering of cells and their faces, i.e. that all
    * faces need to have unique directions and specified orientations with
    * respect to neighboring cells (see the documentations to this class and
-   * the GridReordering class).
+   * the GridTools::consistently_order_cells() function).
    *
    * The output of this function consists of vectors for each line bounding
    * the cells indicating the direction it has with respect to the orientation

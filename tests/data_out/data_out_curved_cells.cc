@@ -124,14 +124,12 @@ curved_grid(std::ostream &out)
 
         cells[index].vertices[0] = p_iplus;
         cells[index].vertices[1] = p;
-        cells[index].vertices[2] = p_jplus;
-        cells[index].vertices[3] = p_iplus_jplus;
+        cells[index].vertices[2] = p_iplus_jplus;
+        cells[index].vertices[3] = p_jplus;
       }
   // create triangulation
   Triangulation<2> triangulation;
-  triangulation.create_triangulation_compatibility(vertices,
-                                                   cells,
-                                                   SubCellData());
+  triangulation.create_triangulation(vertices, cells, SubCellData());
   // now provide everything that is
   // needed for solving a Laplace
   // equation.
