@@ -1,0 +1,23 @@
+
+DEAL:2d::n_levels:                  4
+DEAL:2d::n_cells:                   85
+DEAL:2d::n_active_cells:            64
+DEAL:2d::has_hanging_nodes:         false
+DEAL:2d::
+DEAL:2d::n_levels:                  4
+DEAL:2d::n_cells:                   85
+DEAL:2d::n_active_cells:            64
+DEAL:2d::has_hanging_nodes:         false
+DEAL:2d::
+DEAL:2d::PASSED
+DEAL:3d::n_levels:                  4
+DEAL:3d::n_cells:                   585
+DEAL:3d::n_active_cells:            512
+DEAL:3d::has_hanging_nodes:         false
+DEAL:3d::
+DEAL:3d::n_levels:                  4
+DEAL:3d::n_cells:                   585
+DEAL:3d::n_active_cells:            512
+DEAL:3d::has_hanging_nodes:         false
+DEAL:3d::
+DEAL:3d::PASSED
