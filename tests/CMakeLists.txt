@@ -174,6 +174,7 @@ add_custom_target(test
   COMMENT "Running quicktests..."
   USES_TERMINAL
   )
+add_dependencies(test setup_tests_examples)
 add_dependencies(test setup_tests_quick_tests)
 
 if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
