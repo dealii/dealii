@@ -1,0 +1,41 @@
+#
+# We now parse all diff files and create rules to generate the step-*.cc
+# files.
+#
+# Here, ${_base_directory} points to the base "tests/examples" directory,
+# and ${DEAL_II_SOURCE_DIR} points to the deal.II main repository root.
+#
+
+file(GLOB _diff_files "${_base_directory}/*.diff")
+foreach(_diff_file ${_diff_files})
+  get_filename_component(_step "${_diff_file}" NAME_WLE)
+  set(_source_file "${DEAL_II_SOURCE_DIR}/examples/${_step}/${_step}.cc")
+  set(_output_file "${CMAKE_CURRENT_SOURCE_DIR}/${_step}.cc")
+
+  # ... and create a rule that updates all diff files if necessary during
+  # testsuite invocation:
+  add_custom_command(OUTPUT ${_output_file}
+    COMMAND patch ${_source_file} ${_diff_file} -o ${_output_file}
+    DEPENDS ${_source_file} ${_diff_file}
+    COMMENT "Patching ${_output_file}"
+    )
+
+  # Create symbolic links to the output files:
+  file(GLOB _output_files "${_base_directory}/${_step}*.output*")
+  foreach(_file ${_output_files})
+    get_filename_component(_destination "${_file}" NAME)
+    set(_destination "${CMAKE_CURRENT_SOURCE_DIR}/${_destination}")
+    file(CREATE_LINK ${_file} ${_destination} SYMBOLIC)
+  endforeach()
+endforeach()
+
+#
+# Create a top-level diff target:
+#
+
+add_custom_target(update_diffs
+  COMMAND "${_base_directory}/update_diffs.sh" "${DEAL_II_SOURCE_DIR}" "${_base_directory}"
+  WORKING_DIRECTORY "${_source_directory}"
+  )
+
+deal_ii_pickup_tests(examples)

@@ -289,13 +289,21 @@ function(deal_ii_add_test _category _test_name _comparison_file)
   list(LENGTH _source_file _number)
   if(NOT _number EQUAL 1)
     if(_number EQUAL 0)
-      message(FATAL_ERROR "\n${_comparison_file}:\n"
-        "A comparison file (ending in .output or .run-only) has been "
-        "picked up but no suitable source file or parameter file was "
-        "found. Please provide exactly one of the following.\n"
-        "A source file \"${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.c[cu]\",\n"
-        "or a parameter file \"${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.(prm|json)[.in]\".\n"
-        )
+      #
+      # None of the candidates above exist. Check whether a
+      # ${_test_name}.cc file gets generated during the build process:
+      set(_source_file "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.cc")
+      get_property(_generated SOURCE "${_source_file}" PROPERTY GENERATED)
+      if(NOT ${_generated})
+        message(FATAL_ERROR "\n${_comparison_file}:\n"
+          "A comparison file (ending in .output or .run-only) has been "
+          "picked up but no suitable source file, generated source file, or "
+          "parameter file was found. Please provide exactly one of the following.\n"
+          "A source file \"${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.c[cu]\",\n"
+          "or a parameter file \"${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.(prm|json)[.in]\".\n"
+          )
+      endif()
+
     else()
       string(REPLACE ";" "\n" _source_file "${_source_file}")
       message(FATAL_ERROR "\n${_comparison_file}:\n"
