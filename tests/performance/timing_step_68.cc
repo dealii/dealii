@@ -321,7 +321,8 @@ namespace Step68
   }
 
   template <int dim>
-  void ParticleTracking<dim>::euler_step_interpolated(const double dt)
+  void
+  ParticleTracking<dim>::euler_step_interpolated(const double dt)
   {
     Vector<double> local_dof_values(fluid_fe.dofs_per_cell);
 
@@ -340,32 +341,30 @@ namespace Step68
         Assert(pic.begin() == particle, ExcInternalError());
         std::vector<Point<dim>> particle_positions;
         for (auto &p : pic)
-            particle_positions.push_back(p.get_reference_location());
+          particle_positions.push_back(p.get_reference_location());
 
         evaluator.reinit(cell, particle_positions);
         evaluator.evaluate(make_array_view(local_dof_values),
-                             EvaluationFlags::values);
+                           EvaluationFlags::values);
 
-        for (unsigned int particle_index = 0;
-            particle != pic.end();
-            ++particle, ++particle_index)
-        {
-          Point<dim> particle_location = particle->get_location();
-          const Tensor<1, dim> &particle_velocity = evaluator.get_value(particle_index) ;                
-          particle_location += particle_velocity*dt;
-          particle->set_location(particle_location);
+        for (unsigned int particle_index = 0; particle != pic.end();
+             ++particle, ++particle_index)
+          {
+            Point<dim>            particle_location = particle->get_location();
+            const Tensor<1, dim> &particle_velocity =
+              evaluator.get_value(particle_index);
+            particle_location += particle_velocity * dt;
+            particle->set_location(particle_location);
 
-          ArrayView<double> properties = particle->get_properties();
-          for (int d = 0; d < dim; ++d)
-            properties[d] = particle_velocity[d];
+            ArrayView<double> properties = particle->get_properties();
+            for (int d = 0; d < dim; ++d)
+              properties[d] = particle_velocity[d];
 
-          properties[dim] =
-            Utilities::MPI::this_mpi_process(mpi_communicator);
-        }
+            properties[dim] =
+              Utilities::MPI::this_mpi_process(mpi_communicator);
+          }
       }
   }
-
-
 
 
 
