@@ -549,7 +549,7 @@ public:
    * Return dimension of the vector. This is the sum of the dimensions of all
    * components.
    */
-  size_type
+  virtual size_type
   size() const override;
 
   /**
