@@ -24,7 +24,7 @@
 
 #include "../tests.h"
 
-#include "../tests/test_grids.h"
+#include "../test_grids.h"
 
 template <int dim>
 void
@@ -58,7 +58,7 @@ test(bool second_case = false)
 
   SubCellData subcelldata;
 
-  reorder_old_to_new_style(cells);
+  TestGrids::reorder_old_to_new_style(cells);
   GridTools::invert_all_negative_measure_cells(vertices, cells);
 
   Triangulation<dim> tria;
