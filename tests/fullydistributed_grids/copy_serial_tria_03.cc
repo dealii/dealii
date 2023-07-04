@@ -31,7 +31,7 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_description.h>
 
-#include "./tests.h"
+#include "../grid/tests.h"
 
 using namespace dealii;
 

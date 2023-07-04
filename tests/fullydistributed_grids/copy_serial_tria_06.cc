@@ -34,7 +34,7 @@
 
 #include <deal.II/matrix_free/matrix_free.h>
 
-#include "./tests.h"
+#include "../grid/tests.h"
 
 using namespace dealii;
 

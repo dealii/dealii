@@ -34,7 +34,7 @@
 
 #include <boost/archive/text_oarchive.hpp>
 
-#include "./tests.h"
+#include "../grid/tests.h"
 
 using namespace dealii;
 

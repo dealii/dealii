@@ -32,7 +32,7 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
-#include "../tests.h"
+#include "../grid/tests.h"
 
 using namespace dealii;
 

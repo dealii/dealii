@@ -32,7 +32,7 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
-#include "./tests.h"
+#include "../grid/tests.h"
 
 using namespace dealii;
 
