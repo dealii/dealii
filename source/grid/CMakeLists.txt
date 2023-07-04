@@ -32,7 +32,6 @@ endif()
 
 set(_unity_include_src
   cell_id.cc
-  data_serializer.cc
   grid_refinement.cc
   intergrid_map.cc
   manifold.cc
@@ -71,7 +70,6 @@ setup_source_list("${_unity_include_src}"
 
 set(_inst
   cell_id.inst.in
-  data_serializer.inst.in
   grid_generator_cgal.inst.in
   grid_generator_from_name.inst.in
   grid_generator.inst.in
