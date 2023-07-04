@@ -63,10 +63,14 @@ jobs:
           setup_tests_quick_tests
         ctest --output-on-failure -j2
 
-  linux-debug-parallel-simplex:
-    # simple parallel debug build using g++ with simplex configuration enabled
+  ########################
+  # linux-debug-parallel #
+  ########################
 
-    name: linux debug parallel simplex
+  linux-debug-parallel:
+    # simple parallel debug build using g++
+
+    name: linux debug parallel
     runs-on: [ubuntu-22.04]
 
     # only run on 'push' or if the 'pull_request' is not a draft:
@@ -87,16 +91,16 @@ jobs:
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D DEAL_II_CXX_FLAGS='-Werror -std=c++17' \
+              -D DEAL_II_CXX_FLAGS='-Werror -std=c++20' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
-              -D DEAL_II_WITH_CGAL="ON" \
-              -D DEAL_II_WITH_MPI="ON" \
-              -D DEAL_II_WITH_TRILINOS="ON" \
-              -D DEAL_II_WITH_PETSC="ON" \
-              -D DEAL_II_WITH_METIS="ON" \
-              -D DEAL_II_WITH_HDF5="ON" \
-              -D DEAL_II_WITH_VTK="ON" \
               -D DEAL_II_COMPONENT_EXAMPLES="OFF" \
+              -D DEAL_II_WITH_MPI="ON" \
+              -D DEAL_II_WITH_CGAL="ON" \
+              -D DEAL_II_WITH_HDF5="ON" \
+              -D DEAL_II_WITH_METIS="ON" \
+              -D DEAL_II_WITH_PETSC="ON" \
+              -D DEAL_II_WITH_TRILINOS="ON" \
+              -D DEAL_II_WITH_VTK="ON" \
               ..
     - name: print detailed.log
       run: cat build/detailed.log
@@ -112,16 +116,12 @@ jobs:
         export OMPI_MCA_btl_base_warn_component_unused='0'
 
         cd build
-        make -j2 setup_tests_simplex setup_tests_vtk
+        make -j2 \
+          setup_tests_examples \
+          setup_tests_quick_tests \
+          setup_tests_simplex \
+          setup_tests_vtk
         ctest --output-on-failure -j2
-    - name: failed test log
-      if: ${{ failure() }}
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-log
-        path: |
-          build/tests/**/*output*
-          build/tests/**/*stdout*
 
 
   linux-debug-cuda-11:
