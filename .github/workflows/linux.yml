@@ -1,6 +1,7 @@
 name: github-linux
 
 on:
+  push:
   pull_request:
     types:
     - opened

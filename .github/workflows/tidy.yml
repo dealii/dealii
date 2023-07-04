@@ -1,6 +1,7 @@
 name: tidy
 
 on:
+  push:
   pull_request:
     types:
     - opened
