@@ -543,8 +543,6 @@ namespace Step68
     Vector<double> local_dof_values(fluid_fe.dofs_per_cell);
 
     FEPointEvaluation<dim, dim> evaluator(mapping, fluid_fe, update_values);
-    const FEValuesExtractors::Vector velocity(0);
-
 
     // We loop over all the local particles. Although this could be achieved
     // directly by looping over all the cells, this would force us

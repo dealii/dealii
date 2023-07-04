@@ -320,12 +320,12 @@ namespace Step68
     velocity_field.update_ghost_values();
   }
 
-
   template <int dim>
-  void
-  ParticleTracking<dim>::euler_step_interpolated(const double dt)
+  void ParticleTracking<dim>::euler_step_interpolated(const double dt)
   {
     Vector<double> local_dof_values(fluid_fe.dofs_per_cell);
+
+    FEPointEvaluation<dim, dim> evaluator(mapping, fluid_fe, update_values);
 
     auto particle = particle_handler.begin();
     while (particle != particle_handler.end())
@@ -338,35 +338,34 @@ namespace Step68
 
         const auto pic = particle_handler.particles_in_cell(cell);
         Assert(pic.begin() == particle, ExcInternalError());
+        std::vector<Point<dim>> particle_positions;
         for (auto &p : pic)
-          {
-            const Point<dim> reference_location = p.get_reference_location();
-            Tensor<1, dim>   particle_velocity;
-            for (unsigned int j = 0; j < fluid_fe.dofs_per_cell; ++j)
-              {
-                const auto comp_j = fluid_fe.system_to_component_index(j);
+            particle_positions.push_back(p.get_reference_location());
 
-                particle_velocity[comp_j.first] +=
-                  fluid_fe.shape_value(j, reference_location) *
-                  local_dof_values[j];
-              }
+        evaluator.reinit(cell, particle_positions);
+        evaluator.evaluate(make_array_view(local_dof_values),
+                             EvaluationFlags::values);
 
-            Point<dim> particle_location = particle->get_location();
-            for (int d = 0; d < dim; ++d)
-              particle_location[d] += particle_velocity[d] * dt;
-            p.set_location(particle_location);
+        for (unsigned int particle_index = 0;
+            particle != pic.end();
+            ++particle, ++particle_index)
+        {
+          Point<dim> particle_location = particle->get_location();
+          const Tensor<1, dim> &particle_velocity = evaluator.get_value(particle_index) ;                
+          particle_location += particle_velocity*dt;
+          particle->set_location(particle_location);
 
-            ArrayView<double> properties = p.get_properties();
-            for (int d = 0; d < dim; ++d)
-              properties[d] = particle_velocity[d];
+          ArrayView<double> properties = particle->get_properties();
+          for (int d = 0; d < dim; ++d)
+            properties[d] = particle_velocity[d];
 
-            properties[dim] =
-              Utilities::MPI::this_mpi_process(mpi_communicator);
-
-            ++particle;
-          }
+          properties[dim] =
+            Utilities::MPI::this_mpi_process(mpi_communicator);
+        }
       }
   }
+
+
 
 
 
