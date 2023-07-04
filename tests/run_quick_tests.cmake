@@ -37,6 +37,20 @@ endif()
 message(STATUS "Running quick_tests in ${CMAKE_BUILD_TYPE} mode with -j${_n_processors}:")
 
 #
+# Redirect quick tests to an output.log for CMake versions 3.18 onwards
+# (when we can actually instruct CMake to also print to the standard
+# terminal).
+#
+
+set(_redirect_output "")
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+  set(_redirect_output
+    OUTPUT_VARIABLE _output ECHO_OUTPUT_VARIABLE
+    ERROR_VARIABLE _output ECHO_ERROR_VARIABLE
+    )
+endif()
+
+#
 # Always restrict quick tests with specified build type, but run the step
 # and affinity quick tests in all available configuration:
 #
@@ -45,10 +59,11 @@ string(TOLOWER "${CMAKE_BUILD_TYPE}" _build_type)
 execute_process(COMMAND ${CMAKE_CTEST_COMMAND}
   -j${_n_processors} -C ${CMAKE_BUILD_TYPE} --force-new-ctest-process
   -R "quick_tests/(step.debug|step.release|affinity|.*.${_build_type})"
-  OUTPUT_VARIABLE _output ERROR_VARIABLE _output RESULT_VARIABLE _return_value
+  --output-on-failure
+  ${_redirect_output}
+  RESULT_VARIABLE _return_value
   )
 file(WRITE quick_tests.log ${_output})
-message(${_output})
 
 if(NOT "${_return_value}" STREQUAL "0")
   message("

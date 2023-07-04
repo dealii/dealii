@@ -174,6 +174,7 @@ add_custom_target(test
   COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=${_my_build} -P ${CMAKE_CURRENT_SOURCE_DIR}/run_quick_tests.cmake
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   COMMENT "Running quicktests..."
+  USES_TERMINAL
   )
 add_dependencies(test setup_tests_quick_tests)
 
