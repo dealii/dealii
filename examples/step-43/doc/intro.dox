@@ -66,13 +66,13 @@ We consider the flow of a two-phase immiscible, incompressible
 fluid. Capillary and gravity effects are neglected, and viscous
 effects are assumed dominant. The governing equations for such a
 flow that are identical to those used in step-21 and are
-@f{align*}
+@f{align*}{
   \mathbf{u}_t &= - \mathbf{K} \lambda_t \left(S\right) \nabla p, \\
   \nabla \cdot \mathbf{u}_t &= q, \\
   \epsilon \frac{\partial S}{\partial t} + \nabla \cdot \left( \mathbf{u}_t  F\left( S \right) \right)&=0,
 @f}
 where $S$ is the saturation (volume fraction between zero and one) of the second (wetting) phase, $p$ is the pressure, $\mathbf{K}$ is the permeability tensor, $\lambda_t$ is the total mobility, $\epsilon$ is the porosity, $F$ is the fractional flow of the wetting phase, $q$ is the source term and $\mathbf{u}_t$ is the total velocity. The total mobility, fractional flow of the wetting phase and total velocity are respectively given by
-@f{align*}
+@f{align*}{
    \lambda_t(S)&= \lambda_w + \lambda_{nw} = \frac{k_{rw}(S)}{\mu_w} + \frac{k_{rnw}(S)}{\mu_{nw}}, \\
    F(S) &= \frac{\lambda_w}{\lambda_t} = \frac{\lambda_w}{\lambda_w + \lambda_{nw}} = \frac{k_{rw}(S)/\mu_w}{k_{rw}(S)/\mu_w + k_{rnw}(S)/\mu_{nw}}, \\
    \mathbf{u}_t &= \mathbf{u}_w + \mathbf{u}_{nw} = -\lambda_t(S)\mathbf{K} \cdot \nabla p,
@@ -85,7 +85,7 @@ porosity $\epsilon$ in the saturation equation, which can be considered a
 scaling factor for the time variable, is set to
 one. Following a commonly used prescription for the dependence of the relative
 permeabilities $k_{rw}$ and $k_{rnw}$ on saturation, we use
-@f{align*}
+@f{align*}{
    k_{rw}  &= S^2, \qquad&\qquad
    k_{rnw} &= \left( 1-S \right)^2.
 @f}
@@ -118,7 +118,7 @@ operator splitting" scheme.
 Here, we use the following a posteriori criterion to decide when to re-compute
 pressure and velocity variables
 (detailed derivations and descriptions can be found in @cite Chueh2013):
-@f{align*}
+@f{align*}{
   \theta(n,n_p)
   =
     \max_{\kappa\in{\mathbb T}}
@@ -159,7 +159,7 @@ steps are of uniform length, and both are chosen adaptively.
 
 Using this time discretization, we obtain the following set of equations for
 each time step from the IMPES approach (see step-21):
-@f{align*}
+@f{align*}{
    \mathbf{u}^{(n)}_t + \lambda_t\left(S^{(n-1)}\right) \mathbf{K} \nabla p^{(n)} =0, \\
    \nabla \cdot \mathbf{u}^{(n)}_t = q, \\
    \epsilon \left( \frac{S^{(n-1)}-S^{(n)}}{\Delta t^{(n)}_c} \right) + \mathbf{u}^{(n)}_t \cdot \nabla F\left(S^{(n-1)}\right) + F\left(S^{(n-1)}\right) \nabla \cdot \mathbf{u}^{(n)}_t =0.
@@ -168,7 +168,7 @@ each time step from the IMPES approach (see step-21):
 
 Using the fact that $\nabla \cdot \mathbf{u}_t = q$, the time discrete
 saturation equation becomes
-@f{align*}
+@f{align*}{
   &\epsilon \left( \frac{S^{(n)}-S^{(n-1)}}{\Delta t^{(n)}_c} \right) + \mathbf{u}^{(n)}_t \cdot \nabla F\left(S^{(n-1)}\right) + F\left(S^{(n-1)}\right)q=0.
 @f}
 
@@ -181,7 +181,7 @@ functions $\mathbf{v}$ and $w$
 respectively and then integrating terms by parts as necessary, the weak form
 of the problem reads: Find $\mathbf u, p$ so that for all test functions
 $\mathbf{v}, w$ there holds
-@f{gather*}
+@f{gather*}{
    \left( \left( \mathbf{K} \lambda_t\left(S^{(n-1)}\right) \right)^{-1} \mathbf{u}^{(n)}_t, \mathbf{v}\right)_{\Omega} - \left(p^{(n)}, \nabla \cdot \mathbf{v}\right)_{\Omega} = -\left(p^{(n)}, \mathbf{n} \cdot \mathbf{v} \right)_{\partial \Omega}, \\
    - \left( \nabla \cdot \mathbf{u}^{(n)}_t,w\right)_{\Omega} = - \big(q,w\big)_{\Omega}.
 @f}
@@ -220,7 +220,7 @@ validated in @cite Chueh2013 and
 
 This method modifies the (discrete) weak form of the saturation equation
 to read
-@f{align*}
+@f{align*}{
   \left(\epsilon \frac{\partial S_h}{\partial t},\sigma_h\right)
   -
   \left(\mathbf{u}_t  F\left( S_h \right),
@@ -271,7 +271,7 @@ therefore provides for a higher degree of accuracy. On the other hand, it is
 nonlinear since $\nu$ depends on the saturation $S$. We avoid this difficulty
 by treating all nonlinear terms explicitly, which leads to the following
 fully discrete problem at time step $n$:
-@f{align*}
+@f{align*}{
    &\left( \epsilon S_h^{(n)},\sigma_h\right)_{\Omega} - \Delta t^{(n)}_c \Big(F\left(S_h^{(n-1)}\right)\mathbf{u}^{*}_t,\nabla\sigma_h\Big)_{\Omega} + \Delta t^{(n)}_c \Big(F\left(S_h^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{*}_t\right),\sigma_h\Big)_{\partial\Omega} \nonumber \\
    & \quad = \left( \epsilon S_h^{(n-1)},\sigma_h\right)_{\Omega} - \Delta t^{(n)}_c \bigg(\nu\left(S_h^{(n-1)}\right)\nabla S_h^{(n-1)},\nabla\sigma_h\bigg)_{\Omega} \nonumber \\
    & \qquad + \Delta t^{(n)}_c \bigg(\mathbf{n}\cdot\nu\left(S_h^{(n-1)}\right)\nabla S^{(n-1)},\sigma_h\bigg)_{\partial\Omega}
@@ -284,7 +284,7 @@ is to solve with a @ref GlossMassMatrix "mass matrix" on the saturation space.
 Since the Dirichlet boundary conditions for saturation are only imposed on the
 inflow boundaries, the third term on the left hand side of the equation above
 needs to be split further into two parts:
-@f{align*}
+@f{align*}{
   &\Delta t^{(n)}_c \Big(F\left(S_h^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_t\right),\sigma_h\Big)_{\partial\Omega} \nonumber \\
   &\qquad= \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(+)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(+)}\right),\sigma_h\Big)_{\partial\Omega_{(+)}} + \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(-)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(-)}\right),\sigma_h\Big)_{\partial\Omega_{(-)}}
 @f}
@@ -349,7 +349,7 @@ obtain a linear system of equations in time step $(n)$ of the following form:
  \right)
 @f]
 where the individual matrices and vectors are defined as follows using shape functions $\mathbf{v}_i$ for velocity, and $\phi_i$ for both pressure and saturation:
-@f{align*}
+@f{align*}{
   \mathbf{M}^{\mathbf{u}}_{ij}
   &= \left( \left( \mathbf{K} \lambda_t\left(S^{(n-1)}\right) \right)^{-1}
   \mathbf{v}_{i},\mathbf{v}_{j}\right)_{\Omega},
@@ -399,7 +399,7 @@ We apply the Generalized Minimal Residual (GMRES) method
 @cite Saad1986
 to this linear system. The ideal preconditioner for the
 velocity-pressure system is
-@f{align*}
+@f{align*}{
 \mathbf{P} =
  \left(
   \begin{array}{cc}
@@ -420,7 +420,7 @@ where
 $\mathbf{S}=\mathbf{B}\left(\mathbf{M}^{\mathbf{u}}\right)^{-1}\mathbf{B}^T$ is
 the Schur complement @cite Zhang2005 of the system. This preconditioner is
 optimal since
-@f{align*}
+@f{align*}{
  \mathbf{P}^{-1}
  \left(
   \begin{array}{cc}
@@ -444,7 +444,7 @@ approach by @cite SW94 originally proposed for
 the Stokes system. (See also the note in the "Possibilities for extensions"
 section of step-22.) Adapting it to the current set of equations yield the
 preconditioner
-@f{align*}
+@f{align*}{
  \mathbf{\tilde{P}}^{-1} =
  \left(
   \begin{array}{cc}
@@ -475,7 +475,7 @@ to be built with Dirichlet boundary conditions to ensure its invertibility.
 Once the velocity $\mathbf{U}^{(n)} \equiv \mathbf{u}^*_t$  is available, we
 can assemble $\mathbf{H}$ and
 $\mathbf{F}_{3}$ and solve for the saturations using
-@f{align*}
+@f{align*}{
   \mathbf{M}^{S} \mathbf{S}^{(n)} = \mathbf{F}_{3} - \mathbf{H} \mathbf{U}^{(n)}.
 @f}
 where the mass matrix $\mathbf{M}^{S}$ is solved by the conjugate gradient
@@ -523,7 +523,7 @@ Pressure and saturation uniquely
 determine a velocity, and the velocity determines whether a boundary segment
 is an inflow or outflow boundary. On the inflow part of the boundary,
 $\mathbf{\Gamma}_{in}(t)$, we impose
-@f{align*}
+@f{align*}{
    S(\mathbf{x},t) = 1 \qquad & \textrm{on} \quad \mathbf{\Gamma}_{in}(t) \cap \left\{x = 0\right\}, \\
    S(\mathbf{x},t) = 0 \qquad & \textrm{on} \quad \mathbf{\Gamma}_{in}(t) \backslash \left\{x = 0\right\}.
 @f}

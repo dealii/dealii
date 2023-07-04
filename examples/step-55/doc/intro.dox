@@ -50,7 +50,7 @@ The learning outcomes for this tutorial are:
 
 We are solving for a velocity $\textbf{u}$ and pressure $p$ that satisfy the
 Stokes equation, which reads
-@f{eqnarray*}
+@f{eqnarray*}{
   - \triangle \textbf{u} + \nabla p &=& \textbf{f}, \\
   -\textrm{div}\; \textbf{u} &=& 0.
 @f}
@@ -93,7 +93,7 @@ bigger, the former will eventually beat the latter.
 <h3>The solver and preconditioner</h3>
 
 We precondition the linear system
-@f{eqnarray*}
+@f{eqnarray*}{
   \left(\begin{array}{cc}
     A & B^T \\ B & 0
   \end{array}\right)
@@ -107,7 +107,7 @@ We precondition the linear system
 @f}
 
 with the block diagonal preconditioner
-@f{eqnarray*}
+@f{eqnarray*}{
   P^{-1}
   =
   \left(\begin{array}{cc}

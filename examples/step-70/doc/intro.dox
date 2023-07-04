@@ -108,7 +108,7 @@ one or equal with respect to the dimension of the embedding domain $\Omega$
 We are going to solve the following differential problem: given a sufficiently
 regular function $g$ on $\Gamma$, find the solution $(\textbf{u},p)$ to
 
-@f{eqnarray*}
+@f{eqnarray*}{
   -\Delta \mathbf{u} + \nabla p &=& 0,\\
   -\nabla \cdot \textbf{u} &=& 0,\\
   \textbf{u} &=& \textbf{g}  \text{ in } \Gamma,\\
@@ -131,7 +131,7 @@ on $\partial\Omega$.
 
 The weak form of the Stokes equations is obtained by first writing it in vector
 form as
-@f{eqnarray*}
+@f{eqnarray*}{
   \begin{pmatrix}
     {-\Delta \textbf{u} + \nabla p}
     \\
@@ -147,7 +147,7 @@ form as
 forming the dot product from the left with a vector-valued test
 function $\phi = \begin{pmatrix}\textbf{v} \\ q\end{pmatrix}$, and integrating
 over the domain $\Omega$, yielding the following set of equations:
-@f{eqnarray*}
+@f{eqnarray*}{
   (\mathrm v,
    -\Delta \textbf{u} + \nabla p)_{\Omega}
   -
@@ -314,7 +314,7 @@ $\Omega$. We can think of this as a thick object moving around in the fluid.
 In the case of $\mathcal{L}^2$ penalization, the additional penalization
 term can be interpreted as a Darcy term within $\Gamma$, resulting in:
 
-@f{eqnarray*}
+@f{eqnarray*}{
 (\nabla \textbf{v}, \nabla \textbf{u})_{\Omega} - & (\textrm{div}\;  \textbf{v}, p)_{\Omega}
   - (q, \textrm{div}\; \textbf{u})_{\Omega}  + \beta (\textbf{v},\textbf{u})_{\Gamma}
 =  \beta (\textbf{v},\textbf{g})_{\Gamma}.

@@ -125,7 +125,7 @@ formulations).
 Furthermore, we will make the assumption that the material is linear isotropic,
 in which case the stress-strain tensor can be expressed in terms of the Lam&eacute;
 parameters $\lambda,\mu$ such that
-@f{align}
+@f{align}{
   \boldsymbol{\sigma} &= \rho^p (\lambda \text{tr}(\boldsymbol{\varepsilon}) \mathbf{I} + 2 \mu \boldsymbol{\varepsilon}) , \\
   \sigma_{i,j} &= \rho^p (\lambda \varepsilon_{k,k} \delta_{i,j} + 2 \mu \varepsilon_{i,j}) .
 @f}

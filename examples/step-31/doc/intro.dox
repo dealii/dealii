@@ -27,7 +27,7 @@ down with gravity.
 In cases where the fluid moves slowly enough such that inertial effects
 can be neglected, the equations that describe such behavior are the
 Boussinesq equations that read as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   -\rho\; \beta \; T\; \mathbf{g},
   \\
@@ -162,12 +162,12 @@ time-derivatives and is therefore of the sort of an algebraic
 constraint that has to hold at each time instant. The main difference
 to step-21 is that the algebraic constraint there was a
 mixed Laplace system of the form
-@f{eqnarray*}
+@f{eqnarray*}{
   \mathbf u + {\mathbf K}\lambda \nabla p &=& 0, \\
   \nabla\cdot \mathbf u &=& f,
 @f}
 where now we have a Stokes system
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& f, \\
   \nabla\cdot \mathbf u &=& 0,
 @f}
@@ -192,7 +192,7 @@ solve the Stokes equations for velocity and pressure using the temperature
 field from the previous time step, which means that we get the velocity for
 the previous time step. In other words, we first solve the Stokes system for
 time step $n - 1$ as
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2\eta \varepsilon ({\mathbf u}^{n-1})) + \nabla p^{n-1} &=&
   -\rho\; \beta \; T^{n-1} \mathbf{g},
   \\
@@ -209,7 +209,7 @@ the time derivative $\frac{\partial T}{\partial t}$ by the (one-sided)
 difference quotient $\frac{\frac 32 T^{n}-2T^{n-1}+\frac 12 T^{n-2}}{k}$
 with $k$ the time step size. This gives the discretized-in-time
 temperature equation
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac 32 T^n
   -
   k\nabla \cdot \kappa \nabla T^n
@@ -268,7 +268,7 @@ T^n \approx
    \left(1+\frac{k_n}{k_{n-1}}\right)T^{n-1}-\frac{k_n}{k_{n-1}}T^{n-2},
 @f}
 and above equation is generalized as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^n
   -
   k_n\nabla \cdot \kappa \nabla T^n
@@ -312,7 +312,7 @@ stable pair $Q_{p+1}^d \times Q_p, p\ge 1$. These are continuous
 elements, so we can form the weak form of the Stokes equation without
 problem by integrating by parts and substituting continuous functions
 by their discrete counterparts:
-@f{eqnarray*}
+@f{eqnarray*}{
   (\nabla {\mathbf v}_h, 2\eta \varepsilon ({\mathbf u}^{n-1}_h))
   -
   (\nabla \cdot {\mathbf v}_h, p^{n-1}_h)
@@ -331,7 +331,7 @@ anti-symmetric component of $\nabla {\mathbf v}_h$ plays no role and
 it leads to the entirely same form if we use the symmetric gradient of
 $\mathbf v_h$ instead. Consequently, the formulation we consider and
 that we implement is
-@f{eqnarray*}
+@f{eqnarray*}{
   (\varepsilon({\mathbf v}_h), 2\eta \varepsilon ({\mathbf u}^{n-1}_h))
   -
   (\nabla \cdot {\mathbf v}_h, p^{n-1}_h)
@@ -370,7 +370,7 @@ necessary to stabilize the scheme.
 A better alternative is therefore to add some nonlinear viscosity to
 the model. Essentially, what this does is to transform the temperature
 equation from the form
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac{\partial T}{\partial t}
   +
   {\mathbf u} \cdot \nabla T
@@ -378,7 +378,7 @@ equation from the form
   \nabla \cdot \kappa \nabla T &=& \gamma
 @f}
 to something like
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac{\partial T}{\partial t}
   +
   {\mathbf u} \cdot \nabla T
@@ -394,7 +394,7 @@ To achieve this, the literature contains a number of approaches. We
 will here follow one developed by Guermond and Popov that builds on a
 suitably defined residual and a limiting procedure for the additional
 viscosity. To this end, let us define a residual $R_\alpha(T)$ as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   R_\alpha(T)
   =
   \left(
@@ -411,7 +411,7 @@ within the range $[1,2]$. Note that $R_\alpha(T)$ will be zero if $T$
 satisfies the temperature equation, since then the term in parentheses
 will be zero. Multiplying terms out, we get the following, entirely
 equivalent form:
-@f{eqnarray*}
+@f{eqnarray*}{
   R_\alpha(T)
   =
   \frac 1\alpha
@@ -434,7 +434,7 @@ With this residual, we can now define the artificial viscosity as
 a piecewise constant function defined on each cell $K$ with diameter
 $h_K$ separately as
 follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   \nu_\alpha(T)|_K
   =
   \beta
@@ -521,7 +521,7 @@ discretization error in smooth regions.
 
 Using the BDF-2 scheme introduced above,
 this yields for the simpler case of uniform time steps of size $k$:
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac 32 T^n
   -
   k\nabla \cdot \kappa \nabla T^n
@@ -563,7 +563,7 @@ the advection works in the section on time stepping.
 The form for nonuniform time steps that we will have to use in
 reality is a bit more complicated (which is why we showed the simpler
 form above first) and reads:
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} T^n
   -
   k_n\nabla \cdot \kappa \nabla T^n
@@ -602,7 +602,7 @@ form above first) and reads:
 After settling all these issues, the weak form follows naturally from
 the strong form shown in the last equation, and we immediately arrive
 at the weak form of the discretized equations:
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} (\tau_h,T_h^n)
   +
   k_n (\nabla \tau_h, \kappa \nabla T_h^n)
@@ -641,7 +641,7 @@ $\mathbf{n}\cdot\kappa\nabla T|_{\partial\Omega}=0$.
 
 This then results in a
 matrix equation of form
-@f{eqnarray*}
+@f{eqnarray*}{
   \left( \frac{2k_n+k_{n-1}}{k_n+k_{n-1}} M+k_n A_T\right) T_h^n
   = F(U_h^{n-1}, U_h^{n-2},T_h^{n-1},T_h^{n-2}),
 @f}
@@ -671,13 +671,13 @@ efficient than the original approach. The best alternative
 identified there we to use a GMRES solver preconditioned by a block
 matrix involving the Schur complement. Specifically, the Stokes
 operator leads to a block structured matrix
-@f{eqnarray*}
+@f{eqnarray*}{
   \left(\begin{array}{cc}
     A & B^T \\ B & 0
   \end{array}\right)
 @f}
 and as discussed there a good preconditioner is
-@f{eqnarray*}
+@f{eqnarray*}{
   P
   =
   \left(\begin{array}{cc}
@@ -696,7 +696,7 @@ where $S$ is the Schur complement of the Stokes operator
 $S=B^TA^{-1}B$. Of course, this preconditioner is not useful because we
 can't form the various inverses of matrices, but we can use the
 following as a preconditioner:
-@f{eqnarray*}
+@f{eqnarray*}{
   \tilde P^{-1}
   =
   \left(\begin{array}{cc}
@@ -742,7 +742,7 @@ a way that first all $x$-components of the velocity are numbered, then
 the $y$-components, and then the $z$-components, then the matrix
 $\hat A$ that is associated with this slightly different bilinear form has
 the form
-@f{eqnarray*}
+@f{eqnarray*}{
   \hat A =
   \left(\begin{array}{ccc}
     A_s & 0 & 0 \\ 0 & A_s & 0 \\ 0 & 0 & A_s
@@ -752,7 +752,7 @@ where $A_s$ is a Laplace matrix of size equal to the number of shape functions
 associated with each component of the vector-valued velocity. With this
 matrix, one could be tempted to define our preconditioner for the
 velocity matrix $A$ as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   \tilde A^{-1} =
   \left(\begin{array}{ccc}
     \tilde A_s^{-1} & 0 & 0 \\
@@ -856,7 +856,7 @@ program is based.
 
 We could of course do the same here. The linear system that we would get would
 look like this:
-@f{eqnarray*}
+@f{eqnarray*}{
   \left(\begin{array}{ccc}
     A & B^T & 0 \\ B & 0 &0 \\ C & 0 & K
   \end{array}\right)

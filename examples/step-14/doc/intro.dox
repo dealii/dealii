@@ -79,7 +79,7 @@ sum over cells where each cell's contribution can then be used as an
 error indicator for this cell.
 Thus, we split the scalar products into terms for each cell, and
 integrate by parts on each of them:
-@f{eqnarray*}
+@f{eqnarray*}{
   J(e)
   &=&
   \sum_K (\nabla (u-u_h), \nabla (z-\varphi_h))_K
@@ -98,7 +98,7 @@ with which this term could cancel, the weight $z-\varphi_h$ can be chosen as
 zero, and the whole term disappears.
 
 Thus, we have
-@f{eqnarray*}
+@f{eqnarray*}{
   J(e)
   &=&
   \sum_K (f+\Delta u_h, z-\varphi_h)_K
@@ -109,7 +109,7 @@ the value of this quantity as taken from this side of the cell (for the usual
 Lagrange elements, derivatives are not continuous across edges). We then
 rewrite the above formula by exchanging half of the edge integral of cell $K$
 with the neighbor cell $K'$, to obtain
-@f{eqnarray*}
+@f{eqnarray*}{
   J(e)
   &=&
   \sum_K (f+\Delta u_h, z-\varphi_h)_K
@@ -126,7 +126,7 @@ the jump of the normal derivative by
 and get the final form after setting the discrete function $\varphi_h$, which
 is by now still arbitrary, to the point interpolation of the dual solution,
 $\varphi_h=I_h z$:
-@f{eqnarray*}
+@f{eqnarray*}{
   J(e)
   &=&
   \sum_K (f+\Delta u_h, z-I_h z)_K

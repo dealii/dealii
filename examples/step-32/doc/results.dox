@@ -306,14 +306,14 @@ address to make the program more useful:
   that rises up cools adiabatically, and cold material that sinks down
   heats adiabatically. The correct temperature equation would
   therefore look somewhat like this:
-  @f{eqnarray*}
+  @f{eqnarray*}{
     \frac{D T}{Dt}
     -
     \nabla \cdot \kappa \nabla T &=& \gamma + \tau\frac{Dp}{Dt},
   @f}
   or, expanding the advected derivative $\frac{D}{Dt} =
   \frac{\partial}{\partial t} + \mathbf u \cdot \nabla$:
-  @f{eqnarray*}
+  @f{eqnarray*}{
     \frac{\partial T}{\partial t}
     +
     {\mathbf u} \cdot \nabla T

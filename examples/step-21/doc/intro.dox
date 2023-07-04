@@ -38,7 +38,7 @@ however.
 The velocity with which molecules of each of the two phases move is
 determined by Darcy's law that states that the velocity is
 proportional to the pressure gradient:
-@f{eqnarray*}
+@f{eqnarray*}{
   \mathbf{u}_{j}
   =
   -\frac{k_{rj}(S)}{\mu_{j}} \mathbf{K} \cdot \nabla p
@@ -61,7 +61,7 @@ each phase,
 with a source term for each phase. By summing over the two phases,
 we can express the governing equations in terms of the
 so-called pressure equation:
-@f{eqnarray*}
+@f{eqnarray*}{
 - \nabla \cdot (\mathbf{K}\lambda(S) \nabla p)= q.
 @f}
 Here, $q$ is the sum source term, and
@@ -80,12 +80,12 @@ The second part of the equations is the description of the
 dynamics of the saturation, i.e., how the relative concentration of the
 two fluids changes with time. The saturation equation for the displacing
 fluid (water) is given by the following conservation law:
-@f{eqnarray*}
+@f{eqnarray*}{
   S_{t} + \nabla \cdot (F(S) \mathbf{u}) = q_{w},
 @f}
 which can be rewritten by using the product rule of the divergence operator
 in the previous equation:
-@f{eqnarray*}
+@f{eqnarray*}{
   S_{t} + F(S) \left[\nabla \cdot \mathbf{u}\right]
         + \mathbf{u} \cdot \left[ \nabla F(S)\right]
   = S_{t} + F(S) q + \mathbf{u} \cdot \nabla F(S) = q_{w}.
@@ -104,7 +104,7 @@ where the fractional flow is often parameterized via the (heuristic) expression
 @f]
 Putting it all together yields the saturation equation in the following,
 advected form:
-@f{eqnarray*}
+@f{eqnarray*}{
   S_{t} + \mathbf{u} \cdot \nabla F(S) = 0,
 @f}
 where $\mathbf u$ is the total velocity
@@ -124,7 +124,7 @@ $\mathbf u (1-F'(S))$. $F(S)$ is consequently often referred to as the
 <i>fractional flow</i>.
 
 In summary, what we get are the following two equations:
-@f{eqnarray*}
+@f{eqnarray*}{
   - \nabla \cdot (\mathbf{K}\lambda(S) \nabla p) &=& q
   \qquad \textrm{in}\ \Omega\times[0,T],
   \\
@@ -169,7 +169,7 @@ In the reservoir simulation community, it is common to solve the equations
 derived above by going back to the first order, mixed formulation. To this
 end, we re-introduce the total velocity $\mathbf u$ and write the equations in
 the following form:
-@f{eqnarray*}
+@f{eqnarray*}{
   \mathbf{u}+\mathbf{K}\lambda(S) \nabla p&=&0 \\
   \nabla \cdot\mathbf{u} &=& q \\
   S_{t} + \mathbf{u} \cdot \nabla F(S) &=& 0.
@@ -194,7 +194,7 @@ L. Stone and A. O. Gardner Jr: <i>Analysis of gas-cap or dissolved-gas
 reservoirs</i>, Trans. SPE AIME, 222 (1961), pp. 92-104).
 In a slightly modified form, this algorithm can be
 written as follows: for each time step, solve
-@f{eqnarray*}
+@f{eqnarray*}{
   \mathbf{u}^{n+1}+\mathbf{K}\lambda(S^n) \nabla p^{n+1}&=&0 \\
   \nabla \cdot\mathbf{u}^{n+1} &=& q^{n+1} \\
   \frac {S^{n+1}-S^n}{\triangle t} + \mathbf{u}^{n+1} \cdot \nabla F(S^n) &=& 0,
@@ -211,7 +211,7 @@ splitting" method. step-58 has a long description of the idea behind this.)
 We can then state the problem in weak form as follows, by multiplying each
 equation with test functions $\mathbf v$, $\phi$, and $\sigma$ and integrating
 terms by parts:
-@f{eqnarray*}
+@f{eqnarray*}{
   \left((\mathbf{K}\lambda(S^n))^{-1} \mathbf{u}^{n+1},\mathbf v\right)_\Omega -
   (p^{n+1}, \nabla\cdot\mathbf v)_\Omega &=&
   - (p^{n+1}, \mathbf v)_{\partial\Omega}
@@ -223,7 +223,7 @@ the boundary $\partial\Omega$ as boundary values for our problem. $\mathbf n$
 denotes the unit outward normal vector to $\partial K$, as usual.
 
 For the saturation equation, we obtain after integrating by parts
-@f{eqnarray*}
+@f{eqnarray*}{
   (S^{n+1}, \sigma)_\Omega
   -
   \triangle t
@@ -238,7 +238,7 @@ For the saturation equation, we obtain after integrating by parts
 @f}
 Using the fact that $\nabla \cdot \mathbf{u}^{n+1}=q^{n+1}$, we can rewrite the
 cell term to get an equation as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   (S^{n+1}, \sigma)_\Omega
   -
   \triangle t
@@ -272,7 +272,7 @@ terms on the interfaces between cells, since discontinuous functions are not
 really defined there. In particular, we have to give a meaning to the last
 term on the left hand side of the saturation equation. To this end, let us
 define that we want to evaluate it in the following sense:
-@f{eqnarray*}
+@f{eqnarray*}{
   &&\left(F(S^n) (\mathbf n \cdot \mathbf{u}^{n+1}), \sigma\right)_{\partial K}
   \\
   &&\qquad =
@@ -321,7 +321,7 @@ B &    0 & 0\\
 where the individual matrices and vectors are defined as follows using
 shape functions $\mathbf v_i$ (of type Raviart Thomas $RT_k$) for
 velocities and $\phi_i$ (of type $DGQ_k$) for both pressures and saturations:
-@f{eqnarray*}
+@f{eqnarray*}{
 M^u(S^n)_{ij} &=&
 \left((\mathbf{K}\lambda(S^n))^{-1} \mathbf{v}_i,\mathbf
 v_j\right)_\Omega,
@@ -471,7 +471,7 @@ boundary conditions for the saturation on the inflow part of the boundary,
                      \mathbf{n} \cdot \mathbf{u}(\mathbf{x},t) < 0\}.
 @f]
 On this inflow boundary, we impose the following saturation values:
-@f{eqnarray}
+@f{eqnarray}{
   S(\mathbf{x},t) = 1 & \textrm{on}\ \Gamma_{in}\cap\{x_1=0\},
   \\
   S(\mathbf{x},t) = 0 & \textrm{on}\ \Gamma_{in}\backslash \{x_1=0\}.
@@ -540,7 +540,7 @@ functions introduced at the end of the results section of @ref step_20
   linear solvers will no longer converge properly.
 
   <li>A function that models a somewhat random medium. Here, we choose
-  @f{eqnarray*}
+  @f{eqnarray*}{
     k(\mathbf x)
     &=&
     \min \left\{ \max \left\{ \sum_{i=1}^N \sigma_i(\mathbf{x}), 0.01 \right\}, 4\right\},

@@ -22,7 +22,7 @@ is assumed to be steady. In a domain $\Omega \subset
 $\partial \Omega$, and a given force field $\textbf{f}$, we seek
 a velocity field $\textbf{u}$ and a pressure field $\textbf{p}$
 satisfying
-@f{eqnarray*}
+@f{eqnarray*}{
 - \nu \Delta\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f}\\
 - \nabla \cdot \textbf{u} &=& 0.
 @f}
@@ -38,7 +38,7 @@ solve is necessary.
 <h3> Linearization of Navier-Stokes Equations </h3>
 
 We define a nonlinear function whose root is a solution to the NSE by
-@f{eqnarray*}
+@f{eqnarray*}{
 F(\mathbf{u}, p) =
   \begin{pmatrix}
     - \nu \Delta\mathbf{u} + (\mathbf{u} \cdot \nabla)\mathbf{u} + \nabla p - \mathbf{f} \\
@@ -50,7 +50,7 @@ Assuming the initial guess is good enough to
 guarantee the convergence of Newton's iteration and denoting
 $\textbf{x} = (\textbf{u}, p)$, Newton's iteration on a vector function
 can be defined as
-@f{eqnarray*}
+@f{eqnarray*}{
   \textbf{x}^{k+1} = \textbf{x}^{k} - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
 @f}
 
@@ -64,21 +64,21 @@ The Newton iteration formula implies the new
 solution is obtained by adding an update term to the old solution. Instead
 of evaluating the Jacobian matrix and taking its inverse, we consider
 the update term as a whole, that is
-@f{eqnarray*}
+@f{eqnarray*}{
   \delta \textbf{x}^{k} = - (\nabla F(\textbf{x}^{k}))^{-1} F(\textbf{x}^{k}),
 @f}
 
 where $\textbf{x}^{k+1}=\textbf{x}^{k}+\delta \textbf{x}^{k}$.
 
 We can find the update term by solving the system
-@f{eqnarray*}
+@f{eqnarray*}{
   \nabla F(\textbf{x}^{k}) \delta \textbf{x}^{k} = -F(\textbf{x}^{k}).
 @f}
 
 Here, the left of the previous equation represents the
 directional gradient of $F(\textbf{x})$ along $\delta
 \textbf{x}^{k}$ at $\textbf{x}^{k}$. By definition, the directional gradient is given by
-@f{eqnarray*}
+@f{eqnarray*}{
   & &\nabla F(\mathbf{u}^{k}, p^{k}) (\delta \mathbf{u}^{k}, \delta p^{k}) \\
   \\
   &=& \lim_{\epsilon \to 0} \frac{1}{\epsilon}
@@ -108,7 +108,7 @@ directional gradient of $F(\textbf{x})$ along $\delta
 @f}
 
 Therefore, we arrive at the linearized system:
-@f{eqnarray*}
+@f{eqnarray*}{
    -\nu \Delta \delta \mathbf{u}^{k}
   + \mathbf{u}^{k} \cdot \nabla \delta \mathbf{u}^{k}
   + \delta \mathbf{u}^{k} \cdot \nabla \mathbf{u}^{k}
@@ -166,13 +166,13 @@ $\nu_{i}$ as the initial guess of the NSE with $\nu_{i+1}$. This can be thought 
 as a staircase from the Stokes equations to the NSE we want to solve.
 
 That is, we first solve a Stokes problem
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nu_{1} \Delta \textbf{u} + \nabla p &=& \textbf{f}\\
   -\nabla \cdot \textbf{u} &=& 0
 @f}
 
 to get the initial guess for
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nu_{1} \Delta \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
   -\nabla \cdot \textbf{u} &=& 0,
 @f}
@@ -182,13 +182,13 @@ Here $\nu_{1}$ is relatively large so that the solution to the Stokes problem wi
 can be used as an initial guess for the NSE in Newton's iteration.
 
 Then the solution to
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nu_{i} \Delta \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
   -\nabla \cdot \textbf{u} &=& 0.
 @f}
 
 acts as the initial guess for
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nu_{i+1} \Delta \textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \nabla p &=& \textbf{f},\\
   -\nabla \cdot \textbf{u} &=& 0.
 @f}
@@ -201,7 +201,7 @@ guess for the Newton iteration.
 
 At each step of Newton's iteration, the problem results in solving a
 saddle point systems of the form
-@f{eqnarray*}
+@f{eqnarray*}{
     \begin{pmatrix}
       A & B^{T} \\
       B & 0
@@ -220,7 +220,7 @@ saddle point systems of the form
 This system matrix has the same block structure as the one in step-22. However,
 the matrix $A$ at the top left corner is not symmetric because of the nonlinear term.
 Instead of solving the above system, we can solve the equivalent system
-@f{eqnarray*}
+@f{eqnarray*}{
     \begin{pmatrix}
       A + \gamma B^TW^{-1}B & B^{T} \\
       B & 0
@@ -242,7 +242,7 @@ $\gamma B^TW^{-1}B$ is the Augmented Lagrangian term; see @cite Benzi2006 for de
 Denoting the system matrix of the new system by $G$ and the right-hand
 side by $b$, we solve it iteratively with right preconditioning
 $P^{-1}$ as $GP^{-1}y = b$, where
-@f{eqnarray*}
+@f{eqnarray*}{
 P^{-1} =
   \begin{pmatrix}
     \tilde{A} & B^T \\
@@ -254,14 +254,14 @@ with $\tilde{A} = A + \gamma B^TW^{-1}B$ and $\tilde{S}$ is the
 corresponding Schur complement $\tilde{S} = B^T \tilde{A}^{-1} B$. We
 let $W = M_p$ where $M_p$ is the pressure @ref GlossMassMatrix "mass matrix", then
 $\tilde{S}^{-1}$ can be approximated by
-@f{eqnarray*}
+@f{eqnarray*}{
 \tilde{S}^{-1} \approx -(\nu+\gamma)M_p^{-1}.
 @f}
 
 See @cite Benzi2006 for details.
 
 We decompose $P^{-1}$ as
-@f{eqnarray*}
+@f{eqnarray*}{
 P^{-1} =
   \begin{pmatrix}
     \tilde{A}^{-1} & 0 \\
@@ -293,7 +293,7 @@ We use the lid driven cavity flow as our test case;
 see [this page](http://www.cfd-online.com/Wiki/Lid-driven_cavity_problem) for details.
 The computational domain is the unit square and the right-hand side is
 $f=0$. The boundary condition is
-@f{eqnarray*}
+@f{eqnarray*}{
   (u(x, y), v(x,y)) &=& (1,0) \qquad\qquad \textrm{if}\ y = 1 \\
   (u(x, y), v(x,y)) &=& (0,0) \qquad\qquad \textrm{otherwise}.
 @f}

@@ -42,7 +42,7 @@ them are:
 </ul>
 
 The equation to solve here is as follows:
-@f{align*}
+@f{align*}{
   -\nabla \cdot a(\mathbf x) \nabla u(\mathbf x) &= 1 \qquad\qquad & \text{in}\ \Omega,
   \\
   u &= 0 \qquad\qquad & \text{on}\ \partial\Omega.
@@ -67,7 +67,7 @@ more interpretations than just the two listed above.
 
 When assembling the linear system for this equation, we need the weak form
 which here reads as follows:
-@f{align*}
+@f{align*}{
   (a \nabla \varphi, \nabla u) &= (\varphi, 1) \qquad \qquad \forall \varphi.
 @f}
 The implementation in the <code>assemble_system</code> function follows

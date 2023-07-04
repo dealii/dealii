@@ -97,7 +97,7 @@ things work internally in this program.
 
 This program essentially re-solves what we already do in
 step-6, i.e. it solves the Laplace equation
-@f{align*}
+@f{align*}{
   -\Delta u &= f \qquad &&\text{in}\ \Omega=[0,1]^2, \\
   u &= 0 \qquad &&\text{on}\ \partial\Omega.
 @f}
@@ -109,7 +109,7 @@ not to do something useful but to show how useful programs can be
 implemented using deal.II. Be that as it may, to make things at least
 a tiny bit interesting, we choose the right hand side as a
 discontinuous function,
-@f{align*}
+@f{align*}{
   f(x,y)
   =
   \left\{

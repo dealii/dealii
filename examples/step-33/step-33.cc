@@ -1809,7 +1809,7 @@ namespace Step33
     // vector_valued module). It will be represented by the variable
     // <code>component_i</code> below. With this, the residual term can be
     // re-written as
-    // @f{eqnarray*}
+    // @f{eqnarray*}{
     // R_i &=&
     // \left(\frac{(\mathbf{w}_{n+1} -
     // \mathbf{w}_n)_{\text{component\_i}}}{\delta

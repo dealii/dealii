@@ -339,7 +339,7 @@ if one of the input variables is a function of another, it is also held constant
 and the chain rule does not propagate any further, while the computing total
 derivative would imply judicious use of the chain rule. This can be better
 understood by comparing the following two statements:
-@f{align*}
+@f{align*}{
   \frac{\partial f\left(x, y\left(x\right)\right)}{\partial x}
   &= \frac{d f\left(x, y\left(x\right)\right)}{d x} \Big\vert_{y} \\
   \frac{d f\left(x, y\left(x\right)\right)}{d x}
@@ -636,7 +636,7 @@ Under the assumptions that an incompressible medium is being tested,
 and that the deformation profile through the sample thickness is linear,
 then the displacement at some measurement point $\mathbf{X}$ within
 the sample, expressed in radial coordinates, is
-@f{align*}
+@f{align*}{
   r(\mathbf{X})
   &= \frac{R(X_{1}, X_{2})}{\sqrt{\lambda_{3}}} , \\
   \theta(\mathbf{X})

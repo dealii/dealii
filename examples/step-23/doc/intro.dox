@@ -13,7 +13,7 @@ solutions called solitons.
 
 The wave equation in its prototypical form reads as follows: find
 $u(x,t), x\in\Omega, t\in[0,T]$ that satisfies
-@f{eqnarray*}
+@f{eqnarray*}{
 	\frac{\partial^2 u}{\partial t^2}
 	-
 	\Delta u &=& f
@@ -127,7 +127,7 @@ this end, let us introduce
 @f]
 and call this variable the <i>velocity</i> for obvious reasons. We can
 then reformulate the original wave equation as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
 	\frac{\partial u}{\partial t}
 	-
 	v
@@ -289,7 +289,7 @@ system:
   \right],
 \f}
 where
-@f{eqnarray*}
+@f{eqnarray*}{
 	M^n_{ij} &=& (\phi_i^n, \phi_j^n),
 	\\
 	A^n_{ij} &=& (\nabla\phi_i^n, \nabla\phi_j^n),
@@ -398,7 +398,7 @@ step_24 "step-24" shows a better way how to keep these things in sync.
 Although the program has all the hooks to deal with nonzero initial and
 boundary conditions and body forces, we take a simple case where the domain is
 a square $[-1,1]^2$ and
-@f{eqnarray*}
+@f{eqnarray*}{
 	f &=& 0,
 	\\
 	u_0 &=& 0,

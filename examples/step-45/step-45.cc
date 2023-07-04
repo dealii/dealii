@@ -318,7 +318,7 @@ namespace Step45
     // on the lower boundary given by $\text{vertices}_2=R\cdot
     // \text{vertices}_1+b$ where the rotation matrix $R$ and the offset $b$ are
     // given by
-    // @f{align*}
+    // @f{align*}{
     // R=\begin{pmatrix}
     // 0&1\\-1&0
     // \end{pmatrix},
@@ -405,7 +405,7 @@ namespace Step45
       // $\text{vertices}_1$ of a face on the lower boundary given by
       // $\text{vertices}_2=R\cdot \text{vertices}_1+b$ where the rotation
       // matrix $R$ and the offset $b$ are given by
-      // @f{align*}
+      // @f{align*}{
       // R=\begin{pmatrix}
       // 0&1\\-1&0
       // \end{pmatrix},

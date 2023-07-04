@@ -64,7 +64,7 @@ solution.
 In order to find out how we can write a code that performs a matrix-vector
 product, but does not need to store the matrix elements, let us start at
 looking how a finite element matrix <i>A</i> is assembled:
-@f{eqnarray*}
+@f{eqnarray*}{
 A = \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}}
 P_{\mathrm{cell,{loc-glob}}}^T A_{\mathrm{cell}} P_{\mathrm{cell,{loc-glob}}}.
 @f}
@@ -76,7 +76,7 @@ variable and is used in the assembly calls filling matrices in deal.II. Here,
 <i>A</i><sub>cell</sub> denotes the cell matrix associated with <i>A</i>.
 
 If we are to perform a matrix-vector product, we can hence use that
-@f{eqnarray*}
+@f{eqnarray*}{
 y &=& A\cdot u = \left(\sum_{\text{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T
 A_\mathrm{cell} P_\mathrm{cell,{loc-glob}}\right) \cdot u
 \\
@@ -162,7 +162,7 @@ is much cheaper.
 
 One way to improve this is to realize that conceptually the local
 matrix can be thought of as the product of three matrices,
-@f{eqnarray*}
+@f{eqnarray*}{
 A_\mathrm{cell} = B_\mathrm{cell}^T D_\mathrm{cell} B_\mathrm{cell},
 @f}
 where for the example of the Laplace operator the (<i>q</i>*dim+<i>d,i</i>)-th
@@ -175,7 +175,7 @@ dim copies of each of these values). This kind of representation of
 finite element matrices can often be found in the engineering literature.
 
 When the cell matrix is applied to a vector,
-@f{eqnarray*}
+@f{eqnarray*}{
 A_\mathrm{cell}\cdot u_\mathrm{cell} = B_\mathrm{cell}^T
 D_\mathrm{cell} B_\mathrm{cell} \cdot u_\mathrm{cell},
 @f}
@@ -240,14 +240,14 @@ problem. Each diagonal block is the Jacobian transformation that goes from the
 reference cell to the real cell.
 
 Putting things together, we find that
-@f{eqnarray*}
+@f{eqnarray*}{
 A_\mathrm{cell} = B_\mathrm{cell}^T D B_\mathrm{cell}
                 = B_\mathrm{ref\_cell}^T J_\mathrm{cell}^{-1}
                   D_\mathrm{cell}
                   J_\mathrm{cell}^{-\mathrm T} B_\mathrm{ref\_cell},
 @f}
 so we calculate the product (starting the local product from the right)
-@f{eqnarray*}
+@f{eqnarray*}{
 v_\mathrm{cell} = B_\mathrm{ref\_cell}^T J_\mathrm{cell}^{-1} D J_\mathrm{cell}^{-\mathrm T}
 B_\mathrm{ref\_cell} u_\mathrm{cell}, \quad
 v = \sum_{\mathrm{cell}=1}^{\mathrm{n\_cells}} P_\mathrm{cell,{loc-glob}}^T

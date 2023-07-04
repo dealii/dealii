@@ -55,7 +55,7 @@ strongly when the number of unknowns per processor becomes smaller than
 <h3>The testcase</h3>
 
 We consider the variable-coefficient Laplacian weak formulation
-@f{align*}
+@f{align*}{
  (\epsilon \nabla u, \nabla v) = (f,v) \quad \forall v \in V_h
 @f}
 on the domain $\Omega = [-1,1]^\text{dim} \setminus [0,1]^\text{dim}$ (an L-shaped domain
@@ -69,7 +69,7 @@ the right-hand side is $f=1$. We use continuous $Q_2$ elements for the
 discrete finite element space $V_h$, and use a
 residual-based, cell-wise a posteriori error estimator
 $e(K) = e_{\text{cell}}(K) + e_{\text{face}}(K)$ from @cite karakashian2003posteriori with
-@f{align*}
+@f{align*}{
  e_{\text{cell}}(K) &= h^2 \| f + \epsilon \triangle u \|_K^2, \\
  e_{\text{face}}(K) &= \sum_F h_F \| \jump{ \epsilon \nabla u \cdot n } \|_F^2,
 @f}
@@ -144,26 +144,26 @@ level. Now, let $N_{\ell}$ be the number of cells on level $\ell$
 $p$. We will also denote by $P$ the total number of processors.
 Assuming that the workload for any one processor is proportional to the number
 of cells owned by that processor, the optimal workload per processor is given by
-@f{align*}
+@f{align*}{
 W_{\text{opt}} = \frac1{P}\sum_{\ell} N_{\ell} = \sum_{\ell}\left(\frac1{P}\sum_{p}N_{\ell,p}\right).
 @f}
 Next, assuming a synchronization of work on each level (i.e., on each level of a V-cycle,
 work must be completed by all processors before moving on to the next level), the
 limiting effort on each level is given by
-@f{align*}
+@f{align*}{
 W_\ell = \max_{p} N_{\ell,p},
 @f}
 and the total parallel complexity
-@f{align*}
+@f{align*}{
 W = \sum_{\ell} W_\ell.
 @f}
 Then we define $\mathbb{E}$ as a ratio of the optimal partition to the parallel
 complexity of the current partition
-@f{align*}
+@f{align*}{
   \mathbb{E} = \frac{W_{\text{opt}}}{W}.
 @f}
 For the example distribution above, we have
-@f{align*}
+@f{align*}{
 W_{\text{opt}}&=\frac{1}{P}\sum_{\ell} N_{\ell} = \frac{1}{3} \left(1+4+4\right)= 3 \qquad
 \\
 W &= \sum_\ell W_\ell = 1 + 2 + 3 = 6

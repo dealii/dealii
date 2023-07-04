@@ -73,7 +73,7 @@ dependency of amplitude and phase (relative to the source) of the waves of
 frequency ${\omega}$, with the amplitude being the quantity that we are
 interested in. By plugging this form of the solution into the wave equation,
 we see that for $u$ we have
-@f{eqnarray*}
+@f{eqnarray*}{
 -\omega^2 u(x) - c^2\Delta u(x) &=& 0, \qquad x\in\Omega,\\
 u(x) &=& 1,  \qquad x\in\Gamma_1.
 @f}
@@ -101,7 +101,7 @@ fraction of the wave will be reflected back into the domain.
 
 If we are willing to accept this as a sufficient approximation to an absorbing
 boundary we finally arrive at the following problem for $u$:
-@f{eqnarray*}
+@f{eqnarray*}{
 -\omega^2 u - c^2\Delta u &=& 0, \qquad x\in\Omega,\\
 c (n\cdot\nabla u) + i\,\omega\,u &=&0, \qquad x\in\Gamma_2,\\
 u &=& 1,  \qquad x\in\Gamma_1.
@@ -115,7 +115,7 @@ imaginary parts of $u$, with the boundary condition on $\Gamma_2$ representing
 the coupling terms between the two components of the system. This works along
 the following lines: Let $v=\textrm{Re}\;u,\; w=\textrm{Im}\;u$, then in terms
 of $v$ and $w$ we have the following system:
-@f{eqnarray*}
+@f{eqnarray*}{
   \left.\begin{array}{ccc}
     -\omega^2 v - c^2\Delta v &=& 0 \quad\\
     -\omega^2 w - c^2\Delta w &=& 0 \quad
@@ -135,7 +135,7 @@ of $v$ and $w$ we have the following system:
 For test functions $\phi,\psi$ with $\phi|_{\Gamma_1}=\psi|_{\Gamma_1}=0$, after
 the usual multiplication, integration over $\Omega$ and applying integration by
 parts, we get the weak formulation
-@f{eqnarray*}
+@f{eqnarray*}{
 -\omega^2 \langle \phi, v \rangle_{\mathrm{L}^2(\Omega)}
 + c^2 \langle \nabla \phi, \nabla v \rangle_{\mathrm{L}^2(\Omega)}
 - c \omega \langle \phi, w \rangle_{\mathrm{L}^2(\Gamma_2)} &=& 0, \\

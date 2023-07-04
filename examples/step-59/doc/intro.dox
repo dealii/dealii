@@ -49,7 +49,7 @@ For this tutorial program, we exemplify the matrix-free DG framework for the
 interior penalty discretization of the Laplacian, i.e., the same scheme as the
 one used for the step-39 tutorial program. The discretization of the Laplacian
 is given by the following weak form
-@f{align*}
+@f{align*}{
 &\sum_{K\in\text{cells}} \left(\nabla v_h, \nabla u_h\right)_{K}+\\
 &\sum_{F\in\text{faces}}\Big(-\left<\jump{v_h}, \average{\nabla u_h}\right>_{F} - \left<\average{\nabla v_h}, \jump{u_h}\right>_{F} + \left<\jump{v_h}, \sigma \jump{u_h}\right>_{F}\Big) \\
 &= \sum_{K\in\text{cells}}\left(v_h, f\right)_{K},

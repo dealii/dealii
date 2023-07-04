@@ -9,7 +9,7 @@ This is the first example where we actually use finite elements to compute
 something. We
 will solve a simple version of Poisson's equation with zero boundary
 values, but a nonzero right hand side:
-@f{align*}
+@f{align*}{
   -\Delta u &= f \qquad\qquad & \text{in}\ \Omega,
   \\
   u &= 0 \qquad\qquad & \text{on}\ \partial\Omega.
@@ -27,11 +27,11 @@ of the equation above, which we obtain by multiplying the equation by a test
 function $\varphi$ <i>from the left</i> (we will come back to the reason for
 multiplying from the left and not from the right below) and integrating over
 the domain $\Omega$:
-@f{align*}
+@f{align*}{
   -\int_\Omega \varphi \Delta u = \int_\Omega \varphi f.
 @f}
 This can be integrated by parts:
-@f{align*}
+@f{align*}{
   \int_\Omega \nabla\varphi \cdot \nabla u
   -
   \int_{\partial\Omega} \varphi \mathbf{n}\cdot \nabla u
@@ -41,7 +41,7 @@ The test function $\varphi$ has to satisfy the same kind of boundary
 conditions (in mathematical terms: it needs to come from the tangent space of
 the set in which we seek the solution), so on the boundary $\varphi=0$ and
 consequently the weak form we are looking for reads
-@f{align*}
+@f{align*}{
   (\nabla\varphi, \nabla u)
    = (\varphi, f),
 @f}
@@ -83,7 +83,7 @@ we need the following:
 Through these steps, we now have a set of functions $\varphi_i$, and we can
 define the weak form of the discrete problem: Find a function $u_h$, i.e., find
 the expansion coefficients $U_j$ mentioned above, so that
-@f{align*}
+@f{align*}{
   (\nabla\varphi_i, \nabla u_h)
    = (\varphi_i, f),
    \qquad\qquad
@@ -106,7 +106,7 @@ With this, the problem reads: Find a vector $U$ so that
   A U = F,
 @f}
 where the matrix $A$ and the right hand side $F$ are defined as
-@f{align*}
+@f{align*}{
   A_{ij} &= (\nabla\varphi_i, \nabla \varphi_j),
   \\
   F_i &= (\varphi_i, f).
@@ -119,12 +119,12 @@ Before we move on with describing how these quantities can be computed, note
 that if we had multiplied the original equation from the <i>right</i> by a
 test function rather than from the left, then we would have obtained a linear
 system of the form
-@f{align*}
+@f{align*}{
   U^T A = F^T
 @f}
 with a row vector $F^T$. By transposing this system, this is of course
 equivalent to solving
-@f{align*}
+@f{align*}{
   A^T U = F
 @f}
 which here is the same as above since $A=A^T$. But in general is not,
@@ -151,7 +151,7 @@ takes to make that happen:
   most commonly done using quadrature, i.e. the integrals are replaced by a
   weighted sum over a set of *quadrature points* on each cell. That is, we first split the
   integral over $\Omega$ into integrals over all cells,
-  @f{align*}
+  @f{align*}{
     A_{ij} &= (\nabla\varphi_i, \nabla \varphi_j)
     = \sum_{K \in {\mathbb T}} \int_K \nabla\varphi_i \cdot \nabla \varphi_j,
     \\
@@ -159,7 +159,7 @@ takes to make that happen:
     = \sum_{K \in {\mathbb T}} \int_K \varphi_i f,
   @f}
   and then approximate each cell's contribution by quadrature:
-  @f{align*}
+  @f{align*}{
     A^K_{ij} &=
     \int_K \nabla\varphi_i \cdot \nabla \varphi_j
     \approx

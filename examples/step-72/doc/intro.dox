@@ -17,7 +17,7 @@ Award No. EAR-1550901 and The University of California-Davis.
 This program solves the same problem as step-15, that is, it solves
 for the
 [minimal surface equation](https://en.wikipedia.org/wiki/Minimal_surface)
-  @f{align*}
+  @f{align*}{
     F(u) \dealcoloneq -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right) &= 0 \qquad
     \qquad &&\textrm{in} ~ \Omega
     \\
@@ -70,11 +70,11 @@ might actually be enough.
 Our goal then is this: When
 using a Newton iteration, we need to repeatedly solve the
 linear partial differential equation
-  @f{align*}
+  @f{align*}{
     F'(u^{n},\delta u^{n}) &=- F(u^{n})
   @f}
 so that we can compute the update
-  @f{align*}
+  @f{align*}{
     u^{n+1}&=u^{n}+\alpha^n \delta u^{n}
   @f}
 with the solution $\delta u^{n}$ of the Newton step. As discussed in step-15,

@@ -56,7 +56,7 @@ the second-order scheme discussed in @cite GuermondEtAl2018.
 
 The compressible Euler's equations of gas dynamics are written in
 conservative form as follows:
-@f{align}
+@f{align}{
 \mathbf{u}_t + \text{div} \, \mathbb{f}(\mathbf{u}) = \boldsymbol{0} ,
 @f}
 where $\mathbf{u}(\textbf{x},t):\mathbb{R}^{d} \times \mathbb{R}
@@ -69,7 +69,7 @@ $\textbf{u} = [\rho, \textbf{m}^\top,E]^{\top}$: where $\rho \in \mathbb{R}^+$
 denotes the density, $\textbf{m} \in \mathbb{R}^d$ is the momentum, and $E
 \in \mathbb{R}^+$ is the total energy of the system. The flux of the system
 $\mathbb{f}(\mathbf{u})$ is defined as
-@f{align*}
+@f{align*}{
 \mathbb{f}(\textbf{u})
 =
 \begin{bmatrix}
@@ -83,7 +83,7 @@ $\otimes$ denotes the tensor product. Here, we have introduced the pressure
 $p$ that, in general, is defined by a closed-form equation of state.
 In this tutorial we limit the discussion to the class of polytropic
 ideal gases for which the pressure is given by
-@f{align*}
+@f{align*}{
 p = p(\textbf{u}) := (\gamma -1) \Big(E -
 \tfrac{|\textbf{m}|^2}{2\,\rho}
 \Big),
@@ -96,7 +96,7 @@ heats</a>.
 <h4>Solution theory</h4>
 
 Hyperbolic conservation laws, such as
-@f{align*}
+@f{align*}{
 \mathbf{u}_t + \text{div} \, \mathbb{f}(\mathbf{u}) = \boldsymbol{0},
 @f}
 pose a significant challenge with respect to solution theory. An evident
@@ -112,7 +112,7 @@ understanding of hyperbolic conservation laws was to assume that the
 solution is formally defined as $\mathbf{u} := \lim_{\epsilon \rightarrow
 0^+} \mathbf{u}^{\epsilon}$ where $\mathbf{u}^{\epsilon}$ is the solution
 of the parabolic regularization
-@f{align}
+@f{align}{
 \mathbf{u}_t^{\epsilon} + \text{div} \, \mathbb{f}(\mathbf{u}^{\epsilon})
 - {\epsilon} \Delta \mathbf{u}^{\epsilon} = 0.
 @f}
@@ -127,7 +127,7 @@ Global existence and uniqueness of such solutions is an open issue.
 However, we know at least that if such viscosity solutions exists they have
 to satisfy the constraint $\textbf{u}(\mathbf{x},t) \in \mathcal{B}$ for
 all $\mathbf{x} \in \Omega$ and $t \geq 0$ where
-@f{align}
+@f{align}{
   \mathcal{B} = \big\{ \textbf{u} =
   [\rho, \textbf{m}^\top,E]^{\top} \in \mathbb{R}^{d+2} \, \big |
   \
@@ -139,7 +139,7 @@ all $\mathbf{x} \in \Omega$ and $t \geq 0$ where
   \big\}.
 @f}
 Here, $s(\mathbf{u})$ denotes the specific entropy
-@f{align}
+@f{align}{
   s(\mathbf{u}) = \ln \Big(\frac{p(\mathbf{u})}{\rho^{\gamma}}\Big).
 @f}
 We will refer to $\mathcal{B}$ as the invariant set of Euler's equations.
@@ -166,7 +166,7 @@ $\mathbf{u}(\mathbf{x},t)$ remains in $\mathcal{B}$.
 Following Step-9, Step-12, Step-33, and Step-67, at this point it might look
 tempting to base a discretization of Euler's equations on a (semi-discrete)
 variational formulation:
-@f{align*}
+@f{align*}{
   (\partial_t\mathbf{u}_{h},\textbf{v}_h)_{L^2(\Omega)}
   - ( \mathbb{f}(\mathbf{u}_{h}) ,\text{grad} \, \textbf{v}_{h})_{L^2(\Omega)}
   + s_h(\mathbf{u}_{h},\textbf{v}_h)_{L^2(\Omega)} = \boldsymbol{0}
@@ -181,7 +181,7 @@ are based on such a (semi-discrete) variational approach. Fundamentally,
 from an analysis perspective, variational discretizations are conceived
 to provide some notion of global (integral) stability, meaning an
 estimate of the form
-@f{align*}
+@f{align*}{
   |\!|\!| \mathbf{u}_{h}(t) |\!|\!| \leq |\!|\!| \mathbf{u}_{h}(0) |\!|\!|
 @f}
 holds true, where $|\!|\!| \cdot |\!|\!| $ could represent the
@@ -211,7 +211,7 @@ have an edge in many regards.
 In this tutorial step we therefore depart from variational schemes. We will
 present a completely algebraic formulation (with the flavor of a
 collocation-type scheme) that preserves constraints pointwise, i.e.,
-@f{align*}
+@f{align*}{
   \textbf{u}_h(\mathbf{x}_i,t) \in \mathcal{B}
   \;\text{at every node}\;\mathbf{x}_i\;\text{of the mesh}.
 @f}
@@ -320,7 +320,7 @@ Consider the following pseudo-code, illustrating a possible straight
 forward strategy for computing the solution $\textbf{U}^{n+1}$ at a new
 time $t_{n+1} = t_n + \tau_n$ given a known state $\textbf{U}^{n}$ at time
 $t_n$:
-@f{align*}
+@f{align*}{
 &\textbf{for } i \in \mathcal{V} \\
 &\ \ \ \  \{\mathbf{c}_{ij}\}_{j \in \mathcal{I}(i)} \leftarrow
 \mathtt{gather\_cij\_vectors} (\textbf{c}, \mathcal{I}(i)) \\
@@ -358,7 +358,7 @@ patch).
 
 The actual implementation will deviate from above code in one key aspect:
 the time-step size $\tau$ has to be chosen subject to a CFL condition
-@f{align*}
+@f{align*}{
   \tau_n = c_{\text{cfl}}\,\min_{
   i\in\mathcal{V}}\left(\frac{m_i}{-2\,d_{ii}^{n}}\right),
 @f}
@@ -414,7 +414,7 @@ For the case of the reflecting boundary conditions we will proceed as follows:
   enforce reflecting boundary conditions. At the end of the time step we enforce
   reflecting boundary conditions strongly in a post-processing step where we
   execute the projection
-    @f{align*}
+    @f{align*}{
     \mathbf{m}_i \dealcoloneq \mathbf{m}_i - (\widehat{\boldsymbol{\nu}}_i
     \cdot \mathbf{m}_i)  \widehat{\boldsymbol{\nu}}_i \ \
     \text{where} \ \
@@ -458,7 +458,7 @@ If $\mathbf{u}_t + \text{div} \, \mathbb{f}(\mathbf{u}) = \boldsymbol{0}$
 represents Euler's equation with reflecting boundary conditions on the entirety
 of the boundary (i.e. $\partial\Omega^r \equiv \partial\Omega$) and we
 integrate in space and time $\int_{\Omega}\int_{t_1}^{t_2}$ we would obtain
-@f{align*}
+@f{align*}{
 \int_{\Omega} \rho(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x} =
 \int_{\Omega} \rho(\mathbf{x},t_1) \, \mathrm{d}\mathbf{x} \ , \ \
 \int_{\Omega} \mathbf{m}(\mathbf{x},t_2) \, \mathrm{d}\mathbf{x}
@@ -477,7 +477,7 @@ the domain, we would like to know that our implementation of reflecting
 boundary conditions is consistent with the conservation properties mentioned
 above. In particular, if we use the projection $\boldsymbol{(1)}$ in the
 entirety of the domain the following discrete mass-balance can be guaranteed:
-@f{align*}
+@f{align*}{
 \sum_{i \in \mathcal{V}} m_i \rho_i^{n+1} =
 \sum_{i \in \mathcal{V}} m_i \rho_i^{n} \ , \ \
 \sum_{i \in \mathcal{V}} m_i \mathbf{m}_i^{n+1}

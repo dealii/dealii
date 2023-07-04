@@ -213,7 +213,7 @@ namespace Step32
   // introduction, this preconditioner differs in a number of key portions
   // from the one used in step-31. Specifically, it is a right preconditioner,
   // implementing the matrix
-  // @f{align*}
+  // @f{align*}{
   //   \left(\begin{array}{cc}A^{-1} & B^T
   //                        \\0 & S^{-1}
   // \end{array}\right)

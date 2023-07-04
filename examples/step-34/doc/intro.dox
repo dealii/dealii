@@ -277,7 +277,7 @@ arbitrary constant $c$, which means that, if we set the Neumann data
 to be zero, then any constant $\phi = \phi_\infty$ will be a solution.
 Inserting the constant solution and the Neumann boundary condition in the
 boundary integral equation, we have
-@f{align*}
+@f{align*}{
 \alpha\left(\mathbf{x}\right)\phi\left(\mathbf{x}\right)
 &=\int_{\Omega}\phi\left(\mathbf{y}\right)\delta\left(\mathbf{y}-\mathbf{x}\right)\, dy\\
 \Rightarrow
@@ -323,7 +323,7 @@ v}+\mathbf{v}_\infty=\nabla\phi+\mathbf{v}_\infty$ for some (unknown) pressure
 $p$ and a given constant $\rho$. In other words, we would like to verify that
 Bernoulli's law as stated above indeed holds. To show this, we use that
 the left hand side of this equation equates to
-@f{align*}
+@f{align*}{
   \mathbf{v}\cdot\nabla\mathbf{v}
   &=
   [(\nabla\phi+\mathbf{v}_\infty)\cdot\nabla] (\nabla\phi+\mathbf{v}_\infty)
@@ -336,7 +336,7 @@ write this expression as the gradient of something (remember that $\rho$ is a
 constant). The next step is more
 convenient if we consider the components of the equation individually
 (summation over indices that appear twice is implied):
-@f{align*}
+@f{align*}{
   [\mathbf{v}\cdot\nabla\mathbf{v}]_i
   &=
   (\partial_j\phi+v_{\infty,j}) \partial_j \partial_i\phi
@@ -351,7 +351,7 @@ convenient if we consider the components of the equation individually
 @f}
 because $\partial_j \partial_j\phi = \Delta \phi = 0$ and $\textrm{div}
 \ \mathbf{v}_\infty=0$. Next,
-@f{align*}
+@f{align*}{
   [\mathbf{v}\cdot\nabla\mathbf{v}]_i
   &=
   \partial_j [(\partial_j\phi+v_{\infty,j}) \partial_i\phi]
@@ -384,7 +384,7 @@ because $\partial_j \partial_j\phi = \Delta \phi = 0$ and $\textrm{div}
 @f}
 Again, the last term disappears because $\mathbf{v}_\infty$ is constant and we
 can merge the first and third term into one:
-@f{align*}
+@f{align*}{
   [\mathbf{v}\cdot\nabla\mathbf{v}]_i
   &=
   \partial_i (\partial_j [(\partial_j\phi) \phi + v_{\infty,j} \partial_j \phi])
@@ -399,7 +399,7 @@ can merge the first and third term into one:
 
 We now only need to massage that last term a bit more. Using the product rule,
 we get
-@f{align*}
+@f{align*}{
   \partial_j [\partial_i (\partial_j\phi) \phi]
   &=
   \partial_i [\partial_j \partial_j\phi] \phi
@@ -410,7 +410,7 @@ The first of these terms is zero (because, again, the summation over $j$ gives
 $\Delta\phi$, which is zero). The last term can be written as $\frac 12
 \partial_i [(\partial_j\phi)(\partial_j\phi)]$ which is in the desired gradient
 form. As a consequence, we can now finally state that
-@f{align*}
+@f{align*}{
   [\mathbf{v}\cdot\nabla\mathbf{v}]_i
   &=
   \partial_i (\partial_j [(\partial_j\phi) \phi + v_{\infty,j} \partial_j \phi])
@@ -676,7 +676,7 @@ that respects the continuous geometry behind the discrete initial
 mesh.
 
 For a sphere of radius $a$ translating at a velocity of $U$ in the $x$ direction, the potential reads
-@f{align*}
+@f{align*}{
 \phi = -\frac{1}{2}U \left(\frac{a}{r}\right)3 r \cos\theta
 @f}
 see, e.g. J. N. Newman, <i>Marine Hydrodynamics</i>, 1977,

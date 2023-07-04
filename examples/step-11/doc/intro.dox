@@ -3,7 +3,7 @@
 
 The problem we will be considering is the solution of Laplace's problem with
 Neumann boundary conditions only:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\Delta u &=& f \qquad \mathrm{in}\ \Omega,
   \\
   \partial_n u &=& g \qquad \mathrm{on}\ \partial\Omega.

@@ -457,7 +457,7 @@ arise in the mathematical formulation and how they are implemented in a
 matrix-based variant. In essence, an inhomogeneous Dirichlet condition sets
 some of the nodal values in the solution to given values rather than
 determining them through the variational principles,
-@f{eqnarray*}
+@f{eqnarray*}{
 u_h(\mathbf{x}) = \sum_{i\in \mathcal N} \varphi_i(\mathbf{x}) u_i =
 \sum_{i\in \mathcal N \setminus \mathcal N_D} \varphi_i(\mathbf{x}) u_i +
 \sum_{i\in \mathcal N_D} \varphi_i(\mathbf{x}) g_i,
@@ -470,7 +470,7 @@ of boundary values on the Dirichlet-constrained node points $i\in \mathcal
 N_D$. We then insert this solution
 representation into the weak form, e.g. the Laplacian shown above, and move
 the known quantities to the right hand side:
-@f{eqnarray*}
+@f{eqnarray*}{
 (\nabla \varphi_i, \nabla u_h)_\Omega &=& (\varphi_i, f)_\Omega \quad \Rightarrow \\
 \sum_{j\in \mathcal N \setminus \mathcal N_D}(\nabla \varphi_i,\nabla \varphi_j)_\Omega \, u_j &=&
 (\varphi_i, f)_\Omega

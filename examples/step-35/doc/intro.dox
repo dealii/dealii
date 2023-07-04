@@ -12,7 +12,7 @@ University. Most of the work for this program is by him.
 <h3> Motivation </h3>
 The purpose of this program is to show how to effectively solve the incompressible time-dependent
 Navier-Stokes equations. These equations describe the flow of a viscous incompressible fluid and read
-@f{align*}
+@f{align*}{
   u_t + u \cdot \nabla u - \nu \Delta u + \nabla p = f, \\
   \nabla \cdot u = 0,
 @f}
@@ -42,7 +42,7 @@ In previous tutorial programs (see for instance step-20 and
 step-22) we have seen
 how to solve the time-independent Stokes equations using a Schur complement approach. For the
 time-dependent case, after time discretization, we would arrive at a system like
-@f{align*}
+@f{align*}{
   \frac1\tau u^k - \nu \Delta u^k + \nabla p^k = F^k, \\
   \nabla \cdot u^k = 0,
 @f}

@@ -190,7 +190,7 @@ respectively.
 For example (though this sequence of shape functions is not
 guaranteed, and you should not rely on it),
 the following layout could be used by the library:
-@f{eqnarray*}
+@f{eqnarray*}{
   \Phi_0({\mathbf x}) &=&
   \left(\begin{array}{c}
     \varphi_0({\mathbf x}) \\ 0
@@ -250,7 +250,7 @@ $U_i$ such that
 
 If we insert the definition of the bilinear form and the representation of
 ${\mathbf u}_h$ and ${\mathbf v}_h$ into this formula:
-@f{eqnarray*}
+@f{eqnarray*}{
   \sum_{i,j}
     U_i V_j
   \sum_{k,l}
@@ -307,7 +307,7 @@ $\Phi_i$, which are of course given as follows (see their definition):
 @f]
 with the Kronecker symbol $\delta_{nm}$. Due to this, we can delete some of
 the sums over $k$ and $l$:
-@f{eqnarray*}
+@f{eqnarray*}{
   A^K_{ij}
   &=&
   \sum_{k,l}
@@ -366,7 +366,7 @@ the sums over $k$ and $l$:
 @f}
 
 Likewise, the contribution of cell $K$ to the right hand side vector is
-@f{eqnarray*}
+@f{eqnarray*}{
   f^K_j
   &=&
   \sum_l

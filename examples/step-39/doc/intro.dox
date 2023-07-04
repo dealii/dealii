@@ -25,7 +25,7 @@ averaging operator turns into a jump. The interior penalty method for the proble
   -\Delta u = f \text{ in }\Omega \qquad u = u^D \text{ on } \partial\Omega
 @f]
 becomes
-@f{multline*}
+@f{multline*}{
   \sum_{K\in \mathbb T_h} (\nabla u, \nabla v)_K
   \\
   + \sum_{F \in F_h^i} \biggl\{4\sigma_F (\average{ u \mathbf n}, \average{ v \mathbf n })_F
@@ -64,7 +64,7 @@ right.
 
 As we will see below, even the error estimate is of the same
 structure, since it can be written as
-@f{align*}
+@f{align*}{
   \eta^2 &= \eta_K^2 + \eta_F^2 + \eta_B^2
   \\
   \eta_K^2 &= \sum_{K\in \mathbb T_h} h^2 \|f + \Delta u_h\|^2

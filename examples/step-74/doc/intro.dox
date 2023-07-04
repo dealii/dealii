@@ -56,7 +56,7 @@ respectively. Note that when $f\subset \partial \Omega$, we define $\jump{v} = v
 $\average{v}=v$.
 The discretization using the SIPG is given by the following weak formula
 (more details can be found in @cite di2011mathematical and the references therein)
-@f{align*}
+@f{align*}{
 &\sum_{K\in {\mathbb T}_h} (\nabla v_h, \nu \nabla u_h)_K\\
 &-\sum_{F \in F_h^i} \left\{
     \left< \jump{v_h}, \nu\average{ \nabla u_h} \cdot  \mathbf n \right>_F

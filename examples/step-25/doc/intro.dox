@@ -151,7 +151,7 @@ letter the vector of coefficients (in the nodal basis) of a function
 denoted by the same letter in lower case; e.g., $u^n = \sum_{i=1}^N
 U^n_i \varphi_i$ where $U^n \in {R}^N$ and $u^n \in
 H^1(\Omega)$. Thus, the finite-dimensional version of the variational formulation requires that we solve the following matrix equations at each time step:
-@f{eqnarray*}
+@f{eqnarray*}{
   F_h'(U^{n,l})\delta U^{n,l} &=& -F_h(U^{n,l}), \qquad
         U^{n,l+1} = U^{n,l} + \delta U^{n,l}, \qquad U^{n,0} = U^{n-1}; \\
   MV^n &=& MV^{n-1} - k \theta AU^n -k (1-\theta) AU^{n-1} - k S(u^n,u^{n-1}).
