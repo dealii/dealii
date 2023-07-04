@@ -164,25 +164,25 @@ foreach(_category ${_categories})
     )
 endforeach()
 
+#
+# Define a top-level "test" target that runs our quick tests wrapper.
+#
+
+# Use the first available build type (this prefers debug mode if available):
+list(GET DEAL_II_BUILD_TYPES 0 _my_build)
+add_custom_target(test
+  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=${_my_build} -P ${CMAKE_CURRENT_SOURCE_DIR}/run_quick_tests.cmake
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+  COMMENT "Running quicktests..."
+  )
+add_dependencies(test setup_tests_quick_tests)
 
 if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
-
   #
-  # Define a top-level "test" target that runs our quick tests wrapper.
-  #
-
-  # Use the first available build type (this prefers debug mode if available):
-  list(GET DEAL_II_BUILD_TYPES 0 _my_build)
-  add_custom_target(test
-    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=${_my_build} -P ${CMAKE_CURRENT_SOURCE_DIR}/run_quick_tests.cmake
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    COMMENT "Running quicktests..."
-    )
-
   # Depend on the library targets (to ensure that deal.II is actually
   # compiled), as well as on the setup_tests_quick_tests target to ensure
   # that quick tests are actually available.
-  add_dependencies(test setup_tests_quick_tests)
+  #
   foreach(_build ${DEAL_II_BUILD_TYPES})
     string(TOLOWER ${_build} _build_lowercase)
     add_dependencies(test ${DEAL_II_TARGET_NAME}_${_build_lowercase})
@@ -191,7 +191,6 @@ if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   #
   # Add a dummy target to make files known to IDEs like qtcreator
   #
-
   file(GLOB _misc
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
