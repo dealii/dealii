@@ -38,6 +38,14 @@ namespace LinearAlgebra
 {
   namespace EpetraWrappers
   {
+    // Check that the class we declare here satisfies the
+    // vector-space-vector concept. If we catch it here,
+    // any mistake in the vector class declaration would
+    // show up in uses of this class later on as well.
+#  ifdef DEAL_II_HAVE_CXX20
+    static_assert(concepts::is_vector_space_vector<Vector>);
+#  endif
+
     Vector::Vector()
       : Subscriptor()
       , vector(new Epetra_FEVector(

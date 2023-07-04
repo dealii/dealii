@@ -955,7 +955,97 @@ namespace concepts
   template <typename MeshType>
   concept is_triangulation_or_dof_handler =
     internal::is_triangulation_or_dof_handler<MeshType>;
+
+  /**
+   * A concept that tests whether a class `VectorType` has the required
+   * interface to serve as a vector in vector-space operations -- principally
+   * what is required to run iterative solvers: things such as norms, dot
+   * products, etc.
+   */
+  template <typename VectorType>
+  concept is_vector_space_vector = requires(VectorType                      U,
+                                            VectorType                      V,
+                                            VectorType                      W,
+                                            typename VectorType::value_type a,
+                                            typename VectorType::value_type b,
+                                            typename VectorType::value_type s)
+  {
+    // Check local type requirements:
+    typename VectorType::value_type;
+    typename VectorType::size_type;
+    typename VectorType::real_type;
+
+    // Check some assignment and reinit operations;
+    U.reinit(V);
+    U.reinit(V, /* omit_zeroing_entries= */ true);
+
+    U = V;
+    U = a; // assignment of scalar
+
+    U.equ(a, V);
+
+    // Check scaling operations
+    U *= a;
+    U /= a;
+
+    U.scale(V);
+
+    // Vector additions:
+    U += V;
+    U -= V;
+
+    U.add(a);
+    U.add(a, V);
+    U.add(a, V, b, W);
+
+    U.sadd(s, a, V);
+
+    // Norms and similar stuff:
+    {
+      U.mean_value()
+    }
+    ->std::convertible_to<typename VectorType::value_type>;
+
+    {
+      U.l1_norm()
+    }
+    ->std::convertible_to<typename VectorType::real_type>;
+
+    {
+      U.l2_norm()
+    }
+    ->std::convertible_to<typename VectorType::real_type>;
+
+    {
+      U.linfty_norm()
+    }
+    ->std::convertible_to<typename VectorType::real_type>;
+
+    // Dot products:
+    {
+      U *V
+    }
+    ->std::convertible_to<typename VectorType::value_type>;
+
+    {
+      U.add_and_dot(a, V, W)
+    }
+    ->std::convertible_to<typename VectorType::value_type>;
+
+    // Some queries:
+    {
+      U.size()
+    }
+    ->std::convertible_to<typename VectorType::size_type>;
+
+    {
+      U.all_zero()
+    }
+    ->std::same_as<bool>;
+  };
+
 #endif
+
 } // namespace concepts
 
 

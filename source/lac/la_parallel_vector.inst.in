@@ -21,7 +21,13 @@ for (SCALAR : REAL_AND_COMPLEX_SCALARS)
     \{
       namespace distributed
       \{
+#ifdef DEAL_II_HAVE_CXX20
+        static_assert(concepts::is_vector_space_vector<
+                      Vector<SCALAR, ::dealii::MemorySpace::Host>>);
+#endif
+
         template class Vector<SCALAR, ::dealii::MemorySpace::Host>;
+
         template void
         Vector<SCALAR, ::dealii::MemorySpace::Host>::import_elements<
           ::dealii::MemorySpace::Host>(
