@@ -953,6 +953,8 @@ public:
   /**
    * Return an integer representation that uniquely encodes the orientation,
    * flip, and rotation of a @p face.
+   *
+   * @ingroup reordering
    */
   unsigned char
   combined_face_orientation(const unsigned int face) const;
@@ -1823,6 +1825,8 @@ private:
    *
    * It is only possible to set the face_orientation of cells in 3d (i.e.
    * <code>structdim==3 && dim==3</code>).
+   *
+   * @ingroup reordering
    */
   void
   set_combined_face_orientation(const unsigned int  face,
@@ -2147,6 +2151,8 @@ public:
 
   /**
    * @brief Always return 0
+   *
+   * @ingroup reordering
    */
   static unsigned char
   combined_face_orientation(const unsigned int face);
@@ -2822,6 +2828,8 @@ public:
 
   /**
    * @brief Always return 0
+   *
+   * @ingroup reordering
    */
   static unsigned char
   combined_face_orientation(const unsigned int face);

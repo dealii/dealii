@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2002 - 2021 by the deal.II authors
+// Copyright (C) 2002 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,17 +19,71 @@
  * @brief A module describing how deal.II consistently orients Triangulation
  * objects.
  *
- * <h3>Statement of problems</h3>
+ * @warning The implementation of orientation should be considered an internal
+ * detail of the library. Normal users should not need to use the features
+ * describd in this module: instead, classes like QProjector use orientation
+ * information to consistently compute values on faces and lines.
  *
- * Triangulations in deal.II have a special structure, in that there are not
- * only cells, but also faces, and in 3d also edges, that are objects of their
- * own right. Faces and edges have unique orientations, and they have a
- * specified orientation also with respect to the cells that are adjacent.
- * Thus, a line that separates two cells in two space dimensions does not only
- * have a direction, but it must also have a well-defined orientation with
- * respect to the other lines bounding the two quadrilaterals adjacent to the
- * first line. Likewise definitions hold for three dimensional cells and the
- * objects (lines, quads) that separate them.
+ * <h2>Orientation of Lines</h2>
+ *
+ * A Triangulation is built not just of cells but also of lower-dimensional
+ * objects. In particular, a line in 2D is a face which may be shared by two
+ * cells, whereas in 3D a line may be shared by an arbitrary number of cells.
+ *
+ * Lines (i.e., faces in 2D) are implicitly defined by the vertex numbering of
+ * the cell on which they are defined (i.e., there is no separate line or face
+ * object). This information is encoded in various ReferenceCell functions. For
+ * example, the first face of a triangle with nodes {0, 1, 2} is {0, 1}.
+ * Similarly, the first face of a triangle with nodes {1, 0, 3} is {1, 0}. By
+ * itself, this would be inconsistent, since the same line would be defined in
+ * twice: once by each of the two adjacent cells, and they might not agree
+ * whether the line should be {0, 1} or {1, 0}. To solve this problem deal.II
+ * also stores an <tt>unsigned char</tt> on each cell for each of the cell's
+ * faces; this value encodes the orientation of the line *as seen from this
+ * cell*. In this particular case the orientation of the {1, 0} line from the
+ * {0, 1, 2} cell is ReferenceCell::default_combined_face_orientation() whereas
+ * the orientation of the {0, 1} line from the {1, 0, 3} cell is
+ * ReferenceCell::reversed_combined_line_orientation().
+ *
+ * <h2>Orientation of Faces</h2>
+ *
+ * In deal.II, we express the orientation of an object with three booleans:
+ * orientation, rotate, and flip. The default values for these are true, false,
+ * and false. These values are typically encoded or decoded from or to a single
+ * <tt>unsigned char</tt> by the internal::combined_face_orientation() and
+ * internal::split_face_orientation() functions.
+ *
+ * For a quadrilateral, these values correspond to
+ * - *orientation* : `true` is the default orientation and `false` means
+ *   vertices 1 and 2 are swapped.
+ * - *rotation* : all vertices are rotated by 90 degrees clockwise.
+ * - *flip* : all vertices are rotated by 180 degrees clockwise.
+ *
+ * For a triangle, these values correspond to
+ * - *orientation* : `true` is the default orientation and `false` means
+ *   vertices 1 and 2 are swapped.
+ * - *rotation* : all vertices are rotated by 120 degrees clockwise.
+ * - *flip* : all vertices are rotated by 240 degrees clockwise.
+ *
+ * Here, 'clockwise' is relative to the vector defined by the cross product of
+ * two lines adjacent to the zeroth vertex in their standard orientation (which,
+ * e.g., points into the hexahedron for face 0 but out of the hexahedron for
+ * face 1).
+ *
+ * For triangles, to enable indexing from the combined orientation, we do not
+ * consider flip-rotate or flip-orient-rotate as those cases are equivalent,
+ * respectively, to the identity operation or the orientation = `true` case as
+ * flip-rotate is equal to the identity operation. As a consequence, there are
+ * only six valid orientations for triangles as faces of tetrahedra.
+ *
+ * <h2>Orientation of Quadrilateral Meshes</h2>
+ *
+ * Purely quadrilateral meshes are a special case, since deal.II will (with the
+ * exception of faces which are neighbors across periodic boundaries)
+ * consistently orient purely quadrilateral meshes. Hence, in this case, the
+ * orientation of all lines will be
+ * ReferenceCell::default_combined_face_orientation(). See @cite AABB17 for more
+ * information on this algorithm.
  *
  * For example, in two dimensions, a quad consists of four lines which have a
  * direction, which is by definition as follows:
@@ -48,12 +102,11 @@
  *   |   |   |
  *   0---1---2
  * @endverbatim
- * may be characterised by the vertex numbers <tt>(0 1 3 4)</tt> and <tt>(1 2
- * 4 5)</tt>, since the middle line would get the direction <tt>1->4</tt> when
- * viewed from both cells.  The numbering <tt>(0 1 3 4)</tt> and <tt>(5 4 2
- * 1)</tt> would not be allowed, since the left quad would give the common
- * line the direction <tt>1->4</tt>, while the right one would want to use
- * <tt>4->1</tt>, leading to an ambiguity.
+ * may be characterized by the vertex numbers {0, 1, 3, 4} and {1, 2, 4, 5},
+ * since the middle line would be {1, 4} when viewed from both cells. The
+ * numbering {0, 1, 3, 4} and {5, 4, 2, 1} would not be allowed, since the
+ * left quad would give the common line the direction {1, 4} whereas
+ * the right one would use {4, 1}, leading to an inconsistency.
  *
  * As a sidenote, we remark that if one adopts the idea that having directions
  * of faces is useful, then the orientation of the four faces of a cell as
@@ -85,15 +138,6 @@
  * as one can avoid expensive checks in many places because the orientation of
  * faces is known by assumption that it is guaranteed by the triangulation.
  *
- * The purpose of this class is now to find an ordering for a given set of
- * cells such that the generated triangulation satisfies all the requirements
- * stated above. To this end, we will first show some examples why this is a
- * difficult problem, and then develop algorithms that finds such a
- * reordering. Note that the algorithm operates on a set of CellData objects
- * that are used to describe a mesh to the triangulation class. These objects
- * are, for example, generated by the GridIn class, when reading in grids from
- * input files.
- *
  * As a last question for this first section: is it guaranteed that such
  * orientations of faces always exist for a given subdivision of a domain into
  * cells? The linear complexity algorithm described below for 2d also proves
@@ -113,7 +157,6 @@
  * meshes. However, in order to reduce the effect of possible bugs, it should
  * still be tried to reorder a grid. Only if this procedure fails, the
  * original connectivity information should be used.
- *
  *
  * <h3>Examples of problems</h3>
  *
@@ -148,8 +191,8 @@
  *   ^   ^    \ |
  *   0->-1------2
  * @endverbatim
- * (This could for example be done by using the indices <tt>(0 1 3 4)</tt>,
- * <tt>(3 4 6 7)</tt>, <tt>(6 7 9 10)</tt> for the three cells). Now, you will
+ * (This could for example be done by using the indices {0, 1, 3, 4},
+ * {3, 4, 6, 7}, {6, 7, 9, 10} for the three cells). Now, you will
  * not find a way of giving indices for the right cells, without introducing
  * either ambiguity for one line or other, or without violating that within
  * each cells, there must be one vertex from which both lines are directed
@@ -157,7 +200,7 @@
  *
  * The solution in this case is to renumber one of the three left cells, e.g.
  * by reverting the sense of the line between vertices 7 and 10 by numbering
- * the top left cell by <tt>(9 6 10 7)</tt>:
+ * the top left cell by {9, 6, 10, 7}:
  * @verbatim
  *   9->-10-----11
  *   v   v    / |
@@ -181,7 +224,7 @@
  * @endverbatim
  * Then we run into the same problem as above if we order the cells at the
  * left uniformly, thus forcing us to revert the ordering of one cell (the one
- * which we could order as <tt>(9 6 7 10)</tt> above). However, since opposite
+ * which we could order as {9, 6, 7, 10} above). However, since opposite
  * lines have to have the same direction, this in turn would force us to
  * rotate the cell left of it, and then the one left to that, and so on until
  * we reach the left end of the grid. This is therefore an example we have
@@ -199,7 +242,7 @@
  * @endverbatim
  * We have here only indicated the numbers of the vertices that are relevant.
  * Assume that the user had given the cells 0 and 1 by the vertex indices
- * <tt>0 1 3 2</tt> and <tt>6 7 5 4</tt>. Then, if we follow this orientation,
+ * {0, 1, 3, 2} and {6, 7, 5, 4}. Then, if we follow this orientation,
  * the grid after creating the lines for these two cells would look like this:
  * @verbatim
  *   3-->--2-----o-----o ... o-----7--<--6
@@ -241,9 +284,9 @@
  * structure, where node N has as many children as there are possible
  * orientations of node N+1 (in two space dimensions, there are four
  * orientations in which each cell can be constructed from its four vertices;
- * for example, if the vertex indices are <tt>(0 1 3 2)</tt>, then the four
- * possibilities would be <tt>(0 1 3 2)</tt>, <tt>(1 3 2 0)</tt>, <tt>(3 2 0
- * 1)</tt>, and <tt>(2 0 1 3)</tt>). When adding one cell after the other, we
+ * for example, if the vertex indices are {0 1 3 2}, then the four
+ * possibilities would be {0, 1, 3, 2}, {1, 3, 2, 0}, {3, 2, 0, 1},
+ * and {2, 0, 1, 3}. When adding one cell after the other, we
  * traverse this tree in a depth-first (pre-order) fashion. When we encounter
  * that one path from the root (cell 0) to a leaf (the last cell) is not
  * allowed (i.e. that the orientations of the cells which are encoded in the
@@ -481,8 +524,8 @@
  * 0-----1-----2-----3
  * @endverbatim
  * Note that there is a hole in the middle. Assume now that the user described
- * the first cell 0 by the vertex numbers <tt>2 3 6 7</tt>, and cell 5 by
- * <tt>15 14 11 10</tt>, and assume that cells 1, 2, 3, and 4 are numbered
+ * the first cell 0 by the vertex numbers {2, 3, 6, 7}, and cell 5 by
+ * {15, 14, 11, 10}, and assume that cells 1, 2, 3, and 4 are numbered
  * such that 5 can be added in initial rotation. All other cells are numbered
  * in the usual way, i.e. starting at the bottom left and counting
  * counterclockwise. Given this description of cells, the algorithm will start
