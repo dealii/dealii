@@ -65,7 +65,15 @@ execute_process(COMMAND ${CMAKE_CTEST_COMMAND}
   )
 file(WRITE quick_tests.log ${_output})
 
-if(NOT "${_return_value}" STREQUAL "0")
+if("${_return_value}" STREQUAL "0")
+  message("
+**************************************************************************
+
+                 🎉  🎉  🎉  All quick tests passed.  🎉  🎉  🎉
+
+**************************************************************************"
+    )
+else()
   message("
 **************************************************************************
 **                                                                      **
@@ -73,43 +81,36 @@ if(NOT "${_return_value}" STREQUAL "0")
 **                                                                      **
 **************************************************************************
 
-Check the files quick_tests.log and Testing/Temporary/LastTest.log located
-in your build directory for error messages. Alternatively, you can run all
-failing quick tests again via
+Check the terminal output above. You can run all failing quick tests again
+via  $ ctest --rerun-failed --output-on-failure -R quick_tests/
 
-        $ ctest --rerun-failed --output-on-failure -R quick_tests/
+If you need help with this problem, open a bug report on the issue tracker
 
-If you are unable to fix this problem, write to the mailing list linked at
-https://www.dealii.org\n"
+               https://github.com/dealii/dealii/issues/new
+
+or write to the mailing list linked at https://www.dealii.org/mail.html
+Please also add the files quick_tests.log , Testing/Temporary/LastTest.log
+to your bug report."
     )
 
+  set(_affinity_issue FALSE)
   string(REPLACE "\n" ";" _output "${_output}")
   foreach(_line ${_output})
-    if ("${_line}" MATCHES "affinity.*FAILED")
-      message("
+    if ("${_line}" MATCHES " Test .*quick_tests/affinity.*Failed.*sec")
+      set(_affinity_issue TRUE)
+    endif()
+  endforeach()
+  if(_affinity_issue)
+    message("
 The affinity test can fail when you are linking in a library like BLAS
 which uses OpenMP. Even without calling any BLAS functions, OpenMP messes
 with the thread affinity which causes TBB to run single-threaded only. You
 can fix this by exporting OMP_NUM_THREADS=1. Also see GOMP_CPU_AFFINITY
-and OMP_PROC_BIND.\n"
-        )
-    endif()
+and OMP_PROC_BIND."
+      )
+  endif()
 
-    if (${_line} MATCHES "step-petsc.*FAILED")
-      message("
-Additional information about PETSc issues is available
-at:\nhttp://www.dealii.org/developer/external-libs/petsc.html\n"
-        )
-    endif()
-
-    if (${test} MATCHES "p4est.*FAILED" AND NOT EXISTS ${test}-OK)
-      message("
-The p4est test can fail if you are running an OpenMPI version before 1.5.
-This is a known problem and the only work around is to update to a more
-recent version or use a different MPI library like MPICH.\n"
-        )
-    endif()
-  endforeach()
+  message("\n")
 
   # ensure that this script exits with a non-zero exit code
   message(FATAL_ERROR "quick tests failed")
