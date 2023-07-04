@@ -152,7 +152,7 @@ namespace Step64
 
 
   // The Helmholtz problem we want to solve here reads in weak form as follows:
-  // @f{eqnarray*}
+  // @f{eqnarray*}{
   //   (\nabla v, \nabla u)+ (v, a(\mathbf x) u) &=&(v,1) \quad \forall v.
   // @f}
   // If you have seen step-37, then it will be obvious that

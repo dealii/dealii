@@ -8,7 +8,7 @@ particular Raviart-Thomas elements -- and using block matrices to define
 solvers, preconditioners, and nested versions of those that use the
 substructure of the system matrix. The equation we are going to solve is again
 the Poisson equation, though with a matrix-valued coefficient:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot K({\mathbf x}) \nabla p &=& f \qquad {\textrm{in}\ } \Omega, \\
   p &=& g \qquad {\textrm{on}\ }\partial\Omega.
 @f}
@@ -89,7 +89,7 @@ areas of high pressure to areas of low pressure (thus the negative sign).
 
 With this second variable, one then finds an alternative version of the
 Laplace equation, called the <i>mixed formulation</i>:
-@f{eqnarray*}
+@f{eqnarray*}{
   K^{-1} {\mathbf u} + \nabla p &=& 0 \qquad {\textrm{in}\ } \Omega, \\
   -{\textrm{div}}\ {\mathbf u} &=& -f \qquad {\textrm{in}\ }\Omega, \\
   p &=& g \qquad {\textrm{on}\ } \partial\Omega.
@@ -103,11 +103,11 @@ under the common assumption that $K$ is a symmetric tensor.
 
 The weak formulation of this problem is found by multiplying the two
 equations with test functions and integrating some terms by parts:
-@f{eqnarray*}
+@f{eqnarray*}{
   A(\{{\mathbf u},p\},\{{\mathbf v},q\}) = F(\{{\mathbf v},q\}),
 @f}
 where
-@f{eqnarray*}
+@f{eqnarray*}{
   A(\{{\mathbf u},p\},\{{\mathbf v},q\})
   &=&
   ({\mathbf v}, K^{-1}{\mathbf u})_\Omega - ({\textrm{div}}\ {\mathbf v}, p)_\Omega
@@ -141,7 +141,7 @@ elements, for example the classic book by Brenner and Scott, also state the
 relevant results. In any case, with appropriate choices of function
 spaces, the discrete formulation reads as follows: Find ${\mathbf
 u}_h,p_h$ so that
-@f{eqnarray*}
+@f{eqnarray*}{
   A(\{{\mathbf u}_h,p_h\},\{{\mathbf v}_h,q_h\}) = F(\{{\mathbf v}_h,q_h\})
   \qquad\qquad \forall {\mathbf v}_h,q_h.
 @f}
@@ -156,20 +156,20 @@ zero everywhere else. If we also choose ${\mathbf v}=0$ everywhere
 (remember that the weak form above has to hold for <i>all</i> discrete
 test functions $q,v$), then putting these choices of test functions
 into the weak formulation above implies in particular that
-@f{eqnarray*}
+@f{eqnarray*}{
   - (1,{\textrm{div}}\ {\mathbf u}_h)_K
   =
   -(1,f)_K,
 @f}
 which we can of course write in more explicit form as
-@f{eqnarray*}
+@f{eqnarray*}{
   \int_K {\textrm{div}}\ {\mathbf u}_h
  =
   \int_K f.
 @f}
 Applying the divergence theorem results in the fact that ${\mathbf
 u}_h$ has to satisfy, for every choice of cell $K$, the relationship
-@f{eqnarray*}
+@f{eqnarray*}{
   \int_{\partial K} {\mathbf u}_h\cdot{\mathbf n}
   =
   \int_K f.
@@ -202,7 +202,7 @@ The deal.II library (of course) implements Raviart-Thomas elements $RT(k)$ of
 arbitrary order $k$, as well as discontinuous elements $DG(k)$. If we forget
 about their particular properties for a second, we then have to solve a
 discrete problem
-@f{eqnarray*}
+@f{eqnarray*}{
   A(x_h,w_h) = F(w_h),
 @f}
 with the bilinear form and right hand side as stated above, and $x_h=\{{\mathbf u}_h,p_h\}$, $w_h=\{{\mathbf v}_h,q_h\}$. Both $x_h$ and $w_h$ are from the space
@@ -263,7 +263,7 @@ return a non-zero value for more than just one component.
 We could now attempt to rewrite the bilinear form above in terms of vector
 components. For example, in 2d, the first term could be rewritten like this
 (note that $u_0=x_0, u_1=x_1, p=x_2$):
-@f{eqnarray*}
+@f{eqnarray*}{
   ({\mathbf u}_h^i, K^{-1}{\mathbf u}_h^j)
   =
   &\left((x_h^i)_0, K^{-1}_{00} (x_h^j)_0\right) +
@@ -463,7 +463,7 @@ In view of the difficulties using standard solvers and preconditioners
 mentioned above, let us take another look at the matrix. If we sort our
 degrees of freedom so that all velocity come before all pressure variables,
 then we can subdivide the linear system $Ax=b$ into the following blocks:
-@f{eqnarray*}
+@f{eqnarray*}{
   \left(\begin{array}{cc}
     M & B \\ B^T & 0
   \end{array}\right)
@@ -483,7 +483,7 @@ to the gradient.
 By block elimination, we can then re-order this system in the following way
 (multiply the first row of the system by $B^TM^{-1}$ and then subtract the
 second row from it):
-@f{eqnarray*}
+@f{eqnarray*}{
   B^TM^{-1}B P &=& B^TM^{-1} F - G, \\
   MU &=& F - BP.
 @f}
@@ -713,7 +713,7 @@ We will try something along the second approach, as much to improve the
 performance of the program as to demonstrate some techniques. To this end, let
 us recall that the ideal preconditioner is, of course, $S^{-1}$, but that is
 unattainable. However, how about
-@f{eqnarray*}
+@f{eqnarray*}{
   \tilde S^{-1} = [B^T ({\textrm{diag}\ }M)^{-1}B]^{-1}
 @f}
 as a preconditioner? That would mean that every time we have to do one
@@ -782,12 +782,12 @@ formulation as stated above. Since we want to monitor convergence of the
 solution inside the program, we choose right hand side, boundary conditions,
 and the coefficient so that we recover a solution function known to us. In
 particular, we choose the pressure solution
-@f{eqnarray*}
+@f{eqnarray*}{
   p = -\left(\frac \alpha 2 xy^2 + \beta x - \frac \alpha 6 x^3\right),
 @f}
 and for the coefficient we choose the unit matrix $K_{ij}=\delta_{ij}$ for
 simplicity. Consequently, the exact velocity satisfies
-@f{eqnarray*}
+@f{eqnarray*}{
   {\mathbf u} =
   \left(\begin{array}{cc}
     \frac \alpha 2 y^2 + \beta - \frac \alpha 2 x^2 \\

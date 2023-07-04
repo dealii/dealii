@@ -127,7 +127,7 @@ boundary term ${(v,g_2)}_{\Gamma_2}$ has appeared by integration by parts and
 using $\partial_n u=g_2$ on $\Gamma_2$ and $v=0$ on $\Gamma_1$. The cell
 matrices and vectors which we use to build the global matrices and right hand
 side vectors in the discrete formulation therefore look like this:
-@f{eqnarray*}
+@f{eqnarray*}{
   A_{ij}^K &=& \left(\nabla \varphi_i, \nabla \varphi_j\right)_K
               +\left(\varphi_i, \varphi_j\right)_K,
   \\
@@ -167,7 +167,7 @@ where the centers $x_i$ of the exponentials are
   $\mathbf x_3=(\frac 12,-\frac 12)$,
 and the half width is set to $\sigma=\frac {1}{8}$. The method of manufactured
 solution then says: choose
-@f{align*}
+@f{align*}{
   f &= -\Delta \bar u + \bar u, \\
   g_1 &= \bar u|_{\Gamma_1}, \\
   g_2 &= {\mathbf n}\cdot \nabla\bar u|_{\Gamma_2}.

@@ -106,7 +106,7 @@ Instead of a time domain approach, this tutorial program converts the
 equations above into the frequency domain by performing a Fourier
 transform with regard to the time variable.
 The elastic equations in the frequency domain then read as follows
-@f{eqnarray*}
+@f{eqnarray*}{
 \nabla\cdot(\boldsymbol{\bar\sigma} \xi \boldsymbol{\Lambda})&=&-\omega^2\rho\xi\mathbf{\bar u}\\
 \boldsymbol{\bar \sigma} &=&\mathbf{C}\boldsymbol{\bar\varepsilon}\\
 \boldsymbol{\bar\varepsilon}&=&\frac{1}{2}[(\nabla\mathbf{\bar{u}}\boldsymbol{\Lambda}+\boldsymbol{\Lambda}^\mathrm{T}(\nabla\mathbf{\bar{u}})^\mathrm{T})]\\
@@ -152,14 +152,14 @@ It is useful to introduce the tensors $\alpha_{mnkl}$ and $\beta_{mnkl}$.
 @f]
 
 We can multiply by $\varphi_m$ and integrate over the domain $\Omega$ and integrate by parts.
-@f{eqnarray*}
+@f{eqnarray*}{
 -\omega^2\int_\Omega\rho\xi\varphi_m u_m + \int_\Omega\partial_n\varphi_m \left(\frac{\xi c_{mnkl}}{2s_n s_k} \partial_k u_l
 + \frac{\xi c_{mnkl}}{2s_n s_l} \partial_l u_k\right) = \int_\Omega\varphi_m f_m
 @f}
 It is this set of equations we want to solve for a set of frequencies $\omega$ in order to compute the
 transmission coefficient as function of frequency.
 The linear system becomes
-@f{eqnarray*}
+@f{eqnarray*}{
 AU&=&F\\
 A_{ij} &=& -\omega^2\int_\Omega\rho \xi\varphi_m^i \varphi_m^j + \int_\Omega\partial_n\varphi_m^i \left(\frac{\xi c_{mnkl}}{2s_n s_k} \partial_k \varphi_l^j
 + \frac{\xi c_{mnkl}}{2s_n s_l} \partial_l \varphi_k^j\right)\\

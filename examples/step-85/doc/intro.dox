@@ -14,7 +14,7 @@ under grants 2014-6088 (Kreiss) and 2017-05038 (Massing).
 In this example, we show how to use the cut finite element method (CutFEM) in deal.II.
 For illustration, we want to solve the simplest possible problem,
 so we again consider Poisson's equation:
-@f{align*}
+@f{align*}{
   -\Delta u &= f \qquad && \text{in }\, \Omega,
   \\
   u &= u_D       \qquad && \text{on }\, \Gamma = \partial \Omega,
@@ -29,12 +29,12 @@ Since we no longer use the mesh to describe the geometry of the domain,
 we need some other way to represent it.
 This can be done in several ways but here we assume that $\Omega$ is described by a level set function,
 $\psi : \mathbb{R}^{\text{dim}} \to \mathbb{R}$ such that
-@f{align*}
+@f{align*}{
   \Omega &= \{x \in \mathbb{R}^{\text{dim}} : \psi(x) < 0 \}, \\
   \Gamma &= \{x \in \mathbb{R}^{\text{dim}} : \psi(x) = 0 \}.
 @f}
 For simplicity, we choose $\Omega$ to be a unit disk, so that
-@f{equation*}
+@f{equation*}{
   \psi(x) = \| x \| - 1.
 @f}
 As can be seen from the figure below,
@@ -44,17 +44,17 @@ zero on the boundary, and positive everywhere else.
 To solve this problem,
 we want to distribute degrees of freedom over the smallest submesh, $\mathcal{T}_\Omega^h$,
 that completely covers the domain:
-@f{equation*}
+@f{equation*}{
   \mathcal{T}_\Omega^h = \{ T \in \mathcal{T}^{h} : T \cap \Omega \neq \emptyset \}.
 @f}
 This is usually referred to as the "active mesh".
 @image html step-85-active-mesh.svg
 The finite element space where we want to find our numerical solution, $u_h$, is now
-@f{equation*}
+@f{equation*}{
   V_\Omega^h = \{ v \in C(\mathcal{N}_\Omega^h) : v \in Q_p(T), \, T \in \mathcal{T}_\Omega^h \},
 @f}
 where
-@f{equation*}
+@f{equation*}{
   \mathcal{N}_\Omega^h = \bigcup_{T \in \mathcal{T}_\Omega^h} \overline{T},
 @f}
 and $\overline{T}$ denotes the closure of $T$.
@@ -66,23 +66,23 @@ In this type of immersed finite element method,
 the standard way to apply boundary conditions is using Nitsche's method.
 Multiplying the PDE with a test function, $v_h \in V_\Omega^h$,
 and integrating by parts over $\Omega$, as usual, gives us
-@f{equation*}
+@f{equation*}{
   (\nabla u_h, \nabla v_h)_\Omega - (\partial_n u_h, v_h)_\Gamma = (f,v)_\Omega.
 @f}
 Let $\gamma_D > 0$ be a scalar penalty parameter and let $h$ be some measure of the local cell size.
 We now note that the following terms are consistent with the Dirichlet boundary condition:
-@f{align*}
+@f{align*}{
   -(u_h, \partial_n v_h)_\Gamma &= -(u_D, \partial_n v_h)_\Gamma, \\
   \left (\frac{\gamma_D}{h} u_h, v_h \right )_\Gamma &= \left (\frac{\gamma_D}{h}u_D, v_h \right )_\Gamma.
 @f}
 Thus, we can add these to the weak formulation to enforce the boundary condition.
 This leads to the following weak formulation:
 Find $u_h \in V_\Omega^h$ such that
-@f{equation*}
+@f{equation*}{
   a_h(u_h, v_h) = L_h(v_h), \quad \forall v_h \in V_\Omega^h,
 @f}
 where
-@f{align*}
+@f{align*}{
   a_h(u_h, v_h) &=  (\nabla u_h, \nabla v_h)_\Omega
                   - (\partial_n u_h, v_h)_\Gamma
                   - (u_h, \partial_n v_h)_\Gamma
@@ -101,7 +101,7 @@ that is, over $T \cap \Omega$ and $T \cap \Gamma$.
 @image html immersed_quadratures.svg
 Since $\Omega \cap T$ is the part of the cell that lies inside the domain,
 we shall refer to the following regions
-@f{align*}
+@f{align*}{
   \{x \in T : \psi(x) < 0 \}, \\
   \{x \in T : \psi(x) > 0 \}, \\
   \{x \in T : \psi(x) = 0 \},
@@ -126,11 +126,11 @@ One way to avoid this problem is to add a so-called ghost penalty term, $g_h$,
 to the weak formulation (see e.g. @cite burman_hansbo_2012 and @cite cutfem_2015).
 This leads to the stabilized cut finite element method,
 which reads: Find $u_h \in V_\Omega^h$ such that
-@f{equation*}
+@f{equation*}{
   A_h(u_h, v_h) = L_h(v_h), \quad \forall v_h \in V_\Omega^h,
 @f}
 where
-@f{equation*}
+@f{equation*}{
   A_h(u_h,v_h) = a_h(u_h,v_h) + g_h(u_h, v_h).
 @f}
 The point of this ghost penalty is that it makes the numerical method essentially independent
@@ -138,11 +138,11 @@ of how $\Omega$ relates to the background mesh.
 In particular, $A_h$ can be shown to be continuous and coercive,
 with constants that do not depend on how $\Omega$ intersects $\mathcal{T}^h$.
 To define the ghost penalty, let $\mathcal{T}_\Gamma^h$ be the set of intersected cells:
-@f{equation*}
+@f{equation*}{
   \mathcal{T}_{\Gamma}^h = \{ T \in \mathcal{T}_{\Omega}^{h} : T \cap \Gamma \neq \emptyset \},
 @f}
 and let $\mathcal{F}_h$ denote the interior faces of the intersected cells in the active mesh:
-@f{equation*}
+@f{equation*}{
   \mathcal{F}_h = \{ F = \overline{T}_+ \cap \overline{T}_- : \,
                      T_+ \in \mathcal{T}_{\Gamma}^h, \,
                      T_- \in \mathcal{T}_{\Omega}^h
@@ -150,11 +150,11 @@ and let $\mathcal{F}_h$ denote the interior faces of the intersected cells in th
 @f}
 @image html step-85-ghost-faces.svg
 The ghost penalty acts on these faces and reads
-@f{equation*}
+@f{equation*}{
   g_h(u_h,v_h) = \gamma_A \sum_{F \in \mathcal{F}_h} g_F(u_h, v_h),
 @f}
 where $g_F$ is the face-wise ghost penalty:
-@f{equation*}
+@f{equation*}{
   g_F(u_h, v_h) = \gamma_A \sum_{k=0}^p \left(\frac{h_F^{2k-1}}{k!^2}[\partial_n^k u_h], [\partial_n^k v_h] \right)_F.
 @f}
 Here, $\gamma_A$ is a penalty parameter and $h_F$ is some measure of the face size.
@@ -166,7 +166,7 @@ Hand-wavingly speaking,
 this is the reason why we obtain a cut-independent method when we enforce $g_F(u_h, v_h) = 0$ over the faces in $\mathcal{F}_h$.
 Here, we shall use a continuous space of $Q_1$-elements,
 so the ghost penalty is reduced to
-@f{equation*}
+@f{equation*}{
   g_h(u_h,v_h) = \gamma_A \sum_{F \in \mathcal{F}_h} (h_F [\partial_n u_h], [\partial_n v_h])_F.
 @f}
 
@@ -176,7 +176,7 @@ such that the domain deforms with time.
 For such a problem,
 one would typically solve for an approximation of the level set function, $\psi_h \in V^h$,
 in a separate finite element space over the whole background mesh:
-@f{equation*}
+@f{equation*}{
   V^h = \{ v \in C(\mathcal{N}^h) : v \in Q_p(T), \, T \in \mathcal{T}^h \},
 @f}
 where $\mathcal{N}^h = \bigcup_{T \in \mathcal{T}^h} \overline{T}$.
@@ -184,12 +184,12 @@ Even if we solve a much simpler problem with a stationary domain in this tutoria
 we shall, just to illustrate, still use a discrete level set function for the Poisson problem.
 Technically,
 this is a so-called "variational crime" because we are actually not using the bilinear form $a_h$ but instead
-@f{equation*}
+@f{equation*}{
   a_h^\star(u_h, v_h) = (\nabla u_h, \nabla v_h)_{\Omega_h}
                       - (\partial_n u_h, v_h)_{\Gamma_h} + \ldots
 @f}
 This is an approximation of $a_h$ since we integrate over the approximations of the geometry that we get via the discrete level set function:
-@f{align*}
+@f{align*}{
   \Omega_h &= \{x \in \mathbb{R}^{\text{dim}} : \psi_h(x) < 0 \}, \\
   \Gamma_h &= \{x \in \mathbb{R}^{\text{dim}} : \psi_h(x) = 0 \}.
 @f}

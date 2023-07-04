@@ -6,7 +6,7 @@
 
 
 This program implements the heat equation
-@f{align*}
+@f{align*}{
   \frac{\partial u(\mathbf x, t)}{\partial t}
   -
   \Delta u(\mathbf x, t)
@@ -32,7 +32,7 @@ mesh every few time steps, etc.
 Our goal here will be to solve the equations above using the theta-scheme that
 discretizes the equation in time using the following approach, where we would
 like $u^n(\mathbf x)$ to approximate $u(\mathbf x, t_n)$ at some time $t_n$:
-@f{align*}
+@f{align*}{
   \frac{u^n(\mathbf x)-u^{n-1}(\mathbf x)}{k_n}
   -
   \left[
@@ -59,7 +59,7 @@ does, by multiplying with test functions, integrating by parts, and then
 restricting everything to a finite dimensional subspace. This yields the
 following set of fully discrete equations after multiplying through with
 $k_n$:
-@f{align*}
+@f{align*}{
   M U^n-MU^{n-1}
   +
   k_n \left[
@@ -78,7 +78,7 @@ $k_n$:
 where $M$ is the @ref GlossMassMatrix "mass matrix" and $A$ is the @ref GlossStiffnessMatrix "stiffness matrix" that results from
 discretizing the Laplacian. Bringing all known quantities to the right hand
 side yields the linear system we have to solve in every step:
-@f{align*}
+@f{align*}{
   (M
   +
   k_n \theta A) U^n
@@ -155,7 +155,7 @@ compared to the stationary case. Let us go through them in turn:
 
   <li><i>Test functions from different meshes</i>: Let us consider again the
   semi-discrete equations we have written down above:
-  @f{align*}
+  @f{align*}{
     \frac{u^n(\mathbf x)-u^{n-1}(\mathbf x)}{k_n}
     -
     \left[
@@ -172,14 +172,14 @@ compared to the stationary case. Let us go through them in turn:
   @f}
   We can here consider $u^{n-1}$ as data since it has presumably been computed
   before. Now, let us replace
-  @f{align*}
+  @f{align*}{
     u^n(\mathbf x)\approx u_h^n(\mathbf x)
     =
     \sum_j U^n \varphi_j(\mathbf x),
   @f}
   multiply with test functions $\varphi_i(\mathbf x)$ and integrate by parts
   where necessary. In a process as outlined above, this would yield
-  @f{align*}
+  @f{align*}{
     \sum_j
     (M
     +
@@ -202,7 +202,7 @@ compared to the stationary case. Let us go through them in turn:
   $u^{n-1}$ are different! This pertains to the terms on the right hand side,
   the first of which we could more clearly write as (the second follows the
   same pattern)
-  @f{align*}
+  @f{align*}{
     (\varphi_i, u_h^{n-1})
     =
     (\varphi_i^n, u_h^{n-1})
@@ -232,7 +232,7 @@ compared to the stationary case. Let us go through them in turn:
   whole situation by interpolating the solution from the old to the new mesh
   every time we adapt the mesh. In other words, rather than solving the
   equations above, we instead solve the problem
-  @f{align*}
+  @f{align*}{
     \sum_j
     (M
     +
@@ -289,7 +289,7 @@ equations without coefficients (or constant coefficients) like the one here,
 there is a fairly standard protocol that rests on the following observation:
 if you choose as your domain a square $[0,1]^2$ (or, with slight
 modifications, a rectangle), then the exact solution can be written as
-@f{align*}
+@f{align*}{
   u(x,y,t) = a(t) \sin(n_x \pi x) \sin(n_y \pi y)
 @f}
 (with integer constants $n_x,n_y$)
@@ -303,7 +303,7 @@ As an example, let us consider the situation where we have
 $u_0(x,y)=\sin(n_x \pi x) \sin(n_x \pi y)$ and
 $f(x,y,t)=0$. With the claim (ansatz) of the form for
 $u(x,y,t)$ above, we get that
-@f{align*}
+@f{align*}{
   \left(\frac{\partial}{\partial t} -\Delta\right)
   u(x,y,t)
   &=
@@ -314,12 +314,12 @@ $u(x,y,t)$ above, we get that
   \left(a'(t) + (n_x^2+n_y^2)\pi^2 a(t) \right) \sin(n_x \pi x) \sin(n_y \pi y).
 @f}
 For this to be equal to $f(x,y,t)=0$, we need that
-@f{align*}
+@f{align*}{
   a'(t) + (n_x^2+n_y^2)\pi^2 a(t) = 0
 @f}
 and due to the initial conditions, $a(0)=1$. This differential equation can be
 integrated to yield
-@f{align*}
+@f{align*}{
   a(t) = - e^{-(n_x^2+n_y^2)\pi^2 t}.
 @f}
 In other words, if the initial condition is a product of sines, then the
@@ -341,7 +341,7 @@ If you have so verified that the time integrator is correct, take the
 situation where the right hand side is nonzero but the initial conditions are
 zero: $u_0(x,y)=0$ and
 $f(x,y,t)=\sin(n_x \pi x) \sin(n_x \pi y)$. Again,
-@f{align*}
+@f{align*}{
   \left(\frac{\partial}{\partial t} -\Delta\right)
   u(x,y,t)
   &=
@@ -352,12 +352,12 @@ $f(x,y,t)=\sin(n_x \pi x) \sin(n_x \pi y)$. Again,
   \left(a'(t) + (n_x^2+n_y^2)\pi^2 a(t) \right) \sin(n_x \pi x) \sin(n_y \pi y),
 @f}
 and for this to be equal to $f(x,y,t)$, we need that
-@f{align*}
+@f{align*}{
   a'(t) + (n_x^2+n_y^2)\pi^2 a(t) = 1
 @f}
 and due to the initial conditions, $a(0)=0$. Integrating this equation in time
 yields
-@f{align*}
+@f{align*}{
   a(t) = \frac{1}{(n_x^2+n_y^2)\pi^2} \left[ 1 - e^{-(n_x^2+n_y^2)\pi^2 t} \right].
 @f}
 
@@ -380,7 +380,7 @@ become very smooth very quickly and then do not move very much any
 more. Rather, we here solve the equation on the L-shaped domain with zero
 Dirichlet boundary values and zero initial conditions, but as right hand side
 we choose
-@f{align*}
+@f{align*}{
   f(\mathbf x, t)
   =
   \left\{
@@ -399,7 +399,7 @@ we choose
   \right.
 @f}
 Here,
-@f{align*}
+@f{align*}{
   \chi_1(\mathbf x) &=
   \left\{
   \begin{array}{ll}

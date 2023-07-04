@@ -18,7 +18,7 @@ California Institute of Technology.
 
 This program deals with the Stokes system of equations which reads as
 follows in non-dimensionalized form:
-@f{eqnarray*}
+@f{eqnarray*}{
   -2\; \textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& \textbf{f},
   \\
   -\textrm{div}\; \textbf{u} &=& 0,
@@ -42,14 +42,14 @@ we will focus on the simpler Stokes system.
 
 Note that when deriving the more general compressible Navier-Stokes equations,
 the diffusion is modeled as the divergence of the stress tensor
-@f{eqnarray*}
+@f{eqnarray*}{
   \tau = - \mu \left(2\varepsilon(\textbf{u}) - \frac{2}{3}\nabla \cdot \textbf{u} I\right),
 @f}
 where $\mu$ is the viscosity of the fluid. With the assumption of $\mu=1$
 (assume constant viscosity and non-dimensionalize the equation by dividing out
 $\mu$) and assuming incompressibility ($\textrm{div}\; \textbf{u}=0$), we
 arrive at the formulation from above:
-@f{eqnarray*}
+@f{eqnarray*}{
   \textrm{div}\; \tau = -2\textrm{div}\;\varepsilon(\textbf{u}).
 @f}
 A different formulation uses the Laplace operator ($-\triangle \textbf{u}$)
@@ -57,14 +57,14 @@ instead of the symmetrized gradient. A big difference here is that the
 different components of the velocity do not couple. If you assume additional
 regularity of the solution $\textbf{u}$ (second partial derivatives exist and
 are continuous), the formulations are equivalent:
-@f{eqnarray*}
+@f{eqnarray*}{
   \textrm{div}\; \tau
   = -2\textrm{div}\;\varepsilon(\textbf{u})
   = -\triangle \textbf{u} - \nabla \cdot (\nabla\textbf{u})^T
   = -\triangle \textbf{u}.
 @f}
 This is because the $i$th entry of  $\nabla \cdot (\nabla\textbf{u})^T$ is given by:
-@f{eqnarray*}
+@f{eqnarray*}{
 [\nabla \cdot (\nabla\textbf{u})^T]_i
 = \sum_j \frac{\partial}{\partial x_j} [(\nabla\textbf{u})^T]_{i,j}
 = \sum_j \frac{\partial}{\partial x_j} [(\nabla\textbf{u})]_{j,i}
@@ -92,7 +92,7 @@ toplevel overview of this topic can be found in the @ref vector_valued module.
 
 The weak form of the equations is obtained by writing it in vector
 form as
-@f{eqnarray*}
+@f{eqnarray*}{
   \begin{pmatrix}
     {-2\; \textrm{div}\; \varepsilon(\textbf{u}) + \nabla p}
     \\
@@ -108,7 +108,7 @@ form as
 forming the dot product from the left with a vector-valued test
 function $\phi = \begin{pmatrix}\textbf{v} \\ q\end{pmatrix}$ and integrating
 over the domain $\Omega$, yielding the following set of equations:
-@f{eqnarray*}
+@f{eqnarray*}{
   (\mathrm v,
    -2\; \textrm{div}\; \varepsilon(\textbf{u}) + \nabla p)_{\Omega}
   -
@@ -132,7 +132,7 @@ weak formulation that has only one derivative on both test and trial
 function.
 
 In the current context, we integrate by parts the second term:
-@f{eqnarray*}
+@f{eqnarray*}{
   (\textbf{v}, -2\; \textrm{div}\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   + (\textbf{n}\cdot\textbf{v}, p)_{\partial\Omega}
@@ -142,7 +142,7 @@ In the current context, we integrate by parts the second term:
   (\textbf{v}, \textbf{f})_\Omega.
 @f}
 Likewise, we integrate by parts the first term to obtain
-@f{eqnarray*}
+@f{eqnarray*}{
   (\nabla \textbf{v}, 2\; \varepsilon(\textbf{u}))_{\Omega}
   -
   (\textbf{n} \otimes \textbf{v}, 2\; \varepsilon(\textbf{u}))_{\partial\Omega}
@@ -155,7 +155,7 @@ Likewise, we integrate by parts the first term to obtain
 @f}
 where the scalar product between two tensor-valued quantities is here
 defined as
-@f{eqnarray*}
+@f{eqnarray*}{
   (\nabla \textbf{v}, 2\; \varepsilon(\textbf{u}))_{\Omega}
   =
   2 \int_\Omega \sum_{i,j=1}^d \frac{\partial v_j}{\partial x_i}
@@ -170,7 +170,7 @@ $\nabla\textbf{v}$ and a symmetric tensor like
 $\varepsilon(\textbf{u})$ equals the scalar product between the
 symmetrized forms of the two, we can also write the bilinear form
 above as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
   -
   (\textbf{n} \otimes \textbf{v}, 2\; \varepsilon(\textbf{u}))_{\partial\Omega}
@@ -183,7 +183,7 @@ above as follows:
 @f}
 We will deal with the boundary terms in the next section, but it is already
 clear from the domain terms
-@f{eqnarray*}
+@f{eqnarray*}{
   (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   -
@@ -205,13 +205,13 @@ possibilities for imposing boundary conditions:
     $\Gamma_D\subset\partial\Omega$ we may impose Dirichlet conditions
     on the velocity $\textbf u$:
 
-    @f{eqnarray*}
+    @f{eqnarray*}{
         \textbf u = \textbf g_D \qquad\qquad \textrm{on}\ \Gamma_D.
     @f}
     Because test functions $\textbf{v}$ come from the tangent space of
     the solution variable, we have that $\textbf{v}=0$ on $\Gamma_D$
     and consequently that
-    @f{eqnarray*}
+    @f{eqnarray*}{
       -(\textbf{n} \otimes \mathrm
         v, 2\; \varepsilon(\textbf{u}))_{\Gamma_D}
       +
@@ -229,7 +229,7 @@ possibilities for imposing boundary conditions:
 <li>Neumann-type or natural boundary conditions: On the rest of the boundary
     $\Gamma_N=\partial\Omega\backslash\Gamma_D$, let us re-write the
     boundary terms as follows:
-    @f{eqnarray*}
+    @f{eqnarray*}{
       -(\textbf{n} \otimes \mathrm
         v, 2\; \varepsilon(\textbf{u}))_{\Gamma_N}
       +
@@ -262,14 +262,14 @@ possibilities for imposing boundary conditions:
     @f}
     In other words, on the Neumann part of the boundary we can
     prescribe values for the total stress:
-    @f{eqnarray*}
+    @f{eqnarray*}{
       \textbf{n}\cdot [p \textbf{I} - 2\; \varepsilon(\textbf{u})]
       =
       \textbf g_N \qquad\qquad \textrm{on}\ \Gamma_N.
     @f}
     If the boundary is subdivided into Dirichlet and Neumann parts
     $\Gamma_D,\Gamma_N$, this then leads to the following weak form:
-    @f{eqnarray*}
+    @f{eqnarray*}{
       (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
       - (\textrm{div}\; \textbf{v}, p)_{\Omega}
       -
@@ -283,13 +283,13 @@ possibilities for imposing boundary conditions:
 
 <li>Robin-type boundary conditions: Robin boundary conditions are a mixture of
     Dirichlet and Neumann boundary conditions. They would read
-    @f{eqnarray*}
+    @f{eqnarray*}{
       \textbf{n}\cdot [p \textbf{I} - 2\; \varepsilon(\textbf{u})]
       =
       \textbf S \textbf u \qquad\qquad \textrm{on}\ \Gamma_R,
     @f}
     with a rank-2 tensor (matrix) $\textbf S$. The associated weak form is
-    @f{eqnarray*}
+    @f{eqnarray*}{
       (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
       - (\textrm{div}\; \textbf{v}, p)_{\Omega}
       -
@@ -309,7 +309,7 @@ possibilities for imposing boundary conditions:
     <code>dim</code>-1 components of the velocity. The remaining component can
     be constrained by requiring that the normal component of the normal
     stress be zero, yielding the following set of boundary conditions:
-    @f{eqnarray*}
+    @f{eqnarray*}{
       \textbf u_{\textbf t} &=& 0,
       \\
       \textbf n \cdot \left(\textbf{n}\cdot [p \textbf{I} - 2\;
@@ -329,7 +329,7 @@ possibilities for imposing boundary conditions:
     stratified by different densities but that both have small enough
     viscosities to not introduce much tangential stress on each other).
     In formulas, this means that
-    @f{eqnarray*}
+    @f{eqnarray*}{
       \textbf{n}\cdot\textbf u &=& 0,
       \\
       (\textbf 1-\textbf n\otimes\textbf n)
@@ -353,7 +353,7 @@ As developed above, the weak form of the equations with Dirichlet and Neumann
 boundary conditions on $\Gamma_D$ and $\Gamma_N$ reads like this: find
 $\textbf u\in \textbf V_g = \{\varphi \in H^1(\Omega)^d: \varphi_{\Gamma_D}=\textbf
 g_D\}, p\in Q=L^2(\Omega)$ so that
-@f{eqnarray*}
+@f{eqnarray*}{
   (\varepsilon(\textbf{v}), 2\; \varepsilon(\textbf{u}))_{\Omega}
   - (\textrm{div}\; \textbf{v}, p)_{\Omega}
   -
@@ -387,7 +387,7 @@ pressures.
 
 This then leads to the following discrete problem: find $\textbf u_h,p_h$ so
 that
-@f{eqnarray*}
+@f{eqnarray*}{
   (\varepsilon(\textbf{v}_h), 2\; \varepsilon(\textbf u_h))_{\Omega}
   - (\textrm{div}\; \textbf{v}_h, p_h)_{\Omega}
   -
@@ -408,7 +408,7 @@ vector_valued module.
 
 The weak form of the discrete equations naturally leads to the following
 linear system for the nodal values of the velocity and pressure fields:
-@f{eqnarray*}
+@f{eqnarray*}{
   \left(\begin{array}{cc}
     A & B^T \\ B & 0
   \end{array}\right)
@@ -423,11 +423,11 @@ linear system for the nodal values of the velocity and pressure fields:
 Like in step-20 and step-21, we will solve this
 system of equations by forming the Schur complement, i.e. we will first find
 the solution $P$ of
-@f{eqnarray*}
+@f{eqnarray*}{
   BA^{-1}B^T P &=& BA^{-1} F - G, \\
 @f}
 and then
-@f{eqnarray*}
+@f{eqnarray*}{
   AU &=& F - B^TP.
 @f}
 The way we do this is pretty much exactly like we did in these previous
@@ -611,7 +611,7 @@ complementation preconditioner</a> in the results section of this program.
 <h4> A note on the structure of the linear system </h4>
 
 Above, we have claimed that the linear system has the form
-@f{eqnarray*}
+@f{eqnarray*}{
   \left(\begin{array}{cc}
     A & B^T \\ B & 0
   \end{array}\right)
@@ -645,7 +645,7 @@ a few entries on the diagonal, one for each constrained
 pressure degree of freedom, and a correct description
 of the linear system we have to solve is that it has the
 form
-@f{eqnarray*}
+@f{eqnarray*}{
   \left(\begin{array}{cc}
     A & B^T \\ B & D_c
   \end{array}\right)
@@ -732,7 +732,7 @@ year at most), leaving a crack in the earth crust that is filled with magma
 from below. Without trying to be entirely realistic, we model this situation
 by solving the following set of equations and boundary conditions on the
 domain $\Omega=[-2,2]\times[0,1]\times[-1,0]$:
-@f{eqnarray*}
+@f{eqnarray*}{
   -2\; \textrm{div}\; \varepsilon(\textbf{u}) + \nabla p &=& 0,
   \\
   -\textrm{div}\; \textbf{u} &=& 0,

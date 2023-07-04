@@ -49,7 +49,7 @@ is active there.
 <h3>Classical formulation</h3>
 
 The classical formulation of the problem possesses the following form:
-@f{align*}
+@f{align*}{
  -\textrm{div}\ \sigma &\geq f & &\quad\text{in } \Omega,\\
  \sigma &= \nabla u & &\quad\text{in } \Omega,\\
  u(\mathbf x) &= 0 & &\quad\text{on }\partial\Omega,\\
@@ -91,15 +91,15 @@ obstacle).
 <h3>Derivation of the variational inequality</h3>
 
 An obvious way to obtain the variational formulation of the obstacle problem is to consider the total potential energy:
-@f{equation*}
+@f{equation*}{
  E(u) \dealcoloneq \dfrac{1}{2}\int\limits_{\Omega} \nabla u \cdot \nabla u - \int\limits_{\Omega} fu.
 @f}
 We have to find a solution $u\in G$ of the following minimization problem:
-@f{equation*}
+@f{equation*}{
  E(u)\leq E(v)\quad \forall v\in G,
 @f}
 with the convex set of admissible displacements:
-@f{equation*}
+@f{equation*}{
  G \dealcoloneq \lbrace v\in V: v\geq g \text{ a.e. in } \Omega\rbrace,\quad V\dealcoloneq H^1_0(\Omega).
 @f}
 This set takes care of the third and fifth conditions above (the boundary
@@ -107,7 +107,7 @@ values and the complementarity condition).
 
 Consider now the minimizer $u\in G$ of $E$ and any other function $v\in
 G$. Then the function
-@f{equation*}
+@f{equation*}{
  F(\varepsilon) \dealcoloneq E(u+\varepsilon(v-u)),\quad\varepsilon\in\left[0,1\right],
 @f}
 takes its minimum at $\varepsilon = 0$ (because $u$ is a minimizer of the
@@ -118,7 +118,7 @@ convexity of $G$. If we compute $F'(\varepsilon)\vert_{\varepsilon=0}$ it
 yields the variational formulation we are searching for:
 
 <i>Find a function $u\in G$ with</i>
-@f{equation*}
+@f{equation*}{
  \left(\nabla u, \nabla(v-u)\right) \geq \left(f,v-u\right) \quad \forall v\in G.
 @f}
 
@@ -151,12 +151,12 @@ besides regular functions as well.
 This yields:
 
 <i>Find $u\in V$ and $\lambda\in K$ such that</i>
-@f{align*}
+@f{align*}{
  a(u,v) + b(v,\lambda) &= f(v),\quad &&v\in V\\
  b(u,\mu - \lambda) &\leq \langle g,\mu - \lambda\rangle,\quad&&\mu\in K,
 @f}
 <i>with</i>
-@f{align*}
+@f{align*}{
  a(u,v) &\dealcoloneq \left(\nabla u, \nabla v\right),\quad &&u,v\in V\\
  b(u,\mu) &\dealcoloneq \langle u,\mu\rangle,\quad &&u\in V,\quad\mu\in V'.
 @f}
@@ -180,7 +180,7 @@ inequality constraints.
 To get there, let us assume that we discretize both $u$ and $\lambda$ with the
 same finite element space, for example the usual $Q_k$ spaces. We would then
 get the equations
-@f{eqnarray*}
+@f{eqnarray*}{
  &A U + B\Lambda = F,&\\
  &[BU-G]_i \geq 0, \quad \Lambda_i \leq 0,\quad \Lambda_i[BU-G]_i = 0
 \qquad \forall i.&
@@ -194,27 +194,27 @@ assembling all terms that yield this mass matrix, namely a quadrature formula
 where quadrature points are only located at the interpolation points at
 which shape functions are defined; since all but one shape function are zero
 at these locations, we get a diagonal mass matrix with
-@f{align*}
+@f{align*}{
   B_{ii} = \int_\Omega \varphi_i(\mathbf x)^2\ \textrm{d}x,
   \qquad
   B_{ij}=0 \ \text{for } i\neq j.
 @f}
 To define $G$ we use the same technique as for $B$. In other words, we
 define
-@f{align*}
+@f{align*}{
   G_{i} = \int_\Omega g_h(x) \varphi_i(\mathbf x)\ \textrm{d}x,
 @f}
 where $g_h$ is a suitable approximation of $g$. The integral in the definition
 of $B_{ii}$ and $G_i$ are then approximated by the trapezoidal rule.
 With this, the equations above can be restated as
-@f{eqnarray*}
+@f{eqnarray*}{
  &A U + B\Lambda = F,&\\
  &U_i-B_{ii}^{-1}G_i \ge 0, \quad \Lambda_i \leq 0,\quad \Lambda_i[U_i-B_{ii}^{-1}G_i] = 0
 \qquad \forall i\in{\cal S}.&
 @f}
 
 Now we define for each degree of freedom $i$ the function
-@f{equation*}
+@f{equation*}{
  C([BU]_i,\Lambda_i) \dealcoloneq -\Lambda_i + \min\lbrace 0, \Lambda_i + c([BU]_i - G_i) \rbrace,
 @f}
 with some $c>0$. (In this program we choose $c = 100$. It is a kind of a
@@ -224,7 +224,7 @@ current program if we use 7 global refinements.)
 
 After some head-scratching one can then convince oneself that the inequalities
 above can equivalently be rewritten as
-@f{equation*}
+@f{equation*}{
  C([BU]_i,\Lambda_i) = 0, \qquad \forall i\in{\cal S}.
 @f}
 The primal-dual active set strategy we will use here is an iterative scheme which is based on
@@ -243,7 +243,7 @@ The algorithm for the primal-dual active set method works as follows (NOTE: $B =
  $\mathcal{S}=\mathcal{A}_k\cup\mathcal{F}_k$ and
  $\mathcal{A}_k\cap\mathcal{F}_k=\emptyset$ and set $k=1$.
 2. Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
- @f{align*}
+ @f{align*}{
   AU^k + B\Lambda^k &= F,\\
   [BU^k]_i &= G_i\quad&&\forall i\in\mathcal{A}_k,\\
   \Lambda_i^k &= 0\quad&&\forall i\in\mathcal{F}_k.
@@ -252,7 +252,7 @@ The algorithm for the primal-dual active set method works as follows (NOTE: $B =
  are fixed, with the first condition yielding the remaining $|S|$ equations
  necessary to determine both $U$ and $\Lambda$.
 3. Define the new active and inactive sets by
- @f{equation*}
+ @f{equation*}{
  \begin{split}
   \mathcal{A}_{k+1} \dealcoloneq \lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)< 0\rbrace,\\
   \mathcal{F}_{k+1} \dealcoloneq \lbrace i\in\mathcal{S}:\Lambda^k_i + c([BU^k]_i - G_i)\geq 0\rbrace.
@@ -280,7 +280,7 @@ condition, we can distinguish the following cases:
 Second, the method above appears intuitively correct and useful but a bit ad
 hoc. However, it can be derived in a concisely in the following way. To this
 end, note that we'd like to solve the nonlinear system
-@f{eqnarray*}
+@f{eqnarray*}{
  &A U + B\Lambda = F,&\\
  &C([BU-G]_i, \Lambda_i) = 0,
 \qquad \forall i.&
@@ -289,20 +289,20 @@ We can iteratively solve this by always linearizing around the previous
 iterate (i.e., applying a Newton method), but for this we need to linearize
 the function $C(\cdot,\cdot)$ that is not differentiable. That said, it is
 slantly differentiable, and in fact we have
-@f{equation*}
+@f{equation*}{
  \dfrac{\partial}{\partial U^k_i}C([BU^k]_i,\Lambda^k_i) = \begin{cases}
                                    cB_{ii},& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)< 0\\
                                    0,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)\geq 0.
                                   \end{cases}
 @f}
-@f{equation*}
+@f{equation*}{
  \dfrac{\partial}{\partial\Lambda^k_i}C([BU^k]_i,\Lambda^k_i) = \begin{cases}
                                    0,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)< 0\\
                                    -1,& \text{if}\ \Lambda^k_i + c([BU^k]_i - G_i)\geq 0.
                                   \end{cases}
 @f}
 This suggest a semismooth Newton step of the form
-@f{equation*}
+@f{equation*}{
  \begin{pmatrix}
  A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & B_{\mathcal{F}_k} & 0\\
  A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & 0 & B_{\mathcal{A}_k}\\
@@ -325,7 +325,7 @@ Rather than solving for updates $\delta U, \delta \Lambda$, we can also solve
 for the variables we are interested in right away by setting $\delta U^k \dealcoloneq
 U^{k+1} - U^k$ and $\delta \Lambda^k \dealcoloneq \Lambda^{k+1} - \Lambda^k$ and
 bringing all known terms to the right hand side. This yields
-@f{equation*}
+@f{equation*}{
 \begin{pmatrix}
  A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & B_{\mathcal{F}_k} & 0\\
  A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & 0 & B_{\mathcal{A}_k}\\
@@ -345,7 +345,7 @@ These are the equations outlined above in the description of the basic algorithm
 We could even drive this a bit further.
 It's easy to see that we can eliminate the third row and the third column
 because it implies $\Lambda_{\mathcal{F}_k} = 0$:
-@f{equation*}
+@f{equation*}{
 \begin{pmatrix}
  A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} & 0\\
  A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k} & B_{\mathcal{A}_k}\\
@@ -362,13 +362,13 @@ because it implies $\Lambda_{\mathcal{F}_k} = 0$:
 This shows that one in fact only needs to solve for the Lagrange multipliers
 located on the active set. By considering the second row one would then recover
 the full Lagrange multiplier vector through
-@f{equation*}
+@f{equation*}{
  \Lambda^k_S = B^{-1}\left(f_{\mathcal{S}} - A_{\mathcal{S}}U^k_{\mathcal{S}}\right).
 @f}
 Because of the third row and the fact that $B_{\mathcal{A}_k}$ is a diagonal matrix we are able
 to calculate $U^k_{\mathcal{A}_k}=B^{-1}_{\mathcal{A}_k}G_{\mathcal{A}_k}$ directly. We can therefore also write the
 linear system as follows:
-@f{equation*}
+@f{equation*}{
 \begin{pmatrix}
  A_{\mathcal{F}_k\mathcal{F}_k} & 0\\
  0 & Id_{\mathcal{A}_k} \\
@@ -385,7 +385,7 @@ linear system as follows:
 @f}
 Fortunately, this form is easy to arrive at: we simply build the usual Laplace
 linear system
-@f{equation*}
+@f{equation*}{
 \begin{pmatrix}
  A_{\mathcal{F}_k\mathcal{F}_k} & A_{\mathcal{F}_k\mathcal{A}_k} \\
  A_{\mathcal{A}_k\mathcal{F}_k} & A_{\mathcal{A}_k\mathcal{A}_k}

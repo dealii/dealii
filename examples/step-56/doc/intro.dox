@@ -33,7 +33,7 @@ Let $u \in H_0^1 = \{ u \in H^1(\Omega), u|_{\partial \Omega} = 0 \}$
 and $p \in L_*^2 = \{ p \in L^2(\Omega), \int_\Omega p = 0
 \}$. The Stokes equations read as follows in non-dimensionalized form:
 
-@f{eqnarray*}
+@f{eqnarray*}{
  - 2 \text{div} \frac {1}{2} \left[ (\nabla \textbf{u})
  + (\nabla \textbf{u})^T\right] + \nabla p & =& f \\
  - \nabla \cdot u &=& 0
@@ -49,7 +49,7 @@ well as more expensive).
 The weak form of
 the discrete equations naturally leads to the following linear system
 for the nodal values of the velocity and pressure fields:
-@f{eqnarray*}
+@f{eqnarray*}{
 \left(\begin{array}{cc} A & B^T \\ B & 0
 \end{array}\right) \left(\begin{array}{c} U \\ P \end{array}\right) =
 \left(\begin{array}{c} F \\ 0 \end{array}\right).
@@ -63,7 +63,7 @@ preconditioner, in the spirit of the approach outlined in the "Results"
 section of step-22. The idea is as follows: if we find a block
 preconditioner $P$ such that the matrix
 
-@f{eqnarray*}
+@f{eqnarray*}{
 \left(\begin{array}{cc} A & B^T \\ B & 0 \end{array}\right) P^{-1}
 @f}
 
@@ -72,14 +72,14 @@ converge in a few iterations. Notice that we are doing right
 preconditioning here.  Using the Schur complement $S=BA^{-1}B^T$,
 we find that
 
-@f{eqnarray*}
+@f{eqnarray*}{
 P^{-1} = \left(\begin{array}{cc} A & B^T \\ 0 &
  S \end{array}\right)^{-1}
 @f}
 
 is a good choice. Let $\widetilde{A^{-1}}$ be an approximation of $A^{-1}$
 and $\widetilde{S^{-1}}$ of $S^{-1}$, we see
-@f{eqnarray*}
+@f{eqnarray*}{
 P^{-1} =
 \left(\begin{array}{cc} A^{-1} & 0 \\ 0 & I \end{array}\right)
 \left(\begin{array}{cc} I & B^T \\ 0 & -I \end{array}\right)
@@ -136,13 +136,13 @@ addition, the pressure is chosen to have a mean value of zero.  For
 the "Method of Manufactured Solutions" of step-7, we need to find $\bf
 f$ such that:
 
-@f{align*}
+@f{align*}{
 {\bf f} =   - 2 \text{div} \frac {1}{2} \left[ (\nabla \textbf{u}) + (\nabla \textbf{u})^T\right] + \nabla p.
 @f}
 
 Using the reference solution above, we obtain:
 
-@f{eqnarray*}
+@f{eqnarray*}{
 {\bf f} &=& (2 \pi^2 \sin (\pi x),- \pi^3 y \cos(\pi
 x),- \pi^3 z \cos(\pi x))\\ & & + (\pi \cos(\pi x) \cos(\pi y)
 \sin(\pi z) ,- \pi \sin(\pi y) \sin(\pi x) \sin(\pi z), \pi \cos(\pi

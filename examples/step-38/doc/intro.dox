@@ -18,7 +18,7 @@ In this example, we show how to solve a partial differential equation (PDE)
 on a codimension one surface $\Gamma \subset \mathbb R^3$
 made of quadrilaterals, i.e. on a surface in 3d or a line in 2d.
 We focus on the following elliptic second order PDE
-@f{align*}
+@f{align*}{
 -\Delta_\Gamma u &= f \qquad \text{on } \qquad \Gamma,\\
 u  &= g \qquad \text{on} \qquad \partial \Gamma,
 @f}
@@ -78,7 +78,7 @@ and take advantage of the partition ${\mathbb T}$ to further write
 Moreover, each integral in the above expression is computed in the reference
 element $\hat K \dealcoloneq [0,1]^2$
 so that
-@f{align*}
+@f{align*}{
 \int_{K} \nabla_{K} u \cdot \nabla_{K} v
 &=
 \int_{\hat K} \nabla (u \circ \mathbf x_K)^T G_K^{-1} (D \mathbf
@@ -165,7 +165,7 @@ We produce one test case for a 2d problem and another one for 3d:
   Taking into account that the transformation is length preserving, i.e. a
   segment of length $dt$ is mapped onto a piece of curve of exactly the same
   length, the tangential Laplacian then satisfies
-  @f{align*}
+  @f{align*}{
     \Delta_\Gamma u
     &= \frac{d^2}{dt^2}(-2\cos t \sin t)
     = -2 \frac{d}{dt}(-\sin^2 t + \cos^2 t)

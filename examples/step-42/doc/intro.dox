@@ -53,7 +53,7 @@ step-32.
 <h3>Classical formulation</h3>
 
 The classical formulation of the problem possesses the following form:
-@f{align*}
+@f{align*}{
  \varepsilon(\mathbf u) &= A\sigma + \varepsilon^p & &\quad\text{in } \Omega,\\
   -\textrm{div}\ \sigma &= \mathbf f & &\quad\text{in } \Omega,\\
   \varepsilon^p:(\tau - \sigma) &\geq 0\quad\forall\tau\text{ with
@@ -141,11 +141,11 @@ hint at how difficult it is to construct good solvers and preconditioners.
 With this said, let us simply state the problem we obtain after reformulation
 (again, details can be found in the paper): Find a displacement $\mathbf u \in
 V^+$ so that
-@f{align*}
+@f{align*}{
 \left(P_{\Pi}(C\varepsilon(\mathbf u)),\varepsilon(\varphi) - \varepsilon(\mathbf u)\right) \geq 0,\quad \forall \varphi\in V^+.
 @f}
 where the projector $P_\Pi$ is defined as
-@f{align*}
+@f{align*}{
  P_{\Pi}(\tau) \dealcoloneq \begin{cases}
     \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0,\\
     \left[
@@ -158,7 +158,7 @@ where the projector $P_\Pi$ is defined as
 @f}
 and the space $V^+$ is the space of all displacements that satisfy the contact
 condition:
-@f{align*}
+@f{align*}{
   V
   &=
   \left\{ \mathbf u\in \left[H^1(\Omega)\right]^{d}:
@@ -196,7 +196,7 @@ a semi-smooth function with an appropriately chosen "derivative".
 
 In the current case, we will run our iteration by solving in each iteration $i$
 the following equation (still an inequality, but linearized):
-@f{align*}
+@f{align*}{
   \label{eq:linearization}
   \left(I_{\Pi}\varepsilon(\tilde {\mathbf u}^{i}),
     \varepsilon(\varphi) - \varepsilon(\tilde {\mathbf u}^{i})\right) \geq
@@ -207,7 +207,7 @@ the following equation (still an inequality, but linearized):
   \quad \forall \varphi\in V^+,
 @f}
 where the rank-4 tensor $I_\Pi=I_\Pi(\varepsilon^D(\mathbf u^{i-1}))$ given by
-@f{align}
+@f{align}{
   I_\Pi = \begin{cases}
     C_{\mu} + C_{\kappa}, & \hspace{-8em} \text{if } \vert C\varepsilon^D(\mathbf u^{i-1}) \vert \leq \sigma_0,
     \\
@@ -219,7 +219,7 @@ where the rank-4 tensor $I_\Pi=I_\Pi(\varepsilon^D(\mathbf u^{i-1}))$ given by
 This tensor is the (formal) linearization of $P_\Pi(C\cdot)$ around $\varepsilon^D(\mathbf u^{i-1})$.
 For the linear isotropic material we consider here,
 the bulk and shear components of the projector are given by
-@f{gather*}
+@f{gather*}{
   C_{\kappa} = \kappa I\otimes I,
   \qquad\qquad\qquad\qquad
   C_{\mu} = 2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes
@@ -241,7 +241,7 @@ As a final note about the Newton method let us mention that as is common with
 Newton methods we need to globalize it by controlling the step length. In
 other words, while the system above solves for $\tilde {\mathbf u}^{i}$, the final
 iterate will rather be
-@f{align*}
+@f{align*}{
   {\mathbf u}^{i} = {\mathbf u}^{i-1} + \alpha_i (\tilde {\mathbf u}^{i} - {\mathbf u}^{i-1})
 @f}
 where the difference in parentheses on the right takes the role of the
@@ -285,7 +285,7 @@ method for the contact. It works as follows:
  the contact inequality.
 
  <li> Find the primal-dual pair $(\tilde U^i,\Lambda^i)$ that satisfies
- @f{align*}
+ @f{align*}{
  A\tilde U^i + B\Lambda^i & = F, &\\
  \left[B^T\tilde U^i\right]_p & = G_p & \forall p\in\mathcal{A}_i,\\
  \Lambda^i_p & = 0 & \forall p\in\mathcal{F}_i.
@@ -303,7 +303,7 @@ method for the contact. It works as follows:
  @f{gather*}U^i \dealcoloneq \alpha^i_l\bar U^i +
  (1-\alpha^i_l)U^{i-1}@f}
  satisfies
- @f{gather*}
+ @f{gather*}{
    \vert {\hat R}\left({\mathbf u}^{i}\right) \vert < \vert {\hat R}\left({\mathbf u}^{i-1}\right) \vert.
  \f}
  with ${\hat R}\left({\mathbf u}\right)=\left(P_{Pi}(C\varepsilon(u)),\varepsilon(\varphi^{i}_p\right)$ with
@@ -317,11 +317,11 @@ method for the contact. It works as follows:
  c\left(\left[B^TU^i\right]_p - G_p\right) \leq 0\rbrace.@f}
 
  <li>Project $U^i$ so that it satisfies the contact inequality,
- @f{gather*}\hat U^i \dealcoloneq P_{\mathcal{A}_{i+1}}(U^i).@f}
+ @f{gather*}\hat U^i \dealcoloneq P_{\mathcal{A}_{i+1}}(U^i).@f}{
  Here,
  $P_{\mathcal{A}}(U)$ is the projection of the active
  components in $\mathcal{A}$ to the gap
- @f{gather*}P_{\mathcal{A}}(U)_p \dealcoloneq \begin{cases}
+ @f{gather*}P_{\mathcal{A}}(U)_p \dealcoloneq \begin{cases}{
  U_p, & \textrm{if}\quad p\notin\mathcal{A}\\
  g_{h,p}, & \textrm{if}\quad
  p\in\mathcal{A},
@@ -346,7 +346,7 @@ we can choose $B$ to be a matrix that has only one entry per row,
 set strategy for non-linear multibody contact problems, Comput. Methods Appl. Mech. Engrg.
 194, 2005, pp. 3147-3166).
 The vector $G$ is defined by a suitable approximation $g_h$ of the gap $g$
-@f{gather*}G_p = \begin{cases}
+@f{gather*}G_p = \begin{cases}{
 g_{h,p}, & \text{if}\quad p\in\mathcal{S}\\
 0, & \text{if}\quad p\notin\mathcal{S}.
 \end{cases}@f}

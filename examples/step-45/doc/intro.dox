@@ -152,14 +152,14 @@ velocity component of a Stokes flow.
 
 On a quarter-circle defined by $\Omega=\{{\bf x}\in(0,1)^2:\|{\bf x}\|\in (0.5,1)\}$ we are
 going to solve the Stokes problem
-@f{eqnarray*}
+@f{eqnarray*}{
   -\Delta \; \textbf{u} + \nabla p &=& (\exp(-100\|{\bf x}-(.75,0.1)^T\|^2),0)^T, \\
   -\textrm{div}\;  \textbf{u}&=&0,\\
   \textbf{u}|_{\Gamma_1}&=&{\bf 0},
 @f}
 where the boundary $\Gamma_1$ is defined as $\Gamma_1 \dealcoloneq \{x\in \partial\Omega: \|x\|\in\{0.5,1\}\}$.
 For the remaining parts of the boundary we are going to use periodic boundary conditions, i.e.
-@f{align*}
+@f{align*}{
   u_x(0,\nu)&=-u_y(\nu,0)&\nu&\in[0,1]\\
   u_y(0,\nu)&=u_x(\nu,0)&\nu&\in[0,1].
 @f}

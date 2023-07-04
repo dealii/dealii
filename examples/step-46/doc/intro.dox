@@ -22,20 +22,20 @@ where you may want to read up on the individual equations):
 - In a part $\Omega_f$ of $\Omega$, we have a fluid flowing that satisfies the
   time independent Stokes equations (in the form that involves the strain
   tensor):
-  @f{align*}
+  @f{align*}{
     -2\eta\nabla \cdot \varepsilon(\mathbf v) + \nabla p &= 0,
           \qquad \qquad && \text{in}\ \Omega_f\\
     -\nabla \cdot \mathbf v &= 0  && \text{in}\ \Omega_f.
   @f}
   Here, $\mathbf v, p$ are the fluid velocity and pressure, respectively.
   We prescribe the velocity on part of the external boundary,
-  @f{align*}
+  @f{align*}{
     \mathbf v = \mathbf v_0 \qquad\qquad
      \text{on}\ \Gamma_{f,1} \subset \partial\Omega \cap \partial\Omega_f
   @f}
   while we assume free-flow conditions on the remainder of the external
   boundary,
-  @f{align*}
+  @f{align*}{
     (2\eta \varepsilon(\mathbf v) - p \mathbf 1) \cdot \mathbf n = 0
      \qquad\qquad
      \text{on}\ \Gamma_{f,2} = \partial\Omega \cap \partial\Omega_f \backslash
@@ -44,7 +44,7 @@ where you may want to read up on the individual equations):
 - The remainder of the domain, $\Omega_s = \Omega \backslash \Omega_f$ is
   occupied by a solid whose deformation field $\mathbf u$ satisfies the
   elasticity equation,
-  @f{align*}
+  @f{align*}{
     -\nabla \cdot C \varepsilon(\mathbf u) = 0 \qquad\qquad
     & \text{in}\ \Omega_s,
   @f}
@@ -55,19 +55,19 @@ where you may want to read up on the individual equations):
   be so small that it has no feedback effect on the fluid, i.e. the coupling
   is only in one direction. For simplicity, we will assume that the
   solid's external boundary is clamped, i.e.
-  @f{align*}
+  @f{align*}{
     \mathbf u = \mathbf 0 \qquad\qquad
      \text{on}\ \Gamma_{s,1} = \partial\Omega \cap \partial\Omega_s
   @f}
 - As a consequence of the small displacement assumption, we will pose the
   following boundary conditions on the interface between the fluid and solid:
   first, we have no slip boundary conditions for the fluid,
-  @f{align*}
+  @f{align*}{
     \mathbf v = \mathbf 0 \qquad\qquad
      \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f.
   @f}
   Secondly, the forces (traction) on the solid equal the normal stress from the fluid,
-  @f{align*}
+  @f{align*}{
     (C \varepsilon(\mathbf u)) \mathbf n =
     (2 \eta \varepsilon(\mathbf v) - p \mathbf 1) \mathbf n \qquad\qquad
      \text{on}\ \Gamma_{i} = \partial\Omega_s \cap \partial\Omega_f,
@@ -80,7 +80,7 @@ multiplying from the left by a test function and integrating over the
 domain. It then looks like this: Find $y = \{\mathbf v, p,
 \mathbf u\} \in Y \subset H^1(\Omega_f)^d \times L_2(\Omega_f) \times
 H^1(\Omega_s)^d$ such that
-@f{align*}
+@f{align*}{
 	2 \eta (\varepsilon(\mathbf a), \varepsilon(\mathbf v))_{\Omega_f}
 	- (\nabla \cdot \mathbf a, p)_{\Omega_f}
 	- (q, \nabla \cdot \mathbf v)_{\Omega_f} &
@@ -130,7 +130,7 @@ appropriate function space for these variables? We know that on $\Omega_f$ we
 should require $\mathbf v \in H^1(\Omega_f)^d, p \in L_2(\Omega_f)$, so for
 the extensions $\tilde{\mathbf v}, \tilde p$ to the whole domain the following
 appears a useful set of function spaces:
-@f{align*}
+@f{align*}{
   \tilde {\mathbf v} &\in V
    = \{\tilde {\mathbf v}|_{\Omega_f} \in H^1(\Omega_f)^d, \quad
        \tilde {\mathbf v}|_{\Omega_s} = 0 \}
@@ -156,7 +156,7 @@ $V, P$. For Stokes, we know from step-22 that an appropriate choice is
 $Q_{p+1}^d\times Q_P$ but this only holds for that part of the domain
 occupied by the fluid. For the extended field, let's use the following
 subspaces defined on the triangulation $\mathbb T$:
-@f{align*}
+@f{align*}{
   V_h
    &= \{{\mathbf v}_h \quad | \quad
        \forall K \in {\mathbb T}:
@@ -193,13 +193,13 @@ zero. Obviously, we choose $Z_h=Z$.
 This entire discussion above can be repeated for the variables we use to
 describe the elasticity equation. Here, for the extended variables, we
 have
-@f{align*}
+@f{align*}{
   \tilde {\mathbf u} &\in U
    = \{\tilde {\mathbf u}|_{\Omega_s} \in H^1(\Omega_f)^d, \quad
        \tilde {\mathbf u}|_{\Omega_f} \in Z(\Omega_s)^d \},
 @f}
 and we will typically use a finite element space of the kind
-@f{align*}
+@f{align*}{
   U_h
    &= \{{\mathbf u}_h \quad | \quad
        \forall K \in {\mathbb T}:
@@ -213,7 +213,7 @@ of polynomial degree $r$.
 So to sum up, we are going to look for a discrete vector-valued
 solution $y_h = \{\mathbf v_h, p_h, \mathbf u_h\}$ in the following
 space:
-@f{align*}
+@f{align*}{
   Y_h = \{
       & y_h = \{\mathbf v_h, p_h, \mathbf u_h\} : \\
       & y_h|_{\Omega_f} \in Q_{p+1}^d \times Q_p \times Z^d, \\
@@ -302,7 +302,7 @@ points:
 
 Let us first discuss implementing the bilinear form, which at the
 discrete level we recall to be
-@f{align*}
+@f{align*}{
 	2 \eta (\varepsilon(\mathbf a_h), \varepsilon(\mathbf v_h))_{\Omega_f}
 	- (\nabla \cdot \mathbf a_h, p_h)_{\Omega_f}
 	- (q_h, \nabla \cdot \mathbf v_h)_{\Omega_f} &

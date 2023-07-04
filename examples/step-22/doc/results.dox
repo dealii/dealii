@@ -357,14 +357,14 @@ complement, there is no other possibility.
 The alternative is to attack the block system at once and use an approximate
 Schur complement as efficient preconditioner. The idea is as
 follows: If we find a block preconditioner $P$ such that the matrix
-@f{eqnarray*}
+@f{eqnarray*}{
   P^{-1}\left(\begin{array}{cc}
     A & B^T \\ B & 0
   \end{array}\right)
 @f}
 is simple, then an iterative solver with that preconditioner will converge in a
 few iterations. Using the Schur complement $S = B A^{-1} B^T$, one finds that
-@f{eqnarray*}
+@f{eqnarray*}{
   P^{-1}
   =
   \left(\begin{array}{cc}
@@ -372,7 +372,7 @@ few iterations. Using the Schur complement $S = B A^{-1} B^T$, one finds that
   \end{array}\right)
 @f}
 would appear to be a good choice since
-@f{eqnarray*}
+@f{eqnarray*}{
   P^{-1}\left(\begin{array}{cc}
     A & B^T \\ B & 0
   \end{array}\right)

@@ -150,11 +150,11 @@ This is not what we would expect to happen (in nature).
 
 To get an idea of this behavior mathematically, let us consider a general,
 fully discrete problem:
-@f{align*}
+@f{align*}{
   A u^{n} = B u^{n-1}.
 @f}
 The general form of the $i$th equation then reads:
-@f{align*}
+@f{align*}{
   a_{ii} u^{n}_i &= b_{ii} u^{n-1}_i +
   \sum\limits_{j \in S_i} \left( b_{ij} u^{n-1}_j - a_{ij} u^{n}_j \right),
 @f}
@@ -162,7 +162,7 @@ where $S_i$ is the set of degrees of freedom that DoF $i$ couples with (i.e.,
 for which either the matrix $A$ or matrix $B$ has a nonzero entry at position
 $(i,j)$). If all coefficients
 fulfill the following conditions:
-@f{align*}
+@f{align*}{
   a_{ii} &> 0, & b_{ii} &\geq 0, & a_{ij} &\leq 0, & b_{ij} &\geq 0,
   &
   \forall j &\in S_i,
@@ -177,7 +177,7 @@ able to deduce conditions for the time step $k_n$. For the heat equation with
 the Crank-Nicolson scheme,
 <a href="https://doi.org/10.2478/cmam-2010-0025">Schatz et. al.</a> have
 translated it to the following ones:
-@f{align*}
+@f{align*}{
   (1 - \theta) k a_{ii} &\leq m_{ii},\qquad \forall i,
   &
   \theta k \left| a_{ij} \right| &\geq m_{ij},\qquad j \neq i,
@@ -186,7 +186,7 @@ where $M = m_{ij}$ denotes the @ref GlossMassMatrix "mass matrix" and $A = a_{ij
 matrix with $a_{ij} \leq 0$ for $j \neq i$, respectively. With
 $a_{ij} \leq 0$, we can formulate bounds for the global time step $k$ as
 follows:
-@f{align*}
+@f{align*}{
   k_{\text{max}} &= \frac{ 1 }{ 1 - \theta }
   \min\left( \frac{ m_{ii} }{ a_{ii} } \right),~ \forall i,
   &

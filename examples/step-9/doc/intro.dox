@@ -303,7 +303,7 @@ for problems of the kind we have here.
 
 For the problem which we will solve in this tutorial program, we use
 the following domain and functions (in $d=2$ space dimensions):
-@f{eqnarray*}
+@f{eqnarray*}{
   \Omega &=& [-1,1]^d \\
   \beta({\mathbf x})
   &=&
@@ -436,7 +436,7 @@ criterion:
   \eta_K = h^{1+d/2} |\nabla_h u_h(K)|,
 @f]
 which is inspired by the following (not rigorous) argument:
-@f{eqnarray*}
+@f{eqnarray*}{
   \|u-u_h\|^2_{L_2}
   &\le&
   C h^2 \|\nabla u\|^2_{L_2}

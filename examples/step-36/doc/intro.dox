@@ -17,7 +17,7 @@ here, though the general techniques outlined in this program are of
 course equally applicable to the other applications above.
 
 Eigenspectrum problems have the general form
-@f{align*}
+@f{align*}{
     L \Psi &= \varepsilon \Psi \qquad &&\text{in}\ \Omega, \\
     \Psi   &= 0 &&\text{on}\ \partial\Omega,
 @f}
@@ -124,7 +124,7 @@ If you assume for a moment that we had renumbered degrees of freedom
 in such a way that all of those on the Dirichlet boundary come last,
 then the linear system we would get when solving a regular PDE with
 a right hand side would look like this:
-@f{align*}
+@f{align*}{
   \begin{pmatrix}
     A_i & 0 \\ 0 & D_b
   \end{pmatrix}
@@ -162,7 +162,7 @@ There, eliminating boundary values affects both matrices
 $A$ and $M$ that we will solve with in the current tutorial program.
 After elimination of boundary values, we then receive an eigenvalue
 problem that can be partitioned like this:
-@f{align*}
+@f{align*}{
   \begin{pmatrix}
     A_i & 0 \\ 0 & D_A
   \end{pmatrix}

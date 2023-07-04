@@ -48,7 +48,7 @@ In addition, initial conditions
 @f]
 and Dirichlet (displacement) or Neumann (traction) boundary conditions need
 to be specified for a unique solution:
-@f{eqnarray*}
+@f{eqnarray*}{
   \mathbf{u}(\mathbf{x},t) &=& \mathbf{d}(\mathbf{x},t)
   \qquad
   \textrm{on}\ \Gamma_D\subset\partial\Omega,
@@ -82,7 +82,7 @@ that all changes in external forcing happen on times scales that are
 much larger than $\tau$. In that case, the dynamic nature of the change is
 unimportant: we can consider the body to always be in static equilibrium,
 i.e. we can assume that at all times the body satisfies
-@f{eqnarray*}
+@f{eqnarray*}{
   - \textrm{div}\  ( C \varepsilon(\mathbf{u})) &=& \mathbf{f}(\mathbf{x},t)
   \qquad
   \textrm{in}\ \Omega,
@@ -127,7 +127,7 @@ implementing a <i>real</i> model, as we will see in step-44.
 To come back to defining our "artificial" model, let us first
 introduce a tensorial stress variable $\sigma$, and write the differential
 equations in terms of the stress:
-@f{eqnarray*}
+@f{eqnarray*}{
   - \textrm{div}\  \sigma &=& \mathbf{f}(\mathbf{x},t)
   \qquad
   \textrm{in}\ \Omega(t),
@@ -172,7 +172,7 @@ and $\Delta \mathbf{u}^n$ the incremental displacement for time step
 $n$. In addition, we have to specify initial data $\mathbf{u}(\cdot,0)=\mathbf{u}_0$.
 This way, if we want to solve for the displacement increment, we
 have to solve the following system:
-@f{align*}
+@f{align*}{
   - \textrm{div}\   C \varepsilon(\Delta\mathbf{u}^n) &= \mathbf{f} + \textrm{div}\  \sigma^{n-1}
   \qquad
   &&\textrm{in}\ \Omega(t_{n-1}),
@@ -190,7 +190,7 @@ finite element formulation, reads as follows: find $\Delta \mathbf{u}^n \in
 \{v\in H^1(\Omega(t_{n-1}))^d: v|_{\Gamma_D}=\mathbf{d}(\cdot,t_n) - \mathbf{d}(\cdot,t_{n-1})\}$
 such that
 <a name="step_18.linear-system"></a>
-@f{align*}
+@f{align*}{
   (C \varepsilon(\Delta\mathbf{u}^n), \varepsilon(\varphi) )_{\Omega(t_{n-1})}
   &=
   (\mathbf{f}, \varphi)_{\Omega(t_{n-1})}
@@ -207,7 +207,7 @@ Using that $\sigma^{n-1} \mathbf{n}
             = [C \varepsilon(\mathbf{u}^{n-1})] \mathbf{n}
             = \mathbf{b}(\mathbf x, t_{n-1})$,
 these equations can be simplified to
-@f{align*}
+@f{align*}{
   (C \varepsilon(\Delta\mathbf{u}^n), \varepsilon(\varphi) )_{\Omega(t_{n-1})}
   &=
   (\mathbf{f}, \varphi)_{\Omega(t_{n-1})}
@@ -529,7 +529,7 @@ for (unsigned int i=0; i<dofs_per_cell; ++i)
   between symmetric tensors of even rank here.
 
   Assembling the local contributions
-  @f{eqnarray*}
+  @f{eqnarray*}{
       f^K_i &=&
       (\mathbf{f}, \varphi_i)_K -(\sigma^{n-1},\varepsilon(\varphi_i))_K
       \\

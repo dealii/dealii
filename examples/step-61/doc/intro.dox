@@ -98,16 +98,16 @@ Then we will calculate $L_2$ errors of pressure, velocity, and flux.
 
 The Poisson equation above has a solution $p$ that needs to satisfy the weak
 formulation of the problem,
-@f{equation*}
+@f{equation*}{
 \mathcal{A}\left(p,q \right) = \mathcal{F} \left(q \right),
 @f}
 for all test functions $q$, where
-@f{equation*}
+@f{equation*}{
 \mathcal{A}\left(p,q\right)
   \dealcoloneq \int_\Omega \left(\mathbf{K} \nabla p\right) \cdot \nabla q \;\mathrm{d}x,
 @f}
 and
-@f{equation*}
+@f{equation*}{
 \mathcal{F}\left(q\right)
   \dealcoloneq \int_\Omega f \, q \;\mathrm{d}x
   - \int_{\Gamma^N} u_N q \; \mathrm{d}x.
@@ -135,17 +135,17 @@ test function $q_h$ on the boundary (where we would simply take its interface
 part $q_h^\partial$) but we have to be careful with the gradient because
 that is only defined in cell interiors. Consequently,
 the weak Galerkin scheme for the Poisson equation is defined by
-@f{equation*}
+@f{equation*}{
 \mathcal{A}_h\left(p_h,q \right) = \mathcal{F} \left(q_h \right),
 @f}
 for all discrete test functions $q_h$, where
-@f{equation*}
+@f{equation*}{
 \mathcal{A}_h\left(p_h,q_h\right)
   \dealcoloneq \sum_{K \in \mathbb{T}}
     \int_K \mathbf{K} \nabla_{w,d} p_h \cdot \nabla_{w,d} q_h \;\mathrm{d}x,
 @f}
 and
-@f{equation*}
+@f{equation*}{
 \mathcal{F}\left(q_h\right)
   \dealcoloneq \sum_{K \in \mathbb{T}} \int_K f \, q_h^\circ \;\mathrm{d}x
   - \sum_{\gamma \in \Gamma_h^N} \int_\gamma u_N q_h^\partial \;\mathrm{d}x,
@@ -245,7 +245,7 @@ shape functions will be of either one or the other kind. That is not important,
 here, however. What is important is that we need to wonder how we can represent
 $\nabla_{w,d} \varphi_j$ because that is clearly what will appear in the
 problem when we want to implement the bilinear form
-@f{equation*}
+@f{equation*}{
 \mathcal{A}_h\left(p_h,q_h\right)
   = \sum_{K \in \mathbb{T}}
     \int_K \mathbf{K} \nabla_{w,d} p_h \cdot \nabla_{w,d} q_h \;\mathrm{d}x,
@@ -254,7 +254,7 @@ problem when we want to implement the bilinear form
 The key point is that $\nabla_{w,d} \varphi_j$ is known to be a member of the
 "broken" Raviart-Thomas space $DGRT_s$. What this means is that we can
 represent (on each cell $K$ separately)
-@f{equation*}
+@f{equation*}{
 \nabla_{w,d} \varphi_j|_K
   = \sum_k C_{jk}^K \mathbf v_k|_K
 @f}
@@ -402,7 +402,7 @@ use the discrete weak gradient of $p_h$ to calculate the velocity on each elemen
 As discussed above,
 on each element the gradient of the numerical pressure $\nabla p$ can be
 approximated by discrete weak gradients  $ \nabla_{w,d}\phi_i$:
-@f{equation*}
+@f{equation*}{
 \nabla_{w,d} p_h
 = \nabla_{w,d} \left(\sum_{i} P_i \phi_i\right)
 = \sum_{i} P_i \nabla_{w,d}\phi_i.
@@ -433,12 +433,12 @@ $\left( \mathbf{Q}_h \left( \mathbf{Kv}_j \right),\mathbf{v}_k \right)_K =
 \left( \mathbf{Kv}_j,\mathbf{v}_k \right)_K.$
 So, rather than the formula shown above, the numerical velocity on cell $K$
 instead becomes
-@f{equation*}
+@f{equation*}{
 \mathbf{u}_h = \mathbf{Q}_h \left( -\mathbf{K}\nabla_{w,d}p_h \right) =
 -\sum_i \sum_j P_i B^K_{ij}\mathbf{Q}_h \left( \mathbf{K}\mathbf{v}_j \right),
 @f}
 and we have the following system to solve for the coefficients $d_{jk}$:
-@f{equation*}
+@f{equation*}{
  \sum_j
   \left(\mathbf{v}_i,\mathbf{v}_j\right)
    d_{jk}
@@ -457,7 +457,7 @@ $
 is called <code>cell_matrix_E</code>.
 
 Then the elementwise velocity is
-@f{equation*}
+@f{equation*}{
 \mathbf{u}_h = -\sum_{i} \sum_{j}P_ic_{ij}\sum_{k}d_{jk}\mathbf{v}_k =
 \sum_{k}- \left(\sum_{j} \sum_{i} P_ic_{ij}d_{jk} \right)\mathbf{v}_k,
 @f}

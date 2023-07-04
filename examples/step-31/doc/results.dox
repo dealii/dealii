@@ -304,7 +304,7 @@ theoretical handle on how to choose in an optimal way. These are:
       $k\le \min_K \frac{c_kh_K}{\|\mathbf{u}\|_{L^\infty(K)}}$. Here, $c_k$ is
       dimensionless, but what is the right value?
   <li>In the computation of the artificial viscosity,
-@f{eqnarray*}
+@f{eqnarray*}{
   \nu_\alpha(T)|_K
   =
   \beta
@@ -548,7 +548,7 @@ factor of $\frac 78$).
 
 As a consequence, a formula that reconciles 2d, 3d, and variable polynomial
 degree and takes all factors in account reads as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   k =
   \frac 1{2 \cdot 1.7} \frac 1{\sqrt{d}}
   \frac 2d

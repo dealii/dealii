@@ -71,7 +71,7 @@ the <i>hybridizable discontinuous Galerkin</i> (HDG) method.
 Let us write the complete linear system associated to the HDG problem as a
 block system with the discrete DG (cell interior) variables $U$ as first block
 and the skeleton (face) variables $\Lambda$ as the second block:
-@f{eqnarray*}
+@f{eqnarray*}{
 \begin{pmatrix} A & B \\ C & D \end{pmatrix}
 \begin{pmatrix} U \\ \Lambda \end{pmatrix}
 =
@@ -79,7 +79,7 @@ and the skeleton (face) variables $\Lambda$ as the second block:
 @f}
 Our aim is now to eliminate the $U$ block with a Schur complement
 approach similar to step-20, which results in the following two steps:
-@f{eqnarray*}
+@f{eqnarray*}{
 (D - C A^{-1} B) \Lambda &=& G - C A^{-1} F, \\
 A U &=& F - B \Lambda.
 @f}
@@ -132,7 +132,7 @@ The HDG formulation used for this example is taken from
 We consider the convection-diffusion equation over the domain $\Omega$
 with Dirichlet boundary $\partial \Omega_D$ and Neumann boundary
 $\partial \Omega_N$:
-@f{eqnarray*}
+@f{eqnarray*}{
 	\nabla \cdot (\mathbf{c} u) - \nabla \cdot (\kappa \nabla u) &=& f,
 	\quad \text{ in } \Omega, \\
 	u &=& g_D, \quad \text{ on } \partial \Omega_D, \\
@@ -142,7 +142,7 @@ $\partial \Omega_N$:
 
 Introduce the auxiliary variable $\mathbf{q}=-\kappa \nabla u$ and rewrite
 the above equation as the first order system:
-@f{eqnarray*}
+@f{eqnarray*}{
   \mathbf{q} + \kappa \nabla u &=& 0, \quad \text{ in } \Omega, \\
   \nabla \cdot (\mathbf{c} u + \mathbf{q}) &=& f, \quad \text{ in } \Omega, \\
   u &=& g_D, \quad \text{ on } \partial \Omega_D, \\
@@ -152,7 +152,7 @@ the above equation as the first order system:
 
 We multiply these equations by the weight functions $\mathbf{v}, w$
 and integrate by parts over every element $K$ to obtain:
-@f{eqnarray*}
+@f{eqnarray*}{
   (\mathbf{v}, \kappa^{-1} \mathbf{q})_K - (\nabla\cdot\mathbf{v}, u)_K
     + \left<\mathbf{v}\cdot\mathbf{n}, {\hat{u}}\right>_{\partial K} &=& 0, \\
   - (\nabla w, \mathbf{c} u + \mathbf{q})_K
@@ -167,7 +167,7 @@ these terms must be single-valued on any given element edge $\partial K$ even
 though, with discontinuous shape functions, there may of course be multiple
 values coming from the cells adjacent to an interface.
 We eliminate the numerical trace $\hat{\mathbf{q}}$ by using traces of the form:
-@f{eqnarray*}
+@f{eqnarray*}{
   \widehat{\mathbf{c} u}+\hat{\mathbf{q}} = \mathbf{c}\hat{u} + \mathbf{q}
   + \tau(u - \hat{u})\mathbf{n} \quad \text{ on } \partial K.
 @f}
@@ -188,7 +188,7 @@ stabilization parameter $\tau$ that tends to infinity prohibits jumps in the
 solution over the element boundaries, making the HDG solution approach the
 approximation with continuous finite elements. In the program below, we choose
 the stabilization parameter as
-@f{eqnarray*}
+@f{eqnarray*}{
   \tau = \frac{\kappa}{\ell} + |\mathbf{c} \cdot \mathbf{n}|
 @f}
 where we set the diffusion $\kappa=1$ and the diffusion length scale to
@@ -197,7 +197,7 @@ $\ell = \frac{1}{5}$.
 The trace/skeleton variables in HDG methods are single-valued on element
 faces.  As such, they must strongly represent the Dirichlet data on
 $\partial\Omega_D$.  This means that
-@f{equation*}
+@f{equation*}{
   \hat{u}|_{\partial \Omega_D} = g_D,
 @f}
 where the equal sign actually means an $L_2$ projection of the boundary
@@ -212,7 +212,7 @@ component of the numerical flux, and integrating by parts
 on the equation weighted by $w$, we arrive at the final form of the problem:
 Find $(\mathbf{q}_h, u_h, \hat{u}_h) \in
 \mathcal{V}_h^p \times \mathcal{W}_h^p \times \mathcal{M}_h^p$ such that
-@f{align*}
+@f{align*}{
   (\mathbf{v}, \kappa^{-1} \mathbf{q}_h)_{\mathcal{T}}
     - ( \nabla\cdot\mathbf{v}, u_h)_{\mathcal{T}}
     + \left<\mathbf{v}\cdot\mathbf{n}, \hat{u}_h\right>_{\partial\mathcal{T}}
@@ -301,7 +301,7 @@ $K$ under the constraint $\left(1, u_h^*\right)_K = \left(1,
 u_h\right)_K$. The constraint is necessary because the minimization
 functional does not determine the constant part of $u_h^*$. This
 translates to the following system of equations:
-@f{eqnarray*}
+@f{eqnarray*}{
 \left(1, u_h^*\right)_K &=& \left(1, u_h\right)_K\\
 \left(\nabla w_h^*, \kappa \nabla u_h^*\right)_K &=&
 -\left(\nabla w_h^*, \mathbf{q}_h\right)_K

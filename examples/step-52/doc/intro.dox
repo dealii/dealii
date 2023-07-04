@@ -26,7 +26,7 @@ time-dependent diffusion equation -- which is just a different name for the
 heat equation discussed in step-26, plus some extra terms.
 We assume that the medium is not
 fissible and therefore, the neutron flux satisfies the following equation:
-@f{eqnarray*}
+@f{eqnarray*}{
 \frac{1}{v}\frac{\partial \phi(x,t)}{\partial t} = \nabla \cdot D(x) \nabla \phi(x,t)
 - \Sigma_a(x) \phi(x,t) + S(x,t)
 @f}
@@ -41,7 +41,7 @@ Since this program only intends to demonstrate how to use advanced time
 stepping algorithms, we will only look for the solutions of relatively simple
 problems. Specifically, we are looking for a solution on a square domain
 $[0,b]\times[0,b]$ of the form
-@f{eqnarray*}
+@f{eqnarray*}{
 \phi(x,t) = A\sin(\omega t)(bx-x^2).
 @f}
 By using quadratic finite elements, we can represent this function exactly at
@@ -54,7 +54,7 @@ We impose the following boundary conditions: homogeneous Dirichlet for $x=0$ and
 $x=b$ and homogeneous Neumann conditions for $y=0$ and $y=b$. We choose the
 source term so that the corresponding solution is
 in fact of the form stated above:
-@f{eqnarray*}
+@f{eqnarray*}{
 S=A\left(\frac{1}{v}\omega \cos(\omega t)(bx -x^2) + \sin(\omega t)
 \left(\Sigma_a (bx-x^2)+2D\right) \right).
 @f}
@@ -73,25 +73,25 @@ consequently observe the temporal convergence order with either.
 
 The Runge-Kutta methods implemented in deal.II assume that the equation to be
 solved can be written as:
-@f{eqnarray*}
+@f{eqnarray*}{
 \frac{dy}{dt} = g(t,y).
 @f}
 On the other hand, when using finite elements, discretized time derivatives always result in the
 presence of a @ref GlossMassMatrix "mass matrix" on the left hand side. This can easily be seen by
 considering that if the solution vector $y(t)$ in the equation above is in fact the vector
 of nodal coefficients $U(t)$ for a variable of the form
-@f{eqnarray*}
+@f{eqnarray*}{
   u_h(x,t) = \sum_j U_j(t) \varphi_j(x)
 @f}
 with spatial shape functions $\varphi_j(x)$, then multiplying an equation of
 the form
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac{\partial u(x,t)}{\partial t} = q(t,u(x,t))
 @f}
 by test functions, integrating over $\Omega$, substituting $u\rightarrow u_h$
 and restricting the test functions to the $\varphi_i(x)$ from above, then this
 spatially discretized equation has the form
-@f{eqnarray*}
+@f{eqnarray*}{
 M\frac{dU}{dt} = f(t,U),
 @f}
 where $M$ is the mass matrix and $f(t,U)$ is the spatially discretized version
@@ -99,17 +99,17 @@ of $q(t,u(x,t))$ (where $q$ is typically the place where spatial
 derivatives appear, but this is not of much concern for the moment given that
 we only consider time derivatives). In other words, this form fits the general
 scheme above if we write
-@f{eqnarray*}
+@f{eqnarray*}{
 \frac{dy}{dt} = g(t,y) = M^{-1}f(t,y).
 @f}
 
 Runke-Kutta methods are time stepping schemes that approximate $y(t_n)\approx
 y_{n}$ through a particular one-step approach. They are typically written in the form
-@f{eqnarray*}
+@f{eqnarray*}{
 y_{n+1} = y_n + \sum_{i=1}^s b_i k_i
 @f}
 where for the form of the right hand side above
-@f{eqnarray*}
+@f{eqnarray*}{
 k_i = \Delta t \, M^{-1} f\left(t_n+c_ih,y_n+\sum_{j=1}^sa_{ij}k_j\right).
 @f}
 Here $a_{ij}$, $b_i$, and $c_i$ are known coefficients that identify which
@@ -180,7 +180,7 @@ $\left(M - \tau \frac{\partial f}{\partial y}\right)^{-1} M$.
 
 The particular form of this operator results from the fact that each Newton
 step requires the solution of an equation of the form
-@f{align*}
+@f{align*}{
   \left(M - \tau \frac{\partial f}{\partial y}\right) \Delta y
   = -M h(t,y)
 @f}
@@ -201,16 +201,16 @@ be re-used between stages because $\tau$ is the same every time).
 
 By expanding the solution of our model problem
 as always using shape functions $\psi_j$ and writing
-@f{eqnarray*}
+@f{eqnarray*}{
 \phi_h(x,t) = \sum_j U_j(t) \psi_j(x),
 @f}
 we immediately get the spatially discretized version of the diffusion equation as
-@f{eqnarray*}
+@f{eqnarray*}{
   M \frac{dU(t)}{dt}
   = -{\cal D} U(t) - {\cal A} U(t) + {\cal S}(t)
 @f}
 where
-@f{eqnarray*}
+@f{eqnarray*}{
   M_{ij}  &=& (\psi_i,\psi_j), \\
   {\cal D}_{ij}  &=& (D\nabla\psi_i,\nabla\psi_j)_\Omega, \\
   {\cal A}_{ij}  &=& (\Sigma_a\psi_i,\psi_j)_\Omega, \\
@@ -220,12 +220,12 @@ See also step-24 and step-26 to understand how we arrive here.
 Boundary terms are not necessary due to the chosen boundary conditions for
 the current problem. To use the Runge-Kutta methods, we recast this
 as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
 f(y) = -{\cal D}y - {\cal A}y + {\cal S}.
 @f}
 In the code, we will need to be able to evaluate this function $f(U)$ along
 with its derivative,
-@f{eqnarray*}
+@f{eqnarray*}{
 \frac{\partial f}{\partial y} = -{\cal D} - {\cal A}.
 @f}
 

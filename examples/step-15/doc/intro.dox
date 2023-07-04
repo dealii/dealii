@@ -40,7 +40,7 @@ have to use Newton's method to compute the solution iteratively.
 In a classical sense, the problem is given in the following form:
 
 
-  @f{align*}
+  @f{align*}{
     -\nabla \cdot \left( \frac{1}{\sqrt{1+|\nabla u|^{2}}}\nabla u \right) &= 0 \qquad
     \qquad &&\textrm{in} ~ \Omega
     \\
@@ -53,7 +53,7 @@ space. In this example, we choose $\Omega$ as the unit disk.
 As described above, we solve this equation using Newton's method in which we
 compute the $n$th approximate solution from the $(n-1)$th one, and use
 a damping parameter $\alpha^n$ to get better global convergence behavior:
-  @f{align*}
+  @f{align*}{
     F'(u^{n},\delta u^{n})&=- F(u^{n})
     \\
     u^{n+1}&=u^{n}+\alpha^n \delta u^{n}

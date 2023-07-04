@@ -47,7 +47,7 @@ is described by
 <a href="https://en.wikipedia.org/wiki/Maxwell%27s_equations">Maxwell's
 equations</a>
 @cite Schwartz1972, @cite Monk2003 :
-@f{align*}
+@f{align*}{
   \frac{\partial}{\partial t} \mathbf{H} + \nabla \times \mathbf{E} &= -\mathbf{M}_a,
   \\
   \nabla \cdot \mathbf{H} &= \rho_m,
@@ -87,7 +87,7 @@ $\tilde{\mathbf{F}}(\mathbf{x})$ is a corresponding complex-valued vector
 field (or density). Inserting this ansatz into Maxwell's equations,
 substituting the charge conservation equations and some minor algebra then
 yields the so-called <em>time-harmonic</em> Maxwell's equations:
-@f{align*}
+@f{align*}{
   -i\omega \tilde{\mathbf{H}} + \nabla \times \tilde{\mathbf{E}} &=
   -\tilde{\mathbf{M}}_a,
   \\
@@ -144,7 +144,7 @@ and then taking the limit of the upper and lower part of the line integral
 approaching the sheet. In contrast, the tangential part of the electric
 field is continuous. By fixing a unit normal $\mathbf{\nu}$ on the hypersurface
 $\Sigma$ both jump conditions are
-@f{align*}
+@f{align*}{
 \mathbf{\nu} \times \left[(\mu^{-1}\mathbf{H})^+ - (\mu^{-1}\mathbf{H})^-\right]|_{\Sigma}
 &= \sigma^{\Sigma}\left[(\mathbf{\nu}\times \mathbf{E}\times \mathbf{\nu})\right]|_{\Sigma},
 \\
@@ -201,7 +201,7 @@ Finally, the interface conductivity is rescaled as
 @f]
 
 Accordingly, our rescaled equations are
-@f{align*}
+@f{align*}{
   -i\mu_r \hat{\mathbf{H}} + \hat{\nabla} \times \hat{\mathbf{E}}
   &= -\hat{\mathbf{M}}_a,
   \\
@@ -422,7 +422,7 @@ in which $r = e_r \cdot x$ and $s(\tau)$ is an appropriately chosen, nonnegative
 scaling function.
 
 We introduce the following $2\times2$ matrices
-@f{align*}
+@f{align*}{
   A &= T_{e_xe_r}^{-1} \text{diag}\left(\frac{1}{\bar{d}^2},
        \frac{1}{d\bar{d}}\right)T_{e_xe_r}
        \\
@@ -434,14 +434,14 @@ We introduce the following $2\times2$ matrices
 
 in which
 
-@f{align*}
+@f{align*}{
   d       &= 1 + is(r) \\
   \bar{d} &= 1 + i/r \int\limits_{\rho}^{r}s(\tau)\text{d}\tau
 @f}
 
 and $T_{e_xe_r}$ is the rotation matrix which rotates $e_r$ onto $e_x$.
 Thus, after applying the rescaling, we get the following modified parameters
-@f{align*}
+@f{align*}{
   \bar{\mu}_r^{-1}        &= \frac{\mu_r^{-1}}{d},
   \\
   \bar{\varepsilon}_r     &= A^{-1} \varepsilon_r B^{-1}, \text{ and }

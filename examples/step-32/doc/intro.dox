@@ -68,7 +68,7 @@ parallelize things, and finally the actual testcase we will consider.
 
 In step-31, we used the following Stokes model for the
 velocity and pressure field:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   -\rho \; \beta \; T \mathbf{g},
   \\
@@ -89,13 +89,13 @@ expression of the form $\rho(T) = \rho_{\text{ref}}
 $\rho_{\text{ref}}$ at reference temperature and decreases linearly as
 the temperature increases (as the material expands). The force balance
 equation then looks properly written like this:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   \rho_{\text{ref}} [1-\beta(T-T_{\text{ref}})] \mathbf{g}.
 @f}
 Now note that the gravity force results from a gravity potential as
 $\mathbf g=-\nabla \varphi$, so that we can re-write this as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   -\rho_{\text{ref}} \; \beta\; T\; \mathbf{g}
   -\rho_{\text{ref}} [1+\beta T_{\text{ref}}] \nabla\varphi.
@@ -104,7 +104,7 @@ The second term on the right is time independent, and so we could
 introduce a new "dynamic" pressure $p_{\text{dyn}}=p+\rho_{\text{ref}}
 [1+\beta T_{\text{ref}}] \varphi=p_{\text{total}}-p_{\text{static}}$
 with which the Stokes equations would read:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p_{\text{dyn}} &=&
   -\rho_{\text{ref}} \; \beta \; T \; \mathbf{g},
   \\
@@ -119,7 +119,7 @@ on the velocity field.)
 
 On the other hand, we will here use the form of the Stokes equations
 that considers the total pressure instead:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   \rho(T)\; \mathbf{g},
   \\
@@ -176,7 +176,7 @@ this turns out not to be a limiting factor.
 <h3> The scaling of discretized equations </h3>
 
 Remember that we want to solve the following set of equations:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   \rho(T) \mathbf{g},
   \\
@@ -195,7 +195,7 @@ the temperature equation forward by one time interval.
 
 The problem under consideration in this current section is with the
 Stokes problem: if we discretize it as usual, we get a linear system
-@f{eqnarray*}
+@f{eqnarray*}{
   M \; X
   =
   \left(\begin{array}{cc}
@@ -272,7 +272,7 @@ in our domain (which experiments show is best chosen to be the diameter of
 plumes &mdash; around 10 km &mdash; rather than the diameter of the
 domain). Using these %numbers for $\eta$ and $L$, this factor is around
 $10^{17}$. So, we now get this for the Stokes system:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   \rho(T) \; \mathbf{g},
   \\
@@ -282,7 +282,7 @@ The trouble with this is that the result is not symmetric any more (we have
 $\frac{\eta}{L} \nabla \cdot$ at the bottom left, but not its transpose
 operator at the top right). This, however, can be cured by introducing a
 scaled pressure $\hat p = \frac{L}{\eta}p$, and we get the scaled equations
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) +
   \nabla \left(\frac{\eta}{L} \hat p\right) &=&
   \rho(T) \; \mathbf{g},
@@ -310,7 +310,7 @@ also have to scale the pressure immediately <i>before</i> solving.
 In this tutorial program, we apply a variant of the preconditioner used in
 step-31. That preconditioner was built to operate on the
 system matrix $M$ in block form such that the product matrix
-@f{eqnarray*}
+@f{eqnarray*}{
   P^{-1} M
   =
   \left(\begin{array}{cc}
@@ -430,7 +430,7 @@ Similarly to step-31, we will use an artificial viscosity for stabilization
 based on a residual of the equation.  As a difference to step-31, we will
 provide two slightly different definitions of the stabilization parameter. For
 $\alpha=1$, we use the same definition as in step-31:
-@f{eqnarray*}
+@f{eqnarray*}{
   \nu_\alpha(T)|_K
   =
   \nu_1(T)|_K
@@ -449,16 +449,16 @@ regions where the residual is large (around steep gradients). This definition
 has been shown to work well for the given case, $\alpha = 1$ in step-31, but
 it is usually less effective as the diffusion for $\alpha=2$. For that case, we
 choose a slightly more readable definition of the viscosity,
-@f{eqnarray*}
+@f{eqnarray*}{
   \nu_2(T)|_K = \min (\nu_h^\mathrm{max}|_K,\nu_h^\mathrm{E}|_K)
 @f}
 where the first term gives again the maximum dissipation (similarly to a first
 order upwind scheme),
-@f{eqnarray*}
+@f{eqnarray*}{
   \nu^\mathrm{max}_h|_K = \beta h_K \|\mathbf {u}\|_{L^\infty(K)}
 @f}
 and the entropy viscosity is defined as
-@f{eqnarray*}
+@f{eqnarray*}{
   \nu^\mathrm{E}_h|_K = c_R \frac{h_K^2 \|R_\mathrm{2,E}(T)\|_{L^\infty(K)}}
   {\|E(T) - \bar{E}(T)\|_{L^\infty(\Omega)} }.
 @f}
@@ -469,7 +469,7 @@ Comput. Phys., 230, 4248--4267.</i> Compared to the case $\alpha = 1$, the
 residual is computed from the temperature entropy, $E(T) = \frac12 (T-T_m)^2$
 with $T_m$ an average temperature (we choose the mean between the maximum and
 minimum temperature in the computation), which gives the following formula
-@f{eqnarray*}
+@f{eqnarray*}{
  R_\mathrm{E}(T) = \frac{\partial E(T)}{\partial t} +
     (T-T_\mathrm{m}) \left(\mathbf{u} \cdot \nabla T -  \kappa \nabla^2 T - \gamma\right).
 @f}
@@ -504,7 +504,7 @@ decreasing $c_R$.
 
 As we did in step-31, we first determine an optimal value of $\beta$
 by using the "traditional" formula
-@f{eqnarray*}
+@f{eqnarray*}{
   \nu_\alpha(T)|_K
   =
   \beta
@@ -564,7 +564,7 @@ The standard Taylor-Hood discretization for Stokes, using the $Q_{k+1}^d
 the divergence equation reads $(q_h, \textrm{div}\; \mathbf u_h)=0, \forall
 q_h\in Q_h$. Because the pressure space does contain the function $q_h=1$, we
 get
-@f{align*}
+@f{align*}{
   0 = (1, \textrm{div}\; \mathbf u_h)_\Omega
   = \int_\Omega \textrm{div}\; \mathbf u_h
   = \int_{\partial\Omega} \mathbf n \cdot \mathbf u_h
@@ -589,7 +589,7 @@ This space turns out to be stable for the Stokes equation.
 Because the space is discontinuous, we can now in particular choose the test
 function $q_h(\mathbf x)=\chi_K(\mathbf x)$, i.e. the characteristic function
 of cell $K$. We then get in a similar fashion as above
-@f{align*}
+@f{align*}{
   0
   = (q_h, \textrm{div}\; \mathbf u_h)_\Omega
   = (1, \textrm{div}\; \mathbf u_h)_K
@@ -851,7 +851,7 @@ realistic description is a goal of the <i>ASPECT</i> code in
 development at the time of writing this.
 
 As a reminder, let us again state the equations we want to solve are these:
-@f{eqnarray*}
+@f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) +
   \nabla \left( \frac{\eta}{L} \hat p\right) &=&
   \rho(T) \mathbf{g},
@@ -900,14 +900,14 @@ the following quantities:
   by looking at the pictures shown in the <a href="#Results">results section
   below</a>. The initial temperature field we use here is given in terms of
   the radius by
-  @f{align*}
+  @f{align*}{
     s &= \frac{\|\mathbf x\|-R_0}{R_1-R_0}, \\
     \varphi &= \arctan \frac{y}{x}, \\
     \tau &= s + \frac 15 s(1-s) \sin(6\varphi) q(z), \\
     T(\mathbf x) &= T_0(1-\tau) + T_1\tau,
   @f}
   where
-  @f{align*}
+  @f{align*}{
     q(z) = \left\{
     \begin{array}{ll}
       1 & \text{in 2d} \\
@@ -986,7 +986,7 @@ the following quantities:
   the medium on the other side is in motion as well, so the shear stress
   would, in the simplest case, be proportional to the <i>velocity
   difference</i>, leading to a boundary condition of the form
-  @f{align*}
+  @f{align*}{
     \mathbf{n}\cdot [2\eta \varepsilon(\mathbf v)]
     &=
     s \mathbf{n} \times [\mathbf v - \mathbf v_0],

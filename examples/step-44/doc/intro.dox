@@ -251,7 +251,7 @@ Following the multiplicative decomposition of the deformation gradient, the Helm
 	\Psi(\mathbf{b}) = \Psi_{\text{vol}}(J) + \Psi_{\text{iso}}(\overline{\mathbf{b}}) \, .
 @f]
 Similarly, the Kirchhoff stress can be decomposed into volumetric and isochoric parts as $\boldsymbol{\tau} = \boldsymbol{\tau}_{\text{vol}} + \boldsymbol{\tau}_{\text{iso}}$ where:
-@f{align*}
+@f{align*}{
 	\boldsymbol{\tau}_{\text{vol}} &=
 		2 \mathbf{b} \dfrac{\partial \Psi_{\textrm{vol}}(J)}{\partial \mathbf{b}}
 		\\
@@ -325,7 +325,7 @@ can be written in the following decoupled form:
 	\mathfrak{c} = \mathfrak{c}_{\text{vol}} + \mathfrak{c}_{\text{iso}} \, ,
 @f]
 where
-@f{align*}
+@f{align*}{
 	J \mathfrak{c}_{\text{vol}}
 		&= 4 \mathbf{b} \dfrac{\partial^2 \Psi_{\text{vol}}(J)} {\partial \mathbf{b} \partial \mathbf{b}} \mathbf{b}
 		\\
@@ -382,7 +382,7 @@ The body force per unit current volume is denoted $\mathbf{b}^\text{p}$.
 
 
 The stationarity of the potential follows as
-@f{align*}
+@f{align*}{
 	R(\mathbf\Xi;\delta \mathbf{\Xi})
 		&= D_{\delta \mathbf{\Xi}}\Pi(\mathbf{\Xi})
 		\\
@@ -420,7 +420,7 @@ It should be noted however that they are equivalent.
 
 
 The Euler-Lagrange equations corresponding to the residual are:
-@f{align*}
+@f{align*}{
 	&\textrm{div}\ \boldsymbol{\sigma} + \mathbf{b}^\text{p} = \mathbf{0} && \textrm{[equilibrium]}
 		\\
 	&J(\mathbf{u}) = \widetilde{J} 		&& \textrm{[dilatation]}
@@ -432,7 +432,7 @@ The second is the constraint that $J(\mathbf{u}) = \widetilde{J}$.
 The third is the definition of the pressure $\widetilde{p}$.
 
 @note The simplified single-field derivation ($\mathbf{u}$ is the only primary variable) below makes it clear how we transform the limits of integration to the reference domain:
-@f{align*}
+@f{align*}{
 \int_{\Omega}\delta \mathbf{u} \cdot [\textrm{div}\ \boldsymbol{\sigma} + \mathbf{b}^\text{p}]~\mathrm{d}v
 &=
 \int_{\Omega} [-\mathrm{grad}\delta \mathbf{u}:\boldsymbol{\sigma} + \delta \mathbf{u} \cdot\mathbf{b}^\text{p}]~\mathrm{d}v
@@ -483,7 +483,7 @@ The tangent is given by
 		=: K(\mathbf{\Xi}_{\mathsf{i}}; d \mathbf{\Xi}, \delta \mathbf{\Xi}) \, .
 @f]
 Thus,
-@f{align*}
+@f{align*}{
  	K(\mathbf{\Xi}_{\mathsf{i}}; d \mathbf{\Xi}, \delta \mathbf{\Xi})
  		&=
  			D_{d \mathbf{u}} R( \mathbf{\Xi}_{\mathsf{i}}; \delta \mathbf{\Xi}) \cdot d \mathbf{u}
@@ -495,7 +495,7 @@ Thus,
  			  D_{d \widetilde{J}} R( \mathbf{\Xi}_{\mathsf{i}}; \delta \mathbf{\Xi})  d \widetilde{J} \, ,
 @f}
 where
-@f{align*}
+@f{align*}{
 	D_{d \mathbf{u}} R( \mathbf{\Xi}; \delta \mathbf{\Xi})
  	&=
  	\int_{\Omega_0} \bigl[ \textrm{grad}\ \delta \mathbf{u} :
@@ -518,7 +518,7 @@ where
 @f}
 
 Note that the following terms are termed the geometrical stress and  the material contributions to the tangent matrix:
-@f{align*}
+@f{align*}{
 & \int_{\Omega_0} \textrm{grad}\ \delta \mathbf{u} :
  			\textrm{grad}\ d \mathbf{u} [\boldsymbol{\tau}_{\textrm{iso}} +  \boldsymbol{\tau}_{\textrm{vol}}]~\textrm{d}V
  			&& \quad {[\textrm{Geometrical stress}]} \, ,
@@ -558,7 +558,7 @@ The linearised problem can be written as
 	\mathbf{ \mathsf{F}}(\mathbf{\Xi}_{\textrm{i}})
 @f]
 where
-@f{align*}
+@f{align*}{
 		\underbrace{\begin{bmatrix}
 			\mathbf{\mathsf{K}}_{uu}	&	\mathbf{\mathsf{K}}_{u\widetilde{p}}	& \mathbf{0}
 			\\
@@ -596,7 +596,7 @@ by inverting a local matrix and multiplying it by the local right hand
 side. We can then insert the result into the remaining equations and recover
 a classical displacement-based method.
 In order to condense out the pressure and dilatation contributions at the element level we need the following results:
-@f{align*}
+@f{align*}{
 		d \widetilde{\mathbf{\mathsf{p}}}
 		& = \mathbf{\mathsf{K}}_{\widetilde{J}\widetilde{p}}^{-1} \bigl[
 			 \mathbf{\mathsf{F}}_{\widetilde{J}}

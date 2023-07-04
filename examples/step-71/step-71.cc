@@ -2001,7 +2001,7 @@ namespace Step71
     // \boldsymbol{\mathbb{H}}
     //     \right]
     // @f]
-    // @f{align}
+    // @f{align}{
     //  \mathbf{S}^{\text{tot}} \left( \mathbf{C}, \boldsymbol{\mathbb{H}}
     //  \right)
     // \dealcoloneq 2 \frac{d \psi_{0} \left( \mathbf{C},
@@ -2083,7 +2083,7 @@ namespace Step71
     //     \right)}{d \boldsymbol{\mathbb{H}} \otimes d \boldsymbol{\mathbb{H}}}
     // + \mu_{0} \mu_{r} \text{det}(\mathbf{F}) \mathbf{C}^{-1}
     // @f]
-    // @f{align}
+    // @f{align}{
     // \mathfrak{P}^{\text{tot}} \left( \mathbf{C}, \boldsymbol{\mathbb{H}}
     // \right) = - \frac{d \mathbf{S}^{\text{tot}}}{d \boldsymbol{\mathbb{H}}}
     // &= - \mu_{e}
@@ -2114,7 +2114,7 @@ namespace Step71
     //     \cdot \boldsymbol{\mathbb{H}}
     //       \right]}{d \mathbf{C} \otimes \mathbf{C} \boldsymbol{\mathbb{H}}}
     // @f}
-    // @f{align}
+    // @f{align}{
     // \mathcal{H}^{\text{tot}} \left( \mathbf{C}, \boldsymbol{\mathbb{H}}
     // \right) = 2 \frac{d \mathbf{S}^{\text{tot}}}{d \mathbf{C}}
     // &= 2 \mu_{e} f_{\mu_{e}} \left( \boldsymbol{\mathbb{H}} \right)
@@ -2198,7 +2198,7 @@ namespace Step71
     // = - C^{-1}_{ac} C^{-1}_{be} \mathbb{H}_{e} - C^{-1}_{ae} \mathbb{H}_{e}
     // C^{-1}_{bc}
     // @f]
-    // @f{align}
+    // @f{align}{
     // \frac{d^{2} \left[ \boldsymbol{\mathbb{H}} \cdot \mathbf{C}^{-1} \cdot
     // \boldsymbol{\mathbb{H}}\right]}{d \mathbf{C} \otimes d \mathbf{C}}
     // &= -\frac{d \left[\left[ \mathbf{C}^{-1} \cdot \boldsymbol{\mathbb{H}}
@@ -2712,7 +2712,7 @@ namespace Step71
     //  \right] \otimes \frac{d f_{\mu_{v}^{MVE}} \left( \boldsymbol{\mathbb{H}}
     //  \right)}{d \boldsymbol{\mathbb{H}}}
     // @f]
-    // @f{align}
+    // @f{align}{
     // \mathcal{H}^{\text{tot}, MVE} \left( \mathbf{C}, \mathbf{C}_{v},
     // \boldsymbol{\mathbb{H}} \right)
     // &= 2 \mu_{v} f_{\mu_{v}^{MVE}} \left( \boldsymbol{\mathbb{H}} \right)

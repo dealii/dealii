@@ -378,7 +378,7 @@ namespace step62
 
   // This function defines the spatial shape of the force vector pulse which
   // takes the form of a Gaussian function
-  // @f{align*}
+  // @f{align*}{
   // F_x &=
   // \left\{
   // \begin{array}{ll}

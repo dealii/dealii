@@ -1008,7 +1008,7 @@ namespace Step69
   // Finally, assuming that $\mathbf{x}_i$ is a support point at the boundary,
   // the (nodal) normals are defined as:
   //
-  // @f{align*}
+  // @f{align*}{
   // \widehat{\boldsymbol{\nu}}_i \dealcoloneq
   //  \frac{\int_{\partial\Omega} \phi_i \widehat{\boldsymbol{\nu}} \,
   //  \, \mathrm{d}\mathbf{s}}{\big|\int_{\partial\Omega} \phi_i
@@ -1474,7 +1474,7 @@ namespace Step69
     // Next, we need two local wavenumbers that are defined in terms of a
     // primitive state $[\rho, u, p, a]$ and a given pressure $p^\ast$
     // @cite GuermondPopov2016  Eqn. (3.7):
-    // @f{align*}
+    // @f{align*}{
     //   \lambda^- = u - a\,\sqrt{1 + \frac{\gamma+1}{2\gamma}
     //   \left(\frac{p^\ast-p}{p}\right)_+}
     // @f}
@@ -1498,7 +1498,7 @@ namespace Step69
     }
 
     // Analougously @cite GuermondPopov2016 Eqn. (3.8):
-    // @f{align*}
+    // @f{align*}{
     //   \lambda^+ = u + a\,\sqrt{1 + \frac{\gamma+1}{2\gamma}
     //   \left(\frac{p^\ast-p}{p}\right)_+}
     // @f}
@@ -1557,7 +1557,7 @@ namespace Step69
     // general, not as sharp as the two-rarefaction estimate. But it will
     // save the day in the context of near vacuum conditions when the
     // two-rarefaction approximation might attain extreme values:
-    // @f{align*}
+    // @f{align*}{
     //   \lambda_{\text{exp}} = \max(u_i,u_j) + 5. \max(a_i, a_j).
     // @f}
     // @note The constant 5.0 multiplying the maximum of the sound speeds

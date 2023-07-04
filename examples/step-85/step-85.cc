@@ -427,7 +427,7 @@ namespace Step85
         // etc., one can use its normal_vector(..)-function to get an outward
         // normal to the immersed surface, $\Gamma$. In terms of the level set
         // function, this normal reads
-        // @f{equation*}
+        // @f{equation*}{
         //   n = \frac{\nabla \psi}{\| \nabla \psi \|}.
         // @f}
         // An additional benefit of std::optional is that we do not need any
@@ -573,7 +573,7 @@ namespace Step85
   // To test that the implementation works as expected, we want to compute the
   // error in the solution in the $L^2$-norm. The analytical solution to the
   // Poisson problem stated in the introduction reads
-  // @f{align*}
+  // @f{align*}{
   //  u(x) = 1 - \frac{2}{\text{dim}}(\| x \|^2 - 1) , \qquad x \in
   //  \overline{\Omega}.
   // @f}

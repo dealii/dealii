@@ -52,7 +52,7 @@ G_i(\mathbf w)$, $i=1,\ldots,dim+2$.
 
 For the Euler equations, the flux matrix $\mathbf F$ (or system of flux functions)
 is defined as (shown here for the case $d=3$)
-@f{eqnarray*}
+@f{eqnarray*}{
   \mathbf F(\mathbf w)
   =
   \left(
@@ -67,7 +67,7 @@ is defined as (shown here for the case $d=3$)
 @f}
 and we will choose as particular right hand side forcing only the effects of
 gravity, described by
-@f{eqnarray*}
+@f{eqnarray*}{
   \mathbf G(\mathbf w)
   =
   \left(
@@ -82,7 +82,7 @@ gravity, described by
 @f}
 where $\mathbf g=(g_1,g_2,g_3)^T$ denotes the gravity vector.
 With this, the entire system of equations reads:
-@f{eqnarray*}
+@f{eqnarray*}{
   \partial_t (\rho v_i) + \sum_{s=1}^d \frac{\partial(\rho v_i v_s +
   \delta_{is} p)}{\partial x_s} &=& g_i \rho, \qquad i=1,\dots,d, \\
   \partial_t \rho + \sum_{s=1}^d \frac{\partial(\rho v_s)}{\partial x_s} &=& 0,  \\
@@ -108,7 +108,7 @@ in step-12:
 We choose a finite element space $V_h$, and integrate our conservation law against
 our (vector-valued) test function $\mathbf{z} \in V_h$.  We then integrate by parts and approximate the
 boundary flux with a <i> numerical </i> flux $\mathbf{H}$,
-@f{eqnarray*}
+@f{eqnarray*}{
 &&\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{z}) + (\nabla \cdot \mathbf{F}(\mathbf{w}), \mathbf{z}) \\
 &\approx &\int_{\Omega} (\partial_t \mathbf{w}, \mathbf{z}) - (\mathbf{F}(\mathbf{w}), \nabla \mathbf{z}) + h^{\eta}(\nabla \mathbf{w} , \nabla \mathbf{z}) + \int_{\partial \Omega} (\mathbf{H}(\mathbf{w}^+, \mathbf{w}^-, \mathbf{n}), \mathbf{z}^+),
 @f}
@@ -136,7 +136,7 @@ Compressible Euler Equations", PhD thesis, University of Heidelberg, 2002).
 We use a time stepping scheme to substitute the time derivative in the
 above equations. For simplicity, we define $ \mathbf{B}({\mathbf{w}_{n}})(\mathbf z) $ as the spatial residual at time step $n$ :
 
-@f{eqnarray*}
+@f{eqnarray*}{
  \mathbf{B}(\mathbf{w}_{n})(\mathbf z)  &=&
 - \int_{\Omega} \left(\mathbf{F}(\mathbf{w}_n),
 \nabla\mathbf{z}\right) +  h^{\eta}(\nabla \mathbf{w}_n , \nabla \mathbf{z}) \\
@@ -151,7 +151,7 @@ above equations. For simplicity, we define $ \mathbf{B}({\mathbf{w}_{n}})(\mathb
 At each time step, our full discretization is thus
 that the residual applied to any test
 function $\mathbf z$ equals zero:
-@f{eqnarray*}
+@f{eqnarray*}{
 R(\mathbf{W}_{n+1})(\mathbf z) &=&
 \int_{\Omega} \left(\frac{{\mathbf w}_{n+1} - \mathbf{w}_n}{\delta t},
 \mathbf{z}\right)+
@@ -176,7 +176,7 @@ applied, and $\delta T$ the current time step.
 With these choices, equating the residual to zero results in a
 nonlinear system of equations $R(\mathbf{W}_{n+1})=0$. We solve this nonlinear system by a
 Newton iteration (in the same way as explained in step-15), i.e. by iterating
-@f{eqnarray*}
+@f{eqnarray*}{
 R'(\mathbf{W}^k_{n+1},\delta \mathbf{W}_{n+1}^k)(\mathbf z) & = & -
 R(\mathbf{W}^{k}_{n+1})(\mathbf z) \qquad \qquad \forall \mathbf z\in V_h \\
 \mathbf{W}^{k+1}_{n+1} &=& \mathbf{W}^k_{n+1} + \delta \mathbf{W}^k_{n+1},
@@ -184,7 +184,7 @@ R(\mathbf{W}^{k}_{n+1})(\mathbf z) \qquad \qquad \forall \mathbf z\in V_h \\
 until $|R(\mathbf{W}^k_{n+1})|$ (the residual) is sufficiently small. By
 testing with the nodal basis of a finite element space instead of all
 $\mathbf z$, we arrive at a linear system for $\delta \mathbf W$:
-@f{eqnarray*}
+@f{eqnarray*}{
 \mathbf R'(\mathbf{W}^k_{n+1})\delta \mathbf{W}^k_{n+1} & = & -
 \mathbf R(\mathbf{W}^{k}_{n+1}).
 @f}

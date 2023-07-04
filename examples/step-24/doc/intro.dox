@@ -71,7 +71,7 @@ where $\lambda = - \frac{\beta}{C_p}$.
 
 This somewhat strange equation with the derivative of a Dirac delta function
 on the right hand side can be rewritten as an initial value problem as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
 \Delta \bar{p}- \frac{1}{c_0^2} \frac{\partial^2 \bar{p}}{\partial t^2} & = &
 0 \\
 \bar{p}(0,\mathbf r) &=& c_0^2 \lambda a(\mathbf r) = b(\mathbf r)  \\
@@ -120,12 +120,12 @@ v = \frac{\partial\bar{p}}{\partial t}
 
 With the second variable, one then transforms the forward problem into
 two separate equations:
-@f{eqnarray*}
+@f{eqnarray*}{
 \bar{p}_{t} - v & = & 0 \\
 \Delta\bar{p} - \frac{1}{c_0^2}\,v_{t} & = & f
 @f}
 with initial conditions:
-@f{eqnarray*}
+@f{eqnarray*}{
 \bar{p}(0,\mathbf r) & = & b(r) \\
 v(0,\mathbf r)=\bar{p}_t(0,\mathbf r) & = & 0.
 @f}
@@ -135,7 +135,7 @@ to the thermoacoustic problem $f=0$.
 
 The semi-discretized, weak version of this model, using the general $\theta$ scheme
 introduced in step-23 is then:
-@f{eqnarray*}
+@f{eqnarray*}{
 \left(\frac{\bar{p}^n-\bar{p}^{n-1}}{k},\phi\right)_\Omega-
 \left(\theta v^{n}+(1-\theta)v^{n-1},\phi\right)_\Omega & = & 0   \\
 -\left(\nabla((\theta\bar{p}^n+(1-\theta)\bar{p}^{n-1})),\nabla\phi\right)_\Omega-
@@ -154,7 +154,7 @@ absorbing boundary conditions are incorporated into the weak form by using
 
 From this we obtain the discrete model by introducing a finite number of shape
 functions, and get
-@f{eqnarray*}
+@f{eqnarray*}{
 M\bar{p}^{n}-k \theta M v^n & = & M\bar{p}^{n-1}+k (1-\theta)Mv^{n-1},\\
 
 (-c_0^2k \theta A-c_0 B)\bar{p}^n-Mv^{n} & = &
@@ -198,7 +198,7 @@ G_2 \\
 
 By simple transformations, one then obtains two equations for
 the pressure potential and its derivative, just as in the previous tutorial program:
-@f{eqnarray*}
+@f{eqnarray*}{
 (M+(k\,\theta\,c_{0})^{2}A+c_0k\theta B)\bar{p}^{n} & = &
 G_{1}+(k\, \theta)G_{2}-(c_0k)^2\theta (\theta F^{n}+(1-\theta)F^{n-1}) \\
 Mv^n & = & -(c_0^2\,k\, \theta\, A+c_0B)\bar{p}^{n}+ G_2 -

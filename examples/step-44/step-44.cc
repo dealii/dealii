@@ -1452,7 +1452,7 @@ namespace Step44
       BlockDynamicSparsityPattern dsp(dofs_per_block, dofs_per_block);
 
       // The global system matrix initially has the following structure
-      // @f{align*}
+      // @f{align*}{
       // \underbrace{\begin{bmatrix}
       //   \mathsf{\mathbf{K}}_{uu}  & \mathsf{\mathbf{K}}_{u\widetilde{p}} &
       //   \mathbf{0}
@@ -2503,7 +2503,7 @@ namespace Step44
     // the dof associated with the current element
     // (denoted somewhat loosely as $\mathsf{\mathbf{k}}$)
     // is of the form:
-    // @f{align*}
+    // @f{align*}{
     //    \begin{bmatrix}
     //       \mathsf{\mathbf{k}}_{uu}  &  \mathsf{\mathbf{k}}_{u\widetilde{p}}
     //       & \mathbf{0}
@@ -2514,7 +2514,7 @@ namespace Step44
     // @f}
     //
     // We now need to modify it such that it appear as
-    // @f{align*}
+    // @f{align*}{
     //    \begin{bmatrix}
     //       \mathsf{\mathbf{k}}_{\textrm{con}}   &
     //       \mathsf{\mathbf{k}}_{u\widetilde{p}}    & \mathbf{0}
@@ -2684,7 +2684,7 @@ namespace Step44
       {
         // Firstly, here is the approach using the (permanent) augmentation of
         // the tangent matrix. For the following, recall that
-        // @f{align*}
+        // @f{align*}{
         //  \mathsf{\mathbf{K}}_{\textrm{store}}
         //\dealcoloneq
         //  \begin{bmatrix}
@@ -2697,7 +2697,7 @@ namespace Step44
         //  \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{J}} \end{bmatrix} \, .
         // @f}
         // and
-        //  @f{align*}
+        //  @f{align*}{
         //              d \widetilde{\mathsf{\mathbf{p}}}
         //              & =
         //              \mathsf{\mathbf{K}}_{\widetilde{J}\widetilde{p}}^{-1}

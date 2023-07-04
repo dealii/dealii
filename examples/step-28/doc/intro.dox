@@ -39,7 +39,7 @@ fluxes. Assume we have energy groups $g=1,\ldots,G$, where by convention we
 assume that the neutrons with the highest energy are in group 1 and those with
 the lowest energy in group $G$. Then the neutron flux of each group satisfies the
 following equations:
-@f{eqnarray*}
+@f{eqnarray*}{
 \frac 1{v_g}\frac{\partial \phi_g(x,t)}{\partial t}
 &=&
 \nabla \cdot(D_g(x) \nabla \phi_g(x,t))
@@ -108,7 +108,7 @@ below).
 
 If we consider all energy groups at once, we may write above equations in the
 following operator form:
-@f{eqnarray*}
+@f{eqnarray*}{
 \frac 1v \frac{\partial \phi}{\partial t}
 =
 -L\phi
@@ -126,7 +126,7 @@ that $L$ is symmetric, whereas $F$ and $X$ are not.
 It is well known that this equation admits a stable solution if all
 eigenvalues of the operator $-L+F+X$ are negative. This can be readily seen by
 multiplying the equation by $\phi$ and integrating over the domain, leading to
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac 1{2v} \frac{\partial}{\partial t}  \|\phi\|^2 = ((-L+F+X)\phi,\phi).
 @f}
 Stability means that the solution does not grow, i.e. we want the left hand
@@ -136,7 +136,7 @@ not very desirable if a nuclear reactor produces neutron fluxes that grow
 exponentially, so eigenvalue analyses are the bread-and-butter of nuclear
 engineers. The main point of the program is therefore to consider the
 eigenvalue problem
-@f{eqnarray*}
+@f{eqnarray*}{
   (L-F-X) \phi = \lambda \phi,
 @f}
 where we want to make sure that all eigenvalues are positive. Note that $L$,
@@ -149,20 +149,20 @@ In nuclear engineering, one typically looks at a slightly different
 formulation of the eigenvalue problem. To this end, we do not just multiply
 with $\phi$ and integrate, but rather multiply with $\phi(L-X)^{-1}$. We then
 get the following evolution equation:
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac 1{2v} \frac{\partial}{\partial t}  \|\phi\|^2_{(L-X)^{-1}} = ((L-X)^{-1}(-L+F+X)\phi,\phi).
 @f}
 Stability is then guaranteed if the eigenvalues of the following problem are
 all negative:
-@f{eqnarray*}
+@f{eqnarray*}{
   (L-X)^{-1}(-L+F+X)\phi = \lambda_F \phi,
 @f}
 which is equivalent to the eigenvalue problem
-@f{eqnarray*}
+@f{eqnarray*}{
   (L-X)\phi = \frac 1{\lambda_F+1} F \phi.
 @f}
 The typical formulation in nuclear engineering is to write this as
-@f{eqnarray*}
+@f{eqnarray*}{
   (L-X) \phi = \frac 1{k_{\mathrm{eff}}} F \phi,
 @f}
 where $k_{\mathrm{eff}}=\frac 1{\lambda^F+1}$.
@@ -211,7 +211,7 @@ like this:
   and $k_{\mathrm{eff}}^{(0)}$ and let $n=1$.
 
 <li> Define the so-called <i>fission source</i> by
-  @f{eqnarray*}
+  @f{eqnarray*}{
     s_f^{(n-1)}(x)
     =
     \frac{1}{k_{\mathrm{eff}}^{(n-1)}}
@@ -219,7 +219,7 @@ like this:
   @f}
 
 <li> Solve for all group fluxes $\phi_g,g=1,\ldots,G$ using
-  @f{eqnarray*}
+  @f{eqnarray*}{
     -\nabla \cdot D_g\nabla \phi_g^{(n)}
     +
     \Sigma_{r,g}\phi_g^{(n)}
@@ -232,7 +232,7 @@ like this:
   @f}
 
 <li> Update
-  @f{eqnarray*}
+  @f{eqnarray*}{
     k_{\mathrm{eff}}^{(n)}
     =
     \sum_{g'=1}^G
@@ -292,7 +292,7 @@ again use the a posteriori error estimator by Kelly, Gago, Zienkiewicz
 and Babuska which approximates the error per cell by integrating the jump of
 the gradient of the solution along the faces of each cell. Using this, we
 obtain indicators
-@f{eqnarray*}
+@f{eqnarray*}{
 \eta_{g,K}, \qquad g=1,2,\ldots,G,\qquad K\in{\cal T}_g,
 @f}
 where ${\cal T}_g$ is the triangulation used in the solution of
@@ -315,7 +315,7 @@ there, however, and simply assume that all energy groups are equally
 important, and will therefore normalize the error indicators $\eta_{g,K}$ for
 group $g$ by the maximum of the solution $\phi_g$. We then refine the cells
 whose errors satisfy
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
   >
   \alpha_1
@@ -323,7 +323,7 @@ whose errors satisfy
     \frac{\eta_{g,K}}{\|\phi_g\|_\infty}}
 @f}
 and coarsen the cells where
-@f{eqnarray*}
+@f{eqnarray*}{
   \frac{\eta_{g,K}}{\|\phi_g\|_\infty}
   <
   \alpha_2
@@ -352,7 +352,7 @@ form the weak form for the equation to compute $\phi_g^{(n)}$ as usual by
 multiplication with test functions $\varphi_g^i$ defined on the mesh for
 energy group $g$; in the process, we have to
 compute the right hand side vector that contains terms of the following form:
-@f{eqnarray*}
+@f{eqnarray*}{
   F_i = \int_\Omega f(x) \varphi_g^i(x) \phi_{g'}(x) \ dx,
 @f}
 where $f(x)$ is one of the coefficient functions $\Sigma_{s,g'\to g}$ or
@@ -362,7 +362,7 @@ the mesh for energy group $g'$, i.e. it can be expanded as
 $\phi_{g'}(x)=\sum_j\phi_{g'}^j \varphi_{g'}^j(x)$, with basis functions
 $\varphi_{g'}^j(x)$ defined on mesh $g'$. The contribution to the right hand
 side can therefore be written as
-@f{eqnarray*}
+@f{eqnarray*}{
   F_i = \sum_j \left\{\int_\Omega f(x) \varphi_g^i(x) \varphi_{g'}^j(x)
   \ dx \right\} \phi_{g'}^j ,
 @f}
@@ -389,7 +389,7 @@ GridTools::get_finest_common_cells that computes exactly this set
 of cells that are active on at least one of two meshes.
 
 With this, we can write above integral as follows:
-@f{eqnarray*}
+@f{eqnarray*}{
   F_i
   =
   \sum_{K \in {\cal T}_g \cap {\cal T}_{g'}}
@@ -436,7 +436,7 @@ these three cases, as follows:
   of $\phi_g^i$ to child cell $K_c$ into the basis functions defined on that
   child cell (i.e. on cells on which the basis functions $\varphi_{g'}^l$ are
   defined):
-  @f{eqnarray*}
+  @f{eqnarray*}{
     \phi_g^i|_{K_c} = B_c^{il} \varphi_{g'}^l|_{K_c}.
   @f}
   Here, and in the following, summation over indices appearing twice is
@@ -445,7 +445,7 @@ these three cases, as follows:
 
   Then we can write the contribution of cell $K$ to the right hand side
   component $F_i$ as
-  @f{eqnarray*}
+  @f{eqnarray*}{
     F_i|_K
     &=&
     \left\{ \int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x)
@@ -458,7 +458,7 @@ these three cases, as follows:
     \ dx \right\} \phi_{g'}^j.
   @f}
   In matrix notation, this can be written as
-  @f{eqnarray*}
+  @f{eqnarray*}{
     F_i|_K
     =
     \sum_{0\le c<2^{\texttt{dim}}}
@@ -478,11 +478,11 @@ these three cases, as follows:
   until we find an active cell. We then have to sum up all the contributions
   from all the children, grandchildren, etc, of cell $K$, with contributions
   of the form
-  @f{eqnarray*}
+  @f{eqnarray*}{
     F_i|_{K_{cc'}} = (B_cB_{c'} M_{K_{cc'}})^{ij}  \phi_{g'}^j,
   @f}
   or
-  @f{eqnarray*}
+  @f{eqnarray*}{
     F_i|_{K_{cc'c''}} = (B_c B_{c'} B_{c''}M_{K_{cc'c''}})^{ij}
     \phi_{g'}^j,
   @f}
@@ -499,7 +499,7 @@ these three cases, as follows:
   than $\varphi_g^i$ as before. This of course works in exactly the same
   way. If the children of $K$ are active on mesh $g$, then
   leading to the expression
-  @f{eqnarray*}
+  @f{eqnarray*}{
     F_i|_K
     &=&
     \left\{ \int_K f(x) \varphi_g^i(x) \varphi_{g'}^j(x)
@@ -512,7 +512,7 @@ these three cases, as follows:
     \ dx \right\} \phi_{g'}^j.
   @f}
   In matrix notation, this expression now reads as
-  @f{eqnarray*}
+  @f{eqnarray*}{
     F_i|_K
     =
     \sum_{0\le c<2^{\texttt{dim}}}
@@ -525,11 +525,11 @@ these three cases, as follows:
   @f}
   and correspondingly for cases where cell $K$ is refined more than once on
   mesh $g$:
-  @f{eqnarray*}
+  @f{eqnarray*}{
     F_i|_{K_{cc'}} = (M_{K_{cc'}} B_{c'}^T B_c^T)^{ij}  \phi_{g'}^j,
   @f}
   or
-  @f{eqnarray*}
+  @f{eqnarray*}{
     F_i|_{K_{cc'c''}} = (M_{K_{cc'c''}} B_{c''}^T B_{c'}^T B_c^T)^{ij}
     \phi_{g'}^j,
   @f}
@@ -545,13 +545,13 @@ $(f \varphi_g^i, \varphi_{g'}^j)_K$ onto child cells, and then finally
 forming the inner product (the mass matrix) on the final cell. To make the
 symmetry in these cases more obvious, we can write them like this: for case
 (ii), we have
-@f{eqnarray*}
+@f{eqnarray*}{
   F_i|_{K_{cc'\cdots c^{(k)}}}
   = [B_c B_{c'} \cdots B_{c^{(k)}} M_{K_{cc'\cdots c^{(k)}}}]^{ij}
     \phi_{g'}^j,
 @f}
 whereas for case (iii) we get
-@f{eqnarray*}
+@f{eqnarray*}{
   F_i|_{K_{cc'\cdots c^{(k)}}}
   = [(B_c B_{c'} \cdots B_{c^{(k)}} M_{K_{cc'\cdots c^{(k)}}})^T]^{ij}
     \phi_{g'}^j,

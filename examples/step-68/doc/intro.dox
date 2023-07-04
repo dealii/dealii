@@ -194,7 +194,7 @@ The stream function $\Psi$ of this Rayleigh-Kothe vortex is defined as:
 \Psi = \frac{1}{\pi} \sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
 @f]
 where $T$ is half the period of the flow. The velocity profile in 2D ($\textbf{u}=[u,v]^T$) is :
-@f{eqnarray*}
+@f{eqnarray*}{
    u &=&  - \frac{\partial\Psi}{\partial y} = -2 \sin^2 (\pi x) \sin (\pi y) \cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\
    v &=&  \frac{\partial\Psi}{\partial x} = 2 \cos(\pi x) \sin(\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T} \right)
 @f}
