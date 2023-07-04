@@ -28,9 +28,13 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>
 
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <fstream>
 #include <functional>
 #include <list>
 #include <map>
@@ -12679,7 +12683,25 @@ void Triangulation<dim, spacedim>::load_user_indices(
     Assert(false, ExcNotImplemented());
 }
 
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::save(const std::string &filename) const
+{
+  // Create boost archive then call alternative version of the save function
+  std::ofstream                 ofs(filename);
+  boost::archive::text_oarchive oa(ofs, boost::archive::no_header);
+  save(oa, 0);
+}
 
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::load(const std::string &filename)
+{
+  // Create boost archive then call alternative version of the load function
+  std::ifstream                 ifs(filename);
+  boost::archive::text_iarchive ia(ifs, boost::archive::no_header);
+  load(ia, 0);
+}
 
 namespace
 {

@@ -3398,6 +3398,22 @@ public:
 
 
   /**
+   * Save the triangulation into the given file. Internally, this
+   * function calls the save funtion which uses BOOST archives. This
+   * is a placeholder implementation that, in the near future, will also
+   * attach the data associated with the triangulation
+   */
+  virtual void
+  save(const std::string &filename) const;
+
+  /**
+   * Load the triangulation saved with save() back in.
+   */
+  virtual void
+  load(const std::string &filename);
+
+
+  /**
    * Declare the (coarse) face pairs given in the argument of this function as
    * periodic. This way it is possible to obtain neighbors across periodic
    * boundaries.

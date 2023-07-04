@@ -321,6 +321,22 @@ namespace parallel
         const dealii::Triangulation<dim, spacedim> &other_tria) override;
 
       /**
+       * Save the triangulation into the given file. This file needs to be
+       * reachable from all nodes in the computation on a shared network file
+       * system. See the SolutionTransfer class on how to store solution vectors
+       * into this file. Additional cell-based data can be saved using
+       * register_data_attach().
+       */
+      using parallel::TriangulationBase<dim, spacedim>::save;
+
+      /**
+       * Load the triangulation saved with save() back in. Cell-based data that
+       * was saved with register_data_attach() can be read in with
+       * notify_ready_to_unpack() after calling load().
+       */
+      using parallel::TriangulationBase<dim, spacedim>::load;
+
+      /**
        * Read the data of this object from a stream for the purpose of
        * serialization. Throw away the previous content.
        *
