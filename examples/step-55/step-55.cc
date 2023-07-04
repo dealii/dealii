@@ -328,7 +328,7 @@ namespace Step55
     : velocity_degree(velocity_degree)
     , viscosity(0.1)
     , mpi_communicator(MPI_COMM_WORLD)
-    , fe(FE_Q<dim>(velocity_degree), dim, FE_Q<dim>(velocity_degree - 1), 1)
+    , fe(FE_Q<dim>(velocity_degree) ^ dim, FE_Q<dim>(velocity_degree - 1))
     , triangulation(mpi_communicator,
                     typename Triangulation<dim>::MeshSmoothing(
                       Triangulation<dim>::smoothing_on_refinement |

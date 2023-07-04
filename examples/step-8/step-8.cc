@@ -189,12 +189,26 @@ namespace Step8
   // the solution function has, which is <code>dim</code> since we consider
   // displacement in each space direction. The FESystem class can handle this:
   // we pass it the finite element of which we would like to compose the
-  // system of, and how often it shall be repeated:
-
+  // system of, and how often to repeat it. There are different ways to
+  // tell the FESystem constructor how to do this, but the one that is
+  // closest to mathematical notation is to write out what we want to do
+  // mathematically: We want to construct the finite element space
+  // $Q_1^d$ where the index 1 corresponds to the polynomial degree and
+  // the exponent $d$ to the space dimension -- because the *displacement*
+  // we try to simulate here is a vector with exactly $d$ components. The
+  // FESystem class then lets us create this space by initialization with
+  // `FE_Q<dim>(1)^dim`, emulating the mathematical notation.
+  //
+  // (We could also have written `fe(FE_Q<dim>(1), dim)`, which would simply
+  // have called a different constructor of the FESystem class that first
+  // takes the "base element" and then a "multiplicity", i.e., a number that
+  // indicates how many times the base element is to be repeated. The two
+  // ways of writing things are entirely equivalent; we choose the one that
+  // is closer to mathematical notation.)
   template <int dim>
   ElasticProblem<dim>::ElasticProblem()
     : dof_handler(triangulation)
-    , fe(FE_Q<dim>(1), dim)
+    , fe(FE_Q<dim>(1) ^ dim)
   {}
   // In fact, the FESystem class has several more constructors which can
   // perform more complex operations than just stacking together several

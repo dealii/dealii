@@ -1934,7 +1934,7 @@ namespace Euler_DG
 #ifdef DEAL_II_WITH_P4EST
     , triangulation(MPI_COMM_WORLD)
 #endif
-    , fe(FE_DGQ<dim>(fe_degree), dim + 2)
+    , fe(FE_DGQ<dim>(fe_degree) ^ (dim + 2))
     , mapping(fe_degree)
     , dof_handler(triangulation)
     , timer(pcout, TimerOutput::never, TimerOutput::wall_times)

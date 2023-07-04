@@ -1205,12 +1205,9 @@ namespace Step70
   {
     TimerOutput::Scope t(computing_timer, "Initial setup");
 
-    fluid_fe =
-      std::make_unique<FESystem<spacedim>>(FE_Q<spacedim>(par.velocity_degree),
-                                           spacedim,
-                                           FE_Q<spacedim>(par.velocity_degree -
-                                                          1),
-                                           1);
+    fluid_fe = std::make_unique<FESystem<spacedim>>(
+      FE_Q<spacedim>(par.velocity_degree) ^ spacedim,
+      FE_Q<spacedim>(par.velocity_degree - 1));
 
 
     solid_fe = std::make_unique<FE_Nothing<dim, spacedim>>();

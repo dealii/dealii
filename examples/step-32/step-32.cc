@@ -1190,14 +1190,12 @@ namespace Step32
     mapping(4)
     ,
 
-    stokes_fe(FE_Q<dim>(parameters.stokes_velocity_degree),
-              dim,
+    stokes_fe(FE_Q<dim>(parameters.stokes_velocity_degree) ^ dim,
               (parameters.use_locally_conservative_discretization ?
                  static_cast<const FiniteElement<dim> &>(
                    FE_DGP<dim>(parameters.stokes_velocity_degree - 1)) :
                  static_cast<const FiniteElement<dim> &>(
-                   FE_Q<dim>(parameters.stokes_velocity_degree - 1))),
-              1)
+                   FE_Q<dim>(parameters.stokes_velocity_degree - 1))))
     ,
 
     stokes_dof_handler(triangulation)

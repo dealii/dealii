@@ -260,7 +260,7 @@ namespace Step61
   // interface pressures, $p^\circ$ and $p^\partial$.
   template <int dim>
   WGDarcyEquation<dim>::WGDarcyEquation(const unsigned int degree)
-    : fe(FE_DGQ<dim>(degree), 1, FE_FaceQ<dim>(degree), 1)
+    : fe(FE_DGQ<dim>(degree), FE_FaceQ<dim>(degree))
     , dof_handler(triangulation)
     , fe_dgrt(degree)
     , dof_handler_dgrt(triangulation)

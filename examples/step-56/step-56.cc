@@ -454,11 +454,12 @@ namespace Step56
     , solver_type(solver_type)
     , triangulation(Triangulation<dim>::maximum_smoothing)
     ,
-    // Finite element for the velocity only:
-    velocity_fe(FE_Q<dim>(pressure_degree + 1), dim)
+    // Finite element for the velocity only -- we choose the
+    // $Q_{\text{pressure_degree}}^d$ element:
+    velocity_fe(FE_Q<dim>(pressure_degree + 1) ^ dim)
     ,
     // Finite element for the whole system:
-    fe(velocity_fe, 1, FE_Q<dim>(pressure_degree), 1)
+    fe(velocity_fe, FE_Q<dim>(pressure_degree))
     , dof_handler(triangulation)
     , velocity_dof_handler(triangulation)
     , computing_timer(std::cout, TimerOutput::never, TimerOutput::wall_times)

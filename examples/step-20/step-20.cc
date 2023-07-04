@@ -320,7 +320,7 @@ namespace Step20
   template <int dim>
   MixedLaplaceProblem<dim>::MixedLaplaceProblem(const unsigned int degree)
     : degree(degree)
-    , fe(FE_RaviartThomas<dim>(degree), 1, FE_DGQ<dim>(degree), 1)
+    , fe(FE_RaviartThomas<dim>(degree), FE_DGQ<dim>(degree))
     , dof_handler(triangulation)
   {}
 

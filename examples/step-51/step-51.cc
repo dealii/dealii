@@ -383,7 +383,7 @@ namespace Step51
   // gradient/flux part and the scalar part.
   template <int dim>
   HDG<dim>::HDG(const unsigned int degree, const RefinementMode refinement_mode)
-    : fe_local(FE_DGQ<dim>(degree), dim, FE_DGQ<dim>(degree), 1)
+    : fe_local(FE_DGQ<dim>(degree) ^ dim, FE_DGQ<dim>(degree))
     , dof_handler_local(triangulation)
     , fe(degree)
     , dof_handler(triangulation)

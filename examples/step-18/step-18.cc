@@ -694,7 +694,7 @@ namespace Step18
   template <int dim>
   TopLevel<dim>::TopLevel()
     : triangulation(MPI_COMM_WORLD)
-    , fe(FE_Q<dim>(1), dim)
+    , fe(FE_Q<dim>(1) ^ dim)
     , dof_handler(triangulation)
     , quadrature_formula(fe.degree + 1)
     , present_time(0.0)
