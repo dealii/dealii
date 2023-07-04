@@ -422,7 +422,7 @@ FE_Q_Base<dim, spacedim>::FE_Q_Base(
       poly_space,
       fe_data,
       restriction_is_additive_flags,
-      std::vector<ComponentMask>(1, std::vector<bool>(1, true)))
+      std::vector<ComponentMask>(1, ComponentMask(std::vector<bool>(1, true))))
   , q_degree(dynamic_cast<const TensorProductPolynomialsBubbles<dim> *>(
                &poly_space) != nullptr ?
                this->degree - 1 :

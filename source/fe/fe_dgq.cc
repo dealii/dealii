@@ -79,7 +79,7 @@ FE_DGQ<dim, spacedim>::FE_DGQ(const unsigned int degree)
       std::vector<ComponentMask>(
         FiniteElementData<dim>(get_dpo_vector(degree), 1, degree)
           .n_dofs_per_cell(),
-        std::vector<bool>(1, true)))
+        ComponentMask(std::vector<bool>(1, true))))
 {
   // Compute support points, which are the tensor product of the Lagrange
   // interpolation points in the constructor.
@@ -116,7 +116,7 @@ FE_DGQ<dim, spacedim>::FE_DGQ(
                                1,
                                polynomials.size() - 1)
           .n_dofs_per_cell(),
-        std::vector<bool>(1, true)))
+        ComponentMask(std::vector<bool>(1, true))))
 {
   // No support points can be defined in general. Derived classes might define
   // support points like the class FE_DGQArbitraryNodes

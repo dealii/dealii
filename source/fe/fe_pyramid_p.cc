@@ -91,7 +91,7 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
       std::vector<ComponentMask>(
         FiniteElementData<dim>(dpos, ReferenceCells::Pyramid, 1, degree)
           .dofs_per_cell,
-        std::vector<bool>(1, true)))
+        ComponentMask(std::vector<bool>(1, true))))
 {
   AssertDimension(dim, 3);
 

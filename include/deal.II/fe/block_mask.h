@@ -89,7 +89,7 @@ public:
    * the given vector is zero, then this interpreted as the case where
    * <i>every</i> block is selected.
    */
-  BlockMask(const std::vector<bool> &block_mask);
+  explicit BlockMask(const std::vector<bool> &block_mask);
 
   /**
    * Initialize the block mask with a number of elements that are either all
@@ -345,7 +345,7 @@ BlockMask::operator|(const BlockMask &mask) const
       for (unsigned int i = 0; i < block_mask.size(); ++i)
         new_mask[i] = (block_mask[i] || mask.block_mask[i]);
 
-      return new_mask;
+      return BlockMask(new_mask);
     }
 }
 
@@ -368,7 +368,7 @@ BlockMask::operator&(const BlockMask &mask) const
       for (unsigned int i = 0; i < block_mask.size(); ++i)
         new_mask[i] = (block_mask[i] && mask.block_mask[i]);
 
-      return new_mask;
+      return BlockMask(new_mask);
     }
 }
 

@@ -1831,8 +1831,8 @@ IndexSet::n_elements() const
   size_type v = 0;
   if (!ranges.empty())
     {
-      Range &r = ranges.back();
-      v        = r.nth_index_in_set + r.end - r.begin;
+      const Range &r = ranges.back();
+      v              = r.nth_index_in_set + r.end - r.begin;
     }
 
 #ifdef DEBUG

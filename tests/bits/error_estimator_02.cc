@@ -168,7 +168,7 @@ check()
                                          neumann_bc,
                                          v,
                                          this_error,
-                                         std::vector<bool>(),
+                                         ComponentMask(),
                                          nullptr,
                                          MultithreadInfo::n_threads(),
                                          numbers::invalid_unsigned_int,

@@ -172,13 +172,13 @@ void
 ImposeBC<dim>::test_extract_boundary_DoFs()
 {
   std::map<types::global_dof_index, double> boundary_values;
-  std::vector<bool>                         bc_component_select(dim + 1);
+  ComponentMask                             bc_component_select(dim + 1, false);
 
   // extract boundary DoFs for the Nedelec-component
   // and impose zero boundary condition
-  bc_component_select[0] = true;
-  bc_component_select[1] = true;
-  bc_component_select[2] = false;
+  bc_component_select.set(0, true);
+  bc_component_select.set(1, true);
+  bc_component_select.set(2, false);
 
   const std::set<types::boundary_id> boundary_ids = {0};
   const IndexSet                     ned_boundary_dofs =
@@ -199,12 +199,12 @@ void
 ImposeBC<dim>::test_interpolate_BC()
 {
   std::map<types::global_dof_index, double> boundary_values;
-  std::vector<bool>                         bc_component_select(dim + 1, false);
+  ComponentMask                             bc_component_select(dim + 1, false);
 
 
   // impose inhomogeneous boundary condition
   // on the scalar variable
-  bc_component_select.back() = true;
+  bc_component_select.set(dim, true);
 
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,

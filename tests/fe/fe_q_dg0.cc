@@ -421,8 +421,8 @@ namespace Step22
 
     {
       constraints.clear();
-      std::vector<bool> component_mask(dim + 1, true);
-      component_mask[dim] = false;
+      ComponentMask component_mask(dim + 1, true);
+      component_mask.set(dim, false);
 
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 

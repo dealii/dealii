@@ -157,7 +157,7 @@ check()
       deallog << "Interpolated boundary values" << std::endl;
       std::map<types::global_dof_index, std::complex<double>> interpolated_bv;
       VectorTools::interpolate_boundary_values(
-        mapping, dof, function_map, interpolated_bv, std::vector<bool>());
+        mapping, dof, function_map, interpolated_bv, ComponentMask());
       write_map(interpolated_bv);
 
       // project boundary values

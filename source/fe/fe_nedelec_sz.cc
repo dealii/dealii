@@ -30,7 +30,7 @@ FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int order)
                              FiniteElementData<dim>::Hcurl),
       std::vector<bool>(compute_num_dofs(order), true),
       std::vector<ComponentMask>(compute_num_dofs(order),
-                                 std::vector<bool>(dim, true)))
+                                 ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 

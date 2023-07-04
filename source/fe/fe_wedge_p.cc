@@ -101,7 +101,7 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
       std::vector<ComponentMask>(
         FiniteElementData<dim>(dpos, ReferenceCells::Wedge, 1, degree)
           .dofs_per_cell,
-        std::vector<bool>(1, true)))
+        ComponentMask(std::vector<bool>(1, true))))
 {
   AssertDimension(dim, 3);
 

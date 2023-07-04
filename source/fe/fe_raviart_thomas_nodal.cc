@@ -76,7 +76,7 @@ FE_RaviartThomasNodal<dim>::FE_RaviartThomasNodal(const unsigned int degree)
       std::vector<bool>(1, false),
       std::vector<ComponentMask>(
         PolynomialsRaviartThomas<dim>::n_polynomials(degree + 1, degree),
-        std::vector<bool>(dim, true)))
+        ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 

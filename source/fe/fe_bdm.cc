@@ -50,7 +50,7 @@ FE_BDM<dim>::FE_BDM(const unsigned int deg)
                              FiniteElementData<dim>::Hdiv),
       get_ria_vector(deg),
       std::vector<ComponentMask>(PolynomialsBDM<dim>::n_polynomials(deg),
-                                 std::vector<bool>(dim, true)))
+                                 ComponentMask(std::vector<bool>(dim, true))))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
   Assert(

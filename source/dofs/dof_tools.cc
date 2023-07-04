@@ -1724,7 +1724,7 @@ namespace DoFTools
 
     std::vector<unsigned char> component_association(dof_handler.n_dofs());
     internal::get_component_association(dof_handler,
-                                        std::vector<bool>(),
+                                        ComponentMask(std::vector<bool>()),
                                         component_association);
 
     for (unsigned int c = 0; c < dof_handler.get_fe(0).n_components(); ++c)

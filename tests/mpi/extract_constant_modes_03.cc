@@ -79,7 +79,7 @@ test(unsigned int fe_nothing_index)
 
   if (myid == 0)
     {
-      std::vector<bool> mask(1, true);
+      ComponentMask mask(1, true);
 
       std::vector<std::vector<bool>> constant_modes;
       DoFTools::extract_constant_modes(dofh, mask, constant_modes);

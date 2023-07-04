@@ -285,17 +285,17 @@ TestPointValueHistory<dim>::run()
     node_monitor.add_component_names("Solution", solution_names);
     node_monitor.add_field_name(
       "Post Processed Vector"); // not sensitive to spaces
-    std::vector<bool> component_mask(3, false);
-    component_mask[2] = true;
+    ComponentMask component_mask(3, false);
+    component_mask.set(2, true);
     node_monitor.add_field_name("Pressure", component_mask);
-    component_mask    = std::vector<bool>(3, false);
-    component_mask[1] = true;
+    component_mask = ComponentMask(3, false);
+    component_mask.set(1, true);
     node_monitor.add_field_name("Req_sol", component_mask);
-    component_mask    = std::vector<bool>(4, true);
-    component_mask[3] = false;
+    component_mask = ComponentMask(4, true);
+    component_mask.set(3, false);
     node_monitor.add_field_name("Vector_out", component_mask);
-    component_mask    = std::vector<bool>(4, false);
-    component_mask[3] = true;
+    component_mask = ComponentMask(4, false);
+    component_mask.set(3, true);
     node_monitor.add_field_name("Scalar_out", component_mask);
 
     std::vector<std::string> indep_names;

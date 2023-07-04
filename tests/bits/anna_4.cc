@@ -167,13 +167,13 @@ FindBug<dim>::dirichlet_conditions()
   // on which components of the
   // FESystem we want to impose
   // Dirichlet BC.
-  std::vector<bool> component_mask(2);
+  ComponentMask component_mask(2, false);
   // Dirichlet-BC for the
   // Q1-Component
-  component_mask[0] = true;
+  component_mask.set(0, true);
   // no Dirichlet-BC for the
   // DG-component
-  component_mask[1] = false;
+  component_mask.set(1, false);
 
   // This is just for the final
   // output-test

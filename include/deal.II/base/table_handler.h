@@ -64,7 +64,7 @@ namespace internal
      * <code>t</code>.
      */
     template <typename T>
-    TableEntry(const T &t);
+    explicit TableEntry(const T &t);
 
     /**
      * Return the value stored by this object. The template type T must be one
@@ -634,7 +634,7 @@ protected:
     /**
      * Constructor.
      */
-    Column(const std::string &tex_caption);
+    explicit Column(const std::string &tex_caption);
 
     /**
      * Pad this column with default constructed elements to the number of rows
