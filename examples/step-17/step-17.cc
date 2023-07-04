@@ -361,7 +361,7 @@ namespace Step17
     // matrix-vector multiplications:
     const std::vector<IndexSet> locally_owned_dofs_per_proc =
       DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
-    const IndexSet locally_owned_dofs =
+    const IndexSet &locally_owned_dofs =
       locally_owned_dofs_per_proc[this_mpi_process];
 
     system_matrix.reinit(locally_owned_dofs,
