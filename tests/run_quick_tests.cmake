@@ -53,7 +53,7 @@ endif()
 string(TOLOWER "${CMAKE_BUILD_TYPE}" _build_type)
 execute_process(COMMAND ${CMAKE_CTEST_COMMAND}
   -j${_n_processors} -C ${CMAKE_BUILD_TYPE} --force-new-ctest-process
-  -R "quick_tests/"
+  -R "(quick_tests|examples)/"
   --output-on-failure
   ${_redirect_output}
   RESULT_VARIABLE _return_value
