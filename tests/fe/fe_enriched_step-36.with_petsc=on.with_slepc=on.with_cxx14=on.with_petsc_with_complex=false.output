@@ -10,15 +10,3 @@ Cycle 1
    Number of degrees of freedom: 2206
 
       Eigenvalue 0 : -0.498786
-Cycle 2
-   Number of active cells:       512
-     FE / POUFE :                504 / 72
-   Number of degrees of freedom: 5734
-
-      Eigenvalue 0 : -0.499788
-Cycle 3
-   Number of active cells:       568
-     FE / POUFE :                504 / 136
-   Number of degrees of freedom: 6508
-
-      Eigenvalue 0 : -0.499818
