@@ -20,10 +20,13 @@ jobs:
     # simple serial release build using g++
 
     name: linux release serial
-    runs-on: [ubuntu-20.04]
+    runs-on: [ubuntu-22.04]
 
     # only run on 'push' or if the 'pull_request' is not a draft:
     if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
+    container:
+      image: dealii/dependencies:jammy
 
     steps:
     - uses: actions/checkout@v3
@@ -34,9 +37,6 @@ jobs:
       run: |
         g++ -v
         cmake --version
-    - name: modules
-      run: |
-        sudo apt-get install g++-10
     - name: Build Boost
       id: boost
       uses: egor-tensin/build-boost@v1
