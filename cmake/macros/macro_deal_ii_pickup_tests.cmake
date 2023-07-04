@@ -223,13 +223,7 @@ macro(deal_ii_pickup_tests)
 
   set(DEAL_II_SOURCE_DIR) # avoid a bogus warning
 
-  # Only run "*.output" comparison tests if we have numdiff:
-  set(_globs "*.output" "*.run_only")
-  if("${NUMDIFF_EXECUTABLE}" STREQUAL "")
-    set(_globs "*.run_only")
-  endif()
-
-  file(GLOB _tests ${_globs})
+  file(GLOB _tests "*.output" "*.run_only")
   foreach(_test ${_tests})
     set(_comparison ${_test})
     get_filename_component(_test ${_test} NAME)

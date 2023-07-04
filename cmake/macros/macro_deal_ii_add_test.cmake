@@ -211,6 +211,17 @@ function(deal_ii_add_test _category _test_name _comparison_file)
   endif()
 
   #
+  # Determine whether the .run_only keyword is present.
+  #
+  # In case no numdiff executable was found we fall back to simply running
+  # the tests as well (but not comparing them).
+  #
+  set(_run_only FALSE)
+  if(_file MATCHES "\\.run_only$" OR "${NUMDIFF_EXECUTABLE}" STREQUAL "")
+    set(_run_only TRUE)
+  endif()
+
+  #
   # Determine the expected build stage of this test:
   #
   string(REGEX MATCH "expect=([a-z]*)" _expect ${_file})
@@ -222,11 +233,11 @@ function(deal_ii_add_test _category _test_name _comparison_file)
   endif()
 
   #
-  # Determine whether the .run_only keyword is present:
+  # If _run_only is set then we don't compare test results. Therefore,
+  # we won't fail in the "DIFF" stage of a test.
   #
-  set(_run_only FALSE)
-  if(_file MATCHES "\\.run_only$")
-    set(_run_only TRUE)
+  if(_run_only AND "${_expect}" STREQUAL "DIFF")
+    set(_expect "PASSED")
   endif()
 
   #
@@ -393,7 +404,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       # "mpirun_0-threads_0".
       #
 
-      set(_test_target    ${_category}.${_test_name}) # diff target name
+      set(_test_target    ${_category}.${_test_name}) # diff/run target name
       set(_test_full      ${_category}/${_test_name}) # full test name
       set(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
