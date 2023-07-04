@@ -123,6 +123,95 @@ jobs:
           setup_tests_vtk
         ctest --output-on-failure -j2
 
+  ############################
+  # linux-debug-intel-oneapi #
+  ############################
+
+  linux-debug-intel-oneapi:
+    # parallel debug build with Intel oneAPI including MPI and MKL
+    #
+    # Based on https://github.com/oneapi-src/oneapi-ci
+    # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
+
+    name: linux debug intel oneapi
+    runs-on: [ubuntu-22.04]
+
+    # only run on 'push' or if the 'pull_request' is not a draft:
+    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: setup apt repo
+      run: |
+        # oneapi-ci/scripts/setup_apt_repo_linux.sh
+        wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo apt-get update -o Dir::Etc::sourcelist="sources.list.d/oneAPI.list" -o APT::Get::List-Cleanup="0"
+    - name: collect versioned dependencies of apt packages
+      run : |
+        # oneapi-ci/scripts/apt_depends.sh
+        apt-cache depends intel-oneapi-compiler-dpcpp-cpp \
+                          intel-oneapi-mpi-devel \
+                          intel-oneapi-mkl-devel \
+                          intel-oneapi-tbb-devel | tee dependencies.txt
+    - name: cache install
+      id: cache-install
+      uses: actions/cache@v3
+      with:
+        path: /opt/intel/oneapi
+        key: install-${{ hashFiles('**/dependencies.txt') }}
+    - name: install
+      if: steps.cache-install.outputs.cache-hit != 'true'
+      run: |
+        # oneapi-ci/scripts/install_linux_apt.sh
+        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp \
+                                intel-oneapi-mpi-devel \
+                                intel-oneapi-mkl-devel \
+                                intel-oneapi-tbb-devel
+        sudo apt-get clean
+    - name: info
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        export I_MPI_CXX=icpx
+        mpiicpc -v
+        cmake --version
+    - name: configure deal.II
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        mkdir build
+        cd build
+        cmake -D CMAKE_BUILD_TYPE=Debug \
+              -D CMAKE_CXX_COMPILER=icpx \
+              -D DEAL_II_CXX_FLAGS='-Werror -Wno-error=tautological-constant-compare' \
+              -D DEAL_II_EARLY_DEPRECATIONS=ON \
+              -D DEAL_II_WITH_MPI=ON \
+              -D DEAL_II_WITH_LAPACK=ON \
+              -D DEAL_II_WITH_TBB=ON \
+              -D MPI_DIR=${I_MPI_ROOT} \
+              -D BLAS_DIR=${MKLROOT} \
+              -D LAPACK_DIR=${MKLROOT} \
+              -D TBB_DIR=${TBBROOT} \
+              ..
+    - name: print detailed.log
+      run: cat build/detailed.log
+    - name: build
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        cd build
+        make VERBOSE=1 -j2
+    - name: test
+      run: |
+        source /opt/intel/oneapi/setvars.sh
+        cd build
+        make -j2 \
+          setup_tests_examples \
+          setup_tests_quick_tests
+        ctest --output-on-failure -j2
+
+  #######################
+  # linux-debug-cuda-11 #
+  #######################
 
   linux-debug-cuda-11:
     # simple parallel debug build using cuda-11
@@ -206,6 +295,9 @@ jobs:
         cd tests/cuda
         make -j2 compile_test_executables
 
+  #############################
+  # linux-debug-cuda-11-clang #
+  #############################
 
   linux-debug-cuda-11-clang:
     # simple parallel debug build using cuda-11 and clang
@@ -292,82 +384,3 @@ jobs:
         make -j 2 setup_tests_cuda
         cd tests/cuda
         make -j2 compile_test_executables
-
-  linux-debug-intel-oneapi:
-    # parallel debug build with Intel oneAPI including MPI and MKL
-    #
-    # Based on https://github.com/oneapi-src/oneapi-ci
-    # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
-
-    name: linux debug intel oneapi
-    runs-on: [ubuntu-20.04]
-
-    # only run on 'push' or if the 'pull_request' is not a draft:
-    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: setup apt repo
-      run: |
-        # oneapi-ci/scripts/setup_apt_repo_linux.sh
-        wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
-        sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
-        echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-        sudo apt-get update -o Dir::Etc::sourcelist="sources.list.d/oneAPI.list" -o APT::Get::List-Cleanup="0"
-    - name: collect versioned dependencies of apt packages
-      run : |
-        # oneapi-ci/scripts/apt_depends.sh
-        apt-cache depends intel-oneapi-compiler-dpcpp-cpp \
-                          intel-oneapi-mpi-devel \
-                          intel-oneapi-mkl-devel \
-                          intel-oneapi-tbb-devel | tee dependencies.txt
-    - name: cache install
-      id: cache-install
-      uses: actions/cache@v3
-      with:
-        path: /opt/intel/oneapi
-        key: install-${{ hashFiles('**/dependencies.txt') }}
-    - name: install
-      if: steps.cache-install.outputs.cache-hit != 'true'
-      run: |
-        # oneapi-ci/scripts/install_linux_apt.sh
-        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp \
-                                intel-oneapi-mpi-devel \
-                                intel-oneapi-mkl-devel \
-                                intel-oneapi-tbb-devel
-        sudo apt-get clean
-    - name: info
-      run: |
-        source /opt/intel/oneapi/setvars.sh
-        export I_MPI_CXX=icpx
-        mpiicpc -v
-        cmake --version
-    - name: configure deal.II
-      run: |
-        source /opt/intel/oneapi/setvars.sh
-        mkdir build
-        cd build
-        cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D CMAKE_CXX_COMPILER=icpx \
-              -D DEAL_II_CXX_FLAGS='-Werror -Wno-error=tautological-constant-compare' \
-              -D DEAL_II_EARLY_DEPRECATIONS=ON \
-              -D DEAL_II_WITH_MPI=ON \
-              -D DEAL_II_WITH_LAPACK=ON \
-              -D DEAL_II_WITH_TBB=ON \
-              -D MPI_DIR=${I_MPI_ROOT} \
-              -D BLAS_DIR=${MKLROOT} \
-              -D LAPACK_DIR=${MKLROOT} \
-              -D TBB_DIR=${TBBROOT} \
-              ..
-    - name: print detailed.log
-      run: cat build/detailed.log
-    - name: build
-      run: |
-        source /opt/intel/oneapi/setvars.sh
-        cd build
-        make VERBOSE=1 -j2
-    - name: quicktest
-      run: |
-        source /opt/intel/oneapi/setvars.sh
-        cd build
-        make test
