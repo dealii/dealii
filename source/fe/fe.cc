@@ -684,8 +684,9 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
     ExcInternalError());
   return index + adjust_quad_dof_index_for_face_orientation_table[table_n](
                    index,
-                   (face_orientation ? 4 : 0) + (face_flip ? 2 : 0) +
-                     (face_rotation ? 1 : 0));
+                   internal::combined_face_orientation(face_orientation,
+                                                       face_rotation,
+                                                       face_flip));
 }
 
 

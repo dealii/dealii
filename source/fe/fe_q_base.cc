@@ -1061,35 +1061,35 @@ FE_Q_Base<dim, spacedim>::initialize_quad_dof_index_permutation()
       unsigned int i = local % n, j = local / n;
 
       // face_orientation=false, face_flip=false, face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
-                                                                      0) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+        local, internal::combined_face_orientation(false, false, false)) =
         j + i * n - local;
       // face_orientation=false, face_flip=false, face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
-                                                                      1) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+        local, internal::combined_face_orientation(false, true, false)) =
         i + (n - 1 - j) * n - local;
       // face_orientation=false, face_flip=true,  face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
-                                                                      2) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+        local, internal::combined_face_orientation(false, false, true)) =
         (n - 1 - j) + (n - 1 - i) * n - local;
       // face_orientation=false, face_flip=true,  face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
-                                                                      3) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+        local, internal::combined_face_orientation(false, true, true)) =
         (n - 1 - i) + j * n - local;
       // face_orientation=true,  face_flip=false, face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
-                                                                      4) = 0;
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+        local, internal::combined_face_orientation(true, false, false)) = 0;
       // face_orientation=true,  face_flip=false, face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
-                                                                      5) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+        local, internal::combined_face_orientation(true, true, false)) =
         j + (n - 1 - i) * n - local;
       // face_orientation=true,  face_flip=true,  face_rotation=false
-      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
-                                                                      6) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+        local, internal::combined_face_orientation(true, false, true)) =
         (n - 1 - i) + (n - 1 - j) * n - local;
       // face_orientation=true,  face_flip=true,  face_rotation=true
-      this->adjust_quad_dof_index_for_face_orientation_table[face_no](local,
-                                                                      7) =
+      this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+        local, internal::combined_face_orientation(true, true, true)) =
         (n - 1 - j) + i * n - local;
     }
 

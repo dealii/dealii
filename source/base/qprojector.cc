@@ -20,6 +20,7 @@
 #include <deal.II/base/tensor_product_polynomials.h>
 
 #include <deal.II/grid/reference_cell.h>
+#include <deal.II/grid/tria_orientation.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1330,9 +1331,10 @@ QProjector<dim>::DataSetDescriptor::face(const ReferenceCell &reference_cell,
                 n_quadrature_points};
       else if (dim == 3)
         {
-          const unsigned char orientation = (face_flip ? 4 : 0) +
-                                            (face_rotation ? 2 : 0) +
-                                            (face_orientation ? 1 : 0);
+          const unsigned char orientation =
+            internal::combined_face_orientation(face_orientation,
+                                                face_rotation,
+                                                face_flip);
           Assert(orientation < 6, ExcInternalError());
           return {(reference_cell.n_face_orientations(face_no) * face_no +
                    orientation) *
@@ -1449,12 +1451,10 @@ QProjector<dim>::DataSetDescriptor::face(
                   quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
       else if (dim == 3)
         {
-          const unsigned int orientation = (face_flip ? 4 : 0) +
-                                           (face_rotation ? 2 : 0) +
-                                           (face_orientation ? 1 : 0);
-
           return {offset +
-                  orientation *
+                  internal::combined_face_orientation(face_orientation,
+                                                      face_rotation,
+                                                      face_flip) *
                     quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
         }
     }

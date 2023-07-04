@@ -30,6 +30,7 @@
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_orientation.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -264,8 +265,9 @@ FE_PolyTensor<dim, spacedim>::adjust_quad_dof_sign_for_face_orientation(
   return adjust_quad_dof_sign_for_face_orientation_table
     [this->n_unique_2d_subobjects() == 1 ? 0 : face](
       index,
-      4 * static_cast<int>(face_orientation) + 2 * static_cast<int>(face_flip) +
-        static_cast<int>(face_rotation));
+      internal::combined_face_orientation(face_orientation,
+                                          face_rotation,
+                                          face_flip));
 }
 
 
