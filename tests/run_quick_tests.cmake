@@ -50,15 +50,10 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
     )
 endif()
 
-#
-# Always restrict quick tests with specified build type, but run the step
-# and affinity quick tests in all available configuration:
-#
-
 string(TOLOWER "${CMAKE_BUILD_TYPE}" _build_type)
 execute_process(COMMAND ${CMAKE_CTEST_COMMAND}
   -j${_n_processors} -C ${CMAKE_BUILD_TYPE} --force-new-ctest-process
-  -R "quick_tests/(step.debug|step.release|affinity|.*.${_build_type})"
+  -R "quick_tests/"
   --output-on-failure
   ${_redirect_output}
   RESULT_VARIABLE _return_value

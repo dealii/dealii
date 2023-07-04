@@ -168,10 +168,8 @@ endforeach()
 # Define a top-level "test" target that runs our quick tests wrapper.
 #
 
-# Use the first available build type (this prefers debug mode if available):
-list(GET DEAL_II_BUILD_TYPES 0 _my_build)
 add_custom_target(test
-  COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=${_my_build} -P ${CMAKE_CURRENT_SOURCE_DIR}/run_quick_tests.cmake
+  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/run_quick_tests.cmake
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   COMMENT "Running quicktests..."
   USES_TERMINAL
