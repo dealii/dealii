@@ -536,11 +536,15 @@ namespace Step68
   // In contrast to the previous function in this function we
   // integrate the particle trajectories by interpolating the value of
   // the velocity field at the degrees of freedom to the position of
-  // the particles.
+  // the particles. This is achieved using the FEPointEvaluation object.
   template <int dim>
   void ParticleTracking<dim>::euler_step_interpolated(const double dt)
   {
     Vector<double> local_dof_values(fluid_fe.dofs_per_cell);
+
+    FEPointEvaluation<dim, dim> evaluator(mapping, fluid_fe, update_values);
+    const FEValuesExtractors::Vector velocity(0);
+
 
     // We loop over all the local particles. Although this could be achieved
     // directly by looping over all the cells, this would force us
@@ -561,43 +565,36 @@ namespace Step68
 
         // Next, compute the velocity at the particle locations by evaluating
         // the finite element solution at the position of the particles.
-        // This is essentially an optimized version of the particle advection
-        // functionality in step 19, but instead of creating quadrature
-        // objects and FEValues objects for each cell, we do the
-        // evaluation by hand, which is somewhat more efficient and only
-        // matters for this tutorial, because the particle work is the
-        // dominant cost of the whole program.
+        // This is achieved using FEPointEvaluation object.
         const auto pic = particle_handler.particles_in_cell(cell);
         Assert(pic.begin() == particle, ExcInternalError());
+        std::vector<Point<dim>> particle_positions;
         for (auto &p : pic)
-          {
-            const Point<dim> reference_location = p.get_reference_location();
-            Tensor<1, dim>   particle_velocity;
-            for (unsigned int j = 0; j < fluid_fe.dofs_per_cell; ++j)
-              {
-                const auto comp_j = fluid_fe.system_to_component_index(j);
+            particle_positions.push_back(p.get_reference_location());
 
-                particle_velocity[comp_j.first] +=
-                  fluid_fe.shape_value(j, reference_location) *
-                  local_dof_values[j];
-              }
+        evaluator.reinit(cell, particle_positions);
+        evaluator.evaluate(make_array_view(local_dof_values),
+                             EvaluationFlags::values);
 
-            Point<dim> particle_location = particle->get_location();
-            for (int d = 0; d < dim; ++d)
-              particle_location[d] += particle_velocity[d] * dt;
-            p.set_location(particle_location);
+        // We move the particles using the interpolated velocity field
+        for (unsigned int particle_index = 0;
+            particle != pic.end();
+            ++particle, ++particle_index)
+        {
+          Point<dim> particle_location = particle->get_location();
+          const Tensor<1, dim> &particle_velocity = evaluator.get_value(particle_index) ;                
+          particle_location += particle_velocity*dt;
+          particle->set_location(particle_location);
 
-            // Again, we store the particle velocity and the processor id in the
-            // particle properties for visualization purposes.
-            ArrayView<double> properties = p.get_properties();
-            for (int d = 0; d < dim; ++d)
-              properties[d] = particle_velocity[d];
+          // Again, we store the particle velocity and the processor id in the
+          // particle properties for visualization purposes.
+          ArrayView<double> properties = particle->get_properties();
+          for (int d = 0; d < dim; ++d)
+            properties[d] = particle_velocity[d];
 
-            properties[dim] =
-              Utilities::MPI::this_mpi_process(mpi_communicator);
-
-            ++particle;
-          }
+          properties[dim] =
+            Utilities::MPI::this_mpi_process(mpi_communicator);
+        }
       }
   }
 
