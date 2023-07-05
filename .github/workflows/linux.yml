@@ -39,10 +39,13 @@ jobs:
     - uses: actions/checkout@v3
     - name: info
       run: |
+        python --version
         g++ -v
         cmake --version
     - name: configure deal.II
       run: |
+        # sanitize PYTHONPATH
+        unset PYTHONPATH
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Release \
