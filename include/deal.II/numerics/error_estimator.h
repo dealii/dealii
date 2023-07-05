@@ -24,6 +24,8 @@
 
 #include <deal.II/fe/component_mask.h>
 
+#include <deal.II/lac/read_vector.h>
+
 #include <map>
 
 DEAL_II_NAMESPACE_OPEN
