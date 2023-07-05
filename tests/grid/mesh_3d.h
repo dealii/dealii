@@ -108,6 +108,7 @@ create_two_cubes_rotation(Triangulation<3> & coarse_grid,
     }
   // finally generate a triangulation
   // out of this
+  TestGrids::reorder_old_to_new_style(cells);
   coarse_grid.create_triangulation(vertices, cells, SubCellData());
 }
 
