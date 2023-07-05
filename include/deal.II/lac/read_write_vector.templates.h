@@ -23,7 +23,6 @@
 
 #include <deal.II/lac/exceptions.h>
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_operations_internal.h>
@@ -452,21 +451,6 @@ namespace LinearAlgebra
   ReadWriteVector<Number>::import_elements(
     const dealii::Vector<Number> &vec,
     VectorOperation::values       operation,
-    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-      &communication_pattern)
-  {
-    (void)communication_pattern;
-
-    internal::import_serial_vector(vec, operation, *this);
-  }
-
-
-
-  template <typename Number>
-  void
-  ReadWriteVector<Number>::import_elements(
-    const LinearAlgebra::Vector<Number> &vec,
-    VectorOperation::values              operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
       &communication_pattern)
   {

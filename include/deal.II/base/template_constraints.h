@@ -718,10 +718,6 @@ namespace concepts
 
     template <typename Number>
     inline constexpr bool
-      is_dealii_vector_type<dealii::LinearAlgebra::Vector<Number>> = true;
-
-    template <typename Number>
-    inline constexpr bool
       is_dealii_vector_type<dealii::LinearAlgebra::BlockVector<Number>> = true;
 
     template <typename Number, typename MemorySpace>

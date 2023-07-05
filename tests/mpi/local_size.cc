@@ -20,7 +20,6 @@
 
 #include <deal.II/lac/la_parallel_block_vector.h>
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_epetra_vector.h>
@@ -151,7 +150,6 @@ main(int argc, char *argv[])
 
   // non-block vectors:
   check_serial<Vector<double>>();
-  check_serial<LinearAlgebra::Vector<double>>();
 
   check_unghosted_parallel<LinearAlgebra::EpetraWrappers::Vector>();
   check_unghosted_parallel<LinearAlgebra::TpetraWrappers::Vector<double>>();

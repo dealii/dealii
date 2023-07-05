@@ -18,7 +18,6 @@
 #include <deal.II/base/mpi_noncontiguous_partitioner.templates.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_vector.h>
 
 #include <boost/serialization/utility.hpp>
 

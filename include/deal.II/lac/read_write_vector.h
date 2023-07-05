@@ -322,35 +322,6 @@ namespace LinearAlgebra
      * Imports all the elements present in the vector's IndexSet from the
      * input vector @p vec. VectorOperation::values @p operation
      * is used to decide if the elements in @p V should be added to the
-     * current vector or replace the current elements.
-     *
-     * @note The parameter @p communication_pattern is ignored since we are
-     *   dealing with a serial vector here.
-     */
-    void
-    import_elements(
-      const LinearAlgebra::Vector<Number> &vec,
-      VectorOperation::values              operation,
-      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-        &communication_pattern = {});
-
-    /**
-     * @deprecated Use import_elements() instead.
-     */
-    DEAL_II_DEPRECATED
-    void
-    import(const LinearAlgebra::Vector<Number> &V,
-           VectorOperation::values              operation,
-           const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-             &communication_pattern = {})
-    {
-      import_elements(V, operation, communication_pattern);
-    }
-
-    /**
-     * Imports all the elements present in the vector's IndexSet from the
-     * input vector @p vec. VectorOperation::values @p operation
-     * is used to decide if the elements in @p V should be added to the
      * current vector or replace the current elements. The last parameter can
      * be used if the same communication pattern is used multiple times. This
      * can be used to improve performance.

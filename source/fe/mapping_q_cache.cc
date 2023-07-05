@@ -27,7 +27,6 @@
 #include <deal.II/fe/mapping_q_cache.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 

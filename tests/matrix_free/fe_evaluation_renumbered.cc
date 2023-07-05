@@ -22,8 +22,6 @@
 
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/lac/la_vector.h>
-
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
@@ -59,7 +57,7 @@ test(const unsigned int n_refinements, const unsigned int geometry_type)
 {
   using VectorizedArrayType = VectorizedArray<Number>;
 
-  using VectorType = LinearAlgebra::Vector<Number>;
+  using VectorType = Vector<Number>;
 
   Triangulation<dim> tria;
 
