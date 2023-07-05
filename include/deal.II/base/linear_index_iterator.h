@@ -254,25 +254,23 @@ public:
    * the same entry in the same container.
    */
   template <typename OtherIterator>
-  friend std::enable_if_t<
-    std::is_convertible<OtherIterator, DerivedIterator>::value,
-    bool>
-  operator==(const LinearIndexIterator &left, const OtherIterator &right)
+  std::enable_if_t<std::is_convertible<OtherIterator, DerivedIterator>::value,
+                   bool>
+  operator==(const OtherIterator &right) const
   {
     const auto &right_2 = static_cast<const DerivedIterator &>(right);
-    return left.accessor == right_2.accessor;
+    return this->accessor == right_2.accessor;
   }
 
   /**
    * Opposite of operator==().
    */
   template <typename OtherIterator>
-  friend std::enable_if_t<
-    std::is_convertible<OtherIterator, DerivedIterator>::value,
-    bool>
-  operator!=(const LinearIndexIterator &left, const OtherIterator &right)
+  std::enable_if_t<std::is_convertible<OtherIterator, DerivedIterator>::value,
+                   bool>
+  operator!=(const OtherIterator &right) const
   {
-    return !(left == right);
+    return !(*this == right);
   }
 
   /**
