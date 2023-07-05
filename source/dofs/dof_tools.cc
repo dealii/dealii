@@ -1360,7 +1360,7 @@ namespace DoFTools
   map_boundary_to_bulk_dof_iterators(
     const std::map<typename Triangulation<dim - 1, spacedim>::cell_iterator,
                    typename Triangulation<dim, spacedim>::face_iterator>
-      &                                  c1_to_c0,
+      &                                  c1_to_c0_face,
     const DoFHandler<dim, spacedim> &    c0_dh,
     const DoFHandler<dim - 1, spacedim> &c1_dh)
   {
@@ -1369,11 +1369,11 @@ namespace DoFTools
     std::map<typename DoFHandler<dim - 1, spacedim>::active_cell_iterator,
              std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
                        unsigned int>>
-      c1_to_c0_cells_and_faces;
+      c1_to_c0_cell_and_face;
 
     // Shortcut if there are no faces to check
-    if (c1_to_c0.empty())
-      return c1_to_c0_cells_and_faces;
+    if (c1_to_c0_face.empty())
+      return c1_to_c0_cell_and_face;
 
     // This is the partial inverse of the map passed as input, for dh
     std::map<typename Triangulation<dim, spacedim>::face_iterator,
@@ -1381,24 +1381,28 @@ namespace DoFTools
       c0_to_c1;
 
     // map volume mesh face -> codimension 1 dof cell
-    for (const auto &c1_cell : c1_dh.active_cell_iterators())
-      if (c1_to_c0.find(c1_cell) != c1_to_c0.end())
-        c0_to_c1[c1_to_c0.at(c1_cell)] = c1_cell;
+    for (const auto &[c1_cell, c0_cell] : c1_to_c0_face)
+      if (!c1_cell->has_children())
+        c0_to_c1[c0_cell] = c1_cell->as_dof_handler_iterator(c1_dh);
 
     // generate a mapping that maps codimension-1 cells
     // to codimension-0 cells and faces
     for (const auto &cell :
          c0_dh.active_cell_iterators()) // disp_dof.active_cell_iterators())
       for (const auto f : cell->face_indices())
-        if (cell->face(f)->at_boundary() &&
-            c0_to_c1.find(cell->face(f)) != c0_to_c1.end())
+        if (cell->face(f)->at_boundary())
           {
-            const auto &c1_cell               = c0_to_c1[cell->face(f)];
-            c1_to_c0_cells_and_faces[c1_cell] = {cell, f};
+            const auto &it = c0_to_c1.find(cell->face(f));
+            if (it != c0_to_c1.end())
+              {
+                const auto &c1_cell             = it->second;
+                c1_to_c0_cell_and_face[c1_cell] = {cell, f};
+                c0_to_c1.erase(it);
+              }
           }
     // Check the dimensions: make sure all active cells we had have been mapped.
-    AssertDimension(c1_to_c0_cells_and_faces.size(), c0_to_c1.size());
-    return c1_to_c0_cells_and_faces;
+    AssertDimension(c0_to_c1.size(), 0);
+    return c1_to_c0_cell_and_face;
   }
 
 
