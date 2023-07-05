@@ -22,7 +22,7 @@
 
 #include "../tests.h"
 
-#include "../tests/test_grids.h"
+#include "../test_grids.h"
 
 
 static unsigned subcells[6][4] = {{0, 1, 2, 3},
@@ -94,7 +94,7 @@ test()
         }
     }
 
-  reorder_old_to_new_style(cells);
+  TestGrids::reorder_old_to_new_style(cells);
   Triangulation<dim> tria;
   tria.create_triangulation(vertices, cells, subcelldata);
 

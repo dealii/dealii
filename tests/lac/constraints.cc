@@ -36,7 +36,7 @@
 
 #include "../tests.h"
 
-#include "../tests/test_grids.h"
+#include "../test_grids.h"
 
 
 
@@ -74,7 +74,7 @@ make_tria(Triangulation<3> &tria, int step)
           cells[0].material_id = 0;
           cells[1].material_id = 0;
 
-          reorder_old_to_new_style(cells);
+          TestGrids::reorder_old_to_new_style(cells);
           tria.create_triangulation(std::vector<Point<3>>(&vertices[0],
                                                           &vertices[12]),
                                     cells,
@@ -118,7 +118,7 @@ make_tria(Triangulation<3> &tria, int step)
           cells[0].material_id = 0;
           cells[1].material_id = 0;
 
-          reorder_old_to_new_style(cells);
+          TestGrids::reorder_old_to_new_style(cells);
           tria.create_triangulation(std::vector<Point<3>>(&vertices[0],
                                                           &vertices[12]),
                                     cells,
@@ -162,7 +162,7 @@ make_tria(Triangulation<3> &tria, int step)
           cells[0].material_id = 0;
           cells[1].material_id = 0;
 
-          reorder_old_to_new_style(cells);
+          TestGrids::reorder_old_to_new_style(cells);
           tria.create_triangulation(std::vector<Point<3>>(&vertices[0],
                                                           &vertices[12]),
                                     cells,
@@ -220,7 +220,7 @@ make_tria(Triangulation<3> &tria, int step)
           cells[2].material_id = 0;
           cells[3].material_id = 0;
 
-          reorder_old_to_new_style(cells);
+          TestGrids::reorder_old_to_new_style(cells);
           tria.create_triangulation(std::vector<Point<3>>(&vertices[0],
                                                           &vertices[18]),
                                     cells,

@@ -20,7 +20,7 @@
 
 #include "../tests.h"
 
-#include "../tests/test_grids.h"
+#include "../test_grids.h"
 
 // generate two cubes that are attached to each other in a way so that
 // the edges are all ok, but the normals of the common face don't
@@ -59,7 +59,7 @@ create_two_cubes(Triangulation<3> &coarse_grid)
   // finally generate a triangulation
   // out of this
   // if necessary, convert to new-style format
-  reorder_old_to_new_style(cells);
+  TestGrids::reorder_old_to_new_style(cells);
   GridTools::consistently_order_cells(cells);
   coarse_grid.create_triangulation(vertices, cells, SubCellData());
 }
@@ -158,7 +158,7 @@ create_L_shape(Triangulation<3> &coarse_grid)
 
   // finally generate a triangulation
   // out of this
-  reorder_old_to_new_style(cells);
+  TestGrids::reorder_old_to_new_style(cells);
   GridTools::consistently_order_cells(cells);
   coarse_grid.create_triangulation(vertices, cells, SubCellData());
 }
