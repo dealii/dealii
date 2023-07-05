@@ -52,7 +52,7 @@ namespace TrilinosWrappers
       colnum_cache = std::make_shared<std::vector<size_type>>(
         sparsity_pattern->row_length(this->a_row));
 
-      if (colnum_cache->size() > 0)
+      if (!colnum_cache->empty())
         {
           // get a representation of the present row
           int       ncols;

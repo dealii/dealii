@@ -598,7 +598,7 @@ namespace DoFTools
 
     // let's see whether we have to check for certain boundary indicators
     // or whether we can accept all
-    const bool check_boundary_id = (boundary_ids.size() != 0);
+    const bool check_boundary_id = (!boundary_ids.empty());
 
     // also see whether we have to check whether a certain vector component
     // is selected, or all
@@ -726,7 +726,7 @@ namespace DoFTools
 
     // let's see whether we have to check for certain boundary indicators
     // or whether we can accept all
-    const bool check_boundary_id = (boundary_ids.size() != 0);
+    const bool check_boundary_id = (!boundary_ids.empty());
 
     // also see whether we have to check whether a certain vector component
     // is selected, or all
@@ -2520,7 +2520,7 @@ namespace DoFTools
           indices.resize(cell->get_fe().n_dofs_per_cell());
           cell->get_mg_dof_indices(indices);
 
-          if (selected_dofs.size() != 0)
+          if (!selected_dofs.empty())
             AssertDimension(indices.size(), selected_dofs.size());
 
           for (types::global_dof_index j = 0; j < indices.size(); ++j)

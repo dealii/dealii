@@ -1824,7 +1824,7 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 inline bool DoFHandler<dim, spacedim>::has_level_dofs() const
 {
-  return mg_number_cache.size() > 0;
+  return !mg_number_cache.empty();
 }
 
 

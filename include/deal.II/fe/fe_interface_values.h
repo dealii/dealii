@@ -2727,7 +2727,7 @@ unsigned
 FEInterfaceValues<dim, spacedim>::n_current_interface_dofs() const
 {
   Assert(
-    interface_dof_indices.size() > 0,
+    !interface_dof_indices.empty(),
     ExcMessage(
       "n_current_interface_dofs() is only available after a call to reinit()."));
   return interface_dof_indices.size();

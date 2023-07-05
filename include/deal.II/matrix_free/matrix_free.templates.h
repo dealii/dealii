@@ -2202,7 +2202,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
           // get offsets of shared cells
           std::vector<unsigned int> targets;
           for (unsigned int i = 0; i < cells_shared_ghosts.size(); ++i)
-            if (cells_shared_ghosts[i].size() > 0)
+            if (!cells_shared_ghosts[i].empty())
               targets.push_back(i);
 
           // Then set up the callbacks the consensus algorithm needs:

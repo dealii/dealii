@@ -107,7 +107,7 @@ MGTransferMatrixFree<dim, Number>::build(
            "distribute_mg_dofs() function called, but this is a prerequisite "
            "for multigrid transfers. You will need to call this function, "
            "probably close to where you already call distribute_dofs()."));
-  if (external_partitioners.size() > 0)
+  if (!external_partitioners.empty())
     {
       Assert(this->initialize_dof_vector == nullptr,
              ExcMessage("An initialize_dof_vector function has already "

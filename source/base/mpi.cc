@@ -419,7 +419,7 @@ namespace Utilities
           AssertThrowMPI(ierr);
         }
 
-      if (destinations.size() > 0)
+      if (!destinations.empty())
         {
           const int ierr = MPI_Waitall(destinations.size(),
                                        send_requests.data(),

@@ -546,7 +546,7 @@ namespace Patterns
     std::string tmp(sequence);
 
     // remove whitespace at beginning
-    while ((tmp.size() != 0) && (std::isspace(tmp.front()) != 0))
+    while ((!tmp.empty()) && (std::isspace(tmp.front()) != 0))
       tmp.erase(0, 1);
 
     // check the different possibilities
@@ -559,7 +559,7 @@ namespace Patterns
       }
 
     // remove whitespace at the end
-    while ((tmp.size() != 0) && (std::isspace(tmp.back()) != 0))
+    while ((!tmp.empty()) && (std::isspace(tmp.back()) != 0))
       tmp.erase(tmp.end() - 1);
 
     // check last choice, not finished by |
@@ -660,7 +660,7 @@ namespace Patterns
   {
     Assert(min_elements <= max_elements,
            ExcInvalidRange(min_elements, max_elements));
-    Assert(separator.size() > 0,
+    Assert(!separator.empty(),
            ExcMessage("The separator must have a non-zero length."));
   }
 
@@ -852,9 +852,9 @@ namespace Patterns
   {
     Assert(min_elements <= max_elements,
            ExcInvalidRange(min_elements, max_elements));
-    Assert(separator.size() > 0,
+    Assert(!separator.empty(),
            ExcMessage("The separator must have a non-zero length."));
-    Assert(key_value_separator.size() > 0,
+    Assert(!key_value_separator.empty(),
            ExcMessage("The key_value_separator must have a non-zero length."));
     Assert(separator != key_value_separator,
            ExcMessage(
@@ -1073,9 +1073,9 @@ namespace Patterns
                const std::string &                              separator)
     : separator(separator)
   {
-    Assert(ps.size() > 0,
+    Assert(!ps.empty(),
            ExcMessage("The Patterns list must have a non-zero length."));
-    Assert(separator.size() > 0,
+    Assert(!separator.empty(),
            ExcMessage("The separator must have a non-zero length."));
     patterns.resize(ps.size());
     for (unsigned int i = 0; i < ps.size(); ++i)
@@ -1274,7 +1274,7 @@ namespace Patterns
     std::vector<std::string> split_names;
 
     // first split the input list
-    while (tmp.size() != 0)
+    while (!tmp.empty())
       {
         std::string name;
         name = tmp;
@@ -1287,9 +1287,9 @@ namespace Patterns
         else
           tmp = "";
 
-        while ((name.size() != 0) && (std::isspace(name.front()) != 0))
+        while ((!name.empty()) && (std::isspace(name.front()) != 0))
           name.erase(0, 1);
-        while ((name.size() != 0) && (std::isspace(name.back()) != 0))
+        while ((!name.empty()) && (std::isspace(name.back()) != 0))
           name.erase(name.size() - 1, 1);
 
         split_names.push_back(name);

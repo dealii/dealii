@@ -166,7 +166,7 @@ PolynomialsRannacherTurek<dim>::evaluate(
 
   for (unsigned int i = 0; i < n_pols; ++i)
     {
-      if (values.size() != 0)
+      if (!values.empty())
         {
           values[i] = compute_value(i, unit_point);
         }

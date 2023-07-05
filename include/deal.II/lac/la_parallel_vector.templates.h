@@ -1204,7 +1204,7 @@ namespace LinearAlgebra
       AssertDimension(partitioner->ghost_targets().size() +
                         partitioner->import_targets().size(),
                       update_ghost_values_requests.size());
-      if (update_ghost_values_requests.size() > 0)
+      if (!update_ghost_values_requests.empty())
         {
           // make this function thread safe
           std::lock_guard<std::mutex> lock(mutex);
@@ -1345,7 +1345,7 @@ namespace LinearAlgebra
 
       // make sure that there are not outstanding requests from updating
       // ghost values or compress
-      if (update_ghost_values_requests.size() > 0)
+      if (!update_ghost_values_requests.empty())
         {
           int       flag = 1;
           const int ierr = MPI_Testall(update_ghost_values_requests.size(),
@@ -1358,7 +1358,7 @@ namespace LinearAlgebra
                    "MPI found unfinished update_ghost_values() requests "
                    "when calling swap, which is not allowed."));
         }
-      if (compress_requests.size() > 0)
+      if (!compress_requests.empty())
         {
           int       flag = 1;
           const int ierr = MPI_Testall(compress_requests.size(),

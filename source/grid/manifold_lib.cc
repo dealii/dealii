@@ -2303,7 +2303,7 @@ TransfiniteInterpolationManifold<dim, spacedim>::
         std::make_pair(current_distance, cell->index()));
     }
   // no coarse cell could be found -> transformation failed
-  AssertThrow(distances_and_cells.size() > 0,
+  AssertThrow(!distances_and_cells.empty(),
               (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
   std::sort(distances_and_cells.begin(), distances_and_cells.end());
   std::array<unsigned int, 20> cells;

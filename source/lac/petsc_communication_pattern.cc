@@ -213,7 +213,7 @@ namespace PETScWrappers
                                 nl,
                                 n,
                                 const_cast<PetscInt *>(
-                                  inloc.size() > 0 ? inloc.data() : nullptr),
+                                  !inloc.empty() ? inloc.data() : nullptr),
                                 PETSC_COPY_VALUES,
                                 remotes,
                                 PETSC_OWN_POINTER));
@@ -229,7 +229,7 @@ namespace PETScWrappers
       sf2,
       layout,
       n,
-      const_cast<PetscInt *>(outloc.size() > 0 ? outloc.data() : nullptr),
+      const_cast<PetscInt *>(!outloc.empty() ? outloc.data() : nullptr),
       PETSC_COPY_VALUES,
       const_cast<PetscInt *>(n > 0 ? outidx.data() : nullptr)));
     AssertPETSc(PetscSFSetUp(sf2));

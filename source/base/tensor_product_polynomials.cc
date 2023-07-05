@@ -524,7 +524,7 @@ AnisotropicPolynomials<dim>::AnisotropicPolynomials(
   for (const auto &pols_d : pols)
     {
       (void)pols_d;
-      Assert(pols_d.size() > 0,
+      Assert(!pols_d.empty(),
              ExcMessage("The number of polynomials must be larger than zero "
                         "for all coordinate directions."));
     }

@@ -131,7 +131,7 @@ namespace
     run(const unsigned int degree_fine_   = numbers::invalid_unsigned_int,
         const unsigned int degree_coarse_ = numbers::invalid_unsigned_int)
     {
-      Assert(prolongation_matrix_1d.size() > 0, ExcNotImplemented());
+      Assert(!prolongation_matrix_1d.empty(), ExcNotImplemented());
 
       internal::FEEvaluationImplBasisChange<
         internal::evaluate_general,
@@ -193,7 +193,7 @@ namespace
     run(const unsigned int degree_fine_   = numbers::invalid_unsigned_int,
         const unsigned int degree_coarse_ = numbers::invalid_unsigned_int)
     {
-      Assert(prolongation_matrix_1d.size() > 0, ExcNotImplemented());
+      Assert(!prolongation_matrix_1d.empty(), ExcNotImplemented());
 
       internal::FEEvaluationImplBasisChange<
         internal::evaluate_general,

@@ -452,7 +452,7 @@ namespace hp
       // iterators. But because SG stores all of these edges, we can remove them
       // all from G after collecting the edges in SG.)
       std::vector<std::map<unsigned int, unsigned int>> identities;
-      while (identities_graph.size() > 0)
+      while (!identities_graph.empty())
         {
           Graph          sub_graph;       // SG
           std::set<Node> sub_graph_nodes; // N

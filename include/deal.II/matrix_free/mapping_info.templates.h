@@ -644,7 +644,7 @@ namespace internal
           fe_values(mapping_info.cell_data.size());
 
         const unsigned int max_active_fe_index =
-          active_fe_index.size() > 0 ?
+          !active_fe_index.empty() ?
             *std::max_element(active_fe_index.begin(), active_fe_index.end()) :
             0;
 
@@ -671,7 +671,7 @@ namespace internal
               // general type of cell for appropriate vectorized formats. then
               // fill this data in
               const unsigned int fe_index =
-                active_fe_index.size() > 0 ? active_fe_index[cell] : 0;
+                !active_fe_index.empty() ? active_fe_index[cell] : 0;
               const unsigned int hp_quad_index =
                 mapping_info.cell_data[my_q].descriptor.size() == 1 ? 0 :
                                                                       fe_index;
@@ -697,7 +697,7 @@ namespace internal
               // similarity due to some cells further ahead)
               if (my_q > 0)
                 cell_t_prev = GeometryType(mapping_info.cell_type[cell]);
-              else if (cell > cell_range.first && active_fe_index.size() > 0 &&
+              else if (cell > cell_range.first && !active_fe_index.empty() &&
                        active_fe_index[cell] != active_fe_index[cell - 1])
                 cell_t_prev = general;
 
@@ -1602,7 +1602,7 @@ namespace internal
           }
 
         const unsigned int max_active_fe_index =
-          active_fe_index.size() > 0 ?
+          !active_fe_index.empty() ?
             *std::max_element(active_fe_index.begin(), active_fe_index.end()) :
             0;
 
@@ -1640,7 +1640,7 @@ namespace internal
               // face batch is the same as the FE index of the interior side of
               // its first entry.
               const unsigned int fe_index =
-                active_fe_index.size() > 0 ?
+                !active_fe_index.empty() ?
                   active_fe_index[faces[face].cells_interior[0] /
                                   VectorizedArrayType::size()] :
                   0;
@@ -1827,7 +1827,7 @@ namespace internal
                           // the FE index of the exterior side of its first
                           // entry.
                           const unsigned int fe_index =
-                            active_fe_index.size() > 0 ?
+                            !active_fe_index.empty() ?
                               active_fe_index[faces[face].cells_exterior[0] /
                                               VectorizedArrayType::size()] :
                               0;

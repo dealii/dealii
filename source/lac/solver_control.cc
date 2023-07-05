@@ -157,7 +157,7 @@ SolverControl::get_history_data() const
 {
   Assert(history_data_enabled, ExcHistoryDataRequired());
   Assert(
-    history_data.size() > 0,
+    !history_data.empty(),
     ExcMessage(
       "The SolverControl object was asked for the solver history "
       "data, but there is no data. Possibly you requested the data before the "

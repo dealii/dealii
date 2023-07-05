@@ -381,7 +381,7 @@ namespace internal
               // be made in an arbitrary way.
               unsigned int n_faces_lower_proc = 0, n_faces_higher_proc = 0;
               std::vector<signed char> assignment(other_range.size(), 0);
-              if (inner_face.second.shared_faces.size() > 0)
+              if (!inner_face.second.shared_faces.empty())
                 {
                   // identify faces that go to the processor with the higher
                   // rank
@@ -1084,7 +1084,7 @@ namespace internal
       if (face1.face_type != face2.face_type)
         return false;
 
-      if (active_fe_indices.size() > 0)
+      if (!active_fe_indices.empty())
         {
           if (active_fe_indices[face1.cells_interior[0] / length] !=
               active_fe_indices[face2.cells_interior[0] / length])
@@ -1125,7 +1125,7 @@ namespace internal
           return false;
 
         // check if active FE indices match
-        if (active_fe_indices.size() > 0)
+        if (!active_fe_indices.empty())
           {
             // ... for interior faces
             if (active_fe_indices[face1.cells_interior[0] / length] <

@@ -100,12 +100,12 @@ std::string
 get_substring_with_delim(std::string &in, const std::string &delim_list)
 {
   std::string x;
-  while (in.size() != 0)
+  while (!in.empty())
     {
       // stop copying to the result if the current character is a
       // delimiter, but only if the previous character was not a backslash
       if ((delim_list.find(in[0]) != std::string::npos) &&
-          !((x.size() > 0) && (x[x.size() - 1] == '\\')))
+          !((!x.empty()) && (x[x.size() - 1] == '\\')))
         break;
 
       x += in[0];
@@ -119,7 +119,7 @@ get_substring_with_delim(std::string &in, const std::string &delim_list)
   // would be nice if we could just end the text we read with the last
   // newline in such cases. To this end, just trim trailing
   // whitespace.
-  while ((x.size() > 0) && (x.back() == ' '))
+  while ((!x.empty()) && (x.back() == ' '))
     x.erase(x.size() - 1, 1);
 
   return x;
@@ -130,7 +130,7 @@ get_substring_with_delim(std::string &in, const std::string &delim_list)
 void
 skip_space(std::string &in)
 {
-  while ((in.size() != 0) &&
+  while ((!in.empty()) &&
          ((in[0] == ' ') || (in[0] == '\t') || (in[0] == '\n')))
     in.erase(0, 1);
 }
@@ -212,8 +212,8 @@ split_string_list(const std::string &s, const char delimiter)
 
       skip_space(name);
 
-      while ((name.size() != 0) && (name[name.length() - 1] == ' ' ||
-                                    name[name.length() - 1] == '\n'))
+      while ((!name.empty()) && (name[name.length() - 1] == ' ' ||
+                                 name[name.length() - 1] == '\n'))
         name.erase(name.length() - 1, 1);
 
       split_list.push_back(name);
@@ -316,7 +316,7 @@ read_expansion_lists(const std::string &filename)
 
   // now process entries of the form
   //   NAME := { class1; class2; ...}.
-  while (whole_file.size() != 0)
+  while (!whole_file.empty())
     {
       const std::string name = get_substring_with_delim(whole_file, " :");
 
@@ -447,7 +447,7 @@ process_instantiations()
 
   // process entries of the form
   //   for (X:Y; A:B) { INST }
-  while (whole_file.size() != 0)
+  while (!whole_file.empty())
     {
       // skip space, tabs, comments:
       skip_space(whole_file);

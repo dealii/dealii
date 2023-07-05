@@ -563,7 +563,7 @@ MGTransferBlock<number>::build(const DoFHandler<dim, spacedim> &dof_handler,
   const FiniteElement<dim> &fe       = dof_handler.get_fe();
   unsigned int              n_blocks = dof_handler.get_fe().n_blocks();
 
-  if (sel.size() != 0)
+  if (!sel.empty())
     {
       Assert(sel.size() == n_blocks,
              ExcDimensionMismatch(sel.size(), n_blocks));

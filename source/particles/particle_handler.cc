@@ -669,7 +669,7 @@ namespace Particles
     particle_it->set_reference_location(reference_position);
     particle_it->set_id(particle_index);
 
-    if (properties.size() != 0)
+    if (!properties.empty())
       particle_it->set_properties(properties);
 
     ++number_of_locally_owned_particles;
@@ -1592,7 +1592,7 @@ namespace Particles
                   }
               }
 
-            if (cell_to_neighbor_subdomain.size() > 0)
+            if (!cell_to_neighbor_subdomain.empty())
               {
                 const particle_iterator_range particle_range =
                   particles_in_cell(cell);

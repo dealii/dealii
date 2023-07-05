@@ -286,7 +286,7 @@ namespace Utilities
       {
         ghost_targets_data = {};
 
-        if (owning_ranks_of_ghosts.size() > 0)
+        if (!owning_ranks_of_ghosts.empty())
           {
             ghost_targets_data.emplace_back(owning_ranks_of_ghosts[0], 0);
             for (auto i : owning_ranks_of_ghosts)

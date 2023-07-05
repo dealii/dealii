@@ -447,8 +447,8 @@ namespace internal
       // at the corresponding edge of children of inactive edge neighbors.
       for (unsigned int line_idx = 0; line_idx < n_raw_lines; ++line_idx)
         {
-          if ((line_to_cells[line_idx].size() > 0) &&
-              line_to_inactive_cells[line_idx].size() > 0)
+          if ((!line_to_cells[line_idx].empty()) &&
+              !line_to_inactive_cells[line_idx].empty())
             {
               // We now have cells to add (active ones) and edges to which they
               // should be added (inactive cells).

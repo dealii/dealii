@@ -1787,7 +1787,7 @@ namespace Utilities
 #  ifdef DEAL_II_WITH_MPI
         // clean up
         {
-          if (send_requests.size() > 0)
+          if (!send_requests.empty())
             {
               const int ierr = MPI_Waitall(send_requests.size(),
                                            send_requests.data(),
@@ -2066,7 +2066,7 @@ namespace Utilities
 #  ifdef DEAL_II_WITH_MPI
         // Finalize all MPI_Request objects for both the
         // send-request and receive-answer operations.
-        if (send_request_requests.size() > 0)
+        if (!send_request_requests.empty())
           {
             const int ierr = MPI_Waitall(send_request_requests.size(),
                                          send_request_requests.data(),
@@ -2075,7 +2075,7 @@ namespace Utilities
           }
 
         // Then also check the send-answer requests.
-        if (send_answer_requests.size() > 0)
+        if (!send_answer_requests.empty())
           {
             const int ierr = MPI_Waitall(send_answer_requests.size(),
                                          send_answer_requests.data(),
@@ -2105,7 +2105,7 @@ namespace Utilities
                           "associated with it."));
 
         // The only valid target for a serial program is itself.
-        if (targets.size() != 0)
+        if (!targets.empty())
           {
             Assert(targets.size() == 1,
                    ExcMessage(

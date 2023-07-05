@@ -2706,7 +2706,7 @@ namespace GridTools
         "but marked_vertices contains one or more vertices that are not used vertices!"));
 
     // Remove from the map unwanted elements.
-    if (marked_vertices.size() != 0)
+    if (!marked_vertices.empty())
       for (auto it = vertices.begin(); it != vertices.end();)
         {
           if (marked_vertices[it->first] == false)
@@ -2850,7 +2850,7 @@ namespace GridTools
     // 0) might be found even though it is not marked. This is only relevant if
     // searching with rtree, using find_closest_vertex already can manage not
     // finding points
-    if (marked_vertices.size() && !used_vertices_rtree.empty())
+    if (!marked_vertices.empty() && !used_vertices_rtree.empty())
       {
         const auto itr =
           std::find(marked_vertices.begin(), marked_vertices.end(), true);
@@ -3314,7 +3314,7 @@ namespace GridTools
                   break; // We can check now the next process
                 }
           }
-        Assert(owners_found.size() > 0,
+        Assert(!owners_found.empty(),
                ExcMessage("No owners found for the point " +
                           std::to_string(pt)));
         if (owners_found.size() == 1)
@@ -3366,7 +3366,7 @@ namespace GridTools
             if (pt_inserted)
               point_owners[rank_bbox.second].emplace_back(pt_n);
           }
-        Assert(owners_found.size() > 0,
+        Assert(!owners_found.empty(),
                ExcMessage("No owners found for the point " +
                           std::to_string(pt_n)));
         if (owners_found.size() == 1)
@@ -5015,7 +5015,7 @@ namespace GridTools
   {
     AssertDimension(src_boundary_ids.size(), dst_manifold_ids.size());
     const auto reset_boundary_ids =
-      reset_boundary_ids_.size() ? reset_boundary_ids_ : src_boundary_ids;
+      !reset_boundary_ids_.empty() ? reset_boundary_ids_ : src_boundary_ids;
     AssertDimension(reset_boundary_ids.size(), src_boundary_ids.size());
 
     // in 3d, we not only have to copy boundary ids of faces, but also of edges
@@ -6123,7 +6123,7 @@ namespace GridTools
                     });
         }
 
-      if (recv_components.size() > 0)
+      if (!recv_components.empty())
         {
           // sort according to rank (and point index) -> make deterministic
           std::sort(recv_components.begin(),

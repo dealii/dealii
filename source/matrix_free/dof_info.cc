@@ -113,8 +113,8 @@ namespace internal
           // shift for this cell within the block as compared to the next
           // one
           const bool has_constraints =
-            (hanging_node_constraint_masks.size() != 0 &&
-             hanging_node_constraint_masks_comp.size() != 0 &&
+            (!hanging_node_constraint_masks.empty() &&
+             !hanging_node_constraint_masks_comp.empty() &&
              hanging_node_constraint_masks[cell * n_vectorization + v] !=
                unconstrained_compressed_constraint_kind &&
              hanging_node_constraint_masks_comp[fe_index][0 /*TODO*/]) ||
@@ -245,8 +245,8 @@ namespace internal
                       cell_active_fe_index[boundary_cells[i]];
                   AssertIndexRange(fe_index, dofs_per_cell.size());
 
-                  if (hanging_node_constraint_masks.size() > 0 &&
-                      hanging_node_constraint_masks_comp.size() > 0 &&
+                  if (!hanging_node_constraint_masks.empty() &&
+                      !hanging_node_constraint_masks_comp.empty() &&
                       hanging_node_constraint_masks[boundary_cells[i]] !=
                         unconstrained_compressed_constraint_kind)
                     for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -306,7 +306,7 @@ namespace internal
 
       // first reorder the active FE index.
       const bool have_hp = dofs_per_cell.size() > 1;
-      if (cell_active_fe_index.size() > 0)
+      if (!cell_active_fe_index.empty())
         {
           std::vector<unsigned int> new_active_fe_index;
           new_active_fe_index.reserve(task_info.cell_partition_data.back());
@@ -386,8 +386,8 @@ namespace internal
 
               bool has_hanging_nodes = false;
 
-              if (hanging_node_constraint_masks.size() > 0 &&
-                  hanging_node_constraint_masks_comp.size() > 0)
+              if (!hanging_node_constraint_masks.empty() &&
+                  !hanging_node_constraint_masks_comp.empty())
                 {
                   const auto mask =
                     hanging_node_constraint_masks[renumbering[position_cell +
@@ -447,7 +447,7 @@ namespace internal
               }
 
           for (unsigned int j = n_vect; j < vectorization_length; ++j)
-            if (hanging_node_constraint_masks.size() > 0)
+            if (!hanging_node_constraint_masks.empty())
               new_hanging_node_constraint_masks.push_back(
                 unconstrained_compressed_constraint_kind);
 
@@ -1491,7 +1491,7 @@ namespace internal
               const unsigned int ndofs =
                 dofs_per_cell.size() == 1 ?
                   dofs_per_cell[0] :
-                  (dofs_per_cell[cell_active_fe_index.size() > 0 ?
+                  (dofs_per_cell[!cell_active_fe_index.empty() ?
                                    cell_active_fe_index[cell_no] :
                                    0]);
               const unsigned int *dof_ind =

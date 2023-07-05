@@ -4859,13 +4859,13 @@ namespace GridTools
 
       // make sure that all communication is finished
       // when we leave this function.
-      if (requests.size() > 0)
+      if (!requests.empty())
         {
           const int ierr =
             MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
           AssertThrowMPI(ierr);
         }
-      if (reply_requests.size() > 0)
+      if (!reply_requests.empty())
         {
           const int ierr = MPI_Waitall(reply_requests.size(),
                                        reply_requests.data(),

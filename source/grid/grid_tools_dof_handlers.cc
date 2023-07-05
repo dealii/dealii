@@ -170,7 +170,7 @@ namespace GridTools
         "but marked_vertices contains one or more vertices that are not used vertices!"));
 
     // Remove from the map unwanted elements.
-    if (marked_vertices.size())
+    if (!marked_vertices.empty())
       for (auto it = vertices.begin(); it != vertices.end();)
         {
           if (marked_vertices[it->first] == false)
@@ -487,7 +487,7 @@ namespace GridTools
             if (cell->is_artificial() == false)
               {
                 // marked_vertices are used to filter cell candidates
-                if (marked_vertices.size() > 0)
+                if (!marked_vertices.empty())
                   {
                     bool any_vertex_marked = false;
                     for (const auto &v : cell->vertex_indices())

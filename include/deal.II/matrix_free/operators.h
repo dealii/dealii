@@ -1059,7 +1059,7 @@ namespace MatrixFreeOperators
         Utilities::pow(fe_eval.get_shape_info().data.front().fe_degree + 1,
                        dim);
 
-    Assert(inverse_jxw.size() > 0 &&
+    Assert(!inverse_jxw.empty() &&
              inverse_jxw.size() % dofs_per_component_on_cell == 0,
            ExcMessage(
              "Expected diagonal to be a multiple of scalar dof per cells"));

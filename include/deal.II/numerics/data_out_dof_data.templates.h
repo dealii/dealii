@@ -1982,7 +1982,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
     }
 
   const auto &data_component_interpretation =
-    (data_component_interpretation_.size() != 0 ?
+    (!data_component_interpretation_.empty() ?
        data_component_interpretation_ :
        std::vector<DataComponentInterpretation::DataComponentInterpretation>(
          deduced_names.size(),
@@ -2058,7 +2058,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
 
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
     &data_component_interpretation =
-      (data_component_interpretation_.size() != 0 ?
+      (!data_component_interpretation_.empty() ?
          data_component_interpretation_ :
          std::vector<DataComponentInterpretation::DataComponentInterpretation>(
            n_components, DataComponentInterpretation::component_is_scalar));

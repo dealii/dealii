@@ -680,9 +680,8 @@ namespace TrilinosWrappers
 
       Epetra_Map off_processor_map(-1,
                                    ghost_rows.size(),
-                                   (ghost_rows.size() > 0) ?
-                                     (ghost_rows.data()) :
-                                     nullptr,
+                                   (!ghost_rows.empty()) ? (ghost_rows.data()) :
+                                                           nullptr,
                                    0,
                                    row_space_map.Comm());
 
@@ -693,7 +692,7 @@ namespace TrilinosWrappers
           graph =
             std::make_unique<Epetra_CrsGraph>(Copy,
                                               row_space_map,
-                                              (n_entries_per_row.size() > 0) ?
+                                              (!n_entries_per_row.empty()) ?
                                                 (n_entries_per_row.data()) :
                                                 nullptr,
                                               exchange_data ? false : true);
@@ -702,14 +701,13 @@ namespace TrilinosWrappers
               off_processor_map, n_entries_per_ghost_row.data());
         }
       else
-        graph =
-          std::make_unique<Epetra_CrsGraph>(Copy,
-                                            row_space_map,
-                                            *column_space_map,
-                                            (n_entries_per_row.size() > 0) ?
-                                              (n_entries_per_row.data()) :
-                                              nullptr,
-                                            true);
+        graph = std::make_unique<Epetra_CrsGraph>(Copy,
+                                                  row_space_map,
+                                                  *column_space_map,
+                                                  (!n_entries_per_row.empty()) ?
+                                                    (n_entries_per_row.data()) :
+                                                    nullptr,
+                                                  true);
 
       // now insert the indices, select between the right matrix
       std::vector<TrilinosWrappers::types::int_type> row_indices;

@@ -847,7 +847,7 @@ namespace Step42
       AssertThrow(false, ExcNotImplemented());
 
     output_dir = prm.get("output directory");
-    if (output_dir != "" && *(output_dir.rbegin()) != '/')
+    if (!output_dir.empty() && *(output_dir.rbegin()) != '/')
       output_dir += "/";
 
     // If necessary, create a new directory for the output.

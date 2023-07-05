@@ -73,7 +73,7 @@ namespace Polynomials
                                  const unsigned int           center)
     : in_lagrange_product_form(true)
   {
-    Assert(supp.size() > 0, ExcEmptyObject());
+    Assert(!supp.empty(), ExcEmptyObject());
     AssertIndexRange(center, supp.size());
 
     lagrange_support_points.reserve(supp.size() - 1);

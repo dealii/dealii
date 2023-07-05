@@ -496,7 +496,7 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
   // the prolongation matrix
   // TODO: this way is not very efficient
 
-  if (boundary_indices.size() != 0)
+  if (!boundary_indices.empty())
     {
       std::vector<std::vector<types::global_dof_index>> dofs_per_component(
         mg_dof.get_triangulation().n_levels(),

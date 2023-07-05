@@ -145,7 +145,7 @@ namespace PETScWrappers
         pcomponents[i] = this->components[i].petsc_vector();
 
       MPI_Comm comm =
-        pcomponents.size() > 0 ?
+        !pcomponents.empty() ?
           PetscObjectComm(reinterpret_cast<PetscObject>(pcomponents[0])) :
           PETSC_COMM_SELF;
 

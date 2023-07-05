@@ -292,11 +292,11 @@ namespace PETScWrappers
     reinit();
 
     // Solver type
-    if (data.ts_type.size())
+    if (!data.ts_type.empty())
       AssertPETSc(TSSetType(ts, data.ts_type.c_str()));
 
     // Options prefix
-    if (data.options_prefix.size())
+    if (!data.options_prefix.empty())
       AssertPETSc(TSSetOptionsPrefix(ts, data.options_prefix.c_str()));
 
     // Time and steps limits
@@ -336,7 +336,7 @@ namespace PETScWrappers
 
     // As of 3.19, PETSc does not propagate options prefixes to the
     // adaptors.
-    if (data.options_prefix.size())
+    if (!data.options_prefix.empty())
       AssertPETSc(
         TSAdaptSetOptionsPrefix(tsadapt, data.options_prefix.c_str()));
 

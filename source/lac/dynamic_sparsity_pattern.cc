@@ -444,7 +444,7 @@ DynamicSparsityPattern::get_view(const IndexSet &rows) const
         rowset.size() == 0 ? *it : rowset.index_within_set(*it);
 
       view.lines[view_row].entries = lines[rowindex].entries;
-      view.have_entries |= (lines[rowindex].entries.size() > 0);
+      view.have_entries |= (!lines[rowindex].entries.empty());
     }
   return view;
 }
@@ -625,7 +625,7 @@ DynamicSparsityPattern::nonempty_rows() const
   AssertDimension(locally_stored_rows.n_elements(), lines.size());
   for (const auto row : locally_stored_rows)
     {
-      if (line->entries.size() > 0)
+      if (!line->entries.empty())
         rows.push_back(row);
 
       ++line;

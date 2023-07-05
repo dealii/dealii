@@ -300,7 +300,7 @@ namespace PETScWrappers
       const std::vector<size_type> ghostindices = ghostnodes.get_index_vector();
 
       const PetscInt *ptr =
-        (ghostindices.size() > 0 ?
+        (!ghostindices.empty() ?
            reinterpret_cast<const PetscInt *>(ghostindices.data()) :
            nullptr);
 

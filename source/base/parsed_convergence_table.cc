@@ -164,7 +164,7 @@ ParsedConvergenceTable::prepare_table_for_output()
   if (compute_error)
     {
       // Add convergence rates if the rate_key is not empty
-      if (rate_key != "")
+      if (!rate_key.empty())
         {
           bool has_key = false;
           for (const auto &col : extra_columns)
@@ -172,7 +172,7 @@ ParsedConvergenceTable::prepare_table_for_output()
               if (rate_key == col)
                 has_key = true;
 
-              if (col != "")
+              if (!col.empty())
                 table.omit_column_from_convergence_rate_evaluation(col);
             }
 
@@ -200,7 +200,7 @@ ParsedConvergenceTable::prepare_table_for_output()
             }
           else
             {
-              AssertThrow(rate_key != "",
+              AssertThrow(!rate_key.empty(),
                           ExcMessage(
                             "You specified the key <" + rate_key +
                             "> to compute convergence rates, but that key does "
@@ -228,7 +228,7 @@ ParsedConvergenceTable::output_table(std::ostream &out)
 void
 ParsedConvergenceTable::output_table()
 {
-  if (compute_error && error_file_name != "")
+  if (compute_error && !error_file_name.empty())
     {
       prepare_table_for_output();
 

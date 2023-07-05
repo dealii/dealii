@@ -261,7 +261,7 @@ namespace
   collate_path_string(const char                      separator,
                       const std::vector<std::string> &subsection_path)
   {
-    if (subsection_path.size() > 0)
+    if (!subsection_path.empty())
       {
         std::string p = mangle(subsection_path[0]);
         for (unsigned int i = 1; i < subsection_path.size(); ++i)
@@ -458,23 +458,22 @@ ParameterHandler::parse_input(std::istream &     input,
   // unknown state.
   //
   // after unwinding the subsection stack, just re-throw the exception
-  auto scan_line_or_cleanup = [this,
-                               &skip_undefined,
-                               &saved_path](const std::string &line,
-                                            const std::string &filename,
-                                            const unsigned int line_number) {
-    try
-      {
-        scan_line(line, filename, line_number, skip_undefined);
-      }
-    catch (...)
-      {
-        while ((saved_path != subsection_path) && (subsection_path.size() > 0))
-          leave_subsection();
+  auto scan_line_or_cleanup =
+    [this, &skip_undefined, &saved_path](const std::string &line,
+                                         const std::string &filename,
+                                         const unsigned int line_number) {
+      try
+        {
+          scan_line(line, filename, line_number, skip_undefined);
+        }
+      catch (...)
+        {
+          while ((saved_path != subsection_path) && (!subsection_path.empty()))
+            leave_subsection();
 
-        throw;
-      }
-  };
+          throw;
+        }
+    };
 
 
   while (std::getline(input, input_line))
@@ -488,12 +487,12 @@ ParameterHandler::parse_input(std::istream &     input,
 
       // If we see the line which is the same as @p last_line ,
       // terminate the parsing.
-      if (last_line.size() != 0 && input_line == last_line)
+      if (!last_line.empty() && input_line == last_line)
         break;
 
       // Check whether or not the current line should be joined with the next
       // line before calling scan_line.
-      if (input_line.size() != 0 &&
+      if (!input_line.empty() &&
           input_line.find_last_of('\\') == input_line.size() - 1)
         {
           input_line.erase(input_line.size() - 1); // remove the last '\'
@@ -534,7 +533,7 @@ ParameterHandler::parse_input(std::istream &     input,
   if (saved_path != subsection_path)
     {
       std::stringstream paths_message;
-      if (saved_path.size() > 0)
+      if (!saved_path.empty())
         {
           paths_message << "Path before loading input:\n";
           for (unsigned int i = 0; i < subsection_path.size(); ++i)
@@ -987,9 +986,9 @@ ParameterHandler::leave_subsection()
 {
   // assert there is a subsection that
   // we may leave
-  Assert(subsection_path.size() != 0, ExcAlreadyAtTopLevel());
+  Assert(!subsection_path.empty(), ExcAlreadyAtTopLevel());
 
-  if (subsection_path.size() > 0)
+  if (!subsection_path.empty())
     subsection_path.pop_back();
 }
 
@@ -1672,7 +1671,7 @@ ParameterHandler::recursively_print_parameters(
 
             // if there is a documenting string, print it as well
             if (!is_short &&
-                p.second.get<std::string>("documentation").size() != 0)
+                !p.second.get<std::string>("documentation").empty())
               out << std::setw(overall_indent_level * 2 + longest_name + 10)
                   << ""
                   << "(" << p.second.get<std::string>("documentation") << ")"
@@ -1892,7 +1891,7 @@ ParameterHandler::scan_line(std::string        line,
            Utilities::match_at_string_start(line, "end"))
     {
       line.erase(0, 3);
-      while ((line.size() > 0) && ((std::isspace(line[0])) != 0))
+      while ((!line.empty()) && ((std::isspace(line[0])) != 0))
         line.erase(0, 1);
 
       AssertThrow(
@@ -1900,7 +1899,7 @@ ParameterHandler::scan_line(std::string        line,
         ExcCannotParseLine(current_line_n,
                            input_filename,
                            "Invalid content after 'end' or 'END' statement."));
-      AssertThrow(subsection_path.size() != 0,
+      AssertThrow(!subsection_path.empty(),
                   ExcCannotParseLine(current_line_n,
                                      input_filename,
                                      "There is no subsection to leave here."));
@@ -2010,11 +2009,11 @@ ParameterHandler::scan_line(std::string        line,
     {
       // erase "include " statement and eliminate spaces
       line.erase(0, 7);
-      while ((line.size() > 0) && (line[0] == ' '))
+      while ((!line.empty()) && (line[0] == ' '))
         line.erase(0, 1);
 
       // the remainder must then be a filename
-      AssertThrow(line.size() != 0,
+      AssertThrow(!line.empty(),
                   ExcCannotParseLine(current_line_n,
                                      input_filename,
                                      "The current line is an 'include' or "
@@ -2101,7 +2100,7 @@ ParameterHandler::assert_that_entries_have_been_set() const
   const std::set<std::string> entries_wrongly_not_set =
     this->get_entries_wrongly_not_set();
 
-  if (entries_wrongly_not_set.size() > 0)
+  if (!entries_wrongly_not_set.empty())
     {
       std::string list_of_missing_parameters = "\n\n";
       for (const auto &it : entries_wrongly_not_set)

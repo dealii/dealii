@@ -1664,7 +1664,7 @@ public:
                  std::string,
                  << "There are unequal numbers of 'subsection' and 'end' "
                     "statements in the parameter file <"
-                 << arg1 << ">." << (arg2.size() > 0 ? "\n" + arg2 : ""));
+                 << arg1 << ">." << (!arg2.empty() ? "\n" + arg2 : ""));
 
   /**
    * Exception for when, during parsing of a parameter file, the parser

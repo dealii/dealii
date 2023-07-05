@@ -7014,7 +7014,7 @@ namespace GridGenerator
       // if a non-empty (i.e., not the default) vector is given for
       // manifold_priorities then use it (but check its validity in debug
       // mode)
-      if (0 < manifold_priorities.size())
+      if (!manifold_priorities.empty())
         {
 #  ifdef DEBUG
           // check that the provided manifold_priorities is valid

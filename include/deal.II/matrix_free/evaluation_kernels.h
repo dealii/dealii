@@ -5642,7 +5642,7 @@ namespace internal
       const unsigned int dofs_per_component =
         Utilities::pow(given_degree + 1, dim);
 
-      Assert(inverse_coefficients.size() > 0 &&
+      Assert(!inverse_coefficients.empty() &&
                inverse_coefficients.size() % dofs_per_component == 0,
              ExcMessage(
                "Expected diagonal to be a multiple of scalar dof per cells"));

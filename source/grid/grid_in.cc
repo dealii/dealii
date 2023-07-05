@@ -1476,7 +1476,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
       // so get rid of it in order to not confuse any of the functions
       // below that try to interpret the entire content of a line
       // as a string:
-      if ((line.size() > 0) && (line.back() == '\r'))
+      if ((!line.empty()) && (line.back() == '\r'))
         line.erase(line.size() - 1);
 
       // Strip trailing comments, then strip whatever spaces are at the end
@@ -1484,10 +1484,10 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
       // content of the file:
       if (line.find('#') != std::string::npos)
         line.erase(line.find('#'), std::string::npos);
-      while ((line.size() > 0) && (line.back() == ' '))
+      while ((!line.empty()) && (line.back() == ' '))
         line.erase(line.size() - 1);
 
-      if (line.size() > 0)
+      if (!line.empty())
         whole_file << '\n' << line;
     }
 

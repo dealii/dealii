@@ -1466,7 +1466,7 @@ SparseMatrix<number>::precondition_SSOR(
   // case when we have stored the position
   // just right of the diagonal (then we
   // don't have to search for it).
-  if (pos_right_of_diagonal.size() != 0)
+  if (!pos_right_of_diagonal.empty())
     {
       Assert(pos_right_of_diagonal.size() == dst.size(),
              ExcDimensionMismatch(pos_right_of_diagonal.size(), dst.size()));

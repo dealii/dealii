@@ -150,7 +150,7 @@ TableHandler::Column::pad_column_below(const unsigned int size)
 {
   // we should never have a column that is completely
   // empty and that needs to be padded
-  Assert(entries.size() > 0, ExcInternalError());
+  Assert(!entries.empty(), ExcInternalError());
 
   // add as many elements as necessary
   while (entries.size() < size)

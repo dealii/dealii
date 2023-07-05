@@ -206,7 +206,7 @@ ParameterAcceptor::get_section_path() const
           auto previous_path = acceptor->get_section_path();
 
           // See if we need to remove last piece of the path
-          if ((previous_path.size() > 0) && has_trailing == false)
+          if ((!previous_path.empty()) && has_trailing == false)
             previous_path.resize(previous_path.size() - 1);
 
           sections.insert(sections.begin(),
@@ -230,7 +230,7 @@ ParameterAcceptor::enter_subsection(const std::string &subsection)
               ExcMessage(
                 "A subsection name cannot contain the special character '/'"));
 
-  AssertThrow(subsection != "",
+  AssertThrow(!subsection.empty(),
               ExcMessage("Cannot create an empty subsection."));
 
   subsections.push_back(subsection);
@@ -241,7 +241,7 @@ ParameterAcceptor::enter_subsection(const std::string &subsection)
 void
 ParameterAcceptor::leave_subsection()
 {
-  AssertThrow(subsections.size() > 0,
+  AssertThrow(!subsections.empty(),
               ExcMessage("There is no subsection to leave here."));
   subsections.pop_back();
 }

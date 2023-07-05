@@ -308,7 +308,7 @@ namespace Particles
                                                 probability_density_function);
 
         // Sum the local integrals over all nodes
-        double local_weight_integral = (cumulative_cell_weights.size() > 0) ?
+        double local_weight_integral = (!cumulative_cell_weights.empty()) ?
                                          cumulative_cell_weights.back() :
                                          0.0;
 

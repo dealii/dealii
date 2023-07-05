@@ -196,7 +196,7 @@ namespace Utilities
       // receives are really necessary. this gives (much) better performance
       AssertDimension(ghost_targets().size() + import_targets().size(),
                       requests.size());
-      if (requests.size() > 0)
+      if (!requests.empty())
         {
           const int ierr =
             MPI_Waitall(requests.size(), requests.data(), MPI_STATUSES_IGNORE);
@@ -587,7 +587,7 @@ namespace Utilities
       if (vector_operation != VectorOperation::insert)
         AssertDimension(n_ghost_targets + n_import_targets, requests.size());
       // first wait for the receive to complete
-      if (requests.size() > 0 && n_import_targets > 0)
+      if (!requests.empty() && n_import_targets > 0)
         {
           AssertDimension(locally_owned_array.size(), locally_owned_size());
           const int ierr =
@@ -758,7 +758,7 @@ namespace Utilities
         }
 
       // wait for the send operations to complete
-      if (requests.size() > 0 && n_ghost_targets > 0)
+      if (!requests.empty() && n_ghost_targets > 0)
         {
           const int ierr = MPI_Waitall(n_ghost_targets,
                                        &requests[n_import_targets],
@@ -770,7 +770,7 @@ namespace Utilities
 
       // clear the ghost array in case we did not yet do that in the _start
       // function
-      if (ghost_array.size() > 0)
+      if (!ghost_array.empty())
         {
           Assert(ghost_array.begin() != nullptr, ExcInternalError());
 

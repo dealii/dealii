@@ -1602,7 +1602,7 @@ inline IndexSet::ElementIterator
 IndexSet::begin() const
 {
   compress();
-  if (ranges.size() > 0)
+  if (!ranges.empty())
     return {this, 0, ranges[0].begin};
   else
     return end();
@@ -1623,7 +1623,7 @@ inline IndexSet::IntervalIterator
 IndexSet::begin_intervals() const
 {
   compress();
-  if (ranges.size() > 0)
+  if (!ranges.empty())
     return IndexSet::IntervalIterator(this, 0);
   else
     return end_intervals();

@@ -2221,7 +2221,7 @@ namespace internal
                 }
             }
 
-          while (neighbor_list.size() > 0)
+          while (!neighbor_list.empty())
             {
               partition++;
 

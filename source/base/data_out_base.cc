@@ -4032,7 +4032,7 @@ namespace DataOutBase
       }
 
       // max. and min. height of solution
-      Assert(patches.size() > 0, ExcNoPatches());
+      Assert(!patches.empty(), ExcNoPatches());
       double hmin = patches[0].data(0, 0);
       double hmax = patches[0].data(0, 0);
 
@@ -9731,7 +9731,7 @@ namespace DataOutBase
       do
         {
           getline(in, header);
-          while ((header.size() != 0) && (header.back() == ' '))
+          while ((!header.empty()) && (header.back() == ' '))
             header.erase(header.size() - 1);
         }
       while ((header.empty()) && in);

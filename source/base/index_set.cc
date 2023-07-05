@@ -449,7 +449,7 @@ IndexSet::add_indices(const IndexSet &other, const size_type offset)
   if ((this == &other) && (offset == 0))
     return;
 
-  if (other.ranges.size() != 0)
+  if (!other.ranges.empty())
     {
       AssertIndexRange(other.ranges.back().end - 1, index_space_size);
     }

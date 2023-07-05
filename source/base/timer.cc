@@ -353,7 +353,7 @@ TimerOutput::~TimerOutput()
   auto do_exit = [this]() {
     try
       {
-        while (active_sections.size() > 0)
+        while (!active_sections.empty())
           leave_subsection();
         // don't print unless we leave all subsections
         if ((output_frequency == summary ||

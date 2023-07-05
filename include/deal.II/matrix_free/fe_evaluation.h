@@ -3470,8 +3470,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               my_index_start[0].second)
             has_constraints = true;
 
-          if (dof_info.hanging_node_constraint_masks.size() > 0 &&
-              dof_info.hanging_node_constraint_masks_comp.size() > 0 &&
+          if (!dof_info.hanging_node_constraint_masks.empty() &&
+              !dof_info.hanging_node_constraint_masks_comp.empty() &&
               dof_info.hanging_node_constraint_masks[cells[v]] !=
                 internal::MatrixFreeFunctions::
                   unconstrained_compressed_constraint_kind &&
@@ -3559,8 +3559,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       if (apply_constraints == false &&
           (dof_info.row_starts[cell_dof_index].second !=
              dof_info.row_starts[cell_dof_index + n_components_read].second ||
-           ((dof_info.hanging_node_constraint_masks.size() > 0 &&
-             dof_info.hanging_node_constraint_masks_comp.size() > 0 &&
+           ((!dof_info.hanging_node_constraint_masks.empty() &&
+             !dof_info.hanging_node_constraint_masks_comp.empty() &&
              dof_info.hanging_node_constraint_masks[cell_index] !=
                internal::MatrixFreeFunctions::
                  unconstrained_compressed_constraint_kind) &&
@@ -4166,8 +4166,8 @@ namespace internal
   {
     // note: no hp is supported
     if (is_valid_mode_for_sm &&
-        dof_info->dof_indices_contiguous_sm[0 /*any index (<3) should work*/]
-            .size() > 0 &&
+        !dof_info->dof_indices_contiguous_sm[0 /*any index (<3) should work*/]
+           .empty() &&
         active_fe_index == 0)
       return &vec->shared_vector_data();
     else

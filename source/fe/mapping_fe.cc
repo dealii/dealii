@@ -189,7 +189,7 @@ MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
 
   std::vector<double>         values;
   std::vector<Tensor<1, dim>> grads;
-  if (shape_values.size() != 0)
+  if (!shape_values.empty())
     {
       Assert(shape_values.size() == n_shape_functions * n_points,
              ExcInternalError());
@@ -227,7 +227,7 @@ MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
     }
 
 
-  if (shape_values.size() != 0 || shape_derivatives.size() != 0 ||
+  if (!shape_values.empty() || shape_derivatives.size() != 0 ||
       shape_second_derivatives.size() != 0 ||
       shape_third_derivatives.size() != 0 ||
       shape_fourth_derivatives.size() != 0)
@@ -236,7 +236,7 @@ MappingFE<dim, spacedim>::InternalData::compute_shape_function_values(
         tensor_pols.evaluate(
           unit_points[point], values, grads, grad2, grad3, grad4);
 
-        if (shape_values.size() != 0)
+        if (!shape_values.empty())
           for (unsigned int i = 0; i < n_shape_functions; ++i)
             shape(point, i) = values[i];
 

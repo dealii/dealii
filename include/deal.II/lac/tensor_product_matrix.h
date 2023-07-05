@@ -1358,7 +1358,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
           // indices) as well. This is an optional step.
           std::vector<unsigned int> indices_ev;
 
-          if (indices.size() > 0)
+          if (!indices.empty())
             {
               // 1a) create cache (ev indics -> diag index)
               const unsigned int n_cells = indices.size() / dim;
@@ -1408,8 +1408,8 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
 
           // step 2) allocate memory and set pointers
           const unsigned int n_diag =
-            ((indices_ev.size() > 0) ? indices_ev.size() :
-                                       (matrix_ptr.size() - 1)) /
+            ((!indices_ev.empty()) ? indices_ev.size() :
+                                     (matrix_ptr.size() - 1)) /
             dim;
 
           std::vector<unsigned int> new_vector_ptr(n_diag + 1, 0);
@@ -1417,9 +1417,8 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
 
           for (unsigned int i = 0; i < n_diag; ++i)
             {
-              const unsigned int c = (indices_ev.size() > 0) ?
-                                       indices_ev[dim * i + 0] :
-                                       (dim * i + 0);
+              const unsigned int c =
+                (!indices_ev.empty()) ? indices_ev[dim * i + 0] : (dim * i + 0);
 
               const unsigned int n_rows = vector_ptr[c + 1] - vector_ptr[c];
 
@@ -1440,7 +1439,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::finalize()
               for (unsigned int d = 0; d < dim; ++d)
                 evs[d] =
                   &this
-                     ->eigenvalues[this->vector_ptr[(indices_ev.size() > 0) ?
+                     ->eigenvalues[this->vector_ptr[(!indices_ev.empty()) ?
                                                       indices_ev[dim * i + d] :
                                                       (dim * i + d)]];
 
@@ -1492,7 +1491,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
       for (unsigned int d = 0; d < dim; ++d)
         {
           const unsigned int translated_index =
-            (indices.size() > 0) ? indices[dim * index + d] : (dim * index + d);
+            (!indices.empty()) ? indices[dim * index + d] : (dim * index + d);
 
           eigenvectors[d] =
             this->eigenvectors.data() + matrix_ptr[translated_index];
@@ -1519,7 +1518,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
       for (unsigned int d = 0; d < dim; ++d)
         {
           const unsigned int translated_index =
-            (indices.size() > 0) ?
+            (!indices.empty()) ?
               indices[((dim == 1) ? 1 : (dim + 1)) * index + d] :
               (dim * index + d);
 
@@ -1529,7 +1528,7 @@ TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
 
       {
         const unsigned int translated_index =
-          ((indices.size() > 0) && (dim != 1)) ?
+          ((!indices.empty()) && (dim != 1)) ?
             indices[(dim + 1) * index + dim] :
             index;
 

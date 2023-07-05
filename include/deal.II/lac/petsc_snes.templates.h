@@ -249,11 +249,11 @@ namespace PETScWrappers
     reinit();
 
     // Solver type
-    if (data.snes_type.size())
+    if (!data.snes_type.empty())
       AssertPETSc(SNESSetType(snes, data.snes_type.c_str()));
 
     // Linesearch type
-    if (data.snes_linesearch_type.size())
+    if (!data.snes_linesearch_type.empty())
       {
         SNESLineSearch linesearch;
         AssertPETSc(SNESGetLineSearch(snes, &linesearch));
@@ -262,7 +262,7 @@ namespace PETScWrappers
       }
 
     // Options prefix
-    if (data.options_prefix.size())
+    if (!data.options_prefix.empty())
       AssertPETSc(SNESSetOptionsPrefix(snes, data.options_prefix.c_str()));
 
     // Solver tolerances

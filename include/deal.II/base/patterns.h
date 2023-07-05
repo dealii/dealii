@@ -1789,7 +1789,7 @@ namespace Patterns
           });
 
         std::string s;
-        if (vec.size() > 0)
+        if (!vec.empty())
           s = vec[0];
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];
@@ -1863,7 +1863,7 @@ namespace Patterns
             Convert<typename T::mapped_type>::to_string(ti.second, *val_p);
 
         std::string s;
-        if (vec.size() > 0)
+        if (!vec.empty())
           s = vec[0];
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];
@@ -1939,7 +1939,7 @@ namespace Patterns
           });
 
         std::string s;
-        if (vec.size() > 0)
+        if (!vec.empty())
           s = vec[0];
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];
@@ -2004,7 +2004,7 @@ namespace Patterns
           vec[i] = Convert<typename T::value_type>::to_string(t[i], *base_p);
 
         std::string s;
-        if (vec.size() > 0)
+        if (!vec.empty())
           s = vec[0];
         for (unsigned int i = 1; i < vec.size(); ++i)
           s += p->get_separator() + " " + vec[i];

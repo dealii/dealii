@@ -543,7 +543,7 @@ MGConstrainedDoFs::get_refinement_edge_indices(unsigned int level) const
 inline bool
 MGConstrainedDoFs::have_boundary_indices() const
 {
-  return boundary_indices.size() != 0;
+  return !boundary_indices.empty();
 }
 
 

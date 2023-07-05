@@ -86,7 +86,7 @@ namespace Particles
   PropertyPool<dim, spacedim>::register_particle()
   {
     Handle handle = invalid_handle;
-    if (currently_available_handles.size() > 0)
+    if (!currently_available_handles.empty())
       {
         handle = currently_available_handles.back();
         currently_available_handles.pop_back();

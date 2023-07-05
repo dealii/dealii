@@ -2171,8 +2171,8 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
 #ifdef DEBUG
   // make sure that the provided FE collection is large enough to
   // cover all FE indices presently in use on the mesh
-  if ((hp_cell_active_fe_indices.size() > 0) &&
-      (hp_cell_future_fe_indices.size() > 0))
+  if ((!hp_cell_active_fe_indices.empty()) &&
+      (!hp_cell_future_fe_indices.empty()))
     {
       Assert(hp_capability_enabled, ExcInternalError());
 

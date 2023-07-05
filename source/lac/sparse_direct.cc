@@ -379,8 +379,8 @@ SparseDirectUMFPACK::solve(Vector<double> &rhs_and_solution,
                            const bool      transpose /*=false*/) const
 {
   // make sure that some kind of factorize() call has happened before
-  Assert(Ap.size() != 0, ExcNotInitialized());
-  Assert(Ai.size() != 0, ExcNotInitialized());
+  Assert(!Ap.empty(), ExcNotInitialized());
+  Assert(!Ai.empty(), ExcNotInitialized());
   Assert(Ai.size() == Ax.size(), ExcNotInitialized());
 
   Assert(Az.empty(),
@@ -420,13 +420,13 @@ SparseDirectUMFPACK::solve(Vector<std::complex<double>> &rhs_and_solution,
 {
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
   // make sure that some kind of factorize() call has happened before
-  Assert(Ap.size() != 0, ExcNotInitialized());
-  Assert(Ai.size() != 0, ExcNotInitialized());
+  Assert(!Ap.empty(), ExcNotInitialized());
+  Assert(!Ai.empty(), ExcNotInitialized());
   Assert(Ai.size() == Ax.size(), ExcNotInitialized());
 
   // First see whether the matrix that was factorized was complex-valued.
   // If so, just apply the complex factorization to the vector.
-  if (Az.size() != 0)
+  if (!Az.empty())
     {
       Assert(Ax.size() == Az.size(), ExcInternalError());
 

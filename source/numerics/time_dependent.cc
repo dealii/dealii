@@ -53,7 +53,7 @@ TimeDependent::~TimeDependent()
 {
   try
     {
-      while (timesteps.size() != 0)
+      while (!timesteps.empty())
         delete_timestep(0);
     }
   catch (...)
@@ -76,7 +76,7 @@ TimeDependent::insert_timestep(const TimeStepBase *position,
     {
       // at the end
       new_timestep->set_next_timestep(nullptr);
-      if (timesteps.size() > 0)
+      if (!timesteps.empty())
         {
           timesteps.back()->set_next_timestep(new_timestep);
           new_timestep->set_previous_timestep(timesteps.back());
@@ -88,7 +88,7 @@ TimeDependent::insert_timestep(const TimeStepBase *position,
     {
       // at the beginning
       new_timestep->set_previous_timestep(nullptr);
-      if (timesteps.size() > 0)
+      if (!timesteps.empty())
         {
           timesteps[0]->set_previous_timestep(new_timestep);
           new_timestep->set_next_timestep(timesteps[0]);
@@ -1211,7 +1211,7 @@ TimeStepBase_Tria_Flags::RefinementFlags<dim>::RefinementFlags(
   , min_cells_for_correction(min_cells_for_correction)
   , cell_number_corridor_top(cell_number_corridor_top)
   , cell_number_corridor_bottom(cell_number_corridor_bottom)
-  , correction_relaxations(correction_relaxations.size() != 0 ?
+  , correction_relaxations(!correction_relaxations.empty() ?
                              correction_relaxations :
                              default_correction_relaxations)
   , cell_number_correction_steps(cell_number_correction_steps)

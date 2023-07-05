@@ -229,7 +229,7 @@ PreconditionBlock<MatrixType, inverse_type>::forward_step(
 
   const MatrixType &M = *this->A;
 
-  if (permutation.size() != 0)
+  if (!permutation.empty())
     Assert(
       permutation.size() == M.m() || permutation.size() == this->size(),
       ExcMessage(
@@ -328,7 +328,7 @@ PreconditionBlock<MatrixType, inverse_type>::backward_step(
 
   const MatrixType &M = *this->A;
 
-  if (permutation.size() != 0)
+  if (!permutation.empty())
     Assert(
       permutation.size() == M.m() || permutation.size() == this->size(),
       ExcMessage(

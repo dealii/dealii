@@ -3258,7 +3258,7 @@ namespace DoFTools
         {
           // if this is the line of a parameter dof on the coarse grid, then it
           // should have at least one dependent node on the fine grid
-          Assert(weights[parameter_dof].size() > 0, ExcInternalError());
+          Assert(!weights[parameter_dof].empty(), ExcInternalError());
 
           // find the column where the representant is mentioned
           std::map<types::global_dof_index, float>::const_iterator i =
@@ -3314,7 +3314,7 @@ namespace DoFTools
           types::global_dof_index first_used_row = 0;
 
           {
-            Assert(weights.size() > 0, ExcInternalError());
+            Assert(!weights.empty(), ExcInternalError());
             std::map<types::global_dof_index, float>::const_iterator col_entry =
               weights[0].end();
             for (; first_used_row < n_coarse_dofs; ++first_used_row)

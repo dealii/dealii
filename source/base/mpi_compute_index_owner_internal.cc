@@ -412,7 +412,7 @@ namespace Utilities
                    ExcInternalError());
 
           // 5) make sure that all messages have been sent
-          if (request.size() > 0)
+          if (!request.empty())
             {
               const int ierr = MPI_Waitall(request.size(),
                                            request.data(),
@@ -703,7 +703,7 @@ namespace Utilities
               AssertDimension(offset, buffer.size());
             }
 
-          if (send_requests.size() > 0)
+          if (!send_requests.empty())
             {
               const auto ierr = MPI_Waitall(send_requests.size(),
                                             send_requests.data(),

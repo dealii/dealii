@@ -39,7 +39,7 @@ namespace Particles
         "names as interpretations. Provide the same name for components that "
         "belong to a single vector or tensor."));
 
-    if ((data_component_names.size() > 0) &&
+    if ((!data_component_names.empty()) &&
         (particles.n_locally_owned_particles() > 0))
       {
         Assert(

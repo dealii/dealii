@@ -756,7 +756,7 @@ namespace Particles
              std::to_string(new_properties.size()) +
              " properties. This is not allowed."));
 
-    if (property_values.size() > 0)
+    if (!property_values.empty())
       std::copy(new_properties.begin(),
                 new_properties.end(),
                 property_values.begin());

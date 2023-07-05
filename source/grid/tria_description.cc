@@ -1026,7 +1026,7 @@ namespace TriangulationDescription
                                          relevant_processes.end());
       }();
 
-      const bool construct_multigrid = partitions_mg.size() > 0;
+      const bool construct_multigrid = !partitions_mg.empty();
 
       TriangulationDescription::Settings settings = settings_in;
 

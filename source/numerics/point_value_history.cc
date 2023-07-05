@@ -1017,7 +1017,7 @@ PointValueHistory<dim>::write_gnuplot(
       // write column headings
       to_gnuplot << "# <Key> ";
 
-      if (indep_names.size() > 0)
+      if (!indep_names.empty())
         {
           for (const auto &indep_name : indep_names)
             {
@@ -1121,7 +1121,7 @@ PointValueHistory<dim>::write_gnuplot(
           // write column headings
           to_gnuplot << "# <Key> ";
 
-          if (indep_names.size() > 0)
+          if (!indep_names.empty())
             {
               for (const auto &indep_name : indep_names)
                 {
@@ -1144,7 +1144,7 @@ PointValueHistory<dim>::write_gnuplot(
               std::vector<std::string> names =
                 (component_names_map.find(data_entry.first))->second;
 
-              if (names.size() > 0)
+              if (!names.empty())
                 {
                   AssertThrow(names.size() == n_stored,
                               ExcDimensionMismatch(names.size(), n_stored));
@@ -1354,11 +1354,11 @@ PointValueHistory<dim>::status(std::ostream &out)
     }
   out << '\n';
 
-  if (independent_values.size() != 0)
+  if (!independent_values.empty())
     {
       out << "Independent value(s): " << independent_values.size() << " : "
           << independent_values[0].size() << '\n';
-      if (indep_names.size() > 0)
+      if (!indep_names.empty())
         {
           out << "Names: ";
           for (const auto &indep_name : indep_names)
@@ -1391,7 +1391,7 @@ PointValueHistory<dim>::status(std::ostream &out)
       Assert(component_names != component_names_map.end(),
              ExcMessage("vector_name not in class"));
 
-      if (data_entry.second.size() != 0)
+      if (!data_entry.second.empty())
         {
           out << data_entry.first << ": " << data_entry.second.size() << " (";
           out << mask->second.size() << ", "
@@ -1406,7 +1406,7 @@ PointValueHistory<dim>::status(std::ostream &out)
           out << "No points added" << '\n';
         }
       // add names, if available
-      if (component_names->second.size() > 0)
+      if (!component_names->second.empty())
         {
           for (const auto &name : component_names->second)
             {
@@ -1440,7 +1440,7 @@ PointValueHistory<dim>::deep_check(const bool strict)
         {
           for (const auto &data_entry : data_store)
             {
-              Assert(data_entry.second.size() > 0, ExcInternalError());
+              Assert(!data_entry.second.empty(), ExcInternalError());
               if ((data_entry.second)[0].size() != dataset_key.size())
                 return false;
               // this loop only tests one
@@ -1466,7 +1466,7 @@ PointValueHistory<dim>::deep_check(const bool strict)
     {
       for (const auto &data_entry : data_store)
         {
-          Assert(data_entry.second.size() > 0, ExcInternalError());
+          Assert(!data_entry.second.empty(), ExcInternalError());
 
           if (std::abs(static_cast<int>((data_entry.second)[0].size()) -
                        static_cast<int>(dataset_key.size())) >= 2)
