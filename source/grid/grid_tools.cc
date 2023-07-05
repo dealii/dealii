@@ -5968,10 +5968,8 @@ namespace GridTools
           ArborXWrappers::DistributedTree distributed_tree(comm,
                                                            global_bboxes[idx]);
 
-          auto indices_ranks_offset = distributed_tree.query(bb_intersect);
-          auto indices_ranks        = indices_ranks_offset.first;
-          auto offsets              = indices_ranks_offset.second;
-
+          const auto &[indices_ranks, offsets] =
+            distributed_tree.query(bb_intersect);
           fill_ranks_and_indices(offsets, indices_ranks);
         }
       else if constexpr (spacedim == 3)
@@ -5983,10 +5981,8 @@ namespace GridTools
             {
               ArborXWrappers::PointIntersectPredicate bb_intersect(entities);
 
-              auto indices_ranks_offset = distributed_tree.query(bb_intersect);
-              auto indices_ranks        = indices_ranks_offset.first;
-              auto offsets              = indices_ranks_offset.second;
-
+              const auto &[indices_ranks, offsets] =
+                distributed_tree.query(bb_intersect);
               fill_ranks_and_indices(offsets, indices_ranks);
             }
           else if constexpr (std::is_same<T, BoundingBox<3>>::value)
@@ -5994,10 +5990,8 @@ namespace GridTools
               ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
                 entities);
 
-              auto indices_ranks_offset = distributed_tree.query(bb_intersect);
-              auto indices_ranks        = indices_ranks_offset.first;
-              auto offsets              = indices_ranks_offset.second;
-
+              const auto &[indices_ranks, offsets] =
+                distributed_tree.query(bb_intersect);
               fill_ranks_and_indices(offsets, indices_ranks);
             }
         }
