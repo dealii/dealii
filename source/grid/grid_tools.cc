@@ -5941,7 +5941,7 @@ namespace GridTools
         }
 
 #else
-
+      (void)tolerance;
       auto fill_ranks_and_indices =
         [&ranks_and_indices](
           const std::vector<int> &                offsets,
@@ -5954,46 +5954,25 @@ namespace GridTools
       unsigned int idx = (global_bboxes.size() == 1) ?
                            0 :
                            Utilities::MPI::this_mpi_process(comm);
-      // size of global_bboxes>1
-      if constexpr (spacedim == 2)
-        {
-          // Create query bounding boxes out of entities
-          std::vector<BoundingBox<2>> query_bounding_boxes;
-          for (const auto &entity : entities)
-            query_bounding_boxes.push_back(
-              BoundingBox<2>(entity).create_extended(tolerance));
-          ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
-            query_bounding_boxes);
 
-          ArborXWrappers::DistributedTree distributed_tree(comm,
-                                                           global_bboxes[idx]);
+      ArborXWrappers::DistributedTree distributed_tree(comm,
+                                                       global_bboxes[idx]);
+
+      if constexpr (std::is_same<T, Point<spacedim>>::value)
+        {
+          ArborXWrappers::PointIntersectPredicate bb_intersect(entities);
 
           const auto &[indices_ranks, offsets] =
             distributed_tree.query(bb_intersect);
           fill_ranks_and_indices(offsets, indices_ranks);
         }
-      else if constexpr (spacedim == 3)
+      else if constexpr (std::is_same<T, BoundingBox<spacedim>>::value)
         {
-          ArborXWrappers::DistributedTree distributed_tree(comm,
-                                                           global_bboxes[idx]);
+          ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(entities);
 
-          if constexpr (std::is_same<T, Point<3>>::value)
-            {
-              ArborXWrappers::PointIntersectPredicate bb_intersect(entities);
-
-              const auto &[indices_ranks, offsets] =
-                distributed_tree.query(bb_intersect);
-              fill_ranks_and_indices(offsets, indices_ranks);
-            }
-          else if constexpr (std::is_same<T, BoundingBox<3>>::value)
-            {
-              ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
-                entities);
-
-              const auto &[indices_ranks, offsets] =
-                distributed_tree.query(bb_intersect);
-              fill_ranks_and_indices(offsets, indices_ranks);
-            }
+          const auto &[indices_ranks, offsets] =
+            distributed_tree.query(bb_intersect);
+          fill_ranks_and_indices(offsets, indices_ranks);
         }
 
 #endif
