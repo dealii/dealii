@@ -859,8 +859,8 @@ namespace LinearAlgebra
     inline void
     BlockVector<Number>::import_elements(
       const LinearAlgebra::ReadWriteVector<Number> &,
-      VectorOperation::values,
-      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>)
+      const VectorOperation::values,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &)
     {
       AssertThrow(false, ExcNotImplemented());
     }
