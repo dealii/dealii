@@ -220,12 +220,12 @@ namespace Step46
     : stokes_degree(stokes_degree)
     , elasticity_degree(elasticity_degree)
     , triangulation(Triangulation<dim>::maximum_smoothing)
-    , stokes_fe(FE_Q<dim>(stokes_degree + 1) ^ dim, // for the fluid velocity
-                FE_Q<dim>(stokes_degree),           // for the fluid pressure
-                FE_Nothing<dim>() ^ dim)          // for the solid displacement
-    , elasticity_fe(FE_Nothing<dim>() ^ dim,      // for the fluid velocity
-                    FE_Nothing<dim>(),            // for the fluid pressure
-                    FE_Q<dim>(elasticity_degree)) // for the solid displacement
+    , stokes_fe(FE_Q<dim>(stokes_degree + 1) ^ dim,     // fluid velocity
+                FE_Q<dim>(stokes_degree),               // fluid pressure
+                FE_Nothing<dim>() ^ dim)                // solid displacement
+    , elasticity_fe(FE_Nothing<dim>() ^ dim,            // fluid velocity
+                    FE_Nothing<dim>(),                  // fluid pressure
+                    FE_Q<dim>(elasticity_degree) ^ dim) // solid displacement
     , dof_handler(triangulation)
     , viscosity(2)
     , lambda(1)
