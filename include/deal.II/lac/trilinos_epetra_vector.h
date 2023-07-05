@@ -147,10 +147,11 @@ namespace LinearAlgebra
        */
       DEAL_II_DEPRECATED
       void
-      import(const ReadWriteVector<double> &V,
-             VectorOperation::values        operation,
-             std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {})
+      import(
+        const ReadWriteVector<double> &V,
+        const VectorOperation::values  operation,
+        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          &communication_pattern = {})
       {
         import_elements(V, operation, communication_pattern);
       }
