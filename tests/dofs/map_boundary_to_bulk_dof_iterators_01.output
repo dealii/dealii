@@ -1,0 +1,41 @@
+
+DEAL::Bulk mesh active cells:64
+DEAL::Surface mesh active cells:12
+DEAL::Bulk mesh degrees of freedom:77
+DEAL::Surface mesh degrees of freedom:13
+DEAL::Surface cell 2.0 coincides with face 2 of bulk cell 2.5
+DEAL::Surface cell 2.1 coincides with face 2 of bulk cell 2.4
+DEAL::Surface cell 2.2 coincides with face 2 of bulk cell 2.1
+DEAL::Surface cell 2.3 coincides with face 2 of bulk cell 2.0
+DEAL::Surface cell 2.4 coincides with face 2 of bulk cell 2.37
+DEAL::Surface cell 2.5 coincides with face 2 of bulk cell 2.36
+DEAL::Surface cell 2.6 coincides with face 2 of bulk cell 2.33
+DEAL::Surface cell 2.7 coincides with face 2 of bulk cell 2.32
+DEAL::Surface cell 2.8 coincides with face 0 of bulk cell 2.48
+DEAL::Surface cell 2.9 coincides with face 0 of bulk cell 2.50
+DEAL::Surface cell 2.10 coincides with face 0 of bulk cell 2.56
+DEAL::Surface cell 2.11 coincides with face 0 of bulk cell 2.58
+DEAL::Bulk mesh active cells:48
+DEAL::Surface mesh active cells:20
+DEAL::Bulk mesh degrees of freedom:77
+DEAL::Surface mesh degrees of freedom:25
+DEAL::Surface cell 1.0 coincides with face 4 of bulk cell 1.0
+DEAL::Surface cell 1.1 coincides with face 4 of bulk cell 1.2
+DEAL::Surface cell 1.2 coincides with face 4 of bulk cell 1.1
+DEAL::Surface cell 1.3 coincides with face 4 of bulk cell 1.3
+DEAL::Surface cell 1.4 coincides with face 0 of bulk cell 1.8
+DEAL::Surface cell 1.5 coincides with face 0 of bulk cell 1.12
+DEAL::Surface cell 1.6 coincides with face 0 of bulk cell 1.10
+DEAL::Surface cell 1.7 coincides with face 0 of bulk cell 1.14
+DEAL::Surface cell 1.8 coincides with face 4 of bulk cell 1.24
+DEAL::Surface cell 1.9 coincides with face 4 of bulk cell 1.26
+DEAL::Surface cell 1.10 coincides with face 4 of bulk cell 1.25
+DEAL::Surface cell 1.11 coincides with face 4 of bulk cell 1.27
+DEAL::Surface cell 1.12 coincides with face 0 of bulk cell 1.32
+DEAL::Surface cell 1.13 coincides with face 0 of bulk cell 1.36
+DEAL::Surface cell 1.14 coincides with face 0 of bulk cell 1.34
+DEAL::Surface cell 1.15 coincides with face 0 of bulk cell 1.38
+DEAL::Surface cell 1.16 coincides with face 0 of bulk cell 1.40
+DEAL::Surface cell 1.17 coincides with face 0 of bulk cell 1.44
+DEAL::Surface cell 1.18 coincides with face 0 of bulk cell 1.42
+DEAL::Surface cell 1.19 coincides with face 0 of bulk cell 1.46

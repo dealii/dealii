@@ -1354,6 +1354,60 @@ namespace DoFTools
 
 
   template <int dim, int spacedim>
+  std::map<typename DoFHandler<dim - 1, spacedim>::active_cell_iterator,
+           std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                     unsigned int>>
+  map_boundary_to_bulk_dof_iterators(
+    const std::map<typename Triangulation<dim - 1, spacedim>::cell_iterator,
+                   typename Triangulation<dim, spacedim>::face_iterator>
+      &                                  c1_to_c0_face,
+    const DoFHandler<dim, spacedim> &    c0_dh,
+    const DoFHandler<dim - 1, spacedim> &c1_dh)
+  {
+    // This is the returned object: a map of codimension-1 active dof cell
+    // iterators to codimension-0 cells and face indices
+    std::map<typename DoFHandler<dim - 1, spacedim>::active_cell_iterator,
+             std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                       unsigned int>>
+      c1_to_c0_cell_and_face;
+
+    // Shortcut if there are no faces to check
+    if (c1_to_c0_face.empty())
+      return c1_to_c0_cell_and_face;
+
+    // This is the partial inverse of the map passed as input, for dh
+    std::map<typename Triangulation<dim, spacedim>::face_iterator,
+             typename DoFHandler<dim - 1, spacedim>::active_cell_iterator>
+      c0_to_c1;
+
+    // map volume mesh face -> codimension 1 dof cell
+    for (const auto &[c1_cell, c0_cell] : c1_to_c0_face)
+      if (!c1_cell->has_children())
+        c0_to_c1[c0_cell] = c1_cell->as_dof_handler_iterator(c1_dh);
+
+    // generate a mapping that maps codimension-1 cells
+    // to codimension-0 cells and faces
+    for (const auto &cell :
+         c0_dh.active_cell_iterators()) // disp_dof.active_cell_iterators())
+      for (const auto f : cell->face_indices())
+        if (cell->face(f)->at_boundary())
+          {
+            const auto &it = c0_to_c1.find(cell->face(f));
+            if (it != c0_to_c1.end())
+              {
+                const auto &c1_cell             = it->second;
+                c1_to_c0_cell_and_face[c1_cell] = {cell, f};
+                c0_to_c1.erase(it);
+              }
+          }
+    // Check the dimensions: make sure all active cells we had have been mapped.
+    AssertDimension(c0_to_c1.size(), 0);
+    return c1_to_c0_cell_and_face;
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   get_active_fe_indices(const DoFHandler<dim, spacedim> &dof_handler,
                         std::vector<unsigned int> &      active_fe_indices)

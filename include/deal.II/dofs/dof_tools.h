@@ -92,120 +92,133 @@ namespace DoFTools
 #endif
 
 /**
- * This is a collection of functions operating on, and manipulating the
- * numbers of degrees of freedom. The documentation of the member functions
- * will provide more information, but for functions that exist in multiple
- * versions, there are sections in this global documentation stating some
- * commonalities.
+ * This is a collection of functions operating on, and manipulating the numbers
+ * of degrees of freedom. The documentation of the member functions will provide
+ * more information, but for functions that exist in multiple versions, there
+ * are sections in this global documentation stating some commonalities.
  *
  * <h3>Setting up sparsity patterns</h3>
  *
- * When assembling system matrices, the entries are usually of the form
- * $a_{ij} = a(\phi_i, \phi_j)$, where $a$ is a bilinear functional, often an
- * integral. When using sparse matrices, we therefore only need to reserve
- * space for those $a_{ij}$ only, which are nonzero, which is the same as to
- * say that the basis functions $\phi_i$ and $\phi_j$ have a nonempty
- * intersection of their support. Since the support of basis functions is
- * bound only on cells on which they are located or to which they are
- * adjacent, to determine the sparsity pattern it is sufficient to loop over
- * all cells and connect all basis functions on each cell with all other basis
- * functions on that cell.  There may be finite elements for which not all
- * basis functions on a cell connect with each other, but no use of this case
- * is made since no examples where this occurs are known to the author.
+ * When assembling system matrices, the entries are usually of the form $a_{ij}
+ * = a(\phi_i, \phi_j)$, where $a$ is a bilinear functional, often an integral.
+ * When using sparse matrices, we therefore only need to reserve space for those
+ * $a_{ij}$ only, which are nonzero, which is the same as to say that the basis
+ * functions $\phi_i$ and $\phi_j$ have a nonempty intersection of their
+ * support. Since the support of basis functions is bound only on cells on which
+ * they are located or to which they are adjacent, to determine the sparsity
+ * pattern it is sufficient to loop over all cells and connect all basis
+ * functions on each cell with all other basis functions on that cell.  There
+ * may be finite elements for which not all basis functions on a cell connect
+ * with each other, but no use of this case is made since no examples where this
+ * occurs are known to the author.
  *
  *
  * <h3>DoF numberings on boundaries</h3>
  *
- * When projecting the traces of functions to the boundary or parts thereof,
- * one needs to build matrices and vectors that act only on those degrees of
- * freedom that are located on the boundary, rather than on all degrees of
- * freedom. One could do that by simply building matrices in which the entries
- * for all interior DoFs are zero, but such matrices are always very rank
- * deficient and not very practical to work with.
+ * When projecting the traces of functions to the boundary or parts thereof, one
+ * needs to build matrices and vectors that act only on those degrees of freedom
+ * that are located on the boundary, rather than on all degrees of freedom. One
+ * could do that by simply building matrices in which the entries for all
+ * interior DoFs are zero, but such matrices are always very rank deficient and
+ * not very practical to work with.
  *
- * What is needed instead in this case is a numbering of the boundary degrees
- * of freedom, i.e. we should enumerate all the degrees of freedom that are
- * sitting on the boundary, and exclude all other (interior) degrees of
- * freedom. The map_dof_to_boundary_indices() function does exactly this: it
- * provides a vector with as many entries as there are degrees of freedom on
- * the whole domain, with each entry being the number in the numbering of the
- * boundary or numbers::invalid_dof_index if the dof is not on the
- * boundary.
+ * What is needed instead in this case is a numbering of the boundary degrees of
+ * freedom, i.e. we should enumerate all the degrees of freedom that are sitting
+ * on the boundary, and exclude all other (interior) degrees of freedom. The
+ * map_dof_to_boundary_indices() function does exactly this: it provides a
+ * vector with as many entries as there are degrees of freedom on the whole
+ * domain, with each entry being the number in the numbering of the boundary or
+ * numbers::invalid_dof_index if the dof is not on the boundary.
  *
  * With this vector, one can get, for any given degree of freedom, a unique
  * number among those DoFs that sit on the boundary; or, if your DoF was
- * interior to the domain, the result would be numbers::invalid_dof_index.
- * We need this mapping, for example, to build the @ref GlossMassMatrix "mass matrix" on the boundary
- * (for this, see make_boundary_sparsity_pattern() function, the corresponding
- * section below, as well as the MatrixCreator namespace documentation).
+ * interior to the domain, the result would be numbers::invalid_dof_index. We
+ * need this mapping, for example, to build the @ref GlossMassMatrix "mass
+ * matrix" on the boundary (for this, see make_boundary_sparsity_pattern()
+ * function, the corresponding section below, as well as the MatrixCreator
+ * namespace documentation).
  *
  * Actually, there are two map_dof_to_boundary_indices() functions, one
- * producing a numbering for all boundary degrees of freedom and one producing
- * a numbering for only parts of the boundary, namely those parts for which
- * the boundary indicator is listed in a set of indicators given to the
- * function. The latter case is needed if, for example, we would only want to
- * project the boundary values for the Dirichlet part of the boundary. You
- * then give the function a list of boundary indicators referring to Dirichlet
- * parts on which the projection is to be performed. The parts of the boundary
- * on which you want to project need not be contiguous; however, it is not
- * guaranteed that the indices of each of the boundary parts are continuous,
- * i.e. the indices of degrees of freedom on different parts may be
- * intermixed.
+ * producing a numbering for all boundary degrees of freedom and one producing a
+ * numbering for only parts of the boundary, namely those parts for which the
+ * boundary indicator is listed in a set of indicators given to the function.
+ * The latter case is needed if, for example, we would only want to project the
+ * boundary values for the Dirichlet part of the boundary. You then give the
+ * function a list of boundary indicators referring to Dirichlet parts on which
+ * the projection is to be performed. The parts of the boundary on which you
+ * want to project need not be contiguous; however, it is not guaranteed that
+ * the indices of each of the boundary parts are continuous, i.e. the indices of
+ * degrees of freedom on different parts may be intermixed.
  *
  * Degrees of freedom on the boundary but not on one of the specified boundary
- * parts are given the index numbers::invalid_dof_index, as if they were in
- * the interior. If no boundary indicator was given or if no face of a cell
- * has a boundary indicator contained in the given list, the vector of new
- * indices consists solely of numbers::invalid_dof_index.
+ * parts are given the index numbers::invalid_dof_index, as if they were in the
+ * interior. If no boundary indicator was given or if no face of a cell has a
+ * boundary indicator contained in the given list, the vector of new indices
+ * consists solely of numbers::invalid_dof_index.
  *
  * (As a side note, for corner cases: The question what a degree of freedom on
- * the boundary is, is not so easy.  It should really be a degree of freedom
- * of which the respective basis function has nonzero values on the boundary.
- * At least for Lagrange elements this definition is equal to the statement
- * that the off-point, or what deal.II calls support_point, of the shape
- * function, i.e. the point where the function assumes its nominal value (for
- * Lagrange elements this is the point where it has the function value 1), is
- * located on the boundary. We do not check this directly, the criterion is
- * rather defined through the information the finite element class gives: the
- * FiniteElement class defines the numbers of basis functions per vertex, per
- * line, and so on and the basis functions are numbered after this
- * information; a basis function is to be considered to be on the face of a
- * cell (and thus on the boundary if the cell is at the boundary) according to
- * it belonging to a vertex, line, etc but not to the interior of the cell.
- * The finite element uses the same cell-wise numbering so that we can say
- * that if a degree of freedom was numbered as one of the dofs on lines, we
- * assume that it is located on the line. Where the off-point actually is, is
- * a secret of the finite element (well, you can ask it, but we don't do it
- * here) and not relevant in this context.)
+ * the boundary is, is not so easy.  It should really be a degree of freedom of
+ * which the respective basis function has nonzero values on the boundary. At
+ * least for Lagrange elements this definition is equal to the statement that
+ * the off-point, or what deal.II calls support_point, of the shape function,
+ * i.e. the point where the function assumes its nominal value (for Lagrange
+ * elements this is the point where it has the function value 1), is located on
+ * the boundary. We do not check this directly, the criterion is rather defined
+ * through the information the finite element class gives: the FiniteElement
+ * class defines the numbers of basis functions per vertex, per line, and so on
+ * and the basis functions are numbered after this information; a basis function
+ * is to be considered to be on the face of a cell (and thus on the boundary if
+ * the cell is at the boundary) according to it belonging to a vertex, line, etc
+ * but not to the interior of the cell. The finite element uses the same
+ * cell-wise numbering so that we can say that if a degree of freedom was
+ * numbered as one of the dofs on lines, we assume that it is located on the
+ * line. Where the off-point actually is, is a secret of the finite element
+ * (well, you can ask it, but we don't do it here) and not relevant in this
+ * context.)
  *
  *
  * <h3>Setting up sparsity patterns for boundary matrices</h3>
  *
- * In some cases, one wants to only work with DoFs that sit on the boundary.
- * One application is, for example, if rather than interpolating non-
- * homogeneous boundary values, one would like to project them. For this, we
- * need two things: a way to identify nodes that are located on (parts of) the
- * boundary, and a way to build matrices out of only degrees of freedom that
- * are on the boundary (i.e. much smaller matrices, in which we do not even
- * build the large zero block that stems from the fact that most degrees of
- * freedom have no support on the boundary of the domain). The first of these
- * tasks is done by the map_dof_to_boundary_indices() function (described
- * above).
+ * In some cases, one wants to only work with DoFs that sit on the boundary. One
+ * application is, for example, if rather than interpolating non- homogeneous
+ * boundary values, one would like to project them. For this, we need two
+ * things: a way to identify nodes that are located on (parts of) the boundary,
+ * and a way to build matrices out of only degrees of freedom that are on the
+ * boundary (i.e. much smaller matrices, in which we do not even build the large
+ * zero block that stems from the fact that most degrees of freedom have no
+ * support on the boundary of the domain). The first of these tasks is done by
+ * the map_dof_to_boundary_indices() function (described above).
  *
  * The second part requires us first to build a sparsity pattern for the
  * couplings between boundary nodes, and then to actually build the components
- * of this matrix. While actually computing the entries of these small
- * boundary matrices is discussed in the MatrixCreator namespace, the creation
- * of the sparsity pattern is done by the create_boundary_sparsity_pattern()
- * function. For its work, it needs to have a numbering of all those degrees
- * of freedom that are on those parts of the boundary that we are interested
- * in. You can get this from the map_dof_to_boundary_indices() function. It
- * then builds the sparsity pattern corresponding to integrals like
- * $\int_\Gamma \varphi_{b2d(i)} \varphi_{b2d(j)} dx$, where $i$ and $j$ are
- * indices into the matrix, and $b2d(i)$ is the global DoF number of a degree
- * of freedom sitting on a boundary (i.e., $b2d$ is the inverse of the mapping
- * returned by map_dof_to_boundary_indices() function).
+ * of this matrix. While actually computing the entries of these small boundary
+ * matrices is discussed in the MatrixCreator namespace, the creation of the
+ * sparsity pattern is done by the create_boundary_sparsity_pattern() function.
+ * For its work, it needs to have a numbering of all those degrees of freedom
+ * that are on those parts of the boundary that we are interested in. You can
+ * get this from the map_dof_to_boundary_indices() function. It then builds the
+ * sparsity pattern corresponding to integrals like $\int_\Gamma
+ * \varphi_{b2d(i)} \varphi_{b2d(j)} dx$, where $i$ and $j$ are indices into the
+ * matrix, and $b2d(i)$ is the global DoF number of a degree of freedom sitting
+ * on a boundary (i.e., $b2d$ is the inverse of the mapping returned by
+ * map_dof_to_boundary_indices() function).
  *
+ * <h3>DoF coupling between surface triangulations and bulk triangulations</h3>
+ *
+ * When working with Triangulation and DoFHandler objects of different
+ * co-dimension, such as a `Triangulation<2,3>`, describing (part of) the
+ * boundary of a `Triangulation<3>`, and their corresponding DoFHandler objects,
+ * one often needs to build a one-to-one matching between the degrees of freedom
+ * that live on the surface Triangulation and those that live on the boundary of
+ * the bulk Triangulation. The GridGenerator::extract_boundary_mesh() function
+ * returns a mapping of surface cell iterators to face iterators, that can be
+ * used by the function map_boundary_to_bulk_dof_iterators() to construct a map
+ * between cell iterators of the surface DoFHandler, and the corresponding pair
+ * of cell iterator and face index of the bulk DoFHandler. Such map can be used
+ * to initialize FEValues and FEFaceValues for the corresponding DoFHandler
+ * objects. Notice that one must still ensure that the ordering of the
+ * quadrature points coincide in the two objects, in order to build a coupling
+ * matrix between the two sytesm.
  *
  * @ingroup dofs
  */
@@ -1410,6 +1423,105 @@ namespace DoFTools
                          const ComponentMask &            component_mask,
                          std::vector<std::vector<bool>> & constant_modes);
   /** @} */
+
+  /**
+   * @name Coupling between DoFHandler objects on different dimensions
+   * @{
+   */
+
+  /**
+   * This function generates a mapping of codimension-1 active DoFHandler cell
+   * iterators to codimension-0 cells and face indices, for DoFHandler objects
+   * built on top of the boundary of a given `Triangulation<spacedim>`.
+   *
+   * If you need to couple a PDE defined on the surface of an existing
+   * Triangulation (as in step-38) with the PDE defined on the bulk (say, for
+   * example, a hyper ball and its boundary), the information that is returned
+   * by the function GridGenerator::extract_boundary_mesh() is not enough, since
+   * you need to build FEValues objects on active cell iterators of the
+   * DoFHandler defined on the surface mesh, and FEFaceValues objects on face
+   * iterators of the DoFHandler defined on the bulk mesh. This second step
+   * requires knowledge of the bulk cell iterator and of the corresponding face
+   * index.
+   *
+   * This function examines the map `c1_to_c0` returned by
+   * GridGenerator::extract_boundary_mesh() (when used with two Triangulation
+   * objects as input), and associates to each active cell iterator of the
+   * `c1_dh` DoFHandler that is also contained in the map `c1_to_c0`, a pair of
+   * corresponding active bulk cell iterator of `c0_dh`, and face index
+   * corresponding to the cell iterator on the surface mesh.
+   *
+   * An example usage of this function is the following:
+   *
+   * @code
+   * Triangulation<dim>          triangulation;
+   * Triangulation<dim - 1, dim> surface_triangulation;
+   *
+   * FE_Q<dim>       fe(1);
+   * DoFHandler<dim> dof_handler(triangulation);
+   *
+   * FE_Q<dim - 1, dim>       surface_fe(1);
+   * DoFHandler<dim - 1, dim> surface_dof_handler(surface_triangulation);
+   *
+   * GridGenerator::half_hyper_ball(triangulation);
+   * triangulation.refine_global(4);
+   *
+   * surface_triangulation.set_manifold(0, SphericalManifold<dim - 1, dim>());
+   * const auto surface_to_bulk_map =
+   *   GridGenerator::extract_boundary_mesh(triangulation,
+   *                                        surface_triangulation,
+   *                                        {0});
+   *
+   * dof_handler.distribute_dofs(fe);
+   * surface_dof_handler.distribute_dofs(surface_fe);
+   *
+   * // Extract the mapping between surface and bulk degrees of freedom:
+   * const auto surface_to_bulk_dof_iterator_map =
+   *   DoFTools::map_boundary_to_bulk_dof_iterators(surface_to_bulk_map,
+   *                                                dof_handler,
+   *                                                surface_dof_handler);
+   *
+   * // Loop over the map, and print some information:
+   * for (const auto &p : surface_to_bulk_dof_iterator_map)
+   *   {
+   *     const auto &surface_cell = p.first;
+   *     const auto &bulk_cell    = p.second.first;
+   *     const auto &bulk_face    = p.second.second;
+   *     deallog << "Surface cell " << surface_cell << " coincides with face "
+   *             << bulk_face << " of bulk cell " << bulk_cell << std::endl;
+   *   }
+   * @endcode
+   *
+   * \tparam dim The dimension of the codimension-0 mesh.
+   *
+   * \tparam spacedim The dimension of the underlying space.
+   *
+   * \param[in] c1_to_c0 A map from codimension-1 triangulation cell iterators
+   * to codimension-0 face iterators, as generated by the
+   * GridGenerators::extract_boundary_mesh() function.
+   *
+   * \param[in] c0_dh The DoFHandler object of the codimension-0 mesh.
+   *
+   * \param[in] c1_dh The DoFHandler object of the codimension-1 mesh.
+   *
+   * \return A std::map object that maps codimension-1 active DoFHandler cell
+   * iterators to a pair consisting of the corresponding codimension-0 cell
+   * iterator and face index.
+   */
+  template <int dim, int spacedim>
+  std::map<typename DoFHandler<dim - 1, spacedim>::active_cell_iterator,
+           std::pair<typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                     unsigned int>>
+  map_boundary_to_bulk_dof_iterators(
+    const std::map<typename Triangulation<dim - 1, spacedim>::cell_iterator,
+                   typename Triangulation<dim, spacedim>::face_iterator>
+      &                                  c1_to_c0,
+    const DoFHandler<dim, spacedim> &    c0_dh,
+    const DoFHandler<dim - 1, spacedim> &c1_dh);
+
+  /**
+   * @}
+   */
 
   /**
    * @name Parallelization and domain decomposition
