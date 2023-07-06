@@ -245,7 +245,7 @@ endif()
 
 message("-- CTEST_SITE:             ${CTEST_SITE}")
 
-if(TRACK MATCHES "^Regression Tests$" AND NOT CTEST_SITE MATCHES "^tester(|-ng)$")
+if(TRACK MATCHES "^Regression Tests$" AND NOT CTEST_SITE MATCHES "^tester(|-tos|-tng|-ds9)$")
   message(FATAL_ERROR "
 I'm sorry ${CTEST_SITE}, I'm afraid I can't do that.
 The TRACK \"Regression Tests\" is not for you.
