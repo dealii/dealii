@@ -2707,13 +2707,6 @@ AffineConstraints<number>::distribute(VectorType &vec) const
                                                      line.index,
                                                      vec);
           }
-
-      // now compress to communicate the entries that we added to
-      // and that weren't to local processors to the owner
-      //
-      // this shouldn't be strictly necessary but it probably doesn't
-      // hurt either
-      vec.compress(VectorOperation::insert);
     }
   else
     // purely sequential vector (either because the type doesn't
@@ -2738,14 +2731,12 @@ AffineConstraints<number>::distribute(VectorType &vec) const
                                                    next_constraint.index,
                                                    vec);
         }
-
-      // Finally, call compress(). This is not necessary for sequential
-      // vector types, but we need it for parallel vector types and
-      // we get here if we use parallel vector types but are on a single
-      // process:
-      if (dealii::is_serial_vector<VectorType>::value == false)
-        vec.compress(VectorOperation::insert);
     }
+
+  // Finally, call compress(). This is not necessary for sequential
+  // vector types, but we need it for parallel vector types and it's
+  // a no-op for sequential vectors.
+  vec.compress(VectorOperation::insert);
 }
 
 // Some helper definitions for the local_to_global functions.
