@@ -90,6 +90,14 @@ public:
   ComponentMask() = default;
 
   /**
+   * Deprecated constructor allowing implicit conversion.
+   */
+  template <typename = void>
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Implicit conversions from std::vector<bool> to ComponentMask are deprecated!")
+  ComponentMask(const std::vector<bool> &block_mask);
+
+  /**
    * Initialize an object of this type with a set of selected components
    * specified by the argument.
    *
@@ -258,6 +266,12 @@ operator<<(std::ostream &out, const ComponentMask &mask);
 
 #ifndef DOXYGEN
 // -------------------- inline functions ---------------------
+
+template <typename>
+inline ComponentMask::ComponentMask(const std::vector<bool> &component_mask)
+  : component_mask(component_mask)
+{}
+
 
 inline ComponentMask::ComponentMask(const std::vector<bool> &component_mask)
   : component_mask(component_mask)
