@@ -5954,27 +5954,34 @@ namespace GridTools
       unsigned int idx = (global_bboxes.size() == 1) ?
                            0 :
                            Utilities::MPI::this_mpi_process(comm);
-
-      ArborXWrappers::DistributedTree distributed_tree(comm,
-                                                       global_bboxes[idx]);
-
-      if constexpr (std::is_same<T, Point<spacedim>>::value)
+      if constexpr (spacedim != 1)
         {
-          ArborXWrappers::PointIntersectPredicate bb_intersect(entities);
+          ArborXWrappers::DistributedTree distributed_tree(comm,
+                                                           global_bboxes[idx]);
 
-          const auto &[indices_ranks, offsets] =
-            distributed_tree.query(bb_intersect);
-          fill_ranks_and_indices(offsets, indices_ranks);
+          if constexpr (std::is_same<T, Point<spacedim>>::value)
+            {
+              ArborXWrappers::PointIntersectPredicate bb_intersect(entities);
+
+              const auto &[indices_ranks, offsets] =
+                distributed_tree.query(bb_intersect);
+              fill_ranks_and_indices(offsets, indices_ranks);
+            }
+          else if constexpr (std::is_same<T, BoundingBox<spacedim>>::value)
+            {
+              ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
+                entities);
+
+              const auto &[indices_ranks, offsets] =
+                distributed_tree.query(bb_intersect);
+              fill_ranks_and_indices(offsets, indices_ranks);
+            }
         }
-      else if constexpr (std::is_same<T, BoundingBox<spacedim>>::value)
+      else
         {
-          ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(entities);
-
-          const auto &[indices_ranks, offsets] =
-            distributed_tree.query(bb_intersect);
-          fill_ranks_and_indices(offsets, indices_ranks);
+          AssertThrow(false, ExcInternalError());
+          return {};
         }
-
 #endif
 
       // convert to CRS
