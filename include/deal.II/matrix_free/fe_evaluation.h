@@ -3917,7 +3917,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     }
 
   std::array<unsigned int, n_lanes> dof_indices;
+  std::fill(dof_indices.begin(),
+            dof_indices.end(),
+            numbers::invalid_unsigned_int);
 
+  Assert(n_filled_lanes <= n_lanes, ExcInternalError());
   for (unsigned int v = 0; v < n_filled_lanes; ++v)
     {
       Assert(mask[v] == false || cells[v] != numbers::invalid_unsigned_int,
@@ -3932,9 +3936,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       else
         dof_indices[v] = numbers::invalid_unsigned_int;
     }
-
-  for (unsigned int v = n_filled_lanes; v < n_lanes; ++v)
-    dof_indices[v] = numbers::invalid_unsigned_int;
 
   // In the case with contiguous cell indices, we know that there are no
   // constraints and that the indices within each element are contiguous
