@@ -437,6 +437,21 @@ namespace GinkgoWrappers
     add(indices.size(), indices.data(), values.begin());
   }
 
+  template <typename Number>
+  void
+  Vector<Number>::extract_subvector_to(
+    const ArrayView<const size_type> &indices,
+    ArrayView<Number> &               values) const
+  {
+    Assert(indices.size() == values.size(),
+           ExcDimensionMismatch(indices.size(), values.size()));
+    auto host_data =
+      gko::make_temporary_clone(data_->get_executor()->get_master(), data_);
+    for (size_type i = 0; i < indices.size(); ++i)
+      {
+        values[i] = host_data->get_const_values()[indices[i]];
+      }
+  }
 
 #  define DECLARE_GINKGO_VECTOR(_type) class Vector<_type>
 

@@ -24,7 +24,8 @@
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/subscriptor.h>
 
-#  include <deal.II/lac/la_vector.h>
+#  include <deal.II/lac/read_vector.h>
+#  include <deal.II/lac/read_write_vector.h>
 #  include <deal.II/lac/vector.h>
 
 #  include <ginkgo/core/base/version.hpp>
@@ -53,14 +54,14 @@ namespace GinkgoWrappers
    * @ingroup Vectors
    */
   template <typename Number>
-  class Vector : public Subscriptor
+  class Vector : public Subscriptor, public ReadVector<Number>
   {
   public:
     using value_type       = Number;
     using real_type        = typename numbers::NumberTraits<Number>::real_type;
     using iterator         = value_type *;
     using const_iterator   = const value_type *;
-    using size_type        = types::global_dof_index;
+    using size_type        = typename ReadVector<Number>::size_type;
     using ginkgo_type      = gko::matrix::Dense<Number>;
     using ginkgo_norm_type = typename ginkgo_type::absolute_type;
 
@@ -217,7 +218,7 @@ namespace GinkgoWrappers
      * Returns the size of the vector.
      */
     size_type
-    size() const noexcept;
+    size() const noexcept override;
 
     /**
      * Returns the index set [0, size()). Necessary for compatability
@@ -401,23 +402,9 @@ namespace GinkgoWrappers
       return false;
     }
 
-    /**
-     * Copies the elements at the indices @p indices to the vector @p values.
-     */
-    template <typename Number2>
     void
-    extract_subvector_to(const std::vector<size_type> &indices,
-                         std::vector<Number2> &        values) const;
-
-    /**
-     * Copies the element at the indices defined in the range @p indices_begin,
-     * @p indices_end to the output iterator @p values_begin
-     */
-    template <typename ForwardIterator, typename OutputIterator>
-    void
-    extract_subvector_to(ForwardIterator       indices_begin,
-                         const ForwardIterator indices_end,
-                         OutputIterator        values_begin) const;
+    extract_subvector_to(const ArrayView<const size_type> &indices,
+                         ArrayView<Number> &values) const override;
 
     /**
      * Checks if the index @p index is within the local range ([0, size())) of this vector.
@@ -491,30 +478,6 @@ namespace GinkgoWrappers
   Vector<Number>::size() const noexcept
   {
     return data_->get_size()[0];
-  }
-
-  template <typename Number>
-  template <typename ForwardIterator, typename OutputIterator>
-  void
-  Vector<Number>::extract_subvector_to(ForwardIterator       indices_begin,
-                                       const ForwardIterator indices_end,
-                                       OutputIterator        values_begin) const
-  {
-    auto host_data =
-      gko::make_temporary_clone(data_->get_executor()->get_master(), data_);
-    for (auto it = indices_begin; it != indices_end; ++it, ++values_begin)
-      {
-        *values_begin = host_data->get_const_values()[*it];
-      }
-  }
-
-  template <typename Number>
-  template <typename Number2>
-  void
-  Vector<Number>::extract_subvector_to(const std::vector<size_type> &indices,
-                                       std::vector<Number2> &values) const
-  {
-    extract_subvector_to(indices.begin(), indices.end(), values.begin());
   }
 } // namespace GinkgoWrappers
 
