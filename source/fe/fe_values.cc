@@ -3765,7 +3765,7 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
 
 
 template <int dim, int spacedim>
-const typename Triangulation<dim, spacedim>::cell_iterator
+typename Triangulation<dim, spacedim>::cell_iterator
 FEValuesBase<dim, spacedim>::get_cell() const
 {
   return present_cell;

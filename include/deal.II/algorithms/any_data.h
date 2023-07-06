@@ -76,7 +76,7 @@ public:
    * use try_read() instead.
    */
   template <typename type>
-  const type
+  type
   entry(const std::string &name) const;
 
   /**
@@ -91,7 +91,7 @@ public:
    * Use read_ptr() instead!
    */
   template <typename type>
-  const type
+  type
   read(const std::string &name) const;
 
   /**
@@ -135,12 +135,12 @@ public:
 
   /// Read-only access to stored data object by index.
   template <typename type>
-  const type
+  type
   entry(const unsigned int i) const;
 
   /// Dedicated read only access.
   template <typename type>
-  const type
+  type
   read(const unsigned int i) const;
 
   /// Dedicated read only access to pointer object.
@@ -240,7 +240,7 @@ AnyData::entry(const unsigned int i)
 
 
 template <typename type>
-inline const type
+inline type
 AnyData::entry(const unsigned int i) const
 {
   AssertIndexRange(i, size());
@@ -254,7 +254,7 @@ AnyData::entry(const unsigned int i) const
 
 
 template <typename type>
-inline const type
+inline type
 AnyData::read(const unsigned int i) const
 {
   AssertIndexRange(i, size());
@@ -358,7 +358,7 @@ AnyData::entry(const std::string &n)
 
 
 template <typename type>
-inline const type
+inline type
 AnyData::entry(const std::string &n) const
 {
   const unsigned int i = find(n);
@@ -370,7 +370,7 @@ AnyData::entry(const std::string &n) const
 
 
 template <typename type>
-inline const type
+inline type
 AnyData::read(const std::string &n) const
 {
   const unsigned int i = find(n);

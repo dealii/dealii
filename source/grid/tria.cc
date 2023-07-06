@@ -11198,9 +11198,8 @@ MPI_Comm Triangulation<dim, spacedim>::get_communicator() const
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-const std::weak_ptr<const Utilities::MPI::Partitioner> Triangulation<
-  dim,
-  spacedim>::global_active_cell_index_partitioner() const
+std::weak_ptr<const Utilities::MPI::Partitioner> Triangulation<dim, spacedim>::
+  global_active_cell_index_partitioner() const
 {
   return number_cache.active_cell_index_partitioner;
 }
@@ -11209,9 +11208,8 @@ const std::weak_ptr<const Utilities::MPI::Partitioner> Triangulation<
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-const std::weak_ptr<const Utilities::MPI::Partitioner> Triangulation<
-  dim,
-  spacedim>::global_level_cell_index_partitioner(const unsigned int level) const
+std::weak_ptr<const Utilities::MPI::Partitioner> Triangulation<dim, spacedim>::
+  global_level_cell_index_partitioner(const unsigned int level) const
 {
   AssertIndexRange(level, this->n_levels());
 

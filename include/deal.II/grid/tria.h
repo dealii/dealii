@@ -1635,7 +1635,7 @@ public:
    * level of the triangulation, which is returned by the function
    * CellAccessor::global_active_cell_index().
    */
-  virtual const std::weak_ptr<const Utilities::MPI::Partitioner>
+  virtual std::weak_ptr<const Utilities::MPI::Partitioner>
   global_active_cell_index_partitioner() const;
 
   /**
@@ -1643,7 +1643,7 @@ public:
    * level of the triangulation, which is returned by the function
    * CellAccessor::global_level_cell_index().
    */
-  virtual const std::weak_ptr<const Utilities::MPI::Partitioner>
+  virtual std::weak_ptr<const Utilities::MPI::Partitioner>
   global_level_cell_index_partitioner(const unsigned int level) const;
 
   /**

@@ -413,7 +413,7 @@ public:
    * Return the two function objects that are in use for determining the first
    * and the next cell as set by set_cell_selection().
    */
-  const std::pair<FirstCellFunctionType, NextCellFunctionType>
+  std::pair<FirstCellFunctionType, NextCellFunctionType>
   get_cell_selection() const;
 
 private:

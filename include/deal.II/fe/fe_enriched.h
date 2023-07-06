@@ -429,7 +429,7 @@ public:
   /**
    * Return enrichment functions
    */
-  const std::vector<std::vector<std::function<const Function<spacedim> *(
+  std::vector<std::vector<std::function<const Function<spacedim> *(
     const typename Triangulation<dim, spacedim>::cell_iterator &)>>>
   get_enrichments() const;
 

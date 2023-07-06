@@ -326,7 +326,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  const ArrayView<double>
+  ArrayView<double>
   Particle<dim, spacedim>::get_properties()
   {
     return property_pool->get_properties(property_pool_handle);

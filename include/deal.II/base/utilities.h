@@ -894,7 +894,7 @@ namespace Utilities
      * </tr>
      * </table>
      */
-    const std::string
+    std::string
     get_current_vectorization_level();
 
     /**

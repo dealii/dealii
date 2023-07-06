@@ -177,7 +177,7 @@ namespace Utilities
 
 
 
-    const std::vector<unsigned int>
+    std::vector<unsigned int>
     mpi_processes_within_communicator(const MPI_Comm comm_large,
                                       const MPI_Comm comm_small)
     {
@@ -677,7 +677,7 @@ namespace Utilities
 
 
 
-    const std::vector<unsigned int>
+    std::vector<unsigned int>
     mpi_processes_within_communicator(const MPI_Comm, const MPI_Comm)
     {
       return std::vector<unsigned int>{0};

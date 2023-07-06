@@ -1554,7 +1554,7 @@ public:
    * The @p cell_index is either 0 or 1 and corresponds to the cell index
    * returned by interface_dof_to_cell_and_dof_index().
    */
-  const typename Triangulation<dim, spacedim>::cell_iterator
+  typename Triangulation<dim, spacedim>::cell_iterator
   get_cell(const unsigned int cell_index) const;
 
   /**
@@ -2037,7 +2037,7 @@ public:
    * The concept of views is explained in the documentation of the namespace
    * FEValuesViews.
    */
-  const FEInterfaceViews::Scalar<dim, spacedim>
+  FEInterfaceViews::Scalar<dim, spacedim>
   operator[](const FEValuesExtractors::Scalar &scalar) const;
 
   /**
@@ -2046,7 +2046,7 @@ public:
    * finite element. The concept of views is explained in the documentation of
    * the namespace FEValuesViews.
    */
-  const FEInterfaceViews::Vector<dim, spacedim>
+  FEInterfaceViews::Vector<dim, spacedim>
   operator[](const FEValuesExtractors::Vector &vector) const;
 
   /**
@@ -2704,7 +2704,7 @@ FEInterfaceValues<dim, spacedim>::get_update_flags() const
 
 
 template <int dim, int spacedim>
-const typename Triangulation<dim, spacedim>::cell_iterator
+typename Triangulation<dim, spacedim>::cell_iterator
 FEInterfaceValues<dim, spacedim>::get_cell(const unsigned int cell_index) const
 {
   return get_fe_face_values(cell_index).get_cell();
@@ -3142,7 +3142,7 @@ FEInterfaceValues<dim, spacedim>::get_average_of_function_hessians(
 
 /*------------ Inline functions: FEInterfaceValues------------*/
 template <int dim, int spacedim>
-inline const FEInterfaceViews::Scalar<dim, spacedim>
+inline FEInterfaceViews::Scalar<dim, spacedim>
 FEInterfaceValues<dim, spacedim>::operator[](
   const FEValuesExtractors::Scalar &scalar) const
 {
@@ -3157,7 +3157,7 @@ FEInterfaceValues<dim, spacedim>::operator[](
 
 
 template <int dim, int spacedim>
-inline const FEInterfaceViews::Vector<dim, spacedim>
+inline FEInterfaceViews::Vector<dim, spacedim>
 FEInterfaceValues<dim, spacedim>::operator[](
   const FEValuesExtractors::Vector &vector) const
 {

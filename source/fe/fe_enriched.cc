@@ -258,7 +258,7 @@ FE_Enriched<dim, spacedim>::FE_Enriched(
 
 
 template <int dim, int spacedim>
-const std::vector<std::vector<std::function<const Function<spacedim> *(
+std::vector<std::vector<std::function<const Function<spacedim> *(
   const typename Triangulation<dim, spacedim>::cell_iterator &)>>>
 FE_Enriched<dim, spacedim>::get_enrichments() const
 {

@@ -1325,8 +1325,8 @@ DataOut<dim, spacedim>::set_cell_selection(
 
 
 template <int dim, int spacedim>
-const std::pair<typename DataOut<dim, spacedim>::FirstCellFunctionType,
-                typename DataOut<dim, spacedim>::NextCellFunctionType>
+std::pair<typename DataOut<dim, spacedim>::FirstCellFunctionType,
+          typename DataOut<dim, spacedim>::NextCellFunctionType>
 DataOut<dim, spacedim>::get_cell_selection() const
 {
   return std::make_pair(first_cell_function, next_cell_function);

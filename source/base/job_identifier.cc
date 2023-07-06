@@ -50,7 +50,7 @@ JobIdentifier::JobIdentifier()
 }
 
 
-const std::string
+std::string
 JobIdentifier::operator()() const
 {
   return id;

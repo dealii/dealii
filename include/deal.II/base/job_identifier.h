@@ -63,7 +63,7 @@ public:
   /**
    * Return the value of <tt>id</tt>.
    */
-  const std::string
+  std::string
   operator()() const;
 
   /**
