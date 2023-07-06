@@ -1697,6 +1697,11 @@ public:
    * after applying quadrature equals the summing the JxW values returned by
    * the FEValues or FEFaceValues object you will want to use for the
    * integral.
+   *
+   * @note There is no analytic formula for the area of a bilinear face (i.e.,
+   * something with a quadrilateral reference cell) in 3D. This function uses
+   * the quadrature defined by QGauss<2>(4) to approximate the measure in this
+   * case.
    */
   double
   measure() const;
