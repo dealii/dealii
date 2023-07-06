@@ -912,7 +912,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::import_elements(
       const Vector<Number, MemorySpaceType2> &src,
-      VectorOperation::values                 operation)
+      const VectorOperation::values           operation)
     {
       Assert(src.partitioner.get() != nullptr, ExcNotInitialized());
       Assert(partitioner->locally_owned_range() ==
@@ -1253,9 +1253,9 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::import_elements(
       const ReadWriteVector<Number> &V,
-      VectorOperation::values        operation,
-      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-        communication_pattern)
+      const VectorOperation::values  operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern)
     {
       // If no communication pattern is given, create one. Otherwise, use the
       // given one.
