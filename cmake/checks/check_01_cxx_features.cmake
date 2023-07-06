@@ -327,7 +327,7 @@ if(NOT DEAL_II_HAVE_CXX17)
   message(FATAL_ERROR
     "\nThe current version of deal.II requires a compiler with enabled "
     "C++17 support. Make sure to use a modern enough compiler (GCC version "
-    "8 onwards, Clang version 8 onwards, or Microsoft MS VS 2019 onwards) "
+    "9 onwards, Clang version 10 onwards, or Microsoft MS VS 2019 onwards) "
     "and check that the compiler flag \"-std=\" is either unset, or set to "
     "at least c++17. Similarly, please make sure that the CMake variable "
     "CMAKE_CXX_STANDARD is either unset, or set at least to 17.\n\n"
