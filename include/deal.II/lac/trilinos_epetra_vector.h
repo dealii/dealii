@@ -65,6 +65,7 @@ namespace LinearAlgebra
     public:
       using value_type = double;
       using size_type  = types::global_dof_index;
+      using real_type  = double;
 
       /**
        * Constructor. Create a vector of dimension zero.
