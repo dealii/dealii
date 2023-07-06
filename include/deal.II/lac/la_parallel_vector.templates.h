@@ -1424,32 +1424,10 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpaceType>
-    void
-    Vector<Number, MemorySpaceType>::reinit(const VectorSpaceVector<Number> &V,
-                                            const bool omit_zeroing_entries)
-    {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert(dynamic_cast<const VectorType *>(&V) != nullptr,
-             ExcVectorTypeNotCompatible());
-      const VectorType &down_V = dynamic_cast<const VectorType &>(V);
-
-      reinit(down_V, omit_zeroing_entries);
-    }
-
-
-
-    template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType> &
     Vector<Number, MemorySpaceType>::operator+=(
-      const VectorSpaceVector<Number> &vv)
+      const Vector<Number, MemorySpaceType> &v)
     {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
-      const VectorType &v = dynamic_cast<const VectorType &>(vv);
-
       AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
@@ -1470,14 +1448,8 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     Vector<Number, MemorySpaceType> &
     Vector<Number, MemorySpaceType>::operator-=(
-      const VectorSpaceVector<Number> &vv)
+      const Vector<Number, MemorySpaceType> &v)
     {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
-      const VectorType &v = dynamic_cast<const VectorType &>(vv);
-
       AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
@@ -1514,15 +1486,9 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::add_local(
-      const Number                     a,
-      const VectorSpaceVector<Number> &vv)
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &v)
     {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
-      const VectorType &v = dynamic_cast<const VectorType &>(vv);
-
       AssertIsFinite(a);
       AssertDimension(locally_owned_size(), v.locally_owned_size());
 
@@ -1543,8 +1509,9 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::add(const Number                     a,
-                                         const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::add(
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &vv)
     {
       add_local(a, vv);
 
@@ -1556,20 +1523,12 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::add(const Number                     a,
-                                         const VectorSpaceVector<Number> &vv,
-                                         const Number                     b,
-                                         const VectorSpaceVector<Number> &ww)
+    Vector<Number, MemorySpaceType>::add(
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &v,
+      const Number                           b,
+      const Vector<Number, MemorySpaceType> &w)
     {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
-      const VectorType &v = dynamic_cast<const VectorType &>(vv);
-      Assert(dynamic_cast<const VectorType *>(&ww) != nullptr,
-             ExcVectorTypeNotCompatible());
-      const VectorType &w = dynamic_cast<const VectorType &>(ww);
-
       AssertIsFinite(a);
       AssertIsFinite(b);
 
@@ -1631,16 +1590,10 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::sadd_local(
-      const Number                     x,
-      const Number                     a,
-      const VectorSpaceVector<Number> &vv)
+      const Number                           x,
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &v)
     {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
-             ExcVectorTypeNotCompatible());
-      const VectorType &v = dynamic_cast<const VectorType &>(vv);
-
       AssertIsFinite(x);
       AssertIsFinite(a);
       AssertDimension(locally_owned_size(), v.locally_owned_size());
@@ -1659,11 +1612,12 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::sadd(const Number                     x,
-                                          const Number                     a,
-                                          const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::sadd(
+      const Number                           x,
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &v)
     {
-      sadd_local(x, a, vv);
+      sadd_local(x, a, v);
 
       if (vector_is_ghosted)
         update_ghost_values();
@@ -1704,14 +1658,9 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::scale(const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::scale(
+      const Vector<Number, MemorySpaceType> &v)
     {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
-      const VectorType &v = dynamic_cast<const VectorType &>(vv);
-
       AssertDimension(locally_owned_size(), v.locally_owned_size());
 
       dealii::internal::VectorOperations::
@@ -1726,15 +1675,10 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::equ(const Number                     a,
-                                         const VectorSpaceVector<Number> &vv)
+    Vector<Number, MemorySpaceType>::equ(
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &v)
     {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert(dynamic_cast<const VectorType *>(&vv) != nullptr,
-             ExcVectorTypeNotCompatible());
-      const VectorType &v = dynamic_cast<const VectorType &>(vv);
-
       AssertIsFinite(a);
       AssertDimension(locally_owned_size(), v.locally_owned_size());
 
@@ -1803,14 +1747,8 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     Number
     Vector<Number, MemorySpaceType>::operator*(
-      const VectorSpaceVector<Number> &vv) const
+      const Vector<Number, MemorySpaceType> &v) const
     {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
-             ExcVectorTypeNotCompatible());
-      const VectorType &v = dynamic_cast<const VectorType &>(vv);
-
       Number local_result = inner_product_local(v);
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(local_result,
@@ -2021,19 +1959,10 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     Number
     Vector<Number, MemorySpaceType>::add_and_dot(
-      const Number                     a,
-      const VectorSpaceVector<Number> &vv,
-      const VectorSpaceVector<Number> &ww)
+      const Number                           a,
+      const Vector<Number, MemorySpaceType> &v,
+      const Vector<Number, MemorySpaceType> &w)
     {
-      // Downcast. Throws an exception if invalid.
-      using VectorType = Vector<Number, MemorySpaceType>;
-      Assert((dynamic_cast<const VectorType *>(&vv) != nullptr),
-             ExcVectorTypeNotCompatible());
-      const VectorType &v = dynamic_cast<const VectorType &>(vv);
-      Assert((dynamic_cast<const VectorType *>(&ww) != nullptr),
-             ExcVectorTypeNotCompatible());
-      const VectorType &w = dynamic_cast<const VectorType &>(ww);
-
       Number local_result = add_and_dot_local(a, v, w);
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(local_result,

@@ -248,9 +248,7 @@ namespace LinearAlgebra
      * @endcode
      */
     template <typename Number, typename MemorySpace = MemorySpace::Host>
-    class Vector : public ::dealii::LinearAlgebra::VectorSpaceVector<Number>,
-                   public ::dealii::ReadVector<Number>,
-                   public Subscriptor
+    class Vector : public ::dealii::ReadVector<Number>, public Subscriptor
     {
     public:
       using memory_space    = MemorySpace;
@@ -338,7 +336,7 @@ namespace LinearAlgebra
       /**
        * Destructor.
        */
-      virtual ~Vector() override;
+      ~Vector();
 
       /**
        * Set the global size of the vector to @p size without any actual
@@ -537,8 +535,8 @@ namespace LinearAlgebra
        * with VectorOperation::max two times subsequently, the maximal value
        * after the second calculation will be zero.
        */
-      virtual void
-      compress(VectorOperation::values operation) override;
+      void
+      compress(VectorOperation::values operation);
 
       /**
        * Fills the data field for ghost indices with the values stored in the
@@ -710,41 +708,33 @@ namespace LinearAlgebra
       /** @} */
 
       /**
-       * @name 3: Implementation of VectorSpaceVector
+       * @name 3: Implementation of vector space operations
        */
       /** @{ */
 
       /**
-       * Change the dimension to that of the vector V. The elements of V are not
-       * copied.
-       */
-      virtual void
-      reinit(const VectorSpaceVector<Number> &V,
-             const bool omit_zeroing_entries = false) override;
-
-      /**
        * Multiply the entire vector by a fixed factor.
        */
-      virtual Vector<Number, MemorySpace> &
-      operator*=(const Number factor) override;
+      Vector<Number, MemorySpace> &
+      operator*=(const Number factor);
 
       /**
        * Divide the entire vector by a fixed factor.
        */
-      virtual Vector<Number, MemorySpace> &
-      operator/=(const Number factor) override;
+      Vector<Number, MemorySpace> &
+      operator/=(const Number factor);
 
       /**
        * Add the vector @p V to the present one.
        */
-      virtual Vector<Number, MemorySpace> &
-      operator+=(const VectorSpaceVector<Number> &V) override;
+      Vector<Number, MemorySpace> &
+      operator+=(const Vector<Number, MemorySpace> &V);
 
       /**
        * Subtract the vector @p V from the present one.
        */
-      virtual Vector<Number, MemorySpace> &
-      operator-=(const VectorSpaceVector<Number> &V) override;
+      Vector<Number, MemorySpace> &
+      operator-=(const Vector<Number, MemorySpace> &V);
 
       /**
        * Import all the elements present in the vector's IndexSet from the input
@@ -757,21 +747,21 @@ namespace LinearAlgebra
        * @note If the MemorySpace is Default, the data in the ReadWriteVector will
        * be moved to the @ref GlossDevice "device".
        */
-      virtual void
+      void
       import_elements(
         const LinearAlgebra::ReadWriteVector<Number> &V,
         VectorOperation::values                       operation,
         std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          communication_pattern = {}) override;
+          communication_pattern = {});
 
       /**
        * @deprecated Use import_elements() instead.
        */
-      DEAL_II_DEPRECATED virtual void
+      DEAL_II_DEPRECATED void
       import(const LinearAlgebra::ReadWriteVector<Number> &V,
              VectorOperation::values                       operation,
              std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-               communication_pattern = {}) override
+               communication_pattern = {})
       {
         import_elements(V, operation, communication_pattern);
       }
@@ -779,35 +769,35 @@ namespace LinearAlgebra
       /**
        * Return the scalar product of two vectors.
        */
-      virtual Number
-      operator*(const VectorSpaceVector<Number> &V) const override;
+      Number
+      operator*(const Vector<Number, MemorySpace> &V) const;
 
       /**
        * Add @p a to all components. Note that @p a is a scalar not a vector.
        */
-      virtual void
-      add(const Number a) override;
+      void
+      add(const Number a);
 
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this += a*V</tt>.
        */
-      virtual void
-      add(const Number a, const VectorSpaceVector<Number> &V) override;
+      void
+      add(const Number a, const Vector<Number, MemorySpace> &V);
 
       /**
        * Multiple addition of scaled vectors, i.e. <tt>*this += a*V+b*W</tt>.
        */
-      virtual void
-      add(const Number                     a,
-          const VectorSpaceVector<Number> &V,
-          const Number                     b,
-          const VectorSpaceVector<Number> &W) override;
+      void
+      add(const Number                       a,
+          const Vector<Number, MemorySpace> &V,
+          const Number                       b,
+          const Vector<Number, MemorySpace> &W);
 
       /**
        * A collective add operation: This function adds a whole set of values
        * stored in @p values to the vector components specified by @p indices.
        */
-      virtual void
+      void
       add(const std::vector<size_type> &indices,
           const std::vector<Number> &   values);
 
@@ -815,38 +805,38 @@ namespace LinearAlgebra
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
        * s*(*this)+a*V</tt>.
        */
-      virtual void
-      sadd(const Number                     s,
-           const Number                     a,
-           const VectorSpaceVector<Number> &V) override;
+      void
+      sadd(const Number                       s,
+           const Number                       a,
+           const Vector<Number, MemorySpace> &V);
 
       /**
        * Scale each element of this vector by the corresponding element in the
        * argument. This function is mostly meant to simulate multiplication (and
        * immediate re-assignment) by a diagonal scaling matrix.
        */
-      virtual void
-      scale(const VectorSpaceVector<Number> &scaling_factors) override;
+      void
+      scale(const Vector<Number, MemorySpace> &scaling_factors);
 
       /**
        * Assignment <tt>*this = a*V</tt>.
        */
-      virtual void
-      equ(const Number a, const VectorSpaceVector<Number> &V) override;
+      void
+      equ(const Number a, const Vector<Number, MemorySpace> &V);
 
       /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
        */
-      virtual real_type
-      l1_norm() const override;
+      real_type
+      l1_norm() const;
 
       /**
        * Return the $l_2$ norm of the vector (i.e., the square root of
        * the sum of the square of all entries among all processors).
        */
-      virtual real_type
-      l2_norm() const override;
+      real_type
+      l2_norm() const;
 
       /**
        * Return the square of the $l_2$ norm of the vector.
@@ -858,8 +848,8 @@ namespace LinearAlgebra
        * Return the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
        */
-      virtual real_type
-      linfty_norm() const override;
+      real_type
+      linfty_norm() const;
 
       /**
        * Perform a combined operation of a vector addition and a subsequent
@@ -881,10 +871,10 @@ namespace LinearAlgebra
        * implemented as
        * $\left<v,w\right>=\sum_i v_i \bar{w_i}$.
        */
-      virtual Number
-      add_and_dot(const Number                     a,
-                  const VectorSpaceVector<Number> &V,
-                  const VectorSpaceVector<Number> &W) override;
+      Number
+      add_and_dot(const Number                       a,
+                  const Vector<Number, MemorySpace> &V,
+                  const Vector<Number, MemorySpace> &W);
 
       /**
        * Return the global size of the vector, equal to the sum of the number of
@@ -904,27 +894,27 @@ namespace LinearAlgebra
        *  vec.locally_owned_elements() == complete_index_set(vec.size())
        * @endcode
        */
-      virtual dealii::IndexSet
-      locally_owned_elements() const override;
+      dealii::IndexSet
+      locally_owned_elements() const;
 
       /**
        * Print the vector to the output stream @p out.
        */
-      virtual void
+      void
       print(std::ostream &     out,
             const unsigned int precision  = 3,
             const bool         scientific = true,
-            const bool         across     = true) const override;
+            const bool         across     = true) const;
 
       /**
        * Return the memory consumption of this class in bytes.
        */
-      virtual std::size_t
-      memory_consumption() const override;
+      std::size_t
+      memory_consumption() const;
       /** @} */
 
       /**
-       * @name 4: Other vector operations not included in VectorSpaceVector
+       * @name 4: Other vector operations
        */
       /** @{ */
 
@@ -933,8 +923,8 @@ namespace LinearAlgebra
        * zero, also ghost elements are set to zero, otherwise they remain
        * unchanged.
        */
-      virtual Vector<Number, MemorySpace> &
-      operator=(const Number s) override;
+      Vector<Number, MemorySpace> &
+      operator=(const Number s);
 
       /**
        * This is a collective add operation that adds a whole set of values
@@ -1168,14 +1158,14 @@ namespace LinearAlgebra
        * This is a collective operation. This function is expensive, because
        * potentially all elements have to be checked.
        */
-      virtual bool
-      all_zero() const override;
+      bool
+      all_zero() const;
 
       /**
        * Compute the mean value of all the entries in the vector.
        */
-      virtual Number
-      mean_value() const override;
+      Number
+      mean_value() const;
 
       /**
        * $l_p$-norm of the vector. The pth root of the sum of the pth powers
@@ -1301,16 +1291,16 @@ namespace LinearAlgebra
        * without MPI communication.
        */
       void
-      add_local(const Number a, const VectorSpaceVector<Number> &V);
+      add_local(const Number a, const Vector<Number, MemorySpace> &V);
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
        * s*(*this)+a*V</tt> without MPI communication.
        */
       void
-      sadd_local(const Number                     s,
-                 const Number                     a,
-                 const VectorSpaceVector<Number> &V);
+      sadd_local(const Number                       s,
+                 const Number                       a,
+                 const Vector<Number, MemorySpace> &V);
 
       /**
        * Local part of the inner product of two vectors.
