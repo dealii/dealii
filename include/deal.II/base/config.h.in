@@ -172,7 +172,8 @@
  * Macro indicating that the current feature will be removed in a future
  * release.
  */
-#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
+#define DEAL_II_DEPRECATED [[deprecated]]
+#define DEAL_II_DEPRECATED_WITH_COMMENT(comment) [[deprecated(comment)]]
 
 /**
  * Same as above, but for things that have been deprecated during the current
@@ -180,10 +181,25 @@
  * deprecated prior to a release until <em>after</em> that release has been
  * finalized - see DEAL_II_EARLY_DEPRECATIONS for more information.
  */
+#cmakedefine DEAL_II_EARLY_DEPRECATIONS
 #ifndef DEAL_II_DEPRECATED_EARLY
 // guard to allow user to override DEAL_II_DEPRECATED_EARLY
-#cmakedefine DEAL_II_DEPRECATED_EARLY @DEAL_II_DEPRECATED_EARLY@
+#ifdef DEAL_II_EARLY_DEPRECATIONS
+#define DEAL_II_DEPRECATED_EARLY [[deprecated]]
+#else
+#define DEAL_II_DEPRECATED_EARLY
 #endif
+#endif
+
+#ifndef DEAL_II_DEPRECATED_EARLY_WITH_COMMENT
+// guard to allow user to override DEAL_II_DEPRECATED_EARLY
+#ifdef DEAL_II_EARLY_DEPRECATIONS
+#define DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(comment) [[deprecated(comment)]]
+#else
+#define DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(comment)
+#endif
+#endif
+
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
