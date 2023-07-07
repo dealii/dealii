@@ -25,11 +25,12 @@
   
       constraints.distribute(completely_distributed_solution);
   
---- 494,506 ----
+--- 494,507 ----
       LA::MPI::PreconditionAMG preconditioner;
       preconditioner.initialize(system_matrix, data);
   
-!     check_solver_within_range(solver.solve(system_matrix,
+!     check_solver_within_range(pcout,
+!                               solver.solve(system_matrix,
 !                                            completely_distributed_solution,
 !                                            system_rhs,
 !                                            preconditioner),
