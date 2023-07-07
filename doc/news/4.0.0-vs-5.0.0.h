@@ -151,7 +151,7 @@ inconvenience this causes.
 <ol>
 
   <li> <p> New: After the documentation tool for deal.II has been
-  changed to <a href="http://www.doxygen.org">Doxygen</a>, it is delivered in two
+  changed to <a href="https://www.doxygen.org">Doxygen</a>, it is delivered in two
   tar-files. Additional to the traditional source tarball, the preprocessed
   documentation is available ready for reading with a web browser.
   <br>
@@ -179,7 +179,7 @@ inconvenience this causes.
        </p>
 
   <li> <p> New: deal.II is now able to interface to the
-       <a href="http://www-users.cs.umn.edu/~karypis/metis/index.html"
+       <a href="https://www-users.cs.umn.edu/~karypis/metis/index.html"
        target="_top">METIS</a> library to generate domain partitionings. This
        is enabled if a METIS installation is detected, which either happens
        automatically in <code>./configure</code>, or
@@ -203,7 +203,7 @@ inconvenience this causes.
        </p>
 
   <li> <p> New: deal.II now comes with a complete set of
-       wrappers classes for <a href="http://www.mcs.anl.gov/petsc/"
+       wrappers classes for <a href="https://www.mcs.anl.gov/petsc/"
        target="_top">PETSc</a> vectors, matrices, linear solvers and
        preconditioners. Many of the algorithms in deal.II have also been
        updated to make use of these wrappers. All of this is only enabled if a
@@ -325,9 +325,9 @@ inconvenience this causes.
        </p>
 
   <li> <p> New: First steps to a migration of the documentation from
-       <tt>kdoc</tt> to <a href="http://www.doxygen.org">Doxygen</a> have
+       <tt>kdoc</tt> to <a href="https://www.doxygen.org">Doxygen</a> have
        been done. It can be generated after installing <a
-       href="http://www.doxygen.org">Doxygen</a> by calling <tt>make</tt>
+       href="https://www.doxygen.org">Doxygen</a> by calling <tt>make</tt>
        in <tt>doc/doxygen</tt> and using the preliminary link page <a
        href="../doxygen/index.html">index.html</a> in that directory.
        <br>
@@ -593,7 +593,7 @@ inconvenience this causes.
   </p>
 
   <li> <p>
-       New: Added support for <a href="http://www.gmsh.info"
+       New: Added support for <a href="https://www.gmsh.info"
        target="_top">gmsh</a> mesh format in <code>GridIn::read_msh</code>.
        <br>
        (Luca Heltai 2004/04/21)

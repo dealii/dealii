@@ -40,7 +40,7 @@ All entries are signed with the names of the author.
        functions as a replacement.
        <br>
        For more information, read
-       <a href="http://www.dealii.org/mail/msg00638.html" target="body">this mail</a>.
+       <a href="https://www.dealii.org/mail/msg00638.html" target="body">this mail</a>.
        </strong>
        <br>
        (WB 2002/06/03)
@@ -64,7 +64,7 @@ All entries are signed with the names of the author.
 
   <li> <p>
        New: In all previous versions, deal.II used
-       the <a href="http://www.cs.wustl.edu/~schmidt/ACE.html"
+       the <a href="https://www.cs.wustl.edu/~schmidt/ACE.html"
        target="_top">ACE (Adaptive Communications Environment)</a>
        library to support cross-platform threading
        facilities. While this is still supported, the default way

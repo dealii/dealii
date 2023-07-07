@@ -28,7 +28,7 @@ All entries are signed with the names of the author.
        the file <code>tria_accessor.cc(3d)</code> without optimization
        flags even for optimized libraries. The gcc bug is documented
        at the <a
-       href="http://gcc.gnu.org/cgi-bin/gnatsweb.pl?database=gcc&user=guest&password=guest&cmd=login"
+       href="https://gcc.gnu.org/cgi-bin/gnatsweb.pl?database=gcc&user=guest&password=guest&cmd=login"
        target="_top">gcc bug tracking system page</a>, as bugs reports c++/615 and
        optimization/2938.
        <br>

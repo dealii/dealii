@@ -176,7 +176,7 @@ inconvenience this causes.
   (Bruno Turcksin, Wolfgang Bangerth, 2013/10/26)
   </li>
 
-  <li> New: The testsuite is now ported to <a href="http://www.cmake.org/">
+  <li> New: The testsuite is now ported to <a href="https://www.cmake.org/">
   CMake</a> and uses CTest as test driver.
   <br>
   (Wolfgang Bangerth, Timo Heister, Matthias Maier, Bruno Turcksin, 2013/10/20)
@@ -606,7 +606,7 @@ inconvenience this causes.
   </li>
 
   <li>
-  Fixed: Under some circumstances (see http://code.google.com/p/dealii/issues/detail?id=82)
+  Fixed: Under some circumstances (see https://code.google.com/p/dealii/issues/detail?id=82)
   the DoFTools::make_periodicity_constraints() function could create cycles in
   the ConstraintMatrix object. This is now fixed.
   <br>
@@ -621,7 +621,7 @@ inconvenience this causes.
 
   <li>
   New: TableHandler::write_text() now also supports output in
-  org-mode (http://orgmode.org/) format via a new entry in the
+  org-mode (https://orgmode.org/) format via a new entry in the
   TableHandler::TextOutputFormat enumeration.
   <br>
   (Oleh Krehel, 2013/08/15)
