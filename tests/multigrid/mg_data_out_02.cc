@@ -32,7 +32,7 @@ template <int dim>
 void
 print(DataOut<dim> &data_out, const Triangulation<dim> &tria)
 {
-  auto &p = data_out.get_cell_selection();
+  auto p = data_out.get_cell_selection();
 
   for (auto cell = p.first(tria); cell.state() == IteratorState::valid;
        cell      = p.second(tria, cell))
