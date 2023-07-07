@@ -136,7 +136,7 @@ if( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
     NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND
     NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease" )
   message(FATAL_ERROR
-    "CMAKE_BUILD_TYPE does neither match Release, Debug, nor DebugRelease!"
+  "CMAKE_BUILD_TYPE must either be 'Release', 'Debug', or 'DebugRelease', but is set to '${CMAKE_BUILD_TYPE}'."
     )
 endif()
 
