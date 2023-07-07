@@ -136,7 +136,7 @@ while (<>)
         $text = "\@note The material presented here is also discussed in ";
 
         # add links to the individual lectures
-        $text = $text . "<a href=\"http://www.math.colostate.edu/~bangerth/videos.676.$2.html\">video lecture $2</a>";
+        $text = $text . "<a href=\"https://www.math.colostate.edu/~bangerth/videos.676.$2.html\">video lecture $2</a>";
         
         if (length($3) > 0)
         {
@@ -147,11 +147,11 @@ while (<>)
 
             foreach $lecture (@otherlectures)
             {
-                $text = $text . ", <a href=\"http://www.math.colostate.edu/~bangerth/videos.676.$lecture.html\">video lecture $lecture</a>";
+                $text = $text . ", <a href=\"https://www.math.colostate.edu/~bangerth/videos.676.$lecture.html\">video lecture $lecture</a>";
             }
         }
 
-        $text = $text . ". (All video lectures are also available <a href=\"http://www.math.colostate.edu/~bangerth/videos.html\">here</a>.)";
+        $text = $text . ". (All video lectures are also available <a href=\"https://www.math.colostate.edu/~bangerth/videos.html\">here</a>.)";
         s/(\@dealiiVideoLecture\{([0-9\.]+)((, *[0-9\.]+ *)*)\})/$text/;
     }
 
@@ -165,7 +165,7 @@ while (<>)
         $text = "See also ";
 
         # add links to the individual lectures
-        $text = $text . "<a href=\"http://www.math.colostate.edu/~bangerth/videos.676.$2.html\">video lecture $2</a>";
+        $text = $text . "<a href=\"https://www.math.colostate.edu/~bangerth/videos.676.$2.html\">video lecture $2</a>";
         
         if (length($3) > 0)
         {
@@ -175,7 +175,7 @@ while (<>)
 
             foreach $lecture (@otherlectures)
             {
-                $text = $text . ", <a href=\"http://www.math.colostate.edu/~bangerth/videos.676.$lecture.html\">video lecture $lecture</a>";
+                $text = $text . ", <a href=\"https://www.math.colostate.edu/~bangerth/videos.676.$lecture.html\">video lecture $lecture</a>";
             }
         }
 

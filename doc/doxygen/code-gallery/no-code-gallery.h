@@ -23,5 +23,5 @@
  * such copy was found when configuring your version of deal.II.
  *
  * Instructions for obtaining the code gallery can be found at
- * http://dealii.org/code-gallery.html .
+ * https://dealii.org/code-gallery.html .
  */

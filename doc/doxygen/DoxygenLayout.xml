@@ -22,7 +22,7 @@
       <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
     <tab type="examples" visible="yes" title="" intro=""/>  
-    <tab type="user" visible="yes" title="dealii.org" url="http://www.dealii.org/" />
+    <tab type="user" visible="yes" title="dealii.org" url="https://www.dealii.org/" />
   </navindex>
 
   <!-- Layout definition for a class page -->

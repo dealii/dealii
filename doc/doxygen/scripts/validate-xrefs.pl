@@ -99,8 +99,8 @@ foreach $filename (@ARGV)
 		$external_file = $1;
 		$external_ref = $2;
 
-		# if the file name was prepended with http: (but is a local file,
-		# so no double-slash), then split off http:
+		# if the file name was prepended with https: (but is a local file,
+		# so no double-slash), then split off https:
 		$external_file =~ s/^http(s)?://g;
 
 		print "external reference: $link\n" if $debug;
@@ -129,8 +129,8 @@ foreach $filename (@ARGV)
 		# this must now be a regular file which is
 		# referenced. the file must be local
 
-		# if the file name was prepended with http: (but is a local file,
-		# so no double-slash), then split off http:
+		# if the file name was prepended with https: (but is a local file,
+		# so no double-slash), then split off https:
 		$link =~ s/^http(s)?://g;
 
 		die "---Local file `$link' not found in file `$filename'\n This line is: $this_line.\n"
