@@ -3503,7 +3503,7 @@ public:
   /**
    * Return a triangulation iterator to the current cell.
    */
-  const typename Triangulation<dim, spacedim>::cell_iterator
+  typename Triangulation<dim, spacedim>::cell_iterator
   get_cell() const;
 
   /**

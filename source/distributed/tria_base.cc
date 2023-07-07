@@ -634,7 +634,7 @@ namespace parallel
 
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  const std::weak_ptr<const Utilities::MPI::Partitioner> TriangulationBase<
+  std::weak_ptr<const Utilities::MPI::Partitioner> TriangulationBase<
     dim,
     spacedim>::global_active_cell_index_partitioner() const
   {
@@ -645,10 +645,9 @@ namespace parallel
 
   template <int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  const std::weak_ptr<const Utilities::MPI::Partitioner> TriangulationBase<
-    dim,
-    spacedim>::global_level_cell_index_partitioner(const unsigned int level)
-    const
+  std::weak_ptr<const Utilities::MPI::Partitioner> TriangulationBase<dim,
+                                                                     spacedim>::
+    global_level_cell_index_partitioner(const unsigned int level) const
   {
     Assert(this->is_multilevel_hierarchy_constructed(), ExcNotImplemented());
     AssertIndexRange(level, this->n_global_levels());

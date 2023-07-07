@@ -63,7 +63,7 @@ private:
   /**
    * Main function to compute the co-efficients of the polynomial at degree p.
    */
-  static const std::vector<double>
+  static std::vector<double>
   get_coefficients(const unsigned int k);
 };
 

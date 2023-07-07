@@ -302,7 +302,7 @@ namespace Particles
      *
      * @return An ArrayView of the properties of this particle.
      */
-    const ArrayView<double>
+    ArrayView<double>
     get_properties();
 
     /**
@@ -310,7 +310,7 @@ namespace Particles
      *
      * @return An ArrayView of the properties of this particle.
      */
-    const ArrayView<const double>
+    ArrayView<const double>
     get_properties() const;
 
     /**
@@ -784,7 +784,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  inline const ArrayView<const double>
+  inline ArrayView<const double>
   ParticleAccessor<dim, spacedim>::get_properties() const
   {
     Assert(state() == IteratorState::valid, ExcInternalError());
@@ -833,7 +833,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  inline const ArrayView<double>
+  inline ArrayView<double>
   ParticleAccessor<dim, spacedim>::get_properties()
   {
     Assert(state() == IteratorState::valid, ExcInternalError());

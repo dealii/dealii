@@ -75,7 +75,7 @@ AffineConstraints<number>::ConstraintLine::memory_consumption() const
 
 
 template <typename number>
-const typename AffineConstraints<number>::LineRange
+typename AffineConstraints<number>::LineRange
 AffineConstraints<number>::get_lines() const
 {
   return boost::make_iterator_range(lines.begin(), lines.end());

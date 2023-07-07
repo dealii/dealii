@@ -1727,7 +1727,7 @@ public:
    * @return A range object for the half open range <code>[this->begin(),
    * this->end())</code> of line entries.
    */
-  const LineRange
+  LineRange
   get_lines() const;
 
   /**

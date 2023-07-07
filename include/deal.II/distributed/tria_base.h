@@ -203,10 +203,10 @@ namespace parallel
     const std::set<types::subdomain_id> &
     level_ghost_owners() const;
 
-    const std::weak_ptr<const Utilities::MPI::Partitioner>
+    std::weak_ptr<const Utilities::MPI::Partitioner>
     global_active_cell_index_partitioner() const override;
 
-    const std::weak_ptr<const Utilities::MPI::Partitioner>
+    std::weak_ptr<const Utilities::MPI::Partitioner>
     global_level_cell_index_partitioner(
       const unsigned int level) const override;
 

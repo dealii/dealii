@@ -935,7 +935,7 @@ namespace Utilities
 
 #endif
 
-    const std::string
+    std::string
     get_current_vectorization_level()
     {
       switch (DEAL_II_VECTORIZATION_WIDTH_IN_BITS)

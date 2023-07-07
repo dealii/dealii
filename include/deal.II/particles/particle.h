@@ -376,7 +376,7 @@ namespace Particles
      *
      * @return An ArrayView of the properties of this particle.
      */
-    const ArrayView<double>
+    ArrayView<double>
     get_properties();
 
     /**
@@ -385,7 +385,7 @@ namespace Particles
      *
      * @return An ArrayView of the properties of this particle.
      */
-    const ArrayView<const double>
+    ArrayView<const double>
     get_properties() const;
 
     /**
@@ -624,7 +624,7 @@ namespace Particles
 
 
   template <int dim, int spacedim>
-  inline const ArrayView<const double>
+  inline ArrayView<const double>
   Particle<dim, spacedim>::get_properties() const
   {
     if (has_properties() == false)

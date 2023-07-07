@@ -24,7 +24,7 @@ IntegratedLegendreSZ::IntegratedLegendreSZ(const unsigned int k)
 
 
 
-const std::vector<double>
+std::vector<double>
 IntegratedLegendreSZ::get_coefficients(const unsigned int k)
 {
   std::vector<double> coefficients(k + 1);
