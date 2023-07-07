@@ -618,6 +618,37 @@ namespace SUNDIALS
      */
     std::function<VectorType &()> get_function_scaling;
 
+
+    /**
+     * A function object that users may supply and which is intended to perform
+     * custom setup on the supplied @p kinsol_mem object. Refer to the
+     * SUNDIALS documentation for valid options.
+     *
+     * For instance, the following code attaches a file for error output of the
+     * internal KINSOL implementation:
+     *
+     * @code
+     *      // Open C-style file handle and manage it inside a shared_ptr which
+     *      // is handed to the lambda capture in the next statement. When the
+     *      // custom_setup function is destroyed, the file is closed.
+     *      auto errfile = std::shared_ptr<FILE>(
+     *                        fopen("kinsol.err", "w"),
+     *                        [](FILE *fptr) { fclose(fptr); });
+     *
+     *      ode.custom_setup = [&, errfile](void *kinsol_mem) {
+     *        KINSetErrFile(kinsol_mem, errfile.get());
+     *      };
+     * @endcode
+     *
+     * @note This function will be called at the end of all other setup code
+     *   right before the actual solve call is issued to KINSOL. Consult the
+     *   SUNDIALS manual to see which options are still available at this point.
+     *
+     * @param kinsol_mem pointer to the KINSOL memory block which can be used
+     *   for custom calls to `KINSet...` functions.
+     */
+    std::function<void(void *kinsol_mem)> custom_setup;
+
     /**
      * Handle KINSOL exceptions.
      */
