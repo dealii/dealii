@@ -664,11 +664,13 @@ AffineConstraints<number>::close()
   // appears. obviously, 0*something can be omitted.
   //
   // This can be done in parallel:
-  parallel::internal::parallel_for(
+  parallel::apply_to_subranges(
     lines.begin(),
     lines.end(),
-    [](const auto &range) {
-      for (ConstraintLine &line : range)
+    [](const typename std::vector<ConstraintLine>::iterator begin,
+       const typename std::vector<ConstraintLine>::iterator end) {
+      for (ConstraintLine &line : boost::iterator_range<
+             typename std::vector<ConstraintLine>::iterator>(begin, end))
         line.entries.erase(
           std::remove_if(line.entries.begin(),
                          line.entries.end(),
@@ -826,11 +828,13 @@ AffineConstraints<number>::close()
   //
   // This is again an operation that works on each line separately. It can be
   // run in parallel:
-  parallel::internal::parallel_for(
+  parallel::apply_to_subranges(
     lines.begin(),
     lines.end(),
-    [](const auto &range) {
-      for (ConstraintLine &line : range)
+    [](const typename std::vector<ConstraintLine>::iterator &begin,
+       const typename std::vector<ConstraintLine>::iterator &end) {
+      for (ConstraintLine &line : boost::iterator_range<
+             typename std::vector<ConstraintLine>::iterator>(begin, end))
         {
           std::sort(line.entries.begin(),
                     line.entries.end(),
