@@ -269,21 +269,9 @@ namespace TrilinosWrappers
       // columns as well. If we use a recent Trilinos version, we can also
       // require building a non-local graph which gives us thread-safe
       // initialization.
-      if (row_map->getComm()->getSize() > 1)
         graph = Teuchos::rcp(
           new Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(
-            row_map, n_entries_per_row, false
-            // TODO: Check which new Trilinos version supports this...
-            // Remember to change tests/trilinos/assemble_matrix_parallel_07,
-            // too.
-            //#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
-            //                 , true
-            //#endif
-            ));
-      else
-        graph = Teuchos::rcp(
-          new Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(
-            row_map, col_map, n_entries_per_row, false));
+            row_map, row_map, n_entries_per_row));
     }
 
 
@@ -303,10 +291,10 @@ namespace TrilinosWrappers
         Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>>
         &nonlocal_graph)
     {
-      Assert(row_map.IsOneToOne(),
+      Assert(row_map->isOneToOne(),
              ExcMessage("Row map must be 1-to-1, i.e., no overlap between "
                         "the maps of different processors."));
-      Assert(col_map.IsOneToOne(),
+      Assert(col_map->isOneToOne(),
              ExcMessage("Column map must be 1-to-1, i.e., no overlap between "
                         "the maps of different processors."));
 
@@ -314,43 +302,33 @@ namespace TrilinosWrappers
       nonlocal_graph.reset();
       graph.reset();
       AssertDimension(n_entries_per_row.size(),
-                      TrilinosWrappers::n_global_elements(row_map));
+                      row_map->getGlobalNumElements());
 
       column_space_map = col_map;
 
       // Translate the vector of row lengths into one that only stores
       // those entries that related to the locally stored rows of the matrix:
-      std::vector<dealii::types::signed_global_dof_index> local_entries_per_row(
-        row_map.getMaxGlobalIndex() - row_map.getMinGlobalIndex());
-      for (unsigned int i = 0; i < local_entries_per_row.size(); ++i)
-        local_entries_per_row[i] =
-          n_entries_per_row[row_map.getMinGlobalIndex() + i];
+      Kokkos::DualView<dealii::types::signed_global_dof_index*> local_entries_per_row("local_entries_per_row",
+        row_map->getMaxGlobalIndex() - row_map->getMinGlobalIndex());
+      auto local_entries_per_row_host = local_entries_per_row.view<Kokkos::DefaultHostExecutionSpace>();
+      std::uint64_t total_size = 0;
+      for (unsigned int i = 0; i < local_entries_per_row.extent(0); ++i) {
+        local_entries_per_row_host(i) =
+          n_entries_per_row[row_map->getMinGlobalIndex() + i];
+        total_size += local_entries_per_row_host[i];
+      }  
+      local_entries_per_row.modify<Kokkos::DefaultHostExecutionSpace>();
+      local_entries_per_row.sync<Kokkos::DefaultExecutionSpace>();
 
-      AssertThrow(std::accumulate(local_entries_per_row.begin(),
-                                  local_entries_per_row.end(),
-                                  std::uint64_t(0)) <
-                    static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
-                  ExcMessage("The TrilinosWrappers use Epetra internally which "
-                             "uses 'signed int' to represent local indices. "
-                             "Therefore, only 2,147,483,647 nonzero matrix "
-                             "entries can be stored on a single process, "
-                             "but you are requesting more than that. "
-                             "If possible, use more MPI processes."));
+      AssertThrow(total_size
+                                 <
+                    static_cast<std::uint64_t>(std::numeric_limits< dealii::types::signed_global_dof_index>::max()),
+                  ExcMessage(
+                             "You are requesting to store more elements than global ordinal type allows."));
 
-      if (row_map.getComm()->getSize() > 1)
-        graph = std::make_unique<
-          Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(
-          Copy, row_map, local_entries_per_row.data(), false
-          // TODO: Check which new Trilinos version supports this...
-          // Remember to change tests/trilinos/assemble_matrix_parallel_07, too.
-          //#if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
-          //                , true
-          //#endif
-        );
-      else
-        graph = std::make_unique<
-          Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(
-          Copy, row_map, col_map, local_entries_per_row.data(), false);
+        graph = Teuchos::rcp(new
+          Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(
+          row_map, row_map, local_entries_per_row));
     }
 
 
@@ -358,15 +336,15 @@ namespace TrilinosWrappers
     template <typename SparsityPatternType>
     void
     reinit_sp(
-      const Tpetra::Map<int, dealii::types::signed_global_dof_index> &row_map,
-      const Tpetra::Map<int, dealii::types::signed_global_dof_index> &col_map,
+      const Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &row_map,
+      const Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> &col_map,
       const SparsityPatternType &                                     sp,
       const bool exchange_data,
-      std::unique_ptr<Tpetra::Map<int, dealii::types::signed_global_dof_index>>
+      Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>>
         &column_space_map,
-      std::unique_ptr<
+      Teuchos::RCP<
         Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>> &graph,
-      std::unique_ptr<
+      Teuchos::RCP<
         Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>>
         &nonlocal_graph)
     {
@@ -374,19 +352,19 @@ namespace TrilinosWrappers
       graph.reset();
 
       AssertDimension(sp.n_rows(),
-                      TrilinosWrappers::n_global_elements(row_map));
+                      row_map->getGlobalNumElements());
       AssertDimension(sp.n_cols(),
-                      TrilinosWrappers::n_global_elements(col_map));
+                      col_map->getGlobalNumElements());
 
-      column_space_map = std::make_unique<
-        Tpetra::Map<int, dealii::types::signed_global_dof_index>>(col_map);
+      column_space_map = Teuchos::rcp(new 
+        Tpetra::Map<int, dealii::types::signed_global_dof_index>(col_map));
 
-      Assert(row_map.LinearMap() == true,
+      Assert(row_map->isContiguous() == true,
              ExcMessage(
                "This function only works if the row map is contiguous."));
 
-      const size_type first_row = row_map.getMinGlobalIndex(),
-                      last_row  = row_map.getMaxGlobalIndex() + 1;
+      const size_type first_row = row_map->getMinGlobalIndex(),
+                      last_row  = row_map->getMaxGlobalIndex() + 1;
       std::vector<int> n_entries_per_row(last_row - first_row);
 
       // Trilinos wants the row length as an int this is hopefully never going
@@ -406,16 +384,16 @@ namespace TrilinosWrappers
                              "but you are requesting more than that. "
                              "If possible, use more MPI processes."));
 
-      if (row_map.getComm()->getSize() > 1)
-        graph = std::make_unique<
-          Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(
-          Copy, row_map, n_entries_per_row.data(), false);
+      if (row_map->getComm()->getSize() > 1)
+        graph = Teuchos::rcp(new
+          Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(
+          Copy, row_map, n_entries_per_row.data(), false));
       else
-        graph = std::make_unique<
-          Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(
-          Copy, row_map, col_map, n_entries_per_row.data(), false);
+        graph = Teuchos::rcp(new
+          Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(
+          Copy, row_map, col_map, n_entries_per_row.data(), false));
 
-      AssertDimension(sp.n_rows(), n_global_rows(*graph));
+      AssertDimension(sp.n_rows(), graph->getGlobalNumEntries());
 
       std::vector<TrilinosWrappers::types::int_type> row_indices;
 
@@ -491,7 +469,7 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(parallel_partitioning.size(),
                                 parallel_partitioning.size());
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> map =
       parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(
       map, map, n_entries_per_row, column_space_map, graph, nonlocal_graph);
@@ -506,7 +484,7 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(parallel_partitioning.size(),
                                 parallel_partitioning.size());
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> map =
       parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(
       map, map, n_entries_per_row, column_space_map, graph, nonlocal_graph);
@@ -522,9 +500,9 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
                                 col_parallel_partitioning.size());
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> row_map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> row_map =
       row_parallel_partitioning.make_tpetra_map(communicator, false);
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> col_map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> col_map =
       col_parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(row_map,
               col_map,
@@ -544,9 +522,9 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
                                 col_parallel_partitioning.size());
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> row_map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> row_map =
       row_parallel_partitioning.make_tpetra_map(communicator, false);
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> col_map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> col_map =
       col_parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(row_map,
               col_map,
@@ -567,9 +545,9 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
                                 col_parallel_partitioning.size());
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> row_map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> row_map =
       row_parallel_partitioning.make_tpetra_map(communicator, false);
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> col_map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> col_map =
       col_parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(row_map,
               col_map,
@@ -593,11 +571,11 @@ namespace TrilinosWrappers
     nonlocal_partitioner.subtract_set(row_parallel_partitioning);
     if (Utilities::MPI::n_mpi_processes(communicator) > 1)
       {
-        Tpetra::Map<int, dealii::types::signed_global_dof_index> nonlocal_map =
+        Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> nonlocal_map =
           nonlocal_partitioner.make_tpetra_map(communicator, true);
-        nonlocal_graph = std::make_unique<
-          Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>>(
-          Copy, nonlocal_map, 0);
+        nonlocal_graph = Teuchos::rcp(new
+          Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>(
+          nonlocal_map, nonlocal_map, 0));
       }
     else
       Assert(nonlocal_partitioner.n_elements() == 0, ExcInternalError());
@@ -616,9 +594,9 @@ namespace TrilinosWrappers
   {
     SparsityPatternBase::resize(row_parallel_partitioning.size(),
                                 col_parallel_partitioning.size());
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> row_map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> row_map =
       row_parallel_partitioning.make_tpetra_map(communicator, false);
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> col_map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> col_map =
       col_parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(row_map,
               col_map,
@@ -645,7 +623,7 @@ namespace TrilinosWrappers
                     parallel_partitioning.size());
     SparsityPatternBase::resize(parallel_partitioning.size(),
                                 parallel_partitioning.size());
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> map =
       parallel_partitioning.make_tpetra_map(communicator, false);
     reinit_sp(map,
               map,
@@ -671,17 +649,15 @@ namespace TrilinosWrappers
   SparsityPattern::copy_from(const SparsityPattern &sp)
   {
     SparsityPatternBase::resize(sp.n_rows(), sp.n_cols());
-    column_space_map = std::make_unique<
-      Tpetra::Map<int, dealii::types::signed_global_dof_index>>(
-      *sp.column_space_map);
-    graph = std::make_unique<
-      Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(
-      *sp.graph);
+    column_space_map = Teuchos::rcp(new
+      Tpetra::Map<int, dealii::types::signed_global_dof_index>(
+      *sp.column_space_map));
+    graph = sp.graph;
 
     if (sp.nonlocal_graph.get() != nullptr)
-      nonlocal_graph = std::make_unique<
-        Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>>(
-        *sp.nonlocal_graph);
+      nonlocal_graph = Teuchos::rcp(new
+        Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>(
+        *sp.nonlocal_graph));
     else
       nonlocal_graph.reset();
   }
@@ -693,14 +669,14 @@ namespace TrilinosWrappers
   SparsityPattern::copy_from(const SparsityPatternType &sp)
   {
     SparsityPatternBase::resize(sp.n_rows(), sp.n_cols());
-    const Tpetra::Map<int, dealii::types::signed_global_dof_index> rows(
+    auto rows = Teuchos::rcp(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(
       TrilinosWrappers::types::int_type(sp.n_rows()),
       0,
-      Utilities::Trilinos::tpetra_comm_self());
-    const Tpetra::Map<int, dealii::types::signed_global_dof_index> columns(
+      Utilities::Trilinos::tpetra_comm_self()));
+    auto columns = Teuchos::rcp(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(
       TrilinosWrappers::types::int_type(sp.n_cols()),
       0,
-      Utilities::Trilinos::tpetra_comm_self());
+      Utilities::Trilinos::tpetra_comm_self()));
 
     reinit_sp(
       rows, columns, sp, false, column_space_map, graph, nonlocal_graph);
@@ -715,15 +691,15 @@ namespace TrilinosWrappers
     // When we clear the matrix, reset
     // the pointer and generate an
     // empty sparsity pattern.
-    column_space_map = std::make_unique<
-      Tpetra::Map<int, dealii::types::signed_global_dof_index>>(
+    column_space_map = Teuchos::rcp(new
+      Tpetra::Map<int, dealii::types::signed_global_dof_index>(
       TrilinosWrappers::types::int_type(0),
       TrilinosWrappers::types::int_type(0),
-      Utilities::Trilinos::tpetra_comm_self());
-    graph = std::make_unique<
-      Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>>(
-      View, *column_space_map, *column_space_map, 0);
-    graph->FillComplete();
+      Utilities::Trilinos::tpetra_comm_self()));
+    graph = Teuchos::rcp(new 
+      Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(
+      column_space_map, column_space_map, 0));
+    graph->fillComplete();
 
     nonlocal_graph.reset();
   }
@@ -733,61 +709,50 @@ namespace TrilinosWrappers
   void
   SparsityPattern::compress()
   {
-    int ierr;
     Assert(column_space_map.get(), ExcInternalError());
     if (nonlocal_graph.get() != nullptr)
       {
-        if (nonlocal_graph->IndicesAreGlobal() == false &&
-            nonlocal_graph->RowMap().NumMyElements() > 0 &&
-            n_global_elements(*column_space_map) > 0)
+        if (
+            nonlocal_graph->getRowMap()->getLocalNumElements() > 0 &&
+            column_space_map->getGlobalNumElements() > 0)
           {
             // Insert dummy element at (row, column) that corresponds to row 0
             // in local index counting.
             TrilinosWrappers::types::int_type row =
-              TrilinosWrappers::global_index(nonlocal_graph->RowMap(), 0);
+              nonlocal_graph->getRowMap()->getGlobalElement(0);
             TrilinosWrappers::types::int_type column = 0;
 
             // in case we have a square sparsity pattern, add the entry on the
             // diagonal
-            if (TrilinosWrappers::n_global_elements(*column_space_map) ==
-                TrilinosWrappers::n_global_elements(graph->RangeMap()))
+            if (column_space_map->getGlobalNumElements() ==
+                graph->getRangeMap()->getGlobalNumElements())
               column = row;
             // if not, take a column index that we have ourselves since we
             // know for sure it is there (and it will not create spurious
             // messages to many ranks like putting index 0 on many processors)
-            else if (column_space_map->NumMyElements() > 0)
-              column = TrilinosWrappers::global_index(*column_space_map, 0);
-            ierr = nonlocal_graph->insertGlobalIndices(row, 1, &column);
-            AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+            else if (column_space_map->getLocalNumElements() > 0)
+              column = column_space_map->getGlobalElement(0);
+            nonlocal_graph->insertGlobalIndices(row, 1, &column);
           }
-        Assert(nonlocal_graph->RowMap().NumMyElements() == 0 ||
-                 n_global_elements(*column_space_map) == 0 ||
-                 nonlocal_graph->IndicesAreGlobal() == true,
+        Assert(nonlocal_graph->getRowMap()->getLocalNumElements() == 0 ||
+                 column_space_map->getGlobalNumElements() == 0,
                ExcInternalError());
 
-        ierr =
-          nonlocal_graph->FillComplete(*column_space_map, graph->RangeMap());
-        AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
-        ierr = nonlocal_graph->OptimizeStorage();
-        AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
+          nonlocal_graph->fillComplete(column_space_map, graph->getRangeMap());
+        //ierr = nonlocal_graph->OptimizeStorage();
+        //AssertThrow(ierr >= 0, ExcTrilinosError(ierr));
         Tpetra::Export<int, dealii::types::signed_global_dof_index> exporter(
-          nonlocal_graph->RowMap(), graph->RowMap());
-        ierr = graph->Export(*nonlocal_graph, exporter, Add);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-        ierr = graph->FillComplete(*column_space_map, graph->RangeMap());
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+          nonlocal_graph->getRowMap(), graph->getRowMap());
+        //ierr = graph->export(*nonlocal_graph, exporter, Add);
+        //AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        graph->fillComplete(column_space_map, graph->getRangeMap());
       }
     else
       {
-        // TODO A dynamic_cast fails here, this is suspicious.
-        const auto &range_map = static_cast<
-          const Tpetra::Map<int, dealii::types::signed_global_dof_index> &>(
-          graph->RangeMap()); // NOLINT
-        ierr = graph->globalAssemble(*column_space_map, range_map, true);
-        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        graph->globalAssemble();
       }
 
-    try
+    /*try
       {
         ierr = graph->OptimizeStorage();
       }
@@ -805,15 +770,14 @@ namespace TrilinosWrappers
             "more than 2,147,483,647 nonzero entries in the sparsity "
             "pattern on the local process; this will not work because "
             "Epetra indexes entries with a simple 'signed int'."));
-      }
-    AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      }*/
 
     // Check consistency between the sizes set at the beginning and what
     // Trilinos stores:
     using namespace deal_II_exceptions::internals;
-    Assert(compare_for_equality(n_rows(), n_global_rows(*graph)),
+    Assert(compare_for_equality(n_rows(), graph->getGlobalNumEntries()),
            ExcInternalError());
-    Assert(compare_for_equality(n_cols(), n_global_cols(*graph)),
+    Assert(compare_for_equality(n_cols(), graph->getGlobalNumEntries()),
            ExcInternalError());
   }
 
@@ -822,8 +786,7 @@ namespace TrilinosWrappers
   bool
   SparsityPattern::row_is_stored_locally(const size_type i) const
   {
-    return graph->RowMap().LID(
-             static_cast<TrilinosWrappers::types::int_type>(i)) != -1;
+    return graph->getRowMap()->getLocalElement(i) != Teuchos::OrdinalTraits<int>::invalid();
   }
 
 
@@ -832,79 +795,26 @@ namespace TrilinosWrappers
   SparsityPattern::exists(const size_type i, const size_type j) const
   {
     if (!row_is_stored_locally(i))
-      {
         return false;
-      }
-    else
-      {
-        // Extract local indices in
-        // the matrix.
-        int trilinos_i =
-              graph->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
-            trilinos_j =
-              graph->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
+        
+// Extract local indices in  the matrix.
+        auto trilinos_i =
+              graph->getRowMap()->getLocalElement(i);
 
-        // Check whether the matrix
-        // already is transformed to
-        // local indices.
-        if (graph->Filled() == false)
-          {
-            int nnz_present = graph->NumGlobalIndices(i);
-            int nnz_extracted;
-            TrilinosWrappers::types::int_type *col_indices;
+  auto trilinos_j =
+              graph->getColMap()->getLocalElement(j);
 
-            // Generate the view and make
-            // sure that we have not generated
-            // an error.
-            // TODO: trilinos_i is the local row index -> it is an int but
-            // ExtractGlobalRowView requires trilinos_i to be the global row
-            // index and thus it should be a long long int
-            int ierr = graph->ExtractGlobalRowView(trilinos_i,
-                                                   nnz_extracted,
+        Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>::local_inds_host_view_type col_indices;
+
+            // Generate the view.
+            graph->getLocalRowView(trilinos_i,
                                                    col_indices);
-            (void)ierr;
-            Assert(ierr == 0, ExcTrilinosError(ierr));
-            Assert(nnz_present == nnz_extracted,
-                   ExcDimensionMismatch(nnz_present, nnz_extracted));
-
             // Search the index
             const std::ptrdiff_t local_col_index =
-              std::find(col_indices, col_indices + nnz_present, trilinos_j) -
-              col_indices;
+              std::find(col_indices.data(), col_indices.data() + col_indices.size(), trilinos_j) -
+              col_indices.data();
 
-            if (local_col_index == nnz_present)
-              return false;
-          }
-        else
-          {
-            // Prepare pointers for extraction
-            // of a view of the row.
-            int  nnz_present = graph->NumGlobalIndices(i);
-            int  nnz_extracted;
-            int *col_indices;
-
-            // Generate the view and make
-            // sure that we have not generated
-            // an error.
-            int ierr =
-              graph->ExtractMyRowView(trilinos_i, nnz_extracted, col_indices);
-            (void)ierr;
-            Assert(ierr == 0, ExcTrilinosError(ierr));
-
-            Assert(nnz_present == nnz_extracted,
-                   ExcDimensionMismatch(nnz_present, nnz_extracted));
-
-            // Search the index
-            const std::ptrdiff_t local_col_index =
-              std::find(col_indices, col_indices + nnz_present, trilinos_j) -
-              col_indices;
-
-            if (local_col_index == nnz_present)
-              return false;
-          }
-      }
-
-    return true;
+            return local_col_index != col_indices.size();
   }
 
 
@@ -916,9 +826,9 @@ namespace TrilinosWrappers
     TrilinosWrappers::types::int_type global_b = 0;
     for (int i = 0; i < static_cast<int>(local_size()); ++i)
       {
-        int *indices;
-        int  num_entries;
-        graph->ExtractMyRowView(i, num_entries, indices);
+        Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>::local_inds_host_view_type indices;
+        graph->getLocalRowView(i, indices);
+        int num_entries = indices.size();
         for (unsigned int j = 0; j < static_cast<unsigned int>(num_entries);
              ++j)
           {
@@ -926,7 +836,7 @@ namespace TrilinosWrappers
               local_b = std::abs(i - indices[j]);
           }
       }
-    graph->Comm().MaxAll(reinterpret_cast<TrilinosWrappers::types::int_type *>(
+    graph->getComm()->MaxAll(reinterpret_cast<TrilinosWrappers::types::int_type *>(
                            &local_b),
                          &global_b,
                          1);
@@ -938,7 +848,7 @@ namespace TrilinosWrappers
   unsigned int
   SparsityPattern::local_size() const
   {
-    int n_rows = graph->NumMyRows();
+    int n_rows = graph->getLocalNumRows();
 
     return n_rows;
   }
@@ -949,8 +859,8 @@ namespace TrilinosWrappers
   SparsityPattern::local_range() const
   {
     size_type begin, end;
-    begin = TrilinosWrappers::min_my_gid(graph->RowMap());
-    end   = TrilinosWrappers::max_my_gid(graph->RowMap()) + 1;
+    begin = graph->getRowMap()->getMinGlobalIndex();
+    end   = graph->getRowMap()->getMaxGlobalIndex() + 1;
 
     return std::make_pair(begin, end);
   }
@@ -960,7 +870,7 @@ namespace TrilinosWrappers
   std::uint64_t
   SparsityPattern::n_nonzero_elements() const
   {
-    TrilinosWrappers::types::int64_type nnz = n_global_entries(*graph);
+    TrilinosWrappers::types::int64_type nnz = graph->getGlobalNumEntries();
 
     return static_cast<std::uint64_t>(nnz);
   }
@@ -970,7 +880,7 @@ namespace TrilinosWrappers
   unsigned int
   SparsityPattern::max_entries_per_row() const
   {
-    int nnz = graph->MaxNumIndices();
+    int nnz = graph->getLocalMaxNumRowEntries();
 
     return static_cast<unsigned int>(nnz);
   }
@@ -985,12 +895,12 @@ namespace TrilinosWrappers
     // Get a representation of the where the present row is located on
     // the current processor
     TrilinosWrappers::types::int_type local_row =
-      graph->LRID(static_cast<TrilinosWrappers::types::int_type>(row));
+      graph->getRowMap()->getLocalElement(row);
 
     // On the processor who owns this row, we'll have a non-negative
     // value for `local_row` and can ask for the length of the row.
     if (local_row >= 0)
-      return graph->NumMyIndices(local_row);
+      return graph->getNumEntriesInLocalRow(local_row);
     else
       return static_cast<size_type>(-1);
   }
@@ -1010,11 +920,7 @@ namespace TrilinosWrappers
   const Tpetra::Map<int, dealii::types::signed_global_dof_index> &
   SparsityPattern::domain_partitioner() const
   {
-    // TODO A dynamic_cast fails here, this is suspicious.
-    const auto &domain_map = static_cast<
-      const Tpetra::Map<int, dealii::types::signed_global_dof_index> &>(
-      graph->DomainMap()); // NOLINT
-    return domain_map;
+    return *graph->getDomainMap();
   }
 
 
@@ -1022,11 +928,7 @@ namespace TrilinosWrappers
   const Tpetra::Map<int, dealii::types::signed_global_dof_index> &
   SparsityPattern::range_partitioner() const
   {
-    // TODO A dynamic_cast fails here, this is suspicious.
-    const auto &range_map = static_cast<
-      const Tpetra::Map<int, dealii::types::signed_global_dof_index> &>(
-      graph->RangeMap()); // NOLINT
-    return range_map;
+    return *graph->getRangeMap();
   }
 
 
@@ -1034,9 +936,7 @@ namespace TrilinosWrappers
   MPI_Comm
   SparsityPattern::get_mpi_communicator() const
   {
-    const auto *mpi_comm = &graph->RangeMap().Comm();
-    Assert(mpi_comm != nullptr, ExcInternalError());
-    return mpi_comm->Comm();
+    return graph->getRangeMap()->getComm();
   }
 
 
@@ -1061,15 +961,16 @@ namespace TrilinosWrappers
     else
       {
         int *indices;
-        int  num_entries;
 
-        for (int i = 0; i < graph->NumMyRows(); ++i)
+        for (int i = 0; i < graph->getLocalNumRows(); ++i)
           {
-            graph->ExtractMyRowView(i, num_entries, indices);
+            Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>::local_inds_host_view_type indices;
+            graph->getLocalRowView(i, indices);
+            int num_entries = indices.size();
             for (int j = 0; j < num_entries; ++j)
-              out << "(" << TrilinosWrappers::global_index(graph->RowMap(), i)
+              out << "(" << graph->getRowMap()->getGlobalElement(i)
                   << ","
-                  << TrilinosWrappers::global_index(graph->ColMap(), indices[j])
+                  << graph->getColMap()->getGlobalElement(indices[j])
                   << ") " << std::endl;
           }
       }
@@ -1082,13 +983,13 @@ namespace TrilinosWrappers
   void
   SparsityPattern::print_gnuplot(std::ostream &out) const
   {
-    Assert(graph->Filled() == true, ExcInternalError());
+    Assert(graph->isFillComplete() == true, ExcInternalError());
     for (dealii::types::signed_global_dof_index row = 0; row < local_size();
          ++row)
       {
-        int *indices;
-        int  num_entries;
-        graph->ExtractMyRowView(row, num_entries, indices);
+        Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>::local_inds_host_view_type indices;
+        graph->getLocalRowView(row, indices);
+        int num_entries = indices.size();
 
         Assert(num_entries >= 0, ExcInternalError());
         // avoid sign comparison warning
@@ -1101,10 +1002,10 @@ namespace TrilinosWrappers
           // x-y, that is we have to exchange
           // the order of output
           out << static_cast<int>(
-                   TrilinosWrappers::global_index(graph->ColMap(), indices[j]))
+                   graph->getColMap()->getGlobalElement(indices[j]))
               << " "
               << -static_cast<int>(
-                   TrilinosWrappers::global_index(graph->RowMap(), row))
+                   graph->getRowMap()->getGlobalElement(row))
               << std::endl;
       }
 

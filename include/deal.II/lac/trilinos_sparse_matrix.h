@@ -2405,13 +2405,13 @@ namespace TrilinosWrappers
          * Tpetra_Map that sets the partitioning of the domain space of
          * this operator.
          */
-        Tpetra::Map<int, dealii::types::signed_global_dof_index> domain_map;
+        Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> domain_map;
 
         /**
          * Tpetra_Map that sets the partitioning of the range space of
          * this operator.
          */
-        Tpetra::Map<int, dealii::types::signed_global_dof_index> range_map;
+        Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> range_map;
       };
 
       /**
@@ -2973,7 +2973,7 @@ namespace TrilinosWrappers
                        const bool                            copy_values,
                        const ::dealii::SparsityPattern *     use_this_sparsity)
   {
-    Tpetra::Map<int, dealii::types::signed_global_dof_index> map =
+    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> map =
       parallel_partitioning.make_tpetra_map(communicator, false);
     reinit(parallel_partitioning,
            parallel_partitioning,
