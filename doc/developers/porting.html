@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-	  "http://www.w3.org/TR/html4/loose.dtd">
+	  "https://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
     <title>Porting deal.II</title>
@@ -15,7 +15,7 @@
 
     <p>
       <acronym>deal.II</acronym> uses very few
-      <a href="http://www.opengroup.org/austin/">POSIX</a> specific system
+      <a href="https://www.opengroup.org/austin/">POSIX</a> specific system
       features and is otherwise fairly ISO (2011) C++ Standard compliant.
 
       Consequently, there is a good chance that <acronym>deal.II</acronym>
@@ -29,9 +29,9 @@
     <p>
       Currently, the <acronym>deal.II</acronym> CMake build system
       recognizes
-      <a href="http://gcc.gnu.org/">gcc</a>,
-      <a href="http://clang.llvm.org/">clang</a>, as well as
-      <a href="http://software.intel.com/en-us/intel-compilers">icc</a>, and
+      <a href="https://gcc.gnu.org/">gcc</a>,
+      <a href="https://clang.llvm.org/">clang</a>, as well as
+      <a href="https://software.intel.com/en-us/intel-compilers">icc</a>, and
       sets up reasonable default compiler flags.
       <ul>
         <li>
@@ -54,7 +54,7 @@ cmake/setup_compiler_flags.cmake
 cmake/setup_compiler_flags_gnu.cmake
 cmake/setup_compiler_flags_icc.cmake
 </pre>
-          Patches are highly welcome! See <a href="http://www.dealii.org/participate.html">here</a>
+          Patches are highly welcome! See <a href="https://www.dealii.org/participate.html">here</a>
           for information on how to get in contact with us.
         <li>
           You might want to have a look at
@@ -72,26 +72,26 @@ include/deal.II/base/config.h.in
 
     <p>
       <acronym>deal.II</acronym> should support almost all reasonably
-      <a href="http://www.opengroup.org/austin/">POSIX</a> compliant
+      <a href="https://www.opengroup.org/austin/">POSIX</a> compliant
       platforms out of the box. Nevertheless, the following bits of
       information might help:
       <ul>
         <li>
           The build system of <acronym>deal.II</acronym> uses <a
-          href="http://www.cmake.org/" target="_top">CMake</a>.  So,
+          href="https://www.cmake.org/" target="_top">CMake</a>.  So,
           in order to port <acronym>deal.II</acronym> to a new platform,
-          it is obviously necessary that <a href="http://www.cmake.org/"
+          it is obviously necessary that <a href="https://www.cmake.org/"
           target="_top">CMake</a> supports the platform in question
           with at least one generator for a native build tool, see <a
-          href="http://www.cmake.org/cmake/help/documentation.html">here</a>.
+          href="https://www.cmake.org/cmake/help/documentation.html">here</a>.
         <li>
           <acronym>deal.II</acronym> is mainly developed with <a
-          href="http://gcc.gnu.org/">gcc</a> on GNU/Linux, so it is
+          href="https://gcc.gnu.org/">gcc</a> on GNU/Linux, so it is
           best to begin porting to a new platform with the help of <a
-          href="http://gcc.gnu.org/">gcc</a>.
+          href="https://gcc.gnu.org/">gcc</a>.
           After that a platform specific compiler might be tried.
         <li>
-          Almost all <a href="http://www.opengroup.org/austin/">POSIX</a>
+          Almost all <a href="https://www.opengroup.org/austin/">POSIX</a>
           specific code is well guarded with fall-back code in case the
           specific POSIX function is not available. There is (currently)
           one exception, though: Routines that measure elapsed CPU time in
