@@ -3933,8 +3933,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               ->component_dof_indices_offset[this->active_fe_index]
                                             [this->first_selected_component] *
             dof_info.dof_indices_interleave_strides[ind][cells[v]];
-      else
-        dof_indices[v] = numbers::invalid_unsigned_int;
     }
 
   // In the case with contiguous cell indices, we know that there are no
