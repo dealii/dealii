@@ -20,10 +20,10 @@
 # editing this file.
 #
 
-if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "15.0" )
+if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.0" )
   message(WARNING "\n"
     "You're using an old version of the Intel C++ Compiler (icc/icpc)!\n"
-    "It is strongly recommended to use at least version 15.\n"
+    "It is strongly recommended to use at least version 19.\n"
     )
 endif()
 

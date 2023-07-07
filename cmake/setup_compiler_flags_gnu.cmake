@@ -21,18 +21,18 @@
 #
 
 if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5.0" )
+    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0" )
   message(FATAL_ERROR "\n"
-    "deal.II requires support for features of C++14 that are not present in\n"
-    "versions of GCC prior to 5.0."
+    "deal.II requires support for features of C++17 that are not present in\n"
+    "versions of GCC prior to 9.0."
     )
 endif()
 
 if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
-    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.0" )
+    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0" )
   message(FATAL_ERROR "\n"
-    "deal.II requires support for features of C++14 that are not present in\n"
-    "versions of Clang prior to 4.0."
+    "deal.II requires support for features of C++17 that are not present in\n"
+    "versions of Clang prior to 10.0."
     )
 endif()
 
@@ -40,10 +40,10 @@ endif()
 # https://en.wikipedia.org/wiki/Xcode#Xcode_7.0_-_11.x_(since_Free_On-Device_Development)
 if (POLICY CMP0025)
   if( CMAKE_CXX_COMPILER_ID MATCHES "AppleClang" AND
-      CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0" )
+      CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0" )
     message(FATAL_ERROR "\n"
-      "deal.II requires support for features of C++14 that are not present in\n"
-      "versions of AppleClang prior to 9.0."
+      "deal.II requires support for features of C++17 that are not present in\n"
+      "versions of AppleClang prior to 12.0."
       )
   endif()
 endif()
