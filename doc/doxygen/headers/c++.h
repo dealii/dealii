@@ -18,12 +18,12 @@
  * @defgroup CPP11 deal.II and Modern C++ standards
  *
  * Since version 9.6, deal.II requires a compiler that supports at least
- * <a href="http://en.wikipedia.org/wiki/C%2B%2B17">C++17</a>. Large parts
+ * <a href="https://en.wikipedia.org/wiki/C%2B%2B17">C++17</a>. Large parts
  * of the library now depend on modern language constructs which are
  * documented here.
  *
  * One example is support for C++11
- * <a href="http://en.wikipedia.org/wiki/C++11#Range-based_for_loop">range-based
+ * <a href="https://en.wikipedia.org/wiki/C++11#Range-based_for_loop">range-based
  * for loops</a>. deal.II-based codes often have many loops of the kind
  * @code
  *   Triangulation<dim> triangulation;

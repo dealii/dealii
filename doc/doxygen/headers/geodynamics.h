@@ -42,7 +42,7 @@ Some of these programs were developed under contract from the California
 Institute of Technology with support by the National Science Foundation
 under Award No. EAR-0426271, the first of the grants that funded
 the <a target="_top"
-href="http://www.geodynamics.org">Computational Infrastructure in
+href="https://www.geodynamics.org">Computational Infrastructure in
 Geodynamics</a> initiative. The recipient, Wolfgang Bangerth, gratefully
 acknowledges this source of support.
 

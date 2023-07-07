@@ -173,7 +173,7 @@ inconvenience this causes.
 
    <li>
    <p>
-   New: The version of <a href="http://www.boost.org/">boost</a>
+   New: The version of <a href="https://www.boost.org/">boost</a>
    included in the <code>contrib/</code> directory has been updated
    to 1.41.0.
    <br>
@@ -195,7 +195,7 @@ inconvenience this causes.
    <li>
    <p>
    New: A report has been added on the
-   <a href="http://www.dealii.org/reports/codimension-one/desimone-heltai-manigrasso.pdf"
+   <a href="https://www.dealii.org/reports/codimension-one/desimone-heltai-manigrasso.pdf"
    target="body">codimension one</a> capabilities
    of the library (by Antonio DeSimone, Luca Heltai
    and Cataldo Manigrasso, SISSA, Trieste, Italy). It
@@ -278,7 +278,7 @@ inconvenience this causes.
    a task-based, rather than thread-based approach, in which one
    uses a high-level description of <i>what</i> needs to be done,
    rather than how these jobs have to be mapped onto threads. We then
-   use the <a href="http://www.threadingbuildingblocks.org">Threading
+   use the <a href="https://www.threadingbuildingblocks.org">Threading
    Building Blocks (TBB) library</a> to schedule tasks onto available
    hardware resources. This new scheme of describing parallism and
    various abstractions to make programming in this framework easier

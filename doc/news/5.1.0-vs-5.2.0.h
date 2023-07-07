@@ -504,8 +504,8 @@ inconvenience this causes.
   <li> <p>
        New: Class <code>FunctionParser</code>. Wrapper
        class for the fparser library (see
-       <a href="http://warp.povusers.org/FunctionParser/">
-       http://warp.povusers.org/FunctionParser/</a>).
+       <a href="https://warp.povusers.org/FunctionParser/">
+       https://warp.povusers.org/FunctionParser/</a>).
        <br>
        (Luca Heltai, 2005/03/07).
        </p>

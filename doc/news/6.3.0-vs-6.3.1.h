@@ -98,7 +98,7 @@ inconvenience this causes.
   <li>
   <p>Fixed: Linking with more than one of the deal.II 1d, 2d, or 3d libraries
   when using static libraries did not work. This is now fixed. However, due to
-  GCC bug <a href="http://gcc.gnu.org/bugzilla/show_bug.cgi?id=10591"
+  GCC bug <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=10591"
   target="_top">10591</a>, GCC versions prior to and including 4.1.x will
   still not work. Working with shared libraries was not and is not affected
   by this problem.

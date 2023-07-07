@@ -151,7 +151,7 @@ this function.
   (Juan Carlos Araujo Cabarcas, 2013/03/25)
   </li>
 
-  <li> New: deal.II now uses <a href="http://www.cmake.org/">CMake</a>
+  <li> New: deal.II now uses <a href="https://www.cmake.org/">CMake</a>
   as its configuration and build tool. Please read through the
   readme and other installation files for information about how the
   installation process has changed.

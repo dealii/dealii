@@ -156,7 +156,7 @@ flag, resulting in savings in disk space on the order of 230 MB.
 (Wolfgang Bangerth, 2011/09/22)
 
 <li> New: deal.II can now be configured and built with the
-<a href="http://clang.llvm.org">Clang C++ frontend of the LLVM compiler</a>.
+<a href="https://clang.llvm.org">Clang C++ frontend of the LLVM compiler</a>.
 <br>
 (Timo Heister, Wolfgang Bangerth, 2011/08/20)
 

@@ -142,7 +142,7 @@ All entries are signed with the names of the author.
 
   <li> <p>
        New: There is now some support to include and use routines from the
-       <a href="http://www.cse.clrc.ac.uk/Activity/HSL"
+       <a href="https://www.cse.clrc.ac.uk/Activity/HSL"
        target="_top">Harwell Subroutine Library</a>.
        <br>
        (WB 2001/01/30)
@@ -273,7 +273,7 @@ All entries are signed with the names of the author.
 
   <li> <p>
        New: We now support the output format of the <a
-       href="http://www.kitware.com/vtk.html"
+       href="https://www.kitware.com/vtk.html"
        target="_top">Visualization Toolkit (Vtk)</a> from the <code
        class="class">DataOutBase</code> class and all derived classes.
        <br>
@@ -591,7 +591,7 @@ All entries are signed with the names of the author.
 
   <li> <p>
        New: There is now some support to include and use routines from the
-       <a href="http://www.cse.clrc.ac.uk/Activity/HSL"
+       <a href="https://www.cse.clrc.ac.uk/Activity/HSL"
        target="_top">Harwell Subroutine Library</a>, and support
        classes
        <code>SparseDirectMA27</code> and

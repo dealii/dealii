@@ -187,7 +187,7 @@ inconvenience this causes.
        lexicographic ordering (with x running fastest) wherever
        possible. For more information on the new numbering scheme, see
        the <a
-       href="http://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2005/000827.html">announcement</a>
+       href="https://ganymed.iwr.uni-heidelberg.de/pipermail/dealii/2005/000827.html">announcement</a>
        on the mailing list.  <br> The ordering of vertices in <code>CellData</code> given to the <code>Triangulation::create_triangulation</code>
        function has been changed accordingly. For backward
        compatibility there is now a new <code>Triangulation::create_triangulation_compatibility</code>

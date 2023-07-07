@@ -959,7 +959,7 @@
  *
  * For massively %parallel
  * computations, deal.II builds on the
- * <a href="http://www.p4est.org/" target="_top">p4est</a>
+ * <a href="https://www.p4est.org/" target="_top">p4est</a>
  * library. If you use this functionality, please also cite the
  * p4est paper listed at their website.
  * </dd>
@@ -1212,7 +1212,7 @@
   pages =        {4/1--4/31}
 }
  * @endcode
- * It is available from <a href="http://www.math.colostate.edu/~bangerth/publications.html">http://www.math.colostate.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
+ * It is available from <a href="https://www.math.colostate.edu/~bangerth/publications.html">https://www.math.colostate.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  *
  * The numerical examples shown in that paper are generated with a slightly
  * modified version of step-27. The main difference to that
@@ -1592,7 +1592,7 @@
   publisher={SIAM}}
  * @endcode
  * See
- * <a href="http://dx.doi.org/10.1137/090778523">DOI:10.1137/090778523</a>
+ * <a href="https://dx.doi.org/10.1137/090778523">DOI:10.1137/090778523</a>
  * for the paper and <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for more details.
  * </dd>
  *
@@ -1871,7 +1871,7 @@
  *
  * deal.II implements serialization facilities by implementing the necessary
  * interfaces for the <a
- * href="http://www.boost.org/doc/libs/1_62_0/libs/serialization/doc/index.html"
+ * href="https://www.boost.org/doc/libs/1_62_0/libs/serialization/doc/index.html"
  * target="_top">BOOST serialization</a> library. See there for examples on
  * how to save and restore objects.
  * </dd>
@@ -2258,7 +2258,7 @@
   year =         2016
 }
  * @endcode
- * It is available from <a href="http://www.math.colostate.edu/~bangerth/publications.html">http://www.math.colostate.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
+ * It is available from <a href="https://www.math.colostate.edu/~bangerth/publications.html">https://www.math.colostate.edu/~bangerth/publications.html</a>, also see <a href="https://www.dealii.org/publications.html#details">deal.II publications</a> for details.
  * </dd>
  *
  *

@@ -299,7 +299,7 @@
  * to use the tag file, you have to download it into a place where Doxygen can find it.
  * After that, find the key <code>TAGFILES</code> in your Doxygen options file and write something like
  * <pre>
- * TAGFILES = deal.tag=http://www.dealii.org/X.Y.Z/doxygen/deal.II
+ * TAGFILES = deal.tag=https://www.dealii.org/X.Y.Z/doxygen/deal.II
  * </pre>
  * where <code>X.Y.Z</code> refers to the release you want to link to. Be sure you use
  * the matching tag file. In theory, you can also link against the developing revisions

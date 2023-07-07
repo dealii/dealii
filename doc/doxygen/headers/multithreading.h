@@ -151,7 +151,7 @@
  * vein, it often pays off to use tasks, rather than threads, in a program.
  *
  * deal.II does not implement scheduling tasks to threads itself. For this, we
- * use the <a href="http://www.threadingbuildingblocks.org" target="_top">Threading Building
+ * use the <a href="https://www.threadingbuildingblocks.org" target="_top">Threading Building
  * Blocks (TBB) library</a> for which we provide simple wrappers. TBB
  * abstracts the details of how to start or stop threads, start tasks on
  * individual threads, etc, and provides interfaces that are portable across

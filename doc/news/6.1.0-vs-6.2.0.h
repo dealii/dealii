@@ -238,7 +238,7 @@ inconvenience this causes.
   <p>
   Changed: The subversion repository for deal.II development is now
   located on commercially hosted space at <a
-  href="http://www.dealii.org/svn/dealii/">http://www.dealii.org/svn/dealii/</a>.
+  href="https://www.dealii.org/svn/dealii/">https://www.dealii.org/svn/dealii/</a>.
   <br>
   (GK 2009/01/20)
   </p>
@@ -247,7 +247,7 @@ inconvenience this causes.
   <li>
   <p>
   Changed: Some parts of the library used to use classes and functions
-  from the <a href="http://www.boost.org/">BOOST</a> library. Since
+  from the <a href="https://www.boost.org/">BOOST</a> library. Since
   many of the components of BOOST have been voted into what will be the
   next C++ standard, we now use a namespace std_cxx1x (coined on the
   provisional name C++0x used for the next C++ standard) into which we
@@ -273,7 +273,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Updated: The version of the <a href="http://www.boost.org/">BOOST</a>
+  Updated: The version of the <a href="https://www.boost.org/">BOOST</a>
   library that is in the <code>contrib/</code> directory and is used in
   various places of the library has been upgraded to 1.37.
   <br>
@@ -378,7 +378,7 @@ inconvenience this causes.
 
   <li>
   <p>
-  Updated: The version of the <a href="http://www.boost.org/">BOOST</a>
+  Updated: The version of the <a href="https://www.boost.org/">BOOST</a>
   library that is in the <code>contrib/</code> directory and is used in
   various places of the library has been upgraded to 1.36.
   <br>
@@ -1080,7 +1080,7 @@ inconvenience this causes.
   <li>
   <p>
   New: The GridIn::read_msh function can now read version 2 of the MSH format described
-  <a target="_top" href="http://gmsh.info/doc/texinfo/gmsh.html">here</a>.
+  <a target="_top" href="https://gmsh.info/doc/texinfo/gmsh.html">here</a>.
   <br>
   (WB 2008/10/07)
   </p>

@@ -134,7 +134,7 @@
  * areas, disregarding the blue areas.
  *
  * @note The decomposition of this "real" mesh into the pieces stored
- *   by each processes is provided by the <a href="http://www.p4est.org">p4est</a>
+ *   by each processes is provided by the <a href="https://www.p4est.org">p4est</a>
  *   library. p4est stores the complete mesh in a distributed data structure
  *   called a parallel forest (thus the name). A parallel forest consists of
  *   quad-trees (in 2d) or oct-trees (in 3d) originating in each
@@ -157,7 +157,7 @@
  *   proven that each subdomain consists of at most two disconnected
  *   pieces; see C. Burstedde, J. Holke, T. Isaac: "Bounds on the number of
  *   discontinuities of Morton-type space-filling curves",
- *   <a href="http://arxiv.org/abs/1505.05055">arXiv 1505.05055</a>,
+ *   <a href="https://arxiv.org/abs/1505.05055">arXiv 1505.05055</a>,
  *   2017.)
  *
  *

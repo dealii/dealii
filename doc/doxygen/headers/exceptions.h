@@ -250,7 +250,7 @@
  *  happened: exceptions that can be triggered by <tt>throw</tt> statements
  *  and captured by <tt>catch</tt> clauses, see for example
  *  https://en.wikipedia.org/wiki/C%2B%2B#Exception_handling and
- *  http://www.cplusplus.com/doc/tutorial/exceptions/ .
+ *  https://www.cplusplus.com/doc/tutorial/exceptions/ .
  *
  *  At some fundamental level, a typical C++ exception is an object that
  *  is placed in some special place, and then the function exits the current

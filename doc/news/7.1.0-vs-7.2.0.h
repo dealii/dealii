@@ -429,7 +429,7 @@ into a ConstraintMatrix.
 (Matthias Maier, 2012/05/22)
 
 <li> New: The GridIn::read_unv function can now read meshes generated
-by the Salome framework, see http://www.salome-platform.org/ .
+by the Salome framework, see https://www.salome-platform.org/ .
 <br>
 (Valentin Zingan, 2012/04/27)
 

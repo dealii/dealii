@@ -24,7 +24,7 @@
  * implemented with deal.II, but without the requirement to have these code
  * documented at the same, extensive level as used in the tutorial.
  * Instructions for obtaining the code gallery programs can be found at
- * http://dealii.org/code-gallery.html .
+ * https://dealii.org/code-gallery.html .
  *
  * @warning The programs that form part of the code gallery are contributed by
  *   others and are not part of deal.II itself. The deal.II authors make

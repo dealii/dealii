@@ -135,7 +135,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   (Sebastian Pauletti, Andrea Bonito, Luca Heltai, WB, 2010/12/06)
   </p></li>
 
-  <li><p>Updated: The version of the <a href="http://www.threadingbuildingblocks.org">Threading
+  <li><p>Updated: The version of the <a href="https://www.threadingbuildingblocks.org">Threading
   Building Blocks (TBB)</a> shipped with deal.II has been updated
   to release 3.0 Update 3 (Commercially aligned version).
   <br>
@@ -243,7 +243,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   <li>
   <p>Fixed: Linking with more than one of the deal.II 1d, 2d, or 3d libraries
   when using static libraries did not work. This is now fixed. However, due to
-  GCC bug <a href="http://gcc.gnu.org/bugzilla/show_bug.cgi?id=10591"
+  GCC bug <a href="https://gcc.gnu.org/bugzilla/show_bug.cgi?id=10591"
   target="_top">10591</a>, GCC versions prior to and including 4.1.x will
   still not work. Working with shared libraries was not and is not affected
   by this problem.
@@ -252,7 +252,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
   </p>
 
   <li>
-  <p>Updated: The version of <a href="http://www.boost.org/">boost</a>
+  <p>Updated: The version of <a href="https://www.boost.org/">boost</a>
    included in the <code>contrib/</code> directory has been updated
    to 1.43.0.
   <br>
@@ -318,7 +318,7 @@ independent of the dimension.
   </p>
 
   <li><p> New: The ParameterHandler class is now built on the
-  <a href="http://www.boost.org" target="_top">boost</a>
+  <a href="https://www.boost.org" target="_top">boost</a>
   <code>property_tree</code> library which provides a much better
   foundation for extensions. In particular, the description of parameters
   can now be exported in XML and JSON formats for processing with external

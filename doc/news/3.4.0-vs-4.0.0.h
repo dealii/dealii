@@ -52,7 +52,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
   <li> <p>
        New: deal.II now makes use of some parts of
-       the <a href="http://www.boost.org/">boost</a> library, which is
+       the <a href="https://www.boost.org/">boost</a> library, which is
        supposed to be a testground for the next generation C++ standard
        library. The parts which we use are now in
        <code>contrib/boost/include/boost_local/</code> and can be
@@ -119,7 +119,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
   <li> <p>
        Removed: Thread support now relies solely on the use of POSIX
        functions. The use of the
-       <a href="http://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
+       <a href="https://www.cs.wustl.edu/~schmidt/ACE.html" target="_top">ACE
        (Adaptive Communications Environment)</a> library for this is now no
        longer supported. However, application programs can of course still use
        ACE, but they will need to generate paths to this library in their
@@ -281,7 +281,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
        functions as a replacement.
        <br>
        For more information, read
-       <a href="http://www.dealii.org/mail/msg00638.html" target="body">this mail</a>.
+       <a href="https://www.dealii.org/mail/msg00638.html" target="body">this mail</a>.
        <br>
        (WB 2002/06/10)
        </p>

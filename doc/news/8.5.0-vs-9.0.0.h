@@ -835,7 +835,7 @@ inconvenience this causes.
 
  <li>
   New: Added support for the Open Asset Import Library (Assimp)
-  (http://assimp.sourceforge.net/). This library can be used
+  (https://assimp.sourceforge.net/). This library can be used
   to read about 40 different 3D graphics formats, used in 3D
   modelers (such as Blender, Maya, etc.). Some of these formats
   contain mesh information, that in turn can be read

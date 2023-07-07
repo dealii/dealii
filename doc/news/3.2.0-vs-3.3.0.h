@@ -28,7 +28,7 @@ All entries are signed with the names of the author.
 <ol>
   <li> <p>
        New: Output for
-       <a href="http://www.amtec.org" target="_top">Tecplot</a> has
+       <a href="https://www.amtec.org" target="_top">Tecplot</a> has
        been added. It can be used by choosing output format «tecplot».
        <br>
        (<a href="mailto:benkirk@cfdlab.ae.utexas.edu">Benjamin Shelton Kirk</a> 2002/01/29)
@@ -52,7 +52,7 @@ All entries are signed with the names of the author.
 
   <li> <p>
        New: Output for
-       <a href="http://www.opendx.org" target="_top">OpenDX</a> has
+       <a href="https://www.opendx.org" target="_top">OpenDX</a> has
        been added. It can be used by choosing output format «dx» (not
        yet for grid output). The data format is very basic now, but it
        is planned to improve this to make use of the excellent

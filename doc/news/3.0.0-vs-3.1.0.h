@@ -29,7 +29,7 @@ All entries are signed with the names of the author.
 <ol>
   <li> <p>
        New: All identifiers that the C++ standard (see
-       <a href="http://www.cygnus.com/misc/wp/dec96pub/"
+       <a href="https://www.cygnus.com/misc/wp/dec96pub/"
        target="_top"> this page</a> for the public draft -- the
        standard itself is not available online for copyright reasons)
        mandates to be in namespace <code>std::</code> are correctly

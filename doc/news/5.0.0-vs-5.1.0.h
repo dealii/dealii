@@ -123,7 +123,7 @@ inconvenience this causes.
        Wolfgang.
        <br>
        Deal.II comes with its own copy of the <a
-       href="http://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a>
+       href="https://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a>
        library, courtesy of its author. In order to use, follow the steps
        listed <a href="../readme.html#umfpack">here</a>. Note that UMFPACK
        comes with its own license; to use UMFPACK, please read the <a

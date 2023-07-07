@@ -455,7 +455,7 @@
  * unstructured two- and three-dimensional meshes", R. Agelek,
  * M. Anderson, W.  Bangerth, W. L. Barth, ACM Transactions on
  * Mathematical Software, vol. 44, article 5, 2017. A preprint is
- * available as <a href="http://arxiv.org/abs/1512.02137">arxiv
+ * available as <a href="https://arxiv.org/abs/1512.02137">arxiv
  * 1512.02137</a>.
  *
  *
