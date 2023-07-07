@@ -1760,7 +1760,7 @@ namespace Step70
     static std::map<std::string, std::vector<std::pair<double, std::string>>>
       times_and_names;
     if (times_and_names.find(fprefix) != times_and_names.end())
-      times_and_names[fprefix].push_back(std::make_pair(time, filename));
+      times_and_names[fprefix].emplace_back(time, filename);
     else
       times_and_names[fprefix] = {std::make_pair(time, filename)};
     std::ofstream ofile(par.output_directory + "/" + fprefix + ".pvd");
