@@ -36,11 +36,11 @@ public:
   generate(const char *myname)
   {
     std::string name = myname;
+    deallog << "Read " << name << std::endl;
 
     std::unique_ptr<FiniteElement<dim, spacedim>> fe =
       FETools::get_fe_by_name<dim, spacedim>(name);
 
-    deallog << "Read " << name << std::endl;
     deallog << "Generated :" << std::endl;
     deallog << fe->get_name() << std::endl;
   }
@@ -139,6 +139,19 @@ main()
   gen.generate_all_codim("FE_Q(2)");
   gen.generate_all_codim("FE_Bernstein(2)");
   gen.generate_all_codim("FE_DGQHermite(3)");
+
+  // Simplex finite elements
+  gen.generate_all_codim("FE_SimplexP(1)");
+  gen.generate_all_codim("FE_SimplexP(2)");
+  gen.generate_all_codim("FE_SimplexDGP(1)");
+  gen.generate_all_codim("FE_SimplexDGP(2)");
+  gen.generate_all_codim("FE_SimplexP_Bubbles(2)");
+
+  // Mixed grids finite elements
+  gen.generate<3, 3>("FE_PyramidP(1)");
+  gen.generate<3, 3>("FE_PyramidDGP(1)");
+  gen.generate<3, 3>("FE_WedgeP(1)");
+  gen.generate<3, 3>("FE_WedgeDGP(1)");
 
   // systems
   gen.generate_all_dim("FESystem[FE_Q_Hierarchical(1)^2-FE_Q_Hierarchical(1)]");

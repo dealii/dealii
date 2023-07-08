@@ -42,6 +42,7 @@
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_nedelec_sz.h>
 #include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_q_bubbles.h>
 #include <deal.II/fe/fe_q_dg0.h>
@@ -50,9 +51,12 @@
 #include <deal.II/fe/fe_rannacher_turek.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_rt_bubbles.h>
+#include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_simplex_p_bubbles.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/fe_wedge_p.h>
 #include <deal.II/fe/mapping_cartesian.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -1125,6 +1129,25 @@ namespace FETools
           std::make_unique<FETools::FEFactory<FE_Nothing<dim>>>();
         result["FE_RannacherTurek"] =
           std::make_unique<FETools::FEFactory<FE_RannacherTurek<dim>>>();
+        // Simplex finite elements
+        result["FE_SimplexP"] =
+          std::make_unique<FETools::FEFactory<FE_SimplexP<dim>>>();
+        result["FE_SimplexDGP"] =
+          std::make_unique<FETools::FEFactory<FE_SimplexDGP<dim>>>();
+        result["FE_SimplexP_Bubbles"] =
+          std::make_unique<FETools::FEFactory<FE_SimplexP_Bubbles<dim>>>();
+        // Mixed grids finite elements -- only valid in 3d
+        if constexpr (dim == 3)
+          {
+            result["FE_PyramidP"] =
+              std::make_unique<FETools::FEFactory<FE_PyramidP<dim>>>();
+            result["FE_PyramidDGP"] =
+              std::make_unique<FETools::FEFactory<FE_PyramidDGP<dim>>>();
+            result["FE_WedgeP"] =
+              std::make_unique<FETools::FEFactory<FE_WedgeP<dim>>>();
+            result["FE_WedgeDGP"] =
+              std::make_unique<FETools::FEFactory<FE_WedgeDGP<dim>>>();
+          }
       }
 
 
@@ -1161,6 +1184,12 @@ namespace FETools
           std::make_unique<FETools::FEFactory<FE_Q<dim, spacedim>>>();
         result["FE_Bernstein"] =
           std::make_unique<FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
+        result["FE_SimplexP"] =
+          std::make_unique<FETools::FEFactory<FE_SimplexP<dim, spacedim>>>();
+        result["FE_SimplexDGP"] =
+          std::make_unique<FETools::FEFactory<FE_SimplexDGP<dim, spacedim>>>();
+        result["FE_SimplexP_Bubbles"] = std::make_unique<
+          FETools::FEFactory<FE_SimplexP_Bubbles<dim, spacedim>>>();
       }
 
       // The function filling the vector fe_name_map below. It iterates
@@ -2517,7 +2546,7 @@ namespace FETools
         // didn't know what to do with the
         // string we got. so do as the docs
         // say: raise an exception
-        AssertThrow(false, FETools::ExcInvalidFEName(name));
+        AssertThrow(false, FETools::ExcInvalidFEName(name_part));
 
         // make some compilers happy that
         // do not realize that we can't get
