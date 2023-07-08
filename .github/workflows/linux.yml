@@ -61,7 +61,7 @@ jobs:
         make -j2 \
           setup_tests_examples \
           setup_tests_quick_tests
-        ctest --output-on-failure -j2
+        ctest --output-on-failure -j2 -VV
 
   ########################
   # linux-debug-parallel #
@@ -121,7 +121,7 @@ jobs:
           setup_tests_quick_tests \
           setup_tests_simplex \
           setup_tests_vtk
-        ctest --output-on-failure -j2
+        ctest --output-on-failure -j2 -VV
 
   ############################
   # linux-debug-intel-oneapi #
@@ -207,7 +207,7 @@ jobs:
         make -j2 \
           setup_tests_examples \
           setup_tests_quick_tests
-        ctest --output-on-failure -j2
+        ctest --output-on-failure -j2 -VV
 
   #######################
   # linux-debug-cuda-11 #
