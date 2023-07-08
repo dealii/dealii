@@ -38,7 +38,7 @@ namespace VectorTools
     template <int dim>
     struct VectorDoFTuple
     {
-      types::global_dof_index dof_indices[dim];
+      std::array<types::global_dof_index, dim> dof_indices;
 
       VectorDoFTuple()
       {
@@ -50,28 +50,19 @@ namespace VectorTools
       bool
       operator<(const VectorDoFTuple<dim> &other) const
       {
-        for (unsigned int i = 0; i < dim; ++i)
-          if (dof_indices[i] < other.dof_indices[i])
-            return true;
-          else if (dof_indices[i] > other.dof_indices[i])
-            return false;
-        return false;
+        return (dof_indices < other.dof_indices);
       }
 
       bool
       operator==(const VectorDoFTuple<dim> &other) const
       {
-        for (unsigned int i = 0; i < dim; ++i)
-          if (dof_indices[i] != other.dof_indices[i])
-            return false;
-
-        return true;
+        return (dof_indices == other.dof_indices);
       }
 
       bool
       operator!=(const VectorDoFTuple<dim> &other) const
       {
-        return !(*this == other);
+        return (dof_indices != other.dof_indices);
       }
     };
 
@@ -95,33 +86,24 @@ namespace VectorTools
     {
       static const unsigned int size = 3;
       // store active fe indeX, face number, DoF index
-      unsigned int indices[size];
+      std::array<unsigned int, size> indices;
 
       bool
       operator<(const FaceDoFInfo &other) const
       {
-        for (unsigned int i = 0; i < size; ++i)
-          if (indices[i] < other.indices[i])
-            return true;
-          else if (indices[i] > other.indices[i])
-            return false;
-        return false;
+        return (indices < other.indices);
       }
 
       bool
       operator==(const FaceDoFInfo &other) const
       {
-        for (unsigned int i = 0; i < size; ++i)
-          if (indices[i] != other.indices[i])
-            return false;
-
-        return true;
+        return (indices == other.indices);
       }
 
       bool
       operator!=(const FaceDoFInfo &other) const
       {
-        return !(*this == other);
+        return (indices != other.indices);
       }
     };
 
@@ -557,7 +539,7 @@ namespace VectorTools
                     {
                       local_vector_indices[0]               = i;
                       const FaceDoFInfo local_face_dof_info = {
-                        {cell->active_fe_index(), face_no, i}};
+                        {{cell->active_fe_index(), face_no, i}}};
                       for (unsigned int k = 0; k < fe.n_dofs_per_face(face_no);
                            ++k)
                         if ((k != i) &&
@@ -657,7 +639,7 @@ namespace VectorTools
                     !refinement_edge_indices.is_element(face_dofs[i]))
                   {
                     const FaceDoFInfo face_dof_info = {
-                      {cell->active_fe_index(), face_no, i}};
+                      {{cell->active_fe_index(), face_no, i}}};
                     const auto it = dof_to_vector_dof.find(face_dof_info);
                     Assert(it != dof_to_vector_dof.end(), ExcInternalError());
                     const std::array<unsigned int, dim> local_vector_indices =
