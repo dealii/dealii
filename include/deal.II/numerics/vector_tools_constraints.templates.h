@@ -38,7 +38,7 @@ namespace VectorTools
     template <int dim>
     struct VectorDoFTuple
     {
-      types::global_dof_index dof_indices[dim];
+      std::array<types::global_dof_index, dim> dof_indices;
 
       VectorDoFTuple()
       {
@@ -50,28 +50,19 @@ namespace VectorTools
       bool
       operator<(const VectorDoFTuple<dim> &other) const
       {
-        for (unsigned int i = 0; i < dim; ++i)
-          if (dof_indices[i] < other.dof_indices[i])
-            return true;
-          else if (dof_indices[i] > other.dof_indices[i])
-            return false;
-        return false;
+        return (dof_indices < other.dof_indices);
       }
 
       bool
       operator==(const VectorDoFTuple<dim> &other) const
       {
-        for (unsigned int i = 0; i < dim; ++i)
-          if (dof_indices[i] != other.dof_indices[i])
-            return false;
-
-        return true;
+        return (dof_indices == other.dof_indices);
       }
 
       bool
       operator!=(const VectorDoFTuple<dim> &other) const
       {
-        return !(*this == other);
+        return (dof_indices != other.dof_indices);
       }
     };
 
