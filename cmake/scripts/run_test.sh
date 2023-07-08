@@ -91,8 +91,15 @@ case $STAGE in
     #    cores/processors/sockets. Otherwise we run the risk that multiple
     #    mpi tests (for example with two ranks) are all pinned to the same
     #    processor core, bringing everything to a grinding halt.
+    #
+    #    If the test runs exclusively, however, do not override MPI binding
+    #    policies. This is important to ensure that performance tests are
+    #    scheduled properly.
+    #
     export OMPI_MCA_rmaps_base_oversubscribe=1
-    export OMPI_MCA_hwloc_base_binding_policy=none
+    if [ -z "${TEST_IS_EXCLUSIVE+x}" ]; then
+      export OMPI_MCA_hwloc_base_binding_policy=none
+    fi
 
     #
     # Kokkos parameters:
