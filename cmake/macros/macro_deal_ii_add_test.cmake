@@ -637,7 +637,10 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         # Ensure that the test is not executed concurrently with any other
         # tests.
         #
-        set_tests_properties(${_test_full} PROPERTIES RUN_SERIAL TRUE)
+        set_tests_properties(${_test_full} PROPERTIES
+          RUN_SERIAL TRUE
+          ENVIRONMENT "TEST_IS_EXCLUSIVE=true"
+          )
 
       else()
         #
