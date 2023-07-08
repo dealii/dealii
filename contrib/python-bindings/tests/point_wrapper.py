@@ -15,7 +15,11 @@
 
 import unittest
 import math
-from PyDealII.Debug import *
+
+try:
+    from PyDealII.Debug import *
+except ImportError:
+    from PyDealII.Release import *
 
 
 class TestPointWrapper(unittest.TestCase):

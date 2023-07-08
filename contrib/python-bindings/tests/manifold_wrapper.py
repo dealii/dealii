@@ -16,7 +16,11 @@
 import math
 import os
 import unittest
-from PyDealII.Debug import *
+
+try:
+    from PyDealII.Debug import *
+except ImportError:
+    from PyDealII.Release import *
 
 class TestManifoldWrapperShell(unittest.TestCase):
 
