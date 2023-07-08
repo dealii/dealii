@@ -80,7 +80,7 @@ the techniques previously described:
 
 @code
 // Given a list of points and how vertices connect to cells, create a
-// mesh. This is in the same way as we do in step 14.
+// mesh. This is in the same way as we do in step-14.
 void create_2d_grid(
   const std::vector<Point<2>> &vertices,
   const std::vector<
@@ -95,6 +95,7 @@ void create_2d_grid(
         cells[i].vertices[j] = vertex_indices[i][j];
     }
 
+  GridTools::consistently_order_cells(cells);
   coarse_grid.create_triangulation(vertices, cells, SubCellData());
 }
 
