@@ -104,18 +104,17 @@ namespace LinearAlgebra
    * ReadWriteVector is intended to represent vectors in ${\mathbb R}^N$ for
    * which it stores all or a subset of elements. The latter case in important
    * in parallel computations, where $N$ may be so large that no processor can
-   * actually all elements of a solution vector, but where this is also not
-   * necessary: one typically only has to store the values of degrees of
+   * actually store all elements of a solution vector, but where this is also
+   * not necessary: one typically only has to store the values of degrees of
    * freedom that live on cells that are locally owned plus potentially those
    * degrees of freedom that live on ghost cells.
    *
-   * This class allows to access individual elements to be read or written.
-   * However, it does not allow global operations such as taking the norm.
-   * ReadWriteVector can be used to read and write elements in vectors derived
-   * from VectorSpaceVector such as TrilinosWrappers::MPI::Vector and
-   * PETScWrappers::MPI::Vector.
+   * This class provides access to individual elements to be read or written.
+   * However, it does not allow global operations such as taking the norm
+   * or dot products between vectors.
    *
-   * <h3>Storing elements</h3> Most of the time, one will simply read from or
+   * <h3>Storing elements</h3>
+   * Most of the time, one will simply read from or
    * write into a vector of the current class using the global numbers of
    * these degrees of freedom. This is done using operator()() or operator[]()
    * which call global_to_local() to transform the <i>global</i> index into a
