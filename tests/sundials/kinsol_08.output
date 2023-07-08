@@ -1,0 +1,27 @@
+
+DEAL::KINSOL info: KINSOL:KINSolInit: scsteptol =     3.67e-11  fnormtol =     6.06e-06
+DEAL::Evaluating the solution at u=(0.500000,1.23400)
+DEAL::KINSOL info: KINSOL:KINSolInit: nni =    0   nfe =      1   fnorm =          1.805480887742806
+DEAL::Setting up Jacobian system at u=(0.500000,1.23400)
+DEAL::Solving Jacobian system with rhs=(0.162480,-1.79816)
+DEAL::Evaluating the solution at u=(0.500000,1.23400)
+DEAL::Evaluating the solution at u=(-0.282294,0.265967)
+DEAL::KINSOL info: KINSOL:KINSol: nni =    1   nfe =      2   fnorm =         0.5648238454047571
+DEAL::Setting up Jacobian system at u=(-0.282294,0.265967)
+DEAL::Solving Jacobian system with rhs=(0.564722,-0.0107297)
+DEAL::Evaluating the solution at u=(-0.282294,0.265967)
+DEAL::Evaluating the solution at u=(-0.000445202,0.0468183)
+DEAL::KINSOL info: KINSOL:KINSol: nni =    2   nfe =      3   fnorm =        0.04643227263854082
+DEAL::Setting up Jacobian system at u=(-0.000445202,0.0468183)
+DEAL::Solving Jacobian system with rhs=(0.00196544,-0.0463907)
+DEAL::Evaluating the solution at u=(-0.000445202,0.0468183)
+DEAL::Evaluating the solution at u=(-0.000536539,0.000570488)
+DEAL::KINSOL info: KINSOL:KINSol: nni =    3   nfe =      4   fnorm =       0.001073616152656229
+DEAL::Setting up Jacobian system at u=(-0.000536539,0.000570488)
+DEAL::Solving Jacobian system with rhs=(0.00107308,-3.39491e-05)
+DEAL::Evaluating the solution at u=(-0.000536554,0.000570504)
+DEAL::Evaluating the solution at u=(-2.88123e-10,7.40347e-10)
+DEAL::KINSOL info: KINSOL:KINSol: nni =    4   nfe =      5   fnorm =      7.325069237808057e-10
+DEAL::KINSOL info: KINSOL:KINSol: Return value: 0 (KIN_SUCCESS)
+-2.881e-10 7.403e-10 
+DEAL::Converged in 4 iterations.

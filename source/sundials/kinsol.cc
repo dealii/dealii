@@ -451,6 +451,12 @@ namespace SUNDIALS
         AssertKINSOL(status);
       }
 
+    // Right before calling the main KINSol() call, allow expert users to
+    // perform additional setup operations on the KINSOL object.
+    if (custom_setup)
+      custom_setup(kinsol_mem);
+
+
     // Having set up all of the ancillary things, finally call the main KINSol
     // function. One we return, check that what happened:
     // - If we have a pending recoverable exception, ignore it if SUNDIAL's
