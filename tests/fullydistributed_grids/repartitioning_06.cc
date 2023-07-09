@@ -46,7 +46,7 @@ namespace dealii
     template <int dim, int spacedim = dim>
     std::function<
       unsigned int(const typename Triangulation<dim, spacedim>::cell_iterator &,
-                   const typename Triangulation<dim, spacedim>::CellStatus)>
+                   const CellStatus)>
     hanging_nodes_weighting(const double weight)
     {
       return [weight](const auto &cell, const auto &) -> unsigned int {

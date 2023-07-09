@@ -253,9 +253,8 @@ namespace Step68
     // `private`.
     unsigned int cell_weight(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
-        &cell,
-      const typename parallel::distributed::Triangulation<dim>::CellStatus
-        status) const;
+        &              cell,
+      const CellStatus status) const;
 
     // The following two functions are responsible for outputting the simulation
     // results for the particles and for the velocity profile on the background
@@ -329,9 +328,8 @@ namespace Step68
   template <int dim>
   unsigned int ParticleTracking<dim>::cell_weight(
     const typename parallel::distributed::Triangulation<dim>::cell_iterator
-      &                                                                  cell,
-    const typename parallel::distributed::Triangulation<dim>::CellStatus status)
-    const
+      &              cell,
+    const CellStatus status) const
   {
     // First, we introduce a base weight that will be assigned to every cell.
     const unsigned int base_weight = 1;
@@ -347,21 +345,21 @@ namespace Step68
     const unsigned int particle_weight = 10;
 
     // This example does not use adaptive refinement, therefore every cell
-    // should have the status `CELL_PERSIST`. However this function can also
-    // be used to distribute load during refinement, therefore we consider
-    // refined or coarsened cells as well.
+    // should have the status `CellStatus::cell_will_persist`. However this
+    // function can also be used to distribute load during refinement, therefore
+    // we consider refined or coarsened cells as well.
     unsigned int n_particles_in_cell = 0;
     switch (status)
       {
-        case parallel::distributed::Triangulation<dim>::CELL_PERSIST:
-        case parallel::distributed::Triangulation<dim>::CELL_REFINE:
+        case CellStatus::cell_will_persist:
+        case CellStatus::cell_will_be_refined:
           n_particles_in_cell = particle_handler.n_particles_in_cell(cell);
           break;
 
-        case parallel::distributed::Triangulation<dim>::CELL_INVALID:
+        case CellStatus::cell_invalid:
           break;
 
-        case parallel::distributed::Triangulation<dim>::CELL_COARSEN:
+        case CellStatus::children_will_be_coarsened:
           for (const auto &child : cell->child_iterators())
             n_particles_in_cell += particle_handler.n_particles_in_cell(child);
           break;
@@ -399,11 +397,11 @@ namespace Step68
     // of this class, but for the purpose of this example we want to group the
     // particle related instructions.
     background_triangulation.signals.weight.connect(
-      [&](
-        const typename parallel::distributed::Triangulation<dim>::cell_iterator
-          &cell,
-        const typename parallel::distributed::Triangulation<dim>::CellStatus
-          status) -> unsigned int { return this->cell_weight(cell, status); });
+      [&](const typename parallel::distributed::Triangulation<
+            dim>::cell_iterator &cell,
+          const CellStatus       status) -> unsigned int {
+        return this->cell_weight(cell, status);
+      });
 
     // This initializes the background triangulation where the particles are
     // living and the number of properties of the particles.

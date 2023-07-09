@@ -41,7 +41,7 @@ template <int dim>
 unsigned int
 cell_weight_1(
   const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
-  const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+  const CellStatus status)
 {
   return current_cell_weight++;
 }
@@ -50,7 +50,7 @@ template <int dim>
 unsigned int
 cell_weight_2(
   const typename parallel::distributed::Triangulation<dim>::cell_iterator &cell,
-  const typename parallel::distributed::Triangulation<dim>::CellStatus status)
+  const CellStatus status)
 {
   return 1;
 }

@@ -163,8 +163,7 @@ namespace RepartitioningPolicyTools
     CellWeightPolicy(
       const std::function<unsigned int(
         const typename Triangulation<dim, spacedim>::cell_iterator &,
-        const typename Triangulation<dim, spacedim>::CellStatus)>
-        &weighting_function);
+        const CellStatus)> &weighting_function);
 
     virtual LinearAlgebra::distributed::Vector<double>
     partition(const Triangulation<dim, spacedim> &tria_in) const override;
@@ -175,7 +174,7 @@ namespace RepartitioningPolicyTools
      */
     const std::function<
       unsigned int(const typename Triangulation<dim, spacedim>::cell_iterator &,
-                   const typename Triangulation<dim, spacedim>::CellStatus)>
+                   const CellStatus)>
       weighting_function;
   };
 

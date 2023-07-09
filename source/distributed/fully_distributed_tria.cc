@@ -446,7 +446,7 @@ namespace parallel
       for (const auto &cell : this->active_cell_iterators())
         if (cell->is_locally_owned())
           this->local_cell_relations.emplace_back(
-            cell, Triangulation<dim, spacedim>::CELL_PERSIST);
+            cell, ::dealii::CellStatus::cell_will_persist);
     }
 
 
