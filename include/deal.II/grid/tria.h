@@ -2223,9 +2223,7 @@ public:
   virtual bool
   prepare_coarsening_and_refinement();
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * @name Keeping up with what happens to a triangulation
@@ -2505,9 +2503,7 @@ public:
    */
   mutable Signals signals;
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * @name History of a triangulation
@@ -2570,9 +2566,7 @@ public:
   bool
   get_anisotropic_refinement_flag() const;
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * @name User data
@@ -2852,9 +2846,7 @@ public:
   void
   load_user_pointers_hex(const std::vector<void *> &v);
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * @name Cell iterator functions
@@ -2991,9 +2983,11 @@ public:
    */
   cell_iterator
   create_cell_iterator(const CellId &cell_id) const;
+  /** @} */
 
   /**
    * @name Cell iterator functions returning ranges of iterators
+   * @{
    */
 
   /**
@@ -3083,9 +3077,7 @@ public:
   IteratorRange<active_cell_iterator>
   active_cell_iterators_on_level(const unsigned int level) const;
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /*-------------------------------------------------------------------------*/
 
@@ -3134,9 +3126,7 @@ public:
   IteratorRange<active_face_iterator>
   active_face_iterators() const;
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /*-------------------------------------------------------------------------*/
 
@@ -3168,9 +3158,7 @@ public:
   vertex_iterator
   end_vertex() const;
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * @name Information about the triangulation
@@ -3447,9 +3435,7 @@ public:
   get_triangulation() const;
 
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * @name Internal information about the number of objects
@@ -3542,9 +3528,7 @@ public:
   unsigned int
   n_raw_faces() const;
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -3997,9 +3981,7 @@ public:
     "coarsen flags on your triangulation via "
     "Triangulation::prepare_coarsening_and_refinement() beforehand!");
 
-  /*
-   * @}
-   */
+  /** @} */
 
 protected:
   /**
@@ -4119,9 +4101,7 @@ private:
   raw_cell_iterator
   end_raw(const unsigned int level) const;
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * @name Line iterator functions for internal use
@@ -4184,9 +4164,7 @@ private:
   line_iterator
   end_line() const;
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * @name Quad iterator functions for internal use
@@ -4262,9 +4240,7 @@ private:
   quad_iterator
   end_quad() const;
 
-  /*
-   * @}
-   */
+  /** @} */
 
   /**
    * @name Hex iterator functions for internal use
@@ -4339,9 +4315,7 @@ private:
   hex_iterator
   end_hex() const;
 
-  /*
-   * @}
-   */
+  /** @} */
 
 
   /**
