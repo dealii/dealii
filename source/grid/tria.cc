@@ -15817,6 +15817,21 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   update_periodic_face_map();
 
 #  ifdef DEBUG
+  // Some sanity checks
+  if (dim == 1)
+    {
+      for (const auto &cell_1d : cell_iterators())
+        for (unsigned int v = 0; v < 2; ++v)
+          if (cell_1d->at_boundary(v))
+            {
+              Assert(vertex_to_boundary_id_map_1d->find(cell_1d->vertex_index(
+                       v)) != vertex_to_boundary_id_map_1d->end(),
+                     ExcInternalError());
+              Assert(vertex_to_manifold_id_map_1d->find(cell_1d->vertex_index(
+                       v)) != vertex_to_manifold_id_map_1d->end(),
+                     ExcInternalError());
+            }
+    }
 
   // In debug mode, we want to check for some consistency of the
   // result of this function. Because there are multiple exit
@@ -17620,11 +17635,12 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     // consider the following situation, which
                                     // shows neighboring cells at the common
                                     // face, where the upper right element is
-                                    // coarser at the given face. Now the upper
-                                    // child element of the lower left wants to
-                                    // refine according to cut_z, such that
-                                    // there is a 'horizontal' refinement of the
-                                    // face marked with #####
+                                    // coarser at the given face. Now the
+                                    // upper child element of the lower left
+                                    // wants to refine according to cut_z,
+                                    // such that there is a 'horizontal'
+                                    // refinement of the face marked with
+                                    // #####
                                     //
                                     //                            / /
                                     //                           / /
@@ -17652,10 +17668,10 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     //   /               /
                                     //
                                     // this introduces too many hanging nodes
-                                    // and the neighboring (coarser) cell (upper
-                                    // right) has to be refined. If it is only
-                                    // refined according to cut_z, then
-                                    // everything is ok:
+                                    // and the neighboring (coarser) cell
+                                    // (upper right) has to be refined. If it
+                                    // is only refined according to cut_z,
+                                    // then everything is ok:
                                     //
                                     //                            / /
                                     //                           / /
@@ -17683,12 +17699,13 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     //   /               /
                                     //
                                     // if however the cell wants to refine
-                                    // itself in an other way, or if we disallow
-                                    // anisotropic smoothing, then simply
-                                    // refining the neighbor isotropically is
-                                    // not going to work, since this introduces
-                                    // a refinement of face ##### with both
-                                    // cut_x and cut_y, which is not possible:
+                                    // itself in an other way, or if we
+                                    // disallow anisotropic smoothing, then
+                                    // simply refining the neighbor
+                                    // isotropically is not going to work,
+                                    // since this introduces a refinement of
+                                    // face ##### with both cut_x and cut_y,
+                                    // which is not possible:
                                     //
                                     //                            /       / /
                                     //                           /       / /
@@ -17715,8 +17732,9 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     //    /               /
                                     //   /               /
                                     //
-                                    // thus, in this case we also need to refine
-                                    // our current cell in the new direction:
+                                    // thus, in this case we also need to
+                                    // refine our current cell in the new
+                                    // direction:
                                     //
                                     //                            /       / /
                                     //                           /       / /
@@ -17758,8 +17776,8 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     const int this_face_index =
                                       cell->face_index(i);
 
-                                    // step 1: detect, along which axis the face
-                                    // is currently refined
+                                    // step 1: detect, along which axis the
+                                    // face is currently refined
 
                                     // first, we need an iterator pointing to
                                     // the parent face. This requires a slight
@@ -17809,9 +17827,9 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                         ++refined_along_x;
                                         ++refined_along_y;
                                       }
-                                    // step 2: detect, along which axis the face
-                                    // has to be refined given the current
-                                    // refine flag
+                                    // step 2: detect, along which axis the
+                                    // face has to be refined given the
+                                    // current refine flag
                                     RefinementCase<dim - 1> flagged_frc =
                                       GeometryInfo<dim>::face_refinement_case(
                                         cell->refine_flag_set(),
