@@ -33,6 +33,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -1293,10 +1294,23 @@ namespace Step14
         }
 
       // Finally pass all this information to the library to generate a
-      // triangulation. The last parameter may be used to pass information
-      // about non-zero boundary indicators at certain faces of the
-      // triangulation to the library, but we don't want that here, so we give
-      // an empty object:
+      // triangulation. The right call for this is
+      // Triangulation::create_triangulation(), but that function wants
+      // its input in a format in which cells are consistently oriented
+      // in some way. It turns out that the mesh we describe with the
+      // `vertices` and `cells` objects above already is consistently
+      // oriented, but if you modify the code in some way it may not
+      // be any more, and so it is good practice to call a function
+      // that ensures it is -- GridTools::consistently_order_cells()
+      // does this.
+      //
+      // The last parameter of the call to Triangulation::create_triangulation()
+      // below describes what we want to do about boundary and manifold
+      // indicators on boundary faces. Here, we don't want to do anything
+      // specific (in particular, we are fine with labeling all boundaries
+      // with boundary indicator zero, and so we call the function with
+      // an empty object as the last argument:
+      GridTools::consistently_order_cells(cells);
       coarse_grid.create_triangulation(vertices, cells, SubCellData());
 
       // And since we want that the evaluation point (3/4,3/4) in this example

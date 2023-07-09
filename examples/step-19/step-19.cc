@@ -35,6 +35,7 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_refinement.h>
+#include <deal.II/grid/grid_tools.h>
 
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/matrix_free/fe_point_evaluation.h>
@@ -291,7 +292,10 @@ namespace Step19
     //
     // This information is then handed to the
     // Triangulation::create_triangulation() function, and the mesh is twice
-    // globally refined.
+    // globally refined. As discussed in the corresponding place in step-14,
+    // the inputs to Triangulation::create_triangulation() need to be
+    // consistently oriented, which a function in namespace GridTools
+    // does for us.
     std::vector<CellData<dim>> cells((nx - 1) * (ny - 1), CellData<dim>());
     for (unsigned int i = 0; i < cells.size(); ++i)
       {
@@ -299,6 +303,7 @@ namespace Step19
         cells[i].material_id = 0;
       }
 
+    GridTools::consistently_order_cells(cells);
     triangulation.create_triangulation(
       vertices,
       cells,
