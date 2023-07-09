@@ -104,6 +104,7 @@ pipeline
                     -D DEAL_II_EARLY_DEPRECATIONS=ON \
                     -D CMAKE_BUILD_TYPE=Debug \
                     -D DEAL_II_WITH_MPI=ON \
+                    -D DEAL_II_WITH_TASKFLOW=ON \
                     -D DEAL_II_UNITY_BUILD=OFF \
                     $WORKSPACE/
                   time ninja -j 10 # 12 gives OOM

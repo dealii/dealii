@@ -100,10 +100,10 @@ option(DEAL_II_FORCE_BUNDLED_TASKFLOW
   "Always use the bundled taskflow header library instead of an external one."
   OFF)
 
-set(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-2.5.0")
+set(TASKFLOW_FOLDER "${CMAKE_SOURCE_DIR}/bundled/taskflow-3.6.0")
 
 macro(feature_taskflow_configure_bundled)
-  set(TASKFLOW_VERSION "2.5.0")
+  set(TASKFLOW_VERSION "3.6.0")
 
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${TASKFLOW_FOLDER}/include)
 endmacro()
