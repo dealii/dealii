@@ -4421,6 +4421,15 @@ private:
   fix_coarsen_flags();
 
   /**
+   * At the end of mesh creation and mesh refinement, we reorder the indices
+   * of vertices so that when we loop over all cells, we touch them (and
+   * in particular their locations) in order to reduce cache misses. This
+   * function does that.
+   */
+  void
+  reorder_vertex_indices();
+
+  /**
    * Translate the unique id of a coarse cell to its index. See the glossary
    * entry on
    * @ref GlossCoarseCellId "coarse cell IDs"

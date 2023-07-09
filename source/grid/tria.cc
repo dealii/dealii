@@ -12748,6 +12748,8 @@ void Triangulation<dim, spacedim>::create_triangulation(
 
   reset_policy();
 
+  reorder_vertex_indices();
+
   // update our counts of the various elements of a triangulation, and set
   // active_cell_indices of all cells
   reset_cell_vertex_indices_cache();
@@ -15790,6 +15792,7 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
 
   const DistortedCellList cells_with_distorted_children = execute_refinement();
 
+  reorder_vertex_indices();
   reset_cell_vertex_indices_cache();
 
   // verify a case with which we have had
@@ -15885,9 +15888,9 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::reset_global_cell_indices()
 {
   {
-    types::global_cell_index cell_index = 0;
+    types::global_cell_index active_cell_index = 0;
     for (const auto &cell : active_cell_iterators())
-      cell->set_global_active_cell_index(cell_index++);
+      cell->set_global_active_cell_index(active_cell_index++);
   }
 
   for (unsigned int l = 0; l < levels.size(); ++l)
@@ -15919,7 +15922,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
           // then lines, then vertices, we use a more low-level access method
           // for hexahedral cells, where we can streamline most of the logic
           const ReferenceCell ref_cell = cell->reference_cell();
-          if (ref_cell == ReferenceCells::Hexahedron)
+          if ((dim == 3) && (ref_cell == ReferenceCells::Hexahedron))
             for (unsigned int face = 4; face < 6; ++face)
               {
                 const auto                face_iter = cell->face(face);
@@ -15935,7 +15938,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
                 const unsigned char combined_orientation =
                   levels[l]->face_orientations.get_combined_orientation(
                     cell->index() * GeometryInfo<3>::faces_per_cell + face);
-                std::array<unsigned int, 4> vertex_order{
+                const std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0,
                                                          face,
                                                          combined_orientation),
@@ -15952,11 +15955,11 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
                 for (unsigned int i = 0; i < 4; ++i)
                   cache[index + i] = raw_vertex_indices[vertex_order[i]];
               }
-          else if (ref_cell == ReferenceCells::Quadrilateral)
+          else if ((dim == 2) && (ref_cell == ReferenceCells::Quadrilateral))
             {
               const std::array<bool, 2> line_orientations{
                 {cell->line_orientation(0), cell->line_orientation(1)}};
-              std::array<unsigned int, 4> raw_vertex_indices{
+              const std::array<unsigned int, 4> raw_vertex_indices{
                 {cell->line(0)->vertex_index(1 - line_orientations[0]),
                  cell->line(1)->vertex_index(1 - line_orientations[1]),
                  cell->line(0)->vertex_index(line_orientations[0]),
@@ -15964,7 +15967,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
               for (unsigned int i = 0; i < 4; ++i)
                 cache[my_index + i] = raw_vertex_indices[i];
             }
-          else
+          else // Any other kind of reference cell
             for (const unsigned int i : cell->vertex_indices())
               cache[my_index + i] = internal::TriaAccessorImplementation::
                 Implementation::vertex_index(*cell, i);
@@ -16610,6 +16613,175 @@ Triangulation<1, 3>::prepare_coarsening_and_refinement()
   const auto flags_after = internal::extract_raw_coarsen_flags(levels);
 
   return (flags_before != flags_after);
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::reorder_vertex_indices()
+{
+  // Step 1: Determine a new ordering for vertices.
+  //
+  // First loop over all cells and assign each vertex we haven't
+  // seen so far an index in the order in which we encounter them.
+  //
+  // The vast majority of loops is over active cells, so use this
+  // as the basis for the enumeration. We then do a second loop
+  // over all cells (active or not) and enumerate whatever other
+  // vertices we encounter.
+  //
+  // This scheme ensures that for loops over active cells we encounter
+  // vertices in their natural order, whereas for other loops we see
+  // them in one of two blocks, each of which we traverse in consecutive
+  // order.
+  std::vector<unsigned int> old_to_new_vertex_indices(
+    vertices.size(), numbers::invalid_unsigned_int);
+  {
+    // We will access the indices of vertices of cells below. For
+    // this to work, we have to first make sure the cache for this
+    // information is up to date.
+    reset_cell_vertex_indices_cache();
+
+    unsigned int next_unused_index = 0;
+
+    // First the active cell iterators:
+    for (const auto &cell : active_cell_iterators())
+      for (const unsigned int v : cell->vertex_indices())
+        {
+          const unsigned int vertex_index = cell->vertex_index(v);
+          if (old_to_new_vertex_indices[vertex_index] ==
+              numbers::invalid_unsigned_int)
+            old_to_new_vertex_indices[vertex_index] = next_unused_index++;
+        }
+    // Then the non-active cell iterators (we already covered the active
+    // ones):
+    for (const auto &cell : cell_iterators())
+      if (cell->is_active() == false)
+        for (const unsigned int v : cell->vertex_indices())
+          {
+            const unsigned int vertex_index = cell->vertex_index(v);
+            if (old_to_new_vertex_indices[vertex_index] ==
+                numbers::invalid_unsigned_int)
+              old_to_new_vertex_indices[vertex_index] = next_unused_index++;
+          }
+
+    // At this point, we should have covered all used vertices. Check this:
+    for (unsigned int v = 0; v < vertices.size(); ++v)
+      Assert(((vertices_used[v] == true) && (old_to_new_vertex_indices[v] !=
+                                             numbers::invalid_unsigned_int)) ||
+               ((vertices_used[v] == false) && (old_to_new_vertex_indices[v] ==
+                                                numbers::invalid_unsigned_int)),
+             ExcInternalError());
+
+    // This leaves the unused vertices. Enumerate them as well:
+    for (unsigned int v = 0; v < vertices.size(); ++v)
+      if (old_to_new_vertex_indices[v] == numbers::invalid_unsigned_int)
+        old_to_new_vertex_indices[v] = next_unused_index++;
+    Assert(next_unused_index == vertices.size(), ExcInternalError());
+  }
+
+
+  // Step 2: Now we need to reorder or reindex all sorts of data structures.
+  // This can all be done on parallel tasks.
+  Threads::TaskGroup<> tasks;
+
+  // Reorder the vertices[] and vertices_used[] arrays:
+  tasks += Threads::new_task([&old_to_new_vertex_indices,
+                              &vertices      = this->vertices,
+                              &vertices_used = this->vertices_used]() {
+    std::vector<Point<spacedim>> new_vertices(vertices.size());
+    std::vector<bool>            new_vertices_used(vertices_used.size());
+
+    for (unsigned int v = 0; v < old_to_new_vertex_indices.size(); ++v)
+      {
+        new_vertices[old_to_new_vertex_indices[v]]      = vertices[v];
+        new_vertices_used[old_to_new_vertex_indices[v]] = vertices_used[v];
+      }
+    vertices      = std::move(new_vertices);
+    vertices_used = std::move(new_vertices_used);
+  });
+
+  // In 1d, reoder the two arrays we use to translate boundary vertices
+  // to boundary and manifold ids:
+  if (dim == 1)
+    {
+      tasks += Threads::new_task(
+        [&old_to_new_vertex_indices,
+         &vertex_to_boundary_id_map_1d = this->vertex_to_boundary_id_map_1d,
+         &vertex_to_manifold_id_map_1d = this->vertex_to_manifold_id_map_1d]() {
+          Assert(vertex_to_boundary_id_map_1d != nullptr, ExcInternalError());
+          std::map<unsigned int, types::boundary_id>
+            new_vertex_to_boundary_id_map_1d;
+
+          for (const auto &p : *vertex_to_boundary_id_map_1d)
+            new_vertex_to_boundary_id_map_1d.insert(
+              {old_to_new_vertex_indices[p.first], p.second});
+
+          *vertex_to_boundary_id_map_1d =
+            std::move(new_vertex_to_boundary_id_map_1d);
+
+          Assert(vertex_to_manifold_id_map_1d != nullptr, ExcInternalError());
+          std::map<unsigned int, types::boundary_id>
+            new_vertex_to_manifold_id_map_1d;
+
+          for (const auto &p : *vertex_to_manifold_id_map_1d)
+            new_vertex_to_manifold_id_map_1d.insert(
+              {old_to_new_vertex_indices[p.first], p.second});
+
+          *vertex_to_manifold_id_map_1d =
+            std::move(new_vertex_to_manifold_id_map_1d);
+        });
+    }
+  else
+    {
+      Assert(vertex_to_boundary_id_map_1d == nullptr, ExcInternalError());
+      Assert(vertex_to_manifold_id_map_1d == nullptr, ExcInternalError());
+    }
+
+  // Now also reorder the vertex indices stored for individual cells. In fact,
+  // cells do not store their vertex indices -- they keep a cache (which is
+  // updated after this function is called) but otherwise only get vertex
+  // indices by asking faces, which ultimately ask lines. So that's the place
+  // where we have to renumber stuff, at least in 2d/3d:
+  if (dim > 1)
+    tasks += Threads::new_task([&lines_storage = this->faces->lines,
+                                &old_to_new_vertex_indices]() {
+      constexpr unsigned int vertices_per_line = 2;
+      Assert(lines_storage.cells.size() ==
+               lines_storage.n_objects() * vertices_per_line,
+             ExcInternalError());
+      for (unsigned int l = 0; l < lines_storage.n_objects(); ++l)
+        if (lines_storage.used[l] == true)
+          {
+            for (unsigned int v = 0; v < 2; ++v)
+              lines_storage.cells[l * vertices_per_line + v] =
+                old_to_new_vertex_indices[lines_storage
+                                            .cells[l * vertices_per_line + v]];
+          }
+    });
+  else
+    // In the 1d case, lines are cells and so the vertex indices of
+    // the lines are stored in the levels:
+    for (auto &level : levels)
+      tasks += Threads::new_task(
+        [&lines_storage = level->cells, &old_to_new_vertex_indices]() {
+          constexpr unsigned int vertices_per_line = 2;
+          Assert(lines_storage.cells.size() ==
+                   lines_storage.n_objects() * vertices_per_line,
+                 ExcInternalError());
+          for (unsigned int l = 0; l < lines_storage.n_objects(); ++l)
+            if (lines_storage.used[l] == true)
+              {
+                for (unsigned int v = 0; v < 2; ++v)
+                  lines_storage.cells[l * vertices_per_line + v] =
+                    old_to_new_vertex_indices
+                      [lines_storage.cells[l * vertices_per_line + v]];
+              }
+        });
+
+  // Wait for all of these tasks to complete:
+  tasks.join_all();
 }
 
 
