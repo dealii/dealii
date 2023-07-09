@@ -51,7 +51,7 @@ test(std::string filename, unsigned int degree)
 
   GridIn<dim, spacedim> gi;
   gi.attach_triangulation(tria);
-  std::ifstream in(filename.c_str());
+  std::ifstream in(filename);
   gi.read_ucd(in);
 
   shift_dh.distribute_dofs(fe);

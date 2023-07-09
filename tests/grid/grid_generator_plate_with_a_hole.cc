@@ -99,7 +99,7 @@ test()
 
       const std::string filename =
         "output_" + Utilities::int_to_string(dim) + ".vtu";
-      std::ofstream output(filename.c_str());
+      std::ofstream output(filename);
       data_out.write_vtu(output);
     }
 }

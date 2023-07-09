@@ -249,7 +249,7 @@ TestPointValueHistory<dim>::run()
     {
       deallog << "Copying output file " << filenames[i] << std::endl;
 
-      std::ifstream in(filenames[i].c_str());
+      std::ifstream in(filenames[i]);
       AssertThrow(in, ExcIO());
 
       std::string s;

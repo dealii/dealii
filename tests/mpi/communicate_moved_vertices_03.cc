@@ -95,7 +95,7 @@ test()
 
   /*std::string
   filename("grid"+Utilities::int_to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),2)+".vtu");
-  std::ofstream out(filename.c_str());
+  std::ofstream out(filename);
   GridOut grid_out;
   grid_out.write_vtu(triangulation, out);*/
   deallog << Utilities::int_to_string(dim, 1) << "D OK" << std::endl;

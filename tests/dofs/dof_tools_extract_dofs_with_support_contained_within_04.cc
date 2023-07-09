@@ -229,7 +229,7 @@ test()
         const std::string filename =
           "grid" + dealii::Utilities::int_to_string(n_mpi_processes) +
           dealii::Utilities::int_to_string(this_mpi_process);
-        std::ofstream f((filename + ".gp").c_str());
+        std::ofstream f(filename + ".gp");
 
         f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
           << std::endl
@@ -281,7 +281,7 @@ test()
         const std::string filename =
           output_name(triangulation.locally_owned_subdomain());
 
-        std::ofstream output(filename.c_str());
+        std::ofstream output(filename);
         data_out.write_vtu(output);
 
         if (dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -293,7 +293,7 @@ test()
               filenames.push_back(output_name(i));
 
             const std::string pvtu_filename = "output.pvtu";
-            std::ofstream     pvtu_output(pvtu_filename.c_str());
+            std::ofstream     pvtu_output(pvtu_filename);
             data_out.write_pvtu_record(pvtu_output, filenames);
           }
       }

@@ -560,7 +560,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle) const
   std::ostringstream filename;
   filename << "solution-" << cycle << ".vtk";
 
-  std::ofstream output(filename.str().c_str());
+  std::ofstream output(filename.str());
   data_out.write_vtk(output);
 }
 

@@ -48,7 +48,7 @@ write_vtk(const parallel::distributed::Triangulation<dim, spacedim> &tria,
   // into the logstream
   {
     unsigned int  c = 0;
-    std::ifstream in((std::string(filename) + ".pvtu").c_str());
+    std::ifstream in(std::string(filename) + ".pvtu");
     while (in && ++c < 20)
       {
         std::string s;
@@ -59,7 +59,7 @@ write_vtk(const parallel::distributed::Triangulation<dim, spacedim> &tria,
 
   {
     unsigned int  c = 0;
-    std::ifstream in((std::string(filename) + "_0000.vtu").c_str());
+    std::ifstream in(std::string(filename) + "_0000.vtu");
     while (in && ++c < 20)
       {
         std::string s;
@@ -79,9 +79,9 @@ assert_tria_equal(const Triangulation<dim> &a, const Triangulation<dim> &b)
   std::string file1 = "tmp_grid1";
   std::string file2 = "tmp_grid2";
 
-  std::ofstream out1(file1.c_str());
+  std::ofstream out1(file1);
   GridOut().write_gnuplot(a, out1);
-  std::ofstream out2(file2.c_str());
+  std::ofstream out2(file2);
   GridOut().write_gnuplot(b, out2);
 
   out1.close();

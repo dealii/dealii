@@ -2021,7 +2021,7 @@ ParameterHandler::scan_line(std::string        line,
                                      "'INCLUDE' statement, but it does not "
                                      "name a file for inclusion."));
 
-      std::ifstream input(line.c_str());
+      std::ifstream input(line);
       AssertThrow(input,
                   ExcCannotOpenIncludeStatementFile(current_line_n,
                                                     input_filename,

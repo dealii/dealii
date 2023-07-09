@@ -58,7 +58,7 @@ test(std::string filename, unsigned int degree = 1)
   GridIn<dim, spacedim>        gi;
 
   gi.attach_triangulation(triangulation);
-  std::ifstream in(filename.c_str());
+  std::ifstream in(filename);
   gi.read_ucd(in);
 
   // finite elements used for the

@@ -48,7 +48,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * dealii::PathSearch search("MESH");
  * std::string full_name = search.find("grid");
- * std::ifstream in(full_name.c_str());
+ * std::ifstream in(full_name);
  * ...
  * @endcode
  *

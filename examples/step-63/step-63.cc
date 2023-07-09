@@ -1159,7 +1159,7 @@ namespace Step63
 
     const std::string filename =
       "solution-" + Utilities::int_to_string(cycle) + ".vtu";
-    std::ofstream output(filename.c_str());
+    std::ofstream output(filename);
     data_out.write_vtu(output);
   }
 

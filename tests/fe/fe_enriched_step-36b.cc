@@ -814,7 +814,7 @@ namespace Step36
         std::string filename = "solution-";
         filename += ('0' + cycle);
         filename += ".vtk";
-        std::ofstream output(filename.c_str());
+        std::ofstream output(filename);
 
         Postprocessor<dim> postprocessor(
           enrichment); // has to live until the DataOut object is destroyed;
@@ -835,7 +835,7 @@ namespace Step36
         std::string filename = "mesh-";
         filename += ('0' + cycle);
         filename += ".vtk";
-        std::ofstream output(filename.c_str());
+        std::ofstream output(filename);
 
         DataOut<dim> data_out;
         data_out.attach_dof_handler(dof_handler);
@@ -851,7 +851,7 @@ namespace Step36
       {
         const std::string scalar_fname = "scalar-data.txt";
 
-        std::ofstream output(scalar_fname.c_str(),
+        std::ofstream output(scalar_fname,
                              std::ios::out |
                                (cycle == 0 ? std::ios::trunc : std::ios::app));
 

@@ -114,7 +114,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
         dealii::Utilities::int_to_string(0);
 
       const std::string filename = base_filename + ".gp";
-      std::ofstream     f(filename.c_str());
+      std::ofstream     f(filename);
 
       f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
         << std::endl
@@ -158,7 +158,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
   data_out.build_patches(patches);
 
   std::string   filename = "shape_functions.vtu";
-  std::ofstream output(filename.c_str());
+  std::ofstream output(filename);
   data_out.write_vtu(output);
 
   deallog << "...finished plotting shape functions" << std::endl;

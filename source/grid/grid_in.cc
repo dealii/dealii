@@ -4169,7 +4169,7 @@ GridIn<dim, spacedim>::read(const std::string &filename, Format format)
     }
   else
     {
-      std::ifstream in(name.c_str());
+      std::ifstream in(name);
       read(in, format);
     }
 }

@@ -522,7 +522,7 @@ DGHeat<dim>::output_results(unsigned int it) const
 
   deallog << "  Writing solution to <" << fname << '>' << std::endl;
 
-  std::ofstream output(fname.c_str());
+  std::ofstream output(fname);
 
   if (false)
     {

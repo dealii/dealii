@@ -116,7 +116,7 @@ check_fe(FiniteElement<dim> &fe)
       const std::string filename =
         ("solution." +
          Utilities::int_to_string(tr.locally_owned_subdomain(), 4) + ".vtu");
-      std::ofstream output(filename.c_str());
+      std::ofstream output(filename);
       data_out.write_vtu(output);
     }
 

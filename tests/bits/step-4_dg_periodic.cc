@@ -238,7 +238,7 @@ Step4<dim>::output_results(const unsigned int cycle) const
   data_out.add_data_vector(solution, "u");
 
   data_out.build_patches(fe.degree);
-  std::ofstream output((filename + ".vtk").c_str());
+  std::ofstream output(filename + ".vtk");
   data_out.write_vtk(output);
 }
 

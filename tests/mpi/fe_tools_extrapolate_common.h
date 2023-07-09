@@ -124,7 +124,7 @@ output_vector(const VectorType &     v,
     (output_name + "." +
      Utilities::int_to_string(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
                               1));
-  std::ofstream output((filename + ".vtu").c_str());
+  std::ofstream output(filename + ".vtu");
   data_out.write_vtu(output);
 }
 

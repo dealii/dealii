@@ -7882,7 +7882,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
   if (n_groups == 0 || n_groups > n_ranks)
     {
       // every processor writes one file
-      std::ofstream output(filename.c_str());
+      std::ofstream output(filename);
       AssertThrow(output, ExcFileNotOpen(filename));
       this->write_vtu(output);
     }
@@ -7923,7 +7923,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
           filename_vector.emplace_back(filename);
         }
 
-      std::ofstream pvtu_output((directory + pvtu_filename).c_str());
+      std::ofstream pvtu_output(directory + pvtu_filename);
       this->write_pvtu_record(pvtu_output, filename_vector);
     }
 

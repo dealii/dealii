@@ -467,7 +467,7 @@ Test_Solver_Output::output(unsigned int cycle)
   const std::string filename =
     ("solution-" + Utilities::int_to_string(cycle, 2) + "." +
      Utilities::int_to_string(triangulation.locally_owned_subdomain(), 4));
-  std::ofstream output((filename + ".vtu").c_str());
+  std::ofstream output(filename + ".vtu");
   data_out.write_vtu(output);
 
   if (Utilities::MPI::this_mpi_process(mpi_comm) == 0)

@@ -77,7 +77,7 @@ check()
                           data_filter.get_data_set_dim(i));
     }
 
-  std::ofstream xdmf_file((output_basename + ".xdmf").c_str());
+  std::ofstream xdmf_file(output_basename + ".xdmf");
 
   xdmf_file << "<?xml version=\"1.0\" ?>\n";
   xdmf_file << "<!DOCTYPE Xdmf SYSTEM \"Xdmf.dtd\" []>\n";
@@ -105,7 +105,7 @@ check()
   if (0 == Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
     {
       cat_file((output_basename + ".xdmf").c_str());
-      std::ifstream f((output_basename + ".h5").c_str());
+      std::ifstream f(output_basename + ".h5");
       AssertThrow(f.good(), ExcIO());
     }
 

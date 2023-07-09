@@ -91,7 +91,7 @@ check(const FiniteElement<dim> &fe, const unsigned int selected_block)
   std::ostringstream out_filename;
   out_filename << "gitter.eps";
 
-  //   std::ofstream grid_output (out_filename.str().c_str());
+  //   std::ofstream grid_output (out_filename.str());
   //   GridOut grid_out;
   //   grid_out.write_eps (tr, grid_output);
 

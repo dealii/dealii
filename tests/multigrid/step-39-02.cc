@@ -737,7 +737,7 @@ namespace Step39
     filename += ".gnuplot";
     deallog << "Writing solution to <" << filename << ">..." << std::endl
             << std::endl;
-    std::ofstream gnuplot_output(filename.c_str());
+    std::ofstream gnuplot_output(filename);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);

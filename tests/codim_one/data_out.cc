@@ -49,7 +49,7 @@ test(std::string filename)
   GridIn<dim, spacedim>        gi;
 
   gi.attach_triangulation(triangulation);
-  std::ifstream in(filename.c_str());
+  std::ifstream in(filename);
   gi.read_ucd(in);
 
   FE_Q<dim, spacedim>       fe(1);

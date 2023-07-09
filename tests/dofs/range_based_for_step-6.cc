@@ -302,7 +302,7 @@ Step6<dim>::output_results(const unsigned int cycle) const
   filename += ('0' + cycle);
   filename += ".eps";
 
-  std::ofstream output(filename.c_str());
+  std::ofstream output(filename);
 
   GridOut grid_out;
   grid_out.write_eps(triangulation, output);

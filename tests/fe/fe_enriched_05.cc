@@ -135,7 +135,7 @@ test4()
 
   std::string filename =
     "h-shape_functions_" + dealii::Utilities::int_to_string(dim) + "D.vtu";
-  std::ofstream output(filename.c_str());
+  std::ofstream output(filename);
   data_out.write_vtu(output);
 #endif
 
