@@ -2498,7 +2498,7 @@ public:
    * @{
    */
 
-   /** 
+  /**
    * Signals for the various actions that a triangulation can do to itself.
    */
   mutable Signals signals;
