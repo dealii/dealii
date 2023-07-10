@@ -66,7 +66,7 @@ namespace GridGenerator
   /**
    * @name Creating meshes for basic geometries
    */
-  //** @{ */
+  /** @{ */
 
   /**
    * Initialize the given triangulation with a hypercube (line in 1d, square
@@ -1834,12 +1834,12 @@ namespace GridGenerator
                                   Triangulation<3> &         vol_tria,
                                   const CGALWrappers::AdditionalData<3> &data =
                                     CGALWrappers::AdditionalData<3>{});
-  //** @} */
+  /** @} */
 
   /**
    * @name Creating meshes from other meshes
    */
-  //** @{ */
+  /** @{ */
 
   /**
    * Given the two triangulations specified as the first two arguments, create
@@ -2537,14 +2537,14 @@ namespace GridGenerator
                                        const double       p2       = 1.0,
                                        const bool         colorize = false);
 
-  //** @} */
+  /** @} */
 
   /**
    * @name Creating lower-dimensional meshes
    *
    * Created from parts of higher-dimensional meshes.
    */
-  //** @{ */
+  /** @{ */
 
 #ifdef _MSC_VER
   // Microsoft's VC++ has a bug where it doesn't want to recognize that
@@ -2679,13 +2679,13 @@ namespace GridGenerator
                           const std::set<types::boundary_id> &boundary_ids =
                             std::set<types::boundary_id>());
 
-  //** @} */
+  /** @} */
 
 
   /**
    * @name Exceptions
    */
-  //** @{ */
+  /** @{ */
 
 
   /**
@@ -2712,7 +2712,7 @@ namespace GridGenerator
   DeclExceptionMsg(ExcInvalidInputOrientation,
                    "The input to this function is oriented in a way that will"
                    " cause all cells to have negative measure.");
-  //** @} */
+  /** @} */
 
 #ifndef DOXYGEN
   // These functions are only implemented with specializations; declare them

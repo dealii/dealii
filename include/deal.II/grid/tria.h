@@ -2226,11 +2226,6 @@ public:
   /** @} */
 
   /**
-   * @name Keeping up with what happens to a triangulation
-   * @{
-   */
-
-  /**
    * Alias for backward compatibility.
    *
    * @deprecated This enumeration has been moved to the global namespace.
@@ -2499,6 +2494,11 @@ public:
   };
 
   /**
+   * @name Keeping up with what happens to a triangulation
+   * @{
+   */
+
+   /** 
    * Signals for the various actions that a triangulation can do to itself.
    */
   mutable Signals signals;
@@ -4066,11 +4066,6 @@ private:
     periodic_face_map;
 
   /**
-   * @name Cell iterator functions for internal use
-   * @{
-   */
-
-  /**
    * Declare a number of iterator types for raw iterators, i.e., iterators
    * that also iterate over holes in the list of cells left by cells that have
    * been coarsened away in previous mesh refinement cycles.
@@ -4086,6 +4081,11 @@ private:
   using raw_line_iterator = typename IteratorSelector::raw_line_iterator;
   using raw_quad_iterator = typename IteratorSelector::raw_quad_iterator;
   using raw_hex_iterator  = typename IteratorSelector::raw_hex_iterator;
+
+  /**
+   * @name Cell iterator functions for internal use
+   * @{
+   */
 
   /**
    * Iterator to the first cell, used or not, on level @p level. If a level
