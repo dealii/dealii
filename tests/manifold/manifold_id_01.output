@@ -2,17 +2,17 @@
 DEAL::Testing dim=1, spacedim=1
 DEAL::C: 1.0, mid: -1
 DEAL::f: 0, mid: -1
-DEAL::f: 2, mid: -1
-DEAL::C: 1.1, mid: -1
-DEAL::f: 2, mid: -1
 DEAL::f: 1, mid: -1
+DEAL::C: 1.1, mid: -1
+DEAL::f: 1, mid: -1
+DEAL::f: 2, mid: -1
 DEAL::Testing dim=1, spacedim=2
 DEAL::C: 1.0, mid: -1
 DEAL::f: 0, mid: -1
-DEAL::f: 2, mid: -1
-DEAL::C: 1.1, mid: -1
-DEAL::f: 2, mid: -1
 DEAL::f: 1, mid: -1
+DEAL::C: 1.1, mid: -1
+DEAL::f: 1, mid: -1
+DEAL::f: 2, mid: -1
 DEAL::Testing dim=2, spacedim=2
 DEAL::C: 1.0, mid: -1
 DEAL::f: 6, mid: -1

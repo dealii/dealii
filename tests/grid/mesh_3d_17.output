@@ -1,14 +1,14 @@
 
 DEAL::Coarse cell 0 vertices:
-DEAL:: 7 10 1 4 8 11 2 5
+DEAL:: 0 1 2 3 4 5 6 7
 DEAL::Coarse cell 1 vertices:
-DEAL:: 7 6 1 0 10 9 4 3
+DEAL:: 0 8 2 9 1 10 3 11
 DEAL::Interior face with children:
 DEAL::  cell=0.1
 DEAL::  face_no=0
-DEAL::  vertices=7 10 1 4
+DEAL::  vertices=0 4 2 6
 DEAL::  face orientation=false
-DEAL::  neighbor face vertices=7 10 1 4
+DEAL::  neighbor face vertices=0 4 2 6
 DEAL::  neighbor->face_orientation(nb_of_nb)=true
 DEAL::  checking subfaces:
 DEAL::    subface_no=0
