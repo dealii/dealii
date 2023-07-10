@@ -26,7 +26,7 @@
 
 #include <boost/serialization/vector.hpp>
 
-#include "../fullydistributed_grids/tests.h"
+#include "../grid/tests.h"
 #include "serialization.h"
 
 using namespace dealii;

@@ -24,7 +24,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/la_vector.h>
+#include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/vector_tools.h>
 
