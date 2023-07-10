@@ -29,13 +29,13 @@
 namespace LA
 {
 #if defined(DEAL_II_WITH_PETSC) && \
-  (!defined(DEAL_II_WITH_TRILINOS) || defined(FORCE_USE_OF_PETSC))
+  (!defined(DEAL_II_TRILINOS_WITH_NOX) || defined(FORCE_USE_OF_PETSC))
   using namespace dealii::LinearAlgebraPETSc;
 #  define USE_PETSC_LA
-#elif defined(DEAL_II_WITH_TRILINOS)
+#elif defined(DEAL_II_TRILINOS_WITH_NOX)
   using namespace dealii::LinearAlgebraTrilinos;
 #else
-#  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
+#  error DEAL_II_WITH_PETSC or DEAL_II_TRILINOS_WITH_NOX required
 #endif
 } // namespace LA
 
