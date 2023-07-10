@@ -3,46 +3,46 @@ DEAL::Testing dim=1, spacedim=1
 DEAL::Original mesh ==============================
 DEAL::cell: 1.0, material_id: 1, manifold_id: 4294967295
 DEAL::face: 0, boundary_id: 0, manifold_id: 4294967295
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 4294967295
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 4294967295
 DEAL::cell: 1.1, material_id: 0, manifold_id: 4294967295
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 4294967295
-DEAL::face: 1, boundary_id: 1, manifold_id: 4294967295
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 4294967295
+DEAL::face: 2, boundary_id: 1, manifold_id: 4294967295
 DEAL::Copied mesh ================================
 DEAL::cell: 1.0, material_id: 1, manifold_id: 1
 DEAL::face: 0, boundary_id: 0, manifold_id: 4294967295
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 4294967295
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 4294967295
 DEAL::cell: 1.1, material_id: 0, manifold_id: 0
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 4294967295
-DEAL::face: 1, boundary_id: 1, manifold_id: 4294967295
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 4294967295
+DEAL::face: 2, boundary_id: 1, manifold_id: 4294967295
 DEAL::Copied mesh with boundary  =================
 DEAL::cell: 1.0, material_id: 1, manifold_id: 1
 DEAL::face: 0, boundary_id: 0, manifold_id: 1
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 0
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 0
 DEAL::cell: 1.1, material_id: 0, manifold_id: 0
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 0
-DEAL::face: 1, boundary_id: 1, manifold_id: 0
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 0
+DEAL::face: 2, boundary_id: 1, manifold_id: 0
 DEAL::Testing dim=1, spacedim=2
 DEAL::Original mesh ==============================
 DEAL::cell: 1.0, material_id: 1, manifold_id: 4294967295
 DEAL::face: 0, boundary_id: 0, manifold_id: 4294967295
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 4294967295
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 4294967295
 DEAL::cell: 1.1, material_id: 0, manifold_id: 4294967295
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 4294967295
-DEAL::face: 1, boundary_id: 1, manifold_id: 4294967295
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 4294967295
+DEAL::face: 2, boundary_id: 1, manifold_id: 4294967295
 DEAL::Copied mesh ================================
 DEAL::cell: 1.0, material_id: 1, manifold_id: 1
 DEAL::face: 0, boundary_id: 0, manifold_id: 4294967295
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 4294967295
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 4294967295
 DEAL::cell: 1.1, material_id: 0, manifold_id: 0
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 4294967295
-DEAL::face: 1, boundary_id: 1, manifold_id: 4294967295
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 4294967295
+DEAL::face: 2, boundary_id: 1, manifold_id: 4294967295
 DEAL::Copied mesh with boundary  =================
 DEAL::cell: 1.0, material_id: 1, manifold_id: 1
 DEAL::face: 0, boundary_id: 0, manifold_id: 1
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 0
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 0
 DEAL::cell: 1.1, material_id: 0, manifold_id: 0
-DEAL::face: 2, boundary_id: 4294967295, manifold_id: 0
-DEAL::face: 1, boundary_id: 1, manifold_id: 0
+DEAL::face: 1, boundary_id: 4294967295, manifold_id: 0
+DEAL::face: 2, boundary_id: 1, manifold_id: 0
 DEAL::Testing dim=2, spacedim=2
 DEAL::Original mesh ==============================
 DEAL::cell: 1.0, material_id: 1, manifold_id: 4294967295
