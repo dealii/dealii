@@ -5888,100 +5888,100 @@ namespace GridTools
       std::vector<std::pair<unsigned int, unsigned int>> ranks_and_indices;
       ranks_and_indices.reserve(entities.size());
 
-#if !defined(DEAL_II_WITH_ARBORX)
-      std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes_temp;
-      auto *global_bboxes_to_be_used = &global_bboxes;
-      if (global_bboxes.size() == 1)
-        {
-          global_bboxes_temp =
-            Utilities::MPI::all_gather(comm, global_bboxes[0]);
-          global_bboxes_to_be_used = &global_bboxes_temp;
-        }
-
-
-      // helper function to determine if a bounding box is valid
-      const auto is_valid = [](const auto &bb) {
-        for (unsigned int i = 0; i < spacedim; ++i)
-          if (bb.get_boundary_points().first[i] >
-              bb.get_boundary_points().second[i])
-            return false;
-
-        return true;
-      };
-
-      // linearize vector of vectors
-      std::vector<std::pair<BoundingBox<spacedim>, unsigned int>>
-        boxes_and_ranks;
-
-      for (unsigned rank = 0; rank < global_bboxes_to_be_used->size(); ++rank)
-        for (const auto &box : (*global_bboxes_to_be_used)[rank])
-          if (is_valid(box))
-            boxes_and_ranks.emplace_back(box, rank);
-
-      // pack boxes into r-tree
-      const auto tree = pack_rtree(boxes_and_ranks);
-
-      // loop over all entities
-      for (unsigned int i = 0; i < entities.size(); ++i)
-        {
-          // create a bounding box with tolerance
-          const auto bb =
-            BoundingBox<spacedim>(entities[i]).create_extended(tolerance);
-
-          // determine ranks potentially owning point/bounding box
-          std::set<unsigned int> my_ranks;
-
-          for (const auto &box_and_rank :
-               tree | boost::geometry::index::adaptors::queried(
-                        boost::geometry::index::intersects(bb)))
-            my_ranks.insert(box_and_rank.second);
-
-          for (const auto rank : my_ranks)
-            ranks_and_indices.emplace_back(rank, i);
-        }
-
+#if defined(DEAL_II_WITH_ARBORX)
+#  define USE_ARBORX true
 #else
-      (void)tolerance;
-      auto fill_ranks_and_indices =
-        [&ranks_and_indices](
-          const std::vector<int> &                offsets,
-          const std::vector<std::pair<int, int>> &indices_ranks) {
-          for (unsigned int i = 0; i < offsets.size() - 1; ++i)
-            for (int j = offsets[i]; j < offsets[i + 1]; ++j)
-              ranks_and_indices.emplace_back(indices_ranks[j].second, i);
+#  define USE_ARBORX false
+#endif
+      // Lambda to process bboxes if global_bboxes.size()>1 or ArborX not
+      // available
+      const auto process_bboxes = [&]() -> void {
+        std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes_temp;
+        auto *global_bboxes_to_be_used = &global_bboxes;
+
+        if (global_bboxes.size() == 1 && USE_ARBORX == false)
+          {
+            global_bboxes_temp =
+              Utilities::MPI::all_gather(comm, global_bboxes[0]);
+            global_bboxes_to_be_used = &global_bboxes_temp;
+          }
+
+        // helper function to determine if a bounding box is valid
+        const auto is_valid = [](const auto &bb) {
+          for (unsigned int i = 0; i < spacedim; ++i)
+            if (bb.get_boundary_points().first[i] >
+                bb.get_boundary_points().second[i])
+              return false;
+
+          return true;
         };
 
-      unsigned int idx = (global_bboxes.size() == 1) ?
-                           0 :
-                           Utilities::MPI::this_mpi_process(comm);
-      if constexpr (spacedim != 1)
+        // linearize vector of vectors
+        std::vector<std::pair<BoundingBox<spacedim>, unsigned int>>
+          boxes_and_ranks;
+
+        for (unsigned rank = 0; rank < global_bboxes_to_be_used->size(); ++rank)
+          for (const auto &box : (*global_bboxes_to_be_used)[rank])
+            if (is_valid(box))
+              boxes_and_ranks.emplace_back(box, rank);
+
+        // pack boxes into r-tree
+        const auto tree = pack_rtree(boxes_and_ranks);
+
+        // loop over all entities
+        for (unsigned int i = 0; i < entities.size(); ++i)
+          {
+            // create a bounding box with tolerance
+            const auto bb =
+              BoundingBox<spacedim>(entities[i]).create_extended(tolerance);
+
+            // determine ranks potentially owning point/bounding box
+            std::set<unsigned int> my_ranks;
+
+            for (const auto &box_and_rank :
+                 tree | boost::geometry::index::adaptors::queried(
+                          boost::geometry::index::intersects(bb)))
+              my_ranks.insert(box_and_rank.second);
+
+            for (const auto rank : my_ranks)
+              ranks_and_indices.emplace_back(rank, i);
+          }
+      };
+
+#if defined(DEAL_II_WITH_ARBORX)
+      if (global_bboxes.size() == 1)
         {
-          ArborXWrappers::DistributedTree distributed_tree(comm,
-                                                           global_bboxes[idx]);
-
-          if constexpr (std::is_same<T, Point<spacedim>>::value)
+          if constexpr (spacedim != 1)
             {
-              ArborXWrappers::PointIntersectPredicate bb_intersect(entities);
+              ArborXWrappers::DistributedTree distributed_tree(
+                comm, global_bboxes[0]);
+              std::vector<BoundingBox<spacedim>> query_bounding_boxes;
+              for (const auto &entity : entities)
+                query_bounding_boxes.emplace_back(
+                  BoundingBox<spacedim>(entity).create_extended(tolerance));
 
-              const auto &[indices_ranks, offsets] =
-                distributed_tree.query(bb_intersect);
-              fill_ranks_and_indices(offsets, indices_ranks);
-            }
-          else if constexpr (std::is_same<T, BoundingBox<spacedim>>::value)
-            {
               ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
-                entities);
-
+                query_bounding_boxes);
               const auto &[indices_ranks, offsets] =
                 distributed_tree.query(bb_intersect);
-              fill_ranks_and_indices(offsets, indices_ranks);
+              for (unsigned long int i = 0; i < offsets.size() - 1; ++i)
+                for (int j = offsets[i]; j < offsets[i + 1]; ++j)
+                  ranks_and_indices.emplace_back(indices_ranks[j].second, i);
+            }
+          else
+            {
+              AssertThrow(false, ExcInternalError());
+              return {};
             }
         }
       else
         {
-          AssertThrow(false, ExcInternalError());
-          return {};
+          // global_bboxes.size()>1
+          process_bboxes();
         }
+#else
+      // No ArborX
+      process_bboxes();
 #endif
 
       // convert to CRS
