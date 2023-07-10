@@ -66,6 +66,7 @@
         <li> Ifpack,
         <li> ML,
         <li> MueLu (optional, required for TrilinosWrappers::PreconditionAMGMueLu),
+        <li> NOX (optional, required for TrilinosWrappers::NOXSolver),
         <li> ROL (optional),
         <li> Sacado (optional),
         <li> SEACAS (optional, required for GridIn::read_exodusii()),
@@ -96,6 +97,7 @@
     -DTrilinos_ENABLE_Teuchos=ON                     \
     -DTrilinos_ENABLE_MueLu=ON                       \
     -DTrilinos_ENABLE_ML=ON                          \
+    -DTrilinos_ENABLE_NOX=ON                         \
     -DTrilinos_ENABLE_ROL=ON                         \
     -DTrilinos_ENABLE_Tpetra=ON                      \
     -DTrilinos_ENABLE_COMPLEX_DOUBLE=ON              \
