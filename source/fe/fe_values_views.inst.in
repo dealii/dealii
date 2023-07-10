@@ -1,0 +1,293 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 1998 - 2022 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+#ifndef DOXYGEN
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#  if deal_II_dimension <= deal_II_space_dimension
+    namespace FEValuesViews
+    \{
+      template class Scalar<deal_II_dimension, deal_II_space_dimension>;
+      template class Vector<deal_II_dimension, deal_II_space_dimension>;
+      template class SymmetricTensor<2,
+                                     deal_II_dimension,
+                                     deal_II_space_dimension>;
+      template class Tensor<2, deal_II_dimension, deal_II_space_dimension>;
+    \}
+
+    namespace internal
+    \{
+      namespace FEValuesViews
+      \{
+        template struct Cache<deal_II_dimension, deal_II_space_dimension>;
+      \}
+    \}
+#  endif
+  }
+
+for (S : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#  if deal_II_dimension <= deal_II_space_dimension
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(const dealii::ReadVector<S> &,
+                             std::vector<ProductType<S, value_type>::type> &)
+        const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<1, deal_II_space_dimension>>::type> &)
+        const;
+
+    template void FEValuesViews::SymmetricTensor<2,
+                                                 deal_II_dimension,
+                                                 deal_II_space_dimension>::
+      get_function_values<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<ProductType<
+          S,
+          dealii::SymmetricTensor<2, deal_II_space_dimension>>::type> &) const;
+
+    template void
+    FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+      get_function_values<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<2, deal_II_space_dimension>>::type> &)
+        const;
+
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_gradients<S>(
+        const ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<1, deal_II_space_dimension>>::type> &)
+        const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_gradients<S>(
+        const ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<2, deal_II_space_dimension>>::type> &)
+        const;
+
+    template void
+    FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+      get_function_gradients<S>(
+        const ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<3, deal_II_space_dimension>>::type> &)
+        const;
+#  endif
+  }
+
+
+
+for (S : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#  if deal_II_dimension <= deal_II_space_dimension
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_hessians<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<2, deal_II_space_dimension>>::type> &)
+        const;
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_laplacians<S>(const dealii::ReadVector<S> &,
+                                 std::vector<ProductType<S, double>::type> &)
+        const;
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_third_derivatives<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<3, deal_II_space_dimension>>::type> &)
+        const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_symmetric_gradients<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<ProductType<
+          S,
+          dealii::SymmetricTensor<2, deal_II_space_dimension>>::type> &) const;
+    template void FEValuesViews::
+      Vector<deal_II_dimension, deal_II_space_dimension>::get_function_curls<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<ProductType<S, curl_type>::type> &) const;
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_divergences<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<ProductType<S, divergence_type>::type> &) const;
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_hessians<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<3, deal_II_space_dimension>>::type> &)
+        const;
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_laplacians<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<1, deal_II_space_dimension>>::type> &)
+        const;
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_third_derivatives<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<4, deal_II_space_dimension>>::type> &)
+        const;
+
+    template void FEValuesViews::
+      SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
+        get_function_divergences<S>(
+          const dealii::ReadVector<S> &,
+          std::vector<
+            ProductType<S, dealii::Tensor<1, deal_II_space_dimension>>::type> &)
+          const;
+
+    template void
+    FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+      get_function_divergences<S>(
+        const dealii::ReadVector<S> &,
+        std::vector<
+          ProductType<S, dealii::Tensor<1, deal_II_space_dimension>>::type> &)
+        const;
+#  endif
+  }
+
+
+for (VEC : GENERAL_CONTAINER_TYPES; Number : ALL_SCALAR_TYPES;
+     deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#  if deal_II_dimension <= deal_II_space_dimension
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
+
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_gradients_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
+        const;
+
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_hessians_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_hessian_type<Number>> &)
+        const;
+
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_laplacians_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
+
+    template void
+    FEValuesViews::Scalar<deal_II_dimension, deal_II_space_dimension>::
+      get_function_third_derivatives_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &,
+        std::vector<solution_third_derivative_type<Number>> &) const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_values_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_gradients_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
+        const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_symmetric_gradients_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &,
+        std::vector<solution_symmetric_gradient_type<Number>> &) const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_divergences_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
+        const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_curls_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_curl_type<Number>> &) const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_hessians_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_hessian_type<Number>> &)
+        const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_laplacians_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
+
+    template void
+    FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
+      get_function_third_derivatives_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &,
+        std::vector<solution_third_derivative_type<Number>> &) const;
+
+    template void FEValuesViews::SymmetricTensor<2,
+                                                 deal_II_dimension,
+                                                 deal_II_space_dimension>::
+      get_function_values_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
+
+    template void FEValuesViews::
+      SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
+        get_function_divergences_from_local_dof_values<VEC<Number>>(
+          const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
+          const;
+
+    template void
+    FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+      get_function_values_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_value_type<Number>> &) const;
+
+    template void
+    FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+      get_function_divergences_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
+        const;
+
+    template void
+    FEValuesViews::Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+      get_function_gradients_from_local_dof_values<VEC<Number>>(
+        const VEC<Number> &, std::vector<solution_gradient_type<Number>> &)
+        const;
+#  endif
+  }
+#endif
