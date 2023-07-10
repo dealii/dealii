@@ -479,7 +479,7 @@ namespace Step37
 
         std::string pvtu_filename =
           "solution-" + Utilities::to_string(cycle) + ".pvtu";
-        std::ofstream pvtu_output(pvtu_filename.c_str());
+        std::ofstream pvtu_output(pvtu_filename);
         data_out.write_pvtu_record(pvtu_output, filenames);
       }
 
@@ -495,7 +495,7 @@ namespace Step37
           "grid" + dealii::Utilities::int_to_string(dim) + "_" +
           dealii::Utilities::int_to_string(cycle);
         const std::string filename = base_filename + ".gp";
-        std::ofstream     f(filename.c_str());
+        std::ofstream     f(filename);
 
         f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
           << std::endl

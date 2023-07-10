@@ -171,7 +171,7 @@ check()
     data_out.build_patches();
     std::string filename = spacedim == 2 ? "solution-2d-" : "solution-3d-";
     filename += Utilities::int_to_string(0, 2) + ".vtk";
-    std::ofstream output(filename.c_str());
+    std::ofstream output(filename);
     data_out.write_vtk(output);
   }
 

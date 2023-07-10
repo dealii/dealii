@@ -139,7 +139,7 @@ test(const bool apply_constrains, const unsigned int hp)
                << (apply_constrains ? "_constrained" : "") << hp_string << '_'
                << i << ".vtk";
 
-      std::ofstream output(filename.str().c_str());
+      std::ofstream output(filename.str());
       data_out.write_vtk(output);
 #endif
     }

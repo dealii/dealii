@@ -157,7 +157,7 @@ test(const unsigned int flag)
       const std::string filename =
         output_name(flag, triangulation.locally_owned_subdomain());
 
-      std::ofstream output(filename.c_str());
+      std::ofstream output(filename);
       data_out.write_vtu(output);
 
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -170,7 +170,7 @@ test(const unsigned int flag)
 
           const std::string pvtu_filename =
             "output" + Utilities::int_to_string(flag) + ".pvtu";
-          std::ofstream pvtu_output(pvtu_filename.c_str());
+          std::ofstream pvtu_output(pvtu_filename);
           data_out.write_pvtu_record(pvtu_output, filenames);
         }
     }

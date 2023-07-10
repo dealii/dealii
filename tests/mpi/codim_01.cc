@@ -104,7 +104,7 @@ test(std::ostream & /*out*/)
   name[1] += tr.locally_owned_subdomain();
 
   {
-    std::ofstream file(name.c_str());
+    std::ofstream file(name);
     data_out.build_patches();
     data_out.write_vtu(file);
   }

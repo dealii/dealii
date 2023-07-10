@@ -283,7 +283,7 @@ test()
   const std::string filename =
     ("solution." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
      ".d2");
-  std::ofstream output(filename.c_str());
+  std::ofstream output(filename);
   data_out.write_deal_II_intermediate(output);
 
   tr.reset_manifold(0);

@@ -87,7 +87,7 @@ output(DoFHandler<dim> & dh,
   filename << filename_ << Utilities::int_to_string(loop, 2) << '.'
            << Utilities::int_to_string(myid, 2) << ".vtu";
 
-  std::ofstream output(filename.str().c_str());
+  std::ofstream output(filename.str());
   data_out.write_vtu(output);
   if (myid)
     {
@@ -99,7 +99,7 @@ output(DoFHandler<dim> & dh,
                             "." + Utilities::int_to_string(i, 2) + ".vtu");
       const std::string pvtu_filename =
         (filename_ + Utilities::int_to_string(loop, 2) + ".pvtu");
-      std::ofstream pvtu_output(pvtu_filename.c_str());
+      std::ofstream pvtu_output(pvtu_filename);
       data_out.write_pvtu_record(pvtu_output, filenames);
     }
 }

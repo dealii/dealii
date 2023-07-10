@@ -87,7 +87,7 @@ run()
   tria.reset_manifold(0);
 
   /*  std::string filename = "Mesh.eps";
-  std::ofstream output (filename.c_str());
+  std::ofstream output (filename);
   GridOut grid_out;
   grid_out.write_eps (tria, output);
   */

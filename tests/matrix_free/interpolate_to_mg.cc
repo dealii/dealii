@@ -163,7 +163,7 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
       data_out.build_patches();
       const std::string filename =
         "output_" + Utilities::int_to_string(myid) + ".vtu";
-      std::ofstream output(filename.c_str());
+      std::ofstream output(filename);
       data_out.write_vtu(output);
 
       const std::string mg_mesh = "mg_mesh";

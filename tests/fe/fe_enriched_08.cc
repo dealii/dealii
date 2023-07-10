@@ -174,7 +174,7 @@ test2cells(const unsigned int p_feq = 2, const unsigned int p_feen = 1)
     "2cell-shape_functions_p_feq=" + std::to_string(p_feq) +
     "_p_feenr=" + std::to_string(p_feen) + "_" +
     dealii::Utilities::int_to_string(dim) + "D.vtu";
-  std::ofstream output(filename.c_str());
+  std::ofstream output(filename);
   data_out.write_vtu(output);
 #endif
 

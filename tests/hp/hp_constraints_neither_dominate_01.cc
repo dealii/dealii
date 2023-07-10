@@ -166,7 +166,7 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
   std::string filename = "shape_functions_" +
                          dealii::Utilities::int_to_string(counter, 1) + "_" +
                          dealii::Utilities::int_to_string(dim) + "D.vtu";
-  std::ofstream output(filename.c_str());
+  std::ofstream output(filename);
   data_out.write_vtu(output);
 #endif
 

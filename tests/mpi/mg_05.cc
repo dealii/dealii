@@ -58,7 +58,7 @@ output(parallel::distributed::Triangulation<dim> &tr)
   const std::string filename =
     ("mesh." + Utilities::int_to_string(tr.locally_owned_subdomain(), 4) +
      ".svg");
-  std::ofstream stream(filename.c_str());
+  std::ofstream stream(filename);
   /*
   GridOutFlags::XFig flags;
   flags.color_by = GridOutFlags::XFig::level_subdomain_id;

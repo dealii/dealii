@@ -988,7 +988,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
         dealii::Utilities::int_to_string(0);
 
       const std::string filename = base_filename + ".gp";
-      std::ofstream     f(filename.c_str());
+      std::ofstream     f(filename);
 
       f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
         << std::endl
@@ -1030,7 +1030,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
   data_out.build_patches(patches);
 
   std::string   filename = "shape_functions.vtu";
-  std::ofstream output(filename.c_str());
+  std::ofstream output(filename);
   data_out.write_vtu(output);
 
   std::cout << "...finished plotting shape functions" << std::endl;
@@ -1361,7 +1361,7 @@ LaplaceProblem<dim>::build_fe_space()
             "fe_indices" + dealii::Utilities::int_to_string(dim) + "_p" +
             dealii::Utilities::int_to_string(0);
           const std::string filename = base_filename + ".gp";
-          std::ofstream     f(filename.c_str());
+          std::ofstream     f(filename);
 
           f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
             << std::endl
@@ -1391,7 +1391,7 @@ LaplaceProblem<dim>::build_fe_space()
             "cell_id" + dealii::Utilities::int_to_string(dim) + "_p" +
             dealii::Utilities::int_to_string(0);
           const std::string filename = base_filename + ".gp";
-          std::ofstream     f(filename.c_str());
+          std::ofstream     f(filename);
 
           f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
             << std::endl
@@ -1672,7 +1672,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle)
       std::string filename = "solution-";
       filename += Utilities::to_string(cycle);
       filename += ".vtk";
-      std::ofstream output(filename.c_str());
+      std::ofstream output(filename);
 
       DataOut<dim> data_out;
       data_out.attach_dof_handler(dof_handler);

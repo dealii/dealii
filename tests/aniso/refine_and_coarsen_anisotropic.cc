@@ -106,7 +106,7 @@ test_isotropic(int type, std::ostream &logfile)
           grid_out.set_flags(eps2);
           std::ostringstream filename;
           filename << "grid_" << type << '_' << cycle << ".eps";
-          std::ofstream outfile(filename.str().c_str());
+          std::ofstream outfile(filename.str());
           grid_out.write_eps(tria, outfile);
         }
 

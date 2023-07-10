@@ -1010,7 +1010,7 @@ PointValueHistory<dim>::write_gnuplot(
   if (n_indep != 0)
     {
       std::string   filename = base_name + "_indep.gpl";
-      std::ofstream to_gnuplot(filename.c_str());
+      std::ofstream to_gnuplot(filename);
 
       to_gnuplot << "# Data independent of mesh location\n";
 
@@ -1089,7 +1089,7 @@ PointValueHistory<dim>::write_gnuplot(
           // Utilities::int_to_string(data_store_index,
           // 2) call, can handle up to 100
           // points
-          std::ofstream to_gnuplot(filename.c_str());
+          std::ofstream to_gnuplot(filename);
 
           // put helpful info about the
           // support point into the file as

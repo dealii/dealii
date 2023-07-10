@@ -461,7 +461,7 @@ int
 main()
 {
   const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
+  std::ofstream     logfile(logname);
   deallog.attach(logfile);
 
   Advection::AdvectionProblem<1> advection_problem;

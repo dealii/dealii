@@ -122,7 +122,7 @@ test(const bool left = true)
 
       const std::string filename =
         "grid" + Utilities::int_to_string(dim) + ".gp";
-      std::ofstream f(filename.c_str());
+      std::ofstream f(filename);
 
       f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
         << std::endl

@@ -425,7 +425,7 @@ BEM<spacedim>::read_grid(std::string filename)
 {
   GridIn<spacedim - 1, spacedim> gi;
   gi.attach_triangulation(tria);
-  std::ifstream in(filename.c_str());
+  std::ifstream in(filename);
   gi.read_ucd(in);
 
   for (auto cell = tria.begin_active(); cell != tria.end(); ++cell)

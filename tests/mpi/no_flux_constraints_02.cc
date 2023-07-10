@@ -130,7 +130,7 @@ test()
   {
     // write the constraintmatrix to a file on each cpu
     std::string fname = base + "cm_" + Utilities::int_to_string(myid) + ".dot";
-    std::ofstream file(fname.c_str());
+    std::ofstream file(fname);
     constraints.print(file);
   }
   MPI_Barrier(MPI_COMM_WORLD);
@@ -143,7 +143,7 @@ test()
         (std::string("cat ") + base + "cm_?.dot|sort -n|uniq >" + base + "cm")
           .c_str());
       {
-        std::ifstream     file((base + "cm").c_str());
+        std::ifstream     file(base + "cm");
         std::stringstream ss;
         ss << file.rdbuf();
         std::string str = ss.str();

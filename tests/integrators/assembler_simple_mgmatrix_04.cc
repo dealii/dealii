@@ -231,7 +231,7 @@ int
 main()
 {
   const std::string logname("output");
-  std::ofstream     logfile(logname.c_str());
+  std::ofstream     logfile(logname);
   deallog.attach(logfile);
 
   FE_DGP<2>           p0(0);

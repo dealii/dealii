@@ -2256,7 +2256,7 @@ namespace Step44
     data_out.build_patches(q_mapping, degree);
     std::ostringstream filename;
     filename << "solution-" << dim << "d-" << time.get_timestep() << ".vtk";
-    std::ofstream output(filename.str().c_str());
+    std::ofstream output(filename.str());
     data_out.write_vtk(output);
   }
 } // namespace Step44

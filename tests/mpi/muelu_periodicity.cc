@@ -685,7 +685,7 @@ namespace Step22
       << Utilities::int_to_string(triangulation.locally_owned_subdomain(), 2)
       << ".vtu";
 
-    std::ofstream output(filename.str().c_str());
+    std::ofstream output(filename.str());
     data_out.write_vtu(output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
@@ -700,7 +700,7 @@ namespace Step22
         const std::string pvtu_filename =
           ("solution-" + Utilities::int_to_string(refinement_cycle, 2) +
            ".pvtu");
-        std::ofstream pvtu_output(pvtu_filename.c_str());
+        std::ofstream pvtu_output(pvtu_filename);
         data_out.write_pvtu_record(pvtu_output, filenames);
       }
   }

@@ -602,7 +602,7 @@ Laplace<dim>::print_errors()
       error_table.write_text(std::cout);
 
       const std::string fname = output_name + ".gp";
-      std::ofstream     output(fname.c_str(), std::ios::out | std::ios::trunc);
+      std::ofstream     output(fname, std::ios::out | std::ios::trunc);
 
       // use Gnuplot datablocks:
       output << "$data << EOD" << std::endl;

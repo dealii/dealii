@@ -195,7 +195,7 @@ output(const std::string                   name,
   data_out.add_data_vector(error, std::string("error"));
   data_out.build_patches();
 
-  std::ofstream output(name.c_str());
+  std::ofstream output(name);
   data_out.write_vtu(output);
 }
 

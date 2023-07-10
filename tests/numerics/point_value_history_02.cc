@@ -389,7 +389,7 @@ TestPointValueHistory<dim>::run()
     {
       deallog << "Copying output file " << filenames[i] << std::endl;
 
-      std::ifstream in(filenames[i].c_str());
+      std::ifstream in(filenames[i]);
       AssertThrow(in, ExcIO());
 
       std::string s;
@@ -430,7 +430,7 @@ TestPointValueHistory<dim>::output_results(unsigned int   step,
   std::ostringstream filename;
   filename << "solution-" << Utilities::int_to_string(step, 2) << ".gpl";
 
-  std::ofstream output(filename.str().c_str());
+  std::ofstream output(filename.str());
   data_out.write_gnuplot(output);
 }
 

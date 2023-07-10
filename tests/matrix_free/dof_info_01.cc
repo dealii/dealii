@@ -153,7 +153,7 @@ test(const bool adaptive_ref = true)
         dealii::Utilities::int_to_string(this_mpi_core);
 
       const std::string filename = base_filename + ".gp";
-      std::ofstream     f(filename.c_str());
+      std::ofstream     f(filename);
 
       f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
         << std::endl

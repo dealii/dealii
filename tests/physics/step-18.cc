@@ -564,7 +564,7 @@ namespace Step18
       "solution-" + Utilities::int_to_string(timestep_no, 4) + "." +
       Utilities::int_to_string(this_mpi_process, 3) + ".vtu";
     AssertThrow(n_mpi_processes < 1000, ExcNotImplemented());
-    std::ofstream output(filename.c_str());
+    std::ofstream output(filename);
     data_out.write_vtu(output);
     if (this_mpi_process == 0)
       {
@@ -575,12 +575,12 @@ namespace Step18
                               Utilities::int_to_string(i, 3) + ".vtu");
         const std::string visit_filename =
           ("solution-" + Utilities::int_to_string(timestep_no, 4) + ".visit");
-        std::ofstream visit_output(visit_filename.c_str());
+        std::ofstream visit_output(visit_filename);
         DataOutBase::write_visit_record(visit_output, filenames);
 
         const std::string pvtu_filename =
           ("solution-" + Utilities::int_to_string(timestep_no, 4) + ".pvtu");
-        std::ofstream pvtu_output(pvtu_filename.c_str());
+        std::ofstream pvtu_output(pvtu_filename);
         data_out.write_pvtu_record(pvtu_output, filenames);
         static std::vector<std::pair<double, std::string>> times_and_names;
         times_and_names.push_back(

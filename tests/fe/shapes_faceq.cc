@@ -59,7 +59,7 @@ int
 main()
 {
   const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
+  std::ofstream     logfile(logname);
   deallog << std::setprecision(PRECISION) << std::fixed;
   deallog.attach(logfile);
 

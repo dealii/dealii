@@ -58,7 +58,7 @@ test(std::string filename)
   GridIn<dim, spacedim>        gi;
 
   gi.attach_triangulation(triangulation);
-  std::ifstream in(filename.c_str());
+  std::ifstream in(filename);
   gi.read_ucd(in);
 
   const QMidpoint<dim> q_midpoint;

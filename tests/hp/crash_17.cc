@@ -525,7 +525,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle) const
   {
     const std::string filename =
       "grid-" + Utilities::int_to_string(cycle, 2) + ".eps";
-    std::ofstream output(filename.c_str());
+    std::ofstream output(filename);
 
     GridOut grid_out;
     grid_out.write_eps(triangulation, output);
@@ -563,7 +563,7 @@ LaplaceProblem<dim>::output_results(const unsigned int cycle) const
     data_out.add_data_vector(fe_indices, "fe_index");
     data_out.build_patches();
 
-    std::ofstream output(filename.c_str());
+    std::ofstream output(filename);
     data_out.write_vtk(output);
   }
 }

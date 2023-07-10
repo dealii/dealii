@@ -22,7 +22,7 @@ int
 main()
 {
   const std::string logname = "output";
-  std::ofstream     logfile(logname.c_str());
+  std::ofstream     logfile(logname);
   deallog.attach(logfile);
 
   SparsityPattern pattern(4, 5, 2);

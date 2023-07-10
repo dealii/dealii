@@ -81,7 +81,7 @@ test()
   {
     const std::string filename =
       "grid_no_halo_" + Utilities::int_to_string(dim) + "d.vtk";
-    std::ofstream f(filename.c_str());
+    std::ofstream f(filename);
     GridOut().write_vtk(tria, f);
   }
 
@@ -107,7 +107,7 @@ test()
   {
     const std::string filename =
       "grid_with_halo_" + Utilities::int_to_string(dim) + "d.vtk";
-    std::ofstream f(filename.c_str());
+    std::ofstream f(filename);
     GridOut().write_vtk(tria, f);
   }
 }

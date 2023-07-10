@@ -63,7 +63,7 @@ namespace Algorithms
     std::ostringstream streamOut;
     streamOut << filename_base << std::setw(digits) << std::setfill('0')
               << this->step << out.default_suffix();
-    std::ofstream out_filename(streamOut.str().c_str());
+    std::ofstream out_filename(streamOut.str());
     out.build_patches();
     out.write(out_filename);
     out.clear();

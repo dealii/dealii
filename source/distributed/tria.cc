@@ -2018,7 +2018,7 @@ namespace parallel
       if (this->my_subdomain == 0)
         {
           std::string   fname = std::string(filename) + ".info";
-          std::ofstream f(fname.c_str());
+          std::ofstream f(fname);
           f << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_coarse_cells"
             << std::endl
             << 5 << " "
@@ -2087,7 +2087,7 @@ namespace parallel
         attached_count_variable, n_coarse_cells;
       {
         std::string   fname = std::string(filename) + ".info";
-        std::ifstream f(fname.c_str());
+        std::ifstream f(fname);
         AssertThrow(f.fail() == false, ExcIO());
         std::string firstline;
         getline(f, firstline); // skip first line

@@ -150,7 +150,7 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
 
   std::string filename =
     "hp-shape_functions_" + dealii::Utilities::int_to_string(dim) + "D.vtu";
-  std::ofstream output(filename.c_str());
+  std::ofstream output(filename);
   data_out.write_vtu(output);
 }
 

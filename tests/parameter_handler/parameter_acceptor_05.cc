@@ -71,7 +71,7 @@ main()
     SOURCE_DIR "/parameter_acceptor_parameters/parameter_acceptor_05.prm",
     output_name);
   ParameterAcceptor::prm.log_parameters(deallog);
-  std::ifstream file(output_name.c_str());
+  std::ifstream file(output_name);
 
   std::string str;
   deallog << "reading " << output_name << std::endl;
