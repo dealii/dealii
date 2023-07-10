@@ -381,7 +381,7 @@ namespace Step15
 
     setup_system();
 
-    solution_transfer.interpolate(coarse_solution, current_solution);
+    solution_transfer.interpolate(current_solution);
 
     // On the new mesh, there are different hanging nodes, computed in
     // `setup_system()` above. To be on the safe side, we should  make sure that

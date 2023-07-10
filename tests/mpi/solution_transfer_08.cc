@@ -56,13 +56,13 @@ test(const bool allow_artificial_cells)
   sol_old = 1.;
 
   SolutionTransfer<dim> soltrans(dh);
-  soltrans.prepare_for_pure_refinement();
+  soltrans.prepare_for_coarsening_and_refinement(sol_old);
 
   tria.execute_coarsening_and_refinement();
   dh.distribute_dofs(fe);
 
   Vector<double> sol_new(dh.n_dofs());
-  soltrans.refine_interpolate(sol_old, sol_new);
+  soltrans.interpolate(sol_new);
   for (unsigned int i = 0; i < sol_new.size(); ++i)
     AssertThrow(sol_new[i] == 1., ExcInternalError());
 

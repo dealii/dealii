@@ -65,18 +65,19 @@ test()
   // set refine flag for the only cell we have, then do the refinement
   SolutionTransfer<dim, Vector<double>> solution_trans(dof_handler);
   dof_handler.begin_active()->set_refine_flag();
-  solution_trans.prepare_for_coarsening_and_refinement(solution);
-  triangulation.execute_coarsening_and_refinement();
 
   // now set the active_fe_index flags on the new set of fine level cells
   for (unsigned int c = 0; c < dof_handler.begin(0)->n_children(); ++c)
-    dof_handler.begin(0)->child(c)->set_active_fe_index(1);
+    dof_handler.begin(0)->child(c)->set_future_fe_index(1);
+
+  solution_trans.prepare_for_coarsening_and_refinement(solution);
+  triangulation.execute_coarsening_and_refinement();
 
   // distribute dofs and transfer solution there
   dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> new_solution(dof_handler.n_dofs());
-  solution_trans.interpolate(solution, new_solution);
+  solution_trans.interpolate(new_solution);
 
   // we should now have only 1s in the new_solution vector
   for (unsigned int i = 0; i < new_solution.size(); ++i)

@@ -1977,7 +1977,7 @@ namespace Step31
     std::vector<TrilinosWrappers::MPI::Vector> tmp = {
       TrilinosWrappers::MPI::Vector(temperature_solution),
       TrilinosWrappers::MPI::Vector(temperature_solution)};
-    temperature_trans.interpolate(x_temperature, tmp);
+    temperature_trans.interpolate(tmp);
 
     temperature_solution     = tmp[0];
     old_temperature_solution = tmp[1];
@@ -1991,7 +1991,7 @@ namespace Step31
     // we do not need another temporary vector since we just interpolate a
     // single vector. In the end, we have to tell the program that the matrices
     // and preconditioners need to be regenerated, since the mesh has changed.
-    stokes_trans.interpolate(x_stokes, stokes_solution);
+    stokes_trans.interpolate(stokes_solution);
 
     stokes_constraints.distribute(stokes_solution);
 

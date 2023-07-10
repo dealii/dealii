@@ -105,7 +105,7 @@ main()
   dof_handler.distribute_dofs(fe_collection);
 
   Vector<double> new_solution(dof_handler.n_dofs());
-  solultion_trans.interpolate(solution, new_solution);
+  solultion_trans.interpolate(new_solution);
 
   deallog << "OK" << std::endl;
 }
