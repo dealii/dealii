@@ -3912,14 +3912,19 @@ protected:
    * an extensive description of CellStatus, see the documentation for the
    * member function register_data_attach().
    */
-  virtual void
-  update_cell_relations()
-  {}
+  void
+  update_cell_relations_serial();
+
+  void
+  pack_data_serial_pre();
+
+  void
+  pack_data_serial_post();
 
   /**
    * Vector of pairs, each containing a deal.II cell iterator and its
    * respective CellStatus. To update its contents, use the
-   * update_cell_relations() member function.
+   * update_cell_relations_serial() member function.
    */
   std::vector<typename internal::CellAttachedDataSerializer<dim, spacedim>::
                 cell_relation_t>
@@ -4552,6 +4557,9 @@ private:
    */
   std::unique_ptr<std::map<unsigned int, types::manifold_id>>
     vertex_to_manifold_id_map_1d;
+
+  // TODO
+  std::vector<CellId> active_cell_old;
 
   // make a couple of classes friends
   template <int, int, int>

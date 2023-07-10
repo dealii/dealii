@@ -87,7 +87,7 @@ main()
   // get the interpolated solution
   // back
   Vector<double> tmp(dh.n_dofs());
-  soltrans.interpolate(solution, tmp);
+  soltrans.interpolate(tmp);
 
   deallog << "New values:" << std::endl;
   for (unsigned int i = 0; i < tmp.size(); ++i)

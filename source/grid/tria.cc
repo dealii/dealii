@@ -21,6 +21,8 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/distributed/tria_base.h>
+
 #include <deal.II/grid/connectivity.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/magic_numbers.h>
@@ -211,9 +213,7 @@ namespace internal
                 // can only tolerate one level of coarsening at a time, so
                 // check that the children are all active
                 Assert(dealii_cell->is_active() == false, ExcInternalError());
-                for (unsigned int c = 0;
-                     c < GeometryInfo<dim>::max_children_per_cell;
-                     ++c)
+                for (unsigned int c = 0; c < dealii_cell->n_children(); ++c)
                   Assert(dealii_cell->child(c)->is_active(),
                          ExcInternalError());
                 break;
@@ -1071,7 +1071,6 @@ namespace internal
           std::ifstream file(fname_fixed, std::ios::binary | std::ios::in);
           sizes_fixed_cumulative.resize(1 + n_attached_deserialize_fixed +
                                         (variable_size_data_stored ? 1 : 0));
-
           // Read header data.
           file.read(reinterpret_cast<char *>(sizes_fixed_cumulative.data()),
                     sizes_fixed_cumulative.size() * sizeof(unsigned int));
@@ -12790,6 +12789,8 @@ void Triangulation<dim, spacedim>::create_triangulation(
       clear_user_flags();
     }
 
+  this->update_cell_relations_serial();
+
   // inform all listeners that the triangulation has been created
   signals.create();
 }
@@ -13779,20 +13780,68 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::save(const std::string &filename) const
 {
-  // Create boost archive then call alternative version of the save function
-  std::ofstream                 ofs(filename);
+  // Save triangulation information.
+  std::ofstream                 ofs(filename + "_triangulation.data");
   boost::archive::text_oarchive oa(ofs, boost::archive::no_header);
   save(oa, 0);
+
+  // Save attached data.
+  {
+    std::ofstream ifs(std::string(filename) + ".info");
+    ifs
+      << "version nproc n_attached_fixed_size_objs n_attached_variable_size_objs n_active_cells"
+      << std::endl
+      << 5 << " " << 1 << " "
+      << this->cell_attached_data.pack_callbacks_fixed.size() << " "
+      << this->cell_attached_data.pack_callbacks_variable.size() << " "
+      << this->n_global_active_cells() << std::endl;
+  }
+
+  this->save_attached_data(0, this->n_global_active_cells(), filename);
 }
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::load(const std::string &filename)
 {
-  // Create boost archive then call alternative version of the load function
-  std::ifstream                 ifs(filename);
+  // Load triangulation information.
+  std::ifstream                 ifs(filename + "_triangulation.data");
   boost::archive::text_iarchive ia(ifs, boost::archive::no_header);
   load(ia, 0);
+
+  // Load attached data.
+  unsigned int version, numcpus, attached_count_fixed, attached_count_variable,
+    n_global_active_cells;
+  {
+    std::ifstream ifs(std::string(filename) + ".info");
+    AssertThrow(ifs.fail() == false, ExcIO());
+    std::string firstline;
+    getline(ifs, firstline); // skip first line
+    ifs >> version >> numcpus >> attached_count_fixed >>
+      attached_count_variable >> n_global_active_cells;
+  }
+
+  AssertThrow(numcpus == 1,
+              ExcMessage("Incompatible number of CPUs found in .info file."));
+  AssertThrow(version == 5,
+              ExcMessage("Incompatible version found in .info file."));
+  Assert(this->n_global_active_cells() == n_global_active_cells,
+         ExcMessage("Number of global active cells differ!"));
+
+  // Clear all of the callback data, as explained in the documentation of
+  // register_data_attach().
+  this->cell_attached_data.n_attached_data_sets = 0;
+  this->cell_attached_data.n_attached_deserialize =
+    attached_count_fixed + attached_count_variable;
+
+  this->load_attached_data(0,
+                           this->n_global_active_cells(),
+                           this->n_active_cells(),
+                           filename,
+                           attached_count_fixed,
+                           attached_count_variable);
+
+  this->update_cell_relations_serial();
 }
 
 #endif
@@ -15651,6 +15700,180 @@ const typename std::map<
 }
 
 
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::update_cell_relations_serial()
+{
+  if (dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+        this))
+    return;
+
+  this->local_cell_relations.clear();
+  this->local_cell_relations.reserve(this->n_active_cells());
+
+  for (const auto &cell : this->active_cell_iterators())
+    this->local_cell_relations.emplace_back(
+      cell, ::dealii::CellStatus::cell_will_persist);
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::pack_data_serial_pre()
+{
+  if (dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+        this))
+    return;
+
+  // pack data before triangulation gets updated
+  if (this->cell_attached_data.n_attached_data_sets > 0)
+    {
+      // store old active cells to determine cell status after
+      // coarsening/refinement
+      active_cell_old.clear();
+      active_cell_old.reserve(this->n_active_cells());
+
+      for (const auto &cell : this->active_cell_iterators())
+        {
+          const bool children_will_be_coarsened =
+            (cell->level() > 0) && (cell->coarsen_flag_set());
+
+          if (children_will_be_coarsened == false)
+            this->active_cell_old.emplace_back(cell->id());
+          else
+            {
+              if (cell->parent()->child(0) == cell)
+                this->active_cell_old.emplace_back(cell->parent()->id());
+            }
+        }
+
+      // update cell relations
+      this->local_cell_relations.clear();
+      this->local_cell_relations.reserve(this->n_global_active_cells());
+
+      std::vector<
+        std::pair<unsigned int,
+                  typename internal::CellAttachedDataSerializer<dim, spacedim>::
+                    cell_relation_t>>
+        local_cell_relations_tmp;
+
+      for (const auto &cell : this->active_cell_iterators())
+        {
+          if (std::find(active_cell_old.begin(),
+                        active_cell_old.end(),
+                        cell->id()) != active_cell_old.end())
+            {
+              const unsigned int index =
+                std::distance(active_cell_old.begin(),
+                              std::find(active_cell_old.begin(),
+                                        active_cell_old.end(),
+                                        cell->id()));
+
+              ::dealii::CellStatus status =
+                cell->refine_flag_set() ?
+                  ::dealii::CellStatus::cell_will_be_refined :
+                  ::dealii::CellStatus::cell_will_persist;
+
+              local_cell_relations_tmp.emplace_back(
+                index,
+                typename internal::CellAttachedDataSerializer<dim, spacedim>::
+                  cell_relation_t{cell, status});
+            }
+          else if (cell->level() > 0 &&
+                   std::find(active_cell_old.begin(),
+                             active_cell_old.end(),
+                             cell->parent()->id()) != active_cell_old.end())
+            {
+              const unsigned int index =
+                std::distance(active_cell_old.begin(),
+                              std::find(active_cell_old.begin(),
+                                        active_cell_old.end(),
+                                        cell->parent()->id()));
+
+              ::dealii::CellStatus status;
+
+              if (cell->parent()->child_iterator_to_index(cell) == 0)
+                status = ::dealii::CellStatus::children_will_be_coarsened;
+              else
+                status = ::dealii::CellStatus::cell_invalid;
+
+              local_cell_relations_tmp.emplace_back(
+                index,
+                typename internal::CellAttachedDataSerializer<dim, spacedim>::
+                  cell_relation_t{cell->parent(), status});
+            }
+          else
+            {
+              AssertThrow(false, ExcNotImplemented());
+            }
+        }
+
+      std::stable_sort(local_cell_relations_tmp.begin(),
+                       local_cell_relations_tmp.end(),
+                       [](const auto &a, const auto &b) {
+                         return a.first < b.first;
+                       });
+
+      for (const auto &tmp : local_cell_relations_tmp)
+        this->local_cell_relations.emplace_back(tmp.second);
+
+      // pack data
+      this->data_serializer.pack_data(
+        this->local_cell_relations,
+        this->cell_attached_data.pack_callbacks_fixed,
+        this->cell_attached_data.pack_callbacks_variable,
+        this->get_communicator());
+
+      // dummy copy of data (TODO: fill invalid cells)
+      this->data_serializer.dest_data_fixed =
+        this->data_serializer.src_data_fixed;
+      this->data_serializer.dest_data_variable =
+        this->data_serializer.src_data_variable;
+      this->data_serializer.dest_sizes_variable =
+        this->data_serializer.src_sizes_variable;
+    }
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+void Triangulation<dim, spacedim>::pack_data_serial_post()
+{
+  if (dynamic_cast<parallel::DistributedTriangulationBase<dim, spacedim> *>(
+        this))
+    return;
+
+  // transfer data after triangulation got updated
+  if (this->cell_attached_data.n_attached_data_sets > 0)
+    {
+      std::vector<typename internal::CellAttachedDataSerializer<dim, spacedim>::
+                    cell_relation_t>
+        temp;
+
+      for (const auto &cell : local_cell_relations)
+        {
+          if (cell.first->has_children())
+            {
+              Assert(cell.second == ::dealii::CellStatus::cell_will_be_refined,
+                     ExcInternalError());
+
+              temp.emplace_back(cell.first->child(0),
+                                ::dealii::CellStatus::cell_will_be_refined);
+            }
+          else
+            temp.push_back(cell);
+        }
+
+      this->local_cell_relations = temp;
+
+      // cell status has been set during update_cell_relations_serial()
+      active_cell_old.clear();
+    }
+}
+
+
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -15672,9 +15895,13 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // Inform all listeners about beginning of refinement.
   signals.pre_refinement();
 
+  this->pack_data_serial_pre();
+
   execute_coarsening();
 
   const DistortedCellList cells_with_distorted_children = execute_refinement();
+
+  this->pack_data_serial_post();
 
   reset_cell_vertex_indices_cache();
 
@@ -15698,6 +15925,9 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
               cells_with_distorted_children);
 
   update_periodic_face_map();
+
+  if (this->cell_attached_data.n_attached_data_sets == 0)
+    this->update_cell_relations_serial();
 
 #  ifdef DEBUG
 
@@ -16075,6 +16305,15 @@ void Triangulation<dim, spacedim>::save_attached_data(
 {
   // cast away constness
   auto tria = const_cast<Triangulation<dim, spacedim> *>(this);
+
+  // each cell should have been flagged `CellStatus::cell_will_persist`
+  for (const auto &cell_rel : this->local_cell_relations)
+    {
+      (void)cell_rel;
+      Assert((cell_rel.second == // cell_status
+              dealii::CellStatus::cell_will_persist),
+             ExcInternalError());
+    }
 
   if (this->cell_attached_data.n_attached_data_sets > 0)
     {

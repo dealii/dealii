@@ -345,7 +345,7 @@ namespace Step77
     dof_handler.distribute_dofs(fe);
 
     Vector<double> tmp(dof_handler.n_dofs());
-    solution_transfer.interpolate(current_solution, tmp);
+    solution_transfer.interpolate(tmp);
     current_solution = std::move(tmp);
 
     hanging_node_constraints.clear();
