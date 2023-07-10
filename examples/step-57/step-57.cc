@@ -605,7 +605,7 @@ namespace Step57
     // Transfer solution from coarse to fine mesh and apply boundary value
     // constraints to the new transferred solution. Note that present_solution
     // is still a vector corresponding to the old mesh.
-    solution_transfer.interpolate(present_solution, tmp);
+    solution_transfer.interpolate(tmp);
     nonzero_constraints.distribute(tmp);
 
     // Finally set up matrix and vectors and set the present_solution to the
