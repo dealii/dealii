@@ -205,7 +205,7 @@ namespace Particles
     sorted_ids.reserve(ids.size());
     sorted_properties.reserve(properties.size());
 
-    for (auto &handle : handles_to_sort)
+    for (const auto &handle : handles_to_sort)
       {
         Assert(handle != invalid_handle,
                ExcMessage(

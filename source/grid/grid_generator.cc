@@ -977,7 +977,7 @@ namespace GridGenerator
                                                 std::sin(gamma) * edge_length);
 
           // loop over vertices of all cells
-          for (auto &cell : tria.cell_iterators())
+          for (const auto &cell : tria.cell_iterators())
             for (const unsigned int v : GeometryInfo<2>::vertex_indices())
               {
                 // vertex has been already processed: nothing to do
@@ -1168,11 +1168,11 @@ namespace GridGenerator
       MeshGenerator mesh_generator(additional_data);
       // Cast the triangulation to the right type so that the right
       // specialization of the function create_triangulation is picked up.
-      if (auto parallel_tria =
+      if (auto *parallel_tria =
             dynamic_cast<dealii::parallel::distributed::Triangulation<2, 2> *>(
               &tria))
         mesh_generator.create_triangulation(*parallel_tria, periodic_faces);
-      else if (auto parallel_tria = dynamic_cast<
+      else if (auto *parallel_tria = dynamic_cast<
                  dealii::parallel::fullydistributed::Triangulation<2, 2> *>(
                  &tria))
         mesh_generator.create_triangulation(*parallel_tria, periodic_faces);
@@ -2092,7 +2092,7 @@ namespace GridGenerator
     tria.reset_all_manifolds();
     tria.set_all_manifold_ids(0);
 
-    for (auto &cell : tria.cell_iterators())
+    for (const auto &cell : tria.cell_iterators())
       {
         // identify faces on torus surface and set manifold to 1
         for (const unsigned int f : GeometryInfo<3>::face_indices())

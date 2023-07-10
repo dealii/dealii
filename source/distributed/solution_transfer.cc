@@ -247,7 +247,7 @@ namespace parallel
       Assert(tria != nullptr, ExcInternalError());
 
       if (average_values)
-        for (const auto vec : all_out)
+        for (auto *const vec : all_out)
           *vec = 0.0;
 
       VectorType valence;
@@ -277,7 +277,7 @@ namespace parallel
                             (Number(1.0) / static_cast<Number>(valence[i])));
           valence.compress(VectorOperation::insert);
 
-          for (const auto vec : all_out)
+          for (auto *const vec : all_out)
             {
               // compress and weight with valence
               vec->compress(VectorOperation::add);
@@ -286,7 +286,7 @@ namespace parallel
         }
       else
         {
-          for (const auto vec : all_out)
+          for (auto *const vec : all_out)
             vec->compress(VectorOperation::insert);
         }
 

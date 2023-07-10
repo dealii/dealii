@@ -422,9 +422,9 @@ namespace internal
       const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
         &diagonal)
     {
-      const auto dst_ptr      = dst.begin();
-      const auto src_ptr      = src.begin();
-      const auto diagonal_ptr = diagonal.begin();
+      auto *const       dst_ptr      = dst.begin();
+      const auto *const src_ptr      = src.begin();
+      const auto *const diagonal_ptr = diagonal.begin();
 
       DEAL_II_OPENMP_SIMD_PRAGMA
       for (unsigned int i = 0; i < src.locally_owned_size(); ++i)

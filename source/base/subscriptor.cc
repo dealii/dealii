@@ -34,7 +34,7 @@ Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
   : counter(0)
   , object_info(subscriptor.object_info)
 {
-  for (const auto validity_ptr : subscriptor.validity_pointers)
+  for (auto *const validity_ptr : subscriptor.validity_pointers)
     *validity_ptr = false;
   subscriptor.validity_pointers.clear();
 }
@@ -43,7 +43,7 @@ Subscriptor::Subscriptor(Subscriptor &&subscriptor) noexcept
 
 Subscriptor::~Subscriptor()
 {
-  for (const auto validity_ptr : validity_pointers)
+  for (auto *const validity_ptr : validity_pointers)
     *validity_ptr = false;
   object_info = nullptr;
 }
@@ -123,7 +123,7 @@ Subscriptor::check_no_subscribers() const noexcept
 Subscriptor &
 Subscriptor::operator=(Subscriptor &&s) noexcept
 {
-  for (const auto validity_ptr : s.validity_pointers)
+  for (auto *const validity_ptr : s.validity_pointers)
     *validity_ptr = false;
   s.validity_pointers.clear();
   object_info = s.object_info;

@@ -201,8 +201,8 @@ namespace LinearAlgebra
     Vector<Number>::import_elements(
       const ReadWriteVector<Number> &V,
       VectorOperation::values        operation,
-      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-        communication_pattern)
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+        &communication_pattern)
     {
       // If no communication pattern is given, create one. Otherwise, use the
       // one given.
@@ -563,8 +563,9 @@ namespace LinearAlgebra
     MPI_Comm
     Vector<Number>::get_mpi_communicator() const
     {
-      const auto tpetra_comm = dynamic_cast<const Teuchos::MpiComm<int> *>(
-        vector->getMap()->getComm().get());
+      const auto *const tpetra_comm =
+        dynamic_cast<const Teuchos::MpiComm<int> *>(
+          vector->getMap()->getComm().get());
       Assert(tpetra_comm != nullptr, ExcInternalError());
       return *(tpetra_comm->getRawMpiComm())();
     }

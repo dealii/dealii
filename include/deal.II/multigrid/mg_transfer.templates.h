@@ -574,9 +574,9 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::copy_from_mg(
       if (ghosted_level_vector[level].size() > 0)
         ghosted_vector = src[level];
 
-      const auto ghosted_vector_ptr = (ghosted_level_vector[level].size() > 0) ?
-                                        &ghosted_vector :
-                                        &src[level];
+      const auto *const ghosted_vector_ptr =
+        (ghosted_level_vector[level].size() > 0) ? &ghosted_vector :
+                                                   &src[level];
 
       ghosted_vector_ptr->update_ghost_values();
 
