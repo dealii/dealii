@@ -239,7 +239,7 @@ public:
  * Set the additional data for NOX. See TrilinosWrappers::NOXSolver
  * for more information.
  */
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
   void
   set_data(
     const typename TrilinosWrappers::NOXSolver<VectorType>::AdditionalData
@@ -374,7 +374,7 @@ private:
 /**
  * NOX configuration data
  */
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
   typename TrilinosWrappers::NOXSolver<VectorType>::AdditionalData
                                        additional_data_nox;
   Teuchos::RCP<Teuchos::ParameterList> parameters_nox =
@@ -432,7 +432,7 @@ NonlinearSolverSelector<VectorType>::set_data(
 #endif
 
 // Do the same thing we did above but with NOX
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
   parameters_nox->set("Nonlinear Solver", "Line Search Based");
   Teuchos::ParameterList &Line_Search = parameters_nox->sublist("Line Search");
   Line_Search.set("Method", "Full Step");
@@ -539,7 +539,7 @@ NonlinearSolverSelector<VectorType>::AdditionalData::AdditionalData(
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
 template <typename VectorType>
 void
 NonlinearSolverSelector<VectorType>::set_data(
@@ -617,7 +617,7 @@ NonlinearSolverSelector<VectorType>::solve(
 #ifdef DEAL_II_WITH_PETSC
       additional_data.solver_type = AdditionalData::SolverType::petsc_snes;
 #endif
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
       additional_data.solver_type = AdditionalData::SolverType::nox;
 #endif
 #ifdef DEAL_II_WITH_SUNDIALS
@@ -655,7 +655,7 @@ NonlinearSolverSelector<VectorType>::solve(
     }
   else if (additional_data.solver_type == AdditionalData::SolverType::nox)
     {
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
 
       TrilinosWrappers::NOXSolver<VectorType> nonlinear_solver(
         additional_data_nox, parameters_nox);
@@ -688,7 +688,7 @@ NonlinearSolverSelector<VectorType>::solve(
 #ifdef DEAL_II_WITH_SUNDIALS
         "kinsol\n"
 #endif
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
         "NOX\n"
 #endif
 #ifdef DEAL_II_WITH_PETSC
