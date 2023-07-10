@@ -922,14 +922,17 @@ FlatManifold<dim, spacedim>::normal_vector(
   //   F(xi) = sum_v vertex[v] phi_v(xi)
   // We get the shape functions phi_v from an object of type FE_Q<dim-1>(1)
 
-  // we start with the point xi=1/2, xi=(1/2,1/2), ...
+  // We start at the center of the cell. If the face is a line or
+  // square, then the center is at 0.5 or (0.5,0.5). If the face is
+  // a triangle, then we start at the point (1/3,1/3).
   const unsigned int facedim = dim - 1;
 
   Point<facedim> xi;
 
   const auto face_reference_cell = face->reference_cell();
 
-  if (face_reference_cell == ReferenceCells::get_hypercube<facedim>())
+  if ((dim <= 2) ||
+      (face_reference_cell == ReferenceCells::get_hypercube<facedim>()))
     {
       for (unsigned int i = 0; i < facedim; ++i)
         xi[i] = 1. / 2;
