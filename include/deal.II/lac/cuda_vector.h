@@ -31,8 +31,11 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
 #  ifndef DOXYGEN
-template <typename Number>
-class ReadWriteVector;
+namespace LinearAlgebra
+{
+  template <typename Number>
+  class ReadWriteVector;
+}
 #  endif
 
 namespace LinearAlgebra
