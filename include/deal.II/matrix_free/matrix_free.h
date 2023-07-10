@@ -555,7 +555,7 @@ public:
   };
 
   /**
-   * @name 1: Construction and initialization
+   * @name Construction and initialization
    */
   /** @{ */
   /**
@@ -748,7 +748,7 @@ public:
   };
 
   /**
-   * @name 2: Matrix-free loops
+   * @name Matrix-free loops
    */
   /** @{ */
   /**
@@ -1630,7 +1630,7 @@ public:
   /** @} */
 
   /**
-   * @name 3: Initialization of vectors
+   * @name Initialization of vectors
    */
   /** @{ */
   /**
@@ -1745,7 +1745,7 @@ public:
   /** @} */
 
   /**
-   * @name 4: General information
+   * @name General information
    */
   /** @{ */
   /**
@@ -2095,7 +2095,7 @@ public:
   /** @} */
 
   /**
-   * @name 5: Access of internal data structure
+   * @name Access of internal data structure
    *
    * Note: Expert mode, interface not stable between releases.
    */

@@ -173,7 +173,7 @@ public:
     const internal::MatrixFreeFunctions::FaceToCellTopology<n_lanes> &face);
 
   /**
-   * @name 1: Access to geometry data at quadrature points
+   * @name Access to geometry data at quadrature points
    */
   /** @{ */
 
@@ -240,7 +240,7 @@ public:
   /** @} */
 
   /**
-   * @name 2: Access to internal data arrays
+   * @name Access to internal data arrays
    */
   /** @{ */
   /**
@@ -352,7 +352,7 @@ public:
   /** @} */
 
   /**
-   * @name 3: Information about the current cell this class operates on
+   * @name Information about the current cell this class operates on
    */
   /** @{ */
 
@@ -560,7 +560,7 @@ public:
   /** @} */
 
   /**
-   * @name 3: Functions to access cell- and face-data vectors.
+   * @name Functions to access cell- and face-data vectors.
    */
   /** @{ */
 

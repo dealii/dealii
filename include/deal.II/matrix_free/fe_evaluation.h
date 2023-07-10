@@ -106,7 +106,7 @@ public:
   static constexpr unsigned int n_lanes      = VectorizedArrayType::size();
 
   /**
-   * @name 1: Reading from and writing to vectors
+   * @name Reading from and writing to vectors
    */
   /** @{ */
   /**
@@ -279,7 +279,7 @@ public:
   /** @} */
 
   /**
-   * @name 2: Access to data at quadrature points or the gather vector data
+   * @name Access to data at quadrature points or the gather vector data
    */
   /** @{ */
   /**
