@@ -23,7 +23,6 @@
 #include <deal.II/base/index_set.h>
 
 #include <deal.II/lac/vector_operation.h>
-#include <deal.II/lac/vector_space_vector.h>
 
 #ifdef DEAL_II_WITH_CUDA
 
@@ -31,8 +30,11 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
 #  ifndef DOXYGEN
-template <typename Number>
-class ReadWriteVector;
+namespace LinearAlgebra
+{
+  template <typename Number>
+  class ReadWriteVector;
+}
 #  endif
 
 namespace LinearAlgebra
@@ -138,9 +140,9 @@ namespace LinearAlgebra
       void
       import_elements(
         const ReadWriteVector<Number> &V,
-        VectorOperation::values        operation,
-        std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          communication_pattern = {});
+        const VectorOperation::values  operation,
+        const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+          &communication_pattern = {});
 
       /**
        * @deprecated Use import_elements() instead.

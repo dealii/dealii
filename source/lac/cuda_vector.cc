@@ -128,8 +128,8 @@ namespace LinearAlgebra
     void
     Vector<Number>::import_elements(
       const ReadWriteVector<Number> &V,
-      VectorOperation::values        operation,
-      std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>)
+      const VectorOperation::values  operation,
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &)
     {
       if (operation == VectorOperation::insert)
         {

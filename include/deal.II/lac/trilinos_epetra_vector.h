@@ -28,7 +28,6 @@
 #  include <deal.II/lac/read_vector.h>
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>
 #  include <deal.II/lac/vector_operation.h>
-#  include <deal.II/lac/vector_space_vector.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
 #  include <Epetra_FEVector.h>
