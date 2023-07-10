@@ -7491,19 +7491,15 @@ namespace GridGenerator
     cylinder_shell(triangulation, L, inner_radius, outer_radius, 8, Nz);
     triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
 
-    Triangulation<dim>::active_cell_iterator cell =
-                                               triangulation.begin_active(),
-                                             endc = triangulation.end();
     std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             {
-              for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-                   ++v)
+              for (const unsigned int v : cell->vertex_indices())
                 {
-                  unsigned int vv = cell->face(f)->vertex_index(v);
+                  const unsigned int vv = cell->face(f)->vertex_index(v);
                   if (treated_vertices[vv] == false)
                     {
                       treated_vertices[vv] = true;
@@ -7537,15 +7533,14 @@ namespace GridGenerator
             }
       }
     double eps = 1e-3 * outer_radius;
-    cell       = triangulation.begin_active();
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
-        for (auto f : GeometryInfo<dim>::face_indices())
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
             {
-              double dx = cell->face(f)->center()(0);
-              double dy = cell->face(f)->center()(1);
-              double dz = cell->face(f)->center()(2);
+              const double dx = cell->face(f)->center()(0);
+              const double dy = cell->face(f)->center()(1);
+              const double dz = cell->face(f)->center()(2);
 
               if (colorize)
                 {
@@ -7575,9 +7570,9 @@ namespace GridGenerator
                 }
               else
                 {
-                  Point<dim> c = cell->face(f)->center();
-                  c(2)         = 0;
-                  double d     = c.norm();
+                  Point<dim> c   = cell->face(f)->center();
+                  c(2)           = 0;
+                  const double d = c.norm();
                   if (d - inner_radius < 0)
                     {
                       cell->face(f)->set_all_boundary_ids(1);
