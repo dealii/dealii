@@ -7488,46 +7488,49 @@ namespace GridGenerator
     Assert(L > 0, ExcMessage("Must give positive extension L"));
     Assert(Nz >= 1, ExcLowerRange(1, Nz));
 
+    // Start with a cylinder shell with the correct inner and outer radius
+    // and as many layers as requested
     cylinder_shell(triangulation, L, inner_radius, outer_radius, 8, Nz);
     triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
 
+    // Then loop over all vertices that are at the boundary (by looping
+    // over all cells, their faces, and if the face is at the boundary,
+    // their vertices. If we haven't touched that vertex yet, see if
+    // we need to move it from its cylinder mantle position to the
+    // outer boundary of the box.
     std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
     for (const auto &cell : triangulation.active_cell_iterators())
       {
-        for (auto f : GeometryInfo<dim>::face_indices())
+        for (const auto f : cell->face_indices())
           if (cell->face(f)->at_boundary())
             {
-              for (const unsigned int v : cell->vertex_indices())
+              for (const unsigned int v : cell->face(f)->vertex_indices())
                 {
                   const unsigned int vv = cell->face(f)->vertex_index(v);
                   if (treated_vertices[vv] == false)
                     {
                       treated_vertices[vv] = true;
-                      for (unsigned int i = 0; i <= Nz; ++i)
-                        {
-                          double d = i * L / Nz;
-                          switch (vv - i * 16)
-                            {
-                              case 1:
-                                cell->face(f)->vertex(v) =
-                                  Point<dim>(outer_radius, outer_radius, d);
-                                break;
-                              case 3:
-                                cell->face(f)->vertex(v) =
-                                  Point<dim>(-outer_radius, outer_radius, d);
-                                break;
-                              case 5:
-                                cell->face(f)->vertex(v) =
-                                  Point<dim>(-outer_radius, -outer_radius, d);
-                                break;
-                              case 7:
-                                cell->face(f)->vertex(v) =
-                                  Point<dim>(outer_radius, -outer_radius, d);
-                                break;
-                              default:
-                                break;
-                            }
-                        }
+
+                      // The vertices we have to treat are the ones that
+                      // have x=y or x=-y and are at the outer ring -- that is,
+                      // they are on the diagonal in the x-y plane and radius
+                      // equal to outer_radius. These need to be pulled out to
+                      // the corner point of the square, i.e., their x and y
+                      // coordinates need to be multiplied by sqrt(2),
+                      // whereas the z coordinate remains unchanged:
+                      const Point<dim> vertex_location =
+                        cell->face(f)->vertex(v);
+                      if ((std::fabs(std::fabs(vertex_location[0]) -
+                                     std::fabs(vertex_location[1])) <
+                           1e-12 * outer_radius) &&
+                          (std::fabs(vertex_location[0] * vertex_location[0] +
+                                     vertex_location[1] * vertex_location[1] -
+                                     outer_radius * outer_radius) <
+                           1e-12 * outer_radius))
+                        cell->face(f)->vertex(v) =
+                          Point<3>(vertex_location[0] * std::sqrt(2.0),
+                                   vertex_location[1] * std::sqrt(2.0),
+                                   vertex_location[2]);
                     }
                 }
             }
