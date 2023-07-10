@@ -726,7 +726,7 @@ namespace Step35
     {
       std::string   filename = "nsbench2.inp";
       std::ifstream file(filename);
-      Assert(file, ExcFileNotOpen(filename.c_str()));
+      Assert(file, ExcFileNotOpen(filename));
       grid_in.read_ucd(file);
     }
 

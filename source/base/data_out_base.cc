@@ -7889,7 +7889,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
   else if (n_groups == 1)
     {
       // write only a single data file in parallel
-      this->write_vtu_in_parallel(filename.c_str(), mpi_communicator);
+      this->write_vtu_in_parallel(filename, mpi_communicator);
     }
   else
     {
@@ -7898,7 +7898,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
       MPI_Comm comm_group;
       int ierr = MPI_Comm_split(mpi_communicator, color, rank, &comm_group);
       AssertThrowMPI(ierr);
-      this->write_vtu_in_parallel(filename.c_str(), comm_group);
+      this->write_vtu_in_parallel(filename, comm_group);
       Utilities::MPI::free_communicator(comm_group);
 #else
       AssertThrow(false, ExcMessage("Logical error. Should not arrive here."));

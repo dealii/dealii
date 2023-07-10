@@ -1189,7 +1189,7 @@ namespace step62
                              << std::setfill('0') << frequency_idx;
         std::string filename = (parameters.simulation_name + "_" +
                                 frequency_idx_stream.str() + ".vtu");
-        data_out.write_vtu_in_parallel(filename.c_str(), mpi_communicator);
+        data_out.write_vtu_in_parallel(filename, mpi_communicator);
       }
   }
 

@@ -2373,7 +2373,7 @@ namespace Step33
       grid_in.attach_triangulation(triangulation);
 
       std::ifstream input_file(parameters.mesh_filename);
-      Assert(input_file, ExcFileNotOpen(parameters.mesh_filename.c_str()));
+      Assert(input_file, ExcFileNotOpen(parameters.mesh_filename));
 
       grid_in.read_ucd(input_file);
     }
