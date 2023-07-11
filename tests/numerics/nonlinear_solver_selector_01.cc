@@ -51,7 +51,7 @@
 #ifdef DEAL_II_WITH_SUNDIALS
 #  include <deal.II/sundials/kinsol.h>
 #endif
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_NOX
 #  include <deal.II/trilinos/nox.h>
 #endif
 
