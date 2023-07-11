@@ -471,6 +471,9 @@ endif()
 #                                                                      #
 ########################################################################
 
+# record a status string:
+set(_status "neutral")
+
 ctest_start(Experimental TRACK ${TRACK})
 
 message("-- Running ctest_update() to query git information")
@@ -548,20 +551,13 @@ if("${_res}" STREQUAL "0")
       CLEAR_TARGETDIRECTORIES_TXT()
     endif()
 
+  else()
+    # build unsuccessful
+    set(_status "failure")
   endif()
-endif()
-
-#
-# Inject compiler information and svn revision into xml files:
-#
-
-file(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
-set(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
-if(NOT EXISTS ${_path})
-  message(FATAL_ERROR "
-Unable to determine test submission files from TAG. Bailing out.
-"
-    )
+else()
+  # configure unsuccessful
+  set(_status "failure")
 endif()
 
 #
@@ -586,12 +582,38 @@ if(NOT SKIP_SUBMISSION)
 
   if("${_res}" STREQUAL "0")
     message("-- Submission successful.")
+
+    #
+    # Grab git revision from our revision.log:
+    #
+    file(STRINGS "${CTEST_BINARY_DIRECTORY}/revision.log" _revision REGEX "Revision:")
+    string(REGEX REPLACE "#.*Revision:  " "" _revision "${_revision}")
+
+    #
+    # Configure or build errors are easy, but determining whether we
+    # encountered configure or build warnings, or test failures is
+    # remarkably tricky. None of the ctest_* commands return a value that
+    # would help us :-(
+    #
+    if("${_status}" STREQUAL "neutral")
+      # grab tag:
+      file(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
+      set(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
+      if(EXISTS ${_path})
+
+      else()
+        message(WARNING "Unable to locate test submission files from TAG.")
+      endif()
+    endif()
+
     message("###
 #
+# Revision:      ${_revision}
 # Site:          ${CTEST_SITE}
 # Configuration: ${CTEST_BUILD_NAME}
 # Results:       https://cdash.dealii.org/build/${_build_id}
+# Status:        ${_status}
 #
-###
+###")
   endif()
 endif()
