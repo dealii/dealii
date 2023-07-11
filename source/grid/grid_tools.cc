@@ -5889,9 +5889,10 @@ namespace GridTools
       ranks_and_indices.reserve(entities.size());
 
 #if defined(DEAL_II_WITH_ARBORX)
-#  define USE_ARBORX true
+      // ArborXWrappers don't support spacedim==1
+      static constexpr bool use_arborx = spacedim != 1;
 #else
-#  define USE_ARBORX false
+      static constexpr bool use_arborx = false;
 #endif
       // Lambda to process bboxes if global_bboxes.size()>1 or ArborX not
       // available
@@ -5899,7 +5900,7 @@ namespace GridTools
         std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes_temp;
         auto *global_bboxes_to_be_used = &global_bboxes;
 
-        if (global_bboxes.size() == 1 && USE_ARBORX == false)
+        if (global_bboxes.size() == 1 && use_arborx == false)
           {
             global_bboxes_temp =
               Utilities::MPI::all_gather(comm, global_bboxes[0]);
@@ -5948,10 +5949,9 @@ namespace GridTools
           }
       };
 
-#if defined(DEAL_II_WITH_ARBORX)
-      if (global_bboxes.size() == 1)
+      if constexpr (use_arborx)
         {
-          if constexpr (spacedim != 1)
+          if (global_bboxes.size() == 1)
             {
               ArborXWrappers::DistributedTree distributed_tree(
                 comm, global_bboxes[0]);
@@ -5970,19 +5970,16 @@ namespace GridTools
             }
           else
             {
-              AssertThrow(false, ExcInternalError());
-              return {};
+              // global_bboxes.size()>1
+              process_bboxes();
             }
         }
       else
         {
-          // global_bboxes.size()>1
+          // No ArborX
           process_bboxes();
         }
-#else
-      // No ArborX
-      process_bboxes();
-#endif
+
 
       // convert to CRS
       std::sort(ranks_and_indices.begin(), ranks_and_indices.end());
