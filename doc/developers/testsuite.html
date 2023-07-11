@@ -306,33 +306,6 @@ xx: ===============================    OUTPUT END   ============================
     </p>
 
 
-    <a name="memcheck"></a>
-     <h3>Running with valgrind</h3>
-
-     <p>
-       The testsuite can also be run using <a href="http://valgrind.org/">valgrind</a>
-       to check for <i>memory corruption</i> in the library.
-     </p>
-
-     <p>
-       You can do so by invoking
- <pre>
- ctest -DMEMORYCHECK=ON <...> -S ../tests/run_testsuite.cmake
- </pre>
-       when running the testsuite, or directly by
- <pre>
- ctest <...> -S ../tests/run_memorycheck.cmake
- </pre>
-     </p>
-
-     <p>
-       At the end of all of this, results will be shown in a separate section
-       "Dynamic Analysis" at the
-       <a href="https://cdash.dealii.org/index.php?project=deal.II&display=project"
-       target="_top">deal.II cdash site</a>.
-     </p>
-
-
     <a name="coverage"></a>
     <h3>Generating coverage information</h3>
 
