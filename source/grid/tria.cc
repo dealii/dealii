@@ -5557,7 +5557,9 @@ namespace internal
                   Assert(
                     next_unused_vertex < triangulation.vertices.size(),
                     ExcMessage(
-                      "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+                      "Internal error: During refinement, the triangulation "
+                      "wants to access an element of the 'vertices' array "
+                      "but it turns out that the array is not large enough."));
 
                   // Now we always ask the cell itself where to put
                   // the new point. The cell in turn will query the
@@ -5693,7 +5695,6 @@ namespace internal
       {
         const unsigned int dim = 2;
 
-
         // First check whether we can get away with isotropic refinement, or
         // whether we need to run through the full anisotropic algorithm
         {
@@ -5710,6 +5711,8 @@ namespace internal
             return execute_refinement_isotropic(triangulation,
                                                 check_for_distorted_cells);
         }
+
+        // If we get here, we are doing anisotropic refinement.
 
         // Check whether a new level is needed. We have to check for
         // this on the highest level only
@@ -15600,6 +15603,51 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
               cells_with_distorted_children);
 
   update_periodic_face_map();
+
+#ifdef DEBUG
+
+  // In debug mode, we want to check for some consistency of the
+  // result of this function. Because there are multiple exit
+  // paths, put this check into a ScopeExit object that is
+  // executed on each of the exit paths.
+  //
+  // Specifically, check on exit of this function that if a quad
+  // cell has been refined, all of its children have neighbors
+  // in all directions in which the parent cell has neighbors as
+  // well. The children's neighbors are either the parent
+  // neighbor or the parent neigbor's children, or simply one of
+  // the other children of the current cell. This check is
+  // useful because if one creates a triangulation with an
+  // inconsistently ordered set of cells (e.g., because one has
+  // forgotten to call GridTools::consistently_order_cells()),
+  // then this relatively simple invariant is violated -- so the
+  // check here can be used to catch that case, at least
+  // sometimes.
+  //
+  // In 1d, this situation cannot happen. In 3d, we have explicit
+  // orientation flags to ensure that it is not necessary to re-orient
+  // cells at the beginning. But in both cases, the invariant should
+  // still hold as long as the cell is a hypercube.
+  for (const auto &cell : cell_iterators())
+    {
+      if (cell->has_children() && cell->reference_cell().is_hyper_cube())
+        for (const unsigned int f : cell->face_indices())
+          if (cell->at_boundary(f) == false)
+            {
+              for (const auto &child : cell->child_iterators())
+                {
+                  Assert(
+                    child->at_boundary(f) == false,
+                    ExcMessage(
+                      "We ended up with a triangulation whose child cells "
+                      "are not connected to their neighbors as expected. "
+                      "When you created the triangulation, did you forget "
+                      "to call GridTools::consistently_order_cells() "
+                      "before calling Triangulation::create_triangulation()?"));
+                }
+            }
+    }
+#endif
 }
 
 
