@@ -534,7 +534,7 @@ if("${_res}" STREQUAL "0")
       set(CTEST_BUILD_CONFIGURATION "${JOB_BUILD_CONFIGURATION}")
     endif()
 
-    message("-- Running CTEST_TESTS()")
+    message("-- Running ctest_tests()")
     ctest_test()
 
     if(COVERAGE)
@@ -579,41 +579,47 @@ endif()
 if(NOT SKIP_SUBMISSION)
   message("-- Running ctest_submit()")
   ctest_submit(RETURN_VALUE _res BUILD_ID _build_id)
-
   if("${_res}" STREQUAL "0")
     message("-- Submission successful.")
+    set(_cdash_url "https://cdash.dealii.org/build/${_build_id}")
+  else()
+    message("-- Submission failed.")
+    set(_cdash_url "-- submission failed --")
+  endif()
+else()
+  set(_cdash_url "-- submission skipped --")
+endif()
 
-    #
-    # Grab git revision from our revision.log:
-    #
-    file(STRINGS "${CTEST_BINARY_DIRECTORY}/revision.log" _revision REGEX "Revision:")
-    string(REGEX REPLACE "#.*Revision:  " "" _revision "${_revision}")
 
-    #
-    # Configure or build errors are easy, but determining whether we
-    # encountered configure or build warnings, or test failures is
-    # remarkably tricky. None of the ctest_* commands return a value that
-    # would help us :-(
-    #
-    if("${_status}" STREQUAL "neutral")
-      # grab tag:
-      file(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
-      set(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
-      if(EXISTS ${_path})
+#
+# Grab git revision from our revision.log:
+#
+file(STRINGS "${CTEST_BINARY_DIRECTORY}/revision.log" _revision REGEX "Revision:")
+string(REGEX REPLACE "#.*Revision:  " "" _revision "${_revision}")
 
-      else()
-        message(WARNING "Unable to locate test submission files from TAG.")
-      endif()
-    endif()
+#
+# Configure or build errors are easy, but determining whether we
+# encountered configure or build warnings, or test failures is remarkably
+# tricky. None of the ctest_* commands return a value that would help us
+# :-(
+#
+if("${_status}" STREQUAL "neutral")
+  # grab tag:
+  file(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
+  set(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
+  if(EXISTS ${_path})
 
-    message("###
+  else()
+    message(WARNING "Unable to locate test submission files from TAG.")
+  endif()
+endif()
+
+message("###
 #
 # Revision:      ${_revision}
 # Site:          ${CTEST_SITE}
 # Configuration: ${CTEST_BUILD_NAME}
-# Results:       https://cdash.dealii.org/build/${_build_id}
+# CDash URL:     ${_cdash_url}
 # Status:        ${_status}
 #
 ###")
-  endif()
-endif()
