@@ -264,9 +264,6 @@ namespace Step68
     if (dim == 3)
       center[2] = 0.0;
 
-    const double outer_radius = 0.50;
-    const double inner_radius = 0.01;
-
     parallel::distributed::Triangulation<dim> particle_triangulation(
       MPI_COMM_WORLD);
 
@@ -328,6 +325,9 @@ namespace Step68
 
     FEPointEvaluation<dim, dim> evaluator(mapping, fluid_fe, update_values);
 
+    const double this_mpi_process =
+      (double)Utilities::MPI::this_mpi_process(mpi_communicator);
+
     auto particle = particle_handler.begin();
     while (particle != particle_handler.end())
       {
@@ -360,8 +360,7 @@ namespace Step68
             for (int d = 0; d < dim; ++d)
               properties[d] = particle_velocity[d];
 
-            properties[dim] =
-              Utilities::MPI::this_mpi_process(mpi_communicator);
+            properties[dim] = this_mpi_process;
           }
       }
   }
