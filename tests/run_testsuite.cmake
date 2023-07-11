@@ -95,7 +95,7 @@
 # For details, consult the ./README file.
 #
 
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.15.0)
 message("-- This is CTest ${CMAKE_VERSION}")
 
 #
@@ -582,11 +582,16 @@ endif()
 
 if(NOT SKIP_SUBMISSION)
   message("-- Running ctest_submit()")
-  ctest_submit(RETURN_VALUE _res)
+  ctest_submit(RETURN_VALUE _res BUILD_ID _build_id)
 
   if("${_res}" STREQUAL "0")
-    message("-- Submission successful. Goodbye!")
+    message("-- Submission successful.")
+    message("###
+#
+# Site:          ${CTEST_SITE}
+# Configuration: ${CTEST_BUILD_NAME}
+# Results:       https://cdash.dealii.org/build/${_build_id}
+#
+###
   endif()
 endif()
-
-# .oO( This script is freaky 606 lines long... )
