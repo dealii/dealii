@@ -1,3 +1,13 @@
+[![indent](https://github.com/dealii/dealii/workflows/indent/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Aindent)
+[![workflows/github-linux](https://github.com/dealii/dealii/workflows/github-linux/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-linux)
+[![workflows/github-OSX](https://github.com/dealii/dealii/workflows/github-OSX/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-OSX)
+[![workflows/github-windows](https://github.com/dealii/dealii/workflows/github-windows/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-windows)
+[![workflows/github-docker](https://github.com/dealii/dealii/workflows/github-docker/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-docker)
+[![jenkins/dealii-serial](https://ci.tjhei.info/job/dealii-serial/job/master/badge/icon?style=plastic&subject=jenkins-serial)](https://ci.tjhei.info/job/dealii-serial/job/master/)
+[![jenkins/dealii-mpi](https://ci.tjhei.info/job/dealii-mpi/job/master/badge/icon?style=plastic&subject=jenkins-MPI)](https://ci.tjhei.info/job/dealii-mpi/job/master/)
+[![jenkins/dealii-osx](https://ci.tjhei.info/job/dealii-osx/job/master/badge/icon?style=plastic&subject=jenkins-OSX)](https://ci.tjhei.info/job/dealii-osx/job/master/)
+[![jenkins/dealii-ampere](https://ci.tjhei.info/job/dealii-ampere/job/master/badge/icon?style=plastic&subject=jenkins-ampere)](https://ci.tjhei.info/job/dealii-ampere/job/master/)
+
 What is deal.II?
 ================
 
@@ -53,21 +63,6 @@ Further information:
 For further information have a look at
 [./doc/index.html](https://dealii.org/developer/index.html) or at
 https://www.dealii.org.
-
-Continuous Integration Status:
-------------------------
-
-| System | Status                                                                                                                                                                                                                                           | More information                                                                      |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| Indent | ![indent](https://github.com/dealii/dealii/workflows/indent/badge.svg)                                                                                                                                                                           | using GitHub actions                                                                  |
-| Linux serial | [![Build Status](https://ci.tjhei.info/job/dealii-serial/job/master/badge/icon)](https://ci.tjhei.info/job/dealii-serial/job/master/)                                                                                                                | See https://ci.tjhei.info |
-| Linux MPI | [![Build Status](https://ci.tjhei.info/job/dealii-mpi/job/master/badge/icon)](https://ci.tjhei.info/job/dealii-mpi/job/master/)                                                                                                                | See https://ci.tjhei.info |
-| MacOS  | [![Build Status](https://ci.tjhei.info/job/dealii-OSX/job/master/badge/icon)](https://ci.tjhei.info/job/dealii-OSX/job/master/)                                                                                                        | See https://ci.tjhei.info                                                        |
-| Linux  | [![Build Status](https://github.com/dealii/dealii/workflows/github-linux/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-linux)                                                                                     | See https://github.com/dealii/dealii/actions                                          |
-| MacOS  | [![Build Status](https://github.com/dealii/dealii/workflows/github-OSX/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-OSX)                                                                                         | See https://github.com/dealii/dealii/actions                                          |
-| MSVC   | [![Build status](https://github.com/dealii/dealii/workflows/github-windows/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-windows)                                                                                 | See https://github.com/dealii/dealii/actions                                          |
-| Docker | [![Build status](https://github.com/dealii/dealii/workflows/github-docker/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-docker)                                                                                   | See https://github.com/dealii/dealii/actions                                          |
-| CDash  | [![cdash](https://img.shields.io/website?down_color=lightgrey&down_message=offline&label=CDash&up_color=green&up_message=up&url=https%3A%2F%2Fcdash.dealii.org%2Findex.php%3Fproject%3Ddeal.II)](https://cdash.dealii.org/index.php?project=deal.II) | Various builds and configurations on https://cdash.dealii.org/index.php?project=deal.II |
 
 Docker Images:
 -------------
