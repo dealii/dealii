@@ -1,4 +1,5 @@
-[![indent](https://github.com/dealii/dealii/workflows/indent/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Aindent)
+[![workflows/indent](https://github.com/dealii/dealii/workflows/indent/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Aindent)
+[![workflows/tidy](https://github.com/dealii/dealii/workflows/tidy/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Atidy)
 [![workflows/github-linux](https://github.com/dealii/dealii/workflows/github-linux/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-linux)
 [![workflows/github-OSX](https://github.com/dealii/dealii/workflows/github-OSX/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-OSX)
 [![workflows/github-windows](https://github.com/dealii/dealii/workflows/github-windows/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-windows)
