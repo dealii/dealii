@@ -23,6 +23,19 @@
 #ifdef DEAL_II_WITH_ARBORX
 #  include <deal.II/arborx/access_traits.h>
 #  include <deal.II/arborx/distributed_tree.h>
+#else
+namespace ArborXWrappers
+{
+  class DistributedTree
+  {
+  public:
+    template <typename QueryType>
+    std::pair<std::vector<std::pair<int, int>>, std::vector<int>>
+    query(const QueryType &queries);
+  };
+  class BoundingBoxIntersectPredicate
+  {};
+} // namespace ArborXWrappers
 #endif
 
 #ifdef DEAL_II_WITH_CGAL
