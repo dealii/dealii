@@ -2240,6 +2240,35 @@ public:
   using CellStatus DEAL_II_DEPRECATED_EARLY = ::dealii::CellStatus;
 
   /**
+   * @deprecated This is an alias for backward compatibility. Use
+   * ::dealii::CellStatus directly.
+   */
+  static constexpr auto CELL_PERSIST DEAL_II_DEPRECATED_EARLY =
+    ::dealii::CellStatus::cell_will_persist;
+
+  /**
+   * @deprecated This is an alias for backward compatibility. Use
+   * ::dealii::CellStatus directly.
+   */
+  static constexpr auto CELL_REFINE DEAL_II_DEPRECATED_EARLY =
+    ::dealii::CellStatus::cell_will_be_refined;
+
+  /**
+   * @deprecated This is an alias for backward compatibility. Use
+   * ::dealii::CellStatus directly.
+   */
+  static constexpr auto CELL_COARSEN DEAL_II_DEPRECATED_EARLY =
+    ::dealii::CellStatus::children_will_be_coarsened;
+
+  /**
+   * @deprecated This is an alias for backward compatibility. Use
+   * ::dealii::CellStatus directly.
+   */
+  static constexpr auto CELL_INVALID DEAL_II_DEPRECATED_EARLY =
+    ::dealii::CellStatus::cell_invalid;
+
+
+  /**
    * A structure used to accumulate the results of the `weight` signal slot
    * functions below. It takes an iterator range and returns the sum of
    * values.
