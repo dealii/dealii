@@ -471,8 +471,9 @@ endif()
 #                                                                      #
 ########################################################################
 
-# record a status string:
+# record a status and summary string:
 set(_status "neutral")
+set(_summary "")
 
 ctest_start(Experimental TRACK ${TRACK})
 
@@ -554,10 +555,12 @@ if("${_res}" STREQUAL "0")
   else()
     # build unsuccessful
     set(_status "failure")
+    string(APPEND _summary "\n#   - build failure")
   endif()
 else()
   # configure unsuccessful
   set(_status "failure")
+  string(APPEND _summary "\n#   - configure failure")
 endif()
 
 #
@@ -604,11 +607,37 @@ string(REGEX REPLACE "#.*Revision:  " "" _revision "${_revision}")
 # :-(
 #
 if("${_status}" STREQUAL "neutral")
+  #
+  # If we made it to this place then configure and build succeeded
+  # (otherwise ${_status} would have been set to "failure". So let's try to
+  # locate all relevant xml files to query for configure/build warnings and
+  # test failures
+  #
+
   # grab tag:
   file(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
   set(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
-  if(EXISTS ${_path})
-
+  if(EXISTS "${_path}/Configure.xml" AND EXISTS "${_path}/Build.xml" AND EXISTS "${_path}/Test.xml")
+    #
+    # All xml files are present. So let's make a decision on "success" or
+    # "failure":
+    #
+    set(_status "success")
+    file(STRINGS "${_path}/Configure.xml" _warnings LIMIT_COUNT 1 REGEX "CMake Warning at")
+    if(NOT "${_warnings}" STREQUAL "")
+      set(_status "failure")
+      string(APPEND _summary "\n#   - configure warnings")
+    endif()
+    file(STRINGS "${_path}/Build.xml" _warnings LIMIT_COUNT 1 REGEX "<Warning>")
+    if(NOT "${_warnings}" STREQUAL "")
+      set(_status "failure")
+      string(APPEND _summary "\n#   - build warnings")
+    endif()
+    file(STRINGS "${_path}/Test.xml" _warnings LIMIT_COUNT 1 REGEX "Status=\"failed\"")
+    if(NOT "${_warnings}" STREQUAL "")
+      set(_status "failure")
+      string(APPEND _summary "\n#   - test failures")
+    endif()
   else()
     message(WARNING "Unable to locate test submission files from TAG.")
   endif()
@@ -620,6 +649,6 @@ message("###
 # Site:          ${CTEST_SITE}
 # Configuration: ${CTEST_BUILD_NAME}
 # CDash URL:     ${_cdash_url}
-# Status:        ${_status}
+# Status:        ${_status}${_summary}
 #
 ###")
