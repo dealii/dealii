@@ -728,12 +728,48 @@ AffineConstraints<number>::close()
           // loop over all entries of this line (including ones that we
           // have appended in this go around) and see whether they are
           // further constrained. ignore elements that we don't store on
-          // the current processor
-          unsigned int entry = 0;
-          while (entry < line.entries.size())
+          // the current processor.
+          //
+          // If we find that one of the entries in the current line is indeed
+          // constrained, then store the address of the line it corresponds to
+          // for further processing; this avoids having to look it up again,
+          // which requires an IndexSet lookup. If not, store a nullptr.
+          std::vector<const ConstraintLine *> sub_constraints(
+            line.entries.size(), nullptr);
+          for (unsigned int entry = 0; entry < line.entries.size(); ++entry)
             if (((local_lines.size() == 0) ||
                  (local_lines.is_element(line.entries[entry].first))) &&
                 is_constrained(line.entries[entry].first))
+              {
+                const size_type dof_index = line.entries[entry].first;
+                sub_constraints[entry] =
+                  &lines[lines_cache[calculate_line_index(dof_index)]];
+              }
+
+          // If none of the entries in the current line refer to DoFs that are
+          // themselves constrained, then we can move on:
+          if (std::none_of(sub_constraints.begin(),
+                           sub_constraints.end(),
+                           [](const auto p) { return (p != nullptr); }))
+            continue;
+
+          // Now walk through the original entries. We may replace some of them,
+          // and we may add some, but we only walk through the original entries
+          // (and also don't touch the replacements) even though in principle
+          // we could also do the ones we have added or replaced.
+          // We don't because we don't have information for those in the
+          // sub_constraints array above. But there is no harm in doing so:
+          // we will simply treat those in the next round around of the outer
+          // iteration.
+          //
+          // Since we want to delete some entries (see below) but don't want
+          // to disturb the order of the correspondence between lines.entries
+          // and sub_constraints, we store up which entries we will later
+          // have to delete.
+          const unsigned int     n_original_entries = line.entries.size();
+          std::set<unsigned int> entries_to_delete;
+          for (unsigned int entry = 0; entry < n_original_entries; ++entry)
+            if (sub_constraints[entry] != nullptr)
               {
                 // ok, this entry is further constrained:
                 chained_constraint_replaced = true;
@@ -746,7 +782,7 @@ AffineConstraints<number>::close()
                        ExcMessage("Cycle in constraints detected!"));
 
                 const ConstraintLine &constrained_line =
-                  lines[lines_cache[calculate_line_index(dof_index)]];
+                  *sub_constraints[entry];
                 Assert(constrained_line.index == dof_index, ExcInternalError());
 
                 // now we have to replace an entry by its expansion. we do
@@ -792,20 +828,22 @@ AffineConstraints<number>::close()
                   // empty). in that case, we can't just overwrite the
                   // current entry, but we have to actually eliminate it
                   {
-                    line.entries.erase(line.entries.begin() + entry);
+                    entries_to_delete.insert(entry);
                   }
 
                 line.inhomogeneity += constrained_line.inhomogeneity * weight;
-
-                // now that we're here, do not increase index by one but
-                // rather make another pass for the present entry because
-                // we have replaced the present entry by another one, or
-                // because we have deleted it and shifted all following
-                // ones one forward
               }
-            else
-              // entry not further constrained. just move ahead by one
-              ++entry;
+
+          // Now delete the elements we have marked for deletion. Do
+          // so in reverse order so that we compress the array walking
+          // backward from the end without having to keep track that
+          // we have already erased earlier elements (as we would have to
+          // do if we walked the list of entries to delete in forward
+          // order).
+          for (auto it = entries_to_delete.rbegin();
+               it != entries_to_delete.rend();
+               ++it)
+            line.entries.erase(line.entries.begin() + *it);
         }
 
 #ifdef DEBUG
