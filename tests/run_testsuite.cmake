@@ -638,6 +638,11 @@ if("${_status}" STREQUAL "neutral")
       set(_status "failure")
       string(APPEND _summary "\n#   - test failures")
     endif()
+
+    if("${_status}" STREQUAL "success")
+      string(APPEND _summary "\n#
+# 🎉  🎉  🎉  🎉      Testsuite run succeeded.     🎉  🎉  🎉  🎉")
+    endif()
   else()
     message(WARNING "Unable to locate test submission files from TAG.")
   endif()
