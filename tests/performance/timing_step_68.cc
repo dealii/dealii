@@ -326,7 +326,7 @@ namespace Step68
     FEPointEvaluation<dim, dim> evaluator(mapping, fluid_fe, update_values);
 
     const double this_mpi_process =
-      (double)Utilities::MPI::this_mpi_process(mpi_communicator);
+      static_cast<double>(Utilities::MPI::this_mpi_process(mpi_communicator));
 
     auto particle = particle_handler.begin();
     while (particle != particle_handler.end())
