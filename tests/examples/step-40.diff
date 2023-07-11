@@ -1,6 +1,6 @@
 20a21
 > #include "../example_test.h"
-496,502c497,504
+503,509c504,511
 <     solver.solve(system_matrix,
 <                  completely_distributed_solution,
 <                  system_rhs,
@@ -17,11 +17,11 @@
 >                               solver_control.last_step(),
 >                               8,
 >                               15);
-627c629
+634c636
 <     const unsigned int n_cycles = 8;
 ---
 >     const unsigned int n_cycles = 3;
-655c657
+662c664
 <         computing_timer.print_summary();
 ---
 >         // computing_timer.print_summary();
