@@ -625,7 +625,9 @@ if("${_status}" STREQUAL "neutral")
     set(_status "success")
     file(STRINGS "${_path}/Configure.xml" _warnings LIMIT_COUNT 1 REGEX "CMake Warning at")
     if(NOT "${_warnings}" STREQUAL "")
-      set(_status "failure")
+      # for the time being configure warnings are not a "failure"
+      # condition. This would otherwise create a lot of noise on the
+      # regression tester.
       string(APPEND _summary "\n#   - configure warnings")
     endif()
     file(STRINGS "${_path}/Build.xml" _warnings LIMIT_COUNT 1 REGEX "<Warning>")
