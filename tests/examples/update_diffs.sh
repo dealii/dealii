@@ -28,3 +28,5 @@ for file in ${diff_files}; do
     exit 1
   fi
 done
+
+exit 0
