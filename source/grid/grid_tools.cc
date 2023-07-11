@@ -24,11 +24,17 @@
 #  include <deal.II/arborx/access_traits.h>
 #  include <deal.II/arborx/distributed_tree.h>
 #else
+template <int dim, typename Number>
+class BoundingBox;
+
 namespace ArborXWrappers
 {
   class DistributedTree
   {
   public:
+    template <int dim, typename Number>
+    DistributedTree(const MPI_Comm &,
+                    const std::vector<BoundingBox<dim, Number>> &);
     template <typename QueryType>
     std::pair<std::vector<std::pair<int, int>>, std::vector<int>>
     query(const QueryType &queries);
