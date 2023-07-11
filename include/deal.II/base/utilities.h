@@ -1286,9 +1286,9 @@ namespace Utilities
       object.clear();
       if (vector_size > 0)
         {
-          const auto *const buffer_data_begin =
+          const T *const buffer_data_begin =
             reinterpret_cast<const T *>(&*cbegin + sizeof(vector_size));
-          const auto *const buffer_data_end = buffer_data_begin + vector_size;
+          const T *const buffer_data_end = buffer_data_begin + vector_size;
           object.insert(object.end(), buffer_data_begin, buffer_data_end);
         }
     }
