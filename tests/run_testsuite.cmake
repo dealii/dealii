@@ -81,10 +81,6 @@
 #     ctest_coverage() stage will be run. Test results must go into the
 #     "Experimental" section.
 #
-#   MEMORYCHECK
-#     - If set to ON the CTEST_MEMORYCHECK() stage will be run.
-#     Test results must go into the "Experimental" section.
-#
 #   MAKEOPTS
 #     - Additional options that will be passed directly to make (or ninja).
 #
@@ -436,35 +432,6 @@ endif()
 message("-- COVERAGE:               ${COVERAGE}")
 
 
-#
-# Setup memcheck:
-#
-
-if(MEMORYCHECK)
-  if(NOT TRACK MATCHES "Experimental")
-    message(FATAL_ERROR "
-TRACK must be set to  \"Experimental\" if Memcheck is enabled via
-MEMORYCHECK=TRUE.
-"
-      )
-  endif()
-
-  find_program(MEMORYCHECK_COMMAND NAMES valgrind)
-  if(MEMORYCOMMAND MATCHES "-NOTFOUND")
-    message(FATAL_ERROR "
-Memcheck enabled but could not find the valgrind executable. Please install
-valgrind.
-"
-       )
-  endif()
-
-  set(CTEST_MEMORYCHECK_COMMAND "${MEMORYCHECK_COMMAND}")
-endif()
-
-message("-- MEMORYCHECK:               ${MEMORYCHECK}")
-
-
-
 macro(create_targetdirectories_txt)
   #
   # It gets tricky: Fake a TargetDirectories.txt containing _all_ target
@@ -563,13 +530,9 @@ if("${_res}" STREQUAL "0")
     if(DEAL_II_MSVC)
       set(CTEST_BUILD_CONFIGURATION "${JOB_BUILD_CONFIGURATION}")
     endif()
-    if(MEMORYCHECK)
-      message("-- Running ctest_memcheck()")
-      ctest_memcheck()
-    else()
-      message("-- Running CTEST_TESTS()")
-      ctest_test()
-    endif()
+
+    message("-- Running CTEST_TESTS()")
+    ctest_test()
 
     if(COVERAGE)
       CREATE_TARGETDIRECTORIES_TXT()
