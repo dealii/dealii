@@ -839,7 +839,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::FE_DGQArbitraryNodes(
   : FE_DGQ<dim, spacedim>(
       Polynomials::generate_complete_Lagrange_basis(points.get_points()))
 {
-  Assert(points.size() > 0,
+  Assert(!points.empty(),
          (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
   this->unit_support_points = Quadrature<dim>(points).get_points();
 }

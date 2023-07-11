@@ -470,11 +470,11 @@ namespace internal
       typename CellAttachedDataSerializer<dim, spacedim>::cell_relation_t>
       &cell_relations) const
   {
-    Assert(sizes_fixed_cumulative.size() > 0,
+    Assert(!sizes_fixed_cumulative.empty(),
            ExcMessage("No data has been packed!"));
     if (cell_relations.size() > 0)
       {
-        Assert(dest_data_fixed.size() > 0,
+        Assert(!dest_data_fixed.empty(),
                ExcMessage("No data has been received!"));
       }
 
@@ -523,11 +523,11 @@ namespace internal
     // information), but not necessarily variable size data (e.g., with a
     // ParticleHandler a cell might not contain any particle at all).
     // Thus it is sufficient to check if fixed size data has been received.
-    Assert(sizes_fixed_cumulative.size() > 0,
+    Assert(!sizes_fixed_cumulative.empty(),
            ExcMessage("No data has been packed!"));
     if (cell_relations.size() > 0)
       {
-        Assert(dest_data_fixed.size() > 0,
+        Assert(!dest_data_fixed.empty(),
                ExcMessage("No data has been received!"));
       }
 
@@ -674,7 +674,7 @@ namespace internal
     const std::string &filename,
     const MPI_Comm &   mpi_communicator) const
   {
-    Assert(sizes_fixed_cumulative.size() > 0,
+    Assert(!sizes_fixed_cumulative.empty(),
            ExcMessage("No data has been packed!"));
 
 #ifdef DEAL_II_WITH_MPI

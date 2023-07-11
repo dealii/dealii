@@ -275,7 +275,7 @@ namespace parallel
               AssertThrowMPI(ierr);
             }
 
-          if (requests.size() > 0)
+          if (!requests.empty())
             {
               ierr = MPI_Waitall(requests.size(),
                                  requests.data(),

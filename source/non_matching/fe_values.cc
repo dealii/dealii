@@ -214,7 +214,7 @@ namespace NonMatching
                 fe_values_outside->reinit(cell);
               }
 
-            if (surface_quadrature.size() > 0)
+            if (!surface_quadrature.empty())
               {
                 fe_values_surface.emplace((*mapping_collection)[mapping_index],
                                           (*fe_collection)[active_fe_index],

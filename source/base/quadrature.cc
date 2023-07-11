@@ -507,7 +507,7 @@ QIterated<1>::QIterated(const Quadrature<1> &        base_quadrature,
         (base_quadrature.size() - 1) * (intervals.size() - 1) + 1 :
         base_quadrature.size() * (intervals.size() - 1))
 {
-  Assert(base_quadrature.size() > 0, ExcNotInitialized());
+  Assert(!base_quadrature.empty(), ExcNotInitialized());
   Assert(intervals.size() > 1, ExcZero());
 
   const unsigned int n_copies = intervals.size() - 1;
@@ -618,7 +618,7 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
       internal::QIteratedImplementation::create_equidistant_interval_points(
         n_copies))
 {
-  Assert(base_quadrature.size() > 0, ExcNotInitialized());
+  Assert(!base_quadrature.empty(), ExcNotInitialized());
   Assert(n_copies > 0, ExcZero());
 }
 
