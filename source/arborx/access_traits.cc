@@ -26,16 +26,15 @@ namespace ArborXWrappers
   PointPredicate::PointPredicate(
     const std::vector<dealii::Point<dim, Number>> &dim_points)
   {
-    static_assert(dim != 1, "dim equal to one is not supported.");
-
     const unsigned int size = dim_points.size();
     points.reserve(size);
     for (unsigned int i = 0; i < size; ++i)
       {
         points.emplace_back(static_cast<float>(dim_points[i][0]),
-                            static_cast<float>(dim_points[i][1]),
-                            dim == 2 ? 0.f :
-                                       static_cast<float>(dim_points[i][2]));
+                            dim < 2 ? 0.f :
+                                      static_cast<float>(dim_points[i][1]),
+                            dim < 3 ? 0.f :
+                                      static_cast<float>(dim_points[i][2]));
       }
   }
 
@@ -153,20 +152,18 @@ namespace ArborXWrappers
     const std::vector<std::pair<dealii::Point<dim, Number>, Number>>
       &dim_spheres)
   {
-    static_assert(dim != 1, "dim equal to one is not supported.");
-
     const unsigned int size = dim_spheres.size();
     spheres.reserve(size);
     for (unsigned int i = 0; i < size; ++i)
       {
         // ArborX assumes that the center coordinates and the radius use float
         // and the sphere is 3d
-        spheres.emplace_back(std::make_pair(
+        spheres.emplace_back(
           dealii::Point<3, float>(
             static_cast<float>(dim_spheres[i].first[0]),
-            static_cast<float>(dim_spheres[i].first[1]),
-            dim == 2 ? 0.f : static_cast<float>(dim_spheres[i].first[2])),
-          static_cast<float>(dim_spheres[i].second)));
+            dim < 2 ? 0.f : static_cast<float>(dim_spheres[i].first[1]),
+            dim < 3 ? 0.f : static_cast<float>(dim_spheres[i].first[2])),
+          static_cast<float>(dim_spheres[i].second));
       }
   }
 
@@ -237,8 +234,8 @@ namespace ArborX
     // ArborX assumes that the point coordinates use float and that the point
     // is 3d
     return {static_cast<float>(v[i][0]),
-            static_cast<float>(v[i][1]),
-            dim == 2 ? 0 : static_cast<float>(v[i][2])};
+            dim < 2 ? 0 : static_cast<float>(v[i][1]),
+            dim < 3 ? 0 : static_cast<float>(v[i][2])};
   }
 
 
@@ -265,11 +262,11 @@ namespace ArborX
     // ArborX assumes that the bounding box coordinates use float and that the
     // bounding box is 3d
     return {{static_cast<float>(min_corner[0]),
-             static_cast<float>(min_corner[1]),
-             dim == 2 ? 0.f : static_cast<float>(min_corner[2])},
+             dim < 2 ? 0.f : static_cast<float>(min_corner[1]),
+             dim < 3 ? 0.f : static_cast<float>(min_corner[2])},
             {static_cast<float>(max_corner[0]),
-             static_cast<float>(max_corner[1]),
-             dim == 2 ? 0.f : static_cast<float>(max_corner[2])}};
+             dim < 2 ? 0.f : static_cast<float>(max_corner[1]),
+             dim < 3 ? 0.f : static_cast<float>(max_corner[2])}};
   }
 
 
@@ -296,8 +293,8 @@ namespace ArborX
     // ArborX assumes that the center coordinates and the radius use float and
     // the sphere is 3d
     return {{static_cast<float>(v[i].first[0]),
-             static_cast<float>(v[i].first[1]),
-             dim == 2 ? 0 : static_cast<float>(v[i].first[2])},
+             dim < 2 ? 0 : static_cast<float>(v[i].first[1]),
+             dim < 3 ? 0 : static_cast<float>(v[i].first[2])},
             static_cast<float>(v[i].second)};
   }
 } // namespace ArborX

@@ -26,6 +26,70 @@
 
 
 void
+test_1d()
+{
+  std::vector<BoundingBox<1>> bounding_boxes;
+  std::vector<Point<1>>       points;
+
+  const unsigned int n_points_1d = 5;
+  const int          rank    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  const int          n_procs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  const int          offset_bb    = 2 * rank * n_points_1d;
+  const int          offset_query = 2 * ((rank + 1) % n_procs) * n_points_1d;
+  for (unsigned int i = 0; i < n_points_1d; ++i)
+    points.emplace_back(i + offset_bb);
+
+  for (unsigned int i = 0; i < n_points_1d - 1; ++i)
+    bounding_boxes.emplace_back(std::make_pair(points[i], points[i + 1]));
+
+  Point<1> point_a(0.5 + offset_query);
+  Point<1> point_b(1.5 + offset_query);
+  Point<1> point_c(2.2 + offset_query);
+  Point<1> point_d(2.6 + offset_query);
+
+  std::vector<BoundingBox<1>> query_bounding_boxes;
+  query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
+  query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
+
+  ArborXWrappers::DistributedTree               distributed_tree(MPI_COMM_WORLD,
+                                                   bounding_boxes);
+  ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
+    query_bounding_boxes);
+  auto indices_ranks_offset = distributed_tree.query(bb_intersect);
+  auto indices_ranks        = indices_ranks_offset.first;
+  auto offsets              = indices_ranks_offset.second;
+
+  std::vector<int> indices_ref = {1, 0, 2};
+  std::vector<int> offsets_ref = {0, 2, 3};
+
+  AssertThrow(indices_ranks.size() == indices_ref.size(), ExcInternalError());
+  AssertThrow(offsets.size() == offsets_ref.size(), ExcInternalError());
+  for (unsigned int i = 0; i < offsets.size() - 1; ++i)
+    {
+      for (int j = offsets[i]; j < offsets[i + 1]; ++j)
+        {
+          // The indices associated to each query are not ordered.
+          bool found = false;
+          for (int k = offsets[i]; k < offsets[i + 1]; ++k)
+            {
+              if ((indices_ranks[j].first == indices_ref[k]) &&
+                  (indices_ranks[j].second == (rank + 1) % n_procs))
+                {
+                  found = true;
+                  break;
+                }
+            }
+          AssertThrow(found, ExcInternalError());
+        }
+    }
+  for (unsigned int i = 0; i < offsets.size(); ++i)
+    AssertThrow(offsets[i] == offsets_ref[i], ExcInternalError());
+
+  deallog << "OK" << std::endl;
+}
+
+
+void
 test_2d()
 {
   std::vector<BoundingBox<2>> bounding_boxes;
@@ -192,6 +256,7 @@ main(int argc, char **argv)
   initlog();
 
   // tests
+  test_1d();
   test_2d();
   test_3d();
 }

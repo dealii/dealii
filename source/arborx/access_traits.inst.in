@@ -16,7 +16,6 @@
 
 for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
   {
-#if DIM > 1
     DEAL_II_NAMESPACE_OPEN
     namespace ArborXWrappers
     {
@@ -55,5 +54,4 @@ for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
         std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>,
         PrimitivesTag>;
     \}
-#endif
   }

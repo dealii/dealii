@@ -24,6 +24,62 @@
 
 #include "../tests.h"
 
+void
+test_1d()
+{
+  std::vector<BoundingBox<1>> bounding_boxes;
+  std::vector<Point<1>>       points;
+
+  unsigned int n_points_1d = 5;
+  for (unsigned int i = 0; i < n_points_1d; ++i)
+    points.emplace_back(i);
+
+  for (unsigned int i = 0; i < n_points_1d - 1; ++i)
+    bounding_boxes.emplace_back(std::make_pair(points[i], points[i + 1]));
+
+  Point<1> point_a(0.5);
+  Point<1> point_b(1.5);
+  Point<1> point_c(2.2);
+  Point<1> point_d(2.6);
+
+  std::vector<BoundingBox<1>> query_bounding_boxes;
+  query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
+  query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
+
+  ArborXWrappers::BVH                           bvh(bounding_boxes);
+  ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
+    query_bounding_boxes);
+  auto             indices_offset = bvh.query(bb_intersect);
+  std::vector<int> indices        = indices_offset.first;
+  std::vector<int> offset         = indices_offset.second;
+
+  std::vector<int> indices_ref = {0, 1, 2};
+  std::vector<int> offset_ref  = {0, 2, 3};
+
+  AssertDimension(indices.size(), indices_ref.size());
+  AssertDimension(offset.size(), offset_ref.size());
+  for (unsigned int i = 0; i < offset.size() - 1; ++i)
+    {
+      for (unsigned int j = offset[i]; j < offset[i + 1]; ++j)
+        {
+          // The indices associated to each query are not ordered.
+          bool found = false;
+          for (unsigned int k = offset[i]; k < offset[i + 1]; ++k)
+            {
+              if (indices[j] == indices_ref[k])
+                {
+                  found = true;
+                  break;
+                }
+            }
+          AssertThrow(found, ExcInternalError());
+        }
+    }
+  for (unsigned int i = 0; i < offset.size(); ++i)
+    AssertThrow(offset[i] == offset_ref[i], ExcInternalError());
+
+  deallog << "OK" << std::endl;
+}
 
 void
 test_2d()
@@ -181,6 +237,7 @@ main(int argc, char **argv)
   initlog();
 
   // tests
+  test_1d();
   test_2d();
   test_3d();
 
