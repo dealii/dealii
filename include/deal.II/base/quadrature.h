@@ -251,6 +251,12 @@ public:
   size() const;
 
   /**
+   * Return if quadrature is empty.
+   */
+  bool
+  empty() const;
+
+  /**
    * Return the <tt>i</tt>th quadrature point.
    */
   const Point<dim> &
@@ -459,6 +465,16 @@ Quadrature<dim>::size() const
 {
   return weights.size();
 }
+
+
+
+template <int dim>
+inline bool
+Quadrature<dim>::empty() const
+{
+  return weights.empty();
+}
+
 
 
 template <int dim>
