@@ -1650,7 +1650,7 @@ namespace NonMatching
     // zero. If you call generate() with a ZeroFunction nothing good can be
     // done. You will end up here.
     Assert(
-      q_generator.get_quadratures().indefinite.size() == 0,
+      q_generator.get_quadratures().indefinite.empty(),
       ExcMessage(
         "Generation of quadrature rules failed. This can mean that the level "
         "set function is degenerate in some way, e.g. oscillating extremely "

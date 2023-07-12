@@ -269,8 +269,8 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
                   // we assume that the file contains first all cells,
                   // and only then any faces or lines
-                  AssertThrow(subcelldata.boundary_quads.size() == 0 &&
-                                subcelldata.boundary_lines.size() == 0,
+                  AssertThrow(subcelldata.boundary_quads.empty() &&
+                                subcelldata.boundary_lines.empty(),
                               ExcNotImplemented());
 
                   cells.emplace_back(n_vertices);
@@ -296,7 +296,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
                   // we assume that the file contains first all cells,
                   // then all faces, and finally all lines
-                  AssertThrow(subcelldata.boundary_lines.size() == 0,
+                  AssertThrow(subcelldata.boundary_lines.empty(),
                               ExcNotImplemented());
 
                   subcelldata.boundary_quads.emplace_back(n_vertices);
@@ -338,7 +338,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                 {
                   // we assume that the file contains first all cells,
                   // and only then any faces
-                  AssertThrow(subcelldata.boundary_lines.size() == 0,
+                  AssertThrow(subcelldata.boundary_lines.empty(),
                               ExcNotImplemented());
 
                   cells.emplace_back(n_vertices);
@@ -848,7 +848,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           // we need a call to std::getline() to retrieve it (it is logically
           // a line):
           std::getline(in, line);
-          AssertThrow(line.size() == 0,
+          AssertThrow(line.empty(),
                       ExcMessage(
                         "The line before the line containing an ID has too "
                         "many entries. This is not a valid UNV file."));
@@ -3518,7 +3518,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
     }
 
   // No cells were read
-  if (cells.size() == 0)
+  if (cells.empty())
     return;
 
   if (remove_duplicates)

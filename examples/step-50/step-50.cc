@@ -324,7 +324,7 @@ bool Settings::try_parse(const std::string &prm_filename)
                     Patterns::Bool(),
                     "Output graphical results.");
 
-  if (prm_filename.size() == 0)
+  if (prm_filename.empty())
     {
       std::cout << "****  Error: No input file provided!\n"
                 << "****  Error: Call this program as './step-50 input.prm\n"

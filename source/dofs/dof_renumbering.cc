@@ -403,7 +403,7 @@ namespace DoFRenumbering
     // this processor
     if (dof_handler.locally_owned_dofs().n_elements() == 0)
       {
-        Assert(new_indices.size() == 0, ExcInternalError());
+        Assert(new_indices.empty(), ExcInternalError());
         return;
       }
 
@@ -783,7 +783,7 @@ namespace DoFRenumbering
     // empty vector, set up things to
     // store components in the order
     // found in the system.
-    if (component_order.size() == 0)
+    if (component_order.empty())
       for (unsigned int i = 0; i < fe_collection.n_components(); ++i)
         component_order.push_back(i);
 
@@ -2315,7 +2315,7 @@ namespace DoFRenumbering
 
     // At this point we have no more communication to do - simplify things by
     // returning early if possible
-    if (component_renumbering.size() == 0)
+    if (component_renumbering.empty())
       {
         new_dof_indices.resize(0);
         return;

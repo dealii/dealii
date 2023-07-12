@@ -239,7 +239,7 @@ namespace internal
                   bool has_hanging_nodes = false;
 
                   const unsigned int fe_index =
-                    (cell_active_fe_index.size() == 0 ||
+                    (cell_active_fe_index.empty() ||
                      dofs_per_cell.size() == 1) ?
                       0 :
                       cell_active_fe_index[boundary_cells[i]];
@@ -639,7 +639,7 @@ namespace internal
                       AssertIndexRange(start_index, dof_indices.size());
                       dof_indices_contiguous[dof_access_cell]
                                             [i * vectorization_length + j] =
-                                              this->dof_indices.size() == 0 ?
+                                              this->dof_indices.empty() ?
                                                 0 :
                                                 this->dof_indices[start_index];
                     }

@@ -100,7 +100,7 @@ DataOutStack<dim, spacedim>::declare_data_vector(
   // not called after some parameter
   // values have already been
   // processed
-  Assert(patches.size() == 0, ExcDataAlreadyAdded());
+  Assert(patches.empty(), ExcDataAlreadyAdded());
 
   // also make sure that no name is
   // used twice

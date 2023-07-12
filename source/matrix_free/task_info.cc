@@ -770,7 +770,7 @@ namespace internal
               ++bound_index;
             }
           while (fillup_needed > 0 &&
-                 (new_boundary_cells.size() == 0 ||
+                 (new_boundary_cells.empty() ||
                   new_boundary_cells.back() < n_active_cells - 1))
             new_boundary_cells.push_back(new_boundary_cells.back() + 1);
           while (bound_index < boundary_cells.size())
@@ -1755,7 +1755,7 @@ namespace internal
             unsigned int partition_counter = 0;
             while (work)
               {
-                if (neighbor_list.size() == 0)
+                if (neighbor_list.empty())
                   {
                     work              = false;
                     partition_counter = 0;

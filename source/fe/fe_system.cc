@@ -2535,7 +2535,7 @@ FESystem<dim, spacedim>::unit_support_point(const unsigned int index) const
 {
   AssertIndexRange(index, this->n_dofs_per_cell());
   Assert((this->unit_support_points.size() == this->n_dofs_per_cell()) ||
-           (this->unit_support_points.size() == 0),
+           (this->unit_support_points.empty()),
          (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
 
   // let's see whether we have the information pre-computed
@@ -2561,7 +2561,7 @@ FESystem<dim, spacedim>::unit_face_support_point(
     (this->unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
        .size() == this->n_dofs_per_face(face_no)) ||
       (this->unit_face_support_points[this->n_unique_faces() == 1 ? 0 : face_no]
-         .size() == 0),
+         .empty()),
     (typename FiniteElement<dim, spacedim>::ExcFEHasNoSupportPoints()));
 
   // let's see whether we have the information pre-computed

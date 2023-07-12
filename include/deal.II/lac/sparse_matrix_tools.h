@@ -279,7 +279,7 @@ namespace SparseMatrixTools
 
       for (unsigned int i = 0; i < row_to_procs.size(); ++i)
         {
-          if (row_to_procs[i].size() == 0)
+          if (row_to_procs[i].empty())
             continue;
 
           const auto row   = locally_owned_dofs.nth_index_in_set(i);
@@ -343,7 +343,7 @@ namespace SparseMatrixTools
                                    SparseMatrixType2 &        system_matrix_out,
                                    SparsityPatternType2 &sparsity_pattern_out)
   {
-    Assert(index_set_1.size() == 0 || index_set_0.size() == index_set_1.size(),
+    Assert(index_set_1.empty() || index_set_0.size() == index_set_1.size(),
            ExcInternalError());
 
     auto index_set_1_cleared = index_set_1;
@@ -379,7 +379,7 @@ namespace SparseMatrixTools
     const unsigned int n_rows = index_set_union.n_elements();
     const unsigned int n_cols = index_set_union.n_elements();
     const unsigned int entries_per_row =
-      locally_relevant_matrix_entries.size() == 0 ?
+      locally_relevant_matrix_entries.empty() ?
         0 :
         std::max_element(locally_relevant_matrix_entries.begin(),
                          locally_relevant_matrix_entries.end(),
@@ -521,7 +521,7 @@ namespace SparseMatrixTools
 
     for (unsigned int c = 0; c < indices.size(); ++c)
       {
-        if (indices[c].size() == 0)
+        if (indices[c].empty())
           continue;
 
         const auto &local_dof_indices = indices[c];

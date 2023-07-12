@@ -341,7 +341,7 @@ namespace Utilities
       // same number twice, we know that the destinations were not
       // unique
       const bool my_destinations_are_unique = [destinations]() {
-        if (destinations.size() == 0)
+        if (destinations.empty())
           return true;
         else
           {

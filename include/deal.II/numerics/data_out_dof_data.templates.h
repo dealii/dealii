@@ -1803,9 +1803,9 @@ void
 DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::attach_dof_handler(
   const DoFHandler<dim, spacedim> &d)
 {
-  Assert(dof_data.size() == 0,
+  Assert(dof_data.empty(),
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
-  Assert(cell_data.size() == 0,
+  Assert(cell_data.empty(),
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =
@@ -1822,9 +1822,9 @@ void
 DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::attach_triangulation(
   const Triangulation<dim, spacedim> &tria)
 {
-  Assert(dof_data.size() == 0,
+  Assert(dof_data.empty(),
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
-  Assert(cell_data.size() == 0,
+  Assert(cell_data.empty(),
          Exceptions::DataOutImplementation::ExcOldDataStillPresent());
 
   triangulation =

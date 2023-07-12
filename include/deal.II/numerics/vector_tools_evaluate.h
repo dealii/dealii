@@ -475,7 +475,7 @@ namespace VectorTools
                                           typename VectorType::value_type>>>
         &evaluators)
     {
-      if (evaluators.size() == 0)
+      if (evaluators.empty())
         evaluators.resize(dof_handler.get_fe_collection().size());
 
       typename DoFHandler<dim>::active_cell_iterator cell = {

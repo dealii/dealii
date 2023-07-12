@@ -383,7 +383,7 @@ SparseDirectUMFPACK::solve(Vector<double> &rhs_and_solution,
   Assert(Ai.size() != 0, ExcNotInitialized());
   Assert(Ai.size() == Ax.size(), ExcNotInitialized());
 
-  Assert(Az.size() == 0,
+  Assert(Az.empty(),
          ExcMessage("You have previously factored a matrix using this class "
                     "that had complex-valued entries. This then requires "
                     "applying the factored matrix to a complex-valued "

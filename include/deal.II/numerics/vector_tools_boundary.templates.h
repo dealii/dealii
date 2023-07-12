@@ -74,7 +74,7 @@ namespace VectorTools
 
       // if for whatever reason we were passed an empty map, return
       // immediately
-      if (function_map.size() == 0)
+      if (function_map.empty())
         return;
 
       Assert(function_map.find(numbers::internal_face_boundary_id) ==
@@ -709,7 +709,7 @@ namespace VectorTools
       // in 1d, projection onto the 0d end points == interpolation
       if (dim == 1)
         {
-          Assert(component_mapping.size() == 0, ExcNotImplemented());
+          Assert(component_mapping.empty(), ExcNotImplemented());
           interpolate_boundary_values(
             mapping, dof, boundary_functions, boundary_values, ComponentMask());
           return;
@@ -721,7 +721,7 @@ namespace VectorTools
       //    there are no constrained nodes on the boundary, but is not
       //    acceptable for higher dimensions. Fix this.
 
-      if (component_mapping.size() == 0)
+      if (component_mapping.empty())
         {
           AssertDimension(dof.get_fe(0).n_components(),
                           boundary_functions.begin()->second->n_components);

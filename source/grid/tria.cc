@@ -147,9 +147,9 @@ namespace internal
       &             pack_callbacks_variable,
     const MPI_Comm &mpi_communicator)
   {
-    Assert(src_data_fixed.size() == 0,
+    Assert(src_data_fixed.empty(),
            ExcMessage("Previously packed data has not been released yet!"));
-    Assert(src_sizes_variable.size() == 0, ExcInternalError());
+    Assert(src_sizes_variable.empty(), ExcInternalError());
 
     const unsigned int n_callbacks_fixed    = pack_callbacks_fixed.size();
     const unsigned int n_callbacks_variable = pack_callbacks_variable.size();
@@ -906,7 +906,7 @@ namespace internal
     const unsigned int n_attached_deserialize_variable,
     const MPI_Comm &   mpi_communicator)
   {
-    Assert(dest_data_fixed.size() == 0,
+    Assert(dest_data_fixed.empty(),
            ExcMessage("Previously loaded data has not been released yet!"));
 
     variable_size_data_stored = (n_attached_deserialize_variable > 0);
@@ -3506,7 +3506,7 @@ namespace internal
       {
         AssertDimension(obj.structdim, structdim);
 
-        if (boundary_objects_in.size() == 0)
+        if (boundary_objects_in.empty())
           return; // empty subcelldata -> nothing to do
 
         // pre-sort subcelldata
@@ -12472,7 +12472,7 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::copy_triangulation(
   const Triangulation<dim, spacedim> &other_tria)
 {
-  Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
+  Assert((vertices.empty()) && (levels.empty()) && (faces == nullptr),
          ExcTriangulationNotEmpty(vertices.size(), levels.size()));
   Assert((other_tria.levels.size() != 0) && (other_tria.vertices.size() != 0) &&
            (dim == 1 || other_tria.faces != nullptr),
@@ -12566,7 +12566,7 @@ void Triangulation<dim, spacedim>::create_triangulation(
   const std::vector<CellData<dim>> &  cells,
   const SubCellData &                 subcelldata)
 {
-  Assert((vertices.size() == 0) && (levels.size() == 0) && (faces == nullptr),
+  Assert((vertices.empty()) && (levels.empty()) && (faces == nullptr),
          ExcTriangulationNotEmpty(vertices.size(), levels.size()));
   // check that no forbidden arrays
   // are used
@@ -12605,7 +12605,7 @@ void Triangulation<dim, spacedim>::create_triangulation(
       // throw the array (and fill the various location fields) if
       // there are distorted cells. otherwise, just fall off the end
       // of the function
-      AssertThrow(distorted_cells.distorted_cells.size() == 0, distorted_cells);
+      AssertThrow(distorted_cells.distorted_cells.empty(), distorted_cells);
     }
 
 
@@ -12722,7 +12722,7 @@ void Triangulation<dim, spacedim>::create_triangulation(
 
           // Before we quit let's check that if the triangulation is
           // disconnected that we still get all cells
-          if (next_round.size() == 0)
+          if (next_round.empty())
             for (const auto &cell : this->active_cell_iterators())
               if (cell->user_flag_set() == false)
                 {
@@ -15599,7 +15599,7 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
   // Inform all listeners about end of refinement.
   signals.post_refinement();
 
-  AssertThrow(cells_with_distorted_children.distorted_cells.size() == 0,
+  AssertThrow(cells_with_distorted_children.distorted_cells.empty(),
               cells_with_distorted_children);
 
   update_periodic_face_map();

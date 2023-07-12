@@ -277,8 +277,7 @@ namespace internal
       // current thread, i.e., that the current function is only called
       // once per thread
       ParserData &data = this->parser_data.get();
-      Assert(data.parsers.size() == 0 && data.vars.size() == 0,
-             ExcInternalError());
+      Assert(data.parsers.empty() && data.vars.empty(), ExcInternalError());
       const unsigned int n_components = expressions.size();
 
       // initialize the objects for the current thread
@@ -386,7 +385,7 @@ namespace internal
       // initialize the parser if that hasn't happened yet on the current
       // thread
       internal::FunctionParser::ParserData &data = this->parser_data.get();
-      if (data.vars.size() == 0)
+      if (data.vars.empty())
         init_muparser();
 
       for (unsigned int i = 0; i < dim; ++i)
@@ -434,7 +433,7 @@ namespace internal
       // initialize the parser if that hasn't happened yet on the current
       // thread
       internal::FunctionParser::ParserData &data = this->parser_data.get();
-      if (data.vars.size() == 0)
+      if (data.vars.empty())
         init_muparser();
 
       for (unsigned int i = 0; i < dim; ++i)

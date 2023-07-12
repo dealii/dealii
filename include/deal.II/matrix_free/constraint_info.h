@@ -663,7 +663,7 @@ namespace internal
       const bool             transpose,
       AlignedVector<Number> &evaluation_data_coarse) const
     {
-      if (hanging_node_constraint_masks.size() == 0)
+      if (hanging_node_constraint_masks.empty())
         return;
 
       std::array<MatrixFreeFunctions::compressed_constraint_kind,

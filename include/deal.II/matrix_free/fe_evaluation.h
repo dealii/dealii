@@ -4251,8 +4251,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   apply_hanging_node_constraints(const bool transpose) const
 {
   if (this->dof_info == nullptr ||
-      this->dof_info->hanging_node_constraint_masks.size() == 0 ||
-      this->dof_info->hanging_node_constraint_masks_comp.size() == 0 ||
+      this->dof_info->hanging_node_constraint_masks.empty() ||
+      this->dof_info->hanging_node_constraint_masks_comp.empty() ||
       this->dof_info->hanging_node_constraint_masks_comp
           [this->active_fe_index][this->first_selected_component] == false)
     return; // nothing to do with faces

@@ -978,7 +978,7 @@ inline void
 DynamicSparsityPattern::Line::add(const size_type j)
 {
   // first check the last element (or if line is still empty)
-  if ((entries.size() == 0) || (entries.back() < j))
+  if ((entries.empty()) || (entries.back() < j))
     {
       entries.push_back(j);
       return;
@@ -1118,7 +1118,7 @@ DynamicSparsityPattern::begin(const size_type r) const
       // walking over this vector entry by entry anyways.
       size_type rowindex = rowset.index_within_set(*it);
 
-      while (it != rowset.end() && lines[rowindex].entries.size() == 0)
+      while (it != rowset.end() && lines[rowindex].entries.empty())
         {
           ++it;
           ++rowindex;
@@ -1135,7 +1135,7 @@ DynamicSparsityPattern::begin(const size_type r) const
   // directly instead of going through the slower row_length() function
   size_type row = r;
 
-  while (row < n_rows() && lines[row].entries.size() == 0)
+  while (row < n_rows() && lines[row].entries.empty())
     {
       ++row;
     }

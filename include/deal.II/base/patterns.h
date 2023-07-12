@@ -2096,7 +2096,7 @@ namespace Patterns
                                "to a List compatible type."));
 
         const auto &expressions = t->get_expressions();
-        if (expressions.size() == 0)
+        if (expressions.empty())
           return std::string();
 
         std::string s = expressions[0];

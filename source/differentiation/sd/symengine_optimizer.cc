@@ -728,7 +728,7 @@ namespace Differentiation
       const SD::Expression &func)
     {
       Assert(
-        dependent_variables_output.size() == 0,
+        dependent_variables_output.empty(),
         ExcMessage(
           "Cannot register function as the optimizer has already been finalized."));
       dependent_variables_output.reserve(n_dependent_variables() + 1);
@@ -756,7 +756,7 @@ namespace Differentiation
       const SD::types::symbol_vector &funcs)
     {
       Assert(
-        dependent_variables_output.size() == 0,
+        dependent_variables_output.empty(),
         ExcMessage(
           "Cannot register function as the optimizer has already been finalized."));
       const std::size_t n_dependents_old = n_dependent_variables();

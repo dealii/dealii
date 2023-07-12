@@ -251,7 +251,7 @@ SparsityPattern::reinit(const size_type                      m,
     }
 
   max_row_length =
-    (row_lengths.size() == 0 ?
+    (row_lengths.empty() ?
        0 :
        std::min(static_cast<size_type>(
                   *std::max_element(row_lengths.begin(), row_lengths.end())),

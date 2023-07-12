@@ -1532,7 +1532,7 @@ namespace DoFTools
                             // break if the n_primary_dofs == 0, because we are
                             // attempting to constrain to an element that has no
                             // face dofs
-                            if (primary_dofs.size() == 0)
+                            if (primary_dofs.empty())
                               break;
 
                             dependent_dofs.resize(
@@ -3286,7 +3286,7 @@ namespace DoFTools
         {
           // consistency check: if this is no parameter dof on the coarse grid,
           // then the respective row must be empty!
-          Assert(weights[parameter_dof].size() == 0, ExcInternalError());
+          Assert(weights[parameter_dof].empty(), ExcInternalError());
         }
 
 

@@ -304,7 +304,7 @@ ComponentMask::operator[](const unsigned int component_index) const
 {
   // if the mask represents the all-component mask
   // then always return true
-  if (component_mask.size() == 0)
+  if (component_mask.empty())
     return true;
   else
     {
@@ -319,7 +319,7 @@ ComponentMask::operator[](const unsigned int component_index) const
 inline bool
 ComponentMask::represents_n_components(const unsigned int n) const
 {
-  return ((component_mask.size() == 0) || (component_mask.size() == n));
+  return ((component_mask.empty()) || (component_mask.size() == n));
 }
 
 
@@ -330,7 +330,7 @@ ComponentMask::n_selected_components(const unsigned int n) const
     AssertDimension(n, size());
 
   const unsigned int real_n = (n != numbers::invalid_unsigned_int ? n : size());
-  if (component_mask.size() == 0)
+  if (component_mask.empty())
     return real_n;
   else
     {
@@ -348,7 +348,7 @@ ComponentMask::first_selected_component(const unsigned int n) const
   if ((n != numbers::invalid_unsigned_int) && (size() > 0))
     AssertDimension(n, size());
 
-  if (component_mask.size() == 0)
+  if (component_mask.empty())
     return 0;
   else
     {
@@ -366,7 +366,7 @@ ComponentMask::first_selected_component(const unsigned int n) const
 inline bool
 ComponentMask::represents_the_all_selected_mask() const
 {
-  return (component_mask.size() == 0);
+  return (component_mask.empty());
 }
 
 
@@ -376,9 +376,9 @@ ComponentMask::operator|(const ComponentMask &mask) const
 {
   // if one of the two masks denotes the all-component mask,
   // then return the other one
-  if (component_mask.size() == 0)
+  if (component_mask.empty())
     return mask;
-  else if (mask.component_mask.size() == 0)
+  else if (mask.component_mask.empty())
     return *this;
   else
     {
@@ -399,9 +399,9 @@ ComponentMask::operator&(const ComponentMask &mask) const
 {
   // if one of the two masks denotes the all-component mask,
   // then return the other one
-  if (component_mask.size() == 0)
+  if (component_mask.empty())
     return mask;
-  else if (mask.component_mask.size() == 0)
+  else if (mask.component_mask.empty())
     return *this;
   else
     {

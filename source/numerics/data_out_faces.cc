@@ -375,7 +375,7 @@ DataOutFaces<dim, spacedim>::build_patches(
   // clear the patches array and allocate the right number of elements
   this->patches.clear();
   this->patches.reserve(all_faces.size());
-  Assert(this->patches.size() == 0, ExcInternalError());
+  Assert(this->patches.empty(), ExcInternalError());
 
 
   std::vector<unsigned int> n_postprocessor_outputs(this->dof_data.size());

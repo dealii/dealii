@@ -152,7 +152,7 @@ namespace Utilities
     using LongDouble = long double;
 
     // return if there is nothing to do
-    if (points.size() == 0)
+    if (points.empty())
       return std::vector<std::array<std::uint64_t, dim>>();
 
     // get bounding box:
@@ -630,7 +630,7 @@ namespace Utilities
     //   first part to something useful, but stopped converting short
     //   of the terminating '\0' character. This happens, for example,
     //   if the given string is "1234 abc".
-    AssertThrow(!((errno != 0) || (s.size() == 0) ||
+    AssertThrow(!((errno != 0) || (s.empty()) ||
                   ((s.size() > 0) && (*p != '\0'))),
                 ExcMessage("Can't convert <" + s + "> to an integer."));
 
@@ -678,7 +678,7 @@ namespace Utilities
     //   first part to something useful, but stopped converting short
     //   of the terminating '\0' character. This happens, for example,
     //   if the given string is "1.234 abc".
-    AssertThrow(!((errno != 0) || (s.size() == 0) ||
+    AssertThrow(!((errno != 0) || (s.empty()) ||
                   ((s.size() > 0) && (*p != '\0'))),
                 ExcMessage("Can't convert <" + s + "> to a double."));
 

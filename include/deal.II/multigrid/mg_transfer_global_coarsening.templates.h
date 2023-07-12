@@ -2659,8 +2659,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         continue;
 
       const bool needs_interpolation =
-        (scheme.prolongation_matrix.size() == 0 &&
-         scheme.prolongation_matrix_1d.size() == 0) == false;
+        (scheme.prolongation_matrix.empty() &&
+         scheme.prolongation_matrix_1d.empty()) == false;
 
       evaluation_data_fine.clear();
       evaluation_data_coarse.clear();
@@ -2835,8 +2835,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         continue;
 
       const bool needs_interpolation =
-        (scheme.prolongation_matrix.size() == 0 &&
-         scheme.prolongation_matrix_1d.size() == 0) == false;
+        (scheme.prolongation_matrix.empty() &&
+         scheme.prolongation_matrix_1d.empty()) == false;
 
       evaluation_data_fine.clear();
       evaluation_data_coarse.clear();
@@ -2981,8 +2981,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
         }
 
       const bool needs_interpolation =
-        (scheme.prolongation_matrix.size() == 0 &&
-         scheme.prolongation_matrix_1d.size() == 0) == false;
+        (scheme.prolongation_matrix.empty() &&
+         scheme.prolongation_matrix_1d.empty()) == false;
 
       // general case -> local restriction is needed
       evaluation_data_fine.resize(scheme.n_dofs_per_cell_fine);
@@ -3997,7 +3997,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   for (unsigned int j = 0; j < evaluation_point_results.size(); ++j)
     {
-      if (level_dof_indices_fine_ptrs.size() == 0)
+      if (level_dof_indices_fine_ptrs.empty())
         {
           dst.local_element(this->level_dof_indices_fine[j]) +=
             evaluation_point_results[j];
@@ -4029,7 +4029,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   for (unsigned int j = 0; j < evaluation_point_results.size(); ++j)
     {
-      if (level_dof_indices_fine_ptrs.size() == 0)
+      if (level_dof_indices_fine_ptrs.empty())
         {
           evaluation_point_results[j] =
             src.local_element(this->level_dof_indices_fine[j]);

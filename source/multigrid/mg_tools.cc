@@ -1066,7 +1066,7 @@ namespace MGTools
     Assert(result.size() == nlevels,
            ExcDimensionMismatch(result.size(), nlevels));
 
-    if (target_component.size() == 0)
+    if (target_component.empty())
       {
         target_component.resize(n_components);
         for (unsigned int i = 0; i < n_components; ++i)
@@ -1171,7 +1171,7 @@ namespace MGTools
     // If the empty vector was given as
     // default argument, set up this
     // vector as identity.
-    if (target_block.size() == 0)
+    if (target_block.empty())
       {
         target_block.resize(n_blocks);
         for (unsigned int i = 0; i < n_blocks; ++i)
@@ -1291,7 +1291,7 @@ namespace MGTools
     boundary_indices.resize(dof.get_triangulation().n_global_levels());
 
     // if for whatever reason we were passed an empty set, return immediately
-    if (boundary_ids.size() == 0)
+    if (boundary_ids.empty())
       return;
 
     for (unsigned int i = 0; i < dof.get_triangulation().n_global_levels(); ++i)

@@ -738,11 +738,11 @@ namespace MeshWorker
                                                              unsigned int fp,
                                                              bool         force)
   {
-    if (force || cell_quadrature.size() == 0)
+    if (force || cell_quadrature.empty())
       cell_quadrature = QGauss<dim>(cp);
-    if (force || boundary_quadrature.size() == 0)
+    if (force || boundary_quadrature.empty())
       boundary_quadrature = QGauss<dim - 1>(bp);
-    if (force || face_quadrature.size() == 0)
+    if (force || face_quadrature.empty())
       face_quadrature = QGauss<dim - 1>(fp);
   }
 

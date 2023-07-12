@@ -113,11 +113,11 @@ namespace Polynomials
   {
     // should only be called when the product form is active
     Assert(in_lagrange_product_form == true, ExcInternalError());
-    Assert(coefficients.size() == 0, ExcInternalError());
+    Assert(coefficients.empty(), ExcInternalError());
 
     // compute coefficients by expanding the product (x-x_i) term by term
     coefficients.resize(lagrange_support_points.size() + 1);
-    if (lagrange_support_points.size() == 0)
+    if (lagrange_support_points.empty())
       coefficients[0] = 1.;
     else
       {
@@ -600,7 +600,7 @@ namespace Polynomials
                            generate_equidistant_unit_points(n),
                          support_point)
   {
-    Assert(coefficients.size() == 0, ExcInternalError());
+    Assert(coefficients.empty(), ExcInternalError());
 
     // For polynomial order up to 3, we have precomputed weights. Use these
     // weights instead of the product form

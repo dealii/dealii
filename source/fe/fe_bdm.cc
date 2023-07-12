@@ -178,7 +178,7 @@ FE_BDM<dim>::convert_generalized_support_point_values_to_dof_values(
     {
       // Old version with no moments in 2d. See comment below in
       // initialize_support_points()
-      if (test_values_face.size() == 0)
+      if (test_values_face.empty())
         {
           for (unsigned int i = 0; i < this->n_dofs_per_face(f); ++i)
             nodal_values[dbase + i] =

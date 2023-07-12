@@ -305,7 +305,7 @@ namespace SparsityTools
 #else
 
       Assert(
-        cell_weights.size() == 0,
+        cell_weights.empty(),
         ExcMessage(
           "The cell weighting functionality for Zoltan has not yet been implemented."));
       (void)cell_weights;

@@ -169,7 +169,7 @@ FiniteSizeHistory<T>::add(const T &element)
   if (data.size() < max_n_elements)
     // have not reached the maximum number of elements yet
     {
-      if (cache.size() == 0)
+      if (cache.empty())
         // nothing is cached, just copy a given element
         {
           new_el = std::make_unique<T>(element);

@@ -269,20 +269,21 @@ TensorProductPolynomialsBubbles<dim>::evaluate(
   const unsigned int max_q_indices = tensor_polys.n();
   (void)max_q_indices;
   const unsigned int n_bubbles = ((q_degree <= 1) ? 1 : dim);
-  Assert(values.size() == max_q_indices + n_bubbles || values.size() == 0,
+  Assert(values.size() == max_q_indices + n_bubbles || values.empty(),
          ExcDimensionMismatch2(values.size(), max_q_indices + n_bubbles, 0));
-  Assert(grads.size() == max_q_indices + n_bubbles || grads.size() == 0,
+  Assert(grads.size() == max_q_indices + n_bubbles || grads.empty(),
          ExcDimensionMismatch2(grads.size(), max_q_indices + n_bubbles, 0));
-  Assert(
-    grad_grads.size() == max_q_indices + n_bubbles || grad_grads.size() == 0,
-    ExcDimensionMismatch2(grad_grads.size(), max_q_indices + n_bubbles, 0));
+  Assert(grad_grads.size() == max_q_indices + n_bubbles || grad_grads.empty(),
+         ExcDimensionMismatch2(grad_grads.size(),
+                               max_q_indices + n_bubbles,
+                               0));
   Assert(third_derivatives.size() == max_q_indices + n_bubbles ||
-           third_derivatives.size() == 0,
+           third_derivatives.empty(),
          ExcDimensionMismatch2(third_derivatives.size(),
                                max_q_indices + n_bubbles,
                                0));
   Assert(fourth_derivatives.size() == max_q_indices + n_bubbles ||
-           fourth_derivatives.size() == 0,
+           fourth_derivatives.empty(),
          ExcDimensionMismatch2(fourth_derivatives.size(),
                                max_q_indices + n_bubbles,
                                0));

@@ -1934,9 +1934,9 @@ namespace parallel
           // at all, which is mandatory if one of our processes does not own
           // any quadrant. This bypasses the assertion from being triggered.
           //   - see: https://github.com/cburstedde/p4est/issues/48
-          if (this->data_serializer.src_sizes_variable.size() == 0)
+          if (this->data_serializer.src_sizes_variable.empty())
             this->data_serializer.src_sizes_variable.resize(1);
-          if (this->data_serializer.dest_sizes_variable.size() == 0)
+          if (this->data_serializer.dest_sizes_variable.empty())
             this->data_serializer.dest_sizes_variable.resize(1);
 #  endif
 
@@ -2523,7 +2523,7 @@ namespace parallel
       enforce_mesh_balance_over_periodic_boundaries(
         Triangulation<dim, spacedim> &tria)
       {
-        if (tria.get_periodic_face_map().size() == 0)
+        if (tria.get_periodic_face_map().empty())
           return false;
 
         std::vector<bool> flags_before[2];

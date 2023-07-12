@@ -190,8 +190,7 @@ template <int dim, int spacedim>
 void
 PersistentTriangulation<dim, spacedim>::read_flags(std::istream &in)
 {
-  Assert(refine_flags.size() == 0 && coarsen_flags.size() == 0,
-         ExcFlagsNotCleared());
+  Assert(refine_flags.empty() && coarsen_flags.empty(), ExcFlagsNotCleared());
   AssertThrow(in.fail() == false, ExcIO());
 
   unsigned int magic_number;
