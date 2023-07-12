@@ -712,10 +712,10 @@ AffineConstraints<number>::close()
 #ifdef DEBUG
   size_type iteration = 0;
 #endif
-  while (true)
+  bool chained_constraint_replaced = false;
+  do
     {
-      bool chained_constraint_replaced = false;
-
+      chained_constraint_replaced = false;
       for (ConstraintLine &line : lines)
         {
 #ifdef DEBUG
@@ -729,7 +729,7 @@ AffineConstraints<number>::close()
           // have appended in this go around) and see whether they are
           // further constrained. ignore elements that we don't store on
           // the current processor
-          size_type entry = 0;
+          unsigned int entry = 0;
           while (entry < line.entries.size())
             if (((local_lines.size() == 0) ||
                  (local_lines.is_element(line.entries[entry].first))) &&
@@ -755,7 +755,7 @@ AffineConstraints<number>::close()
                 // where we will later process them once more
                 //
                 // we can of course only do that if the DoF that we are
-                // currently handle is constrained by a linear combination
+                // currently handling is constrained by a linear combination
                 // of other dofs:
                 if (constrained_line.entries.size() > 0)
                   {
@@ -808,18 +808,15 @@ AffineConstraints<number>::close()
               ++entry;
         }
 
-      // if we didn't do anything in this round, then quit the loop
-      if (chained_constraint_replaced == false)
-        break;
-
 #ifdef DEBUG
       // increase iteration count. note that we should not iterate more
       // times than there are constraints, since this puts a natural upper
       // bound on the length of constraint chains
       ++iteration;
-      Assert(iteration <= lines.size(), ExcInternalError());
+      Assert(iteration <= lines.size() + 1, ExcInternalError());
 #endif
     }
+  while (chained_constraint_replaced == true);
 
   // Finally sort the entries and re-scale them if necessary. in this step,
   // we also throw out duplicates as mentioned above. moreover, as some
