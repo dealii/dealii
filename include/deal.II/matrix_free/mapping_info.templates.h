@@ -3318,8 +3318,11 @@ namespace internal
     {
       std::size_t memory = MemoryConsumption::memory_consumption(cell_data);
       memory += MemoryConsumption::memory_consumption(face_data);
+      memory += MemoryConsumption::memory_consumption(face_data_by_cells);
       memory += cell_type.capacity() * sizeof(GeometryType);
       memory += face_type.capacity() * sizeof(GeometryType);
+      memory += faces_by_cells_type.capacity() *
+                GeometryInfo<dim>::faces_per_cell * sizeof(GeometryType);
       memory += sizeof(*this);
       return memory;
     }
@@ -3341,11 +3344,19 @@ namespace internal
       task_info.print_memory_statistics(out,
                                         face_type.capacity() *
                                           sizeof(GeometryType));
+
+      out << "    Faces by cells types:            ";
+      task_info.print_memory_statistics(out,
+                                        faces_by_cells_type.capacity() *
+                                          GeometryInfo<dim>::faces_per_cell *
+                                          sizeof(GeometryType));
+
       for (unsigned int j = 0; j < cell_data.size(); ++j)
         {
           out << "    Data component " << j << std::endl;
           cell_data[j].print_memory_consumption(out, task_info);
           face_data[j].print_memory_consumption(out, task_info);
+          face_data_by_cells[j].print_memory_consumption(out, task_info);
         }
     }
 
