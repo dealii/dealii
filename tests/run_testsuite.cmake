@@ -95,7 +95,7 @@
 # For details, consult the ./README file.
 #
 
-cmake_minimum_required(VERSION 3.3.0)
+cmake_minimum_required(VERSION 3.15.0)
 message("-- This is CTest ${CMAKE_VERSION}")
 
 #
@@ -471,6 +471,10 @@ endif()
 #                                                                      #
 ########################################################################
 
+# record a status and summary string:
+set(_status "neutral")
+set(_summary "")
+
 ctest_start(Experimental TRACK ${TRACK})
 
 message("-- Running ctest_update() to query git information")
@@ -531,7 +535,7 @@ if("${_res}" STREQUAL "0")
       set(CTEST_BUILD_CONFIGURATION "${JOB_BUILD_CONFIGURATION}")
     endif()
 
-    message("-- Running CTEST_TESTS()")
+    message("-- Running ctest_tests()")
     ctest_test()
 
     if(COVERAGE)
@@ -548,20 +552,15 @@ if("${_res}" STREQUAL "0")
       CLEAR_TARGETDIRECTORIES_TXT()
     endif()
 
+  else()
+    # build unsuccessful
+    set(_status "failure")
+    string(APPEND _summary "\n#   - build failure")
   endif()
-endif()
-
-#
-# Inject compiler information and svn revision into xml files:
-#
-
-file(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
-set(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
-if(NOT EXISTS ${_path})
-  message(FATAL_ERROR "
-Unable to determine test submission files from TAG. Bailing out.
-"
-    )
+else()
+  # configure unsuccessful
+  set(_status "failure")
+  string(APPEND _summary "\n#   - configure failure")
 endif()
 
 #
@@ -582,11 +581,81 @@ endif()
 
 if(NOT SKIP_SUBMISSION)
   message("-- Running ctest_submit()")
-  ctest_submit(RETURN_VALUE _res)
-
+  ctest_submit(RETURN_VALUE _res BUILD_ID _build_id)
   if("${_res}" STREQUAL "0")
-    message("-- Submission successful. Goodbye!")
+    message("-- Submission successful.")
+    set(_cdash_url "https://cdash.dealii.org/build/${_build_id}")
+  else()
+    message("-- Submission failed.")
+    set(_cdash_url "-- submission failed --")
+  endif()
+else()
+  set(_cdash_url "-- submission skipped --")
+endif()
+
+
+#
+# Grab git revision from our revision.log:
+#
+file(STRINGS "${CTEST_BINARY_DIRECTORY}/revision.log" _revision REGEX "Revision:")
+string(REGEX REPLACE "#.*Revision:  " "" _revision "${_revision}")
+
+#
+# Configure or build errors are easy, but determining whether we
+# encountered configure or build warnings, or test failures is remarkably
+# tricky. None of the ctest_* commands return a value that would help us
+# :-(
+#
+if("${_status}" STREQUAL "neutral")
+  #
+  # If we made it to this place then configure and build succeeded
+  # (otherwise ${_status} would have been set to "failure". So let's try to
+  # locate all relevant xml files to query for configure/build warnings and
+  # test failures
+  #
+
+  # grab tag:
+  file(STRINGS ${CTEST_BINARY_DIRECTORY}/Testing/TAG _tag LIMIT_COUNT 1)
+  set(_path "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}")
+  if(EXISTS "${_path}/Configure.xml" AND EXISTS "${_path}/Build.xml" AND EXISTS "${_path}/Test.xml")
+    #
+    # All xml files are present. So let's make a decision on "success" or
+    # "failure":
+    #
+    set(_status "success")
+    file(STRINGS "${_path}/Configure.xml" _warnings LIMIT_COUNT 1 REGEX "CMake Warning at")
+    if(NOT "${_warnings}" STREQUAL "")
+      # for the time being configure warnings are not a "failure"
+      # condition. This would otherwise create a lot of noise on the
+      # regression tester.
+      string(APPEND _summary "\n#   - configure warnings")
+    endif()
+    file(STRINGS "${_path}/Build.xml" _warnings LIMIT_COUNT 1 REGEX "<Warning>")
+    if(NOT "${_warnings}" STREQUAL "")
+      set(_status "failure")
+      string(APPEND _summary "\n#   - build warnings")
+    endif()
+    file(STRINGS "${_path}/Test.xml" _warnings LIMIT_COUNT 1 REGEX "Status=\"failed\"")
+    if(NOT "${_warnings}" STREQUAL "")
+      set(_status "failure")
+      string(APPEND _summary "\n#   - test failures")
+    endif()
+
+    if("${_status}" STREQUAL "success")
+      string(APPEND _summary "\n#
+# 🎉  🎉  🎉  🎉      Testsuite run succeeded.     🎉  🎉  🎉  🎉")
+    endif()
+  else()
+    message(WARNING "Unable to locate test submission files from TAG.")
   endif()
 endif()
 
-# .oO( This script is freaky 606 lines long... )
+message("###
+#
+# Revision:      ${_revision}
+# Site:          ${CTEST_SITE}
+# Configuration: ${CTEST_BUILD_NAME}
+# CDash URL:     ${_cdash_url}
+# Status:        ${_status}${_summary}
+#
+###")
