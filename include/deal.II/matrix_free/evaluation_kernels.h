@@ -853,9 +853,9 @@ namespace internal
 
     if (evaluation_flag & EvaluationFlags::values)
       {
-        const auto shape_values    = shape_data.front().shape_values.data();
-        auto       values_quad_ptr = fe_eval.begin_values();
-        auto       values_dofs_actual_ptr = values_dofs_actual;
+        const auto *const shape_values = shape_data.front().shape_values.data();
+        auto *            values_quad_ptr        = fe_eval.begin_values();
+        const auto *      values_dofs_actual_ptr = values_dofs_actual;
 
         Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
         for (unsigned int c = 0; c < n_components; ++c)
@@ -870,9 +870,10 @@ namespace internal
 
     if (evaluation_flag & EvaluationFlags::gradients)
       {
-        const auto shape_gradients = shape_data.front().shape_gradients.data();
-        auto       gradients_quad_ptr     = fe_eval.begin_gradients();
-        auto       values_dofs_actual_ptr = values_dofs_actual;
+        const auto *const shape_gradients =
+          shape_data.front().shape_gradients.data();
+        auto *      gradients_quad_ptr     = fe_eval.begin_gradients();
+        const auto *values_dofs_actual_ptr = values_dofs_actual;
 
         for (unsigned int c = 0; c < n_components; ++c)
           {
@@ -925,9 +926,9 @@ namespace internal
 
     if (integration_flag & EvaluationFlags::values)
       {
-        const auto shape_values    = shape_data.front().shape_values.data();
-        auto       values_quad_ptr = fe_eval.begin_values();
-        auto       values_dofs_actual_ptr = values_dofs_actual;
+        const auto *const shape_values = shape_data.front().shape_values.data();
+        auto *            values_quad_ptr        = fe_eval.begin_values();
+        auto *            values_dofs_actual_ptr = values_dofs_actual;
 
         Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
         for (unsigned int c = 0; c < n_components; ++c)
@@ -946,9 +947,10 @@ namespace internal
 
     if (integration_flag & EvaluationFlags::gradients)
       {
-        const auto shape_gradients = shape_data.front().shape_gradients.data();
-        auto       gradients_quad_ptr     = fe_eval.begin_gradients();
-        auto       values_dofs_actual_ptr = values_dofs_actual;
+        const auto *const shape_gradients =
+          shape_data.front().shape_gradients.data();
+        auto *gradients_quad_ptr     = fe_eval.begin_gradients();
+        auto *values_dofs_actual_ptr = values_dofs_actual;
 
         for (unsigned int c = 0; c < n_components; ++c)
           {
@@ -4100,11 +4102,11 @@ namespace internal
 
           if (evaluation_flag & EvaluationFlags::values)
             {
-              const auto shape_values =
+              const auto *const shape_values =
                 &shape_data.shape_values_face(face_no, face_orientation, 0);
 
-              auto values_quad_ptr        = fe_eval.begin_values();
-              auto values_dofs_actual_ptr = values_dofs;
+              auto *values_quad_ptr        = fe_eval.begin_values();
+              auto *values_dofs_actual_ptr = values_dofs;
 
               Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
               for (unsigned int c = 0; c < n_components; ++c)
@@ -4119,8 +4121,8 @@ namespace internal
 
           if (evaluation_flag & EvaluationFlags::gradients)
             {
-              auto gradients_quad_ptr     = fe_eval.begin_gradients();
-              auto values_dofs_actual_ptr = values_dofs;
+              auto *      gradients_quad_ptr     = fe_eval.begin_gradients();
+              const auto *values_dofs_actual_ptr = values_dofs;
 
               std::array<const Number2 *, dim> shape_gradients;
               for (unsigned int d = 0; d < dim; ++d)
@@ -4339,11 +4341,11 @@ namespace internal
 
           if (integration_flag & EvaluationFlags::values)
             {
-              const auto shape_values =
+              const auto *const shape_values =
                 &shape_data.shape_values_face(face_no, face_orientation, 0);
 
-              auto values_quad_ptr        = fe_eval.begin_values();
-              auto values_dofs_actual_ptr = values_dofs;
+              auto *values_quad_ptr        = fe_eval.begin_values();
+              auto *values_dofs_actual_ptr = values_dofs;
 
               Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
               for (unsigned int c = 0; c < n_components; ++c)
@@ -4358,8 +4360,8 @@ namespace internal
 
           if (integration_flag & EvaluationFlags::gradients)
             {
-              auto gradients_quad_ptr     = fe_eval.begin_gradients();
-              auto values_dofs_actual_ptr = values_dofs;
+              auto *gradients_quad_ptr     = fe_eval.begin_gradients();
+              auto *values_dofs_actual_ptr = values_dofs;
 
               std::array<const Number2 *, dim> shape_gradients;
               for (unsigned int d = 0; d < dim; ++d)
@@ -5833,10 +5835,10 @@ namespace internal
           const Number *in  = in_array + d * n_q_points;
           Number *      out = out_array + d * dofs_per_component;
 
-          auto temp_1 = do_inplace ? out : fe_eval.get_scratch_data().begin();
-          auto temp_2 = do_inplace ?
-                          out :
-                          (temp_1 + std::max(n_q_points, dofs_per_component));
+          auto *temp_1 = do_inplace ? out : fe_eval.get_scratch_data().begin();
+          auto *temp_2 = do_inplace ?
+                           out :
+                           (temp_1 + std::max(n_q_points, dofs_per_component));
 
           if (dim == 3)
             {

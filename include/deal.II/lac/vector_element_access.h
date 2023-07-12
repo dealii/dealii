@@ -228,8 +228,8 @@ namespace internal
     const types::global_dof_index                            i)
   {
     // Extract local indices in the vector.
-    Tpetra::Vector<NumberType, int, types::signed_global_dof_index> vector =
-      V.trilinos_vector();
+    const Tpetra::Vector<NumberType, int, types::signed_global_dof_index>
+      &                               vector = V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));

@@ -430,7 +430,7 @@ namespace Step12
                                              system_matrix,
                                              right_hand_side);
 
-      for (auto &cdf : c.face_data)
+      for (const auto &cdf : c.face_data)
         {
           constraints.distribute_local_to_global(cdf.cell_matrix,
                                                  cdf.joint_dof_indices,

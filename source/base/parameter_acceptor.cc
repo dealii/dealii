@@ -199,7 +199,7 @@ ParameterAcceptor::get_section_path() const
            acceptor_it != class_list.rend();
            ++acceptor_it)
         {
-          const auto acceptor = *acceptor_it;
+          auto *const acceptor = *acceptor_it;
           if (acceptor->get_acceptor_id() >= get_acceptor_id())
             continue;
           bool has_trailing  = acceptor->get_section_name().back() == sep;

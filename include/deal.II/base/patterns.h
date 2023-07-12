@@ -1777,7 +1777,7 @@ namespace Patterns
         const T &                    t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a "
                                "string to a List type."));
@@ -1805,7 +1805,7 @@ namespace Patterns
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
 
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
                                "to a List type."));
@@ -1848,7 +1848,7 @@ namespace Patterns
         const T &                    t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
-        auto p = dynamic_cast<const Patterns::Map *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::Map *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a Map pattern to convert a string to "
                                "a Map compatible type."));
@@ -1879,7 +1879,7 @@ namespace Patterns
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
 
-        auto p = dynamic_cast<const Patterns::Map *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::Map *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a Map pattern to convert a "
                                "string to a Map compatible type."));
@@ -1927,7 +1927,7 @@ namespace Patterns
         const T &                    t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a "
                                "string to a std::array."));
@@ -1955,7 +1955,7 @@ namespace Patterns
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
 
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
                                "to a std::array."));
@@ -1994,7 +1994,7 @@ namespace Patterns
         const T &                    t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
                                "to a List compatible type."));
@@ -2020,7 +2020,7 @@ namespace Patterns
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
 
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
                                "to a List compatible type."));
@@ -2091,7 +2091,7 @@ namespace Patterns
         const T &                    t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
                                "to a List compatible type."));
@@ -2114,7 +2114,7 @@ namespace Patterns
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
 
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
                                "to a List compatible type."));
@@ -2188,7 +2188,7 @@ namespace Patterns
         const T &                    t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
                                "to a List compatible type."));
@@ -2212,7 +2212,7 @@ namespace Patterns
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
 
-        auto p = dynamic_cast<const Patterns::List *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a List pattern to convert a string "
                                "to a List compatible type."));
@@ -2316,7 +2316,7 @@ namespace Patterns
         const T &                    t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
-        auto p = dynamic_cast<const Patterns::Tuple *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::Tuple *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a Tuple pattern to convert a tuple "
                                "to a string."));
@@ -2336,7 +2336,7 @@ namespace Patterns
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
 
-        auto p = dynamic_cast<const Patterns::Tuple *>(&pattern);
+        const auto *p = dynamic_cast<const Patterns::Tuple *>(&pattern);
         AssertThrow(p,
                     ExcMessage("I need a Tuple pattern to convert a string "
                                "to a tuple type."));

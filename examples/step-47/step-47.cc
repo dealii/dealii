@@ -702,7 +702,7 @@ namespace Step47
                                              system_matrix,
                                              system_rhs);
 
-      for (auto &cdf : copy_data.face_data)
+      for (const auto &cdf : copy_data.face_data)
         {
           constraints.distribute_local_to_global(cdf.cell_matrix,
                                                  cdf.joint_dof_indices,

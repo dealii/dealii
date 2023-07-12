@@ -1358,7 +1358,7 @@ void LaplaceProblem<dim, degree>::estimate()
     if (copy_data.cell_index != numbers::invalid_unsigned_int)
       estimated_error_square_per_cell[copy_data.cell_index] += copy_data.value;
 
-    for (auto &cdf : copy_data.face_data)
+    for (const auto &cdf : copy_data.face_data)
       for (unsigned int j = 0; j < 2; ++j)
         estimated_error_square_per_cell[cdf.cell_indices[j]] += cdf.values[j];
   };

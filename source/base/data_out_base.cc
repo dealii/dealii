@@ -178,7 +178,7 @@ namespace
           static_cast<std::uint32_t>(
             compressed_data_length)}; /* list of compressed sizes of blocks */
 
-        const auto header_start =
+        const auto *const header_start =
           reinterpret_cast<const unsigned char *>(&compression_header[0]);
 
         return (Utilities::encode_base64(

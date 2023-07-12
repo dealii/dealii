@@ -2698,9 +2698,9 @@ FESystem<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
 
                   // we have to extract the correct slice out of the global
                   // vector of values:
-                  const auto begin =
+                  const auto *const begin =
                     std::begin(point_values[n]) + current_vector_component;
-                  const auto end = begin + n_base_components;
+                  const auto *const end = begin + n_base_components;
                   std::copy(begin, end, std::begin(base_point_values[j]));
                 }
 

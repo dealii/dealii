@@ -1793,7 +1793,7 @@ Iterator
 Tensor<rank_, dim, Number>::unroll_recursion(const Iterator current,
                                              const Iterator end) const
 {
-  auto next = current;
+  Iterator next = current;
   for (unsigned int i = 0; i < dim; ++i)
     next = values[i].unroll_recursion(next, end);
   return next;

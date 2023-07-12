@@ -2286,7 +2286,7 @@ namespace internal
       using ExecutionSpace =
         MemorySpace::Default::kokkos_space::execution_space;
       ExecutionSpace exec;
-      auto           local_values = vec.get_values();
+      auto *         local_values = vec.get_values();
       Kokkos::parallel_for(
         "dealii::set_zero_parallel",
         Kokkos::RangePolicy<ExecutionSpace>(exec, 0, n_constraints),

@@ -34,6 +34,7 @@ Checks: >
   mpi-*,
   performance-*,
   -performance-inefficient-string-concatenation,
-  -performance-no-automatic-move
+  -performance-no-automatic-move,
+  readability-qualified-auto
 
 WarningsAsErrors: '*'

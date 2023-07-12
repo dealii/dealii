@@ -1125,7 +1125,7 @@ namespace PETScWrappers
     PetscFunctionBeginUser;
     PetscCall(PCShellGetContext(ppc, &ctx));
 
-    auto user = static_cast<PreconditionShell *>(ctx);
+    auto *user = static_cast<PreconditionShell *>(ctx);
     if (!user->vmult)
       SETERRQ(
         PetscObjectComm((PetscObject)ppc),
@@ -1166,7 +1166,7 @@ namespace PETScWrappers
     PetscFunctionBeginUser;
     PetscCall(PCShellGetContext(ppc, &ctx));
 
-    auto user = static_cast<PreconditionShell *>(ctx);
+    auto *user = static_cast<PreconditionShell *>(ctx);
     if (!user->vmultT)
       SETERRQ(
         PetscObjectComm((PetscObject)ppc),

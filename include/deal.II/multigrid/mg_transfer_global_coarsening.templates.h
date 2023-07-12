@@ -2597,13 +2597,13 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     LinearAlgebra::distributed::Vector<Number> &      dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
-  const bool use_dst_inplace = this->vec_fine.size() == 0;
-  const auto vec_fine_ptr    = use_dst_inplace ? &dst : &this->vec_fine;
+  const bool  use_dst_inplace = this->vec_fine.size() == 0;
+  auto *const vec_fine_ptr    = use_dst_inplace ? &dst : &this->vec_fine;
   Assert(vec_fine_ptr->get_partitioner().get() == this->partitioner_fine.get(),
          ExcInternalError());
 
-  const bool use_src_inplace = this->vec_coarse.size() == 0;
-  const auto vec_coarse_ptr  = use_src_inplace ? &src : &this->vec_coarse;
+  const bool        use_src_inplace = this->vec_coarse.size() == 0;
+  const auto *const vec_coarse_ptr = use_src_inplace ? &src : &this->vec_coarse;
   Assert(vec_coarse_ptr->get_partitioner().get() ==
            this->partitioner_coarse.get(),
          ExcInternalError());
@@ -2764,13 +2764,13 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
   restrict_and_add(LinearAlgebra::distributed::Vector<Number> &      dst,
                    const LinearAlgebra::distributed::Vector<Number> &src) const
 {
-  const bool use_src_inplace = this->vec_fine.size() == 0;
-  const auto vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
+  const bool        use_src_inplace = this->vec_fine.size() == 0;
+  const auto *const vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
   Assert(vec_fine_ptr->get_partitioner().get() == this->partitioner_fine.get(),
          ExcInternalError());
 
-  const bool use_dst_inplace = this->vec_coarse.size() == 0;
-  const auto vec_coarse_ptr  = use_dst_inplace ? &dst : &this->vec_coarse;
+  const bool  use_dst_inplace = this->vec_coarse.size() == 0;
+  auto *const vec_coarse_ptr  = use_dst_inplace ? &dst : &this->vec_coarse;
   Assert(vec_coarse_ptr->get_partitioner().get() ==
            this->partitioner_coarse.get(),
          ExcInternalError());
@@ -2943,13 +2943,13 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 {
   const unsigned int n_lanes = VectorizedArrayType::size();
 
-  const bool use_src_inplace = this->vec_fine.size() == 0;
-  const auto vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
+  const bool        use_src_inplace = this->vec_fine.size() == 0;
+  const auto *const vec_fine_ptr    = use_src_inplace ? &src : &this->vec_fine;
   Assert(vec_fine_ptr->get_partitioner().get() == this->partitioner_fine.get(),
          ExcInternalError());
 
-  const bool use_dst_inplace = this->vec_coarse.size() == 0;
-  const auto vec_coarse_ptr  = use_dst_inplace ? &dst : &this->vec_coarse;
+  const bool  use_dst_inplace = this->vec_coarse.size() == 0;
+  auto *const vec_coarse_ptr  = use_dst_inplace ? &dst : &this->vec_coarse;
   Assert(vec_coarse_ptr->get_partitioner().get() ==
            this->partitioner_coarse.get(),
          ExcInternalError());
@@ -3633,10 +3633,10 @@ namespace internal
                       if (dof_processed[local_dof_idx] == false)
                         {
                           if (!constraint.is_constrained(global_dof_idx))
-                            support_point_dofs.emplace_back(std::make_pair(
+                            support_point_dofs.emplace_back(
                               partitioner_support_points.global_to_local(
                                 support_point_indices[i]),
-                              global_dof_idx));
+                              global_dof_idx);
 
                           dof_processed[local_dof_idx] = true;
                         }

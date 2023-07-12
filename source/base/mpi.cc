@@ -795,7 +795,7 @@ namespace Utilities
         // likely did not intend. As a consequence, filter out this specific
         // flag.
         std::vector<char *> argv_new;
-        for (const auto arg : make_array_view(&argv[0], &argv[0] + argc))
+        for (auto *const arg : make_array_view(&argv[0], &argv[0] + argc))
           if (strcmp(arg, "--help") != 0)
             argv_new.push_back(arg);
 
@@ -976,7 +976,7 @@ namespace Utilities
 
 #ifdef DEAL_II_WITH_MPI
       // Before exiting, wait for nonblocking communication to complete:
-      for (auto request : requests)
+      for (auto *request : requests)
         {
           const int ierr = MPI_Wait(request, MPI_STATUS_IGNORE);
           AssertThrowMPI(ierr);
