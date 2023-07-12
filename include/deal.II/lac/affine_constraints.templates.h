@@ -782,8 +782,9 @@ AffineConstraints<number>::close()
                   chained_constraint_replaced = true;
 
                   // look up the chain of constraints for this entry
-                  const size_type dof_index = line.entries[entry].first;
-                  const number    weight    = line.entries[entry].second;
+                  [[maybe_unused]] const size_type dof_index =
+                    line.entries[entry].first;
+                  const number weight = line.entries[entry].second;
 
                   Assert(dof_index != line.index,
                          ExcMessage("Cycle in constraints detected!"));
