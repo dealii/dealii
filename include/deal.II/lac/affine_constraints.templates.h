@@ -712,8 +712,9 @@ AffineConstraints<number>::close()
 #ifdef DEBUG
   size_type iteration = 0;
 #endif
-  bool              chained_constraint_replaced = false;
-  std::vector<bool> line_finalized(lines.size(), false);
+  bool                                chained_constraint_replaced = false;
+  std::vector<bool>                   line_finalized(lines.size(), false);
+  std::vector<const ConstraintLine *> sub_constraints;
   do
     {
       chained_constraint_replaced = false;
@@ -738,8 +739,8 @@ AffineConstraints<number>::close()
             // constrained, then store the address of the line it corresponds to
             // for further processing; this avoids having to look it up again,
             // which requires an IndexSet lookup. If not, store a nullptr.
-            std::vector<const ConstraintLine *> sub_constraints(
-              line.entries.size(), nullptr);
+            sub_constraints.resize(line.entries.size());
+            bool has_sub_constraints = false;
             for (unsigned int entry = 0; entry < line.entries.size(); ++entry)
               if (((local_lines.size() == 0) ||
                    (local_lines.is_element(line.entries[entry].first))) &&
@@ -748,13 +749,14 @@ AffineConstraints<number>::close()
                   const size_type dof_index = line.entries[entry].first;
                   sub_constraints[entry] =
                     &lines[lines_cache[calculate_line_index(dof_index)]];
+                  has_sub_constraints = true;
                 }
+              else
+                sub_constraints[entry] = nullptr;
 
             // If none of the entries in the current line refer to DoFs that are
             // themselves constrained, then we can move on:
-            if (std::none_of(sub_constraints.begin(),
-                             sub_constraints.end(),
-                             [](const auto p) { return (p != nullptr); }))
+            if (has_sub_constraints == false)
               {
                 line_finalized[line_index] = true;
                 continue;
