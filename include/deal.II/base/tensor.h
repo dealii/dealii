@@ -1125,8 +1125,8 @@ constexpr inline bool
 Tensor<0, dim, Number>::operator==(const Tensor<0, dim, OtherNumber> &p) const
 {
 #  ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
-  Assert(!(std::is_same<Number, adouble>::value ||
-           std::is_same<OtherNumber, adouble>::value),
+  Assert(!(std::is_same_v<Number, adouble> ||
+           std::is_same_v<OtherNumber, adouble>),
          ExcMessage(
            "The Tensor equality operator for ADOL-C taped numbers has not yet "
            "been extended to support advanced branching."));
@@ -1681,7 +1681,7 @@ namespace internal
               std::enable_if_t<
                 !std::is_integral<
                   typename ProductType<Number, OtherNumber>::type>::value &&
-                  !std::is_same<Number, Differentiation::SD::Expression>::value,
+                  !std::is_same_v<Number, Differentiation::SD::Expression>,
                 int> = 0>
     constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE void
     division_operator(Tensor<rank, dim, Number> (&t)[dim],
@@ -1701,7 +1701,7 @@ namespace internal
               std::enable_if_t<
                 std::is_integral<
                   typename ProductType<Number, OtherNumber>::type>::value ||
-                  std::is_same<Number, Differentiation::SD::Expression>::value,
+                  std::is_same_v<Number, Differentiation::SD::Expression>,
                 int> = 0>
     constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE void
     division_operator(Tensor<rank, dim, Number> (&t)[dim],

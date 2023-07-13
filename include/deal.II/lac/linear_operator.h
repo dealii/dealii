@@ -1551,8 +1551,8 @@ template <
   typename Range  = typename Solver::vector_type,
   typename Domain = Range,
   typename = std::enable_if_t<!std::is_lvalue_reference<Preconditioner>::value>,
-  typename = std::enable_if_t<
-    !std::is_same<Preconditioner, PreconditionIdentity>::value>,
+  typename =
+    std::enable_if_t<!std::is_same_v<Preconditioner, PreconditionIdentity>>,
   typename = std::enable_if_t<
     !std::is_same<Preconditioner,
                   LinearOperator<Range, Domain, Payload>>::value>>

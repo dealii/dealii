@@ -603,8 +603,7 @@ namespace internal
         const Number previous_r_dot_preconditioner_dot_r =
           r_dot_preconditioner_dot_r;
 
-        if (std::is_same<PreconditionerType, PreconditionIdentity>::value ==
-            false)
+        if (std::is_same_v<PreconditionerType, PreconditionIdentity> == false)
           {
             preconditioner.vmult(v, r);
             r_dot_preconditioner_dot_r = r * v;
@@ -613,7 +612,7 @@ namespace internal
           r_dot_preconditioner_dot_r = residual_norm * residual_norm;
 
         const VectorType &direction =
-          std::is_same<PreconditionerType, PreconditionIdentity>::value ? r : v;
+          std::is_same_v<PreconditionerType, PreconditionIdentity> ? r : v;
 
         if (iteration_index > 1)
           {

@@ -339,7 +339,7 @@ template <int dim, int fe_degree, int n_q_points_1d, typename number>
 void
 do_test(const DoFHandler<dim> &dof)
 {
-  if (std::is_same<number, float>::value == true)
+  if (std::is_same_v<number, float> == true)
     {
       deallog.push("float");
     }
@@ -420,7 +420,7 @@ do_test(const DoFHandler<dim> &dof)
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
 
-  if (std::is_same<number, float>::value == true)
+  if (std::is_same_v<number, float> == true)
     deallog.pop();
 }
 

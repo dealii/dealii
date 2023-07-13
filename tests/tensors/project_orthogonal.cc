@@ -23,9 +23,9 @@ template <int dim, typename number>
 void
 print_type(const Tensor<2, dim, number> &)
 {
-  if (std::is_same<number, float>::value)
+  if (std::is_same_v<number, float>)
     deallog << " Tensor<2, " << dim << ", float>" << std::endl;
-  else if (std::is_same<number, double>::value)
+  else if (std::is_same_v<number, double>)
     deallog << " Tensor<2, " << dim << ", double>" << std::endl;
   else
     Assert(false, ExcNotImplemented());

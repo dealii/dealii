@@ -111,8 +111,8 @@ namespace Utilities
       // performance reasons as this can significantly decrease the number of
       // kernel launched. The indices are expanded the first time the function
       // is called.
-      if ((std::is_same<MemorySpaceType, MemorySpace::Default>::value) &&
-          (import_indices_plain_dev.size() == 0))
+      if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>)&&(
+            import_indices_plain_dev.size() == 0))
         initialize_import_indices_plain_dev();
 #    endif
 
@@ -449,7 +449,7 @@ namespace Utilities
             ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
                        "The number of ghost entries times the size of 'Number' "
                        "exceeds this value. This is not supported."));
-          if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
+          if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
             Kokkos::fence();
           const int ierr =
             MPI_Isend(ghost_array_ptr,
@@ -579,8 +579,8 @@ namespace Utilities
       // performance reasons as this can significantly decrease the number of
       // kernel launched. The indices are expanded the first time the function
       // is called.
-      if ((std::is_same<MemorySpaceType, MemorySpace::Default>::value) &&
-          (import_indices_plain_dev.size() == 0))
+      if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>)&&(
+            import_indices_plain_dev.size() == 0))
         initialize_import_indices_plain_dev();
 #    endif
 

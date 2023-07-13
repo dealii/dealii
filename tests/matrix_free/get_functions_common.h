@@ -163,7 +163,7 @@ public:
 
     // for doubles, use a stricter condition than
     // for floats for the relative error size
-    if (std::is_same<Number, double>::value == true)
+    if (std::is_same_v<Number, double> == true)
       {
         deallog << "Error function values: " << errors[0] / total[0]
                 << std::endl;
@@ -186,7 +186,7 @@ public:
         const double output4 = total[4] == 0 ? 0. : errors[4] / total[4];
         deallog << "Error function Hessians: " << output4 << std::endl;
       }
-    else if (std::is_same<Number, float>::value == true)
+    else if (std::is_same_v<Number, float> == true)
       {
         deallog << "Error function values: " << errors[0] / total[0]
                 << std::endl;

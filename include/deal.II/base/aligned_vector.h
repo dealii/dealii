@@ -890,7 +890,7 @@ namespace internal
       // completely fill its memory and may lead to false positives in
       // e.g. valgrind
       if (std::is_trivial<T>::value == true &&
-          std::is_same<T, long double>::value == false)
+          std::is_same_v<T, long double> == false)
         {
           const unsigned char zero[sizeof(T)] = {};
           // cast element to (void*) to silence compiler warning for virtual

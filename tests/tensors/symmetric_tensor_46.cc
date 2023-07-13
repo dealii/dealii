@@ -30,7 +30,7 @@ main()
 
   {
     const SymmetricTensor<2, 3, double> st{};
-    static_assert(std::is_same<decltype(st[0][0]), const double &>::value);
+    static_assert(std::is_same_v<decltype(st[0][0]), const double &>);
   }
 
   {

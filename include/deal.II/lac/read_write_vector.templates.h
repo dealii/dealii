@@ -108,8 +108,8 @@ namespace LinearAlgebra
         (void)rw_vector;
 
         static_assert(
-          std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
-            std::is_same<MemorySpace, ::dealii::MemorySpace::Default>::value,
+          std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host> ||
+            std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>,
           "MemorySpace should be Host or Default");
       }
     };
@@ -563,7 +563,7 @@ namespace LinearAlgebra
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   template <typename Dummy>
-  std::enable_if_t<std::is_same<Dummy, Number>::value &&
+  std::enable_if_t<std::is_same_v<Dummy, Number> &&
                    dealii::is_tpetra_type<Number>::value>
   ReadWriteVector<Number>::import_elements(
     const Tpetra::Vector<Number, int, types::signed_global_dof_index> &vector,
@@ -848,7 +848,7 @@ namespace LinearAlgebra
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
   template <typename Dummy>
-  std::enable_if_t<std::is_same<Dummy, Number>::value &&
+  std::enable_if_t<std::is_same_v<Dummy, Number> &&
                    dealii::is_tpetra_type<Number>::value>
   ReadWriteVector<Number>::import_elements(
     const LinearAlgebra::TpetraWrappers::Vector<Number> &trilinos_vec,

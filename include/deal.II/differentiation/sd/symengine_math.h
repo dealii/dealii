@@ -69,7 +69,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     pow(const Expression &base, const NumberType &exponent)
     {
@@ -88,7 +88,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     pow(const NumberType &base, const Expression &exponent)
     {
@@ -154,7 +154,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     log(const Expression &x, const NumberType &base)
     {
@@ -173,7 +173,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     log(const NumberType &x, const Expression &base)
     {
@@ -313,7 +313,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     atan2(const NumberType &y, const Expression &x)
     {
@@ -333,7 +333,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     atan2(const Expression &y, const NumberType &x)
     {
@@ -602,7 +602,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     max(const Expression &a, const NumberType &b)
     {
@@ -621,7 +621,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     max(const NumberType &a, const Expression &b)
     {
@@ -650,7 +650,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     min(const Expression &a, const NumberType &b)
     {
@@ -669,7 +669,7 @@ namespace Differentiation
      */
     template <
       typename NumberType,
-      typename = std::enable_if_t<!std::is_same<NumberType, Expression>::value>>
+      typename = std::enable_if_t<!std::is_same_v<NumberType, Expression>>>
     Expression
     min(const NumberType &a, const Expression &b)
     {

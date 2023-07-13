@@ -33,12 +33,11 @@ main()
   dealii::ndarray<double, 1, 2, 3>    r3;
   dealii::ndarray<double, 1, 2, 3, 4> r4;
 
-  static_assert(std::is_same<decltype(r0), double>::value,
-                "types must be the same");
-  static_assert(std::is_same<decltype(r1), std::array<double, 1>>::value,
+  static_assert(std::is_same_v<decltype(r0), double>, "types must be the same");
+  static_assert(std::is_same_v<decltype(r1), std::array<double, 1>>,
                 "types must be the same");
   static_assert(
-    std::is_same<decltype(r2), std::array<std::array<double, 2>, 1>>::value,
+    std::is_same_v<decltype(r2), std::array<std::array<double, 2>, 1>>,
     "types must be the same");
   static_assert(
     std::is_same<decltype(r3),

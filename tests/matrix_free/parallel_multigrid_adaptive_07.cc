@@ -223,7 +223,7 @@ void
 do_test(const std::vector<const DoFHandler<dim> *> &dof)
 {
   const unsigned int nb = 2;
-  if (std::is_same<number, float>::value == true)
+  if (std::is_same_v<number, float> == true)
     {
       deallog.push("float");
     }
@@ -413,7 +413,7 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
     solver.solve(fine_matrix, sol, in, preconditioner);
   }
 
-  if (std::is_same<number, float>::value == true)
+  if (std::is_same_v<number, float> == true)
     deallog.pop();
 
   fine_matrix.clear();

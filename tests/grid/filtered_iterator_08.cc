@@ -65,7 +65,7 @@ test()
           //
           // using C1 = typename std::decay<decltype(cell)>::type;
           // using C2 = typename std::decay<decltype(cell_neighbor)>::type;
-          // static_assert(std::is_same<C1, C2>::value,
+          // static_assert(std::is_same_v<C1, C2>,
           //               "Cell iterator types are not identical.");
 
           fe_interface_values.reinit(cell,

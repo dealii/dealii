@@ -622,7 +622,7 @@ namespace MatrixFreeOperators
   class CellwiseInverseMassMatrix
   {
     static_assert(
-      std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+      std::is_same_v<Number, typename VectorizedArrayType::value_type>,
       "Type of Number and of VectorizedArrayType do not match.");
 
   public:
@@ -1838,7 +1838,7 @@ namespace MatrixFreeOperators
   {
 #ifndef DEAL_II_MSVC
     static_assert(
-      std::is_same<typename VectorType::value_type, value_type>::value,
+      std::is_same_v<typename VectorType::value_type, value_type>,
       "The vector type must be based on the same value type as this "
       "operator");
 #endif
@@ -1858,7 +1858,7 @@ namespace MatrixFreeOperators
   {
 #ifndef DEAL_II_MSVC
     static_assert(
-      std::is_same<typename VectorType::value_type, value_type>::value,
+      std::is_same_v<typename VectorType::value_type, value_type>,
       "The vector type must be based on the same value type as this "
       "operator");
 #endif

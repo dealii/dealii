@@ -131,8 +131,7 @@ sub_test()
 
       // make 10 sweeps in order to get in some
       // variation to the threaded program
-      const double float_factor =
-        std::is_same<number, float>::value ? 0.01 : 1.;
+      const double float_factor = std::is_same_v<number, float> ? 0.01 : 1.;
       for (unsigned int sweep = 0; sweep < 10; ++sweep)
         {
           mf_color.vmult(out_color, in_dist);

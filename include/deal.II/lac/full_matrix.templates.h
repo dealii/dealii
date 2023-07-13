@@ -519,9 +519,8 @@ FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
-  if ((std::is_same<number, double>::value ||
-       std::is_same<number, float>::value) &&
-      std::is_same<number, number2>::value)
+  if ((std::is_same_v<number, double> ||
+       std::is_same_v<number, float>)&&std::is_same_v<number, number2>)
     if (this->n() * this->m() * src.n() > 300 && src.n() <= max_blas_int &&
         this->m() <= max_blas_int && this->n() <= max_blas_int)
       {
@@ -602,9 +601,8 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
-  if ((std::is_same<number, double>::value ||
-       std::is_same<number, float>::value) &&
-      std::is_same<number, number2>::value)
+  if ((std::is_same_v<number, double> ||
+       std::is_same_v<number, float>)&&std::is_same_v<number, number2>)
     if (this->n() * this->m() * src.n() > 300 && src.n() <= max_blas_int &&
         this->n() <= max_blas_int && this->m() <= max_blas_int)
       {
@@ -706,9 +704,8 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
-  if ((std::is_same<number, double>::value ||
-       std::is_same<number, float>::value) &&
-      std::is_same<number, number2>::value)
+  if ((std::is_same_v<number, double> ||
+       std::is_same_v<number, float>)&&std::is_same_v<number, number2>)
     if (this->n() * this->m() * src.m() > 300 && src.m() <= max_blas_int &&
         this->n() <= max_blas_int && this->m() <= max_blas_int)
       {
@@ -808,9 +805,8 @@ FullMatrix<number>::TmTmult(FullMatrix<number2> &      dst,
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
-  if ((std::is_same<number, double>::value ||
-       std::is_same<number, float>::value) &&
-      std::is_same<number, number2>::value)
+  if ((std::is_same_v<number, double> ||
+       std::is_same_v<number, float>)&&std::is_same_v<number, number2>)
     if (this->n() * this->m() * src.m() > 300 && src.m() <= max_blas_int &&
         this->n() <= max_blas_int && this->m() <= max_blas_int)
       {
@@ -1218,8 +1214,8 @@ namespace internal
   // floats and doubles
   template <typename number>
   struct Determinant<number,
-                     std::enable_if_t<std::is_same<number, float>::value ||
-                                      std::is_same<number, double>::value>>
+                     std::enable_if_t<std::is_same_v<number, float> ||
+                                      std::is_same_v<number, double>>>
   {
 #ifdef DEAL_II_WITH_LAPACK
     static number
@@ -1755,7 +1751,7 @@ FullMatrix<number>::gauss_jordan()
   // efficient to use Lapack for very small
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
-  if (std::is_same<number, double>::value || std::is_same<number, float>::value)
+  if (std::is_same_v<number, double> || std::is_same_v<number, float>)
     if (this->n_cols() > 15 && static_cast<types::blas_int>(this->n_cols()) <=
                                  std::numeric_limits<types::blas_int>::max())
       {

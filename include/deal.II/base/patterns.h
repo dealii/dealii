@@ -1484,8 +1484,8 @@ namespace Patterns
     struct Convert<T, std::enable_if_t<std::is_arithmetic<T>::value>>
     {
       template <typename Dummy = T>
-      static std::enable_if_t<std::is_same<Dummy, T>::value &&
-                                std::is_same<T, bool>::value,
+      static std::enable_if_t<std::is_same_v<Dummy, T> &&
+                                std::is_same_v<T, bool>,
                               std::unique_ptr<Patterns::PatternBase>>
       to_pattern()
       {
@@ -1493,8 +1493,8 @@ namespace Patterns
       }
 
       template <typename Dummy = T>
-      static std::enable_if_t<std::is_same<Dummy, T>::value &&
-                                !std::is_same<T, bool>::value &&
+      static std::enable_if_t<std::is_same_v<Dummy, T> &&
+                                !std::is_same_v<T, bool> &&
                                 std::is_integral<T>::value,
                               std::unique_ptr<Patterns::PatternBase>>
       to_pattern()
@@ -1504,8 +1504,8 @@ namespace Patterns
       }
 
       template <typename Dummy = T>
-      static std::enable_if_t<std::is_same<Dummy, T>::value &&
-                                !std::is_same<T, bool>::value &&
+      static std::enable_if_t<std::is_same_v<Dummy, T> &&
+                                !std::is_same_v<T, bool> &&
                                 std::is_floating_point<T>::value,
                               std::unique_ptr<Patterns::PatternBase>>
       to_pattern()
@@ -1519,10 +1519,10 @@ namespace Patterns
                 const Patterns::PatternBase &p = *Convert<T>::to_pattern())
       {
         std::stringstream str;
-        if (std::is_same<T, unsigned char>::value ||
-            std::is_same<T, signed char>::value || std::is_same<T, char>::value)
+        if (std::is_same_v<T, unsigned char> ||
+            std::is_same_v<T, signed char> || std::is_same_v<T, char>)
           str << static_cast<int>(value);
-        else if (std::is_same<T, bool>::value)
+        else if (std::is_same_v<T, bool>)
           str << (static_cast<bool>(value) ? "true" : "false");
         else
           str << value;
@@ -1536,14 +1536,13 @@ namespace Patterns
       {
         AssertThrow(p.match(s), ExcNoMatch(s, p.description()));
         T value;
-        if (std::is_same<T, bool>::value)
+        if (std::is_same_v<T, bool>)
           value = (s == "true");
         else
           {
             std::istringstream is(s);
-            if (std::is_same<T, unsigned char>::value ||
-                std::is_same<T, signed char>::value ||
-                std::is_same<T, char>::value)
+            if (std::is_same_v<T, unsigned char> ||
+                std::is_same_v<T, signed char> || std::is_same_v<T, char>)
               {
                 int i;
                 is >> i;

@@ -763,7 +763,7 @@ class FEEvaluationAccess : public FEEvaluationBase<dim,
                                                    VectorizedArrayType>
 {
   static_assert(
-    std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+    std::is_same_v<Number, typename VectorizedArrayType::value_type>,
     "Type of Number and of VectorizedArrayType do not match.");
 
 public:
@@ -835,7 +835,7 @@ class FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>
   : public FEEvaluationBase<dim, 1, Number, is_face, VectorizedArrayType>
 {
   static_assert(
-    std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+    std::is_same_v<Number, typename VectorizedArrayType::value_type>,
     "Type of Number and of VectorizedArrayType do not match.");
 
 public:
@@ -993,7 +993,7 @@ class FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>
   : public FEEvaluationBase<dim, dim, Number, is_face, VectorizedArrayType>
 {
   static_assert(
-    std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+    std::is_same_v<Number, typename VectorizedArrayType::value_type>,
     "Type of Number and of VectorizedArrayType do not match.");
 
 public:
@@ -1169,7 +1169,7 @@ class FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>
   : public FEEvaluationBase<1, 1, Number, is_face, VectorizedArrayType>
 {
   static_assert(
-    std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+    std::is_same_v<Number, typename VectorizedArrayType::value_type>,
     "Type of Number and of VectorizedArrayType do not match.");
 
 public:
@@ -1914,7 +1914,7 @@ class FEEvaluation : public FEEvaluationAccess<dim,
                                                VectorizedArrayType>
 {
   static_assert(
-    std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+    std::is_same_v<Number, typename VectorizedArrayType::value_type>,
     "Type of Number and of VectorizedArrayType do not match.");
 
 public:
@@ -2378,7 +2378,7 @@ class FEFaceEvaluation : public FEEvaluationAccess<dim,
                                                    VectorizedArrayType>
 {
   static_assert(
-    std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+    std::is_same_v<Number, typename VectorizedArrayType::value_type>,
     "Type of Number and of VectorizedArrayType do not match.");
 
 public:
@@ -7900,7 +7900,7 @@ namespace internal
     // into the vector to the evaluate() and integrate() calls, without
     // reading the vector entries into a separate data field. This saves some
     // operations.
-    if (std::is_same<typename VectorType::value_type, Number>::value &&
+    if (std::is_same_v<typename VectorType::value_type, Number> &&
         dof_info.index_storage_variants
             [internal::MatrixFreeFunctions::DoFInfo::dof_access_cell][cell] ==
           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::

@@ -81,10 +81,9 @@ namespace Utilities
     const unsigned int            n_partitions,
     const types::global_dof_index total_size)
   {
-    static_assert(
-      std::is_same<types::global_dof_index, IndexSet::size_type>::value,
-      "IndexSet::size_type must match types::global_dof_index for "
-      "using this function");
+    static_assert(std::is_same_v<types::global_dof_index, IndexSet::size_type>,
+                  "IndexSet::size_type must match types::global_dof_index for "
+                  "using this function");
     const unsigned int remain = total_size % n_partitions;
 
     const IndexSet::size_type min_size = total_size / n_partitions;
@@ -237,7 +236,7 @@ namespace Utilities
       const types::global_dof_index locally_owned_size)
     {
       static_assert(
-        std::is_same<types::global_dof_index, IndexSet::size_type>::value,
+        std::is_same_v<types::global_dof_index, IndexSet::size_type>,
         "IndexSet::size_type must match types::global_dof_index for "
         "using this function");
       const unsigned int                     n_proc = n_mpi_processes(comm);

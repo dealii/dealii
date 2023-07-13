@@ -50,7 +50,7 @@ namespace numbers
           double,
           Differentiation::AD::NumberTypes::adolc_taped>::ad_type;
         static_assert(
-          std::is_same<adouble, ad_type>::value,
+          std::is_same_v<adouble, ad_type>,
           "The type of the AD number is not that which was expected.");
         const ad_type result = comparator(value_1, value_2);
         return !(Differentiation::AD::ADNumberTraits<ad_type>::get_scalar_value(

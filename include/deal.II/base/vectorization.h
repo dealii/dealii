@@ -155,7 +155,7 @@ public:
    * current lane.
    */
   template <typename U = T>
-  std::enable_if_t<!std::is_same<U, const U>::value, typename T::value_type> &
+  std::enable_if_t<!std::is_same_v<U, const U>, typename T::value_type> &
   operator*()
   {
     AssertIndexRange(lane, T::size());

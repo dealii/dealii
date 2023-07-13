@@ -765,7 +765,7 @@ do_test(const DoFHandler<dim> &          dof,
         const AffineConstraints<double> &constraints,
         const bool                       also_test_parallel = false)
 {
-  if (std::is_same<number, float>::value == true)
+  if (std::is_same_v<number, float> == true)
     deallog.push("float");
 
   deallog << "Testing " << dof.get_fe().get_name();
@@ -876,7 +876,7 @@ do_test(const DoFHandler<dim> &          dof,
     }
   deallog << std::endl;
 
-  if (std::is_same<number, float>::value == true)
+  if (std::is_same_v<number, float> == true)
     deallog.pop();
 }
 

@@ -68,7 +68,7 @@ test(unsigned int variant)
       }
   else
     Assert(false, ExcMessage("Invalid variant"));
-  if (std::is_same<number, float>::value == true)
+  if (std::is_same_v<number, float> == true)
     Assert(variant < 4, ExcMessage("Invalid_variant"));
 
   deallog.push(Utilities::int_to_string(variant, 1));

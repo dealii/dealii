@@ -2363,7 +2363,7 @@ inline void
 PreconditionRichardson::vmult(VectorType &dst, const VectorType &src) const
 {
   static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
+    std::is_same_v<size_type, typename VectorType::size_type>,
     "PreconditionRichardson and VectorType must have the same size_type.");
 
   dst.equ(relaxation, src);
@@ -2376,7 +2376,7 @@ inline void
 PreconditionRichardson::Tvmult(VectorType &dst, const VectorType &src) const
 {
   static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
+    std::is_same_v<size_type, typename VectorType::size_type>,
     "PreconditionRichardson and VectorType must have the same size_type.");
 
   dst.equ(relaxation, src);
@@ -2387,7 +2387,7 @@ inline void
 PreconditionRichardson::vmult_add(VectorType &dst, const VectorType &src) const
 {
   static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
+    std::is_same_v<size_type, typename VectorType::size_type>,
     "PreconditionRichardson and VectorType must have the same size_type.");
 
   dst.add(relaxation, src);
@@ -2400,7 +2400,7 @@ inline void
 PreconditionRichardson::Tvmult_add(VectorType &dst, const VectorType &src) const
 {
   static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
+    std::is_same_v<size_type, typename VectorType::size_type>,
     "PreconditionRichardson and VectorType must have the same size_type.");
 
   dst.add(relaxation, src);
@@ -3420,11 +3420,11 @@ namespace internal
       eigenvector /= eigenvector.l2_norm();
       VectorType vector1, vector2;
       vector1.reinit(eigenvector, true);
-      if (!std::is_same<PreconditionerType, PreconditionIdentity>::value)
+      if (!std::is_same_v<PreconditionerType, PreconditionIdentity>)
         vector2.reinit(eigenvector, true);
       for (unsigned int i = 0; i < n_iterations; ++i)
         {
-          if (!std::is_same<PreconditionerType, PreconditionIdentity>::value)
+          if (!std::is_same_v<PreconditionerType, PreconditionIdentity>)
             {
               matrix.vmult(vector2, eigenvector);
               preconditioner.vmult(vector1, vector2);
@@ -3494,7 +3494,7 @@ inline PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   , eigenvalues_are_initialized(false)
 {
   static_assert(
-    std::is_same<size_type, typename VectorType::size_type>::value,
+    std::is_same_v<size_type, typename VectorType::size_type>,
     "PreconditionChebyshev and VectorType must have the same size_type.");
 }
 
@@ -3666,7 +3666,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   using NumberType = typename VectorType::value_type;
   if (std::is_same<PreconditionerType,
                    dealii::DiagonalMatrix<VectorType>>::value == false ||
-      (std::is_same<VectorType, dealii::Vector<NumberType>>::value == false &&
+      (std::is_same_v<VectorType, dealii::Vector<NumberType>> == false &&
        ((std::is_same<VectorType,
                       LinearAlgebra::distributed::
                         Vector<NumberType, MemorySpace::Host>>::value ==

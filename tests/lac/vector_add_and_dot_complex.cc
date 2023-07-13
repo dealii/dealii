@@ -49,7 +49,7 @@ check()
 
       // then do it a second time with the add_and_dot function
       const std::complex<number> prod_check = check.add_and_dot(factor, v2, v3);
-      if (test == 0 && std::is_same<number, double>::value)
+      if (test == 0 && std::is_same_v<number, double>)
         {
           deallog << "Vector add reference:   " << std::flush;
           v1.print(deallog.get_file_stream(), 7);

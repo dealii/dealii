@@ -1221,7 +1221,7 @@ namespace HDF5
      */
     template <typename Container>
     std::enable_if_t<
-      std::is_same<Container, Vector<typename Container::value_type>>::value,
+      std::is_same_v<Container, Vector<typename Container::value_type>>,
       Container>
     initialize_container(const std::vector<hsize_t> &dimensions);
 
@@ -1277,37 +1277,37 @@ namespace HDF5
     std::shared_ptr<hid_t>
     get_hdf5_datatype()
     {
-      static_assert(std::is_same<number, float>::value ||
-                      std::is_same<number, double>::value ||
-                      std::is_same<number, int>::value ||
-                      std::is_same<number, bool>::value ||
-                      std::is_same<number, unsigned int>::value ||
-                      std::is_same<number, std::complex<float>>::value ||
-                      std::is_same<number, std::complex<double>>::value,
+      static_assert(std::is_same_v<number, float> ||
+                      std::is_same_v<number, double> ||
+                      std::is_same_v<number, int> ||
+                      std::is_same_v<number, bool> ||
+                      std::is_same_v<number, unsigned int> ||
+                      std::is_same_v<number, std::complex<float>> ||
+                      std::is_same_v<number, std::complex<double>>,
                     "The data type you are trying to get the HDF5 tag for "
                     "is not supported by this function.");
 
-      if (std::is_same<number, float>::value)
+      if (std::is_same_v<number, float>)
         {
           return std::make_shared<hid_t>(H5T_NATIVE_FLOAT);
         }
-      else if (std::is_same<number, double>::value)
+      else if (std::is_same_v<number, double>)
         {
           return std::make_shared<hid_t>(H5T_NATIVE_DOUBLE);
         }
-      else if (std::is_same<number, int>::value)
+      else if (std::is_same_v<number, int>)
         {
           return std::make_shared<hid_t>(H5T_NATIVE_INT);
         }
-      else if (std::is_same<number, unsigned int>::value)
+      else if (std::is_same_v<number, unsigned int>)
         {
           return std::make_shared<hid_t>(H5T_NATIVE_UINT);
         }
-      else if (std::is_same<number, bool>::value)
+      else if (std::is_same_v<number, bool>)
         {
           return std::make_shared<hid_t>(H5T_NATIVE_HBOOL);
         }
-      else if (std::is_same<number, std::complex<float>>::value)
+      else if (std::is_same_v<number, std::complex<float>>)
         {
           std::shared_ptr<hid_t> t_type =
             std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
@@ -1330,7 +1330,7 @@ namespace HDF5
           (void)ret;
           return t_type;
         }
-      else if (std::is_same<number, std::complex<double>>::value)
+      else if (std::is_same_v<number, std::complex<double>>)
         {
           std::shared_ptr<hid_t> t_type =
             std::shared_ptr<hid_t>(new hid_t, [](hid_t *pointer) {
@@ -1432,7 +1432,7 @@ namespace HDF5
 
     template <typename Container>
     std::enable_if_t<
-      std::is_same<Container, Vector<typename Container::value_type>>::value,
+      std::is_same_v<Container, Vector<typename Container::value_type>>,
       Container>
     initialize_container(const std::vector<hsize_t> &dimensions)
     {

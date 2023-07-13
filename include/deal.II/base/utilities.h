@@ -1137,7 +1137,7 @@ namespace Utilities
     struct IsVectorOfTriviallyCopyable<std::vector<T>>
     {
       static constexpr bool value =
-        std::is_trivially_copyable<T>::value && !std::is_same<T, bool>::value;
+        std::is_trivially_copyable<T>::value && !std::is_same_v<T, bool>;
     };
 
 
@@ -1146,7 +1146,7 @@ namespace Utilities
     struct IsVectorOfTriviallyCopyable<std::vector<std::vector<T>>>
     {
       static constexpr bool value =
-        std::is_trivially_copyable<T>::value && !std::is_same<T, bool>::value;
+        std::is_trivially_copyable<T>::value && !std::is_same_v<T, bool>;
     };
 
 
@@ -1171,7 +1171,7 @@ namespace Utilities
 
 
     template <typename T,
-              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+              typename = std::enable_if_t<!std::is_same_v<T, bool> &&
                                           std::is_trivially_copyable<T>::value>>
     inline void
     append_vector_of_trivially_copyable_to_buffer(
@@ -1201,7 +1201,7 @@ namespace Utilities
 
 
     template <typename T,
-              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+              typename = std::enable_if_t<!std::is_same_v<T, bool> &&
                                           std::is_trivially_copyable<T>::value>>
     inline void
     append_vector_of_trivially_copyable_to_buffer(
@@ -1261,7 +1261,7 @@ namespace Utilities
 
 
     template <typename T,
-              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+              typename = std::enable_if_t<!std::is_same_v<T, bool> &&
                                           std::is_trivially_copyable<T>::value>>
     inline void
     create_vector_of_trivially_copyable_from_buffer(
@@ -1296,7 +1296,7 @@ namespace Utilities
 
 
     template <typename T,
-              typename = std::enable_if_t<!std::is_same<T, bool>::value &&
+              typename = std::enable_if_t<!std::is_same_v<T, bool> &&
                                           std::is_trivially_copyable<T>::value>>
     inline void
     create_vector_of_trivially_copyable_from_buffer(
@@ -1366,7 +1366,7 @@ namespace Utilities
         // sizeof(...) because that is the minimum possible for objects --
         // objects need to have distinct addresses, so they need to have a size
         // of at least one. But we can special case this situation.
-        size = (std::is_same<T, std::tuple<>>::value ? 0 : sizeof(T));
+        size = (std::is_same_v<T, std::tuple<>> ? 0 : sizeof(T));
 
         (void)allow_compression;
         const std::size_t previous_size = dest_buffer.size();
@@ -1450,7 +1450,7 @@ namespace Utilities
         // objects need to have distinct addresses, so they need to have a size
         // of at least one. But we can special case this situation.
         const std::size_t size =
-          (std::is_same<T, std::tuple<>>::value ? 0 : sizeof(T));
+          (std::is_same_v<T, std::tuple<>> ? 0 : sizeof(T));
 
         T object;
 

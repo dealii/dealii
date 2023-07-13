@@ -139,14 +139,14 @@ sub_test()
 
           out_color -= out_dist;
           double diff_norm = out_color.linfty_norm();
-          if (std::is_same<number, float>::value && diff_norm < 5e-6)
+          if (std::is_same_v<number, float> && diff_norm < 5e-6)
             diff_norm = 0;
           deallog << "Sweep " << sweep
                   << ", error in partition/color:                  "
                   << diff_norm << std::endl;
           out_partition -= out_dist;
           diff_norm = out_partition.linfty_norm();
-          if (std::is_same<number, float>::value && diff_norm < 5e-6)
+          if (std::is_same_v<number, float> && diff_norm < 5e-6)
             diff_norm = 0;
           deallog << "Sweep " << sweep
                   << ", error in partition/partition:              "

@@ -3947,7 +3947,7 @@ AffineConstraints<number>::distribute_local_to_global(
   const bool use_vectors =
     (local_vector.size() == 0 && global_vector.size() == 0) ? false : true;
   const bool use_dealii_matrix =
-    std::is_same<MatrixType, SparseMatrix<number>>::value;
+    std::is_same_v<MatrixType, SparseMatrix<number>>;
 
   AssertDimension(local_matrix.n(), local_dof_indices.size());
   AssertDimension(local_matrix.m(), local_dof_indices.size());
@@ -4060,7 +4060,7 @@ AffineConstraints<number>::distribute_local_to_global(
   // add must be equal if we have a Trilinos or PETSc vector but do not have to
   // be if we have a deal.II native vector: one could further optimize this for
   // Vector, LinearAlgebra::distributed::vector, etc.
-  if (std::is_same<typename VectorType::value_type, number>::value)
+  if (std::is_same_v<typename VectorType::value_type, number>)
     {
       global_vector.add(vector_indices,
                         *reinterpret_cast<std::vector<number> *>(
@@ -4104,7 +4104,7 @@ AffineConstraints<number>::distribute_local_to_global(
   const bool use_vectors =
     (local_vector.size() == 0 && global_vector.size() == 0) ? false : true;
   const bool use_dealii_matrix =
-    std::is_same<MatrixType, BlockSparseMatrix<number>>::value;
+    std::is_same_v<MatrixType, BlockSparseMatrix<number>>;
 
   AssertDimension(local_matrix.n(), local_dof_indices.size());
   AssertDimension(local_matrix.m(), local_dof_indices.size());

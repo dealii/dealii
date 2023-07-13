@@ -50,20 +50,18 @@ main()
                 "Wrong return type for FunctionTime<float>::get_time().");
 
   MyFunction<1, std::complex<double>> function_1;
-  static_assert(std::is_same<decltype(function_1.get_time()), double>::value,
+  static_assert(std::is_same_v<decltype(function_1.get_time()), double>,
                 "Wrong return type for Function<double>::get_time().");
   MyFunction<2, std::complex<float>> function_2;
-  static_assert(std::is_same<decltype(function_2.get_time()), float>::value,
+  static_assert(std::is_same_v<decltype(function_2.get_time()), float>,
                 "Wrong return type for Function<float>::get_time().");
 
   MyTensorFunction<1, 1, std::complex<double>> tensor_function_1;
-  static_assert(
-    std::is_same<decltype(tensor_function_1.get_time()), double>::value,
-    "Wrong return type for TensorFunction<double>::get_time().");
+  static_assert(std::is_same_v<decltype(tensor_function_1.get_time()), double>,
+                "Wrong return type for TensorFunction<double>::get_time().");
   MyTensorFunction<2, 2, std::complex<float>> tensor_function_2;
-  static_assert(
-    std::is_same<decltype(tensor_function_2.get_time()), float>::value,
-    "Wrong return type for TensorFunction<float>::get_time().");
+  static_assert(std::is_same_v<decltype(tensor_function_2.get_time()), float>,
+                "Wrong return type for TensorFunction<float>::get_time().");
 
   deallog << "OK" << std::endl;
 }

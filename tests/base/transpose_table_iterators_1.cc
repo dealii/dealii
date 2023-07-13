@@ -66,19 +66,17 @@ main()
 
   // test some type equalities
   static_assert(
-    std::is_same<decltype(table.begin()->value()), double &>::value,
+    std::is_same_v<decltype(table.begin()->value()), double &>,
     "The iterator value for a non-const table should not be const.");
   static_assert(
-    std::is_same<decltype(table.end()->value()), double &>::value,
+    std::is_same_v<decltype(table.end()->value()), double &>,
     "The iterator value for a non-const table should not be const.");
 
   const TransposeTable<double> &ref = table;
-  static_assert(
-    std::is_same<decltype(ref.begin()->value()), const double &>::value,
-    "The iterator value for a constant table should be const.");
-  static_assert(
-    std::is_same<decltype(ref.end()->value()), const double &>::value,
-    "The iterator value for a constant table should be const.");
+  static_assert(std::is_same_v<decltype(ref.begin()->value()), const double &>,
+                "The iterator value for a constant table should be const.");
+  static_assert(std::is_same_v<decltype(ref.end()->value()), const double &>,
+                "The iterator value for a constant table should be const.");
 
   deallog << "OK" << std::endl;
 }
