@@ -17,8 +17,10 @@
 
 #include <deal.II/base/config.h>
 
+#ifdef DEAL_II_EARLY_DEPRECATIONS
 DEAL_II_WARNING(
-  "This file is deprecated. Simply use the corresponding C++14 header <variant>.")
+  "This file is deprecated. Simply use the corresponding C++17 header <variant>.")
+#endif
 
 #include <variant>
 
