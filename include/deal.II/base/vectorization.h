@@ -662,7 +662,7 @@ public:
    */
   DEAL_II_ALWAYS_INLINE
   Number
-  sum()
+  sum() const
   {
     return data;
   }
@@ -1205,7 +1205,7 @@ public:
    * this->data[i]$.
    */
   double
-  sum()
+  sum() const
   {
     __m128d t1 = _mm_unpackhi_pd(data, data);
     __m128d t2 = _mm_add_pd(data, t1);
@@ -1673,7 +1673,7 @@ public:
    * this->data[i]$.
    */
   float
-  sum()
+  sum() const
   {
     __m128 t1 = _mm_movehl_ps(data, data);
     __m128 t2 = _mm_add_ps(data, t1);
@@ -2217,7 +2217,7 @@ public:
    * this->data[i]$.
    */
   double
-  sum()
+  sum() const
   {
     VectorizedArray<double, 2> t1;
     t1.data = _mm_add_pd(this->get_lower(), this->get_upper());
@@ -2781,7 +2781,7 @@ public:
    * this->data[i]$.
    */
   float
-  sum()
+  sum() const
   {
     VectorizedArray<float, 4> t1;
     t1.data = _mm_add_ps(this->get_lower(), this->get_upper());
@@ -3402,7 +3402,7 @@ public:
    * this->data[i]$.
    */
   double
-  sum()
+  sum() const
   {
     VectorizedArray<double, 4> t1;
     t1.data = _mm256_add_pd(this->get_lower(), this->get_upper());
@@ -4007,7 +4007,7 @@ public:
    * this->data[i]$.
    */
   float
-  sum()
+  sum() const
   {
     VectorizedArray<float, 8> t1;
     t1.data = _mm256_add_ps(this->get_lower(), this->get_upper());
