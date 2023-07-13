@@ -343,7 +343,7 @@ namespace SparseMatrixTools
                                    SparseMatrixType2 &        system_matrix_out,
                                    SparsityPatternType2 &sparsity_pattern_out)
   {
-    Assert(index_set_1.size() || index_set_0.size() == index_set_1.size(),
+    Assert(index_set_1.size() == 0 || index_set_0.size() == index_set_1.size(),
            ExcInternalError());
 
     auto index_set_1_cleared = index_set_1;
