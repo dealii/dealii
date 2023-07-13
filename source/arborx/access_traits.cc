@@ -29,11 +29,11 @@ namespace ArborXWrappers
     {
       static_assert(dim >= 1 && dim <= 3);
       if (dim == 1)
-        return {float(p[0]), 0.f, 0.f};
+        return Point<3, float>(p[0], 0.f, 0.f);
       else if (dim == 2)
-        return {float(p[0]), float(p[1]), 0.f};
+        return Point<3, float>(p[0], p[1], 0.f);
       else
-        return {float(p[0]), float(p[1]), float(p[2])};
+        return Point<3, float>(p[0], p[1], p[2]);
     }
   } // namespace
 
