@@ -1,70 +1,29 @@
-*** /home/tamiko/workspace/dealii/tests/examples/../../examples/step-56/step-56.cc	2023-06-30 07:12:37.000000000 -0500
---- step-56.cc	2023-07-02 21:24:24.368982230 -0500
-***************
-*** 1054,1060 ****
-    void StokesProblem<dim>::run()
-    {
-      GridGenerator::hyper_cube(triangulation);
-!     triangulation.refine_global(6 - dim);
-  
-      if (solver_type == SolverType::FGMRES_ILU)
-        std::cout << "Now running with ILU" << std::endl;
---- 1054,1060 ----
-    void StokesProblem<dim>::run()
-    {
-      GridGenerator::hyper_cube(triangulation);
-!     triangulation.refine_global(2);
-  
-      if (solver_type == SolverType::FGMRES_ILU)
-        std::cout << "Now running with ILU" << std::endl;
-***************
-*** 1094,1102 ****
-  
-          Utilities::System::MemoryStats mem;
-          Utilities::System::get_memory_stats(mem);
-!         std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
-  
-!         computing_timer.print_summary();
-          computing_timer.reset();
-        }
-    }
---- 1094,1102 ----
-  
-          Utilities::System::MemoryStats mem;
-          Utilities::System::get_memory_stats(mem);
-!         // std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
-  
-!         // computing_timer.print_summary();
-          computing_timer.reset();
-        }
-    }
-***************
-*** 1110,1120 ****
-        using namespace Step56;
-  
-        const int degree = 1;
-!       const int dim    = 3;
-        // options for SolverType: UMFPACK FGMRES_ILU FGMRES_GMG
-!       StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
-! 
-!       flow_problem.run();
-      }
-    catch (std::exception &exc)
-      {
---- 1110,1125 ----
-        using namespace Step56;
-  
-        const int degree = 1;
-!       const int dim    = 2;
-        // options for SolverType: UMFPACK FGMRES_ILU FGMRES_GMG
-!       {
-!         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
-!         flow_problem.run();
-!       }
-!       {
-!         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_ILU);
-!         flow_problem.run();
-!       }
-      }
-    catch (std::exception &exc)
-      {
+1058c1058
+<     triangulation.refine_global(6 - dim);
+---
+>     triangulation.refine_global(2);
+1098c1098
+<         std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
+---
+>         // std::cout << "   VM Peak: " << mem.VmPeak << std::endl;
+1100c1100
+<         computing_timer.print_summary();
+---
+>         // computing_timer.print_summary();
+1114c1114
+<       const int dim    = 3;
+---
+>       const int dim    = 2;
+1116,1118c1116,1123
+<       StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
+< 
+<       flow_problem.run();
+---
+>       {
+>         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_GMG);
+>         flow_problem.run();
+>       }
+>       {
+>         StokesProblem<dim> flow_problem(degree, SolverType::FGMRES_ILU);
+>         flow_problem.run();
+>       }
