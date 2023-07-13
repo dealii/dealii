@@ -228,20 +228,21 @@ namespace internal
     const types::global_dof_index                            i)
   {
     // Extract local indices in the vector.
-    const Tpetra::Vector<NumberType, int, types::signed_global_dof_index>
-      &                               vector = V.trilinos_vector();
-    TrilinosWrappers::types::int_type trilinos_i =
-      vector.getMap()->getLocalElement(
-        static_cast<TrilinosWrappers::types::int_type>(i));
-
 #    if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+    const Tpetra::Vector<NumberType, int, types::signed_global_dof_index>
+      &  vector = V.trilinos_vector();
     auto vector_2d =
       vector.template getLocalView<Kokkos::HostSpace>(Tpetra::Access::ReadOnly);
 #    else
+    Tpetra::Vector<NumberType, int, types::signed_global_dof_index> vector =
+      V.trilinos_vector();
     vector.template sync<Kokkos::HostSpace>();
     auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
 #    endif
     auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+    TrilinosWrappers::types::int_type trilinos_i =
+      vector.getMap()->getLocalElement(
+        static_cast<TrilinosWrappers::types::int_type>(i));
     return vector_1d(trilinos_i);
   }
 #  endif
