@@ -200,7 +200,7 @@ namespace Differentiation
       struct ADNumberInfoFromEnum<
         ScalarType,
         Differentiation::AD::NumberTypes::sacado_dfad,
-        std::enable_if_t<std::is_floating_point<ScalarType>::value>>
+        std::enable_if_t<std::is_floating_point_v<ScalarType>>>
       {
         static const bool is_taped = false;
         using real_type            = Sacado::Fad::DFad<ScalarType>;
@@ -219,7 +219,7 @@ namespace Differentiation
       struct ADNumberInfoFromEnum<
         ScalarType,
         Differentiation::AD::NumberTypes::sacado_dfad_dfad,
-        std::enable_if_t<std::is_floating_point<ScalarType>::value>>
+        std::enable_if_t<std::is_floating_point_v<ScalarType>>>
       {
         static const bool is_taped = false;
         using real_type = Sacado::Fad::DFad<Sacado::Fad::DFad<ScalarType>>;
@@ -238,7 +238,7 @@ namespace Differentiation
       struct ADNumberInfoFromEnum<
         ScalarType,
         Differentiation::AD::NumberTypes::sacado_rad,
-        std::enable_if_t<std::is_floating_point<ScalarType>::value>>
+        std::enable_if_t<std::is_floating_point_v<ScalarType>>>
       {
         static const bool is_taped = false;
         using real_type            = Sacado::Rad::ADvar<ScalarType>;
@@ -257,7 +257,7 @@ namespace Differentiation
       struct ADNumberInfoFromEnum<
         ScalarType,
         Differentiation::AD::NumberTypes::sacado_rad_dfad,
-        std::enable_if_t<std::is_floating_point<ScalarType>::value>>
+        std::enable_if_t<std::is_floating_point_v<ScalarType>>>
       {
         static const bool is_taped = false;
         using real_type = Sacado::Rad::ADvar<Sacado::Fad::DFad<ScalarType>>;

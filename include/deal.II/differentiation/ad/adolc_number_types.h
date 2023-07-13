@@ -111,7 +111,7 @@ namespace Differentiation
       struct ADNumberInfoFromEnum<
         ScalarType,
         Differentiation::AD::NumberTypes::adolc_taped,
-        std::enable_if_t<std::is_floating_point<ScalarType>::value>>
+        std::enable_if_t<std::is_floating_point_v<ScalarType>>>
       {
         static const bool is_taped = true;
         using real_type            = adouble;
@@ -129,7 +129,7 @@ namespace Differentiation
       struct ADNumberInfoFromEnum<
         ScalarType,
         Differentiation::AD::NumberTypes::adolc_tapeless,
-        std::enable_if_t<std::is_floating_point<ScalarType>::value>>
+        std::enable_if_t<std::is_floating_point_v<ScalarType>>>
       {
         static const bool is_taped                              = false;
         using real_type                                         = adtl::adouble;
