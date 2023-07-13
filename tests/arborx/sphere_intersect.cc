@@ -26,6 +26,56 @@
 
 
 void
+test_1d()
+{
+  std::vector<Point<1>> points;
+
+  unsigned int n_points_1d = 5;
+  for (unsigned int i = 0; i < n_points_1d; ++i)
+    points.emplace_back(i);
+
+  std::vector<std::pair<Point<1>, double>> query_spheres;
+  query_spheres.emplace_back(Point<1>(0.5), 0.8);
+  query_spheres.emplace_back(Point<1>(1.5), 0.8);
+  query_spheres.emplace_back(Point<1>(2.2), 1.2);
+  query_spheres.emplace_back(Point<1>(2.6), 0.9);
+
+
+  ArborXWrappers::BVH                      bvh(points);
+  ArborXWrappers::SphereIntersectPredicate sph_intersect(query_spheres);
+  auto             indices_offsets = bvh.query(sph_intersect);
+  std::vector<int> indices         = indices_offsets.first;
+  std::vector<int> offsets         = indices_offsets.second;
+
+  std::vector<int> indices_ref = {0, 1, 1, 2, 1, 2, 3, 2, 3};
+  std::vector<int> offsets_ref = {0, 2, 4, 7, 9};
+
+  AssertThrow(indices.size() == indices_ref.size(), ExcInternalError());
+  AssertThrow(offsets.size() == offsets_ref.size(), ExcInternalError());
+  for (unsigned int i = 0; i < offsets.size() - 1; ++i)
+    {
+      for (int j = offsets[i]; j < offsets[i + 1]; ++j)
+        {
+          // The indices associated to each query are not ordered.
+          bool found = false;
+          for (int k = offsets[i]; k < offsets[i + 1]; ++k)
+            {
+              if (indices[j] == indices_ref[k])
+                {
+                  found = true;
+                  break;
+                }
+            }
+          AssertThrow(found, ExcInternalError());
+        }
+    }
+  for (unsigned int i = 0; i < offsets.size(); ++i)
+    AssertThrow(offsets[i] == offsets_ref[i], ExcInternalError());
+
+  deallog << "OK" << std::endl;
+}
+
+void
 test_2d()
 {
   std::vector<Point<2>> points;
@@ -150,6 +200,7 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   // tests
+  test_1d();
   test_2d();
   test_3d();
 }
