@@ -106,19 +106,6 @@
 
 
 /**
- * Previously, deal.II did not require C++17 and provided implementations of some
- * useful C++14 features in this namespace. Presently, as the library now requires
- * C++14, usage of this namespace is deprecated.
- *
- * This namespace contains functions imported from `namespace std`. It
- * used to be used in the same way as the std_cxx17 namespace.
- */
-namespace std_cxx14
-{}
-
-
-
-/**
  * Similarly, deal.II defined the C++17 library features it used before
  * requiring C++17 in this namespac.
  *
