@@ -87,7 +87,7 @@ namespace internal
   copy_petsc_vector(const PETScWrappers::VectorBase &v,
                     ::dealii::Vector<Number> &       out)
   {
-    if (v.empty())
+    if (v.size() == 0)
       {
         out.reinit(0);
         return;
