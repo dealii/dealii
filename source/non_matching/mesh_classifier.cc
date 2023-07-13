@@ -157,11 +157,7 @@ namespace NonMatching
         const unsigned int                                       face_index,
         Vector<double> &local_levelset_values)
       {
-        typename DoFHandler<dim>::active_cell_iterator cell_with_dofs(
-          &dof_handler->get_triangulation(),
-          cell->level(),
-          cell->index(),
-          dof_handler);
+        const auto cell_with_dofs = cell->as_dof_handler_iterator(*dof_handler);
 
         const unsigned int n_dofs_per_face =
           dof_handler->get_fe().n_dofs_per_face();
@@ -183,11 +179,7 @@ namespace NonMatching
       DiscreteLevelSetDescription<dim, VectorType>::active_fe_index(
         const typename Triangulation<dim>::active_cell_iterator &cell) const
       {
-        typename DoFHandler<dim>::active_cell_iterator cell_with_dofs(
-          &dof_handler->get_triangulation(),
-          cell->level(),
-          cell->index(),
-          dof_handler);
+        const auto cell_with_dofs = cell->as_dof_handler_iterator(*dof_handler);
 
         return cell_with_dofs->active_fe_index();
       }

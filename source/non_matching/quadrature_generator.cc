@@ -1440,11 +1440,8 @@ namespace NonMatching
             "The incoming cell must belong to the triangulation associated with "
             "the DoFHandler passed to the constructor."));
 
-        const typename DoFHandler<dim>::active_cell_iterator dof_handler_cell(
-          &dof_handler->get_triangulation(),
-          cell->level(),
-          cell->index(),
-          dof_handler);
+        const auto dof_handler_cell =
+          cell->as_dof_handler_iterator(*dof_handler);
 
         // Save the element and the local dof values, since this is what we need
         // to evaluate the function.
