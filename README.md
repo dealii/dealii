@@ -1,17 +1,16 @@
-[![regression-tester/current](https://dealii.org/regression_tests/reports/current-status-badge.svg)](https://dealii.org/regression_tests/reports/current.html)
-[![regression-tester/previous](https://dealii.org/regression_tests/reports/previous-status-badge.svg)](https://dealii.org/regression_tests/reports/previous.html)
+[![regression-tester/current](https://dealii.org/regression_tests/reports/current-status-badge.svg)](https://dealii.org/regression_tests/reports/render.html?#!current.md)
+[![regression-tester/previous](https://dealii.org/regression_tests/reports/previous-status-badge.svg)](https://dealii.org/regression_tests/reports/render.html?#!previous.md)
+[![performance-tester/current](https://dealii.org/performance_tests/reports/current-status-badge.svg)](https://dealii.org/performance_tests/reports/render.html?#!current.md)
+[![jenkins/dealii-serial](https://ci.tjhei.info/job/dealii-serial/job/master/badge/icon?style=plastic&subject=jenkins-serial)](https://ci.tjhei.info/job/dealii-serial/job/master/)
+[![jenkins/dealii-mpi](https://ci.tjhei.info/job/dealii-mpi/job/master/badge/icon?style=plastic&subject=jenkins-MPI)](https://ci.tjhei.info/job/dealii-mpi/job/master/)
+[![jenkins/dealii-osx](https://ci.tjhei.info/job/dealii-osx/job/master/badge/icon?style=plastic&subject=jenkins-OSX)](https://ci.tjhei.info/job/dealii-osx/job/master/)
+[![jenkins/dealii-ampere](https://ci.tjhei.info/job/dealii-ampere/job/master/badge/icon?style=plastic&subject=jenkins-ampere)](https://ci.tjhei.info/job/dealii-ampere/job/master/)
 [![workflows/github-docker](https://github.com/dealii/dealii/workflows/github-docker/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-docker)
-<br>
 [![workflows/indent](https://github.com/dealii/dealii/workflows/indent/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Aindent)
 [![workflows/tidy](https://github.com/dealii/dealii/workflows/tidy/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Atidy)
 [![workflows/github-linux](https://github.com/dealii/dealii/workflows/github-linux/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-linux)
 [![workflows/github-OSX](https://github.com/dealii/dealii/workflows/github-OSX/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-OSX)
 [![workflows/github-windows](https://github.com/dealii/dealii/workflows/github-windows/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-windows)
-<br>
-[![jenkins/dealii-serial](https://ci.tjhei.info/job/dealii-serial/job/master/badge/icon?style=plastic&subject=jenkins-serial)](https://ci.tjhei.info/job/dealii-serial/job/master/)
-[![jenkins/dealii-mpi](https://ci.tjhei.info/job/dealii-mpi/job/master/badge/icon?style=plastic&subject=jenkins-MPI)](https://ci.tjhei.info/job/dealii-mpi/job/master/)
-[![jenkins/dealii-osx](https://ci.tjhei.info/job/dealii-osx/job/master/badge/icon?style=plastic&subject=jenkins-OSX)](https://ci.tjhei.info/job/dealii-osx/job/master/)
-[![jenkins/dealii-ampere](https://ci.tjhei.info/job/dealii-ampere/job/master/badge/icon?style=plastic&subject=jenkins-ampere)](https://ci.tjhei.info/job/dealii-ampere/job/master/)
 
 What is deal.II?
 ================
