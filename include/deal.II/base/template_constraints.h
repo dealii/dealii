@@ -252,7 +252,7 @@ struct is_same_as_any_of
  * do with something like
  * @code
  *   template <typename T>
- *   typename std::enable_if<std::is_floating_point<T>::value, T>::type
+ *   typename std::enable_if<std::is_floating_point_v<T>, T>::type
  *   abs (const T t);
  * @endcode
  * which declares a function template `abs()` that can only be
@@ -284,7 +284,7 @@ struct enable_if_all
  * do with something like
  * @code
  *   template <typename T>
- *   std::enable_if_t<std::is_floating_point<T>::value, T>
+ *   std::enable_if_t<std::is_floating_point_v<T>, T>
  *   abs (const T t);
  * @endcode
  * which declares a function template `abs()` that can only be
