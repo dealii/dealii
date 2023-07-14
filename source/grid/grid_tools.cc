@@ -5908,8 +5908,7 @@ namespace GridTools
       ranks_and_indices.reserve(entities.size());
 
 #if defined(DEAL_II_WITH_ARBORX)
-      // ArborXWrappers don't support spacedim==1
-      static constexpr bool use_arborx = spacedim != 1;
+      static constexpr bool use_arborx = true;
 #else
       static constexpr bool use_arborx = false;
 #endif
