@@ -121,8 +121,6 @@ namespace Step27
     LA::MPI::Vector system_rhs;
 
     const unsigned int max_degree;
-
-    ConditionalOStream pcout;
   };
 
 
@@ -171,8 +169,6 @@ namespace Step27
     , triangulation(mpi_communicator)
     , dof_handler(triangulation)
     , max_degree(dim <= 2 ? 7 : 5)
-    , pcout(deallog.get_file_stream(),
-            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
   {
     for (unsigned int degree = 2; degree <= max_degree; ++degree)
       {
@@ -348,8 +344,8 @@ namespace Step27
              system_rhs,
              preconditioner);
 
-    pcout << "   Solved in " << solver_control.last_step() << " iterations."
-          << std::endl;
+    deallog << "   Solved in " << solver_control.last_step() << " iterations."
+            << std::endl;
 
     constraints.distribute(completely_distributed_solution);
 
@@ -443,21 +439,21 @@ namespace Step27
   {
     for (unsigned int cycle = 0; cycle < 5; ++cycle)
       {
-        pcout << "Cycle " << cycle << ':' << std::endl;
+        deallog << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
           create_coarse_grid();
 
         setup_system();
 
-        pcout << "   Number of active cells      : "
-              << triangulation.n_global_active_cells() << std::endl
-              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
-              << std::endl
-              << "   Number of constraints       : "
-              << Utilities::MPI::sum(constraints.n_constraints(),
-                                     mpi_communicator)
-              << std::endl;
+        deallog << "   Number of active cells      : "
+                << triangulation.n_global_active_cells() << std::endl
+                << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+                << std::endl
+                << "   Number of constraints       : "
+                << Utilities::MPI::sum(constraints.n_constraints(),
+                                       mpi_communicator)
+                << std::endl;
 
         assemble_system();
         solve();
@@ -476,9 +472,10 @@ main(int argc, char *argv[])
       using namespace Step27;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-      // This is the right choice (e.g., vs. mpi_initlog()) since the test
-      // uses ConditionalOStream
-      initlog();
+
+      // We need mpi_initlog() in order to  make sure to only write to the
+      // »output« file from rank 0.
+      mpi_initlog();
 
       LaplaceProblem<2> laplace_problem;
       laplace_problem.run();
