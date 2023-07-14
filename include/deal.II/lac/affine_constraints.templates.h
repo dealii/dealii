@@ -715,6 +715,7 @@ AffineConstraints<number>::close()
   bool                                chained_constraint_replaced = false;
   std::vector<bool>                   line_finalized(lines.size(), false);
   std::vector<const ConstraintLine *> sub_constraints;
+  std::vector<unsigned int>           entries_to_delete;
   do
     {
       chained_constraint_replaced = false;
@@ -775,8 +776,8 @@ AffineConstraints<number>::close()
             // to disturb the order of the correspondence between lines.entries
             // and sub_constraints, we store up which entries we will later
             // have to delete.
-            const unsigned int     n_original_entries = line.entries.size();
-            std::set<unsigned int> entries_to_delete;
+            const unsigned int n_original_entries = line.entries.size();
+            entries_to_delete.clear();
             for (unsigned int entry = 0; entry < n_original_entries; ++entry)
               if (sub_constraints[entry] != nullptr)
                 {
@@ -839,7 +840,7 @@ AffineConstraints<number>::close()
                     // empty). in that case, we can't just overwrite the
                     // current entry, but we have to actually eliminate it
                     {
-                      entries_to_delete.insert(entry);
+                      entries_to_delete.emplace_back(entry);
                     }
 
                   line.inhomogeneity += constrained_line.inhomogeneity * weight;
@@ -851,6 +852,7 @@ AffineConstraints<number>::close()
             // we have already erased earlier elements (as we would have to
             // do if we walked the list of entries to delete in forward
             // order).
+            std::sort(entries_to_delete.begin(), entries_to_delete.end());
             for (auto it = entries_to_delete.rbegin();
                  it != entries_to_delete.rend();
                  ++it)
