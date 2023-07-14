@@ -7538,7 +7538,7 @@ namespace GridGenerator
     double eps = 1e-3 * outer_radius;
     for (const auto &cell : triangulation.active_cell_iterators())
       {
-        for (const unsigned int f : GeometryInfo<dim>::face_indices())
+        for (const unsigned int f : cell->face_indices())
           if (cell->face(f)->at_boundary())
             {
               const double dx = cell->face(f)->center()(0);
