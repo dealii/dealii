@@ -135,7 +135,7 @@ PolynomialsRT_Bubbles<dim>::evaluate(
           for (unsigned int d = 0; d < dim; ++d)
             monomials[i].value(unit_point(d), n_derivatives, monoval_i[d]);
 
-          if (values.size() != 0)
+          if (!values.empty())
             {
               values[start][0] = monoval_i[0][0] * monoval_plus[1][1];
               values[start][1] = -monoval_i[0][1] * monoval_plus[1][0];
@@ -146,7 +146,7 @@ PolynomialsRT_Bubbles<dim>::evaluate(
                 monoval_plus[0][1] * monoval_i[1][0];
             }
 
-          if (grads.size() != 0)
+          if (!grads.empty())
             {
               grads[start][0][0] = monoval_i[0][1] * monoval_plus[1][1];
               grads[start][0][1] = monoval_i[0][0] * monoval_plus[1][2];
@@ -163,7 +163,7 @@ PolynomialsRT_Bubbles<dim>::evaluate(
                 monoval_plus[0][1] * monoval_i[1][1];
             }
 
-          if (grad_grads.size() != 0)
+          if (!grad_grads.empty())
             {
               grad_grads[start][0][0][0] = monoval_i[0][2] * monoval_plus[1][1];
               grad_grads[start][0][0][1] = monoval_i[0][1] * monoval_plus[1][2];
@@ -241,7 +241,7 @@ PolynomialsRT_Bubbles<dim>::evaluate(
                                          monoval_jplus[d]);
                 }
 
-              if (values.size() != 0)
+              if (!values.empty())
                 {
                   values[start][0] = monoval_i[0][0] * monoval_j[1][0] *
                                      monoval[2][0] *
@@ -297,7 +297,7 @@ PolynomialsRT_Bubbles<dim>::evaluate(
                     }
                 }
 
-              if (grads.size() != 0)
+              if (!grads.empty())
                 {
                   grads[start][0][0] = monoval_i[0][1] * monoval_j[1][0] *
                                        monoval[2][0] *
@@ -435,7 +435,7 @@ PolynomialsRT_Bubbles<dim>::evaluate(
                     }
                 }
 
-              if (grad_grads.size() != 0)
+              if (!grad_grads.empty())
                 {
                   grad_grads[start][0][0][0] =
                     monoval_i[0][2] * monoval_j[1][0] * monoval[2][0] *

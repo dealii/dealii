@@ -8422,7 +8422,7 @@ namespace GridGenerator
         }
 
     // create level 0 surface triangulation
-    Assert(cells.size() > 0, ExcMessage("No boundary faces selected"));
+    Assert(!cells.empty(), ExcMessage("No boundary faces selected"));
     const_cast<Triangulation<dim - 1, spacedim> &>(
       surface_mesh.get_triangulation())
       .create_triangulation(vertices, cells, subcell_data);

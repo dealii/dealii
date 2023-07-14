@@ -51,7 +51,7 @@ namespace hp
     const std::vector<const FiniteElement<dim, spacedim> *> &fes)
     : FECollection()
   {
-    Assert(fes.size() > 0,
+    Assert(!fes.empty(),
            ExcMessage("Need to pass at least one finite element."));
 
     for (unsigned int i = 0; i < fes.size(); ++i)

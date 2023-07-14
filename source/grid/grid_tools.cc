@@ -2933,7 +2933,7 @@ namespace GridTools
                 Assert(res.size() < 2,
                        dealii::ExcMessage("There can not be multiple results"));
 
-                if (res.size() > 0)
+                if (!res.empty())
                   if (any_cell_marked(vertex_to_cells[res[0].second]))
                     closest_vertex_index = res[0].second;
               }
@@ -6716,7 +6716,7 @@ namespace GridTools
                       compute_intersection_of_cells<dim, structdim, spacedim>(
                         try_intersection, requested_intersection, tolerance);
 
-                    if (found_intersections.size() > 0)
+                    if (!found_intersections.empty())
                       {
                         for (const auto &found_intersection :
                              found_intersections)

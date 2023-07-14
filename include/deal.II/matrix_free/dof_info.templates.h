@@ -416,7 +416,7 @@ namespace internal
                     touched_last_by[myindex] = chunk;
                   }
               }
-            if (faces.size() > 0)
+            if (!faces.empty())
               {
                 const auto fill_touched_by_for_face =
                   [&](const unsigned int face) {

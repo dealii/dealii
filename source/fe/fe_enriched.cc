@@ -78,7 +78,7 @@ namespace internal
           const typename dealii::Triangulation<dim, spacedim>::cell_iterator
             &)>>> &                                              functions)
       {
-        AssertThrow(fes.size() > 0, ExcMessage("FEs size should be >=1"));
+        AssertThrow(!fes.empty(), ExcMessage("FEs size should be >=1"));
         AssertThrow(fes.size() == multiplicities.size(),
                     ExcMessage(
                       "FEs and multiplicities should have the same size"));
@@ -1485,7 +1485,7 @@ namespace ColorEnriched
   {
     AssertDimension(predicates.size(), enrichments.size());
     AssertDimension(fe_base.n_components(), fe_enriched.n_components());
-    AssertThrow(predicates.size() > 0,
+    AssertThrow(!predicates.empty(),
                 ExcMessage("Number of predicates should be positive"));
   }
 

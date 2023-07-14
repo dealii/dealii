@@ -618,7 +618,7 @@ namespace internal
     unsigned int
     TmpVectors<VectorType>::size() const
     {
-      return (data.size() > 0 ? data.size() - 1 : 0);
+      return (data.empty() ? 0 : data.size() - 1);
     }
 
 

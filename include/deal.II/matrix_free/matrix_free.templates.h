@@ -434,7 +434,7 @@ MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
   if (additional_data.initialize_indices == true)
     {
       clear();
-      Assert(dof_handler.size() > 0, ExcMessage("No DoFHandler is given."));
+      Assert(!dof_handler.empty(), ExcMessage("No DoFHandler is given."));
       AssertDimension(dof_handler.size(), constraints.size());
       AssertDimension(dof_handler.size(), locally_owned_dofs.size());
 

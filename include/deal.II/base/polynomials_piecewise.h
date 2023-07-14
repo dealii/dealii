@@ -234,7 +234,7 @@ namespace Polynomials
   inline unsigned int
   PiecewisePolynomial<number>::degree() const
   {
-    if (points.size() > 0)
+    if (!points.empty())
       return 1;
     return polynomial.degree();
   }
@@ -245,7 +245,7 @@ namespace Polynomials
   inline number
   PiecewisePolynomial<number>::value(const number x) const
   {
-    if (points.size() > 0)
+    if (!points.empty())
       {
         if (x > points[index])
           return std::max<number>(0.0,

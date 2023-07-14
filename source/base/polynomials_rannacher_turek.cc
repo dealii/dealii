@@ -170,19 +170,19 @@ PolynomialsRannacherTurek<dim>::evaluate(
         {
           values[i] = compute_value(i, unit_point);
         }
-      if (grads.size() != 0)
+      if (!grads.empty())
         {
           grads[i] = compute_grad(i, unit_point);
         }
-      if (grad_grads.size() != 0)
+      if (!grad_grads.empty())
         {
           grad_grads[i] = compute_grad_grad(i, unit_point);
         }
-      if (third_derivatives.size() != 0)
+      if (!third_derivatives.empty())
         {
           third_derivatives[i] = compute_derivative<3>(i, unit_point);
         }
-      if (fourth_derivatives.size() != 0)
+      if (!fourth_derivatives.empty())
         {
           fourth_derivatives[i] = compute_derivative<4>(i, unit_point);
         }

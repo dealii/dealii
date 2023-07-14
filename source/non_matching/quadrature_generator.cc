@@ -106,7 +106,7 @@ namespace NonMatching
           &               functions,
         const Point<dim> &point)
       {
-        Assert(functions.size() > 0,
+        Assert(!functions.empty(),
                ExcMessage(
                  "The incoming vector must contain at least one function."));
 
@@ -199,7 +199,7 @@ namespace NonMatching
       std::pair<double, double>
       find_extreme_values(const std::vector<FunctionBounds<dim>> &bounds)
       {
-        Assert(bounds.size() > 0, ExcMessage("The incoming vector is empty."));
+        Assert(!bounds.empty(), ExcMessage("The incoming vector is empty."));
 
         std::pair<double, double> extremes = bounds[0].value;
         for (unsigned int i = 1; i < bounds.size(); ++i)
@@ -1495,7 +1495,7 @@ namespace NonMatching
       {
         // If set cell hasn't been called the size of local_dof_values will be
         // zero.
-        return local_dof_values.size() > 0;
+        return !local_dof_values.empty();
       }
 
 

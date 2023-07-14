@@ -3197,7 +3197,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    Assert(!patches.empty(), ExcNoPatches());
 #else
     if (patches.empty())
       return;
@@ -3287,7 +3287,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    Assert(!patches.empty(), ExcNoPatches());
 #else
     if (patches.empty())
       return;
@@ -3575,7 +3575,7 @@ namespace DataOutBase
     // happen that on the coarsest mesh, a processor simply has no
     // cells it actually owns, and in that case it is legit if there
     // are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    Assert(!patches.empty(), ExcNoPatches());
 #else
     if (patches.empty())
       return;
@@ -3975,7 +3975,7 @@ namespace DataOutBase
       // assertion is disabled if we support MPI since then it can
       // happen that on the coarsest mesh, a processor simply has no cells it
       // actually owns, and in that case it is legit if there are no patches
-      Assert(patches.size() > 0, ExcNoPatches());
+      Assert(!patches.empty(), ExcNoPatches());
 #else
       if (patches.empty())
         return;
@@ -4347,7 +4347,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    Assert(!patches.empty(), ExcNoPatches());
 #else
     if (patches.empty())
       return;
@@ -4672,7 +4672,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    Assert(!patches.empty(), ExcNoPatches());
 #else
     if (patches.empty())
       return;
@@ -4803,7 +4803,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    Assert(!patches.empty(), ExcNoPatches());
 #else
     if (patches.empty())
       return;
@@ -4952,7 +4952,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    Assert(!patches.empty(), ExcNoPatches());
 #else
     if (patches.empty())
       return;
@@ -5284,7 +5284,7 @@ namespace DataOutBase
     // if we support MPI since then it can happen that on the coarsest mesh, a
     // processor simply has no cells it actually owns, and in that case it is
     // legit if there are no patches
-    Assert(patches.size() > 0, ExcNoPatches());
+    Assert(!patches.empty(), ExcNoPatches());
 #else
     if (patches.empty())
       {
@@ -8048,7 +8048,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   if (am_i_first_rank_with_data)
     {
       const auto &patches = get_patches();
-      Assert(patches.size() > 0, DataOutBase::ExcNoPatches());
+      Assert(!patches.empty(), DataOutBase::ExcNoPatches());
 
       // We currently don't support writing mixed meshes:
 #  ifdef DEBUG
@@ -8552,7 +8552,7 @@ DataOutBase::write_filtered_data(
   // since then it can happen that on the coarsest mesh, a processor simply has
   // no cells it actually owns, and in that case it is legit if there are no
   // patches
-  Assert(patches.size() > 0, ExcNoPatches());
+  Assert(!patches.empty(), ExcNoPatches());
 #else
   if (patches.empty())
     return;
@@ -8749,14 +8749,14 @@ DataOutBase::write_hdf5_parallel(
   // since then it can happen that, on coarse meshes, a processor
   // simply has no cells it actually owns, and in that case it is
   // legit if there are no patches.
-  Assert((patches.size() > 0) || (n_ranks > 1), ExcNoPatches());
+  Assert((!patches.empty()) || (n_ranks > 1), ExcNoPatches());
 
   // The HDF5 routines perform a bunch of collective calls that expect all
   // ranks to participate. One ranks without any patches we are missing
   // critical information, so rather than broadcasting that information, just
   // create a new communicator that only contains ranks with cells and
   // use that to perform the write operations:
-  const bool have_patches = (patches.size() > 0);
+  const bool have_patches = !patches.empty();
   MPI_Comm   split_comm;
   {
     const int key   = Utilities::MPI::this_mpi_process(comm);

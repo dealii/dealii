@@ -33,7 +33,7 @@ namespace Functions
     , cspline(gsl_spline_alloc(gsl_interp_cspline, interpolation_points.size()),
               [](gsl_spline *p) { gsl_spline_free(p); })
   {
-    Assert(interpolation_points.size() > 0,
+    Assert(!interpolation_points.empty(),
            ExcCSplineEmpty(interpolation_points.size()));
 
     Assert(interpolation_points.size() == interpolation_values.size(),

@@ -100,7 +100,7 @@ namespace Polynomials
   void
   Polynomial<number>::value(const number x, std::vector<number> &values) const
   {
-    Assert(values.size() > 0, ExcZero());
+    Assert(!values.empty(), ExcZero());
 
     value(x, values.size() - 1, values.data());
   }

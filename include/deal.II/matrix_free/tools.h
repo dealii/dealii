@@ -713,7 +713,7 @@ namespace MatrixFreeTools
               c_pool.col.clear();
               c_pool.val.clear();
 
-              if (locally_relevant_constraints.size() > 0)
+              if (!locally_relevant_constraints.empty())
                 c_pool.row_lid_to_gid.emplace_back(
                   std::get<1>(locally_relevant_constraints.front()));
               for (const auto &j : locally_relevant_constraints)

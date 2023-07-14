@@ -1543,7 +1543,7 @@ namespace HDF5
       std::string message;
 
       auto append_to_message = [&message](const char *p) {
-        if (message.size() > 0)
+        if (!message.empty())
           message += ", ";
         message += p;
       };

@@ -477,11 +477,11 @@ namespace CUDAWrappers
   MatrixFree<dim, Number>::get_data(unsigned int color) const
   {
     Data data_copy;
-    if (q_points.size() > 0)
+    if (!q_points.empty())
       data_copy.q_points = q_points[color];
-    if (inv_jacobian.size() > 0)
+    if (!inv_jacobian.empty())
       data_copy.inv_jacobian = inv_jacobian[color];
-    if (JxW.size() > 0)
+    if (!JxW.empty())
       data_copy.JxW = JxW[color];
     data_copy.local_to_global    = local_to_global[color];
     data_copy.constraint_mask    = constraint_mask[color];

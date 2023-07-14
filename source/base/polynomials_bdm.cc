@@ -133,14 +133,14 @@ PolynomialsBDM<dim>::evaluate(
     {
       for (unsigned int d = 0; d < dim; ++d)
         monomials[0].value(unit_point(d), monovali[d]);
-      if (values.size() != 0)
+      if (!values.empty())
         {
           values[start][0]     = monovali[0][0];
           values[start][1]     = -unit_point(1) * monovali[0][1];
           values[start + 1][0] = unit_point(0) * monovali[1][1];
           values[start + 1][1] = -monovali[1][0];
         }
-      if (grads.size() != 0)
+      if (!grads.empty())
         {
           grads[start][0][0]     = monovali[0][1];
           grads[start][0][1]     = 0.;
@@ -151,7 +151,7 @@ PolynomialsBDM<dim>::evaluate(
           grads[start + 1][1][0] = 0.;
           grads[start + 1][1][1] = -monovali[1][1];
         }
-      if (grad_grads.size() != 0)
+      if (!grad_grads.empty())
         {
           grad_grads[start][0][0][0]     = monovali[0][2];
           grad_grads[start][0][0][1]     = 0.;
@@ -190,7 +190,7 @@ PolynomialsBDM<dim>::evaluate(
                                                       monovalk[d]);
             }
 
-          if (values.size() != 0)
+          if (!values.empty())
             {
               // x p'(y) q(z)
               values[start][0] =
@@ -214,7 +214,7 @@ PolynomialsBDM<dim>::evaluate(
               values[start + 2][1] = 0.;
             }
 
-          if (grads.size() != 0)
+          if (!grads.empty())
             {
               grads[start][0][0] = monovali[1][1] * monovalk[2][0];
               grads[start][0][1] =
@@ -253,7 +253,7 @@ PolynomialsBDM<dim>::evaluate(
               grads[start + 2][1][1] = 0.;
             }
 
-          if (grad_grads.size() != 0)
+          if (!grad_grads.empty())
             {
               grad_grads[start][0][0][0] = 0.;
               grad_grads[start][0][0][1] = monovali[1][2] * monovalk[2][0];

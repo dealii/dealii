@@ -320,7 +320,7 @@ namespace GridTools
 
     // if this was an active vertex then there needs to have been
     // at least one cell to which it is adjacent!
-    Assert(adjacent_cells.size() > 0, ExcInternalError());
+    Assert(!adjacent_cells.empty(), ExcInternalError());
 
     // return the result as a vector, rather than the set we built above
     return std::vector<typename dealii::internal::
@@ -464,7 +464,7 @@ namespace GridTools
 
     // Make sure that we have found
     // at least one cell adjacent to vertex.
-    Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
+    Assert(!adjacent_cells_tmp.empty(), ExcInternalError());
 
     // Copy all the cells into a std::set
     std::set<active_cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(),
@@ -1342,7 +1342,7 @@ namespace GridTools
 
         // Make sure that we have found
         // at least one cell adjacent to vertex.
-        Assert(adjacent_cells_tmp.size() > 0, ExcInternalError());
+        Assert(!adjacent_cells_tmp.empty(), ExcInternalError());
 
         // Copy all the cells into a std::set
         std::set<cell_iterator> adjacent_cells(adjacent_cells_tmp.begin(),
@@ -1478,7 +1478,7 @@ namespace GridTools
   get_cells_at_coarsest_common_level(
     const std::vector<typename Container::active_cell_iterator> &patch)
   {
-    Assert(patch.size() > 0,
+    Assert(!patch.empty(),
            ExcMessage(
              "Vector containing patch cells should not be an empty vector!"));
     // In order to extract the set of cells with the coarsest common level from
@@ -2075,11 +2075,11 @@ namespace GridTools
       // faces on periodic boundaries on the coarse grid, which results that
       // this assert is not fulfilled (not a bug!). See also the discussion in
       // the method collect_periodic_faces.
-      if (!(((pairs1.size() > 0) &&
+      if (!(((!pairs1.empty()) &&
              (dynamic_cast<const parallel::fullydistributed::
                              Triangulation<dim, spacedim> *>(
                 &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
-            ((pairs2.size() > 0) &&
+            ((!pairs2.empty()) &&
              (dynamic_cast<
                 const parallel::fullydistributed::Triangulation<dim, spacedim>
                   *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
@@ -2130,11 +2130,11 @@ namespace GridTools
     {
       constexpr int dim      = CellIterator::AccessorType::dimension;
       constexpr int spacedim = CellIterator::AccessorType::space_dimension;
-      if (!(((pairs1.size() > 0) &&
+      if (!(((!pairs1.empty()) &&
              (dynamic_cast<const parallel::fullydistributed::
                              Triangulation<dim, spacedim> *>(
                 &pairs1.begin()->first->get_triangulation()) != nullptr)) ||
-            ((pairs2.size() > 0) &&
+            ((!pairs2.empty()) &&
              (dynamic_cast<
                 const parallel::fullydistributed::Triangulation<dim, spacedim>
                   *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
@@ -2197,7 +2197,7 @@ namespace GridTools
     Assert(pairs1.size() == pairs2.size(),
            ExcMessage("Unmatched faces on periodic boundaries"));
 
-    Assert(pairs1.size() > 0,
+    Assert(!pairs1.empty(),
            ExcMessage("No new periodic face pairs have been found. "
                       "Are you sure that you've selected the correct boundary "
                       "id's and that the coarsest level mesh is colorized?"));
@@ -2279,11 +2279,11 @@ namespace GridTools
     // requirement has not to be met neither (consider faces on the outside of a
     // ghost cell that are periodic but for which the ghost neighbor doesn't
     // exist).
-    if (!(((pairs1.size() > 0) &&
+    if (!(((!pairs1.empty()) &&
            (dynamic_cast<
               const parallel::fullydistributed::Triangulation<dim, space_dim>
                 *>(&pairs1.begin()->first->get_triangulation()) != nullptr)) ||
-          ((pairs2.size() > 0) &&
+          ((!pairs2.empty()) &&
            (dynamic_cast<
               const parallel::fullydistributed::Triangulation<dim, space_dim>
                 *>(&pairs2.begin()->first->get_triangulation()) != nullptr))))
@@ -2291,7 +2291,7 @@ namespace GridTools
              ExcMessage("Unmatched faces on periodic boundaries"));
 
     Assert(
-      (pairs1.size() > 0 ||
+      (!pairs1.empty() ||
        (dynamic_cast<
           const parallel::fullydistributed::Triangulation<dim, space_dim> *>(
           &mesh.begin()->get_triangulation()) != nullptr)),

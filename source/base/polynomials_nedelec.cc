@@ -102,15 +102,15 @@ PolynomialsNedelec<dim>::evaluate(
 
           // Assign the correct values to the
           // corresponding shape functions.
-          if (values.size() > 0)
+          if (!values.empty())
             for (unsigned int i = 0; i < unit_point_values.size(); ++i)
               values[i][0] = unit_point_values[i];
 
-          if (grads.size() > 0)
+          if (!grads.empty())
             for (unsigned int i = 0; i < unit_point_grads.size(); ++i)
               grads[i][0][0] = unit_point_grads[i][0];
 
-          if (grad_grads.size() > 0)
+          if (!grad_grads.empty())
             for (unsigned int i = 0; i < unit_point_grad_grads.size(); ++i)
               grad_grads[i][0][0][0] = unit_point_grad_grads[i][0][0];
 
@@ -150,7 +150,7 @@ PolynomialsNedelec<dim>::evaluate(
 
           // Assign the correct values to the
           // corresponding shape functions.
-          if (values.size() > 0)
+          if (!values.empty())
             {
               for (unsigned int i = 0; i <= my_degree; ++i)
                 for (unsigned int j = 0; j < 2; ++j)
@@ -184,7 +184,7 @@ PolynomialsNedelec<dim>::evaluate(
                     }
             }
 
-          if (grads.size() > 0)
+          if (!grads.empty())
             {
               for (unsigned int i = 0; i <= my_degree; ++i)
                 for (unsigned int j = 0; j < 2; ++j)
@@ -233,7 +233,7 @@ PolynomialsNedelec<dim>::evaluate(
                     }
             }
 
-          if (grad_grads.size() > 0)
+          if (!grad_grads.empty())
             {
               for (unsigned int i = 0; i <= my_degree; ++i)
                 for (unsigned int j = 0; j < 2; ++j)
@@ -348,7 +348,7 @@ PolynomialsNedelec<dim>::evaluate(
 
           // Assign the correct values to the
           // corresponding shape functions.
-          if (values.size() > 0)
+          if (!values.empty())
             {
               for (unsigned int i = 0; i <= my_degree; ++i)
                 {
@@ -518,7 +518,7 @@ PolynomialsNedelec<dim>::evaluate(
                     }
             }
 
-          if (grads.size() > 0)
+          if (!grads.empty())
             {
               for (unsigned int i = 0; i <= my_degree; ++i)
                 {
@@ -803,7 +803,7 @@ PolynomialsNedelec<dim>::evaluate(
                     }
             }
 
-          if (grad_grads.size() > 0)
+          if (!grad_grads.empty())
             {
               for (unsigned int i = 0; i <= my_degree; ++i)
                 {

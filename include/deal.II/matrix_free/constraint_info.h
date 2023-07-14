@@ -198,7 +198,7 @@ namespace internal
       const std::vector<std::pair<types::global_dof_index, number2>> &entries)
     {
       next_constraint.first.resize(entries.size());
-      if (entries.size() > 0)
+      if (!entries.empty())
         {
           constraint_indices.resize(entries.size());
           // Use assign so that values for nonmatching Number / number2 are

@@ -1757,8 +1757,7 @@ FESystem<dim, spacedim>::initialize(
 {
   Assert(fes.size() == multiplicities.size(),
          ExcDimensionMismatch(fes.size(), multiplicities.size()));
-  Assert(fes.size() > 0,
-         ExcMessage("Need to pass at least one finite element."));
+  Assert(!fes.empty(), ExcMessage("Need to pass at least one finite element."));
   Assert(count_nonzeros(multiplicities) > 0,
          ExcMessage("You only passed FiniteElements with multiplicity 0."));
 

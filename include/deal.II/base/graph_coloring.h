@@ -179,7 +179,7 @@ namespace GraphColoring
           // find an iterator on the other part of the graph. start the whole
           // process again with the first iterator that hasn't been assigned to
           // a zone yet
-          if (new_zone.size() != 0)
+          if (!new_zone.empty())
             zones.push_back(new_zone);
           else
             for (Iterator it = begin; it != end; ++it)

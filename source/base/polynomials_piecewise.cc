@@ -70,7 +70,7 @@ namespace Polynomials
   PiecewisePolynomial<number>::value(const number         x,
                                      std::vector<number> &values) const
   {
-    Assert(values.size() > 0, ExcZero());
+    Assert(!values.empty(), ExcZero());
 
     value(x, values.size() - 1, values.data());
   }
@@ -83,7 +83,7 @@ namespace Polynomials
                                      const unsigned int n_derivatives,
                                      number *           values) const
   {
-    if (points.size() > 0)
+    if (!points.empty())
       {
         if (x > points[index])
           values[0] = std::max<number>(0.0,

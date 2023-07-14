@@ -472,7 +472,7 @@ namespace internal
   {
     Assert(!sizes_fixed_cumulative.empty(),
            ExcMessage("No data has been packed!"));
-    if (cell_relations.size() > 0)
+    if (!cell_relations.empty())
       {
         Assert(!dest_data_fixed.empty(),
                ExcMessage("No data has been received!"));
@@ -525,7 +525,7 @@ namespace internal
     // Thus it is sufficient to check if fixed size data has been received.
     Assert(!sizes_fixed_cumulative.empty(),
            ExcMessage("No data has been packed!"));
-    if (cell_relations.size() > 0)
+    if (!cell_relations.empty())
       {
         Assert(!dest_data_fixed.empty(),
                ExcMessage("No data has been received!"));
@@ -3240,8 +3240,8 @@ namespace internal
                            const SubCellData &                 subcelldata,
                            Triangulation<dim, spacedim> &      tria)
       {
-        AssertThrow(vertices.size() > 0, ExcMessage("No vertices given"));
-        AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
+        AssertThrow(!vertices.empty(), ExcMessage("No vertices given"));
+        AssertThrow(!cells.empty(), ExcMessage("No cells given"));
 
         // Check that all cells have positive volume.
 #ifndef _MSC_VER
@@ -12675,7 +12675,7 @@ void Triangulation<dim, spacedim>::create_triangulation(
       begin_active()->set_direction_flag(true);
       begin_active()->set_user_flag();
 
-      while (this_round.size() > 0)
+      while (!this_round.empty())
         {
           for (typename std::list<active_cell_iterator>::iterator cell =
                  this_round.begin();
@@ -15858,7 +15858,7 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 bool Triangulation<dim, spacedim>::all_reference_cells_are_hyper_cube() const
 {
-  Assert(this->reference_cells.size() > 0,
+  Assert(!this->reference_cells.empty(),
          ExcMessage("You can't ask about the kinds of reference "
                     "cells used by this triangulation if the "
                     "triangulation doesn't yet have any cells in it."));
@@ -15872,7 +15872,7 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 bool Triangulation<dim, spacedim>::all_reference_cells_are_simplex() const
 {
-  Assert(this->reference_cells.size() > 0,
+  Assert(!this->reference_cells.empty(),
          ExcMessage("You can't ask about the kinds of reference "
                     "cells used by this triangulation if the "
                     "triangulation doesn't yet have any cells in it."));
@@ -15886,7 +15886,7 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 bool Triangulation<dim, spacedim>::is_mixed_mesh() const
 {
-  Assert(this->reference_cells.size() > 0,
+  Assert(!this->reference_cells.empty(),
          ExcMessage("You can't ask about the kinds of reference "
                     "cells used by this triangulation if the "
                     "triangulation doesn't yet have any cells in it."));

@@ -2036,7 +2036,7 @@ namespace Functions
     , fourier_coefficients(fourier_coefficients)
     , weights(weights)
   {
-    Assert(fourier_coefficients.size() > 0, ExcZero());
+    Assert(!fourier_coefficients.empty(), ExcZero());
     Assert(fourier_coefficients.size() == weights.size(),
            ExcDimensionMismatch(fourier_coefficients.size(), weights.size()));
   }
@@ -2110,7 +2110,7 @@ namespace Functions
     , fourier_coefficients(fourier_coefficients)
     , weights(weights)
   {
-    Assert(fourier_coefficients.size() > 0, ExcZero());
+    Assert(!fourier_coefficients.empty(), ExcZero());
     Assert(fourier_coefficients.size() == weights.size(),
            ExcDimensionMismatch(fourier_coefficients.size(), weights.size()));
   }

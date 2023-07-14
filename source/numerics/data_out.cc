@@ -1249,7 +1249,7 @@ DataOut<dim, spacedim>::build_patches(
   };
 
   // now build the patches in parallel
-  if (all_cells.size() > 0)
+  if (!all_cells.empty())
     WorkStream::run(all_cells.data(),
                     all_cells.data() + all_cells.size(),
                     worker,

@@ -410,7 +410,7 @@ namespace FETools
     {
       AssertDimension(fes.size(), multiplicities.size());
       Assert(
-        fes.size() > 0,
+        !fes.empty(),
         ExcMessage(
           "This function only makes sense if at least one FiniteElement is provided."));
       // first count the number of dofs and components that will emerge from the
@@ -2423,7 +2423,7 @@ namespace FETools
             name.erase(0, 1);
             // just one more sanity check
             Assert((base_fes.size() == base_multiplicities.size()) &&
-                     (base_fes.size() > 0),
+                     (!base_fes.empty()),
                    ExcInternalError());
 
             // this is a workaround since the constructor for FESystem

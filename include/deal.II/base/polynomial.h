@@ -805,7 +805,7 @@ namespace Polynomials
       }
     else
       {
-        Assert(coefficients.size() > 0, ExcEmptyObject());
+        Assert(!coefficients.empty(), ExcEmptyObject());
         return coefficients.size() - 1;
       }
   }
@@ -818,7 +818,7 @@ namespace Polynomials
   {
     if (in_lagrange_product_form == false)
       {
-        Assert(coefficients.size() > 0, ExcEmptyObject());
+        Assert(!coefficients.empty(), ExcEmptyObject());
 
         // Horner scheme
         const unsigned int m     = coefficients.size();
@@ -977,7 +977,7 @@ namespace Polynomials
         return;
       }
 
-    Assert(coefficients.size() > 0, ExcEmptyObject());
+    Assert(!coefficients.empty(), ExcEmptyObject());
 
     // if derivatives are needed, then do it properly by the full
     // Horner scheme

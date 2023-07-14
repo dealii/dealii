@@ -58,7 +58,7 @@ Histogram::evaluate(const std::vector<Vector<number>> &values,
                     const unsigned int                 n_intervals,
                     const IntervalSpacing              interval_spacing)
 {
-  Assert(values.size() > 0,
+  Assert(!values.empty(),
          ExcMessage(
            "Your input data needs to contain at least one input vector."));
   Assert(n_intervals > 0,

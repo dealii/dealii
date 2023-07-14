@@ -171,24 +171,24 @@ PolynomialsBernardiRaugel<dim>::evaluate(
   // first dim*vertices_per_cell functions are Q_1^2 functions
   for (unsigned int i = 0; i < dim * GeometryInfo<dim>::vertices_per_cell; ++i)
     {
-      if (values.size() != 0)
+      if (!values.empty())
         {
           values[i] = units[i % dim] * Q_values[i / dim];
         }
-      if (grads.size() != 0)
+      if (!grads.empty())
         {
           grads[i] = outer_product(units[i % dim], Q_grads[i / dim]);
         }
-      if (grad_grads.size() != 0)
+      if (!grad_grads.empty())
         {
           grad_grads[i] = outer_product(units[i % dim], Q_grad_grads[i / dim]);
         }
-      if (third_derivatives.size() != 0)
+      if (!third_derivatives.empty())
         {
           third_derivatives[i] =
             outer_product(units[i % dim], Q_third_derivatives[i / dim]);
         }
-      if (fourth_derivatives.size() != 0)
+      if (!fourth_derivatives.empty())
         {
           fourth_derivatives[i] =
             outer_product(units[i % dim], Q_fourth_derivatives[i / dim]);
@@ -205,26 +205,26 @@ PolynomialsBernardiRaugel<dim>::evaluate(
         i -
         dim *
           GeometryInfo<dim>::vertices_per_cell; // ranges 0 to faces_per_cell-1
-      if (values.size() != 0)
+      if (!values.empty())
         {
           values[i] = normals[j] * bubble_values[aniso_indices[j]];
         }
-      if (grads.size() != 0)
+      if (!grads.empty())
         {
           grads[i] = outer_product(normals[j], bubble_grads[aniso_indices[j]]);
         }
-      if (grad_grads.size() != 0)
+      if (!grad_grads.empty())
         {
           grad_grads[i] =
             outer_product(normals[j], bubble_grad_grads[aniso_indices[j]]);
         }
-      if (third_derivatives.size() != 0)
+      if (!third_derivatives.empty())
         {
           third_derivatives[i] =
             outer_product(normals[j],
                           bubble_third_derivatives[aniso_indices[j]]);
         }
-      if (fourth_derivatives.size() != 0)
+      if (!fourth_derivatives.empty())
         {
           fourth_derivatives[i] =
             outer_product(normals[j],

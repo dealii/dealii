@@ -2413,7 +2413,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
 
   types::blas_int   info  = 0;
   types::blas_int   lwork = -1;
-  const char *const jobz  = (eigenvectors.size() > 0) ? (&V) : (&N);
+  const char *const jobz  = (eigenvectors.empty()) ? (&N) : (&V);
   const char *const uplo  = (&U);
 
   /*

@@ -2665,7 +2665,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
   AssertThrow(in.fail() == false, ExcIO());
 
   // check that we actually read some cells.
-  AssertThrow(cells.size() > 0,
+  AssertThrow(!cells.empty(),
               ExcGmshNoCellInformation(subcelldata.boundary_lines.size(),
                                        subcelldata.boundary_quads.size()));
 
@@ -3559,7 +3559,7 @@ namespace
   exodusii_name_to_type(const std::string &type_name,
                         const int          n_nodes_per_element)
   {
-    Assert(type_name.size() > 0, ExcInternalError());
+    Assert(!type_name.empty(), ExcInternalError());
     // Try to canonify the name by switching to upper case and removing
     // trailing numbers. This makes, e.g., pyramid, PYRAMID, PYRAMID5, and
     // PYRAMID13 all equal.
@@ -3681,7 +3681,7 @@ namespace
         face_id_to_side_sets.reserve(face_side_sets.size());
         for (auto &pair : face_side_sets)
           {
-            Assert(pair.second.size() > 0, ExcInternalError());
+            Assert(!pair.second.empty(), ExcInternalError());
             face_id_to_side_sets.push_back(std::move(pair));
           }
 
