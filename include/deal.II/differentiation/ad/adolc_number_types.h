@@ -330,10 +330,10 @@ namespace Differentiation
     template <typename ADNumberType>
     struct ADNumberTraits<
       ADNumberType,
-      std::enable_if_t<std::is_same<ADNumberType, adouble>::value>>
+      std::enable_if_t<std::is_same_v<ADNumberType, adouble>>>
       : NumberTraits<double, NumberTypes::adolc_taped>
     {
-      static_assert(std::is_same<ad_type, adouble>::value,
+      static_assert(std::is_same_v<ad_type, adouble>,
                     "Incorrect template type selected for taped ad_type");
       static_assert(is_taped == true, "Incorrect setting for taping");
     };
@@ -352,11 +352,10 @@ namespace Differentiation
     template <typename ADNumberType>
     struct ADNumberTraits<
       ADNumberType,
-      std::enable_if_t<
-        std::is_same<ADNumberType, std::complex<adouble>>::value>>
+      std::enable_if_t<std::is_same_v<ADNumberType, std::complex<adouble>>>>
       : NumberTraits<std::complex<double>, NumberTypes::adolc_taped>
     {
-      static_assert(std::is_same<ad_type, std::complex<adouble>>::value,
+      static_assert(std::is_same_v<ad_type, std::complex<adouble>>,
                     "Incorrect template type selected for taped ad_type");
       static_assert(is_taped == true, "Incorrect setting for taping");
     };
@@ -374,10 +373,10 @@ namespace Differentiation
     template <typename ADNumberType>
     struct ADNumberTraits<
       ADNumberType,
-      std::enable_if_t<std::is_same<ADNumberType, adtl::adouble>::value>>
+      std::enable_if_t<std::is_same_v<ADNumberType, adtl::adouble>>>
       : NumberTraits<double, NumberTypes::adolc_tapeless>
     {
-      static_assert(std::is_same<ad_type, adtl::adouble>::value,
+      static_assert(std::is_same_v<ad_type, adtl::adouble>,
                     "Incorrect template type selected for tapeless ad_type");
       static_assert(is_tapeless == true, "Incorrect setting for taping");
     };
@@ -397,10 +396,10 @@ namespace Differentiation
     struct ADNumberTraits<
       ADNumberType,
       std::enable_if_t<
-        std::is_same<ADNumberType, std::complex<adtl::adouble>>::value>>
+        std::is_same_v<ADNumberType, std::complex<adtl::adouble>>>>
       : NumberTraits<std::complex<double>, NumberTypes::adolc_tapeless>
     {
-      static_assert(std::is_same<ad_type, std::complex<adtl::adouble>>::value,
+      static_assert(std::is_same_v<ad_type, std::complex<adtl::adouble>>,
                     "Incorrect template type selected for tapeless ad_type");
       static_assert(is_tapeless == true, "Incorrect setting for taping");
     };

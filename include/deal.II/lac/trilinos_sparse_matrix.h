@@ -845,7 +845,7 @@ namespace TrilinosWrappers
      */
     template <typename SparsityPatternType>
     std::enable_if_t<
-      !std::is_same<SparsityPatternType, dealii::SparseMatrix<double>>::value>
+      !std::is_same_v<SparsityPatternType, dealii::SparseMatrix<double>>>
     reinit(const IndexSet &           row_parallel_partitioning,
            const IndexSet &           col_parallel_partitioning,
            const SparsityPatternType &sparsity_pattern,
@@ -1442,7 +1442,7 @@ namespace TrilinosWrappers
      */
     template <typename VectorType>
     std::enable_if_t<
-      std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
+      std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
     vmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -1453,7 +1453,7 @@ namespace TrilinosWrappers
      */
     template <typename VectorType>
     std::enable_if_t<
-      !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
+      !std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
     vmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -1472,7 +1472,7 @@ namespace TrilinosWrappers
      */
     template <typename VectorType>
     std::enable_if_t<
-      std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
+      std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
     Tvmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -1483,7 +1483,7 @@ namespace TrilinosWrappers
      */
     template <typename VectorType>
     std::enable_if_t<
-      !std::is_same<typename VectorType::value_type, TrilinosScalar>::value>
+      !std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
     Tvmult(VectorType &dst, const VectorType &src) const;
 
     /**

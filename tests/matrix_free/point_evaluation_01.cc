@@ -91,7 +91,7 @@ test(const unsigned int degree)
   // For float numbers that are sensitive to roundoff in the numdiff
   // tolerances (absolute 1e-8), we multiply by 1e-3 to ensure that the test
   // remains robust
-  const double factor_float = std::is_same<Number, float>::value ? 0.001 : 1.;
+  const double factor_float = std::is_same_v<Number, float> ? 0.001 : 1.;
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {

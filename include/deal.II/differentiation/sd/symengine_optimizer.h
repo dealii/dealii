@@ -372,10 +372,8 @@ namespace Differentiation
       {
         static const bool is_supported = true;
 
-        using ReturnType =
-          typename std::conditional<std::is_same<ReturnType_, float>::value,
-                                    float,
-                                    double>::type;
+        using ReturnType = typename std::
+          conditional<std::is_same_v<ReturnType_, float>, float, double>::type;
       };
 
 
@@ -391,7 +389,7 @@ namespace Differentiation
         static const bool is_supported = true;
 
         using ReturnType = typename std::conditional<
-          std::is_same<ReturnType_, std::complex<float>>::value,
+          std::is_same_v<ReturnType_, std::complex<float>>,
           std::complex<float>,
           std::complex<double>>::type;
       };
@@ -601,12 +599,10 @@ namespace Differentiation
         ReturnType_,
         std::enable_if_t<std::is_arithmetic<ReturnType_>::value>>
       {
-        using ReturnType =
-          typename std::conditional<std::is_same<ReturnType_, float>::value,
-                                    float,
-                                    double>::type;
+        using ReturnType = typename std::
+          conditional<std::is_same_v<ReturnType_, float>, float, double>::type;
         using OptimizerType =
-          typename std::conditional<std::is_same<ReturnType_, float>::value,
+          typename std::conditional<std::is_same_v<ReturnType_, float>,
                                     SymEngine::LLVMFloatVisitor,
                                     SymEngine::LLVMDoubleVisitor>::type;
 
@@ -819,7 +815,7 @@ namespace Differentiation
         ReturnType,
         Optimizer,
         std::enable_if_t<
-          std::is_same<ReturnType, typename Optimizer::ReturnType>::value>>
+          std::is_same_v<ReturnType, typename Optimizer::ReturnType>>>
       {
         /**
          * Initialize an instance of an optimizer.
@@ -961,7 +957,7 @@ namespace Differentiation
         ReturnType,
         Optimizer,
         std::enable_if_t<
-          !std::is_same<ReturnType, typename Optimizer::ReturnType>::value>>
+          !std::is_same_v<ReturnType, typename Optimizer::ReturnType>>>
       {
         /**
          * Initialize an instance of an optimizer.

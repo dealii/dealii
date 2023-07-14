@@ -920,8 +920,8 @@ namespace Differentiation
 
 
       static_assert((is_real_valued == true ?
-                       std::is_same<ad_type, real_type>::value :
-                       std::is_same<ad_type, complex_type>::value),
+                       std::is_same_v<ad_type, real_type> :
+                       std::is_same_v<ad_type, complex_type>),
                     "Incorrect template type selected for ad_type");
 
       static_assert((is_complex_valued == true ?

@@ -57,8 +57,7 @@ namespace internal
                 const types::blas_int work_flag,
                 types::blas_int &     info)
     {
-      static_assert(std::is_same<T, double>::value ||
-                      std::is_same<T, float>::value,
+      static_assert(std::is_same_v<T, double> || std::is_same_v<T, float>,
                     "Only implemented for double and float");
       Assert(matrix.size() == static_cast<std::size_t>(n_rows * n_rows),
              ExcInternalError());
@@ -113,7 +112,7 @@ namespace internal
                 types::blas_int &             info)
     {
       static_assert(
-        std::is_same<T, double>::value || std::is_same<T, float>::value,
+        std::is_same_v<T, double> || std::is_same_v<T, float>,
         "Only implemented for std::complex<double> and std::complex<float>");
       Assert(matrix.size() == static_cast<std::size_t>(n_rows * n_rows),
              ExcInternalError());

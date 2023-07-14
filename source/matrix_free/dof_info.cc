@@ -34,7 +34,7 @@ namespace internal
   {
     // ensure that the type defined in both dof_info.h and
     // hanging_nodes_internal.h is consistent
-    static_assert(std::is_same<compressed_constraint_kind, std::uint8_t>::value,
+    static_assert(std::is_same_v<compressed_constraint_kind, std::uint8_t>,
                   "Unexpected type for compressed hanging node indicators!");
 
 

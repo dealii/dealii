@@ -418,7 +418,7 @@ namespace LinearAlgebra
      * performance.
      */
     template <typename Dummy = Number>
-    std::enable_if_t<std::is_same<Dummy, Number>::value &&
+    std::enable_if_t<std::is_same_v<Dummy, Number> &&
                      dealii::is_tpetra_type<Number>::value>
     import_elements(
       const TpetraWrappers::Vector<Number> &tpetra_vec,
@@ -430,7 +430,7 @@ namespace LinearAlgebra
      * @deprecated Use import_elements() instead.
      */
     template <typename Dummy = Number>
-    DEAL_II_DEPRECATED std::enable_if_t<std::is_same<Dummy, Number>::value &&
+    DEAL_II_DEPRECATED std::enable_if_t<std::is_same_v<Dummy, Number> &&
                                         dealii::is_tpetra_type<Number>::value>
                        import(const TpetraWrappers::Vector<Number> &V,
                               VectorOperation::values               operation,
@@ -742,7 +742,7 @@ namespace LinearAlgebra
      * used directly.
      */
     template <typename Dummy = Number>
-    std::enable_if_t<std::is_same<Dummy, Number>::value &&
+    std::enable_if_t<std::is_same_v<Dummy, Number> &&
                      dealii::is_tpetra_type<Number>::value>
     import_elements(
       const Tpetra::Vector<Number, int, types::signed_global_dof_index>

@@ -3099,8 +3099,7 @@ namespace internal
       const std::size_t n_dofs_normal =
         n_dofs_tangent - Utilities::pow(fe_degree, dim - 2);
       const std::size_t dofs_stride =
-        (std::is_same<Eval0, EvalGeneral>::value) ? n_dofs_normal :
-                                                    n_dofs_tangent;
+        (std::is_same_v<Eval0, EvalGeneral>) ? n_dofs_normal : n_dofs_tangent;
 
       static constexpr dealii::ndarray<unsigned int, 3, 3> component_table = {
         {{{1, 2, 0}}, {{2, 0, 1}}, {{0, 1, 2}}}};
@@ -3304,8 +3303,7 @@ namespace internal
       const std::size_t n_dofs_normal =
         n_dofs_tangent - Utilities::pow(fe_degree, dim - 2);
       const std::size_t dofs_stride =
-        (std::is_same<Eval0, EvalGeneral>::value) ? n_dofs_normal :
-                                                    n_dofs_tangent;
+        (std::is_same_v<Eval0, EvalGeneral>) ? n_dofs_normal : n_dofs_tangent;
 
       static constexpr dealii::ndarray<unsigned int, 3, 3> component_table = {
         {{{1, 2, 0}}, {{2, 0, 1}}, {{0, 1, 2}}}};

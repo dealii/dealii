@@ -117,7 +117,7 @@ namespace internal
       has_begin<T> &&
       (has_local_element<T> ||
        is_serial_vector<typename std::remove_const<T>::type>::value) &&
-      std::is_same<typename T::value_type, Number>::value;
+      std::is_same_v<typename T::value_type, Number>;
   };
 
   // We need to have a separate declaration for static const members

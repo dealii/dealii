@@ -258,7 +258,7 @@ public:
               dst_dummy,
               src);
 
-    if (std::is_same<Number, float>::value)
+    if (std::is_same_v<Number, float>)
       for (unsigned int i = 0; i < 4; ++i)
         {
           if (cell_errors[i] / cell_times < 1e-5)

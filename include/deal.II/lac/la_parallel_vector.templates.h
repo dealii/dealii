@@ -84,10 +84,9 @@ namespace LinearAlgebra
       template <typename Number, typename MemorySpaceType>
       struct la_parallel_vector_templates_functions
       {
-        static_assert(
-          std::is_same<MemorySpaceType, MemorySpace::Host>::value ||
-            std::is_same<MemorySpaceType, MemorySpace::Default>::value,
-          "MemorySpace should be Host or Default");
+        static_assert(std::is_same_v<MemorySpaceType, MemorySpace::Host> ||
+                        std::is_same_v<MemorySpaceType, MemorySpace::Default>,
+                      "MemorySpace should be Host or Default");
 
         static void
         resize_val(
@@ -334,8 +333,7 @@ namespace LinearAlgebra
           (void)comm_sm;
 
           static_assert(
-            std::is_same<Number, float>::value ||
-              std::is_same<Number, double>::value,
+            std::is_same_v<Number, float> || std::is_same_v<Number, double>,
             "Number should be float or double for Default memory space");
 
           if (new_alloc_size > allocated_size)
@@ -470,7 +468,7 @@ namespace LinearAlgebra
                           const unsigned int                 size,
                           RealType &                         result)
         {
-          static_assert(std::is_same<Number, RealType>::value,
+          static_assert(std::is_same_v<Number, RealType>,
                         "RealType should be the same type as Number");
 
           typename ::dealii::MemorySpace::Default::kokkos_space::execution_space
@@ -997,7 +995,7 @@ namespace LinearAlgebra
         }
 
 #  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-      if (std::is_same<MemorySpaceType, dealii::MemorySpace::Default>::value)
+      if (std::is_same_v<MemorySpaceType, dealii::MemorySpace::Default>)
         {
           // Move the data to the host and then move it back to the
           // device. We use values to store the elements because the function
@@ -1059,7 +1057,7 @@ namespace LinearAlgebra
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
 #  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-      if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
+      if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
         {
           Assert(partitioner->n_import_indices() == 0 ||
                    import_data.values_host_buffer.size() != 0,
@@ -1129,7 +1127,7 @@ namespace LinearAlgebra
       if (partitioner->n_import_indices() > 0)
         {
 #  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-          if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
+          if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
             {
               if (import_data.values_host_buffer.size() == 0)
                 Kokkos::resize(import_data.values_host_buffer,
@@ -1145,7 +1143,7 @@ namespace LinearAlgebra
         }
 
 #  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-      if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
+      if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
         {
           // Move the data to the host and then move it back to the
           // device. We use values to store the elements because the function
@@ -1212,7 +1210,7 @@ namespace LinearAlgebra
           std::lock_guard<std::mutex> lock(mutex);
 
 #  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-          if (std::is_same<MemorySpaceType, MemorySpace::Default>::value)
+          if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
             {
               partitioner->export_to_ghosted_array_finish(
                 ArrayView<Number, MemorySpace::Host>(

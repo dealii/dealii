@@ -57,8 +57,7 @@ test_view(const Vector<double> &            solution,
   using View = typename std::remove_reference<
     typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
   const View &     fe_values_view = fe_values[extractor];
-  const NumberType tolerance =
-    std::is_same<NumberType, float>::value ? 1e-5 : 1e-13;
+  const NumberType tolerance = std::is_same_v<NumberType, float> ? 1e-5 : 1e-13;
 
   // Typedefs
   using value_type =
@@ -152,8 +151,7 @@ test_view(const Vector<double> &            solution,
   using View = typename std::remove_reference<
     typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
   const View &     fe_values_view = fe_values[extractor];
-  const NumberType tolerance =
-    std::is_same<NumberType, float>::value ? 1e-5 : 1e-13;
+  const NumberType tolerance = std::is_same_v<NumberType, float> ? 1e-5 : 1e-13;
 
   // Typedefs
   using value_type =
@@ -295,8 +293,7 @@ test_view(const Vector<double> &                        solution,
   using View = typename std::remove_reference<
     typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
   const View &     fe_values_view = fe_values[extractor];
-  const NumberType tolerance =
-    std::is_same<NumberType, float>::value ? 1e-5 : 1e-13;
+  const NumberType tolerance = std::is_same_v<NumberType, float> ? 1e-5 : 1e-13;
 
   // Typedefs
   using value_type =
@@ -353,8 +350,7 @@ test_view(const Vector<double> &               solution,
     typename ProductType<typename View::gradient_type, NumberType>::type;
   using divergence_type =
     typename ProductType<typename View::divergence_type, NumberType>::type;
-  const NumberType tolerance =
-    std::is_same<NumberType, float>::value ? 1e-5 : 1e-13;
+  const NumberType tolerance = std::is_same_v<NumberType, float> ? 1e-5 : 1e-13;
 
   // Values
   std::vector<typename View::template solution_value_type<NumberType>>

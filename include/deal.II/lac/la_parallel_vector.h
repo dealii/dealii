@@ -262,8 +262,8 @@ namespace LinearAlgebra
       using real_type       = typename numbers::NumberTraits<Number>::real_type;
 
       static_assert(
-        std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value ||
-          std::is_same<MemorySpace, ::dealii::MemorySpace::Default>::value,
+        std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host> ||
+          std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>,
         "MemorySpace should be Host or Default");
 
       /**
@@ -1549,7 +1549,7 @@ namespace LinearAlgebra
     inline Number
     Vector<Number, MemorySpace>::operator()(const size_type global_index) const
     {
-      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+      Assert((std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host>),
              ExcMessage(
                "This function is only implemented for the Host memory space"));
       Assert(
@@ -1575,7 +1575,7 @@ namespace LinearAlgebra
     inline Number &
     Vector<Number, MemorySpace>::operator()(const size_type global_index)
     {
-      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+      Assert((std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host>),
              ExcMessage(
                "This function is only implemented for the Host memory space"));
       Assert(
@@ -1621,7 +1621,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::local_element(
       const size_type local_index) const
     {
-      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+      Assert((std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host>),
              ExcMessage(
                "This function is only implemented for the Host memory space"));
       AssertIndexRange(local_index,
@@ -1641,7 +1641,7 @@ namespace LinearAlgebra
     inline Number &
     Vector<Number, MemorySpace>::local_element(const size_type local_index)
     {
-      Assert((std::is_same<MemorySpace, ::dealii::MemorySpace::Host>::value),
+      Assert((std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host>),
              ExcMessage(
                "This function is only implemented for the Host memory space"));
 

@@ -242,7 +242,7 @@ namespace internal
         Assert(end >= begin, ExcInternalError());
 
         if constexpr (std::is_trivially_copyable<Number>() &&
-                      std::is_same<Number, OtherNumber>::value)
+                      std::is_same_v<Number, OtherNumber>)
           std::memcpy(dst + begin, src + begin, (end - begin) * sizeof(Number));
         else
           {
@@ -753,7 +753,7 @@ namespace internal
     template <typename Number, typename Number2>
     struct Dot
     {
-      static constexpr bool vectorizes = std::is_same<Number, Number2>::value &&
+      static constexpr bool vectorizes = std::is_same_v<Number, Number2> &&
                                          (VectorizedArray<Number>::size() > 1);
 
       Dot(const Number *const X, const Number2 *const Y)
@@ -1473,8 +1473,8 @@ namespace internal
         ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
       {
         static_assert(
-          std::is_same<MemorySpace, ::dealii::MemorySpace::Default>::value &&
-            std::is_same<Number, Number2>::value,
+          std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default> &&
+            std::is_same_v<Number, Number2>,
           "For the Default MemorySpace Number and Number2 should be the same type");
       }
 
@@ -2069,7 +2069,7 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data,
         std::enable_if_t<
-          std::is_same<MemorySpace2, dealii::MemorySpace::Host>::value,
+          std::is_same_v<MemorySpace2, dealii::MemorySpace::Host>,
           int> = 0)
       {
         if (operation == VectorOperation::insert)
@@ -2099,7 +2099,7 @@ namespace internal
                                                ::dealii::MemorySpace::Host>
           &data,
         std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::Default>::value,
+          std::is_same_v<MemorySpace2, ::dealii::MemorySpace::Default>,
           int> = 0)
       {
         if (operation == VectorOperation::insert)
@@ -2606,7 +2606,7 @@ namespace internal
                                                ::dealii::MemorySpace::Default>
           &data,
         std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::Default>::value,
+          std::is_same_v<MemorySpace2, ::dealii::MemorySpace::Default>,
           int> = 0)
       {
         if (operation == VectorOperation::insert)
@@ -2636,7 +2636,7 @@ namespace internal
                                                ::dealii::MemorySpace::Default>
           &data,
         std::enable_if_t<
-          std::is_same<MemorySpace2, ::dealii::MemorySpace::Host>::value,
+          std::is_same_v<MemorySpace2, ::dealii::MemorySpace::Host>,
           int> = 0)
       {
         if (operation == VectorOperation::insert)

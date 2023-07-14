@@ -113,7 +113,7 @@ template <int dim,
 class MatrixFree : public Subscriptor
 {
   static_assert(
-    std::is_same<Number, typename VectorizedArrayType::value_type>::value,
+    std::is_same_v<Number, typename VectorizedArrayType::value_type>,
     "Type of Number and of VectorizedArrayType do not match.");
 
 public:
@@ -3458,9 +3458,8 @@ namespace internal
     update_ghost_values_start(const unsigned int component_in_block_vector,
                               const VectorType & vec)
     {
-      static_assert(
-        std::is_same<Number, typename VectorType::value_type>::value,
-        "Type mismatch between VectorType and VectorDataExchange");
+      static_assert(std::is_same_v<Number, typename VectorType::value_type>,
+                    "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       const bool ghosts_set = vec.has_ghost_elements();
 
@@ -3552,9 +3551,8 @@ namespace internal
     update_ghost_values_finish(const unsigned int component_in_block_vector,
                                const VectorType & vec)
     {
-      static_assert(
-        std::is_same<Number, typename VectorType::value_type>::value,
-        "Type mismatch between VectorType and VectorDataExchange");
+      static_assert(std::is_same_v<Number, typename VectorType::value_type>,
+                    "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
 
       if (vec.size() != 0)
@@ -3658,9 +3656,8 @@ namespace internal
     compress_start(const unsigned int component_in_block_vector,
                    VectorType &       vec)
     {
-      static_assert(
-        std::is_same<Number, typename VectorType::value_type>::value,
-        "Type mismatch between VectorType and VectorDataExchange");
+      static_assert(std::is_same_v<Number, typename VectorType::value_type>,
+                    "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       Assert(vec.has_ghost_elements() == false, ExcNotImplemented());
 
@@ -3745,9 +3742,8 @@ namespace internal
     compress_finish(const unsigned int component_in_block_vector,
                     VectorType &       vec)
     {
-      static_assert(
-        std::is_same<Number, typename VectorType::value_type>::value,
-        "Type mismatch between VectorType and VectorDataExchange");
+      static_assert(std::is_same_v<Number, typename VectorType::value_type>,
+                    "Type mismatch between VectorType and VectorDataExchange");
       (void)component_in_block_vector;
       if (vec.size() != 0)
         {
@@ -3833,9 +3829,8 @@ namespace internal
     void
     reset_ghost_values(const VectorType &vec) const
     {
-      static_assert(
-        std::is_same<Number, typename VectorType::value_type>::value,
-        "Type mismatch between VectorType and VectorDataExchange");
+      static_assert(std::is_same_v<Number, typename VectorType::value_type>,
+                    "Type mismatch between VectorType and VectorDataExchange");
       if (ghosts_were_set == true)
         return;
 
@@ -3877,9 +3872,8 @@ namespace internal
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
-      static_assert(
-        std::is_same<Number, typename VectorType::value_type>::value,
-        "Type mismatch between VectorType and VectorDataExchange");
+      static_assert(std::is_same_v<Number, typename VectorType::value_type>,
+                    "Type mismatch between VectorType and VectorDataExchange");
       if (range_index == numbers::invalid_unsigned_int)
         vec = Number();
       else

@@ -1086,7 +1086,7 @@ namespace internal
         univariate_shape_data.inverse_shape_values_eo;
 
       const double zero_tol =
-        std::is_same<Number, double>::value == true ? 1e-12 : 1e-7;
+        std::is_same_v<Number, double> == true ? 1e-12 : 1e-7;
       // symmetry for values
       const unsigned int n_dofs_1d = fe_degree + 1;
       for (unsigned int i = 0; i < (n_dofs_1d + 1) / 2; ++i)
@@ -1206,7 +1206,7 @@ namespace internal
       auto &     shape_values = univariate_shape_data.shape_values;
 
       const double zero_tol =
-        std::is_same<Number, double>::value == true ? 1e-12 : 1e-7;
+        std::is_same_v<Number, double> == true ? 1e-12 : 1e-7;
       // check: identity operation for shape values
       const unsigned int n_points_1d = fe_degree + 1;
       for (unsigned int i = 0; i < n_points_1d; ++i)

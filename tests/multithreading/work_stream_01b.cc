@@ -38,7 +38,7 @@ using IteratorType      = typename std::vector<unsigned int>::iterator;
 using IteratorRangeType = IteratorRange<IteratorType>;
 
 static_assert(
-  std::is_same<typename IteratorRangeType::iterator, IteratorType>::value,
+  std::is_same_v<typename IteratorRangeType::iterator, IteratorType>,
   "Iterator types not the same");
 
 struct X

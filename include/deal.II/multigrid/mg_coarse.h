@@ -362,14 +362,13 @@ namespace internal
 {
   namespace MGCoarseGridIterativeSolver
   {
-    template <
-      typename VectorType,
-      typename SolverType,
-      typename MatrixType,
-      typename PreconditionerType,
-      std::enable_if_t<
-        std::is_same<VectorType, typename SolverType::vector_type>::value,
-        VectorType> * = nullptr>
+    template <typename VectorType,
+              typename SolverType,
+              typename MatrixType,
+              typename PreconditionerType,
+              std::enable_if_t<
+                std::is_same_v<VectorType, typename SolverType::vector_type>,
+                VectorType> * = nullptr>
     void
     solve(SolverType &              solver,
           const MatrixType &        matrix,
@@ -380,14 +379,13 @@ namespace internal
       solver.solve(matrix, dst, src, preconditioner);
     }
 
-    template <
-      typename VectorType,
-      typename SolverType,
-      typename MatrixType,
-      typename PreconditionerType,
-      std::enable_if_t<
-        !std::is_same<VectorType, typename SolverType::vector_type>::value,
-        VectorType> * = nullptr>
+    template <typename VectorType,
+              typename SolverType,
+              typename MatrixType,
+              typename PreconditionerType,
+              std::enable_if_t<
+                !std::is_same_v<VectorType, typename SolverType::vector_type>,
+                VectorType> * = nullptr>
     void
     solve(SolverType &              solver,
           const MatrixType &        matrix,

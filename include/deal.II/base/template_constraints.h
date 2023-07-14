@@ -217,7 +217,7 @@ template <typename Type, class... Types>
 struct all_same_as
 {
   static constexpr bool value = internal::TemplateConstraints::all_true<
-    std::is_same<Type, Types>::value...>::value;
+    std::is_same_v<Type, Types>...>::value;
 };
 
 
@@ -232,7 +232,7 @@ template <typename Type, class... Types>
 struct is_same_as_any_of
 {
   static constexpr bool value = internal::TemplateConstraints::any_true<
-    std::is_same<Type, Types>::value...>::value;
+    std::is_same_v<Type, Types>...>::value;
 };
 
 

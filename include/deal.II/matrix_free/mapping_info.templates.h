@@ -2685,7 +2685,7 @@ namespace internal
 
       using VectorizedDouble =
         VectorizedArray<double,
-                        ((std::is_same<Number, float>::value &&
+                        ((std::is_same_v<Number, float> &&
                           VectorizedArrayType::size() > 1) ?
                            VectorizedArrayType::size() / 2 :
                            VectorizedArrayType::size())>;

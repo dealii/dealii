@@ -506,7 +506,7 @@ namespace CUDAWrappers
                                                    VectorType &      dst) const
   {
     static_assert(
-      std::is_same<Number, typename VectorType::value_type>::value,
+      std::is_same_v<Number, typename VectorType::value_type>,
       "VectorType::value_type and Number should be of the same type.");
     Assert(src.size() == dst.size(),
            ExcMessage("src and dst vectors have different size."));
@@ -539,7 +539,7 @@ namespace CUDAWrappers
                                                   VectorType &dst) const
   {
     static_assert(
-      std::is_same<Number, typename VectorType::value_type>::value,
+      std::is_same_v<Number, typename VectorType::value_type>,
       "VectorType::value_type and Number should be of the same type.");
     Number *dst_ptr = dst.get_values();
     // FIXME When using C++17, we can use KOKKOS_CLASS_LAMBDA and this

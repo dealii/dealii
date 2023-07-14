@@ -147,7 +147,7 @@ test(const bool adaptive_ref = true)
       DoFTools::map_dofs_to_support_points(mapping, dof, support_points);
 
       const std::string prefix =
-        std::is_same<float, number>::value ? "float_" : "double_";
+        std::is_same_v<float, number> ? "float_" : "double_";
       const std::string href = (adaptive_ref ? "" : "global_");
       const std::string base_filename =
         prefix + href + "grid" + dealii::Utilities::int_to_string(dim) + "_" +
