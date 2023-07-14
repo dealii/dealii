@@ -540,8 +540,8 @@ public:
       (std::is_same<typename std::decay<FEPairs>::type,
                     std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
                               unsigned int>>::value ||
-       std::is_base_of<FiniteElement<dim, spacedim>,
-                       typename std::decay<FEPairs>::type>::value)...>>
+       std::is_base_of_v<FiniteElement<dim, spacedim>,
+                         typename std::decay<FEPairs>::type>)...>>
   FESystem(FEPairs &&...fe_pairs);
 
   /**

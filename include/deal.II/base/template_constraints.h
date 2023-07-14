@@ -202,7 +202,7 @@ template <class Base, class... Derived>
 struct is_base_of_all
 {
   static constexpr bool value = internal::TemplateConstraints::all_true<
-    std::is_base_of<Base, Derived>::value...>::value;
+    std::is_base_of_v<Base, Derived>...>::value;
 };
 
 

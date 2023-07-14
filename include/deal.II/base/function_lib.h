@@ -1764,7 +1764,7 @@ namespace Functions
   {
     initialized = true;
     static_assert(
-      std::is_base_of<CutOffFunctionBase<1>, CutOffFunctionBaseType<1>>::value,
+      std::is_base_of_v<CutOffFunctionBase<1>, CutOffFunctionBaseType<1>>,
       "You can only construct a CutOffFunctionTensorProduct function from "
       "a class derived from CutOffFunctionBase.");
 

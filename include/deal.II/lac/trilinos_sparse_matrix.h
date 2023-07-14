@@ -2186,9 +2186,9 @@ namespace TrilinosWrappers
          */
         template <typename Solver, typename Preconditioner>
         std::enable_if_t<
-          std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
-            std::is_base_of<TrilinosWrappers::PreconditionBase,
-                            Preconditioner>::value,
+          std::is_base_of_v<TrilinosWrappers::SolverBase, Solver> &&
+            std::is_base_of_v<TrilinosWrappers::PreconditionBase,
+                              Preconditioner>,
           TrilinosPayload>
         inverse_payload(Solver &, const Preconditioner &) const;
 
@@ -2211,9 +2211,9 @@ namespace TrilinosWrappers
          */
         template <typename Solver, typename Preconditioner>
         std::enable_if_t<
-          !(std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
-            std::is_base_of<TrilinosWrappers::PreconditionBase,
-                            Preconditioner>::value),
+          !(std::is_base_of_v<TrilinosWrappers::SolverBase, Solver> &&
+            std::is_base_of_v<TrilinosWrappers::PreconditionBase,
+                              Preconditioner>),
           TrilinosPayload>
         inverse_payload(Solver &, const Preconditioner &) const;
 
@@ -3218,9 +3218,8 @@ namespace TrilinosWrappers
 
       template <typename Solver, typename Preconditioner>
       std::enable_if_t<
-        std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
-          std::is_base_of<TrilinosWrappers::PreconditionBase,
-                          Preconditioner>::value,
+        std::is_base_of_v<TrilinosWrappers::SolverBase, Solver> &&
+          std::is_base_of_v<TrilinosWrappers::PreconditionBase, Preconditioner>,
         TrilinosPayload>
       TrilinosPayload::inverse_payload(
         Solver &              solver,
@@ -3273,9 +3272,9 @@ namespace TrilinosWrappers
 
       template <typename Solver, typename Preconditioner>
       std::enable_if_t<
-        !(std::is_base_of<TrilinosWrappers::SolverBase, Solver>::value &&
-          std::is_base_of<TrilinosWrappers::PreconditionBase,
-                          Preconditioner>::value),
+        !(std::is_base_of_v<TrilinosWrappers::SolverBase, Solver> &&
+          std::is_base_of_v<TrilinosWrappers::PreconditionBase,
+                            Preconditioner>),
         TrilinosPayload>
       TrilinosPayload::inverse_payload(Solver &, const Preconditioner &) const
       {

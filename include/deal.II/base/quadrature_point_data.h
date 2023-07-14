@@ -440,7 +440,7 @@ namespace parallel
     {
     public:
       static_assert(
-        std::is_base_of<TransferableQuadraturePointData, DataType>::value,
+        std::is_base_of_v<TransferableQuadraturePointData, DataType>,
         "User's DataType class should be derived from TransferableQuadraturePointData");
 
       /**
@@ -604,7 +604,7 @@ CellDataStorage<CellIteratorType, DataType>::initialize(
   const CellIteratorType &cell,
   const unsigned int      n_q_points)
 {
-  static_assert(std::is_base_of<DataType, T>::value,
+  static_assert(std::is_base_of_v<DataType, T>,
                 "User's T class should be derived from user's DataType class");
   // The first time this method is called, it has to initialize the reference
   // to the triangulation object
@@ -694,7 +694,7 @@ inline std::vector<std::shared_ptr<T>>
 CellDataStorage<CellIteratorType, DataType>::get_data(
   const CellIteratorType &cell)
 {
-  static_assert(std::is_base_of<DataType, T>::value,
+  static_assert(std::is_base_of_v<DataType, T>,
                 "User's T class should be derived from user's DataType class");
   Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
@@ -723,7 +723,7 @@ inline std::vector<std::shared_ptr<const T>>
 CellDataStorage<CellIteratorType, DataType>::get_data(
   const CellIteratorType &cell) const
 {
-  static_assert(std::is_base_of<DataType, T>::value,
+  static_assert(std::is_base_of_v<DataType, T>,
                 "User's T class should be derived from user's DataType class");
   Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
@@ -748,7 +748,7 @@ inline std::optional<std::vector<std::shared_ptr<T>>>
 CellDataStorage<CellIteratorType, DataType>::try_get_data(
   const CellIteratorType &cell)
 {
-  static_assert(std::is_base_of<DataType, T>::value,
+  static_assert(std::is_base_of_v<DataType, T>,
                 "User's T class should be derived from user's DataType class");
   Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
@@ -779,7 +779,7 @@ inline std::optional<std::vector<std::shared_ptr<const T>>>
 CellDataStorage<CellIteratorType, DataType>::try_get_data(
   const CellIteratorType &cell) const
 {
-  static_assert(std::is_base_of<DataType, T>::value,
+  static_assert(std::is_base_of_v<DataType, T>,
                 "User's T class should be derived from user's DataType class");
   Assert(&cell->get_triangulation() == tria, ExcTriangulationMismatch());
 
@@ -822,9 +822,8 @@ pack_cell_data(const CellIteratorType &                           cell,
                const CellDataStorage<CellIteratorType, DataType> *data_storage,
                FullMatrix<double> &                               matrix_data)
 {
-  static_assert(
-    std::is_base_of<TransferableQuadraturePointData, DataType>::value,
-    "User's DataType class should be derived from QPData");
+  static_assert(std::is_base_of_v<TransferableQuadraturePointData, DataType>,
+                "User's DataType class should be derived from QPData");
 
   if (const auto qpd = data_storage->try_get_data(cell))
     {
@@ -860,9 +859,8 @@ unpack_to_cell_data(const CellIteratorType &                     cell,
                     const FullMatrix<double> &                   values_at_qp,
                     CellDataStorage<CellIteratorType, DataType> *data_storage)
 {
-  static_assert(
-    std::is_base_of<TransferableQuadraturePointData, DataType>::value,
-    "User's DataType class should be derived from QPData");
+  static_assert(std::is_base_of_v<TransferableQuadraturePointData, DataType>,
+                "User's DataType class should be derived from QPData");
 
   if (const auto qpd = data_storage->try_get_data(cell))
     {
