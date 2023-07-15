@@ -5981,9 +5981,16 @@ namespace GridTools
                 query_bounding_boxes);
               const auto &[indices_ranks, offsets] =
                 distributed_tree.query(bb_intersect);
+
               for (unsigned long int i = 0; i < offsets.size() - 1; ++i)
-                for (int j = offsets[i]; j < offsets[i + 1]; ++j)
-                  ranks_and_indices.emplace_back(indices_ranks[j].second, i);
+                {
+                  std::set<unsigned int> my_ranks;
+                  for (int j = offsets[i]; j < offsets[i + 1]; ++j)
+                    my_ranks.insert(indices_ranks[j].second);
+
+                  for (const auto rank : my_ranks)
+                    ranks_and_indices.emplace_back(rank, i);
+                }
             }
           else
             {
