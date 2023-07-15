@@ -889,11 +889,11 @@ public:
    *
    * @note DoFHandler is not needed here, but is required by the interface.
    */
-  template <class InVector, int spacedim>
+  template <class InVector>
   void
-  copy_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
-             MGLevelObject<VectorType> &      dst,
-             const InVector &                 src) const;
+  copy_to_mg(const DoFHandler<dim> &    dof_handler,
+             MGLevelObject<VectorType> &dst,
+             const InVector &           src) const;
 
   /**
    * Initialize internal vectors and copy the values on the finest
@@ -901,9 +901,9 @@ public:
    *
    * @note DoFHandler is not needed here, but is required by the interface.
    */
-  template <class OutVector, int spacedim>
+  template <class OutVector>
   void
-  copy_from_mg(const DoFHandler<dim, spacedim> &dof_handler,
+  copy_from_mg(const DoFHandler<dim> &          dof_handler,
                OutVector &                      dst,
                const MGLevelObject<VectorType> &src) const;
 
@@ -929,11 +929,11 @@ public:
    * is required to be able to use MGTransferGlobalCoarsening and
    * MGTransferMatrixFree as template argument.
    */
-  template <class InVector, int spacedim>
+  template <class InVector>
   void
-  interpolate_to_mg(const DoFHandler<dim, spacedim> &dof_handler,
-                    MGLevelObject<VectorType> &      dst,
-                    const InVector &                 src) const;
+  interpolate_to_mg(const DoFHandler<dim> &    dof_handler,
+                    MGLevelObject<VectorType> &dst,
+                    const InVector &           src) const;
 
   /**
    * Return the memory consumption of the allocated memory in this class.
@@ -1150,12 +1150,12 @@ MGTransferGlobalCoarsening<dim, VectorType>::restrict_and_add(
 
 
 template <int dim, typename VectorType>
-template <class InVector, int spacedim>
+template <class InVector>
 void
 MGTransferGlobalCoarsening<dim, VectorType>::copy_to_mg(
-  const DoFHandler<dim, spacedim> &dof_handler,
-  MGLevelObject<VectorType> &      dst,
-  const InVector &                 src) const
+  const DoFHandler<dim> &    dof_handler,
+  MGLevelObject<VectorType> &dst,
+  const InVector &           src) const
 {
   (void)dof_handler;
 
@@ -1173,10 +1173,10 @@ MGTransferGlobalCoarsening<dim, VectorType>::copy_to_mg(
 
 
 template <int dim, typename VectorType>
-template <class OutVector, int spacedim>
+template <class OutVector>
 void
 MGTransferGlobalCoarsening<dim, VectorType>::copy_from_mg(
-  const DoFHandler<dim, spacedim> &dof_handler,
+  const DoFHandler<dim> &          dof_handler,
   OutVector &                      dst,
   const MGLevelObject<VectorType> &src) const
 {
@@ -1212,12 +1212,12 @@ MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
 
 
 template <int dim, typename VectorType>
-template <class InVector, int spacedim>
+template <class InVector>
 void
 MGTransferGlobalCoarsening<dim, VectorType>::interpolate_to_mg(
-  const DoFHandler<dim, spacedim> &dof_handler,
-  MGLevelObject<VectorType> &      dst,
-  const InVector &                 src) const
+  const DoFHandler<dim> &    dof_handler,
+  MGLevelObject<VectorType> &dst,
+  const InVector &           src) const
 {
   (void)dof_handler;
 

@@ -97,7 +97,7 @@ MGTransferMatrixFree<dim, Number>::clear()
 template <int dim, typename Number>
 void
 MGTransferMatrixFree<dim, Number>::build(
-  const DoFHandler<dim, dim> &dof_handler,
+  const DoFHandler<dim> &dof_handler,
   const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     &external_partitioners)
 {
@@ -203,7 +203,7 @@ MGTransferMatrixFree<dim, Number>::build(
 template <int dim, typename Number>
 void
 MGTransferMatrixFree<dim, Number>::build(
-  const DoFHandler<dim, dim> &dof_handler,
+  const DoFHandler<dim> &dof_handler,
   const std::function<void(const unsigned int,
                            LinearAlgebra::distributed::Vector<Number> &)>
     &initialize_dof_vector)
@@ -756,7 +756,7 @@ MGTransferBlockMatrixFree<dim, Number>::initialize_constraints(
 template <int dim, typename Number>
 void
 MGTransferBlockMatrixFree<dim, Number>::build(
-  const DoFHandler<dim, dim> &dof_handler)
+  const DoFHandler<dim> &dof_handler)
 {
   AssertDimension(this->matrix_free_transfer_vector.size(), 1);
   this->matrix_free_transfer_vector[0].build(dof_handler);
@@ -767,7 +767,7 @@ MGTransferBlockMatrixFree<dim, Number>::build(
 template <int dim, typename Number>
 void
 MGTransferBlockMatrixFree<dim, Number>::build(
-  const std::vector<const DoFHandler<dim, dim> *> &dof_handler)
+  const std::vector<const DoFHandler<dim> *> &dof_handler)
 {
   AssertDimension(this->matrix_free_transfer_vector.size(), dof_handler.size());
   for (unsigned int i = 0; i < dof_handler.size(); ++i)
