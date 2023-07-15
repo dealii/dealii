@@ -189,11 +189,6 @@ public:
     const BlockVectorType2 &                                   src) const;
 
   /**
-   * Finite element does not provide prolongation matrices.
-   */
-  DeclException0(ExcNoProlongation);
-
-  /**
    * Memory used by this object.
    */
   std::size_t
