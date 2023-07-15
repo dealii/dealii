@@ -304,7 +304,7 @@ namespace Differentiation
               typename ValueType          = double,
               typename SymbolicType,
               typename T = std::enable_if_t<
-                !std::is_base_of<Expression, SymbolicType>::value &&
+                !std::is_base_of_v<Expression, SymbolicType> &&
                 dealii::internal::is_explicitly_convertible<
                   SymbolicType,
                   const SymEngine::RCP<const SymEngine::Basic> &>::value>>

@@ -1482,7 +1482,7 @@ namespace deal_II_exceptions
                         const char *  exc_name,
                         ExceptionType e) noexcept
     {
-      static_assert(std::is_base_of<ExceptionBase, ExceptionType>::value,
+      static_assert(std::is_base_of_v<ExceptionBase, ExceptionType>,
                     "The provided exception must inherit from ExceptionBase.");
       // Fill the fields of the exception object
       e.set_fields(file, line, function, cond, exc_name);

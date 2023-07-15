@@ -238,10 +238,9 @@ public:
    * object @p op for which the conversion function
    * <code>linear_operator</code> is defined.
    */
-  template <
-    typename Op,
-    typename = std::enable_if_t<
-      !std::is_base_of<LinearOperator<Range, Domain, Payload>, Op>::value>>
+  template <typename Op,
+            typename = std::enable_if_t<
+              !std::is_base_of_v<LinearOperator<Range, Domain, Payload>, Op>>>
   LinearOperator(const Op &op)
   {
     *this = linear_operator<Range, Domain, Payload, Op>(op);
@@ -257,10 +256,9 @@ public:
    * Templated copy assignment operator for an object @p op for which the
    * conversion function <code>linear_operator</code> is defined.
    */
-  template <
-    typename Op,
-    typename = std::enable_if_t<
-      !std::is_base_of<LinearOperator<Range, Domain, Payload>, Op>::value>>
+  template <typename Op,
+            typename = std::enable_if_t<
+              !std::is_base_of_v<LinearOperator<Range, Domain, Payload>, Op>>>
   LinearOperator<Range, Domain, Payload> &
   operator=(const Op &op)
   {
