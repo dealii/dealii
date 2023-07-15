@@ -1,0 +1,73 @@
+
+DEAL::Testing FE_Q<2>(1)
+DEAL::Number of degrees of freedom: 289
+DEAL:cg::Starting value 15.0000
+DEAL:cg::Convergence step 6 value 5.63311e-11
+DEAL::Approx. number of calls to special vmult for Operator of size 4: 20
+DEAL::Approx. number of calls to special vmult for Operator of size 9: 40
+DEAL::Approx. number of calls to special vmult for Operator of size 25: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 81: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 289: 50
+DEAL::Testing FE_Q<2>(1)
+DEAL::Number of degrees of freedom: 1089
+DEAL:cg::Starting value 31.0000
+DEAL:cg::Convergence step 6 value 6.08657e-10
+DEAL::Approx. number of calls to special vmult for Operator of size 4: 20
+DEAL::Approx. number of calls to special vmult for Operator of size 9: 40
+DEAL::Approx. number of calls to special vmult for Operator of size 25: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 81: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 289: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 1089: 50
+DEAL::Testing FE_Q<2>(3)
+DEAL::Number of degrees of freedom: 2401
+DEAL:cg::Starting value 47.0000
+DEAL:cg::Convergence step 6 value 2.11509e-09
+DEAL::Approx. number of calls to special vmult for Operator of size 16: 30
+DEAL::Approx. number of calls to special vmult for Operator of size 49: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 169: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 625: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 2401: 50
+DEAL::Testing FE_Q<2>(3)
+DEAL::Number of degrees of freedom: 9409
+DEAL:cg::Starting value 95.0000
+DEAL:cg::Convergence step 6 value 8.72760e-09
+DEAL::Approx. number of calls to special vmult for Operator of size 16: 30
+DEAL::Approx. number of calls to special vmult for Operator of size 49: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 169: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 625: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 2401: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 9409: 50
+DEAL::Testing FE_Q<3>(1)
+DEAL::Number of degrees of freedom: 729
+DEAL:cg::Starting value 18.5203
+DEAL:cg::Convergence step 6 value 2.77603e-11
+DEAL::Approx. number of calls to special vmult for Operator of size 8: 20
+DEAL::Approx. number of calls to special vmult for Operator of size 27: 40
+DEAL::Approx. number of calls to special vmult for Operator of size 125: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 729: 50
+DEAL::Testing FE_Q<3>(1)
+DEAL::Number of degrees of freedom: 4913
+DEAL:cg::Starting value 58.0948
+DEAL:cg::Convergence step 6 value 3.05980e-10
+DEAL::Approx. number of calls to special vmult for Operator of size 8: 20
+DEAL::Approx. number of calls to special vmult for Operator of size 27: 40
+DEAL::Approx. number of calls to special vmult for Operator of size 125: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 729: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 4913: 50
+DEAL::Testing FE_Q<3>(2)
+DEAL::Number of degrees of freedom: 4913
+DEAL:cg::Starting value 58.0948
+DEAL:cg::Convergence step 6 value 1.26786e-09
+DEAL::Approx. number of calls to special vmult for Operator of size 27: 20
+DEAL::Approx. number of calls to special vmult for Operator of size 125: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 729: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 4913: 50
+DEAL::Testing FE_Q<3>(2)
+DEAL::Number of degrees of freedom: 35937
+DEAL:cg::Starting value 172.601
+DEAL:cg::Convergence step 6 value 4.72892e-09
+DEAL::Approx. number of calls to special vmult for Operator of size 27: 20
+DEAL::Approx. number of calls to special vmult for Operator of size 125: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 729: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 4913: 50
+DEAL::Approx. number of calls to special vmult for Operator of size 35937: 50

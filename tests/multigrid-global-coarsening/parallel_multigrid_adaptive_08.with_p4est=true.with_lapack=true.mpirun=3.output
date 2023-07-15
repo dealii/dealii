@@ -1,0 +1,47 @@
+
+DEAL::Testing FE_Q<2>(2)
+DEAL::Number of degrees of freedom: 1935
+DEAL:cg::Starting value 43.0929
+DEAL:cg:cg::Starting value 2.63785
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg:cg::Starting value 0.000574845
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg:cg::Starting value 4.62010e-05
+DEAL:cg:cg::Convergence step 1 value 6.77626e-21
+DEAL:cg:cg::Starting value 6.27180e-07
+DEAL:cg:cg::Convergence step 1 value 1.05879e-22
+DEAL:cg:cg::Starting value 3.19916e-08
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg::Convergence step 5 value 2.10775e-06
+DEAL::Testing FE_Q<2>(2)
+DEAL::Number of degrees of freedom: 3403
+DEAL:cg::Starting value 55.4346
+DEAL:cg:cg::Starting value 3.96150
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg:cg::Starting value 0.00121318
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg:cg::Starting value 9.44668e-05
+DEAL:cg:cg::Convergence step 1 value 1.35525e-20
+DEAL:cg:cg::Starting value 1.80128e-06
+DEAL:cg:cg::Convergence step 1 value 2.11758e-22
+DEAL:cg:cg::Starting value 1.21766e-07
+DEAL:cg:cg::Convergence step 1 value 2.64698e-23
+DEAL:cg:cg::Starting value 5.04178e-09
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg::Convergence step 6 value 4.24128e-07
+DEAL::Testing FE_Q<2>(2)
+DEAL::Number of degrees of freedom: 8417
+DEAL:cg::Starting value 87.1149
+DEAL:cg:cg::Starting value 9.09582
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg:cg::Starting value 0.00294550
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg:cg::Starting value 0.000242151
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg:cg::Starting value 3.21426e-06
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg:cg::Starting value 1.60211e-07
+DEAL:cg:cg::Convergence step 1 value 0.00000
+DEAL:cg:cg::Starting value 3.38024e-09
+DEAL:cg:cg::Convergence step 1 value 4.13590e-25
+DEAL:cg::Convergence step 6 value 2.56705e-07

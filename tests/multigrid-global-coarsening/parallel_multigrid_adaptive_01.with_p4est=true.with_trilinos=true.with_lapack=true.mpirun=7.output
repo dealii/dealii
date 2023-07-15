@@ -1,0 +1,29 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 507
+DEAL:2d:cg::Starting value 21.93
+DEAL:2d:cg::Convergence step 5 value 1.145e-06
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 881
+DEAL:2d:cg::Starting value 27.77
+DEAL:2d:cg::Convergence step 6 value 1.176e-06
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 2147
+DEAL:2d:cg::Starting value 43.26
+DEAL:2d:cg::Convergence step 6 value 1.884e-06
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 6517
+DEAL:2d:cg::Starting value 76.92
+DEAL:2d:cg::Convergence step 6 value 3.090e-06
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Number of degrees of freedom: 1103
+DEAL:3d:cg::Starting value 31.21
+DEAL:3d:cg::Convergence step 6 value 2.139e-07
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Number of degrees of freedom: 3694
+DEAL:3d:cg::Starting value 55.00
+DEAL:3d:cg::Convergence step 7 value 4.739e-06
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Number of degrees of freedom: 9566
+DEAL:3d:cg::Starting value 76.18
+DEAL:3d:cg::Convergence step 8 value 6.236e-06

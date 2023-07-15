@@ -1229,17 +1229,17 @@ namespace internal
                (mg_level_coarse + 1 == mg_level_fine),
              ExcNotImplemented());
 
-      if (mg_level_fine != numbers::invalid_unsigned_int)
-        AssertIndexRange(mg_level_fine,
-                         MGTools::max_level_for_coarse_mesh(
-                           dof_handler_fine.get_triangulation()) +
-                           1);
-
-      if (mg_level_coarse != numbers::invalid_unsigned_int)
-        AssertIndexRange(mg_level_coarse,
-                         MGTools::max_level_for_coarse_mesh(
-                           dof_handler_coarse.get_triangulation()) +
-                           1);
+      // if (mg_level_fine != numbers::invalid_unsigned_int)
+      //   AssertIndexRange(mg_level_fine,
+      //                    MGTools::max_level_for_coarse_mesh(
+      //                      dof_handler_fine.get_triangulation()) +
+      //                      1);
+      //
+      // if (mg_level_coarse != numbers::invalid_unsigned_int)
+      //   AssertIndexRange(mg_level_coarse,
+      //                    MGTools::max_level_for_coarse_mesh(
+      //                      dof_handler_coarse.get_triangulation()) +
+      //                      1);
 
       const GlobalCoarseningFineDoFHandlerView<dim> view(dof_handler_fine,
                                                          dof_handler_coarse,
@@ -3440,27 +3440,345 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
 
 
 
-template <int dim, typename VectorType>
-MGTransferBlockGlobalCoarsening<dim, VectorType>::
-  MGTransferBlockGlobalCoarsening(
-    const MGTransferGlobalCoarsening<dim, VectorType> &transfer_operator)
-  : MGTransferBlockMatrixFreeBase<dim,
-                                  typename VectorType::value_type,
-                                  MGTransferGlobalCoarsening<dim, VectorType>>(
-      true)
-  , transfer_operator(transfer_operator)
-{}
+template <int dim, typename Number>
+MGTransferMF<dim, Number>::MGTransferMF(
+  const MGConstrainedDoFs &mg_constrained_dofs)
+{
+  this->initialize_constraints(mg_constrained_dofs);
+}
 
 
 
-template <int dim, typename VectorType>
-const MGTransferGlobalCoarsening<dim, VectorType> &
-MGTransferBlockGlobalCoarsening<dim, VectorType>::get_matrix_free_transfer(
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::initialize_constraints(
+  const MGConstrainedDoFs &mg_constrained_dofs)
+{
+  this->mg_constrained_dofs = &mg_constrained_dofs;
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::intitialize_internal_transfer(
+  const DoFHandler<dim> &                      dof_handler,
+  const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs)
+{
+  const unsigned int min_level = 0;
+  const unsigned int max_level =
+    dof_handler.get_triangulation().n_global_levels() - 1;
+
+  MGLevelObject<AffineConstraints<typename VectorType::value_type>> constraints(
+    min_level, max_level);
+
+  if (mg_constrained_dofs)
+    for (unsigned int l = min_level; l <= max_level; ++l)
+      mg_constrained_dofs->merge_constraints(
+        constraints[l],
+        l,
+        /*add_boundary_indices*/ true,
+        /*add_refinement_edge_indices*/ false,
+        /*add_level_constraints*/ true,
+        /*add_user_constraints*/ true);
+
+  this->internal_transfer.resize(min_level, max_level);
+
+  for (unsigned int l = min_level; l < max_level; ++l)
+    internal_transfer[l + 1].reinit_geometric_transfer(
+      dof_handler, dof_handler, constraints[l + 1], constraints[l], l + 1, l);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::build(
+  const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+    &external_partitioners)
+{
+  this->external_partitioners = external_partitioners;
+
+  if (this->external_partitioners.size() > 0)
+    {
+      const unsigned int min_level = transfer.min_level();
+      const unsigned int max_level = transfer.max_level();
+
+      AssertDimension(this->external_partitioners.size(), transfer.n_levels());
+
+      for (unsigned int l = min_level + 1; l <= max_level; ++l)
+        transfer[l]->enable_inplace_operations_if_possible(
+          this->external_partitioners[l - 1 - min_level],
+          this->external_partitioners[l - min_level]);
+    }
+  else
+    {
+      const unsigned int min_level = transfer.min_level();
+      const unsigned int max_level = transfer.max_level();
+
+      for (unsigned int l = min_level + 1; l <= max_level; ++l)
+        {
+          if (l == min_level + 1)
+            this->external_partitioners.push_back(
+              transfer[l]->partitioner_coarse);
+
+          this->external_partitioners.push_back(transfer[l]->partitioner_fine);
+        }
+    }
+
+  this->perform_plain_copy            = true;
+  this->perform_renumbered_plain_copy = false;
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::build(
+  const std::function<void(const unsigned int, VectorType &)>
+    &initialize_dof_vector)
+{
+  if (initialize_dof_vector)
+    {
+      const unsigned int min_level = transfer.min_level();
+      const unsigned int max_level = transfer.max_level();
+      const unsigned int n_levels  = transfer.n_levels();
+
+      std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+        external_partitioners(n_levels);
+
+      for (unsigned int l = min_level; l <= max_level; ++l)
+        {
+          LinearAlgebra::distributed::Vector<typename VectorType::value_type>
+            vector;
+          initialize_dof_vector(l, vector);
+          external_partitioners[l - min_level] = vector.get_partitioner();
+        }
+
+      this->build(external_partitioners);
+    }
+  else
+    {
+      this->build();
+    }
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::build(
+  const DoFHandler<dim> &dof_handler,
+  const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
+    &external_partitioners)
+{
+  this->intitialize_internal_transfer(dof_handler, this->mg_constrained_dofs);
+  this->intitialize_transfer_references(internal_transfer);
+  this->build(external_partitioners);
+  this->fill_and_communicate_copy_indices(dof_handler);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::build(
+  const DoFHandler<dim> &dof_handler,
+  const std::function<void(const unsigned int, VectorType &)>
+    &initialize_dof_vector)
+{
+  this->intitialize_internal_transfer(dof_handler, this->mg_constrained_dofs);
+  this->intitialize_transfer_references(internal_transfer);
+  this->build(initialize_dof_vector);
+  this->fill_and_communicate_copy_indices(dof_handler);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::prolongate(const unsigned int to_level,
+                                      VectorType &       dst,
+                                      const VectorType & src) const
+{
+  dst = 0;
+  prolongate_and_add(to_level, dst, src);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::prolongate_and_add(const unsigned int to_level,
+                                              VectorType &       dst,
+                                              const VectorType & src) const
+{
+  this->transfer[to_level]->prolongate_and_add(dst, src);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::restrict_and_add(const unsigned int from_level,
+                                            VectorType &       dst,
+                                            const VectorType & src) const
+{
+  this->transfer[from_level]->restrict_and_add(dst, src);
+}
+
+
+
+template <int dim, typename Number>
+std::size_t
+MGTransferMF<dim, Number>::memory_consumption() const
+{
+  std::size_t size = 0;
+
+  const unsigned int min_level = transfer.min_level();
+  const unsigned int max_level = transfer.max_level();
+
+  for (unsigned int l = min_level + 1; l <= max_level; ++l)
+    size += this->transfer[l]->memory_consumption();
+
+  return size;
+}
+
+
+
+template <int dim, typename Number>
+inline unsigned int
+MGTransferMF<dim, Number>::min_level() const
+{
+  return transfer.min_level();
+}
+
+
+
+template <int dim, typename Number>
+inline unsigned int
+MGTransferMF<dim, Number>::max_level() const
+{
+  return transfer.max_level();
+}
+
+
+template <int dim, typename Number>
+inline void
+MGTransferMF<dim, Number>::clear()
+{
+  MGLevelGlobalTransfer<VectorType>::clear();
+
+  internal_transfer.clear();
+  transfer.clear();
+  external_partitioners.clear();
+}
+
+
+
+template <int dim, typename Number>
+MGTransferBlockMF<dim, Number>::MGTransferBlockMF(
+  const MGTransferMF<dim, Number> &transfer_operator)
+  : MGTransferBlockMatrixFreeBase<dim, Number, MGTransferMF<dim, Number>>(true)
+{
+  this->transfer_operators = {&transfer_operator};
+}
+
+
+
+template <int dim, typename Number>
+MGTransferBlockMF<dim, Number>::MGTransferBlockMF(
+  const MGConstrainedDoFs &mg_constrained_dofs)
+  : MGTransferBlockMatrixFreeBase<dim, Number, MGTransferMF<dim, Number>>(true)
+{
+  initialize_constraints(mg_constrained_dofs);
+}
+
+
+
+template <int dim, typename Number>
+MGTransferBlockMF<dim, Number>::MGTransferBlockMF(
+  const std::vector<MGConstrainedDoFs> &mg_constrained_dofs)
+  : MGTransferBlockMatrixFreeBase<dim, Number, MGTransferMF<dim, Number>>(false)
+{
+  initialize_constraints(mg_constrained_dofs);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferBlockMF<dim, Number>::initialize_constraints(
+  const MGConstrainedDoFs &mg_constrained_dofs)
+{
+  this->transfer_operators_internal.clear();
+  this->transfer_operators.clear();
+
+  Assert(this->same_for_all,
+         ExcMessage("This object was initialized with support for usage with "
+                    "one DoFHandler for each block, but this method assumes "
+                    "that the same DoFHandler is used for all the blocks!"));
+
+  this->transfer_operators_internal.emplace_back(mg_constrained_dofs);
+  this->transfer_operators = {&transfer_operators_internal.back()};
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferBlockMF<dim, Number>::initialize_constraints(
+  const std::vector<MGConstrainedDoFs> &mg_constrained_dofs)
+{
+  this->transfer_operators_internal.clear();
+  this->transfer_operators.clear();
+
+  Assert(!this->same_for_all,
+         ExcMessage("This object was initialized with support for using "
+                    "the same DoFHandler for all the blocks, but this "
+                    "method assumes that there is a separate DoFHandler "
+                    "for each block!"));
+
+  for (const auto &dofs : mg_constrained_dofs)
+    this->transfer_operators_internal.emplace_back(dofs);
+
+  for (const auto &transfer : this->transfer_operators_internal)
+    this->transfer_operators.emplace_back(&transfer);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferBlockMF<dim, Number>::build(const DoFHandler<dim> &dof_handler)
+{
+  AssertDimension(transfer_operators.size(), 1);
+  this->transfer_operators_internal[0].build(dof_handler);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferBlockMF<dim, Number>::build(
+  const std::vector<const DoFHandler<dim> *> &dof_handler)
+{
+  AssertDimension(transfer_operators.size(), dof_handler.size());
+  AssertDimension(transfer_operators_internal.size(), dof_handler.size());
+
+  for (unsigned int i = 0; i < dof_handler.size(); ++i)
+    this->transfer_operators_internal[i].build(*dof_handler[i]);
+}
+
+
+
+template <int dim, typename Number>
+const MGTransferMF<dim, Number> &
+MGTransferBlockMF<dim, Number>::get_matrix_free_transfer(
   const unsigned int b) const
 {
-  (void)b;
-  AssertDimension(b, 0);
-  return transfer_operator;
+  AssertIndexRange(b, transfer_operators.size());
+  return *transfer_operators[b];
 }
 
 namespace internal

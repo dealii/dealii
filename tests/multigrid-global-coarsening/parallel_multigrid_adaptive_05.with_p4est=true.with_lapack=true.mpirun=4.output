@@ -1,0 +1,17 @@
+
+DEAL:threaded::Testing FE_Q<2>(1)
+DEAL:threaded::Number of degrees of freedom: 507
+DEAL:threaded:cg::Starting value 21.9317
+DEAL:threaded:cg::Convergence step 5 value 1.14537e-06
+DEAL:threaded::Testing FE_Q<2>(1)
+DEAL:threaded::Number of degrees of freedom: 881
+DEAL:threaded:cg::Starting value 27.7669
+DEAL:threaded:cg::Convergence step 6 value 1.18996e-06
+DEAL:threaded::Testing FE_Q<2>(1)
+DEAL:threaded::Number of degrees of freedom: 2147
+DEAL:threaded:cg::Starting value 43.2551
+DEAL:threaded:cg::Convergence step 6 value 1.86235e-06
+DEAL:threaded::Testing FE_Q<2>(1)
+DEAL:threaded::Number of degrees of freedom: 6517
+DEAL:threaded:cg::Starting value 76.9220
+DEAL:threaded:cg::Convergence step 6 value 3.14118e-06
