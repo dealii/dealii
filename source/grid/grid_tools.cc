@@ -795,7 +795,7 @@ namespace GridTools
     std::iota(new_vertex_numbers.begin(), new_vertex_numbers.end(), 0);
 
     // if the considered_vertices vector is empty, consider all vertices
-    if (considered_vertices.size() == 0)
+    if (considered_vertices.empty())
       considered_vertices = new_vertex_numbers;
     Assert(considered_vertices.size() <= vertices.size(), ExcInternalError());
 
@@ -915,7 +915,7 @@ namespace GridTools
   delete_duplicated_vertices(std::vector<Point<dim>> &vertices,
                              const double             tol)
   {
-    if (vertices.size() == 0)
+    if (vertices.empty())
       return;
 
     // 1) map point to local vertex index
@@ -2639,7 +2639,7 @@ namespace GridTools
     const std::vector<Point<spacedim>> &vertices = tria.get_vertices();
 
     Assert(tria.get_vertices().size() == marked_vertices.size() ||
-             marked_vertices.size() == 0,
+             marked_vertices.empty(),
            ExcDimensionMismatch(tria.get_vertices().size(),
                                 marked_vertices.size()));
 
@@ -2648,7 +2648,7 @@ namespace GridTools
     // the range used_vertices.begin() to used_vertices.end() the element in the
     // second range must be valid if the element in the first range is valid.
     Assert(
-      marked_vertices.size() == 0 ||
+      marked_vertices.empty() ||
         std::equal(marked_vertices.begin(),
                    marked_vertices.end(),
                    tria.get_used_vertices().begin(),
@@ -2659,9 +2659,8 @@ namespace GridTools
 
     // If marked_indices is empty, consider all used_vertices for finding the
     // closest vertex to the point. Otherwise, marked_indices is used.
-    const std::vector<bool> &vertices_to_use = (marked_vertices.size() == 0) ?
-                                                 tria.get_used_vertices() :
-                                                 marked_vertices;
+    const std::vector<bool> &vertices_to_use =
+      (marked_vertices.empty()) ? tria.get_used_vertices() : marked_vertices;
 
     // At the beginning, the first used vertex is considered to be the closest
     // one.
@@ -2711,7 +2710,7 @@ namespace GridTools
     auto vertices = extract_used_vertices(tria, mapping);
 
     Assert(tria.get_vertices().size() == marked_vertices.size() ||
-             marked_vertices.size() == 0,
+             marked_vertices.empty(),
            ExcDimensionMismatch(tria.get_vertices().size(),
                                 marked_vertices.size()));
 
@@ -2721,7 +2720,7 @@ namespace GridTools
     // in the second range must be valid if the element in the first range is
     // valid.
     Assert(
-      marked_vertices.size() == 0 ||
+      marked_vertices.empty() ||
         std::equal(marked_vertices.begin(),
                    marked_vertices.end(),
                    tria.get_used_vertices().begin(),
@@ -2889,7 +2888,7 @@ namespace GridTools
 
     // check whether cell has at least one marked vertex
     const auto cell_marked = [&mesh, &marked_vertices](const auto &cell) {
-      if (marked_vertices.size() == 0)
+      if (marked_vertices.empty())
         return true;
 
       if (cell != mesh.active_cell_iterators().end())
@@ -3136,7 +3135,7 @@ namespace GridTools
           ++i;
 
         // No active cells or no active cells with property
-        if (active_cells.size() == 0 || i == active_cells.size())
+        if (active_cells.empty() || i == active_cells.size())
           {
             BoundingBox<spacedim> bbox;
             return std::make_tuple(bbox, has_predicate);
@@ -5526,7 +5525,7 @@ namespace GridTools
 
     // if no cells need to be added, then no regularization is necessary.
     // Restore things as they were before this function was called.
-    if (cells_to_add.size() == 0)
+    if (cells_to_add.empty())
       {
         while (refinement_cycles > 0)
           {
@@ -6269,7 +6268,7 @@ namespace GridTools
       };
 
       Assert(
-        (marked_vertices.size() == 0) ||
+        (marked_vertices.empty()) ||
           (marked_vertices.size() == cache.get_triangulation().n_vertices()),
         ExcMessage(
           "The marked_vertices vector has to be either empty or its size has "
@@ -6283,7 +6282,7 @@ namespace GridTools
       // any of the incoming points (and it will not send any data) so
       // that we can take a short cut.
       const bool has_relevant_vertices =
-        (marked_vertices.size() == 0) ||
+        (marked_vertices.empty()) ||
         (std::find(marked_vertices.begin(), marked_vertices.end(), true) !=
          marked_vertices.end());
 
@@ -6655,7 +6654,7 @@ namespace GridTools
       };
 
       Assert(
-        (marked_vertices.size() == 0) ||
+        (marked_vertices.empty()) ||
           (marked_vertices.size() == cache.get_triangulation().n_vertices()),
         ExcMessage(
           "The marked_vertices vector has to be either empty or its size has "
@@ -6666,7 +6665,7 @@ namespace GridTools
       // any of the incoming points (and it will not send any data) so
       // that we can take a short cut.
       const bool has_relevant_vertices =
-        (marked_vertices.size() == 0) ||
+        (marked_vertices.empty()) ||
         (std::find(marked_vertices.begin(), marked_vertices.end(), true) !=
          marked_vertices.end());
 
@@ -6712,7 +6711,7 @@ namespace GridTools
           const auto &boxes_and_cells =
             cache.get_locally_owned_cell_bounding_boxes_rtree();
 
-          if (marked_verts.size() == 0)
+          if (marked_verts.empty())
             return boxes_and_cells;
 
           std::vector<std::pair<

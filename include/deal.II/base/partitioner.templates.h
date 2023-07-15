@@ -60,7 +60,7 @@ namespace Utilities
       if (n_import_targets > 0)
         AssertDimension(locally_owned_array.size(), locally_owned_size());
 
-      Assert(requests.size() == 0,
+      Assert(requests.empty(),
              ExcMessage("Another operation seems to still be running. "
                         "Call update_ghost_values_finish() first."));
 
@@ -112,7 +112,7 @@ namespace Utilities
       // kernel launched. The indices are expanded the first time the function
       // is called.
       if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>)&&(
-            import_indices_plain_dev.size() == 0))
+            import_indices_plain_dev.empty()))
         initialize_import_indices_plain_dev();
 #    endif
 
@@ -326,7 +326,7 @@ namespace Utilities
       const unsigned int n_import_targets = import_targets_data.size();
       const unsigned int n_ghost_targets  = ghost_targets_data.size();
 
-      Assert(requests.size() == 0,
+      Assert(requests.empty(),
              ExcMessage("Another compress operation seems to still be running. "
                         "Call compress_finish() first."));
 
@@ -580,7 +580,7 @@ namespace Utilities
       // kernel launched. The indices are expanded the first time the function
       // is called.
       if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>)&&(
-            import_indices_plain_dev.size() == 0))
+            import_indices_plain_dev.empty()))
         initialize_import_indices_plain_dev();
 #    endif
 

@@ -185,7 +185,7 @@ namespace Differentiation
              ExcMessage("Not all values of sensitivities have been recorded!"));
 
       // This should happen only once
-      if (this->independent_variables.size() == 0)
+      if (this->independent_variables.empty())
         {
           this->independent_variables.resize(
             this->n_independent_variables(),

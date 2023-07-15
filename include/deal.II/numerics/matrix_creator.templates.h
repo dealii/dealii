@@ -1363,7 +1363,7 @@ namespace MatrixCreator
              coefficient->n_components == n_components,
            ExcComponentMismatch());
 
-    if (component_mapping.size() == 0)
+    if (component_mapping.empty())
       {
         AssertDimension(n_components,
                         boundary_functions.begin()->second->n_components);
@@ -1834,7 +1834,7 @@ namespace MatrixCreator
              coefficient->n_components == n_components,
            ExcComponentMismatch());
 
-    if (component_mapping.size() == 0)
+    if (component_mapping.empty())
       {
         AssertDimension(n_components,
                         boundary_functions.begin()->second->n_components);

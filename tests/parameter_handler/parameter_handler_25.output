@@ -1,22 +1,14 @@
 
 DEAL::
 DEAL::successful
-DEAL::
---------------------------------------------------------
-An error occurred in file <parameter_handler.cc> in function
-    void dealii::ParameterHandler::set(const string&, const string&)
-The violated condition was: 
+DEAL::The violated condition was: 
     false
 Additional information: 
     You can't ask for entry <Precison> you have not yet declared.
 --------------------------------------------------------
 
-DEAL::
---------------------------------------------------------
-An error occurred in file <parameter_handler.cc> in function
-    void dealii::ParameterHandler::assert_that_entries_have_been_set() const
-The violated condition was: 
-    entries_wrongly_not_set.size() == 0
+DEAL::The violated condition was: 
+    entries_wrongly_not_set.empty()
 Additional information: 
     Not all entries of the parameter handler that were declared with
     `has_to_be_set = true` have been set. The following parameters

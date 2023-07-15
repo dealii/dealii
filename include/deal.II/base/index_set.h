@@ -1705,7 +1705,7 @@ IndexSet::add_range(const size_type begin, const size_type end)
     {
       // the new index might be larger than the last index present in the
       // ranges. Then we can skip the binary search
-      if (ranges.size() == 0 || begin > ranges.back().end)
+      if (ranges.empty() || begin > ranges.back().end)
         ranges.emplace_back(begin, end);
       else if (begin == ranges.back().end)
         ranges.back().end = end;

@@ -2364,7 +2364,7 @@ namespace FETools
 
             // Now, just the [...]
             // part should be left.
-            if (name.size() == 0 || name[0] != '[')
+            if (name.empty() || name[0] != '[')
               throw std::string("Invalid first character in ") + name;
             do
               {
@@ -2418,7 +2418,7 @@ namespace FETools
             // list. make sure that
             // we actually had a ']'
             // there
-            if (name.size() == 0 || name[0] != ']')
+            if (name.empty() || name[0] != ']')
               throw std::string("Invalid first character in ") + name;
             name.erase(0, 1);
             // just one more sanity check
@@ -2466,7 +2466,7 @@ namespace FETools
             // Now, just the (degree)
             // or (Quadrature<1>(degree+1))
             // part should be left.
-            if (name.size() == 0 || name[0] != '(')
+            if (name.empty() || name[0] != '(')
               throw std::string("Invalid first character in ") + name;
             name.erase(0, 1);
             if (name[0] != 'Q')
@@ -2638,7 +2638,7 @@ namespace FETools
 
         // Make sure the auxiliary function
         // ate up all characters of the name.
-        AssertThrow(name.size() == 0,
+        AssertThrow(name.empty(),
                     ExcInvalidFEName(parameter_name +
                                      std::string(" extra characters after "
                                                  "end of name")));

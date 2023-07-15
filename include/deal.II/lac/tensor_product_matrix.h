@@ -1583,7 +1583,7 @@ std::size_t
 TensorProductMatrixSymmetricSumCollection<dim, Number, n_rows_1d>::
   storage_size() const
 {
-  if (matrix_ptr.size() == 0)
+  if (matrix_ptr.empty())
     return 0; // if not initialized
 
   return matrix_ptr.size() - 1;

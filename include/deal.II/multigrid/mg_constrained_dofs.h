@@ -362,7 +362,7 @@ MGConstrainedDoFs::make_zero_boundary_constraints(
   // allocate an IndexSet for each global level. Contents will be
   // overwritten inside make_boundary_list.
   const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-  Assert(boundary_indices.size() == 0 || boundary_indices.size() == n_levels,
+  Assert(boundary_indices.empty() || boundary_indices.size() == n_levels,
          ExcInternalError());
   boundary_indices.resize(n_levels);
 
@@ -381,7 +381,7 @@ MGConstrainedDoFs::add_boundary_indices(const DoFHandler<dim, spacedim> &dof,
                                         const IndexSet &level_boundary_indices)
 {
   const unsigned int n_levels = dof.get_triangulation().n_global_levels();
-  if (boundary_indices.size() == 0)
+  if (boundary_indices.empty())
     {
       boundary_indices.resize(n_levels);
       for (unsigned int i = 0; i < n_levels; ++i)
@@ -489,7 +489,7 @@ inline bool
 MGConstrainedDoFs::is_boundary_index(const unsigned int            level,
                                      const types::global_dof_index index) const
 {
-  if (boundary_indices.size() == 0)
+  if (boundary_indices.empty())
     return false;
 
   AssertIndexRange(level, boundary_indices.size());

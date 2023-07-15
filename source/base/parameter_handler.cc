@@ -1864,7 +1864,7 @@ ParameterHandler::scan_line(std::string        line,
   line = Utilities::trim(line);
 
   // if line is now empty: leave
-  if (line.size() == 0)
+  if (line.empty())
     {
       return;
     }
@@ -1896,7 +1896,7 @@ ParameterHandler::scan_line(std::string        line,
         line.erase(0, 1);
 
       AssertThrow(
-        line.size() == 0,
+        line.empty(),
         ExcCannotParseLine(current_line_n,
                            input_filename,
                            "Invalid content after 'end' or 'END' statement."));
@@ -2109,7 +2109,7 @@ ParameterHandler::assert_that_entries_have_been_set() const
       list_of_missing_parameters += "\n";
 
       AssertThrow(
-        entries_wrongly_not_set.size() == 0,
+        entries_wrongly_not_set.empty(),
         ExcMessage(
           "Not all entries of the parameter handler that were declared with "
           "`has_to_be_set = true` have been set. The following parameters " +

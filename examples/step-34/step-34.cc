@@ -869,7 +869,7 @@ namespace Step34
            ExcIndexRange(0, fe.n_dofs_per_cell(), index));
 
     static std::vector<QGaussOneOverR<2>> quadratures;
-    if (quadratures.size() == 0)
+    if (quadratures.empty())
       for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
         quadratures.emplace_back(singular_quadrature_order,
                                  fe.get_unit_support_points()[i],

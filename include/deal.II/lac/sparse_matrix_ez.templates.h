@@ -138,7 +138,7 @@ template <typename number>
 bool
 SparseMatrixEZ<number>::empty() const
 {
-  return ((n_columns == 0) && (row_info.size() == 0));
+  return ((n_columns == 0) && (row_info.empty()));
 }
 
 

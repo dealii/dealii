@@ -36,7 +36,7 @@ namespace Particles
     {
       std::vector<char> buffer;
 
-      if (particles.size() == 0)
+      if (particles.empty())
         return buffer;
 
       buffer.resize(particles.size() *
@@ -411,7 +411,7 @@ namespace Particles
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
     const
   {
-    if (cells_to_particle_cache.size() == 0)
+    if (cells_to_particle_cache.empty())
       return 0;
 
     if (cell->is_artificial() == false)
@@ -742,7 +742,7 @@ namespace Particles
     auto &missing_points  = std::get<3>(point_locations);
     // If a point was not found, throwing an error, as the old
     // implementation of compute_point_locations would have done
-    AssertThrow(missing_points.size() == 0,
+    AssertThrow(missing_points.empty(),
                 VectorTools::ExcPointNotAvailableHere());
 
     (void)missing_points;
@@ -1761,7 +1761,7 @@ namespace Particles
                 // information
                 typename Triangulation<dim, spacedim>::active_cell_iterator
                   cell;
-                if (send_cells.size() == 0)
+                if (send_cells.empty())
                   cell = particles_to_send.at(neighbors[i])[j]
                            ->get_surrounding_cell();
                 else

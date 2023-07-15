@@ -217,14 +217,14 @@ namespace internal
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
+      Assert(shape_values.empty() ||
                shape_values.size() == n_rows * n_columns ||
                shape_values.size() == 3 * n_rows,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
+      Assert(shape_gradients.empty() ||
                shape_gradients.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
+      Assert(shape_hessians.empty() ||
                shape_hessians.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
       (void)dummy1;
@@ -641,14 +641,14 @@ namespace internal
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
+      Assert(shape_values.empty() ||
                shape_values.size() == n_rows * n_columns ||
                shape_values.size() == n_rows * 3,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
+      Assert(shape_gradients.empty() ||
                shape_gradients.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
+      Assert(shape_hessians.empty() ||
                shape_hessians.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
     }
@@ -1062,13 +1062,12 @@ namespace internal
       , shape_gradients(shape_gradients.begin())
       , shape_hessians(shape_hessians.begin())
     {
-      Assert(shape_values.size() == 0 ||
-               shape_values.size() == n_rows * n_columns,
+      Assert(shape_values.empty() || shape_values.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
+      Assert(shape_gradients.empty() ||
                shape_gradients.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
+      Assert(shape_hessians.empty() ||
                shape_hessians.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
       (void)dummy1;
@@ -2577,14 +2576,14 @@ namespace internal
       // n_rows * n_columns entries or for the apply_face() path that only has
       // n_rows * 3 entries in the array. Since we cannot decide about the use
       // we must allow for both here.
-      Assert(shape_values.size() == 0 ||
+      Assert(shape_values.empty() ||
                shape_values.size() == n_rows * n_columns ||
                shape_values.size() == 3 * n_rows,
              ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.size() == 0 ||
+      Assert(shape_gradients.empty() ||
                shape_gradients.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.size() == 0 ||
+      Assert(shape_hessians.empty() ||
                shape_hessians.size() == n_rows * n_columns,
              ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
       (void)dummy1;

@@ -1054,7 +1054,7 @@ PointValueHistory<dim>::write_gnuplot(
   if (have_dof_handler)
     {
       AssertThrow(have_dof_handler, ExcDoFHandlerRequired());
-      AssertThrow(postprocessor_locations.size() == 0 ||
+      AssertThrow(postprocessor_locations.empty() ||
                     postprocessor_locations.size() ==
                       point_geometry_data.size(),
                   ExcDimensionMismatch(postprocessor_locations.size(),

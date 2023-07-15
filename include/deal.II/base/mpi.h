@@ -1865,7 +1865,7 @@ namespace Utilities
       Assert(objects_to_send.size() < 2,
              ExcMessage("Cannot send to more than one processor."));
       Assert(objects_to_send.find(0) != objects_to_send.end() ||
-               objects_to_send.size() == 0,
+               objects_to_send.empty(),
              ExcMessage("Can only send to myself or to nobody."));
       return objects_to_send;
 #  else
@@ -1892,7 +1892,7 @@ namespace Utilities
       // processors, we need to visit one of the two scopes below. Otherwise,
       // no other action is required by this mpi process, and we can safely
       // return.
-      if (send_to.size() == 0 && n_expected_incoming_messages == 0)
+      if (send_to.empty() && n_expected_incoming_messages == 0)
         return received_objects;
 
       const int mpi_tag =
@@ -2136,7 +2136,7 @@ namespace Utilities
 
       AssertIndexRange(root_process, n_procs);
       AssertThrow(
-        (my_rank != root_process && objects_to_send.size() == 0) ||
+        (my_rank != root_process && objects_to_send.empty()) ||
           objects_to_send.size() == n_procs,
         ExcMessage(
           "The number of objects to be scattered must correspond to the number processes."));

@@ -652,7 +652,7 @@ namespace OpenCASCADE
     // run through maps in an orderly fashion, i.e., through the
     // boundary in one cycle and add points to pointlist.
     std::vector<TopoDS_Edge> interpolation_curves;
-    bool                     finished = (face_to_verts.size() == 0);
+    bool                     finished = (face_to_verts.empty());
     face_index = finished ? 0 : face_to_verts.begin()->first;
 
     while (finished == false)

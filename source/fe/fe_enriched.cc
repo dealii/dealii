@@ -737,7 +737,7 @@ FE_Enriched<dim, spacedim>::multiply_by_enrichment(
           // Avoid evaluating quadrature points if no dofs are assigned. This
           // happens when FE_Nothing is used together with other FE (i.e. FE_Q)
           // as enrichments.
-          if (base_no_mult_local_enriched_dofs[base_no][m].size() == 0)
+          if (base_no_mult_local_enriched_dofs[base_no][m].empty())
             continue;
 
           Assert(enrichments[base_no - 1][m](cell) != nullptr,

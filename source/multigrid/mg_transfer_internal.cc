@@ -202,7 +202,7 @@ namespace internal
         (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
                         *>(&dof_handler.get_triangulation()));
       AssertThrow(
-        send_data_temp.size() == 0 || tria != nullptr,
+        send_data_temp.empty() || tria != nullptr,
         ExcMessage(
           "We should only be sending information with a parallel Triangulation!"));
 

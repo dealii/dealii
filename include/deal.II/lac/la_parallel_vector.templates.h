@@ -1052,7 +1052,7 @@ namespace LinearAlgebra
 
       // in order to zero ghost part of the vector, we need to call
       // import_from_ghosted_array_finish() regardless of
-      // compress_requests.size() == 0
+      // compress_requests.empty()
 
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);

@@ -94,7 +94,7 @@ namespace internal
     std::visit([&ss](auto &v) { ss << v; }, value);
 
     cached_value = ss.str();
-    if (cached_value.size() == 0)
+    if (cached_value.empty())
       cached_value = "\"\"";
   }
 
@@ -742,7 +742,7 @@ TableHandler::clear()
 unsigned int
 TableHandler::n_rows() const
 {
-  if (columns.size() == 0)
+  if (columns.empty())
     return 0;
 
   std::map<std::string, Column>::const_iterator col_iter = columns.begin();

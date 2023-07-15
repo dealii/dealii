@@ -153,15 +153,15 @@ PolynomialsRannacherTurek<dim>::evaluate(
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
   const unsigned int n_pols = this->n();
-  Assert(values.size() == n_pols || values.size() == 0,
+  Assert(values.size() == n_pols || values.empty(),
          ExcDimensionMismatch(values.size(), n_pols));
-  Assert(grads.size() == n_pols || grads.size() == 0,
+  Assert(grads.size() == n_pols || grads.empty(),
          ExcDimensionMismatch(grads.size(), n_pols));
-  Assert(grad_grads.size() == n_pols || grad_grads.size() == 0,
+  Assert(grad_grads.size() == n_pols || grad_grads.empty(),
          ExcDimensionMismatch(grad_grads.size(), n_pols));
-  Assert(third_derivatives.size() == n_pols || third_derivatives.size() == 0,
+  Assert(third_derivatives.size() == n_pols || third_derivatives.empty(),
          ExcDimensionMismatch(third_derivatives.size(), n_pols));
-  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size() == n_pols || fourth_derivatives.empty(),
          ExcDimensionMismatch(fourth_derivatives.size(), n_pols));
 
   for (unsigned int i = 0; i < n_pols; ++i)

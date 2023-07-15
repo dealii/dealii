@@ -1601,7 +1601,7 @@ MappingFE<dim, spacedim>::fill_fe_face_values(
   // cell (note that we need to first check the triangulation pointer, since
   // otherwise the second test might trigger an exception if the
   // triangulations are not the same)
-  if ((data.mapping_support_points.size() == 0) ||
+  if ((data.mapping_support_points.empty()) ||
       (&cell->get_triangulation() !=
        &data.cell_of_current_support_points->get_triangulation()) ||
       (cell != data.cell_of_current_support_points))
@@ -1648,7 +1648,7 @@ MappingFE<dim, spacedim>::fill_fe_subface_values(
   // cell (note that we need to first check the triangulation pointer, since
   // otherwise the second test might trigger an exception if the
   // triangulations are not the same)
-  if ((data.mapping_support_points.size() == 0) ||
+  if ((data.mapping_support_points.empty()) ||
       (&cell->get_triangulation() !=
        &data.cell_of_current_support_points->get_triangulation()) ||
       (cell != data.cell_of_current_support_points))

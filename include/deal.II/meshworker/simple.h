@@ -1036,7 +1036,7 @@ namespace MeshWorker
       Assert(info.level_cell, ExcMessage("Cell must access level dofs"));
       const unsigned int level = info.cell->level();
 
-      if (info.indices_by_block.size() == 0)
+      if (info.indices_by_block.empty())
         {
           assemble((*matrix)[level],
                    info.matrix(0, false).matrix,
@@ -1097,7 +1097,7 @@ namespace MeshWorker
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
 
-      if (info1.indices_by_block.size() == 0)
+      if (info1.indices_by_block.empty())
         {
           if (level1 == level2)
             {

@@ -359,7 +359,7 @@ namespace DataOutBase
     create_global_data_table(const std::vector<Patch<dim, spacedim>> &patches)
     {
       // If there is nothing to write, just return
-      if (patches.size() == 0)
+      if (patches.empty())
         return std::make_unique<Table<2, Number>>();
 
       // unlike in the main function, we don't have here the data_names field,
@@ -3199,7 +3199,7 @@ namespace DataOutBase
     // legit if there are no patches
     Assert(patches.size() > 0, ExcNoPatches());
 #else
-    if (patches.size() == 0)
+    if (patches.empty())
       return;
 #endif
 
@@ -3289,7 +3289,7 @@ namespace DataOutBase
     // legit if there are no patches
     Assert(patches.size() > 0, ExcNoPatches());
 #else
-    if (patches.size() == 0)
+    if (patches.empty())
       return;
 #endif
     // Stream with special features for dx output
@@ -3577,7 +3577,7 @@ namespace DataOutBase
     // are no patches
     Assert(patches.size() > 0, ExcNoPatches());
 #else
-    if (patches.size() == 0)
+    if (patches.empty())
       return;
 #endif
 
@@ -3977,7 +3977,7 @@ namespace DataOutBase
       // actually owns, and in that case it is legit if there are no patches
       Assert(patches.size() > 0, ExcNoPatches());
 #else
-      if (patches.size() == 0)
+      if (patches.empty())
         return;
 #endif
       constexpr int dim = 2;
@@ -4349,7 +4349,7 @@ namespace DataOutBase
     // legit if there are no patches
     Assert(patches.size() > 0, ExcNoPatches());
 #else
-    if (patches.size() == 0)
+    if (patches.empty())
       return;
 #endif
 
@@ -4674,7 +4674,7 @@ namespace DataOutBase
     // legit if there are no patches
     Assert(patches.size() > 0, ExcNoPatches());
 #else
-    if (patches.size() == 0)
+    if (patches.empty())
       return;
 #endif
 
@@ -4805,7 +4805,7 @@ namespace DataOutBase
     // legit if there are no patches
     Assert(patches.size() > 0, ExcNoPatches());
 #else
-    if (patches.size() == 0)
+    if (patches.empty())
       return;
 #endif
 
@@ -4954,7 +4954,7 @@ namespace DataOutBase
     // legit if there are no patches
     Assert(patches.size() > 0, ExcNoPatches());
 #else
-    if (patches.size() == 0)
+    if (patches.empty())
       return;
 #endif
 
@@ -5286,7 +5286,7 @@ namespace DataOutBase
     // legit if there are no patches
     Assert(patches.size() > 0, ExcNoPatches());
 #else
-    if (patches.size() == 0)
+    if (patches.empty())
       {
         // we still need to output a valid vtu file, because other CPUs might
         // output data. This is the minimal file that is accepted by paraview
@@ -6310,7 +6310,7 @@ namespace DataOutBase
   {
     AssertThrow(out.fail() == false, ExcIO());
 
-    if (piece_names.size() == 0)
+    if (piece_names.empty())
       return;
 
     const double nblocks = piece_names[0].size();
@@ -6340,7 +6340,7 @@ namespace DataOutBase
   {
     AssertThrow(out.fail() == false, ExcIO());
 
-    if (times_and_piece_names.size() == 0)
+    if (times_and_piece_names.empty())
       return;
 
     const double nblocks = times_and_piece_names[0].second.size();
@@ -8554,7 +8554,7 @@ DataOutBase::write_filtered_data(
   // patches
   Assert(patches.size() > 0, ExcNoPatches());
 #else
-  if (patches.size() == 0)
+  if (patches.empty())
     return;
 #endif
 

@@ -1328,7 +1328,7 @@ namespace MatrixFreeOperators
             selected_rows.push_back(given_row_selection[i]);
           }
       }
-    if (given_column_selection.size() == 0)
+    if (given_column_selection.empty())
       selected_columns = selected_rows;
     else
       {

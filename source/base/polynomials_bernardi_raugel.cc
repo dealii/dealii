@@ -76,16 +76,15 @@ PolynomialsBernardiRaugel<dim>::evaluate(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() == this->n() || values.empty(),
          ExcDimensionMismatch(values.size(), this->n()));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() == this->n() || grads.empty(),
          ExcDimensionMismatch(grads.size(), this->n()));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() == this->n() || grad_grads.empty(),
          ExcDimensionMismatch(grad_grads.size(), this->n()));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size() == this->n() || third_derivatives.empty(),
          ExcDimensionMismatch(third_derivatives.size(), this->n()));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size() == this->n() || fourth_derivatives.empty(),
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   std::vector<double>         Q_values;
@@ -104,18 +103,17 @@ PolynomialsBernardiRaugel<dim>::evaluate(
   constexpr int n_q = 1 << dim; // size for create_polynomials_q
 
   // don't resize if the provided vector has 0 length
-  Q_values.resize((values.size() == 0) ? 0 : n_q);
-  Q_grads.resize((grads.size() == 0) ? 0 : n_q);
-  Q_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_q);
-  Q_third_derivatives.resize((third_derivatives.size() == 0) ? 0 : n_q);
-  Q_fourth_derivatives.resize((fourth_derivatives.size() == 0) ? 0 : n_q);
-  bubble_values.resize((values.size() == 0) ? 0 : n_bubbles);
-  bubble_grads.resize((grads.size() == 0) ? 0 : n_bubbles);
-  bubble_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_bubbles);
-  bubble_third_derivatives.resize((third_derivatives.size() == 0) ? 0 :
-                                                                    n_bubbles);
-  bubble_fourth_derivatives.resize(
-    (fourth_derivatives.size() == 0) ? 0 : n_bubbles);
+  Q_values.resize((values.empty()) ? 0 : n_q);
+  Q_grads.resize((grads.empty()) ? 0 : n_q);
+  Q_grad_grads.resize((grad_grads.empty()) ? 0 : n_q);
+  Q_third_derivatives.resize((third_derivatives.empty()) ? 0 : n_q);
+  Q_fourth_derivatives.resize((fourth_derivatives.empty()) ? 0 : n_q);
+  bubble_values.resize((values.empty()) ? 0 : n_bubbles);
+  bubble_grads.resize((grads.empty()) ? 0 : n_bubbles);
+  bubble_grad_grads.resize((grad_grads.empty()) ? 0 : n_bubbles);
+  bubble_third_derivatives.resize((third_derivatives.empty()) ? 0 : n_bubbles);
+  bubble_fourth_derivatives.resize((fourth_derivatives.empty()) ? 0 :
+                                                                  n_bubbles);
 
   // 1 normal vector per face, ordering consistent with GeometryInfo
   // Normal vectors point in the +x, +y, and +z directions for

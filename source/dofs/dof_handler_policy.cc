@@ -2709,7 +2709,7 @@ namespace internal
         // independently, and then unifies some located at vertices or faces;
         // this leaves us with fewer DoFs than there were before, so use the
         // largest index as the one to determine the size of the index space
-        if (new_numbers.size() == 0)
+        if (new_numbers.empty())
           return NumberCache();
         else
           return NumberCache(

@@ -436,7 +436,7 @@ namespace internal
           univariate_shape_data.fe_degree     = fe.degree;
           univariate_shape_data.n_q_points_1d = quad.size();
 
-          if ((fe.n_dofs_per_cell() == 0) || (quad.size() == 0))
+          if ((fe.n_dofs_per_cell() == 0) || (quad.empty()))
             return;
 
           // grant write access to common univariate shape data
@@ -606,7 +606,7 @@ namespace internal
       univariate_shape_data.fe_degree     = fe.degree;
       univariate_shape_data.n_q_points_1d = quad.size();
 
-      if ((fe.n_dofs_per_cell() == 0) || (quad.size() == 0))
+      if ((fe.n_dofs_per_cell() == 0) || (quad.empty()))
         return;
 
       // grant write access to common univariate shape data

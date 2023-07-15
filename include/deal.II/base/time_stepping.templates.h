@@ -48,11 +48,11 @@ namespace TimeStepping
     VectorType &y)
   {
     AssertThrow(
-      F.size() == 0,
+      F.empty(),
       ExcMessage(
         "RungeKutta methods cannot handle more that one function to integrate."));
     AssertThrow(
-      J_inverse.size() == 0,
+      J_inverse.empty(),
       ExcMessage(
         "RungeKutta methods cannot handle more that one function to integrate."));
 

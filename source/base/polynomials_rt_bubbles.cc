@@ -49,23 +49,22 @@ PolynomialsRT_Bubbles<dim>::evaluate(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() == this->n() || values.empty(),
          ExcDimensionMismatch(values.size(), this->n()));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() == this->n() || grads.empty(),
          ExcDimensionMismatch(grads.size(), this->n()));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() == this->n() || grad_grads.empty(),
          ExcDimensionMismatch(grad_grads.size(), this->n()));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size() == this->n() || third_derivatives.empty(),
          ExcDimensionMismatch(third_derivatives.size(), this->n()));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size() == this->n() || fourth_derivatives.empty(),
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   // Third and fourth derivatives are not implemented
   (void)third_derivatives;
-  Assert(third_derivatives.size() == 0, ExcNotImplemented());
+  Assert(third_derivatives.empty(), ExcNotImplemented());
   (void)fourth_derivatives;
-  Assert(fourth_derivatives.size() == 0, ExcNotImplemented());
+  Assert(fourth_derivatives.empty(), ExcNotImplemented());
 
   const unsigned int n_sub     = raviart_thomas_space.n();
   const unsigned int my_degree = this->degree();
@@ -83,9 +82,9 @@ PolynomialsRT_Bubbles<dim>::evaluate(
     static std::vector<Tensor<4, dim>> p_third_derivatives;
     static std::vector<Tensor<5, dim>> p_fourth_derivatives;
 
-    p_values.resize((values.size() == 0) ? 0 : n_sub);
-    p_grads.resize((grads.size() == 0) ? 0 : n_sub);
-    p_grad_grads.resize((grad_grads.size() == 0) ? 0 : n_sub);
+    p_values.resize((values.empty()) ? 0 : n_sub);
+    p_grads.resize((grads.empty()) ? 0 : n_sub);
+    p_grad_grads.resize((grad_grads.empty()) ? 0 : n_sub);
 
     // This is the Raviart-Thomas part of the space
     raviart_thomas_space.evaluate(unit_point,

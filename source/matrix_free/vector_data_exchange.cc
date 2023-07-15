@@ -1345,7 +1345,7 @@ namespace internal
       unsigned int
       Full::n_import_indices() const
       {
-        if (import_targets_data.size() == 0)
+        if (import_targets_data.empty())
           return 0;
         return import_targets_data.back()[1] + import_targets_data.back()[2];
       }

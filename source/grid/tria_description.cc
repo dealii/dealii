@@ -71,9 +71,9 @@ SubCellData::check_consistency(const unsigned int dim) const
   switch (dim)
     {
       case 1:
-        return ((boundary_lines.size() == 0) && (boundary_quads.size() == 0));
+        return ((boundary_lines.empty()) && (boundary_quads.empty()));
       case 2:
-        return (boundary_quads.size() == 0);
+        return (boundary_quads.empty());
     }
   return true;
 }
@@ -289,7 +289,7 @@ namespace TriangulationDescription
           // make cells unique
           for (unsigned int i = 0; i < this->cell_infos.size(); ++i)
             {
-              if (this->cell_infos[i].size() == 0)
+              if (this->cell_infos[i].empty())
                 continue;
 
               std::sort(this->cell_infos[i].begin(),

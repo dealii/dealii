@@ -215,7 +215,7 @@ namespace internal
       const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
       std::vector<types::global_dof_index> &                dof_indices)
     {
-      if (this->hanging_node_constraint_masks_comp.size() == 0)
+      if (this->hanging_node_constraint_masks_comp.empty())
         return false;
 
       // 2) determine the refinement configuration of the cell

@@ -230,7 +230,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::do_step(
   const MatrixType &                      M = *this->A;
   Vector<typename VectorType::value_type> b_cell, x_cell;
 
-  const bool         permutation_empty = additional_data->order.size() == 0;
+  const bool         permutation_empty = additional_data->order.empty();
   const unsigned int n_permutations =
     (permutation_empty) ? 1U : additional_data->order.size();
   const size_type n_blocks = additional_data->block_list.n_rows();

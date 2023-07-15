@@ -80,7 +80,7 @@ namespace internal
                   MGLevelObject<BlockVector<number>> &v)
     {
       const unsigned int n_blocks = dof_handler.get_fe().n_blocks();
-      if (target_component.size() == 0)
+      if (target_component.empty())
         {
           target_component.resize(n_blocks);
           for (unsigned int i = 0; i < n_blocks; ++i)

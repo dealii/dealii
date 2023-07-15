@@ -93,7 +93,10 @@ fail()
     }
   catch (const std::exception &exc)
     {
-      deallog << exc.what() << std::endl;
+      std::string error = exc.what();
+      auto        start = error.find("The violated condition was:");
+      if (start != std::string::npos)
+        deallog << error.substr(start) << std::endl;
     }
 
   // check set status
@@ -103,7 +106,10 @@ fail()
     }
   catch (const std::exception &exc)
     {
-      deallog << exc.what() << std::endl;
+      std::string error = exc.what();
+      auto        start = error.find("The violated condition was:");
+      if (start != std::string::npos)
+        deallog << error.substr(start) << std::endl;
     }
 }
 

@@ -515,7 +515,7 @@ namespace internal
       const CellIterator &cell) const
     {
       // TODO: for simplex or mixed meshes: nothing to do
-      if ((dim == 3 && line_to_cells.size() == 0) ||
+      if ((dim == 3 && line_to_cells.empty()) ||
           (cell->reference_cell().is_hyper_cube() == false))
         return ConstraintKinds::unconstrained;
 

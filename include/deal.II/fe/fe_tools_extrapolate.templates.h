@@ -548,7 +548,7 @@ namespace FETools
           // at this point of
           // the procedure no new
           // needs should come up
-          Assert(new_needs.size() == 0, ExcInternalError());
+          Assert(new_needs.empty(), ExcInternalError());
 
           set_dof_values_by_interpolation(dealii_cell,
                                           p4est_cell,
@@ -1036,7 +1036,7 @@ namespace FETools
         std::vector<CellData> &computed_cells,
         std::vector<CellData> &new_needs)
     {
-      if (cells_to_compute.size() == 0)
+      if (cells_to_compute.empty())
         return;
 
       // check if this cell exists in the local p4est
@@ -1077,7 +1077,7 @@ namespace FETools
           // store cell_data in the list of
           // computed cells and erase this cell
           // from the list of cells to compute
-          if (tmp.size() == 0)
+          if (tmp.empty())
             {
               cell_data_insert(cells_to_compute[pos], computed_cells);
               cells_to_compute.erase(cells_to_compute.begin() + pos);

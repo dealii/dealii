@@ -2509,7 +2509,7 @@ template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_inner_face_batches() const
 {
-  if (task_info.face_partition_data.size() == 0)
+  if (task_info.face_partition_data.empty())
     return 0;
   return task_info.face_partition_data.back();
 }
@@ -2520,7 +2520,7 @@ template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_boundary_face_batches() const
 {
-  if (task_info.face_partition_data.size() == 0)
+  if (task_info.face_partition_data.empty())
     return 0;
   return task_info.boundary_partition_data.back() -
          task_info.face_partition_data.back();
@@ -2532,7 +2532,7 @@ template <int dim, typename Number, typename VectorizedArrayType>
 inline unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::n_ghost_inner_face_batches() const
 {
-  if (task_info.face_partition_data.size() == 0)
+  if (task_info.face_partition_data.empty())
     return 0;
   return face_info.faces.size() - task_info.boundary_partition_data.back();
 }

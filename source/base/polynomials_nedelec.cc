@@ -59,35 +59,33 @@ PolynomialsNedelec<dim>::evaluate(
   std::vector<Tensor<4, dim>> &third_derivatives,
   std::vector<Tensor<5, dim>> &fourth_derivatives) const
 {
-  Assert(values.size() == this->n() || values.size() == 0,
+  Assert(values.size() == this->n() || values.empty(),
          ExcDimensionMismatch(values.size(), this->n()));
-  Assert(grads.size() == this->n() || grads.size() == 0,
+  Assert(grads.size() == this->n() || grads.empty(),
          ExcDimensionMismatch(grads.size(), this->n()));
-  Assert(grad_grads.size() == this->n() || grad_grads.size() == 0,
+  Assert(grad_grads.size() == this->n() || grad_grads.empty(),
          ExcDimensionMismatch(grad_grads.size(), this->n()));
-  Assert(third_derivatives.size() == this->n() || third_derivatives.size() == 0,
+  Assert(third_derivatives.size() == this->n() || third_derivatives.empty(),
          ExcDimensionMismatch(third_derivatives.size(), this->n()));
-  Assert(fourth_derivatives.size() == this->n() ||
-           fourth_derivatives.size() == 0,
+  Assert(fourth_derivatives.size() == this->n() || fourth_derivatives.empty(),
          ExcDimensionMismatch(fourth_derivatives.size(), this->n()));
 
   // third and fourth derivatives not implemented
   (void)third_derivatives;
-  Assert(third_derivatives.size() == 0, ExcNotImplemented());
+  Assert(third_derivatives.empty(), ExcNotImplemented());
   (void)fourth_derivatives;
-  Assert(fourth_derivatives.size() == 0, ExcNotImplemented());
+  Assert(fourth_derivatives.empty(), ExcNotImplemented());
 
   // Declare the values, derivatives
   // and second derivatives vectors of
   // <tt>polynomial_space</tt> at
   // <tt>unit_point</tt>
-  const unsigned int  n_basis   = polynomial_space.n();
-  const unsigned int  my_degree = this->degree();
-  std::vector<double> unit_point_values((values.size() == 0) ? 0 : n_basis);
-  std::vector<Tensor<1, dim>> unit_point_grads((grads.size() == 0) ? 0 :
-                                                                     n_basis);
+  const unsigned int          n_basis   = polynomial_space.n();
+  const unsigned int          my_degree = this->degree();
+  std::vector<double>         unit_point_values((values.empty()) ? 0 : n_basis);
+  std::vector<Tensor<1, dim>> unit_point_grads((grads.empty()) ? 0 : n_basis);
   std::vector<Tensor<2, dim>> unit_point_grad_grads(
-    (grad_grads.size() == 0) ? 0 : n_basis);
+    (grad_grads.empty()) ? 0 : n_basis);
   std::vector<Tensor<3, dim>> empty_vector_of_3rd_order_tensors;
   std::vector<Tensor<4, dim>> empty_vector_of_4th_order_tensors;
 
@@ -138,11 +136,10 @@ PolynomialsNedelec<dim>::evaluate(
           p(0) = unit_point(1);
           p(1) = unit_point(0);
 
-          std::vector<double> p_values((values.size() == 0) ? 0 : n_basis);
-          std::vector<Tensor<1, dim>> p_grads((grads.size() == 0) ? 0 :
-                                                                    n_basis);
+          std::vector<double>         p_values((values.empty()) ? 0 : n_basis);
+          std::vector<Tensor<1, dim>> p_grads((grads.empty()) ? 0 : n_basis);
           std::vector<Tensor<2, dim>> p_grad_grads(
-            (grad_grads.size() == 0) ? 0 : n_basis);
+            (grad_grads.empty()) ? 0 : n_basis);
 
           polynomial_space.evaluate(p,
                                     p_values,
@@ -320,17 +317,15 @@ PolynomialsNedelec<dim>::evaluate(
           // <tt>unit_point</tt> with coordinates
           // shifted two steps in positive
           // direction
-          Point<dim>          p1, p2;
-          std::vector<double> p1_values((values.size() == 0) ? 0 : n_basis);
-          std::vector<Tensor<1, dim>> p1_grads((grads.size() == 0) ? 0 :
-                                                                     n_basis);
+          Point<dim>                  p1, p2;
+          std::vector<double>         p1_values((values.empty()) ? 0 : n_basis);
+          std::vector<Tensor<1, dim>> p1_grads((grads.empty()) ? 0 : n_basis);
           std::vector<Tensor<2, dim>> p1_grad_grads(
-            (grad_grads.size() == 0) ? 0 : n_basis);
-          std::vector<double> p2_values((values.size() == 0) ? 0 : n_basis);
-          std::vector<Tensor<1, dim>> p2_grads((grads.size() == 0) ? 0 :
-                                                                     n_basis);
+            (grad_grads.empty()) ? 0 : n_basis);
+          std::vector<double>         p2_values((values.empty()) ? 0 : n_basis);
+          std::vector<Tensor<1, dim>> p2_grads((grads.empty()) ? 0 : n_basis);
           std::vector<Tensor<2, dim>> p2_grad_grads(
-            (grad_grads.size() == 0) ? 0 : n_basis);
+            (grad_grads.empty()) ? 0 : n_basis);
 
           p1(0) = unit_point(1);
           p1(1) = unit_point(2);

@@ -421,7 +421,7 @@ namespace Utilities
             }
 
 #else
-          Assert(buffers.size() == 0, ExcInternalError());
+          Assert(buffers.empty(), ExcInternalError());
           (void)comm;
           (void)dic_local_received;
 #endif

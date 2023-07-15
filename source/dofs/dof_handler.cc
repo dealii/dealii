@@ -2816,8 +2816,8 @@ void DoFHandler<dim, spacedim>::create_active_fe_table()
   for (unsigned int level = 0; level < this->hp_cell_future_fe_indices.size();
        ++level)
     {
-      if (this->hp_cell_active_fe_indices[level].size() == 0 &&
-          this->hp_cell_future_fe_indices[level].size() == 0)
+      if (this->hp_cell_active_fe_indices[level].empty() &&
+          this->hp_cell_future_fe_indices[level].empty())
         {
           this->hp_cell_active_fe_indices[level].resize(
             this->tria->n_raw_cells(level), 0);

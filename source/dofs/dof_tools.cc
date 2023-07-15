@@ -1932,7 +1932,7 @@ namespace DoFTools
     // If the empty vector was given as default argument, set up this
     // vector as identity.
     std::vector<unsigned int> target_component = target_component_;
-    if (target_component.size() == 0)
+    if (target_component.empty())
       {
         target_component.resize(n_components);
         for (unsigned int i = 0; i < n_components; ++i)
@@ -2029,7 +2029,7 @@ namespace DoFTools
     const unsigned int n_blocks = fe_collection[0].n_blocks();
 
     std::vector<unsigned int> target_block = target_block_;
-    if (target_block.size() == 0)
+    if (target_block.empty())
       {
         target_block.resize(fe_collection[0].n_blocks());
         for (unsigned int i = 0; i < n_blocks; ++i)
@@ -2156,7 +2156,7 @@ namespace DoFTools
                    numbers::invalid_dof_index);
 
     // return if there is nothing to do
-    if (boundary_ids.size() == 0)
+    if (boundary_ids.empty())
       return;
 
     std::vector<types::global_dof_index> dofs_on_face;
@@ -2525,7 +2525,7 @@ namespace DoFTools
 
           for (types::global_dof_index j = 0; j < indices.size(); ++j)
             {
-              if (selected_dofs.size() == 0)
+              if (selected_dofs.empty())
                 block_list.add(i, indices[j] - offset);
               else
                 {

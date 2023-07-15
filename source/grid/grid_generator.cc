@@ -2255,7 +2255,7 @@ namespace GridGenerator
                             const bool                       colorize)
   {
     std::vector<unsigned int> compute_subdivisions = subdivisions;
-    if (compute_subdivisions.size() == 0)
+    if (compute_subdivisions.empty())
       {
         compute_subdivisions.resize(dim, 1);
       }

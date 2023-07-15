@@ -2422,7 +2422,7 @@ namespace internal
     {
       face_type.resize(faces.size(), general);
 
-      if (faces.size() == 0)
+      if (faces.empty())
         return;
 
       // Create as many chunks of cells as we have threads and spawn the
