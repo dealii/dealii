@@ -84,6 +84,47 @@ macro(set_if_empty _variable)
 endmacro()
 
 
+function(pad_string_right output _str _length)
+  string(LENGTH "${_str}" _strlen)
+  math(EXPR _strlen "${_length} - ${_strlen}")
+
+  if(_strlen GREATER 0)
+    if(${CMAKE_VERSION} VERSION_LESS "3.14")
+      unset(_pad)
+      foreach(_i RANGE 1 ${_strlen}) # inclusive
+        string(APPEND _pad " ")
+      endforeach()
+    else()
+      string(REPEAT " " ${_strlen} _pad)
+    endif()
+    set(_str "${_str}${_pad}")
+  endif()
+
+  set(${output} "${_str}" PARENT_SCOPE)
+endfunction()
+
+
+function(pad_string_left output _str _length)
+  string(LENGTH "${_str}" _strlen)
+  math(EXPR _strlen "${_length} - ${_strlen}")
+
+  if(_strlen GREATER 0)
+    if(${CMAKE_VERSION} VERSION_LESS "3.14")
+      unset(_pad)
+      foreach(_i RANGE 1 ${_strlen}) # inclusive
+        string(APPEND _pad " ")
+      endforeach()
+    else()
+      string(REPEAT " " ${_strlen} _pad)
+    endif()
+    set(_str "${_pad}${_str}")
+  endif()
+
+  set(${output} "${_str}" PARENT_SCOPE)
+endfunction()
+
+
+
 macro(deal_ii_pickup_tests)
   #
   # Initialize two counters to zero:
@@ -345,6 +386,11 @@ Comparison operator \"=\" expected for boolean match.\n"
   endforeach()
 
   if(NOT "${_number_of_tests}" STREQUAL "0")
-    message(STATUS "Test category \"${_category}\": ${_number_of_tests} tests (and ${_number_of_test_dependencies} test dependencies)")
+    # Pad the category to 27 characters -- that's currently the longest
+    # category (namely, 'multigrid-global-coarsening'). Pad numbers to 4 digits
+    pad_string_right(_category ${_category} 27)
+    pad_string_left(_number_of_tests ${_number_of_tests} 4)
+    pad_string_left(_number_of_test_dependencies ${_number_of_test_dependencies} 4)
+    message(STATUS "Test category ${_category}: ${_number_of_tests} tests (and ${_number_of_test_dependencies} test dependencies)")
   endif()
 endmacro()
