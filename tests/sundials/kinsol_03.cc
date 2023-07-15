@@ -28,11 +28,11 @@
 // the Jacobian matrix. For the current case,
 //
 //   F(u) = [  cos(u1 + u2) - 1 + 2*u1  ]
-//          [  sin(u1 - u2)     + 2*u2   ]
+//          [  sin(u1 - u2)     + 2*u2  ]
 //
 // the Jacobian is the 2x2 matrix
 //
-//   J(u) = [ -sin(u1 + u2) + 2      -sin(u1 + u2)]
+//   J(u) = [ -sin(u1 + u2) + 2      -sin(u1 + u2)    ]
 //          [  cos(u1 - u2)          -cos(u1 - u2) + 2]
 //
 // The addition of the +2u_i to the function F does not move the solution

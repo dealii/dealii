@@ -1633,7 +1633,7 @@ namespace Step33
   // $\mathbf{z}_i$ is the $i$th vector valued test function.
   //   Furthermore, the scalar product
   // $\left(\mathbf{F}(\mathbf{w}), \nabla\mathbf{z}_i\right)_K$ is
-  // understood as $\int_K \sum_{c=1}^{\text{n\_components}}
+  // understood as $\int_K \sum_{c=1}^{\text{n_components}}
   // \sum_{d=1}^{\text{dim}} \mathbf{F}(\mathbf{w})_{cd}
   // \frac{\partial z^c_i}{x_d}$ where $z^c_i$ is the $c$th component of
   // the $i$th test function.
@@ -1812,21 +1812,21 @@ namespace Step33
     // @f{eqnarray*}{
     // R_i &=&
     // \left(\frac{(\mathbf{w}_{n+1} -
-    // \mathbf{w}_n)_{\text{component\_i}}}{\delta
-    // t},(\mathbf{z}_i)_{\text{component\_i}}\right)_K
+    // \mathbf{w}_n)_{\text{component_i}}}{\delta
+    // t},(\mathbf{z}_i)_{\text{component_i}}\right)_K
     // \\ &-& \sum_{d=1}^{\text{dim}} \left(  \theta \mathbf{F}
-    // ({\mathbf{w}^k_{n+1}})_{\text{component\_i},d} + (1-\theta)
-    // \mathbf{F} ({\mathbf{w}_{n}})_{\text{component\_i},d}  ,
-    // \frac{\partial(\mathbf{z}_i)_{\text{component\_i}}} {\partial
+    // ({\mathbf{w}^k_{n+1}})_{\text{component_i},d} + (1-\theta)
+    // \mathbf{F} ({\mathbf{w}_{n}})_{\text{component_i},d}  ,
+    // \frac{\partial(\mathbf{z}_i)_{\text{component_i}}} {\partial
     // x_d}\right)_K
     // \\ &+& \sum_{d=1}^{\text{dim}} h^{\eta} \left( \theta \frac{\partial
-    // (\mathbf{w}^k_{n+1})_{\text{component\_i}}}{\partial x_d} + (1-\theta)
-    // \frac{\partial (\mathbf{w}_n)_{\text{component\_i}}}{\partial x_d} ,
-    // \frac{\partial (\mathbf{z}_i)_{\text{component\_i}}}{\partial x_d}
+    // (\mathbf{w}^k_{n+1})_{\text{component_i}}}{\partial x_d} + (1-\theta)
+    // \frac{\partial (\mathbf{w}_n)_{\text{component_i}}}{\partial x_d} ,
+    // \frac{\partial (\mathbf{z}_i)_{\text{component_i}}}{\partial x_d}
     // \right)_K
-    // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component\_i}}
-    // + (1-\theta)\mathbf{G}({\mathbf{w}_n})_{\text{component\_i}} ,
-    // (\mathbf{z}_i)_{\text{component\_i}} \right)_K ,
+    // \\ &-& \left( \theta\mathbf{G}({\mathbf{w}^k_n+1} )_{\text{component_i}}
+    // + (1-\theta)\mathbf{G}({\mathbf{w}_n})_{\text{component_i}} ,
+    // (\mathbf{z}_i)_{\text{component_i}} \right)_K ,
     // @f}
     // where integrals are
     // understood to be evaluated through summation over quadrature points.
