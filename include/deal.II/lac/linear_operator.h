@@ -1503,8 +1503,7 @@ template <
   typename =
     std::enable_if_t<!std::is_lvalue_reference<OperatorExemplar>::value>,
   typename = std::enable_if_t<
-    !std::is_same<OperatorExemplar,
-                  LinearOperator<Range, Domain, Payload>>::value>>
+    !std::is_same_v<OperatorExemplar, LinearOperator<Range, Domain, Payload>>>>
 LinearOperator<Range, Domain, Payload>
 linear_operator(OperatorExemplar &&, const Matrix &) = delete;
 
@@ -1518,8 +1517,7 @@ template <
   typename =
     std::enable_if_t<!std::is_lvalue_reference<OperatorExemplar>::value>,
   typename = std::enable_if_t<
-    !std::is_same<OperatorExemplar,
-                  LinearOperator<Range, Domain, Payload>>::value>>
+    !std::is_same_v<OperatorExemplar, LinearOperator<Range, Domain, Payload>>>>
 LinearOperator<Range, Domain, Payload>
 linear_operator(OperatorExemplar &&, Matrix &&) = delete;
 
@@ -1552,8 +1550,7 @@ template <
   typename =
     std::enable_if_t<!std::is_same_v<Preconditioner, PreconditionIdentity>>,
   typename = std::enable_if_t<
-    !std::is_same<Preconditioner,
-                  LinearOperator<Range, Domain, Payload>>::value>>
+    !std::is_same_v<Preconditioner, LinearOperator<Range, Domain, Payload>>>>
 LinearOperator<Domain, Range, Payload>
 inverse_operator(const LinearOperator<Range, Domain, Payload> &,
                  Solver &,

@@ -978,8 +978,7 @@ namespace LinearAlgebra
       if (partitioner->n_import_indices() > 0)
         {
 #  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-          if (std::is_same<MemorySpaceType,
-                           dealii::MemorySpace::Default>::value)
+          if (std::is_same_v<MemorySpaceType, dealii::MemorySpace::Default>)
             {
               if (import_data.values_host_buffer.size() == 0)
                 Kokkos::resize(import_data.values_host_buffer,

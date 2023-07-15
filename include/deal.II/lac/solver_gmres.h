@@ -736,10 +736,10 @@ namespace internal
       VectorType,
       typename std::enable_if<!internal::is_block_vector<VectorType>>::type>
     {
-      static constexpr bool value = std::is_same<
+      static constexpr bool value = std::is_same_v<
         VectorType,
         LinearAlgebra::distributed::Vector<typename VectorType::value_type,
-                                           MemorySpace::Host>>::value;
+                                           MemorySpace::Host>>;
     };
 
 
@@ -749,10 +749,10 @@ namespace internal
       VectorType,
       typename std::enable_if<internal::is_block_vector<VectorType>>::type>
     {
-      static constexpr bool value = std::is_same<
+      static constexpr bool value = std::is_same_v<
         typename VectorType::BlockType,
         LinearAlgebra::distributed::Vector<typename VectorType::value_type,
-                                           MemorySpace::Host>>::value;
+                                           MemorySpace::Host>>;
     };
 
 

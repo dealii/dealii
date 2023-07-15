@@ -543,14 +543,13 @@ namespace internal
             typename PreconditionerType>
   constexpr bool has_vmult_with_std_functions =
     is_supported_operation<vmult_functions_t, MatrixType, VectorType> &&
-      std::is_same<PreconditionerType,
-                   dealii::DiagonalMatrix<VectorType>>::value &&
-    (std::is_same<VectorType,
-                  dealii::Vector<typename VectorType::value_type>>::value ||
-     std::is_same<
+      std::is_same_v<PreconditionerType, dealii::DiagonalMatrix<VectorType>> &&
+    (std::is_same_v<VectorType,
+                    dealii::Vector<typename VectorType::value_type>> ||
+     std::is_same_v<
        VectorType,
        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
-                                          MemorySpace::Host>>::value);
+                                          MemorySpace::Host>>);
 
 
   template <typename MatrixType, typename VectorType>
@@ -3664,17 +3663,16 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   // We do not need the second temporary vector in case we have a
   // DiagonalMatrix as preconditioner and use deal.II's own vectors
   using NumberType = typename VectorType::value_type;
-  if (std::is_same<PreconditionerType,
-                   dealii::DiagonalMatrix<VectorType>>::value == false ||
+  if (std::is_same_v<PreconditionerType, dealii::DiagonalMatrix<VectorType>> ==
+        false ||
       (std::is_same_v<VectorType, dealii::Vector<NumberType>> == false &&
-       ((std::is_same<VectorType,
-                      LinearAlgebra::distributed::
-                        Vector<NumberType, MemorySpace::Host>>::value ==
+       ((std::is_same_v<
+           VectorType,
+           LinearAlgebra::distributed::Vector<NumberType, MemorySpace::Host>> ==
          false) ||
-        (std::is_same<VectorType,
-                      LinearAlgebra::distributed::
-                        Vector<NumberType, MemorySpace::Default>>::value ==
-         false))))
+        (std::is_same_v<VectorType,
+                        LinearAlgebra::distributed::
+                          Vector<NumberType, MemorySpace::Default>> == false))))
     temp_vector2.reinit(src, true);
   else
     {

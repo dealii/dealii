@@ -705,10 +705,10 @@ namespace internal
       std::enable_if_t<has_vmult_functions<MatrixType, VectorType> &&
                          (has_apply_to_subrange<PreconditionerType> ||
                           has_apply<PreconditionerType>)&&std::
-                           is_same<VectorType,
-                                   LinearAlgebra::distributed::Vector<
-                                     typename VectorType::value_type,
-                                     MemorySpace::Host>>::value,
+                           is_same_v<VectorType,
+                                     LinearAlgebra::distributed::Vector<
+                                       typename VectorType::value_type,
+                                       MemorySpace::Host>>,
                        int>>
       : public IterationWorkerBase<VectorType, MatrixType, PreconditionerType>
     {

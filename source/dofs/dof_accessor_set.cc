@@ -76,16 +76,16 @@ namespace internal
    */
   template <typename VectorType>
   constexpr bool is_dealii_vector =
-    std::is_same<VectorType,
-                 dealii::Vector<typename VectorType::value_type>>::value ||
-    std::is_same<VectorType,
-                 dealii::BlockVector<typename VectorType::value_type>>::value ||
-    std::is_same<VectorType,
-                 dealii::LinearAlgebra::distributed::Vector<
-                   typename VectorType::value_type>>::value ||
-    std::is_same<VectorType,
-                 dealii::LinearAlgebra::distributed::BlockVector<
-                   typename VectorType::value_type>>::value;
+    std::is_same_v<VectorType,
+                   dealii::Vector<typename VectorType::value_type>> ||
+    std::is_same_v<VectorType,
+                   dealii::BlockVector<typename VectorType::value_type>> ||
+    std::is_same_v<VectorType,
+                   dealii::LinearAlgebra::distributed::Vector<
+                     typename VectorType::value_type>> ||
+    std::is_same_v<VectorType,
+                   dealii::LinearAlgebra::distributed::BlockVector<
+                     typename VectorType::value_type>>;
 
   /**
    * Helper functions that call set_ghost_state() if the vector supports this
