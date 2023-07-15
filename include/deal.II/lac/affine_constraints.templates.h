@@ -712,101 +712,152 @@ AffineConstraints<number>::close()
 #ifdef DEBUG
   size_type iteration = 0;
 #endif
-  bool chained_constraint_replaced = false;
+  bool                                chained_constraint_replaced = false;
+  std::vector<bool>                   line_finalized(lines.size(), false);
+  std::vector<const ConstraintLine *> sub_constraints;
+  std::vector<unsigned int>           entries_to_delete;
   do
     {
       chained_constraint_replaced = false;
-      for (ConstraintLine &line : lines)
-        {
+      for (unsigned int line_index = 0; line_index < lines.size(); ++line_index)
+        if (line_finalized[line_index] == false)
+          {
+            ConstraintLine &line = lines[line_index];
+
 #ifdef DEBUG
-          // we need to keep track of how many replacements we do in this line,
-          // because we can end up in a cycle A->B->C->A without the number of
-          // entries growing.
-          size_type n_replacements = 0;
+            // we need to keep track of how many replacements we do in this
+            // line, because we can end up in a cycle A->B->C->A without the
+            // number of entries growing.
+            size_type n_replacements = 0;
 #endif
 
-          // loop over all entries of this line (including ones that we
-          // have appended in this go around) and see whether they are
-          // further constrained. ignore elements that we don't store on
-          // the current processor
-          unsigned int entry = 0;
-          while (entry < line.entries.size())
-            if (((local_lines.size() == 0) ||
-                 (local_lines.is_element(line.entries[entry].first))) &&
-                is_constrained(line.entries[entry].first))
+            // loop over all entries of this line (including ones that we
+            // have appended in this go around) and see whether they are
+            // further constrained. ignore elements that we don't store on
+            // the current processor.
+            //
+            // If we find that one of the entries in the current line is indeed
+            // constrained, then store the address of the line it corresponds to
+            // for further processing; this avoids having to look it up again,
+            // which requires an IndexSet lookup. If not, store a nullptr.
+            sub_constraints.resize(line.entries.size());
+            bool has_sub_constraints = false;
+            for (unsigned int entry = 0; entry < line.entries.size(); ++entry)
+              if (((local_lines.size() == 0) ||
+                   (local_lines.is_element(line.entries[entry].first))) &&
+                  is_constrained(line.entries[entry].first))
+                {
+                  const size_type dof_index = line.entries[entry].first;
+                  sub_constraints[entry] =
+                    &lines[lines_cache[calculate_line_index(dof_index)]];
+                  has_sub_constraints = true;
+                }
+              else
+                sub_constraints[entry] = nullptr;
+
+            // If none of the entries in the current line refer to DoFs that are
+            // themselves constrained, then we can move on:
+            if (has_sub_constraints == false)
               {
-                // ok, this entry is further constrained:
-                chained_constraint_replaced = true;
+                line_finalized[line_index] = true;
+                continue;
+              }
 
-                // look up the chain of constraints for this entry
-                const size_type dof_index = line.entries[entry].first;
-                const number    weight    = line.entries[entry].second;
+            // Now walk through the original entries. We may replace some of
+            // them, and we may add some, but we only walk through the original
+            // entries (and also don't touch the replacements) even though in
+            // principle we could also do the ones we have added or replaced. We
+            // don't because we don't have information for those in the
+            // sub_constraints array above. But there is no harm in doing so:
+            // we will simply treat those in the next round around of the outer
+            // iteration.
+            //
+            // Since we want to delete some entries (see below) but don't want
+            // to disturb the order of the correspondence between lines.entries
+            // and sub_constraints, we store up which entries we will later
+            // have to delete.
+            const unsigned int n_original_entries = line.entries.size();
+            entries_to_delete.clear();
+            for (unsigned int entry = 0; entry < n_original_entries; ++entry)
+              if (sub_constraints[entry] != nullptr)
+                {
+                  // ok, this entry is further constrained:
+                  chained_constraint_replaced = true;
 
-                Assert(dof_index != line.index,
-                       ExcMessage("Cycle in constraints detected!"));
+                  // look up the chain of constraints for this entry
+                  [[maybe_unused]] const size_type dof_index =
+                    line.entries[entry].first;
+                  const number weight = line.entries[entry].second;
 
-                const ConstraintLine &constrained_line =
-                  lines[lines_cache[calculate_line_index(dof_index)]];
-                Assert(constrained_line.index == dof_index, ExcInternalError());
+                  Assert(dof_index != line.index,
+                         ExcMessage("Cycle in constraints detected!"));
 
-                // now we have to replace an entry by its expansion. we do
-                // that by overwriting the entry by the first entry of the
-                // expansion and adding the remaining ones to the end,
-                // where we will later process them once more
-                //
-                // we can of course only do that if the DoF that we are
-                // currently handling is constrained by a linear combination
-                // of other dofs:
-                if (constrained_line.entries.size() > 0)
-                  {
-                    for (size_type i = 0; i < constrained_line.entries.size();
-                         ++i)
-                      Assert(dof_index != constrained_line.entries[i].first,
-                             ExcMessage("Cycle in constraints detected!"));
+                  const ConstraintLine &constrained_line =
+                    *sub_constraints[entry];
+                  Assert(constrained_line.index == dof_index,
+                         ExcInternalError());
 
-                    // replace first entry, then tack the rest to the end
-                    // of the list
-                    line.entries[entry] = std::pair<size_type, number>(
-                      constrained_line.entries[0].first,
-                      constrained_line.entries[0].second * weight);
+                  // now we have to replace an entry by its expansion. we do
+                  // that by overwriting the entry by the first entry of the
+                  // expansion and adding the remaining ones to the end,
+                  // where we will later process them once more
+                  //
+                  // we can of course only do that if the DoF that we are
+                  // currently handling is constrained by a linear combination
+                  // of other dofs:
+                  if (constrained_line.entries.size() > 0)
+                    {
+                      for (size_type i = 0; i < constrained_line.entries.size();
+                           ++i)
+                        Assert(dof_index != constrained_line.entries[i].first,
+                               ExcMessage("Cycle in constraints detected!"));
 
-                    for (size_type i = 1; i < constrained_line.entries.size();
-                         ++i)
-                      line.entries.emplace_back(
-                        constrained_line.entries[i].first,
-                        constrained_line.entries[i].second * weight);
+                      // replace first entry, then tack the rest to the end
+                      // of the list
+                      line.entries[entry] = std::pair<size_type, number>(
+                        constrained_line.entries[0].first,
+                        constrained_line.entries[0].second * weight);
+
+                      for (size_type i = 1; i < constrained_line.entries.size();
+                           ++i)
+                        line.entries.emplace_back(
+                          constrained_line.entries[i].first,
+                          constrained_line.entries[i].second * weight);
 
 #ifdef DEBUG
-                    // keep track of how many entries we replace in this
-                    // line. If we do more than there are constraints or
-                    // dofs in our system, we must have a cycle.
-                    ++n_replacements;
-                    Assert(n_replacements / 2 < largest_idx,
-                           ExcMessage("Cycle in constraints detected!"));
+                      // keep track of how many entries we replace in this
+                      // line. If we do more than there are constraints or
+                      // dofs in our system, we must have a cycle.
+                      ++n_replacements;
+                      Assert(n_replacements / 2 < largest_idx,
+                             ExcMessage("Cycle in constraints detected!"));
 #endif
-                  }
-                else
-                  // the DoF that we encountered is not constrained by a
-                  // linear combination of other dofs but is equal to just
-                  // the inhomogeneity (i.e. its chain of entries is
-                  // empty). in that case, we can't just overwrite the
-                  // current entry, but we have to actually eliminate it
-                  {
-                    line.entries.erase(line.entries.begin() + entry);
-                  }
+                    }
+                  else
+                    // the DoF that we encountered is not constrained by a
+                    // linear combination of other dofs but is equal to just
+                    // the inhomogeneity (i.e. its chain of entries is
+                    // empty). in that case, we can't just overwrite the
+                    // current entry, but we have to actually eliminate it
+                    {
+                      entries_to_delete.emplace_back(entry);
+                    }
 
-                line.inhomogeneity += constrained_line.inhomogeneity * weight;
+                  line.inhomogeneity += constrained_line.inhomogeneity * weight;
+                }
 
-                // now that we're here, do not increase index by one but
-                // rather make another pass for the present entry because
-                // we have replaced the present entry by another one, or
-                // because we have deleted it and shifted all following
-                // ones one forward
-              }
-            else
-              // entry not further constrained. just move ahead by one
-              ++entry;
-        }
+            // Now delete the elements we have marked for deletion. Do
+            // so in reverse order so that we compress the array walking
+            // backward from the end without having to keep track that
+            // we have already erased earlier elements (as we would have to
+            // do if we walked the list of entries to delete in forward
+            // order).
+            std::sort(entries_to_delete.begin(), entries_to_delete.end());
+            for (auto it = entries_to_delete.rbegin();
+                 it != entries_to_delete.rend();
+                 ++it)
+              line.entries.erase(line.entries.begin() + *it);
+          }
 
 #ifdef DEBUG
       // increase iteration count. note that we should not iterate more
