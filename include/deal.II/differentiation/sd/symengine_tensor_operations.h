@@ -1020,18 +1020,19 @@ namespace Differentiation
                   out[indices_out] *= 0.5;
 
                 // TODO: Implement for SymmetricTensor<4,dim,...>
-                if (std::is_same<TensorType_1<rank_1, dim, ValueType>,
-                                 SymmetricTensor<2, dim, ValueType>>::
-                      value) // Symmetric function
+                if (std::is_same_v<
+                      TensorType_1<rank_1, dim, ValueType>,
+                      SymmetricTensor<2, dim, ValueType>>) // Symmetric function
                   {
                     const TableIndices<rank_1 + rank_2> indices_out_t =
                       concatenate_indices(transpose_indices(indices_i),
                                           indices_j);
                     out[indices_out_t] = out[indices_out];
                   }
-                else if (std::is_same<TensorType_2<rank_2, dim, ValueType>,
-                                      SymmetricTensor<2, dim, ValueType>>::
-                           value) // Symmetric operator
+                else if (std::is_same_v<
+                           TensorType_2<rank_2, dim, ValueType>,
+                           SymmetricTensor<2, dim, ValueType>>) // Symmetric
+                                                                // operator
                   {
                     const TableIndices<rank_1 + rank_2> indices_out_t =
                       concatenate_indices(indices_i,

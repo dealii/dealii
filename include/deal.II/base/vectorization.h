@@ -780,9 +780,9 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
 make_vectorized_array(const typename VectorizedArrayType::value_type &u)
 {
   static_assert(
-    std::is_same<VectorizedArrayType,
-                 VectorizedArray<typename VectorizedArrayType::value_type,
-                                 VectorizedArrayType::size()>>::value,
+    std::is_same_v<VectorizedArrayType,
+                   VectorizedArray<typename VectorizedArrayType::value_type,
+                                   VectorizedArrayType::size()>>,
     "VectorizedArrayType is not a VectorizedArray.");
 
   VectorizedArrayType result = u;

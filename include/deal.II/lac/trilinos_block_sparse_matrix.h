@@ -601,9 +601,9 @@ namespace TrilinosWrappers
         TrilinosBlockPayload(const Args &...)
         {
           static_assert(
-            std::is_same<
+            std::is_same_v<
               PayloadBlockType,
-              internal::LinearOperatorImplementation::TrilinosPayload>::value,
+              internal::LinearOperatorImplementation::TrilinosPayload>,
             "TrilinosBlockPayload can only accept a payload of type TrilinosPayload.");
         }
       };

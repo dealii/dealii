@@ -1211,8 +1211,7 @@ namespace HDF5
      */
     template <typename Container>
     std::enable_if_t<
-      std::is_same<Container,
-                   std::vector<typename Container::value_type>>::value,
+      std::is_same_v<Container, std::vector<typename Container::value_type>>,
       Container>
     initialize_container(const std::vector<hsize_t> &dimensions);
 
@@ -1230,8 +1229,7 @@ namespace HDF5
      */
     template <typename Container>
     std::enable_if_t<
-      std::is_same<Container,
-                   FullMatrix<typename Container::value_type>>::value,
+      std::is_same_v<Container, FullMatrix<typename Container::value_type>>,
       Container>
     initialize_container(const std::vector<hsize_t> &dimensions);
 
@@ -1419,8 +1417,7 @@ namespace HDF5
 
     template <typename Container>
     std::enable_if_t<
-      std::is_same<Container,
-                   std::vector<typename Container::value_type>>::value,
+      std::is_same_v<Container, std::vector<typename Container::value_type>>,
       Container>
     initialize_container(const std::vector<hsize_t> &dimensions)
     {
@@ -1444,8 +1441,7 @@ namespace HDF5
 
     template <typename Container>
     std::enable_if_t<
-      std::is_same<Container,
-                   FullMatrix<typename Container::value_type>>::value,
+      std::is_same_v<Container, FullMatrix<typename Container::value_type>>,
       Container>
     initialize_container(const std::vector<hsize_t> &dimensions)
     {

@@ -2433,8 +2433,8 @@ namespace internal
        * types).
        */
       static const bool value =
-        std::is_same<decltype(check(std::declval<MatrixType *>())),
-                     std::true_type>::value;
+        std::is_same_v<decltype(check(std::declval<MatrixType *>())),
+                       std::true_type>;
     };
 
     // instantiation of the static member
