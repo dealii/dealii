@@ -23,8 +23,13 @@ jobs:
     name: Windows Serial
     runs-on: ${{ matrix.os }}
 
-    # only run on 'push' or if the 'pull_request' is not a draft:
-    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+    #
+    # The following condition only runs the workflow on 'push' or if the
+    # 'pull_request' is not a draft. This is only useful for hackathons or
+    # other situations when the CI is massively overburdened with pull
+    # requests.
+    #
+    # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     strategy:
       fail-fast: false
