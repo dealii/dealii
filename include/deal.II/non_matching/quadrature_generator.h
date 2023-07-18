@@ -202,6 +202,12 @@ namespace NonMatching
       const AdditionalData &    additional_data = AdditionalData());
 
     /**
+     * Clears the inside, outside and surface quadratures.
+     */
+    void
+    clear_quadratures();
+
+    /**
      * Construct immersed quadratures rules for the incoming level set
      * function over the BoundingBox.
      *
@@ -215,6 +221,14 @@ namespace NonMatching
      */
     void
     generate(const Function<dim> &level_set, const BoundingBox<dim> &box);
+
+    /**
+     * Same as above but does not clear quadratures and appends it to the
+     * existing quadrature instead.
+     */
+    void
+    generate_append(const Function<dim> &   level_set,
+                    const BoundingBox<dim> &box);
 
     /**
      * Return the quadrature rule for the region
@@ -306,6 +320,12 @@ namespace NonMatching
       const AdditionalData &    additional_data = AdditionalData());
 
     /**
+     * Clears the inside, outside and surface quadratures.
+     */
+    void
+    clear_quadratures();
+
+    /**
      * Construct immersed quadratures rules for the incoming level set
      * function on a given face of the BoundingBox.
      *
@@ -321,6 +341,15 @@ namespace NonMatching
     generate(const Function<dim> &   level_set,
              const BoundingBox<dim> &box,
              const unsigned int      face_index);
+
+    /**
+     * Same as above but does not clear quadratures and appends it to the
+     * existing quadrature instead.
+     */
+    void
+    generate_append(const Function<dim> &   level_set,
+                    const BoundingBox<dim> &box,
+                    const unsigned int      face_index);
 
     /**
      * Return the quadrature rule for the region
@@ -404,6 +433,12 @@ namespace NonMatching
       const AdditionalData &    additional_data = AdditionalData());
 
     /**
+     * Does nothing. Exists for compatibility reasons.
+     */
+    void
+    clear_quadratures();
+
+    /**
      * Construct immersed quadratures rules for the incoming level set
      * function on a given face of the BoundingBox.
      *
@@ -416,6 +451,15 @@ namespace NonMatching
     generate(const Function<1> &   level_set,
              const BoundingBox<1> &box,
              const unsigned int    face_index);
+
+    /**
+     * Same as above but does not clear quadratures and appends it to the
+     * existing quadrature instead.
+     */
+    void
+    generate_append(const Function<1> &   level_set,
+                    const BoundingBox<1> &box,
+                    const unsigned int    face_index);
 
     /**
      * @copydoc FaceQuadratureGenerator<dim>::get_inside_quadrature()
@@ -519,6 +563,12 @@ namespace NonMatching
 
   private:
     /**
+     * Construct immersed quadratures for FE_Q_iso_Q1.
+     */
+    void
+    generate_fe_q_iso_q1(const BoundingBox<dim> &unit_box);
+
+    /**
      * Function that describes our level set function in reference space.
      */
     std::unique_ptr<internal::DiscreteQuadratureGeneratorImplementation::
@@ -575,6 +625,13 @@ namespace NonMatching
              const unsigned int face_index);
 
   private:
+    /**
+     * Construct immersed quadratures for FE_Q_iso_Q1.
+     */
+    void
+    generate_fe_q_iso_q1(const BoundingBox<dim> &unit_box,
+                         unsigned int            face_index);
+
     /**
      * Function that describes our level set function in reference space.
      */
@@ -702,6 +759,12 @@ namespace NonMatching
         ExtendableQuadrature(const Quadrature<dim> &quadrature);
 
         /**
+         * Clears weights and points vectors.
+         */
+        void
+        clear();
+
+        /**
          * Add a point with an associated weight to the quadrature.
          */
         void
@@ -759,6 +822,12 @@ namespace NonMatching
          */
         ExtendableQuadrature<dim> &
         quadrature_by_definiteness(const Definiteness definiteness);
+
+        /**
+         * Clears all quadratures.
+         */
+        void
+        clear();
 
         /**
          * Quadrature for the region $\{x \in B : \psi_i(x) < 0 \forall i \}$ of
@@ -1396,6 +1465,26 @@ namespace NonMatching
         virtual void
         set_active_cell(
           const typename Triangulation<dim>::active_cell_iterator &cell) = 0;
+
+        /**
+         * Set the dof values and the bounding box of the subcell the
+         * function should be evaluated on. Relevant for FE_Q_iso_Q1.
+         */
+        virtual void
+        set_subcell(const std::vector<unsigned int> &mask,
+                    const BoundingBox<dim> &         subcell_box) = 0;
+
+        /**
+         * Returns flag indicating if the finite element is FE_Q_iso_Q1.
+         */
+        virtual bool
+        is_fe_q_iso_q1() const = 0;
+
+        /**
+         * Number of subdivisions of the FE_Q_iso_Q1 element.
+         */
+        virtual unsigned int
+        n_subdivisions() const = 0;
       };
 
     } // namespace DiscreteQuadratureGeneratorImplementation
