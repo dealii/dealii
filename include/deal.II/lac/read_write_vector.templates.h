@@ -619,7 +619,7 @@ namespace LinearAlgebra
     const auto *new_values = target_vector.getData().get();
     const auto  size       = target_vector.getLocalLength();
 
-    using size_type = typename std::decay<decltype(size)>::type;
+    using size_type = std::decay_t<decltype(size)>;
 
     Assert(size == 0 || values != nullptr, ExcInternalError("Export failed."));
     AssertDimension(size, stored_elements.n_elements());

@@ -442,8 +442,7 @@ namespace Differentiation
      */
     template <typename NumberType>
     struct is_ad_number
-      : internal::HasRequiredADInfo<
-          ADNumberTraits<typename std::decay<NumberType>::type>>
+      : internal::HasRequiredADInfo<ADNumberTraits<std::decay_t<NumberType>>>
     {};
 
 
@@ -454,8 +453,7 @@ namespace Differentiation
     template <typename NumberType>
     struct is_taped_ad_number<
       NumberType,
-      std::enable_if_t<
-        ADNumberTraits<typename std::decay<NumberType>::type>::is_taped>>
+      std::enable_if_t<ADNumberTraits<std::decay_t<NumberType>>::is_taped>>
       : std::true_type
     {};
 
@@ -467,8 +465,7 @@ namespace Differentiation
     template <typename NumberType>
     struct is_tapeless_ad_number<
       NumberType,
-      std::enable_if_t<
-        ADNumberTraits<typename std::decay<NumberType>::type>::is_tapeless>>
+      std::enable_if_t<ADNumberTraits<std::decay_t<NumberType>>::is_tapeless>>
       : std::true_type
     {};
 
@@ -482,7 +479,7 @@ namespace Differentiation
     struct is_real_valued_ad_number<
       NumberType,
       std::enable_if_t<
-        ADNumberTraits<typename std::decay<NumberType>::type>::is_real_valued>>
+        ADNumberTraits<std::decay_t<NumberType>>::is_real_valued>>
       : std::true_type
     {};
 
@@ -495,8 +492,8 @@ namespace Differentiation
     template <typename NumberType>
     struct is_complex_valued_ad_number<
       NumberType,
-      std::enable_if_t<ADNumberTraits<
-        typename std::decay<NumberType>::type>::is_complex_valued>>
+      std::enable_if_t<
+        ADNumberTraits<std::decay_t<NumberType>>::is_complex_valued>>
       : std::true_type
     {};
 
