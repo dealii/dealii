@@ -390,41 +390,27 @@
 /*
  * PETSc:
  *
- * Note: The following definitions will be set in petscconf.h and
- *       petscversion.h, so we don't repeat them here.
- *
- *  PETSC_VERSION_MAJOR
- *  PETSC_VERSION_MINOR
- *  PETSC_VERSION_SUBMINOR
- *  PETSC_VERSION_PATCH
- *  PETSC_VERSION_RELEASE
- *  PETSC_USE_COMPLEX
+ * Note: The following macros are defined in petscversion.h
+ *       so we don't repeat them here.
  */
 
-#define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
-  ((PETSC_VERSION_MAJOR * 10000 + \
-    PETSC_VERSION_MINOR * 100 + \
-    PETSC_VERSION_SUBMINOR) \
-    <  \
-    (major)*10000 + (minor)*100 + (subminor))
-
-#define DEAL_II_PETSC_VERSION_GTE(major,minor,subminor) \
-  ((PETSC_VERSION_MAJOR * 10000 + \
-    PETSC_VERSION_MINOR * 100 + \
-    PETSC_VERSION_SUBMINOR) \
-    >=  \
-    (major)*10000 + (minor)*100 + (subminor))
+#ifdef DEAL_II_WITH_PETSC
+#  define DEAL_II_PETSC_VERSION_LT(major,minor,subminor) \
+    PETSC_VERSION_LT(major,minor,subminor)
+#  define DEAL_II_PETSC_VERSION_GTE(major,minor,subminor) \
+    PETSC_VERSION_GE(major,minor,subminor)
+#endif
 
 /*
- * SLEPC
- * see slepcversion.h
+ * SLEPC:
  */
-#define DEAL_II_SLEPC_VERSION_GTE(major,minor,subminor) \
-  ((SLEPC_VERSION_MAJOR * 10000 + \
-    SLEPC_VERSION_MINOR * 100 + \
-    SLEPC_VERSION_SUBMINOR) \
-    >=  \
-    (major)*10000 + (minor)*100 + (subminor))
+
+#ifdef DEAL_II_WITH_SLEPC
+#  define DEAL_II_SLEPC_VERSION_LT(major,minor,subminor) \
+    SLEPC_VERSION_LT(major,minor,subminor)
+#  define DEAL_II_SLEPC_VERSION_GTE(major,minor,subminor) \
+    SLEPC_VERSION_GE(major,minor,subminor)
+#endif
 
 /*
  * Trilinos:
