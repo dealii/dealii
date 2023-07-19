@@ -212,7 +212,7 @@ namespace internal
 
         if (value == Number())
           {
-            if constexpr (std::is_trivial<Number>::value)
+            if constexpr (std::is_trivial_v<Number>)
               {
                 std::memset(dst + begin, 0, sizeof(Number) * (end - begin));
                 return;

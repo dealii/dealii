@@ -368,7 +368,7 @@ namespace Differentiation
       template <typename ReturnType_>
       struct SupportedOptimizerTypeTraits<
         ReturnType_,
-        std::enable_if_t<std::is_arithmetic<ReturnType_>::value>>
+        std::enable_if_t<std::is_arithmetic_v<ReturnType_>>>
       {
         static const bool is_supported = true;
 
@@ -384,7 +384,7 @@ namespace Differentiation
         ReturnType_,
         std::enable_if_t<
           boost::is_complex<ReturnType_>::value &&
-          std::is_arithmetic<typename ReturnType_::value_type>::value>>
+          std::is_arithmetic_v<typename ReturnType_::value_type>>>
       {
         static const bool is_supported = true;
 
@@ -595,9 +595,8 @@ namespace Differentiation
 
 #    ifdef HAVE_SYMENGINE_LLVM
       template <typename ReturnType_>
-      struct LLVMOptimizer<
-        ReturnType_,
-        std::enable_if_t<std::is_arithmetic<ReturnType_>::value>>
+      struct LLVMOptimizer<ReturnType_,
+                           std::enable_if_t<std::is_arithmetic_v<ReturnType_>>>
       {
         using ReturnType = typename std::
           conditional<std::is_same_v<ReturnType_, float>, float, double>::type;
@@ -711,7 +710,7 @@ namespace Differentiation
         ReturnType_,
         std::enable_if_t<
           boost::is_complex<ReturnType_>::value &&
-          std::is_arithmetic<typename ReturnType_::value_type>::value>>
+          std::is_arithmetic_v<typename ReturnType_::value_type>>>
       {
         // Since there is no working implementation, these are dummy types
         // that help with templating in the calling function.

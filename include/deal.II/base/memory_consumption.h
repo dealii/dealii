@@ -89,7 +89,7 @@ namespace MemoryConsumption
    * implemented.
    */
   template <typename T>
-  inline std::enable_if_t<std::is_fundamental<T>::value, std::size_t>
+  inline std::enable_if_t<std::is_fundamental_v<T>, std::size_t>
   memory_consumption(const T &t);
 
   /**
@@ -99,8 +99,7 @@ namespace MemoryConsumption
    * <tt>t.memory_consumption()</tt>'s value.
    */
   template <typename T>
-  inline std::enable_if_t<!(std::is_fundamental<T>::value ||
-                            std::is_pointer<T>::value),
+  inline std::enable_if_t<!(std::is_fundamental_v<T> || std::is_pointer_v<T>),
                           std::size_t>
   memory_consumption(const T &t);
 
@@ -260,7 +259,7 @@ namespace MemoryConsumption
 namespace MemoryConsumption
 {
   template <typename T>
-  inline std::enable_if_t<std::is_fundamental<T>::value, std::size_t>
+  inline std::enable_if_t<std::is_fundamental_v<T>, std::size_t>
   memory_consumption(const T &)
   {
     return sizeof(T);
@@ -314,7 +313,7 @@ namespace MemoryConsumption
   memory_consumption(const std::vector<T> &v)
   {
     // shortcut for types that do not allocate memory themselves
-    if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
+    if (std::is_fundamental_v<T> || std::is_pointer_v<T>)
       {
         return v.capacity() * sizeof(T) + sizeof(v);
       }
@@ -337,7 +336,7 @@ namespace MemoryConsumption
   memory_consumption(const std::array<T, N> &v)
   {
     // shortcut for types that do not allocate memory themselves
-    if (std::is_fundamental<T>::value || std::is_pointer<T>::value)
+    if (std::is_fundamental_v<T> || std::is_pointer_v<T>)
       {
         return sizeof(v);
       }
@@ -409,8 +408,7 @@ namespace MemoryConsumption
 
 
   template <typename T>
-  inline std::enable_if_t<!(std::is_fundamental<T>::value ||
-                            std::is_pointer<T>::value),
+  inline std::enable_if_t<!(std::is_fundamental_v<T> || std::is_pointer_v<T>),
                           std::size_t>
   memory_consumption(const T &t)
   {

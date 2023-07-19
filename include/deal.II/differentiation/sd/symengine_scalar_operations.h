@@ -464,7 +464,7 @@ namespace Differentiation
                 dealii::internal::is_explicitly_convertible<
                   SymbolicType,
                   const SymEngine::RCP<const SymEngine::Basic> &>::value &&
-                std::is_constructible<SymbolicType, ValueType>::value>>
+                std::is_constructible_v<SymbolicType, ValueType>>>
     void
     set_value_in_symbol_map(types::substitution_map &substitution_map,
                             const SymbolicType &     symbol,
@@ -653,7 +653,7 @@ namespace Differentiation
                 dealii::internal::is_explicitly_convertible<
                   ExpressionType,
                   const SymEngine::RCP<const SymEngine::Basic> &>::value &&
-                std::is_constructible<ExpressionType, ValueType>::value>>
+                std::is_constructible_v<ExpressionType, ValueType>>>
     types::substitution_map
     make_substitution_map(const ExpressionType &symbol, const ValueType &value);
 
@@ -896,7 +896,7 @@ namespace Differentiation
                 dealii::internal::is_explicitly_convertible<
                   ExpressionType,
                   const SymEngine::RCP<const SymEngine::Basic> &>::value &&
-                std::is_constructible<ExpressionType, ValueType>::value>>
+                std::is_constructible_v<ExpressionType, ValueType>>>
     void
     add_to_substitution_map(types::substitution_map &substitution_map,
                             const ExpressionType &   symbol,
@@ -942,7 +942,7 @@ namespace Differentiation
                 dealii::internal::is_explicitly_convertible<
                   ExpressionType,
                   const SymEngine::RCP<const SymEngine::Basic> &>::value &&
-                std::is_constructible<ExpressionType, ValueType>::value>>
+                std::is_constructible_v<ExpressionType, ValueType>>>
     void
     add_to_substitution_map(types::substitution_map &          substitution_map,
                             const std::vector<ExpressionType> &symbols,

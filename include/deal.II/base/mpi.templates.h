@@ -339,7 +339,7 @@ namespace Utilities
     T
     logical_or(const T &t, const MPI_Comm mpi_communicator)
     {
-      static_assert(std::is_integral<T>::value,
+      static_assert(std::is_integral_v<T>,
                     "The MPI_LOR operation only allows integral data types.");
 
       T return_value{};
@@ -359,7 +359,7 @@ namespace Utilities
       static_assert(std::is_same_v<std::decay_t<T>, std::decay_t<U>>,
                     "Input and output arguments must have the same type!");
 
-      static_assert(std::is_integral<typename T::value_type>::value,
+      static_assert(std::is_integral_v<typename T::value_type>,
                     "The MPI_LOR operation only allows integral data types.");
 
       // Specializations of std containers for the data type bool do not
@@ -386,7 +386,7 @@ namespace Utilities
                const MPI_Comm            mpi_communicator,
                const ArrayView<T> &      results)
     {
-      static_assert(std::is_integral<T>::value,
+      static_assert(std::is_integral_v<T>,
                     "The MPI_LOR operation only allows integral data types.");
 
       internal::all_reduce(MPI_LOR, values, mpi_communicator, results);

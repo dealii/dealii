@@ -122,9 +122,9 @@ template <typename... T>
 constexpr TableIndices<N>::TableIndices(const T... args)
   : indices{static_cast<std::size_t>(args)...}
 {
-  static_assert(internal::TemplateConstraints::all_true<
-                  std::is_integral<T>::value...>::value,
-                "Not all of the parameters have integral type!");
+  static_assert(
+    internal::TemplateConstraints::all_true<std::is_integral_v<T>...>::value,
+    "Not all of the parameters have integral type!");
   static_assert(sizeof...(T) == N, "Wrong number of constructor arguments!");
 }
 

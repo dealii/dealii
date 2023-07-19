@@ -106,7 +106,7 @@ namespace Threads
     static_assert(
       std::is_copy_constructible<
         typename internal::unpack_container<T>::type>::value ||
-        std::is_default_constructible<T>::value,
+        std::is_default_constructible_v<T>,
       "The stored type must be either copyable, or default constructible");
 
   public:
@@ -373,7 +373,7 @@ namespace Threads
      */
     template <typename T>
     std::enable_if_t<
-      std::is_copy_constructible<typename unpack_container<T>::type>::value,
+      std::is_copy_constructible_v<typename unpack_container<T>::type>,
       T &>
     construct_element(std::map<std::thread::id, T> &  data,
                       const std::thread::id &         id,
@@ -389,7 +389,7 @@ namespace Threads
 
     template <typename T>
     std::enable_if_t<
-      !std::is_copy_constructible<typename unpack_container<T>::type>::value,
+      !std::is_copy_constructible_v<typename unpack_container<T>::type>,
       T &>
     construct_element(std::map<std::thread::id, T> &data,
                       const std::thread::id &       id,

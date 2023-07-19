@@ -1844,7 +1844,7 @@ namespace Utilities
                const MPI_Comm mpi_communicator,
                T (&results)[N])
     {
-      static_assert(std::is_integral<T>::value,
+      static_assert(std::is_integral_v<T>,
                     "The MPI_LOR operation only allows integral data types.");
 
       internal::all_reduce(MPI_LOR,

@@ -56,7 +56,7 @@ namespace Rol
    * VectorAdaptor::value_type itself is a type for real-valued numbers.
    * Therefore, VectorAdaptor supports vectors whose real_type is
    * convertible to value_type in the sense that
-   * <code>std::is_convertible<real_type, value_type>::value</code> yields
+   * <code>std::is_convertible_v<real_type, value_type></code> yields
    * <code>true</code>.
    *
    * The <tt>VectorType</tt> should contain the following methods.
@@ -125,7 +125,7 @@ namespace Rol
      */
     using real_type = typename VectorType::real_type;
 
-    static_assert(std::is_convertible<real_type, value_type>::value,
+    static_assert(std::is_convertible_v<real_type, value_type>,
                   "The real_type of the current VectorType is not "
                   "convertible to the value_type.");
 

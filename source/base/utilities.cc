@@ -487,9 +487,9 @@ namespace Utilities
     // https://en.cppreference.com/w/cpp/string/basic_string/to_string). So
     // resort to boost::lexical_cast for all other types (in
     // particular for floating point types.
-    std::string lc_string = (std::is_integral<number>::value ?
-                               std::to_string(value) :
-                               boost::lexical_cast<std::string>(value));
+    std::string lc_string =
+      (std::is_integral_v<number> ? std::to_string(value) :
+                                    boost::lexical_cast<std::string>(value));
 
     if ((digits != numbers::invalid_unsigned_int) &&
         (lc_string.size() < digits))

@@ -57,7 +57,7 @@ namespace internal
    * std::abs on default types, but simply return the number on unsigned types.
    */
   template <typename Number>
-  std::enable_if_t<!std::is_unsigned<Number>::value,
+  std::enable_if_t<!std::is_unsigned_v<Number>,
                    typename numbers::NumberTraits<Number>::real_type>
   get_abs(const Number a)
   {
@@ -65,7 +65,7 @@ namespace internal
   }
 
   template <typename Number>
-  std::enable_if_t<std::is_unsigned<Number>::value, Number>
+  std::enable_if_t<std::is_unsigned_v<Number>, Number>
   get_abs(const Number a)
   {
     return a;

@@ -2339,7 +2339,7 @@ ParameterHandler::add_parameter(const std::string &          entry,
                                 const Patterns::PatternBase &pattern,
                                 const bool                   has_to_be_set)
 {
-  static_assert(std::is_const<ParameterType>::value == false,
+  static_assert(std::is_const_v<ParameterType> == false,
                 "You tried to add a parameter using a type "
                 "that is const. Use a non-const type.");
 

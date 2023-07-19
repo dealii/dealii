@@ -26,8 +26,8 @@ template <typename T>
 constexpr bool
 is_const_reference()
 {
-  return std::is_reference<T>::value &&
-         std::is_const<typename std::remove_reference<T>::type>::value;
+  return std::is_reference_v<T> &&
+         std::is_const_v<typename std::remove_reference<T>::type>;
 }
 
 void
@@ -40,9 +40,9 @@ test()
     AssertThrow(a.begin() == &v[4], ExcInternalError());
     AssertThrow(a.end() == &v[7], ExcInternalError());
 
-    static_assert(std::is_reference<decltype(*a.begin())>::value,
+    static_assert(std::is_reference_v<decltype(*a.begin())>,
                   "type should be a reference");
-    static_assert(std::is_reference<decltype(*a.end())>::value,
+    static_assert(std::is_reference_v<decltype(*a.end())>,
                   "type should be a reference");
     static_assert(!is_const_reference<decltype(*a.begin())>(),
                   "type should not be const");

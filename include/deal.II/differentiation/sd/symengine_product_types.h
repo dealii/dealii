@@ -64,10 +64,9 @@ namespace internal
     struct GeneralProductTypeImpl;
 
     template <typename T>
-    struct GeneralProductTypeImpl<
-      T,
-      Differentiation::SD::Expression,
-      std::enable_if_t<std::is_arithmetic<T>::value>>
+    struct GeneralProductTypeImpl<T,
+                                  Differentiation::SD::Expression,
+                                  std::enable_if_t<std::is_arithmetic_v<T>>>
     {
       using type = Differentiation::SD::Expression;
     };
@@ -77,7 +76,7 @@ namespace internal
       T,
       Differentiation::SD::Expression,
       std::enable_if_t<boost::is_complex<T>::value &&
-                       std::is_arithmetic<typename T::value_type>::value>>
+                       std::is_arithmetic_v<typename T::value_type>>>
     {
       using type = Differentiation::SD::Expression;
     };

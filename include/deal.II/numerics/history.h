@@ -50,7 +50,7 @@ class FiniteSizeHistory
 {
 public:
   static_assert(
-    std::is_default_constructible<T>::value,
+    std::is_default_constructible_v<T>,
     "This class requires that the elements of type T are default constructible.");
 
   /**

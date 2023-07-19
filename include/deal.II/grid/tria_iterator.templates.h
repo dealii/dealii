@@ -83,8 +83,7 @@ TriaRawIterator<Accessor>::operator=(const TriaRawIterator<Accessor> &i)
 
 template <typename Accessor>
 template <typename OtherAccessor>
-inline std::enable_if_t<std::is_convertible<OtherAccessor, Accessor>::value,
-                        bool>
+inline std::enable_if_t<std::is_convertible_v<OtherAccessor, Accessor>, bool>
 TriaRawIterator<Accessor>::operator==(
   const TriaRawIterator<OtherAccessor> &other) const
 {
