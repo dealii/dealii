@@ -201,17 +201,29 @@ namespace PETScWrappers
    * For details, consult the [PETSc
    * manual](https://petsc.org/release/manual/snes/#sec-nlmatrixfree).
    *
-   * In alternative, users can also provide the implementation of the
-   * Jacobian. This can be accomplished in two ways:
+   * Users can also provide the implementations of the Jacobian. This can be
+   * accomplished in two ways:
    *  - PETSc style using NonlinearSolver::jacobian
    *  - deal.II style using NonlinearSolver::setup_jacobian and
-   * NonlinearSolver::solve_with_jacobian.
+   *    NonlinearSolver::solve_with_jacobian.
+   * The preconditioning matrix can be specified using
+   * NonlinearSolver::set_matrix. In case both approaches are implemented, the
+   * deal.II style will be used.
    *
-   * In case both approaches are implemented, the deal.II style
-   * will be used.
+   * NonlinearSolver::set_matrices must be used in case the user wants to
+   * provide the iteration matrix of the tangent system in the deal.II style
+   * approach, thus replacing the matrix-free linearization.
    *
-   * The second approach is more in style with the deal.II philosophy
-   * and it also allows command line customization, like for example,
+   * The correctness of the constructed Jacobians passed using
+   * NonlinearSolver::set_matrix can be checked using
+   * @code
+   * ./myApp -snes_test_jacobian
+   * @endcode
+   * See NonlinearSolver::set_matrix and NonlinearSolver::set_matrices for
+   * additional details.
+   *
+   * The deal.II style approach still allows command line customization, like
+   * for example,
    * @code
    * ./myApp -snes_type newtontr -ksp_type cg
    * @endcode
@@ -219,15 +231,14 @@ namespace PETScWrappers
    * a trust region solver and iterate on the matrix-free tangent system with
    * CG, still using NonlinearSolver::solve_with_jacobian as a preconditioner.
    *
-   * The first approach has instead the advantage that only the matrix assembly
-   * procedure has to be provided, thus allowing quicker implementations and
-   * faster turnaround for experimenting with linear solver preconditioning
-   * configurations via command line customizations, like for example,
+   * The PETSc style approach has instead the advantage that only the matrix
+   * assembly procedure has to be implemented, thus allowing quicker
+   * implementations and faster turnaround for experimenting with linear solver
+   * preconditioning configurations via command line customizations, like for
+   * example,
    * @code
    * ./myApp -ksp_type cg -pc_type gamg
    * @endcode
-   * See NonlinearSolver::set_matrix and NonlinearSolver::set_matrices for
-   * additional details.
    *
    * In case the nonlinear equations are derived from energy minimization
    * arguments, it may be beneficial to perform linesearch or test trust-region
@@ -323,7 +334,8 @@ namespace PETScWrappers
 
     /**
      * Set both the linear system matrix and the preconditioning matrix
-     * that PETSc will use.
+     * that PETSc will use (can be the same matrix). In this case, the
+     * Jacobian-Free-Newton-Krylov approach will not be used.
      */
     void
     set_matrices(AMatrixType &A, PMatrixType &P);
