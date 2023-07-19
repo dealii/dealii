@@ -818,21 +818,23 @@ namespace Utilities
       // we are allowed to call MPI_Init ourselves and PETScInitialize will
       // detect this. This allows us to use MPI_Init_thread instead.
 #ifdef DEAL_II_WITH_PETSC
+      PetscErrorCode pierr;
 #  ifdef DEAL_II_WITH_SLEPC
       // Initialize SLEPc (with PETSc):
       finalize_petscslepc = SlepcInitializeCalled ? false : true;
-      ierr                = SlepcInitialize(&argc, &argv, nullptr, nullptr);
-      AssertThrow(ierr == 0, SLEPcWrappers::SolverBase::ExcSLEPcError(ierr));
+      pierr               = SlepcInitialize(&argc, &argv, nullptr, nullptr);
+      AssertThrow(pierr == 0, SLEPcWrappers::SolverBase::ExcSLEPcError(pierr));
 #  else
       // or just initialize PETSc alone:
       finalize_petscslepc = PetscInitializeCalled ? false : true;
-      ierr                = PetscInitialize(&argc, &argv, nullptr, nullptr);
-      AssertThrow(ierr == 0, ExcPETScError(ierr));
+      pierr               = PetscInitialize(&argc, &argv, nullptr, nullptr);
+      AssertThrow(pierr == 0, ExcPETScError(pierr));
 #  endif
 
       // Disable PETSc exception handling. This just prints a large wall
       // of text that is not particularly helpful for what we do:
-      PetscPopSignalHandler();
+      pierr = PetscPopSignalHandler();
+      AssertThrow(pierr == 0, ExcPETScError(pierr));
 #endif
 
       // Initialize zoltan
@@ -1014,11 +1016,17 @@ namespace Utilities
 #  ifdef DEAL_II_WITH_SLEPC
       // and now end SLEPc with PETSc if we did so
       if (finalize_petscslepc)
-        SlepcFinalize();
+        {
+          PetscErrorCode ierr = SlepcFinalize();
+          AssertThrow(ierr == 0, SLEPcWrappers::SolverBase::ExcSLEPcError(ierr))
+        }
 #  else
       // or just end PETSc if we did so
       if (finalize_petscslepc)
-        PetscFinalize();
+        {
+          PetscErrorCode ierr = PetscFinalize();
+          AssertThrow(ierr == 0, ExcPETScError(ierr));
+        }
 #  endif
 #endif
 

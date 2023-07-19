@@ -168,16 +168,18 @@ namespace PETScWrappers
     // since this is a collective operation
     IS index_set;
 
-    ISCreateGeneral(get_mpi_communicator(),
-                    rows.size(),
-                    petsc_rows.data(),
-                    PETSC_COPY_VALUES,
-                    &index_set);
-
-    const PetscErrorCode ierr =
-      MatZeroRowsIS(matrix, index_set, new_diag_value, nullptr, nullptr);
+    PetscErrorCode ierr;
+    ierr = ISCreateGeneral(get_mpi_communicator(),
+                           rows.size(),
+                           petsc_rows.data(),
+                           PETSC_COPY_VALUES,
+                           &index_set);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-    ISDestroy(&index_set);
+
+    ierr = MatZeroRowsIS(matrix, index_set, new_diag_value, nullptr, nullptr);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = ISDestroy(&index_set);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
   void
@@ -195,16 +197,19 @@ namespace PETScWrappers
     // since this is a collective operation
     IS index_set;
 
-    ISCreateGeneral(get_mpi_communicator(),
-                    rows.size(),
-                    petsc_rows.data(),
-                    PETSC_COPY_VALUES,
-                    &index_set);
+    PetscErrorCode ierr;
+    ierr = ISCreateGeneral(get_mpi_communicator(),
+                           rows.size(),
+                           petsc_rows.data(),
+                           PETSC_COPY_VALUES,
+                           &index_set);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    const PetscErrorCode ierr =
+    ierr =
       MatZeroRowsColumnsIS(matrix, index_set, new_diag_value, nullptr, nullptr);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
-    ISDestroy(&index_set);
+    ierr = ISDestroy(&index_set);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
 
