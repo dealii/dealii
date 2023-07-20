@@ -715,8 +715,7 @@ namespace internal
     template <typename F>
     static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE T
     value(const F &f,
-          std::enable_if_t<!std::is_same_v<typename std::decay<T>::type,
-                                           typename std::decay<F>::type> &&
+          std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::decay_t<F>> &&
                            std::is_constructible<T, F>::value> * = nullptr)
     {
       return T(f);
@@ -726,8 +725,7 @@ namespace internal
     template <typename F>
     static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE T
     value(const F &f,
-          std::enable_if_t<!std::is_same_v<typename std::decay<T>::type,
-                                           typename std::decay<F>::type> &&
+          std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::decay_t<F>> &&
                            !std::is_constructible<T, F>::value &&
                            is_explicitly_convertible<const F, T>::value> * =
             nullptr)
@@ -743,8 +741,7 @@ namespace internal
     static T
     value(
       const F &f,
-      std::enable_if_t<!std::is_same_v<typename std::decay<T>::type,
-                                       typename std::decay<F>::type> &&
+      std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::decay_t<F>> &&
                        !std::is_constructible<T, F>::value &&
                        !is_explicitly_convertible<const F, T>::value &&
                        Differentiation::AD::is_ad_number<F>::value> * = nullptr)

@@ -460,9 +460,8 @@ namespace Differentiation
     template <typename NumberType>
     struct is_adolc_taped_number<
       NumberType,
-      std::enable_if_t<ADNumberTraits<typename std::decay<NumberType>::type>::
-                         type_code == NumberTypes::adolc_taped>>
-      : std::true_type
+      std::enable_if_t<ADNumberTraits<std::decay_t<NumberType>>::type_code ==
+                       NumberTypes::adolc_taped>> : std::true_type
     {};
 
 
@@ -473,9 +472,8 @@ namespace Differentiation
     template <typename NumberType>
     struct is_adolc_tapeless_number<
       NumberType,
-      std::enable_if_t<ADNumberTraits<typename std::decay<NumberType>::type>::
-                         type_code == NumberTypes::adolc_tapeless>>
-      : std::true_type
+      std::enable_if_t<ADNumberTraits<std::decay_t<NumberType>>::type_code ==
+                       NumberTypes::adolc_tapeless>> : std::true_type
     {};
 
 

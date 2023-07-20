@@ -1261,7 +1261,7 @@ namespace TrilinosWrappers
 
     TrilinosWrappers::types::int_type *col_index_ptr =
       reinterpret_cast<TrilinosWrappers::types::int_type *>(
-        const_cast<typename std::decay<decltype(*begin)>::type *>(&*begin));
+        const_cast<std::decay_t<decltype(*begin)> *>(&*begin));
     // Check at least for the first index that the conversion actually works
     AssertDimension(*col_index_ptr, *begin);
     TrilinosWrappers::types::int_type trilinos_row_index = row;

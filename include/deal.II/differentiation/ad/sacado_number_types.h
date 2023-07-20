@@ -184,9 +184,9 @@ namespace Differentiation
        * templates used in the above specializations.
        */
       template <typename Number>
-      struct SacadoNumberInfo<Number,
-                              std::enable_if_t<std::is_arithmetic<
-                                typename std::decay<Number>::type>::value>>
+      struct SacadoNumberInfo<
+        Number,
+        std::enable_if_t<std::is_arithmetic<std::decay_t<Number>>::value>>
       {
         static const unsigned int n_supported_derivative_levels = 0;
       };
@@ -849,11 +849,10 @@ namespace Differentiation
     template <typename NumberType>
     struct is_sacado_dfad_number<
       NumberType,
-      std::enable_if_t<
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-          NumberTypes::sacado_dfad ||
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-          NumberTypes::sacado_dfad_dfad>> : std::true_type
+      std::enable_if_t<ADNumberTraits<std::decay_t<NumberType>>::type_code ==
+                         NumberTypes::sacado_dfad ||
+                       ADNumberTraits<std::decay_t<NumberType>>::type_code ==
+                         NumberTypes::sacado_dfad_dfad>> : std::true_type
     {};
 
 
@@ -870,11 +869,10 @@ namespace Differentiation
     template <typename NumberType>
     struct is_sacado_rad_number<
       NumberType,
-      std::enable_if_t<
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-          NumberTypes::sacado_rad ||
-        ADNumberTraits<typename std::decay<NumberType>::type>::type_code ==
-          NumberTypes::sacado_rad_dfad>> : std::true_type
+      std::enable_if_t<ADNumberTraits<std::decay_t<NumberType>>::type_code ==
+                         NumberTypes::sacado_rad ||
+                       ADNumberTraits<std::decay_t<NumberType>>::type_code ==
+                         NumberTypes::sacado_rad_dfad>> : std::true_type
     {};
 
 

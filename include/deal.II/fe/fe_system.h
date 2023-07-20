@@ -537,11 +537,11 @@ public:
   template <
     class... FEPairs,
     typename = enable_if_all_t<
-      (std::is_same_v<typename std::decay<FEPairs>::type,
+      (std::is_same_v<std::decay_t<FEPairs>,
                       std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
                                 unsigned int>> ||
        std::is_base_of_v<FiniteElement<dim, spacedim>,
-                         typename std::decay<FEPairs>::type>)...>>
+                         std::decay_t<FEPairs>>)...>>
   FESystem(FEPairs &&...fe_pairs);
 
   /**

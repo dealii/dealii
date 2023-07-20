@@ -459,8 +459,7 @@ template <typename T, typename U>
 struct ProductType
 {
   using type =
-    typename internal::ProductTypeImpl<typename std::decay<T>::type,
-                                       typename std::decay<U>::type>::type;
+    typename internal::ProductTypeImpl<std::decay_t<T>, std::decay_t<U>>::type;
 };
 
 namespace internal

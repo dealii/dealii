@@ -157,8 +157,7 @@ namespace Utilities
     void
     sum(const T &values, const MPI_Comm mpi_communicator, U &sums)
     {
-      static_assert(std::is_same_v<typename std::decay<T>::type,
-                                   typename std::decay<U>::type>,
+      static_assert(std::is_same_v<std::decay_t<T>, std::decay_t<U>>,
                     "Input and output arguments must have the same type!");
       const auto array_view_values = make_array_view(values);
       using const_type =
@@ -272,8 +271,7 @@ namespace Utilities
     void
     max(const T &values, const MPI_Comm mpi_communicator, U &maxima)
     {
-      static_assert(std::is_same_v<typename std::decay<T>::type,
-                                   typename std::decay<U>::type>,
+      static_assert(std::is_same_v<std::decay_t<T>, std::decay_t<U>>,
                     "Input and output arguments must have the same type!");
       const auto array_view_values = make_array_view(values);
       using const_type =
@@ -314,8 +312,7 @@ namespace Utilities
     void
     min(const T &values, const MPI_Comm mpi_communicator, U &minima)
     {
-      static_assert(std::is_same_v<typename std::decay<T>::type,
-                                   typename std::decay<U>::type>,
+      static_assert(std::is_same_v<std::decay_t<T>, std::decay_t<U>>,
                     "Input and output arguments must have the same type!");
       const auto array_view_values = make_array_view(values);
       using const_type =
@@ -359,8 +356,7 @@ namespace Utilities
     void
     logical_or(const T &values, const MPI_Comm mpi_communicator, U &results)
     {
-      static_assert(std::is_same_v<typename std::decay<T>::type,
-                                   typename std::decay<U>::type>,
+      static_assert(std::is_same_v<std::decay_t<T>, std::decay_t<U>>,
                     "Input and output arguments must have the same type!");
 
       static_assert(std::is_integral<typename T::value_type>::value,
