@@ -1,0 +1,137 @@
+
+DEAL::** coupling between cell1 and cell2 (tensor) **
+DEAL::n_coupling_dofs: 8
+DEAL::coupling_dof_indices: 0 1 2 3 1 4 3 5 
+DEAL::  index 0 global_dof_index: 0, index 1: 0, index 2: -1
+DEAL::  index 1 global_dof_index: 1, index 1: 1, index 2: -1
+DEAL::  index 2 global_dof_index: 2, index 1: 2, index 2: -1
+DEAL::  index 3 global_dof_index: 3, index 1: 3, index 2: -1
+DEAL::  index 4 global_dof_index: 1, index 1: -1, index 2: 0
+DEAL::  index 5 global_dof_index: 4, index 1: -1, index 2: 1
+DEAL::  index 6 global_dof_index: 3, index 1: -1, index 2: 2
+DEAL::  index 7 global_dof_index: 5, index 1: -1, index 2: 3
+DEAL::n_quadrature_points: 16
+DEAL::  q index 0, index 1: 0, index 2: 0, q1: 0.211325 0.211325, q2: 1.21132 0.211325
+DEAL::  q index 1, index 1: 0, index 2: 1, q1: 0.211325 0.211325, q2: 1.78868 0.211325
+DEAL::  q index 2, index 1: 0, index 2: 2, q1: 0.211325 0.211325, q2: 1.21132 0.788675
+DEAL::  q index 3, index 1: 0, index 2: 3, q1: 0.211325 0.211325, q2: 1.78868 0.788675
+DEAL::  q index 4, index 1: 1, index 2: 0, q1: 0.788675 0.211325, q2: 1.21132 0.211325
+DEAL::  q index 5, index 1: 1, index 2: 1, q1: 0.788675 0.211325, q2: 1.78868 0.211325
+DEAL::  q index 6, index 1: 1, index 2: 2, q1: 0.788675 0.211325, q2: 1.21132 0.788675
+DEAL::  q index 7, index 1: 1, index 2: 3, q1: 0.788675 0.211325, q2: 1.78868 0.788675
+DEAL::  q index 8, index 1: 2, index 2: 0, q1: 0.211325 0.788675, q2: 1.21132 0.211325
+DEAL::  q index 9, index 1: 2, index 2: 1, q1: 0.211325 0.788675, q2: 1.78868 0.211325
+DEAL::  q index 10, index 1: 2, index 2: 2, q1: 0.211325 0.788675, q2: 1.21132 0.788675
+DEAL::  q index 11, index 1: 2, index 2: 3, q1: 0.211325 0.788675, q2: 1.78868 0.788675
+DEAL::  q index 12, index 1: 3, index 2: 0, q1: 0.788675 0.788675, q2: 1.21132 0.211325
+DEAL::  q index 13, index 1: 3, index 2: 1, q1: 0.788675 0.788675, q2: 1.78868 0.211325
+DEAL::  q index 14, index 1: 3, index 2: 2, q1: 0.788675 0.788675, q2: 1.21132 0.788675
+DEAL::  q index 15, index 1: 3, index 2: 3, q1: 0.788675 0.788675, q2: 1.78868 0.788675
+DEAL::
+DEAL::** coupling between cell1 and cell2 (unrolled) **
+DEAL::n_coupling_dofs: 8
+DEAL::coupling_dof_indices: 0 1 2 3 1 4 3 5 
+DEAL::  index 0 global_dof_index: 0, index 1: 0, index 2: -1
+DEAL::  index 1 global_dof_index: 1, index 1: 1, index 2: -1
+DEAL::  index 2 global_dof_index: 2, index 1: 2, index 2: -1
+DEAL::  index 3 global_dof_index: 3, index 1: 3, index 2: -1
+DEAL::  index 4 global_dof_index: 1, index 1: -1, index 2: 0
+DEAL::  index 5 global_dof_index: 4, index 1: -1, index 2: 1
+DEAL::  index 6 global_dof_index: 3, index 1: -1, index 2: 2
+DEAL::  index 7 global_dof_index: 5, index 1: -1, index 2: 3
+DEAL::n_quadrature_points: 4
+DEAL::  q index 0, index 1: 0, index 2: 0, q1: 0.211325 0.211325, q2: 1.21132 0.211325
+DEAL::  q index 1, index 1: 1, index 2: 1, q1: 0.788675 0.211325, q2: 1.78868 0.211325
+DEAL::  q index 2, index 1: 2, index 2: 2, q1: 0.211325 0.788675, q2: 1.21132 0.788675
+DEAL::  q index 3, index 1: 3, index 2: 3, q1: 0.788675 0.788675, q2: 1.78868 0.788675
+DEAL::
+DEAL::** coupling between cell1 and cell2 Trapez (overlapping) **
+DEAL::n_coupling_dofs: 8
+DEAL::coupling_dof_indices: 0 1 2 3 1 4 3 5 
+DEAL::  index 0 global_dof_index: 0, index 1: 0, index 2: -1
+DEAL::  index 1 global_dof_index: 1, index 1: 1, index 2: -1
+DEAL::  index 2 global_dof_index: 2, index 1: 2, index 2: -1
+DEAL::  index 3 global_dof_index: 3, index 1: 3, index 2: -1
+DEAL::  index 4 global_dof_index: 1, index 1: -1, index 2: 0
+DEAL::  index 5 global_dof_index: 4, index 1: -1, index 2: 1
+DEAL::  index 6 global_dof_index: 3, index 1: -1, index 2: 2
+DEAL::  index 7 global_dof_index: 5, index 1: -1, index 2: 3
+DEAL::n_quadrature_points: 2
+DEAL::  q index 0, index 1: 1, index 2: 0, q1: 1.00000 0.00000, q2: 1.00000 0.00000
+DEAL::  q index 1, index 1: 3, index 2: 2, q1: 1.00000 1.00000, q2: 1.00000 1.00000
+DEAL::
+DEAL::** coupling between cell1 and boundary face, trapez (overlapping) **
+DEAL::n_coupling_dofs: 8
+DEAL::coupling_dof_indices: 0 1 2 3 0 1 2 3 
+DEAL::  index 0 global_dof_index: 0, index 1: 0, index 2: -1
+DEAL::  index 1 global_dof_index: 1, index 1: 1, index 2: -1
+DEAL::  index 2 global_dof_index: 2, index 1: 2, index 2: -1
+DEAL::  index 3 global_dof_index: 3, index 1: 3, index 2: -1
+DEAL::  index 4 global_dof_index: 0, index 1: -1, index 2: 0
+DEAL::  index 5 global_dof_index: 1, index 1: -1, index 2: 1
+DEAL::  index 6 global_dof_index: 2, index 1: -1, index 2: 2
+DEAL::  index 7 global_dof_index: 3, index 1: -1, index 2: 3
+DEAL::n_quadrature_points: 2
+DEAL::  q index 0, index 1: 0, index 2: 0, q1: 0.00000 0.00000, q2: 0.00000 0.00000
+DEAL::  q index 1, index 1: 2, index 2: 1, q1: 0.00000 1.00000, q2: 0.00000 1.00000
+DEAL::
+DEAL::** coupling between cell1 and cell1->internal_face, trapez (overlapping) **
+DEAL::n_coupling_dofs: 8
+DEAL::coupling_dof_indices: 0 1 2 3 1 4 3 5 
+DEAL::  index 0 global_dof_index: 0, index 1: 0, index 2: -1
+DEAL::  index 1 global_dof_index: 1, index 1: 1, index 2: -1
+DEAL::  index 2 global_dof_index: 2, index 1: 2, index 2: -1
+DEAL::  index 3 global_dof_index: 3, index 1: 3, index 2: -1
+DEAL::  index 4 global_dof_index: 1, index 1: -1, index 2: 0
+DEAL::  index 5 global_dof_index: 4, index 1: -1, index 2: 1
+DEAL::  index 6 global_dof_index: 3, index 1: -1, index 2: 2
+DEAL::  index 7 global_dof_index: 5, index 1: -1, index 2: 3
+DEAL::n_quadrature_points: 2
+DEAL::  q index 0, index 1: 1, index 2: 0, q1: 1.00000 0.00000, q2: 1.00000 0.00000
+DEAL::  q index 1, index 1: 3, index 2: 1, q1: 1.00000 1.00000, q2: 1.00000 1.00000
+DEAL::
+DEAL::** coupling between cell1 and cell2->internal_face, trapez (overlapping) **
+DEAL::n_coupling_dofs: 8
+DEAL::coupling_dof_indices: 0 1 2 3 1 4 3 5 
+DEAL::  index 0 global_dof_index: 0, index 1: 0, index 2: -1
+DEAL::  index 1 global_dof_index: 1, index 1: 1, index 2: -1
+DEAL::  index 2 global_dof_index: 2, index 1: 2, index 2: -1
+DEAL::  index 3 global_dof_index: 3, index 1: 3, index 2: -1
+DEAL::  index 4 global_dof_index: 1, index 1: -1, index 2: 0
+DEAL::  index 5 global_dof_index: 4, index 1: -1, index 2: 1
+DEAL::  index 6 global_dof_index: 3, index 1: -1, index 2: 2
+DEAL::  index 7 global_dof_index: 5, index 1: -1, index 2: 3
+DEAL::n_quadrature_points: 2
+DEAL::  q index 0, index 1: 1, index 2: 0, q1: 1.00000 0.00000, q2: 1.00000 0.00000
+DEAL::  q index 1, index 1: 3, index 2: 1, q1: 1.00000 1.00000, q2: 1.00000 1.00000
+DEAL::
+DEAL::** coupling between cell1 and cell2->other_face, trapez (overlapping) **
+DEAL::n_coupling_dofs: 8
+DEAL::coupling_dof_indices: 0 1 2 3 1 4 3 5 
+DEAL::  index 0 global_dof_index: 0, index 1: 0, index 2: -1
+DEAL::  index 1 global_dof_index: 1, index 1: 1, index 2: -1
+DEAL::  index 2 global_dof_index: 2, index 1: 2, index 2: -1
+DEAL::  index 3 global_dof_index: 3, index 1: 3, index 2: -1
+DEAL::  index 4 global_dof_index: 1, index 1: -1, index 2: 0
+DEAL::  index 5 global_dof_index: 4, index 1: -1, index 2: 1
+DEAL::  index 6 global_dof_index: 3, index 1: -1, index 2: 2
+DEAL::  index 7 global_dof_index: 5, index 1: -1, index 2: 3
+DEAL::n_quadrature_points: 0
+DEAL::
+DEAL::** coupling between cell1->face(0) and cell1->face(2), trapez (tensor) **
+DEAL::n_coupling_dofs: 8
+DEAL::coupling_dof_indices: 0 1 2 3 0 1 2 3 
+DEAL::  index 0 global_dof_index: 0, index 1: 0, index 2: -1
+DEAL::  index 1 global_dof_index: 1, index 1: 1, index 2: -1
+DEAL::  index 2 global_dof_index: 2, index 1: 2, index 2: -1
+DEAL::  index 3 global_dof_index: 3, index 1: 3, index 2: -1
+DEAL::  index 4 global_dof_index: 0, index 1: -1, index 2: 0
+DEAL::  index 5 global_dof_index: 1, index 1: -1, index 2: 1
+DEAL::  index 6 global_dof_index: 2, index 1: -1, index 2: 2
+DEAL::  index 7 global_dof_index: 3, index 1: -1, index 2: 3
+DEAL::n_quadrature_points: 4
+DEAL::  q index 0, index 1: 0, index 2: 0, q1: 0.00000 0.00000, q2: 0.00000 0.00000
+DEAL::  q index 1, index 1: 0, index 2: 1, q1: 0.00000 0.00000, q2: 1.00000 0.00000
+DEAL::  q index 2, index 1: 1, index 2: 0, q1: 0.00000 1.00000, q2: 0.00000 0.00000
+DEAL::  q index 3, index 1: 1, index 2: 1, q1: 0.00000 1.00000, q2: 1.00000 0.00000
+DEAL::

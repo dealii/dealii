@@ -268,6 +268,42 @@ namespace FEValuesExtractors
     std::string
     get_name() const;
   };
+
+  /**
+   * Helper struct to associate an extractor to the first FEValuesBase
+   * sub-object of a FECouplingValues object.
+   */
+  template <typename Extractor>
+  struct FirstCoupling
+  {
+    /**
+     * Construct a new FirstCoupling object with the given extractor.
+     */
+    FirstCoupling(const Extractor &extractor);
+
+    /**
+     * The actual extractor object.
+     */
+    const Extractor extractor;
+  };
+
+  /**
+   * Helper struct to associate an extractor to the second FEValuesBase
+   * sub-object of a FECouplingValues object.
+   */
+  template <typename Extractor>
+  struct SecondCoupling
+  {
+    /**
+     * Construct a new SecondCoupling object with the given extractor.
+     */
+    SecondCoupling(const Extractor &extractor);
+
+    /**
+     * The actual extractor object.
+     */
+    const Extractor extractor;
+  };
 } // namespace FEValuesExtractors
 
 
@@ -320,8 +356,19 @@ namespace FEValuesExtractors
   inline Tensor<rank>::Tensor(const unsigned int first_tensor_component)
     : first_tensor_component(first_tensor_component)
   {}
-} // namespace FEValuesExtractors
 
+
+  template <typename Extractor>
+  inline FirstCoupling<Extractor>::FirstCoupling(const Extractor &extractor)
+    : extractor(extractor)
+  {}
+
+
+  template <typename Extractor>
+  inline SecondCoupling<Extractor>::SecondCoupling(const Extractor &extractor)
+    : extractor(extractor)
+  {}
+} // namespace FEValuesExtractors
 
 
 DEAL_II_NAMESPACE_CLOSE
