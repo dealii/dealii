@@ -53,6 +53,41 @@ endmacro()
 #
 # Wrap the following checks into a macro to make it easier to rerun them.
 #
+macro(_test_cxx23_support)
+  unset_if_changed(CHECK_CXX23_FEATURES_FLAGS_SAVED
+    "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
+    DEAL_II_HAVE_CXX23_FEATURES
+    )
+
+  # Strictly speaking "202100L" indicates support for a preliminary version
+  # of the C++23 standard (which will have "202302L" when finalized). gcc-13
+  # exports this version number when configured with C++23 support.
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <version>
+
+    #if __cplusplus < 202100L && !defined(_MSC_VER) && !defined(__INTEL_COMPILER)
+    #  error \"insufficient support for C++23\"
+    #endif
+
+    int main() {}
+    "
+    DEAL_II_HAVE_CXX23_FEATURES)
+
+  if(DEAL_II_HAVE_CXX23_FEATURES)
+    message(STATUS "C++23 support is enabled.")
+    set(DEAL_II_HAVE_CXX23 TRUE)
+    set(_cxx_standard 23)
+  else()
+    message(STATUS "C++23 support is disabled.")
+    set(DEAL_II_HAVE_CXX23 FALSE)
+  endif()
+endmacro()
+
+
+#
+# Wrap the following checks into a macro to make it easier to rerun them.
+#
 macro(_test_cxx20_support)
   unset_if_changed(CHECK_CXX20_FEATURES_FLAGS_SAVED
     "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
@@ -333,6 +368,8 @@ if(NOT DEAL_II_HAVE_CXX17)
 endif()
 
 _test_cxx20_support()
+
+_test_cxx23_support()
 
 set_if_empty(CMAKE_CXX_STANDARD "${_cxx_standard}")
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
