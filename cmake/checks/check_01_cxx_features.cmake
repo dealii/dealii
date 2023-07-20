@@ -70,6 +70,10 @@ macro(_test_cxx23_support)
     #  error \"insufficient support for C++23\"
     #endif
 
+    struct Dummy {
+      static void operator()() {}
+    };
+
     int main() {}
     "
     DEAL_II_HAVE_CXX23_FEATURES)
