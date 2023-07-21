@@ -200,25 +200,36 @@ namespace CUDAWrappers
       auto constraint_mask_host =
         Kokkos::create_mirror_view(data->constraint_mask[color]);
 
+      typename std::remove_reference_t<decltype(
+        data->q_points[color])>::HostMirror q_points_host;
+      typename std::remove_reference_t<decltype(data->JxW[color])>::HostMirror
+                                                JxW_host;
+      typename std::remove_reference_t<decltype(
+        data->inv_jacobian[color])>::HostMirror inv_jacobian_host;
 #if KOKKOS_VERSION >= 30600
       auto local_to_global_host =
         Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                    data->local_to_global[color]);
-      auto q_points_host =
-        Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
-                                   data->q_points[color]);
-      auto JxW_host = Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
-                                                 data->JxW[color]);
-      auto inv_jacobian_host =
-        Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
-                                   data->inv_jacobian[color]);
+      if (update_flags & update_quadrature_points)
+        q_points_host = Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                                   data->q_points[color]);
+      if (update_flags & update_JxW_values)
+        JxW_host = Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                              data->JxW[color]);
+      if (update_flags & update_gradients)
+        inv_jacobian_host =
+          Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                     data->inv_jacobian[color]);
 #else
       auto local_to_global_host =
         Kokkos::create_mirror_view(data->local_to_global[color]);
-      auto q_points_host = Kokkos::create_mirror_view(data->q_points[color]);
-      auto JxW_host      = Kokkos::create_mirror_view(data->JxW[color]);
-      auto inv_jacobian_host =
-        Kokkos::create_mirror_view(data->inv_jacobian[color]);
+      if (update_flags & update_quadrature_points)
+        q_points_host = Kokkos::create_mirror_view(data->q_points[color]);
+      if (update_flags & update_JxW_values)
+        JxW_host = Kokkos::create_mirror_view(data->JxW[color]);
+      if (update_flags & update_gradients)
+        inv_jacobian_host =
+          Kokkos::create_mirror_view(data->inv_jacobian[color]);
 #endif
 
       auto cell = graph.cbegin(), end_cell = graph.cend();
@@ -277,9 +288,12 @@ namespace CUDAWrappers
       // Copy the data to the device
       Kokkos::deep_copy(data->constraint_mask[color], constraint_mask_host);
       Kokkos::deep_copy(data->local_to_global[color], local_to_global_host);
-      Kokkos::deep_copy(data->q_points[color], q_points_host);
-      Kokkos::deep_copy(data->JxW[color], JxW_host);
-      Kokkos::deep_copy(data->inv_jacobian[color], inv_jacobian_host);
+      if (update_flags & update_quadrature_points)
+        Kokkos::deep_copy(data->q_points[color], q_points_host);
+      if (update_flags & update_JxW_values)
+        Kokkos::deep_copy(data->JxW[color], JxW_host);
+      if (update_flags & update_gradients)
+        Kokkos::deep_copy(data->inv_jacobian[color], inv_jacobian_host);
     }
 
 
