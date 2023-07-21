@@ -1675,9 +1675,9 @@ public:
                  std::string,
                  std::string,
                  << "Line <" << arg1 << "> of file <" << arg2
-                 << ": There is "
-                    "no such subsection to be entered: "
-                 << arg3);
+                 << ">: You are trying to enter a subsection '" << arg3
+                 << "', but the ParameterHandler object does "
+                 << "not know of any such subsection.");
 
   /**
    * General exception for a line that could not be parsed, taking, as
