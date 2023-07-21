@@ -473,7 +473,7 @@ namespace Utilities
       // standards. To avoid this, we use std::abs on default types but
       // simply return the number on unsigned types
       template <typename Number>
-      std::enable_if_t<!std::is_unsigned<Number>::value,
+      std::enable_if_t<!std::is_unsigned_v<Number>,
                        typename numbers::NumberTraits<Number>::real_type>
       get_abs(const Number a)
       {
@@ -481,7 +481,7 @@ namespace Utilities
       }
 
       template <typename Number>
-      std::enable_if_t<std::is_unsigned<Number>::value, Number>
+      std::enable_if_t<std::is_unsigned_v<Number>, Number>
       get_abs(const Number a)
       {
         return a;
@@ -783,7 +783,7 @@ namespace Utilities
           else
 #    endif
             {
-              if constexpr (std::is_trivial<Number>::value)
+              if constexpr (std::is_trivial_v<Number>)
                 {
                   std::memset(ghost_array.data(),
                               0,

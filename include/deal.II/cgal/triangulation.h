@@ -260,7 +260,7 @@ namespace CGALWrappers
 
     // Do the same with surface patches, if possible
     SubCellData subcell_data;
-    if constexpr (std::is_integral<typename C3T3::Surface_patch_index>::value)
+    if constexpr (std::is_integral_v<typename C3T3::Surface_patch_index>)
       {
         for (auto face = cgal_triangulation.facets_in_complex_begin();
              face != cgal_triangulation.facets_in_complex_end();
@@ -283,7 +283,7 @@ namespace CGALWrappers
           }
       }
     // and curves
-    if constexpr (std::is_integral<typename C3T3::Curve_index>::value)
+    if constexpr (std::is_integral_v<typename C3T3::Curve_index>)
       {
         for (auto edge = cgal_triangulation.edges_in_complex_begin();
              edge != cgal_triangulation.edges_in_complex_end();

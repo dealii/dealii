@@ -254,8 +254,7 @@ public:
    * the same entry in the same container.
    */
   template <typename OtherIterator>
-  std::enable_if_t<std::is_convertible<OtherIterator, DerivedIterator>::value,
-                   bool>
+  std::enable_if_t<std::is_convertible_v<OtherIterator, DerivedIterator>, bool>
   operator==(const OtherIterator &right) const
   {
     const auto &right_2 = static_cast<const DerivedIterator &>(right);
@@ -266,8 +265,7 @@ public:
    * Opposite of operator==().
    */
   template <typename OtherIterator>
-  std::enable_if_t<std::is_convertible<OtherIterator, DerivedIterator>::value,
-                   bool>
+  std::enable_if_t<std::is_convertible_v<OtherIterator, DerivedIterator>, bool>
   operator!=(const OtherIterator &right) const
   {
     return !(*this == right);

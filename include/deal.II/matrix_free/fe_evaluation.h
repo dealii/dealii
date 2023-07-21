@@ -3153,7 +3153,7 @@ namespace internal
   {
     using BaseVectorType = typename ConstBlockVectorSelector<
       VectorType,
-      std::is_const<VectorType>::value>::BaseVectorType;
+      std::is_const_v<VectorType>>::BaseVectorType;
 
     static BaseVectorType *
     get_vector_component(VectorType &vec, const unsigned int component)

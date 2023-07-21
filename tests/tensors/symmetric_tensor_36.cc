@@ -34,7 +34,7 @@ template <int rank,
           class TensorType,
           typename NumberType1,
           typename NumberType2>
-std::enable_if_t<!std::is_constructible<NumberType1, NumberType2>::value, void>
+std::enable_if_t<!std::is_constructible_v<NumberType1, NumberType2>, void>
 test_tensor_constructor(const std::string &, const std::string &)
 {}
 
@@ -44,7 +44,7 @@ template <int rank,
           class TensorType,
           typename NumberType1,
           typename NumberType2>
-std::enable_if_t<std::is_constructible<NumberType1, NumberType2>::value, void>
+std::enable_if_t<std::is_constructible_v<NumberType1, NumberType2>, void>
 test_tensor_constructor(const std::string &type1, const std::string &type2)
 {
   deallog << "Rank " << rank << ", "

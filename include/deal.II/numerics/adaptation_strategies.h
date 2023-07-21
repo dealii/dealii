@@ -229,7 +229,7 @@ namespace AdaptationStrategies
             &              parent,
           const value_type parent_value)
     {
-      static_assert(std::is_arithmetic<value_type>::value &&
+      static_assert(std::is_arithmetic_v<value_type> &&
                       !std::is_same_v<value_type, bool>,
                     "The provided value_type may not meet the requirements "
                     "of this function.");
@@ -247,7 +247,7 @@ namespace AdaptationStrategies
               &              parent,
             const value_type parent_value)
     {
-      static_assert(std::is_arithmetic<value_type>::value &&
+      static_assert(std::is_arithmetic_v<value_type> &&
                       !std::is_same_v<value_type, bool>,
                     "The provided value_type may not meet the requirements "
                     "of this function.");
@@ -289,7 +289,7 @@ namespace AdaptationStrategies
     sum(const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
         const std::vector<value_type> &children_values)
     {
-      static_assert(std::is_arithmetic<value_type>::value &&
+      static_assert(std::is_arithmetic_v<value_type> &&
                       !std::is_same_v<value_type, bool>,
                     "The provided value_type may not meet the requirements "
                     "of this function.");
@@ -308,7 +308,7 @@ namespace AdaptationStrategies
       const typename dealii::Triangulation<dim, spacedim>::cell_iterator &,
       const std::vector<value_type> &children_values)
     {
-      static_assert(std::is_arithmetic<value_type>::value &&
+      static_assert(std::is_arithmetic_v<value_type> &&
                       !std::is_same_v<value_type, bool>,
                     "The provided value_type may not meet the requirements "
                     "of this function.");

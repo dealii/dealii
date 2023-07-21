@@ -1481,7 +1481,7 @@ namespace Patterns
 
     // Arithmetic types
     template <class T>
-    struct Convert<T, std::enable_if_t<std::is_arithmetic<T>::value>>
+    struct Convert<T, std::enable_if_t<std::is_arithmetic_v<T>>>
     {
       template <typename Dummy = T>
       static std::enable_if_t<std::is_same_v<Dummy, T> &&
@@ -1495,7 +1495,7 @@ namespace Patterns
       template <typename Dummy = T>
       static std::enable_if_t<std::is_same_v<Dummy, T> &&
                                 !std::is_same_v<T, bool> &&
-                                std::is_integral<T>::value,
+                                std::is_integral_v<T>,
                               std::unique_ptr<Patterns::PatternBase>>
       to_pattern()
       {
@@ -1506,7 +1506,7 @@ namespace Patterns
       template <typename Dummy = T>
       static std::enable_if_t<std::is_same_v<Dummy, T> &&
                                 !std::is_same_v<T, bool> &&
-                                std::is_floating_point<T>::value,
+                                std::is_floating_point_v<T>,
                               std::unique_ptr<Patterns::PatternBase>>
       to_pattern()
       {

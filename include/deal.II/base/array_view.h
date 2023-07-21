@@ -452,7 +452,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   // nevertheless, leave the static_assert in since it provides a
   // more descriptive error message that will simply come after the first
   // error produced above
-  static_assert(std::is_const<value_type>::value == true,
+  static_assert(std::is_const_v<value_type> == true,
                 "This constructor may only be called if the ArrayView "
                 "object has a const value_type. In other words, you can "
                 "only create an ArrayView to const values from a const "
@@ -486,7 +486,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   // nevertheless, leave the static_assert in since it provides a
   // more descriptive error message that will simply come after the first
   // error produced above
-  static_assert(std::is_const<value_type>::value == true,
+  static_assert(std::is_const_v<value_type> == true,
                 "This constructor may only be called if the ArrayView "
                 "object has a const value_type. In other words, you can "
                 "only create an ArrayView to const values from a const "

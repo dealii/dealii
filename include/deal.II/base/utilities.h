@@ -498,7 +498,7 @@ namespace Utilities
     // return prefactor * dealii::Utilities::pow(base*base, iexp/2);
     // </code>
 
-    static_assert(std::is_integral<T>::value, "Only integral types supported");
+    static_assert(std::is_integral_v<T>, "Only integral types supported");
 
     return iexp <= 0 ?
              1 :
@@ -982,8 +982,8 @@ namespace Utilities
   inline T
   fixed_power(const T x)
   {
-    Assert(((std::is_integral<T>::value == true) && (N >= 0)) ||
-             (std::is_integral<T>::value == false),
+    Assert(((std::is_integral_v<T> == true) && (N >= 0)) ||
+             (std::is_integral_v<T> == false),
            ExcMessage("If the type of the argument, T, is an integer type, "
                       "then the exponent N must be a non-negative integer "
                       "because the result would otherwise not be an integer."));
@@ -1123,7 +1123,7 @@ namespace Utilities
     /**
      * A structure that is used to identify whether a template argument is a
      * std::vector<T> or std::vector<std::vector<T>> where T is a type that
-     * satisfies std::is_trivially_copyable<T>::value == true.
+     * satisfies std::is_trivially_copyable_v<T> == true.
      */
     template <typename T>
     struct IsVectorOfTriviallyCopyable
@@ -1137,7 +1137,7 @@ namespace Utilities
     struct IsVectorOfTriviallyCopyable<std::vector<T>>
     {
       static constexpr bool value =
-        std::is_trivially_copyable<T>::value && !std::is_same_v<T, bool>;
+        std::is_trivially_copyable_v<T> && !std::is_same_v<T, bool>;
     };
 
 
@@ -1146,14 +1146,14 @@ namespace Utilities
     struct IsVectorOfTriviallyCopyable<std::vector<std::vector<T>>>
     {
       static constexpr bool value =
-        std::is_trivially_copyable<T>::value && !std::is_same_v<T, bool>;
+        std::is_trivially_copyable_v<T> && !std::is_same_v<T, bool>;
     };
 
 
 
     /**
      * A function that is used to append the contents of a std::vector<T>
-     * (where T is a type that satisfies std::is_trivially_copyable<T>::value
+     * (where T is a type that satisfies std::is_trivially_copyable_v<T>
      * == true but not T==bool) bit for bit to a character array.
      *
      * If the type is not such a vector of T, then the function
@@ -1172,7 +1172,7 @@ namespace Utilities
 
     template <typename T,
               typename = std::enable_if_t<!std::is_same_v<T, bool> &&
-                                          std::is_trivially_copyable<T>::value>>
+                                          std::is_trivially_copyable_v<T>>>
     inline void
     append_vector_of_trivially_copyable_to_buffer(
       const std::vector<T> &object,
@@ -1202,7 +1202,7 @@ namespace Utilities
 
     template <typename T,
               typename = std::enable_if_t<!std::is_same_v<T, bool> &&
-                                          std::is_trivially_copyable<T>::value>>
+                                          std::is_trivially_copyable_v<T>>>
     inline void
     append_vector_of_trivially_copyable_to_buffer(
       const std::vector<std::vector<T>> &object,
@@ -1262,7 +1262,7 @@ namespace Utilities
 
     template <typename T,
               typename = std::enable_if_t<!std::is_same_v<T, bool> &&
-                                          std::is_trivially_copyable<T>::value>>
+                                          std::is_trivially_copyable_v<T>>>
     inline void
     create_vector_of_trivially_copyable_from_buffer(
       const std::vector<char>::const_iterator &cbegin,
@@ -1297,7 +1297,7 @@ namespace Utilities
 
     template <typename T,
               typename = std::enable_if_t<!std::is_same_v<T, bool> &&
-                                          std::is_trivially_copyable<T>::value>>
+                                          std::is_trivially_copyable_v<T>>>
     inline void
     create_vector_of_trivially_copyable_from_buffer(
       const std::vector<char>::const_iterator &cbegin,

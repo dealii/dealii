@@ -762,7 +762,7 @@ namespace internal
       // (void*) to silence compiler warning for virtual classes (they will
       // never arrive here because they are non-trivial).
 
-      if (std::is_trivial<T>::value == true)
+      if (std::is_trivial_v<T> == true)
         std::memcpy(static_cast<void *>(destination_ + begin),
                     static_cast<const void *>(source_ + begin),
                     (end - begin) * sizeof(T));
@@ -830,7 +830,7 @@ namespace internal
       // Classes with trivial assignment can use memcpy. cast element to
       // (void*) to silence compiler warning for virtual classes (they will
       // never arrive here because they are non-trivial).
-      if (std::is_trivial<T>::value == true)
+      if (std::is_trivial_v<T> == true)
         std::memcpy(static_cast<void *>(destination_ + begin),
                     static_cast<void *>(source_ + begin),
                     (end - begin) * sizeof(T));
@@ -889,7 +889,7 @@ namespace internal
       // do not use memcmp for long double because on some systems it does not
       // completely fill its memory and may lead to false positives in
       // e.g. valgrind
-      if (std::is_trivial<T>::value == true &&
+      if (std::is_trivial_v<T> == true &&
           std::is_same_v<T, long double> == false)
         {
           const unsigned char zero[sizeof(T)] = {};
@@ -918,7 +918,7 @@ namespace internal
       // element to (void*) to silence compiler warning for virtual
       // classes (they will never arrive here because they are
       // non-trivial).
-      if (std::is_trivial<T>::value == true && trivial_element)
+      if (std::is_trivial_v<T> == true && trivial_element)
         std::memset(static_cast<void *>(destination_ + begin),
                     0,
                     (end - begin) * sizeof(T));
@@ -1003,7 +1003,7 @@ namespace internal
       // element to (void*) to silence compiler warning for virtual
       // classes (they will never arrive here because they are
       // non-trivial).
-      if (std::is_trivial<T>::value == true)
+      if (std::is_trivial_v<T> == true)
         std::memset(static_cast<void *>(destination_ + begin),
                     0,
                     (end - begin) * sizeof(T));
@@ -1081,7 +1081,7 @@ AlignedVector<T>::Deleter::operator()(T *ptr)
           Assert(owning_aligned_vector->used_elements_end != nullptr,
                  ExcInternalError());
 
-          if (std::is_trivial<T>::value == false)
+          if (std::is_trivial_v<T> == false)
             for (T *p = owning_aligned_vector->used_elements_end - 1; p >= ptr;
                  --p)
               p->~T();
@@ -1138,7 +1138,7 @@ AlignedVector<T>::Deleter::MPISharedMemDeleterAction::delete_array(
   // it, not unique_ptr) so it is still set to its correct value.
 
   if (is_shmem_root)
-    if (std::is_trivial<T>::value == false)
+    if (std::is_trivial_v<T> == false)
       for (T *p = aligned_vector->used_elements_end - 1; p >= ptr; --p)
         p->~T();
 
@@ -1266,7 +1266,7 @@ AlignedVector<T>::resize_fast(const size_type new_size)
       // call destructor on fields that are released, if the type requires it.
       // doing it backward releases the elements in reverse order as compared to
       // how they were created
-      if (std::is_trivial<T>::value == false)
+      if (std::is_trivial_v<T> == false)
         for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
           p->~T();
       used_elements_end = elements.get() + new_size;
@@ -1279,7 +1279,7 @@ AlignedVector<T>::resize_fast(const size_type new_size)
 
       // need to still set the values in case the class is non-trivial because
       // virtual classes etc. need to run their (default) constructor
-      if (std::is_trivial<T>::value == false)
+      if (std::is_trivial_v<T> == false)
         dealii::internal::AlignedVectorDefaultInitialize<T, true>(
           new_size - old_size, elements.get() + old_size);
     }
@@ -1302,7 +1302,7 @@ AlignedVector<T>::resize(const size_type new_size)
       // call destructor on fields that are released, if the type requires it.
       // doing it backward releases the elements in reverse order as compared to
       // how they were created
-      if (std::is_trivial<T>::value == false)
+      if (std::is_trivial_v<T> == false)
         for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
           p->~T();
       used_elements_end = elements.get() + new_size;
@@ -1336,7 +1336,7 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
       // call destructor on fields that are released, if the type requires it.
       // doing it backward releases the elements in reverse order as compared to
       // how they were created
-      if (std::is_trivial<T>::value == false)
+      if (std::is_trivial_v<T> == false)
         for (T *p = used_elements_end - 1; p >= elements.get() + new_size; --p)
           p->~T();
       used_elements_end = elements.get() + new_size;
@@ -1433,7 +1433,7 @@ AlignedVector<T>::push_back(const T in_data)
   Assert(used_elements_end <= allocated_elements_end, ExcInternalError());
   if (used_elements_end == allocated_elements_end)
     reserve(std::max(2 * capacity(), static_cast<size_type>(16)));
-  if (std::is_trivial<T>::value == false)
+  if (std::is_trivial_v<T> == false)
     new (used_elements_end++) T(in_data);
   else
     *used_elements_end++ = in_data;
@@ -1472,7 +1472,7 @@ AlignedVector<T>::insert_back(ForwardIterator begin, ForwardIterator end)
   reserve(old_size + (end - begin));
   for (; begin != end; ++begin, ++used_elements_end)
     {
-      if (std::is_trivial<T>::value == false)
+      if (std::is_trivial_v<T> == false)
         new (used_elements_end) T;
       *used_elements_end = *begin;
     }
@@ -1633,7 +1633,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // has all of the data.
   if (is_shmem_root)
     {
-      if (std::is_trivial<T>::value)
+      if (std::is_trivial_v<T>)
         {
           // The data is "trivial", i.e., we can copy things directly without
           // having to go through the serialization/deserialization machinery of
@@ -1826,7 +1826,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // shared memory space.
   if (is_shmem_root)
     {
-      if (std::is_trivial<T>::value == true)
+      if (std::is_trivial_v<T> == true)
         std::memcpy(aligned_shmem_pointer, elements.get(), sizeof(T) * size());
       else
         for (std::size_t i = 0; i < size(); ++i)

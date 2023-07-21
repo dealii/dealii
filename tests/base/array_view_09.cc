@@ -28,8 +28,8 @@ template <typename T>
 constexpr bool
 is_const_reference()
 {
-  return std::is_reference<T>::value &&
-         std::is_const<typename std::remove_reference<T>::type>::value;
+  return std::is_reference_v<T> &&
+         std::is_const_v<typename std::remove_reference<T>::type>;
 }
 
 void
@@ -77,9 +77,9 @@ test()
     std::fill(v.begin(), v.end(), 42.0);
     auto a = make_array_view(v.cbegin() + 2, v.cend());
     // a needs to be ArrayView<const double>
-    static_assert(!std::is_const<decltype(a)>::value,
+    static_assert(!std::is_const_v<decltype(a)>,
                   "a should not be const (but has const value)");
-    static_assert(std::is_const<decltype(a)::value_type>::value,
+    static_assert(std::is_const_v<decltype(a)::value_type>,
                   "a::value_type needs to be const");
     static_assert(is_const_reference<decltype(*a.begin())>(),
                   "type needs to be const");
@@ -101,9 +101,9 @@ test()
     // the type checking in that case
 #if BOOST_VERSION >= 106200
     // a needs to be const ArrayView<const double>
-    static_assert(std::is_const<decltype(a)>::value,
+    static_assert(std::is_const_v<decltype(a)>,
                   "a should not be const (but has const value)");
-    static_assert(std::is_const<decltype(a)::value_type>::value,
+    static_assert(std::is_const_v<decltype(a)::value_type>,
                   "a::value_type needs to be const");
     static_assert(is_const_reference<decltype(*a.begin())>(),
                   "type needs to be const");
