@@ -32,12 +32,14 @@
 
 #ifdef DEAL_II_WITH_PETSC
 
-#  include <petscconf.h>
 #  include <petscksp.h>
 #  include <petscmat.h>
 #  include <petscpc.h>
 #  include <petscsnes.h>
 #  include <petscts.h>
+#  if DEAL_II_PETSC_VERSION_LT(3, 19, 0)
+#    define PETSC_SUCCESS 0
+#  endif
 
 #  include <string>
 

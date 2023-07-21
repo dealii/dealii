@@ -18,7 +18,6 @@
 #include <deal.II/lac/exceptions.h>
 
 #ifdef DEAL_II_WITH_PETSC
-#  include <petscconf.h>
 #  include <petscsys.h>
 #endif // DEAL_II_WITH_PETSC
 
@@ -39,9 +38,10 @@ namespace LACExceptions
     // PetscErrorMessage changes the value in a pointer to refer to a
     // statically allocated description of the current error message.
     const char *         petsc_message;
-    const PetscErrorCode ierr = PetscErrorMessage(error_code,
-                                                  &petsc_message,
-                                                  /*specific=*/nullptr);
+    const PetscErrorCode ierr =
+      PetscErrorMessage(static_cast<PetscErrorCode>(error_code),
+                        &petsc_message,
+                        /*specific=*/nullptr);
     if (ierr == 0 && petsc_message != nullptr)
       {
         out << "The description of the error provided by PETSc is \""

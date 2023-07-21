@@ -461,8 +461,11 @@ namespace
   void
   check_petsc_allocations()
   {
-    PetscStageLog stageLog;
-    PetscLogGetStageLog(&stageLog);
+    PetscStageLog  stageLog;
+    PetscErrorCode ierr;
+
+    ierr = PetscLogGetStageLog(&stageLog);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // I don't quite understand petsc and it looks like
     // stageLog->stageInfo->classLog->classInfo[i].id is always -1, so we look

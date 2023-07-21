@@ -1114,7 +1114,7 @@ namespace PETScWrappers
     // interface code of PCSetUp in PETSc.
     // We handle it here.
     PetscCall(pc_set_failed_reason(ppc, PC_NOERROR));
-    PetscFunctionReturn(0);
+    PetscFunctionReturn(PETSC_SUCCESS);
   }
 
   PetscErrorCode
@@ -1155,7 +1155,7 @@ namespace PETScWrappers
           "Failure in pcapply from dealii::PETScWrappers::NonlinearSolver");
       }
     petsc_increment_state_counter(y);
-    PetscFunctionReturn(0);
+    PetscFunctionReturn(PETSC_SUCCESS);
   }
 
   PetscErrorCode
@@ -1196,7 +1196,7 @@ namespace PETScWrappers
           "Failure in pcapply_transpose from dealii::PETScWrappers::NonlinearSolver");
       }
     petsc_increment_state_counter(y);
-    PetscFunctionReturn(0);
+    PetscFunctionReturn(PETSC_SUCCESS);
   }
 
 
