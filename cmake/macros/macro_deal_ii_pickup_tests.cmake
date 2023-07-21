@@ -89,7 +89,7 @@ function(pad_string_right output _str _length)
   math(EXPR _strlen "${_length} - ${_strlen}")
 
   if(_strlen GREATER 0)
-    if(${CMAKE_VERSION} VERSION_LESS "3.14")
+    if(${CMAKE_VERSION} VERSION_LESS "3.15")
       unset(_pad)
       foreach(_i RANGE 1 ${_strlen}) # inclusive
         string(APPEND _pad " ")
@@ -109,7 +109,7 @@ function(pad_string_left output _str _length)
   math(EXPR _strlen "${_length} - ${_strlen}")
 
   if(_strlen GREATER 0)
-    if(${CMAKE_VERSION} VERSION_LESS "3.14")
+    if(${CMAKE_VERSION} VERSION_LESS "3.15")
       unset(_pad)
       foreach(_i RANGE 1 ${_strlen}) # inclusive
         string(APPEND _pad " ")
