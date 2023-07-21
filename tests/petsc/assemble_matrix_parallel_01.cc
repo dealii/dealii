@@ -18,11 +18,6 @@
 // same as deal.II/assemble_matrix_parallel_01, but for PETSc matrices
 // and vectors
 //
-// This test requires PETSc to be configured with the option
-// "--with-threadsafety" in case of debug builds of PETSc
-// For optimized builds, the above option is needed only in case
-// users want PETSc to produce useful logs with "-log_view" runtime
-// option
 #include <deal.II/base/function.h>
 #include <deal.II/base/graph_coloring.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -52,6 +47,8 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools.h>
+
+#include <petscconf.h>
 
 #include <complex>
 #include <iostream>
@@ -384,6 +381,12 @@ template <int dim>
 void
 LaplaceProblem<dim>::assemble_test()
 {
+  // This test requires PETSc to be configured with the option
+  // "--with-threadsafety" in case of debug builds of PETSc.
+  // For optimized builds, the above option is needed only in case
+  // users want PETSc to produce useful logs with "-log_view" runtime
+  // option
+#if !defined(PETSC_USE_DEBUG) || defined(PETSC_HAVE_THREADSAFETY)
   test_matrix = 0;
   test_rhs    = 0;
 
@@ -405,11 +408,18 @@ LaplaceProblem<dim>::assemble_test()
   test_rhs.compress(VectorOperation::add);
 
   test_matrix.add(-1, reference_matrix);
-
-  // there should not even be roundoff difference between matrices
-  deallog << "error in matrix: " << test_matrix.frobenius_norm() << std::endl;
   test_rhs.add(-1., reference_rhs);
-  deallog << "error in vector: " << test_rhs.l2_norm() << std::endl;
+
+  auto mnorm = test_matrix.frobenius_norm();
+  auto vnorm = test_rhs.l2_norm();
+#else
+  auto mnorm = 0.0;
+  auto vnorm = 0.0;
+#endif
+
+  // there should not even be roundoff difference
+  deallog << "error in matrix: " << mnorm << std::endl;
+  deallog << "error in vector: " << vnorm << std::endl;
 }
 
 
