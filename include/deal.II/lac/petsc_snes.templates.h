@@ -364,7 +364,7 @@ namespace PETScWrappers
           PETSC_ERROR_INITIAL,
           "Failure in snes_function from dealii::PETScWrappers::NonlinearSolver");
       petsc_increment_state_counter(f);
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto snes_jacobian =
@@ -408,7 +408,7 @@ namespace PETScWrappers
       else
         petsc_increment_state_counter(A);
 
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto snes_jacobian_with_setup =
@@ -461,7 +461,7 @@ namespace PETScWrappers
         }
       else
         petsc_increment_state_counter(A);
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto snes_monitor =
@@ -489,7 +489,7 @@ namespace PETScWrappers
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
           "Failure in snes_monitor from dealii::PETScWrappers::NonlinearSolver");
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto snes_objective =
@@ -519,7 +519,7 @@ namespace PETScWrappers
           PETSC_ERROR_INITIAL,
           "Failure in snes_objective from dealii::PETScWrappers::NonlinearSolver");
       *f = v;
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     AssertThrow(residual,
@@ -623,7 +623,7 @@ namespace PETScWrappers
     // a zero error code -- if so, just eat the exception and
     // continue on; otherwise, just rethrow the exception
     // and get outta here.
-    const int status = SNESSolve(snes, nullptr, x.petsc_vector());
+    const PetscErrorCode status = SNESSolve(snes, nullptr, x.petsc_vector());
     if (pending_exception)
       {
         try
