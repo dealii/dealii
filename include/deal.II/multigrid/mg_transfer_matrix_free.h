@@ -102,7 +102,7 @@ public:
    * ignored and internal variants are used instead.
    */
   void
-  build(const DoFHandler<dim, dim> &dof_handler,
+  build(const DoFHandler<dim> &dof_handler,
         const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
           &external_partitioners =
             std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>());
@@ -112,7 +112,7 @@ public:
    * partitioners.
    */
   void
-  build(const DoFHandler<dim, dim> &dof_handler,
+  build(const DoFHandler<dim> &dof_handler,
         const std::function<void(const unsigned int,
                                  LinearAlgebra::distributed::Vector<Number> &)>
           &initialize_dof_vector);
@@ -181,10 +181,10 @@ public:
    *
    * The use of this function is demonstrated in step-66.
    */
-  template <typename BlockVectorType2, int spacedim>
+  template <typename BlockVectorType2>
   void
   interpolate_to_mg(
-    const DoFHandler<dim, spacedim> &                          dof_handler,
+    const DoFHandler<dim> &                                    dof_handler,
     MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
     const BlockVectorType2 &                                   src) const;
 
@@ -382,42 +382,42 @@ public:
    * This function will initialize @p dst accordingly if needed as required by
    * the Multigrid class.
    */
-  template <typename BlockVectorType2, int spacedim>
+  template <typename BlockVectorType2>
   void
   copy_to_mg(
-    const DoFHandler<dim, spacedim> &                               dof_handler,
+    const DoFHandler<dim> &                                         dof_handler,
     MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
     const BlockVectorType2 &                                        src) const;
 
   /**
    * Same as above for the case that each block has its own DoFHandler.
    */
-  template <typename BlockVectorType2, int spacedim>
+  template <typename BlockVectorType2>
   void
   copy_to_mg(
-    const std::vector<const DoFHandler<dim, spacedim> *> &          dof_handler,
+    const std::vector<const DoFHandler<dim> *> &                    dof_handler,
     MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
     const BlockVectorType2 &                                        src) const;
 
   /**
    * Transfer from multi-level block-vector to normal vector.
    */
-  template <typename BlockVectorType2, int spacedim>
+  template <typename BlockVectorType2>
   void
   copy_from_mg(
-    const DoFHandler<dim, spacedim> &dof_handler,
-    BlockVectorType2 &               dst,
+    const DoFHandler<dim> &dof_handler,
+    BlockVectorType2 &     dst,
     const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
     const;
 
   /**
    * Same as above for the case that each block has its own DoFHandler.
    */
-  template <typename BlockVectorType2, int spacedim>
+  template <typename BlockVectorType2>
   void
   copy_from_mg(
-    const std::vector<const DoFHandler<dim, spacedim> *> &dof_handler,
-    BlockVectorType2 &                                    dst,
+    const std::vector<const DoFHandler<dim> *> &dof_handler,
+    BlockVectorType2 &                          dst,
     const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
     const;
 
@@ -510,13 +510,13 @@ public:
    * Actually build the information for the prolongation for each level.
    */
   void
-  build(const DoFHandler<dim, dim> &dof_handler);
+  build(const DoFHandler<dim> &dof_handler);
 
   /**
    * Same as above for the case that each block has its own DoFHandler.
    */
   void
-  build(const std::vector<const DoFHandler<dim, dim> *> &dof_handler);
+  build(const std::vector<const DoFHandler<dim> *> &dof_handler);
 
   /**
    * Memory used by this object.
@@ -544,10 +544,10 @@ private:
 
 
 template <int dim, typename Number>
-template <typename BlockVectorType2, int spacedim>
+template <typename BlockVectorType2>
 void
 MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
-  const DoFHandler<dim, spacedim> &                          dof_handler,
+  const DoFHandler<dim> &                                    dof_handler,
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
   const BlockVectorType2 &                                   src) const
 {
@@ -558,7 +558,7 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
          ExcDimensionMismatch(
            max_level, dof_handler.get_triangulation().n_global_levels() - 1));
 
-  const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
+  const auto &fe = dof_handler.get_fe();
 
   for (unsigned int level = min_level; level <= max_level; ++level)
     if (dst[level].size() != dof_handler.n_dofs(level) ||
@@ -637,10 +637,10 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
 
 
 template <int dim, typename Number, typename TransferType>
-template <typename BlockVectorType2, int spacedim>
+template <typename BlockVectorType2>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
-  const DoFHandler<dim, spacedim> &                               dof_handler,
+  const DoFHandler<dim> &                                         dof_handler,
   MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
   const BlockVectorType2 &                                        src) const
 {
@@ -649,8 +649,8 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
            "This object was initialized with support for usage with one "
            "DoFHandler for each block, but this method assumes that "
            "the same DoFHandler is used for all the blocks!"));
-  const std::vector<const DoFHandler<dim, spacedim> *> mg_dofs(src.n_blocks(),
-                                                               &dof_handler);
+  const std::vector<const DoFHandler<dim> *> mg_dofs(src.n_blocks(),
+                                                     &dof_handler);
 
   copy_to_mg(mg_dofs, dst, src);
 }
@@ -658,10 +658,10 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
 
 
 template <int dim, typename Number, typename TransferType>
-template <typename BlockVectorType2, int spacedim>
+template <typename BlockVectorType2>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
-  const std::vector<const DoFHandler<dim, spacedim> *> &          dof_handler,
+  const std::vector<const DoFHandler<dim> *> &                    dof_handler,
   MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
   const BlockVectorType2 &                                        src) const
 {
@@ -697,11 +697,11 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
 }
 
 template <int dim, typename Number, typename TransferType>
-template <typename BlockVectorType2, int spacedim>
+template <typename BlockVectorType2>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
-  const DoFHandler<dim, spacedim> &dof_handler,
-  BlockVectorType2 &               dst,
+  const DoFHandler<dim> &dof_handler,
+  BlockVectorType2 &     dst,
   const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
   const
 {
@@ -710,18 +710,18 @@ MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
            "This object was initialized with support for usage with one "
            "DoFHandler for each block, but this method assumes that "
            "the same DoFHandler is used for all the blocks!"));
-  const std::vector<const DoFHandler<dim, spacedim> *> mg_dofs(dst.n_blocks(),
-                                                               &dof_handler);
+  const std::vector<const DoFHandler<dim> *> mg_dofs(dst.n_blocks(),
+                                                     &dof_handler);
 
   copy_from_mg(mg_dofs, dst, src);
 }
 
 template <int dim, typename Number, typename TransferType>
-template <typename BlockVectorType2, int spacedim>
+template <typename BlockVectorType2>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
-  const std::vector<const DoFHandler<dim, spacedim> *> &dof_handler,
-  BlockVectorType2 &                                    dst,
+  const std::vector<const DoFHandler<dim> *> &dof_handler,
+  BlockVectorType2 &                          dst,
   const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
   const
 {
