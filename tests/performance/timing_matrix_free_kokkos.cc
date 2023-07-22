@@ -61,10 +61,13 @@ public:
   using VectorType =
     LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>;
 
-  LaplaceOperator(const Mapping<dim> &             mapping,
-                  const DoFHandler<dim> &          dof_handler,
-                  const AffineConstraints<Number> &constraints,
-                  const Quadrature<1> &            quadrature)
+  LaplaceOperator() = default;
+
+  void
+  reinit(const Mapping<dim> &             mapping,
+         const DoFHandler<dim> &          dof_handler,
+         const AffineConstraints<Number> &constraints,
+         const Quadrature<1> &            quadrature)
   {
     typename MatrixFree<dim, Number>::AdditionalData additional_data;
     additional_data.mapping_update_flags = update_gradients;
@@ -160,16 +163,17 @@ public:
   using VectorType =
     LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>;
 
-  LaplaceOperator(const Mapping<dim> &             mapping,
-                  const DoFHandler<dim> &          dof_handler,
-                  const AffineConstraints<Number> &constraints,
-                  const Quadrature<1> &            quadrature)
+  LaplaceOperator() = default;
+
+  void
+  reinit(const Mapping<dim> &             mapping,
+         const DoFHandler<dim> &          dof_handler,
+         const AffineConstraints<Number> &constraints,
+         const Quadrature<1> &            quadrature)
   {
     typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
       additional_data;
-    additional_data.mapping_update_flags =
-      update_JxW_values | update_gradients |
-      update_quadrature_points; // TODO: remove update_quadrature_points
+    additional_data.mapping_update_flags = update_JxW_values | update_gradients;
 
     matrix_free.reinit(
       mapping, dof_handler, constraints, quadrature, additional_data);
@@ -225,7 +229,8 @@ run(const unsigned int n_refinements)
   using Number     = double;
   using VectorType = LinearAlgebra::distributed::Vector<Number, MemorySpace>;
 
-  const unsigned n_repetitions = 100;
+  const unsigned n_repetitions_setup = 10;
+  const unsigned n_repetitions_vmult = 100;
 
   parallel::distributed::Triangulation<dim> tria(comm);
 
@@ -246,17 +251,22 @@ run(const unsigned int n_refinements)
 
   table.add_value("n_dofs", dof_handler.n_dofs());
 
-  AffineConstraints<Number> constraints;
+  AffineConstraints<Number>                         constraints;
+  LaplaceOperator<dim, degree, Number, MemorySpace> laplace_operator;
 
-  std::chrono::time_point<std::chrono::system_clock> temp =
+  std::chrono::time_point<std::chrono::system_clock> now_setup =
     std::chrono::system_clock::now();
-  LaplaceOperator<dim, degree, Number, MemorySpace> laplace_operator(
-    mapping, dof_handler, constraints, quadrature);
 
-  const double dt_setup = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::system_clock::now() - temp)
-                            .count() /
-                          1e9;
+  for (unsigned int i = 0; i < n_repetitions_setup; ++i)
+    laplace_operator.reinit(mapping, dof_handler, constraints, quadrature);
+
+  double dt_setup = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                      std::chrono::system_clock::now() - now_setup)
+                      .count() /
+                    1e9;
+
+  dt_setup = Utilities::MPI::sum(dt_setup, MPI_COMM_WORLD) /
+             Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
   VectorType src, dst;
 
@@ -278,29 +288,19 @@ run(const unsigned int n_refinements)
     dst = 0.0;
   }
 
-  double dt_vmult = 0;
+  const std::chrono::time_point<std::chrono::system_clock> now_vmult =
+    std::chrono::system_clock::now();
 
-  for (unsigned int i = 0; i < n_repetitions; ++i)
-    {
-      MPI_Barrier(MPI_COMM_WORLD);
+  for (unsigned int i = 0; i < n_repetitions_vmult; ++i)
+    laplace_operator.vmult(dst, src);
 
-      std::chrono::time_point<std::chrono::system_clock> temp =
-        std::chrono::system_clock::now();
-
-      laplace_operator.vmult(dst, src);
-
-      MPI_Barrier(MPI_COMM_WORLD);
-
-      const double dt = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                          std::chrono::system_clock::now() - temp)
-                          .count() /
-                        1e9;
-
-      dt_vmult += dt;
-    }
+  double dt_vmult = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                      std::chrono::system_clock::now() - now_vmult)
+                      .count() /
+                    1e9;
 
   dt_vmult = Utilities::MPI::sum(dt_vmult, MPI_COMM_WORLD) /
-             Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) / n_repetitions;
+             Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
 
   table.add_value("time_setup", dt_setup);
@@ -333,7 +333,18 @@ perform_single_measurement()
 {
   const unsigned int dim           = 3;
   const unsigned int fe_degree     = 4;
-  const unsigned int n_refinements = 5;
+  unsigned int       n_refinements = 5;
+
+  switch (get_testing_environment())
+    {
+      case TestingEnvironment::light:
+        break;
+      case TestingEnvironment::medium:
+        break;
+      case TestingEnvironment::heavy:
+        n_refinements += 1;
+        break;
+    }
 
   const auto result0 = run<dim, fe_degree, MemorySpace::Host>(n_refinements);
   const auto result1 = run<dim, fe_degree, MemorySpace::Default>(n_refinements);
