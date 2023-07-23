@@ -327,8 +327,7 @@ test(const unsigned int degree)
         auto &      x,
         auto &      b) -> std::pair<unsigned int, double> {
     ReductionControl reduction_control(1000, 1e-7, 1e-3);
-    SolverCG<typename std::remove_reference<decltype(x)>::type> solver(
-      reduction_control);
+    SolverCG<std::remove_reference_t<decltype(x)>> solver(reduction_control);
 
     try
       {

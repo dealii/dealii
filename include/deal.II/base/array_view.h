@@ -136,8 +136,8 @@ public:
    * non-@p const view to a @p const view, akin to converting a non-@p const
    * pointer to a @p const pointer.
    */
-  ArrayView(const ArrayView<typename std::remove_cv<value_type>::type,
-                            MemorySpaceType> &view);
+  ArrayView(
+    const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType> &view);
 
   /**
    * A constructor that automatically creates a view from a single value_type
@@ -159,8 +159,7 @@ public:
    *   You cannot initialize ArrayView objects to non-@p const memory with
    *   such arguments, such as <code>ArrayView@<double@></code>.
    */
-  ArrayView(
-    const std::vector<typename std::remove_cv<value_type>::type> &vector);
+  ArrayView(const std::vector<std::remove_cv_t<value_type>> &vector);
 
   /**
    * A constructor that automatically creates a view from a std::vector object.
@@ -176,7 +175,7 @@ public:
    *   <code>ArrayView@<const double@></code>, or to non-@p const memory,
    *   such as <code>ArrayView@<double@></code>.
    */
-  ArrayView(std::vector<typename std::remove_cv<value_type>::type> &vector);
+  ArrayView(std::vector<std::remove_cv_t<value_type>> &vector);
 
   /**
    * A constructor that automatically creates a view for a given C-style array.
@@ -204,8 +203,7 @@ public:
    * a std::array.
    */
   template <std::size_t N>
-  ArrayView(
-    const std::array<typename std::remove_cv<value_type>::type, N> &vector);
+  ArrayView(const std::array<std::remove_cv_t<value_type>, N> &vector);
 
   /**
    * A constructor that automatically creates a view from a std::array object.
@@ -216,7 +214,7 @@ public:
    * a std::array.
    */
   template <std::size_t N>
-  ArrayView(std::array<typename std::remove_cv<value_type>::type, N> &vector);
+  ArrayView(std::array<std::remove_cv_t<value_type>, N> &vector);
 
   /**
    * Reinitialize a view.
@@ -271,8 +269,8 @@ public:
    * This version always compares with the non-const value_type.
    */
   bool
-  operator==(const ArrayView<typename std::remove_cv<value_type>::type,
-                             MemorySpaceType> &other_view) const;
+  operator==(const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType>
+               &other_view) const;
 
   /**
    * Compare two ArrayView objects of the same type. Two objects are considered
@@ -308,8 +306,8 @@ public:
    * This version always compares with the non-const value_type.
    */
   bool
-  operator!=(const ArrayView<typename std::remove_cv<value_type>::type,
-                             MemorySpaceType> &other_view) const;
+  operator!=(const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType>
+               &other_view) const;
 
   /**
    * Return the size (in elements) of the view of memory this object
@@ -429,8 +427,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(ElementType &element)
 
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
-    &view)
+  const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType> &view)
   : starting_element(view.starting_element)
   , n_elements(view.n_elements)
 {}
@@ -439,7 +436,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const std::vector<typename std::remove_cv<value_type>::type> &vector)
+  const std::vector<std::remove_cv_t<value_type>> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
 {
@@ -463,7 +460,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  std::vector<typename std::remove_cv<value_type>::type> &vector)
+  std::vector<std::remove_cv_t<value_type>> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
 {}
@@ -473,7 +470,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 template <typename ElementType, typename MemorySpaceType>
 template <std::size_t N>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const std::array<typename std::remove_cv<value_type>::type, N> &vector)
+  const std::array<std::remove_cv_t<value_type>, N> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
 {
@@ -507,7 +504,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 template <typename ElementType, typename MemorySpaceType>
 template <std::size_t N>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  std::array<typename std::remove_cv<value_type>::type, N> &vector)
+  std::array<std::remove_cv_t<value_type>, N> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
 {}
@@ -528,8 +525,8 @@ ArrayView<ElementType, MemorySpaceType>::operator==(
 template <typename ElementType, typename MemorySpaceType>
 inline bool
 ArrayView<ElementType, MemorySpaceType>::operator==(
-  const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
-    &other_view) const
+  const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType> &other_view)
+  const
 {
   return (other_view.data() == starting_element) &&
          (other_view.size() == n_elements);
@@ -563,8 +560,8 @@ inline DEAL_II_HOST_DEVICE
 template <typename ElementType, typename MemorySpaceType>
 inline bool
 ArrayView<ElementType, MemorySpaceType>::operator!=(
-  const ArrayView<typename std::remove_cv<value_type>::type, MemorySpaceType>
-    &other_view) const
+  const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType> &other_view)
+  const
 {
   return !(*this == other_view);
 }

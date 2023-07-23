@@ -28,8 +28,7 @@ template <typename T>
 constexpr bool
 is_const_reference()
 {
-  return std::is_reference_v<T> &&
-         std::is_const_v<typename std::remove_reference<T>::type>;
+  return std::is_reference_v<T> && std::is_const_v<std::remove_reference_t<T>>;
 }
 
 void

@@ -60,8 +60,8 @@ test_view(const Vector<double> &            solution,
           const FEValuesExtractors::Scalar &extractor,
           const std::vector<NumberType> &   local_dof_values)
 {
-  using View = typename std::remove_reference<
-    typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
+  using View = std::remove_reference_t<
+    std::remove_const_t<decltype(fe_values[extractor])>>;
   const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
@@ -106,8 +106,8 @@ test_view(const Vector<double> &            solution,
           const FEValuesExtractors::Vector &extractor,
           const std::vector<NumberType> &   local_dof_values)
 {
-  using View = typename std::remove_reference<
-    typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
+  using View = std::remove_reference_t<
+    std::remove_const_t<decltype(fe_values[extractor])>>;
   const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
@@ -171,8 +171,8 @@ test_view(const Vector<double> &                        solution,
           const FEValuesExtractors::SymmetricTensor<2> &extractor,
           const std::vector<NumberType> &               local_dof_values)
 {
-  using View = typename std::remove_reference<
-    typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
+  using View = std::remove_reference_t<
+    std::remove_const_t<decltype(fe_values[extractor])>>;
   const View &fe_values_view = fe_values[extractor];
 
   // Typedefs
@@ -203,8 +203,8 @@ test_view(const Vector<double> &               solution,
           const FEValuesExtractors::Tensor<2> &extractor,
           const std::vector<NumberType> &      local_dof_values)
 {
-  using View = typename std::remove_reference<
-    typename std::remove_const<decltype(fe_values[extractor])>::type>::type;
+  using View = std::remove_reference_t<
+    std::remove_const_t<decltype(fe_values[extractor])>>;
   const View &fe_values_view = fe_values[extractor];
 
   // Typedefs

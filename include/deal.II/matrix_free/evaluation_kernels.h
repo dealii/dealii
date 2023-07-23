@@ -2279,9 +2279,8 @@ namespace internal
     {
       // `OtherNumber` is either `const Number` (evaluate()) or `Number`
       // (integrate())
-      static_assert(
-        std::is_same_v<Number, typename std::remove_const<OtherNumber>::type>,
-        "Type of Number and of OtherNumber do not match.");
+      static_assert(std::is_same_v<Number, std::remove_const_t<OtherNumber>>,
+                    "Type of Number and of OtherNumber do not match.");
 
       const auto element_type = fe_eval.get_shape_info().element_type;
       using ElementType       = MatrixFreeFunctions::ElementType;

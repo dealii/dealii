@@ -4228,9 +4228,9 @@ namespace internal
     for (unsigned int d = 0; d < n_components; ++d)
       src_data.second[d] = get_shared_vector_data(
         const_cast<typename internal::BlockVectorSelector<
-          typename std::remove_const<VectorType>::type,
-          IsBlockVector<typename std::remove_const<VectorType>::type>::value>::
-                     BaseVectorType *>(src_data.first[d]),
+          std::remove_const_t<VectorType>,
+          IsBlockVector<std::remove_const_t<VectorType>>::value>::BaseVectorType
+                     *>(src_data.first[d]),
         is_valid_mode_for_sm,
         active_fe_index,
         dof_info);
