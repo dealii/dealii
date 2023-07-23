@@ -1,0 +1,260 @@
+<br>
+
+<i>
+This program was contributed by Wolfgang Bangerth, Colorado State University.
+
+This material is based upon work partially supported by National Science
+Foundation grants OAC-1835673, DMS-1821210, and EAR-1925595;
+and by the Computational Infrastructure in
+Geodynamics initiative (CIG), through the National Science Foundation under
+Award No. EAR-1550901 and The University of California-Davis.
+
+Stefano Zampini (King Abdullah University of Science and Technology)
+contributed the results obtained with the PETSc variant of this program
+discussed in the <a href="#Results">results section</a> below.
+</i>
+<br>
+
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+step-26 solved the simple heat equation, one of the prototypical examples
+of time dependent problems:
+@f{align*}{
+  \frac{\partial u(\mathbf x, t)}{\partial t}
+  -
+  \Delta u(\mathbf x, t)
+  &=
+  f(\mathbf x, t),
+  \qquad\qquad &&
+  \forall \mathbf x \in \Omega, t\in (0,T),
+  \\
+  u(\mathbf x, 0) &= u_0(\mathbf x) &&
+  \forall \mathbf x \in \Omega,
+  \\
+  u(\mathbf x, t) &= g(\mathbf x,t) &&
+  \forall \mathbf x \in \partial\Omega, t \in (0,T).
+@f}
+While that program showed a number of advanced techniques such as
+using adaptive mesh refinement, it did not address one big issue:
+It hand-rolls its own time stepping scheme, which in that program
+is the simple
+<a href="https://en.wikipedia.org/wiki/Crank%E2%80%93Nicolson_method">Crank-Nicolson</a>
+method with a fixed time step. This is neither accurate nor efficient: We
+should be using a higher-order time stepping algorithm, and we should
+use one of the many ways to efficiently and automatically choose the
+length of the time step in response to the accuracy obtained.
+
+This would of course require quite a lot of development effort -- unless,
+of course, you do what we always advise: You build on what others have
+already done and have likely done in a way far superior to what one can
+do by oneself. In the current case, deal.II has interfaces to two
+such libraries: SUNDIALS, the *SUite of Nonlinear and DIfferential/ALgebraic
+equation Solvers* (and here specifically the Runge-Kutta-type solvers
+wrapped in the SUNDIALS::ARKode class), and PETSc's TS sub-packaged
+(wrapped in the PETScWrappers::TimeStepper class).
+
+
+<h3> Mapping the heat equation onto an ordinary differential equation formulation </h3>
+
+Both of these require that we first write the partial differential equation
+in the form of an ordinary differential equation. To this end, let us turn
+around the approach we used in step-26. There, we first discretized in time,
+obtaining a PDE to be solved at each time step that we could then discretize
+using the finite element method. This approach is called the "Rothe method".
+Instead, here, we use what's called the "method of lines" where we first
+discretize in space, obtaining a system of ordinary differential equations
+to which we can apply traditional time steppers. (There are some trade-offs
+between these two strategies, principally around using dynamically changing
+meshes; we will get back to this issue later on.)
+
+To get this started, we take the equation above and multiply it by a test
+function $\varphi(\mathbf x)$ and integrate by parts to get a weak form:
+We seek a function $u(\mathbf x, t)$ that for all test functions
+$\varphi \in H^1(\Omega)$
+satisfies
+@f{align*}{
+\left(\varphi(\mathbf x),
+  \frac{\partial u(\mathbf x, t)}{\partial t} \right)_\Omega
+  +
+\left(\nabla \varphi(\mathbf x),
+  \nabla u(\mathbf x, t) \right)_\Omega
+  &=
+\left(\varphi(\mathbf x),
+  f(\mathbf x, t) \right)_\Omega,
+  \\
+\left(\varphi(\mathbf x),  u(\mathbf x, 0)\right)_\Omega &=
+\left(\varphi(\mathbf x), u_0(\mathbf x)\right)_\Omega &&
+  \\
+  u(\mathbf x, t) &= g(\mathbf x,t) &&
+  \forall \mathbf x \in \partial\Omega, t \in (0,T).
+@f}
+
+We then discretize by restricting ourself to finite element functions
+of the form
+@f{align*}{
+u_h(\mathbf x,t) = \sum_j U_j(t) \varphi_j(\mathbf x),
+@f}
+which leads to the problem of finding $u_h(\mathbf x, t)$ that for all
+discrete test functions $\varphi \in V_h(\Omega)$ satisfies
+@f{align*}{
+\left(\varphi_i(\mathbf x),
+  \frac{\partial u_h(\mathbf x, t)}{\partial t} \right)_\Omega
+  +
+\left(\nabla \varphi_j(\mathbf x),
+  \nabla u_h(\mathbf x, t) \right)_\Omega
+  &=
+\left(\varphi_i(\mathbf x),
+  f(\mathbf x, t) \right)_\Omega,
+  \\
+\left(\varphi_i(\mathbf x),  u_h(\mathbf x, 0)\right)_\Omega &=
+\left(\varphi_i(\mathbf x), u_0(\mathbf x)\right)_\Omega &&
+  \\
+  u_h(\mathbf x, t) &= g_h(\mathbf x,t) &&
+  \forall \mathbf x \in \partial\Omega, t \in (0,T),
+@f}
+where $g_h$ is an interpolant of the function $g$ on the boundary.
+
+This equation can be rewritten in matrix form in the usual way, by
+expanding $u_h$ into its coefficients times shape function form,
+pulling the sum over $j$ out of the integrals, and then considering
+that choosing test function $\varphi_i$ leads to the $i$th row
+of the linear system. This then gives us
+@f{align*}{
+  M
+  \frac{\partial U(t)}{\partial t}
+  +
+  AU(t)
+  &=
+  F(t)
+  \\
+  U(0) = U_0,
+@f}
+plus appropriate boundary conditions.
+
+There are now two perspectives on how one should proceed. If we
+were to use the SUNDIALS::ARKode wrappers to solve this linear system,
+we would bring the $AU$ term to the right hand side and consider
+the ODE
+@f{align*}{
+  M
+  \frac{\partial U(t)}{\partial t}
+  &=
+  -
+  AU(t)
+  +
+  F(t),
+@f}
+which matches the form stated in the documentation of SUNDIALS::ARKode.
+In particular, ARKode is able to deal with the fact that the time
+derivative is multiplied by the mass matrix $M$, which is always
+there when using finite elements.
+
+On the other hand, when using the PETScWrappers::TimeStepper class that
+wraps the PETSc TS sub-package, you will find that when stating things
+as a typical ODE, it does not like the presence of a mass matrix. But
+it can solve ODEs that are stated in "implicit" form, and in that
+case we simply bring everything to the left hand side and obtain
+@f{align*}{
+  \underbrace{
+    M
+    \frac{\partial U(t)}{\partial t}
+    +
+    AU(t)
+    -
+    F(t)
+  }_{=:F(t,U,\dot U)}
+  =
+  0.
+@f}
+This matches the form $F(t,U,\dot U) = 0$ you can find in the
+documentation of PETScWrappers::TimerStepper if you identify the time
+dependent function $y=y(t)$ used there with our solution vector $U(t)$.
+
+This program uses the PETScWrappers::TimeStepper class, and so we
+will take the latter viewpoint. In what follows, we will continue to
+use $U(t)$ as the function we seek, even though the documentation of
+the class uses $y(t)$.
+
+
+<h3> Mapping the differential equation formulation to the time stepper</h3>
+
+Having identified how we want to see the problem (namely, as an "implicit"
+ODE), the question is how we describe the problem to the time stepper.
+Conceptually, all of the wrappers for time stepping packages we support
+in deal.II only requires us to provide them with a very limited set of
+operations. Specifically, for the implicit formulation, all we need to
+provide are functions that:
+- A way, for a given $t,U,\dot U$, to evaluate the vector
+  $F(t,U,\dot U)$.
+- A way, for a given $t,U,\dot U, \alpha$, to set up a matrix
+  $J := \dfrac{\partial F}{\partial y} +
+  \alpha \dfrac{\partial F}{\partial \dot y}$. This is often
+  called the "Jacobian" of the implicit function $F$, perhaps with
+  a small abuse of terminology. In the current case, this matrix
+  is $J=M + \alpha A$. If you have read through step-26, it is probably
+  not lost on you that this matrix appears prominently there as well --
+  with $\alpha$ being a multiple of the time step $k$. Importantly,
+  for the linear problem we consider here, $J$ is a linear combination
+  of matrices that do not depend on $U$.
+- A way to solve a linear system with this matrix $J$.
+
+That's really it. If we can provide these three functions, PETSc will do
+the rest (as would, for example, SUNDIALS::ARKode). It will not be
+very difficult to set these things up. In practice, the way this will
+work is that inside the `run()` function, we will set up lambda functions
+that can access the information of the surrounding scopes and that
+return the requested information.
+
+In practice, we often want to provide a fourth function:
+- A callback that is called at the end of each time step (or perhaps
+  at other intervals) and that is provided with the current solution
+  and other information and that can be used to "monitor" the progress
+  of computations. One of the ways in which this can be used is to
+  output visualization data every few time steps.
+
+
+<h3> Complication 1: Dirichlet boundary values </h3>
+
+
+<h3> Complication 2: Mesh refinement </h3>
+
+When stating an ODE in the form
+@f{align*}{
+  M
+  \frac{\partial U(t)}{\partial t}
+  &=
+  -
+  AU(t)
+  +
+  F(t),
+@f}
+or one of the reformulations discussed above, there is an implicit
+assumption that the number of entries in the vector $U$ stays constant
+and that each entry continues to correspond to the same quantity. But
+if you use mesh refinement, this is not the case: The number of unknowns
+will go up or down whenever you refine or coarsen the mesh, and the
+42nd degree of freedom may be located at an entirely different
+physical location after mesh refinement than where it was located
+below.
+
+The way we approach this complication is that we break things into
+"time slabs". Let's say we want to solve on the time interval $[0,T]$,
+then we break things into slabs $[0=\tau_0,\tau_1], [\tau_1,\tau_2], \ldots
+[\tau_{n-1},\tau_n=T]$ where the break points satisfy $\tau_{k-1}<\tau_k$.
+On each time slab, we keep the mesh the same, and so we can call into
+our time integrator. At the end of a time slab, we then save the solution,
+refine the mesh, set up other data structures, and restore the solution
+on the new mesh; then we start the time integrator again at the start
+of the new time slab.
+
+This approach guarantees that for the purposes of ODE solvers, we
+really only ever give them something that can rightfully be considered
+an ODE system. A disadvantage is that we typically want to refine or
+coarsen the mesh relatively frequently (in large-scale codes one often
+chooses to refine and coarsen the mesh every 10-20 time steps), and that
+limits the efficiency of time integrators: They gain much of their
+advantage from being able to choose the time step length automatically,
+but there is often a cost associated with starting up; if the slabs are
+too short, then neither the start-up cost nor the benefit of potentially
+long time steps are realized.

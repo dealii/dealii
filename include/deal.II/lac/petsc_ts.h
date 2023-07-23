@@ -203,7 +203,8 @@ namespace PETScWrappers
   /**
    * Interface to the PETSc TS solver for Ordinary Differential Equations
    * and Differential-Algebraic Equations. The TS solver is described in the
-   * [PETSc manual](https://petsc.org/release/manual/ts/).
+   * [PETSc manual](https://petsc.org/release/manual/ts/). This class is
+   * used in step-86.
    *
    * This class supports two kinds of formulations.
    * The explicit formulation:
