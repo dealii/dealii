@@ -177,6 +177,12 @@ public:
     return inverse_diagonal_entries;
   }
 
+  const std::shared_ptr<const Utilities::MPI::Partitioner> &
+  get_vector_partitioner() const
+  {
+    return data.get_vector_partitioner();
+  }
+
 
 private:
   void
@@ -408,40 +414,6 @@ public:
 
 
 
-template <int dim, typename LAPLACEOPERATOR>
-class MGTransferMF
-  : public MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>
-{
-public:
-  MGTransferMF(const MGLevelObject<LAPLACEOPERATOR> &laplace,
-               const MGConstrainedDoFs &             mg_constrained_dofs)
-    : MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>(
-        mg_constrained_dofs)
-    , laplace_operator(laplace){};
-
-  /**
-   * Overload copy_to_mg from MGTransferPrebuilt
-   */
-  template <class InVector, int spacedim>
-  void
-  copy_to_mg(const DoFHandler<dim, spacedim> &         mg_dof_handler,
-             MGLevelObject<LinearAlgebra::distributed::Vector<
-               typename LAPLACEOPERATOR::value_type>> &dst,
-             const InVector &                          src) const
-  {
-    for (unsigned int level = dst.min_level(); level <= dst.max_level();
-         ++level)
-      laplace_operator[level].initialize_dof_vector(dst[level]);
-    MGTransferMatrixFree<dim, typename LAPLACEOPERATOR::value_type>::copy_to_mg(
-      mg_dof_handler, dst, src);
-  }
-
-private:
-  const MGLevelObject<LAPLACEOPERATOR> &laplace_operator;
-};
-
-
-
 template <int dim, typename number>
 void
 do_test(const DoFHandler<dim> &dof, const unsigned int n_q_points_1d)
@@ -503,9 +475,14 @@ do_test(const DoFHandler<dim> &dof, const unsigned int n_q_points_1d)
   mg_constrained_dofs.initialize(dof);
   mg_constrained_dofs.make_zero_boundary_constraints(dof, {0});
 
-  MGTransferMF<dim, LevelMatrixType> mg_transfer(mg_matrices,
-                                                 mg_constrained_dofs);
-  mg_transfer.build(dof);
+  std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>> partitioners;
+  for (unsigned int level = mg_matrices.min_level();
+       level <= mg_matrices.max_level();
+       ++level)
+    partitioners.push_back(mg_matrices[level].get_vector_partitioner());
+
+  MGTransferMatrixFree<dim, double> mg_transfer(mg_constrained_dofs);
+  mg_transfer.build(dof, partitioners);
 
   mg::Matrix<LinearAlgebra::distributed::Vector<double>> mg_matrix(mg_matrices);
 
@@ -513,7 +490,7 @@ do_test(const DoFHandler<dim> &dof, const unsigned int n_q_points_1d)
     mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   PreconditionMG<dim,
                  LinearAlgebra::distributed::Vector<double>,
-                 MGTransferMF<dim, LevelMatrixType>>
+                 MGTransferMatrixFree<dim, double>>
     preconditioner(dof, mg, mg_transfer);
 
   {
