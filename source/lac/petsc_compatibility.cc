@@ -26,6 +26,7 @@
 #  include <petsc/private/petscimpl.h>
 #  include <petsc/private/snesimpl.h>
 #  include <petsc/private/tsimpl.h>
+#  include <petscdm.h>
 
 // Shorthand notation for PETSc error codes.
 #  define AssertPETSc(code)                          \
@@ -126,6 +127,12 @@ namespace PETScWrappers
 #  else
     AssertPETSc(TSSetMaxTime(ts, maxtime));
 #  endif
+  }
+
+  void
+  ts_reset_dm(TS ts)
+  {
+    AssertPETSc(DMDestroy(&ts->dm));
   }
 
   unsigned int
