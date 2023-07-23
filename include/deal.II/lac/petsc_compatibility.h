@@ -176,6 +176,14 @@ namespace PETScWrappers
 
 
   /**
+   * Reset DM (no public API).
+   */
+  void
+  ts_reset_dm(TS ts);
+
+
+
+  /**
    * Set final time for ODE integration.
    */
   void

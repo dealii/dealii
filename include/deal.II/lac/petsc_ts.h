@@ -263,18 +263,29 @@ namespace PETScWrappers
    * are ODE-solver specific. For details, consult the [PETSc
    * manual](https://petsc.org/release/manual/snes/#sec-nlmatrixfree).
    *
-   * In alternative, users can also provide the implementations of the
-   * *Jacobians*. This can be accomplished in two ways:
+   * Users can also provide the implementations of the *Jacobians*. This can be
+   * accomplished in two ways:
    *  - PETSc style using TimeStepper::implicit_jacobian
    *    and TimeStepper::explicit_jacobian.
    *  - deal.II style using TimeStepper::setup_jacobian and
-   * TimeStepper::solve_with_jacobian
+   *    TimeStepper::solve_with_jacobian.
+   * The preconditioning matrix can be specified using TimeStepper::set_matrix.
+   * In case both approaches are implemented, the deal.II style will be used.
    *
-   * In case both approaches are coded, the deal.II style
-   * will be used.
+   * TimeStepper::set_matrices must be used in case the user wants to provide
+   * the iteration matrix of the tangent system in the deal.II style approach,
+   * thus replacing the matrix-free linearization.
    *
-   * The second approach is more in style with the deal.II philosophy
-   * and it also allows command line customization, like for example,
+   * The correctness of the constructed Jacobians passed using
+   * TimeStepper::set_matrix can be checked using
+   * @code
+   * ./myApp -snes_test_jacobian
+   * @endcode
+   * See TimeStepper::set_matrix and TimeStepper::set_matrices for
+   * additional details.
+   *
+   * The deal.II style approach still allows command line customization, like
+   * for example,
    * @code
    * ./myApp -snes_type newtontr -ksp_type cg
    * @endcode
@@ -282,15 +293,14 @@ namespace PETScWrappers
    * a trust region solver and iterate on the tangent system with CG,
    * still using TimeStepper::solve_with_jacobian as a preconditioner.
    *
-   * The first approach has instead the advantage that only the matrix assembly
-   * procedure has to be coded, thus allowing quicker implementations and
-   * faster turnaround for experimenting with linear solver preconditioning
-   * configurations via command line customizations, like for example,
+   * The PETSc style approach has instead the advantage that only the matrix
+   * assembly procedure has to be implemented, thus allowing quicker
+   * implementations and faster turnaround for experimenting with linear solver
+   * preconditioning configurations via command line customizations, like for
+   * example,
    * @code
    * ./myApp -ksp_type cg -pc_type gamg
    * @endcode
-   * See TimeStepper::set_matrix and TimeStepper::set_matrices for
-   * additional details.
    *
    * @dealiiConceptRequires{(concepts::is_dealii_petsc_vector_type<VectorType>
    * || std::constructible_from<VectorType,Vec>) &&
@@ -386,7 +396,8 @@ namespace PETScWrappers
 
     /**
      * Set both the linear system matrix and the preconditioning matrix
-     * that PETSc will use.
+     * that PETSc will use (can be the same matrix). In this case, the
+     * Jacobian-Free-Newton-Krylov approach will not be used.
      */
     void
     set_matrices(AMatrixType &A, PMatrixType &P);
@@ -402,6 +413,12 @@ namespace PETScWrappers
      */
     real_type
     get_time_step();
+
+    /**
+     * Return current step number.
+     */
+    unsigned int
+    get_step_number();
 
     /**
      * Integrate the differential-algebraic equations starting from @p y.
@@ -437,6 +454,26 @@ namespace PETScWrappers
      */
     unsigned int
     solve(VectorType &y, AMatrixType &A, PMatrixType &P);
+
+    /**
+     * Setup callbacks.
+     *
+     * This function is called inside TimeStepper::solve routines and does
+     * not need to be called by the user. It is used to reinitialize the
+     * solver if mesh adaption has been performed.
+     */
+    void
+    setup_callbacks();
+
+    /**
+     * Setup algebraic constraints.
+     *
+     * This function is called inside TimeStepper::solve routines and does
+     * not need to be called by the user. It is used to reinitialize the
+     * solver if mesh adaption has been performed.
+     */
+    void
+    setup_algebraic_constraints(const VectorType &y);
 
     /**
      * Callback for the computation of the implicit residual $F(t, y, \dot y)$.
@@ -565,6 +602,61 @@ namespace PETScWrappers
      */
     std::function<IndexSet()> algebraic_components;
 
+    /**
+     * Callback to distribute solution to hanging nodes.
+     *
+     * Implementation of this function is optional.
+     * It is called at the end of each successful stage.
+     * The same functionality can be equivalently implemented in
+     * TimeStepper::solve_with_jacobian.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions.
+     */
+    std::function<void(const real_type t, VectorType &y)> distribute;
+
+    /**
+     * Callback to setup mesh adaption.
+     *
+     * Implementation of this function is optional.
+     * @p resize must be set to true if mesh adaption is to be performed, false
+     * otherwise.
+     * The @p y vector contains the current solution, @p t the current time,
+     * @ step the step number.
+     * Solution transfer and actual mesh adaption must be performed in a
+     * separate callback, TimeStepper::interpolate
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions.
+     */
+    std::function<void(const real_type    t,
+                       const unsigned int step,
+                       const VectorType & y,
+                       bool &             resize)>
+      prepare_for_coarsening_and_refinement;
+
+    /**
+     * Callback to interpolate vectors and perform mesh adaption.
+     *
+     * Implementation of this function is mandatory if
+     * TimeStepper::prepare_for_coarsening_and_refinement is used.
+     * This function must perform mesh adaption and interpolate the discrete
+     * functions that are stored in @p all_in onto the refined and/or coarsenend grid.
+     * Output vectors must be created inside the callback.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions.
+     */
+    std::function<void(const std::vector<VectorType> &all_in,
+                       std::vector<VectorType> &      all_out)>
+      interpolate;
+
   private:
     /**
      * The PETSc object.
@@ -576,6 +668,11 @@ namespace PETScWrappers
      */
     SmartPointer<AMatrixType, TimeStepper> A;
     SmartPointer<PMatrixType, TimeStepper> P;
+
+    /**
+     * Object to apply solve_with_jacobian.
+     */
+    PreconditionShell solve_with_jacobian_pc;
 
     /**
      * This flag is set when changing the customization and used within solve.

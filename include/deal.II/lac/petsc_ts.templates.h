@@ -130,7 +130,8 @@ namespace PETScWrappers
   TimeStepper<VectorType, PMatrixType, AMatrixType>::TimeStepper(
     const TimeStepperData &data,
     const MPI_Comm         mpi_comm)
-    : pending_exception(nullptr)
+    : solve_with_jacobian_pc(mpi_comm)
+    , pending_exception(nullptr)
   {
     AssertPETSc(TSCreate(mpi_comm, &ts));
     AssertPETSc(TSSetApplicationContext(ts, this));
@@ -151,6 +152,12 @@ namespace PETScWrappers
                          std::constructible_from<AMatrixType, Mat>))
   TimeStepper<VectorType, PMatrixType, AMatrixType>::~TimeStepper()
   {
+    AssertPETSc(PetscObjectComposeFunction((PetscObject)ts,
+                                           "__dealii_ts_resize_setup__",
+                                           nullptr));
+    AssertPETSc(PetscObjectComposeFunction((PetscObject)ts,
+                                           "__dealii_ts_resize_transfer__",
+                                           nullptr));
     AssertPETSc(TSDestroy(&ts));
 
     Assert(pending_exception == nullptr, ExcInternalError());
@@ -227,6 +234,24 @@ namespace PETScWrappers
     PetscReal t;
     AssertPETSc(TSGetTime(ts, &t));
     return t;
+  }
+
+
+
+  template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_petsc_vector_type<VectorType> ||
+     std::constructible_from<
+       VectorType,
+       Vec>)&&(concepts::is_dealii_petsc_matrix_type<PMatrixType> ||
+               std::constructible_from<
+                 PMatrixType,
+                 Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
+                         std::constructible_from<AMatrixType, Mat>))
+  unsigned int TimeStepper<VectorType, PMatrixType, AMatrixType>::
+    get_step_number()
+  {
+    return ts_get_step_number(ts);
   }
 
 
@@ -401,12 +426,149 @@ namespace PETScWrappers
                  PMatrixType,
                  Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
                          std::constructible_from<AMatrixType, Mat>))
-  unsigned int TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(
-    VectorType &y)
+  void TimeStepper<VectorType, PMatrixType, AMatrixType>::setup_callbacks()
   {
-    const auto ts_prestage = [](TS ts, PetscReal) -> PetscErrorCode {
-      void *ctx;
+    const auto ts_resize_setup =
+      [](TS ts, PetscInt it, PetscReal t, Vec x, PetscBool *flg, void *ctx)
+      -> PetscErrorCode {
       PetscFunctionBeginUser;
+      auto user = static_cast<TimeStepper *>(ctx);
+
+      VectorType xdealii(x);
+      bool       resize = false;
+
+      const int lineno = __LINE__;
+      const int err    = call_and_possibly_capture_ts_exception(
+        user->prepare_for_coarsening_and_refinement,
+        user->pending_exception,
+        []() -> void {},
+        t,
+        it,
+        xdealii,
+        resize);
+      *flg = resize ? PETSC_TRUE : PETSC_FALSE;
+      if (err)
+        return PetscError(
+          PetscObjectComm((PetscObject)ts),
+          lineno + 1,
+          "prepare_for_coarsening_and_refinement",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in ts_resize_setup from dealii::PETScWrappers::TimeStepper");
+
+      PetscFunctionReturn(PETSC_SUCCESS);
+    };
+
+    const auto ts_resize_transfer = [](TS       ts,
+                                       PetscInt nv,
+                                       Vec      vin[],
+                                       Vec      vout[],
+                                       void *   ctx) -> PetscErrorCode {
+      PetscFunctionBeginUser;
+      auto user = static_cast<TimeStepper *>(ctx);
+
+      std::vector<VectorType> all_in, all_out;
+      for (PetscInt i = 0; i < nv; i++)
+        {
+          all_in.push_back(VectorType(vin[i]));
+        }
+
+      const int lineno = __LINE__;
+      const int err    = call_and_possibly_capture_ts_exception(
+        user->interpolate,
+        user->pending_exception,
+        []() -> void {},
+        all_in,
+        all_out);
+      if (err)
+        return PetscError(
+          PetscObjectComm((PetscObject)ts),
+          lineno + 1,
+          "interpolate",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in ts_resize_transfer from dealii::PETScWrappers::TimeStepper");
+
+      if (all_out.size() != all_in.size())
+        SETERRQ(PetscObjectComm((PetscObject)ts),
+                PETSC_ERR_LIB,
+                "Broken all_out");
+
+      for (PetscInt i = 0; i < nv; i++)
+        {
+          vout[i] = all_out[i].petsc_vector();
+          PetscCall(PetscObjectReference((PetscObject)vout[i]));
+        }
+
+      try
+        {
+          user->setup_callbacks();
+        }
+      catch (...)
+        {
+          SETERRQ(PetscObjectComm((PetscObject)ts),
+                  PETSC_ERR_LIB,
+                  "Exception in setup_callbacks");
+        }
+
+      try
+        {
+          user->setup_algebraic_constraints(all_out[0]);
+        }
+      catch (...)
+        {
+          SETERRQ(PetscObjectComm((PetscObject)ts),
+                  PETSC_ERR_LIB,
+                  "Exception in setup_algebraic_constraints");
+        }
+      PetscFunctionReturn(PETSC_SUCCESS);
+    };
+
+    const auto ts_poststep_amr = [](TS ts) -> PetscErrorCode {
+      PetscFunctionBeginUser;
+      void *ctx;
+      PetscCall(TSGetApplicationContext(ts, &ctx));
+      auto user = static_cast<TimeStepper *>(ctx);
+
+      PetscErrorCode (
+        *transfer_setup)(TS, PetscInt, PetscReal, Vec, PetscBool *, void *);
+      PetscErrorCode (*transfer)(TS, PetscInt, Vec[], Vec[], void *);
+      AssertPETSc(PetscObjectQueryFunction((PetscObject)ts,
+                                           "__dealii_ts_resize_setup__",
+                                           &transfer_setup));
+      AssertPETSc(PetscObjectQueryFunction((PetscObject)ts,
+                                           "__dealii_ts_resize_transfer__",
+                                           &transfer));
+
+      PetscBool resize = PETSC_FALSE;
+      Vec       x;
+      PetscCall(TSGetSolution(ts, &x));
+      PetscCall(PetscObjectReference((PetscObject)x));
+      PetscCall((*transfer_setup)(
+        ts, user->get_step_number(), user->get_time(), x, &resize, user));
+
+      if (resize)
+        {
+          Vec new_x;
+
+          user->reinit();
+
+          // Reinitialize DM. Currently it is not possible to do with public API
+          ts_reset_dm(ts);
+
+          PetscCall((*transfer)(ts, 1, &x, &new_x, user));
+          PetscCall(TSSetSolution(ts, new_x));
+          PetscCall(VecDestroy(&new_x));
+        }
+      PetscCall(VecDestroy(&x));
+      PetscFunctionReturn(PETSC_SUCCESS);
+    };
+
+    const auto ts_prestage = [](TS ts, PetscReal) -> PetscErrorCode {
+      PetscFunctionBeginUser;
+      void *ctx;
       PetscCall(TSGetApplicationContext(ts, &ctx));
       auto user               = static_cast<TimeStepper *>(ctx);
       user->error_in_function = false;
@@ -418,17 +580,52 @@ namespace PETScWrappers
           PetscCall(TSGetSNES(ts, &snes));
           snes_reset_domain_flags(snes);
         }
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
+    };
+
+    const auto ts_poststage =
+      [](TS ts, PetscReal t, PetscInt i, Vec *xx) -> PetscErrorCode {
+      PetscFunctionBeginUser;
+      void *ctx;
+      PetscCall(TSGetApplicationContext(ts, &ctx));
+      auto user = static_cast<TimeStepper *>(ctx);
+
+      VectorType xdealii(xx[i]);
+
+      const int lineno = __LINE__;
+      const int err    = call_and_possibly_capture_ts_exception(
+        user->distribute,
+        user->pending_exception,
+        [user, ts]() -> void {
+          user->error_in_function = true;
+
+          SNES snes;
+          AssertPETSc(TSGetSNES(ts, &snes));
+          AssertPETSc(SNESSetFunctionDomainError(snes));
+        },
+        t,
+        xdealii);
+      if (err)
+        return PetscError(
+          PetscObjectComm((PetscObject)ts),
+          lineno + 1,
+          "distribute",
+          __FILE__,
+          PETSC_ERR_LIB,
+          PETSC_ERROR_INITIAL,
+          "Failure in ts_poststage from dealii::PETScWrappers::TimeStepper");
+      petsc_increment_state_counter(xx[i]);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto ts_functiondomainerror =
       [](TS ts, PetscReal, Vec, PetscBool *accept) -> PetscErrorCode {
-      void *ctx;
       PetscFunctionBeginUser;
+      void *ctx;
       AssertPETSc(TSGetApplicationContext(ts, &ctx));
       auto user = static_cast<TimeStepper *>(ctx);
       *accept   = user->error_in_function ? PETSC_FALSE : PETSC_TRUE;
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto ts_ifunction =
@@ -466,7 +663,7 @@ namespace PETScWrappers
           PETSC_ERROR_INITIAL,
           "Failure in ts_ifunction from dealii::PETScWrappers::TimeStepper");
       petsc_increment_state_counter(f);
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto ts_ijacobian = [](TS        ts,
@@ -524,7 +721,7 @@ namespace PETScWrappers
       else
         petsc_increment_state_counter(A);
 
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto ts_ijacobian_with_setup = [](TS        ts,
@@ -598,7 +795,7 @@ namespace PETScWrappers
       else
         petsc_increment_state_counter(A);
 
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto ts_rhsfunction =
@@ -636,7 +833,7 @@ namespace PETScWrappers
           PETSC_ERROR_INITIAL,
           "Failure in ts_rhsfunction from dealii::PETScWrappers::TimeStepper");
       petsc_increment_state_counter(f);
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto ts_rhsjacobian =
@@ -685,7 +882,7 @@ namespace PETScWrappers
       else
         petsc_increment_state_counter(A);
 
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     const auto ts_monitor =
@@ -712,27 +909,25 @@ namespace PETScWrappers
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
           "Failure in ts_monitor from dealii::PETScWrappers::TimeStepper");
-      PetscFunctionReturn(0);
+      PetscFunctionReturn(PETSC_SUCCESS);
     };
 
     AssertThrow(explicit_function || implicit_function,
                 StandardExceptions::ExcFunctionNotProvided(
                   "explicit_function || implicit_function"));
 
+    // Handle recoverable errors.
     this->error_in_function = false;
-
-    AssertPETSc(TSSetSolution(ts, y.petsc_vector()));
-
-    // Handle recoverable errors
     AssertPETSc(TSSetPreStage(ts, ts_prestage));
     AssertPETSc(TSSetFunctionDomainError(ts, ts_functiondomainerror));
 
+    // Problem description.
     if (explicit_function)
       AssertPETSc(TSSetRHSFunction(ts, nullptr, ts_rhsfunction, this));
-
     if (implicit_function)
       AssertPETSc(TSSetIFunction(ts, nullptr, ts_ifunction, this));
 
+    // Handle Jacobians.
     this->need_dummy_assemble = false;
     if (setup_jacobian)
       {
@@ -801,12 +996,10 @@ namespace PETScWrappers
     // Using solve_with_jacobian as a preconditioner allow users
     // to provide approximate solvers and possibly iterate on a matrix-free
     // approximation of the tangent operator.
-    PreconditionShell precond(
-      PetscObjectComm(reinterpret_cast<PetscObject>(ts)));
     if (solve_with_jacobian)
       {
-        precond.vmult = [&](VectorBase &      indst,
-                            const VectorBase &insrc) -> void {
+        solve_with_jacobian_pc.vmult = [&](VectorBase &      indst,
+                                           const VectorBase &insrc) -> void {
           VectorType       dst(static_cast<const Vec &>(indst));
           const VectorType src(static_cast<const Vec &>(insrc));
           solve_with_jacobian(src, dst);
@@ -818,25 +1011,78 @@ namespace PETScWrappers
         AssertPETSc(TSGetSNES(ts, &snes));
         AssertPETSc(SNESGetKSP(snes, &ksp));
         AssertPETSc(KSPSetType(ksp, KSPPREONLY));
-        AssertPETSc(KSPSetPC(ksp, precond.get_pc()));
+        AssertPETSc(KSPSetPC(ksp, solve_with_jacobian_pc.get_pc()));
       }
+
+    if (distribute)
+      AssertPETSc(TSSetPostStage(ts, ts_poststage));
 
     // Attach user monitoring routine.
     if (monitor)
       AssertPETSc(TSMonitorSet(ts, ts_monitor, this, nullptr));
 
+    // Handle AMR.
+    if (prepare_for_coarsening_and_refinement)
+      {
+        AssertThrow(interpolate,
+                    StandardExceptions::ExcFunctionNotProvided("interpolate"));
+#  if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
+        (void)ts_poststep_amr;
+        AssertPETSc(TSSetResize(ts, ts_resize_setup, ts_resize_transfer, this));
+#  else
+        AssertPETSc(PetscObjectComposeFunction(
+          (PetscObject)ts,
+          "__dealii_ts_resize_setup__",
+          static_cast<PetscErrorCode (*)(
+            TS, PetscInt, PetscReal, Vec, PetscBool *, void *)>(
+            ts_resize_setup)));
+        AssertPETSc(PetscObjectComposeFunction(
+          (PetscObject)ts,
+          "__dealii_ts_resize_transfer__",
+          static_cast<PetscErrorCode (*)(TS, PetscInt, Vec[], Vec[], void *)>(
+            ts_resize_transfer)));
+        AssertPETSc(TSSetPostStep(ts, ts_poststep_amr));
+#  endif
+      }
+
     // Allow command line customization.
     AssertPETSc(TSSetFromOptions(ts));
 
-    // Handle algebraic components.
+    // By default PETSc does not check for Jacobian errors in optimized
+    // mode. Here we do it unconditionally.
+#  if DEAL_II_PETSC_VERSION_GTE(3, 11, 0)
+    {
+      SNES snes;
+      AssertPETSc(TSGetSNES(ts, &snes));
+      AssertPETSc(SNESSetCheckJacobianDomainError(snes, PETSC_TRUE));
+    }
+#  endif
+  }
+
+
+
+  template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_petsc_vector_type<VectorType> ||
+     std::constructible_from<
+       VectorType,
+       Vec>)&&(concepts::is_dealii_petsc_matrix_type<PMatrixType> ||
+               std::constructible_from<
+                 PMatrixType,
+                 Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
+                         std::constructible_from<AMatrixType, Mat>))
+  void TimeStepper<VectorType, PMatrixType, AMatrixType>::
+    setup_algebraic_constraints(const VectorType &y)
+  {
     if (algebraic_components && need_dae_tolerances)
       {
         PetscReal atol, rtol;
         AssertPETSc(TSGetTolerances(ts, &atol, nullptr, &rtol, nullptr));
 
         Vec av, rv;
-        AssertPETSc(VecDuplicate(y.petsc_vector(), &av));
-        AssertPETSc(VecDuplicate(y.petsc_vector(), &rv));
+        Vec py = const_cast<VectorType &>(y).petsc_vector();
+        AssertPETSc(VecDuplicate(py, &av));
+        AssertPETSc(VecDuplicate(py, &rv));
 
         VectorBase avdealii(av);
         VectorBase rvdealii(rv);
@@ -853,21 +1099,50 @@ namespace PETScWrappers
         AssertPETSc(VecDestroy(&av));
         AssertPETSc(VecDestroy(&rv));
       }
+  }
+
+
+
+  template <typename VectorType, typename PMatrixType, typename AMatrixType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_petsc_vector_type<VectorType> ||
+     std::constructible_from<
+       VectorType,
+       Vec>)&&(concepts::is_dealii_petsc_matrix_type<PMatrixType> ||
+               std::constructible_from<
+                 PMatrixType,
+                 Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
+                         std::constructible_from<AMatrixType, Mat>))
+  unsigned int TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(
+    VectorType &y)
+  {
+    try
+      {
+        setup_callbacks();
+      }
+    catch (...)
+      {
+        throw;
+      }
+
+    // Set solution vector.
+    AssertPETSc(TSSetSolution(ts, y.petsc_vector()));
 
     // Setup internal data structures, including the internal nonlinear
     // solver SNES if using an implicit solver.
     AssertPETSc(TSSetUp(ts));
 
-    // By default PETSc does not check for Jacobian errors in optimized
-    // mode. Here we do it unconditionally.
-#  if DEAL_II_PETSC_VERSION_GTE(3, 11, 0)
-    if (ts_has_snes(ts))
+    // Handle algebraic components. This must be done when we know the layout
+    // of the solution vector.
+    try
       {
-        SNES snes;
-        AssertPETSc(TSGetSNES(ts, &snes));
-        AssertPETSc(SNESSetCheckJacobianDomainError(snes, PETSC_TRUE));
+        setup_algebraic_constraints(y);
       }
-#  endif
+    catch (...)
+      {
+        throw;
+      }
+
     // Having set everything up, now do the actual work
     // and let PETSc do the time stepping. If there is
     // a pending exception, then one of the user callbacks
@@ -877,7 +1152,7 @@ namespace PETScWrappers
     // a zero error code -- if so, just eat the exception and
     // continue on; otherwise, just rethrow the exception
     // and get outta here.
-    const int status = TSSolve(ts, nullptr);
+    const PetscErrorCode status = TSSolve(ts, nullptr);
     if (pending_exception)
       {
         try
