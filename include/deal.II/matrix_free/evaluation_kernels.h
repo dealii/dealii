@@ -1062,12 +1062,9 @@ namespace internal
                                         normal_dir,
                                         Number,
                                         Number2>;
-    using Eval0 =
-      typename std::conditional<normal_dir == 0, EvalNormal, EvalTangent>::type;
-    using Eval1 =
-      typename std::conditional<normal_dir == 1, EvalNormal, EvalTangent>::type;
-    using Eval2 =
-      typename std::conditional<normal_dir == 2, EvalNormal, EvalTangent>::type;
+    using Eval0 = std::conditional_t<normal_dir == 0, EvalNormal, EvalTangent>;
+    using Eval1 = std::conditional_t<normal_dir == 1, EvalNormal, EvalTangent>;
+    using Eval2 = std::conditional_t<normal_dir == 2, EvalNormal, EvalTangent>;
 
     const auto &shape_info = fe_eval.get_shape_info();
     Eval0       eval0      = create_evaluator_tensor_product<Eval0>(
@@ -1258,12 +1255,9 @@ namespace internal
                                         normal_dir,
                                         Number,
                                         Number2>;
-    using Eval0 =
-      typename std::conditional<normal_dir == 0, EvalNormal, EvalTangent>::type;
-    using Eval1 =
-      typename std::conditional<normal_dir == 1, EvalNormal, EvalTangent>::type;
-    using Eval2 =
-      typename std::conditional<normal_dir == 2, EvalNormal, EvalTangent>::type;
+    using Eval0 = std::conditional_t<normal_dir == 0, EvalNormal, EvalTangent>;
+    using Eval1 = std::conditional_t<normal_dir == 1, EvalNormal, EvalTangent>;
+    using Eval2 = std::conditional_t<normal_dir == 2, EvalNormal, EvalTangent>;
 
     const auto &shape_info = fe_eval.get_shape_info();
     Eval0       eval0      = create_evaluator_tensor_product<Eval0>(
