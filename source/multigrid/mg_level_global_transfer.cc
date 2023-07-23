@@ -312,22 +312,27 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
           break;
         }
   if (Utilities::MPI::max(have_refinement_edge_dofs, mpi_communicator) == 1)
-    fill_internal(mg_dof,
-                  mg_constrained_dofs,
-                  mpi_communicator,
-                  true,
-                  this->solution_copy_indices,
-                  this->solution_copy_indices_global_mine,
-                  this->solution_copy_indices_level_mine,
-                  solution_ghosted_global_vector,
-                  solution_ghosted_level_vector);
+    {
+      // note: variables not needed
+      std::vector<Table<2, unsigned int>> solution_copy_indices_global_mine;
+      MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
+        solution_ghosted_level_vector;
+
+      fill_internal(mg_dof,
+                    mg_constrained_dofs,
+                    mpi_communicator,
+                    true,
+                    this->solution_copy_indices,
+                    solution_copy_indices_global_mine,
+                    this->solution_copy_indices_level_mine,
+                    solution_ghosted_global_vector,
+                    solution_ghosted_level_vector);
+    }
   else
     {
-      this->solution_copy_indices             = this->copy_indices;
-      this->solution_copy_indices_global_mine = this->copy_indices_global_mine;
-      this->solution_copy_indices_level_mine  = this->copy_indices_level_mine;
-      solution_ghosted_global_vector          = ghosted_global_vector;
-      solution_ghosted_level_vector           = ghosted_level_vector;
+      this->solution_copy_indices            = this->copy_indices;
+      this->solution_copy_indices_level_mine = this->copy_indices_level_mine;
+      solution_ghosted_global_vector         = ghosted_global_vector;
     }
 
   // Check if we can perform a cheaper "plain copy" (with or without
@@ -375,7 +380,6 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::
       ghosted_global_vector.reinit(0);
       ghosted_level_vector.resize(0, 0);
       solution_ghosted_global_vector.reinit(0);
-      solution_ghosted_level_vector.resize(0, 0);
     }
 }
 
@@ -389,7 +393,6 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::clear()
   copy_indices.clear();
   solution_copy_indices.clear();
   copy_indices_global_mine.clear();
-  solution_copy_indices_global_mine.clear();
   copy_indices_level_mine.clear();
   solution_copy_indices_level_mine.clear();
   component_to_block_map.resize(0);
@@ -397,7 +400,6 @@ MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>::clear()
   ghosted_global_vector.reinit(0);
   solution_ghosted_global_vector.reinit(0);
   ghosted_level_vector.resize(0, 0);
-  solution_ghosted_level_vector.resize(0, 0);
   perform_plain_copy            = false;
   perform_renumbered_plain_copy = false;
   initialize_dof_vector         = nullptr;

@@ -537,11 +537,6 @@ protected:
   std::vector<Table<2, unsigned int>> copy_indices_global_mine;
 
   /**
-   * Same as above, but used to transfer solution vectors.
-   */
-  std::vector<Table<2, unsigned int>> solution_copy_indices_global_mine;
-
-  /**
    * Additional degrees of freedom for the copy_from_mg() function. These are
    * the ones where the level degree of freedom is locally owned and the
    * global degree of freedom is not.
@@ -604,12 +599,6 @@ protected:
    */
   mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
     ghosted_level_vector;
-
-  /**
-   * Same as above but used when working with solution vectors.
-   */
-  mutable MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
-    solution_ghosted_level_vector;
 
   /**
    * Function to initialize internal level vectors.
