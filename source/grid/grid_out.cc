@@ -927,7 +927,7 @@ GridOut::write_dx(const Triangulation<dim, spacedim> &tria,
           for (const unsigned int f : GeometryInfo<dim>::face_indices())
             {
               out << ' '
-                  << static_cast<std::make_signed<types::boundary_id>::type>(
+                  << static_cast<std::make_signed_t<types::boundary_id>>(
                        cell->face(f)->boundary_id());
             }
           out << '\n';
@@ -2505,9 +2505,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                   if (svg_flags.label_level_number ||
                       svg_flags.label_cell_index)
                     out << ',';
-                  out
-                    << static_cast<std::make_signed<types::material_id>::type>(
-                         cell->material_id());
+                  out << static_cast<std::make_signed_t<types::material_id>>(
+                    cell->material_id());
                 }
 
               if (svg_flags.label_subdomain_id)
@@ -2516,8 +2515,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                       svg_flags.label_cell_index || svg_flags.label_material_id)
                     out << ',';
                   if (cell->is_active())
-                    out << static_cast<
-                      std::make_signed<types::subdomain_id>::type>(
+                    out << static_cast<std::make_signed_t<types::subdomain_id>>(
                       cell->subdomain_id());
                   else
                     out << 'X';
@@ -2530,9 +2528,8 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                       svg_flags.label_material_id ||
                       svg_flags.label_subdomain_id)
                     out << ',';
-                  out
-                    << static_cast<std::make_signed<types::subdomain_id>::type>(
-                         cell->level_subdomain_id());
+                  out << static_cast<std::make_signed_t<types::subdomain_id>>(
+                    cell->level_subdomain_id());
                 }
 
               out << "</text>" << '\n';
@@ -3139,19 +3136,19 @@ namespace
             patch.vertices[v] = cell->vertex(v);
             patch.data(0, v)  = cell->level();
             patch.data(1, v) =
-              static_cast<std::make_signed<types::manifold_id>::type>(
+              static_cast<std::make_signed_t<types::manifold_id>>(
                 cell->manifold_id());
             patch.data(2, v) =
-              static_cast<std::make_signed<types::material_id>::type>(
+              static_cast<std::make_signed_t<types::material_id>>(
                 cell->material_id());
             if (cell->is_active())
               patch.data(3, v) =
-                static_cast<std::make_signed<types::subdomain_id>::type>(
+                static_cast<std::make_signed_t<types::subdomain_id>>(
                   cell->subdomain_id());
             else
               patch.data(3, v) = -1;
             patch.data(4, v) =
-              static_cast<std::make_signed<types::subdomain_id>::type>(
+              static_cast<std::make_signed_t<types::subdomain_id>>(
                 cell->level_subdomain_id());
           }
         patches.push_back(patch);
@@ -3473,7 +3470,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     {
       for (const auto &cell : tria.active_cell_iterators())
         {
-          out << static_cast<std::make_signed<types::material_id>::type>(
+          out << static_cast<std::make_signed_t<types::material_id>>(
                    cell->material_id())
               << ' ';
         }
@@ -3483,7 +3480,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     {
       for (const auto &face : faces)
         {
-          out << static_cast<std::make_signed<types::boundary_id>::type>(
+          out << static_cast<std::make_signed_t<types::boundary_id>>(
                    face->boundary_id())
               << ' ';
         }
@@ -3493,7 +3490,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     {
       for (const auto &edge : edges)
         {
-          out << static_cast<std::make_signed<types::boundary_id>::type>(
+          out << static_cast<std::make_signed_t<types::boundary_id>>(
                    edge->boundary_id())
               << ' ';
         }
@@ -3507,7 +3504,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     {
       for (const auto &cell : tria.active_cell_iterators())
         {
-          out << static_cast<std::make_signed<types::manifold_id>::type>(
+          out << static_cast<std::make_signed_t<types::manifold_id>>(
                    cell->manifold_id())
               << ' ';
         }
@@ -3517,7 +3514,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     {
       for (const auto &face : faces)
         {
-          out << static_cast<std::make_signed<types::manifold_id>::type>(
+          out << static_cast<std::make_signed_t<types::manifold_id>>(
                    face->manifold_id())
               << ' ';
         }
@@ -3527,7 +3524,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
     {
       for (const auto &edge : edges)
         {
-          out << static_cast<std::make_signed<types::manifold_id>::type>(
+          out << static_cast<std::make_signed_t<types::manifold_id>>(
                    edge->manifold_id())
               << ' ';
         }
@@ -3645,12 +3642,12 @@ GridOut::write_mesh_per_processor_as_vtu(
           patch.data(0, vertex)  = cell->level();
           if (cell->is_active())
             patch.data(1, vertex) = static_cast<double>(
-              static_cast<std::make_signed<types::subdomain_id>::type>(
+              static_cast<std::make_signed_t<types::subdomain_id>>(
                 cell->subdomain_id()));
           else
             patch.data(1, vertex) = -1.0;
           patch.data(2, vertex) = static_cast<double>(
-            static_cast<std::make_signed<types::subdomain_id>::type>(
+            static_cast<std::make_signed_t<types::subdomain_id>>(
               cell->level_subdomain_id()));
           patch.data(3, vertex) = tria.locally_owned_subdomain();
         }
