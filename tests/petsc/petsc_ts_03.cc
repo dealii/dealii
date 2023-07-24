@@ -49,6 +49,8 @@
  * solution is completely on users. In this case
  * users are in charge of solving for the
  * implicit Jacobian.
+ * Here we also test the functionalities of the
+ * various user callbacks available.
  * The model used to wrap PETSc's TS is the same
  * used for the nonlinear solver SNES. Check
  * petsc_snes_00.cc for additional information.
@@ -167,6 +169,31 @@ public:
       deallog << "  t =" << t << std::endl;
       deallog << "  y =" << sol[0] << "  (exact: " << std::exp(-kappa * t)
               << ')' << std::endl;
+    };
+
+    // This callback is invoked after a successfull stage.
+    // Here we only print that the callback is invoked.
+    time_stepper.distribute = [&](const real_type t, VectorType &) -> void {
+      deallog << "Distribute at time " << t << std::endl;
+    };
+
+    // This callback is used to decide to remesh.
+    time_stepper.prepare_for_coarsening_and_refinement =
+      [&](const real_type    t,
+          const unsigned int step,
+          const VectorType &,
+          bool &resize) -> void {
+      deallog << "Prepare at time " << t << " and step " << step << std::endl;
+      resize = (step && step % 5 == 0);
+    };
+
+    // This callback is called if prepare_for_coarsening_and_refinement sets
+    // resize to true.
+    time_stepper.interpolate = [&](const std::vector<VectorType> &all_in,
+                                   std::vector<VectorType> &all_out) -> void {
+      deallog << "Interpolate" << std::endl;
+      for (auto &v : all_in)
+        all_out.push_back(v);
     };
   }
 
