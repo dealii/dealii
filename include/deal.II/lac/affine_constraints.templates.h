@@ -2560,6 +2560,18 @@ AffineConstraints<number>::distribute(VectorType &vec) const
 
   if (dealii::is_serial_vector<VectorType>::value == false)
     {
+      // Check that the set of indices we will import is a superset of
+      // the locally-owned ones. This *should* be the case if, as one
+      // would expect, the AffineConstraint object was initialized
+      // with a locally-relevant index set that is indeed a superset
+      // of the locally-owned indices. But you never know what people
+      // pass as arguments...
+#ifdef DEBUG
+      for (const auto i : vec_owned_elements)
+        Assert(needed_elements_for_distribute.is_element(i),
+               ExcInternalError());
+#endif
+
       VectorType ghosted_vector;
       internal::import_vector_with_ghost_elements(
         vec,
