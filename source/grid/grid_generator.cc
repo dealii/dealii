@@ -6487,12 +6487,12 @@ namespace GridGenerator
                ExcMessage("The input triangulations must be non-empty "
                           "and must not be refined."));
 
-        std::vector<Point<spacedim>> tria_vertices;
-        std::vector<CellData<dim>>   tria_cells;
-        SubCellData                  tria_subcell_data;
-        std::tie(tria_vertices, tria_cells, tria_subcell_data) =
+        auto [tria_vertices, tria_cells, tria_subcell_data] =
           GridTools::get_coarse_mesh_description(*triangulation);
 
+        // Copy the vertices of the current triangulation into the merged list,
+        // and then let the vertex indices of the cells refer to those in
+        // the merged list:
         vertices.insert(vertices.end(),
                         tria_vertices.begin(),
                         tria_vertices.end());
@@ -6750,11 +6750,9 @@ namespace GridGenerator
     tria_to_replicate.copy_triangulation(input);
     for (unsigned int d = 0; d < dim; ++d)
       {
-        std::vector<Point<spacedim>> input_vertices;
-        std::vector<CellData<dim>>   input_cell_data;
-        SubCellData                  input_subcell_data;
-        std::tie(input_vertices, input_cell_data, input_subcell_data) =
+        auto [input_vertices, input_cell_data, input_subcell_data] =
           GridTools::get_coarse_mesh_description(tria_to_replicate);
+
         std::vector<Point<spacedim>> output_vertices     = input_vertices;
         std::vector<CellData<dim>>   output_cell_data    = input_cell_data;
         SubCellData                  output_subcell_data = input_subcell_data;
