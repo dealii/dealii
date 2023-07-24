@@ -746,13 +746,8 @@ namespace PETScWrappers
       PetscFunctionBeginUser;
       auto user = static_cast<TimeStepper *>(ctx);
 
-      VectorType  xdealii(x);
-      VectorType  xdotdealii(xdot);
-      AMatrixType Adealii(A);
-      PMatrixType Pdealii(P);
-
-      user->A = &Adealii;
-      user->P = &Pdealii;
+      VectorType xdealii(x);
+      VectorType xdotdealii(xdot);
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
@@ -776,6 +771,13 @@ namespace PETScWrappers
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
           "Failure in ts_ijacobian_with_setup from dealii::PETScWrappers::TimeStepper");
+      // The MatCopy calls below are 99% of the times dummy calls.
+      // They are only used in case we get different Mats then the one we passed
+      // to TSSetIJacobian.
+      if (user->P)
+        PetscCall(MatCopy(user->P->petsc_matrix(), P, SAME_NONZERO_PATTERN));
+      if (user->A)
+        PetscCall(MatCopy(user->A->petsc_matrix(), A, SAME_NONZERO_PATTERN));
       petsc_increment_state_counter(P);
 
       // Handle older versions of PETSc for which we cannot pass a MATSHELL
