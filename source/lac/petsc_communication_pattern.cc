@@ -37,10 +37,14 @@ namespace PETScWrappers
     : sf(nullptr)
   {}
 
+
+
   CommunicationPattern::~CommunicationPattern()
   {
     clear();
   }
+
+
 
   void
   CommunicationPattern::reinit(const types::global_dof_index local_size,
@@ -78,6 +82,8 @@ namespace PETScWrappers
     AssertPETSc(PetscLayoutDestroy(&layout));
   }
 
+
+
   void
   CommunicationPattern::reinit(const IndexSet &locally_owned_indices,
                                const IndexSet &ghost_indices,
@@ -95,6 +101,8 @@ namespace PETScWrappers
 
     this->do_reinit(in_petsc, dummy, out_petsc, dummy, communicator);
   }
+
+
 
   void
   CommunicationPattern::reinit(
@@ -148,6 +156,8 @@ namespace PETScWrappers
                     indices_want_loc,
                     communicator);
   }
+
+
 
   void
   CommunicationPattern::do_reinit(const std::vector<PetscInt> &inidx,
@@ -243,11 +253,15 @@ namespace PETScWrappers
     AssertPETSc(PetscSFDestroy(&sf2));
   }
 
+
+
   void
   CommunicationPattern::clear()
   {
     AssertPETSc(PetscSFDestroy(&sf));
   }
+
+
 
   MPI_Comm
   CommunicationPattern::get_mpi_communicator() const
@@ -255,21 +269,35 @@ namespace PETScWrappers
     return PetscObjectComm(reinterpret_cast<PetscObject>(sf));
   }
 
+
+
   template <typename Number>
   void
   CommunicationPattern::export_to_ghosted_array_start(
     const ArrayView<const Number> &src,
     const ArrayView<Number> &      dst) const
   {
+#  ifdef DEAL_II_WITH_MPI
     auto datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
-#  if DEAL_II_PETSC_VERSION_LT(3, 15, 0)
+#    if DEAL_II_PETSC_VERSION_LT(3, 15, 0)
     AssertPETSc(PetscSFBcastBegin(sf, datatype, src.data(), dst.data()));
-#  else
+#    else
     AssertPETSc(
       PetscSFBcastBegin(sf, datatype, src.data(), dst.data(), MPI_REPLACE));
+#    endif
+
+#  else
+
+    (void)src;
+    (void)dst;
+    Assert(false,
+           ExcMessage("This program is running without MPI. There should "
+                      "not be anything to import or export!"));
 #  endif
   }
+
+
 
   template <typename Number>
   void
@@ -277,15 +305,27 @@ namespace PETScWrappers
     const ArrayView<const Number> &src,
     const ArrayView<Number> &      dst) const
   {
+#  ifdef DEAL_II_WITH_MPI
     auto datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
-#  if DEAL_II_PETSC_VERSION_LT(3, 15, 0)
+#    if DEAL_II_PETSC_VERSION_LT(3, 15, 0)
     AssertPETSc(PetscSFBcastEnd(sf, datatype, src.data(), dst.data()));
-#  else
+#    else
     AssertPETSc(
       PetscSFBcastEnd(sf, datatype, src.data(), dst.data(), MPI_REPLACE));
+#    endif
+
+#  else
+
+    (void)src;
+    (void)dst;
+    Assert(false,
+           ExcMessage("This program is running without MPI. There should "
+                      "not be anything to import or export!"));
 #  endif
   }
+
+
 
   template <typename Number>
   void
@@ -297,6 +337,8 @@ namespace PETScWrappers
     export_to_ghosted_array_finish(src, dst);
   }
 
+
+
   template <typename Number>
   void
   CommunicationPattern::import_from_ghosted_array_start(
@@ -304,12 +346,25 @@ namespace PETScWrappers
     const ArrayView<const Number> &src,
     const ArrayView<Number> &      dst) const
   {
+#  ifdef DEAL_II_WITH_MPI
     MPI_Op mpiop    = (op == VectorOperation::insert) ? MPI_REPLACE : MPI_SUM;
     auto   datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
     AssertPETSc(
       PetscSFReduceBegin(sf, datatype, src.data(), dst.data(), mpiop));
+
+#  else
+
+    (void)op;
+    (void)src;
+    (void)dst;
+    Assert(false,
+           ExcMessage("This program is running without MPI. There should "
+                      "not be anything to import or export!"));
+#  endif
   }
+
+
 
   template <typename Number>
   void
@@ -318,11 +373,24 @@ namespace PETScWrappers
     const ArrayView<const Number> &src,
     const ArrayView<Number> &      dst) const
   {
+#  ifdef DEAL_II_WITH_MPI
     MPI_Op mpiop    = (op == VectorOperation::insert) ? MPI_REPLACE : MPI_SUM;
     auto   datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
     AssertPETSc(PetscSFReduceEnd(sf, datatype, src.data(), dst.data(), mpiop));
+
+#  else
+
+    (void)op;
+    (void)src;
+    (void)dst;
+    Assert(false,
+           ExcMessage("This program is running without MPI. There should "
+                      "not be anything to import or export!"));
+#  endif
   }
+
+
 
   template <typename Number>
   void
@@ -335,6 +403,8 @@ namespace PETScWrappers
     import_from_ghosted_array_finish(op, src, dst);
   }
 
+
+
   // Partitioner
 
   Partitioner::Partitioner()
@@ -344,6 +414,8 @@ namespace PETScWrappers
     , n_ghost_indices_data(numbers::invalid_dof_index)
     , n_ghost_indices_larger(numbers::invalid_dof_index)
   {}
+
+
 
   void
   Partitioner::reinit(const IndexSet &locally_owned_indices,
