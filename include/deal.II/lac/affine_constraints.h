@@ -1955,6 +1955,16 @@ private:
   IndexSet local_lines;
 
   /**
+   * The set of elements that are necessary to call distribute(). Because
+   * we need to set locally owned constrained elements of a vector, the
+   * needed elements include all vector entries that these constrained
+   * elements depend on -- which may be owned by other processes.
+   *
+   * This variable is set in close().
+   */
+  IndexSet needed_elements_for_distribute;
+
+  /**
    * Store whether the arrays are sorted.  If so, no new entries can be added.
    */
   bool sorted;

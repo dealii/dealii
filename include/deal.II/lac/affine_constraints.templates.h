@@ -993,6 +993,37 @@ AffineConstraints<number>::close()
          ExcMessage("The constraints represented by this object have a cycle. "
                     "This is not allowed."));
 
+  // Now also compute which indices we need in distribute().
+  //
+  // This processor owns only part of the vector. one may think that
+  // every processor should be able to simply communicate those elements
+  // it owns and for which it knows that they act as sources to constrained
+  // DoFs to the owner of these DoFs. This would lead to a scheme where all
+  // we need to do is to add some local elements to (possibly non-local)
+  // ones and then call compress().
+  //
+  // Alas, this scheme does not work as evidenced by the disaster of bug
+  // #51, see http://code.google.com/p/dealii/issues/detail?id=51 and the
+  // reversion of one attempt that implements this in r29662. Rather, we
+  // need to get a vector that has all the *sources* or constraints we
+  // own locally, possibly as ghost vector elements, then read from them,
+  // and finally throw away the ghosted vector. Implement this in the
+  // following.
+  needed_elements_for_distribute = local_lines;
+
+  if (needed_elements_for_distribute != complete_index_set(local_lines.size()))
+    {
+      std::vector<types::global_dof_index> additional_elements;
+      for (const ConstraintLine &line : lines)
+        if (local_lines.is_element(line.index))
+          for (const std::pair<size_type, number> &entry : line.entries)
+            if (!local_lines.is_element(entry.first))
+              additional_elements.emplace_back(entry.first);
+      std::sort(additional_elements.begin(), additional_elements.end());
+      needed_elements_for_distribute.add_indices(additional_elements.begin(),
+                                                 additional_elements.end());
+    }
+
   sorted = true;
 }
 
@@ -2265,6 +2296,8 @@ namespace internal
   } // namespace AffineConstraintsImplementation
 } // namespace internal
 
+
+
 template <typename number>
 template <typename VectorType>
 void
@@ -2281,6 +2314,8 @@ AffineConstraints<number>::distribute_local_to_global(
                              local_matrix,
                              true);
 }
+
+
 
 template <typename number>
 template <typename VectorType>
@@ -2434,6 +2469,8 @@ namespace internal
   }
 #endif
 
+
+
   template <typename number>
   void
   import_vector_with_ghost_elements(
@@ -2453,6 +2490,8 @@ namespace internal
     output = vec;
     output.update_ghost_values();
   }
+
+
 
   // all other vector non-block vector types are sequential and we should
   // not have this function called at all -- so throw an exception
@@ -2498,6 +2537,8 @@ namespace internal
   }
 } // namespace internal
 
+
+
 template <typename number>
 template <typename VectorType>
 void
@@ -2519,37 +2560,11 @@ AffineConstraints<number>::distribute(VectorType &vec) const
 
   if (dealii::is_serial_vector<VectorType>::value == false)
     {
-      // This processor owns only part of the vector. one may think that
-      // every processor should be able to simply communicate those elements
-      // it owns and for which it knows that they act as sources to constrained
-      // DoFs to the owner of these DoFs. This would lead to a scheme where all
-      // we need to do is to add some local elements to (possibly non-local)
-      // ones and then call compress().
-      //
-      // Alas, this scheme does not work as evidenced by the disaster of bug
-      // #51, see http://code.google.com/p/dealii/issues/detail?id=51 and the
-      // reversion of one attempt that implements this in r29662. Rather, we
-      // need to get a vector that has all the *sources* or constraints we
-      // own locally, possibly as ghost vector elements, then read from them,
-      // and finally throw away the ghosted vector. Implement this in the
-      // following.
-      IndexSet needed_elements = vec_owned_elements;
-
-      std::vector<types::global_dof_index> additional_elements;
-      for (const ConstraintLine &line : lines)
-        if (vec_owned_elements.is_element(line.index))
-          for (const std::pair<size_type, number> &entry : line.entries)
-            if (!vec_owned_elements.is_element(entry.first))
-              additional_elements.emplace_back(entry.first);
-      std::sort(additional_elements.begin(), additional_elements.end());
-      needed_elements.add_indices(additional_elements.begin(),
-                                  additional_elements.end());
-
       VectorType ghosted_vector;
       internal::import_vector_with_ghost_elements(
         vec,
         vec_owned_elements,
-        needed_elements,
+        needed_elements_for_distribute,
         ghosted_vector,
         std::integral_constant<bool, IsBlockVector<VectorType>::value>());
 
