@@ -572,7 +572,7 @@ _Pragma("GCC diagnostic pop")
  * Some systems require including mpi.h before stdio.h which happens in
  * types.h
  */
-#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
+#if defined(DEAL_II_WITH_MPI)
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS

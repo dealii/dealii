@@ -277,23 +277,13 @@ namespace PETScWrappers
     const ArrayView<const Number> &src,
     const ArrayView<Number> &      dst) const
   {
-#  ifdef DEAL_II_WITH_MPI
     auto datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
-#    if DEAL_II_PETSC_VERSION_LT(3, 15, 0)
+#  if DEAL_II_PETSC_VERSION_LT(3, 15, 0)
     AssertPETSc(PetscSFBcastBegin(sf, datatype, src.data(), dst.data()));
-#    else
+#  else
     AssertPETSc(
       PetscSFBcastBegin(sf, datatype, src.data(), dst.data(), MPI_REPLACE));
-#    endif
-
-#  else
-
-    (void)src;
-    (void)dst;
-    Assert(false,
-           ExcMessage("This program is running without MPI. There should "
-                      "not be anything to import or export!"));
 #  endif
   }
 
@@ -305,23 +295,13 @@ namespace PETScWrappers
     const ArrayView<const Number> &src,
     const ArrayView<Number> &      dst) const
   {
-#  ifdef DEAL_II_WITH_MPI
     auto datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
-#    if DEAL_II_PETSC_VERSION_LT(3, 15, 0)
+#  if DEAL_II_PETSC_VERSION_LT(3, 15, 0)
     AssertPETSc(PetscSFBcastEnd(sf, datatype, src.data(), dst.data()));
-#    else
+#  else
     AssertPETSc(
       PetscSFBcastEnd(sf, datatype, src.data(), dst.data(), MPI_REPLACE));
-#    endif
-
-#  else
-
-    (void)src;
-    (void)dst;
-    Assert(false,
-           ExcMessage("This program is running without MPI. There should "
-                      "not be anything to import or export!"));
 #  endif
   }
 
@@ -346,22 +326,11 @@ namespace PETScWrappers
     const ArrayView<const Number> &src,
     const ArrayView<Number> &      dst) const
   {
-#  ifdef DEAL_II_WITH_MPI
     MPI_Op mpiop    = (op == VectorOperation::insert) ? MPI_REPLACE : MPI_SUM;
     auto   datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
     AssertPETSc(
       PetscSFReduceBegin(sf, datatype, src.data(), dst.data(), mpiop));
-
-#  else
-
-    (void)op;
-    (void)src;
-    (void)dst;
-    Assert(false,
-           ExcMessage("This program is running without MPI. There should "
-                      "not be anything to import or export!"));
-#  endif
   }
 
 
@@ -373,21 +342,10 @@ namespace PETScWrappers
     const ArrayView<const Number> &src,
     const ArrayView<Number> &      dst) const
   {
-#  ifdef DEAL_II_WITH_MPI
     MPI_Op mpiop    = (op == VectorOperation::insert) ? MPI_REPLACE : MPI_SUM;
     auto   datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
     AssertPETSc(PetscSFReduceEnd(sf, datatype, src.data(), dst.data(), mpiop));
-
-#  else
-
-    (void)op;
-    (void)src;
-    (void)dst;
-    Assert(false,
-           ExcMessage("This program is running without MPI. There should "
-                      "not be anything to import or export!"));
-#  endif
   }
 
 

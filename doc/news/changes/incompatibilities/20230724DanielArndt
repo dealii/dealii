@@ -1,0 +1,3 @@
+Removed: Support for PETSc without MPI has been removed.
+<br>
+(Daniel Arndt, 2023/07/24)
