@@ -562,6 +562,17 @@ namespace PETScWrappers
           PetscCall(TSSetSolution(ts, new_x));
           PetscCall(VecDestroy(&new_x));
         }
+#  if DEAL_II_PETSC_VERSION_LT(3, 17, 0)
+      // Older versions of PETSc assume that the user does not
+      // change the solution vector during TSPostStep
+      // We "fix" it by taking a reference to the object and
+      // increment its state so that the time stepper is restarted
+      // properly.
+      AssertPETSc(PetscObjectCompose((PetscObject)ts,
+                                     "__dealii_ts_resize_bug__",
+                                     (PetscObject)x));
+      petsc_increment_state_counter(x);
+#  endif
       PetscCall(VecDestroy(&x));
       PetscFunctionReturn(PETSC_SUCCESS);
     };
