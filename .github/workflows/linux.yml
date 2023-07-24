@@ -28,8 +28,13 @@ jobs:
     name: linux release serial
     runs-on: [ubuntu-22.04]
 
-    # only run on 'push' or if the 'pull_request' is not a draft:
-    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+    #
+    # The following condition only runs the workflow on 'push' or if the
+    # 'pull_request' is not a draft. This is only useful for hackathons or
+    # other situations when the CI is massively overburdened with pull
+    # requests.
+    #
+    # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     container:
       image: dealii/dependencies:jammy
@@ -77,8 +82,13 @@ jobs:
     name: linux debug parallel
     runs-on: [ubuntu-22.04]
 
-    # only run on 'push' or if the 'pull_request' is not a draft:
-    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+    #
+    # The following condition only runs the workflow on 'push' or if the
+    # 'pull_request' is not a draft. This is only useful for hackathons or
+    # other situations when the CI is massively overburdened with pull
+    # requests.
+    #
+    # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     container:
       image: dealii/dependencies:jammy
@@ -140,8 +150,13 @@ jobs:
     name: linux debug intel oneapi
     runs-on: [ubuntu-22.04]
 
-    # only run on 'push' or if the 'pull_request' is not a draft:
-    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+    #
+    # The following condition only runs the workflow on 'push' or if the
+    # 'pull_request' is not a draft. This is only useful for hackathons or
+    # other situations when the CI is massively overburdened with pull
+    # requests.
+    #
+    # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
     - uses: actions/checkout@v3
@@ -223,8 +238,13 @@ jobs:
     name: linux debug cuda-11
     runs-on: [ubuntu-20.04]
 
-    # only run on 'push' or if the 'pull_request' is not a draft:
-    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+    #
+    # The following condition only runs the workflow on 'push' or if the
+    # 'pull_request' is not a draft. This is only useful for hackathons or
+    # other situations when the CI is massively overburdened with pull
+    # requests.
+    #
+    # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     env:
       CUDA_ROOT: /usr/local/cuda
@@ -309,8 +329,13 @@ jobs:
     name: linux debug cuda-11 clang
     runs-on: [ubuntu-20.04]
 
-    # only run on 'push' or if the 'pull_request' is not a draft:
-    if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
+    #
+    # The following condition only runs the workflow on 'push' or if the
+    # 'pull_request' is not a draft. This is only useful for hackathons or
+    # other situations when the CI is massively overburdened with pull
+    # requests.
+    #
+    # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     env:
       CUDA_ROOT: /usr/local/cuda
