@@ -392,11 +392,15 @@ namespace GridTools
 
   /**
    * Return the arrays that define the coarse mesh of a Triangulation. This
-   * function is the inverse of Triangulation::create_triangulation().
+   * function is the inverse of Triangulation::create_triangulation() in the
+   * sense that if one called this function on a triangulation, then that
+   * triangulation could be recreated by some kind of refinement from the
+   * results of this function.
    *
    * The return value is a tuple with the vector of vertices, the vector of
    * cells, and a SubCellData structure. The latter contains additional
-   * information about faces and lines.
+   * information about faces and lines. These three objects are exactly
+   * the arguments to Triangulation::create_triangulation().
    *
    * This function is useful in cases where one needs to deconstruct a
    * Triangulation or manipulate the numbering of the vertices in some way: an
