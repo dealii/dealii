@@ -55,8 +55,8 @@ test_feiv_view(const Vector<double> &            solution,
                const FEValuesExtractors::Scalar &extractor,
                const std::vector<NumberType> &   local_dof_values)
 {
-  using View = typename std::remove_reference<
-    typename std::remove_const<decltype(fe_iv[extractor])>::type>::type;
+  using View =
+    std::remove_reference_t<std::remove_const_t<decltype(fe_iv[extractor])>>;
   const View &fe_iv_view = fe_iv[extractor];
 
   // Typedefs
@@ -176,8 +176,8 @@ test_feiv_view(const Vector<double> &            solution,
                const FEValuesExtractors::Vector &extractor,
                const std::vector<NumberType> &   local_dof_values)
 {
-  using View = typename std::remove_reference<
-    typename std::remove_const<decltype(fe_iv[extractor])>::type>::type;
+  using View =
+    std::remove_reference_t<std::remove_const_t<decltype(fe_iv[extractor])>>;
   const View &fe_iv_view = fe_iv[extractor];
 
   // Typedefs

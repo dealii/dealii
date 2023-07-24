@@ -289,7 +289,7 @@ FullMatrix<number>::backward(Vector<number2> &      dst,
 
   size_type j;
   size_type nu = (m() < n() ? m() : n());
-  for (std::make_signed<size_type>::type i = nu - 1; i >= 0; --i)
+  for (std::make_signed_t<size_type> i = nu - 1; i >= 0; --i)
     {
       typename ProductType<number, number2>::type s = src(i);
       for (j = i + 1; j < nu; ++j)

@@ -473,14 +473,13 @@ namespace SUNDIALS
 #  endif
                                          )
       : vector_ptr(
-          create_nvector(
-            new NVectorContent<typename std::remove_const<VectorType>::type>(
-              &vector)
+          create_nvector(new NVectorContent<std::remove_const_t<VectorType>>(
+                           &vector)
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-              ,
-            nvector_context
+                           ,
+                         nvector_context
 #  endif
-            ),
+                         ),
           [](N_Vector v) { N_VDestroy(v); })
     {}
 

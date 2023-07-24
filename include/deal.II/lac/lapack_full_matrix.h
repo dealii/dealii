@@ -62,7 +62,7 @@ public:
   /**
    * Declare type for container size.
    */
-  using size_type = std::make_unsigned<types::blas_int>::type;
+  using size_type = std::make_unsigned_t<types::blas_int>;
 
   /**
    * Constructor. Initialize the matrix as a square matrix with dimension

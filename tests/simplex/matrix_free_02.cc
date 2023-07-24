@@ -181,8 +181,7 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
         auto &      x,
         auto &      b) -> std::tuple<unsigned int, double, double, double> {
     ReductionControl reduction_control(1000, 1e-10, 1e-4);
-    SolverCG<typename std::remove_reference<decltype(x)>::type> solver(
-      reduction_control);
+    SolverCG<std::remove_reference_t<decltype(x)>> solver(reduction_control);
     solver.solve(poisson_operator, x, b, PreconditionIdentity());
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

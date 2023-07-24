@@ -1062,12 +1062,9 @@ namespace internal
                                         normal_dir,
                                         Number,
                                         Number2>;
-    using Eval0 =
-      typename std::conditional<normal_dir == 0, EvalNormal, EvalTangent>::type;
-    using Eval1 =
-      typename std::conditional<normal_dir == 1, EvalNormal, EvalTangent>::type;
-    using Eval2 =
-      typename std::conditional<normal_dir == 2, EvalNormal, EvalTangent>::type;
+    using Eval0 = std::conditional_t<normal_dir == 0, EvalNormal, EvalTangent>;
+    using Eval1 = std::conditional_t<normal_dir == 1, EvalNormal, EvalTangent>;
+    using Eval2 = std::conditional_t<normal_dir == 2, EvalNormal, EvalTangent>;
 
     const auto &shape_info = fe_eval.get_shape_info();
     Eval0       eval0      = create_evaluator_tensor_product<Eval0>(
@@ -1258,12 +1255,9 @@ namespace internal
                                         normal_dir,
                                         Number,
                                         Number2>;
-    using Eval0 =
-      typename std::conditional<normal_dir == 0, EvalNormal, EvalTangent>::type;
-    using Eval1 =
-      typename std::conditional<normal_dir == 1, EvalNormal, EvalTangent>::type;
-    using Eval2 =
-      typename std::conditional<normal_dir == 2, EvalNormal, EvalTangent>::type;
+    using Eval0 = std::conditional_t<normal_dir == 0, EvalNormal, EvalTangent>;
+    using Eval1 = std::conditional_t<normal_dir == 1, EvalNormal, EvalTangent>;
+    using Eval2 = std::conditional_t<normal_dir == 2, EvalNormal, EvalTangent>;
 
     const auto &shape_info = fe_eval.get_shape_info();
     Eval0       eval0      = create_evaluator_tensor_product<Eval0>(
@@ -2285,9 +2279,8 @@ namespace internal
     {
       // `OtherNumber` is either `const Number` (evaluate()) or `Number`
       // (integrate())
-      static_assert(
-        std::is_same_v<Number, typename std::remove_const<OtherNumber>::type>,
-        "Type of Number and of OtherNumber do not match.");
+      static_assert(std::is_same_v<Number, std::remove_const_t<OtherNumber>>,
+                    "Type of Number and of OtherNumber do not match.");
 
       const auto element_type = fe_eval.get_shape_info().element_type;
       using ElementType       = MatrixFreeFunctions::ElementType;
