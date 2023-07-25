@@ -132,6 +132,13 @@ public:
   operator=(const double d);
 
   /**
+   * Clear all data fields and brings the class into a condition similar
+   * to after having called the default constructor.
+   */
+  void
+  clear();
+
+  /**
    * Call @p clear on all objects stored by this object. This function
    * is only implemented for some @p Object classes, e.g., matrix
    * types or the PreconditionBlockSOR and similar classes. Using this
@@ -272,6 +279,15 @@ MGLevelObject<Object>::operator=(const double d)
   for (v = objects.begin(); v != objects.end(); ++v)
     **v = d;
   return *this;
+}
+
+
+template <class Object>
+void
+MGLevelObject<Object>::clear()
+{
+  minlevel = 0;
+  objects.clear();
 }
 
 
