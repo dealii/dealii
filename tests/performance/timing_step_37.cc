@@ -308,8 +308,7 @@ private:
   LinearAlgebra::distributed::Vector<double> solution;
   LinearAlgebra::distributed::Vector<double> system_rhs;
 
-  MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<float>>
-    mg_transfer;
+  MGTransferMatrixFree<dim, float> mg_transfer;
 
   using SmootherType =
     PreconditionChebyshev<LevelMatrixType,
@@ -567,10 +566,9 @@ LaplaceProblem<dim>::solve()
     mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface, mg_interface);
 
-  PreconditionMG<
-    dim,
-    LinearAlgebra::distributed::Vector<float>,
-    MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<float>>>
+  PreconditionMG<dim,
+                 LinearAlgebra::distributed::Vector<float>,
+                 MGTransferMatrixFree<dim, float>>
     preconditioner(dof_handler, mg, mg_transfer);
 
 
