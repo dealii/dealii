@@ -83,9 +83,9 @@ namespace Step86
     // derivative is defined (e.g., backward Euler, Crank-Nicolson, etc.) and
     // allow the user to provide a uniform interface, irrespective of the time
     // stepper used. PETSc and SUNDIALS are two examples of such packages, and
-    // they require the user to provide C style call-backs to compute residuals,
+    // they require the user to provide C style callbacks to compute residuals,
     // Jacobians, etc. In deal.II, we wrap these C stype libraries with our own
-    // wrappers, that use a style which is closer to c++, and that allows us to
+    // wrappers, that use a style that is closer to C++, and that allows us to
     // simply define the callbacks via lambda functions.
     //
     // To make it clear what we are doing here, we start by defining functions
@@ -114,18 +114,18 @@ namespace Step86
                         const unsigned int timestep_number) const;
 
     // in addition to the above functions, we also choose to implement an extra
-    // call back, which is used to distribute affine constraints to the solution
-    // vector after each solve function. We could inserted a call to
-    // `distribute` inside the solve_with_jacobian function, but by doing things
+    // callback, which is used to distribute affine constraints to the solution
+    // vector after each solve function. We could insert a call to
+    // `distribute` inside the `solve_with_jacobian` function, but by doing things
     // this way, we can also replace all-together our implementation of the
-    // solve_with_jacobian function with a call to a PETSc solver (from the
+    // `solve_with_jacobian` function with a call to a PETSc solver (from the
     // command line), and we would still have the constraints correctly applied
     // to the solution vector.
     void distribute(const double                time,
                     PETScWrappers::MPI::Vector &residual) const;
 
     // An extremely important part of solving a time dependent PDE system is
-    // related to how we treat boundary conditions and hanging nodes
+    // related to how we treat essential boundary conditions and hanging nodes
     // constraints. In particular, these constraints are not part of the ODE
     // system, and are technically not true degrees of freedom. We need to
     // instruct the time stepper to ignore these components when computing the
@@ -154,7 +154,7 @@ namespace Step86
     void interpolate(const std::vector<PETScWrappers::MPI::Vector> &all_in,
                      std::vector<PETScWrappers::MPI::Vector> &      all_out);
 
-    // For a time dependent problem, boundary conditions may generally depend on
+    // For a time-dependent problem, essential boundary conditions may generally depend on
     // time. For distributed solutions, we usually use AffineConstraint objects
     // for such scope, and we therefore need to update the constraints whenever
     // time changes.
@@ -172,7 +172,7 @@ namespace Step86
     IndexSet locally_relevant_dofs;
 
     // The only major difference between this program and step-26 is that we now
-    // apply boundary conditions with AffineConstraints, and we allow time
+    // apply essential boundary conditions with AffineConstraints, and we allow time
     // dependent boundary conditions. During the computation of the residual, we
     // will need to impose two different types of boundary conditions:
     // homogeneous boundary conditions for the time derivative of the solution,
@@ -190,10 +190,10 @@ namespace Step86
     // Instead of assembling two matrices once, and then modifying them at each
     // time step, we let the time-stepper decide when to assemble the Jacobian
     // matrix, and provide a function that does so. This is the matrix that we
-    // will use to store the Jacobian matrix.
+    // will use to store the Jacobian.
     PETScWrappers::MPI::SparseMatrix jacobian_matrix;
 
-    // Unlike in step-26, we do not need to store ourselves the solution vector
+    // Unlike step-26, we do not need to store the solution vector
     // at previous time steps. Instead, we will need to access the solution and
     // the time derivative of the solution at the current time step, and we
     // therefore need to provide a way to access locally relevant degrees of
@@ -209,7 +209,7 @@ namespace Step86
     // the time stepper:
     PETScWrappers::TimeStepperData time_stepper_data;
 
-    // Since we already derive our class from ParameterAcceptor, we exploit its
+    // Since we already derived our class from ParameterAcceptor, we exploit its
     // facilities to parse also the parameters of the functions that define the
     // initial value, the right hand side, and the boundary values. We therefore
     // create three ParameterAcceptorProxy objects, which wrap the actual
@@ -223,8 +223,7 @@ namespace Step86
     mutable ParameterAcceptorProxy<Functions::ParsedFunction<dim>>
       boundary_values_function;
 
-    // Finally, we also store the parameters that control the mesh refinement,
-    // and the adaptive mesh refinement
+    // Finally, we also store the parameters that control the mesh refinement.
     unsigned int initial_global_refinement;
     unsigned int max_delta_refinement_level;
     unsigned int adaption_frequency;
@@ -412,7 +411,7 @@ namespace Step86
     // conditions, and the second is that we need to compute the residual, and
     // therefore in general we need to evaluate their values and gradients
     // inside locally owned cells, and we need access to degrees of freedom
-    // which may be owned by neighboring processors. We therefore need to create
+    // which may be owned by neighboring processors. Since deal.II ghosted vectors are read-only, we need to create
     // a (non-ghosted) copy of the vectors, apply boundary conditions and
     // hanging node constraints, and then copy to ghosted vectors before we can
     // do anything sensible with them.
@@ -581,7 +580,7 @@ namespace Step86
     jacobian_matrix.compress(VectorOperation::insert);
   }
 
-  // Whenever the time stepper solves a linear system, it calls this function to
+  // After a successful stage, the time stepper calls this function to
   // make sure that hanging nodes and boundary conditions are correctly applied.
   // We could have done this inside the solve_with_jacobian function, but by not
   // doing so, we can also replace the solve_with_jacobian function with a call
@@ -599,16 +598,17 @@ namespace Step86
   // This is the function that actually solves the linear system. We could in
   // principle not provide this function to the time stepper, and instead select
   // a specific solver on the command line by using the `-ksp_*` options of
-  // petsc. However, by providing this function, we can use a specific solver
+  // PETSc. However, by providing this function, we can use a specific solver
   // and preconditioner for the linear system, and still have the possibility to
   // change them on the command line.
   //
   // Providing a specific solver is more inline with the way we usually do
   // things in other deal.II examples, while letting PETSc choose a generic
   // solver, and changing it on the command line via `-ksp_type` is more inline
-  // with the way PETSc is usually used. Both options are available here, since
-  // we can still change both the solver and the preconditioner on the command
-  // line via `-user_ksp_type` and `-user_pc_type` options.
+  // with the way PETSc is usually used. Many options are available here.
+  // We can change both our solver and the preconditioner on the command
+  // line via `-user_ksp_type` and `-user_pc_type` options,
+  // or instead use PETSc-owned solvers via `-ksp_type` and `-pc_type`.
   template <int dim>
   void
   HeatEquation<dim>::solve_with_jacobian(const PETScWrappers::MPI::Vector &src,
@@ -634,11 +634,11 @@ namespace Step86
   }
 
 
-  // This function is called by the time stepper whenever it deems appropriate
-  // to monitor the output solution. We use it to write the solution to a file,
-  // and provide graphical output through paraview or visit. We also write a pvd
+  // This function is called by the time stepper at the beginning of each step
+  // to monitor the solution. We use it to write the solution to a file,
+  // and provide graphical output through Paraview or Visit. We also write a pvd
   // file, which groups all meta informations about the vtu files into a single
-  // that can be used to load the full time dependent solution in paraview.
+  // file that can be used to load the full-time dependent solution in Paraview.
   template <int dim>
   void
   HeatEquation<dim>::output_results(const double                      time,
@@ -717,13 +717,6 @@ namespace Step86
   // type of time advancing scheme may have computed the intermediate stage at
   // different times, and we have no way to know what boundary conditions to use
   // at what stage.
-  //
-  // While this could be a problem if we used the values of the solution and of
-  // the intermediate stages on the constrained degrees of freedom to compute
-  // the errors, we do not do so. Instead, we compute the errors on the
-  // differential equation, and ignore algebraic constraints, therefore we do no
-  // need to guarantee that the boundary conditions are satisfied also in the
-  // intermediate stages.
   //
   // We have at our disposal the hanging node constraints alone, though, and
   // therefore we enforce them on the output vectors, even if this is not really
