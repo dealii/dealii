@@ -265,41 +265,6 @@ LaplaceOperator<dim, fe_degree, number>::local_compute_diagonal(
 
 
 
-template <int dim, typename MatrixType>
-class MGTransferMF
-  : public MGTransferMatrixFree<dim, typename MatrixType::value_type>
-{
-public:
-  void
-  setup(const MGLevelObject<MatrixType> &laplace,
-        const MGConstrainedDoFs &        mg_constrained_dofs)
-  {
-    this->MGTransferMatrixFree<dim, typename MatrixType::value_type>::
-      initialize_constraints(mg_constrained_dofs);
-    laplace_operator = &laplace;
-  }
-
-  template <class InVector, int spacedim>
-  void
-  copy_to_mg(
-    const DoFHandler<dim, spacedim> &mg_dof,
-    MGLevelObject<
-      LinearAlgebra::distributed::Vector<typename MatrixType::value_type>> &dst,
-    const InVector &src) const
-  {
-    for (unsigned int level = dst.min_level(); level <= dst.max_level();
-         ++level)
-      (*laplace_operator)[level].initialize_dof_vector(dst[level]);
-    MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<
-      typename MatrixType::value_type>>::copy_to_mg(mg_dof, dst, src);
-  }
-
-private:
-  const MGLevelObject<MatrixType> *laplace_operator;
-};
-
-
-
 template <int dim>
 class LaplaceProblem
 {
@@ -343,7 +308,8 @@ private:
   LinearAlgebra::distributed::Vector<double> solution;
   LinearAlgebra::distributed::Vector<double> system_rhs;
 
-  MGTransferMF<dim, LevelMatrixType> mg_transfer;
+  MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<float>>
+    mg_transfer;
 
   using SmootherType =
     PreconditionChebyshev<LevelMatrixType,
@@ -537,7 +503,7 @@ template <int dim>
 void
 LaplaceProblem<dim>::setup_transfer()
 {
-  mg_transfer.setup(mg_matrices, mg_constrained_dofs);
+  mg_transfer.initialize_constraints(mg_constrained_dofs);
   std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>> partitioners(
     dof_handler.get_triangulation().n_global_levels());
   for (unsigned int level = 0; level < partitioners.size(); ++level)
@@ -601,9 +567,10 @@ LaplaceProblem<dim>::solve()
     mg_matrix, mg_coarse, mg_transfer, mg_smoother, mg_smoother);
   mg.set_edge_matrices(mg_interface, mg_interface);
 
-  PreconditionMG<dim,
-                 LinearAlgebra::distributed::Vector<float>,
-                 MGTransferMF<dim, LevelMatrixType>>
+  PreconditionMG<
+    dim,
+    LinearAlgebra::distributed::Vector<float>,
+    MGTransferMatrixFree<dim, LinearAlgebra::distributed::Vector<float>>>
     preconditioner(dof_handler, mg, mg_transfer);
 
 
