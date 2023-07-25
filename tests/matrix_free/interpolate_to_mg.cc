@@ -211,6 +211,8 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
     {
       --level;
 
+      level_projection[level].update_ghost_values();
+
       std::vector<types::global_dof_index>    dof_indices(fe.dofs_per_cell);
       typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin(level);
       typename DoFHandler<dim>::cell_iterator endc = dof_handler.end(level);
