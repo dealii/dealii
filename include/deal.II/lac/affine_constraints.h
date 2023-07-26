@@ -2524,8 +2524,7 @@ AffineConstraints<number>::merge(
 
               const number weight = entry.second;
 
-              for (const std::pair<size_type, number> &other_entry :
-                   *other_entries)
+              for (const auto &other_entry : *other_entries)
                 tmp.emplace_back(other_entry.first,
                                  other_entry.second * weight);
 
@@ -2600,7 +2599,7 @@ AffineConstraints<number>::merge(
                     line.index,
                     typename ConstraintLine::Entries(line.entries.begin(),
                                                      line.entries.end()),
-                    line.inhomogeneity};
+                    static_cast<number>(line.inhomogeneity)};
                   break;
 
                 default:
