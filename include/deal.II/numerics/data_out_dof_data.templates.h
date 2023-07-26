@@ -915,15 +915,21 @@ namespace internal
                 std::enable_if_t<IsBlockVector<VectorType>::value, VectorType>
                   * = nullptr>
       void
-      create_dof_vector(const DoFHandler<dim, spacedim> &dof_handler,
-                        const VectorType &               src,
-                        LinearAlgebra::distributed::BlockVector<Number> &dst)
+      create_dof_vector(
+        const DoFHandler<dim, spacedim> &                dof_handler,
+        const VectorType &                               src,
+        LinearAlgebra::distributed::BlockVector<Number> &dst,
+        const unsigned int level = numbers::invalid_unsigned_int)
       {
-        IndexSet locally_relevant_dofs;
-        DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                                locally_relevant_dofs);
+        const IndexSet &locally_owned_dofs =
+          (level == numbers::invalid_unsigned_int) ?
+            dof_handler.locally_owned_dofs() :
+            dof_handler.locally_owned_mg_dofs(level);
 
-        const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+        const IndexSet locally_relevant_dofs =
+          (level == numbers::invalid_unsigned_int) ?
+            DoFTools::extract_locally_relevant_dofs(dof_handler) :
+            DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
 
         std::vector<types::global_dof_index> n_indices_per_block(
           src.n_blocks());
@@ -977,23 +983,32 @@ namespace internal
                 std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
                   * = nullptr>
       void
-      create_dof_vector(const DoFHandler<dim, spacedim> &dof_handler,
-                        const VectorType &               src,
-                        LinearAlgebra::distributed::BlockVector<Number> &dst)
+      create_dof_vector(
+        const DoFHandler<dim, spacedim> &                dof_handler,
+        const VectorType &                               src,
+        LinearAlgebra::distributed::BlockVector<Number> &dst,
+        const unsigned int level = numbers::invalid_unsigned_int)
       {
-        Assert(dof_handler.locally_owned_dofs().is_contiguous(),
+        const IndexSet &locally_owned_dofs =
+          (level == numbers::invalid_unsigned_int) ?
+            dof_handler.locally_owned_dofs() :
+            dof_handler.locally_owned_mg_dofs(level);
+
+        const IndexSet locally_relevant_dofs =
+          (level == numbers::invalid_unsigned_int) ?
+            DoFTools::extract_locally_relevant_dofs(dof_handler) :
+            DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
+
+
+        Assert(locally_owned_dofs.is_contiguous(),
                ExcMessage(
                  "You are trying to add a non-block vector with non-contiguous "
                  "locally-owned index sets. This is not possible. Please "
                  "consider to use an adequate block vector!"));
 
-        IndexSet locally_relevant_dofs;
-        DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                                locally_relevant_dofs);
-
         dst.reinit(1);
 
-        dst.block(0).reinit(dof_handler.locally_owned_dofs(),
+        dst.block(0).reinit(locally_owned_dofs,
                             locally_relevant_dofs,
                             dof_handler.get_communicator());
         copy_locally_owned_data_from(src, dst.block(0));
@@ -1542,10 +1557,11 @@ namespace internal
      * MGLevelObject<VectorType> given on the specific level instead of
      * interpolating data to coarser cells.
      */
-    template <int dim, int spacedim, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     class MGDataEntry : public DataEntryBase<dim, spacedim>
     {
     public:
+      template <typename VectorType>
       MGDataEntry(const DoFHandler<dim, spacedim> *dofs,
                   const MGLevelObject<VectorType> *vectors,
                   const std::vector<std::string> & names,
@@ -1555,8 +1571,15 @@ namespace internal
         : DataEntryBase<dim, spacedim>(dofs,
                                        names,
                                        data_component_interpretation)
-        , vectors(vectors)
-      {}
+      {
+        AssertDimension(vectors->min_level(), 0);
+
+        this->vectors.resize(vectors->min_level(), vectors->max_level());
+
+        for (unsigned int l = vectors->min_level(); l <= vectors->max_level();
+             ++l)
+          create_dof_vector(*dofs, (*vectors)[l], this->vectors[l], l);
+      }
 
       virtual double
       get_cell_data_value(
@@ -1643,12 +1666,9 @@ namespace internal
       virtual bool
       is_complex_valued() const override
       {
-        Assert(
-          numbers::NumberTraits<typename VectorType::value_type>::is_complex ==
-            false,
-          ExcNotImplemented());
-        return numbers::NumberTraits<
-          typename VectorType::value_type>::is_complex;
+        Assert(numbers::NumberTraits<ScalarType>::is_complex == false,
+               ExcNotImplemented());
+        return numbers::NumberTraits<ScalarType>::is_complex;
       }
 
       /**
@@ -1657,7 +1677,7 @@ namespace internal
       virtual void
       clear() override
       {
-        vectors = nullptr;
+        vectors.clear();
       }
 
       /**
@@ -1671,14 +1691,15 @@ namespace internal
       }
 
     private:
-      const MGLevelObject<VectorType> *vectors;
+      MGLevelObject<LinearAlgebra::distributed::BlockVector<ScalarType>>
+        vectors;
     };
 
 
 
-    template <int dim, int spacedim, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     double
-    MGDataEntry<dim, spacedim, VectorType>::get_cell_data_value(
+    MGDataEntry<dim, spacedim, ScalarType>::get_cell_data_value(
       const unsigned int       cell_number,
       const ComponentExtractor extract_component) const
     {
@@ -1691,9 +1712,9 @@ namespace internal
 
 
 
-    template <int dim, int spacedim, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     void
-    MGDataEntry<dim, spacedim, VectorType>::get_function_values(
+    MGDataEntry<dim, spacedim, ScalarType>::get_function_values(
       const FEValuesBase<dim, spacedim> &fe_patch_values,
       const ComponentExtractor           extract_component,
       std::vector<double> &              patch_values) const
@@ -1707,7 +1728,7 @@ namespace internal
         fe_patch_values.get_cell()->index(),
         this->dof_handler);
 
-      const VectorType *vector = &((*vectors)[dof_cell->level()]);
+      const auto *vector = &(vectors[dof_cell->level()]);
 
       const unsigned int dofs_per_cell =
         this->dof_handler->get_fe(0).n_dofs_per_cell();
@@ -1715,10 +1736,8 @@ namespace internal
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
       dof_cell->get_mg_dof_indices(dof_indices);
       std::vector<double> values(dofs_per_cell);
-      VectorHelper<VectorType>::extract(*vector,
-                                        dof_indices,
-                                        extract_component,
-                                        values);
+      VectorHelper<LinearAlgebra::distributed::BlockVector<ScalarType>>::
+        extract(*vector, dof_indices, extract_component, values);
       std::fill(patch_values.begin(), patch_values.end(), 0.0);
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -1729,9 +1748,9 @@ namespace internal
 
 
 
-    template <int dim, int spacedim, typename VectorType>
+    template <int dim, int spacedim, typename ScalarType>
     void
-    MGDataEntry<dim, spacedim, VectorType>::get_function_values(
+    MGDataEntry<dim, spacedim, ScalarType>::get_function_values(
       const FEValuesBase<dim, spacedim> &  fe_patch_values,
       const ComponentExtractor             extract_component,
       std::vector<dealii::Vector<double>> &patch_values_system) const
@@ -1745,7 +1764,7 @@ namespace internal
         fe_patch_values.get_cell()->index(),
         this->dof_handler);
 
-      const VectorType *vector = &((*vectors)[dof_cell->level()]);
+      const auto *vector = &(vectors[dof_cell->level()]);
 
       const unsigned int dofs_per_cell =
         this->dof_handler->get_fe(0).n_dofs_per_cell();
@@ -1753,10 +1772,8 @@ namespace internal
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
       dof_cell->get_mg_dof_indices(dof_indices);
       std::vector<double> values(dofs_per_cell);
-      VectorHelper<VectorType>::extract(*vector,
-                                        dof_indices,
-                                        extract_component,
-                                        values);
+      VectorHelper<LinearAlgebra::distributed::BlockVector<ScalarType>>::
+        extract(*vector, dof_indices, extract_component, values);
 
       const unsigned int n_components = fe_patch_values.get_fe().n_components();
       const unsigned int n_eval_points = fe_patch_values.n_quadrature_points;
@@ -2068,7 +2085,8 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
            "Invalid number of entries in data_component_interpretation."));
 
   auto new_entry = std::make_unique<
-    internal::DataOutImplementation::MGDataEntry<dim, spacedim, VectorType>>(
+    internal::DataOutImplementation::
+      MGDataEntry<dim, spacedim, typename VectorType::value_type>>(
     &dof_handler, &data, deduced_names, data_component_interpretation);
   dof_data.emplace_back(std::move(new_entry));
 }
