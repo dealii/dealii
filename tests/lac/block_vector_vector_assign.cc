@@ -25,22 +25,27 @@
 
 #include "../tests.h"
 
-template <typename Vector1, typename Vector2>
-bool
-operator==(const Vector1 &v1, const Vector2 &v2)
+namespace dealii::Testing
 {
-  if (v1.size() != v2.size())
-    return false;
-  for (unsigned int i = 0; i < v1.size(); ++i)
-    if (v1(i) != v2(i))
+  template <typename Vector1, typename Vector2>
+  bool
+  compare_equal(const Vector1 &v1, const Vector2 &v2)
+  {
+    if (v1.size() != v2.size())
       return false;
-  return true;
-}
+    for (unsigned int i = 0; i < v1.size(); ++i)
+      if (v1(i) != v2(i))
+        return false;
+    return true;
+  }
+} // namespace dealii::Testing
 
 
 void
 test()
 {
+  using namespace dealii::Testing;
+
   std::vector<types::global_dof_index> ivector(4);
   ivector[0] = 2;
   ivector[1] = 4;
@@ -54,12 +59,12 @@ test()
     v1(i) = 1 + i * i;
 
   v2 = v1;
-  AssertThrow(v1 == v2, ExcInternalError());
+  AssertThrow(compare_equal(v1, v2), ExcInternalError());
 
   BlockVector<double> v3(ivector);
   v3 = v2;
-  AssertThrow(v3 == v2, ExcInternalError());
-  AssertThrow(v3 == v1, ExcInternalError());
+  AssertThrow(compare_equal(v3, v2), ExcInternalError());
+  AssertThrow(compare_equal(v3, v1), ExcInternalError());
 
   deallog << "OK" << std::endl;
 }
