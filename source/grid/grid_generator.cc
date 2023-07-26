@@ -6489,6 +6489,10 @@ namespace GridGenerator
 
         auto [tria_vertices, tria_cells, tria_subcell_data] =
           GridTools::get_coarse_mesh_description(*triangulation);
+        Assert(tria_vertices.size() == triangulation->n_vertices(),
+               ExcInternalError());
+        Assert(tria_cells.size() == triangulation->n_cells(),
+               ExcInternalError());
 
         // Copy the vertices of the current triangulation into the merged list,
         // and then let the vertex indices of the cells refer to those in
@@ -7268,60 +7272,38 @@ namespace GridGenerator
     Assert(inner_radius < outer_radius,
            ExcMessage("outer_radius has to be bigger than inner_radius."));
 
-    Point<dim> center;
-    // We create an hyper_shell in two dimensions, and then we modify it.
+    const Point<dim> center;
+
+    // We create a hyper_shell (i.e., an annulus) in two dimensions, and then we
+    // modify it by pulling the vertices on the diagonals out to where the
+    // corners of a square would be:
     hyper_shell(triangulation, center, inner_radius, outer_radius, 8);
     triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
-    Triangulation<dim>::active_cell_iterator cell =
-                                               triangulation.begin_active(),
-                                             endc = triangulation.end();
     std::vector<bool> treated_vertices(triangulation.n_vertices(), false);
-    for (; cell != endc; ++cell)
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
         for (auto f : GeometryInfo<dim>::face_indices())
           if (cell->face(f)->at_boundary())
-            {
-              for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-                   ++v)
-                {
-                  unsigned int vv = cell->face(f)->vertex_index(v);
-                  if (treated_vertices[vv] == false)
-                    {
-                      treated_vertices[vv] = true;
-                      switch (vv)
-                        {
-                          case 1:
-                            cell->face(f)->vertex(v) =
-                              center + Point<dim>(outer_radius, outer_radius);
-                            break;
-                          case 3:
-                            cell->face(f)->vertex(v) =
-                              center + Point<dim>(-outer_radius, outer_radius);
-                            break;
-                          case 5:
-                            cell->face(f)->vertex(v) =
-                              center + Point<dim>(-outer_radius, -outer_radius);
-                            break;
-                          case 7:
-                            cell->face(f)->vertex(v) =
-                              center + Point<dim>(outer_radius, -outer_radius);
-                            break;
-                          default:
-                            break;
-                        }
-                    }
-                }
-            }
+            for (const unsigned int v : cell->face(f)->vertex_indices())
+              if (/* is the vertex on the outer ring? */
+                  (std::fabs(cell->face(f)->vertex(v).norm() - outer_radius) <
+                   1e-12 * outer_radius)
+                  /* and */
+                  &&
+                  /* is the vertex on one of the two diagonals? */
+                  (std::fabs(std::fabs(cell->face(f)->vertex(v)[0]) -
+                             std::fabs(cell->face(f)->vertex(v)[1])) <
+                   1e-12 * outer_radius))
+                cell->face(f)->vertex(v) *= std::sqrt(2.);
       }
-    double eps = 1e-3 * outer_radius;
-    cell       = triangulation.begin_active();
-    for (; cell != endc; ++cell)
+    const double eps = 1e-3 * outer_radius;
+    for (const auto &cell : triangulation.active_cell_iterators())
       {
-        for (auto f : GeometryInfo<dim>::face_indices())
+        for (const unsigned int f : cell->face_indices())
           if (cell->face(f)->at_boundary())
             {
-              double dx = cell->face(f)->center()(0) - center(0);
-              double dy = cell->face(f)->center()(1) - center(1);
+              const double dx = cell->face(f)->center()(0) - center(0);
+              const double dy = cell->face(f)->center()(1) - center(1);
               if (colorize)
                 {
                   if (std::abs(dx + outer_radius) < eps)
@@ -7340,7 +7322,7 @@ namespace GridGenerator
                 }
               else
                 {
-                  double d = (cell->face(f)->center() - center).norm();
+                  const double d = (cell->face(f)->center() - center).norm();
                   if (d - inner_radius < 0)
                     {
                       cell->face(f)->set_boundary_id(1);
