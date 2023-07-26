@@ -718,82 +718,6 @@ namespace internal
     }
 
 
-    /**
-     * Helper class templated on vector type to allow different implementations
-     * to extract information from a vector.
-     */
-    template <typename VectorType>
-    struct VectorHelper
-    {
-      /**
-       * extract the @p indices from @p vector and put them into @p values.
-       */
-      static void
-      extract(const VectorType &                          vector,
-              const std::vector<types::global_dof_index> &indices,
-              const ComponentExtractor                    extract_component,
-              std::vector<double> &                       values);
-    };
-
-
-
-    template <typename VectorType>
-    void
-    VectorHelper<VectorType>::extract(
-      const VectorType &                          vector,
-      const std::vector<types::global_dof_index> &indices,
-      const ComponentExtractor                    extract_component,
-      std::vector<double> &                       values)
-    {
-      for (unsigned int i = 0; i < values.size(); ++i)
-        values[i] = get_component(vector[indices[i]], extract_component);
-    }
-
-
-
-#ifdef DEAL_II_WITH_TRILINOS
-    template <>
-    inline void
-    VectorHelper<LinearAlgebra::EpetraWrappers::Vector>::extract(
-      const LinearAlgebra::EpetraWrappers::Vector & /*vector*/,
-      const std::vector<types::global_dof_index> & /*indices*/,
-      const ComponentExtractor /*extract_component*/,
-      std::vector<double> & /*values*/)
-    {
-      // TODO: we don't have element access
-      Assert(false, ExcNotImplemented());
-    }
-#endif
-
-
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
-    template <>
-    inline void
-    VectorHelper<LinearAlgebra::TpetraWrappers::Vector<double>>::extract(
-      const LinearAlgebra::TpetraWrappers::Vector<double> & /*vector*/,
-      const std::vector<types::global_dof_index> & /*indices*/,
-      const ComponentExtractor /*extract_component*/,
-      std::vector<double> & /*values*/)
-    {
-      // TODO: we don't have element access
-      Assert(false, ExcNotImplemented());
-    }
-
-    template <>
-    inline void
-    VectorHelper<LinearAlgebra::TpetraWrappers::Vector<float>>::extract(
-      const LinearAlgebra::TpetraWrappers::Vector<float> & /*vector*/,
-      const std::vector<types::global_dof_index> & /*indices*/,
-      const ComponentExtractor /*extract_component*/,
-      std::vector<double> & /*values*/)
-    {
-      // TODO: we don't have element access
-      Assert(false, ExcNotImplemented());
-    }
-#endif
-
-
 
     template <int dim, int spacedim>
     DataEntryBase<dim, spacedim>::DataEntryBase(
@@ -1693,6 +1617,19 @@ namespace internal
     private:
       MGLevelObject<LinearAlgebra::distributed::BlockVector<ScalarType>>
         vectors;
+
+      /**
+       * Extract the @p indices from @p vector and put them into @p values.
+       */
+      void
+      extract(const LinearAlgebra::distributed::BlockVector<ScalarType> &vector,
+              const std::vector<types::global_dof_index> &indices,
+              const ComponentExtractor                    extract_component,
+              std::vector<double> &                       values) const
+      {
+        for (unsigned int i = 0; i < values.size(); ++i)
+          values[i] = get_component(vector[indices[i]], extract_component);
+      }
     };
 
 
@@ -1736,8 +1673,7 @@ namespace internal
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
       dof_cell->get_mg_dof_indices(dof_indices);
       std::vector<double> values(dofs_per_cell);
-      VectorHelper<LinearAlgebra::distributed::BlockVector<ScalarType>>::
-        extract(*vector, dof_indices, extract_component, values);
+      extract(*vector, dof_indices, extract_component, values);
       std::fill(patch_values.begin(), patch_values.end(), 0.0);
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -1772,8 +1708,7 @@ namespace internal
       std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
       dof_cell->get_mg_dof_indices(dof_indices);
       std::vector<double> values(dofs_per_cell);
-      VectorHelper<LinearAlgebra::distributed::BlockVector<ScalarType>>::
-        extract(*vector, dof_indices, extract_component, values);
+      extract(*vector, dof_indices, extract_component, values);
 
       const unsigned int n_components = fe_patch_values.get_fe().n_components();
       const unsigned int n_eval_points = fe_patch_values.n_quadrature_points;
