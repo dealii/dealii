@@ -1,0 +1,4 @@
+Changed: MGTransferMatrixFree::interpolate_to_mg()
+returns now non-ghosted vectors.
+<br>
+(Peter Munch, 2023/07/25)

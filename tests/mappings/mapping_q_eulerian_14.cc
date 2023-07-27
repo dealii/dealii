@@ -346,6 +346,8 @@ test(const unsigned int n_ref = 0)
 
       MatrixFree<dim, LevelNumberType> mg_level_euler;
 
+      displacement_level[level].update_ghost_values();
+
       MappingQEulerian<dim, LinearAlgebra::distributed::Vector<LevelNumberType>>
         euler_level(euler_fe_degree,
                     dof_handler_euler,

@@ -632,6 +632,9 @@ MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
 
       dst[level - 1].update_ghost_values();
     }
+
+  for (unsigned int level = min_level; level <= max_level; ++level)
+    dst[level].zero_out_ghost_values();
 }
 
 
