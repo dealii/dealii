@@ -470,9 +470,19 @@ namespace internal
 
   } // namespace
 
+
+
+  /**
+   * A class behaving like DoFCellAccessor. Intended to be used for locally
+   * relevant cell as a wrapper around DoFCellAccessor and for other cells
+   * behaving as if the cell would be available.
+   */
   class FineDoFHandlerViewCell
   {
   public:
+    /**
+     * Constructor.
+     */
     FineDoFHandlerViewCell(
       const std::function<bool()> &has_children_function,
       const std::function<void(std::vector<types::global_dof_index> &)>
@@ -483,41 +493,487 @@ namespace internal
       , active_fe_index_function(active_fe_index_function)
     {}
 
+    /**
+     * Return if cell has child.
+     */
     bool
     has_children() const
     {
       return has_children_function();
     }
 
+    /**
+     * Get DoF indices.
+     */
     void
     get_dof_indices(std::vector<types::global_dof_index> &dof_indices) const
     {
       get_dof_indices_function(dof_indices);
     }
-
+    /**
+     * Get active FE index.
+     */
     unsigned int
     active_fe_index() const
     {
       return active_fe_index_function();
     }
 
-
   private:
+    /**
+     * Lambda function returning if cell has child.
+     */
     const std::function<bool()> has_children_function;
+
+    /**
+     * Lambda function returning DoF indices.
+     */
     const std::function<void(std::vector<types::global_dof_index> &)>
-                                        get_dof_indices_function;
+      get_dof_indices_function;
+
+    /**
+     * Lambda function returning active FE index.
+     */
     const std::function<unsigned int()> active_fe_index_function;
   };
 
 
 
+  /**
+   * Base class for a view on fine DoFHandler.
+   *
+   * Implementations include:
+   *  - IdentityFineDoFHandlerView: all cells on the fine mesh are either
+   *    locally owned or ghosted; useful for p-multigrid without repartitioning;
+   *  - FistChildPolicyFineDoFHandlerView: parent cells are owned by the first
+   *    child cell; useful for local smoothing with fast setup;
+   *  - PermutationFineDoFHandlerView: fine mesh has the same set as the coarse
+   *    mesh but are partitioned differently; useful for p-multigrid with
+   *    repartitioning;
+   *  - GlobalCoarseningFineDoFHandlerView: cells on the coarse mesh are either
+   *    refined or not; useful for global coarsening.
+   */
   template <int dim>
-  class FineDoFHandlerView
+  class FineDoFHandlerViewBase
   {
   public:
-    FineDoFHandlerView(const DoFHandler<dim> &dof_handler_fine,
-                       const DoFHandler<dim> &dof_handler_coarse,
-                       const unsigned int     mg_level_fine)
+    virtual ~FineDoFHandlerViewBase() = default;
+
+    /**
+     * Return cell on fine DoFHandler.
+     */
+    virtual FineDoFHandlerViewCell
+    get_cell(const typename DoFHandler<dim>::cell_iterator &cell) const = 0;
+
+    /**
+     * Return child of cell on fine DoFHandler.
+     */
+    virtual FineDoFHandlerViewCell
+    get_cell(const typename DoFHandler<dim>::cell_iterator &cell,
+             const unsigned int                             c) const = 0;
+
+    /**
+     * Return locally owned DoFs.
+     */
+    virtual const IndexSet &
+    locally_owned_dofs() const = 0;
+
+    /**
+     * Return ghost DoFs.
+     */
+    virtual const IndexSet &
+    locally_relevant_dofs() const = 0;
+  };
+
+
+
+  template <int dim>
+  class IdentityFineDoFHandlerView : public FineDoFHandlerViewBase<dim>
+  {
+  public:
+    IdentityFineDoFHandlerView(const DoFHandler<dim> &dof_handler_fine,
+                               const unsigned int     mg_level_fine)
+      : dof_handler_fine(dof_handler_fine)
+      , mg_level_fine(mg_level_fine)
+    {
+      if (this->mg_level_fine == numbers::invalid_unsigned_int)
+        {
+          is_locally_owned_dofs = dof_handler_fine.locally_owned_dofs();
+          is_locally_relevant_dofs =
+            DoFTools::extract_locally_active_dofs(dof_handler_fine);
+        }
+      else
+        {
+          is_locally_owned_dofs =
+            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
+          is_locally_relevant_dofs =
+            DoFTools::extract_locally_active_level_dofs(dof_handler_fine,
+                                                        mg_level_fine);
+        }
+    }
+
+    virtual ~IdentityFineDoFHandlerView() = default;
+
+    FineDoFHandlerViewCell
+    get_cell(const typename DoFHandler<dim>::cell_iterator &cell) const override
+    {
+      return FineDoFHandlerViewCell(
+        []() {
+          Assert(false, ExcInternalError());
+          return false;
+        },
+        [this, cell](auto &dof_indices) {
+          if (this->mg_level_fine == numbers::invalid_unsigned_int)
+            cell->as_dof_handler_iterator(this->dof_handler_fine)
+              ->get_dof_indices(dof_indices);
+          else
+            cell->as_dof_handler_level_iterator(this->dof_handler_fine)
+              ->get_mg_dof_indices(dof_indices);
+        },
+        [this, cell]() {
+          if (this->mg_level_fine == numbers::invalid_unsigned_int)
+            return cell->as_dof_handler_iterator(dof_handler_fine)
+              ->active_fe_index();
+          else
+            return cell->as_dof_handler_level_iterator(this->dof_handler_fine)
+              ->active_fe_index();
+        });
+    }
+
+    FineDoFHandlerViewCell
+    get_cell(const typename DoFHandler<dim>::cell_iterator &,
+             const unsigned int) const override
+    {
+      Assert(false, ExcInternalError());
+
+      return FineDoFHandlerViewCell(
+        []() {
+          Assert(false, ExcInternalError());
+          return false;
+        },
+        [](auto &) { Assert(false, ExcInternalError()); },
+        []() {
+          Assert(false, ExcInternalError());
+          return 0;
+        });
+    }
+
+    const IndexSet &
+    locally_owned_dofs() const override
+    {
+      return is_locally_owned_dofs;
+    }
+
+    /**
+     * Return ghost DoFs.
+     */
+    const IndexSet &
+    locally_relevant_dofs() const override
+    {
+      return is_locally_relevant_dofs;
+    }
+
+  private:
+    const DoFHandler<dim> &dof_handler_fine;
+    const unsigned int     mg_level_fine;
+    IndexSet               is_locally_owned_dofs;
+    IndexSet               is_locally_relevant_dofs;
+  };
+
+
+
+  template <int dim>
+  class FistChildPolicyFineDoFHandlerView : public FineDoFHandlerViewBase<dim>
+  {
+  public:
+    FistChildPolicyFineDoFHandlerView(const DoFHandler<dim> &dof_handler_fine,
+                                      const DoFHandler<dim> &dof_handler_coarse,
+                                      const unsigned int     mg_level_fine)
+      : dof_handler_fine(dof_handler_fine)
+      , mg_level_fine(mg_level_fine)
+    {
+      std::vector<types::global_dof_index> indices;
+
+      unsigned int                           n_dofs_per_cell_coarse = 0;
+      unsigned int                           n_dofs_per_cell_fine   = 0;
+      std::vector<std::vector<unsigned int>> cell_local_children_indices;
+      std::vector<unsigned int>              lexicographic_numbering;
+
+      {
+        const auto &fe             = dof_handler_fine.get_fe();
+        const auto &reference_cell = fe.reference_cell();
+
+        const bool is_feq =
+          fe.n_base_elements() == 1 &&
+          (dynamic_cast<const FE_Q<dim> *>(&fe.base_element(0)) != nullptr);
+
+        n_dofs_per_cell_coarse = fe.n_dofs_per_cell();
+        n_dofs_per_cell_fine =
+          is_feq ?
+            (fe.n_components() * Utilities::pow(2 * fe.degree + 1, dim)) :
+            (fe.n_dofs_per_cell() * GeometryInfo<dim>::max_children_per_cell);
+
+        cell_local_children_indices =
+          get_child_offsets<dim>(n_dofs_per_cell_coarse,
+                                 is_feq ? fe.degree : (fe.degree + 1),
+                                 fe.degree);
+
+        if (reference_cell.is_hyper_cube())
+          {
+            const Quadrature<1> dummy_quadrature(
+              std::vector<Point<1>>(1, Point<1>()));
+            internal::MatrixFreeFunctions::ShapeInfo<double> shape_info;
+            shape_info.reinit(dummy_quadrature, fe, 0);
+            lexicographic_numbering = shape_info.lexicographic_numbering;
+          }
+        else
+          {
+            const auto dummy_quadrature =
+              reference_cell.template get_gauss_type_quadrature<dim>(1);
+            internal::MatrixFreeFunctions::ShapeInfo<double> shape_info;
+            shape_info.reinit(dummy_quadrature, fe, 0);
+            lexicographic_numbering = shape_info.lexicographic_numbering;
+          }
+      }
+
+      if (this->mg_level_fine == numbers::invalid_unsigned_int)
+        {
+          is_locally_owned_dofs = dof_handler_fine.locally_owned_dofs();
+
+          is_locally_relevant_dofs.set_size(is_locally_owned_dofs.size());
+
+          std::vector<types::global_dof_index> dof_indices_cell;
+          std::vector<types::global_dof_index> dof_indices_patch;
+
+          loop_over_active_or_level_cells(
+            dof_handler_coarse,
+            numbers::invalid_unsigned_int,
+            [&](const auto &cell) {
+              const auto cell_id = cell->id();
+
+              const auto cell_fine_raw =
+                dof_handler_fine.get_triangulation().create_cell_iterator(
+                  cell_id);
+
+              if (cell_fine_raw->has_children() == false)
+                {
+                  const auto cell_fine =
+                    cell_fine_raw->as_dof_handler_iterator(dof_handler_fine);
+
+                  dof_indices_cell.resize(
+                    cell_fine->get_fe().n_dofs_per_cell());
+                  cell_fine->get_dof_indices(dof_indices_cell);
+                  indices.insert(indices.end(),
+                                 dof_indices_cell.begin(),
+                                 dof_indices_cell.end());
+                }
+              else
+                {
+                  unsigned int c = 0;
+
+                  dof_indices_patch.resize(n_dofs_per_cell_fine);
+
+                  for (const auto &child_raw : cell_fine_raw->child_iterators())
+                    {
+                      const auto child =
+                        child_raw->as_dof_handler_iterator(dof_handler_fine);
+
+                      dof_indices_cell.resize(
+                        child->get_fe().n_dofs_per_cell());
+                      child->get_dof_indices(dof_indices_cell);
+
+                      for (unsigned int i = 0; i < n_dofs_per_cell_coarse; ++i)
+                        {
+                          const auto index =
+                            dof_indices_cell[lexicographic_numbering[i]];
+
+                          dof_indices_patch[cell_local_children_indices[c][i]] =
+                            index;
+                        }
+
+                      c++;
+                    }
+
+                  indices.insert(indices.end(),
+                                 dof_indices_patch.begin(),
+                                 dof_indices_patch.end());
+                }
+            });
+        }
+      else
+        {
+          is_locally_owned_dofs =
+            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
+
+          is_locally_relevant_dofs.set_size(is_locally_owned_dofs.size());
+
+          Assert(mg_level_fine > 0, ExcInternalError());
+
+          std::vector<types::global_dof_index> dof_indices_cell;
+          std::vector<types::global_dof_index> dof_indices_patch;
+
+          loop_over_active_or_level_cells(
+            dof_handler_fine, mg_level_fine - 1, [&](const auto &cell) {
+              if (cell->has_children())
+                {
+                  unsigned int c = 0;
+
+                  dof_indices_patch.resize(n_dofs_per_cell_fine);
+
+                  for (const auto &child : cell->child_iterators())
+                    {
+                      dof_indices_cell.resize(
+                        child->get_fe().n_dofs_per_cell());
+                      child->get_mg_dof_indices(dof_indices_cell);
+
+                      for (unsigned int i = 0; i < n_dofs_per_cell_coarse; ++i)
+                        {
+                          const auto index =
+                            dof_indices_cell[lexicographic_numbering[i]];
+
+                          dof_indices_patch[cell_local_children_indices[c][i]] =
+                            index;
+                        }
+
+                      c++;
+                    }
+
+                  indices.insert(indices.end(),
+                                 dof_indices_patch.begin(),
+                                 dof_indices_patch.end());
+                }
+            });
+        }
+
+      std::sort(indices.begin(), indices.end());
+      indices.erase(std::unique(indices.begin(), indices.end()), indices.end());
+      is_locally_relevant_dofs.add_indices(indices.begin(), indices.end());
+    }
+
+    virtual ~FistChildPolicyFineDoFHandlerView() = default;
+
+    FineDoFHandlerViewCell
+    get_cell(const typename DoFHandler<dim>::cell_iterator &cell) const override
+    {
+      return FineDoFHandlerViewCell(
+        [this, cell]() {
+          if (this->mg_level_fine == numbers::invalid_unsigned_int)
+            {
+              const auto cell_id = cell->id();
+              const auto cell_fine_raw =
+                dof_handler_fine.get_triangulation().create_cell_iterator(
+                  cell_id);
+              return cell_fine_raw->has_children();
+            }
+          else
+            {
+              return cell->has_children();
+            }
+        },
+        [this, cell](auto &dof_indices) {
+          if (this->mg_level_fine == numbers::invalid_unsigned_int)
+            {
+              const auto cell_id = cell->id();
+              const auto cell_fine_raw =
+                dof_handler_fine.get_triangulation().create_cell_iterator(
+                  cell_id);
+              return cell_fine_raw->as_dof_handler_iterator(dof_handler_fine)
+                ->get_dof_indices(dof_indices);
+            }
+          else
+            {
+              cell->get_mg_dof_indices(dof_indices);
+            }
+        },
+        [this, cell]() {
+          if (this->mg_level_fine == numbers::invalid_unsigned_int)
+            {
+              const auto cell_id = cell->id();
+              const auto cell_fine_raw =
+                dof_handler_fine.get_triangulation().create_cell_iterator(
+                  cell_id);
+              return cell_fine_raw->as_dof_handler_iterator(dof_handler_fine)
+                ->active_fe_index();
+            }
+          else
+            {
+              return cell->active_fe_index();
+            }
+        });
+    }
+
+    FineDoFHandlerViewCell
+    get_cell(const typename DoFHandler<dim>::cell_iterator &cell,
+             const unsigned int                             c) const override
+    {
+      return FineDoFHandlerViewCell(
+        []() {
+          Assert(false, ExcInternalError());
+          return false;
+        },
+        [this, cell, c](auto &dof_indices) {
+          if (this->mg_level_fine == numbers::invalid_unsigned_int)
+            {
+              const auto cell_id       = cell->id();
+              const auto cell_fine_raw = dof_handler_fine.get_triangulation()
+                                           .create_cell_iterator(cell_id)
+                                           ->child(c);
+              cell_fine_raw->as_dof_handler_iterator(dof_handler_fine)
+                ->get_dof_indices(dof_indices);
+            }
+          else
+            {
+              cell->child(c)->get_mg_dof_indices(dof_indices);
+            }
+        },
+        [this, cell, c]() {
+          if (this->mg_level_fine == numbers::invalid_unsigned_int)
+            {
+              const auto cell_id       = cell->id();
+              const auto cell_fine_raw = dof_handler_fine.get_triangulation()
+                                           .create_cell_iterator(cell_id)
+                                           ->child(c);
+              return cell_fine_raw->as_dof_handler_iterator(dof_handler_fine)
+                ->active_fe_index();
+            }
+          else
+            {
+              return cell->child(c)->active_fe_index();
+            }
+        });
+    }
+
+    const IndexSet &
+    locally_owned_dofs() const override
+    {
+      return is_locally_owned_dofs;
+    }
+
+    /**
+     * Return ghost DoFs.
+     */
+    const IndexSet &
+    locally_relevant_dofs() const override
+    {
+      return is_locally_relevant_dofs;
+    }
+
+  private:
+    const DoFHandler<dim> &dof_handler_fine;
+    const unsigned int     mg_level_fine;
+    IndexSet               is_locally_owned_dofs;
+    IndexSet               is_locally_relevant_dofs;
+  };
+
+
+
+  template <int dim>
+  class BlackBoxFineDoFHandlerView : public FineDoFHandlerViewBase<dim>
+  {
+  public:
+    BlackBoxFineDoFHandlerView(const DoFHandler<dim> &dof_handler_fine,
+                               const DoFHandler<dim> &dof_handler_coarse,
+                               const unsigned int     mg_level_fine)
       : dof_handler_fine(dof_handler_fine)
       , dof_handler_coarse(dof_handler_coarse)
       , mg_level_fine(mg_level_fine)
@@ -534,6 +990,8 @@ namespace internal
                        dof_handler_fine.get_triangulation().n_global_levels() +
                          1);
     }
+
+    virtual ~BlackBoxFineDoFHandlerView() = default;
 
     void
     reinit(const IndexSet &is_dst_locally_owned,
@@ -785,7 +1243,7 @@ namespace internal
     }
 
     FineDoFHandlerViewCell
-    get_cell(const typename DoFHandler<dim>::cell_iterator &cell) const
+    get_cell(const typename DoFHandler<dim>::cell_iterator &cell) const override
     {
       const auto id = this->cell_id_translator.translate(cell);
 
@@ -857,7 +1315,7 @@ namespace internal
 
     FineDoFHandlerViewCell
     get_cell(const typename DoFHandler<dim>::cell_iterator &cell,
-             const unsigned int                             c) const
+             const unsigned int                             c) const override
     {
       const auto id = this->cell_id_translator.translate(cell, c);
 
@@ -907,13 +1365,13 @@ namespace internal
     }
 
     const IndexSet &
-    locally_owned_dofs() const
+    locally_owned_dofs() const override
     {
       return is_extended_locally_owned;
     }
 
     const IndexSet &
-    locally_relevant_dofs() const
+    locally_relevant_dofs() const override
     {
       return is_extended_ghosts;
     }
@@ -942,14 +1400,17 @@ namespace internal
   };
 
   template <int dim>
-  class GlobalCoarseningFineDoFHandlerView : public FineDoFHandlerView<dim>
+  class GlobalCoarseningFineDoFHandlerView
+    : public BlackBoxFineDoFHandlerView<dim>
   {
   public:
     GlobalCoarseningFineDoFHandlerView(const DoFHandler<dim> &dof_handler_dst,
                                        const DoFHandler<dim> &dof_handler_src,
                                        const unsigned int     mg_level_fine,
                                        const unsigned int     mg_level_coarse)
-      : FineDoFHandlerView<dim>(dof_handler_dst, dof_handler_src, mg_level_fine)
+      : BlackBoxFineDoFHandlerView<dim>(dof_handler_dst,
+                                        dof_handler_src,
+                                        mg_level_fine)
     {
       Assert((mg_level_fine == numbers::invalid_unsigned_int &&
               mg_level_coarse == numbers::invalid_unsigned_int) ||
@@ -996,19 +1457,23 @@ namespace internal
                    is_src_locally_owned,
                    true);
     }
+
+    virtual ~GlobalCoarseningFineDoFHandlerView() = default;
   };
 
+
+
   template <int dim>
-  class PermutationFineDoFHandlerView : public internal::FineDoFHandlerView<dim>
+  class PermutationFineDoFHandlerView : public BlackBoxFineDoFHandlerView<dim>
   {
   public:
     PermutationFineDoFHandlerView(const DoFHandler<dim> &dof_handler_dst,
                                   const DoFHandler<dim> &dof_handler_src,
                                   const unsigned int     mg_level_fine,
                                   const unsigned int     mg_level_coarse)
-      : internal::FineDoFHandlerView<dim>(dof_handler_dst,
-                                          dof_handler_src,
-                                          mg_level_fine)
+      : BlackBoxFineDoFHandlerView<dim>(dof_handler_dst,
+                                        dof_handler_src,
+                                        mg_level_fine)
     {
       // get reference to triangulations
       const auto &tria_dst = dof_handler_dst.get_triangulation();
@@ -1040,7 +1505,99 @@ namespace internal
                    is_src_locally_owned,
                    false);
     }
+
+    virtual ~PermutationFineDoFHandlerView() = default;
   };
+
+
+
+  template <int dim, int spacedim>
+  bool
+  p_transfer_without_repartitioning(
+    const DoFHandler<dim, spacedim> &dof_handler_fine,
+    const DoFHandler<dim, spacedim> &dof_handler_coarse,
+    const unsigned int               mg_level_fine,
+    const unsigned int               mg_level_coarse)
+  {
+    if (mg_level_fine != mg_level_coarse)
+      return false;
+
+    if (&dof_handler_fine.get_triangulation() !=
+        &dof_handler_coarse.get_triangulation())
+      return false;
+
+    return true;
+  }
+
+
+
+  template <int dim, int spacedim>
+  bool
+  h_transfer_with_first_child_policy(
+    const DoFHandler<dim, spacedim> &dof_handler_fine,
+    const DoFHandler<dim, spacedim> &dof_handler_coarse,
+    const unsigned int               mg_level_fine,
+    const unsigned int               mg_level_coarse)
+  {
+    if (mg_level_fine == numbers::invalid_unsigned_int &&
+        mg_level_coarse == numbers::invalid_unsigned_int)
+      {
+        // two DoFHandlers
+
+        bool flag = true;
+
+        loop_over_active_or_level_cells(
+          dof_handler_coarse.get_triangulation(),
+          mg_level_coarse,
+          [&](const auto &cell) {
+            const auto cell_id = cell->id();
+
+            if (dof_handler_fine.get_triangulation().contains_cell(cell_id) ==
+                false)
+              {
+                flag = false;
+              }
+            else
+              {
+                const auto cell_fine =
+                  dof_handler_fine.get_triangulation().create_cell_iterator(
+                    cell_id);
+
+                if (cell_fine->has_children() == false)
+                  {
+                    if (cell_fine->subdomain_id() != cell->subdomain_id())
+                      flag = false;
+                  }
+                else
+                  {
+                    if (cell_fine->child(0)->subdomain_id() !=
+                        cell->subdomain_id())
+                      flag = false;
+                  }
+              }
+          });
+
+        return Utilities::MPI::min(static_cast<unsigned int>(flag),
+                                   dof_handler_fine.get_communicator()) == 1;
+      }
+    else
+      {
+        // single DoFHandler
+        if (mg_level_fine == numbers::invalid_unsigned_int ||
+            mg_level_coarse == numbers::invalid_unsigned_int)
+          return false;
+
+        if (mg_level_coarse + 1 != mg_level_fine)
+          return false;
+
+        if (&dof_handler_fine != &dof_handler_coarse)
+          return false;
+
+        return true;
+      }
+  }
+
+
 
   class MGTwoLevelTransferImplementation
   {
@@ -1212,10 +1769,22 @@ namespace internal
       //                      dof_handler_coarse.get_triangulation()) +
       //                      1);
 
-      const GlobalCoarseningFineDoFHandlerView<dim> view(dof_handler_fine,
-                                                         dof_handler_coarse,
-                                                         mg_level_fine,
-                                                         mg_level_coarse);
+      std::unique_ptr<FineDoFHandlerViewBase<dim>> dof_handler_fine_view;
+
+      if (internal::h_transfer_with_first_child_policy(dof_handler_fine,
+                                                       dof_handler_coarse,
+                                                       mg_level_fine,
+                                                       mg_level_coarse))
+        dof_handler_fine_view =
+          std::make_unique<FistChildPolicyFineDoFHandlerView<dim>>(
+            dof_handler_fine, dof_handler_coarse, mg_level_fine);
+      else
+        dof_handler_fine_view =
+          std::make_unique<GlobalCoarseningFineDoFHandlerView<dim>>(
+            dof_handler_fine,
+            dof_handler_coarse,
+            mg_level_fine,
+            mg_level_coarse);
 
       // gather ranges for active FE indices on both fine and coarse dofhandlers
       std::array<unsigned int, 2> min_active_fe_indices = {
@@ -1282,8 +1851,8 @@ namespace internal
         {
           transfer.partitioner_fine =
             std::make_shared<Utilities::MPI::Partitioner>(
-              view.locally_owned_dofs(),
-              view.locally_relevant_dofs(),
+              dof_handler_fine_view->locally_owned_dofs(),
+              dof_handler_fine_view->locally_relevant_dofs(),
               dof_handler_fine.get_communicator());
           transfer.vec_fine.reinit(transfer.partitioner_fine);
         }
@@ -1310,7 +1879,7 @@ namespace internal
                 // get a reference to the equivalent cell on the fine
                 // triangulation
                 const auto cell_coarse_on_fine_mesh =
-                  view.get_cell(cell_coarse);
+                  dof_handler_fine_view->get_cell(cell_coarse);
 
                 // check if cell has children
                 if (cell_coarse_on_fine_mesh.has_children())
@@ -1318,7 +1887,9 @@ namespace internal
                   for (unsigned int c = 0;
                        c < GeometryInfo<dim>::max_children_per_cell;
                        c++)
-                    fu_refined(cell_coarse, view.get_cell(cell_coarse, c), c);
+                    fu_refined(cell_coarse,
+                               dof_handler_fine_view->get_cell(cell_coarse, c),
+                               c);
                 else // ... cell has no children -> process cell
                   fu_non_refined(cell_coarse, cell_coarse_on_fine_mesh);
               }
@@ -1330,7 +1901,9 @@ namespace internal
                   for (unsigned int c = 0;
                        c < GeometryInfo<dim>::max_children_per_cell;
                        c++)
-                    fu_refined(cell_coarse, view.get_cell(cell_coarse, c), c);
+                    fu_refined(cell_coarse,
+                               dof_handler_fine_view->get_cell(cell_coarse, c),
+                               c);
               }
           });
       };
@@ -1734,10 +2307,22 @@ namespace internal
           "(numbers::invalid_unsigned_int) or on refinement levels without "
           "hanging nodes."));
 
-      const PermutationFineDoFHandlerView<dim> view(dof_handler_fine,
-                                                    dof_handler_coarse,
-                                                    mg_level_fine,
-                                                    mg_level_coarse);
+      std::unique_ptr<FineDoFHandlerViewBase<dim>> dof_handler_fine_view;
+
+      if (internal::p_transfer_without_repartitioning(dof_handler_fine,
+                                                      dof_handler_coarse,
+                                                      mg_level_fine,
+                                                      mg_level_coarse))
+        dof_handler_fine_view =
+          std::make_unique<IdentityFineDoFHandlerView<dim>>(dof_handler_fine,
+                                                            mg_level_fine);
+      else
+        dof_handler_fine_view =
+          std::make_unique<PermutationFineDoFHandlerView<dim>>(
+            dof_handler_fine,
+            dof_handler_coarse,
+            mg_level_fine,
+            mg_level_coarse);
 
       // TODO: adjust assert
       AssertDimension(
@@ -1785,7 +2370,8 @@ namespace internal
       const auto process_cells = [&](const auto &fu) {
         loop_over_active_or_level_cells(
           dof_handler_coarse, mg_level_coarse, [&](const auto &cell_coarse) {
-            const auto cell_coarse_on_fine_mesh = view.get_cell(cell_coarse);
+            const auto cell_coarse_on_fine_mesh =
+              dof_handler_fine_view->get_cell(cell_coarse);
             fu(cell_coarse, &cell_coarse_on_fine_mesh);
           });
       };
@@ -1836,8 +2422,8 @@ namespace internal
       {
         transfer.partitioner_fine =
           std::make_shared<Utilities::MPI::Partitioner>(
-            view.locally_owned_dofs(),
-            view.locally_relevant_dofs(),
+            dof_handler_fine_view->locally_owned_dofs(),
+            dof_handler_fine_view->locally_relevant_dofs(),
             dof_handler_fine.get_communicator());
         transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
