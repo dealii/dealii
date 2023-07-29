@@ -225,6 +225,27 @@ public:
   const AffineConstraints<double> &
   get_user_constraint_matrix(const unsigned int level) const;
 
+  /**
+   * Merge selected constraints of a specifiedlevel into a given single
+   * AffineConstraints object.
+   *
+   * @param constraints AffineConstraints object to be filled.
+   * @param level Refinement to be considered.
+   * @param add_boundary_indices Add boundary indices.
+   * @param add_refinement_edge_indices Add refinement-edge indices.
+   * @param add_level_constraints Add level constraints including the one passed
+   *   during initialize() and periodicy constraints.
+   * @param add_user_constraints Add user constraints.
+   */
+  template <typename Number>
+  void
+  merge_constraints(AffineConstraints<Number> &constraints,
+                    const unsigned int         level,
+                    const bool                 add_boundary_indices,
+                    const bool                 add_refinement_edge_indices,
+                    const bool                 add_level_constraints,
+                    const bool                 add_user_constraints) const;
+
 private:
   /**
    * The indices of boundary dofs for each level.
@@ -562,6 +583,57 @@ MGConstrainedDoFs::get_user_constraint_matrix(const unsigned int level) const
 {
   AssertIndexRange(level, user_constraints.size());
   return user_constraints[level];
+}
+
+
+template <typename Number>
+inline void
+MGConstrainedDoFs::merge_constraints(AffineConstraints<Number> &constraints,
+                                     const unsigned int         level,
+                                     const bool add_boundary_indices,
+                                     const bool add_refinement_edge_indices,
+                                     const bool add_level_constraints,
+                                     const bool add_user_constraints) const
+{
+  constraints.clear();
+
+  // determine local lines
+  IndexSet index_set(this->get_refinement_edge_indices(level).size());
+
+  if (add_boundary_indices && this->have_boundary_indices())
+    index_set.add_indices(this->get_boundary_indices(level));
+
+  if (add_refinement_edge_indices)
+    index_set.add_indices(this->get_refinement_edge_indices(level));
+
+  if (add_level_constraints)
+    index_set.add_indices(this->get_level_constraints(level).get_local_lines());
+
+  if (add_user_constraints)
+    index_set.add_indices(
+      this->get_user_constraint_matrix(level).get_local_lines());
+
+  constraints.reinit(index_set);
+
+  // merge constraints
+  if (add_boundary_indices && this->have_boundary_indices())
+    constraints.add_lines(this->get_boundary_indices(level));
+
+  if (add_refinement_edge_indices)
+    constraints.add_lines(this->get_refinement_edge_indices(level));
+
+  if (add_level_constraints)
+    constraints.merge(this->get_level_constraints(level),
+                      AffineConstraints<Number>::left_object_wins,
+                      true);
+
+  if (add_user_constraints)
+    constraints.merge(this->get_user_constraint_matrix(level),
+                      AffineConstraints<Number>::left_object_wins,
+                      true);
+
+  // finalize setup
+  constraints.close();
 }
 
 
