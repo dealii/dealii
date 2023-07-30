@@ -1,0 +1,72 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2023 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+// Test GridTools::find_active_cell_around_point() and
+// GridTools::find_all_active_cells_around_point for simplices. These
+// functions are used in find_all_locally_owned_active_cells_around_point(),
+// which is used by distributed_compute_point_locations().
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_cache.h>
+#include <deal.II/grid/tria.h>
+
+#include "../tests.h"
+
+template <int dim>
+void
+test()
+{
+  const auto  reference_cell = ReferenceCells::get_simplex<dim>();
+  const auto &mapping =
+    reference_cell.template get_default_linear_mapping<dim>();
+
+  Triangulation<dim> tria;
+  if (false)
+    GridGenerator::reference_cell(tria, reference_cell);
+  else
+    GridGenerator::subdivided_hyper_cube_with_simplices(tria, 2);
+
+  GridTools::Cache<dim> cache(tria, mapping);
+
+  const unsigned n_subdivisions = 8;
+
+  for (unsigned int i = 0; i <= n_subdivisions; ++i)
+    for (unsigned int j = 0; j <= n_subdivisions; ++j)
+      {
+        Point<dim> p(1.0 * i / n_subdivisions, 1.0 * j / n_subdivisions);
+
+        const auto first_point =
+          GridTools::find_active_cell_around_point(mapping, tria, p, {}, 1e-6);
+
+        const auto result = GridTools::find_all_active_cells_around_point(
+          mapping, tria, p, 1e-6, {first_point.first, first_point.second});
+
+        deallog << result.size() << std::endl; // should be 2
+        for (const auto &cell : result)
+          deallog << cell.first->id() << " " << cell.second << std::endl;
+        deallog << std::endl;
+      }
+}
+
+main(int argc, char **argv)
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll                    all;
+
+  deallog.precision(8);
+
+  test<2>();
+}
