@@ -1044,49 +1044,6 @@ namespace internal
   class MGTwoLevelTransferImplementation
   {
     template <int dim, typename Number>
-    static std::shared_ptr<const Utilities::MPI::Partitioner>
-    create_coarse_partitioner(
-      const DoFHandler<dim> &                  dof_handler_coarse,
-      const dealii::AffineConstraints<Number> &constraints_coarse,
-      const unsigned int                       mg_level_coarse)
-    {
-      IndexSet locally_relevant_dofs =
-        (mg_level_coarse == numbers::invalid_unsigned_int) ?
-          DoFTools::extract_locally_active_dofs(dof_handler_coarse) :
-          DoFTools::extract_locally_active_level_dofs(dof_handler_coarse,
-                                                      mg_level_coarse);
-
-      std::vector<types::global_dof_index> locally_relevant_dofs_temp;
-
-      for (const auto i : locally_relevant_dofs)
-        {
-          if (locally_relevant_dofs.is_element(i) == false)
-            locally_relevant_dofs_temp.emplace_back(i);
-
-          const auto constraints = constraints_coarse.get_constraint_entries(i);
-
-          if (constraints)
-            for (const auto &p : *constraints)
-              if (locally_relevant_dofs.is_element(p.first) == false)
-                locally_relevant_dofs_temp.emplace_back(p.first);
-        }
-
-      std::sort(locally_relevant_dofs_temp.begin(),
-                locally_relevant_dofs_temp.end());
-      locally_relevant_dofs.add_indices(locally_relevant_dofs_temp.begin(),
-                                        locally_relevant_dofs_temp.end());
-
-      return std::make_shared<Utilities::MPI::Partitioner>(
-        mg_level_coarse == numbers::invalid_unsigned_int ?
-          dof_handler_coarse.locally_owned_dofs() :
-          dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
-        locally_relevant_dofs,
-        dof_handler_coarse.get_communicator());
-    }
-
-
-
-    template <int dim, typename Number>
     static void
     compute_weights(
       const DoFHandler<dim> &                  dof_handler_fine,
@@ -1212,6 +1169,49 @@ namespace internal
 
 
   public:
+    template <int dim, typename Number>
+    static std::shared_ptr<const Utilities::MPI::Partitioner>
+    create_coarse_partitioner(
+      const DoFHandler<dim> &                  dof_handler_coarse,
+      const dealii::AffineConstraints<Number> &constraints_coarse,
+      const unsigned int                       mg_level_coarse)
+    {
+      IndexSet locally_relevant_dofs =
+        (mg_level_coarse == numbers::invalid_unsigned_int) ?
+          DoFTools::extract_locally_active_dofs(dof_handler_coarse) :
+          DoFTools::extract_locally_active_level_dofs(dof_handler_coarse,
+                                                      mg_level_coarse);
+
+      std::vector<types::global_dof_index> locally_relevant_dofs_temp;
+
+      for (const auto i : locally_relevant_dofs)
+        {
+          if (locally_relevant_dofs.is_element(i) == false)
+            locally_relevant_dofs_temp.emplace_back(i);
+
+          const auto constraints = constraints_coarse.get_constraint_entries(i);
+
+          if (constraints)
+            for (const auto &p : *constraints)
+              if (locally_relevant_dofs.is_element(p.first) == false)
+                locally_relevant_dofs_temp.emplace_back(p.first);
+        }
+
+      std::sort(locally_relevant_dofs_temp.begin(),
+                locally_relevant_dofs_temp.end());
+      locally_relevant_dofs.add_indices(locally_relevant_dofs_temp.begin(),
+                                        locally_relevant_dofs_temp.end());
+
+      return std::make_shared<Utilities::MPI::Partitioner>(
+        mg_level_coarse == numbers::invalid_unsigned_int ?
+          dof_handler_coarse.locally_owned_dofs() :
+          dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
+        locally_relevant_dofs,
+        dof_handler_coarse.get_communicator());
+    }
+
+
+
     template <int dim, typename Number>
     static void
     reinit_geometric_transfer(
@@ -2224,18 +2224,6 @@ namespace internal
             compress_weights(transfer);
         }
     }
-
-
-    template <int dim, typename Number>
-    friend void
-    MGTwoLevelTransferNonNested<dim,
-                                LinearAlgebra::distributed::Vector<Number>>::
-      reinit(const DoFHandler<dim> &          dof_handler_fine,
-             const DoFHandler<dim> &          dof_handler_coarse,
-             const Mapping<dim> &             mapping_fine,
-             const Mapping<dim> &             mapping_coarse,
-             const AffineConstraints<Number> &constraint_fine,
-             const AffineConstraints<Number> &constraint_coarse);
   };
 
 
