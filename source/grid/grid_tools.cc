@@ -2849,16 +2849,7 @@ namespace GridTools
         !relevant_cell_bounding_boxes_rtree->empty())
       {
         // create a bounding box around point p with 2*tolerance as side length.
-        auto p1 = p;
-        auto p2 = p;
-
-        for (unsigned int d = 0; d < spacedim; ++d)
-          {
-            p1[d] = p1[d] - tolerance;
-            p2[d] = p2[d] + tolerance;
-          }
-
-        BoundingBox<spacedim> bb({p1, p2});
+        const auto bb = BoundingBox<spacedim>(p).create_extended(tolerance);
 
         if (relevant_cell_bounding_boxes_rtree->qbegin(
               boost::geometry::index::intersects(bb)) ==
