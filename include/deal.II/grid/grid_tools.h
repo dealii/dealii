@@ -1810,6 +1810,11 @@ namespace GridTools
    * corresponding neighboring cells with points in unit coordinates are also
    * identified.
    *
+   * The parameter @p vertex_to_cells allows to accelerate the process of
+   * identifying the neighbors of a cell, by first precomputing a map from the
+   * vertex indices to the cells. Such data structure is, e.g., provided by
+   * GridTools::Cache::get_vertex_to_cell_map().
+   *
    * This function is useful e.g. for discontinuous function spaces where, for
    * the case the given point `p` lies on a vertex, edge or face, several
    * cells might hold independent values of the solution that get combined in
@@ -1843,7 +1848,10 @@ namespace GridTools
       const Point<spacedim> &        p,
       const double                   tolerance,
       const std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
-                      Point<dim>> &  first_cell);
+                      Point<dim>> &  first_cell,
+      const std::vector<
+        std::set<typename MeshType<dim, spacedim>::active_cell_iterator>>
+        *vertex_to_cells = nullptr);
 
   /**
    * A variant of the previous function that internally calls one of the

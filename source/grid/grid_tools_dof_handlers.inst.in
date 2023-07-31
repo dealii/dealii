@@ -69,7 +69,8 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS;
         const Point<deal_II_space_dimension> &,
         const double,
         const std::pair<typename X::active_cell_iterator,
-                        Point<deal_II_dimension>> &);
+                        Point<deal_II_dimension>> &,
+        const std::vector<std::set<typename X::active_cell_iterator>> *);
 
       template std::vector<
         std::pair<dealii::internal::ActiveCellIterator<deal_II_dimension,

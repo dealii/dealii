@@ -6073,7 +6073,8 @@ namespace GridTools
               cache.get_triangulation(),
               point,
               tolerance,
-              first_cell);
+              first_cell,
+              &cache.get_vertex_to_cell_map());
 
           if (enforce_unique_mapping)
             {
