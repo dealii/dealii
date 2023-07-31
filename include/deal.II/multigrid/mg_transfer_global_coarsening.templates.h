@@ -2224,6 +2224,18 @@ namespace internal
             compress_weights(transfer);
         }
     }
+
+
+    template <int dim, typename Number>
+    friend void
+    MGTwoLevelTransferNonNested<dim,
+                                LinearAlgebra::distributed::Vector<Number>>::
+      reinit(const DoFHandler<dim> &          dof_handler_fine,
+             const DoFHandler<dim> &          dof_handler_coarse,
+             const Mapping<dim> &             mapping_fine,
+             const Mapping<dim> &             mapping_coarse,
+             const AffineConstraints<Number> &constraint_fine,
+             const AffineConstraints<Number> &constraint_coarse);
   };
 
 
@@ -3839,12 +3851,9 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   // create partitioners and internal vectors
   {
-    IndexSet locally_active_dofs =
-      DoFTools::extract_locally_active_dofs(dof_handler_coarse);
-    this->partitioner_coarse.reset(
-      new Utilities::MPI::Partitioner(dof_handler_coarse.locally_owned_dofs(),
-                                      locally_active_dofs,
-                                      dof_handler_coarse.get_communicator()));
+    this->partitioner_coarse =
+      internal::MGTwoLevelTransferImplementation::create_coarse_partitioner(
+        dof_handler_coarse, constraint_coarse, numbers::invalid_unsigned_int);
 
     this->vec_coarse.reinit(this->partitioner_coarse);
   }
