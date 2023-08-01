@@ -410,10 +410,11 @@ namespace parallel
         coarse_cell_id,
         [](const std::pair<types::coarse_cell_id, unsigned int> &pair,
            const types::coarse_cell_id &val) { return pair.first < val; });
-      Assert(coarse_cell_index !=
-               coarse_cell_id_to_coarse_cell_index_vector.cend(),
-             ExcMessage("Coarse cell index not found!"));
-      return coarse_cell_index->second;
+      if (coarse_cell_index !=
+          coarse_cell_id_to_coarse_cell_index_vector.cend())
+        return coarse_cell_index->second;
+      else
+        return numbers::invalid_unsigned_int; // cell could no be found
     }
 
 

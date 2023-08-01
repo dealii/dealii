@@ -2994,16 +2994,24 @@ public:
    * Return an iterator to a cell of this Triangulation object constructed from
    * an independent CellId object.
    *
-   * If the given argument corresponds to a valid cell in this triangulation,
-   * this operation will always succeed for sequential triangulations where the
-   * current processor stores all cells that are part of the triangulation. On
-   * the other hand, if this is a parallel triangulation, then the current
-   * processor may not actually know about this cell. In this case, this
-   * operation will succeed for locally relevant cells, but may not for
-   * artificial cells that are less refined on the current processor.
+   * @note See the documentation of contains_cell() about which CellId objects
+   * are valid.
    */
   cell_iterator
   create_cell_iterator(const CellId &cell_id) const;
+
+  /**
+   * Check if the triangulation contains a cell with the id @p cell_id.
+   * If the given argument corresponds to a valid cell in this triangulation,
+   * this operation will always return true for sequential triangulations where
+   * the current processor stores all cells that are part of the triangulation.
+   * On the other hand, if this is a parallel triangulation, then the current
+   * processor may not actually know about this cell. In this case, this
+   * operation will return true for locally relevant cells, but may return false
+   * for artificial cells that are less refined on the current processor.
+   */
+  bool
+  contains_cell(const CellId &cell_id) const;
   /** @} */
 
   /**
@@ -4422,7 +4430,9 @@ private:
    *
    * @note For serial and shared triangulation both id and index are the same.
    *       For distributed triangulations setting both might differ, since the
-   *       id might correspond to a global id and the index to a local id.
+   *       id might correspond to a global id and the index to a local id. If
+   *       a cell does not exist locally, the returned value is
+   *       numbers::invalid_unsigned_int.
    *
    * @param coarse_cell_id Unique id of the coarse cell.
    * @return Index of the coarse cell within the current triangulation.
