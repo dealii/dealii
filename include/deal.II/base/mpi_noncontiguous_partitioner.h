@@ -167,6 +167,63 @@ namespace Utilities
         std::vector<MPI_Request> &     requests) const;
 
       /**
+       * Similar to the above functions but for importing vector entries
+       * from @p ghost_array to @p locally_owned_storage.
+       *
+       * @note In contrast to the functions in
+       *   Utilities::MPI::Partitioner, this function expects that
+       *   locally_owned_storage is empty.
+       */
+      template <typename Number>
+      void
+      import_from_ghosted_array(
+        const VectorOperation::values vector_operation,
+        const ArrayView<Number> &     ghost_array,
+        const ArrayView<Number> &     locally_owned_storage) const;
+
+      /**
+       * Similar to the above function with the difference that
+       * users can provide temporaty arrays. This function calls
+       * import_from_ghosted_array_start() and
+       * import_from_ghosted_array_finish() in sequence.
+       */
+      template <typename Number>
+      void
+      import_from_ghosted_array(const VectorOperation::values vector_operation,
+                                const unsigned int        communication_channel,
+                                const ArrayView<Number> & ghost_array,
+                                const ArrayView<Number> & temporary_storage,
+                                const ArrayView<Number> & locally_owned_storage,
+                                std::vector<MPI_Request> &requests) const;
+
+      /**
+       * Start update for importig values: Data is packed, non-blocking send
+       * and receives are started.
+       */
+      template <typename Number>
+      void
+      import_from_ghosted_array_start(
+        const VectorOperation::values vector_operation,
+        const unsigned int            communication_channel,
+        const ArrayView<Number> &     ghost_array,
+        const ArrayView<Number> &     temporary_storage,
+        std::vector<MPI_Request> &    requests) const;
+
+      /**
+       * Finish update for importing values. The method waits until all data has
+       * been sent and received. Once data from any process is received it is
+       * processed and placed at the right position of the vector
+       * @p locally_owned_storage.
+       */
+      template <typename Number>
+      void
+      import_from_ghosted_array_finish(
+        const VectorOperation::values  vector_operation,
+        const ArrayView<const Number> &temporary_storage,
+        const ArrayView<Number> &      locally_owned_storage,
+        std::vector<MPI_Request> &     requests) const;
+
+      /**
        * Returns the number of processes this process sends data to and the
        * number of processes this process receives data from.
        */
