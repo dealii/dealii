@@ -178,7 +178,7 @@ public:
     };
 
     // This callback is used to decide to remesh.
-    time_stepper.prepare_for_coarsening_and_refinement =
+    time_stepper.decide_for_coarsening_and_refinement =
       [&](const real_type    t,
           const unsigned int step,
           const VectorType &,
@@ -187,7 +187,7 @@ public:
       resize = (step && step % 5 == 0);
     };
 
-    // This callback is called if prepare_for_coarsening_and_refinement sets
+    // This callback is called if decide_for_coarsening_and_refinement sets
     // resize to true.
     time_stepper.interpolate = [&](const std::vector<VectorType> &all_in,
                                    std::vector<VectorType> &all_out) -> void {

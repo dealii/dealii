@@ -439,7 +439,7 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        user->prepare_for_coarsening_and_refinement,
+        user->decide_for_coarsening_and_refinement,
         user->pending_exception,
         []() -> void {},
         t,
@@ -451,7 +451,7 @@ namespace PETScWrappers
         return PetscError(
           PetscObjectComm((PetscObject)ts),
           lineno + 1,
-          "prepare_for_coarsening_and_refinement",
+          "decide_for_coarsening_and_refinement",
           __FILE__,
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
@@ -532,9 +532,13 @@ namespace PETScWrappers
       PetscCall(TSGetApplicationContext(ts, &ctx));
       auto user = static_cast<TimeStepper *>(ctx);
 
-      PetscErrorCode (
-        *transfer_setup)(TS, PetscInt, PetscReal, Vec, PetscBool *, void *);
-      PetscErrorCode (*transfer)(TS, PetscInt, Vec[], Vec[], void *);
+      using transfer_setup_fn =
+        PetscErrorCode (*)(TS, PetscInt, PetscReal, Vec, PetscBool *, void *);
+      using transfer_fn =
+        PetscErrorCode (*)(TS, PetscInt, Vec[], Vec[], void *);
+      transfer_setup_fn transfer_setup;
+      transfer_fn       transfer;
+
       AssertPETSc(PetscObjectQueryFunction((PetscObject)ts,
                                            "__dealii_ts_resize_setup__",
                                            &transfer_setup));
@@ -546,7 +550,7 @@ namespace PETScWrappers
       Vec       x;
       PetscCall(TSGetSolution(ts, &x));
       PetscCall(PetscObjectReference((PetscObject)x));
-      PetscCall((*transfer_setup)(
+      PetscCall(transfer_setup(
         ts, user->get_step_number(), user->get_time(), x, &resize, user));
 
       if (resize)
@@ -558,7 +562,7 @@ namespace PETScWrappers
           // Reinitialize DM. Currently it is not possible to do with public API
           ts_reset_dm(ts);
 
-          PetscCall((*transfer)(ts, 1, &x, &new_x, user));
+          PetscCall(transfer(ts, 1, &x, &new_x, user));
           PetscCall(TSSetSolution(ts, new_x));
           PetscCall(VecDestroy(&new_x));
         }
@@ -1035,7 +1039,7 @@ namespace PETScWrappers
       AssertPETSc(TSMonitorSet(ts, ts_monitor, this, nullptr));
 
     // Handle AMR.
-    if (prepare_for_coarsening_and_refinement)
+    if (decide_for_coarsening_and_refinement)
       {
         AssertThrow(interpolate,
                     StandardExceptions::ExcFunctionNotProvided("interpolate"));
@@ -1129,14 +1133,8 @@ namespace PETScWrappers
   unsigned int TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(
     VectorType &y)
   {
-    try
-      {
-        setup_callbacks();
-      }
-    catch (...)
-      {
-        throw;
-      }
+    // Set up PETSc data structure.
+    setup_callbacks();
 
     // Set solution vector.
     AssertPETSc(TSSetSolution(ts, y.petsc_vector()));
@@ -1147,14 +1145,7 @@ namespace PETScWrappers
 
     // Handle algebraic components. This must be done when we know the layout
     // of the solution vector.
-    try
-      {
-        setup_algebraic_constraints(y);
-      }
-    catch (...)
-      {
-        throw;
-      }
+    setup_algebraic_constraints(y);
 
     // Having set everything up, now do the actual work
     // and let PETSc do the time stepping. If there is

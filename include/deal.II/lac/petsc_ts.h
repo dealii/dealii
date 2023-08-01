@@ -269,19 +269,20 @@ namespace PETScWrappers
    *    and TimeStepper::explicit_jacobian.
    *  - deal.II style using TimeStepper::setup_jacobian and
    *    TimeStepper::solve_with_jacobian.
-   * The preconditioning matrix can be specified using TimeStepper::set_matrix.
-   * In case both approaches are implemented, the deal.II style will be used.
+   * The preconditioning matrix can be specified using
+   * TimeStepper::set_matrix(). In case both approaches are implemented, the
+   * deal.II style will be used.
    *
-   * TimeStepper::set_matrices must be used in case the user wants to provide
+   * TimeStepper::set_matrices() must be used in case the user wants to provide
    * the iteration matrix of the tangent system in the deal.II style approach,
    * thus replacing the matrix-free linearization.
    *
    * The correctness of the constructed Jacobians passed using
-   * TimeStepper::set_matrix can be checked using
+   * TimeStepper::set_matrix() can be checked using
    * @code
    * ./myApp -snes_test_jacobian
    * @endcode
-   * See TimeStepper::set_matrix and TimeStepper::set_matrices for
+   * See TimeStepper::set_matrix() and TimeStepper::set_matrices() for
    * additional details.
    *
    * The deal.II style approach still allows command line customization, like
@@ -618,7 +619,7 @@ namespace PETScWrappers
     std::function<void(const real_type t, VectorType &y)> distribute;
 
     /**
-     * Callback to setup mesh adaption.
+     * Callback to set up mesh adaption.
      *
      * Implementation of this function is optional.
      * @p resize must be set to true if mesh adaption is to be performed, false
@@ -637,13 +638,13 @@ namespace PETScWrappers
                        const unsigned int step,
                        const VectorType & y,
                        bool &             resize)>
-      prepare_for_coarsening_and_refinement;
+      decide_for_coarsening_and_refinement;
 
     /**
      * Callback to interpolate vectors and perform mesh adaption.
      *
      * Implementation of this function is mandatory if
-     * TimeStepper::prepare_for_coarsening_and_refinement is used.
+     * TimeStepper::decide_for_coarsening_and_refinement is used.
      * This function must perform mesh adaption and interpolate the discrete
      * functions that are stored in @p all_in onto the refined and/or coarsenend grid.
      * Output vectors must be created inside the callback.
