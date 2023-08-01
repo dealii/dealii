@@ -457,26 +457,6 @@ namespace PETScWrappers
     solve(VectorType &y, AMatrixType &A, PMatrixType &P);
 
     /**
-     * Setup callbacks.
-     *
-     * This function is called inside TimeStepper::solve routines and does
-     * not need to be called by the user. It is used to reinitialize the
-     * solver if mesh adaption has been performed.
-     */
-    void
-    setup_callbacks();
-
-    /**
-     * Setup algebraic constraints.
-     *
-     * This function is called inside TimeStepper::solve routines and does
-     * not need to be called by the user. It is used to reinitialize the
-     * solver if mesh adaption has been performed.
-     */
-    void
-    setup_algebraic_constraints(const VectorType &y);
-
-    /**
      * Callback for the computation of the implicit residual $F(t, y, \dot y)$.
      *
      * @note This variable represents a
@@ -696,6 +676,26 @@ namespace PETScWrappers
      * Internal data to handle recoverable errors.
      */
     bool error_in_function;
+
+    /**
+     * Setup callbacks.
+     *
+     * This function is called inside TimeStepper::solve routines and does
+     * not need to be called by the user. It is used to reinitialize the
+     * solver if mesh adaption has been performed.
+     */
+    void
+    setup_callbacks();
+
+    /**
+     * Setup algebraic constraints.
+     *
+     * This function is called inside TimeStepper::solve routines and does
+     * not need to be called by the user. It is used to reinitialize the
+     * solver if mesh adaption has been performed.
+     */
+    void
+    setup_algebraic_constraints(const VectorType &y);
   };
 
 } // namespace PETScWrappers
