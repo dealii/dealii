@@ -628,97 +628,137 @@ namespace GridTools
     // insert the fist cell and point into the vector
     cells_and_points.push_back(first_cell);
 
-    // check if the given point is on the surface of the unit cell. If yes,
-    // need to find all neighbors
     const Point<dim> unit_point = cells_and_points.front().second;
     const auto       my_cell    = cells_and_points.front().first;
 
-    Tensor<1, dim> distance_to_center;
-    unsigned int   n_dirs_at_threshold     = 0;
-    unsigned int   last_point_at_threshold = numbers::invalid_unsigned_int;
-    for (unsigned int d = 0; d < dim; ++d)
-      {
-        distance_to_center[d] = std::abs(unit_point[d] - 0.5);
-        if (distance_to_center[d] > 0.5 - tolerance)
-          {
-            ++n_dirs_at_threshold;
-            last_point_at_threshold = d;
-          }
-      }
-
     std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
       cells_to_add;
-    // point is within face -> only need neighbor
-    if (n_dirs_at_threshold == 1)
+
+    if (my_cell->reference_cell().is_hyper_cube())
       {
-        unsigned int neighbor_index =
-          2 * last_point_at_threshold +
-          (unit_point[last_point_at_threshold] > 0.5 ? 1 : 0);
-        if (!my_cell->at_boundary(neighbor_index))
-          {
-            const auto neighbor_cell = my_cell->neighbor(neighbor_index);
+        // check if the given point is on the surface of the unit cell. If yes,
+        // need to find all neighbors
 
-            if (neighbor_cell->is_active())
-              cells_to_add.push_back(neighbor_cell);
-            else
-              for (const auto &child_cell : neighbor_cell->child_iterators())
-                {
-                  if (child_cell->is_active())
-                    cells_to_add.push_back(child_cell);
-                }
-          }
-      }
-    // corner point -> use all neighbors
-    else if (n_dirs_at_threshold == dim)
-      {
-        unsigned int local_vertex_index = 0;
-        for (unsigned int d = 0; d < dim; ++d)
-          local_vertex_index += (unit_point[d] > 0.5 ? 1 : 0) << d;
-
-        const auto fu = [&](const auto &tentative_cells) {
-          for (const auto &cell : tentative_cells)
-            if (cell != my_cell)
-              cells_to_add.push_back(cell);
-        };
-
-        const auto vertex_index = my_cell->vertex_index(local_vertex_index);
-
-        if (vertex_to_cells != nullptr)
-          fu((*vertex_to_cells)[vertex_index]);
-        else
-          fu(find_cells_adjacent_to_vertex(mesh, vertex_index));
-      }
-    // point on line in 3d: We cannot simply take the intersection between
-    // the two vertices of cells because of hanging nodes. So instead we
-    // list the vertices around both points and then select the
-    // appropriate cells according to the result of read_to_unit_cell
-    // below.
-    else if (n_dirs_at_threshold == 2)
-      {
-        std::pair<unsigned int, unsigned int> vertex_indices[3];
-        unsigned int                          count_vertex_indices = 0;
-        unsigned int free_direction = numbers::invalid_unsigned_int;
+        Tensor<1, dim> distance_to_center;
+        unsigned int   n_dirs_at_threshold     = 0;
+        unsigned int   last_point_at_threshold = numbers::invalid_unsigned_int;
         for (unsigned int d = 0; d < dim; ++d)
           {
+            distance_to_center[d] = std::abs(unit_point[d] - 0.5);
             if (distance_to_center[d] > 0.5 - tolerance)
               {
-                vertex_indices[count_vertex_indices].first = d;
-                vertex_indices[count_vertex_indices].second =
-                  unit_point[d] > 0.5 ? 1 : 0;
-                count_vertex_indices++;
+                ++n_dirs_at_threshold;
+                last_point_at_threshold = d;
               }
-            else
-              free_direction = d;
           }
 
-        AssertDimension(count_vertex_indices, 2);
-        Assert(free_direction != numbers::invalid_unsigned_int,
-               ExcInternalError());
+        // point is within face -> only need neighbor
+        if (n_dirs_at_threshold == 1)
+          {
+            unsigned int neighbor_index =
+              2 * last_point_at_threshold +
+              (unit_point[last_point_at_threshold] > 0.5 ? 1 : 0);
+            if (!my_cell->at_boundary(neighbor_index))
+              {
+                const auto neighbor_cell = my_cell->neighbor(neighbor_index);
 
-        const unsigned int first_vertex =
-          (vertex_indices[0].second << vertex_indices[0].first) +
-          (vertex_indices[1].second << vertex_indices[1].first);
-        for (unsigned int d = 0; d < 2; ++d)
+                if (neighbor_cell->is_active())
+                  cells_to_add.push_back(neighbor_cell);
+                else
+                  for (const auto &child_cell :
+                       neighbor_cell->child_iterators())
+                    {
+                      if (child_cell->is_active())
+                        cells_to_add.push_back(child_cell);
+                    }
+              }
+          }
+        // corner point -> use all neighbors
+        else if (n_dirs_at_threshold == dim)
+          {
+            unsigned int local_vertex_index = 0;
+            for (unsigned int d = 0; d < dim; ++d)
+              local_vertex_index += (unit_point[d] > 0.5 ? 1 : 0) << d;
+
+            const auto fu = [&](const auto &tentative_cells) {
+              for (const auto &cell : tentative_cells)
+                if (cell != my_cell)
+                  cells_to_add.push_back(cell);
+            };
+
+            const auto vertex_index = my_cell->vertex_index(local_vertex_index);
+
+            if (vertex_to_cells != nullptr)
+              fu((*vertex_to_cells)[vertex_index]);
+            else
+              fu(find_cells_adjacent_to_vertex(mesh, vertex_index));
+          }
+        // point on line in 3d: We cannot simply take the intersection between
+        // the two vertices of cells because of hanging nodes. So instead we
+        // list the vertices around both points and then select the
+        // appropriate cells according to the result of read_to_unit_cell
+        // below.
+        else if (n_dirs_at_threshold == 2)
+          {
+            std::pair<unsigned int, unsigned int> vertex_indices[3];
+            unsigned int                          count_vertex_indices = 0;
+            unsigned int free_direction = numbers::invalid_unsigned_int;
+            for (unsigned int d = 0; d < dim; ++d)
+              {
+                if (distance_to_center[d] > 0.5 - tolerance)
+                  {
+                    vertex_indices[count_vertex_indices].first = d;
+                    vertex_indices[count_vertex_indices].second =
+                      unit_point[d] > 0.5 ? 1 : 0;
+                    count_vertex_indices++;
+                  }
+                else
+                  free_direction = d;
+              }
+
+            AssertDimension(count_vertex_indices, 2);
+            Assert(free_direction != numbers::invalid_unsigned_int,
+                   ExcInternalError());
+
+            const unsigned int first_vertex =
+              (vertex_indices[0].second << vertex_indices[0].first) +
+              (vertex_indices[1].second << vertex_indices[1].first);
+            for (unsigned int d = 0; d < 2; ++d)
+              {
+                const auto fu = [&](const auto &tentative_cells) {
+                  for (const auto &cell : tentative_cells)
+                    {
+                      bool cell_not_yet_present = true;
+                      for (const auto &other_cell : cells_to_add)
+                        if (cell == other_cell)
+                          {
+                            cell_not_yet_present = false;
+                            break;
+                          }
+                      if (cell_not_yet_present)
+                        cells_to_add.push_back(cell);
+                    }
+                };
+
+                const auto vertex_index =
+                  my_cell->vertex_index(first_vertex + (d << free_direction));
+
+                if (vertex_to_cells != nullptr)
+                  fu((*vertex_to_cells)[vertex_index]);
+                else
+                  fu(find_cells_adjacent_to_vertex(mesh, vertex_index));
+              }
+          }
+      }
+    else
+      {
+        // Note: The non-hypercube path takes a very naive approach and
+        // checks all possible neighbors. This can be made faster by 1)
+        // checking if the point is in the inner cell and 2) identifying
+        // the right lines/vertices so that the number of potential
+        // neighbors is reduced.
+
+        for (const auto v : my_cell->vertex_indices())
           {
             const auto fu = [&](const auto &tentative_cells) {
               for (const auto &cell : tentative_cells)
@@ -735,8 +775,7 @@ namespace GridTools
                 }
             };
 
-            const auto vertex_index =
-              my_cell->vertex_index(first_vertex + (d << free_direction));
+            const auto vertex_index = my_cell->vertex_index(v);
 
             if (vertex_to_cells != nullptr)
               fu((*vertex_to_cells)[vertex_index]);
@@ -745,8 +784,6 @@ namespace GridTools
           }
       }
 
-    const double original_distance_to_unit_cell =
-      my_cell->reference_cell().closest_point(unit_point).distance(unit_point);
     for (const auto &cell : cells_to_add)
       {
         if (cell != my_cell)
@@ -754,8 +791,7 @@ namespace GridTools
             {
               const Point<dim> p_unit =
                 mapping.transform_real_to_unit_cell(cell, p);
-              if (cell->reference_cell().closest_point(p_unit).distance(
-                    p_unit) < original_distance_to_unit_cell + tolerance)
+              if (cell->reference_cell().contains_point(p_unit, tolerance))
                 cells_and_points.emplace_back(cell, p_unit);
             }
           catch (typename Mapping<dim>::ExcTransformationFailed &)
