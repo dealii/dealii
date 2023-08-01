@@ -3414,33 +3414,42 @@ namespace GridTools
       for (const unsigned int i : cell->vertex_indices())
         vertex_to_cell_map[cell->vertex_index(i)].insert(cell);
 
-    // Take care of hanging nodes
-    cell = triangulation.begin_active();
-    for (; cell != endc; ++cell)
+    // Check if mesh has hanging nodes. Do this only locally to
+    // prevent communication and possible deadlock.
+    if (triangulation.Triangulation<dim, spacedim>::has_hanging_nodes())
       {
-        for (const unsigned int i : cell->face_indices())
-          {
-            if ((cell->at_boundary(i) == false) &&
-                (cell->neighbor(i)->is_active()))
-              {
-                typename Triangulation<dim, spacedim>::active_cell_iterator
-                  adjacent_cell = cell->neighbor(i);
-                for (unsigned int j = 0; j < cell->face(i)->n_vertices(); ++j)
-                  vertex_to_cell_map[cell->face(i)->vertex_index(j)].insert(
-                    adjacent_cell);
-              }
-          }
+        Assert(triangulation.all_reference_cells_are_hyper_cube(),
+               ExcNotImplemented());
 
-        // in 3d also loop over the edges
-        if (dim == 3)
+        // Take care of hanging nodes
+        cell = triangulation.begin_active();
+        for (; cell != endc; ++cell)
           {
-            for (unsigned int i = 0; i < cell->n_lines(); ++i)
-              if (cell->line(i)->has_children())
-                // the only place where this vertex could have been
-                // hiding is on the mid-edge point of the edge we
-                // are looking at
-                vertex_to_cell_map[cell->line(i)->child(0)->vertex_index(1)]
-                  .insert(cell);
+            for (const unsigned int i : cell->face_indices())
+              {
+                if ((cell->at_boundary(i) == false) &&
+                    (cell->neighbor(i)->is_active()))
+                  {
+                    typename Triangulation<dim, spacedim>::active_cell_iterator
+                      adjacent_cell = cell->neighbor(i);
+                    for (unsigned int j = 0; j < cell->face(i)->n_vertices();
+                         ++j)
+                      vertex_to_cell_map[cell->face(i)->vertex_index(j)].insert(
+                        adjacent_cell);
+                  }
+              }
+
+            // in 3d also loop over the edges
+            if (dim == 3)
+              {
+                for (unsigned int i = 0; i < cell->n_lines(); ++i)
+                  if (cell->line(i)->has_children())
+                    // the only place where this vertex could have been
+                    // hiding is on the mid-edge point of the edge we
+                    // are looking at
+                    vertex_to_cell_map[cell->line(i)->child(0)->vertex_index(1)]
+                      .insert(cell);
+              }
           }
       }
 
