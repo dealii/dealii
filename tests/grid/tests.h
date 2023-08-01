@@ -13,8 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
-#ifndef dealii_fully_distributed_tests_h
-#define dealii_fully_distributed_tests_h
+#ifndef dealii_grid_tests_h
+#define dealii_grid_tests_h
 
 #include "../tests.h"
 

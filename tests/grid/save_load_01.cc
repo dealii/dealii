@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2008 - 2021 by the deal.II authors
+// Copyright (C) 2008 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -15,12 +15,9 @@
 
 
 
-// Test fullydistributed::Triangulation::load()/save().
+// Test Triangulation::load()/save().
 // Create a triangulation, save it and load it.
 // The initial and the loaded triangulations must be the same.
-
-#include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -28,11 +25,12 @@
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_description.h>
 
-#include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/vector.h>
 
-#include "../grid/tests.h"
+#include "./tests.h"
 
 using namespace dealii;
 
@@ -59,26 +57,17 @@ test(TriangulationType &triangulation)
 int
 main(int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-
-  MPILogInitAll all;
+  initlog();
 
   deallog.push("2d");
   {
     constexpr int dim = 2;
 
-    parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
+    Triangulation<dim> triangulation;
     GridGenerator::hyper_cube(triangulation);
     triangulation.refine_global(3);
 
-    const auto description = TriangulationDescription::Utilities::
-      create_description_from_triangulation(triangulation, MPI_COMM_WORLD);
-
-    parallel::fullydistributed::Triangulation<dim> triangulation_pft(
-      MPI_COMM_WORLD);
-    triangulation_pft.create_triangulation(description);
-
-    test<dim>(triangulation_pft);
+    test<dim>(triangulation);
   }
   deallog.pop();
 
@@ -86,18 +75,11 @@ main(int argc, char **argv)
   {
     constexpr int dim = 3;
 
-    parallel::distributed::Triangulation<dim> triangulation(MPI_COMM_WORLD);
+    Triangulation<dim> triangulation;
     GridGenerator::hyper_cube(triangulation);
     triangulation.refine_global(3);
 
-    const auto description = TriangulationDescription::Utilities::
-      create_description_from_triangulation(triangulation, MPI_COMM_WORLD);
-
-    parallel::fullydistributed::Triangulation<dim> triangulation_pft(
-      MPI_COMM_WORLD);
-    triangulation_pft.create_triangulation(description);
-
-    test<dim>(triangulation_pft);
+    test<dim>(triangulation);
   }
   deallog.pop();
 }

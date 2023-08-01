@@ -1,0 +1,47 @@
+
+DEAL:0:2d::n_levels:                  4
+DEAL:0:2d::n_cells:                   85
+DEAL:0:2d::n_active_cells:            64
+DEAL:0:2d::has_hanging_nodes:         false
+DEAL:0:2d::
+DEAL:0:2d::n_levels:                  4
+DEAL:0:2d::n_cells:                   85
+DEAL:0:2d::n_active_cells:            64
+DEAL:0:2d::has_hanging_nodes:         false
+DEAL:0:2d::
+DEAL:0:2d::PASSED
+DEAL:0:3d::n_levels:                  4
+DEAL:0:3d::n_cells:                   585
+DEAL:0:3d::n_active_cells:            512
+DEAL:0:3d::has_hanging_nodes:         false
+DEAL:0:3d::
+DEAL:0:3d::n_levels:                  4
+DEAL:0:3d::n_cells:                   585
+DEAL:0:3d::n_active_cells:            512
+DEAL:0:3d::has_hanging_nodes:         false
+DEAL:0:3d::
+DEAL:0:3d::PASSED
+
+DEAL:1:2d::n_levels:                  4
+DEAL:1:2d::n_cells:                   85
+DEAL:1:2d::n_active_cells:            64
+DEAL:1:2d::has_hanging_nodes:         false
+DEAL:1:2d::
+DEAL:1:2d::n_levels:                  4
+DEAL:1:2d::n_cells:                   85
+DEAL:1:2d::n_active_cells:            64
+DEAL:1:2d::has_hanging_nodes:         false
+DEAL:1:2d::
+DEAL:1:2d::PASSED
+DEAL:1:3d::n_levels:                  4
+DEAL:1:3d::n_cells:                   585
+DEAL:1:3d::n_active_cells:            512
+DEAL:1:3d::has_hanging_nodes:         false
+DEAL:1:3d::
+DEAL:1:3d::n_levels:                  4
+DEAL:1:3d::n_cells:                   585
+DEAL:1:3d::n_active_cells:            512
+DEAL:1:3d::has_hanging_nodes:         false
+DEAL:1:3d::
+DEAL:1:3d::PASSED
+

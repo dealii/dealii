@@ -34,7 +34,7 @@
 
 #include <deal.II/numerics/data_out.h>
 
-#include "tests.h"
+#include "../grid/tests.h"
 
 using namespace dealii;
 

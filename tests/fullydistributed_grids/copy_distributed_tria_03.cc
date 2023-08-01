@@ -30,7 +30,7 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
-#include "./tests.h"
+#include "../grid/tests.h"
 
 using namespace dealii;
 
