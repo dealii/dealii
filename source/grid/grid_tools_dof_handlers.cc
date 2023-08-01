@@ -615,7 +615,10 @@ namespace GridTools
       const Point<spacedim> &        p,
       const double                   tolerance,
       const std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
-                      Point<dim>> &  first_cell)
+                      Point<dim>> &  first_cell,
+      const std::vector<
+        std::set<typename MeshType<dim, spacedim>::active_cell_iterator>>
+        *vertex_to_cells)
   {
     std::vector<
       std::pair<typename MeshType<dim, spacedim>::active_cell_iterator,
@@ -671,14 +674,19 @@ namespace GridTools
         unsigned int local_vertex_index = 0;
         for (unsigned int d = 0; d < dim; ++d)
           local_vertex_index += (unit_point[d] > 0.5 ? 1 : 0) << d;
-        std::vector<typename MeshType<dim, spacedim>::active_cell_iterator>
-          cells = find_cells_adjacent_to_vertex(
-            mesh, my_cell->vertex_index(local_vertex_index));
-        for (const auto &cell : cells)
-          {
+
+        const auto fu = [&](const auto &tentative_cells) {
+          for (const auto &cell : tentative_cells)
             if (cell != my_cell)
               cells_to_add.push_back(cell);
-          }
+        };
+
+        const auto vertex_index = my_cell->vertex_index(local_vertex_index);
+
+        if (vertex_to_cells != nullptr)
+          fu((*vertex_to_cells)[vertex_index]);
+        else
+          fu(find_cells_adjacent_to_vertex(mesh, vertex_index));
       }
     // point on line in 3d: We cannot simply take the intersection between
     // the two vertices of cells because of hanging nodes. So instead we
@@ -712,21 +720,28 @@ namespace GridTools
           (vertex_indices[1].second << vertex_indices[1].first);
         for (unsigned int d = 0; d < 2; ++d)
           {
-            auto tentative_cells = find_cells_adjacent_to_vertex(
-              mesh,
-              my_cell->vertex_index(first_vertex + (d << free_direction)));
-            for (const auto &cell : tentative_cells)
-              {
-                bool cell_not_yet_present = true;
-                for (const auto &other_cell : cells_to_add)
-                  if (cell == other_cell)
-                    {
-                      cell_not_yet_present = false;
-                      break;
-                    }
-                if (cell_not_yet_present)
-                  cells_to_add.push_back(cell);
-              }
+            const auto fu = [&](const auto &tentative_cells) {
+              for (const auto &cell : tentative_cells)
+                {
+                  bool cell_not_yet_present = true;
+                  for (const auto &other_cell : cells_to_add)
+                    if (cell == other_cell)
+                      {
+                        cell_not_yet_present = false;
+                        break;
+                      }
+                  if (cell_not_yet_present)
+                    cells_to_add.push_back(cell);
+                }
+            };
+
+            const auto vertex_index =
+              my_cell->vertex_index(first_vertex + (d << free_direction));
+
+            if (vertex_to_cells != nullptr)
+              fu((*vertex_to_cells)[vertex_index]);
+            else
+              fu(find_cells_adjacent_to_vertex(mesh, vertex_index));
           }
       }
 
