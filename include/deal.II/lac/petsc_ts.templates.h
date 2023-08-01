@@ -441,7 +441,7 @@ namespace PETScWrappers
       const int err    = call_and_possibly_capture_ts_exception(
         user->decide_for_coarsening_and_refinement,
         user->pending_exception,
-        []() -> void {},
+        {},
         t,
         it,
         xdealii,
@@ -476,11 +476,7 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        user->interpolate,
-        user->pending_exception,
-        []() -> void {},
-        all_in,
-        all_out);
+        user->interpolate, user->pending_exception, {}, all_in, all_out);
       if (err)
         return PetscError(
           PetscObjectComm((PetscObject)ts),
@@ -911,12 +907,7 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        user->monitor,
-        user->pending_exception,
-        []() -> void {},
-        t,
-        xdealii,
-        it);
+        user->monitor, user->pending_exception, {}, t, xdealii, it);
       if (err)
         return PetscError(
           PetscObjectComm((PetscObject)ts),
