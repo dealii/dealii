@@ -1,0 +1,9 @@
+
+DEAL::dof_renumbering = -1 0 1 2 3 4 5 6 7 8 
+DEAL::quad_renumbering = 0; 0; 
+DEAL::function_gradients = 0.500000 5.00000; 
+DEAL::function_gradients_renumbered = 0.500000 5.00000; 0.500000 5.00000; 
+DEAL::dof_values = 0.00000; 0.500000; 5.00000; 5.50000; 1.25000; 1.75000; 0.125000; 5.12500; 1.37500; 
+DEAL::dof_values_renumbered = 42.0000; 0.00000; 0.500000; 5.00000; 5.50000; 1.25000; 1.75000; 0.125000; 5.12500; 1.37500; 
+DEAL::function_gradients from dof_values = 0.500000 5.00000; 
+DEAL::function_gradients_renumbered from dof_values_renumbered = 0.500000 5.00000; 0.500000 5.00000; 
