@@ -541,6 +541,7 @@ namespace Step68
     Vector<double> local_dof_values(fluid_fe.dofs_per_cell);
 
     FEPointEvaluation<dim, dim> evaluator(mapping, fluid_fe, update_values);
+    std::vector<Point<dim>>     particle_positions;
 
     // We loop over all the local particles. Although this could be achieved
     // directly by looping over all the cells, this would force us
@@ -564,7 +565,7 @@ namespace Step68
         // This is achieved using FEPointEvaluation object.
         const auto pic = particle_handler.particles_in_cell(cell);
         Assert(pic.begin() == particle, ExcInternalError());
-        std::vector<Point<dim>> particle_positions;
+        particle_positions.clear();
         for (auto &p : pic)
           particle_positions.push_back(p.get_reference_location());
 
