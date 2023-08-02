@@ -327,6 +327,7 @@ namespace Utilities
       (void)requests;
       Assert(false, ExcNeedsMPI());
 #else
+      (void)vector_operation;
       Assert(vector_operation == VectorOperation::add, ExcNotImplemented());
 
       AssertDimension(requests.size(), recv_ranks.size() + send_ranks.size());
