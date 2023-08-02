@@ -188,6 +188,187 @@ namespace Utilities
 #endif
     }
 
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner::import_from_ghosted_array(
+      const VectorOperation::values vector_operation,
+      const ArrayView<Number> &     src,
+      const ArrayView<Number> &     dst) const
+    {
+      // allocate internal memory since needed
+      if (requests.size() != send_ranks.size() + recv_ranks.size())
+        requests.resize(send_ranks.size() + recv_ranks.size());
+
+      if (this->buffers.size() != send_ptr.back() * sizeof(Number))
+        this->buffers.resize(this->temporary_storage_size() * sizeof(Number));
+
+      // perform actual exchange
+      this->template import_from_ghosted_array<Number>(
+        vector_operation,
+        0,
+        src,
+        ArrayView<Number>(reinterpret_cast<Number *>(this->buffers.data()),
+                          send_ptr.back()),
+        dst,
+        this->requests);
+    }
+
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner::import_from_ghosted_array(
+      const VectorOperation::values vector_operation,
+      const unsigned int            communication_channel,
+      const ArrayView<Number> &     ghost_array,
+      const ArrayView<Number> &     temporary_storage,
+      const ArrayView<Number> &     locally_owned_array,
+      std::vector<MPI_Request> &    requests) const
+    {
+      this->template import_from_ghosted_array_start<Number>(
+        vector_operation,
+        communication_channel,
+        ghost_array,
+        temporary_storage,
+        requests);
+      this->template import_from_ghosted_array_finish<Number>(
+        vector_operation, temporary_storage, locally_owned_array, requests);
+    }
+
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner::import_from_ghosted_array_start(
+      const VectorOperation::values vector_operation,
+      const unsigned int            communication_channel,
+      const ArrayView<Number> &     src,
+      const ArrayView<Number> &     buffers,
+      std::vector<MPI_Request> &    requests) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      (void)vector_operation;
+      (void)communication_channel;
+      (void)src;
+      (void)buffers;
+      (void)requests;
+      Assert(false, ExcNeedsMPI());
+#else
+      (void)vector_operation; // nothing to do here
+
+      AssertDimension(requests.size(), recv_ranks.size() + send_ranks.size());
+
+      const auto tag =
+        communication_channel +
+        internal::Tags::noncontiguous_partitioner_update_ghost_values_start;
+
+      AssertIndexRange(
+        tag,
+        internal::Tags::noncontiguous_partitioner_update_ghost_values_end + 1);
+
+      // post recv
+      AssertIndexRange(send_ranks.size(), send_ptr.size());
+      for (types::global_dof_index i = 0; i < send_ranks.size(); ++i)
+        {
+          const int ierr =
+            MPI_Irecv(buffers.data() + send_ptr[i],
+                      send_ptr[i + 1] - send_ptr[i],
+                      Utilities::MPI::mpi_type_id_for_type<Number>,
+                      send_ranks[i],
+                      tag,
+                      communicator,
+                      &requests[i + send_ranks.size()]);
+          AssertThrowMPI(ierr);
+        }
+
+      // pack data and send away
+      for (types::global_dof_index i = 0; i < recv_ranks.size(); ++i)
+        {
+          AssertIndexRange(i + 1, recv_ptr.size());
+          for (types::global_dof_index j = recv_ptr[i], c = 0;
+               j < recv_ptr[i + 1];
+               j++)
+            buffers[recv_ptr[i] + c++] = src[recv_indices[j]];
+
+          // send data
+          Assert((recv_ptr[i] < buffers.size()) ||
+                   (recv_ptr[i] == buffers.size() &&
+                    recv_ptr[i + 1] == recv_ptr[i]),
+                 ExcMessage("The input buffer doesn't contain enough entries"));
+          const int ierr =
+            MPI_Isend(buffers.data() + recv_ptr[i],
+                      recv_ptr[i + 1] - recv_ptr[i],
+                      Utilities::MPI::mpi_type_id_for_type<Number>,
+                      recv_ranks[i],
+                      tag,
+                      communicator,
+                      &requests[i]);
+          AssertThrowMPI(ierr);
+        }
+#endif
+    }
+
+
+
+    template <typename Number>
+    void
+    NoncontiguousPartitioner::import_from_ghosted_array_finish(
+      const VectorOperation::values  vector_operation,
+      const ArrayView<const Number> &buffers,
+      const ArrayView<Number> &      dst,
+      std::vector<MPI_Request> &     requests) const
+    {
+#ifndef DEAL_II_WITH_MPI
+      (void)vector_operation;
+      (void)buffers;
+      (void)dst;
+      (void)requests;
+      Assert(false, ExcNeedsMPI());
+#else
+      Assert(vector_operation == VectorOperation::add, ExcNotImplemented());
+
+      AssertDimension(requests.size(), recv_ranks.size() + send_ranks.size());
+
+      Assert(std::accumulate(dst.begin(), dst.end(), 0) == 0,
+             ExcMessage("The destination vector has to be empty."));
+
+      // wait that all data packages have been received
+      // note: this for-loop cold be merged with the next for-loop,
+      // however, for this send_indices would be needed to stored
+      // rank by rank
+      for (types::global_dof_index proc = 0; proc < send_ranks.size(); ++proc)
+        {
+          int        i;
+          MPI_Status status;
+          const auto ierr = MPI_Waitany(recv_ranks.size(),
+                                        requests.data() + send_ranks.size(),
+                                        &i,
+                                        &status);
+          AssertThrowMPI(ierr);
+        }
+
+      // write data into destination vector
+      for (types::global_dof_index i = 0, k = 0; i < send_ranks.size(); ++i)
+        {
+          // collect data to be send
+          for (types::global_dof_index j = send_ptr[i]; j < send_ptr[i + 1];
+               j++)
+            {
+              AssertIndexRange(k, send_indices.size());
+              dst[send_indices[k]] += buffers[j];
+              ++k;
+            }
+        }
+
+      // wait that all data packages have been sent
+      const int ierr =
+        MPI_Waitall(send_ranks.size(), requests.data(), MPI_STATUSES_IGNORE);
+      AssertThrowMPI(ierr);
+#endif
+    }
+
   } // namespace MPI
 } // namespace Utilities
 
