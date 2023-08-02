@@ -577,18 +577,11 @@ namespace GridTools
     tuple<std::vector<Point<spacedim>>, std::vector<CellData<dim>>, SubCellData>
     get_coarse_mesh_description(const Triangulation<dim, spacedim> &tria)
   {
-    Assert(1 <= tria.n_levels(),
+    Assert(tria.n_levels() >= 1,
            ExcMessage("The input triangulation must be non-empty."));
 
-    std::vector<Point<spacedim>> vertices;
+    std::vector<Point<spacedim>> vertices = tria.get_vertices();
     std::vector<CellData<dim>>   cells;
-
-    unsigned int max_level_0_vertex_n = 0;
-    for (const auto &cell : tria.cell_iterators_on_level(0))
-      for (const unsigned int cell_vertex_n : cell->vertex_indices())
-        max_level_0_vertex_n =
-          std::max(cell->vertex_index(cell_vertex_n), max_level_0_vertex_n);
-    vertices.resize(max_level_0_vertex_n + 1);
 
     internal::FaceDataHelper<dim> face_data;
     std::set<CellData<1>, internal::CellDataComparator<1>>
@@ -602,14 +595,12 @@ namespace GridTools
           {
             Assert(cell->vertex_index(cell_vertex_n) < vertices.size(),
                    ExcInternalError());
-            vertices[cell->vertex_index(cell_vertex_n)] =
-              cell->vertex(cell_vertex_n);
             cell_data.vertices[cell_vertex_n] =
               cell->vertex_index(cell_vertex_n);
           }
         cell_data.material_id = cell->material_id();
         cell_data.manifold_id = cell->manifold_id();
-        cells.push_back(cell_data);
+        cells.emplace_back(std::move(cell_data));
 
         // Save face data
         if (dim > 1)
@@ -645,25 +636,16 @@ namespace GridTools
           }
       }
 
-      // Double-check that there are no unused vertices:
-#ifdef DEBUG
-    {
-      std::vector<bool> used_vertices(vertices.size());
-      for (const CellData<dim> &cell_data : cells)
-        for (const auto v : cell_data.vertices)
-          used_vertices[v] = true;
-      Assert(std::find(used_vertices.begin(), used_vertices.end(), false) ==
-               used_vertices.end(),
-             ExcMessage("The level zero vertices should form a contiguous "
-                        "range."));
-    }
-#endif
-
     SubCellData subcell_data = face_data.get();
 
     if (dim == 3)
       for (const CellData<1> &face_line_data : line_data)
         subcell_data.boundary_lines.push_back(face_line_data);
+
+    // We end up with a 'vertices' array that uses some of the entries,
+    // but not all -- specifically, all vertices referenced by level-0
+    // cells. We can compress the array:
+    GridTools::delete_unused_vertices(vertices, cells, subcell_data);
 
     return std::tuple<std::vector<Point<spacedim>>,
                       std::vector<CellData<dim>>,
