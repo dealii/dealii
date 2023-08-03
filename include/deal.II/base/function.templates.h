@@ -853,6 +853,89 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_value_list(
       points[p], value_list[p]);
 }
 
+template <int dim, typename RangeNumberType>
+inline Tensor<1, dim, RangeNumberType>
+VectorFunctionFromTensorFunction<dim, RangeNumberType>::gradient(
+  const Point<dim> & p,
+  const unsigned int component) const
+{
+  AssertIndexRange(component, this->n_components);
+
+  // if the requested component is out of the range selected, then we can
+  // return early
+  if ((component < selected_component) ||
+      (component >= selected_component + dim))
+    return Tensor<1, dim>();
+
+  // // otherwise retrieve the values from the <tt>tensor_function</tt> to be
+  // // placed at the <tt>selected_component</tt> to
+  // // <tt>selected_component + dim - 1</tt> elements of the <tt>Vector</tt>
+  // // values and pick the correct one
+  const Tensor<2, dim, RangeNumberType> tensor_gradient =
+    tensor_function.gradient(p);
+
+  return tensor_gradient[component - selected_component];
+}
+
+template <int dim, typename RangeNumberType>
+void
+VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_gradient(
+  const Point<dim> &                            p,
+  std::vector<Tensor<1, dim, RangeNumberType>> &gradients) const
+{
+  AssertDimension(gradients.size(), this->n_components);
+
+
+  for (unsigned int i = 0; i < this->n_components; ++i)
+    gradients[i] = gradient(p, i);
+}
+
+template <int dim, typename RangeNumberType>
+void
+VectorFunctionFromTensorFunction<dim, RangeNumberType>::gradient_list(
+  const std::vector<Point<dim>> &               points,
+  std::vector<Tensor<1, dim, RangeNumberType>> &gradients,
+  const unsigned int                            component) const
+{
+  Assert(gradients.size() == points.size(),
+         ExcDimensionMismatch(gradients.size(), points.size()));
+
+
+  for (unsigned int i = 0; i < points.size(); ++i)
+    gradients[i] = gradient(points[i], component);
+}
+
+
+
+template <int dim, typename RangeNumberType>
+void
+VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_gradient_list(
+  const std::vector<Point<dim>> &                            points,
+  std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const
+{
+  Assert(gradients.size() == points.size(),
+         ExcDimensionMismatch(gradients.size(), points.size()));
+
+
+  for (unsigned int i = 0; i < points.size(); ++i)
+    {
+      Assert(gradients[i].size() == this->n_components,
+             ExcDimensionMismatch(gradients[i].size(), this->n_components));
+      vector_gradient(points[i], gradients[i]);
+    }
+}
+
+template <int dim, typename RangeNumberType>
+void
+VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_gradients(
+  const std::vector<Point<dim>> &                            points,
+  std::vector<std::vector<Tensor<1, dim, RangeNumberType>>> &gradients) const
+{
+  const unsigned int n = this->n_components;
+  AssertDimension(gradients.size(), n);
+  for (unsigned int i = 0; i < n; ++i)
+    gradient_list(points, gradients[i], i);
+}
 
 
 template <int dim, typename RangeNumberType>

@@ -1148,6 +1148,60 @@ public:
     const std::vector<Point<dim>> &       points,
     std::vector<Vector<RangeNumberType>> &value_list) const override;
 
+  /**
+   * Return the gradient of the specified component of the function at the given
+   * point.
+   */
+  virtual Tensor<1, dim, RangeNumberType>
+  gradient(const Point<dim> & p,
+           const unsigned int component = 0) const override;
+
+  /**
+   * Return the gradient of all components of the function at the given point.
+   */
+  virtual void
+  vector_gradient(
+    const Point<dim> &                            p,
+    std::vector<Tensor<1, dim, RangeNumberType>> &gradients) const override;
+
+  /**
+   * Set <tt>gradients</tt> to the gradients of the specified component of the
+   * function at the <tt>points</tt>.  It is assumed that <tt>gradients</tt>
+   * already has the right size, i.e.  the same size as the <tt>points</tt>
+   * array.
+   */
+  virtual void
+  gradient_list(const std::vector<Point<dim>> &               points,
+                std::vector<Tensor<1, dim, RangeNumberType>> &gradients,
+                const unsigned int component = 0) const override;
+
+  /**
+   * For each component of the function, fill a vector of gradient values, one
+   * for each point.
+   *
+   * The default implementation of this function in Function calls
+   * value_list() for each component. In order to improve performance, this
+   * can be reimplemented in derived classes to speed up performance.
+   */
+  virtual void
+  vector_gradients(const std::vector<Point<dim>> &points,
+                   std::vector<std::vector<Tensor<1, dim, RangeNumberType>>>
+                     &gradients) const override;
+
+  /**
+   * Set <tt>gradients</tt> to the gradients of the function at the
+   * <tt>points</tt>, for all components. It is assumed that
+   * <tt>gradients</tt> already has the right size, i.e. the same size as the
+   * <tt>points</tt> array.
+   *
+   * The outer loop over <tt>gradients</tt> is over the points in the list,
+   * the inner loop over the different components of the function.
+   */
+  virtual void
+  vector_gradient_list(const std::vector<Point<dim>> &points,
+                       std::vector<std::vector<Tensor<1, dim, RangeNumberType>>>
+                         &gradients) const override;
+
 private:
   /**
    * The TensorFunction object which we call when this class's vector_value()
