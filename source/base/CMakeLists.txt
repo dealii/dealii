@@ -38,6 +38,7 @@ set(_unity_include_src
   function_spherical.cc
   function_time.cc
   function_tools.cc
+  function_unit_to_real.cc
   geometry_info.cc
   geometric_utilities.cc
   graph_coloring.cc
@@ -135,6 +136,7 @@ set(_inst
   function_restriction.inst.in
   function_time.inst.in
   function_tools.inst.in
+  function_unit_to_real.inst.in
   incremental_function.inst.in
   geometric_utilities.inst.in
   mpi.inst.in
