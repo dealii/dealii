@@ -103,9 +103,11 @@ not be implementing finite element methods by hand but use deal.II instead.
 Indeed, deal.II has interfaces to one such time stepping library,
 [SUNDIALS](https://computing.llnl.gov/projects/sundials), already available.
 In particular, the SUNDIALS::ARKode class would make for a great starting
-point for the use of much better (and much more accurate) time steppers;
+point for the use of much better (and much more accurate) time steppers,
+as would PETScWrappers::TimeStepper;
 the methods one would then get also implement the automatic time step
-control mentioned above.
+control mentioned above. To see how this works, take a look at
+step-86.
 
 
 <h4>Better refinement criteria</h4>
