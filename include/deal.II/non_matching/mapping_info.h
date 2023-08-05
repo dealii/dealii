@@ -216,8 +216,10 @@ namespace NonMatching
       /**
        * Constructor which sets the default arguments.
        */
-      AdditionalData(const bool use_global_weights = false)
+      AdditionalData(const bool use_global_weights = false,
+                     const bool store_cells        = false)
         : use_global_weights(use_global_weights)
+        , store_cells(store_cells)
       {}
 
       /**
@@ -226,6 +228,15 @@ namespace NonMatching
        * QSimplex::compute_affine_transformation().
        */
       bool use_global_weights;
+
+      /**
+       * During the reinit() function calls, cells are passed as
+       * argument. In the default case, the cell is not stored,
+       * since all relevant mapping related information is precomputed.
+       * Hoever, this flag enables that the cells are stored so that
+       * they can be accessed later on.
+       */
+      bool store_cells;
     };
 
     /**
@@ -421,6 +432,14 @@ namespace NonMatching
     unsigned int
     get_n_q_points_unvectorized(const unsigned int cell_index,
                                 const unsigned int face_number) const;
+
+    /**
+     * Return cell iterator.
+     *
+     * @note This call is only possible if AdditionalData::store_cells is enabled.
+     */
+    typename Triangulation<dim, spacedim>::cell_iterator
+    get_cell_iterator(const unsigned int cell_index) const;
 
   private:
     using MappingData =
@@ -633,6 +652,19 @@ namespace NonMatching
      * dependent objects know that they need to reinitialize as well.
      */
     boost::signals2::signal<void()> is_reinitialized;
+
+    /**
+     * Reference to the triangulation passed via the cells to the
+     * reinit functions. This field is only set if
+     * AdditionalData::store_cells is enabled.
+     */
+    SmartPointer<const Triangulation<dim, spacedim>> triangulation;
+
+    /**
+     * Level and indices of cells passed to the reinit functions. This
+     * vector is only filled if AdditionalData::store_cells is enabled.
+     */
+    std::vector<std::pair<int, int>> cell_level_and_indices;
   };
 
   // ----------------------- template functions ----------------------
@@ -807,6 +839,9 @@ namespace NonMatching
 
     n_q_points_unvectorized.reserve(n_cells);
 
+    if (additional_data.store_cells)
+      cell_level_and_indices.resize(n_cells);
+
     // fill unit points index offset vector
     unit_points_index.reserve(n_cells + 1);
     unit_points_index.push_back(0);
@@ -844,6 +879,12 @@ namespace NonMatching
     unsigned int cell_index = 0;
     for (const auto &cell : cell_iterator_range)
       {
+        if (additional_data.store_cells)
+          {
+            this->triangulation                = &cell->get_triangulation();
+            cell_level_and_indices[cell_index] = {cell->level(), cell->index()};
+          }
+
         // store unit points
         const unsigned int n_q_points = compute_n_q_points<VectorizedArrayType>(
           n_q_points_unvectorized[cell_index]);
@@ -1160,6 +1201,22 @@ namespace NonMatching
         return n_q_points_unvectorized[compute_geometry_index_offset(
           cell_index, face_number)];
       }
+  }
+
+
+
+  template <int dim, int spacedim, typename Number>
+  typename Triangulation<dim, spacedim>::cell_iterator
+  MappingInfo<dim, spacedim, Number>::get_cell_iterator(
+    const unsigned int cell_index) const
+  {
+    Assert(
+      additional_data.store_cells,
+      ExcMessage(
+        "Cells have been not stored. You can enable this by Additional::store_cells."));
+    return {triangulation.get(),
+            cell_level_and_indices[cell_index].first,
+            cell_level_and_indices[cell_index].second};
   }
 
 
