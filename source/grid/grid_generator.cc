@@ -3450,7 +3450,7 @@ namespace GridGenerator
                 if (face->at_boundary() &&
                     internal::point_in_2d_box(face->center(),
                                               center,
-                                              outer_radius))
+                                              outer_radius * (1. - 1e-12)))
                   face->set_manifold_id(polar_manifold_id);
                 else
                   face->set_manifold_id(tfi_manifold_id);
