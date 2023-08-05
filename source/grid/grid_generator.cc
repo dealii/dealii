@@ -3353,7 +3353,7 @@ namespace GridGenerator
     auto min_line_length = [](const Triangulation<2> &tria) -> double {
       double length = std::numeric_limits<double>::max();
       for (const auto &cell : tria.active_cell_iterators())
-        for (unsigned int n = 0; n < GeometryInfo<2>::lines_per_cell; ++n)
+        for (unsigned int n = 0; n < cell->n_lines(); ++n)
           length = std::min(length, cell->line(n)->diameter());
       return length;
     };
@@ -3444,7 +3444,7 @@ namespace GridGenerator
         // grid around the cylinder to the new TFI manifold id.
         if (cell->manifold_id() == tfi_manifold_id)
           {
-            for (const unsigned int face_n : GeometryInfo<2>::face_indices())
+            for (const unsigned int face_n : cell->face_indices())
               {
                 const auto &face = cell->face(face_n);
                 if (face->at_boundary() &&
@@ -3468,7 +3468,7 @@ namespace GridGenerator
       std::numeric_limits<double>::epsilon() * 10000;
     if (colorize)
       for (const auto &cell : tria.active_cell_iterators())
-        for (const unsigned int face_n : GeometryInfo<2>::face_indices())
+        for (const unsigned int face_n : cell->face_indices())
           {
             const auto face = cell->face(face_n);
             if (face->at_boundary())
