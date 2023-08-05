@@ -68,7 +68,7 @@ test()
               return std::get<2>(t1) < std::get<2>(t2);
             });
 
-  for (const auto el : boundary_faces)
+  for (const auto & el : boundary_faces)
     deallog << "center: " << std::get<0>(el)
             << " boundary id: " << std::get<1>(el)
             << " manifold id: " << std::get<2>(el) << std::endl;
