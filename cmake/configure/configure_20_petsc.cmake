@@ -17,7 +17,7 @@
 # Configuration for the petsc library:
 #
 
-set(FEATURE_PETSC_AFTER MPI)
+set(FEATURE_PETSC_DEPENDS MPI)
 
 
 macro(feature_petsc_find_external var)
@@ -51,17 +51,14 @@ macro(feature_petsc_find_external var)
     # _NOT_ enabled.
     # So we check for this:
     #
-    if( (PETSC_WITH_MPIUNI AND DEAL_II_WITH_MPI)
-         OR
-         (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_WITH_MPI))
+    if(PETSC_WITH_MPIUNI)
       message(STATUS "Could not find a sufficient PETSc installation: "
-        "PETSc has to be configured with the same MPI configuration as deal.II."
+        "PETSc has to be configured with MPI support."
         )
       set(PETSC_ADDITIONAL_ERROR_STRING
         ${PETSC_ADDITIONAL_ERROR_STRING}
         "Could not find a sufficient PETSc installation:\n"
-        "PETSc has to be configured with the same MPI configuration as deal.II, but found:\n"
-        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
+        "PETSc has to be configured with the MPI support, but found:\n"
         "  PETSC_WITH_MPI   = (NOT ${PETSC_WITH_MPIUNI})\n"
         )
       set(${var} FALSE)

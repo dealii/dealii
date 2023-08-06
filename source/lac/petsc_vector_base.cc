@@ -542,7 +542,6 @@ namespace PETScWrappers
   {
     {
 #  ifdef DEBUG
-#    ifdef DEAL_II_WITH_MPI
       // Check that all processors agree that last_action is the same (or none!)
 
       int my_int_last_action = last_action;
@@ -560,7 +559,6 @@ namespace PETScWrappers
                     (VectorOperation::add | VectorOperation::insert),
                   ExcMessage("Error: not all processors agree on the last "
                              "VectorOperation before this compress() call."));
-#    endif
 #  endif
     }
 

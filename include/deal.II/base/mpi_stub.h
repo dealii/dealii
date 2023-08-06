@@ -22,7 +22,7 @@
 // types and global constants for the no-MPI case. This way we can still use,
 // e.g., MPI_Comm in the API.
 
-#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
+#if defined(DEAL_II_WITH_MPI)
 #  include <mpi.h>
 #else
 // without MPI, we would still like to use
