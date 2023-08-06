@@ -1046,8 +1046,6 @@ namespace internal
     template <int dim, typename Number>
     static void
     compute_weights(
-      const DoFHandler<dim> &                  dof_handler_fine,
-      const unsigned int                       mg_level_fine,
       const dealii::AffineConstraints<Number> &constraints_fine,
       const MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
         &                                         transfer,
@@ -1059,41 +1057,13 @@ namespace internal
         touch_count.local_element(i) += 1;
       touch_count.compress(VectorOperation::add);
 
-      IndexSet locally_relevant_dofs;
-      if (mg_level_fine == numbers::invalid_unsigned_int)
-        DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
-                                                locally_relevant_dofs);
-      else
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler_fine,
-                                                      mg_level_fine,
-                                                      locally_relevant_dofs);
-
-      const auto partitioner_fine_ =
-        std::make_shared<Utilities::MPI::Partitioner>(
-          mg_level_fine == numbers::invalid_unsigned_int ?
-            dof_handler_fine.locally_owned_dofs() :
-            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
-          locally_relevant_dofs,
-          dof_handler_fine.get_communicator());
-      transfer.vec_fine.reinit(transfer.partitioner_fine);
-
-      LinearAlgebra::distributed::Vector<Number> touch_count_;
-      touch_count_.reinit(partitioner_fine_);
-
-      touch_count_.copy_locally_owned_data_from(touch_count);
-
-      for (unsigned int i = 0; i < touch_count_.locally_owned_size(); ++i)
-        touch_count_.local_element(i) =
+      for (unsigned int i = 0; i < touch_count.locally_owned_size(); ++i)
+        touch_count.local_element(i) =
           constraints_fine.is_constrained(
-            touch_count_.get_partitioner()->local_to_global(i)) ?
+            touch_count.get_partitioner()->local_to_global(i)) ?
             Number(0.) :
-            Number(1.) / touch_count_.local_element(i);
+            Number(1.) / touch_count.local_element(i);
 
-      touch_count_.update_ghost_values();
-
-      // copy weights to other indexset
-      touch_count.reinit(transfer.partitioner_fine);
-      touch_count.copy_locally_owned_data_from(touch_count_);
       touch_count.update_ghost_values();
     }
 
@@ -1685,11 +1655,7 @@ namespace internal
         {
           // compute weights globally
           LinearAlgebra::distributed::Vector<Number> weight_vector;
-          compute_weights(dof_handler_fine,
-                          mg_level_fine,
-                          constraints_fine,
-                          transfer,
-                          weight_vector);
+          compute_weights(constraints_fine, transfer, weight_vector);
 
           // ... and store them cell-wise a DG format
           transfer.weights.resize(n_dof_indices_fine.back());
@@ -2182,11 +2148,7 @@ namespace internal
         {
           // compute weights globally
           LinearAlgebra::distributed::Vector<Number> weight_vector;
-          compute_weights(dof_handler_fine,
-                          mg_level_fine,
-                          constraints_fine,
-                          transfer,
-                          weight_vector);
+          compute_weights(constraints_fine, transfer, weight_vector);
 
           // ... and store them cell-wise a DG format
           transfer.weights.resize(n_dof_indices_fine.back());
