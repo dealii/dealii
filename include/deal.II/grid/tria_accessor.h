@@ -3185,6 +3185,19 @@ public:
   as_dof_handler_iterator(const DoFHandler<dim, spacedim> &dof_handler) const;
 
   /**
+   * A function similar to as_dof_handler_iterator(). It converts
+   * a Triangulation active/level cell iterator to a
+   * DoFHandler active level cell iterator, or a DoFHandler level active/cell
+   * iterator to a level cell iterator of another DoFHandler. The
+   * @p iterator must be associated with the triangulation of the
+   * @p dof_handler.
+   */
+  TriaIterator<DoFCellAccessor<dim, spacedim, true>>
+  as_dof_handler_level_iterator(
+    const DoFHandler<dim, spacedim> &dof_handler) const;
+
+
+  /**
    * @}
    */
 
