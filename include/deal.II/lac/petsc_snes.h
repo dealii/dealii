@@ -30,6 +30,7 @@
 #  include <petscsnes.h>
 
 #  include <exception>
+
 #  if defined(DEAL_II_HAVE_CXX20)
 #    include <concepts>
 #  endif
@@ -207,19 +208,19 @@ namespace PETScWrappers
    *  - deal.II style using NonlinearSolver::setup_jacobian and
    *    NonlinearSolver::solve_with_jacobian.
    * The preconditioning matrix can be specified using
-   * NonlinearSolver::set_matrix. In case both approaches are implemented, the
+   * NonlinearSolver::set_matrix(). In case both approaches are implemented, the
    * deal.II style will be used.
    *
-   * NonlinearSolver::set_matrices must be used in case the user wants to
+   * NonlinearSolver::set_matrices() must be used in case the user wants to
    * provide the iteration matrix of the tangent system in the deal.II style
    * approach, thus replacing the matrix-free linearization.
    *
    * The correctness of the constructed Jacobians passed using
-   * NonlinearSolver::set_matrix can be checked using
+   * NonlinearSolver::set_matrix() can be checked using
    * @code
    * ./myApp -snes_test_jacobian
    * @endcode
-   * See NonlinearSolver::set_matrix and NonlinearSolver::set_matrices for
+   * See NonlinearSolver::set_matrix() and NonlinearSolver::set_matrices() for
    * additional details.
    *
    * The deal.II style approach still allows command line customization, like
@@ -307,13 +308,14 @@ namespace PETScWrappers
     get_mpi_communicator() const;
 
     /**
-     * Reset the solver. It does not change the customization.
+     * Reset the solver, it does not change the customization.
      */
     void
     reinit();
 
     /**
-     * Reset solver. Change customization according to @p data.
+     * Reset solver.
+     * Change customization according to @p data.
      */
     void
     reinit(const NonlinearSolverData &data);
@@ -401,8 +403,8 @@ namespace PETScWrappers
      * Callback for monitoring the solution process.
      *
      * This function is called by NonlinearSolver at the beginning
-     * of each time step. Input arguments are the current step number
-     * and the current value for ||F(x)||.
+     * of each step. Input arguments are the current step number
+     * and the current value for $||F(x)||$.
      *
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
@@ -415,7 +417,7 @@ namespace PETScWrappers
       monitor;
 
     /**
-     * Callback to set up the Jacobian system.
+     * Callback for the set up of the Jacobian system.
      *
      * This callback gives full control to users to set up the tangent
      * operator $\dfrac{\partial F}{\partial x}$.

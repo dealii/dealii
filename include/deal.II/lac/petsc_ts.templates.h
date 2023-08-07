@@ -50,6 +50,7 @@ DEAL_II_NAMESPACE_OPEN
           CHKERRQ(ierr);                \
         }                               \
       while (0)
+#    define undefPetscCall
 #  endif
 
 namespace PETScWrappers
@@ -796,7 +797,7 @@ namespace PETScWrappers
       user->need_dummy_assemble = false;
 
       // Handle the Jacobian-free case
-      // This call allow to resample the linearization point
+      // This call allows to resample the linearization point
       // of the MFFD tangent operator
       PetscBool flg;
       PetscCall(PetscObjectTypeCompare((PetscObject)A, MATMFFD, &flg));
@@ -1001,7 +1002,7 @@ namespace PETScWrappers
     // solver only applies the preconditioner. This choice
     // can be overridden by command line and users can use any other
     // Krylov method if their solve is not accurate enough.
-    // Using solve_with_jacobian as a preconditioner allow users
+    // Using solve_with_jacobian as a preconditioner allows users
     // to provide approximate solvers and possibly iterate on a matrix-free
     // approximation of the tangent operator.
     if (solve_with_jacobian)
