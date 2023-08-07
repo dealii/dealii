@@ -98,8 +98,8 @@ test(int fe_degree, const Function<dim, Number> &function)
   if (fe_degree > 0)
     {
       deallog.push("CG<2>(" + str_fine + ")<->CG<2>(" + str_coarse + ")");
-      do_test<dim, double>(FESystem<dim>(FE_Q<dim>(fe_degree) ^ dim),
-                           FESystem<dim>(FE_Q<dim>(fe_degree) ^ dim),
+      do_test<dim, double>(FESystem<dim>(FE_Q<dim>(fe_degree), dim),
+                           FESystem<dim>(FE_Q<dim>(fe_degree), dim),
                            function);
       deallog.pop();
     }
