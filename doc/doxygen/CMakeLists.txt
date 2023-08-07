@@ -144,12 +144,6 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
   )
 
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/mod_footer.pl.in
-  ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl
-  )
-
-
 #
 # Generate header, footer and style files for doxygen.
 #
@@ -167,11 +161,9 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E touch footer.html
   COMMAND ${DOXYGEN_EXECUTABLE} -w html header.html footer.html style.css options.dox
   COMMAND ${PERL_EXECUTABLE} -pi ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl header.html
-  COMMAND ${PERL_EXECUTABLE} -pi ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl footer.html
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/options.dox
     ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_header.pl
-    ${CMAKE_CURRENT_BINARY_DIR}/scripts/mod_footer.pl
   )
 
 #
