@@ -1,0 +1,265 @@
+
+DEAL::FE: FE_Q<2>(2)
+DEAL::FE: FE_Q<2>(1)
+DEAL::no. cells: 88
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff prolongate   l5: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::Diff restrict     l5: 0.00000
+DEAL::Diff restrict add l5: 0.00000
+DEAL::
+DEAL::no. cells: 250
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff prolongate   l5: 0.00000
+DEAL::Diff prolongate   l6: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::Diff restrict     l5: 0.00000
+DEAL::Diff restrict add l5: 0.00000
+DEAL::Diff restrict     l6: 0.00000
+DEAL::Diff restrict add l6: 0.00000
+DEAL::
+DEAL::no. cells: 510
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff prolongate   l5: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::Diff restrict     l5: 0.00000
+DEAL::Diff restrict add l5: 0.00000
+DEAL::
+DEAL::FE: FE_Q<2>(4)
+DEAL::FE: FE_Q<2>(3)
+DEAL::no. cells: 34
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::
+DEAL::no. cells: 88
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff prolongate   l5: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::Diff restrict     l5: 0.00000
+DEAL::Diff restrict add l5: 0.00000
+DEAL::
+DEAL::no. cells: 141
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::
+DEAL::FE: FE_Q<3>(2)
+DEAL::FE: FE_Q<3>(1)
+DEAL::no. cells: 15
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::
+DEAL::no. cells: 694
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff prolongate   l5: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::Diff restrict     l5: 0.00000
+DEAL::Diff restrict add l5: 0.00000
+DEAL::
+DEAL::no. cells: 1791
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::
+DEAL::FE: FE_Q<3>(4)
+DEAL::FE: FE_Q<3>(3)
+DEAL::no. cells: 1
+DEAL::
+DEAL::no. cells: 15
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::
+DEAL::no. cells: 223
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::
+DEAL::FE: FE_Q<2>(3)
+DEAL::FE: FE_Q<2>(2)
+DEAL::no. cells: 88
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff prolongate   l5: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::Diff restrict     l5: 0.00000
+DEAL::Diff restrict add l5: 0.00000
+DEAL::
+DEAL::no. cells: 250
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff prolongate   l5: 0.00000
+DEAL::Diff prolongate   l6: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::Diff restrict     l5: 0.00000
+DEAL::Diff restrict add l5: 0.00000
+DEAL::Diff restrict     l6: 0.00000
+DEAL::Diff restrict add l6: 0.00000
+DEAL::
+DEAL::no. cells: 510
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff prolongate   l5: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::Diff restrict     l5: 0.00000
+DEAL::Diff restrict add l5: 0.00000
+DEAL::
+DEAL::FE: FE_Q<3>(3)
+DEAL::FE: FE_Q<3>(2)
+DEAL::no. cells: 15
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::
+DEAL::no. cells: 694
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff prolongate   l5: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::Diff restrict     l5: 0.00000
+DEAL::Diff restrict add l5: 0.00000
+DEAL::
+DEAL::no. cells: 1791
+DEAL::Diff prolongate   l1: 0.00000
+DEAL::Diff prolongate   l2: 0.00000
+DEAL::Diff prolongate   l3: 0.00000
+DEAL::Diff prolongate   l4: 0.00000
+DEAL::Diff restrict     l1: 0.00000
+DEAL::Diff restrict add l1: 0.00000
+DEAL::Diff restrict     l2: 0.00000
+DEAL::Diff restrict add l2: 0.00000
+DEAL::Diff restrict     l3: 0.00000
+DEAL::Diff restrict add l3: 0.00000
+DEAL::Diff restrict     l4: 0.00000
+DEAL::Diff restrict add l4: 0.00000
+DEAL::

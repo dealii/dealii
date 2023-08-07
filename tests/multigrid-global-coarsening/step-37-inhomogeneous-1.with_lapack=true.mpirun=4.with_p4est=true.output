@@ -1,0 +1,150 @@
+
+Cycle 0
+Number of degrees of freedom: 81
+DEAL:0:cg::Starting value 45.0807
+DEAL:0:cg::Convergence step 7 value 2.65304e-12
+max error: 0.00772526
+error ratio: 1.00000
+
+Cycle 1
+Number of degrees of freedom: 289
+DEAL:0:cg::Starting value 68.5863
+DEAL:0:cg::Convergence step 7 value 3.81082e-12
+max error: 0.000971239
+error ratio: 7.95402
+
+Cycle 2
+Number of degrees of freedom: 1089
+DEAL:0:cg::Starting value 95.4381
+DEAL:0:cg::Convergence step 7 value 7.14371e-12
+max error: 0.000120278
+error ratio: 8.07497
+
+Cycle 3
+Number of degrees of freedom: 4225
+DEAL:0:cg::Starting value 131.732
+DEAL:0:cg::Convergence step 7 value 1.44204e-11
+max error: 1.49228e-05
+error ratio: 8.05998
+
+Cycle 4
+Number of degrees of freedom: 16641
+DEAL:0:cg::Starting value 183.473
+DEAL:0:cg::Convergence step 7 value 2.54095e-11
+max error: 1.85713e-06
+error ratio: 8.03544
+
+Cycle 5
+Number of degrees of freedom: 66049
+DEAL:0:cg::Starting value 257.379
+DEAL:0:cg::Convergence step 7 value 3.94318e-11
+max error: 2.31590e-07
+error ratio: 8.01904
+
+Cycle 0
+Number of degrees of freedom: 125
+DEAL:0:cg::Starting value 6.44073
+DEAL:0:cg::Convergence step 7 value 4.64523e-13
+max error: 0.0499110
+error ratio: 1.00000
+
+Cycle 1
+Number of degrees of freedom: 729
+DEAL:0:cg::Starting value 8.68642
+DEAL:0:cg::Convergence step 7 value 5.79753e-13
+max error: 0.00756448
+error ratio: 6.59807
+
+Cycle 2
+Number of degrees of freedom: 4913
+DEAL:0:cg::Starting value 9.47362
+DEAL:0:cg::Convergence step 7 value 6.67651e-13
+max error: 0.000965192
+error ratio: 7.83728
+
+Cycle 3
+Number of degrees of freedom: 35937
+DEAL:0:cg::Starting value 9.30402
+DEAL:0:cg::Convergence step 7 value 9.36336e-13
+max error: 0.000120048
+error ratio: 8.04008
+
+Cycle 4
+Number of degrees of freedom: 274625
+DEAL:0:cg::Starting value 8.99023
+DEAL:0:cg::Convergence step 7 value 1.22268e-12
+max error: 1.49140e-05
+error ratio: 8.04933
+
+
+DEAL:1:cg::Starting value 45.0807
+DEAL:1:cg::Convergence step 7 value 2.65304e-12
+DEAL:1:cg::Starting value 68.5863
+DEAL:1:cg::Convergence step 7 value 3.81082e-12
+DEAL:1:cg::Starting value 95.4381
+DEAL:1:cg::Convergence step 7 value 7.14371e-12
+DEAL:1:cg::Starting value 131.732
+DEAL:1:cg::Convergence step 7 value 1.44204e-11
+DEAL:1:cg::Starting value 183.473
+DEAL:1:cg::Convergence step 7 value 2.54095e-11
+DEAL:1:cg::Starting value 257.379
+DEAL:1:cg::Convergence step 7 value 3.94318e-11
+DEAL:1:cg::Starting value 6.44073
+DEAL:1:cg::Convergence step 7 value 4.64523e-13
+DEAL:1:cg::Starting value 8.68642
+DEAL:1:cg::Convergence step 7 value 5.79753e-13
+DEAL:1:cg::Starting value 9.47362
+DEAL:1:cg::Convergence step 7 value 6.67651e-13
+DEAL:1:cg::Starting value 9.30402
+DEAL:1:cg::Convergence step 7 value 9.36336e-13
+DEAL:1:cg::Starting value 8.99023
+DEAL:1:cg::Convergence step 7 value 1.22268e-12
+
+
+DEAL:2:cg::Starting value 45.0807
+DEAL:2:cg::Convergence step 7 value 2.65304e-12
+DEAL:2:cg::Starting value 68.5863
+DEAL:2:cg::Convergence step 7 value 3.81082e-12
+DEAL:2:cg::Starting value 95.4381
+DEAL:2:cg::Convergence step 7 value 7.14371e-12
+DEAL:2:cg::Starting value 131.732
+DEAL:2:cg::Convergence step 7 value 1.44204e-11
+DEAL:2:cg::Starting value 183.473
+DEAL:2:cg::Convergence step 7 value 2.54095e-11
+DEAL:2:cg::Starting value 257.379
+DEAL:2:cg::Convergence step 7 value 3.94318e-11
+DEAL:2:cg::Starting value 6.44073
+DEAL:2:cg::Convergence step 7 value 4.64523e-13
+DEAL:2:cg::Starting value 8.68642
+DEAL:2:cg::Convergence step 7 value 5.79753e-13
+DEAL:2:cg::Starting value 9.47362
+DEAL:2:cg::Convergence step 7 value 6.67651e-13
+DEAL:2:cg::Starting value 9.30402
+DEAL:2:cg::Convergence step 7 value 9.36336e-13
+DEAL:2:cg::Starting value 8.99023
+DEAL:2:cg::Convergence step 7 value 1.22268e-12
+
+
+DEAL:3:cg::Starting value 45.0807
+DEAL:3:cg::Convergence step 7 value 2.65304e-12
+DEAL:3:cg::Starting value 68.5863
+DEAL:3:cg::Convergence step 7 value 3.81082e-12
+DEAL:3:cg::Starting value 95.4381
+DEAL:3:cg::Convergence step 7 value 7.14371e-12
+DEAL:3:cg::Starting value 131.732
+DEAL:3:cg::Convergence step 7 value 1.44204e-11
+DEAL:3:cg::Starting value 183.473
+DEAL:3:cg::Convergence step 7 value 2.54095e-11
+DEAL:3:cg::Starting value 257.379
+DEAL:3:cg::Convergence step 7 value 3.94318e-11
+DEAL:3:cg::Starting value 6.44073
+DEAL:3:cg::Convergence step 7 value 4.64523e-13
+DEAL:3:cg::Starting value 8.68642
+DEAL:3:cg::Convergence step 7 value 5.79753e-13
+DEAL:3:cg::Starting value 9.47362
+DEAL:3:cg::Convergence step 7 value 6.67651e-13
+DEAL:3:cg::Starting value 9.30402
+DEAL:3:cg::Convergence step 7 value 9.36336e-13
+DEAL:3:cg::Starting value 8.99023
+DEAL:3:cg::Convergence step 7 value 1.22268e-12
+

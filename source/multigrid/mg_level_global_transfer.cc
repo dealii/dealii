@@ -160,11 +160,8 @@ namespace
   template <int dim, int spacedim, typename Number>
   void
   fill_internal(
-    const DoFHandler<dim, spacedim> &mg_dof,
-    SmartPointer<
-      const MGConstrainedDoFs,
-      MGLevelGlobalTransfer<LinearAlgebra::distributed::Vector<Number>>>
-                                                mg_constrained_dofs,
+    const DoFHandler<dim, spacedim> &           mg_dof,
+    SmartPointer<const MGConstrainedDoFs>       mg_constrained_dofs,
     const MPI_Comm                              mpi_communicator,
     const bool                                  transfer_solution_vectors,
     std::vector<Table<2, unsigned int>> &       copy_indices,

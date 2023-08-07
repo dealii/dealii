@@ -30,11 +30,9 @@ for (deal_II_dimension : DIMENSIONS; S1 : REAL_SCALARS)
     template class MGTransferBlockMatrixFreeBase<
       deal_II_dimension,
       S1,
-      MGTransferGlobalCoarsening<deal_II_dimension,
-                                 LinearAlgebra::distributed::Vector<S1>>>;
-    template class MGTransferBlockGlobalCoarsening<
-      deal_II_dimension,
-      LinearAlgebra::distributed::Vector<S1>>;
+      MGTransferMF<deal_II_dimension, S1>>;
+    template class MGTransferMF<deal_II_dimension, S1>;
+    template class MGTransferBlockMF<deal_II_dimension, S1>;
   }
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)

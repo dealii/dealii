@@ -1,0 +1,41 @@
+
+DEAL::FE: FE_DGQ<2>(3)
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 34.1210
+DEAL::FE: FE_DGQ<2>(8)
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 71.6678
+DEAL::FE: FE_DGQ<2>(16)
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 151.607
+DEAL::FE: FE_Q<2>(16)
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 133.734
+DEAL::FE: FE_DGQ<3>(11)
+DEAL::no. cells: 64
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 774.120
+DEAL::FE: FE_DGQ<2>(3)
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 34.1210
+DEAL::FE: FE_DGQ<2>(8)
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 71.6678
+DEAL::FE: FE_DGQ<2>(16)
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 151.607
+DEAL::FE: FE_Q<2>(16)
+DEAL::no. cells: 16
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 133.734
+DEAL::FE: FE_DGQ<3>(11)
+DEAL::no. cells: 64
+DEAL::Error after prolongation: 0
+DEAL::Norm after restriction: 774.120

@@ -1,0 +1,19 @@
+
+DEAL:2d::Sinker problem in 2D.
+DEAL:2d::n_sinker: 4       max/min viscosity ratio: 1000.00
+DEAL:2d::
+DEAL:2d::Number of active cells: 1024 (on 6 levels)
+DEAL:2d::Number of degrees of freedom: 9539 (8450+1089)
+DEAL:2d::Solved-in 69 iterations, final residual: 5.58979e-08
+DEAL:2d::
+DEAL:2d::Number of active cells: 4096 (on 7 levels)
+DEAL:2d::Number of degrees of freedom: 37507 (33282+4225)
+DEAL:2d::Solved-in 69 iterations, final residual: 2.58019e-08
+DEAL:2d::
+DEAL:3d::Sinker problem in 3D.
+DEAL:3d::n_sinker: 4       max/min viscosity ratio: 1000.00
+DEAL:3d::
+DEAL:3d::Number of active cells: 512 (on 4 levels)
+DEAL:3d::Number of degrees of freedom: 15468 (14739+729)
+DEAL:3d::Solved-in 62 iterations, final residual: 1.99453e-08
+DEAL:3d::
