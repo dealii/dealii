@@ -344,8 +344,8 @@ namespace internal
       void
       transpose_subface_index(unsigned int &subface) const;
 
-      std::vector<std::vector<
-        std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>>>
+      std::vector<
+        boost::container::small_vector<std::array<unsigned int, 3>, 6>>
         line_to_cells;
 
       const dealii::ndarray<unsigned int, 3, 2, 2> local_lines = {
@@ -372,7 +372,11 @@ namespace internal
     inline std::size_t
     HangingNodes<dim>::memory_consumption() const
     {
-      return MemoryConsumption::memory_consumption(line_to_cells);
+      std::size_t size = 0;
+      for (const auto &a : line_to_cells)
+        size +=
+          (a.capacity() > 6 ? a.capacity() : 0) * sizeof(a[0]) + sizeof(a);
+      return size;
     }
 
 
@@ -424,21 +428,25 @@ namespace internal
                                                     {2, 6},
                                                     {3, 7}};
 
-      std::vector<std::vector<
-        std::pair<typename Triangulation<3>::cell_iterator, unsigned int>>>
+      std::vector<
+        boost::container::small_vector<std::array<unsigned int, 3>, 6>>
         line_to_inactive_cells(n_raw_lines);
 
       // First add active and inactive cells to their lines:
       for (const auto &cell : triangulation.cell_iterators())
         {
+          const unsigned int cell_level = cell->level();
+          const unsigned int cell_index = cell->index();
           for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_cell;
                ++line)
             {
-              const unsigned int line_idx = cell->line(line)->index();
+              const unsigned int line_idx = cell->line_index(line);
               if (cell->is_active())
-                line_to_cells[line_idx].emplace_back(cell, line);
+                line_to_cells[line_idx].push_back(
+                  {{cell_level, cell_index, line}});
               else
-                line_to_inactive_cells[line_idx].emplace_back(cell, line);
+                line_to_inactive_cells[line_idx].push_back(
+                  {{cell_level, cell_index, line}});
             }
         }
 
@@ -452,17 +460,19 @@ namespace internal
             {
               // We now have cells to add (active ones) and edges to which they
               // should be added (inactive cells).
-              const auto &inactive_cell =
-                line_to_inactive_cells[line_idx][0].first;
+              const Triangulation<3>::cell_iterator inactive_cell(
+                &triangulation,
+                line_to_inactive_cells[line_idx][0][0],
+                line_to_inactive_cells[line_idx][0][1]);
               const unsigned int neighbor_line =
-                line_to_inactive_cells[line_idx][0].second;
+                line_to_inactive_cells[line_idx][0][2];
 
               for (unsigned int c = 0; c < 2; ++c)
                 {
                   const auto &child =
                     inactive_cell->child(line_to_children[neighbor_line][c]);
                   const unsigned int child_line_idx =
-                    child->line(neighbor_line)->index();
+                    child->line_index(neighbor_line);
 
                   // Now add all active cells
                   for (const auto &cl : line_to_cells[line_idx])
@@ -566,21 +576,19 @@ namespace internal
                      (local_lines[1][subcell_x == 0][subcell_z == 0]) :
                      (local_lines[2][subcell_x == 0][subcell_y == 0]));
 
-              const unsigned int line_index = cell->line(line_no)->index();
+              const unsigned int line_index = cell->line_index(line_no);
 
               const auto edge_neighbor =
                 std::find_if(line_to_cells[line_index].begin(),
                              line_to_cells[line_index].end(),
                              [&cell](const auto &edge_neighbor) {
                                DoFCellAccessor<dim, dim, false> dof_cell(
-                                 &edge_neighbor.first->get_triangulation(),
-                                 edge_neighbor.first->level(),
-                                 edge_neighbor.first->index(),
+                                 &cell->get_triangulation(),
+                                 edge_neighbor[0],
+                                 edge_neighbor[1],
                                  &cell->get_dof_handler());
-                               return edge_neighbor.first->is_artificial() ==
-                                        false &&
-                                      edge_neighbor.first->level() <
-                                        cell->level() &&
+                               return dof_cell.is_artificial() == false &&
+                                      dof_cell.level() < cell->level() &&
                                       dof_cell.get_fe().n_dofs_per_cell() > 0;
                              });
 
@@ -786,25 +794,26 @@ namespace internal
               const auto edge_neighbor =
                 std::find_if(line_to_cells[line_index].begin(),
                              line_to_cells[line_index].end(),
-                             [&cell](const auto &edge_neighbor) {
-                               return edge_neighbor.first->is_artificial() ==
-                                        false &&
-                                      edge_neighbor.first->level() <
-                                        cell->level();
+                             [&cell](const auto &edge_array) {
+                               const typename Triangulation<dim>::cell_iterator
+                                 edge_neighbor(&cell->get_triangulation(),
+                                               edge_array[0],
+                                               edge_array[1]);
+                               return edge_neighbor->is_artificial() == false &&
+                                      edge_neighbor->level() < cell->level();
                              });
 
               if (edge_neighbor == line_to_cells[line_index].end())
                 continue;
 
-              const auto neighbor_cell       = edge_neighbor->first;
-              const auto local_line_neighbor = edge_neighbor->second;
+              const DoFCellAccessor<dim, dim, false> neighbor_cell(
+                &cell->get_triangulation(),
+                (*edge_neighbor)[0],
+                (*edge_neighbor)[1],
+                &cell->get_dof_handler());
+              const auto local_line_neighbor = (*edge_neighbor)[2];
 
-              DoFCellAccessor<dim, dim, false>(
-                &neighbor_cell->get_triangulation(),
-                neighbor_cell->level(),
-                neighbor_cell->index(),
-                &cell->get_dof_handler())
-                .get_dof_indices(neighbor_dofs_all);
+              neighbor_cell.get_dof_indices(neighbor_dofs_all);
 
               if (partitioner)
                 for (auto &index : neighbor_dofs_all)
@@ -816,7 +825,7 @@ namespace internal
 
               const bool flipped =
                 cell->line_orientation(line_no) !=
-                neighbor_cell->line_orientation(local_line_neighbor);
+                neighbor_cell.line_orientation(local_line_neighbor);
 
               for (unsigned int base_element_index = 0, comp = 0;
                    base_element_index < cell->get_fe().n_base_elements();
