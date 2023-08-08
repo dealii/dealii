@@ -872,13 +872,11 @@ namespace internal
       const auto supported_components = compute_supported_components(
         cell->get_dof_handler().get_fe_collection());
 
-      if ([](const auto &supported_components) {
-            return std::none_of(supported_components.begin(),
-                                supported_components.end(),
-                                [](const auto &a) {
-                                  return *std::max_element(a.begin(), a.end());
-                                });
-          }(supported_components))
+      if (std::none_of(supported_components.begin(),
+                       supported_components.end(),
+                       [](const auto &a) {
+                         return *std::max_element(a.begin(), a.end());
+                       }))
         return false;
 
       // 2) determine the refinement configuration of the cell
