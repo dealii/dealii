@@ -277,8 +277,8 @@ namespace PETScWrappers
         // numbers back as integers later on, we get the same thing.
         for (PetscInt i = 0; i < end_index - ghost_start_index; i++)
           {
-            Assert(static_cast<PetscInt>(static_cast<PetscScalar>(
-                     ghost_start_index + i)) == (ghost_start_index + i),
+            Assert(static_cast<PetscInt>(std::real(static_cast<PetscScalar>(
+                     ghost_start_index + i))) == (ghost_start_index + i),
                    ExcInternalError());
             array[i] = ghost_start_index + i;
           }
