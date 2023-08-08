@@ -44,6 +44,202 @@ namespace CUDAWrappers
       evaluate_evenodd
     };
 
+
+
+#if KOKKOS_VERSION >= 40000
+    /**
+     * Helper function for values() and gradients() in 1D
+     */
+    template <int n_q_points_1d,
+              typename Number,
+              int  direction,
+              bool dof_to_quad,
+              bool add,
+              bool in_place,
+              typename ViewTypeIn,
+              typename ViewTypeOut>
+    DEAL_II_HOST_DEVICE void
+    apply_1d(const Kokkos::TeamPolicy<
+               MemorySpace::Default::kokkos_space::execution_space>::member_type
+               &team_member,
+             const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+                              shape_data,
+             const ViewTypeIn in,
+             ViewTypeOut      out)
+    {
+      Number t[n_q_points_1d];
+      Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, n_q_points_1d),
+                           [&](const int &q) {
+                             t[q] = 0;
+                             // This loop simply multiplies the shape function
+                             // at the quadrature point by the value finite
+                             // element coefficient.
+                             // FIXME check why using parallel_reduce
+                             // ThreadVector is slower
+                             for (int k = 0; k < n_q_points_1d; ++k)
+                               {
+                                 const unsigned int shape_idx =
+                                   dof_to_quad ? (q + k * n_q_points_1d) :
+                                                 (k + q * n_q_points_1d);
+                                 const unsigned int source_idx = k;
+                                 t[q] += shape_data[shape_idx] * in(source_idx);
+                               }
+                           });
+
+      if constexpr (in_place)
+        team_member.team_barrier();
+
+      Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, n_q_points_1d),
+                           [&](const int &q) {
+                             const unsigned int destination_idx = q;
+                             if constexpr (add)
+                               Kokkos::atomic_add(&out(destination_idx), t[q]);
+                             else
+                               out(destination_idx) = t[q];
+                           });
+    }
+
+
+
+    /**
+     * Helper function for values() and gradients() in 2D
+     */
+    template <int n_q_points_1d,
+              typename Number,
+              int  direction,
+              bool dof_to_quad,
+              bool add,
+              bool in_place,
+              typename ViewTypeIn,
+              typename ViewTypeOut>
+    DEAL_II_HOST_DEVICE void
+    apply_2d(const Kokkos::TeamPolicy<
+               MemorySpace::Default::kokkos_space::execution_space>::member_type
+               &team_member,
+             const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+                              shape_data,
+             const ViewTypeIn in,
+             ViewTypeOut      out)
+    {
+      using TeamType = Kokkos::TeamPolicy<
+        MemorySpace::Default::kokkos_space::execution_space>::member_type;
+      constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, 2);
+
+      Number t[n_q_points];
+      auto   thread_policy =
+        Kokkos::TeamThreadMDRange<Kokkos::Rank<2>, TeamType>(team_member,
+                                                             n_q_points_1d,
+                                                             n_q_points_1d);
+      Kokkos::parallel_for(thread_policy, [&](const int i, const int j) {
+        int q_point = i + j * n_q_points_1d;
+        t[q_point]  = 0;
+
+        // This loop simply multiplies the shape function at the quadrature
+        // point by the value finite element coefficient.
+        // FIXME check why using parallel_reduce ThreadVector is slower
+        for (int k = 0; k < n_q_points_1d; ++k)
+          {
+            const unsigned int shape_idx =
+              dof_to_quad ? (j + k * n_q_points_1d) : (k + j * n_q_points_1d);
+            const unsigned int source_idx = (direction == 0) ?
+                                              (k + n_q_points_1d * i) :
+                                              (i + n_q_points_1d * k);
+            t[q_point] += shape_data[shape_idx] * in(source_idx);
+          }
+      });
+
+      if (in_place)
+        team_member.team_barrier();
+
+      Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, n_q_points),
+                           [&](const int i, const int j) {
+                             const int          q_point = i + j * n_q_points_1d;
+                             const unsigned int destination_idx =
+                               (direction == 0) ? (j + n_q_points_1d * i) :
+                                                  (i + n_q_points_1d * j);
+
+                             if (add)
+                               Kokkos::atomic_add(&out(destination_idx),
+                                                  t[q_point]);
+                             else
+                               out(destination_idx) = t[q_point];
+                           });
+    }
+
+
+
+    /**
+     * Helper function for values() and gradients() in 3D
+     */
+    template <int n_q_points_1d,
+              typename Number,
+              int  direction,
+              bool dof_to_quad,
+              bool add,
+              bool in_place,
+              typename ViewTypeIn,
+              typename ViewTypeOut>
+    DEAL_II_HOST_DEVICE void
+    apply_3d(const Kokkos::TeamPolicy<
+               MemorySpace::Default::kokkos_space::execution_space>::member_type
+               &team_member,
+             const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+                              shape_data,
+             const ViewTypeIn in,
+             ViewTypeOut      out)
+    {
+      using TeamType = Kokkos::TeamPolicy<
+        MemorySpace::Default::kokkos_space::execution_space>::member_type;
+      constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, 3);
+
+      Number t[n_q_points];
+      auto thread_policy = Kokkos::TeamThreadMDRange<Kokkos::Rank<3>, TeamType>(
+        team_member, n_q_points_1d, n_q_points_1d, n_q_points_1d);
+      Kokkos::parallel_for(
+        thread_policy, [&](const int i, const int j, const int q) {
+          const int q_point =
+            i + j * n_q_points_1d + q * n_q_points_1d * n_q_points_1d;
+          t[q_point] = 0;
+
+          // This loop simply multiplies the shape function at the quadrature
+          // point by the value finite element coefficient.
+          // FIXME check why using parallel_reduce ThreadVector is slower
+          for (int k = 0; k < n_q_points_1d; ++k)
+            {
+              const unsigned int shape_idx =
+                dof_to_quad ? (q + k * n_q_points_1d) : (k + q * n_q_points_1d);
+              const unsigned int source_idx =
+                (direction == 0) ?
+                  (k + n_q_points_1d * (i + n_q_points_1d * j)) :
+                (direction == 1) ?
+                  (i + n_q_points_1d * (k + n_q_points_1d * j)) :
+                  (i + n_q_points_1d * (j + n_q_points_1d * k));
+              t[q_point] += shape_data[shape_idx] * in(source_idx);
+            }
+        });
+
+      if (in_place)
+        team_member.team_barrier();
+
+      Kokkos::parallel_for(
+        thread_policy, [&](const int i, const int j, const int q) {
+          const int q_point =
+            i + j * n_q_points_1d + q * n_q_points_1d * n_q_points_1d;
+          const unsigned int destination_idx =
+            (direction == 0) ? (q + n_q_points_1d * (i + n_q_points_1d * j)) :
+            (direction == 1) ? (i + n_q_points_1d * (q + n_q_points_1d * j)) :
+                               (i + n_q_points_1d * (j + n_q_points_1d * q));
+
+          if (add)
+            Kokkos::atomic_add(&out(destination_idx), t[q_point]);
+          else
+            out(destination_idx) = t[q_point];
+        });
+    }
+#endif
+
+
+
     /**
      * Helper function for values() and gradients().
      */
@@ -65,6 +261,17 @@ namespace CUDAWrappers
           const ViewTypeIn in,
           ViewTypeOut      out)
     {
+#if KOKKOS_VERSION >= 40000
+      if constexpr (dim == 1)
+        apply_1d<n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
+          team_member, shape_data, in, out);
+      if constexpr (dim == 2)
+        apply_2d<n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
+          team_member, shape_data, in, out);
+      if constexpr (dim == 3)
+        apply_3d<n_q_points_1d, Number, direction, dof_to_quad, add, in_place>(
+          team_member, shape_data, in, out);
+#else
       constexpr unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
       Number t[n_q_points];
@@ -121,6 +328,7 @@ namespace CUDAWrappers
           else
             out(destination_idx) = t[q_point];
         });
+#endif
     }
 
 
