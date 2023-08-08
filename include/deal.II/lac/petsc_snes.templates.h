@@ -184,7 +184,7 @@ namespace PETScWrappers
                  PMatrixType,
                  Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
                          std::constructible_from<AMatrixType, Mat>))
-  MPI_Comm NonlinearSolver<VectorType, PMatrixType, AMatrixType>::
+  inline MPI_Comm NonlinearSolver<VectorType, PMatrixType, AMatrixType>::
     get_mpi_communicator() const
   {
     return PetscObjectComm(reinterpret_cast<PetscObject>(snes));
@@ -416,12 +416,8 @@ namespace PETScWrappers
       PetscFunctionBeginUser;
       auto user = static_cast<NonlinearSolver *>(ctx);
 
-      VectorType  xdealii(x);
-      AMatrixType Adealii(A);
-      PMatrixType Pdealii(P);
+      VectorType xdealii(x);
 
-      user->A          = &Adealii;
-      user->P          = &Pdealii;
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_snes_exception(
         user->setup_jacobian,
@@ -437,6 +433,13 @@ namespace PETScWrappers
           PETSC_ERR_LIB,
           PETSC_ERROR_INITIAL,
           "Failure in snes_jacobian_with_setup from dealii::PETScWrappers::NonlinearSolver");
+      // The MatCopy calls below are 99% of the times dummy calls.
+      // They are only used in case we get different Mats then the one we passed
+      // to SNESSetJacobian.
+      if (user->P)
+        PetscCall(MatCopy(user->P->petsc_matrix(), P, SAME_NONZERO_PATTERN));
+      if (user->A)
+        PetscCall(MatCopy(user->A->petsc_matrix(), A, SAME_NONZERO_PATTERN));
       petsc_increment_state_counter(P);
 
       // Handle older versions of PETSc for which we cannot pass a MATSHELL
@@ -474,12 +477,7 @@ namespace PETScWrappers
       VectorType xdealii(x);
       const int  lineno = __LINE__;
       const int  err    = call_and_possibly_capture_snes_exception(
-        user->monitor,
-        user->pending_exception,
-        []() -> void {},
-        xdealii,
-        it,
-        f);
+        user->monitor, user->pending_exception, {}, xdealii, it, f);
       if (err)
         return PetscError(
           PetscObjectComm((PetscObject)snes),
@@ -540,9 +538,10 @@ namespace PETScWrappers
                                     P ? P->petsc_matrix() : nullptr,
                                     snes_jacobian_with_setup,
                                     this));
+
+        // Tell PETSc to set up a MFFD operator for the linear system matrix
         if (!A)
           set_use_matrix_free(snes, true, false);
-
 
         // Do not waste memory by creating a dummy AIJ matrix inside PETSc.
         if (!P)
@@ -579,8 +578,8 @@ namespace PETScWrappers
       }
 
     // In case solve_with_jacobian is provided, create a shell
-    // preconditioner wrapping the user call. The internal Krylov
-    // solver will apply the preconditioner only once. This choice
+    // preconditioner wrapping the user call. The default internal Krylov
+    // solver only applies the preconditioner. This choice
     // can be overridden by command line and users can use any other
     // Krylov method if their solve is not accurate enough.
     // Using solve_with_jacobian as a preconditioner allows users
@@ -699,11 +698,13 @@ namespace PETScWrappers
   }
 
 } // namespace PETScWrappers
+
 #  undef AssertPETSc
 #  if defined(undefPetscCall)
 #    undef PetscCall
 #    undef undefPetscCall
 #  endif
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
