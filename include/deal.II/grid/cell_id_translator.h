@@ -269,8 +269,8 @@ namespace internal
     unsigned int child_level  = 0;
     unsigned int binary_entry = 2;
 
-    // path to the get to the cell
-    std::vector<unsigned int> cell_indices;
+    // compute new coarse-grid id: c_{i+1} = c_{i}*2^dim + q on path to cell
+    types::global_cell_index level_coarse_cell_id = coarse_cell_id;
     while (child_level < n_child_indices)
       {
         Assert(binary_entry < binary_representation.size(), ExcInternalError());
@@ -280,19 +280,15 @@ namespace internal
             unsigned int cell_index =
               (((binary_representation[binary_entry] >> (j * dim))) &
                (GeometryInfo<dim>::max_children_per_cell - 1));
-            cell_indices.push_back(cell_index);
+            level_coarse_cell_id =
+              level_coarse_cell_id * GeometryInfo<dim>::max_children_per_cell +
+              cell_index;
             ++child_level;
             if (child_level == n_child_indices)
               break;
           }
         ++binary_entry;
       }
-
-    // compute new coarse-grid id: c_{i+1} = c_{i}*2^dim + q;
-    types::global_cell_index level_coarse_cell_id = coarse_cell_id;
-    for (auto i : cell_indices)
-      level_coarse_cell_id =
-        level_coarse_cell_id * GeometryInfo<dim>::max_children_per_cell + i;
 
     return level_coarse_cell_id;
   }
