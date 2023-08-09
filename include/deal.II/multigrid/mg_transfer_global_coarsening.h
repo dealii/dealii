@@ -221,13 +221,13 @@ public:
   /**
    * Perform prolongation.
    */
-  virtual void
+  void
   prolongate_and_add(VectorType &dst, const VectorType &src) const;
 
   /**
    * Perform restriction.
    */
-  virtual void
+  void
   restrict_and_add(VectorType &dst, const VectorType &src) const;
 
   /**
