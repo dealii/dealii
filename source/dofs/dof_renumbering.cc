@@ -2819,72 +2819,71 @@ namespace DoFRenumbering
            ExcMessage("Could not locate the given DoFHandler in MatrixFree"));
 
     // Summary of the algorithm below:
-    // (a) renumber each DoF in order the corresponding object appears in the
-    //     mf loop
+    // (a) compute renumbering of each DoF in the order the corresponding
+    //     object appears in the mf loop -> local_numbering
     // (b) determine by how many cell groups (call-back places in the loop) a
-    //     dof is touched -> first type of category
-    // (c) determine by how many MPI processes a dof is touched -> second type
-    //     of category
-    // (d) combine both category types (second, first) and sort the indices
-    //     according to this new category type but also keeping the order
-    //     within the other category.
+    //     dof is touched -> touch_count
+    // (c) determine by how many MPI processes a dof is touched
+    //     -> dofs_by_rank_access
+    // (d) combine both category types of (b) and (c) and list the indices
+    //     according to four categories
 
     const std::vector<std::vector<unsigned int>> dofs_by_rank_access =
       group_dofs_by_rank_access(
         *matrix_free.get_dof_info(component).vector_partitioner);
 
-    const std::pair<std::vector<unsigned int>, std::vector<unsigned char>>
-      local_numbering = compute_mf_numbering(matrix_free, component);
+    const auto &[local_numbering, touch_count] =
+      compute_mf_numbering(matrix_free, component);
 
-    // Now construct the new numbering
     const IndexSet &owned_dofs = matrix_free.get_dof_info(component)
                                    .vector_partitioner->locally_owned_range();
-    std::vector<unsigned int> new_numbers;
-    new_numbers.reserve(owned_dofs.n_elements());
+    const types::global_dof_index locally_owned_size = owned_dofs.n_elements();
+    AssertDimension(locally_owned_size, local_numbering.size());
+    AssertDimension(locally_owned_size, touch_count.size());
 
-    // step 1: Take all DoFs with reference only to the current MPI process
-    // and touched once ("perfect overlap" case). We define a custom
-    // comparator for std::sort to then order the unknowns by the specified
-    // matrix-free loop order
-    const std::vector<unsigned int> &purely_local_dofs = dofs_by_rank_access[0];
-    for (const unsigned int i : purely_local_dofs)
-      if (local_numbering.second[i] == 1)
-        new_numbers.push_back(i);
-
-    const auto comparator = [&](const unsigned int a, const unsigned int b) {
-      return (local_numbering.first[a] < local_numbering.first[b]);
-    };
-
-    std::sort(new_numbers.begin(), new_numbers.end(), comparator);
-    unsigned int sorted_size = new_numbers.size();
-
-    // step 2: Take all DoFs with reference to only the current MPI process
-    // and touched multiple times (more strain on caches).
-    for (auto i : purely_local_dofs)
-      if (local_numbering.second[i] > 1)
-        new_numbers.push_back(i);
-    std::sort(new_numbers.begin() + sorted_size, new_numbers.end(), comparator);
-    sorted_size = new_numbers.size();
-
-    // step 3: Get all DoFs with reference from other MPI ranks
+    // Create a second permutation to group the unknowns into the following
+    // four categories, to be eventually composed with 'local_renumbering':
+    // 0: all DoFs without any reference (constrained DoFs)
+    // 1: all DoFs with reference only to the current MPI process and
+    //    touched once ("perfect overlap" case)
+    // 2: all DoFs with reference to only the current MPI process and
+    //    touched from multiple cell ranges (more strain on caches)
+    // 3: all DoFs with reference from other MPI ranks
+    std::vector<unsigned char> categories(locally_owned_size);
+    for (unsigned int i = 0; i < locally_owned_size; ++i)
+      categories[local_numbering[i]] =
+        std::min<unsigned char>(2, touch_count[i]);
     for (unsigned int chunk = 1; chunk < dofs_by_rank_access.size(); ++chunk)
-      for (auto i : dofs_by_rank_access[chunk])
-        new_numbers.push_back(i);
-    std::sort(new_numbers.begin() + sorted_size, new_numbers.end(), comparator);
-    sorted_size = new_numbers.size();
+      for (const auto i : dofs_by_rank_access[chunk])
+        categories[local_numbering[i]] = 3;
 
-    // step 4: Put all DoFs without any reference (constrained DoFs)
-    for (auto i : purely_local_dofs)
-      if (local_numbering.second[i] == 0)
-        new_numbers.push_back(i);
-    std::sort(new_numbers.begin() + sorted_size, new_numbers.end(), comparator);
+    // Assign numbers to the categories in the order 1 -> 2 -> 3 -> 0, which
+    // is done by starting 'counter' for each category at an offset
+    std::array<unsigned int, 4> n_entries_per_category = {};
+    for (const unsigned char i : categories)
+      {
+        AssertIndexRange(i, static_cast<unsigned char>(4));
+        ++n_entries_per_category[i];
+      }
+    std::array<unsigned int, 4> counters;
+    counters[1] = 0;
+    counters[2] = counters[1] + n_entries_per_category[1];
+    counters[3] = counters[2] + n_entries_per_category[2];
+    counters[0] = counters[3] + n_entries_per_category[3];
+    std::vector<unsigned int> numbers_categories;
+    numbers_categories.reserve(locally_owned_size);
+    for (const unsigned int category : categories)
+      {
+        numbers_categories.push_back(counters[category]);
+        ++counters[category];
+      }
 
-    AssertDimension(new_numbers.size(), owned_dofs.n_elements());
-
+    // The final numbers are given by the composition of the two permutations
     std::vector<dealii::types::global_dof_index> new_global_numbers(
-      owned_dofs.n_elements());
-    for (unsigned int i = 0; i < new_numbers.size(); ++i)
-      new_global_numbers[new_numbers[i]] = owned_dofs.nth_index_in_set(i);
+      locally_owned_size);
+    for (unsigned int i = 0; i < locally_owned_size; ++i)
+      new_global_numbers[i] =
+        owned_dofs.nth_index_in_set(numbers_categories[local_numbering[i]]);
 
     return new_global_numbers;
   }
