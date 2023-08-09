@@ -573,6 +573,7 @@ AffineConstraints<number>::add_entries(
   //
   // in any case: skip this entry if an entry for this column already
   // exists, since we don't want to enter it twice
+  line.entries.reserve(line.entries.size() + col_weight_pairs.size());
   for (const std::pair<size_type, number> &col_weight_pair : col_weight_pairs)
     {
       Assert(constrained_dof_index != col_weight_pair.first,
