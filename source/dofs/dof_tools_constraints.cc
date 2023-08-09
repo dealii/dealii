@@ -509,7 +509,10 @@ namespace DoFTools
           Assert(primary_dofs[col] != numbers::invalid_dof_index,
                  ExcInternalError());
 
-
+        std::vector<
+          std::pair<typename AffineConstraints<number2>::size_type, number2>>
+          entries;
+        entries.reserve(n_primary_dofs);
         for (unsigned int row = 0; row != n_dependent_dofs; ++row)
           if (constraints.is_constrained(dependent_dofs[row]) == false)
             {
@@ -558,16 +561,18 @@ namespace DoFTools
               // then enter those constraints that are larger than
               // 1e-14*abs_sum. everything else probably originated from
               // inexact inversion of matrices and similar effects. having
-              // those constraints in here will only lead to problems
-              // because it makes sparsity patterns fuller than necessary
-              // without producing any significant effect
-              constraints.add_line(dependent_dofs[row]);
+              // those constraints in here will only lead to problems because
+              // it makes sparsity patterns fuller than necessary without
+              // producing any significant effect. do this in two steps, first
+              // filling a vector and then adding to the constraints in order
+              // to reduce the number of memory allocations.
+              entries.clear();
               for (unsigned int i = 0; i < n_primary_dofs; ++i)
-                if ((face_constraints(row, i) != 0) &&
-                    (std::fabs(face_constraints(row, i)) >= 1e-14 * abs_sum))
-                  constraints.add_entry(dependent_dofs[row],
-                                        primary_dofs[i],
-                                        face_constraints(row, i));
+                if (std::fabs(face_constraints(row, i)) >= 1e-14 * abs_sum)
+                  entries.emplace_back(primary_dofs[i],
+                                       face_constraints(row, i));
+              constraints.add_line(dependent_dofs[row]);
+              constraints.add_entries(dependent_dofs[row], entries);
               constraints.set_inhomogeneity(dependent_dofs[row], 0.);
             }
       }
