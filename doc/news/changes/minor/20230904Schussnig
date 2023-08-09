@@ -1,0 +1,4 @@
+Improved: MGTwoLevelTransferBase does not clear the
+ghost state of the source vector anymore.
+<br>
+(Richard Schussnig, Martin Kronbichler, Peter Munch, 2023/09/04)
