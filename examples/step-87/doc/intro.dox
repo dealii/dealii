@@ -1,0 +1,312 @@
+<br>
+
+<i>
+This program was contributed by Magdalena Schreter-Fleischhacker
+and Peter Munch. Many ideas presented here are the result of common code
+development with  Maximilian Bergbauer, Marco Feder,
+Niklas Fehn, Johannes Heinz, Luca Heltai, Martin Kronbichler, Nils Much,
+and Judith Pauen.
+
+This tutorial is loosely based on chapter 3.4 of the submitted
+PhD thesis "Matrix-free finite element computations at extreme scale and for
+challenging applications" by Peter Munch. Magdalena Schreter-Fleischhacker
+is funded by the Austrian Science Fund (FWF) Schrödinger Fellowship  (J4577).
+</i>
+
+<h1>Introduction</h1>
+
+This tutorial presents the advanced point-evaluation functionalities of
+deal.II, specifically useful for evaluating finite element solutions at
+arbitrary points. The underlying finite element mesh can be distributed
+among processes, which makes the operations more involved due to communication.
+In the examples discussed in this tutorial, we focus on point evaluation for
+MPI-parallel computations, like parallel::distributed::Triangulation.
+Nevertheless, the application to non-distributed meshes is also possible.
+
+<h3>%Point evaluation</h3>
+
+In the context of the finite element method (FEM), it is a common task to
+query the solution $u$ at an arbitrary point $\boldsymbol{x}_q$ in the
+domain of interest $\Omega$
+@f[
+u(\boldsymbol{x}_q) = \sum_{i} N_i(\boldsymbol{x}_q) u_i  \quad\text{with}\quad
+i\in[0,n_{\text{dofs}}),
+@f]
+by evaluating the shape functions $N_i$ at this point  together with the
+corresponding solution coefficients $u_i$.
+After identifying the cell $K$ where the point $\boldsymbol{x}_q$ resides, the
+transformation between $\boldsymbol{x}_q$ and the corresponding coordinates in
+the reference cell $\hat{\boldsymbol{x}}_q$ is obtained by the mapping
+$\boldsymbol{x}_q=\boldsymbol{F}_K(\hat{\boldsymbol{x}}_q)$. In this setting,
+the evaluation of the solution at an arbitrary point boils down to a cell-local
+evaluation
+@f[
+u(\boldsymbol{x}_q) = \sum_{i} \hat{N}^K_i(\hat{\boldsymbol{x}}_q) u_i^K
+\quad\text{with}\quad i\in[0,n_{\text{dofs_per_cell}}),
+@f]
+with $\hat{N}^K_i$ being the shape functions defined on the reference cell and
+$u_i^{K}$ the solution coefficients
+restricted to the cell $K$.
+
+Alternatively to point evaluation, evaluating weak-form (integration) operations
+of the type
+@f[
+u_i
+=
+\left(N_i(\boldsymbol{x}), u(\boldsymbol{x})\right)_\Omega
+=
+\int_{\Omega} N_i(\boldsymbol{x}) u(\boldsymbol{x}) dx
+=
+\sum_q N_i\left(\boldsymbol{x}_q\right) u\left(\boldsymbol{x}_q\right) |J\left(
+\boldsymbol{x}_q\right)| w\left(\boldsymbol{x}_q\right) \quad\text{with}\quad
+i\in[0,n_{\text{dofs}})
+@f]
+is possible, with $\boldsymbol{x}_q$ being quadrature points at arbitrary
+positions.
+After the values at the quadrature points have been multiplied by the
+integration weights, this operation can be interpreted as the transpose of the
+evaluation. Not surprisingly, such an operation can be also implemented as a
+cell loop.
+
+<h3>Setup and communication</h3>
+
+To determine the cell $K$ and the reference position $\hat{\boldsymbol x}_q$
+within the cell for a given point $\boldsymbol{x}_q$ on distributed meshes,
+deal.II performs a two-level-search approach. First, all processes whose portion
+of the global mesh might contain the point are determined ("coarse search").
+For this purpose, e.g., a distributed tree based on bounding boxes around
+locally owned domains using "ArborX" @cite lebrun2020arborx is applied. After
+the potentially owning processes have been determined and the points have been
+sent to them as a request, one can start to find the cells that surround the
+points among locally owned cells ("fine search"). In order to accelerate this
+search, an R-tree from "boost::geometry" built around the vertices of the mesh
+is used.
+
+Once the cell $K$ that surrounds point $\boldsymbol{x}_q$ has been found,
+the reference position $\hat{\boldsymbol{x}}_q$ is obtained by performing the
+minimization:
+@f[
+\min_{\hat{\boldsymbol{x}}_q}(| \boldsymbol{F}_K(\hat{\boldsymbol{x}}_q)
+- {\boldsymbol{x}_q}|)
+\quad
+\text{with}
+\quad
+\hat{\boldsymbol{x}}_q\in[0,1]^{dim}.
+@f]
+With the determined pieces of information, the desired evaluation can be
+performed by the process that owns the cell. The result can now be communicated
+to the requesting process.
+
+In summary, the coarse search determines, for each point, a list of processes
+that might own it. The subsequent fine search by each process determines whether
+the processes actually own these points by the sequence of request
+("Does the process own the point?") and  answer ("Yes."/"No.").
+Processes might post any number of point requests and communicate with
+any process. We propose to collect the point requests to a process to
+use the dynamic, sparse, scalable consensus-based communication
+algorithms @cite hoefler2010scalable, and to consider the obtained information
+to set up point-to-point communication patterns.
+
+<h3>Implementation: Utilities::MPI::RemotePointEvaluation</h3>
+
+The algorithm described above is implemented in
+Utilities::MPI::RemotePointEvaluation (short: ``rpe'') and related
+classes/functions. In this section, basic functionalities are briefly
+summarized. Their advanced capabilities will be shown subsequently based on
+concrete application cases.
+
+The following code snippet shows the setup steps for the communication pattern:
+@code
+std::vector<Point<dim>> points; // ... (filling of points not shown)
+
+RemotePointEvaluation<dim> rpe;
+rpe.reinit(points, triangulation, mapping);
+@endcode
+
+All what is needed is a list of evaluation points and the mesh with a mapping.
+
+The following code snippet shows the evaluation steps:
+@code
+const std::function<void(const ArrayView<T> &, const CellData &)>
+  evaluation_function;
+
+std::vector<T> output;
+rpe.evaluate_and_process(output, evaluation_function);
+
+@endcode
+
+The user provides a function that processes the locally owned points.
+These values are communicated by Utilities::MPI::RemotePointEvaluation.
+
+The relevant class during the local evaluation is
+Utilities::MPI::RemotePointEvaluation::CellData. It allows to loop over
+cells that surround the points. On these cells,
+a cell iterator and the positions in the reference cell of the
+requested points can be queried. Furthermore, this class provides
+controlled access to the output vector of the
+Utilities::MPI::RemotePointEvaluation::evaluate_and_process() function.
+@code
+for (const auto cell_index : cell_data.cell_indices())
+  {
+    const auto cell         = cell_data.get_active_cell_iterator(cell_index);
+    const auto unit_points  = cell_data.get_unit_points(cell_index);
+    const auto local_output = cell_data.get_data_view(cell_index, output);
+  }
+@endcode
+
+The functions
+@code
+const auto evaluated_values =
+  VectorTools::point_values<n_components>(rpe, dof_handler, vector);
+
+const auto evaluated_gradients =
+  VectorTools::point_gradients<n_components>(rpe, dof_handler, vector);
+@endcode
+
+evaluate the values and gradients of a solution defined by DoFHandler and a
+vector at the requested points. Internally, a lambda function is passed to
+Utilities::MPI::RemotePointEvaluation.
+Additionally it handles the special case if points belong to multiple cells
+by taking, e.g., the average, the minimum, or
+the maximum via an optional argument of type EvaluationFlags::EvaluationFlags.
+This occurs when a point lies on a cell boundary or within a small tolerance
+around it and might be relevant for discontinuous solution quantities, such
+as values of discontinuous Galerkin methods or gradients in continuous finite
+element methods.
+
+
+<h3>Motivation: two-phase flow</h3>
+
+The minimal code examples (short "mini examples") presented in this tutorial
+are motivated by the application of two-phase-flow simulations formulated in
+a one-fluid setting using a Eulerian framework. In diffuse interface methods,
+the two phases may be implicitly described by a level-set function, here
+chosen as a signed distance function $\phi(\boldsymbol{ x})$ in
+$\Omega$ and illustrated for a popular benchmark case of a rising
+bubble in the following figure.
+
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+        @image html https://www.dealii.org/images/steps/developer/step_87_rising_bubble.png
+    </td>
+  </tr>
+</table>
+
+The discrete interface $\Gamma$ is
+represented implicitly through a certain isosurface of the level-set function
+e.g. for the signed-distance function $\Gamma=\{\boldsymbol x \in \Omega~|~\phi
+(\boldsymbol{x})=0\}$.
+We would like to note that deal.II provides a set of analytical signed distance
+functions for simple geometries in the Functions::SignedDistance namespace.
+Those can be combined via Boolean operations to describe more complex
+geometries @cite burman2015cutfem. The temporal evolution of the level-set field
+is obtained by the transport equation
+@f[
+	\frac{\partial \, \phi}{\partial \, t} + \boldsymbol{u}\vert_\Gamma \cdot
+  \nabla \phi = 0
+@f]
+with the transport velocity at the interface $\boldsymbol{u}\vert_\Gamma$,
+which might be approximated by the local fluid velocity $\boldsymbol{u}
+\vert_\Gamma\approx\boldsymbol{u}(\boldsymbol{x})$. To reobtain the
+signed-distance property of the level-set field throughout the numerical
+solution procedure, PDE-based or, alternatively, also geometric reinitialization
+methods are used. For the latter, an algorithm for computing the distance from
+the support points to the discrete interface, e.g., via closest-point point
+projection @cite henri2022geometrical, is needed. This will be part of one of
+the mini examples, where we describe how to obtain the closest point
+$\boldsymbol{x}^*$ to the interface $\Gamma$ for an arbitrary point
+$\boldsymbol{x}$. For the simplest case, the former can be computed from the
+following equation
+@f[
+	\boldsymbol{x}^{*} = \boldsymbol{x} - \boldsymbol{n}(\boldsymbol{x})
+  \phi(\boldsymbol{x}),
+@f]
+assuming that the interface normal vector $\boldsymbol{n}(\boldsymbol{x})$ and
+$\phi(\boldsymbol{x})$ represent exact quantities. Typically, this projection
+is only performed for points located within a narrow band region around the
+interface, indicated in the right panel of the figure above.
+
+Alternatively to the implicit representation of the interface, in sharp
+interface methods, e.g., via front tracking, the interface $\Gamma$ is
+explicitly represented by a surface mesh. The latter is immersed into a
+background mesh, from which the local velocity at the support points of the
+surface mesh is extracted and leads to a movement of the support points of the
+immersed mesh as
+@f[
+	\boldsymbol{x}_q^{(i + 1)} = \boldsymbol{x}_q^{(i)} +  \Delta t \cdot
+  \boldsymbol{u}(\boldsymbol{x}_q^{(i)}) \quad \text{ for } \boldsymbol{x}_q
+  \in \Gamma
+@f]
+which considers an explicit Euler time integration scheme from time step $i$ to
+$i+1$ with time step-size $\Delta t$.
+
+For a two-phase-flow model considering the incompressible Navier-Stokes
+equations, the two phases are usually coupled by a singular surface-tension
+force $\boldsymbol{F}_S$, which results, together with the difference in fluid
+properties, in discontinuities across the interface:
+@f[
+	\boldsymbol{F}_S(\boldsymbol{x})= \sigma \kappa(\boldsymbol{x})
+  \boldsymbol{n}(\boldsymbol{x}) \delta_{\Gamma}(\boldsymbol{x}).
+@f]
+Here $\sigma$ represents the surface-tension coefficient,
+$\boldsymbol{n}(\boldsymbol{x})$ the interface normal vector
+and $\kappa(\boldsymbol{x})$ the interface mean curvature field.
+The singularity at the interface is imposed by the Dirac delta function
+@f[
+\delta_{\Gamma}(\boldsymbol{x}) = \begin{cases}
+1 & \text{on } \Gamma \\
+0 & \text{else}\end{cases}
+@f]
+with support on the interface $\Gamma$.
+In a finite element context, the weak form of the surface-tension force
+is needed. The latter can be applied as a  sharp surface-tension force model
+@f[
+	(\boldsymbol v, \boldsymbol F_S)_{\Omega} = \left( \boldsymbol{v}, \sigma
+  \kappa \boldsymbol{n} \right)_\Gamma,
+@f]
+exploiting the property of the Dirac delta function for any smooth
+function $v$, i.e.,
+$\int_\Omega\delta_{\Gamma}\,v\,\text{d}x=\int_\Gamma v\,\text{d}y$. For
+front-tracking methods, the curvature and the normal vector are directly
+computed from the surface mesh.
+
+Alternatively, in regularized surface-tension-force models
+@cite brackbill1992continuum @cite olsson2005conservative
+@cite kronbichler2018fast, the Dirac delta function is approximated by a smooth
+ansatz
+@f[
+(\boldsymbol v, \boldsymbol F_S)_{\Omega} \approx \left(\boldsymbol v, \sigma
+\kappa \boldsymbol{n} \|\nabla H\|  \right)_\Omega
+@f]
+considering the absolute value of the gradient of a regularized indicator
+function $\|\nabla H\|$, which is related to the level-set field. In such
+models, the interface normal vector
+@f[
+	\boldsymbol{n}(\boldsymbol{x}) = \nabla \phi(\boldsymbol{x}),
+@f]
+and the interface curvature field
+@f[
+	\kappa(\boldsymbol{x}) = \nabla \cdot \boldsymbol{n}(\boldsymbol{x})=
+  \Delta \phi(\boldsymbol{x}) \,.
+@f]
+are derived from the level-set function.
+
+
+<h3>Overview</h3>
+
+In the following, we present three simple use cases of
+Utilities::MPI::RemotePointEvaluation.
+We start with discussing a serial code in mini example 0.
+In the subsequent mini examples, advanced problems are solved on distributed
+meshes:
+<ul>
+<li>mini example 1: we evaluate values and user quantities along a line;</li>
+<li>mini example 2: we perform a closest-point projection within a narrow band,
+based on a level-set function, use the information to update the distance and
+to perform an extrapolation from the interface;</li>
+<li>mini example 3: we compute the surface-tension term sharply
+with the interface given by an codim-1 mesh, which is advected by
+the velocity from the background mesh (front tracking;
+solution transfer between a background mesh and an immersed surface mesh).</li>
+</ul>
