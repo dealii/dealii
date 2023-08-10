@@ -477,34 +477,26 @@ namespace Utilities
 #    endif
 #  endif
 #endif
-    // The "exponentiation by squaring" algorithm used below has to be
-    // compressed to one statement due to C++11's restrictions on constexpr
-    // functions. A more descriptive version would be:
-    //
-    // <code>
-    // if (iexp <= 0)
-    //   return 1;
-    //
-    // // avoid overflow of one additional recursion with pow(base * base, 0)
-    // if (iexp == 1)
-    //   return base;
-    //
-    // // if the current exponent is not divisible by two,
-    // // we need to account for that.
-    // const unsigned int prefactor = (iexp % 2 == 1) ? base : 1;
-    //
-    // // a^b = (a*a)^(b/2)      for b even
-    // // a^b = a*(a*a)^((b-1)/2 for b odd
-    // return prefactor * dealii::Utilities::pow(base*base, iexp/2);
-    // </code>
-
     static_assert(std::is_integral_v<T>, "Only integral types supported");
 
-    return iexp <= 0 ?
-             1 :
-             (iexp == 1 ? base :
-                          (((iexp % 2 == 1) ? base : 1) *
-                           dealii::Utilities::pow(base * base, iexp / 2)));
+    // The "exponentiation by squaring" algorithm used below has to be expressed
+    // in an iterative version since SYCL doesn't allow recursive functions used
+    // in device code.
+
+    if (iexp <= 0)
+      return 1;
+
+    int exp = iexp;
+    T   x   = base;
+    T   y   = 1;
+    while (exp > 1)
+      {
+        if (exp % 2 == 1)
+          y *= x;
+        x *= x;
+        exp /= 2;
+      }
+    return x * y;
   }
 
   /**
