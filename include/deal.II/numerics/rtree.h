@@ -430,7 +430,8 @@ extract_rtree_level(const Rtree &tree, const unsigned int level);
 /**
  * Given an Rtree object @p tree and a target level @p level, this function returns
  * the bounding boxes associated to the children on level l+1 and stores them in
- * a vector. The resulting type is hence a vector of vectors of BoundingBox.
+ * a vector. The resulting type is hence a vector of vectors of BoundingBox
+ * objects.
  * If @p v is such a vector, then @p v has the following property:
  * @p v[i] is a vector with all of the bounding boxes associated to the children
  * of the i-th node of the tree.
