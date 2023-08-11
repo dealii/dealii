@@ -46,10 +46,12 @@ DEAL_II_NAMESPACE_OPEN
  * data_out.build_patches(mapping);
  *
  * // ... no changes in triangulation and mapping -> reuse internal data
- * structures data_out.build_patches();
+ * // structures
+ * data_out.build_patches();
  *
  * // ... changes in triangulation or mapping -> reinitialize internal data
- * structures data_out.build_patches(mapping);
+ * // structures
+ * data_out.build_patches(mapping);
  * @endcode
  *
  * @note While the dimension of the two triangulations might differ, their
