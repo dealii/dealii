@@ -836,17 +836,17 @@ namespace TrilinosWrappers
               else
                 {
                   // unwrap the various vectors
-                  const VectorType &x__ = *dynamic_cast<
+                  const VectorType &x = *dynamic_cast<
                     const internal::NOXWrappers::Vector<VectorType> *>(
                     &problem.getSolutionGroup().getX());
-                  const VectorType &f__ = *dynamic_cast<
+                  const VectorType &f = *dynamic_cast<
                     const internal::NOXWrappers::Vector<VectorType> *>(
                     &problem.getSolutionGroup().getF());
 
-                  // forward to the user-provided function and checks
+                  // forward to the user-provided function and check
                   // convergence
                   const auto state = this->check_iteration_status(
-                    problem.getNumIterations(), f__.l2_norm(), x__, f__);
+                    problem.getNumIterations(), f.l2_norm(), x, f);
 
                   // translate the returned value back to Trilinos data
                   // structure
