@@ -123,6 +123,12 @@ namespace NonMatching
                               const std::vector<Tensor<1, spacedim>> &normals);
 
     /**
+     * Clears weights, points and normals vectors.
+     */
+    void
+    clear();
+
+    /**
      * Extend the given formula by an additional quadrature point.
      * The point, weight and normal should be with respect to reference space,
      * and the normal should be normalized.

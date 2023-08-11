@@ -17,6 +17,7 @@
 
 #include <deal.II/dofs/dof_accessor.h>
 
+#include "deal.II/fe/fe_q_iso_q1.h"
 #include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
@@ -410,6 +411,24 @@ namespace NonMatching
                                                       face_index,
                                                       local_levelset_values);
 
+    const FiniteElement<dim> &fe =
+      level_set_description->get_fe_collection()[fe_index];
+
+    const FE_Q_iso_Q1<dim> *fe_q_iso_q1 =
+      dynamic_cast<const FE_Q_iso_Q1<dim> *>(&fe);
+
+    const FE_Poly<dim> *fe_poly = dynamic_cast<const FE_Poly<dim> *>(&fe);
+
+    const bool is_linear = fe_q_iso_q1 != nullptr ||
+                           (fe_poly != nullptr && fe_poly->get_degree() == 1);
+
+    // shortcut for linear elements
+    if (is_linear)
+      {
+        return internal::MeshClassifierImplementation::location_from_dof_signs(
+          local_levelset_values);
+      }
+
     lagrange_to_bernstein_face[fe_index][face_index].solve(
       local_levelset_values);
 
@@ -466,7 +485,8 @@ namespace NonMatching
     for (unsigned int i = 0; i < fe_collection.size(); i++)
       {
         const FiniteElement<dim> &element = fe_collection[i];
-        const FE_Q<dim> *fe_q = dynamic_cast<const FE_Q<dim> *>(&element);
+        const FE_Q_Base<dim> *    fe_q =
+          dynamic_cast<const FE_Q_Base<dim> *>(&element);
         Assert(fe_q != nullptr, ExcNotImplemented());
 
         const FE_Bernstein<dim> fe_bernstein(fe_q->get_degree());

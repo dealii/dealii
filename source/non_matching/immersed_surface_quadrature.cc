@@ -39,6 +39,17 @@ namespace NonMatching
 
 
   template <int dim, int spacedim>
+  inline void
+  ImmersedSurfaceQuadrature<dim, spacedim>::clear()
+  {
+    this->quadrature_points.clear();
+    this->weights.clear();
+    this->normals.clear();
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   ImmersedSurfaceQuadrature<dim, spacedim>::push_back(
     const Point<dim> &         point,

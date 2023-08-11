@@ -18,6 +18,7 @@
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_iso_q1.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -35,7 +36,7 @@ template <int dim>
 class Test
 {
 public:
-  Test();
+  Test(const FE_Poly<dim> &fe);
 
   void
   run();
@@ -67,11 +68,15 @@ private:
 
 
 template <int dim>
-Test<dim>::Test()
+Test<dim>::Test(const FE_Poly<dim> &fe)
   : dof_handler(triangulation)
 {
-  fe_collection.push_back(FE_Q<dim>(1));
-  const unsigned int n_quadrature_points = 1;
+  const FE_Q_iso_Q1<dim> *fe_q_iso_q1 =
+    dynamic_cast<const FE_Q_iso_Q1<dim> *>(&fe);
+  const bool is_fe_q_iso_q1 = fe_q_iso_q1 != nullptr;
+  fe_collection.push_back(fe);
+
+  const unsigned int n_quadrature_points = is_fe_q_iso_q1 ? 1 : fe.get_degree();
   q_collection1D.push_back(QGauss<1>(n_quadrature_points));
 }
 
@@ -131,8 +136,11 @@ Test<dim>::test_discrete_quadrature_generator()
     q_collection1D, dof_handler, level_set);
   quadrature_generator.generate(triangulation.begin_active());
 
+  deallog << "inside" << std::endl;
   print_quadrature(quadrature_generator.get_inside_quadrature());
+  deallog << "outside" << std::endl;
   print_quadrature(quadrature_generator.get_outside_quadrature());
+  deallog << "surface" << std::endl;
   print_surface_quadrature(quadrature_generator.get_surface_quadrature());
 }
 
@@ -149,9 +157,12 @@ Test<dim>::test_discrete_face_quadrature_generator()
   for (const auto f : cell->face_indices())
     {
       face_quadrature_generator.generate(cell, f);
-
+      deallog << "face_index = " << f << std::endl;
+      deallog << "inside" << std::endl;
       print_quadrature(face_quadrature_generator.get_inside_quadrature());
+      deallog << "outside" << std::endl;
       print_quadrature(face_quadrature_generator.get_outside_quadrature());
+      deallog << "surface" << std::endl;
       print_surface_quadrature(
         face_quadrature_generator.get_surface_quadrature());
     }
@@ -161,10 +172,10 @@ Test<dim>::test_discrete_face_quadrature_generator()
 
 template <int dim>
 void
-run_test()
+run_test(const FE_Poly<dim> &fe)
 {
   deallog << "dim = " << dim << std::endl;
-  Test<dim> test;
+  Test<dim> test(fe);
   test.run();
   deallog << std::endl;
 }
@@ -176,7 +187,19 @@ main()
 {
   initlog();
 
-  run_test<1>();
-  run_test<2>();
-  run_test<3>();
+  std::shared_ptr<FE_Poly<1>> fe_1;
+  std::shared_ptr<FE_Poly<2>> fe_2;
+  std::shared_ptr<FE_Poly<3>> fe_3;
+  fe_1 = std::make_shared<FE_Q<1>>(1);
+  fe_2 = std::make_shared<FE_Q<2>>(1);
+  fe_3 = std::make_shared<FE_Q<3>>(1);
+  run_test<1>(*fe_1);
+  run_test<2>(*fe_2);
+  run_test<3>(*fe_3);
+  fe_1 = std::make_shared<FE_Q_iso_Q1<1>>(2);
+  fe_2 = std::make_shared<FE_Q_iso_Q1<2>>(2);
+  fe_3 = std::make_shared<FE_Q_iso_Q1<3>>(2);
+  run_test<1>(*fe_1);
+  run_test<2>(*fe_2);
+  run_test<3>(*fe_3);
 }
