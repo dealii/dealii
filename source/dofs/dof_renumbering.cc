@@ -2842,40 +2842,49 @@ namespace DoFRenumbering
     AssertDimension(locally_owned_size, touch_count.size());
 
     // Create a second permutation to group the unknowns into the following
-    // four categories, to be eventually composed with 'local_renumbering':
-    // 0: all DoFs without any reference (constrained DoFs)
-    // 1: all DoFs with reference only to the current MPI process and
-    //    touched once ("perfect overlap" case)
-    // 2: all DoFs with reference to only the current MPI process and
-    //    touched from multiple cell ranges (more strain on caches)
-    // 3: all DoFs with reference from other MPI ranks
-    std::vector<unsigned char> categories(locally_owned_size);
+    // four categories, to be eventually composed with 'local_renumbering'
+    enum class Category : unsigned char
+    {
+      single,     // DoFs only referring to a single batch and MPI process
+      multiple,   // DoFs referring to multiple batches (long-range)
+      mpi_dof,    // DoFs referring to DoFs in exchange with other MPI processes
+      constrained // DoFs without any reference (constrained DoFs)
+    };
+    std::vector<Category> categories(locally_owned_size);
     for (unsigned int i = 0; i < locally_owned_size; ++i)
-      categories[local_numbering[i]] =
-        std::min<unsigned char>(2, touch_count[i]);
+      switch (touch_count[i])
+        {
+          case 0:
+            categories[local_numbering[i]] = Category::constrained;
+            break;
+          case 1:
+            categories[local_numbering[i]] = Category::single;
+            break;
+          default:
+            categories[local_numbering[i]] = Category::multiple;
+            break;
+        }
     for (unsigned int chunk = 1; chunk < dofs_by_rank_access.size(); ++chunk)
       for (const auto i : dofs_by_rank_access[chunk])
-        categories[local_numbering[i]] = 3;
+        categories[local_numbering[i]] = Category::mpi_dof;
 
-    // Assign numbers to the categories in the order 1 -> 2 -> 3 -> 0, which
+    // Assign numbers to the categories in the order listed in the enum, which
     // is done by starting 'counter' for each category at an offset
-    std::array<unsigned int, 4> n_entries_per_category = {};
-    for (const unsigned char i : categories)
+    std::array<unsigned int, 4> n_entries_per_category{};
+    for (const Category i : categories)
       {
-        AssertIndexRange(i, static_cast<unsigned char>(4));
-        ++n_entries_per_category[i];
+        AssertIndexRange(static_cast<int>(i), 4);
+        ++n_entries_per_category[static_cast<int>(i)];
       }
-    std::array<unsigned int, 4> counters;
-    counters[1] = 0;
-    counters[2] = counters[1] + n_entries_per_category[1];
-    counters[3] = counters[2] + n_entries_per_category[2];
-    counters[0] = counters[3] + n_entries_per_category[3];
-    std::vector<unsigned int> numbers_categories;
-    numbers_categories.reserve(locally_owned_size);
-    for (const unsigned int category : categories)
+    std::array<unsigned int, 4> counters{};
+    for (unsigned int i = 1; i < 4; ++i)
+      counters[i] = counters[i - 1] + n_entries_per_category[i - 1];
+    std::vector<unsigned int> numbering_categories;
+    numbering_categories.reserve(locally_owned_size);
+    for (const Category category : categories)
       {
-        numbers_categories.push_back(counters[category]);
-        ++counters[category];
+        numbering_categories.push_back(counters[static_cast<int>(category)]);
+        ++counters[static_cast<int>(category)];
       }
 
     // The final numbers are given by the composition of the two permutations
@@ -2883,7 +2892,7 @@ namespace DoFRenumbering
       locally_owned_size);
     for (unsigned int i = 0; i < locally_owned_size; ++i)
       new_global_numbers[i] =
-        owned_dofs.nth_index_in_set(numbers_categories[local_numbering[i]]);
+        owned_dofs.nth_index_in_set(numbering_categories[local_numbering[i]]);
 
     return new_global_numbers;
   }
