@@ -61,18 +61,9 @@ test(const unsigned int ref = 6, const unsigned int level = 0)
           << boxes_in_level.size() << std::endl;
   const auto boxes_in_boxes = extract_children_of_level(tree, level);
 
-  unsigned int total_number_of_boxes = 0;
   for (unsigned int i = 0; i < boxes_in_boxes.size(); ++i)
-    {
-      deallog << "boxes_in_boxes[" << i
-              << "] has size: " << boxes_in_boxes[i].size() << std::endl;
-      total_number_of_boxes += boxes_in_boxes[i].size();
-
-      for (const auto &b : boxes_in_boxes[i])
-        deallog << "Box: "
-                << Patterns::Tools::to_string(b.get_boundary_points())
-                << std::endl;
-    }
+    deallog << "boxes_in_boxes[" << i
+            << "] has size: " << boxes_in_boxes[i].size() << std::endl;
 
   // Uncomment to display the partition
   // {
