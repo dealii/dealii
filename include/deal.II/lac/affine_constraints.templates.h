@@ -1025,7 +1025,7 @@ AffineConstraints<number>::shift(const size_type offset)
   else
     {
       // shift local_lines
-      IndexSet new_local_lines(local_lines.size());
+      IndexSet new_local_lines(local_lines.size() + offset);
       new_local_lines.add_indices(local_lines, offset);
       std::swap(local_lines, new_local_lines);
     }
