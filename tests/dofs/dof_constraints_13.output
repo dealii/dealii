@@ -1,0 +1,10 @@
+
+DEAL::constraints1: 
+    1 2:  1.00000
+DEAL::constraints2: 
+    2 3:  2.00000
+DEAL::constraints2 shifted:
+    12 13:  2.00000
+DEAL::constraints: 
+    1 2:  1.00000
+    12 13:  2.00000
