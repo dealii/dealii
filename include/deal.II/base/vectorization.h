@@ -2170,7 +2170,7 @@ public:
   void
   gather(const double *base_ptr, const unsigned int *offsets)
   {
-#    ifdef __AVX2__
+#    if defined(__AVX2__) && defined(DEAL_II_USE_VECTORIZATION_GATHER)
     // unfortunately, there does not appear to be a 128 bit integer load, so
     // do it by some reinterpret casts here. this is allowed because the Intel
     // API allows aliasing between different vector types.
@@ -2734,7 +2734,7 @@ public:
   void
   gather(const float *base_ptr, const unsigned int *offsets)
   {
-#    ifdef __AVX2__
+#    if defined(__AVX2__) && defined(DEAL_II_USE_VECTORIZATION_GATHER)
     // unfortunately, there does not appear to be a 256 bit integer load, so
     // do it by some reinterpret casts here. this is allowed because the Intel
     // API allows aliasing between different vector types.
@@ -3350,6 +3350,7 @@ public:
   void
   gather(const double *base_ptr, const unsigned int *offsets)
   {
+#    ifdef DEAL_II_USE_VECTORIZATION_GATHER
     // unfortunately, there does not appear to be a 256 bit integer load, so
     // do it by some reinterpret casts here. this is allowed because the Intel
     // API allows aliasing between different vector types.
@@ -3364,6 +3365,10 @@ public:
     __mmask8 mask = 0xFF;
 
     data = _mm512_mask_i32gather_pd(zero, mask, index, base_ptr, 8);
+#    else
+    for (unsigned int i = 0; i < 8; ++i)
+      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+#    endif
   }
 
   /**
@@ -3382,6 +3387,7 @@ public:
   void
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
+#    ifdef DEAL_II_USE_VECTORIZATION_GATHER
     for (unsigned int i = 0; i < 8; ++i)
       for (unsigned int j = i + 1; j < 8; ++j)
         Assert(offsets[i] != offsets[j],
@@ -3395,6 +3401,10 @@ public:
       _mm256_loadu_ps(reinterpret_cast<const float *>(offsets));
     const __m256i index = *reinterpret_cast<const __m256i *>(&index_val);
     _mm512_i32scatter_pd(base_ptr, index, data, 8);
+#    else
+    for (unsigned int i = 0; i < 8; ++i)
+      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+#    endif
   }
 
   /**
@@ -3955,6 +3965,7 @@ public:
   void
   gather(const float *base_ptr, const unsigned int *offsets)
   {
+#    ifdef DEAL_II_USE_VECTORIZATION_GATHER
     // unfortunately, there does not appear to be a 512 bit integer load, so
     // do it by some reinterpret casts here. this is allowed because the Intel
     // API allows aliasing between different vector types.
@@ -3969,6 +3980,10 @@ public:
     __mmask16 mask = 0xFFFF;
 
     data = _mm512_mask_i32gather_ps(zero, mask, index, base_ptr, 4);
+#    else
+    for (unsigned int i = 0; i < 16; ++i)
+      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+#    endif
   }
 
   /**
@@ -3987,6 +4002,7 @@ public:
   void
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
+#    ifdef DEAL_II_USE_VECTORIZATION_GATHER
     for (unsigned int i = 0; i < 16; ++i)
       for (unsigned int j = i + 1; j < 16; ++j)
         Assert(offsets[i] != offsets[j],
@@ -4000,6 +4016,10 @@ public:
       _mm512_loadu_ps(reinterpret_cast<const float *>(offsets));
     const __m512i index = *reinterpret_cast<const __m512i *>(&index_val);
     _mm512_i32scatter_ps(base_ptr, index, data, 4);
+#    else
+    for (unsigned int i = 0; i < 16; ++i)
+      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+#    endif
   }
 
   /**
