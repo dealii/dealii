@@ -152,7 +152,7 @@ function(copy_target_properties _destination_target)
   if(NOT "${_link_options}" STREQUAL "")
     remove_duplicates(_link_options REVERSE)
     message(STATUS "    LINK_OPTIONS: ${_link_options}")
-    target_compile_options(${_destination_target} INTERFACE ${_link_options})
+    target_link_options(${_destination_target} INTERFACE ${_link_options})
   endif()
 endfunction()
 
