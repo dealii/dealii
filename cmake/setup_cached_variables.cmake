@@ -46,6 +46,7 @@
 #     DEAL_II_DEFINITIONS
 #     DEAL_II_DEFINITIONS_DEBUG
 #     DEAL_II_DEFINITIONS_RELEASE
+#     DEAL_II_USE_VECTORIZATION_GATHER
 #
 # Components and miscellaneous options:
 #
@@ -174,6 +175,12 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
   "Set the rpath of the library to the external link paths on installation"
   )
 mark_as_advanced(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+
+option(DEAL_II_USE_VECTORIZATION_GATHER
+  "For the x86 compilation target, the use of SIMD gather/scatter instructions can be much slower than using scalar loads. This includes a wide range of Intel hardware (in particular, server processors of the Broadwell, Skylake, Cascade Lake, and Ice Lake families released between 2015 and 2021). While the default is to aggressively use these instructions, this variable can be used to disable their use if deemed to give better performance."
+  ON
+  )
+mark_as_advanced(DEAL_II_USE_VECTORIZATION_GATHER)
 
 
 ########################################################################
