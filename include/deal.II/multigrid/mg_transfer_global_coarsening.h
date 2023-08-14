@@ -767,6 +767,24 @@ protected:
 
 private:
   /**
+   * Perform prolongation for correct number of components.
+   */
+  template <int n_components>
+  void
+  prolongate_and_add_internal_comp(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const;
+
+  /**
+   * Perform restriction for correct number of components.
+   */
+  template <int n_components>
+  void
+  restrict_and_add_internal_comp(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const;
+
+  /**
    * Object to evaluate shape functions on one mesh on visited support points of
    * the other mesh.
    */

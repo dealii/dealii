@@ -31,6 +31,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 
@@ -3810,10 +3811,11 @@ namespace internal
       // uniquely assigned to support points (they are always defined in the
       // center of the element) and are never shared at vertices or faces.
       Assert((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
-                &dof_handler.get_fe()) != nullptr) ||
+                &dof_handler.get_fe().base_element(0)) != nullptr) ||
                (dynamic_cast<const FE_Q<dim, spacedim> *>(
-                  &dof_handler.get_fe()) != nullptr),
-             ExcMessage("Function expects FE_DGQ of FE_Q in dof_handler."));
+                  &dof_handler.get_fe().base_element(0)) != nullptr),
+             ExcMessage(
+               "Function expects FE_DGQ of FE_Q elements in dof_handler."));
 
       Assert(
         (dynamic_cast<const FE_Q<dim, spacedim> *>(
@@ -3837,11 +3839,8 @@ namespace internal
                dof_handler_support_points.get_fe().degree,
              ExcMessage("DoFHandlers need the same degree."));
 
-      Assert(
-        dof_handler.get_fe().n_dofs_per_cell() ==
-          dof_handler_support_points.get_fe().n_dofs_per_cell(),
-        ExcMessage(
-          "For now multiple components are not considered and therefore DoFHandlers need the same degree."));
+      Assert(dof_handler.get_fe().is_primitive(),
+             ExcMessage("Only primitive elements are allowed."));
 
       const auto degree        = dof_handler.get_fe().degree;
       const auto dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
@@ -3851,6 +3850,8 @@ namespace internal
       std::vector<std::pair<unsigned int, types::global_dof_index>>
         support_point_dofs;
       support_point_dofs.reserve(dof_handler.n_locally_owned_dofs());
+
+      const unsigned int n_components = dof_handler.get_fe().n_components();
 
       // fill support_point_dofs
       {
@@ -3894,31 +3895,39 @@ namespace internal
                 cell_support_point->get_dof_indices(support_point_indices);
                 cell->get_dof_indices(dof_indices);
 
-                // collect unconstrained DoFs for support point (assuming
-                // support_points_per_cell==dofs_per_cell, i.e. n_components==1)
+                // collect unconstrained DoFs for support point. In case of DG
+                // elements with polynomial degree > 0 or continuous elements
+                // with multiple components, more DoFs are associated to the
+                // same support point.
                 for (unsigned int i = 0; i < support_point_indices.size(); ++i)
                   if (partitioner_support_points.in_local_range(
                         support_point_indices[i]))
                     {
-                      const auto global_dof_idx =
-                        needs_conversion ?
-                          dof_indices[lexicographic_to_hierarchic[i]] :
-                          dof_indices[i];
-
-                      const auto local_dof_idx =
-                        partitioner_dof.global_to_local(global_dof_idx);
-
-                      AssertIndexRange(local_dof_idx, dof_processed.size());
-
-                      if (dof_processed[local_dof_idx] == false)
+                      for (unsigned int c = 0; c < n_components; ++c)
                         {
-                          if (!constraint.is_constrained(global_dof_idx))
-                            support_point_dofs.emplace_back(
-                              partitioner_support_points.global_to_local(
-                                support_point_indices[i]),
-                              global_dof_idx);
+                          const auto global_dof_idx =
+                            needs_conversion ?
+                              dof_indices
+                                [dof_handler.get_fe().component_to_system_index(
+                                  c, lexicographic_to_hierarchic[i])] :
+                              dof_indices[dof_handler.get_fe()
+                                            .component_to_system_index(c, i)];
 
-                          dof_processed[local_dof_idx] = true;
+                          const auto local_dof_idx =
+                            partitioner_dof.global_to_local(global_dof_idx);
+
+                          AssertIndexRange(local_dof_idx, dof_processed.size());
+
+                          if (dof_processed[local_dof_idx] == false)
+                            {
+                              if (!constraint.is_constrained(global_dof_idx))
+                                support_point_dofs.emplace_back(
+                                  partitioner_support_points.global_to_local(
+                                    support_point_indices[i]),
+                                  global_dof_idx);
+
+                              dof_processed[local_dof_idx] = true;
+                            }
                         }
                     }
               }
@@ -3952,7 +3961,7 @@ namespace internal
               ++it;
             }
           support_point_indices.push_back(index);
-          dof_ptrs.push_back(dof_indices.size());
+          dof_ptrs.push_back(dof_indices.size() / n_components);
         }
 
       return std::make_tuple(std::move(support_point_indices),
@@ -4190,10 +4199,12 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   constraint_info.finalize();
 
-  const auto &fe_base = dof_handler_coarse.get_fe().base_element(0);
+  const auto &       fe_base      = dof_handler_coarse.get_fe().base_element(0);
+  const unsigned int n_components = dof_handler_coarse.get_fe().n_components();
 
   if (const auto fe = dynamic_cast<const FE_Q<dim> *>(&fe_base))
-    fe_coarse = std::make_unique<FE_DGQ<dim>>(fe->get_degree());
+    fe_coarse = std::make_unique<FESystem<dim>>(FE_DGQ<dim>(fe->get_degree()),
+                                                n_components);
   else if (const auto fe = dynamic_cast<const FE_DGQ<dim> *>(&fe_base))
     fe_coarse = fe->clone();
   else
@@ -4201,21 +4212,62 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 }
 
 
+// Access utilities for scalar or vector valued fields computed with
+// FEPointEvaluation. Mimicking the members of
+// internal::FEPointEvaluation::EvaluatorTypeTraits
+namespace internal
+{
+  template <typename T>
+  const T &
+  access(const T &value, const unsigned int)
+  {
+    return value;
+  }
+
+  template <typename T>
+  T &
+  access(T &value, const unsigned int)
+  {
+    return value;
+  }
+
+  template <int dim, typename T>
+  const T &
+  access(const Tensor<1, dim, T> &value, const unsigned int c)
+  {
+    return value[c];
+  }
+
+  template <int dim, typename T>
+  T &
+  access(Tensor<1, dim, T> &value, const unsigned int c)
+  {
+    return value[c];
+  }
+} // namespace internal
+
+
 
 template <int dim, typename Number>
+template <int n_components>
 void
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  prolongate_and_add_internal(
+  prolongate_and_add_internal_comp(
     LinearAlgebra::distributed::Vector<Number> &      dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
-  std::vector<Number> evaluation_point_results;
-  std::vector<Number> buffer;
+  using Traits =
+    internal::FEPointEvaluation::EvaluatorTypeTraits<dim, n_components, Number>;
+  using value_type = typename Traits::value_type;
+
+  std::vector<value_type> evaluation_point_results;
+  std::vector<value_type> buffer;
 
   const auto evaluation_function = [&](auto &values, const auto &cell_data) {
     std::vector<Number> solution_values;
 
-    FEPointEvaluation<1, dim, dim, Number> evaluator(*mapping_info, *fe_coarse);
+    FEPointEvaluation<n_components, dim, dim, Number> evaluator(*mapping_info,
+                                                                *fe_coarse);
 
     for (unsigned int cell = 0; cell < cell_data.cells.size(); ++cell)
       {
@@ -4243,9 +4295,9 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
       }
   };
 
-  rpe.template evaluate_and_process<Number>(evaluation_point_results,
-                                            buffer,
-                                            evaluation_function);
+  rpe.template evaluate_and_process<value_type>(evaluation_point_results,
+                                                buffer,
+                                                evaluation_function);
 
   // Weight operator in case some points are owned by multiple cells.
   if (rpe.is_map_unique() == false)
@@ -4260,7 +4312,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
         {
           const auto n_entries = ptr[i + 1] - ptr[i];
 
-          Number result = 0.0;
+          value_type result{};
 
           if (n_entries > 0)
             {
@@ -4276,16 +4328,28 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
     {
       if (level_dof_indices_fine_ptrs.empty())
         {
-          dst.local_element(this->level_dof_indices_fine[j]) +=
-            evaluation_point_results[j];
+          for (unsigned int c = 0; c < n_components; ++c)
+            {
+              AssertIndexRange(n_components * j + c,
+                               this->level_dof_indices_fine.size());
+              dst.local_element(
+                this->level_dof_indices_fine[n_components * j + c]) +=
+                internal::access(evaluation_point_results[j], c);
+            }
         }
       else
         {
           for (unsigned int i = this->level_dof_indices_fine_ptrs[j];
                i < this->level_dof_indices_fine_ptrs[j + 1];
                ++i)
-            dst.local_element(this->level_dof_indices_fine[i]) +=
-              evaluation_point_results[j];
+            for (unsigned int c = 0; c < n_components; ++c)
+              {
+                AssertIndexRange(n_components * i + c,
+                                 this->level_dof_indices_fine.size());
+                dst.local_element(
+                  this->level_dof_indices_fine[n_components * i + c]) +=
+                  internal::access(evaluation_point_results[j], c);
+              }
         }
     }
 }
@@ -4295,12 +4359,34 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 template <int dim, typename Number>
 void
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  restrict_and_add_internal(
+  prolongate_and_add_internal(
     LinearAlgebra::distributed::Vector<Number> &      dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
-  std::vector<Number> evaluation_point_results;
-  std::vector<Number> buffer;
+  if (this->fe_coarse->n_components() == 1)
+    prolongate_and_add_internal_comp<1>(dst, src);
+  else if (this->fe_coarse->n_components() == dim)
+    prolongate_and_add_internal_comp<dim>(dst, src);
+  else
+    AssertThrow(false, ExcNotImplemented());
+}
+
+
+
+template <int dim, typename Number>
+template <int n_components>
+void
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  restrict_and_add_internal_comp(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const
+{
+  using Traits =
+    internal::FEPointEvaluation::EvaluatorTypeTraits<dim, n_components, Number>;
+  using value_type = typename Traits::value_type;
+
+  std::vector<value_type> evaluation_point_results;
+  std::vector<value_type> buffer;
 
   evaluation_point_results.resize(rpe.get_point_ptrs().size() - 1);
 
@@ -4308,17 +4394,31 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
     {
       if (level_dof_indices_fine_ptrs.empty())
         {
-          evaluation_point_results[j] =
-            src.local_element(this->level_dof_indices_fine[j]);
+          for (unsigned int c = 0; c < n_components; ++c)
+            {
+              AssertIndexRange(n_components * j + c,
+                               this->level_dof_indices_fine.size());
+
+              internal::access(evaluation_point_results[j], c) =
+                src.local_element(
+                  this->level_dof_indices_fine[n_components * j + c]);
+            }
         }
       else
         {
-          evaluation_point_results[j] = 0.0;
+          evaluation_point_results[j] = {};
+
           for (unsigned int i = this->level_dof_indices_fine_ptrs[j];
                i < this->level_dof_indices_fine_ptrs[j + 1];
                ++i)
-            evaluation_point_results[j] +=
-              src.local_element(this->level_dof_indices_fine[i]);
+            for (unsigned int c = 0; c < n_components; ++c)
+              {
+                AssertIndexRange(n_components * i + c,
+                                 this->level_dof_indices_fine.size());
+                internal::access(evaluation_point_results[j], c) +=
+                  src.local_element(
+                    this->level_dof_indices_fine[n_components * i + c]);
+              }
         }
     }
 
@@ -4339,8 +4439,9 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const auto evaluation_function = [&](const auto &values,
                                        const auto &cell_data) {
-    std::vector<Number>                    solution_values;
-    FEPointEvaluation<1, dim, dim, Number> evaluator(*mapping_info, *fe_coarse);
+    std::vector<Number>                               solution_values;
+    FEPointEvaluation<n_components, dim, dim, Number> evaluator(*mapping_info,
+                                                                *fe_coarse);
 
     for (unsigned int cell = 0; cell < cell_data.cells.size(); ++cell)
       {
@@ -4369,9 +4470,26 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
       }
   };
 
-  rpe.template process_and_evaluate<Number>(evaluation_point_results,
-                                            buffer,
-                                            evaluation_function);
+  rpe.template process_and_evaluate<value_type>(evaluation_point_results,
+                                                buffer,
+                                                evaluation_function);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  restrict_and_add_internal(
+    LinearAlgebra::distributed::Vector<Number> &      dst,
+    const LinearAlgebra::distributed::Vector<Number> &src) const
+{
+  if (this->fe_coarse->n_components() == 1)
+    restrict_and_add_internal_comp<1>(dst, src);
+  else if (this->fe_coarse->n_components() == dim)
+    restrict_and_add_internal_comp<dim>(dst, src);
+  else
+    AssertThrow(false, ExcNotImplemented());
 }
 
 
