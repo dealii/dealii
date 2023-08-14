@@ -28,6 +28,7 @@
 #   DEAL_II_HAVE_AVX                     (*)
 #   DEAL_II_HAVE_AVX512                  (*)
 #   DEAL_II_HAVE_ALTIVEC                 (*)
+#   DEAL_II_HAVE_ARM_NEON                (*)
 #   DEAL_II_HAVE_OPENMP_SIMD             (*)
 #   DEAL_II_VECTORIZATION_WIDTH_IN_BITS
 #   DEAL_II_OPENMP_SIMD_PRAGMA
@@ -72,7 +73,7 @@ if(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   # CMAKE_REQUIRED_FLAGS changes..
   #
   unset_if_changed(CHECK_CPU_FEATURES_FLAGS_SAVED "${CMAKE_REQUIRED_FLAGS}"
-    DEAL_II_HAVE_SSE2 DEAL_II_HAVE_AVX DEAL_II_HAVE_AVX512 DEAL_II_HAVE_ALTIVEC
+    DEAL_II_HAVE_SSE2 DEAL_II_HAVE_AVX DEAL_II_HAVE_AVX512 DEAL_II_HAVE_ALTIVEC DEAL_II_HAVE_ARM_NEON
     )
 
   CHECK_CXX_SOURCE_RUNS(
@@ -245,6 +246,40 @@ if(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     "
     DEAL_II_HAVE_ALTIVEC)
 
+    CHECK_CXX_SOURCE_RUNS(
+      "
+      #ifndef __ARM_NEON
+      #error Preprocessor flag not found
+      #endif
+      #include <arm_neon.h>
+      #include <stdlib.h>
+      int main()
+      {
+      float64x2_t a, b;
+      const unsigned int vector_bytes = sizeof(float64x2_t);
+      const int n_vectors = vector_bytes/sizeof(double);
+      float64x2_t * data =
+        reinterpret_cast<float64x2_t*>(aligned_alloc (vector_bytes, 2*vector_bytes));
+      double * ptr = reinterpret_cast<double*>(&a);
+      ptr[0] = static_cast<volatile double>(1.0);
+      for (int i=1; i<n_vectors; ++i)
+        ptr[i] = 0.0;
+      b = vdupq_n_f64 (static_cast<volatile double>(2.25));
+      data[0] = vaddq_f64 (a, b);
+      data[1] = vmulq_f64 (b, data[0]);
+      ptr = reinterpret_cast<double*>(&data[1]);
+      int return_value = 0;
+      if (ptr[0] != 7.3125)
+        return_value = 1;
+      for (int i=1; i<n_vectors; ++i)
+        if (ptr[i] != 5.0625)
+          return_value = 1;
+      free(data);
+      return return_value;
+      }
+      "
+      DEAL_II_HAVE_ARM_NEON)
+
   #
   # OpenMP 4.0 can be used for vectorization. Only the vectorization
   # instructions are allowed, the threading must be done through TBB.
@@ -286,6 +321,10 @@ else()
 endif()
 
 if(DEAL_II_HAVE_ALTIVEC)
+  set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 128)
+endif()
+
+if(DEAL_II_HAVE_ARM_NEON)
   set(DEAL_II_VECTORIZATION_WIDTH_IN_BITS 128)
 endif()
 
