@@ -18,6 +18,7 @@
 
 Checks: >
   -*,
+  bugprone-reserved-identifier,
   cppcoreguidelines-pro-type-static-cast-downcast,
   modernize-*,
   -modernize-avoid-c-arrays,
