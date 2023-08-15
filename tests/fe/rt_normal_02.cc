@@ -88,8 +88,7 @@ evaluate_normal_component(const DoFHandler<2> &dof_handler,
   const unsigned int n_components  = dof_handler.get_fe().n_components();
   const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 
-  deallog << "Quad Points Face " << n_q_face << ", Quad Points Proj. "
-          << n_q_proj << std::endl;
+  deallog << "n_q_face=" << n_q_face << ", n_q_proj=" << n_q_proj << std::endl;
 
   // Cell iterators
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
@@ -103,6 +102,9 @@ evaluate_normal_component(const DoFHandler<2> &dof_handler,
         {
           if (!cell->face(f)->at_boundary())
             {
+              deallog << "Testing face with center at "
+                      << cell->face(f)->center() << std::endl;
+
               const QProjector<2>::DataSetDescriptor offset =
                 (QProjector<2>::DataSetDescriptor::face(
                   ReferenceCells::Quadrilateral,
@@ -151,9 +153,9 @@ evaluate_normal_component(const DoFHandler<2> &dof_handler,
                   const double un1 = u * n;
                   const double un2 = u_n * n;
 
-                  deallog << "QP " << q_point << ", Error: " << (u - u_n) * n
-                          << ", u " << un1 << ", un " << un2 << ", Rat "
-                          << un2 / un1 << std::endl;
+                  deallog << "  QP=" << q_point << ", error=" << (u - u_n) * n
+                          << ", u.n=" << un1 << ", u_neighbor.n=" << un2
+                          << std::endl;
 
                   Assert(std::fabs((u - u_n) * n) < 1e-12, ExcInternalError());
                 }
