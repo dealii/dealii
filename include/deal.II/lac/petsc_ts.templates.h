@@ -1092,8 +1092,8 @@ namespace PETScWrappers
         AssertPETSc(VecDuplicate(py, &av));
         AssertPETSc(VecDuplicate(py, &rv));
 
-        VectorBase avdealii(av);
-        VectorBase rvdealii(rv);
+        VectorType avdealii(av);
+        VectorType rvdealii(rv);
         avdealii = atol;
         rvdealii = rtol;
         for (auto i : algebraic_components())
