@@ -16083,6 +16083,15 @@ void Triangulation<dim, spacedim>::clear_despite_subscriptions()
 
   manifolds.clear();
 
+  // In 1d, also reset vertex-to-(boundary|manifold) maps to empty maps
+  if (dim == 1)
+    {
+      vertex_to_boundary_id_map_1d =
+        std::make_unique<std::map<unsigned int, types::boundary_id>>();
+      vertex_to_manifold_id_map_1d =
+        std::make_unique<std::map<unsigned int, types::manifold_id>>();
+    }
+
   number_cache = internal::TriangulationImplementation::NumberCache<dim>();
 }
 
