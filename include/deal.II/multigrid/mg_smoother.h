@@ -689,7 +689,7 @@ namespace mg
     this->resize(min, max);
 
     for (unsigned int i = min; i <= max; ++i)
-      (*this)[i].initialize(m[i], data);
+      (*this)[i].initialize(Utilities::get_underlying_value(m[i]), data);
   }
 
 
@@ -706,7 +706,7 @@ namespace mg
     this->resize(min, max);
 
     for (unsigned int i = min; i <= max; ++i)
-      (*this)[i].initialize(m[i], data[i]);
+      (*this)[i].initialize(Utilities::get_underlying_value(m[i]), data[i]);
   }
 
 
@@ -833,8 +833,9 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
       matrices[i] =
-        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
-      smoothers[i].initialize(m[i], data);
+        linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                    Utilities::get_underlying_value(m[i]));
+      smoothers[i].initialize(Utilities::get_underlying_value(m[i]), data);
     }
 }
 
@@ -860,8 +861,9 @@ MGSmootherRelaxation<MatrixType, RelaxationType, VectorType>::initialize(
       // enough interface to populate reinit_(domain|range)_vector. Thus,
       // apply an empty LinearOperator exemplar.
       matrices[i] =
-        linear_operator<VectorType>(LinearOperator<VectorType>(), m[i]);
-      smoothers[i].initialize(m[i], data[i]);
+        linear_operator<VectorType>(LinearOperator<VectorType>(),
+                                    Utilities::get_underlying_value(m[i]));
+      smoothers[i].initialize(Utilities::get_underlying_value(m[i]), data[i]);
     }
 }
 
