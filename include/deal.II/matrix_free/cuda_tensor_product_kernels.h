@@ -151,19 +151,16 @@ namespace CUDAWrappers
       if (in_place)
         team_member.team_barrier();
 
-      Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, n_q_points),
-                           [&](const int i, const int j) {
-                             const int          q_point = i + j * n_q_points_1d;
-                             const unsigned int destination_idx =
-                               (direction == 0) ? (j + n_q_points_1d * i) :
-                                                  (i + n_q_points_1d * j);
+      Kokkos::parallel_for(thread_policy, [&](const int i, const int j) {
+        const int          q_point = i + j * n_q_points_1d;
+        const unsigned int destination_idx =
+          (direction == 0) ? (j + n_q_points_1d * i) : (i + n_q_points_1d * j);
 
-                             if (add)
-                               Kokkos::atomic_add(&out(destination_idx),
-                                                  t[q_point]);
-                             else
-                               out(destination_idx) = t[q_point];
-                           });
+        if (add)
+          Kokkos::atomic_add(&out(destination_idx), t[q_point]);
+        else
+          out(destination_idx) = t[q_point];
+      });
     }
 
 
