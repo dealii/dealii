@@ -861,9 +861,10 @@ namespace MatrixFreeTools
         // compute i-th column of element stiffness matrix:
         // this could be simply performed as done at the moment with
         // matrix-free operator evaluation applied to a ith-basis vector
-        for (unsigned int j = 0; j < phi->dofs_per_cell; ++j)
-          phi->begin_dof_values()[j] = VectorizedArrayType();
-        phi->begin_dof_values()[i] = Number(1);
+        VectorizedArrayType *dof_values = phi->begin_dof_values();
+        for (const unsigned int j : phi->dof_indices())
+          dof_values[j] = VectorizedArrayType();
+        dof_values[i] = Number(1);
       }
 
       void
