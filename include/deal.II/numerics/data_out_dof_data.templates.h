@@ -1179,20 +1179,13 @@ namespace internal
       const ComponentExtractor             extract_component,
       std::vector<dealii::Vector<double>> &patch_values_system) const
     {
-      if (typeid(ScalarType) == typeid(double))
+      if constexpr (std::is_same_v<ScalarType, double>)
         {
+          (void)extract_component;
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
-
-          fe_patch_values.get_function_values(
-            vector,
-            // reinterpret output argument type; because of the 'if' statement
-            // above, this is the identity cast whenever the code is executed,
-            // but the cast is necessary to allow compilation even if we don't
-            // get here
-            reinterpret_cast<std::vector<dealii::Vector<ScalarType>> &>(
-              patch_values_system));
+          fe_patch_values.get_function_values(vector, patch_values_system);
         }
       else
         {
@@ -1233,19 +1226,14 @@ namespace internal
       const ComponentExtractor           extract_component,
       std::vector<double> &              patch_values) const
     {
-      if (typeid(ScalarType) == typeid(double))
+      if constexpr (std::is_same_v<ScalarType, double>)
         {
+          (void)extract_component;
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
-          fe_patch_values.get_function_values(
-            vector,
-            // reinterpret output argument type; because of the 'if' statement
-            // above, this is the identity cast whenever the code is executed,
-            // but the cast is necessary to allow compilation even if we don't
-            // get here
-            reinterpret_cast<std::vector<ScalarType> &>(patch_values));
+          fe_patch_values.get_function_values(vector, patch_values);
         }
       else
         {
@@ -1268,21 +1256,15 @@ namespace internal
       std::vector<std::vector<Tensor<1, spacedim>>> &patch_gradients_system)
       const
     {
-      if (typeid(ScalarType) == typeid(double))
+      if constexpr (std::is_same_v<ScalarType, double>)
         {
+          (void)extract_component;
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
-          fe_patch_values.get_function_gradients(
-            vector,
-            // reinterpret output argument type; because of the 'if' statement
-            // above, this is the identity cast whenever the code is executed,
-            // but the cast is necessary to allow compilation even if we don't
-            // get here
-            reinterpret_cast<
-              std::vector<std::vector<Tensor<1, spacedim, ScalarType>>> &>(
-              patch_gradients_system));
+          fe_patch_values.get_function_gradients(vector,
+                                                 patch_gradients_system);
         }
       else
         {
@@ -1324,20 +1306,14 @@ namespace internal
       const ComponentExtractor           extract_component,
       std::vector<Tensor<1, spacedim>> & patch_gradients) const
     {
-      if (typeid(ScalarType) == typeid(double))
+      if constexpr (std::is_same_v<ScalarType, double>)
         {
+          (void)extract_component;
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
-          fe_patch_values.get_function_gradients(
-            vector,
-            // reinterpret output argument type; because of the 'if' statement
-            // above, this is the identity cast whenever the code is executed,
-            // but the cast is necessary to allow compilation even if we don't
-            // get here
-            reinterpret_cast<std::vector<Tensor<1, spacedim, ScalarType>> &>(
-              patch_gradients));
+          fe_patch_values.get_function_gradients(vector, patch_gradients);
         }
       else
         {
@@ -1361,21 +1337,14 @@ namespace internal
       std::vector<std::vector<Tensor<2, spacedim>>> &patch_hessians_system)
       const
     {
-      if (typeid(ScalarType) == typeid(double))
+      if constexpr (std::is_same_v<ScalarType, double>)
         {
+          (void)extract_component;
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
-          fe_patch_values.get_function_hessians(
-            vector,
-            // reinterpret output argument type; because of the 'if' statement
-            // above, this is the identity cast whenever the code is executed,
-            // but the cast is necessary to allow compilation even if we don't
-            // get here
-            reinterpret_cast<
-              std::vector<std::vector<Tensor<2, spacedim, ScalarType>>> &>(
-              patch_hessians_system));
+          fe_patch_values.get_function_hessians(vector, patch_hessians_system);
         }
       else
         {
@@ -1417,20 +1386,14 @@ namespace internal
       const ComponentExtractor           extract_component,
       std::vector<Tensor<2, spacedim>> & patch_hessians) const
     {
-      if (typeid(ScalarType) == typeid(double))
+      if constexpr (std::is_same_v<ScalarType, double>)
         {
+          (void)extract_component;
           Assert(extract_component == ComponentExtractor::real_part,
                  ExcMessage("You cannot extract anything other than the real "
                             "part from a real number."));
 
-          fe_patch_values.get_function_hessians(
-            vector,
-            // reinterpret output argument type; because of the 'if' statement
-            // above, this is the identity cast whenever the code is executed,
-            // but the cast is necessary to allow compilation even if we don't
-            // get here
-            reinterpret_cast<std::vector<Tensor<2, spacedim, ScalarType>> &>(
-              patch_hessians));
+          fe_patch_values.get_function_hessians(vector, patch_hessians);
         }
       else
         {
