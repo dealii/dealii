@@ -280,7 +280,9 @@ namespace TriangulationDescription
                    const std::pair<unsigned int, Point<spacedim>> &b) {
                   if (a.first == b.first)
                     {
-                      Assert(a.second.distance(b.second) < 10e-8,
+                      Assert(a.second.distance(b.second) <=
+                               1e-7 *
+                                 std::max(a.second.norm(), b.second.norm()),
                              ExcInternalError());
                       return true;
                     }
