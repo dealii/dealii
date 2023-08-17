@@ -268,21 +268,24 @@ namespace TriangulationDescription
           {
             std::sort(this->coarse_cell_vertices.begin(),
                       this->coarse_cell_vertices.end(),
-                      [](const auto &a, const auto &b) {
+                      [](const std::pair<unsigned int, Point<spacedim>> &a,
+                         const std::pair<unsigned int, Point<spacedim>> &b) {
                         return a.first < b.first;
                       });
             this->coarse_cell_vertices.erase(
-              std::unique(this->coarse_cell_vertices.begin(),
-                          this->coarse_cell_vertices.end(),
-                          [](const auto &a, const auto &b) {
-                            if (a.first == b.first)
-                              {
-                                Assert(a.second.distance(b.second) < 10e-8,
-                                       ExcInternalError());
-                                return true;
-                              }
-                            return false;
-                          }),
+              std::unique(
+                this->coarse_cell_vertices.begin(),
+                this->coarse_cell_vertices.end(),
+                [](const std::pair<unsigned int, Point<spacedim>> &a,
+                   const std::pair<unsigned int, Point<spacedim>> &b) {
+                  if (a.first == b.first)
+                    {
+                      Assert(a.second.distance(b.second) < 10e-8,
+                             ExcInternalError());
+                      return true;
+                    }
+                  return false;
+                }),
               this->coarse_cell_vertices.end());
           }
 
