@@ -95,71 +95,975 @@ namespace internal
 
 
   /**
+   * One-dimensional kernel for use by the generic tensor product
+   * interpolation as provided by the class EvaluatorTensorProduct,
+   * implementing a matrix-vector product along this dimension, controlled by
+   * the number of rows and columns and the stride in the input and output
+   * arrays, which are embedded into some lexicographic ordering of unknowns
+   * in a tensor-product arrangement.
+   *
+   * Besides this generic function for templated loop lengths, there are
+   * several specializations of this class to account for run-time matrix
+   * sizes as well as some symmetries that reduce the data access or
+   * arithmetic operations. The specializations are technically realized by
+   * conditional function overloading with std::enable_if_t based on the first
+   * template parameter.
+   */
+  template <EvaluatorVariant  variant,
+            EvaluatorQuantity quantity,
+            int               n_rows,
+            int               n_columns,
+            int               stride_in,
+            int               stride_out,
+            bool              transpose_matrix,
+            bool              add,
+            typename Number,
+            typename Number2>
+  std::enable_if_t<(variant == evaluate_general), void>
+  apply_matrix_vector_product(const Number2 *matrix,
+                              const Number * in,
+                              Number *       out)
+  {
+    // We can only statically assert that one argument is non-zero because
+    // face evaluation might instantiate some functions, so we need to use the
+    // run-time assert to verify that we do not end up involuntarily.
+    static_assert(n_rows > 0 || n_columns > 0,
+                  "Specialization only for n_rows, n_columns > 0");
+    Assert(n_rows > 0 && n_columns > 0,
+           ExcInternalError("The evaluation needs n_rows, n_columns > 0, but " +
+                            std::to_string(n_rows) + ", " +
+                            std::to_string(n_columns) + " was passed!"));
+    static_assert(quantity == EvaluatorQuantity::value,
+                  "This function should only use EvaluatorQuantity::value");
+
+    constexpr int mm = transpose_matrix ? n_rows : n_columns,
+                  nn = transpose_matrix ? n_columns : n_rows;
+
+    std::array<Number, mm> x;
+    for (int i = 0; i < mm; ++i)
+      x[i] = in[stride_in * i];
+    for (int col = 0; col < nn; ++col)
+      {
+        Number res0;
+        if (transpose_matrix == true)
+          {
+            res0 = matrix[col] * x[0];
+            for (int i = 1; i < mm; ++i)
+              res0 += matrix[i * n_columns + col] * x[i];
+          }
+        else
+          {
+            res0 = matrix[col * n_columns] * x[0];
+            for (int i = 1; i < mm; ++i)
+              res0 += matrix[col * n_columns + i] * x[i];
+          }
+        if (add)
+          out[stride_out * col] += res0;
+        else
+          out[stride_out * col] = res0;
+      }
+  }
+
+
+
+  /**
+   * Specialization of the matrix-vector kernel for run-time loop bounds in
+   * the generic evaluator.
+   */
+  template <EvaluatorVariant  variant,
+            EvaluatorQuantity quantity,
+            bool              transpose_matrix,
+            bool              add,
+            typename Number,
+            typename Number2>
+  std::enable_if_t<(variant == evaluate_general), void>
+  apply_matrix_vector_product(const Number2 *matrix,
+                              const Number * in,
+                              Number *       out,
+                              const int      n_rows,
+                              const int      n_columns,
+                              const int      stride_in,
+                              const int      stride_out)
+  {
+    const int mm = transpose_matrix ? n_rows : n_columns,
+              nn = transpose_matrix ? n_columns : n_rows;
+    Assert(n_rows <= 128, ExcNotImplemented());
+    Assert(n_rows > 0 && n_columns > 0,
+           ExcInternalError("Empty evaluation task!"));
+    Assert(n_rows > 0 && n_columns > 0,
+           ExcInternalError("The evaluation needs n_rows, n_columns > 0, but " +
+                            std::to_string(n_rows) + ", " +
+                            std::to_string(n_columns) + " was passed!"));
+
+    static_assert(quantity == EvaluatorQuantity::value,
+                  "This function should only use EvaluatorQuantity::value");
+
+    // specialization for n_rows = 2 that manually unrolls the innermost loop
+    // to make the operation perform better (not completely as good as the
+    // templated one, but much better than the generic version down below,
+    // because the loop over col can be more effectively unrolled by the
+    // compiler)
+    if (transpose_matrix && n_rows == 2)
+      {
+        const Number2 *matrix_1 = matrix + n_columns;
+        const Number   x0 = in[0], x1 = in[stride_in];
+        for (int col = 0; col < nn; ++col)
+          {
+            const Number result = matrix[col] * x0 + matrix_1[col] * x1;
+            if (add)
+              out[stride_out * col] += result;
+            else
+              out[stride_out * col] = result;
+          }
+      }
+    else if (transpose_matrix && n_rows == 3)
+      {
+        const Number2 *matrix_1 = matrix + n_columns;
+        const Number2 *matrix_2 = matrix_1 + n_columns;
+        const Number   x0 = in[0], x1 = in[stride_in], x2 = in[2 * stride_in];
+        for (int col = 0; col < nn; ++col)
+          {
+            const Number result =
+              matrix[col] * x0 + matrix_1[col] * x1 + matrix_2[col] * x2;
+            if (add)
+              out[stride_out * col] += result;
+            else
+              out[stride_out * col] = result;
+          }
+      }
+    else
+      {
+        std::array<Number, 129> x;
+        for (int i = 0; i < mm; ++i)
+          x[i] = in[stride_in * i];
+
+        Number res0;
+        for (int col = 0; col < nn; ++col)
+          {
+            if (transpose_matrix == true)
+              {
+                res0 = matrix[col] * x[0];
+                for (int i = 1; i < mm; ++i)
+                  res0 += matrix[i * n_columns + col] * x[i];
+              }
+            else
+              {
+                res0 = matrix[col * n_columns] * x[0];
+                for (int i = 1; i < mm; ++i)
+                  res0 += matrix[col * n_columns + i] * x[i];
+              }
+            if (add)
+              out[stride_out * col] += res0;
+            else
+              out[stride_out * col] = res0;
+          }
+      }
+  }
+
+
+
+  /**
+   * Internal evaluator specialized for "symmetric" finite elements, i.e.,
+   * when the shape functions and quadrature points are symmetric about the
+   * middle point, making the matrix entries the same when starting to read in
+   * the (1,1) entry forward compared to the (N,N) entry backward.
+   */
+  template <EvaluatorVariant  variant,
+            EvaluatorQuantity quantity,
+            int               n_rows,
+            int               n_columns,
+            int               stride_in,
+            int               stride_out,
+            bool              transpose_matrix,
+            bool              add,
+            typename Number,
+            typename Number2>
+  std::enable_if_t<(variant == evaluate_symmetric), void>
+  apply_matrix_vector_product(const Number2 *matrix,
+                              const Number * in,
+                              Number *       out)
+  {
+    // We can only statically assert that one argument is non-zero because
+    // face evaluation might instantiate some functions, so we need to use the
+    // run-time assert to verify that we do not end up involuntarily.
+    static_assert(n_rows > 0 || n_columns > 0,
+                  "Specialization only for n_rows, n_columns > 0");
+    Assert(n_rows > 0 && n_columns > 0,
+           ExcInternalError("The evaluation needs n_rows, n_columns > 0, but " +
+                            std::to_string(n_rows) + ", " +
+                            std::to_string(n_columns) + " was passed!"));
+
+    constexpr int mm     = transpose_matrix ? n_rows : n_columns,
+                  nn     = transpose_matrix ? n_columns : n_rows;
+    constexpr int n_cols = nn / 2;
+    constexpr int mid    = mm / 2;
+
+    std::array<Number, mm> x;
+    for (int i = 0; i < mm; ++i)
+      x[i] = in[stride_in * i];
+
+    if (quantity == EvaluatorQuantity::value)
+      {
+        // In this case, the 1d shape values read (sorted lexicographically,
+        // rows run over 1d dofs, columns over quadrature points):
+        // Q2 --> [ 0.687  0 -0.087 ]
+        //        [ 0.4    1  0.4   ]
+        //        [-0.087  0  0.687 ]
+        // Q3 --> [ 0.66   0.003  0.002  0.049 ]
+        //        [ 0.521  1.005 -0.01  -0.230 ]
+        //        [-0.230 -0.01   1.005  0.521 ]
+        //        [ 0.049  0.002  0.003  0.66  ]
+        // Q4 --> [ 0.658  0.022  0 -0.007 -0.032 ]
+        //        [ 0.608  1.059  0  0.039  0.176 ]
+        //        [-0.409 -0.113  1 -0.113 -0.409 ]
+        //        [ 0.176  0.039  0  1.059  0.608 ]
+        //        [-0.032 -0.007  0  0.022  0.658 ]
+        //
+        // In these matrices, we want to use avoid computations involving
+        // zeros and ones and use the symmetry in entries starting from (1,1)
+        // forward and (N,N) backward, respectively to reduce the number of
+        // read operations.
+        for (int col = 0; col < n_cols; ++col)
+          {
+            Number2 val0, val1;
+            Number  res0, res1;
+            if (transpose_matrix == true)
+              {
+                val0 = matrix[col];
+                val1 = matrix[nn - 1 - col];
+              }
+            else
+              {
+                val0 = matrix[col * n_columns];
+                val1 = matrix[(col + 1) * n_columns - 1];
+              }
+            if (mid > 0)
+              {
+                res0 = val0 * x[0];
+                res1 = val1 * x[0];
+                res0 += val1 * x[mm - 1];
+                res1 += val0 * x[mm - 1];
+                for (int ind = 1; ind < mid; ++ind)
+                  {
+                    if (transpose_matrix == true)
+                      {
+                        val0 = matrix[ind * n_columns + col];
+                        val1 = matrix[ind * n_columns + nn - 1 - col];
+                      }
+                    else
+                      {
+                        val0 = matrix[col * n_columns + ind];
+                        val1 = matrix[(col + 1) * n_columns - 1 - ind];
+                      }
+                    res0 += val0 * x[ind];
+                    res1 += val1 * x[ind];
+                    res0 += val1 * x[mm - 1 - ind];
+                    res1 += val0 * x[mm - 1 - ind];
+                  }
+              }
+            else
+              res0 = res1 = Number();
+            if (transpose_matrix == true)
+              {
+                if (mm % 2 == 1)
+                  {
+                    const Number tmp = matrix[mid * n_columns + col] * x[mid];
+                    res0 += tmp;
+                    res1 += tmp;
+                  }
+              }
+            else
+              {
+                if (mm % 2 == 1 && nn % 2 == 0)
+                  {
+                    const Number tmp = matrix[col * n_columns + mid] * x[mid];
+                    res0 += tmp;
+                    res1 += tmp;
+                  }
+              }
+            if (add)
+              {
+                out[stride_out * col] += res0;
+                out[stride_out * (nn - 1 - col)] += res1;
+              }
+            else
+              {
+                out[stride_out * col]            = res0;
+                out[stride_out * (nn - 1 - col)] = res1;
+              }
+          }
+        if (transpose_matrix == true && nn % 2 == 1 && mm % 2 == 1)
+          {
+            if (add)
+              out[stride_out * n_cols] += x[mid];
+            else
+              out[stride_out * n_cols] = x[mid];
+          }
+        else if (transpose_matrix == true && nn % 2 == 1)
+          {
+            Number res0;
+            if (mid > 0)
+              {
+                res0 = matrix[n_cols] * (x[0] + x[mm - 1]);
+                for (int ind = 1; ind < mid; ++ind)
+                  {
+                    const Number2 val0 = matrix[ind * n_columns + n_cols];
+                    res0 += val0 * (x[ind] + in[mm - 1 - ind]);
+                  }
+              }
+            else
+              res0 = Number();
+            if (add)
+              out[stride_out * n_cols] += res0;
+            else
+              out[stride_out * n_cols] = res0;
+          }
+        else if (transpose_matrix == false && nn % 2 == 1)
+          {
+            Number res0;
+            if (mid > 0)
+              {
+                res0 = matrix[n_cols * n_columns] * (x[0] + x[mm - 1]);
+                for (int ind = 1; ind < mid; ++ind)
+                  {
+                    const Number2 val0 = matrix[n_cols * n_columns + ind];
+                    res0 += val0 * (x[ind] + x[mm - 1 - ind]);
+                    ;
+                  }
+                if (mm % 2)
+                  res0 += x[mid];
+              }
+            else
+              res0 = in[0];
+            if (add)
+              out[stride_out * n_cols] += res0;
+            else
+              out[stride_out * n_cols] = res0;
+          }
+      }
+    else if (quantity == EvaluatorQuantity::gradient)
+      {
+        // For the specialized loop used for gradient computations we again
+        // exploit symmetries according to the following entries (sorted
+        // lexicographically, rows run over 1d dofs, columns over quadrature
+        // points):
+        // Q2 --> [-2.549 -1  0.549 ]
+        //        [ 3.098  0 -3.098 ]
+        //        [-0.549  1  2.549 ]
+        // Q3 --> [-4.315 -1.03  0.5  -0.44  ]
+        //        [ 6.07  -1.44 -2.97  2.196 ]
+        //        [-2.196  2.97  1.44 -6.07  ]
+        //        [ 0.44  -0.5   1.03  4.315 ]
+        // Q4 --> [-6.316 -1.3    0.333 -0.353  0.413 ]
+        //        [10.111 -2.76  -2.667  2.066 -2.306 ]
+        //        [-5.688  5.773  0     -5.773  5.688 ]
+        //        [ 2.306 -2.066  2.667  2.76 -10.111 ]
+        //        [-0.413  0.353 -0.333 -0.353  0.413 ]
+        for (int col = 0; col < n_cols; ++col)
+          {
+            Number2 val0, val1;
+            Number  res0, res1;
+            if (transpose_matrix == true)
+              {
+                val0 = matrix[col];
+                val1 = matrix[nn - 1 - col];
+              }
+            else
+              {
+                val0 = matrix[col * n_columns];
+                val1 = matrix[(nn - col - 1) * n_columns];
+              }
+            if (mid > 0)
+              {
+                res0 = val0 * x[0];
+                res1 = val1 * x[0];
+                res0 -= val1 * x[mm - 1];
+                res1 -= val0 * x[mm - 1];
+                for (int ind = 1; ind < mid; ++ind)
+                  {
+                    if (transpose_matrix == true)
+                      {
+                        val0 = matrix[ind * n_columns + col];
+                        val1 = matrix[ind * n_columns + nn - 1 - col];
+                      }
+                    else
+                      {
+                        val0 = matrix[col * n_columns + ind];
+                        val1 = matrix[(nn - col - 1) * n_columns + ind];
+                      }
+                    res0 += val0 * x[ind];
+                    res1 += val1 * x[ind];
+                    res0 -= val1 * x[mm - 1 - ind];
+                    res1 -= val0 * x[mm - 1 - ind];
+                  }
+              }
+            else
+              res0 = res1 = Number();
+            if (mm % 2 == 1)
+              {
+                if (transpose_matrix == true)
+                  val0 = matrix[mid * n_columns + col];
+                else
+                  val0 = matrix[col * n_columns + mid];
+                const Number tmp = val0 * x[mid];
+                res0 += tmp;
+                res1 -= tmp;
+              }
+            if (add)
+              {
+                out[stride_out * col] += res0;
+                out[stride_out * (nn - 1 - col)] += res1;
+              }
+            else
+              {
+                out[stride_out * col]            = res0;
+                out[stride_out * (nn - 1 - col)] = res1;
+              }
+          }
+        if (nn % 2 == 1)
+          {
+            Number2 val0;
+            Number  res0;
+            if (transpose_matrix == true)
+              val0 = matrix[n_cols];
+            else
+              val0 = matrix[n_cols * n_columns];
+            res0 = val0 * (x[0] - x[mm - 1]);
+            for (int ind = 1; ind < mid; ++ind)
+              {
+                if (transpose_matrix == true)
+                  val0 = matrix[ind * n_columns + n_cols];
+                else
+                  val0 = matrix[n_cols * n_columns + ind];
+                Number in1 = val0 * (x[ind] - x[mm - 1 - ind]);
+                res0 += in1;
+              }
+            if (add)
+              out[stride_out * n_cols] += res0;
+            else
+              out[stride_out * n_cols] = res0;
+          }
+      }
+    else
+      {
+        // Hessians are almost the same as values, apart from some missing '1'
+        // entries
+        for (int col = 0; col < n_cols; ++col)
+          {
+            Number2 val0, val1;
+            Number  res0, res1;
+            if (transpose_matrix == true)
+              {
+                val0 = matrix[col];
+                val1 = matrix[nn - 1 - col];
+              }
+            else
+              {
+                val0 = matrix[col * n_columns];
+                val1 = matrix[(col + 1) * n_columns - 1];
+              }
+            if (mid > 0)
+              {
+                res0 = val0 * x[0];
+                res1 = val1 * x[0];
+                res0 += val1 * x[mm - 1];
+                res1 += val0 * x[mm - 1];
+                for (int ind = 1; ind < mid; ++ind)
+                  {
+                    if (transpose_matrix == true)
+                      {
+                        val0 = matrix[ind * n_columns + col];
+                        val1 = matrix[ind * n_columns + nn - 1 - col];
+                      }
+                    else
+                      {
+                        val0 = matrix[col * n_columns + ind];
+                        val1 = matrix[(col + 1) * n_columns - 1 - ind];
+                      }
+                    res0 += val0 * x[ind];
+                    res1 += val1 * x[ind];
+                    res0 += val1 * x[mm - 1 - ind];
+                    res1 += val0 * x[mm - 1 - ind];
+                  }
+              }
+            else
+              res0 = res1 = Number();
+            if (mm % 2 == 1)
+              {
+                if (transpose_matrix == true)
+                  val0 = matrix[mid * n_columns + col];
+                else
+                  val0 = matrix[col * n_columns + mid];
+                const Number tmp = val0 * x[mid];
+                res0 += tmp;
+                res1 += tmp;
+              }
+            if (add)
+              {
+                out[stride_out * col] += res0;
+                out[stride_out * (nn - 1 - col)] += res1;
+              }
+            else
+              {
+                out[stride_out * col]            = res0;
+                out[stride_out * (nn - 1 - col)] = res1;
+              }
+          }
+        if (nn % 2 == 1)
+          {
+            Number2 val0;
+            Number  res0;
+            if (transpose_matrix == true)
+              val0 = matrix[n_cols];
+            else
+              val0 = matrix[n_cols * n_columns];
+            if (mid > 0)
+              {
+                res0 = val0 * (x[0] + x[mm - 1]);
+                for (int ind = 1; ind < mid; ++ind)
+                  {
+                    if (transpose_matrix == true)
+                      val0 = matrix[ind * n_columns + n_cols];
+                    else
+                      val0 = matrix[n_cols * n_columns + ind];
+                    Number in1 = val0 * (x[ind] + x[mm - 1 - ind]);
+                    res0 += in1;
+                  }
+              }
+            else
+              res0 = Number();
+            if (mm % 2 == 1)
+              {
+                if (transpose_matrix == true)
+                  val0 = matrix[mid * n_columns + n_cols];
+                else
+                  val0 = matrix[n_cols * n_columns + mid];
+                res0 += val0 * x[mid];
+              }
+            if (add)
+              out[stride_out * n_cols] += res0;
+            else
+              out[stride_out * n_cols] = res0;
+          }
+      }
+  }
+
+
+
+  /**
+   * Internal evaluator specialized for "symmetric" finite elements in the
+   * evenodd matrix format.
+   *
+   * This function implements a different approach to the symmetric case for
+   * values, gradients, and Hessians as in the above matrices: It is possible
+   * to reduce the cost per dimension from N^2 to N^2/2, where N is the number
+   * of 1d dofs (there are only N^2/2 different entries in the shape matrix,
+   * so this is plausible). The approach is based on the idea of applying the
+   * operator on the even and odd part of the input vectors separately, given
+   * that the basis of shape functions evaluated at quadrature points is
+   * symmetric. This method is presented e.g. in the book "Implementing
+   * Spectral Methods for Partial Differential Equations" by David A. Kopriva,
+   * Springer, 2009, section 3.5.3 (Even-Odd-Decomposition). Even though the
+   * experiments in the book say that the method is not efficient for N<20, it
+   * is more efficient in the context where the loop bounds are compile-time
+   * constants (templates).
+   */
+  template <EvaluatorVariant  variant,
+            EvaluatorQuantity quantity,
+            int               n_rows_static,
+            int               n_columns_static,
+            int               stride_in_static,
+            int               stride_out_static,
+            bool              transpose_matrix,
+            bool              add,
+            typename Number,
+            typename Number2>
+  std::enable_if_t<(variant == evaluate_evenodd), void>
+  apply_matrix_vector_product(const Number2 *matrix,
+                              const Number * in,
+                              Number *       out,
+                              int            n_rows_runtime     = 0,
+                              int            n_columns_runtime  = 0,
+                              int            stride_in_runtime  = 0,
+                              int            stride_out_runtime = 0)
+  {
+    const int n_rows = n_rows_static == 0 ? n_rows_runtime : n_rows_static;
+    const int n_columns =
+      n_rows_static == 0 ? n_columns_runtime : n_columns_static;
+    const int stride_in =
+      n_rows_static == 0 ? stride_in_runtime : stride_in_static;
+    const int stride_out =
+      n_rows_static == 0 ? stride_out_runtime : stride_out_static;
+
+    Assert(n_rows > 0 && n_columns > 0,
+           ExcInternalError("The evaluation needs n_rows, n_columns > 0, but " +
+                            std::to_string(n_rows) + ", " +
+                            std::to_string(n_columns) + " was passed!"));
+
+    const int mm     = transpose_matrix ? n_rows : n_columns,
+              nn     = transpose_matrix ? n_columns : n_rows;
+    const int n_cols = nn / 2;
+    const int mid    = mm / 2;
+
+    constexpr int max_mid = 16; // for non-templated execution
+    constexpr int static_mid =
+      n_rows_static == 0 ? 1 : (transpose_matrix ? n_rows : n_columns) / 2;
+    const int offset = (n_columns + 1) / 2;
+
+    Assert((n_rows_static != 0 && n_columns_static != 0) || mid <= max_mid,
+           ExcNotImplemented());
+
+    std::array<Number, (n_rows_static != 0 ? static_mid : max_mid)> xp, xm;
+    for (int i = 0; i < mid; ++i)
+      {
+        if (transpose_matrix == true && quantity == EvaluatorQuantity::gradient)
+          {
+            xp[i] = in[stride_in * i] - in[stride_in * (mm - 1 - i)];
+            xm[i] = in[stride_in * i] + in[stride_in * (mm - 1 - i)];
+          }
+        else
+          {
+            xp[i] = in[stride_in * i] + in[stride_in * (mm - 1 - i)];
+            xm[i] = in[stride_in * i] - in[stride_in * (mm - 1 - i)];
+          }
+      }
+    Number xmid = in[stride_in * mid];
+    for (int col = 0; col < n_cols; ++col)
+      {
+        Number r0, r1;
+        if (mid > 0)
+          {
+            if (transpose_matrix == true)
+              {
+                r0 = matrix[col] * xp[0];
+                r1 = matrix[(n_rows - 1) * offset + col] * xm[0];
+              }
+            else
+              {
+                r0 = matrix[col * offset] * xp[0];
+                r1 = matrix[(n_rows - 1 - col) * offset] * xm[0];
+              }
+            for (int ind = 1; ind < mid; ++ind)
+              {
+                if (transpose_matrix == true)
+                  {
+                    r0 += matrix[ind * offset + col] * xp[ind];
+                    r1 += matrix[(n_rows - 1 - ind) * offset + col] * xm[ind];
+                  }
+                else
+                  {
+                    r0 += matrix[col * offset + ind] * xp[ind];
+                    r1 += matrix[(n_rows - 1 - col) * offset + ind] * xm[ind];
+                  }
+              }
+          }
+        else
+          r0 = r1 = Number();
+        if (mm % 2 == 1 && transpose_matrix == true)
+          {
+            if (quantity == EvaluatorQuantity::gradient)
+              r1 += matrix[mid * offset + col] * xmid;
+            else
+              r0 += matrix[mid * offset + col] * xmid;
+          }
+        else if (mm % 2 == 1 &&
+                 (nn % 2 == 0 || quantity != EvaluatorQuantity::value ||
+                  mm == 3))
+          r0 += matrix[col * offset + mid] * xmid;
+
+        if (add)
+          {
+            out[stride_out * col] += r0 + r1;
+            if (quantity == EvaluatorQuantity::gradient &&
+                transpose_matrix == false)
+              out[stride_out * (nn - 1 - col)] += r1 - r0;
+            else
+              out[stride_out * (nn - 1 - col)] += r0 - r1;
+          }
+        else
+          {
+            out[stride_out * col] = r0 + r1;
+            if (quantity == EvaluatorQuantity::gradient &&
+                transpose_matrix == false)
+              out[stride_out * (nn - 1 - col)] = r1 - r0;
+            else
+              out[stride_out * (nn - 1 - col)] = r0 - r1;
+          }
+      }
+    if (quantity == EvaluatorQuantity::value && transpose_matrix == true &&
+        nn % 2 == 1 && mm % 2 == 1 && mm > 3)
+      {
+        if (add)
+          out[stride_out * n_cols] += matrix[mid * offset + n_cols] * xmid;
+        else
+          out[stride_out * n_cols] = matrix[mid * offset + n_cols] * xmid;
+      }
+    else if (transpose_matrix == true && nn % 2 == 1)
+      {
+        Number r0;
+        if (mid > 0)
+          {
+            r0 = matrix[n_cols] * xp[0];
+            for (int ind = 1; ind < mid; ++ind)
+              r0 += matrix[ind * offset + n_cols] * xp[ind];
+          }
+        else
+          r0 = Number();
+        if (quantity != EvaluatorQuantity::gradient && mm % 2 == 1)
+          r0 += matrix[mid * offset + n_cols] * xmid;
+
+        if (add)
+          out[stride_out * n_cols] += r0;
+        else
+          out[stride_out * n_cols] = r0;
+      }
+    else if (transpose_matrix == false && nn % 2 == 1)
+      {
+        Number r0;
+        if (mid > 0)
+          {
+            if (quantity == EvaluatorQuantity::gradient)
+              {
+                r0 = matrix[n_cols * offset] * xm[0];
+                for (int ind = 1; ind < mid; ++ind)
+                  r0 += matrix[n_cols * offset + ind] * xm[ind];
+              }
+            else
+              {
+                r0 = matrix[n_cols * offset] * xp[0];
+                for (int ind = 1; ind < mid; ++ind)
+                  r0 += matrix[n_cols * offset + ind] * xp[ind];
+              }
+          }
+        else
+          r0 = Number();
+
+        if (quantity != EvaluatorQuantity::gradient && mm % 2 == 1)
+          r0 += matrix[n_cols * offset + mid] * xmid;
+
+        if (add)
+          out[stride_out * n_cols] += r0;
+        else
+          out[stride_out * n_cols] = r0;
+      }
+  }
+
+
+
+  /**
+   * Internal evaluator specialized for "symmetric" finite elements in the
+   * evenodd matrix format with run-time bounds.
+   */
+  template <EvaluatorVariant  variant,
+            EvaluatorQuantity quantity,
+            bool              transpose_matrix,
+            bool              add,
+            typename Number,
+            typename Number2>
+  std::enable_if_t<(variant == evaluate_evenodd), void>
+  apply_matrix_vector_product(const Number2 *matrix,
+                              const Number * in,
+                              Number *       out,
+                              int            n_rows,
+                              int            n_columns,
+                              int            stride_in,
+                              int            stride_out)
+  {
+    apply_matrix_vector_product<evaluate_evenodd,
+                                quantity,
+                                0,
+                                0,
+                                0,
+                                0,
+                                transpose_matrix,
+                                add>(
+      matrix, in, out, n_rows, n_columns, stride_in, stride_out);
+  }
+
+
+
+  /**
+   * Internal evaluator specialized for "symmetric" finite elements in the
+   * symmetric_hierarchical matrix format.
+   *
+   * This class implements an approach similar to the even-odd decomposition
+   * but with a different type of symmetry. In this case, we assume that a
+   * single shape function already shows the symmetry over the quadrature
+   * points, rather than the complete basis that is considered in the even-odd
+   * case. In particular, we assume that the shape functions are ordered as in
+   * the Legendre basis, with symmetric shape functions in the even slots
+   * (rows of the values array) and point-symmetric in the odd slots. Like the
+   * even-odd decomposition, the number of operations are N^2/2 rather than
+   * N^2 FMAs (fused multiply-add), where N is the number of 1d dofs. The
+   * difference is in the way the input and output quantities are symmetrized.
+   */
+  template <EvaluatorVariant  variant,
+            EvaluatorQuantity quantity,
+            int               n_rows,
+            int               n_columns,
+            int               stride_in,
+            int               stride_out,
+            bool              transpose_matrix,
+            bool              add,
+            typename Number,
+            typename Number2>
+  std::enable_if_t<(variant == evaluate_symmetric_hierarchical), void>
+  apply_matrix_vector_product(const Number2 *matrix,
+                              const Number * in,
+                              Number *       out)
+  {
+    static_assert(n_rows > 0 && n_columns > 0,
+                  "Specialization requires n_rows, n_columns > 0");
+
+    constexpr bool evaluate_antisymmetric =
+      (quantity == EvaluatorQuantity::gradient);
+
+    constexpr int mm     = transpose_matrix ? n_rows : n_columns,
+                  nn     = transpose_matrix ? n_columns : n_rows;
+    constexpr int n_cols = nn / 2;
+    constexpr int mid    = mm / 2;
+
+    if (transpose_matrix)
+      {
+        std::array<Number, mm> x;
+        for (unsigned int i = 0; i < mm; ++i)
+          x[i] = in[stride_in * i];
+        for (unsigned int col = 0; col < n_cols; ++col)
+          {
+            Number r0, r1;
+            if (mid > 0)
+              {
+                r0 = matrix[col] * x[0];
+                r1 = matrix[col + n_columns] * x[1];
+                for (unsigned int ind = 1; ind < mid; ++ind)
+                  {
+                    r0 += matrix[col + 2 * ind * n_columns] * x[2 * ind];
+                    r1 +=
+                      matrix[col + (2 * ind + 1) * n_columns] * x[2 * ind + 1];
+                  }
+              }
+            else
+              r0 = r1 = Number();
+            if (mm % 2 == 1)
+              r0 += matrix[col + (mm - 1) * n_columns] * x[mm - 1];
+            if (add)
+              {
+                out[stride_out * col] += r0 + r1;
+                if (evaluate_antisymmetric)
+                  out[stride_out * (nn - 1 - col)] += r1 - r0;
+                else
+                  out[stride_out * (nn - 1 - col)] += r0 - r1;
+              }
+            else
+              {
+                out[stride_out * col] = r0 + r1;
+                if (evaluate_antisymmetric)
+                  out[stride_out * (nn - 1 - col)] = r1 - r0;
+                else
+                  out[stride_out * (nn - 1 - col)] = r0 - r1;
+              }
+          }
+        if (nn % 2 == 1)
+          {
+            Number             r0;
+            const unsigned int shift = evaluate_antisymmetric ? 1 : 0;
+            if (mid > 0)
+              {
+                r0 = matrix[n_cols + shift * n_columns] * x[shift];
+                for (unsigned int ind = 1; ind < mid; ++ind)
+                  r0 += matrix[n_cols + (2 * ind + shift) * n_columns] *
+                        x[2 * ind + shift];
+              }
+            else
+              r0 = 0;
+            if (!evaluate_antisymmetric && mm % 2 == 1)
+              r0 += matrix[n_cols + (mm - 1) * n_columns] * x[mm - 1];
+            if (add)
+              out[stride_out * n_cols] += r0;
+            else
+              out[stride_out * n_cols] = r0;
+          }
+      }
+    else
+      {
+        std::array<Number, mid + 1> xp, xm;
+        for (int i = 0; i < mid; ++i)
+          if (!evaluate_antisymmetric)
+            {
+              xp[i] = in[stride_in * i] + in[stride_in * (mm - 1 - i)];
+              xm[i] = in[stride_in * i] - in[stride_in * (mm - 1 - i)];
+            }
+          else
+            {
+              xp[i] = in[stride_in * i] - in[stride_in * (mm - 1 - i)];
+              xm[i] = in[stride_in * i] + in[stride_in * (mm - 1 - i)];
+            }
+        if (mm % 2 == 1)
+          xp[mid] = in[stride_in * mid];
+        for (unsigned int col = 0; col < n_cols; ++col)
+          {
+            Number r0, r1;
+            if (mid > 0)
+              {
+                r0 = matrix[2 * col * n_columns] * xp[0];
+                r1 = matrix[(2 * col + 1) * n_columns] * xm[0];
+                for (unsigned int ind = 1; ind < mid; ++ind)
+                  {
+                    r0 += matrix[2 * col * n_columns + ind] * xp[ind];
+                    r1 += matrix[(2 * col + 1) * n_columns + ind] * xm[ind];
+                  }
+              }
+            else
+              r0 = r1 = Number();
+            if (mm % 2 == 1)
+              {
+                if (evaluate_antisymmetric)
+                  r1 += matrix[(2 * col + 1) * n_columns + mid] * xp[mid];
+                else
+                  r0 += matrix[2 * col * n_columns + mid] * xp[mid];
+              }
+            if (add)
+              {
+                out[stride_out * (2 * col)] += r0;
+                out[stride_out * (2 * col + 1)] += r1;
+              }
+            else
+              {
+                out[stride_out * (2 * col)]     = r0;
+                out[stride_out * (2 * col + 1)] = r1;
+              }
+          }
+        if (nn % 2 == 1)
+          {
+            Number r0;
+            if (mid > 0)
+              {
+                r0 = matrix[(nn - 1) * n_columns] * xp[0];
+                for (unsigned int ind = 1; ind < mid; ++ind)
+                  r0 += matrix[(nn - 1) * n_columns + ind] * xp[ind];
+              }
+            else
+              r0 = Number();
+            if (mm % 2 == 1 && !evaluate_antisymmetric)
+              r0 += matrix[(nn - 1) * n_columns + mid] * xp[mid];
+            if (add)
+              out[stride_out * (nn - 1)] += r0;
+            else
+              out[stride_out * (nn - 1)] = r0;
+          }
+      }
+  }
+
+
+
+  /**
    * Generic evaluator framework that valuates the given shape data in general
    * dimensions using the tensor product form. Depending on the particular
    * layout in the matrix entries, this corresponds to a usual matrix-matrix
-   * product or a matrix-matrix product including some symmetries.
-   *
-   * @tparam variant Variant of evaluation used for creating template
-   *                 specializations
-   * @tparam dim Dimension of the function
-   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
-   *                to the number of 1d shape functions in the usual tensor
-   *                contraction setting
-   * @tparam n_columns Number of columns in the transformation matrix, which
-   *                   corresponds to the number of 1d shape functions in the
-   *                   usual tensor contraction setting
-   * @tparam Number Abstract number type for input and output arrays
-   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
-   *                 same type as the input/output arrays); must implement
-   *                 operator* with Number to be valid
-   */
-  template <EvaluatorVariant variant,
-            int              dim,
-            int              n_rows,
-            int              n_columns,
-            typename Number,
-            typename Number2 = Number>
-  struct EvaluatorTensorProduct
-  {};
-
-  /**
-   * Evaluator framework for anisotropic polynomial spaces that valuates the
-   * given shape data in general dimensions using the tensor product form.
-   *
-   * @tparam variant Variant of evaluation used for creating template
-   *                 specializations
-   * @tparam dim Dimension of the function
-   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
-   *                to the number of 1d shape functions in the usual tensor
-   *                contraction setting
-   * @tparam n_columns Number of columns in the transformation matrix, which
-   *                   corresponds to the number of 1d shape functions in the
-   *                   usual tensor contraction setting
-   * @tparam Number Abstract number type for input and output arrays
-   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
-   *                 same type as the input/output arrays); must implement
-   *                 operator* with Number to be valid
-   * @tparam normal_dir Indicates the direction of the continuous component for the
-   *                    Raviart-Thomas space in terms of the normal onto the
-   * face, e.g 0 if the  is in x-direction, 1 if in y-direction, and 2 if in
-   * z-direction.
-   */
-  template <EvaluatorVariant variant,
-            int              dim,
-            int              n_rows,
-            int              n_columns,
-            int              normal_dir,
-            typename Number,
-            typename Number2 = Number>
-  struct EvaluatorTensorProductAnisotropic
-  {};
-
-
-
-  /**
-   * Internal evaluator for shape function in arbitrary dimension using the
-   * tensor product form of the basis functions.
+   * product or a matrix-matrix product including some symmetries. The actual
+   * work is implemented by functions of type apply_matrix_vector_product
+   * working on a single dimension, controlled by suitable strides, using the
+   * kernel specified via variant.
    *
    * @tparam dim Space dimension in which this class is applied
    * @tparam n_rows Number of rows in the transformation matrix, which corresponds
@@ -174,17 +1078,13 @@ namespace internal
    *                 operator* with Number and produce Number as an output to
    *                 be a valid type
    */
-  template <int dim,
-            int n_rows,
-            int n_columns,
+  template <EvaluatorVariant variant,
+            int              dim,
+            int              n_rows,
+            int              n_columns,
             typename Number,
-            typename Number2>
-  struct EvaluatorTensorProduct<evaluate_general,
-                                dim,
-                                n_rows,
-                                n_columns,
-                                Number,
-                                Number2>
+            typename Number2 = Number>
+  struct EvaluatorTensorProduct
   {
     static constexpr unsigned int n_rows_of_product =
       Utilities::pow(n_rows, dim);
@@ -207,28 +1107,43 @@ namespace internal
     EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
                            const AlignedVector<Number2> &shape_gradients,
                            const AlignedVector<Number2> &shape_hessians,
-                           const unsigned int            dummy1 = 0,
-                           const unsigned int            dummy2 = 0)
+                           const unsigned int = 0,
+                           const unsigned int = 0)
       : shape_values(shape_values.begin())
       , shape_gradients(shape_gradients.begin())
       , shape_hessians(shape_hessians.begin())
     {
-      // We can enter this function either for the apply() path that has
-      // n_rows * n_columns entries or for the apply_face() path that only has
-      // n_rows * 3 entries in the array. Since we cannot decide about the use
-      // we must allow for both here.
-      Assert(shape_values.empty() ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == 3 * n_rows,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.empty() ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.empty() ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
-      (void)dummy1;
-      (void)dummy2;
+      if (variant == evaluate_evenodd)
+        {
+          if (!shape_values.empty())
+            AssertDimension(shape_values.size(),
+                            n_rows * ((n_columns + 1) / 2));
+          if (!shape_gradients.empty())
+            AssertDimension(shape_gradients.size(),
+                            n_rows * ((n_columns + 1) / 2));
+          if (!shape_hessians.empty())
+            AssertDimension(shape_hessians.size(),
+                            n_rows * ((n_columns + 1) / 2));
+        }
+      else
+        {
+          // We can enter this function either for the apply() path that has
+          // n_rows * n_columns entries or for the apply_face() path that only
+          // has n_rows * 3 entries in the array. Since we cannot decide about
+          // the use we must allow for both here.
+          Assert(shape_values.empty() ||
+                   shape_values.size() == n_rows * n_columns ||
+                   shape_values.size() == 3 * n_rows,
+                 ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
+          Assert(shape_gradients.empty() ||
+                   shape_gradients.size() == n_rows * n_columns,
+                 ExcDimensionMismatch(shape_gradients.size(),
+                                      n_rows * n_columns));
+          Assert(shape_hessians.empty() ||
+                   shape_hessians.size() == n_rows * n_columns,
+                 ExcDimensionMismatch(shape_hessians.size(),
+                                      n_rows * n_columns));
+        }
     }
 
     /**
@@ -251,21 +1166,35 @@ namespace internal
     void
     values(const Number in[], Number out[]) const
     {
-      apply<direction, contract_over_rows, add>(shape_values, in, out);
+      apply<direction,
+            contract_over_rows,
+            add,
+            false,
+            EvaluatorQuantity::value>(shape_values, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
     void
     gradients(const Number in[], Number out[]) const
     {
-      apply<direction, contract_over_rows, add>(shape_gradients, in, out);
+      constexpr EvaluatorQuantity gradient_type =
+        (variant == evaluate_general ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::gradient);
+      apply<direction, contract_over_rows, add, false, gradient_type>(
+        shape_gradients, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
     void
     hessians(const Number in[], Number out[]) const
     {
-      apply<direction, contract_over_rows, add>(shape_hessians, in, out);
+      constexpr EvaluatorQuantity hessian_type =
+        (((variant == evaluate_general) |
+          (variant == evaluate_symmetric_hierarchical)) ?
+           EvaluatorQuantity::value :
+           EvaluatorQuantity::hessian);
+      apply<direction, contract_over_rows, add, false, hessian_type>(
+        shape_hessians, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -273,7 +1202,8 @@ namespace internal
     values_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_values != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, true>(shape_values, in, out);
+      apply<direction, contract_over_rows, add, true, EvaluatorQuantity::value>(
+        shape_values, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -281,7 +1211,11 @@ namespace internal
     gradients_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, true>(shape_gradients, in, out);
+      constexpr EvaluatorQuantity gradient_type =
+        (variant == evaluate_general ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::gradient);
+      apply<direction, contract_over_rows, add, true, gradient_type>(
+        shape_gradients, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -289,7 +1223,13 @@ namespace internal
     hessians_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, true>(shape_hessians, in, out);
+      constexpr EvaluatorQuantity hessian_type =
+        (((variant == evaluate_general) |
+          (variant == evaluate_symmetric_hierarchical)) ?
+           EvaluatorQuantity::value :
+           EvaluatorQuantity::hessian);
+      apply<direction, contract_over_rows, add, true, hessian_type>(
+        shape_hessians, in, out);
     }
 
     /**
@@ -319,7 +1259,8 @@ namespace internal
     template <int  direction,
               bool contract_over_rows,
               bool add,
-              bool one_line = false>
+              bool one_line     = false,
+              EvaluatorQuantity = EvaluatorQuantity::value>
     static void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
           const Number *                  in,
@@ -370,22 +1311,22 @@ namespace internal
 
 
 
-  template <int dim,
-            int n_rows,
-            int n_columns,
+  template <EvaluatorVariant variant,
+            int              dim,
+            int              n_rows,
+            int              n_columns,
             typename Number,
             typename Number2>
-  template <int direction, bool contract_over_rows, bool add, bool one_line>
+  template <int               direction,
+            bool              contract_over_rows,
+            bool              add,
+            bool              one_line,
+            EvaluatorQuantity quantity>
   inline void
-  EvaluatorTensorProduct<evaluate_general,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::apply(const Number2 *DEAL_II_RESTRICT
-                                                       shape_data,
-                                         const Number *in,
-                                         Number *      out)
+  EvaluatorTensorProduct<variant, dim, n_rows, n_columns, Number, Number2>::
+    apply(const Number2 *DEAL_II_RESTRICT shape_data,
+          const Number *                  in,
+          Number *                        out)
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
@@ -409,30 +1350,14 @@ namespace internal
       {
         for (int i1 = 0; i1 < n_blocks1; ++i1)
           {
-            Number x[mm];
-            for (int i = 0; i < mm; ++i)
-              x[i] = in[stride * i];
-            for (int col = 0; col < nn; ++col)
-              {
-                Number2 val0;
-                if (contract_over_rows == true)
-                  val0 = shape_data[col];
-                else
-                  val0 = shape_data[col * n_columns];
-                Number res0 = val0 * x[0];
-                for (int i = 1; i < mm; ++i)
-                  {
-                    if (contract_over_rows == true)
-                      val0 = shape_data[i * n_columns + col];
-                    else
-                      val0 = shape_data[col * n_columns + i];
-                    res0 += val0 * x[i];
-                  }
-                if (add)
-                  out[stride * col] += res0;
-                else
-                  out[stride * col] = res0;
-              }
+            apply_matrix_vector_product<variant,
+                                        quantity,
+                                        n_rows,
+                                        n_columns,
+                                        stride,
+                                        stride,
+                                        contract_over_rows,
+                                        add>(shape_data, in, out);
 
             if (one_line == false)
               {
@@ -450,9 +1375,10 @@ namespace internal
 
 
 
-  template <int dim,
-            int n_rows,
-            int n_columns,
+  template <EvaluatorVariant variant,
+            int              dim,
+            int              n_rows,
+            int              n_columns,
             typename Number,
             typename Number2>
   template <int  face_direction,
@@ -460,14 +1386,9 @@ namespace internal
             bool add,
             int  max_derivative>
   inline void
-  EvaluatorTensorProduct<evaluate_general,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::apply_face(const Number *DEAL_II_RESTRICT in,
-                                              Number *DEAL_II_RESTRICT
-                                                out) const
+  EvaluatorTensorProduct<variant, dim, n_rows, n_columns, Number, Number2>::
+    apply_face(const Number *DEAL_II_RESTRICT in,
+               Number *DEAL_II_RESTRICT       out) const
   {
     Assert(dim > 0, ExcMessage("Only dim=1,2,3 supported"));
     static_assert(max_derivative >= 0 && max_derivative < 3,
@@ -603,8 +1524,11 @@ namespace internal
    *                 operator* with Number and produce Number as an output to
    *                 be a valid type
    */
-  template <int dim, typename Number, typename Number2>
-  struct EvaluatorTensorProduct<evaluate_general, dim, 0, 0, Number, Number2>
+  template <EvaluatorVariant variant,
+            int              dim,
+            typename Number,
+            typename Number2>
+  struct EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>
   {
     static constexpr unsigned int n_rows_of_product =
       numbers::invalid_unsigned_int;
@@ -629,28 +1553,45 @@ namespace internal
     EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
                            const AlignedVector<Number2> &shape_gradients,
                            const AlignedVector<Number2> &shape_hessians,
-                           const unsigned int            n_rows,
-                           const unsigned int            n_columns)
+                           const unsigned int            n_rows    = 0,
+                           const unsigned int            n_columns = 0)
       : shape_values(shape_values.begin())
       , shape_gradients(shape_gradients.begin())
       , shape_hessians(shape_hessians.begin())
       , n_rows(n_rows)
       , n_columns(n_columns)
     {
-      // We can enter this function either for the apply() path that has
-      // n_rows * n_columns entries or for the apply_face() path that only has
-      // n_rows * 3 entries in the array. Since we cannot decide about the use
-      // we must allow for both here.
-      Assert(shape_values.empty() ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == n_rows * 3,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.empty() ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.empty() ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
+      if (variant == evaluate_evenodd)
+        {
+          if (!shape_values.empty())
+            AssertDimension(shape_values.size(),
+                            n_rows * ((n_columns + 1) / 2));
+          if (!shape_gradients.empty())
+            AssertDimension(shape_gradients.size(),
+                            n_rows * ((n_columns + 1) / 2));
+          if (!shape_hessians.empty())
+            AssertDimension(shape_hessians.size(),
+                            n_rows * ((n_columns + 1) / 2));
+        }
+      else
+        {
+          // We can enter this function either for the apply() path that has
+          // n_rows * n_columns entries or for the apply_face() path that only
+          // has n_rows * 3 entries in the array. Since we cannot decide about
+          // the use we must allow for both here.
+          Assert(shape_values.empty() ||
+                   shape_values.size() == n_rows * n_columns ||
+                   shape_values.size() == n_rows * 3,
+                 ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
+          Assert(shape_gradients.empty() ||
+                   shape_gradients.size() == n_rows * n_columns,
+                 ExcDimensionMismatch(shape_gradients.size(),
+                                      n_rows * n_columns));
+          Assert(shape_hessians.empty() ||
+                   shape_hessians.size() == n_rows * n_columns,
+                 ExcDimensionMismatch(shape_hessians.size(),
+                                      n_rows * n_columns));
+        }
     }
 
     /**
@@ -659,8 +1600,8 @@ namespace internal
     EvaluatorTensorProduct(const Number2 *    shape_values,
                            const Number2 *    shape_gradients,
                            const Number2 *    shape_hessians,
-                           const unsigned int n_rows,
-                           const unsigned int n_columns)
+                           const unsigned int n_rows    = 0,
+                           const unsigned int n_columns = 0)
       : shape_values(shape_values)
       , shape_gradients(shape_gradients)
       , shape_hessians(shape_hessians)
@@ -672,21 +1613,33 @@ namespace internal
     void
     values(const Number *in, Number *out) const
     {
-      apply<direction, contract_over_rows, add>(shape_values, in, out);
+      apply<direction,
+            contract_over_rows,
+            add,
+            false,
+            EvaluatorQuantity::value>(shape_values, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
     void
     gradients(const Number *in, Number *out) const
     {
-      apply<direction, contract_over_rows, add>(shape_gradients, in, out);
+      constexpr EvaluatorQuantity gradient_type =
+        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::gradient);
+      apply<direction, contract_over_rows, add, false, gradient_type>(
+        shape_gradients, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
     void
     hessians(const Number *in, Number *out) const
     {
-      apply<direction, contract_over_rows, add>(shape_hessians, in, out);
+      constexpr EvaluatorQuantity hessian_type =
+        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::hessian);
+      apply<direction, contract_over_rows, add, false, hessian_type>(
+        shape_hessians, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -694,7 +1647,8 @@ namespace internal
     values_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_values != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, true>(shape_values, in, out);
+      apply<direction, contract_over_rows, add, true, EvaluatorQuantity::value>(
+        shape_values, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -702,7 +1656,11 @@ namespace internal
     gradients_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, true>(shape_gradients, in, out);
+      constexpr EvaluatorQuantity gradient_type =
+        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::gradient);
+      apply<direction, contract_over_rows, add, true, gradient_type>(
+        shape_gradients, in, out);
     }
 
     template <int direction, bool contract_over_rows, bool add>
@@ -710,13 +1668,18 @@ namespace internal
     hessians_one_line(const Number in[], Number out[]) const
     {
       Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, true>(shape_hessians, in, out);
+      constexpr EvaluatorQuantity hessian_type =
+        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::hessian);
+      apply<direction, contract_over_rows, add, true, hessian_type>(
+        shape_hessians, in, out);
     }
 
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              bool one_line = false>
+    template <int               direction,
+              bool              contract_over_rows,
+              bool              add,
+              bool              one_line = false,
+              EvaluatorQuantity quantity = EvaluatorQuantity::value>
     void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
           const Number *                  in,
@@ -739,10 +1702,17 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename Number2>
-  template <int direction, bool contract_over_rows, bool add, bool one_line>
+  template <EvaluatorVariant variant,
+            int              dim,
+            typename Number,
+            typename Number2>
+  template <int               direction,
+            bool              contract_over_rows,
+            bool              add,
+            bool              one_line,
+            EvaluatorQuantity quantity>
   inline void
-  EvaluatorTensorProduct<evaluate_general, dim, 0, 0, Number, Number2>::apply(
+  EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>::apply(
     const Number2 *DEAL_II_RESTRICT shape_data,
     const Number *                  in,
     Number *                        out) const
@@ -768,132 +1738,48 @@ namespace internal
                             Utilities::fixed_power<dim - direction - 1>(n_rows);
     Assert(n_rows <= 128, ExcNotImplemented());
 
-    // specialization for n_rows = 2 that manually unrolls the innermost loop
-    // to make the operation perform better (not completely as good as the
-    // templated one, but much better than the generic version down below,
-    // because the loop over col can be more effectively unrolled by the
-    // compiler)
-    if (contract_over_rows && n_rows == 2)
+    for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
-        const Number2 *shape_data_1 = shape_data + n_columns;
-        for (int i2 = 0; i2 < n_blocks2; ++i2)
+        for (int i1 = 0; i1 < n_blocks1; ++i1)
           {
-            for (int i1 = 0; i1 < n_blocks1; ++i1)
-              {
-                const Number x0 = in[0], x1 = in[stride];
-                for (int col = 0; col < nn; ++col)
-                  {
-                    const Number result =
-                      shape_data[col] * x0 + shape_data_1[col] * x1;
-                    if (add)
-                      out[stride * col] += result;
-                    else
-                      out[stride * col] = result;
-                  }
+            // the empty template case can only run the general evaluator or
+            // evenodd
+            constexpr EvaluatorVariant restricted_variant =
+              variant == evaluate_evenodd ? evaluate_evenodd : evaluate_general;
+            apply_matrix_vector_product<restricted_variant,
+                                        quantity,
+                                        contract_over_rows,
+                                        add>(
+              shape_data, in, out, n_rows, n_columns, stride, stride);
 
-                if (one_line == false)
-                  {
-                    ++in;
-                    ++out;
-                  }
-              }
             if (one_line == false)
               {
-                in += stride * (mm - 1);
-                out += stride * (nn - 1);
+                ++in;
+                ++out;
               }
           }
-      }
-    // specialization for n = 3
-    else if (contract_over_rows && n_rows == 3)
-      {
-        const Number2 *shape_data_1 = shape_data + n_columns;
-        const Number2 *shape_data_2 = shape_data + 2 * n_columns;
-        for (int i2 = 0; i2 < n_blocks2; ++i2)
+        if (one_line == false)
           {
-            for (int i1 = 0; i1 < n_blocks1; ++i1)
-              {
-                const Number x0 = in[0], x1 = in[stride], x2 = in[2 * stride];
-                for (int col = 0; col < nn; ++col)
-                  {
-                    const Number result = shape_data[col] * x0 +
-                                          shape_data_1[col] * x1 +
-                                          shape_data_2[col] * x2;
-                    if (add)
-                      out[stride * col] += result;
-                    else
-                      out[stride * col] = result;
-                  }
-
-                if (one_line == false)
-                  {
-                    ++in;
-                    ++out;
-                  }
-              }
-            if (one_line == false)
-              {
-                in += stride * (mm - 1);
-                out += stride * (nn - 1);
-              }
+            in += stride * (mm - 1);
+            out += stride * (nn - 1);
           }
       }
-    // general loop for all other cases
-    else
-      for (int i2 = 0; i2 < n_blocks2; ++i2)
-        {
-          for (int i1 = 0; i1 < n_blocks1; ++i1)
-            {
-              Number x[129];
-              for (int i = 0; i < mm; ++i)
-                x[i] = in[stride * i];
-              for (int col = 0; col < nn; ++col)
-                {
-                  Number2 val0;
-                  if (contract_over_rows == true)
-                    val0 = shape_data[col];
-                  else
-                    val0 = shape_data[col * n_columns];
-                  Number res0 = val0 * x[0];
-                  for (int i = 1; i < mm; ++i)
-                    {
-                      if (contract_over_rows == true)
-                        val0 = shape_data[i * n_columns + col];
-                      else
-                        val0 = shape_data[col * n_columns + i];
-                      res0 += val0 * x[i];
-                    }
-                  if (add)
-                    out[stride * col] += res0;
-                  else
-                    out[stride * col] = res0;
-                }
-
-              if (one_line == false)
-                {
-                  ++in;
-                  ++out;
-                }
-            }
-          if (one_line == false)
-            {
-              in += stride * (mm - 1);
-              out += stride * (nn - 1);
-            }
-        }
   }
 
 
 
-  template <int dim, typename Number, typename Number2>
+  template <EvaluatorVariant variant,
+            int              dim,
+            typename Number,
+            typename Number2>
   template <int  face_direction,
             bool contract_onto_face,
             bool add,
             int  max_derivative>
   inline void
-  EvaluatorTensorProduct<evaluate_general, dim, 0, 0, Number, Number2>::
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT       out) const
+  EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>::apply_face(
+    const Number *DEAL_II_RESTRICT in,
+    Number *DEAL_II_RESTRICT       out) const
   {
     Assert(shape_values != nullptr,
            ExcMessage(
@@ -1014,13 +1900,17 @@ namespace internal
 
 
   /**
-   * Internal evaluator for 1d-3d shape function using the tensor product form
-   * of the basis functions. This class specializes the general application of
-   * tensor-product based elements for "symmetric" finite elements, i.e., when
-   * the shape functions are symmetric about 0.5 and the quadrature points
-   * are, too.
+   * Generic evaluator framework that valuates the given shape data in general
+   * dimensions using the tensor product form. Depending on the particular
+   * layout in the matrix entries, this corresponds to a usual matrix-matrix
+   * product or a matrix-matrix product including some symmetries. The actual
+   * work is implemented by functions of type apply_matrix_vector_product
+   * working on a single dimension, controlled by suitable strides, using the
+   * kernel specified via variant.
    *
-   * @tparam dim Space dimension in which this class is applied
+   * @tparam variant Variant of evaluation used for creating template
+   *                 specializations
+   * @tparam dim Dimension of the function
    * @tparam n_rows Number of rows in the transformation matrix, which corresponds
    *                to the number of 1d shape functions in the usual tensor
    *                contraction setting
@@ -1030,1484 +1920,21 @@ namespace internal
    * @tparam Number Abstract number type for input and output arrays
    * @tparam Number2 Abstract number type for coefficient arrays (defaults to
    *                 same type as the input/output arrays); must implement
-   *                 operator* with Number and produce Number as an output to
-   *                 be a valid type
+   *                 operator* with Number to be valid
+   * @tparam normal_dir Indicates the direction of the continuous component for the
+   *                    Raviart-Thomas space in terms of the normal onto the
+   * face, e.g 0 if the  is in x-direction, 1 if in y-direction, and 2 if in
+   * z-direction.
    */
-  template <int dim,
-            int n_rows,
-            int n_columns,
+  template <EvaluatorVariant variant,
+            int              dim,
+            int              n_rows,
+            int              n_columns,
+            int              normal_dir,
             typename Number,
-            typename Number2>
-  struct EvaluatorTensorProduct<evaluate_symmetric,
-                                dim,
-                                n_rows,
-                                n_columns,
-                                Number,
-                                Number2>
-  {
-    static constexpr unsigned int n_rows_of_product =
-      Utilities::pow(n_rows, dim);
-    static constexpr unsigned int n_columns_of_product =
-      Utilities::pow(n_columns, dim);
-
-    /**
-     * Constructor, taking the data from ShapeInfo
-     */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
-                           const unsigned int            dummy1 = 0,
-                           const unsigned int            dummy2 = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
-    {
-      Assert(shape_values.empty() || shape_values.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.empty() ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.empty() ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
-      (void)dummy1;
-      (void)dummy2;
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values(const Number in[], Number out[]) const;
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients(const Number in[], Number out[]) const;
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians(const Number in[], Number out[]) const;
-
-  private:
-    const Number2 *shape_values;
-    const Number2 *shape_gradients;
-    const Number2 *shape_hessians;
-  };
-
-
-
-  // In this case, the 1d shape values read (sorted lexicographically, rows
-  // run over 1d dofs, columns over quadrature points):
-  // Q2 --> [ 0.687  0 -0.087 ]
-  //        [ 0.4    1  0.4   ]
-  //        [-0.087  0  0.687 ]
-  // Q3 --> [ 0.66   0.003  0.002  0.049 ]
-  //        [ 0.521  1.005 -0.01  -0.230 ]
-  //        [-0.230 -0.01   1.005  0.521 ]
-  //        [ 0.049  0.002  0.003  0.66  ]
-  // Q4 --> [ 0.658  0.022  0 -0.007 -0.032 ]
-  //        [ 0.608  1.059  0  0.039  0.176 ]
-  //        [-0.409 -0.113  1 -0.113 -0.409 ]
-  //        [ 0.176  0.039  0  1.059  0.608 ]
-  //        [-0.032 -0.007  0  0.022  0.658 ]
-  //
-  // In these matrices, we want to use avoid computations involving zeros and
-  // ones and in addition use the symmetry in entries to reduce the number of
-  // read operations.
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  template <int direction, bool contract_over_rows, bool add>
-  inline void
-  EvaluatorTensorProduct<evaluate_symmetric,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::values(const Number in[], Number out[]) const
-  {
-    Assert(shape_values != nullptr, ExcNotInitialized());
-    AssertIndexRange(direction, dim);
-    constexpr int mm     = contract_over_rows ? n_rows : n_columns,
-                  nn     = contract_over_rows ? n_columns : n_rows;
-    constexpr int n_cols = nn / 2;
-    constexpr int mid    = mm / 2;
-
-    constexpr int stride    = Utilities::pow(n_columns, direction);
-    constexpr int n_blocks1 = stride;
-    constexpr int n_blocks2 =
-      Utilities::pow(n_rows, (direction >= dim) ? 0 : (dim - direction - 1));
-
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            for (int col = 0; col < n_cols; ++col)
-              {
-                Number2 val0, val1;
-                Number  in0, in1, res0, res1;
-                if (contract_over_rows == true)
-                  {
-                    val0 = shape_values[col];
-                    val1 = shape_values[nn - 1 - col];
-                  }
-                else
-                  {
-                    val0 = shape_values[col * n_columns];
-                    val1 = shape_values[(col + 1) * n_columns - 1];
-                  }
-                if (mid > 0)
-                  {
-                    in0  = in[0];
-                    in1  = in[stride * (mm - 1)];
-                    res0 = val0 * in0;
-                    res1 = val1 * in0;
-                    res0 += val1 * in1;
-                    res1 += val0 * in1;
-                    for (int ind = 1; ind < mid; ++ind)
-                      {
-                        if (contract_over_rows == true)
-                          {
-                            val0 = shape_values[ind * n_columns + col];
-                            val1 = shape_values[ind * n_columns + nn - 1 - col];
-                          }
-                        else
-                          {
-                            val0 = shape_values[col * n_columns + ind];
-                            val1 =
-                              shape_values[(col + 1) * n_columns - 1 - ind];
-                          }
-                        in0 = in[stride * ind];
-                        in1 = in[stride * (mm - 1 - ind)];
-                        res0 += val0 * in0;
-                        res1 += val1 * in0;
-                        res0 += val1 * in1;
-                        res1 += val0 * in1;
-                      }
-                  }
-                else
-                  res0 = res1 = Number();
-                if (contract_over_rows == true)
-                  {
-                    if (mm % 2 == 1)
-                      {
-                        val0 = shape_values[mid * n_columns + col];
-                        in1  = val0 * in[stride * mid];
-                        res0 += in1;
-                        res1 += in1;
-                      }
-                  }
-                else
-                  {
-                    if (mm % 2 == 1 && nn % 2 == 0)
-                      {
-                        val0 = shape_values[col * n_columns + mid];
-                        in1  = val0 * in[stride * mid];
-                        res0 += in1;
-                        res1 += in1;
-                      }
-                  }
-                if (add)
-                  {
-                    out[stride * col] += res0;
-                    out[stride * (nn - 1 - col)] += res1;
-                  }
-                else
-                  {
-                    out[stride * col]            = res0;
-                    out[stride * (nn - 1 - col)] = res1;
-                  }
-              }
-            if (contract_over_rows == true && nn % 2 == 1 && mm % 2 == 1)
-              {
-                if (add)
-                  out[stride * n_cols] += in[stride * mid];
-                else
-                  out[stride * n_cols] = in[stride * mid];
-              }
-            else if (contract_over_rows == true && nn % 2 == 1)
-              {
-                Number  res0;
-                Number2 val0 = shape_values[n_cols];
-                if (mid > 0)
-                  {
-                    res0 = val0 * (in[0] + in[stride * (mm - 1)]);
-                    for (int ind = 1; ind < mid; ++ind)
-                      {
-                        val0 = shape_values[ind * n_columns + n_cols];
-                        res0 += val0 * (in[stride * ind] +
-                                        in[stride * (mm - 1 - ind)]);
-                      }
-                  }
-                else
-                  res0 = Number();
-                if (add)
-                  out[stride * n_cols] += res0;
-                else
-                  out[stride * n_cols] = res0;
-              }
-            else if (contract_over_rows == false && nn % 2 == 1)
-              {
-                Number res0;
-                if (mid > 0)
-                  {
-                    Number2 val0 = shape_values[n_cols * n_columns];
-                    res0         = val0 * (in[0] + in[stride * (mm - 1)]);
-                    for (int ind = 1; ind < mid; ++ind)
-                      {
-                        val0       = shape_values[n_cols * n_columns + ind];
-                        Number in1 = val0 * (in[stride * ind] +
-                                             in[stride * (mm - 1 - ind)]);
-                        res0 += in1;
-                      }
-                    if (mm % 2)
-                      res0 += in[stride * mid];
-                  }
-                else
-                  res0 = in[0];
-                if (add)
-                  out[stride * n_cols] += res0;
-                else
-                  out[stride * n_cols] = res0;
-              }
-
-            ++in;
-            ++out;
-          }
-        in += stride * (mm - 1);
-        out += stride * (nn - 1);
-      }
-  }
-
-
-
-  // For the specialized loop used for the gradient computation in
-  // here, the 1d shape values read (sorted lexicographically, rows
-  // run over 1d dofs, columns over quadrature points):
-  // Q2 --> [-2.549 -1  0.549 ]
-  //        [ 3.098  0 -3.098 ]
-  //        [-0.549  1  2.549 ]
-  // Q3 --> [-4.315 -1.03  0.5  -0.44  ]
-  //        [ 6.07  -1.44 -2.97  2.196 ]
-  //        [-2.196  2.97  1.44 -6.07  ]
-  //        [ 0.44  -0.5   1.03  4.315 ]
-  // Q4 --> [-6.316 -1.3    0.333 -0.353  0.413 ]
-  //        [10.111 -2.76  -2.667  2.066 -2.306 ]
-  //        [-5.688  5.773  0     -5.773  5.688 ]
-  //        [ 2.306 -2.066  2.667  2.76 -10.111 ]
-  //        [-0.413  0.353 -0.333 -0.353  0.413 ]
-  //
-  // In these matrices, we want to use avoid computations involving
-  // zeros and ones and in addition use the symmetry in entries to
-  // reduce the number of read operations.
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  template <int direction, bool contract_over_rows, bool add>
-  inline void
-  EvaluatorTensorProduct<evaluate_symmetric,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::gradients(const Number in[],
-                                             Number       out[]) const
-  {
-    Assert(shape_gradients != nullptr, ExcNotInitialized());
-    AssertIndexRange(direction, dim);
-    constexpr int mm     = contract_over_rows ? n_rows : n_columns,
-                  nn     = contract_over_rows ? n_columns : n_rows;
-    constexpr int n_cols = nn / 2;
-    constexpr int mid    = mm / 2;
-
-    constexpr int stride    = Utilities::pow(n_columns, direction);
-    constexpr int n_blocks1 = stride;
-    constexpr int n_blocks2 =
-      Utilities::pow(n_rows, (direction >= dim) ? 0 : (dim - direction - 1));
-
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            for (int col = 0; col < n_cols; ++col)
-              {
-                Number2 val0, val1;
-                Number  in0, in1, res0, res1;
-                if (contract_over_rows == true)
-                  {
-                    val0 = shape_gradients[col];
-                    val1 = shape_gradients[nn - 1 - col];
-                  }
-                else
-                  {
-                    val0 = shape_gradients[col * n_columns];
-                    val1 = shape_gradients[(nn - col - 1) * n_columns];
-                  }
-                if (mid > 0)
-                  {
-                    in0  = in[0];
-                    in1  = in[stride * (mm - 1)];
-                    res0 = val0 * in0;
-                    res1 = val1 * in0;
-                    res0 -= val1 * in1;
-                    res1 -= val0 * in1;
-                    for (int ind = 1; ind < mid; ++ind)
-                      {
-                        if (contract_over_rows == true)
-                          {
-                            val0 = shape_gradients[ind * n_columns + col];
-                            val1 =
-                              shape_gradients[ind * n_columns + nn - 1 - col];
-                          }
-                        else
-                          {
-                            val0 = shape_gradients[col * n_columns + ind];
-                            val1 =
-                              shape_gradients[(nn - col - 1) * n_columns + ind];
-                          }
-                        in0 = in[stride * ind];
-                        in1 = in[stride * (mm - 1 - ind)];
-                        res0 += val0 * in0;
-                        res1 += val1 * in0;
-                        res0 -= val1 * in1;
-                        res1 -= val0 * in1;
-                      }
-                  }
-                else
-                  res0 = res1 = Number();
-                if (mm % 2 == 1)
-                  {
-                    if (contract_over_rows == true)
-                      val0 = shape_gradients[mid * n_columns + col];
-                    else
-                      val0 = shape_gradients[col * n_columns + mid];
-                    in1 = val0 * in[stride * mid];
-                    res0 += in1;
-                    res1 -= in1;
-                  }
-                if (add)
-                  {
-                    out[stride * col] += res0;
-                    out[stride * (nn - 1 - col)] += res1;
-                  }
-                else
-                  {
-                    out[stride * col]            = res0;
-                    out[stride * (nn - 1 - col)] = res1;
-                  }
-              }
-            if (nn % 2 == 1)
-              {
-                Number2 val0;
-                Number  res0;
-                if (contract_over_rows == true)
-                  val0 = shape_gradients[n_cols];
-                else
-                  val0 = shape_gradients[n_cols * n_columns];
-                res0 = val0 * (in[0] - in[stride * (mm - 1)]);
-                for (int ind = 1; ind < mid; ++ind)
-                  {
-                    if (contract_over_rows == true)
-                      val0 = shape_gradients[ind * n_columns + n_cols];
-                    else
-                      val0 = shape_gradients[n_cols * n_columns + ind];
-                    Number in1 =
-                      val0 * (in[stride * ind] - in[stride * (mm - 1 - ind)]);
-                    res0 += in1;
-                  }
-                if (add)
-                  out[stride * n_cols] += res0;
-                else
-                  out[stride * n_cols] = res0;
-              }
-
-            ++in;
-            ++out;
-          }
-        in += stride * (mm - 1);
-        out += stride * (nn - 1);
-      }
-  }
-
-
-
-  // evaluates the given shape data in 1d-3d using the tensor product
-  // form assuming the symmetries of unit cell shape hessians for
-  // finite elements in FEEvaluation
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  template <int direction, bool contract_over_rows, bool add>
-  inline void
-  EvaluatorTensorProduct<evaluate_symmetric,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::hessians(const Number in[],
-                                            Number       out[]) const
-  {
-    Assert(shape_hessians != nullptr, ExcNotInitialized());
-    AssertIndexRange(direction, dim);
-    constexpr int mm     = contract_over_rows ? n_rows : n_columns;
-    constexpr int nn     = contract_over_rows ? n_columns : n_rows;
-    constexpr int n_cols = nn / 2;
-    constexpr int mid    = mm / 2;
-
-    constexpr int stride    = Utilities::pow(n_columns, direction);
-    constexpr int n_blocks1 = stride;
-    constexpr int n_blocks2 =
-      Utilities::pow(n_rows, (direction >= dim) ? 0 : (dim - direction - 1));
-
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            for (int col = 0; col < n_cols; ++col)
-              {
-                Number2 val0, val1;
-                Number  in0, in1, res0, res1;
-                if (contract_over_rows == true)
-                  {
-                    val0 = shape_hessians[col];
-                    val1 = shape_hessians[nn - 1 - col];
-                  }
-                else
-                  {
-                    val0 = shape_hessians[col * n_columns];
-                    val1 = shape_hessians[(col + 1) * n_columns - 1];
-                  }
-                if (mid > 0)
-                  {
-                    in0  = in[0];
-                    in1  = in[stride * (mm - 1)];
-                    res0 = val0 * in0;
-                    res1 = val1 * in0;
-                    res0 += val1 * in1;
-                    res1 += val0 * in1;
-                    for (int ind = 1; ind < mid; ++ind)
-                      {
-                        if (contract_over_rows == true)
-                          {
-                            val0 = shape_hessians[ind * n_columns + col];
-                            val1 =
-                              shape_hessians[ind * n_columns + nn - 1 - col];
-                          }
-                        else
-                          {
-                            val0 = shape_hessians[col * n_columns + ind];
-                            val1 =
-                              shape_hessians[(col + 1) * n_columns - 1 - ind];
-                          }
-                        in0 = in[stride * ind];
-                        in1 = in[stride * (mm - 1 - ind)];
-                        res0 += val0 * in0;
-                        res1 += val1 * in0;
-                        res0 += val1 * in1;
-                        res1 += val0 * in1;
-                      }
-                  }
-                else
-                  res0 = res1 = Number();
-                if (mm % 2 == 1)
-                  {
-                    if (contract_over_rows == true)
-                      val0 = shape_hessians[mid * n_columns + col];
-                    else
-                      val0 = shape_hessians[col * n_columns + mid];
-                    in1 = val0 * in[stride * mid];
-                    res0 += in1;
-                    res1 += in1;
-                  }
-                if (add)
-                  {
-                    out[stride * col] += res0;
-                    out[stride * (nn - 1 - col)] += res1;
-                  }
-                else
-                  {
-                    out[stride * col]            = res0;
-                    out[stride * (nn - 1 - col)] = res1;
-                  }
-              }
-            if (nn % 2 == 1)
-              {
-                Number2 val0;
-                Number  res0;
-                if (contract_over_rows == true)
-                  val0 = shape_hessians[n_cols];
-                else
-                  val0 = shape_hessians[n_cols * n_columns];
-                if (mid > 0)
-                  {
-                    res0 = val0 * (in[0] + in[stride * (mm - 1)]);
-                    for (int ind = 1; ind < mid; ++ind)
-                      {
-                        if (contract_over_rows == true)
-                          val0 = shape_hessians[ind * n_columns + n_cols];
-                        else
-                          val0 = shape_hessians[n_cols * n_columns + ind];
-                        Number in1 = val0 * (in[stride * ind] +
-                                             in[stride * (mm - 1 - ind)]);
-                        res0 += in1;
-                      }
-                  }
-                else
-                  res0 = Number();
-                if (mm % 2 == 1)
-                  {
-                    if (contract_over_rows == true)
-                      val0 = shape_hessians[mid * n_columns + n_cols];
-                    else
-                      val0 = shape_hessians[n_cols * n_columns + mid];
-                    res0 += val0 * in[stride * mid];
-                  }
-                if (add)
-                  out[stride * n_cols] += res0;
-                else
-                  out[stride * n_cols] = res0;
-              }
-
-            ++in;
-            ++out;
-          }
-        in += stride * (mm - 1);
-        out += stride * (nn - 1);
-      }
-  }
-
-
-
-  template <int dim,
-            int n_rows_static,
-            int n_columns_static,
-            typename Number,
-            typename Number2,
-            int  direction,
-            bool contract_over_rows,
-            bool add,
-            int  type,
-            bool one_line>
-  inline void
-  even_odd_apply(const int                       n_rows_in,
-                 const int                       n_columns_in,
-                 const Number2 *DEAL_II_RESTRICT shapes,
-                 const Number *                  in,
-                 Number *                        out)
-  {
-    static_assert(type < 3, "Only three variants type=0,1,2 implemented");
-    static_assert(one_line == false || direction == dim - 1,
-                  "Single-line evaluation only works for direction=dim-1.");
-
-    const int n_rows = n_rows_static == -1 ? n_rows_in : n_rows_static;
-    const int n_columns =
-      n_columns_static == -1 ? n_columns_in : n_columns_static;
-
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
-
-    // We cannot statically assert that direction is less than dim, so must do
-    // an additional dynamic check
-    AssertIndexRange(direction, dim);
-
-    const int     nn = contract_over_rows ? n_columns : n_rows;
-    const int     mm = contract_over_rows ? n_rows : n_columns;
-    constexpr int mm_static =
-      contract_over_rows ? n_rows_static : n_columns_static;
-    const int     n_cols     = nn / 2;
-    const int     mid        = mm / 2;
-    constexpr int mid_static = mm_static / 2;
-    constexpr int max_mid    = 15; // for non-templated execution
-
-    Assert((n_rows_static != -1 && n_columns_static != -1) || mid <= max_mid,
-           ExcNotImplemented());
-
-    const int stride    = Utilities::pow(n_columns, direction);
-    const int n_blocks1 = one_line ? 1 : stride;
-    const int n_blocks2 =
-      Utilities::pow(n_rows, (direction >= dim) ? 0 : (dim - direction - 1));
-
-    const int offset = (n_columns + 1) / 2;
-
-    // this code may look very inefficient at first sight due to the many
-    // different cases with if's at the innermost loop part, but all of the
-    // conditionals can be evaluated at compile time because they are
-    // templates, so the compiler should optimize everything away
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            constexpr unsigned int mid_size =
-              (n_rows_static == -1 || n_columns_static == -1) ?
-                max_mid :
-                (mid_static > 0 ? mid_static : 1);
-            Number xp[mid_size], xm[mid_size];
-            for (int i = 0; i < mid; ++i)
-              {
-                if (contract_over_rows == true && type == 1)
-                  {
-                    xp[i] = in[stride * i] - in[stride * (mm - 1 - i)];
-                    xm[i] = in[stride * i] + in[stride * (mm - 1 - i)];
-                  }
-                else
-                  {
-                    xp[i] = in[stride * i] + in[stride * (mm - 1 - i)];
-                    xm[i] = in[stride * i] - in[stride * (mm - 1 - i)];
-                  }
-              }
-            Number xmid = in[stride * mid];
-            for (int col = 0; col < n_cols; ++col)
-              {
-                Number r0, r1;
-                if (mid > 0)
-                  {
-                    if (contract_over_rows == true)
-                      {
-                        r0 = shapes[col] * xp[0];
-                        r1 = shapes[(n_rows - 1) * offset + col] * xm[0];
-                      }
-                    else
-                      {
-                        r0 = shapes[col * offset] * xp[0];
-                        r1 = shapes[(n_rows - 1 - col) * offset] * xm[0];
-                      }
-                    for (int ind = 1; ind < mid; ++ind)
-                      {
-                        if (contract_over_rows == true)
-                          {
-                            r0 += shapes[ind * offset + col] * xp[ind];
-                            r1 += shapes[(n_rows - 1 - ind) * offset + col] *
-                                  xm[ind];
-                          }
-                        else
-                          {
-                            r0 += shapes[col * offset + ind] * xp[ind];
-                            r1 += shapes[(n_rows - 1 - col) * offset + ind] *
-                                  xm[ind];
-                          }
-                      }
-                  }
-                else
-                  r0 = r1 = Number();
-                if (mm % 2 == 1 && contract_over_rows == true)
-                  {
-                    if (type == 1)
-                      r1 += shapes[mid * offset + col] * xmid;
-                    else
-                      r0 += shapes[mid * offset + col] * xmid;
-                  }
-                else if (mm % 2 == 1 && (nn % 2 == 0 || type > 0 || mm == 3))
-                  r0 += shapes[col * offset + mid] * xmid;
-
-                if (add)
-                  {
-                    out[stride * col] += r0 + r1;
-                    if (type == 1 && contract_over_rows == false)
-                      out[stride * (nn - 1 - col)] += r1 - r0;
-                    else
-                      out[stride * (nn - 1 - col)] += r0 - r1;
-                  }
-                else
-                  {
-                    out[stride * col] = r0 + r1;
-                    if (type == 1 && contract_over_rows == false)
-                      out[stride * (nn - 1 - col)] = r1 - r0;
-                    else
-                      out[stride * (nn - 1 - col)] = r0 - r1;
-                  }
-              }
-            if (type == 0 && contract_over_rows == true && nn % 2 == 1 &&
-                mm % 2 == 1 && mm > 3)
-              {
-                if (add)
-                  out[stride * n_cols] += shapes[mid * offset + n_cols] * xmid;
-                else
-                  out[stride * n_cols] = shapes[mid * offset + n_cols] * xmid;
-              }
-            else if (contract_over_rows == true && nn % 2 == 1)
-              {
-                Number r0;
-                if (mid > 0)
-                  {
-                    r0 = shapes[n_cols] * xp[0];
-                    for (int ind = 1; ind < mid; ++ind)
-                      r0 += shapes[ind * offset + n_cols] * xp[ind];
-                  }
-                else
-                  r0 = Number();
-                if (type != 1 && mm % 2 == 1)
-                  r0 += shapes[mid * offset + n_cols] * xmid;
-
-                if (add)
-                  out[stride * n_cols] += r0;
-                else
-                  out[stride * n_cols] = r0;
-              }
-            else if (contract_over_rows == false && nn % 2 == 1)
-              {
-                Number r0;
-                if (mid > 0)
-                  {
-                    if (type == 1)
-                      {
-                        r0 = shapes[n_cols * offset] * xm[0];
-                        for (int ind = 1; ind < mid; ++ind)
-                          r0 += shapes[n_cols * offset + ind] * xm[ind];
-                      }
-                    else
-                      {
-                        r0 = shapes[n_cols * offset] * xp[0];
-                        for (int ind = 1; ind < mid; ++ind)
-                          r0 += shapes[n_cols * offset + ind] * xp[ind];
-                      }
-                  }
-                else
-                  r0 = Number();
-
-                if ((type == 0 || type == 2) && mm % 2 == 1)
-                  r0 += shapes[n_cols * offset + mid] * xmid;
-
-                if (add)
-                  out[stride * n_cols] += r0;
-                else
-                  out[stride * n_cols] = r0;
-              }
-            if (one_line == false)
-              {
-                in += 1;
-                out += 1;
-              }
-          }
-        if (one_line == false)
-          {
-            in += stride * (mm - 1);
-            out += stride * (nn - 1);
-          }
-      }
-  }
-
-
-
-  /**
-   * Internal evaluator for 1d-3d shape function using the tensor product form
-   * of the basis functions.
-   *
-   * This class implements a different approach to the symmetric case for
-   * values, gradients, and Hessians also treated with the above functions: It
-   * is possible to reduce the cost per dimension from N^2 to N^2/2, where N
-   * is the number of 1d dofs (there are only N^2/2 different entries in the
-   * shape matrix, so this is plausible). The approach is based on the idea of
-   * applying the operator on the even and odd part of the input vectors
-   * separately, given that the shape functions evaluated on quadrature points
-   * are symmetric. This method is presented e.g. in the book "Implementing
-   * Spectral Methods for Partial Differential Equations" by David A. Kopriva,
-   * Springer, 2009, section 3.5.3 (Even-Odd-Decomposition). Even though the
-   * experiments in the book say that the method is not efficient for N<20, it
-   * is more efficient in the context where the loop bounds are compile-time
-   * constants (templates).
-   *
-   * @tparam dim Space dimension in which this class is applied
-   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
-   *                to the number of 1d shape functions in the usual tensor
-   *                contraction setting
-   * @tparam n_columns Number of columns in the transformation matrix, which
-   *                   corresponds to the number of 1d shape functions in the
-   *                   usual tensor contraction setting
-   * @tparam Number Abstract number type for input and output arrays
-   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
-   *                 same type as the input/output arrays); must implement
-   *                 operator* with Number and produce Number as an output to
-   *                 be a valid type
-   */
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  struct EvaluatorTensorProduct<evaluate_evenodd,
-                                dim,
-                                n_rows,
-                                n_columns,
-                                Number,
-                                Number2>
-  {
-    static constexpr unsigned int n_rows_of_product =
-      Utilities::pow(n_rows, dim);
-    static constexpr unsigned int n_columns_of_product =
-      Utilities::pow(n_columns, dim);
-
-    /**
-     * Empty constructor. Does nothing. Be careful when using 'values' and
-     * related methods because they need to be filled with the other
-     * constructor passing in at least an array for the values.
-     */
-    EvaluatorTensorProduct()
-      : shape_values(nullptr)
-      , shape_gradients(nullptr)
-      , shape_hessians(nullptr)
-    {}
-
-    /**
-     * Constructor, taking the data from ShapeInfo (using the even-odd
-     * variants stored there)
-     */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values)
-      : shape_values(shape_values.begin())
-      , shape_gradients(nullptr)
-      , shape_hessians(nullptr)
-    {
-      AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
-    }
-
-    /**
-     * Constructor, taking the data from ShapeInfo (using the even-odd
-     * variants stored there)
-     */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
-                           const unsigned int            dummy1 = 0,
-                           const unsigned int            dummy2 = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
-    {
-      // In this function, we allow for dummy pointers if some of values,
-      // gradients or hessians should not be computed
-      if (!shape_values.empty())
-        AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
-      if (!shape_gradients.empty())
-        AssertDimension(shape_gradients.size(), n_rows * ((n_columns + 1) / 2));
-      if (!shape_hessians.empty())
-        AssertDimension(shape_hessians.size(), n_rows * ((n_columns + 1) / 2));
-      (void)dummy1;
-      (void)dummy2;
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values(const Number in[], Number out[]) const
-    {
-      Assert(shape_values != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0>(shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients(const Number in[], Number out[]) const
-    {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1>(shape_gradients, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians(const Number in[], Number out[]) const
-    {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 2>(shape_hessians, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_values != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0, true>(shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1, true>(shape_gradients,
-                                                         in,
-                                                         out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 2, true>(shape_hessians,
-                                                         in,
-                                                         out);
-    }
-
-    /**
-     * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1d stripes, along the given @p direction of the tensor
-     * data in the input array. This function allows the @p in and @p out
-     * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
-     * perform the contraction in place where @p in and @p out point to the
-     * same address. For the case n_rows != n_columns, the output is only
-     * correct if @p one_line is set to true.
-     *
-     * @tparam direction Direction that is evaluated
-     * @tparam contract_over_rows If true, the tensor contraction sums
-     *                            over the rows in the given @p shape_data
-     *                            array, otherwise it sums over the columns
-     * @tparam add If true, the result is added to the output vector, else
-     *             the computed values overwrite the content in the output
-     * @tparam type Determines whether to use the symmetries appearing in
-     *              shape values (type=0), shape gradients (type=1) or
-     *              second derivatives (type=2, similar to type 0 but
-     *              without two additional zero entries)
-     * @tparam one_line If true, the kernel is only applied along a single 1d
-     *                  stripe within a dim-dimensional tensor, not the full
-     *                  n_rows^dim points as in the @p false case.
-     *
-     * @param shape_data Transformation matrix with @p n_rows rows and
-     *                   @p n_columns columns, stored in row-major format
-     * @param in Pointer to the start of the input data vector
-     * @param out Pointer to the start of the output data vector
-     */
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              int  type,
-              bool one_line = false>
-    static void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out)
-    {
-      even_odd_apply<dim,
-                     n_rows,
-                     n_columns,
-                     Number,
-                     Number2,
-                     direction,
-                     contract_over_rows,
-                     add,
-                     type,
-                     one_line>(n_rows, n_columns, shape_data, in, out);
-    }
-
-  private:
-    const Number2 *shape_values;
-    const Number2 *shape_gradients;
-    const Number2 *shape_hessians;
-  };
-
-
-  /**
-   * Internal evaluator for shape function using the tensor product form
-   * of the basis functions. The same as the other templated class but
-   * without making use of template arguments and variable loop bounds
-   * instead.
-   */
-  template <int dim, typename Number, typename Number2>
-  struct EvaluatorTensorProduct<evaluate_evenodd, dim, 0, 0, Number, Number2>
-  {
-    EvaluatorTensorProduct()
-      : shape_values(nullptr)
-      , shape_gradients(nullptr)
-      , shape_hessians(nullptr)
-      , n_rows(numbers::invalid_unsigned_int)
-      , n_columns(numbers::invalid_unsigned_int)
-    {}
-
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const unsigned int            n_rows    = 0,
-                           const unsigned int            n_columns = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(nullptr)
-      , shape_hessians(nullptr)
-      , n_rows(n_rows)
-      , n_columns(n_columns)
-    {
-      AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
-    }
-
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
-                           const unsigned int            n_rows    = 0,
-                           const unsigned int            n_columns = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
-      , n_rows(n_rows)
-      , n_columns(n_columns)
-    {
-      if (!shape_values.empty())
-        AssertDimension(shape_values.size(), n_rows * ((n_columns + 1) / 2));
-      if (!shape_gradients.empty())
-        AssertDimension(shape_gradients.size(), n_rows * ((n_columns + 1) / 2));
-      if (!shape_hessians.empty())
-        AssertDimension(shape_hessians.size(), n_rows * ((n_columns + 1) / 2));
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values(const Number in[], Number out[]) const
-    {
-      Assert(shape_values != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0>(shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients(const Number in[], Number out[]) const
-    {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1>(shape_gradients, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians(const Number in[], Number out[]) const
-    {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 2>(shape_hessians, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_values != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0, true>(shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1, true>(shape_gradients,
-                                                         in,
-                                                         out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 2, true>(shape_hessians,
-                                                         in,
-                                                         out);
-    }
-
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              int  type,
-              bool one_line = false>
-    void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out) const
-    {
-      even_odd_apply<dim,
-                     -1,
-                     -1,
-                     Number,
-                     Number2,
-                     direction,
-                     contract_over_rows,
-                     add,
-                     type,
-                     one_line>(n_rows, n_columns, shape_data, in, out);
-    }
-
-  private:
-    const Number2 *    shape_values;
-    const Number2 *    shape_gradients;
-    const Number2 *    shape_hessians;
-    const unsigned int n_rows;
-    const unsigned int n_columns;
-  };
-
-
-
-  /**
-   * Internal evaluator for 1d-3d shape function using the tensor product form
-   * of the basis functions.
-   *
-   * This class implements an approach similar to the even-odd decomposition
-   * but with a different type of symmetry. In this case, we assume that a
-   * single shape function already shows the symmetry over the quadrature
-   * points, rather than the complete basis that is considered in the even-odd
-   * case. In particular, we assume that the shape functions are ordered as in
-   * the Legendre basis, with symmetric shape functions in the even slots
-   * (rows of the values array) and point-symmetric in the odd slots. Like the
-   * even-odd decomposition, the number of operations are N^2/2 rather than
-   * N^2 FMAs (fused multiply-add), where N is the number of 1d dofs. The
-   * difference is in the way the input and output quantities are symmetrized.
-   *
-   * @tparam dim Space dimension in which this class is applied
-   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
-   *                to the number of 1d shape functions in the usual tensor
-   *                contraction setting
-   * @tparam n_columns Number of columns in the transformation matrix, which
-   *                   corresponds to the number of 1d shape functions in the
-   *                   usual tensor contraction setting
-   * @tparam Number Abstract number type for input and output arrays
-   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
-   *                 same type as the input/output arrays); must implement
-   *                 operator* with Number and produce Number as an output to
-   *                 be a valid type
-   */
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  struct EvaluatorTensorProduct<evaluate_symmetric_hierarchical,
-                                dim,
-                                n_rows,
-                                n_columns,
-                                Number,
-                                Number2>
-  {
-    static constexpr unsigned int n_rows_of_product =
-      Utilities::pow(n_rows, dim);
-    static constexpr unsigned int n_columns_of_product =
-      Utilities::pow(n_columns, dim);
-
-    /**
-     * Empty constructor. Does nothing. Be careful when using 'values' and
-     * related methods because they need to be filled with the other
-     * constructor passing in at least an array for the values.
-     */
-    EvaluatorTensorProduct()
-      : shape_values(nullptr)
-      , shape_gradients(nullptr)
-      , shape_hessians(nullptr)
-    {}
-
-    /**
-     * Constructor, taking the data from ShapeInfo (using the even-odd
-     * variants stored there)
-     */
-    EvaluatorTensorProduct(const AlignedVector<Number> &shape_values)
-      : shape_values(shape_values.begin())
-      , shape_gradients(nullptr)
-      , shape_hessians(nullptr)
-    {}
-
-    /**
-     * Constructor, taking the data from ShapeInfo (using the even-odd
-     * variants stored there)
-     */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
-                           const unsigned int            dummy1 = 0,
-                           const unsigned int            dummy2 = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
-    {
-      (void)dummy1;
-      (void)dummy2;
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values(const Number in[], Number out[]) const
-    {
-      Assert(shape_values != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0>(shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients(const Number in[], Number out[]) const
-    {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1>(shape_gradients, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians(const Number in[], Number out[]) const
-    {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0>(shape_hessians, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_values != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0, true>(shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 1, true>(shape_gradients,
-                                                         in,
-                                                         out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, 0, true>(shape_hessians,
-                                                         in,
-                                                         out);
-    }
-
-    /**
-     * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1d stripes, along the given @p direction of the tensor
-     * data in the input array. This function allows the @p in and @p out
-     * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
-     * perform the contraction in place where @p in and @p out point to the
-     * same address. For the case n_rows != n_columns, the output is only
-     * correct if @p one_line is set to true.
-     *
-     * @tparam direction Direction that is evaluated
-     * @tparam contract_over_rows If true, the tensor contraction sums
-     *                            over the rows in the given @p shape_data
-     *                            array, otherwise it sums over the columns
-     * @tparam add If true, the result is added to the output vector, else
-     *             the computed values overwrite the content in the output
-     * @tparam type Determines whether the evaluation is symmetric in even
-     *              rows (type=0) or odd rows (type=1) of @p shape_data and
-     *              skew-symmetric in odd rows (type=0) or even rows (type=1)
-     * @tparam one_line If true, the kernel is only applied along a single 1d
-     *                  stripe within a dim-dimensional tensor, not the full
-     *                  n_rows^dim points as in the @p false case.
-     *
-     * @param shape_data Transformation matrix with @p n_rows rows and
-     *                   @p n_columns columns, stored in row-major format
-     * @param in Pointer to the start of the input data vector
-     * @param out Pointer to the start of the output data vector
-     */
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              int  type,
-              bool one_line = false>
-    static void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out);
-
-  private:
-    const Number2 *shape_values;
-    const Number2 *shape_gradients;
-    const Number2 *shape_hessians;
-  };
-
-
-
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            typename Number,
-            typename Number2>
-  template <int  direction,
-            bool contract_over_rows,
-            bool add,
-            int  type,
-            bool one_line>
-  inline void
-  EvaluatorTensorProduct<evaluate_symmetric_hierarchical,
-                         dim,
-                         n_rows,
-                         n_columns,
-                         Number,
-                         Number2>::apply(const Number2 *DEAL_II_RESTRICT shapes,
-                                         const Number *                  in,
-                                         Number *                        out)
-  {
-    static_assert(one_line == false || direction == dim - 1,
-                  "Single-line evaluation only works for direction=dim-1.");
-    static_assert(
-      type == 0 || type == 1,
-      "Only types 0 and 1 implemented for evaluate_symmetric_hierarchical.");
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
-
-    // We cannot statically assert that direction is less than dim, so must do
-    // an additional dynamic check
-    AssertIndexRange(direction, dim);
-
-    constexpr int nn     = contract_over_rows ? n_columns : n_rows;
-    constexpr int mm     = contract_over_rows ? n_rows : n_columns;
-    constexpr int n_cols = nn / 2;
-    constexpr int mid    = mm / 2;
-
-    constexpr int stride    = Utilities::pow(n_columns, direction);
-    constexpr int n_blocks1 = one_line ? 1 : stride;
-    constexpr int n_blocks2 =
-      Utilities::pow(n_rows, (direction >= dim) ? 0 : (dim - direction - 1));
-
-    // this code may look very inefficient at first sight due to the many
-    // different cases with if's at the innermost loop part, but all of the
-    // conditionals can be evaluated at compile time because they are
-    // templates, so the compiler should optimize everything away
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            if (contract_over_rows)
-              {
-                Number x[mm];
-                for (unsigned int i = 0; i < mm; ++i)
-                  x[i] = in[stride * i];
-                for (unsigned int col = 0; col < n_cols; ++col)
-                  {
-                    Number r0, r1;
-                    if (mid > 0)
-                      {
-                        r0 = shapes[col] * x[0];
-                        r1 = shapes[col + n_columns] * x[1];
-                        for (unsigned int ind = 1; ind < mid; ++ind)
-                          {
-                            r0 +=
-                              shapes[col + 2 * ind * n_columns] * x[2 * ind];
-                            r1 += shapes[col + (2 * ind + 1) * n_columns] *
-                                  x[2 * ind + 1];
-                          }
-                      }
-                    else
-                      r0 = r1 = Number();
-                    if (mm % 2 == 1)
-                      r0 += shapes[col + (mm - 1) * n_columns] * x[mm - 1];
-                    if (add)
-                      {
-                        out[stride * col] += r0 + r1;
-                        if (type == 1)
-                          out[stride * (nn - 1 - col)] += r1 - r0;
-                        else
-                          out[stride * (nn - 1 - col)] += r0 - r1;
-                      }
-                    else
-                      {
-                        out[stride * col] = r0 + r1;
-                        if (type == 1)
-                          out[stride * (nn - 1 - col)] = r1 - r0;
-                        else
-                          out[stride * (nn - 1 - col)] = r0 - r1;
-                      }
-                  }
-                if (nn % 2 == 1)
-                  {
-                    Number             r0;
-                    const unsigned int shift = type == 1 ? 1 : 0;
-                    if (mid > 0)
-                      {
-                        r0 = shapes[n_cols + shift * n_columns] * x[shift];
-                        for (unsigned int ind = 1; ind < mid; ++ind)
-                          r0 += shapes[n_cols + (2 * ind + shift) * n_columns] *
-                                x[2 * ind + shift];
-                      }
-                    else
-                      r0 = 0;
-                    if (type != 1 && mm % 2 == 1)
-                      r0 += shapes[n_cols + (mm - 1) * n_columns] * x[mm - 1];
-                    if (add)
-                      out[stride * n_cols] += r0;
-                    else
-                      out[stride * n_cols] = r0;
-                  }
-              }
-            else
-              {
-                Number xp[mid + 1], xm[mid > 0 ? mid : 1];
-                for (int i = 0; i < mid; ++i)
-                  if (type == 0)
-                    {
-                      xp[i] = in[stride * i] + in[stride * (mm - 1 - i)];
-                      xm[i] = in[stride * i] - in[stride * (mm - 1 - i)];
-                    }
-                  else
-                    {
-                      xp[i] = in[stride * i] - in[stride * (mm - 1 - i)];
-                      xm[i] = in[stride * i] + in[stride * (mm - 1 - i)];
-                    }
-                if (mm % 2 == 1)
-                  xp[mid] = in[stride * mid];
-                for (unsigned int col = 0; col < n_cols; ++col)
-                  {
-                    Number r0, r1;
-                    if (mid > 0)
-                      {
-                        r0 = shapes[2 * col * n_columns] * xp[0];
-                        r1 = shapes[(2 * col + 1) * n_columns] * xm[0];
-                        for (unsigned int ind = 1; ind < mid; ++ind)
-                          {
-                            r0 += shapes[2 * col * n_columns + ind] * xp[ind];
-                            r1 +=
-                              shapes[(2 * col + 1) * n_columns + ind] * xm[ind];
-                          }
-                      }
-                    else
-                      r0 = r1 = Number();
-                    if (mm % 2 == 1)
-                      {
-                        if (type == 1)
-                          r1 +=
-                            shapes[(2 * col + 1) * n_columns + mid] * xp[mid];
-                        else
-                          r0 += shapes[2 * col * n_columns + mid] * xp[mid];
-                      }
-                    if (add)
-                      {
-                        out[stride * (2 * col)] += r0;
-                        out[stride * (2 * col + 1)] += r1;
-                      }
-                    else
-                      {
-                        out[stride * (2 * col)]     = r0;
-                        out[stride * (2 * col + 1)] = r1;
-                      }
-                  }
-                if (nn % 2 == 1)
-                  {
-                    Number r0;
-                    if (mid > 0)
-                      {
-                        r0 = shapes[(nn - 1) * n_columns] * xp[0];
-                        for (unsigned int ind = 1; ind < mid; ++ind)
-                          r0 += shapes[(nn - 1) * n_columns + ind] * xp[ind];
-                      }
-                    else
-                      r0 = Number();
-                    if (mm % 2 == 1 && type == 0)
-                      r0 += shapes[(nn - 1) * n_columns + mid] * xp[mid];
-                    if (add)
-                      out[stride * (nn - 1)] += r0;
-                    else
-                      out[stride * (nn - 1)] = r0;
-                  }
-              }
-            if (one_line == false)
-              {
-                in += 1;
-                out += 1;
-              }
-          }
-        if (one_line == false)
-          {
-            in += stride * (mm - 1);
-            out += stride * (nn - 1);
-          }
-      }
-  }
+            typename Number2 = Number>
+  struct EvaluatorTensorProductAnisotropic
+  {};
 
 
 
