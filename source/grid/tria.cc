@@ -16083,6 +16083,23 @@ void Triangulation<dim, spacedim>::clear_despite_subscriptions()
 
   manifolds.clear();
 
+  // In 1d, also reset vertex-to-(boundary|manifold) maps to empty maps
+  if (dim == 1)
+    {
+      Assert(vertex_to_boundary_id_map_1d != nullptr, ExcInternalError());
+      vertex_to_boundary_id_map_1d->clear();
+
+      Assert(vertex_to_manifold_id_map_1d != nullptr, ExcInternalError());
+      vertex_to_manifold_id_map_1d->clear();
+    }
+  else
+    {
+      // For dim>1, these maps should simply not exist.
+      Assert(vertex_to_boundary_id_map_1d == nullptr, ExcInternalError());
+      Assert(vertex_to_manifold_id_map_1d == nullptr, ExcInternalError());
+    }
+
+
   number_cache = internal::TriangulationImplementation::NumberCache<dim>();
 }
 
