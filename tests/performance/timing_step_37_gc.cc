@@ -587,84 +587,30 @@ LaplaceProblem<dim>::run()
 {
   std::map<std::string, dealii::Timer> timer;
 
-  timer["setup_grid"].start();
   setup_grid();
-  timer["setup_grid"].stop();
-
-  timer["setup_dofs"].start();
   setup_dofs();
-  timer["setup_dofs"].stop();
-
-  timer["setup_matrix_free"].start();
   setup_matrix_free();
-  timer["setup_matrix_free"].stop();
-
-  timer["assemble_rhs"].start();
   assemble_rhs();
-  timer["assemble_rhs"].stop();
 
   timer["setup_transfer"].start();
   setup_transfer();
   timer["setup_transfer"].stop();
 
-  timer["setup_smoother"].start();
   setup_smoother();
-  timer["setup_smoother"].stop();
 
   timer["solve"].start();
   solve();
   timer["solve"].stop();
 
-  const unsigned int n_repeat = 50;
-  timer["matvec_double"].start();
-  for (unsigned int t = 0; t < n_repeat; ++t)
-    system_matrix.vmult(system_rhs, solution);
-  timer["matvec_double"].stop();
-
-  LinearAlgebra::distributed::Vector<float> vec1, vec2;
-  mg_matrices[mg_matrices.max_level()].initialize_dof_vector(vec1);
-  vec2.reinit(vec1);
-  timer["matvec_float"].start();
-  for (unsigned int t = 0; t < n_repeat; ++t)
-    mg_matrices[mg_matrices.max_level()].vmult(vec2, vec1);
-  timer["matvec_float"].stop();
-
-  mg_matrices[mg_matrices.max_level() - 1].initialize_dof_vector(vec1);
-  vec2.reinit(vec1);
-  timer["matvec_float_coarser"].start();
-  for (unsigned int t = 0; t < n_repeat; ++t)
-    mg_matrices[mg_matrices.max_level() - 1].vmult(vec2, vec1);
-  timer["matvec_float_coarser"].stop();
-
   debug_output << std::endl;
-  return {timer["setup_grid"].wall_time(),
-          timer["setup_dofs"].wall_time(),
-          timer["setup_matrix_free"].wall_time(),
-          timer["assemble_rhs"].wall_time(),
-          timer["setup_transfer"].wall_time(),
-          timer["setup_smoother"].wall_time(),
-          timer["solve"].wall_time(),
-          timer["matvec_double"].wall_time(),
-          timer["matvec_float"].wall_time(),
-          timer["matvec_float_coarser"].wall_time()};
+  return {timer["setup_transfer"].wall_time(), timer["solve"].wall_time()};
 }
 
 
 std::tuple<Metric, unsigned int, std::vector<std::string>>
 describe_measurements()
 {
-  return {Metric::timing,
-          4,
-          {"setup_grid",
-           "setup_dofs",
-           "setup_matrix_free",
-           "assemble_rhs",
-           "setup_transfer",
-           "setup_smoother",
-           "solve",
-           "matvec_double",
-           "matvec_float",
-           "matvec_float_coarser"}};
+  return {Metric::timing, 4, {"setup_transfer", "solve"}};
 }
 
 
