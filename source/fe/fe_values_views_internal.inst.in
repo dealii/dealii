@@ -1,0 +1,204 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 1998 - 2022 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+#ifndef DOXYGEN
+
+for (S : ALL_SCALAR_TYPES; deal_II_dimension : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#  if deal_II_dimension <= deal_II_space_dimension
+    namespace FEValuesViews
+
+    {
+      namespace internal
+
+      {
+        template void
+        do_function_values<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const Table<2, double> &,
+          const std::vector<Scalar<deal_II_dimension,
+                                   deal_II_space_dimension>::ShapeFunctionData>
+            &,
+          std::vector<ProductType<S, double>::type> &);
+
+
+        template void
+        do_function_laplacians<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<2, deal_II_space_dimension>> &,
+          const std::vector<Scalar<deal_II_dimension,
+                                   deal_II_space_dimension>::ShapeFunctionData>
+            &,
+          std::vector<Scalar<deal_II_dimension, deal_II_space_dimension>::
+                        template solution_laplacian_type<S>> &);
+
+        template void
+        do_function_values<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const Table<2, double> &,
+          const std::vector<Vector<deal_II_dimension,
+                                   deal_II_space_dimension>::ShapeFunctionData>
+            &,
+          std::vector<
+            ProductType<S, dealii::Tensor<1, deal_II_space_dimension>>::type>
+            &);
+
+        template void
+        do_function_symmetric_gradients<deal_II_dimension,
+                                        deal_II_space_dimension,
+                                        S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<1, deal_II_space_dimension>> &,
+          const std::vector<Vector<deal_II_dimension,
+                                   deal_II_space_dimension>::ShapeFunctionData>
+            &,
+          std::vector<ProductType<
+            S,
+            dealii::SymmetricTensor<2, deal_II_space_dimension>>::type> &);
+
+        template void
+        do_function_divergences<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<1, deal_II_space_dimension>> &,
+          const std::vector<Vector<deal_II_dimension,
+                                   deal_II_space_dimension>::ShapeFunctionData>
+            &,
+          std::vector<Vector<deal_II_dimension, deal_II_space_dimension>::
+                        template solution_divergence_type<S>> &);
+
+        template void
+        do_function_curls<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<1, deal_II_space_dimension>> &,
+          const std::vector<Vector<deal_II_dimension,
+                                   deal_II_space_dimension>::ShapeFunctionData>
+            &,
+          std::vector<ProductType<
+            S,
+            dealii::internal::CurlType<deal_II_space_dimension>::type>::type>
+            &);
+
+        template void
+        do_function_laplacians<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<2, deal_II_space_dimension>> &,
+          const std::vector<Vector<deal_II_dimension,
+                                   deal_II_space_dimension>::ShapeFunctionData>
+            &,
+          std::vector<Vector<deal_II_dimension, deal_II_space_dimension>::
+                        template solution_laplacian_type<S>> &);
+
+        template void
+        do_function_values<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const dealii::Table<2, double> &,
+          const std::vector<
+            SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
+              ShapeFunctionData> &,
+          std::vector<ProductType<
+            S,
+            dealii::SymmetricTensor<2, deal_II_space_dimension>>::type> &);
+
+        template void
+        do_function_divergences<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<1, deal_II_space_dimension>> &,
+          const std::vector<
+            SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
+              ShapeFunctionData> &,
+          std::vector<
+            SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>::
+              template solution_divergence_type<S>> &);
+
+        template void
+        do_function_values<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const dealii::Table<2, double> &,
+          const std::vector<
+            Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+              ShapeFunctionData> &,
+          std::vector<
+            ProductType<S, dealii::Tensor<2, deal_II_space_dimension>>::type>
+            &);
+
+        template void
+        do_function_divergences<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<1, deal_II_space_dimension>> &,
+          const std::vector<
+            Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+              ShapeFunctionData> &,
+          std::vector<Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+                        template solution_divergence_type<S>> &);
+
+        template void
+        do_function_gradients<deal_II_dimension, deal_II_space_dimension, S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<1, deal_II_space_dimension>> &,
+          const std::vector<
+            Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+              ShapeFunctionData> &,
+          std::vector<Tensor<2, deal_II_dimension, deal_II_space_dimension>::
+                        template solution_gradient_type<S>> &);
+
+      \}
+    \}
+#  endif
+  }
+
+for (S : ALL_SCALAR_TYPES; deal_II_dimension : DIMENSIONS; ORDER : DIMENSIONS;
+     deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#  if deal_II_dimension <= deal_II_space_dimension
+    namespace FEValuesViews
+    \{
+      namespace internal
+      \{
+        template void
+        do_function_derivatives<ORDER,
+                                deal_II_dimension,
+                                deal_II_space_dimension,
+                                S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<ORDER, deal_II_space_dimension>> &,
+          const std::vector<Scalar<deal_II_dimension,
+                                   deal_II_space_dimension>::ShapeFunctionData>
+            &,
+          std::vector<
+            ProductType<S,
+                        dealii::Tensor<ORDER, deal_II_space_dimension>>::type>
+            &);
+
+        template void
+        do_function_derivatives<ORDER,
+                                deal_II_dimension,
+                                deal_II_space_dimension,
+                                S>(
+          const ArrayView<const S> &,
+          const Table<2, dealii::Tensor<ORDER, deal_II_space_dimension>> &,
+          const std::vector<Vector<deal_II_dimension,
+                                   deal_II_space_dimension>::ShapeFunctionData>
+            &,
+          std::vector<ProductType<
+            S,
+            dealii::Tensor<ORDER + 1, deal_II_space_dimension>>::type> &);
+      \}
+    \}
+#  endif
+  }
+
+
+#endif
