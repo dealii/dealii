@@ -152,8 +152,15 @@ public:
   operator*() const;
 
   /**
-   * Dereferencing operator. This operator throws an ExcNotInitializedi() if the
-   * pointer is a null pointer.
+   * Return underlying pointer. This operator throws an ExcNotInitialized() if
+   * the pointer is a null pointer.
+   */
+  T *
+  get() const;
+
+  /**
+   * Operator that returns the underlying pointer. This operator throws an
+   * ExcNotInitialized() if the pointer is a null pointer.
    */
   T *
   operator->() const;
@@ -378,12 +385,21 @@ SmartPointer<T, P>::operator*() const
 
 template <typename T, typename P>
 inline T *
-SmartPointer<T, P>::operator->() const
+SmartPointer<T, P>::get() const
 {
   Assert(t != nullptr, ExcNotInitialized());
   Assert(pointed_to_object_is_alive,
          ExcMessage("The object pointed to is not valid anymore."));
   return t;
+}
+
+
+
+template <typename T, typename P>
+inline T *
+SmartPointer<T, P>::operator->() const
+{
+  return this->get();
 }
 
 
