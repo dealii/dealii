@@ -707,6 +707,30 @@ private:
 
 public:
   /**
+   * AdditionalData structure for construction arguments needed by
+   * RemotePointEvaluation. Default values are the same as the ones in
+   * RemotePointEvaluation.
+   */
+  struct AdditionalData
+  {
+    AdditionalData(const double       tol                = 1e-6,
+                   const bool         enf_unique_mapping = false,
+                   const unsigned int rtree_l            = 0,
+                   const std::function<std::vector<bool>()> &marked_verts = {})
+      : tolerance(tol)
+      , enforce_unique_mapping(enf_unique_mapping)
+      , rtree_level(rtree_l)
+      , marked_vertices(marked_verts)
+    {}
+    double                             tolerance;
+    bool                               enforce_unique_mapping;
+    unsigned int                       rtree_level;
+    std::function<std::vector<bool>()> marked_vertices;
+  };
+
+  MGTwoLevelTransferNonNested(const AdditionalData &data = AdditionalData());
+
+  /**
    * Set up transfer operator between the given DoFHandler objects (
    * @p dof_handler_fine and @p dof_handler_coarse).
    */
@@ -788,7 +812,7 @@ private:
    * Object to evaluate shape functions on one mesh on visited support points of
    * the other mesh.
    */
-  Utilities::MPI::RemotePointEvaluation<dim> rpe;
+  std::shared_ptr<Utilities::MPI::RemotePointEvaluation<dim>> rpe;
 
   /**
    * MappingInfo object needed as Mapping argument by FEPointEvaluation.
