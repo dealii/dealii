@@ -94,7 +94,7 @@ public:
   make_zero_boundary_constraints(
     const DoFHandler<dim, spacedim> &   dof,
     const std::set<types::boundary_id> &boundary_ids,
-    const ComponentMask &               component_mask = ComponentMask());
+    const ComponentMask &               component_mask = {});
 
   /**
    * Add Dirichlet boundary dofs to the internal data structures

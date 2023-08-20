@@ -252,7 +252,7 @@ namespace Particles
 #else
            .ReferenceCell::get_default_linear_mapping<dim, spacedim>()),
 #endif
-      const ComponentMask &                   components = ComponentMask(),
+      const ComponentMask &                   components = {},
       const std::vector<std::vector<double>> &properties = {});
 
     /**

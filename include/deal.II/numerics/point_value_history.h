@@ -293,7 +293,7 @@ public:
    */
   void
   add_field_name(const std::string &  vector_name,
-                 const ComponentMask &component_mask = ComponentMask());
+                 const ComponentMask &component_mask = {});
 
   /**
    * Put another mnemonic string (and hence @p VectorType) into the class.

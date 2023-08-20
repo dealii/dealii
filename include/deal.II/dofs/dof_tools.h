@@ -1046,11 +1046,11 @@ namespace DoFTools
     const FaceIterator &                            face_1,
     const std_cxx20::type_identity_t<FaceIterator> &face_2,
     AffineConstraints<number> &                     constraints,
-    const ComponentMask &            component_mask   = ComponentMask(),
-    const bool                       face_orientation = true,
-    const bool                       face_flip        = false,
-    const bool                       face_rotation    = false,
-    const FullMatrix<double> &       matrix           = FullMatrix<double>(),
+    const ComponentMask &                           component_mask   = {},
+    const bool                                      face_orientation = true,
+    const bool                                      face_flip        = false,
+    const bool                                      face_rotation    = false,
+    const FullMatrix<double> &       matrix = FullMatrix<double>(),
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>(),
     const number periodicity_factor = 1.);
@@ -1081,7 +1081,7 @@ namespace DoFTools
     const std::vector<GridTools::PeriodicFacePair<
       typename DoFHandler<dim, spacedim>::cell_iterator>> &periodic_faces,
     AffineConstraints<number> &                            constraints,
-    const ComponentMask &            component_mask = ComponentMask(),
+    const ComponentMask &                                  component_mask = {},
     const std::vector<unsigned int> &first_vector_components =
       std::vector<unsigned int>(),
     const number periodicity_factor = 1.);
@@ -1119,14 +1119,13 @@ namespace DoFTools
    */
   template <int dim, int spacedim, typename number>
   void
-  make_periodicity_constraints(
-    const DoFHandler<dim, spacedim> &dof_handler,
-    const types::boundary_id         b_id1,
-    const types::boundary_id         b_id2,
-    const unsigned int               direction,
-    AffineConstraints<number> &      constraints,
-    const ComponentMask &            component_mask     = ComponentMask(),
-    const number                     periodicity_factor = 1.);
+  make_periodicity_constraints(const DoFHandler<dim, spacedim> &dof_handler,
+                               const types::boundary_id         b_id1,
+                               const types::boundary_id         b_id2,
+                               const unsigned int               direction,
+                               AffineConstraints<number> &      constraints,
+                               const ComponentMask &component_mask     = {},
+                               const number         periodicity_factor = 1.);
 
 
 
@@ -1157,13 +1156,12 @@ namespace DoFTools
    */
   template <int dim, int spacedim, typename number>
   void
-  make_periodicity_constraints(
-    const DoFHandler<dim, spacedim> &dof_handler,
-    const types::boundary_id         b_id,
-    const unsigned int               direction,
-    AffineConstraints<number> &      constraints,
-    const ComponentMask &            component_mask     = ComponentMask(),
-    const number                     periodicity_factor = 1.);
+  make_periodicity_constraints(const DoFHandler<dim, spacedim> &dof_handler,
+                               const types::boundary_id         b_id,
+                               const unsigned int               direction,
+                               AffineConstraints<number> &      constraints,
+                               const ComponentMask &component_mask     = {},
+                               const number         periodicity_factor = 1.);
 
   /**
    * @}
@@ -1317,8 +1315,8 @@ namespace DoFTools
    */
   template <int dim, int spacedim>
   IndexSet
-  extract_boundary_dofs(const DoFHandler<dim, spacedim> &dof_handler,
-                        const ComponentMask &component_mask = ComponentMask(),
+  extract_boundary_dofs(const DoFHandler<dim, spacedim> &   dof_handler,
+                        const ComponentMask &               component_mask = {},
                         const std::set<types::boundary_id> &boundary_ids = {});
 
   /**
@@ -1647,9 +1645,8 @@ namespace DoFTools
    */
   template <int dim, int spacedim>
   std::vector<IndexSet>
-  locally_owned_dofs_per_component(
-    const DoFHandler<dim, spacedim> &dof_handler,
-    const ComponentMask &            components = ComponentMask());
+  locally_owned_dofs_per_component(const DoFHandler<dim, spacedim> &dof_handler,
+                                   const ComponentMask &components = {});
 
   /**
    * For each processor, determine the set of locally owned degrees of freedom
@@ -2278,7 +2275,7 @@ namespace DoFTools
   map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
                              std::vector<Point<spacedim>> &   support_points,
-                             const ComponentMask &mask = ComponentMask());
+                             const ComponentMask &            mask = {});
 
   /**
    * Same as the previous function but for the hp-case.
@@ -2289,7 +2286,7 @@ namespace DoFTools
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim> &           dof_handler,
     std::vector<Point<spacedim>> &              support_points,
-    const ComponentMask &                       mask = ComponentMask());
+    const ComponentMask &                       mask = {});
 
   /**
    * This function is a version of the above map_dofs_to_support_points
@@ -2324,7 +2321,7 @@ namespace DoFTools
   std::map<types::global_dof_index, Point<spacedim>>
   map_dofs_to_support_points(const Mapping<dim, spacedim> &   mapping,
                              const DoFHandler<dim, spacedim> &dof_handler,
-                             const ComponentMask &mask = ComponentMask());
+                             const ComponentMask &            mask = {});
 
   /**
    * Same as the previous function but for the hp-case.
@@ -2334,7 +2331,7 @@ namespace DoFTools
   map_dofs_to_support_points(
     const hp::MappingCollection<dim, spacedim> &mapping,
     const DoFHandler<dim, spacedim> &           dof_handler,
-    const ComponentMask &                       mask = ComponentMask());
+    const ComponentMask &                       mask = {});
 
   /**
    * A version of the function of same name that returns the map via its third
@@ -2347,7 +2344,7 @@ namespace DoFTools
     const Mapping<dim, spacedim> &                      mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask &                               mask = ComponentMask());
+    const ComponentMask &                               mask = {});
 
   /**
    * A version of the function of same name that returns the map via its third
@@ -2360,7 +2357,7 @@ namespace DoFTools
     const hp::MappingCollection<dim, spacedim> &        mapping,
     const DoFHandler<dim, spacedim> &                   dof_handler,
     std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask &                               mask = ComponentMask());
+    const ComponentMask &                               mask = {});
 
 
   /**
@@ -2565,7 +2562,7 @@ namespace DoFTools
     const DoFHandler<dim, spacedim> &dof,
     const types::boundary_id         boundary_id,
     AffineConstraints<number> &      zero_boundary_constraints,
-    const ComponentMask &            component_mask = ComponentMask());
+    const ComponentMask &            component_mask = {});
 
   /**
    * Do the same as the previous function, except do it for all parts of the
@@ -2582,7 +2579,7 @@ namespace DoFTools
   make_zero_boundary_constraints(
     const DoFHandler<dim, spacedim> &dof,
     AffineConstraints<number> &      zero_boundary_constraints,
-    const ComponentMask &            component_mask = ComponentMask());
+    const ComponentMask &            component_mask = {});
 
   /**
    * @}

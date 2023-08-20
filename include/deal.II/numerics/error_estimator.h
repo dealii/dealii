@@ -348,7 +348,7 @@ public:
       &                       neumann_bc,
     const ReadVector<Number> &solution,
     Vector<float> &           error,
-    const ComponentMask &     component_mask = ComponentMask(),
+    const ComponentMask &     component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -368,7 +368,7 @@ public:
       &                       neumann_bc,
     const ReadVector<Number> &solution,
     Vector<float> &           error,
-    const ComponentMask &     component_mask = ComponentMask(),
+    const ComponentMask &     component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -398,12 +398,12 @@ public:
       &                                          neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
     ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &     component_mask = ComponentMask(),
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
+    const ComponentMask &                        component_mask = {},
+    const Function<spacedim> *                   coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
   /**
    * Call the @p estimate function, see above, with
@@ -418,12 +418,12 @@ public:
       &                                          neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
     ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &     component_mask = ComponentMask(),
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
+    const ComponentMask &                        component_mask = {},
+    const Function<spacedim> *                   coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
   /**
@@ -440,7 +440,7 @@ public:
       &                       neumann_bc,
     const ReadVector<Number> &solution,
     Vector<float> &           error,
-    const ComponentMask &     component_mask = ComponentMask(),
+    const ComponentMask &     component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -461,7 +461,7 @@ public:
       &                       neumann_bc,
     const ReadVector<Number> &solution,
     Vector<float> &           error,
-    const ComponentMask &     component_mask = ComponentMask(),
+    const ComponentMask &     component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -483,12 +483,12 @@ public:
       &                                          neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
     ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &     component_mask = ComponentMask(),
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
+    const ComponentMask &                        component_mask = {},
+    const Function<spacedim> *                   coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
   /**
@@ -504,12 +504,12 @@ public:
       &                                          neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
     ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &     component_mask = ComponentMask(),
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
+    const ComponentMask &                        component_mask = {},
+    const Function<spacedim> *                   coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
   /**
    * Exception
@@ -628,7 +628,7 @@ public:
       &                       neumann_bc,
     const ReadVector<Number> &solution,
     Vector<float> &           error,
-    const ComponentMask &     component_mask = ComponentMask(),
+    const ComponentMask &     component_mask = {},
     const Function<spacedim> *coefficient    = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -650,7 +650,7 @@ public:
       &                       neumann_bc,
     const ReadVector<Number> &solution,
     Vector<float> &           error,
-    const ComponentMask &     component_mask = ComponentMask(),
+    const ComponentMask &     component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -682,12 +682,12 @@ public:
       &                                          neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
     ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &     component_mask = ComponentMask(),
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
+    const ComponentMask &                        component_mask = {},
+    const Function<spacedim> *                   coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
 
@@ -704,12 +704,12 @@ public:
       &                                          neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
     ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &     component_mask = ComponentMask(),
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
+    const ComponentMask &                        component_mask = {},
+    const Function<spacedim> *                   coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
 
@@ -727,7 +727,7 @@ public:
       &                       neumann_bc,
     const ReadVector<Number> &solution,
     Vector<float> &           error,
-    const ComponentMask &     component_mask = ComponentMask(),
+    const ComponentMask &     component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -749,7 +749,7 @@ public:
       &                       neumann_bc,
     const ReadVector<Number> &solution,
     Vector<float> &           error,
-    const ComponentMask &     component_mask = ComponentMask(),
+    const ComponentMask &     component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -772,12 +772,12 @@ public:
       &                                          neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
     ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &     component_mask = ComponentMask(),
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
+    const ComponentMask &                        component_mask = {},
+    const Function<spacedim> *                   coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
 
@@ -794,12 +794,12 @@ public:
       &                                          neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
     ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &     component_mask = ComponentMask(),
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
+    const ComponentMask &                        component_mask = {},
+    const Function<spacedim> *                   coefficients   = nullptr,
+    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
+    const types::material_id  material_id  = numbers::invalid_material_id,
+    const Strategy            strategy     = cell_diameter_over_24);
 
 
 

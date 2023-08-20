@@ -155,7 +155,7 @@ namespace VectorTools
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                        function_map,
     std::map<types::global_dof_index, number> &boundary_values,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &                      component_mask = {});
 
   /**
    * Like the previous function, but take a mapping collection to go with
@@ -169,7 +169,7 @@ namespace VectorTools
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                        function_map,
     std::map<types::global_dof_index, number> &boundary_values,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &                      component_mask = {});
 
   /**
    * Like the previous functions but without Mapping argument, using
@@ -182,7 +182,7 @@ namespace VectorTools
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                                        function_map,
     std::map<types::global_dof_index, number> &boundary_values,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &                      component_mask = {});
 
   /**
    * Take only one boundary indicator with corresponding boundary function.
@@ -198,7 +198,7 @@ namespace VectorTools
     const types::boundary_id                   boundary_indicator,
     const Function<spacedim, number> &         boundary_function,
     std::map<types::global_dof_index, number> &boundary_values,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &                      component_mask = {});
 
   /**
    * Like the previous function, but take a mapping collection to go with
@@ -212,7 +212,7 @@ namespace VectorTools
     const types::boundary_id                    boundary_indicator,
     const Function<spacedim, number> &          boundary_function,
     std::map<types::global_dof_index, number> & boundary_values,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &                       component_mask = {});
 
   /**
    * Like the previous functions but without Mapping argument, using
@@ -228,7 +228,7 @@ namespace VectorTools
     const types::boundary_id                   boundary_indicator,
     const Function<spacedim, number> &         boundary_function,
     std::map<types::global_dof_index, number> &boundary_values,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &                      component_mask = {});
 
 
   /**
@@ -265,7 +265,7 @@ namespace VectorTools
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                        function_map,
     AffineConstraints<number> &constraints,
-    const ComponentMask &      component_mask = ComponentMask());
+    const ComponentMask &      component_mask = {});
 
   /**
    * Like the previous function, but take a mapping collection to go with
@@ -281,7 +281,7 @@ namespace VectorTools
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                        function_map,
     AffineConstraints<number> &constraints,
-    const ComponentMask &      component_mask = ComponentMask());
+    const ComponentMask &      component_mask = {});
 
   /**
    * Like the previous functions but without Mapping argument, using
@@ -296,7 +296,7 @@ namespace VectorTools
     const std::map<types::boundary_id, const Function<spacedim, number> *>
       &                        function_map,
     AffineConstraints<number> &constraints,
-    const ComponentMask &      component_mask = ComponentMask());
+    const ComponentMask &      component_mask = {});
 
   /**
    * Take only one boundary indicator with corresponding boundary function.
@@ -314,7 +314,7 @@ namespace VectorTools
     const types::boundary_id          boundary_indicator,
     const Function<spacedim, number> &boundary_function,
     AffineConstraints<number> &       constraints,
-    const ComponentMask &             component_mask = ComponentMask());
+    const ComponentMask &             component_mask = {});
 
   /**
    * Like the previous function, but take a mapping collection to go with
@@ -330,7 +330,7 @@ namespace VectorTools
     const types::boundary_id                    boundary_indicator,
     const Function<spacedim, number> &          boundary_function,
     AffineConstraints<number> &                 constraints,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &                       component_mask = {});
 
   /**
    * Like the previous functions but without Mapping argument, using
@@ -348,7 +348,7 @@ namespace VectorTools
     const types::boundary_id          boundary_indicator,
     const Function<spacedim, number> &boundary_function,
     AffineConstraints<number> &       constraints,
-    const ComponentMask &             component_mask = ComponentMask());
+    const ComponentMask &             component_mask = {});
 
 
   /**
