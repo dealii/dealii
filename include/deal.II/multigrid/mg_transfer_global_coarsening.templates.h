@@ -49,6 +49,8 @@
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
 
+#include <boost/algorithm/string/join.hpp>
+
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -806,6 +808,9 @@ namespace internal
               return true;
           }
 
+        AssertThrow(is_cell_locally_owned || is_cell_remotly_owned,
+                    ExcInternalError());
+
         return false;
       }();
 
@@ -922,21 +927,20 @@ namespace internal
     const DoFHandler<dim> &dof_handler_fine;
     const DoFHandler<dim> &dof_handler_coarse;
     const unsigned int     mg_level_fine;
-    const MPI_Comm         communicator;
 
   protected:
+    const MPI_Comm              communicator;
     const CellIDTranslator<dim> cell_id_translator;
+    IndexSet                    is_dst_locally_owned;
+    IndexSet                    is_dst_remote;
 
   private:
-    IndexSet is_dst_locally_owned;
-    IndexSet is_dst_remote;
     IndexSet is_src_locally_owned;
-
 
     IndexSet is_extended_locally_owned;
     IndexSet is_extended_ghosts;
 
-    std::map<unsigned int,
+    std::map<types::global_cell_index,
              std::pair<unsigned int, std::vector<types::global_dof_index>>>
       map;
   };
@@ -995,6 +999,70 @@ namespace internal
                    is_dst_remote,
                    is_src_locally_owned,
                    true);
+
+      // check if meshes are compatible
+      if (mg_level_coarse == numbers::invalid_unsigned_int)
+        {
+          std::vector<std::string> not_found_cells_local;
+
+          const auto coarse_operation_check = [&](const auto &cell) {
+            bool flag = false;
+
+            const auto index = this->cell_id_translator.translate(cell);
+
+            flag |= this->is_dst_remote.is_element(index) ||
+                    this->is_dst_locally_owned.is_element(index);
+
+            if (cell->level() + 1u != tria_dst.n_global_levels())
+              {
+                for (unsigned int i = 0;
+                     i < GeometryInfo<dim>::max_children_per_cell;
+                     ++i)
+                  {
+                    const auto index =
+                      this->cell_id_translator.translate(cell, i);
+
+                    flag |= this->is_dst_remote.is_element(index) ||
+                            this->is_dst_locally_owned.is_element(index);
+                  }
+              }
+
+            if (!flag)
+              not_found_cells_local.emplace_back(cell->id().to_string());
+          };
+
+          loop_over_active_or_level_cells(tria_src,
+                                          mg_level_coarse,
+                                          coarse_operation_check);
+
+          auto not_found_cells =
+            Utilities::MPI::reduce<std::vector<std::string>>(
+              not_found_cells_local,
+              this->communicator,
+              [](const auto &a, const auto &b) {
+                auto result = a;
+                result.insert(result.end(), b.begin(), b.end());
+                return result;
+              },
+              0);
+
+          if (Utilities::MPI::this_mpi_process(this->communicator) == 0 &&
+              !not_found_cells.empty())
+            {
+              std::sort(not_found_cells.begin(), not_found_cells.end());
+
+              const std::string str =
+                boost::algorithm::join(not_found_cells, ", ");
+
+              AssertThrow(
+                false,
+                ExcMessage(
+                  "Problem setting up two-level transfer operator, since coarse triangulation "
+                  "seems to be obtainable by simple coarsening. Following coarse cells "
+                  "or children cells could not be found in the fine mesh: " +
+                  str + "."));
+            }
+        }
     }
   };
 
