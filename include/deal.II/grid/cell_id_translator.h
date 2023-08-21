@@ -131,7 +131,6 @@ namespace internal
     // modest numbers of cells. Check for this by first calculating
     // the maximal index we will get in 64-bit arithmetic and testing
     // that it is representable in 32-bit arithmetic:
-#ifdef DEBUG
     std::uint64_t max_cell_index = 0;
 
     for (unsigned int i = 0; i < n_global_levels; ++i)
@@ -142,7 +141,7 @@ namespace internal
 
     max_cell_index -= 1;
 
-    Assert(
+    AssertThrow(
       max_cell_index <= std::numeric_limits<types::global_cell_index>::max(),
       ExcMessage(
         "You have exceeded the maximal number of possible indices this function "
@@ -155,7 +154,6 @@ namespace internal
         " indices. You may want to consider to build deal.II with 64bit "
         "indices (-D DEAL_II_WITH_64BIT_INDICES=\"ON\") to increase the limit "
         "of indices."));
-#endif
 
     // Now do the whole computation again, but for real:
     tree_sizes.reserve(n_global_levels + 1);
