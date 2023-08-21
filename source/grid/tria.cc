@@ -12259,8 +12259,6 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::set_mesh_smoothing(
   const MeshSmoothing mesh_smoothing)
 {
-  Assert(n_levels() == 0,
-         ExcTriangulationNotEmpty(vertices.size(), levels.size()));
   smooth_grid = mesh_smoothing;
 }
 
