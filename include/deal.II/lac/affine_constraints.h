@@ -548,23 +548,38 @@ public:
   };
 
   /**
+   * Default constructor.
+   *
+   * This constructor sets up an object that stores all constraints eventually
+   * given to it. (This is in contrast to the following constructor that
+   * restricts which degrees of freedom we should care about -- for example,
+   * in a parallel context one would typically only store constraints
+   * for the locally relevant DoFs, see
+   * @ref GlossLocallyRelevantDof .)
+   * Consequently, this constructor creates internal data structures for
+   * <i>all</i> possible
+   * indices will be created, leading to memory consumption on every
+   * processor that is proportional to the <i>overall</i> size of the
+   * problem, not just proportional to the size of the portion of the
+   * overall problem that is handled by the current processor. Calling
+   * this constructor in a parallel program is a common bug: Call the
+   * other one, with an index set, instead.
+   */
+  AffineConstraints();
+
+  /**
    * Constructor. The supplied IndexSet defines which indices might be
    * constrained inside this AffineConstraints container. In a calculation
    * with a DoFHandler object based on parallel::distributed::Triangulation
    * or parallel::shared::Triangulation, one should use the set of locally
-   * relevant dofs (see
+   * relevant DoFs (see
    * @ref GlossLocallyRelevantDof).
    *
    * The given IndexSet allows the AffineConstraints container to save
    * memory by just not caring about degrees of freedom that are not of
-   * importance to the current processor. Alternatively, if no such
-   * IndexSet is provided, internal data structures for <i>all</i> possible
-   * indices will be created, leading to memory consumption on every
-   * processor that is proportional to the <i>overall</i> size of the
-   * problem, not just proportional to the size of the portion of the
-   * overall problem that is handled by the current processor.
+   * importance to the current processor.
    */
-  explicit AffineConstraints(const IndexSet &local_constraints = IndexSet());
+  explicit AffineConstraints(const IndexSet &local_constraints);
 
   /**
    * Copy constructor
@@ -2023,6 +2038,20 @@ private:
 /* ---------------- template and inline functions ----------------- */
 
 template <typename number>
+inline AffineConstraints<number>::AffineConstraints()
+  : lines()
+  , local_lines()
+  , sorted(false)
+{
+  // make sure the IndexSet is compressed. Otherwise this can lead to crashes
+  // that are hard to find (only happen in release mode).
+  // see tests/mpi/affine_constraints_crash_01
+  local_lines.compress();
+}
+
+
+
+template <typename number>
 inline AffineConstraints<number>::AffineConstraints(
   const IndexSet &local_constraints)
   : lines()
@@ -2035,6 +2064,8 @@ inline AffineConstraints<number>::AffineConstraints(
   local_lines.compress();
 }
 
+
+
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints(
   const AffineConstraints &affine_constraints)
@@ -2044,6 +2075,8 @@ inline AffineConstraints<number>::AffineConstraints(
   , local_lines(affine_constraints.local_lines)
   , sorted(affine_constraints.sorted)
 {}
+
+
 
 template <typename number>
 inline void
