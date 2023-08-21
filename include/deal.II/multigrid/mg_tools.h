@@ -226,7 +226,7 @@ namespace MGTools
     const std::map<types::boundary_id, const Function<spacedim> *>
       &                                             function_map,
     std::vector<std::set<types::global_dof_index>> &boundary_indices,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &                           component_mask = {});
 
   /**
    * The same function as above, but return an IndexSet rather than a
@@ -241,7 +241,7 @@ namespace MGTools
                      const std::map<types::boundary_id,
                                     const Function<spacedim> *> &function_map,
                      std::vector<IndexSet> &boundary_indices,
-                     const ComponentMask &  component_mask = ComponentMask());
+                     const ComponentMask &  component_mask = {});
 
   /**
    * The same function as above, but return an IndexSet rather than a
@@ -255,7 +255,7 @@ namespace MGTools
   make_boundary_list(const DoFHandler<dim, spacedim> &   mg_dof,
                      const std::set<types::boundary_id> &boundary_ids,
                      std::vector<IndexSet> &             boundary_indices,
-                     const ComponentMask &component_mask = ComponentMask());
+                     const ComponentMask &               component_mask = {});
 
   /**
    * For each level in a multigrid hierarchy, produce an IndexSet that

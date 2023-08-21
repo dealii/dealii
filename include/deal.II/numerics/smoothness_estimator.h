@@ -220,9 +220,9 @@ namespace SmoothnessEstimator
       const DoFHandler<dim, spacedim> &  dof_handler,
       const VectorType &                 solution,
       Vector<float> &                    smoothness_indicators,
-      const ComponentMask &coefficients_predicate   = ComponentMask(),
-      const double         smallest_abs_coefficient = 1e-10,
-      const bool           only_flagged_cells       = false);
+      const ComponentMask &              coefficients_predicate   = {},
+      const double                       smallest_abs_coefficient = 1e-10,
+      const bool                         only_flagged_cells       = false);
 
     /**
      * Returns a FESeries::Legendre object for Legendre series expansions with
@@ -458,9 +458,9 @@ namespace SmoothnessEstimator
       const DoFHandler<dim, spacedim> & dof_handler,
       const VectorType &                solution,
       Vector<float> &                   smoothness_indicators,
-      const ComponentMask &coefficients_predicate   = ComponentMask(),
-      const double         smallest_abs_coefficient = 1e-10,
-      const bool           only_flagged_cells       = false);
+      const ComponentMask &             coefficients_predicate   = {},
+      const double                      smallest_abs_coefficient = 1e-10,
+      const bool                        only_flagged_cells       = false);
 
     /**
      * Returns a FESeries::Fourier object for Fourier series expansions with

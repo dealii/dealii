@@ -98,8 +98,8 @@ namespace NonMatching
     const Quadrature<dim1> &          quad,
     SparsityPatternBase &             sparsity,
     const AffineConstraints<number> & constraints = AffineConstraints<number>(),
-    const ComponentMask &             space_comps = ComponentMask(),
-    const ComponentMask &             immersed_comps = ComponentMask(),
+    const ComponentMask &             space_comps = {},
+    const ComponentMask &             immersed_comps = {},
     const Mapping<dim0, spacedim> &   space_mapping =
       StaticMappingQ1<dim0, spacedim>::mapping,
     const Mapping<dim1, spacedim> &immersed_mapping =
@@ -122,8 +122,8 @@ namespace NonMatching
     const Quadrature<dim1> &                quad,
     SparsityPatternBase &                   sparsity,
     const AffineConstraints<number> &constraints = AffineConstraints<number>(),
-    const ComponentMask &            space_comps = ComponentMask(),
-    const ComponentMask &            immersed_comps = ComponentMask(),
+    const ComponentMask &            space_comps = {},
+    const ComponentMask &            immersed_comps = {},
     const Mapping<dim1, spacedim> &  immersed_mapping =
       StaticMappingQ1<dim1, spacedim>::mapping,
     const AffineConstraints<number> &immersed_constraints =
@@ -183,8 +183,8 @@ namespace NonMatching
     Matrix &                                              matrix,
     const AffineConstraints<typename Matrix::value_type> &constraints =
       AffineConstraints<typename Matrix::value_type>(),
-    const ComponentMask &          space_comps    = ComponentMask(),
-    const ComponentMask &          immersed_comps = ComponentMask(),
+    const ComponentMask &          space_comps    = {},
+    const ComponentMask &          immersed_comps = {},
     const Mapping<dim0, spacedim> &space_mapping =
       StaticMappingQ1<dim0, spacedim>::mapping,
     const Mapping<dim1, spacedim> &immersed_mapping =
@@ -208,8 +208,8 @@ namespace NonMatching
     Matrix &                                              matrix,
     const AffineConstraints<typename Matrix::value_type> &constraints =
       AffineConstraints<typename Matrix::value_type>(),
-    const ComponentMask &          space_comps    = ComponentMask(),
-    const ComponentMask &          immersed_comps = ComponentMask(),
+    const ComponentMask &          space_comps    = {},
+    const ComponentMask &          immersed_comps = {},
     const Mapping<dim1, spacedim> &immersed_mapping =
       StaticMappingQ1<dim1, spacedim>::mapping,
     const AffineConstraints<typename Matrix::value_type> &immersed_constraints =
@@ -272,8 +272,8 @@ namespace NonMatching
     const Quadrature<dim1> &                quad,
     SparsityPatternBase &                   sparsity,
     const AffineConstraints<Number> &constraints0 = AffineConstraints<Number>(),
-    const ComponentMask &            comps0       = ComponentMask(),
-    const ComponentMask &            comps1       = ComponentMask());
+    const ComponentMask &            comps0       = {},
+    const ComponentMask &            comps1       = {});
 
   /**
    * Create a coupling @ref GlossMassMatrix "mass matrix" for non-matching independent grids,
@@ -335,8 +335,8 @@ namespace NonMatching
     Matrix &                                              matrix,
     const AffineConstraints<typename Matrix::value_type> &constraints0 =
       AffineConstraints<typename Matrix::value_type>(),
-    const ComponentMask &comps0 = ComponentMask(),
-    const ComponentMask &comps1 = ComponentMask());
+    const ComponentMask &comps0 = {},
+    const ComponentMask &comps1 = {});
 } // namespace NonMatching
 DEAL_II_NAMESPACE_CLOSE
 

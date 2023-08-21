@@ -76,7 +76,7 @@ namespace VectorTools
     const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType &                                               vec,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &component_mask = {});
 
   /**
    * Same as above but in an hp-context.
@@ -90,7 +90,7 @@ namespace VectorTools
     const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType &                                               vec,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &component_mask = {});
 
 
   /**
@@ -105,7 +105,7 @@ namespace VectorTools
     const DoFHandler<dim, spacedim> &                          dof,
     const Function<spacedim, typename VectorType::value_type> &function,
     VectorType &                                               vec,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &component_mask = {});
 
   /**
    * Interpolate different finite element spaces. The interpolation of vector
@@ -194,7 +194,7 @@ namespace VectorTools
                    const Function<spacedim, typename VectorType::value_type> *>
       &                  function_map,
     VectorType &         dst,
-    const ComponentMask &component_mask = ComponentMask());
+    const ComponentMask &component_mask = {});
 
   /**
    * Compute the interpolation of a @p dof1-function @p u1 to a @p dof2-function
@@ -307,7 +307,7 @@ namespace VectorTools
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void get_position_vector(const DoFHandler<dim, spacedim> &dh,
                            VectorType &                     vector,
-                           const ComponentMask &mask = ComponentMask());
+                           const ComponentMask &            mask = {});
 
   /**
    * Like the above function but also taking @p mapping as argument.
@@ -324,7 +324,7 @@ namespace VectorTools
   void get_position_vector(const Mapping<dim, spacedim> &   mapping,
                            const DoFHandler<dim, spacedim> &dh,
                            VectorType &                     vector,
-                           const ComponentMask &mask = ComponentMask());
+                           const ComponentMask &            mask = {});
 
   /** @} */
 } // namespace VectorTools

@@ -114,7 +114,7 @@ public:
    */
   MappingFEField(const DoFHandler<dim, spacedim> &euler_dof_handler,
                  const VectorType &               euler_vector,
-                 const ComponentMask &            mask = ComponentMask());
+                 const ComponentMask &            mask = {});
 
   /**
    * Constructor taking vectors on the multigrid levels rather than the active
@@ -127,7 +127,7 @@ public:
    */
   MappingFEField(const DoFHandler<dim, spacedim> &euler_dof_handler,
                  const std::vector<VectorType> &  euler_vector,
-                 const ComponentMask &            mask = ComponentMask());
+                 const ComponentMask &            mask = {});
 
   /**
    * Constructor with MGLevelObject instead of std::vector, otherwise the same
@@ -138,7 +138,7 @@ public:
    */
   MappingFEField(const DoFHandler<dim, spacedim> &euler_dof_handler,
                  const MGLevelObject<VectorType> &euler_vector,
-                 const ComponentMask &            mask = ComponentMask());
+                 const ComponentMask &            mask = {});
 
   /**
    * Copy constructor.

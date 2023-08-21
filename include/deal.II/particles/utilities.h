@@ -99,7 +99,7 @@ namespace Particles
       SparsityPatternBase &                            sparsity,
       const AffineConstraints<number> &                constraints =
         AffineConstraints<number>(),
-      const ComponentMask &space_comps = ComponentMask());
+      const ComponentMask &space_comps = {});
 
     /**
      * Create an interpolation matrix for particles.
@@ -152,7 +152,7 @@ namespace Particles
       MatrixType &                                     matrix,
       const AffineConstraints<typename MatrixType::value_type> &constraints =
         AffineConstraints<typename MatrixType::value_type>(),
-      const ComponentMask &space_comps = ComponentMask());
+      const ComponentMask &space_comps = {});
 
     /**
      * Given a DoFHandler and a ParticleHandler, interpolate a vector field
@@ -186,7 +186,7 @@ namespace Particles
       const Particles::ParticleHandler<dim, spacedim> &particle_handler,
       const InputVectorType &                          field_vector,
       OutputVectorType &                               interpolated_field,
-      const ComponentMask &field_comps = ComponentMask())
+      const ComponentMask &                            field_comps = {})
     {
       if (particle_handler.n_locally_owned_particles() == 0)
         {
