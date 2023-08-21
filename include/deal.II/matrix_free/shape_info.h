@@ -145,6 +145,35 @@ namespace internal
       memory_consumption() const;
 
       /**
+       * Evaluate the auxiliary polynomial space associated with the Lagrange
+       * polynomials in points of the given quadrature formula, filling the
+       * fields shape_[gradients,hessians]_collocation and related
+       * information.
+       */
+      template <int dim, int spacedim>
+      void
+      evaluate_collocation_space(
+        const FiniteElement<dim, spacedim> &fe,
+        const Quadrature<1> &               quad,
+        const std::vector<unsigned int> &   lexicographic);
+
+      /**
+       * Check whether we have symmetries in the shape values. In that case,
+       * also fill the shape_???_eo fields.
+       */
+      bool
+      check_and_set_shapes_symmetric();
+
+      /**
+       * Check whether symmetric 1d basis functions are such that the shape
+       * values form a diagonal matrix, i.e., the nodal points are collocated
+       * with the quadrature points. This allows for specialized algorithms
+       * that save some operations in the evaluation.
+       */
+      bool
+      check_shapes_collocation() const;
+
+      /**
        * Encodes the type of element detected at construction. FEEvaluation
        * will select the most efficient algorithm based on the given element
        * type.
@@ -578,25 +607,6 @@ namespace internal
        * quadrature points to represent the correct order.
        */
       dealii::Table<2, unsigned int> face_orientations_quad;
-
-    private:
-      /**
-       * Check whether we have symmetries in the shape values. In that case,
-       * also fill the shape_???_eo fields.
-       */
-      bool
-      check_1d_shapes_symmetric(
-        UnivariateShapeData<Number> &univariate_shape_data);
-
-      /**
-       * Check whether symmetric 1d basis functions are such that the shape
-       * values form a diagonal matrix, i.e., the nodal points are collocated
-       * with the quadrature points. This allows for specialized algorithms
-       * that save some operations in the evaluation.
-       */
-      bool
-      check_1d_shapes_collocation(
-        const UnivariateShapeData<Number> &univariate_shape_data) const;
     };
 
 
