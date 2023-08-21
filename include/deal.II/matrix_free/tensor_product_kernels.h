@@ -678,14 +678,17 @@ namespace internal
             bool              add,
             typename Number,
             typename Number2>
-  std::enable_if_t<(variant == evaluate_evenodd), void>
-  apply_matrix_vector_product(const Number2 *matrix,
-                              const Number * in,
-                              Number *       out,
-                              int            n_rows_runtime     = 0,
-                              int            n_columns_runtime  = 0,
-                              int            stride_in_runtime  = 0,
-                              int            stride_out_runtime = 0)
+#ifndef DEBUG
+  inline DEAL_II_ALWAYS_INLINE
+#endif
+    std::enable_if_t<(variant == evaluate_evenodd), void>
+    apply_matrix_vector_product(const Number2 *matrix,
+                                const Number * in,
+                                Number *       out,
+                                int            n_rows_runtime     = 0,
+                                int            n_columns_runtime  = 0,
+                                int            stride_in_runtime  = 0,
+                                int            stride_out_runtime = 0)
   {
     const int n_rows = n_rows_static == 0 ? n_rows_runtime : n_rows_static;
     const int n_columns =
