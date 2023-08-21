@@ -3884,6 +3884,9 @@ namespace internal
         std::vector<types::global_dof_index> support_point_indices(
           support_points_per_cell);
         std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
+        std::vector<std::pair<unsigned int, types::global_dof_index>>
+          support_point_dofs_comp;
+        support_point_dofs_comp.reserve(n_components);
 
         for (const auto &cell : dof_handler.active_cell_iterators())
           {
@@ -3921,7 +3924,7 @@ namespace internal
                           if (dof_processed[local_dof_idx] == false)
                             {
                               if (!constraint.is_constrained(global_dof_idx))
-                                support_point_dofs.emplace_back(
+                                support_point_dofs_comp.emplace_back(
                                   partitioner_support_points.global_to_local(
                                     support_point_indices[i]),
                                   global_dof_idx);
@@ -3929,6 +3932,18 @@ namespace internal
                               dof_processed[local_dof_idx] = true;
                             }
                         }
+
+                      Assert(support_point_dofs_comp.size() == 0 ||
+                               support_point_dofs_comp.size() == n_components,
+                             ExcNotImplemented());
+
+                      if (support_point_dofs_comp.empty() == false)
+                        support_point_dofs.insert(
+                          support_point_dofs.end(),
+                          support_point_dofs_comp.begin(),
+                          support_point_dofs_comp.end());
+
+                      support_point_dofs_comp.clear();
                     }
               }
           }
