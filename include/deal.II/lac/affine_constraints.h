@@ -557,8 +557,7 @@ public:
    * for the locally relevant DoFs, see
    * @ref GlossLocallyRelevantDof .)
    * Consequently, this constructor creates internal data structures for
-   * <i>all</i> possible
-   * indices will be created, leading to memory consumption on every
+   * <i>all</i> possible indices, leading to memory consumption on every
    * processor that is proportional to the <i>overall</i> size of the
    * problem, not just proportional to the size of the portion of the
    * overall problem that is handled by the current processor. Calling
