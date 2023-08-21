@@ -355,9 +355,13 @@ namespace FEValuesViews
                 &shape_gradients[snc][0];
               for (unsigned int q_point = 0; q_point < n_quadrature_points;
                    ++q_point)
-                symmetric_gradients[q_point] +=
-                  value * dealii::SymmetricTensor<2, spacedim>(
-                            symmetrize_single_row(comp, *shape_gradient_ptr++));
+                {
+                  for (unsigned int d = 0; d < dim; ++d)
+                    symmetric_gradients[q_point][comp][d] +=
+                      0.5 * value * (*shape_gradient_ptr)[d];
+                  symmetric_gradients[q_point][comp][comp] +=
+                    0.5 * value * (*shape_gradient_ptr++)[comp];
+                }
             }
           else
             for (unsigned int q_point = 0; q_point < n_quadrature_points;
