@@ -18,33 +18,18 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/quadrature.h>
-#include <deal.II/base/std_cxx20/iota_view.h>
-#include <deal.II/base/subscriptor.h>
+#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/tensor.h>
 
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_handler.h>
-
-#include <deal.II/fe/fe.h>
 #include <deal.II/fe/fe_update_flags.h>
 #include <deal.II/fe/fe_values_extractors.h>
-#include <deal.II/fe/mapping.h>
-#include <deal.II/fe/mapping_related_data.h>
-
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/tria_iterator.h>
-
-#include <deal.II/hp/q_collection.h>
 
 #include <deal.II/lac/read_vector.h>
 
-#include <algorithm>
-#include <memory>
 #include <type_traits>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
