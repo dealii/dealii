@@ -4104,6 +4104,7 @@ namespace internal
 template <int dim, typename Number>
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   MGTwoLevelTransferNonNested(const AdditionalData &data)
+  : additional_data(data)
 {
   rpe = std::make_shared<Utilities::MPI::RemotePointEvaluation<dim>>(
     data.tolerance,
@@ -4183,6 +4184,12 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   // hand points over to RPE
   rpe->reinit(points, dof_handler_coarse.get_triangulation(), mapping_coarse);
+
+  if (additional_data.enforce_all_points_found)
+    AssertThrow(
+      rpe->all_points_found(),
+      ExcMessage(
+        "You requested that all points should be found, but this didn't happen. You can change this option through the AdditionaData struct in the constructor."));
 
   // set up MappingInfo for easier data access
   mapping_info = internal::fill_mapping_info<dim, Number>(*rpe);

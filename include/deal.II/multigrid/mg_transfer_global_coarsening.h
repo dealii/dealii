@@ -707,25 +707,30 @@ private:
 
 public:
   /**
-   * AdditionalData structure for construction arguments needed by
-   * RemotePointEvaluation. Default values are the same as the ones in
-   * RemotePointEvaluation.
+   * AdditionalData structure with the arguments needed by
+   * RemotePointEvaluation. Default values are the same as the ones described in
+   * the documentation of RemotePointEvaluation. The last boolean parameter, @p enf_all_points_found is true by defaults and
+   * checks if RemotePointEvaluation::all_points_found() evaluates to true, i.e.
+   * all submitted points have been found inside the domain.
    */
   struct AdditionalData
   {
     AdditionalData(const double       tol                = 1e-6,
                    const bool         enf_unique_mapping = false,
                    const unsigned int rtree_l            = 0,
-                   const std::function<std::vector<bool>()> &marked_verts = {})
+                   const std::function<std::vector<bool>()> &marked_verts = {},
+                   const bool enf_all_points_found = true)
       : tolerance(tol)
       , enforce_unique_mapping(enf_unique_mapping)
       , rtree_level(rtree_l)
       , marked_vertices(marked_verts)
+      , enforce_all_points_found(enf_all_points_found)
     {}
     double                             tolerance;
     bool                               enforce_unique_mapping;
     unsigned int                       rtree_level;
     std::function<std::vector<bool>()> marked_vertices;
+    bool                               enforce_all_points_found;
   };
 
   MGTwoLevelTransferNonNested(const AdditionalData &data = AdditionalData());
@@ -773,6 +778,7 @@ public:
   memory_consumption() const override;
 
 protected:
+  AdditionalData additional_data;
   /**
    * Perform prolongation.
    */

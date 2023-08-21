@@ -80,8 +80,12 @@ do_test(const FiniteElement<dim> &   fe_fine,
   constraint_fine.close();
 
   // setup transfer operator
+  typename MGTwoLevelTransferNonNested<
+    dim,
+    LinearAlgebra::distributed::Vector<Number>>::AdditionalData data;
+  data.enforce_all_points_found = false;
   MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>
-                 transfer;
+                 transfer(data);
   MappingQ1<dim> mapping_fine, mapping_coarse;
   transfer.reinit(dof_handler_fine,
                   dof_handler_coarse,
