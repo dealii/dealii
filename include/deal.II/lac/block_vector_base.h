@@ -47,13 +47,13 @@ DEAL_II_NAMESPACE_OPEN
 namespace internal
 {
   template <typename T>
-  using has_block_t = decltype(std::declval<T const>().block(0));
+  using has_block_t = decltype(std::declval<const T>().block(0));
 
   template <typename T>
   constexpr bool has_block = internal::is_supported_operation<has_block_t, T>;
 
   template <typename T>
-  using has_n_blocks_t = decltype(std::declval<T const>().n_blocks());
+  using has_n_blocks_t = decltype(std::declval<const T>().n_blocks());
 
   template <typename T>
   constexpr bool has_n_blocks =

@@ -908,8 +908,8 @@ namespace internal
 
     template <>
     bool
-    quadrant_is_ancestor<1>(types<1>::quadrant const &q1,
-                            types<1>::quadrant const &q2)
+    quadrant_is_ancestor<1>(const types<1>::quadrant &q1,
+                            const types<1>::quadrant &q2)
     {
       // determine level of quadrants
       const int level_1 = (q1 << types<1>::max_n_child_indices_bits) >>

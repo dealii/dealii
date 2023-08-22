@@ -51,7 +51,7 @@ namespace Utilities
       /**
        * Copy constructor is deleted.
        */
-      Handle(Handle const &) = delete;
+      Handle(const Handle &) = delete;
 
       /**
        * Destructor. Destroy the handles.

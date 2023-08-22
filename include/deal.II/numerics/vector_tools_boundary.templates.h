@@ -232,7 +232,7 @@ namespace VectorTools
             q_collection,
             update_quadrature_points);
 
-          for (auto const &cell : dof.active_cell_iterators())
+          for (const auto &cell : dof.active_cell_iterators())
             if (!cell->is_artificial())
               for (const unsigned int face_no : cell->face_indices())
                 {

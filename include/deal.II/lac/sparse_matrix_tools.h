@@ -170,14 +170,14 @@ namespace SparseMatrixTools
 
     template <typename T>
     using get_mpi_communicator_t =
-      decltype(std::declval<T const>().get_mpi_communicator());
+      decltype(std::declval<const T>().get_mpi_communicator());
 
     template <typename T>
     constexpr bool has_get_mpi_communicator =
       dealii::internal::is_supported_operation<get_mpi_communicator_t, T>;
 
     template <typename T>
-    using local_size_t = decltype(std::declval<T const>().local_size());
+    using local_size_t = decltype(std::declval<const T>().local_size());
 
     template <typename T>
     constexpr bool has_local_size =

@@ -141,7 +141,7 @@ test()
 
   for (auto cell : tria.cell_iterators())
     {
-      for (auto const &v : cell->vertex_indices())
+      for (const auto &v : cell->vertex_indices())
         {
           if (vertex_touched[cell->vertex_index(v)] == false)
             {

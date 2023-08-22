@@ -530,7 +530,7 @@ namespace internal
   // ... MatrixType::vmult(VectorType &, const VectorType&,
   // std::function<...>, std::function<...>) const
   template <typename MatrixType, typename VectorType>
-  using vmult_functions_t = decltype(std::declval<MatrixType const>().vmult(
+  using vmult_functions_t = decltype(std::declval<const MatrixType>().vmult(
     std::declval<VectorType &>(),
     std::declval<const VectorType &>(),
     std::declval<
@@ -560,7 +560,7 @@ namespace internal
   {
     template <typename T, typename VectorType>
     using Tvmult_t = decltype(
-      std::declval<T const>().Tvmult(std::declval<VectorType &>(),
+      std::declval<const T>().Tvmult(std::declval<VectorType &>(),
                                      std::declval<const VectorType &>()));
 
     template <typename T, typename VectorType>
@@ -568,7 +568,7 @@ namespace internal
 
     template <typename T, typename VectorType>
     using step_t = decltype(
-      std::declval<T const>().step(std::declval<VectorType &>(),
+      std::declval<const T>().step(std::declval<VectorType &>(),
                                    std::declval<const VectorType &>()));
 
     template <typename T, typename VectorType>
@@ -576,7 +576,7 @@ namespace internal
 
     template <typename T, typename VectorType>
     using step_omega_t =
-      decltype(std::declval<T const>().step(std::declval<VectorType &>(),
+      decltype(std::declval<const T>().step(std::declval<VectorType &>(),
                                             std::declval<const VectorType &>(),
                                             std::declval<const double>()));
 
@@ -586,7 +586,7 @@ namespace internal
 
     template <typename T, typename VectorType>
     using Tstep_t = decltype(
-      std::declval<T const>().Tstep(std::declval<VectorType &>(),
+      std::declval<const T>().Tstep(std::declval<VectorType &>(),
                                     std::declval<const VectorType &>()));
 
     template <typename T, typename VectorType>
@@ -594,7 +594,7 @@ namespace internal
 
     template <typename T, typename VectorType>
     using Tstep_omega_t =
-      decltype(std::declval<T const>().Tstep(std::declval<VectorType &>(),
+      decltype(std::declval<const T>().Tstep(std::declval<VectorType &>(),
                                              std::declval<const VectorType &>(),
                                              std::declval<const double>()));
 
@@ -604,7 +604,7 @@ namespace internal
 
     template <typename T, typename VectorType>
     using jacobi_step_t = decltype(
-      std::declval<T const>().Jacobi_step(std::declval<VectorType &>(),
+      std::declval<const T>().Jacobi_step(std::declval<VectorType &>(),
                                           std::declval<const VectorType &>(),
                                           std::declval<const double>()));
 
@@ -614,7 +614,7 @@ namespace internal
 
     template <typename T, typename VectorType>
     using SOR_step_t = decltype(
-      std::declval<T const>().SOR_step(std::declval<VectorType &>(),
+      std::declval<const T>().SOR_step(std::declval<VectorType &>(),
                                        std::declval<const VectorType &>(),
                                        std::declval<const double>()));
 
@@ -624,7 +624,7 @@ namespace internal
 
     template <typename T, typename VectorType>
     using SSOR_step_t = decltype(
-      std::declval<T const>().SSOR_step(std::declval<VectorType &>(),
+      std::declval<const T>().SSOR_step(std::declval<VectorType &>(),
                                         std::declval<const VectorType &>(),
                                         std::declval<const double>()));
 

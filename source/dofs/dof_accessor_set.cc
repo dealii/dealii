@@ -93,7 +93,7 @@ namespace internal
    */
   template <typename T>
   using set_ghost_state_t =
-    decltype(std::declval<T const>().set_ghost_state(std::declval<bool>()));
+    decltype(std::declval<const T>().set_ghost_state(std::declval<bool>()));
 
   template <typename T>
   constexpr bool has_set_ghost_state =

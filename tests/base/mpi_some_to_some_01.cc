@@ -41,7 +41,7 @@ main(int argc, char *argv[])
   auto received_pts = Utilities::MPI::some_to_some(MPI_COMM_WORLD, m);
 
   bool test_passed = true;
-  for (auto const &pt : received_pts)
+  for (const auto &pt : received_pts)
     if (std::abs(pt.first - pt.second[0][0]) > 1e-12 ||
         std::abs(2.0 * pt.first + pt.second[0][1]) > 1e-12)
       {

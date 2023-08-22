@@ -191,7 +191,7 @@ namespace parallel
           out.local_element(i) = std::numeric_limits<Number>::infinity();
 
         unsigned int cell_i = 0;
-        for (auto const &cell : dof_handler.active_cell_iterators())
+        for (const auto &cell : dof_handler.active_cell_iterators())
           {
             if ((cell->is_locally_owned()) &&
                 (transferred_data[cell_i][0] !=
