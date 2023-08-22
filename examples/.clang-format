@@ -1,5 +1,5 @@
 #
-# The clang-format (Clang 11) style file used by deal.II for the examples.
+# The clang-format (Clang 16) style file used by deal.II for the examples.
 # In contrast to the general one, header files are not sorted and we do
 # not require return types to be on a separate line.
 #
@@ -86,7 +86,7 @@ PenaltyBreakBeforeFirstCallParameter: 90
 PointerAlignment: Right
 
 ReflowComments: true
-CommentPragmas: '( \| |\*--|<li>|@ref | @p | @param  |@returns |@warning |@ingroup |@author |@date |@related |@relates |@relatesalso |@deprecated |@image |@return |@brief |@attention |@copydoc |@addtogroup |@todo |@tparam |@see |@note |@skip |@skipline |@until |@line |@dontinclude |@include|@sect1|@sect2|@sect3|@sect4)'
+CommentPragmas: '( \| |\*--|<li>|@ref | @p |@param |@name |@returns |@warning |@ingroup |@author |@date |@related |@relates |@relatesalso |@deprecated |@image |@return |@brief |@attention |@copydoc |@addtogroup |@todo |@tparam |@see |@note |@skip |@skipline |@until |@line |@dontinclude |@include|@sect1|@sect2|@sect3|@sect4)'
 
 SortIncludes: false
 SortUsingDeclarations: true
@@ -103,7 +103,7 @@ SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 
-Standard: Cpp11
+Standard: c++20
 
 TabWidth: 2
 
