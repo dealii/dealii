@@ -316,7 +316,7 @@ namespace internal
     template <int dim, std::size_t dim1>
     void
     evaluate_tensor_product(
-      const unsigned int n_values_and_derivatives,
+      const unsigned int n_derivatives,
       const boost::container::small_vector<dealii::ndarray<double, 5, dim>, 10>
         &                values_1d,
       const unsigned int size_x,
@@ -340,7 +340,7 @@ namespace internal
 
       // For values, 1st and 2nd derivatives use a more lengthy code that
       // minimizes the number of arithmetic operations and memory accesses
-      if (n_values_and_derivatives == 1)
+      if (n_derivatives == 0)
         for (unsigned int i = 0, i1 = 0; i1 < indices.size(); ++i1)
           {
             double value_outer = 1.;
@@ -526,17 +526,17 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
          ExcDimensionMismatch2(fourth_derivatives.size(), this->n(), 0));
 
   // check how many values/derivatives we have to compute
-  unsigned int n_values_and_derivatives = 0;
+  unsigned int n_derivatives = 0;
   if (values.size() == this->n())
-    n_values_and_derivatives = 1;
+    n_derivatives = 0;
   if (grads.size() == this->n())
-    n_values_and_derivatives = 2;
+    n_derivatives = 1;
   if (grad_grads.size() == this->n())
-    n_values_and_derivatives = 3;
+    n_derivatives = 2;
   if (third_derivatives.size() == this->n())
-    n_values_and_derivatives = 4;
+    n_derivatives = 3;
   if (fourth_derivatives.size() == this->n())
-    n_values_and_derivatives = 5;
+    n_derivatives = 4;
 
   // Compute the values (and derivatives, if necessary) of all 1d polynomials
   // at this evaluation point. We can use the more optimized values_of_array
@@ -552,7 +552,7 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
         point_array[d] = p[d];
       for (unsigned int i = 0; i < n_polynomials; ++i)
         polynomials[i].values_of_array(point_array,
-                                       n_values_and_derivatives,
+                                       n_derivatives,
                                        values_1d[i].data());
     }
   else
@@ -560,10 +560,8 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
       for (unsigned int d = 0; d < dim; ++d)
         {
           std::array<double, 5> derivatives;
-          polynomials[i].value(p[d],
-                               n_values_and_derivatives,
-                               derivatives.data());
-          for (unsigned int j = 0; j < n_values_and_derivatives; ++j)
+          polynomials[i].value(p[d], n_derivatives, derivatives.data());
+          for (unsigned int j = 0; j <= n_derivatives; ++j)
             values_1d[i][j][d] = derivatives[j];
         }
 
@@ -585,7 +583,7 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   AssertDimension(indices.size(), Utilities::pow(n_polynomials, dim - 1));
 
   internal::TensorProductPolynomials::evaluate_tensor_product<dim>(
-    n_values_and_derivatives,
+    n_derivatives,
     values_1d,
     n_polynomials,
     indices,
@@ -834,17 +832,17 @@ AnisotropicPolynomials<dim>::evaluate(
          ExcDimensionMismatch2(fourth_derivatives.size(), this->n(), 0));
 
   // check how many values/derivatives we have to compute
-  unsigned int n_values_and_derivatives = 0;
+  unsigned int n_derivatives = 0;
   if (values.size() == this->n())
-    n_values_and_derivatives = 1;
+    n_derivatives = 0;
   if (grads.size() == this->n())
-    n_values_and_derivatives = 2;
+    n_derivatives = 1;
   if (grad_grads.size() == this->n())
-    n_values_and_derivatives = 3;
+    n_derivatives = 2;
   if (third_derivatives.size() == this->n())
-    n_values_and_derivatives = 4;
+    n_derivatives = 3;
   if (fourth_derivatives.size() == this->n())
-    n_values_and_derivatives = 5;
+    n_derivatives = 4;
 
   // compute the values (and derivatives, if necessary) of all polynomials at
   // this evaluation point
@@ -855,7 +853,7 @@ AnisotropicPolynomials<dim>::evaluate(
   // 5 is enough to store values and derivatives in all supported cases
   boost::container::small_vector<ndarray<double, 5, dim>, 10> values_1d(
     max_n_polynomials);
-  if (n_values_and_derivatives == 1)
+  if (n_derivatives == 0)
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int i = 0; i < polynomials[d].size(); ++i)
         values_1d[i][0][d] = polynomials[d][i].value(p[d]);
@@ -867,10 +865,8 @@ AnisotropicPolynomials<dim>::evaluate(
           // innermost index, so we cannot pass the values_1d array into the
           // function directly
           std::array<double, 5> derivatives;
-          polynomials[d][i].value(p[d],
-                                  n_values_and_derivatives,
-                                  derivatives.data());
-          for (unsigned int j = 0; j < n_values_and_derivatives; ++j)
+          polynomials[d][i].value(p[d], n_derivatives, derivatives.data());
+          for (unsigned int j = 0; j <= n_derivatives; ++j)
             values_1d[i][j][d] = derivatives[j];
         }
 
@@ -890,7 +886,7 @@ AnisotropicPolynomials<dim>::evaluate(
     }
 
   internal::TensorProductPolynomials::evaluate_tensor_product<dim>(
-    n_values_and_derivatives,
+    n_derivatives,
     values_1d,
     polynomials[0].size(),
     indices,
