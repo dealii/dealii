@@ -1088,13 +1088,28 @@ namespace PETScWrappers
         PetscReal atol, rtol;
         AssertPETSc(TSGetTolerances(ts, &atol, nullptr, &rtol, nullptr));
 
+        // Fill up vectors with individual tolerances, using -1 for the
+        // algebraic variables.
+        // We need to input them with the same vector type of our solution
+        // but we are not sure that the user's VectorType supports operator[]
+        // We thus first create standard vectors that we know support the
+        // operator, and then copy the values into the user's type operator.
         Vec av, rv;
         Vec py = const_cast<VectorType &>(y).petsc_vector();
         AssertPETSc(VecDuplicate(py, &av));
         AssertPETSc(VecDuplicate(py, &rv));
 
-        VectorType avdealii(av);
-        VectorType rvdealii(rv);
+        // Standard vectors
+        Vec      avT, rvT;
+        PetscInt n, N;
+        AssertPETSc(VecGetLocalSize(py, &n));
+        AssertPETSc(VecGetSize(py, &N));
+        AssertPETSc(VecCreateMPI(this->get_mpi_communicator(), n, N, &avT));
+        AssertPETSc(VecDuplicate(avT, &rvT));
+
+        // Fill-up the vectors
+        VectorBase avdealii(avT);
+        VectorBase rvdealii(rvT);
         avdealii = atol;
         rvdealii = rtol;
         for (auto i : algebraic_components())
@@ -1104,9 +1119,15 @@ namespace PETScWrappers
           }
         avdealii.compress(VectorOperation::insert);
         rvdealii.compress(VectorOperation::insert);
+
+        // Copy, set and destroy
+        AssertPETSc(VecCopy(avT, av));
+        AssertPETSc(VecCopy(rvT, rv));
         AssertPETSc(TSSetTolerances(ts, atol, av, rtol, rv));
         AssertPETSc(VecDestroy(&av));
         AssertPETSc(VecDestroy(&rv));
+        AssertPETSc(VecDestroy(&avT));
+        AssertPETSc(VecDestroy(&rvT));
       }
   }
 
