@@ -356,6 +356,7 @@ namespace internal
       else
         for (unsigned int iy = 0, i1 = 0; i1 < indices.size(); ++i1)
           {
+            // prepare parts of products in y (and z) directions
             std::array<double, dim + (dim * (dim - 1)) / 2> value_outer;
             value_outer[0] = 1.;
             for (unsigned int x = 1; x < dim; ++x)
@@ -383,54 +384,39 @@ namespace internal
                         values_1d[indices[i1][x - 1]][derivative][x];
                     }
                 }
-            if (update_values)
-              {
-                if (index_map.empty())
-                  for (unsigned int ix = 0, i = iy; ix < size_x; ++ix, ++i)
-                    values[i] = value_outer[0] * values_1d[ix][0][0];
-                else
-                  for (unsigned int ix = 0, i = iy; ix < size_x; ++ix, ++i)
-                    values[index_map[i]] = value_outer[0] * values_1d[ix][0][0];
-              }
 
-            if (update_grads)
+            // now run the loop over x and multiply by the values/derivatives
+            // in x direction
+            for (unsigned int ix = 0, i = iy; ix < size_x; ++ix, ++i)
               {
-                if (index_map.empty())
-                  for (unsigned int ix = 0, i = iy; ix < size_x; ++ix, ++i)
-                    {
-                      grads[i][0]      = value_outer[0] * values_1d[ix][1][0];
-                      const double tmp = values_1d[ix][0][0];
-                      for (unsigned int d = 1; d < dim; ++d)
-                        grads[i][d] = value_outer[d] * tmp;
-                    }
-                else
-                  for (unsigned int ix = 0, i = iy; ix < size_x; ++ix, ++i)
-                    {
-                      grads[index_map[i]][0] =
-                        value_outer[0] * values_1d[ix][1][0];
-                      const double tmp = values_1d[ix][0][0];
-                      for (unsigned int d = 1; d < dim; ++d)
-                        grads[index_map[i]][d] = value_outer[d] * tmp;
-                    }
-              }
+                std::array<double, 3> val_x{{values_1d[ix][0][0],
+                                             values_1d[ix][1][0],
+                                             values_1d[ix][2][0]}};
+                const unsigned int    index =
+                  (index_map.empty() ? i : index_map[i]);
 
-            if (update_grad_grads)
-              for (unsigned int ix = 0, i = iy; ix < size_x; ++ix, ++i)
-                {
-                  const unsigned int index =
-                    (index_map.empty() ? i : index_map[i]);
-                  grad_grads[index][0][0] =
-                    value_outer[0] * values_1d[ix][2][0];
-                  const double tmp1 = values_1d[ix][1][0];
-                  for (unsigned int d = 1; d < dim; ++d)
-                    grad_grads[index][0][d] = grad_grads[index][d][0] =
-                      value_outer[d] * tmp1;
-                  const double tmp0 = values_1d[ix][0][0];
-                  for (unsigned int d1 = 1, count = dim; d1 < dim; ++d1)
-                    for (unsigned int d2 = d1; d2 < dim; ++d2, ++count)
-                      grad_grads[index][d1][d2] = grad_grads[index][d2][d1] =
-                        value_outer[count] * tmp0;
-                }
+                if (update_values)
+                  values[index] = value_outer[0] * val_x[0];
+
+                if (update_grads)
+                  {
+                    grads[index][0] = value_outer[0] * val_x[1];
+                    for (unsigned int d = 1; d < dim; ++d)
+                      grads[index][d] = value_outer[d] * val_x[0];
+                  }
+
+                if (update_grad_grads)
+                  {
+                    grad_grads[index][0][0] = value_outer[0] * val_x[2];
+                    for (unsigned int d = 1; d < dim; ++d)
+                      grad_grads[index][0][d] = grad_grads[index][d][0] =
+                        value_outer[d] * val_x[1];
+                    for (unsigned int d1 = 1, count = dim; d1 < dim; ++d1)
+                      for (unsigned int d2 = d1; d2 < dim; ++d2, ++count)
+                        grad_grads[index][d1][d2] = grad_grads[index][d2][d1] =
+                          value_outer[count] * val_x[0];
+                  }
+              }
 
             // Use slower code for 3rd and 4th derivatives
             if (update_3rd_derivatives)
