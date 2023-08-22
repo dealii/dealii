@@ -392,7 +392,7 @@ namespace CUDAWrappers
     nnz                              = sparse_matrix_host.n_nonzero_elements();
     n_rows                           = sparse_matrix_host.m();
     n_cols                           = sparse_matrix_host.n();
-    unsigned int const  row_ptr_size = n_rows + 1;
+    const unsigned int  row_ptr_size = n_rows + 1;
     std::vector<Number> val;
     val.reserve(nnz);
     std::vector<int> column_index;
@@ -414,8 +414,8 @@ namespace CUDAWrappers
         row_ptr[row + 1] = row_ptr[row] + counter;
 
         // Sort the elements in the row
-        unsigned int const offset     = row_ptr[row];
-        int const          diag_index = column_index[offset];
+        const unsigned int offset     = row_ptr[row];
+        const int          diag_index = column_index[offset];
         Number             diag_elem  = sparse_matrix_host.diag_element(row);
         unsigned int       pos        = 1;
         while ((column_index[offset + pos] < row) && (pos < counter))

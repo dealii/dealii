@@ -986,14 +986,13 @@ namespace MatrixCreator
       const MatrixCreator::internal::AssemblerBoundary::Scratch &,
       MatrixCreator::internal::AssemblerBoundary::
         CopyData<dim, spacedim, number> & copy_data,
-      Mapping<dim, spacedim> const &      mapping,
-      FiniteElement<dim, spacedim> const &fe,
-      Quadrature<dim - 1> const &         q,
-      std::map<types::boundary_id, const Function<spacedim, number> *> const
+      const Mapping<dim, spacedim> &      mapping,
+      const FiniteElement<dim, spacedim> &fe,
+      const Quadrature<dim - 1> &         q,
+      const std::map<types::boundary_id, const Function<spacedim, number> *>
         &                                     boundary_functions,
-      Function<spacedim, number> const *const coefficient,
-      std::vector<unsigned int> const &       component_mapping)
-
+      const Function<spacedim, number> *const coefficient,
+      const std::vector<unsigned int> &       component_mapping)
     {
       // Most assertions for this function are in the calling function
       // before creating threads.
@@ -1218,11 +1217,11 @@ namespace MatrixCreator
     template <int dim, int spacedim, typename number>
     void
     copy_boundary_mass_matrix_1(
-      MatrixCreator::internal::AssemblerBoundary::
-        CopyData<dim, spacedim, number> const &copy_data,
-      std::map<types::boundary_id, const Function<spacedim, number> *> const
+      const MatrixCreator::internal::AssemblerBoundary::
+        CopyData<dim, spacedim, number> &copy_data,
+      const std::map<types::boundary_id, const Function<spacedim, number> *>
         &                                         boundary_functions,
-      std::vector<types::global_dof_index> const &dof_to_boundary_mapping,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
       SparseMatrix<number> &                      matrix,
       Vector<number> &                            rhs_vector)
     {
@@ -1295,13 +1294,13 @@ namespace MatrixCreator
       const MatrixCreator::internal::AssemblerBoundary::Scratch &,
       MatrixCreator::internal::AssemblerBoundary::CopyData<1, 3, float>
         & /*copy_data*/,
-      Mapping<1, 3> const &,
-      FiniteElement<1, 3> const &,
-      Quadrature<0> const &,
-      std::map<types::boundary_id, const Function<3, float> *> const
+      const Mapping<1, 3> &,
+      const FiniteElement<1, 3> &,
+      const Quadrature<0> &,
+      const std::map<types::boundary_id, const Function<3, float> *>
         & /*boundary_functions*/,
-      Function<3, float> const *const /*coefficient*/,
-      std::vector<unsigned int> const & /*component_mapping*/)
+      const Function<3, float> *const /*coefficient*/,
+      const std::vector<unsigned int> & /*component_mapping*/)
     {
       Assert(false, ExcNotImplemented());
     }
@@ -1312,13 +1311,13 @@ namespace MatrixCreator
       const MatrixCreator::internal::AssemblerBoundary::Scratch &,
       MatrixCreator::internal::AssemblerBoundary::CopyData<1, 3, double>
         & /*copy_data*/,
-      Mapping<1, 3> const &,
-      FiniteElement<1, 3> const &,
-      Quadrature<0> const &,
-      std::map<types::boundary_id, const Function<3, double> *> const
+      const Mapping<1, 3> &,
+      const FiniteElement<1, 3> &,
+      const Quadrature<0> &,
+      const std::map<types::boundary_id, const Function<3, double> *>
         & /*boundary_functions*/,
-      Function<3, double> const *const /*coefficient*/,
-      std::vector<unsigned int> const & /*component_mapping*/)
+      const Function<3, double> *const /*coefficient*/,
+      const std::vector<unsigned int> & /*component_mapping*/)
     {
       Assert(false, ExcNotImplemented());
     }
@@ -1396,8 +1395,8 @@ namespace MatrixCreator
                                                 component_mapping);
       },
       [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
-        MatrixCreator::internal::AssemblerBoundary::
-          CopyData<dim, spacedim, number> const &copy_data) {
+        const MatrixCreator::internal::AssemblerBoundary::
+          CopyData<dim, spacedim, number> &copy_data) {
         internal::copy_boundary_mass_matrix_1(copy_data,
                                               boundary_functions,
                                               dof_to_boundary_mapping,
@@ -1419,13 +1418,13 @@ namespace MatrixCreator
       const MatrixCreator::internal::AssemblerBoundary::Scratch &,
       MatrixCreator::internal::AssemblerBoundary ::
         CopyData<dim, spacedim, number> &         copy_data,
-      hp::MappingCollection<dim, spacedim> const &mapping,
-      hp::FECollection<dim, spacedim> const &     fe_collection,
-      hp::QCollection<dim - 1> const &            q,
+      const hp::MappingCollection<dim, spacedim> &mapping,
+      const hp::FECollection<dim, spacedim> &     fe_collection,
+      const hp::QCollection<dim - 1> &            q,
       const std::map<types::boundary_id, const Function<spacedim, number> *>
         &                                     boundary_functions,
-      Function<spacedim, number> const *const coefficient,
-      std::vector<unsigned int> const &       component_mapping)
+      const Function<spacedim, number> *const coefficient,
+      const std::vector<unsigned int> &       component_mapping)
     {
       const unsigned int n_components = fe_collection.n_components();
       const unsigned int n_function_components =
@@ -1672,11 +1671,11 @@ namespace MatrixCreator
     template <int dim, int spacedim, typename number>
     void
     copy_hp_boundary_mass_matrix_1(
-      MatrixCreator::internal::AssemblerBoundary ::
-        CopyData<dim, spacedim, number> const &copy_data,
-      std::map<types::boundary_id, const Function<spacedim, number> *> const
+      const MatrixCreator::internal::AssemblerBoundary ::
+        CopyData<dim, spacedim, number> &copy_data,
+      const std::map<types::boundary_id, const Function<spacedim, number> *>
         &                                         boundary_functions,
-      std::vector<types::global_dof_index> const &dof_to_boundary_mapping,
+      const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
       SparseMatrix<number> &                      matrix,
       Vector<number> &                            rhs_vector)
     {
@@ -1872,8 +1871,8 @@ namespace MatrixCreator
                                                    component_mapping);
       },
       [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
-        MatrixCreator::internal::AssemblerBoundary ::
-          CopyData<dim, spacedim, number> const &copy_data) {
+        const MatrixCreator::internal::AssemblerBoundary ::
+          CopyData<dim, spacedim, number> &copy_data) {
         internal::copy_hp_boundary_mass_matrix_1(copy_data,
                                                  boundary_functions,
                                                  dof_to_boundary_mapping,

@@ -24,7 +24,7 @@
 #include "../tests.h"
 
 Vector<double>
-f(double const t, Vector<double> const &y)
+f(const double t, const Vector<double> &y)
 {
   Vector<double> values(y);
   for (unsigned int i = 0; i < values.size(); ++i)
@@ -34,15 +34,15 @@ f(double const t, Vector<double> const &y)
 }
 
 double
-my(double const t)
+my(const double t)
 {
   return t;
 }
 
 void
 test(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> &          solver,
-     std::function<Vector<double>(double const, Vector<double> const &)> f,
-     std::function<double(double const)>                                 my)
+     std::function<Vector<double>(const double, const Vector<double> &)> f,
+     std::function<double(const double)>                                 my)
 {
   double         initial_time = 0.0, final_time = 1.0;
   double         time_step    = 0.1;

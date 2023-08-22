@@ -59,7 +59,7 @@ namespace boost
          * a dealii::BoundingBox.
          */
         static inline double
-        get(dealii::BoundingBox<dim, Number> const &box)
+        get(const dealii::BoundingBox<dim, Number> &box)
         {
           return box.get_boundary_points().first[D];
         }
@@ -87,7 +87,7 @@ namespace boost
          * a dealii::BoundingBox.
          */
         static inline double
-        get(dealii::BoundingBox<dim, Number> const &box)
+        get(const dealii::BoundingBox<dim, Number> &box)
         {
           return box.get_boundary_points().second[D];
         }

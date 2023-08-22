@@ -38,22 +38,22 @@ void
 test()
 {
   Triangulation<3>   tria;
-  unsigned int const n_cells_toroidal = 9;
-  double const       angle            = 2.0 * numbers::PI;
-  double const       R = 3., r = 1.;
+  const unsigned int n_cells_toroidal = 9;
+  const double       angle            = 2.0 * numbers::PI;
+  const double       R = 3., r = 1.;
   GridGenerator::torus(tria, R, r, n_cells_toroidal, angle);
 
   Triangulation<3>   tria_open;
-  unsigned int const factor = 3;
+  const unsigned int factor = 3;
   GridGenerator::torus(
     tria_open, R, r, n_cells_toroidal / factor, angle / (double)factor);
 
-  MappingQ<3> const mapping(3);
-  QGauss<3> const   gauss(4);
+  const MappingQ<3> mapping(3);
+  const QGauss<3>   gauss(4);
 
-  double const ar_full_torus =
+  const double ar_full_torus =
     GridTools::compute_maximum_aspect_ratio(mapping, tria, gauss);
-  double const ar_open_torus =
+  const double ar_open_torus =
     GridTools::compute_maximum_aspect_ratio(mapping, tria_open, gauss);
 
   deallog << "N_active_cells_full = " << tria.n_global_active_cells()

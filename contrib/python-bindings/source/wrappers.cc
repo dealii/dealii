@@ -41,7 +41,7 @@ namespace python
 
 DEAL_II_NAMESPACE_CLOSE
 
-char const *pydealii_docstring =
+const char *pydealii_docstring =
   "                                                             \n"
   "PyDealII                                                     \n"
   "========                                                     \n"

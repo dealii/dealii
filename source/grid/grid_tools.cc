@@ -394,9 +394,9 @@ namespace GridTools
 
                     J.compute_svd();
 
-                    double const max_sv = J.singular_value(0);
-                    double const min_sv = J.singular_value(dim - 1);
-                    double const ar     = max_sv / min_sv;
+                    const double max_sv = J.singular_value(0);
+                    const double min_sv = J.singular_value(dim - 1);
+                    const double ar     = max_sv / min_sv;
 
                     // Take the max between the previous and the current
                     // aspect ratio value; if we had previously encountered

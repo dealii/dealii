@@ -151,19 +151,19 @@ test()
 
   // Computation the host
   auto               graph    = mf_data.get_colored_graph();
-  unsigned int const n_colors = graph.size();
+  const unsigned int n_colors = graph.size();
   for (unsigned int color = 0; color < n_colors; ++color)
     {
       typename CUDAWrappers::MatrixFree<dim, double>::Data gpu_data =
         mf_data.get_data(color);
-      unsigned int const n_cells = gpu_data.n_cells;
+      const unsigned int n_cells = gpu_data.n_cells;
       auto gpu_data_host = CUDAWrappers::copy_mf_data_to_host<dim, double>(
         gpu_data, additional_data.mapping_update_flags);
       for (unsigned int cell_id = 0; cell_id < n_cells; ++cell_id)
         {
           for (unsigned int i = 0; i < n_q_points_per_cell; ++i)
             {
-              unsigned int const pos =
+              const unsigned int pos =
                 gpu_data_host.local_q_point_id(cell_id, n_q_points_per_cell, i);
               auto         p = gpu_data_host.get_quadrature_point(cell_id, i);
               const double p_val = dim == 2 ? p(0) + p(1) : p(0) + p(1) + p(2);

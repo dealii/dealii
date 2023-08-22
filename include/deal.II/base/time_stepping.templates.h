@@ -543,7 +543,7 @@ namespace TimeStepping
             this->n_stages = 2;
             this->b.reserve(this->n_stages);
             this->c.reserve(this->n_stages);
-            double const gamma = 1.0 - 1.0 / std::sqrt(2.0);
+            const double gamma = 1.0 - 1.0 / std::sqrt(2.0);
             this->b.push_back(1.0 - gamma);
             this->b.push_back(gamma);
             this->a.push_back(std::vector<double>(1, gamma));

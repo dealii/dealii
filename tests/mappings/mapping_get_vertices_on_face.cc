@@ -62,7 +62,7 @@ test_vertex_order()
 
         for (unsigned int i = 0; i < vertices.size(); ++i)
           {
-            auto const diff = vertices[i] - vertices_detour[i];
+            const auto diff = vertices[i] - vertices_detour[i];
             AssertThrow(diff.norm() < 1e-12, ExcMessage("Vertices differ!"));
           }
       }

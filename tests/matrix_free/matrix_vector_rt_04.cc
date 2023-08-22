@@ -30,10 +30,10 @@ template <int dim>
 class DeformedCubeManifold : public dealii::ChartManifold<dim, dim, dim>
 {
 public:
-  DeformedCubeManifold(double const       left,
-                       double const       right,
-                       double const       deformation,
-                       unsigned int const frequency = 1)
+  DeformedCubeManifold(const double       left,
+                       const double       right,
+                       const double       deformation,
+                       const unsigned int frequency = 1)
     : left(left)
     , right(right)
     , deformation(deformation)
@@ -41,7 +41,7 @@ public:
   {}
 
   dealii::Point<dim>
-  push_forward(dealii::Point<dim> const &chart_point) const override
+  push_forward(const dealii::Point<dim> &chart_point) const override
   {
     double sinval = deformation;
     for (unsigned int d = 0; d < dim; ++d)
@@ -54,7 +54,7 @@ public:
   }
 
   dealii::Point<dim>
-  pull_back(dealii::Point<dim> const &space_point) const override
+  pull_back(const dealii::Point<dim> &space_point) const override
   {
     dealii::Point<dim> x = space_point;
     dealii::Point<dim> one;
@@ -117,10 +117,10 @@ public:
   }
 
 private:
-  double const       left;
-  double const       right;
-  double const       deformation;
-  unsigned int const frequency;
+  const double       left;
+  const double       right;
+  const double       deformation;
+  const unsigned int frequency;
 };
 
 template <int dim, int fe_degree>
@@ -130,8 +130,8 @@ test()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
-  unsigned int const               frequency   = 2;
-  double const                     deformation = 0.05;
+  const unsigned int               frequency   = 2;
+  const double                     deformation = 0.05;
   static DeformedCubeManifold<dim> manifold(0.0, 1.0, deformation, frequency);
   tria.set_all_manifold_ids(1);
   tria.set_manifold(1, manifold);

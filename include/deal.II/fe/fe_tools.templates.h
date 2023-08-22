@@ -1813,7 +1813,7 @@ namespace FETools
             // sufficiently large so that there
             // are more than about 5000
             // operations in the inner loop
-            // (which is const basically * n^2
+            // (which is basically const * n^2
             // operations).
             if (n > 30)
               {

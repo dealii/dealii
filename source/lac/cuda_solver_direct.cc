@@ -316,8 +316,8 @@ namespace CUDAWrappers
                      Number *                    x_dev)
     {
       // Change the format of the matrix from sparse to dense
-      unsigned int const m = matrix.m();
-      unsigned int const n = matrix.n();
+      const unsigned int m = matrix.m();
+      const unsigned int n = matrix.n();
       Assert(m == n, ExcMessage("The matrix is not square"));
       Number *dense_matrix_dev;
       Utilities::CUDA::malloc(dense_matrix_dev, m * n);
