@@ -3521,7 +3521,216 @@ outer_product(const SymmetricTensor<2, dim, Number> &t1,
   return tmp;
 }
 
+/**
+ * Perform a spectrum decomposition of a 2nd-order symmetric tensor \a
+ * original_tensor given as the input argument, \f[ \mathrm{original\_tensor} =
+ * \sum_i \lambda_i \, \boldsymbol{n}_i \otimes \boldsymbol{n}_i, \f] where
+ * $\lambda_i$ is the eigenvalue, and $\boldsymbol{n}_i$ is the corresponding
+ * eigenvector. The outputs are the positive part \a positive_part_tensor and
+ * negative part \a negative_part_tensor of the input tensor,
+ * that is,
+ * \f[
+ *   \mathrm{positive\_part\_tensor} = \sum_i <\lambda_i>_+ \boldsymbol{n}_i
+ * \otimes \boldsymbol{n}_i, \quad \mathrm{negative\_part\_tensor} = \sum_i
+ * <\lambda_i>_- \boldsymbol{n}_i \otimes \boldsymbol{n}_i, \f] where
+ * $<\lambda_i>_+ = \mathrm{max}\{ \lambda_i, 0 \}$ and
+ * $<\lambda_i>_- = \mathrm{min}\{ \lambda_i, 0 \}$. Obviously,
+ * \f[
+ *   \mathrm{positive\_part\_tensor}  + \mathrm{negative\_part\_tensor} =
+ * \mathrm{original\_tensor}. \f]
+ *
+ * @param[in] original_tensor The 2nd-order symmetric tensor to be split into
+ * the positive and negative parts
+ * @param[out] positive_part_tensor The positive part of the input tensor in
+ * which the eigenvalues are positive or zero
+ * @param[out] negative_part_tensor The negative part of the input tensor in
+ * which the eigenvalues are negative or zero
+ *
+ * @relatesalso SymmetricTensor
+ */
+template <int dim, typename Number>
+void
+positive_negative_split(const SymmetricTensor<2, dim, Number> &original_tensor,
+                        SymmetricTensor<2, dim, Number> &positive_part_tensor,
+                        SymmetricTensor<2, dim, Number> &negative_part_tensor)
+{
+  Assert(dim <= 3, ExcMessage("dim should not be larger than 3."));
 
+  std::array<std::pair<Number, Tensor<1, dim, Number>>, dim> eigen_system;
+  std::vector<Number>                                        eigen_values(dim);
+  std::vector<Tensor<1, dim, Number>>                        eigen_vectors(dim);
+
+  eigen_system = eigenvectors(original_tensor);
+
+  for (int i = 0; i < dim; i++)
+    {
+      eigen_values[i]  = eigen_system[i].first;
+      eigen_vectors[i] = eigen_system[i].second;
+    }
+
+  positive_part_tensor = 0;
+  for (int i = 0; i < dim; i++)
+    positive_part_tensor +=
+      std::fmax(eigen_values[i], 0.0) *
+      symmetrize(outer_product(eigen_vectors[i], eigen_vectors[i]));
+
+  negative_part_tensor = 0;
+  for (int i = 0; i < dim; i++)
+    negative_part_tensor +=
+      std::fmin(eigen_values[i], 0.0) *
+      symmetrize(outer_product(eigen_vectors[i], eigen_vectors[i]));
+}
+
+/**
+ * This function is similar to the function positive_negative_split(). That is,
+ * perform a spectrum decomposition of a 2nd-order symmetric tensor \a
+ * original_tensor given as the input argument, and split it into a positive
+ * part \a positive_part_tensor and a negative part \a negative_part_tensor.
+ * Moreover, this function also provides the derivatives. Let $\mathbf{A}$
+ * represent the input 2nd-order symmetric tensor \a original_tensor,
+ * $\mathbf{A}^+$ represent the positive part \a positive_part_tensor, and
+ * $\mathbf{A}^-$ represent the negative part \a negative_part_tensor. Then, two
+ * fourth-order tensors are defined as
+ * \f[
+ *   \mathbb{P}^+ = \frac{\partial \mathbf{A}^+}{\partial \mathbf{A}}, \quad
+ *   \mathbb{P}^- = \frac{\partial \mathbf{A}^-}{\partial \mathbf{A}},
+ * \f]
+ * where $\mathbb{P}^+$ is the \a positive_projector and $\mathbb{P}^-$ is the
+ * \a negative_projector. These two fourth-order tensors satisfy the following
+ * properties: \f[ \mathbb{P}^+ : \mathbf{A} = \mathbf{A}^+, \quad \mathbb{P}^-
+ * : \mathbf{A} = \mathbf{A}^-. \f] Since $\mathbb{P}^+$ and $\mathbb{P}^-$ are
+ * 4th-order projectors, \f[ \mathbb{P}^+ : \mathbf{A}^+ = \mathbf{A}^+, \quad
+ * \mathbb{P}^- : \mathbf{A}^- = \mathbf{A}^-, \quad \mathbb{P}^+ : \mathbf{A}^-
+ * = \mathbb{P}^- : \mathbf{A}^+ = \mathbf{0}. \f] Lastly, \f[ \mathbb{P}^+ +
+ * \mathbb{P}^- = \mathbb{S}, \f] where $\mathbb{S}$ is the fourth-order
+ * symmetric identity tensor Physics::Elasticity::StandardTensors< dim >::S.
+ *
+ * @param[in] original_tensor The 2nd-order symmetric tensor to be split into
+ * the positive and negative parts
+ * @param[out] positive_part_tensor The positive part of the input tensor in
+ * which the eigenvalues are positive or zero
+ * @param[out] negative_part_tensor The negative part of the input tensor in
+ * which the eigenvalues are negative or zero
+ * @param[out] positive_projector The fourth-order positive projection tensor
+ * $\mathbb{P}^+$
+ * @param[out] negative_projector The fourth-order negative projection tensor
+ * $\mathbb{P}^-$
+ *
+ * @relatesalso SymmetricTensor
+ */
+template <int dim, typename Number>
+void
+positive_negative_projectors(
+  const SymmetricTensor<2, dim, Number> &original_tensor,
+  SymmetricTensor<2, dim, Number> &      positive_part_tensor,
+  SymmetricTensor<2, dim, Number> &      negative_part_tensor,
+  SymmetricTensor<4, dim, Number> &      positive_projector,
+  SymmetricTensor<4, dim, Number> &      negative_projector)
+{
+  Assert(dim <= 3, ExcMessage("dim should not be larger than 3."));
+
+  auto heaviside_function{[](const double x) {
+    if (std::fabs(x) < 1.0e-16)
+      return 0.5;
+    if (x > 0)
+      return 1.0;
+    else
+      return 0.0;
+  }};
+
+  std::array<std::pair<Number, Tensor<1, dim, Number>>, dim> eigen_system;
+  std::vector<Number>                                        eigen_values(dim);
+  std::vector<Tensor<1, dim, Number>>                        eigen_vectors(dim);
+
+  eigen_system = eigenvectors(original_tensor);
+
+  for (int i = 0; i < dim; i++)
+    {
+      eigen_values[i]  = eigen_system[i].first;
+      eigen_vectors[i] = eigen_system[i].second;
+    }
+
+  positive_part_tensor = 0;
+  for (int i = 0; i < dim; i++)
+    positive_part_tensor +=
+      std::fmax(eigen_values[i], 0.0) *
+      symmetrize(outer_product(eigen_vectors[i], eigen_vectors[i]));
+
+  negative_part_tensor = 0;
+  for (int i = 0; i < dim; i++)
+    negative_part_tensor +=
+      std::fmin(eigen_values[i], 0.0) *
+      symmetrize(outer_product(eigen_vectors[i], eigen_vectors[i]));
+
+  std::vector<SymmetricTensor<2, dim, Number>> M(dim);
+  for (int a = 0; a < dim; a++)
+    M[a] = symmetrize(outer_product(eigen_vectors[a], eigen_vectors[a]));
+
+  std::vector<SymmetricTensor<4, dim, Number>> Q(dim);
+  for (int a = 0; a < dim; a++)
+    Q[a] = outer_product(M[a], M[a]);
+
+  std::vector<std::vector<SymmetricTensor<4, dim, Number>>> G(
+    dim, std::vector<SymmetricTensor<4, dim, Number>>(dim));
+  for (int a = 0; a < dim; a++)
+    for (int b = 0; b < dim; b++)
+      for (int i = 0; i < dim; i++)
+        for (int j = 0; j < dim; j++)
+          for (int k = 0; k < dim; k++)
+            for (int l = 0; l < dim; l++)
+              G[a][b][i][j][k][l] =
+                M[a][i][k] * M[b][j][l] + M[a][i][l] * M[b][j][k];
+
+  // positive P
+  positive_projector = 0;
+  for (int a = 0; a < dim; a++)
+    {
+      double lambda_a = eigen_values[a];
+      positive_projector += heaviside_function(lambda_a) * Q[a];
+      for (int b = 0; b < dim; b++)
+        {
+          if (b != a)
+            {
+              double lambda_b = eigen_values[b];
+
+              double v_ab = 0.0;
+              if (std::fabs(lambda_a - lambda_b) > 1.0e-12)
+                v_ab = (std::fmax(lambda_a, 0.0) - std::fmax(lambda_b, 0.0)) /
+                       (lambda_a - lambda_b);
+              else
+                v_ab = 0.5 * (heaviside_function(lambda_a) +
+                              heaviside_function(lambda_b));
+
+              positive_projector += 0.5 * v_ab * 0.5 * (G[a][b] + G[b][a]);
+            }
+        }
+    }
+
+  // negative P
+  negative_projector = 0;
+  for (int a = 0; a < dim; a++)
+    {
+      double lambda_a = eigen_values[a];
+      negative_projector += heaviside_function(-lambda_a) * Q[a];
+      for (int b = 0; b < dim; b++)
+        {
+          if (b != a)
+            {
+              double lambda_b = eigen_values[b];
+
+              double v_ab = 0.0;
+              if (std::fabs(lambda_a - lambda_b) > 1.0e-12)
+                v_ab = (std::fmin(lambda_a, 0.0) - std::fmin(lambda_b, 0.0)) /
+                       (lambda_a - lambda_b);
+              else
+                v_ab = 0.5 * (heaviside_function(-lambda_a) +
+                              heaviside_function(-lambda_b));
+
+              negative_projector += 0.5 * v_ab * 0.5 * (G[a][b] + G[b][a]);
+            }
+        }
+    }
+}
 
 /**
  * Return the symmetrized version of a full rank-2 tensor, i.e.
