@@ -31,7 +31,7 @@ template class Vector<int>;
 template Vector<double> &
 Vector<double>::operator=<int>(const dealii::Vector<int> &);
 template bool
-Vector<int>::operator==<int>(dealii::Vector<int> const &) const;
+Vector<int>::operator==<int>(const dealii::Vector<int> &) const;
 
 // instantiate for long double manually because we use it in a few places:
 template class Vector<long double>;

@@ -918,13 +918,13 @@ namespace DerivativeApproximation
               int spacedim>
     void
     approximate(
-      SynchronousIterators<
+      const SynchronousIterators<
         std::tuple<typename DoFHandler<dim, spacedim>::active_cell_iterator,
-                   Vector<float>::iterator>> const &cell,
-      const Mapping<dim, spacedim> &                mapping,
-      const DoFHandler<dim, spacedim> &             dof_handler,
-      const InputVector &                           solution,
-      const unsigned int                            component)
+                   Vector<float>::iterator>> &cell,
+      const Mapping<dim, spacedim> &          mapping,
+      const DoFHandler<dim, spacedim> &       dof_handler,
+      const InputVector &                     solution,
+      const unsigned int                      component)
     {
       // if the cell is not locally owned, then there is nothing to do
       if (std::get<0>(*cell)->is_locally_owned() == false)
@@ -992,7 +992,7 @@ namespace DerivativeApproximation
         begin,
         end,
         [&mapping, &dof_handler, &solution, component](
-          SynchronousIterators<Iterators> const &cell,
+          const SynchronousIterators<Iterators> &cell,
           const Assembler::Scratch &,
           Assembler::CopyData &) {
           approximate<DerivativeDescription, dim, InputVector, spacedim>(

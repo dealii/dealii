@@ -2009,8 +2009,8 @@ namespace GridGenerator
                 ExcMessage("Invalid angle phi specified."));
 
     // the first 8 vertices are in the x-y-plane
-    Point<3> const p = Point<3>(R, 0.0, 0.0);
-    double const   a = 1. / (1 + std::sqrt(2.0));
+    const Point<3> p = Point<3>(R, 0.0, 0.0);
+    const double   a = 1. / (1 + std::sqrt(2.0));
     // A value of 1 indicates "open" torus with angle < 2*pi, which
     // means that we need an additional layer of vertices
     const unsigned int additional_layer =
@@ -2031,12 +2031,12 @@ namespace GridGenerator
 
     // create remaining vertices by rotating around negative y-axis (the
     // direction is to ensure positive cell measures)
-    double const phi_cell = phi / n_cells_toroidal;
+    const double phi_cell = phi / n_cells_toroidal;
     for (unsigned int c = 1; c < n_point_layers_toroidal; ++c)
       {
         for (unsigned int v = 0; v < 8; ++v)
           {
-            double const r_2d      = vertices[v][0];
+            const double r_2d      = vertices[v][0];
             vertices[8 * c + v][0] = r_2d * std::cos(phi_cell * c);
             vertices[8 * c + v][1] = vertices[v][1];
             vertices[8 * c + v][2] = r_2d * std::sin(phi_cell * c);

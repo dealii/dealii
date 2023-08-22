@@ -53,19 +53,19 @@ template <int dim>
 void
 construct_triangulation(Triangulation<dim> &tria)
 {
-  double const L_F = 0.7;
-  double const B_F = 1.0;
-  double const H_F = 0.5;
+  const double L_F = 0.7;
+  const double B_F = 1.0;
+  const double H_F = 0.5;
 
-  double const T_S = 0.05;
-  double const B_S = 0.6;
-  double const H_S = 0.4;
+  const double T_S = 0.05;
+  const double B_S = 0.6;
+  const double H_S = 0.4;
 
-  double const L_IN = 0.6;
+  const double L_IN = 0.6;
 
-  unsigned int const N_CELLS_X_OUTFLOW = 1;
-  unsigned int const N_CELLS_Y_LOWER   = 2;
-  unsigned int const N_CELLS_Z_MIDDLE  = 2;
+  const unsigned int N_CELLS_X_OUTFLOW = 1;
+  const unsigned int N_CELLS_Y_LOWER   = 2;
+  const unsigned int N_CELLS_Z_MIDDLE  = 2;
 
   std::vector<dealii::Triangulation<3>> tria_vec;
   tria_vec.resize(4);
@@ -95,7 +95,7 @@ construct_triangulation(Triangulation<dim> &tria)
     dealii::Point<3>(L_IN, -H_F / 2.0, -B_F / 2.0),
     dealii::Point<3>(L_IN + T_S, H_S - H_F / 2.0, -B_S / 2.0));
 
-  std::vector<dealii::Triangulation<3> const *> tria_vec_ptr(tria_vec.size());
+  std::vector<const dealii::Triangulation<3> *> tria_vec_ptr(tria_vec.size());
   for (unsigned int i = 0; i < tria_vec.size(); ++i)
     tria_vec_ptr[i] = &tria_vec[i];
 
@@ -224,7 +224,7 @@ test(const unsigned int mapping_degree,
 
       // enclosing dummy triangulation for point plots
       dealii::BoundingBox<dim> bounding_box(points);
-      auto const               boundary_points =
+      const auto               boundary_points =
         bounding_box.create_extended_relative(1e-3).get_boundary_points();
 
       dealii::Triangulation<dim> particle_dummy_tria;

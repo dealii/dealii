@@ -28,7 +28,7 @@
 
 
 void
-check_matrix(SparseMatrix<double> const &        A,
+check_matrix(const SparseMatrix<double> &        A,
              CUDAWrappers::SparseMatrix<double> &A_dev)
 {
   cudaError_t cuda_error_code;
@@ -53,7 +53,7 @@ check_matrix(SparseMatrix<double> const &        A,
                                cudaMemcpyDeviceToHost);
   AssertCuda(cuda_error_code);
 
-  int const        n_rows = A_dev.m() + 1;
+  const int        n_rows = A_dev.m() + 1;
   std::vector<int> row_ptr_host(n_rows + 1);
   cuda_error_code = cudaMemcpy(&row_ptr_host[0],
                                row_ptr_dev,
@@ -68,8 +68,8 @@ check_matrix(SparseMatrix<double> const &        A,
 }
 
 void
-check_vector(Vector<double> const &                        a,
-             LinearAlgebra::ReadWriteVector<double> const &b)
+check_vector(const Vector<double> &                        a,
+             const LinearAlgebra::ReadWriteVector<double> &b)
 {
   unsigned int size = a.size();
   for (unsigned int i = 0; i < size; ++i)

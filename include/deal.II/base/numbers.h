@@ -687,7 +687,7 @@ namespace internal
     }
 
   public:
-    static bool const value = test<From, To>(0);
+    static const bool value = test<From, To>(0);
   };
 
   /*

@@ -26,7 +26,7 @@ template <typename number>
 void
 print_sparse_matrix()
 {
-  unsigned int const n = 20;
+  const unsigned int n = 20;
   SparsityPattern    sp(n, n);
   for (unsigned int i = 0; i < n; ++i)
     for (unsigned int j = 0; j < n; ++j)

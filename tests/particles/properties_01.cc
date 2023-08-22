@@ -47,7 +47,7 @@ public:
   {}
 
   inline virtual void
-  vector_value(Point<dim> const &p, Vector<double> &values) const override
+  vector_value(const Point<dim> &p, Vector<double> &values) const override
   {
     for (unsigned int i = 0; i < dim; ++i)
       {

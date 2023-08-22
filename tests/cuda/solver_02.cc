@@ -35,7 +35,7 @@ test(Utilities::CUDA::Handle &cuda_handle)
   // Create the matrix on the host.
   dealii::SparsityPattern                sparsity_pattern;
   dealii::SparseMatrix<double>           matrix;
-  unsigned int const                     size = 30;
+  const unsigned int                     size = 30;
   std::vector<std::vector<unsigned int>> column_indices(size);
   for (unsigned int i = 0; i < size; ++i)
     {

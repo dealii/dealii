@@ -68,7 +68,7 @@ namespace boost
       struct access<dealii::Point<dim, Number>, D>
       {
         static inline double
-        get(dealii::Point<dim, Number> const &p)
+        get(const dealii::Point<dim, Number> &p)
         {
           return p[D];
         }

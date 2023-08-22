@@ -70,7 +70,7 @@ enum TestType : unsigned char
 };
 
 std::string
-enum_to_string(TestType const enum_type)
+enum_to_string(const TestType enum_type)
 {
   std::string string_type;
   switch (enum_type)
