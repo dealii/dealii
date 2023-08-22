@@ -907,7 +907,9 @@ MappingQ<dim, spacedim>::fill_fe_values(
 
   if (update_flags & (update_normal_vectors | update_JxW_values))
     {
-      AssertDimension(output_data.JxW_values.size(), n_q_points);
+      Assert(!(update_flags & update_JxW_values) ||
+               (output_data.JxW_values.size() == n_q_points),
+             ExcDimensionMismatch(output_data.JxW_values.size(), n_q_points));
 
       Assert(!(update_flags & update_normal_vectors) ||
                (output_data.normal_vectors.size() == n_q_points),
@@ -950,8 +952,9 @@ MappingQ<dim, spacedim>::fill_fe_values(
                   for (unsigned int j = 0; j < dim; ++j)
                     G[i][j] = DX_t[i] * DX_t[j];
 
-                output_data.JxW_values[point] =
-                  std::sqrt(determinant(G)) * weights[point];
+                if (update_flags & update_JxW_values)
+                  output_data.JxW_values[point] =
+                    std::sqrt(determinant(G)) * weights[point];
 
                 if (computed_cell_similarity ==
                     CellSimilarity::inverted_translation)
