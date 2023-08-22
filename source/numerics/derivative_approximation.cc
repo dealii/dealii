@@ -993,12 +993,12 @@ namespace DerivativeApproximation
         end,
         [&mapping, &dof_handler, &solution, component](
           SynchronousIterators<Iterators> const &cell,
-          Assembler::Scratch const &,
+          const Assembler::Scratch &,
           Assembler::CopyData &) {
           approximate<DerivativeDescription, dim, InputVector, spacedim>(
             cell, mapping, dof_handler, solution, component);
         },
-        std::function<void(internal::Assembler::CopyData const &)>(),
+        std::function<void(const internal::Assembler::CopyData &)>(),
         internal::Assembler::Scratch(),
         internal::Assembler::CopyData());
     }

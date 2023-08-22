@@ -216,7 +216,7 @@ public:
   /**
    * Constructor. Store a const reference to a container.
    */
-  explicit IndexableGetterFromIndices(Container const &c)
+  explicit IndexableGetterFromIndices(const Container &c)
     : container(c)
   {}
 
@@ -334,7 +334,7 @@ struct ExtractLevelVisitor
    * @p target_level of the tree.
    */
   inline ExtractLevelVisitor(
-    Translator const & translator,
+    const Translator & translator,
     const unsigned int target_level,
     std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes);
 
@@ -364,18 +364,18 @@ struct ExtractLevelVisitor
    * belongs to the @p target_level, then fill the bounding box vector.
    */
   inline void
-  operator()(InternalNode const &node);
+  operator()(const InternalNode &node);
 
   /**
    * Implements the visitor interface for Leaf objects.
    */
   inline void
-  operator()(Leaf const &);
+  operator()(const Leaf &);
 
   /**
    * Translator interface, required by the boost implementation of the rtree.
    */
-  Translator const &translator;
+  const Translator &translator;
 
   /**
    * Store the level we are currently visiting.
@@ -683,18 +683,18 @@ struct NodeVisitor : public boost::geometry::index::detail::rtree::visitor<
    * belongs to the level next to @p target_level, then fill the bounding box vector for that node.
    */
   inline void
-  operator()(InternalNode const &node);
+  operator()(const InternalNode &node);
 
   /**
    * Implements the visitor interface for Leaf objects.
    */
   inline void
-  operator()(Leaf const &);
+  operator()(const Leaf &);
 
   /**
    * Translator interface, required by the boost implementation of the rtree.
    */
-  Translator const &translator;
+  const Translator &translator;
 
   /**
    * Store the level we are currently visiting.

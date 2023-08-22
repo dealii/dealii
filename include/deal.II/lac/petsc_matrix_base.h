@@ -1342,9 +1342,9 @@ namespace PETScWrappers
     prepare_action(VectorOperation::insert);
 
     const PetscInt  petsc_i = row;
-    PetscInt const *col_index_ptr;
+    const PetscInt *col_index_ptr;
 
-    PetscScalar const *col_value_ptr;
+    const PetscScalar *col_value_ptr;
     int                n_columns;
 
     // If we don't elide zeros, the pointers are already available...
@@ -1486,9 +1486,9 @@ namespace PETScWrappers
     prepare_action(VectorOperation::add);
 
     const PetscInt  petsc_i = row;
-    PetscInt const *col_index_ptr;
+    const PetscInt *col_index_ptr;
 
-    PetscScalar const *col_value_ptr;
+    const PetscScalar *col_value_ptr;
     int                n_columns;
 
     // If we don't elide zeros, the pointers are already available...

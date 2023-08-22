@@ -38,7 +38,7 @@ namespace internal
   // a helper type-trait that leverage SFINAE to figure out if type T has
   // ... T::local_element() const
   template <typename T>
-  using local_element_t = decltype(std::declval<T const>().local_element(0));
+  using local_element_t = decltype(std::declval<const T>().local_element(0));
 
   template <typename T>
   constexpr bool has_local_element = is_supported_operation<local_element_t, T>;
@@ -74,7 +74,7 @@ namespace internal
   // const
   template <typename T>
   using partitioners_are_compatible_t =
-    decltype(std::declval<T const>().partitioners_are_compatible(
+    decltype(std::declval<const T>().partitioners_are_compatible(
       std::declval<Utilities::MPI::Partitioner>()));
 
   template <typename T>
@@ -86,7 +86,7 @@ namespace internal
   // same as above to check
   // ... T::begin() const
   template <typename T>
-  using begin_t = decltype(std::declval<T const>().begin());
+  using begin_t = decltype(std::declval<const T>().begin());
 
   template <typename T>
   constexpr bool has_begin = is_supported_operation<begin_t, T>;
@@ -97,7 +97,7 @@ namespace internal
   // ... T::shared_vector_data() const
   template <typename T>
   using shared_vector_data_t =
-    decltype(std::declval<T const>().shared_vector_data());
+    decltype(std::declval<const T>().shared_vector_data());
 
   template <typename T>
   constexpr bool has_shared_vector_data =
@@ -138,7 +138,7 @@ namespace internal
   // void T::update_ghost_values_start(const uint) const
   template <typename T>
   using update_ghost_values_start_t =
-    decltype(std::declval<T const>().update_ghost_values_start(0));
+    decltype(std::declval<const T>().update_ghost_values_start(0));
 
   template <typename T>
   constexpr bool has_update_ghost_values_start =

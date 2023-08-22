@@ -2000,7 +2000,7 @@ namespace internal
       }
 
       // ------------------------- prolongation matrix -------------------------
-      for (auto const &fe_index_pair_ : fe_index_pairs)
+      for (const auto &fe_index_pair_ : fe_index_pairs)
         {
           const auto &fe_index_pair = fe_index_pair_.first;
           const auto &fe_index_no   = fe_index_pair_.second;

@@ -6402,7 +6402,7 @@ namespace GridTools
       // requested intersections are unique also the resulting quadrature
       // points are unique and we can simply number the points in an
       // ascending way.
-      for (auto const &recv_component : recv_components)
+      for (const auto &recv_component : recv_components)
         {
           // dependent on the size of the intersection an empty quadrature
           // is returned. Therefore, we have to compute the quadrature also
@@ -6755,7 +6755,7 @@ namespace GridTools
                     CGALWrappers::resort_dealii_vertices_to_cgal_order(
                       structdim, requested_intersection);
 
-                    auto const &try_intersection =
+                    const auto &try_intersection =
                       CGALWrappers::get_vertices_in_cgal_order(
                         cell, cache.get_mapping());
 

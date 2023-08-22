@@ -94,9 +94,9 @@ namespace internal
     struct nonesuch : private nonesuch_base
     {
       ~nonesuch()                = delete;
-      nonesuch(nonesuch const &) = delete;
+      nonesuch(const nonesuch &) = delete;
       void
-      operator=(nonesuch const &) = delete;
+      operator=(const nonesuch &) = delete;
     };
 
     template <class Default, template <class...> class Op, class... Args>

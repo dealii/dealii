@@ -656,7 +656,7 @@ namespace internal
     // ... MatrixType::vmult(VectorType &, const VectorType&,
     // std::function<...>, std::function<...>) const
     template <typename MatrixType, typename VectorType>
-    using vmult_functions_t = decltype(std::declval<MatrixType const>().vmult(
+    using vmult_functions_t = decltype(std::declval<const MatrixType>().vmult(
       std::declval<VectorType &>(),
       std::declval<const VectorType &>(),
       std::declval<
@@ -673,7 +673,7 @@ namespace internal
     // unsigned int, const unsigned int, const Number*, Number*) const
     template <typename PreconditionerType>
     using apply_to_subrange_t =
-      decltype(std::declval<PreconditionerType const>()
+      decltype(std::declval<const PreconditionerType>()
                  .apply_to_subrange(0U, 0U, nullptr, nullptr));
 
     template <typename PreconditionerType>
@@ -685,7 +685,7 @@ namespace internal
     // unsigned int, const Number) const
     template <typename PreconditionerType>
     using apply_t =
-      decltype(std::declval<PreconditionerType const>().apply(0U, 0.0));
+      decltype(std::declval<const PreconditionerType>().apply(0U, 0.0));
 
     template <typename PreconditionerType>
     constexpr bool has_apply =

@@ -6561,7 +6561,7 @@ namespace GridGenerator
           {
             for (const auto &cell : tria->cell_iterators())
               {
-                for (auto const &f : cell->face_indices())
+                for (const auto &f : cell->face_indices())
                   if (result_cell->face(f)->at_boundary())
                     result_cell->face(f)->set_boundary_id(
                       cell->face(f)->boundary_id());

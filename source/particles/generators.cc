@@ -476,7 +476,7 @@ namespace Particles
       // Memory is reserved for efficiency reasons
       std::vector<Point<spacedim>> support_points_vec;
       support_points_vec.reserve(support_points_map.size());
-      for (auto const &element : support_points_map)
+      for (const auto &element : support_points_map)
         support_points_vec.push_back(element.second);
 
       particle_handler.insert_global_particles(support_points_vec,

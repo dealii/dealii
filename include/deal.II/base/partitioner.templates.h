@@ -599,7 +599,7 @@ namespace Utilities
             {
               if (vector_operation == VectorOperation::add)
                 {
-                  for (auto const &import_indices_plain :
+                  for (const auto &import_indices_plain :
                        import_indices_plain_dev)
                     {
                       const auto chunk_size = import_indices_plain.size();
@@ -623,7 +623,7 @@ namespace Utilities
                 }
               else if (vector_operation == VectorOperation::min)
                 {
-                  for (auto const &import_indices_plain :
+                  for (const auto &import_indices_plain :
                        import_indices_plain_dev)
                     {
                       const auto chunk_size = import_indices_plain.size();
@@ -650,7 +650,7 @@ namespace Utilities
                 }
               else if (vector_operation == VectorOperation::max)
                 {
-                  for (auto const &import_indices_plain :
+                  for (const auto &import_indices_plain :
                        import_indices_plain_dev)
                     {
                       const auto chunk_size = import_indices_plain.size();
@@ -677,7 +677,7 @@ namespace Utilities
                 }
               else
                 {
-                  for (auto const &import_indices_plain :
+                  for (const auto &import_indices_plain :
                        import_indices_plain_dev)
                     {
                       // We can't easily assert here, so we just move the

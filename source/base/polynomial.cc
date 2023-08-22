@@ -626,7 +626,7 @@ namespace Polynomials
 
     unsigned int n_functions = n + 1;
     AssertIndexRange(support_point, n_functions);
-    double const *x = nullptr;
+    const double *x = nullptr;
 
     switch (n)
       {

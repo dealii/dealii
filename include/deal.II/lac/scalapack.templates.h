@@ -505,7 +505,7 @@ extern "C"
    * norm, or the element of largest absolute value of a distributed matrix
    */
   double
-  pdlange_(char const *  norm,
+  pdlange_(const char *  norm,
            const int *   m,
            const int *   n,
            const double *A,
