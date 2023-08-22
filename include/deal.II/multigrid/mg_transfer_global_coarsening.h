@@ -707,30 +707,51 @@ private:
 
 public:
   /**
-   * AdditionalData structure with the arguments needed by
-   * RemotePointEvaluation. Default values are the same as the ones described in
-   * the documentation of RemotePointEvaluation. The last boolean parameter, @p enf_all_points_found is true by defaults and
-   * checks if RemotePointEvaluation::all_points_found() evaluates to true, i.e.
-   * all submitted points have been found inside the domain.
+   * AdditionalData structure that can be used to tweak parameters
+   * related to the search procedure (used internally by RemotePointEvaluation)
+   * or, in the future, transfer operators needed by the non-nested multigrid
+   * algorithm.
    */
   struct AdditionalData
   {
-    AdditionalData(const double       tol                = 1e-6,
-                   const bool         enf_unique_mapping = false,
-                   const unsigned int rtree_l            = 0,
-                   const std::function<std::vector<bool>()> &marked_verts = {},
-                   const bool enf_all_points_found = true)
-      : tolerance(tol)
-      , enforce_unique_mapping(enf_unique_mapping)
-      , rtree_level(rtree_l)
-      , marked_vertices(marked_verts)
-      , enforce_all_points_found(enf_all_points_found)
+    /**
+     * Constructor. By default, the @p tolerance and @p rtree_level parameters
+     * are set to the default values used in the constructor of
+     * RemotePointEvaluation, i.e. 1e-6 and 0, respectively. The last Boolean
+     * parameter @p enforce_all_points_found is true by default and checks
+     * that all points submitted internally to RemotePointEvaluation::reinit()
+     * have been found.
+     *
+     */
+    AdditionalData(const double       tolerance                = 1e-6,
+                   const unsigned int rtree_level              = 0,
+                   const bool         enforce_all_points_found = true)
+      : tolerance(tolerance)
+      , rtree_level(rtree_level)
+      , enforce_all_points_found(enforce_all_points_found)
     {}
-    double                             tolerance;
-    bool                               enforce_unique_mapping;
-    unsigned int                       rtree_level;
-    std::function<std::vector<bool>()> marked_vertices;
-    bool                               enforce_all_points_found;
+
+    /**
+     * Tolerance parameter. See the constructor of RemotePointEvaluation for
+     * more details.
+     */
+    double tolerance;
+
+    /**
+     * RTree level parameter. See the constructor of RemotePointEvaluation for
+     * more details.
+     *
+     */
+    unsigned int rtree_level;
+
+    /**
+     * If set to true, it checks if RemotePointEvaluation::all_points_found()
+     * evaluates to true internally during the each call to reinit() from one
+     * level to the next one, ensuring that all submitted points have been found
+     * inside the domain.
+     *
+     */
+    bool enforce_all_points_found;
   };
 
   MGTwoLevelTransferNonNested(const AdditionalData &data = AdditionalData());
@@ -818,7 +839,7 @@ private:
    * Object to evaluate shape functions on one mesh on visited support points of
    * the other mesh.
    */
-  std::shared_ptr<Utilities::MPI::RemotePointEvaluation<dim>> rpe;
+  Utilities::MPI::RemotePointEvaluation<dim> rpe;
 
   /**
    * MappingInfo object needed as Mapping argument by FEPointEvaluation.
