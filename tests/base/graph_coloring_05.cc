@@ -39,7 +39,7 @@
 template <int dim>
 std::vector<types::global_dof_index>
 get_conflict_indices_cfem(
-  typename DoFHandler<dim>::active_cell_const iterator &it)
+  const typename DoFHandler<dim>::active_cell_iterator &it)
 {
   std::vector<types::global_dof_index> local_dof_indices(
     it->get_fe().dofs_per_cell);
@@ -77,7 +77,7 @@ check()
       dof_handler.begin_active(),
       dof_handler.end(),
       std::function<std::vector<types::global_dof_index>(
-        typename DoFHandler<dim>::active_cell_const iterator &)>(
+        const typename DoFHandler<dim>::active_cell_iterator &)>(
         &get_conflict_indices_cfem<dim>)));
 
   // Check that a color does not contain a conflict index twice
