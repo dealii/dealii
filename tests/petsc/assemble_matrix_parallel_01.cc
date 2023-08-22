@@ -127,7 +127,7 @@ private:
 
   std::vector<types::global_dof_index>
   get_conflict_indices(
-    typename DoFHandler<dim>::active_cell_const iterator &cell) const;
+    const typename DoFHandler<dim>::active_cell_iterator &cell) const;
 
   Triangulation<dim> triangulation;
 
@@ -235,7 +235,7 @@ LaplaceProblem<dim>::~LaplaceProblem()
 template <int dim>
 std::vector<types::global_dof_index>
 LaplaceProblem<dim>::get_conflict_indices(
-  typename DoFHandler<dim>::active_cell_const iterator &cell) const
+  const typename DoFHandler<dim>::active_cell_iterator &cell) const
 {
   std::vector<types::global_dof_index> local_dof_indices(
     cell->get_fe().dofs_per_cell);
@@ -271,7 +271,7 @@ LaplaceProblem<dim>::setup_system()
     dof_handler.begin_active(),
     dof_handler.end(),
     static_cast<std::function<std::vector<types::global_dof_index>(
-      typename DoFHandler<dim>::active_cell_const iterator &)>>(
+      const typename DoFHandler<dim>::active_cell_iterator &)>>(
       std::bind(&LaplaceProblem<dim>::get_conflict_indices,
                 this,
                 std::placeholders::_1)));
