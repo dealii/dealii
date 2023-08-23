@@ -1603,6 +1603,32 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit(
   current_face_number = numbers::invalid_unsigned_int;
 
   do_reinit();
+
+  if (!fast_path)
+    {
+      const auto unit_points_vectorized = mapping_info->get_unit_point(
+        mapping_info->compute_unit_point_index_offset(current_cell_index,
+                                                      current_face_number));
+      const unsigned int n_q_points_unvectorized =
+        mapping_info->get_n_q_points_unvectorized(current_cell_index,
+                                                  current_face_number);
+
+      std::vector<Point<dim>> unit_points(n_q_points_unvectorized);
+
+      for (unsigned int v = 0; v < n_q_points_unvectorized; ++v)
+        for (unsigned int d = 0; d < dim; ++d)
+          unit_points[v][d] = unit_points_vectorized[v / n_lanes_internal][d]
+                                                    [v % n_lanes_internal];
+
+      fe_values = std::make_shared<FEValues<dim, spacedim>>(
+        *mapping,
+        *fe,
+        Quadrature<dim>(
+          std::vector<Point<dim>>(unit_points.begin(), unit_points.end())),
+        update_flags);
+
+      fe_values->reinit(mapping_info->get_cell_iterator(current_cell_index));
+    }
 }
 
 
