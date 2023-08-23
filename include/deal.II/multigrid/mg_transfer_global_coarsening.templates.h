@@ -2984,8 +2984,7 @@ namespace MGTransferGlobalCoarseningTools
             &fine_triangulation_in))
         return std::make_shared<
           parallel::distributed::Triangulation<dim, spacedim>>(
-          fine_triangulation->get_communicator(),
-          fine_triangulation->get_mesh_smoothing());
+          fine_triangulation->get_communicator());
       else
 #endif
 #ifdef DEAL_II_WITH_MPI
@@ -2994,23 +2993,29 @@ namespace MGTransferGlobalCoarseningTools
               &fine_triangulation_in))
         return std::make_shared<parallel::shared::Triangulation<dim, spacedim>>(
           fine_triangulation->get_communicator(),
-          fine_triangulation->get_mesh_smoothing(),
+          Triangulation<dim, spacedim>::none,
           fine_triangulation->with_artificial_cells());
       else
 #endif
-        return std::make_shared<Triangulation<dim, spacedim>>(
-          fine_triangulation_in.get_mesh_smoothing());
+        return std::make_shared<Triangulation<dim, spacedim>>();
     };
 
     const unsigned int max_level = fine_triangulation_in.n_global_levels() - 1;
+
+    // clear 'eliminate_unrefined_islands' from MeshSmoothing flags
+    // to prevent unintentional refinement during coarsen_global()
+    const auto mesh_smoothing =
+      static_cast<typename Triangulation<dim, spacedim>::MeshSmoothing>(
+        fine_triangulation_in.get_mesh_smoothing() &
+        ~(Triangulation<dim, spacedim>::eliminate_unrefined_islands));
 
     // create coarse meshes
     for (unsigned int l = max_level; l > 0; --l)
       {
         // copy triangulation
         auto new_tria = create_new_empty_triangulation();
-
         new_tria->copy_triangulation(*coarse_grid_triangulations[l]);
+        new_tria->set_mesh_smoothing(mesh_smoothing);
 
         // coarsen mesh
         new_tria->coarsen_global();
@@ -3050,9 +3055,6 @@ namespace MGTransferGlobalCoarseningTools
     Assert(fine_triangulation, ExcNotImplemented());
 
     const auto comm = fine_triangulation->get_communicator();
-
-    parallel::distributed::Triangulation<dim, spacedim> temp_triangulation(
-      comm, fine_triangulation->get_mesh_smoothing());
 
     if (keep_fine_triangulation == true &&
         repartition_fine_triangulation == false)
@@ -3096,11 +3098,22 @@ namespace MGTransferGlobalCoarseningTools
     if (fine_triangulation_in.n_global_levels() == 1)
       return coarse_grid_triangulations;
 
+    parallel::distributed::Triangulation<dim, spacedim> temp_triangulation(
+      comm);
+
     if (keep_fine_triangulation == true)
       temp_triangulation.copy_triangulation(*fine_triangulation);
 
     auto *temp_triangulation_ptr =
       keep_fine_triangulation ? &temp_triangulation : fine_triangulation;
+
+    // clear 'eliminate_unrefined_islands' from MeshSmoothing flags
+    // to prevent unintentional refinement during coarsen_global()
+    const auto mesh_smoothing =
+      static_cast<typename Triangulation<dim, spacedim>::MeshSmoothing>(
+        temp_triangulation_ptr->get_mesh_smoothing() &
+        ~(Triangulation<dim, spacedim>::eliminate_unrefined_islands));
+    temp_triangulation_ptr->set_mesh_smoothing(mesh_smoothing);
 
     const unsigned int max_level = fine_triangulation->n_global_levels() - 1;
 
@@ -3129,6 +3142,12 @@ namespace MGTransferGlobalCoarseningTools
         // save mesh
         coarse_grid_triangulations[l - 1] = level_triangulation;
       }
+
+    // recover MeshSmoothing flags in case we used the fine_triangulation
+    // to build the sequence
+    if (keep_fine_triangulation == false)
+      fine_triangulation->set_mesh_smoothing(
+        coarse_grid_triangulations.back()->get_mesh_smoothing());
 #endif
 
     AssertDimension(coarse_grid_triangulations[0]->n_global_levels(), 1);

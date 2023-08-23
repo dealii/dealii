@@ -1849,8 +1849,7 @@ public:
 
   /**
    * Set the mesh smoothing to @p mesh_smoothing. This overrides the
-   * MeshSmoothing given to the constructor. It is allowed to call this
-   * function only if the triangulation is empty.
+   * MeshSmoothing given to the constructor.
    */
   virtual void
   set_mesh_smoothing(const MeshSmoothing mesh_smoothing);
