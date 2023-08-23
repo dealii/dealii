@@ -2038,15 +2038,8 @@ private:
 
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints()
-  : lines()
-  , local_lines()
-  , sorted(false)
-{
-  // make sure the IndexSet is compressed. Otherwise this can lead to crashes
-  // that are hard to find (only happen in release mode).
-  // see tests/mpi/affine_constraints_crash_01
-  local_lines.compress();
-}
+  : AffineConstraints<number>(IndexSet())
+{}
 
 
 
