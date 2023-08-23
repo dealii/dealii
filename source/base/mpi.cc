@@ -742,7 +742,9 @@ namespace Utilities
 
     MPI_InitFinalize::MPI_InitFinalize(int &              argc,
                                        char **&           argv,
-                                       const unsigned int max_num_threads)
+                                       const unsigned int max_num_threads,
+                                       const bool         allow_external_initialization_)
+      : allow_external_initialization(allow_external_initialization_)
     {
       static bool constructor_has_already_run = false;
       (void)constructor_has_already_run;
@@ -758,17 +760,25 @@ namespace Utilities
       int MPI_has_been_started = 0;
       ierr                     = MPI_Initialized(&MPI_has_been_started);
       AssertThrowMPI(ierr);
-      AssertThrow(MPI_has_been_started == 0,
-                  ExcMessage("MPI error. You can only start MPI once!"));
 
-      int provided;
-      // this works like ierr = MPI_Init (&argc, &argv); but tells MPI that
-      // we might use several threads but never call two MPI functions at the
-      // same time. For an explanation see on why we do this see
-      // http://www.open-mpi.org/community/lists/users/2010/03/12244.php
-      int wanted = MPI_THREAD_SERIALIZED;
-      ierr       = MPI_Init_thread(&argc, &argv, wanted, &provided);
-      AssertThrowMPI(ierr);
+      if (MPI_has_been_started == 1 && allow_external_initialization)
+        {
+          finalize_mpi = false;
+        }
+      else
+        {
+          AssertThrow(MPI_has_been_started == 0,
+                      ExcMessage("MPI error. You can only start MPI once!"));
+
+          int provided;
+          // this works like ierr = MPI_Init (&argc, &argv); but tells MPI that
+          // we might use several threads but never call two MPI functions at the
+          // same time. For an explanation see on why we do this see
+          // http://www.open-mpi.org/community/lists/users/2010/03/12244.php
+          int wanted = MPI_THREAD_SERIALIZED;
+          ierr       = MPI_Init_thread(&argc, &argv, wanted, &provided);
+          AssertThrowMPI(ierr);
+        }
 
       // disable for now because at least some implementations always return
       // MPI_THREAD_SINGLE.
@@ -850,9 +860,19 @@ namespace Utilities
       // MPI_Comm_create_group (see cburstedde/p4est#30).
       // Disabling it leads to more verbose p4est error messages
       // which should be fine.
-      sc_init(MPI_COMM_WORLD, 0, 0, nullptr, SC_LP_SILENT);
+      if (sc_package_id >= 0 && allow_external_initialization)
+        {
+          finalize_sc = false;
+        }
+      else
+        {
+          sc_init(MPI_COMM_WORLD, 0, 0, nullptr, SC_LP_SILENT);
+        }
 #  endif
-      p4est_init(nullptr, SC_LP_SILENT);
+      if (p4est_package_id < 0 || !allow_external_initialization)
+        {
+          p4est_init(nullptr, SC_LP_SILENT);
+        }
 #endif
 
       constructor_has_already_run = true;
@@ -1033,7 +1053,10 @@ namespace Utilities
 #ifdef DEAL_II_WITH_P4EST
       // now end p4est and libsc
       // Note: p4est has no finalize function
-      sc_finalize();
+      if (finalize_sc)
+        {
+          sc_finalize();
+        }
 #endif
 
 
@@ -1057,9 +1080,12 @@ namespace Utilities
             }
           else
             {
-              const int ierr = MPI_Finalize();
-              (void)ierr;
-              AssertNothrow(ierr == MPI_SUCCESS, dealii::ExcMPI(ierr));
+              if (finalize_mpi)
+                {
+                  const int ierr = MPI_Finalize();
+                  (void)ierr;
+                  AssertNothrow(ierr == MPI_SUCCESS, dealii::ExcMPI(ierr));
+                }
             }
         }
 #endif
