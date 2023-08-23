@@ -195,9 +195,9 @@ namespace internal
     NumberCache::serialize(Archive &ar, const unsigned int /*version*/)
     {
       ar &n_global_dofs &n_locally_owned_dofs;
-      ar &               locally_owned_dofs;
-      ar &               n_locally_owned_dofs_per_processor;
-      ar &               locally_owned_dofs_per_processor;
+      ar                &locally_owned_dofs;
+      ar                &n_locally_owned_dofs_per_processor;
+      ar                &locally_owned_dofs_per_processor;
     }
 
   } // namespace DoFHandlerImplementation

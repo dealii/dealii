@@ -76,7 +76,7 @@ public:
     time_stepper.residual = [&](const double      t,
                                 const VectorType &y,
                                 const VectorType &y_dot,
-                                VectorType &      res) {
+                                VectorType       &res) {
       res = y_dot;
       A.vmult_add(res, y);
     };
@@ -102,8 +102,8 @@ public:
       };
 
     time_stepper.output_step = [&](const double       t,
-                                   const VectorType & sol,
-                                   const VectorType & sol_dot,
+                                   const VectorType  &sol,
+                                   const VectorType  &sol_dot,
                                    const unsigned int step_number) {
       deallog << t << ' ' << sol[0] << ' ' << sol[1] << ' ' << sol_dot[0] << ' '
               << sol_dot[1] << std::endl;

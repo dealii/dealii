@@ -103,7 +103,7 @@ namespace Differentiation
       template <typename StreamType>
       StreamType &
       print_substitution_map(
-        StreamType &                       stream,
+        StreamType                        &stream,
         const SD::types::substitution_map &symbol_value_map);
 
     } // namespace Utilities
@@ -142,7 +142,7 @@ namespace Differentiation
       template <typename StreamType>
       StreamType &
       print_substitution_map(
-        StreamType &                       stream,
+        StreamType                        &stream,
         const SD::types::substitution_map &symbol_value_map)
       {
         for (const auto &entry : symbol_value_map)

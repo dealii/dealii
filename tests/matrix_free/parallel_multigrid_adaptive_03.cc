@@ -64,11 +64,11 @@ public:
 
 
   void
-  initialize(const Mapping<dim> &     mapping,
-             const DoFHandler<dim> &  dof_handler,
+  initialize(const Mapping<dim>      &mapping,
+             const DoFHandler<dim>   &dof_handler,
              const MGConstrainedDoFs &mg_constrained_dofs,
              const std::map<types::boundary_id, const Function<dim> *>
-               &                dirichlet_boundary,
+                               &dirichlet_boundary,
              const unsigned int level,
              const bool         threaded)
   {
@@ -127,7 +127,7 @@ public:
   }
 
   void
-  vmult(LinearAlgebra::distributed::Vector<number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<number>       &dst,
         const LinearAlgebra::distributed::Vector<number> &src) const
   {
     dst = 0;
@@ -135,7 +135,7 @@ public:
   }
 
   void
-  Tvmult(LinearAlgebra::distributed::Vector<number> &      dst,
+  Tvmult(LinearAlgebra::distributed::Vector<number>       &dst,
          const LinearAlgebra::distributed::Vector<number> &src) const
   {
     dst = 0;
@@ -143,14 +143,14 @@ public:
   }
 
   void
-  Tvmult_add(LinearAlgebra::distributed::Vector<number> &      dst,
+  Tvmult_add(LinearAlgebra::distributed::Vector<number>       &dst,
              const LinearAlgebra::distributed::Vector<number> &src) const
   {
     vmult_add(dst, src);
   }
 
   void
-  vmult_add(LinearAlgebra::distributed::Vector<number> &      dst,
+  vmult_add(LinearAlgebra::distributed::Vector<number>       &dst,
             const LinearAlgebra::distributed::Vector<number> &src) const
   {
     Assert(src.partitioners_are_globally_compatible(
@@ -193,7 +193,7 @@ public:
 
   void
   vmult_interface_down(
-    LinearAlgebra::distributed::Vector<number> &      dst,
+    LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
     Assert(src.partitioners_are_globally_compatible(
@@ -239,7 +239,7 @@ public:
 
   void
   vmult_interface_up(
-    LinearAlgebra::distributed::Vector<number> &      dst,
+    LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
     Assert(src.partitioners_are_globally_compatible(
@@ -320,8 +320,8 @@ public:
 
 private:
   void
-  local_apply(const MatrixFree<dim, number> &                   data,
-              LinearAlgebra::distributed::Vector<number> &      dst,
+  local_apply(const MatrixFree<dim, number>                    &data,
+              LinearAlgebra::distributed::Vector<number>       &dst,
               const LinearAlgebra::distributed::Vector<number> &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
@@ -371,7 +371,7 @@ private:
 
   void
   local_diagonal_cell(
-    const MatrixFree<dim, number> &             data,
+    const MatrixFree<dim, number>              &data,
     LinearAlgebra::distributed::Vector<number> &dst,
     const unsigned int &,
     const std::pair<unsigned int, unsigned int> &cell_range) const
@@ -460,7 +460,7 @@ public:
 
   virtual void
   operator()(const unsigned int                                level,
-             LinearAlgebra::distributed::Vector<Number> &      dst,
+             LinearAlgebra::distributed::Vector<Number>       &dst,
              const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     ReductionControl solver_control(1e4, 1e-50, 1e-10);

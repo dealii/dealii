@@ -214,7 +214,7 @@ namespace CUDAWrappers
     apply_for_each_quad_point(const Functor &func);
 
   private:
-    const data_type *        data;
+    const data_type         *data;
     SharedData<dim, Number> *shared_data;
     int                      cell_id;
   };

@@ -129,7 +129,7 @@ namespace Euler_DG
       : Function<dim>(dim + 2, time)
     {}
 
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
   };
 
@@ -155,7 +155,7 @@ namespace Euler_DG
   // velocity field, computed from the relation $E = \frac{c^2}{\gamma (\gamma
   // -1)} + \frac 12 \rho \|u\|^2$.
   template <int dim>
-  double ExactSolution<dim>::value(const Point<dim> & x,
+  double ExactSolution<dim>::value(const Point<dim>  &x,
                                    const unsigned int component) const
   {
     const double t = this->get_time();
@@ -336,9 +336,9 @@ namespace Euler_DG
     void perform_time_step(const Operator &pde_operator,
                            const double    current_time,
                            const double    time_step,
-                           VectorType &    solution,
-                           VectorType &    vec_ri,
-                           VectorType &    vec_ki) const
+                           VectorType     &solution,
+                           VectorType     &vec_ri,
+                           VectorType     &vec_ki) const
     {
       AssertDimension(ai.size() + 1, bi.size());
 
@@ -489,7 +489,7 @@ namespace Euler_DG
   inline DEAL_II_ALWAYS_INLINE //
     Tensor<1, n_components, Number>
     operator*(const Tensor<1, n_components, Tensor<1, dim, Number>> &matrix,
-              const Tensor<1, dim, Number> &                         vector)
+              const Tensor<1, dim, Number>                          &vector)
   {
     Tensor<1, n_components, Number> result;
     for (unsigned int d = 0; d < n_components; ++d)
@@ -571,7 +571,7 @@ namespace Euler_DG
     Tensor<1, dim + 2, Number>
     euler_numerical_flux(const Tensor<1, dim + 2, Number> &u_m,
                          const Tensor<1, dim + 2, Number> &u_p,
-                         const Tensor<1, dim, Number> &    normal)
+                         const Tensor<1, dim, Number>     &normal)
   {
     const auto velocity_m = euler_velocity<dim>(u_m);
     const auto velocity_p = euler_velocity<dim>(u_p);
@@ -633,7 +633,7 @@ namespace Euler_DG
   // where all components of the solution are set.
   template <int dim, typename Number>
   VectorizedArray<Number>
-  evaluate_function(const Function<dim> &                      function,
+  evaluate_function(const Function<dim>                       &function,
                     const Point<dim, VectorizedArray<Number>> &p_vectorized,
                     const unsigned int                         component)
   {
@@ -651,7 +651,7 @@ namespace Euler_DG
 
   template <int dim, typename Number, int n_components = dim + 2>
   Tensor<1, n_components, VectorizedArray<Number>>
-  evaluate_function(const Function<dim> &                      function,
+  evaluate_function(const Function<dim>                       &function,
                     const Point<dim, VectorizedArray<Number>> &p_vectorized)
   {
     AssertDimension(function.n_components, n_components);
@@ -700,7 +700,7 @@ namespace Euler_DG
 
     EulerOperator(TimerOutput &timer_output);
 
-    void reinit(const Mapping<dim> &   mapping,
+    void reinit(const Mapping<dim>    &mapping,
                 const DoFHandler<dim> &dof_handler);
 
     void set_inflow_boundary(const types::boundary_id       boundary_id,
@@ -716,22 +716,22 @@ namespace Euler_DG
 
     void apply(const double                                      current_time,
                const LinearAlgebra::distributed::Vector<Number> &src,
-               LinearAlgebra::distributed::Vector<Number> &      dst) const;
+               LinearAlgebra::distributed::Vector<Number>       &dst) const;
 
     void
     perform_stage(const Number cur_time,
                   const Number factor_solution,
                   const Number factor_ai,
                   const LinearAlgebra::distributed::Vector<Number> &current_ri,
-                  LinearAlgebra::distributed::Vector<Number> &      vec_ki,
-                  LinearAlgebra::distributed::Vector<Number> &      solution,
+                  LinearAlgebra::distributed::Vector<Number>       &vec_ki,
+                  LinearAlgebra::distributed::Vector<Number>       &solution,
                   LinearAlgebra::distributed::Vector<Number> &next_ri) const;
 
-    void project(const Function<dim> &                       function,
+    void project(const Function<dim>                        &function,
                  LinearAlgebra::distributed::Vector<Number> &solution) const;
 
     std::array<double, 3> compute_errors(
-      const Function<dim> &                             function,
+      const Function<dim>                              &function,
       const LinearAlgebra::distributed::Vector<Number> &solution) const;
 
     double compute_cell_transport_speed(
@@ -753,28 +753,28 @@ namespace Euler_DG
     std::unique_ptr<Function<dim>> body_force;
 
     void local_apply_inverse_mass_matrix(
-      const MatrixFree<dim, Number> &                   data,
-      LinearAlgebra::distributed::Vector<Number> &      dst,
+      const MatrixFree<dim, Number>                    &data,
+      LinearAlgebra::distributed::Vector<Number>       &dst,
       const LinearAlgebra::distributed::Vector<Number> &src,
-      const std::pair<unsigned int, unsigned int> &     cell_range) const;
+      const std::pair<unsigned int, unsigned int>      &cell_range) const;
 
     void local_apply_cell(
-      const MatrixFree<dim, Number> &                   data,
-      LinearAlgebra::distributed::Vector<Number> &      dst,
+      const MatrixFree<dim, Number>                    &data,
+      LinearAlgebra::distributed::Vector<Number>       &dst,
       const LinearAlgebra::distributed::Vector<Number> &src,
-      const std::pair<unsigned int, unsigned int> &     cell_range) const;
+      const std::pair<unsigned int, unsigned int>      &cell_range) const;
 
     void local_apply_face(
-      const MatrixFree<dim, Number> &                   data,
-      LinearAlgebra::distributed::Vector<Number> &      dst,
+      const MatrixFree<dim, Number>                    &data,
+      LinearAlgebra::distributed::Vector<Number>       &dst,
       const LinearAlgebra::distributed::Vector<Number> &src,
-      const std::pair<unsigned int, unsigned int> &     face_range) const;
+      const std::pair<unsigned int, unsigned int>      &face_range) const;
 
     void local_apply_boundary_face(
-      const MatrixFree<dim, Number> &                   data,
-      LinearAlgebra::distributed::Vector<Number> &      dst,
+      const MatrixFree<dim, Number>                    &data,
+      LinearAlgebra::distributed::Vector<Number>       &dst,
       const LinearAlgebra::distributed::Vector<Number> &src,
-      const std::pair<unsigned int, unsigned int> &     face_range) const;
+      const std::pair<unsigned int, unsigned int>      &face_range) const;
   };
 
 
@@ -806,7 +806,7 @@ namespace Euler_DG
   // necessary to ensure optimal computational efficiency overall.
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::reinit(
-    const Mapping<dim> &   mapping,
+    const Mapping<dim>    &mapping,
     const DoFHandler<dim> &dof_handler)
   {
     const std::vector<const DoFHandler<dim> *> dof_handlers = {&dof_handler};
@@ -1012,9 +1012,9 @@ namespace Euler_DG
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::local_apply_cell(
     const MatrixFree<dim, Number> &,
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src,
-    const std::pair<unsigned int, unsigned int> &     cell_range) const
+    const std::pair<unsigned int, unsigned int>      &cell_range) const
   {
     FEEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi(data);
 
@@ -1103,9 +1103,9 @@ namespace Euler_DG
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::local_apply_face(
     const MatrixFree<dim, Number> &,
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src,
-    const std::pair<unsigned int, unsigned int> &     face_range) const
+    const std::pair<unsigned int, unsigned int>      &face_range) const
   {
     FEFaceEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi_m(data,
                                                                       true);
@@ -1191,9 +1191,9 @@ namespace Euler_DG
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::local_apply_boundary_face(
     const MatrixFree<dim, Number> &,
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src,
-    const std::pair<unsigned int, unsigned int> &     face_range) const
+    const std::pair<unsigned int, unsigned int>      &face_range) const
   {
     FEFaceEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi(data, true);
 
@@ -1293,9 +1293,9 @@ namespace Euler_DG
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::local_apply_inverse_mass_matrix(
     const MatrixFree<dim, Number> &,
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src,
-    const std::pair<unsigned int, unsigned int> &     cell_range) const
+    const std::pair<unsigned int, unsigned int>      &cell_range) const
   {
     FEEvaluation<dim, degree, degree + 1, dim + 2, Number> phi(data, 0, 1);
     MatrixFreeOperators::CellwiseInverseMassMatrix<dim, degree, dim + 2, Number>
@@ -1352,7 +1352,7 @@ namespace Euler_DG
   void EulerOperator<dim, degree, n_points_1d>::apply(
     const double                                      current_time,
     const LinearAlgebra::distributed::Vector<Number> &src,
-    LinearAlgebra::distributed::Vector<Number> &      dst) const
+    LinearAlgebra::distributed::Vector<Number>       &dst) const
   {
     {
       TimerOutput::Scope t(timer, "apply - integrals");
@@ -1430,9 +1430,9 @@ namespace Euler_DG
     const Number                                      factor_solution,
     const Number                                      factor_ai,
     const LinearAlgebra::distributed::Vector<Number> &current_ri,
-    LinearAlgebra::distributed::Vector<Number> &      vec_ki,
-    LinearAlgebra::distributed::Vector<Number> &      solution,
-    LinearAlgebra::distributed::Vector<Number> &      next_ri) const
+    LinearAlgebra::distributed::Vector<Number>       &vec_ki,
+    LinearAlgebra::distributed::Vector<Number>       &solution,
+    LinearAlgebra::distributed::Vector<Number>       &next_ri) const
   {
     {
       TimerOutput::Scope t(timer, "rk_stage - integrals L_h");
@@ -1536,7 +1536,7 @@ namespace Euler_DG
   // cell for discontinuous Galerkin discretizations.
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::project(
-    const Function<dim> &                       function,
+    const Function<dim>                        &function,
     LinearAlgebra::distributed::Vector<Number> &solution) const
   {
     FEEvaluation<dim, degree, degree + 1, dim + 2, Number> phi(data, 0, 1);
@@ -1584,7 +1584,7 @@ namespace Euler_DG
   // has a remainder compared to the SIMD width.
   template <int dim, int degree, int n_points_1d>
   std::array<double, 3> EulerOperator<dim, degree, n_points_1d>::compute_errors(
-    const Function<dim> &                             function,
+    const Function<dim>                              &function,
     const LinearAlgebra::distributed::Vector<Number> &solution) const
   {
     TimerOutput::Scope t(timer, "compute errors");
@@ -1830,7 +1830,7 @@ namespace Euler_DG
   template <int dim>
   void EulerProblem<dim>::Postprocessor::evaluate_vector_field(
     const DataPostprocessorInputs::Vector<dim> &inputs,
-    std::vector<Vector<double>> &               computed_quantities) const
+    std::vector<Vector<double>>                &computed_quantities) const
   {
     const unsigned int n_evaluation_points = inputs.solution_values.size();
 

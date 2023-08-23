@@ -34,8 +34,8 @@ main(void)
   const unsigned int n = 10; // Independents
   std::size_t        tape_stats[STAT_SIZE];
 
-  double * xp = new double[n];
-  double * yp = new double[m];
+  double  *xp = new double[n];
+  double  *yp = new double[m];
   adouble *x  = new adouble[n];
   adouble *y  = new adouble[m];
 

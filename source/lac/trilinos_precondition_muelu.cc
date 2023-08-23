@@ -37,8 +37,8 @@ namespace TrilinosWrappers
     const unsigned int                    smoother_sweeps,
     const unsigned int                    smoother_overlap,
     const bool                            output_details,
-    const char *                          smoother_type,
-    const char *                          coarse_type)
+    const char                           *smoother_type,
+    const char                           *coarse_type)
     : elliptic(elliptic)
     , n_cycles(n_cycles)
     , w_cycle(w_cycle)
@@ -70,7 +70,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionAMGMueLu::initialize(const SparseMatrix &  matrix,
+  PreconditionAMGMueLu::initialize(const SparseMatrix   &matrix,
                                    const AdditionalData &additional_data)
   {
     initialize(matrix.trilinos_matrix(), additional_data);
@@ -80,7 +80,7 @@ namespace TrilinosWrappers
 
   void
   PreconditionAMGMueLu::initialize(const Epetra_CrsMatrix &matrix,
-                                   const AdditionalData &  additional_data)
+                                   const AdditionalData   &additional_data)
   {
     // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
@@ -183,7 +183,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionAMGMueLu::initialize(const SparseMatrix &    matrix,
+  PreconditionAMGMueLu::initialize(const SparseMatrix     &matrix,
                                    Teuchos::ParameterList &muelu_parameters)
   {
     initialize(matrix.trilinos_matrix(), muelu_parameters);
@@ -207,9 +207,9 @@ namespace TrilinosWrappers
   void
   PreconditionAMGMueLu::initialize(
     const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
-    const AdditionalData &                additional_data,
+    const AdditionalData                 &additional_data,
     const double                          drop_tolerance,
-    const ::dealii::SparsityPattern *     use_this_sparsity)
+    const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     preconditioner.reset();
     const size_type n_rows = deal_ii_sparse_matrix.m();

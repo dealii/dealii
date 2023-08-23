@@ -29,8 +29,8 @@
 template <int dim>
 void
 check_this(const DoFHandler<dim> &dof_handler,
-           const Vector<double> & v_node,
-           const Vector<double> & v_cell)
+           const Vector<double>  &v_node,
+           const Vector<double>  &v_cell)
 {
   DataOut<dim> data_out;
   data_out.add_data_vector(dof_handler, v_node, "node_data");

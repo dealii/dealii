@@ -100,7 +100,7 @@ public:
    */
   virtual void
   value_list(const std::vector<Point<dim>> &points,
-             std::vector<value_type> &      values) const;
+             std::vector<value_type>       &values) const;
 
   /**
    * Return the gradient of the function at the given point.
@@ -115,7 +115,7 @@ public:
    */
   virtual void
   gradient_list(const std::vector<Point<dim>> &points,
-                std::vector<gradient_type> &   gradients) const;
+                std::vector<gradient_type>    &gradients) const;
 };
 
 

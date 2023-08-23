@@ -90,8 +90,8 @@ class EnrichmentFunction : public Function<dim>
 {
 public:
   EnrichmentFunction(const Point<dim> &origin,
-                     const double &    Z,
-                     const double &    radius)
+                     const double     &Z,
+                     const double     &radius)
     : Function<dim>(1)
     , origin(origin)
     , Z(Z)
@@ -749,11 +749,11 @@ namespace Step36
 
     virtual void
     compute_derived_quantities_vector(
-      const std::vector<Vector<double>> &             solution_values,
+      const std::vector<Vector<double>>              &solution_values,
       const std::vector<std::vector<Tensor<1, dim>>> &solution_gradients,
       const std::vector<std::vector<Tensor<2, dim>>> &solution_hessians,
-      const std::vector<Point<dim>> &                 normals,
-      const std::vector<Point<dim>> &                 evaluation_points,
+      const std::vector<Point<dim>>                  &normals,
+      const std::vector<Point<dim>>                  &evaluation_points,
       std::vector<Vector<double>> &computed_quantities) const;
 
   private:
@@ -775,7 +775,7 @@ namespace Step36
     const std::vector<std::vector<Tensor<2, dim>>> & /*solution_hessians*/,
     const std::vector<Point<dim>> & /*normals*/,
     const std::vector<Point<dim>> &evaluation_points,
-    std::vector<Vector<double>> &  computed_quantities) const
+    std::vector<Vector<double>>   &computed_quantities) const
   {
     const unsigned int n_quadrature_points = solution_values.size();
     Assert(computed_quantities.size() == n_quadrature_points,

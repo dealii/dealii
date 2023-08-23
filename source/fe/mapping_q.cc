@@ -289,7 +289,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 MappingQ<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const Point<dim> &                                          p) const
+  const Point<dim>                                           &p) const
 {
   return Point<spacedim>(internal::evaluate_tensor_product_value(
     polynomials_1d,
@@ -337,8 +337,8 @@ template <>
 Point<1>
 MappingQ<1, 1>::transform_real_to_unit_cell_internal(
   const Triangulation<1, 1>::cell_iterator &cell,
-  const Point<1> &                          p,
-  const Point<1> &                          initial_p_unit) const
+  const Point<1>                           &p,
+  const Point<1>                           &initial_p_unit) const
 {
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
@@ -357,8 +357,8 @@ template <>
 Point<2>
 MappingQ<2, 2>::transform_real_to_unit_cell_internal(
   const Triangulation<2, 2>::cell_iterator &cell,
-  const Point<2> &                          p,
-  const Point<2> &                          initial_p_unit) const
+  const Point<2>                           &p,
+  const Point<2>                           &initial_p_unit) const
 {
   return internal::MappingQImplementation::
     do_transform_real_to_unit_cell_internal<2>(
@@ -375,8 +375,8 @@ template <>
 Point<3>
 MappingQ<3, 3>::transform_real_to_unit_cell_internal(
   const Triangulation<3, 3>::cell_iterator &cell,
-  const Point<3> &                          p,
-  const Point<3> &                          initial_p_unit) const
+  const Point<3>                           &p,
+  const Point<3>                           &initial_p_unit) const
 {
   return internal::MappingQImplementation::
     do_transform_real_to_unit_cell_internal<3>(
@@ -393,8 +393,8 @@ template <>
 Point<1>
 MappingQ<1, 2>::transform_real_to_unit_cell_internal(
   const Triangulation<1, 2>::cell_iterator &cell,
-  const Point<2> &                          p,
-  const Point<1> &                          initial_p_unit) const
+  const Point<2>                           &p,
+  const Point<1>                           &initial_p_unit) const
 {
   const int dim      = 1;
   const int spacedim = 2;
@@ -426,8 +426,8 @@ template <>
 Point<2>
 MappingQ<2, 3>::transform_real_to_unit_cell_internal(
   const Triangulation<2, 3>::cell_iterator &cell,
-  const Point<3> &                          p,
-  const Point<2> &                          initial_p_unit) const
+  const Point<3>                           &p,
+  const Point<2>                           &initial_p_unit) const
 {
   const int dim      = 2;
   const int spacedim = 3;
@@ -472,7 +472,7 @@ template <int dim, int spacedim>
 Point<dim>
 MappingQ<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const Point<spacedim> &                                     p) const
+  const Point<spacedim>                                      &p) const
 {
   // Use an exact formula if one is available. this is only the case
   // for Q1 mappings in 1d, and in 2d if dim==spacedim
@@ -592,8 +592,8 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform_points_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const ArrayView<const Point<spacedim>> &                    real_points,
-  const ArrayView<Point<dim>> &                               unit_points) const
+  const ArrayView<const Point<spacedim>>                     &real_points,
+  const ArrayView<Point<dim>>                                &unit_points) const
 {
   // Go to base class functions for dim < spacedim because it is not yet
   // implemented with optimized code.
@@ -786,8 +786,8 @@ CellSimilarity::Similarity
 MappingQ<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity                            cell_similarity,
-  const Quadrature<dim> &                                     quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const Quadrature<dim>                                      &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -1005,8 +1005,8 @@ void
 MappingQ<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const hp::QCollection<dim - 1> &                            quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const hp::QCollection<dim - 1>                             &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -1058,8 +1058,8 @@ MappingQ<dim, spacedim>::fill_fe_subface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          subface_no,
-  const Quadrature<dim - 1> &                                 quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const Quadrature<dim - 1>                                  &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -1109,8 +1109,8 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const NonMatching::ImmersedSurfaceQuadrature<dim>          &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -1240,7 +1240,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::fill_mapping_data_for_generic_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const ArrayView<const Point<dim>> &                         unit_points,
+  const ArrayView<const Point<dim>>                          &unit_points,
   const UpdateFlags                                           update_flags,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
@@ -1281,8 +1281,8 @@ void
 MappingQ<dim, spacedim>::fill_mapping_data_for_face_quadrature(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 face_quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const Quadrature<dim - 1>                                  &face_quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -1315,10 +1315,10 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_face_quadrature(
 template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
-  const ArrayView<const Tensor<1, dim>> &                  input,
+  const ArrayView<const Tensor<1, dim>>                   &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<1, spacedim>> &                   output) const
+  const ArrayView<Tensor<1, spacedim>>                    &output) const
 {
   internal::MappingQImplementation::transform_fields(input,
                                                      mapping_kind,
@@ -1334,7 +1334,7 @@ MappingQ<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<2, spacedim>> &                   output) const
+  const ArrayView<Tensor<2, spacedim>>                    &output) const
 {
   internal::MappingQImplementation::transform_differential_forms(input,
                                                                  mapping_kind,
@@ -1347,10 +1347,10 @@ MappingQ<dim, spacedim>::transform(
 template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
-  const ArrayView<const Tensor<2, dim>> &                  input,
+  const ArrayView<const Tensor<2, dim>>                   &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<2, spacedim>> &                   output) const
+  const ArrayView<Tensor<2, spacedim>>                    &output) const
 {
   switch (mapping_kind)
     {
@@ -1382,7 +1382,7 @@ MappingQ<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<3, spacedim>> &                   output) const
+  const ArrayView<Tensor<3, spacedim>>                    &output) const
 {
   AssertDimension(input.size(), output.size());
   Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
@@ -1431,10 +1431,10 @@ MappingQ<dim, spacedim>::transform(
 template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::transform(
-  const ArrayView<const Tensor<3, dim>> &                  input,
+  const ArrayView<const Tensor<3, dim>>                   &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<3, spacedim>> &                   output) const
+  const ArrayView<Tensor<3, spacedim>>                    &output) const
 {
   switch (mapping_kind)
     {
@@ -1457,7 +1457,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::add_line_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  std::vector<Point<spacedim>> &                              a) const
+  std::vector<Point<spacedim>>                               &a) const
 {
   // if we only need the midpoint, then ask for it.
   if (this->polynomial_degree == 2)
@@ -1524,7 +1524,7 @@ template <>
 void
 MappingQ<3, 3>::add_quad_support_points(
   const Triangulation<3, 3>::cell_iterator &cell,
-  std::vector<Point<3>> &                   a) const
+  std::vector<Point<3>>                    &a) const
 {
   const unsigned int faces_per_cell = GeometryInfo<3>::faces_per_cell;
 
@@ -1593,7 +1593,7 @@ template <>
 void
 MappingQ<2, 3>::add_quad_support_points(
   const Triangulation<2, 3>::cell_iterator &cell,
-  std::vector<Point<3>> &                   a) const
+  std::vector<Point<3>>                    &a) const
 {
   std::array<Point<3>, GeometryInfo<2>::vertices_per_cell> vertices;
   for (const unsigned int i : GeometryInfo<2>::vertex_indices())

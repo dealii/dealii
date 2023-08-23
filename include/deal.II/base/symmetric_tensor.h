@@ -509,7 +509,7 @@ namespace internal
        * than the mother object, avoid problems with data consistency.
        */
       DEAL_II_HOST
-      constexpr Accessor(tensor_type &             tensor,
+      constexpr Accessor(tensor_type              &tensor,
                          const TableIndices<rank> &previous_indices);
 
       /**
@@ -538,7 +538,7 @@ namespace internal
       /**
        * Store the data given to the constructor.
        */
-      tensor_type &            tensor;
+      tensor_type             &tensor;
       const TableIndices<rank> previous_indices;
 
       // Declare some other classes as friends. Make sure to work around bugs
@@ -595,7 +595,7 @@ namespace internal
        * than the mother object, avoid problems with data consistency.
        */
       DEAL_II_HOST
-      constexpr Accessor(tensor_type &             tensor,
+      constexpr Accessor(tensor_type              &tensor,
                          const TableIndices<rank> &previous_indices);
 
       /**
@@ -624,7 +624,7 @@ namespace internal
       /**
        * Store the data given to the constructor.
        */
-      tensor_type &            tensor;
+      tensor_type             &tensor;
       const TableIndices<rank> previous_indices;
 
       // Declare some other classes as friends. Make sure to work around bugs
@@ -1198,7 +1198,7 @@ namespace internal
     template <int rank_, int dim, bool constness, int P, typename Number>
     DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
     Accessor<rank_, dim, constness, P, Number>::Accessor(
-      tensor_type &              tensor,
+      tensor_type               &tensor,
       const TableIndices<rank_> &previous_indices)
       : tensor(tensor)
       , previous_indices(previous_indices)
@@ -1233,7 +1233,7 @@ namespace internal
     template <int rank_, int dim, bool constness, typename Number>
     DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
     Accessor<rank_, dim, constness, 1, Number>::Accessor(
-      tensor_type &              tensor,
+      tensor_type               &tensor,
       const TableIndices<rank_> &previous_indices)
       : tensor(tensor)
       , previous_indices(previous_indices)
@@ -2691,7 +2691,7 @@ SymmetricTensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
   SymmetricTensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-  operator+(const SymmetricTensor<rank_, dim, Number> &     left,
+  operator+(const SymmetricTensor<rank_, dim, Number>      &left,
             const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
   SymmetricTensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
@@ -2716,7 +2716,7 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
   SymmetricTensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-  operator-(const SymmetricTensor<rank_, dim, Number> &     left,
+  operator-(const SymmetricTensor<rank_, dim, Number>      &left,
             const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
   SymmetricTensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
@@ -2737,7 +2737,7 @@ template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
   operator+(const SymmetricTensor<rank_, dim, Number> &left,
-            const Tensor<rank_, dim, OtherNumber> &    right)
+            const Tensor<rank_, dim, OtherNumber>     &right)
 {
   return Tensor<rank_, dim, Number>(left) + right;
 }
@@ -2753,7 +2753,7 @@ DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-  operator+(const Tensor<rank_, dim, Number> &              left,
+  operator+(const Tensor<rank_, dim, Number>               &left,
             const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
   return left + Tensor<rank_, dim, OtherNumber>(right);
@@ -2771,7 +2771,7 @@ template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
   operator-(const SymmetricTensor<rank_, dim, Number> &left,
-            const Tensor<rank_, dim, OtherNumber> &    right)
+            const Tensor<rank_, dim, OtherNumber>     &right)
 {
   return Tensor<rank_, dim, Number>(left) - right;
 }
@@ -2787,7 +2787,7 @@ DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   Tensor<rank_, dim, typename ProductType<Number, OtherNumber>::type>
-  operator-(const Tensor<rank_, dim, Number> &              left,
+  operator-(const Tensor<rank_, dim, Number>               &left,
             const SymmetricTensor<rank_, dim, OtherNumber> &right)
 {
   return left - Tensor<rank_, dim, OtherNumber>(right);
@@ -3052,9 +3052,9 @@ namespace internal
     template <int dim, typename Number>
     void
     tridiagonalize(const dealii::SymmetricTensor<2, dim, Number> &A,
-                   dealii::Tensor<2, dim, Number> &               Q,
-                   std::array<Number, dim> &                      d,
-                   std::array<Number, dim - 1> &                  e);
+                   dealii::Tensor<2, dim, Number>                &Q,
+                   std::array<Number, dim>                       &d,
+                   std::array<Number, dim - 1>                   &e);
 
 
 
@@ -3615,7 +3615,7 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<
   typename ProductType<Number,
                        typename EnableIfScalar<OtherNumber>::type>::type>
 operator*(const SymmetricTensor<rank_, dim, Number> &t,
-          const OtherNumber &                        factor)
+          const OtherNumber                         &factor)
 {
   // form the product. we have to convert the two factors into the final
   // type via explicit casts because, for awkward reasons, the C++
@@ -3643,7 +3643,7 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<
   dim,
   typename ProductType<OtherNumber,
                        typename EnableIfScalar<Number>::type>::type>
-operator*(const Number &                                  factor,
+operator*(const Number                                   &factor,
           const SymmetricTensor<rank_, dim, OtherNumber> &t)
 {
   // simply forward to the other operator with switched arguments
@@ -3664,7 +3664,7 @@ DEAL_II_HOST constexpr inline SymmetricTensor<
   typename ProductType<Number,
                        typename EnableIfScalar<OtherNumber>::type>::type>
 operator/(const SymmetricTensor<rank_, dim, Number> &t,
-          const OtherNumber &                        factor)
+          const OtherNumber                         &factor)
 {
   using product_type = typename ProductType<Number, OtherNumber>::type;
   SymmetricTensor<rank_, dim, product_type> tt(t);
@@ -3734,7 +3734,7 @@ operator/(const SymmetricTensor<rank_, dim> &t, const double factor)
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   typename ProductType<Number, OtherNumber>::type
-  scalar_product(const SymmetricTensor<2, dim, Number> &     t1,
+  scalar_product(const SymmetricTensor<2, dim, Number>      &t1,
                  const SymmetricTensor<2, dim, OtherNumber> &t2)
 {
   return (t1 * t2);
@@ -3757,7 +3757,7 @@ template <int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
   typename ProductType<Number, OtherNumber>::type
   scalar_product(const SymmetricTensor<2, dim, Number> &t1,
-                 const Tensor<2, dim, OtherNumber> &    t2)
+                 const Tensor<2, dim, OtherNumber>     &t2)
 {
   typename ProductType<Number, OtherNumber>::type s = internal::NumberType<
     typename ProductType<Number, OtherNumber>::type>::value(0.0);
@@ -3783,7 +3783,7 @@ DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   typename ProductType<Number, OtherNumber>::type
-  scalar_product(const Tensor<2, dim, Number> &              t1,
+  scalar_product(const Tensor<2, dim, Number>               &t1,
                  const SymmetricTensor<2, dim, OtherNumber> &t2)
 {
   return scalar_product(t2, t1);
@@ -3808,8 +3808,8 @@ template <typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr inline DEAL_II_ALWAYS_INLINE void
 double_contract(
   SymmetricTensor<2, 1, typename ProductType<Number, OtherNumber>::type> &tmp,
-  const SymmetricTensor<4, 1, Number> &                                   t,
-  const SymmetricTensor<2, 1, OtherNumber> &                              s)
+  const SymmetricTensor<4, 1, Number>                                    &t,
+  const SymmetricTensor<2, 1, OtherNumber>                               &s)
 {
   tmp[0][0] = t[0][0][0][0] * s[0][0];
 }
@@ -3834,8 +3834,8 @@ template <typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr inline void
 double_contract(
   SymmetricTensor<2, 1, typename ProductType<Number, OtherNumber>::type> &tmp,
-  const SymmetricTensor<2, 1, Number> &                                   s,
-  const SymmetricTensor<4, 1, OtherNumber> &                              t)
+  const SymmetricTensor<2, 1, Number>                                    &s,
+  const SymmetricTensor<4, 1, OtherNumber>                               &t)
 {
   tmp[0][0] = t[0][0][0][0] * s[0][0];
 }
@@ -3860,8 +3860,8 @@ template <typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr inline void
 double_contract(
   SymmetricTensor<2, 2, typename ProductType<Number, OtherNumber>::type> &tmp,
-  const SymmetricTensor<4, 2, Number> &                                   t,
-  const SymmetricTensor<2, 2, OtherNumber> &                              s)
+  const SymmetricTensor<4, 2, Number>                                    &t,
+  const SymmetricTensor<2, 2, OtherNumber>                               &s)
 {
   const unsigned int dim = 2;
 
@@ -3891,8 +3891,8 @@ template <typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr inline void
 double_contract(
   SymmetricTensor<2, 2, typename ProductType<Number, OtherNumber>::type> &tmp,
-  const SymmetricTensor<2, 2, Number> &                                   s,
-  const SymmetricTensor<4, 2, OtherNumber> &                              t)
+  const SymmetricTensor<2, 2, Number>                                    &s,
+  const SymmetricTensor<4, 2, OtherNumber>                               &t)
 {
   const unsigned int dim = 2;
 
@@ -3922,8 +3922,8 @@ template <typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr inline void
 double_contract(
   SymmetricTensor<2, 3, typename ProductType<Number, OtherNumber>::type> &tmp,
-  const SymmetricTensor<4, 3, Number> &                                   t,
-  const SymmetricTensor<2, 3, OtherNumber> &                              s)
+  const SymmetricTensor<4, 3, Number>                                    &t,
+  const SymmetricTensor<2, 3, OtherNumber>                               &s)
 {
   const unsigned int dim = 3;
 
@@ -3954,8 +3954,8 @@ template <typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr inline void
 double_contract(
   SymmetricTensor<2, 3, typename ProductType<Number, OtherNumber>::type> &tmp,
-  const SymmetricTensor<2, 3, Number> &                                   s,
-  const SymmetricTensor<4, 3, OtherNumber> &                              t)
+  const SymmetricTensor<2, 3, Number>                                    &s,
+  const SymmetricTensor<4, 3, OtherNumber>                               &t)
 {
   const unsigned int dim = 3;
 
@@ -3979,7 +3979,7 @@ DEAL_II_HOST constexpr Tensor<1,
                               dim,
                               typename ProductType<Number, OtherNumber>::type>
 operator*(const SymmetricTensor<2, dim, Number> &src1,
-          const Tensor<1, dim, OtherNumber> &    src2)
+          const Tensor<1, dim, OtherNumber>     &src2)
 {
   Tensor<1, dim, typename ProductType<Number, OtherNumber>::type> dest;
   for (unsigned int i = 0; i < dim; ++i)
@@ -3999,7 +3999,7 @@ template <int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST constexpr Tensor<1,
                               dim,
                               typename ProductType<Number, OtherNumber>::type>
-operator*(const Tensor<1, dim, Number> &              src1,
+operator*(const Tensor<1, dim, Number>               &src1,
           const SymmetricTensor<2, dim, OtherNumber> &src2)
 {
   // this is easy for symmetric tensors:
@@ -4036,7 +4036,7 @@ DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
   typename Tensor<rank_1 + rank_2 - 2,
                   dim,
                   typename ProductType<Number, OtherNumber>::type>::tensor_type
-  operator*(const Tensor<rank_1, dim, Number> &              src1,
+  operator*(const Tensor<rank_1, dim, Number>               &src1,
             const SymmetricTensor<rank_2, dim, OtherNumber> &src2)
 {
   return src1 * Tensor<rank_2, dim, OtherNumber>(src2);
@@ -4073,7 +4073,7 @@ DEAL_II_HOST constexpr DEAL_II_ALWAYS_INLINE
                   dim,
                   typename ProductType<Number, OtherNumber>::type>::tensor_type
   operator*(const SymmetricTensor<rank_1, dim, Number> &src1,
-            const Tensor<rank_2, dim, OtherNumber> &    src2)
+            const Tensor<rank_2, dim, OtherNumber>     &src2)
 {
   return Tensor<rank_1, dim, Number>(src1) * src2;
 }

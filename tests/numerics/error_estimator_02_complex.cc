@@ -174,10 +174,10 @@ get_h_area_sub<3>(double &h, double &a, const double L)
 template <int dim>
 void
 output(const std::string                   name,
-       const Triangulation<dim> &          triangulation,
-       const DoFHandler<dim> &             dof_handler,
+       const Triangulation<dim>           &triangulation,
+       const DoFHandler<dim>              &dof_handler,
        const Vector<std::complex<double>> &values,
-       const Vector<float> &               error)
+       const Vector<float>                &error)
 {
   dealii::Vector<double> fe_degrees(triangulation.n_active_cells());
   {

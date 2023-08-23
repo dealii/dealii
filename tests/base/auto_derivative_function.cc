@@ -91,7 +91,7 @@ public:
   gradient(const Point<dim> &p, const unsigned int component = 0) const;
 
   virtual void
-  vector_gradient(const Point<dim> &                    p,
+  vector_gradient(const Point<dim>                     &p,
                   typename std::vector<Tensor<1, dim>> &gradients) const;
 };
 
@@ -111,7 +111,7 @@ ExactSinExp<dim>::gradient(const Point<dim> &p, const unsigned int) const
 template <int dim>
 void
 ExactSinExp<dim>::vector_gradient(
-  const Point<dim> &                    p,
+  const Point<dim>                     &p,
   typename std::vector<Tensor<1, dim>> &gradients) const
 {
   Assert(gradients.size() == this->n_components,

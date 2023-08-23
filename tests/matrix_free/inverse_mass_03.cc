@@ -54,9 +54,9 @@ public:
 
   void
   local_mass_operator(
-    const MatrixFree<dim, Number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
+    const MatrixFree<dim, Number>               &data,
+    VectorType                                  &dst,
+    const VectorType                            &src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 3, Number> fe_eval(data);
@@ -82,9 +82,9 @@ public:
 
   void
   local_inverse_mass_operator(
-    const MatrixFree<dim, Number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
+    const MatrixFree<dim, Number>               &data,
+    VectorType                                  &dst,
+    const VectorType                            &src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 3, Number> fe_eval(data);

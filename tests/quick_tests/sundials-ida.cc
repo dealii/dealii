@@ -76,7 +76,7 @@ public:
     time_stepper.residual = [&](const double /*t*/,
                                 const VectorType &y,
                                 const VectorType &y_dot,
-                                VectorType &      res) {
+                                VectorType       &res) {
       res = y_dot;
       A.vmult_add(res, y);
     };

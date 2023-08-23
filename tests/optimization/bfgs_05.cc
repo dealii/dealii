@@ -124,9 +124,9 @@ test()
   const unsigned int print_n_iterations     = 5;
   unsigned int       iteration              = 0;
   unsigned int       line_search_iterations = 0;
-  const auto         line_min               = [&](number &          f,
-                            VectorType &      x,
-                            VectorType &      g,
+  const auto         line_min               = [&](number           &f,
+                            VectorType       &x,
+                            VectorType       &g,
                             const VectorType &p) {
     if (iteration <= print_n_iterations)
       out << "------------------------------------------------" << std::endl
@@ -190,7 +190,7 @@ test()
     return res.first;
   };
 
-  const auto preconditioner = [](VectorType &                         g,
+  const auto preconditioner = [](VectorType                          &g,
                                  const FiniteSizeHistory<VectorType> &s,
                                  const FiniteSizeHistory<VectorType> &y) {
     if (s.size() > 0)

@@ -58,32 +58,32 @@ public:
    */
   virtual void
   vmult(const unsigned int level,
-        VectorType &       dst,
-        const VectorType & src) const = 0;
+        VectorType        &dst,
+        const VectorType  &src) const = 0;
 
   /**
    * Adding matrix-vector-multiplication on a certain level.
    */
   virtual void
   vmult_add(const unsigned int level,
-            VectorType &       dst,
-            const VectorType & src) const = 0;
+            VectorType        &dst,
+            const VectorType  &src) const = 0;
 
   /**
    * Transpose matrix-vector-multiplication on a certain level.
    */
   virtual void
   Tvmult(const unsigned int level,
-         VectorType &       dst,
-         const VectorType & src) const = 0;
+         VectorType        &dst,
+         const VectorType  &src) const = 0;
 
   /**
    * Adding transpose matrix-vector-multiplication on a certain level.
    */
   virtual void
   Tvmult_add(const unsigned int level,
-             VectorType &       dst,
-             const VectorType & src) const = 0;
+             VectorType        &dst,
+             const VectorType  &src) const = 0;
 
   /**
    * Return the minimal level for which matrices are stored.
@@ -118,8 +118,8 @@ public:
    */
   virtual void
   operator()(const unsigned int level,
-             VectorType &       dst,
-             const VectorType & src) const = 0;
+             VectorType        &dst,
+             const VectorType  &src) const = 0;
 };
 
 
@@ -189,8 +189,8 @@ public:
    */
   virtual void
   prolongate(const unsigned int to_level,
-             VectorType &       dst,
-             const VectorType & src) const = 0;
+             VectorType        &dst,
+             const VectorType  &src) const = 0;
 
   /**
    * Prolongate a vector from level <tt>to_level-1</tt> to level
@@ -204,8 +204,8 @@ public:
    */
   virtual void
   prolongate_and_add(const unsigned int to_level,
-                     VectorType &       dst,
-                     const VectorType & src) const;
+                     VectorType        &dst,
+                     const VectorType  &src) const;
 
   /**
    * Restrict a vector from level <tt>from_level</tt> to level
@@ -223,8 +223,8 @@ public:
    */
   virtual void
   restrict_and_add(const unsigned int from_level,
-                   VectorType &       dst,
-                   const VectorType & src) const = 0;
+                   VectorType        &dst,
+                   const VectorType  &src) const = 0;
 };
 
 
@@ -269,8 +269,8 @@ public:
    */
   virtual void
   smooth(const unsigned int level,
-         VectorType &       u,
-         const VectorType & rhs) const = 0;
+         VectorType        &u,
+         const VectorType  &rhs) const = 0;
 
   /**
    * As opposed to the smooth() function, this function applies the action of

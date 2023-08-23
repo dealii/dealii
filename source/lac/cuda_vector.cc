@@ -142,7 +142,7 @@ namespace LinearAlgebra
       else if (operation == VectorOperation::add)
         {
           // Create a temporary vector on the device
-          Number *    tmp;
+          Number     *tmp;
           cudaError_t error_code =
             cudaMalloc(&tmp, n_elements * sizeof(Number));
           AssertCuda(error_code);
@@ -263,7 +263,7 @@ namespace LinearAlgebra
              ExcMessage(
                "Cannot add two vectors with different numbers of elements"));
 
-      Number *    result_device;
+      Number     *result_device;
       cudaError_t error_code =
         cudaMalloc(&result_device, n_elements * sizeof(Number));
       AssertCuda(error_code);
@@ -422,7 +422,7 @@ namespace LinearAlgebra
     typename Vector<Number>::value_type
     Vector<Number>::mean_value() const
     {
-      Number *    result_device;
+      Number     *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
       AssertCuda(error_code);
       error_code = cudaMemset(result_device, 0, sizeof(Number));
@@ -453,7 +453,7 @@ namespace LinearAlgebra
     typename Vector<Number>::real_type
     Vector<Number>::l1_norm() const
     {
-      Number *    result_device;
+      Number     *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
       AssertCuda(error_code);
       error_code = cudaMemset(result_device, 0, sizeof(Number));
@@ -501,7 +501,7 @@ namespace LinearAlgebra
     typename Vector<Number>::real_type
     Vector<Number>::linfty_norm() const
     {
-      Number *    result_device;
+      Number     *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
       AssertCuda(error_code);
       error_code = cudaMemset(result_device, 0, sizeof(Number));
@@ -540,7 +540,7 @@ namespace LinearAlgebra
       Assert(W.size() == this->size(),
              ExcMessage("Vector W has the wrong size."));
 
-      Number *    result_device;
+      Number     *result_device;
       cudaError_t error_code = cudaMalloc(&result_device, sizeof(Number));
       AssertCuda(error_code);
       error_code = cudaMemset(result_device, 0, sizeof(Number));
@@ -564,7 +564,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Vector<Number>::print(std::ostream &     out,
+    Vector<Number>::print(std::ostream      &out,
                           const unsigned int precision,
                           const bool         scientific,
                           const bool) const

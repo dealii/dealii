@@ -230,9 +230,9 @@ template <int dim>
 void
 output(const std::string         name,
        const Triangulation<dim> &triangulation,
-       const DoFHandler<dim> &   dof_handler,
-       const Vector<double> &    values,
-       const Vector<float> &     error)
+       const DoFHandler<dim>    &dof_handler,
+       const Vector<double>     &values,
+       const Vector<float>      &error)
 {
   dealii::Vector<double> fe_degrees(triangulation.n_active_cells());
   {

@@ -43,7 +43,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         template void
         probabilistic_locations<deal_II_dimension, deal_II_space_dimension>(
           const Triangulation<deal_II_dimension, deal_II_space_dimension>
-            &                                      triangulation,
+                                                  &triangulation,
           const Function<deal_II_space_dimension> &probability_density_function,
           const bool                               random_cell_selection,
           const types::particle_index              n_particles_to_create,
@@ -61,13 +61,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           ParticleHandler<deal_II_dimension, deal_II_space_dimension>
             &particle_handler,
           const Mapping<deal_II_dimension, deal_II_space_dimension> &mapping,
-          const ComponentMask &                                      components,
+          const ComponentMask                                       &components,
           const std::vector<std::vector<double>> &properties);
 
         template void
         quadrature_points<deal_II_dimension, deal_II_space_dimension>(
           const Triangulation<deal_II_dimension, deal_II_space_dimension>
-            &                                  particle_tria,
+                                              &particle_tria,
           const Quadrature<deal_II_dimension> &quadrature,
           const std::vector<std::vector<BoundingBox<deal_II_space_dimension>>>
             &global_bounding_boxes,

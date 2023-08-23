@@ -30,7 +30,7 @@ namespace
   template <int dim>
   void
   print_derivatives_at_point(const Function<dim> &function,
-                             const Point<dim> &   point)
+                             const Point<dim>    &point)
   {
     deallog << "point = " << point << std::endl;
     deallog << "value = " << function.value(point) << std::endl;

@@ -55,8 +55,8 @@ FiniteElement<dim, spacedim>::InternalDataBase::memory_consumption() const
 
 template <int dim, int spacedim>
 FiniteElement<dim, spacedim>::FiniteElement(
-  const FiniteElementData<dim> &    fe_data,
-  const std::vector<bool> &         r_i_a_f,
+  const FiniteElementData<dim>     &fe_data,
+  const std::vector<bool>          &r_i_a_f,
   const std::vector<ComponentMask> &nonzero_c)
   : FiniteElementData<dim>(fe_data)
   , adjust_line_dof_index_for_line_orientation_table(this->n_dofs_per_line())
@@ -1280,7 +1280,7 @@ template <int dim, int spacedim>
 std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FiniteElement<dim, spacedim>::get_face_data(
   const UpdateFlags               flags,
-  const Mapping<dim, spacedim> &  mapping,
+  const Mapping<dim, spacedim>   &mapping,
   const hp::QCollection<dim - 1> &quadrature,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -1300,7 +1300,7 @@ std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FiniteElement<dim, spacedim>::get_face_data(
   const UpdateFlags             flags,
   const Mapping<dim, spacedim> &mapping,
-  const Quadrature<dim - 1> &   quadrature,
+  const Quadrature<dim - 1>    &quadrature,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
     &output_data) const
@@ -1319,11 +1319,11 @@ inline void
 FiniteElement<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const hp::QCollection<dim - 1> &                            quadrature,
-  const Mapping<dim, spacedim> &                              mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const hp::QCollection<dim - 1>                             &quadrature,
+  const Mapping<dim, spacedim>                               &mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    &                                                            mapping_data,
+                                                                &mapping_data,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -1348,11 +1348,11 @@ inline void
 FiniteElement<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const Quadrature<dim - 1> &                                 quadrature,
-  const Mapping<dim, spacedim> &                              mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const Quadrature<dim - 1>                                  &quadrature,
+  const Mapping<dim, spacedim>                               &mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    &                                                            mapping_data,
+                                                                &mapping_data,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -1379,7 +1379,7 @@ std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FiniteElement<dim, spacedim>::get_subface_data(
   const UpdateFlags             flags,
   const Mapping<dim, spacedim> &mapping,
-  const Quadrature<dim - 1> &   quadrature,
+  const Quadrature<dim - 1>    &quadrature,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
     &output_data) const

@@ -102,16 +102,16 @@ main()
     };
 
   ode.jacobian_times_vector = [&](const VectorType &v,
-                                  VectorType &      Jv,
+                                  VectorType       &Jv,
                                   double            t,
                                   const VectorType &y,
                                   const VectorType &fy) { J.vmult(Jv, v); };
 
   ode.solve_linearized_system =
-    [&](SUNDIALS::SundialsOperator<VectorType> &      op,
+    [&](SUNDIALS::SundialsOperator<VectorType>       &op,
         SUNDIALS::SundialsPreconditioner<VectorType> &prec,
-        VectorType &                                  x,
-        const VectorType &                            b,
+        VectorType                                   &x,
+        const VectorType                             &b,
         double                                        tol) {
       ReductionControl     control;
       SolverCG<VectorType> solver_cg(control);
@@ -122,7 +122,7 @@ main()
                                           const VectorType &y,
                                           const VectorType &fy,
                                           int               jok,
-                                          int &             jcur,
+                                          int              &jcur,
                                           double            gamma) {
     deallog << "jacobian_preconditioner_setup called\n";
   };
@@ -131,7 +131,7 @@ main()
                                           const VectorType &y,
                                           const VectorType &fy,
                                           const VectorType &r,
-                                          VectorType &      z,
+                                          VectorType       &z,
                                           double            gamma,
                                           double            delta,
                                           int               lr) {

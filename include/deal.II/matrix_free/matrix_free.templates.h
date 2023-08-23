@@ -161,7 +161,7 @@ namespace
     template <int vectorization_width>
     bool
     operator()(const internal::MatrixFreeFunctions::FaceToCellTopology<
-                 vectorization_width> &           face,
+                 vectorization_width>            &face,
                const std::array<unsigned int, 2> &fe_index)
     {
       const unsigned int face_type = face.face_type;
@@ -178,7 +178,7 @@ namespace
     template <int vectorization_width>
     bool
     operator()(const internal::MatrixFreeFunctions::FaceToCellTopology<
-                 vectorization_width> &           face,
+                 vectorization_width>            &face,
                const std::array<unsigned int, 3> &fe_index)
     {
       const unsigned int face_type = face.face_type;
@@ -373,7 +373,7 @@ namespace internal
   template <typename Number>
   void
   store_affine_constraints(
-    const dealii::AffineConstraints<Number> *              affine_constraints,
+    const dealii::AffineConstraints<Number>               *affine_constraints,
     SmartPointer<const dealii::AffineConstraints<Number>> &stored_constraints)
   {
     stored_constraints = affine_constraints;
@@ -386,11 +386,11 @@ template <int dim, typename Number, typename VectorizedArrayType>
 template <typename number2, int q_dim>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::internal_reinit(
-  const std::shared_ptr<hp::MappingCollection<dim>> &    mapping,
-  const std::vector<const DoFHandler<dim, dim> *> &      dof_handler,
+  const std::shared_ptr<hp::MappingCollection<dim>>     &mapping,
+  const std::vector<const DoFHandler<dim, dim> *>       &dof_handler,
   const std::vector<const AffineConstraints<number2> *> &constraints,
-  const std::vector<IndexSet> &                          locally_owned_dofs,
-  const std::vector<hp::QCollection<q_dim>> &            quad,
+  const std::vector<IndexSet>                           &locally_owned_dofs,
+  const std::vector<hp::QCollection<q_dim>>             &quad,
   const typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     &additional_data)
 {
@@ -919,7 +919,7 @@ namespace internal
     // steps through all children and adds the active cells recursively
     template <typename InIterator>
     void
-    resolve_cell(const InIterator &                                  cell,
+    resolve_cell(const InIterator                                   &cell,
                  std::vector<std::pair<unsigned int, unsigned int>> &cell_its)
     {
       if (cell->has_children())
@@ -940,7 +940,7 @@ template <int dim, typename Number, typename VectorizedArrayType>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::initialize_dof_handlers(
   const std::vector<const DoFHandler<dim, dim> *> &dof_handler_in,
-  const AdditionalData &                           additional_data)
+  const AdditionalData                            &additional_data)
 {
   cell_level_index.clear();
   dof_handlers.resize(dof_handler_in.size());
@@ -1031,7 +1031,7 @@ namespace internal
   fill_connectivity_subrange(
     const unsigned int                                        begin,
     const unsigned int                                        end,
-    const dealii::Triangulation<dim> &                        tria,
+    const dealii::Triangulation<dim>                         &tria,
     const std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
     const tbb::concurrent_unordered_map<std::pair<unsigned int, unsigned int>,
                                         unsigned int
@@ -1040,7 +1040,7 @@ namespace internal
                                         unsigned_int_pair_hash
 #  endif
                                         > &map,
-    DynamicSparsityPattern &               connectivity_direct)
+    DynamicSparsityPattern                &connectivity_direct)
   {
     std::vector<types::global_dof_index> new_indices;
     for (unsigned int cell = begin; cell < end; ++cell)
@@ -1081,7 +1081,7 @@ namespace internal
     const unsigned int            begin,
     const unsigned int            end,
     const DynamicSparsityPattern &connectivity_direct,
-    DynamicSparsityPattern &      connectivity)
+    DynamicSparsityPattern       &connectivity)
   {
     std::vector<types::global_dof_index> new_indices;
     for (unsigned int block = begin; block < end; ++block)
@@ -1115,7 +1115,7 @@ namespace internal
   std::vector<bool>
   compute_dof_info(
     const std::vector<const dealii::AffineConstraints<number> *> &constraint,
-    const std::vector<IndexSet> &                           locally_owned_dofs,
+    const std::vector<IndexSet>                            &locally_owned_dofs,
     const std::vector<SmartPointer<const DoFHandler<dim>>> &dof_handlers,
     const Table<2, MatrixFreeFunctions::ShapeInfo<double>> &shape_infos,
     const unsigned int               cell_level_index_end_local,
@@ -1126,11 +1126,11 @@ namespace internal
     const bool                       do_face_integrals,
     const bool                       build_inner_faces,
     const bool                       overlap_communication_computation,
-    MatrixFreeFunctions::TaskInfo &  task_info,
+    MatrixFreeFunctions::TaskInfo   &task_info,
     std::vector<std::pair<unsigned int, unsigned int>> &cell_level_index,
-    std::vector<MatrixFreeFunctions::DoFInfo> &         dof_info,
-    MatrixFreeFunctions::FaceSetup<dim> &               face_setup,
-    MatrixFreeFunctions::ConstraintValues<double> &     constraint_values,
+    std::vector<MatrixFreeFunctions::DoFInfo>          &dof_info,
+    MatrixFreeFunctions::FaceSetup<dim>                &face_setup,
+    MatrixFreeFunctions::ConstraintValues<double>      &constraint_values,
     const bool use_vector_data_exchanger_full)
   {
     if (do_face_integrals)
@@ -1542,7 +1542,7 @@ namespace internal
                 &tria, cell_level_index[c].first, cell_level_index[c].second);
               Assert(cell->level() > 0, ExcInternalError());
               const auto parent = cell->parent();
-              auto &     entry = cell_parents[parent->level()][parent->index()];
+              auto      &entry = cell_parents[parent->level()][parent->index()];
               entry.second[entry.first++] = c;
             }
         unsigned int position = 0;
@@ -1847,8 +1847,8 @@ template <typename number2>
 void
 MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
   const std::vector<const AffineConstraints<number2> *> &constraint,
-  const std::vector<IndexSet> &                          locally_owned_dofs,
-  const AdditionalData &                                 additional_data)
+  const std::vector<IndexSet>                           &locally_owned_dofs,
+  const AdditionalData                                  &additional_data)
 {
   // insert possible ghost cells and construct face topology
   const bool do_face_integrals =

@@ -197,9 +197,9 @@ public:
    * false, i.e. do not consider time.
    */
   virtual void
-  initialize(const std::string &             vars,
+  initialize(const std::string              &vars,
              const std::vector<std::string> &expressions,
-             const ConstMap &                constants,
+             const ConstMap                 &constants,
              const bool                      time_dependent = false) override;
 
   /**
@@ -212,7 +212,7 @@ public:
   void
   initialize(const std::string &vars,
              const std::string &expression,
-             const ConstMap &   constants,
+             const ConstMap    &constants,
              const bool         time_dependent = false);
 
   /**
@@ -233,7 +233,7 @@ public:
    * Return the value of the tensor function at the given point.
    */
   virtual void
-  value_list(const std::vector<Point<dim>> &         p,
+  value_list(const std::vector<Point<dim>>          &p,
              std::vector<Tensor<rank, dim, Number>> &values) const override;
 
   /**

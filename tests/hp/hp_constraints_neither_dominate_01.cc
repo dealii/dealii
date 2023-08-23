@@ -64,7 +64,7 @@
 
 #include "../tests.h"
 
-//#define DEBUG_OUTPUT_VTK
+// #define DEBUG_OUTPUT_VTK
 unsigned int counter = 0;
 
 const double eps = 1e-10;

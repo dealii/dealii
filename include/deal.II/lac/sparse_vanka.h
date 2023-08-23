@@ -199,7 +199,7 @@ public:
    */
   void
   initialize(const SparseMatrix<number> &M,
-             const AdditionalData &      additional_data);
+             const AdditionalData       &additional_data);
 
   /**
    * Do the preconditioning. This function takes the residual in @p src and
@@ -261,8 +261,8 @@ protected:
    */
   template <typename number2>
   void
-  apply_preconditioner(Vector<number2> &              dst,
-                       const Vector<number2> &        src,
+  apply_preconditioner(Vector<number2>               &dst,
+                       const Vector<number2>         &src,
                        const std::vector<bool> *const dof_mask = nullptr) const;
 
   /**
@@ -501,7 +501,7 @@ public:
    * Constructor. Pass all arguments except for @p n_blocks to the base class.
    */
   SparseBlockVanka(const SparseMatrix<number> &M,
-                   const std::vector<bool> &   selected,
+                   const std::vector<bool>    &selected,
                    const unsigned int          n_blocks,
                    const BlockingStrategy      blocking_strategy);
 
@@ -540,7 +540,7 @@ private:
    */
   void
   compute_dof_masks(const SparseMatrix<number> &M,
-                    const std::vector<bool> &   selected,
+                    const std::vector<bool>    &selected,
                     const BlockingStrategy      blocking_strategy);
 };
 

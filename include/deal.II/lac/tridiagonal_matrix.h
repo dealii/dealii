@@ -141,7 +141,7 @@ public:
    * Source and destination must not be the same vector.
    */
   void
-  vmult(Vector<number> &      w,
+  vmult(Vector<number>       &w,
         const Vector<number> &v,
         const bool            adding = false) const;
 
@@ -164,7 +164,7 @@ public:
    * Source and destination must not be the same vector.
    */
   void
-  Tvmult(Vector<number> &      w,
+  Tvmult(Vector<number>       &w,
          const Vector<number> &v,
          const bool            adding = false) const;
 
@@ -224,7 +224,7 @@ public:
    */
   template <class OutputStream>
   void
-  print(OutputStream &     s,
+  print(OutputStream      &s,
         const unsigned int width     = 5,
         const unsigned int precision = 2) const;
   /** @} */
@@ -345,7 +345,7 @@ TridiagonalMatrix<number>::operator()(size_type i, size_type j)
 template <typename number>
 template <class OutputStream>
 void
-TridiagonalMatrix<number>::print(OutputStream &     s,
+TridiagonalMatrix<number>::print(OutputStream      &s,
                                  const unsigned int width,
                                  const unsigned int) const
 {

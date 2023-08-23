@@ -228,7 +228,7 @@ namespace TrilinosWrappers
       void
       reinit(
         const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-          &        partitioners,
+                  &partitioners,
         const bool make_ghosted    = true,
         const bool vector_writable = false);
 
@@ -277,7 +277,7 @@ namespace TrilinosWrappers
        */
       void
       import_nonlocal_data_for_fe(const TrilinosWrappers::BlockSparseMatrix &m,
-                                  const BlockVector &                        v);
+                                  const BlockVector                         &v);
 
       /**
        * Return if this Vector contains ghost elements.
@@ -312,7 +312,7 @@ namespace TrilinosWrappers
        * Print to a stream.
        */
       void
-      print(std::ostream &     out,
+      print(std::ostream      &out,
             const unsigned int precision  = 3,
             const bool         scientific = true,
             const bool         across     = true) const;
@@ -467,7 +467,7 @@ namespace internal
     public:
       template <typename Matrix>
       static void
-      reinit_range_vector(const Matrix &                      matrix,
+      reinit_range_vector(const Matrix                       &matrix,
                           TrilinosWrappers::MPI::BlockVector &v,
                           bool omit_zeroing_entries)
       {
@@ -478,7 +478,7 @@ namespace internal
 
       template <typename Matrix>
       static void
-      reinit_domain_vector(const Matrix &                      matrix,
+      reinit_domain_vector(const Matrix                       &matrix,
                            TrilinosWrappers::MPI::BlockVector &v,
                            bool omit_zeroing_entries)
       {

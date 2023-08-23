@@ -134,7 +134,7 @@ Subscriptor::operator=(Subscriptor &&s) noexcept
 
 void
 Subscriptor::subscribe(std::atomic<bool> *const validity,
-                       const std::string &      id) const
+                       const std::string       &id) const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
@@ -154,7 +154,7 @@ Subscriptor::subscribe(std::atomic<bool> *const validity,
 
 void
 Subscriptor::unsubscribe(std::atomic<bool> *const validity,
-                         const std::string &      id) const
+                         const std::string       &id) const
 {
   const std::string &name = id.empty() ? unknown_subscriber : id;
 

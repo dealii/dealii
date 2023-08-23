@@ -207,7 +207,7 @@ namespace Step33
     static void compute_flux_matrix(const InputVector &W,
                                     ndarray<typename InputVector::value_type,
                                             EulerEquations<dim>::n_components,
-                                            dim> &     flux)
+                                            dim>      &flux)
     {
       // First compute the pressure that appears in the flux matrix, and then
       // compute the first <code>dim</code> columns of the matrix that
@@ -244,9 +244,9 @@ namespace Step33
     // $\alpha$. It's form has also been given already in the introduction:
     template <typename InputVector>
     static void numerical_normal_flux(
-      const Tensor<1, dim> &                                      normal,
-      const InputVector &                                         Wplus,
-      const InputVector &                                         Wminus,
+      const Tensor<1, dim>                                       &normal,
+      const InputVector                                          &Wplus,
+      const InputVector                                          &Wminus,
       const double                                                alpha,
       std::array<typename InputVector::value_type, n_components> &normal_flux)
     {
@@ -280,7 +280,7 @@ namespace Step33
     // 2d. This naturally leads to the following function:
     template <typename InputVector>
     static void compute_forcing_vector(
-      const InputVector &                                         W,
+      const InputVector                                          &W,
       std::array<typename InputVector::value_type, n_components> &forcing)
     {
       const double gravity = -1.0;
@@ -354,10 +354,10 @@ namespace Step33
     template <typename DataVector>
     static void
     compute_Wminus(const std::array<BoundaryKind, n_components> &boundary_kind,
-                   const Tensor<1, dim> &                        normal_vector,
-                   const DataVector &                            Wplus,
+                   const Tensor<1, dim>                         &normal_vector,
+                   const DataVector                             &Wplus,
                    const Vector<double> &boundary_values,
-                   const DataVector &    Wminus)
+                   const DataVector     &Wminus)
     {
       for (unsigned int c = 0; c < n_components; ++c)
         switch (boundary_kind[c])
@@ -441,9 +441,9 @@ namespace Step33
     // indicators, but this one does, and it is easy to compute:
     static void
     compute_refinement_indicators(const DoFHandler<dim> &dof_handler,
-                                  const Mapping<dim> &   mapping,
-                                  const Vector<double> & solution,
-                                  Vector<double> &       refinement_indicators)
+                                  const Mapping<dim>    &mapping,
+                                  const Vector<double>  &solution,
+                                  Vector<double>        &refinement_indicators)
     {
       const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();
       std::vector<unsigned int> dofs(dofs_per_cell);
@@ -557,7 +557,7 @@ namespace Step33
   template <int dim>
   void EulerEquations<dim>::Postprocessor::evaluate_vector_field(
     const DataPostprocessorInputs::Vector<dim> &inputs,
-    std::vector<Vector<double>> &               computed_quantities) const
+    std::vector<Vector<double>>                &computed_quantities) const
   {
     // At the beginning of the function, let us make sure that all variables
     // have the correct sizes, so that we can access individual vector
@@ -1298,12 +1298,12 @@ namespace Step33
     void setup_system();
 
     void assemble_system();
-    void assemble_cell_term(const FEValues<dim> &                       fe_v,
+    void assemble_cell_term(const FEValues<dim>                        &fe_v,
                             const std::vector<types::global_dof_index> &dofs);
     void assemble_face_term(
       const unsigned int                          face_no,
-      const FEFaceValuesBase<dim> &               fe_v,
-      const FEFaceValuesBase<dim> &               fe_v_neighbor,
+      const FEFaceValuesBase<dim>                &fe_v,
+      const FEFaceValuesBase<dim>                &fe_v_neighbor,
       const std::vector<types::global_dof_index> &dofs,
       const std::vector<types::global_dof_index> &dofs_neighbor,
       const bool                                  external_face,
@@ -1674,7 +1674,7 @@ namespace Step33
   // residual:
   template <int dim>
   void ConservationLaw<dim>::assemble_cell_term(
-    const FEValues<dim> &                       fe_v,
+    const FEValues<dim>                        &fe_v,
     const std::vector<types::global_dof_index> &dof_indices)
   {
     const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
@@ -1904,8 +1904,8 @@ namespace Step33
   template <int dim>
   void ConservationLaw<dim>::assemble_face_term(
     const unsigned int                          face_no,
-    const FEFaceValuesBase<dim> &               fe_v,
-    const FEFaceValuesBase<dim> &               fe_v_neighbor,
+    const FEFaceValuesBase<dim>                &fe_v,
+    const FEFaceValuesBase<dim>                &fe_v_neighbor,
     const std::vector<types::global_dof_index> &dof_indices,
     const std::vector<types::global_dof_index> &dof_indices_neighbor,
     const bool                                  external_face,

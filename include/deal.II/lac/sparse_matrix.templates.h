@@ -134,7 +134,7 @@ SparseMatrix<number>::SparseMatrix(const SparsityPattern &c)
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix(const SparsityPattern &c,
-                                   const IdentityMatrix & id)
+                                   const IdentityMatrix  &id)
   : cols(nullptr, "SparseMatrix")
   , val(nullptr)
   , max_len(0)
@@ -347,7 +347,7 @@ SparseMatrix<number>::symmetrize()
       number *val_ptr = &val[cols->rowstart[row]];
       if (m() == n())
         ++val_ptr;
-      const size_type *   colnum_ptr = &cols->colnums[cols->rowstart[row] + 1];
+      const size_type    *colnum_ptr = &cols->colnums[cols->rowstart[row] + 1];
       const number *const val_end_of_row = &val[cols->rowstart[row + 1]];
 
       // treat lower left triangle
@@ -464,8 +464,8 @@ SparseMatrix<number>::add(const number                    factor,
   Assert(val != nullptr, ExcNotInitialized());
   Assert(cols == matrix.cols, ExcDifferentSparsityPatterns());
 
-  number *            val_ptr    = val.get();
-  const somenumber *  matrix_ptr = matrix.val.get();
+  number             *val_ptr    = val.get();
+  const somenumber   *matrix_ptr = matrix.val.get();
   const number *const end_ptr    = val.get() + cols->n_nonzero_elements();
 
   while (val_ptr != end_ptr)
@@ -490,15 +490,15 @@ namespace internal
     void
     vmult_on_subrange(const size_type    begin_row,
                       const size_type    end_row,
-                      const number *     values,
+                      const number      *values,
                       const std::size_t *rowstart,
-                      const size_type *  colnums,
-                      const InVector &   src,
-                      OutVector &        dst,
+                      const size_type   *colnums,
+                      const InVector    &src,
+                      OutVector         &dst,
                       const bool         add)
     {
-      const number *               val_ptr    = &values[rowstart[begin_row]];
-      const size_type *            colnum_ptr = &colnums[rowstart[begin_row]];
+      const number                *val_ptr    = &values[rowstart[begin_row]];
+      const size_type             *colnum_ptr = &colnums[rowstart[begin_row]];
       typename OutVector::iterator dst_ptr    = dst.begin() + begin_row;
 
       if (add == false)
@@ -532,7 +532,7 @@ void
 SparseMatrix<number>::add(const size_type  row,
                           const size_type  n_cols,
                           const size_type *col_indices,
-                          const number2 *  values,
+                          const number2   *values,
                           const bool       elide_zero_values,
                           const bool       col_indices_are_sorted)
 {
@@ -558,7 +558,7 @@ SparseMatrix<number>::add(const size_type  row,
 
       const size_type *this_cols    = &cols->colnums[cols->rowstart[row]];
       const size_type  row_length_1 = cols->row_length(row) - 1;
-      number *         val_ptr      = &val[cols->rowstart[row]];
+      number          *val_ptr      = &val[cols->rowstart[row]];
 
       if (m() == n())
         {
@@ -690,7 +690,7 @@ void
 SparseMatrix<number>::set(const size_type  row,
                           const size_type  n_cols,
                           const size_type *col_indices,
-                          const number2 *  values,
+                          const number2   *values,
                           const bool       elide_zero_values)
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
@@ -699,7 +699,7 @@ SparseMatrix<number>::set(const size_type  row,
   // First, search all the indices to find
   // out which values we actually need to
   // set.
-  const size_type * my_cols = cols->colnums.get();
+  const size_type  *my_cols = cols->colnums.get();
   std::size_t       index = cols->rowstart[row], next_index = index;
   const std::size_t next_row_index = cols->rowstart[row + 1];
 
@@ -894,10 +894,10 @@ namespace internal
     typename InVector::value_type
     matrix_norm_sqr_on_subrange(const size_type    begin_row,
                                 const size_type    end_row,
-                                const number *     values,
+                                const number      *values,
                                 const std::size_t *rowstart,
-                                const size_type *  colnums,
-                                const InVector &   v)
+                                const size_type   *colnums,
+                                const InVector    &v)
     {
       typename InVector::value_type norm_sqr = 0.;
 
@@ -960,11 +960,11 @@ namespace internal
     typename InVector::value_type
     matrix_scalar_product_on_subrange(const size_type    begin_row,
                                       const size_type    end_row,
-                                      const number *     values,
+                                      const number      *values,
                                       const std::size_t *rowstart,
-                                      const size_type *  colnums,
-                                      const InVector &   u,
-                                      const InVector &   v)
+                                      const size_type   *colnums,
+                                      const InVector    &u,
+                                      const InVector    &v)
     {
       typename InVector::value_type norm_sqr = 0.;
 
@@ -1016,9 +1016,9 @@ SparseMatrix<number>::matrix_scalar_product(const Vector<somenumber> &u,
 template <typename number>
 template <typename numberB, typename numberC>
 void
-SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
+SparseMatrix<number>::mmult(SparseMatrix<numberC>       &C,
                             const SparseMatrix<numberB> &B,
-                            const Vector<number> &       V,
+                            const Vector<number>        &V,
                             const bool rebuild_sparsity_C) const
 {
   const bool use_vector = V.size() == n() ? true : false;
@@ -1076,7 +1076,7 @@ SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
   // elements in that row in B.
   for (size_type i = 0; i < C.m(); ++i)
     {
-      const size_type *      rows     = &sp_A.colnums[sp_A.rowstart[i]];
+      const size_type       *rows     = &sp_A.colnums[sp_A.rowstart[i]];
       const size_type *const end_rows = &sp_A.colnums[sp_A.rowstart[i + 1]];
       for (; rows != end_rows; ++rows)
         {
@@ -1099,7 +1099,7 @@ SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
           // now the innermost loop that goes over all the elements in row
           // 'col' of matrix B. Cache the elements, and then write them into C
           // at once
-          numberC *      new_ptr = new_entries.data();
+          numberC       *new_ptr = new_entries.data();
           const numberB *B_val_ptr =
             &B.val[new_cols - &sp_B.colnums[sp_B.rowstart[0]]];
           const numberB *const end_cols = &B.val[sp_B.rowstart[col + 1]];
@@ -1122,9 +1122,9 @@ SparseMatrix<number>::mmult(SparseMatrix<numberC> &      C,
 template <typename number>
 template <typename numberB, typename numberC>
 void
-SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
+SparseMatrix<number>::Tmmult(SparseMatrix<numberC>       &C,
                              const SparseMatrix<numberB> &B,
-                             const Vector<number> &       V,
+                             const Vector<number>        &V,
                              const bool rebuild_sparsity_C) const
 {
   const bool use_vector = V.size() == m() ? true : false;
@@ -1182,9 +1182,9 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
   // elements in that row in B.
   for (size_type i = 0; i < m(); ++i)
     {
-      const size_type *      rows     = &sp_A.colnums[sp_A.rowstart[i]];
+      const size_type       *rows     = &sp_A.colnums[sp_A.rowstart[i]];
       const size_type *const end_rows = &sp_A.colnums[sp_A.rowstart[i + 1]];
-      const size_type *      new_cols = &sp_B.colnums[sp_B.rowstart[i]];
+      const size_type       *new_cols = &sp_B.colnums[sp_B.rowstart[i]];
       if (sp_B.n_rows() == sp_B.n_cols())
         ++new_cols;
 
@@ -1207,7 +1207,7 @@ SparseMatrix<number>::Tmmult(SparseMatrix<numberC> &      C,
           // now the innermost loop that goes over all the elements in row
           // 'col' of matrix B. Cache the elements, and then write them into C
           // at once
-          numberC *      new_ptr = new_entries.data();
+          numberC       *new_ptr = new_entries.data();
           const numberB *B_val_ptr =
             &B.val[new_cols - &sp_B.colnums[sp_B.rowstart[0]]];
           for (; B_val_ptr != end_cols; ++B_val_ptr)
@@ -1304,12 +1304,12 @@ namespace internal
     typename OutVector::value_type
     residual_sqr_on_subrange(const size_type    begin_row,
                              const size_type    end_row,
-                             const number *     values,
+                             const number      *values,
                              const std::size_t *rowstart,
-                             const size_type *  colnums,
-                             const InVector &   u,
-                             const InVector &   b,
-                             OutVector &        dst)
+                             const size_type   *colnums,
+                             const InVector    &u,
+                             const InVector    &b,
+                             OutVector         &dst)
     {
       typename OutVector::value_type norm_sqr = 0.;
 
@@ -1332,7 +1332,7 @@ namespace internal
 template <typename number>
 template <typename somenumber>
 somenumber
-SparseMatrix<number>::residual(Vector<somenumber> &      dst,
+SparseMatrix<number>::residual(Vector<somenumber>       &dst,
                                const Vector<somenumber> &u,
                                const Vector<somenumber> &b) const
 {
@@ -1400,7 +1400,7 @@ namespace internal
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
+SparseMatrix<number>::precondition_Jacobi(Vector<somenumber>       &dst,
                                           const Vector<somenumber> &src,
                                           const number              omega) const
 {
@@ -1413,8 +1413,8 @@ SparseMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
   internal::SparseMatrixImplementation::AssertNoZerosOnDiagonal(*this);
 
   const size_type    n            = src.size();
-  somenumber *       dst_ptr      = dst.begin();
-  const somenumber * src_ptr      = src.begin();
+  somenumber        *dst_ptr      = dst.begin();
+  const somenumber  *src_ptr      = src.begin();
   const std::size_t *rowstart_ptr = cols->rowstart.get();
 
   // optimize the following loop for
@@ -1442,8 +1442,8 @@ template <typename number>
 template <typename somenumber>
 void
 SparseMatrix<number>::precondition_SSOR(
-  Vector<somenumber> &            dst,
-  const Vector<somenumber> &      src,
+  Vector<somenumber>             &dst,
+  const Vector<somenumber>       &src,
   const number                    omega,
   const std::vector<std::size_t> &pos_right_of_diagonal) const
 {
@@ -1461,7 +1461,7 @@ SparseMatrix<number>::precondition_SSOR(
 
   const size_type    n            = src.size();
   const std::size_t *rowstart_ptr = cols->rowstart.get();
-  somenumber *       dst_ptr      = &dst(0);
+  somenumber        *dst_ptr      = &dst(0);
 
   // case when we have stored the position
   // just right of the diagonal (then we
@@ -1579,7 +1579,7 @@ SparseMatrix<number>::precondition_SSOR(
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_SOR(Vector<somenumber> &      dst,
+SparseMatrix<number>::precondition_SOR(Vector<somenumber>       &dst,
                                        const Vector<somenumber> &src,
                                        const number              omega) const
 {
@@ -1594,7 +1594,7 @@ SparseMatrix<number>::precondition_SOR(Vector<somenumber> &      dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::precondition_TSOR(Vector<somenumber> &      dst,
+SparseMatrix<number>::precondition_TSOR(Vector<somenumber>       &dst,
                                         const Vector<somenumber> &src,
                                         const number              omega) const
 {
@@ -1666,7 +1666,7 @@ SparseMatrix<number>::TSOR(Vector<somenumber> &dst, const number omega) const
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::PSOR(Vector<somenumber> &          dst,
+SparseMatrix<number>::PSOR(Vector<somenumber>           &dst,
                            const std::vector<size_type> &permutation,
                            const std::vector<size_type> &inverse_permutation,
                            const number                  omega) const
@@ -1705,7 +1705,7 @@ SparseMatrix<number>::PSOR(Vector<somenumber> &          dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::TPSOR(Vector<somenumber> &          dst,
+SparseMatrix<number>::TPSOR(Vector<somenumber>           &dst,
                             const std::vector<size_type> &permutation,
                             const std::vector<size_type> &inverse_permutation,
                             const number                  omega) const
@@ -1743,7 +1743,7 @@ SparseMatrix<number>::TPSOR(Vector<somenumber> &          dst,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::Jacobi_step(Vector<somenumber> &      v,
+SparseMatrix<number>::Jacobi_step(Vector<somenumber>       &v,
                                   const Vector<somenumber> &b,
                                   const number              omega) const
 {
@@ -1774,7 +1774,7 @@ SparseMatrix<number>::Jacobi_step(Vector<somenumber> &      v,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::SOR_step(Vector<somenumber> &      v,
+SparseMatrix<number>::SOR_step(Vector<somenumber>       &v,
                                const Vector<somenumber> &b,
                                const number              omega) const
 {
@@ -1802,7 +1802,7 @@ SparseMatrix<number>::SOR_step(Vector<somenumber> &      v,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::TSOR_step(Vector<somenumber> &      v,
+SparseMatrix<number>::TSOR_step(Vector<somenumber>       &v,
                                 const Vector<somenumber> &b,
                                 const number              omega) const
 {
@@ -1830,7 +1830,7 @@ SparseMatrix<number>::TSOR_step(Vector<somenumber> &      v,
 template <typename number>
 template <typename somenumber>
 void
-SparseMatrix<number>::SSOR_step(Vector<somenumber> &      v,
+SparseMatrix<number>::SSOR_step(Vector<somenumber>       &v,
                                 const Vector<somenumber> &b,
                                 const number              omega) const
 {
@@ -1907,11 +1907,11 @@ SparseMatrix<number>::get_sparsity_pattern() const
 
 template <typename number>
 void
-SparseMatrix<number>::print_formatted(std::ostream &     out,
+SparseMatrix<number>::print_formatted(std::ostream      &out,
                                       const unsigned int precision,
                                       const bool         scientific,
                                       const unsigned int width_,
-                                      const char *       zero_string,
+                                      const char        *zero_string,
                                       const double       denominator) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
@@ -1980,7 +1980,7 @@ SparseMatrix<number>::print_pattern(std::ostream &out,
 
 template <typename number>
 void
-SparseMatrix<number>::print_as_numpy_arrays(std::ostream &     out,
+SparseMatrix<number>::print_as_numpy_arrays(std::ostream      &out,
                                             const unsigned int precision) const
 {
   AssertThrow(out.fail() == false, ExcIO());
@@ -2077,7 +2077,8 @@ SparseMatrix<number>::block_read(std::istream &in)
 
 
 template <typename number>
-void SparseMatrix<number>::compress(VectorOperation::values)
+void
+SparseMatrix<number>::compress(VectorOperation::values)
 {}
 
 

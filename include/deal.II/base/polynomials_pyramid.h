@@ -49,8 +49,8 @@ public:
    * @note Currently, only the vectors @p values and @p grads are filled.
    */
   void
-  evaluate(const Point<dim> &           unit_point,
-           std::vector<double> &        values,
+  evaluate(const Point<dim>            &unit_point,
+           std::vector<double>         &values,
            std::vector<Tensor<1, dim>> &grads,
            std::vector<Tensor<2, dim>> &grad_grads,
            std::vector<Tensor<3, dim>> &third_derivatives,
@@ -70,11 +70,11 @@ public:
 
   Tensor<1, dim>
   compute_1st_derivative(const unsigned int i,
-                         const Point<dim> & p) const override;
+                         const Point<dim>  &p) const override;
 
   Tensor<2, dim>
   compute_2nd_derivative(const unsigned int i,
-                         const Point<dim> & p) const override;
+                         const Point<dim>  &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
@@ -83,7 +83,7 @@ public:
    */
   Tensor<3, dim>
   compute_3rd_derivative(const unsigned int i,
-                         const Point<dim> & p) const override;
+                         const Point<dim>  &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
@@ -92,7 +92,7 @@ public:
    */
   Tensor<4, dim>
   compute_4th_derivative(const unsigned int i,
-                         const Point<dim> & p) const override;
+                         const Point<dim>  &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_grad()
@@ -124,7 +124,7 @@ template <int order>
 Tensor<order, dim>
 ScalarLagrangePolynomialPyramid<dim>::compute_derivative(
   const unsigned int i,
-  const Point<dim> & p) const
+  const Point<dim>  &p) const
 {
   Tensor<order, dim> der;
 

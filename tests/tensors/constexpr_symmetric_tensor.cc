@@ -117,8 +117,8 @@ main()
     DEAL_II_CONSTEXPR const SymmetricTensor<2, 3> a = symmetrize(dummy_a);
     DEAL_II_CONSTEXPR const auto                  inverted = invert(a);
     constexpr double        ref_init[3][3]                 = {{0., -2., 2.},
-                                       {-2., 5., -2.},
-                                       {2., -2., 0.}};
+                                                              {-2., 5., -2.},
+                                                              {2., -2., 0.}};
     constexpr Tensor<2, 3>  dummy_ref{ref_init};
     DEAL_II_CONSTEXPR const SymmetricTensor<2, 3> ref = symmetrize(dummy_ref);
     Assert(inverted == ref, ExcInternalError());

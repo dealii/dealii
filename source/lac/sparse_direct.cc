@@ -571,7 +571,7 @@ SparseDirectUMFPACK::solve(BlockVector<std::complex<double>> &rhs_and_solution,
 
 template <class Matrix>
 void
-SparseDirectUMFPACK::solve(const Matrix &  matrix,
+SparseDirectUMFPACK::solve(const Matrix   &matrix,
                            Vector<double> &rhs_and_solution,
                            const bool      transpose /*=false*/)
 {
@@ -583,7 +583,7 @@ SparseDirectUMFPACK::solve(const Matrix &  matrix,
 
 template <class Matrix>
 void
-SparseDirectUMFPACK::solve(const Matrix &                matrix,
+SparseDirectUMFPACK::solve(const Matrix                 &matrix,
                            Vector<std::complex<double>> &rhs_and_solution,
                            const bool                    transpose /*=false*/)
 {
@@ -607,7 +607,7 @@ SparseDirectUMFPACK::solve(const Matrix &                matrix,
 
 template <class Matrix>
 void
-SparseDirectUMFPACK::solve(const Matrix &       matrix,
+SparseDirectUMFPACK::solve(const Matrix        &matrix,
                            BlockVector<double> &rhs_and_solution,
                            const bool           transpose /*=false*/)
 {
@@ -619,7 +619,7 @@ SparseDirectUMFPACK::solve(const Matrix &       matrix,
 
 template <class Matrix>
 void
-SparseDirectUMFPACK::solve(const Matrix &                     matrix,
+SparseDirectUMFPACK::solve(const Matrix                      &matrix,
                            BlockVector<std::complex<double>> &rhs_and_solution,
                            const bool transpose /*=false*/)
 {
@@ -802,7 +802,7 @@ SparseDirectUMFPACK::vmult(Vector<double> &dst, const Vector<double> &src) const
 
 
 void
-SparseDirectUMFPACK::vmult(BlockVector<double> &      dst,
+SparseDirectUMFPACK::vmult(BlockVector<double>       &dst,
                            const BlockVector<double> &src) const
 {
   dst = src;
@@ -811,7 +811,7 @@ SparseDirectUMFPACK::vmult(BlockVector<double> &      dst,
 
 
 void
-SparseDirectUMFPACK::Tvmult(Vector<double> &      dst,
+SparseDirectUMFPACK::Tvmult(Vector<double>       &dst,
                             const Vector<double> &src) const
 {
   dst = src;
@@ -821,7 +821,7 @@ SparseDirectUMFPACK::Tvmult(Vector<double> &      dst,
 
 
 void
-SparseDirectUMFPACK::Tvmult(BlockVector<double> &      dst,
+SparseDirectUMFPACK::Tvmult(BlockVector<double>       &dst,
                             const BlockVector<double> &src) const
 {
   dst = src;

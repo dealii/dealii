@@ -548,7 +548,7 @@ public:
    * not provide for nonzero entries on the entire diagonal.
    */
   ChunkSparseMatrix(const ChunkSparsityPattern &sparsity,
-                    const IdentityMatrix &      id);
+                    const IdentityMatrix       &id);
 
   /**
    * Destructor. Free all memory, but do not release the memory of the
@@ -709,7 +709,7 @@ public:
   add(const size_type  row,
       const size_type  n_cols,
       const size_type *col_indices,
-      const number2 *  values,
+      const number2   *values,
       const bool       elide_zero_values      = true,
       const bool       col_indices_are_sorted = false);
 
@@ -866,9 +866,9 @@ public:
   void
   extract_row_copy(const size_type row,
                    const size_type array_length,
-                   size_type &     row_length,
-                   size_type *     column_indices,
-                   number *        values) const;
+                   size_type      &row_length,
+                   size_type      *column_indices,
+                   number         *values) const;
 
   /** @} */
   /**
@@ -984,7 +984,7 @@ public:
    */
   template <typename somenumber>
   somenumber
-  residual(Vector<somenumber> &      dst,
+  residual(Vector<somenumber>       &dst,
            const Vector<somenumber> &x,
            const Vector<somenumber> &b) const;
 
@@ -1033,7 +1033,7 @@ public:
    */
   template <typename somenumber>
   void
-  precondition_Jacobi(Vector<somenumber> &      dst,
+  precondition_Jacobi(Vector<somenumber>       &dst,
                       const Vector<somenumber> &src,
                       const number              omega = 1.) const;
 
@@ -1042,7 +1042,7 @@ public:
    */
   template <typename somenumber>
   void
-  precondition_SSOR(Vector<somenumber> &      dst,
+  precondition_SSOR(Vector<somenumber>       &dst,
                     const Vector<somenumber> &src,
                     const number              om = 1.) const;
 
@@ -1051,7 +1051,7 @@ public:
    */
   template <typename somenumber>
   void
-  precondition_SOR(Vector<somenumber> &      dst,
+  precondition_SOR(Vector<somenumber>       &dst,
                    const Vector<somenumber> &src,
                    const number              om = 1.) const;
 
@@ -1060,7 +1060,7 @@ public:
    */
   template <typename somenumber>
   void
-  precondition_TSOR(Vector<somenumber> &      dst,
+  precondition_TSOR(Vector<somenumber>       &dst,
                     const Vector<somenumber> &src,
                     const number              om = 1.) const;
 
@@ -1101,7 +1101,7 @@ public:
    */
   template <typename somenumber>
   void
-  PSOR(Vector<somenumber> &          v,
+  PSOR(Vector<somenumber>           &v,
        const std::vector<size_type> &permutation,
        const std::vector<size_type> &inverse_permutation,
        const number                  om = 1.) const;
@@ -1118,7 +1118,7 @@ public:
    */
   template <typename somenumber>
   void
-  TPSOR(Vector<somenumber> &          v,
+  TPSOR(Vector<somenumber>           &v,
         const std::vector<size_type> &permutation,
         const std::vector<size_type> &inverse_permutation,
         const number                  om = 1.) const;
@@ -1129,7 +1129,7 @@ public:
    */
   template <typename somenumber>
   void
-  SOR_step(Vector<somenumber> &      v,
+  SOR_step(Vector<somenumber>       &v,
            const Vector<somenumber> &b,
            const number              om = 1.) const;
 
@@ -1139,7 +1139,7 @@ public:
    */
   template <typename somenumber>
   void
-  TSOR_step(Vector<somenumber> &      v,
+  TSOR_step(Vector<somenumber>       &v,
             const Vector<somenumber> &b,
             const number              om = 1.) const;
 
@@ -1149,7 +1149,7 @@ public:
    */
   template <typename somenumber>
   void
-  SSOR_step(Vector<somenumber> &      v,
+  SSOR_step(Vector<somenumber>       &v,
             const Vector<somenumber> &b,
             const number              om = 1.) const;
   /** @} */
@@ -1305,11 +1305,11 @@ public:
    * applied to a large matrix!
    */
   void
-  print_formatted(std::ostream &     out,
+  print_formatted(std::ostream      &out,
                   const unsigned int precision   = 3,
                   const bool         scientific  = true,
                   const unsigned int width       = 0,
-                  const char *       zero_string = " ",
+                  const char        *zero_string = " ",
                   const double       denominator = 1.) const;
 
   /**
@@ -1545,7 +1545,7 @@ inline void
 ChunkSparseMatrix<number>::add(const size_type  row,
                                const size_type  n_cols,
                                const size_type *col_indices,
-                               const number2 *  values,
+                               const number2   *values,
                                const bool /*elide_zero_values*/,
                                const bool /*col_indices_are_sorted*/)
 {
@@ -1569,7 +1569,7 @@ ChunkSparseMatrix<number>::operator*=(const number factor)
   // the padding elements in chunks that overlap the boundaries of the actual
   // matrix -- but since multiplication with a number does not violate the
   // invariant of keeping these elements at zero nothing can happen
-  number *            val_ptr = val.get();
+  number             *val_ptr = val.get();
   const number *const end_ptr =
     val.get() +
     cols->sparsity_pattern.n_nonzero_elements() * chunk_size * chunk_size;
@@ -1597,7 +1597,7 @@ ChunkSparseMatrix<number>::operator/=(const number factor)
   // the padding elements in chunks that overlap the boundaries of the actual
   // matrix -- but since multiplication with a number does not violate the
   // invariant of keeping these elements at zero nothing can happen
-  number *            val_ptr = val.get();
+  number             *val_ptr = val.get();
   const number *const end_ptr =
     val.get() +
     cols->sparsity_pattern.n_nonzero_elements() * chunk_size * chunk_size;
@@ -1687,7 +1687,7 @@ ChunkSparseMatrix<number>::copy_from(const ForwardIterator begin,
 namespace ChunkSparseMatrixIterators
 {
   template <typename number>
-  inline Accessor<number, true>::Accessor(const MatrixType * matrix,
+  inline Accessor<number, true>::Accessor(const MatrixType  *matrix,
                                           const unsigned int row)
     : ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(),
                                               row)
@@ -1824,7 +1824,7 @@ namespace ChunkSparseMatrixIterators
 
 
   template <typename number>
-  inline Accessor<number, false>::Accessor(MatrixType *       matrix,
+  inline Accessor<number, false>::Accessor(MatrixType        *matrix,
                                            const unsigned int row)
     : ChunkSparsityPatternIterators::Accessor(&matrix->get_sparsity_pattern(),
                                               row)
@@ -1860,7 +1860,7 @@ namespace ChunkSparseMatrixIterators
 
 
   template <typename number, bool Constness>
-  inline Iterator<number, Constness>::Iterator(MatrixType *       matrix,
+  inline Iterator<number, Constness>::Iterator(MatrixType        *matrix,
                                                const unsigned int row)
     : accessor(matrix, row)
   {}

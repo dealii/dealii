@@ -49,7 +49,7 @@ CellId::CellId(const types::coarse_cell_id      coarse_cell_id,
 
 CellId::CellId(const types::coarse_cell_id coarse_cell_id,
                const unsigned int          n_child_indices,
-               const std::uint8_t *        id)
+               const std::uint8_t         *id)
   : coarse_cell_id(coarse_cell_id)
   , n_child_indices(n_child_indices)
 {

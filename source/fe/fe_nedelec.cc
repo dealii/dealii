@@ -39,7 +39,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-//#define DEBUG_NEDELEC
+// #define DEBUG_NEDELEC
 
 namespace internal
 {
@@ -2483,7 +2483,7 @@ template <int dim>
 void
 FE_Nedelec<dim>::get_face_interpolation_matrix(
   const FiniteElement<dim> &source,
-  FullMatrix<double> &      interpolation_matrix,
+  FullMatrix<double>       &interpolation_matrix,
   const unsigned int        face_no) const
 {
   (void)face_no;
@@ -2591,7 +2591,7 @@ void
 FE_Nedelec<dim>::get_subface_interpolation_matrix(
   const FiniteElement<dim> &source,
   const unsigned int        subface,
-  FullMatrix<double> &      interpolation_matrix,
+  FullMatrix<double>       &interpolation_matrix,
   const unsigned int        face_no) const
 {
   // this is only implemented, if the
@@ -3147,7 +3147,7 @@ template <int dim>
 void
 FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
-  std::vector<double> &              nodal_values) const
+  std::vector<double>               &nodal_values) const
 {
   // TODO: the implementation makes the assumption that all faces have the
   // same number of dofs

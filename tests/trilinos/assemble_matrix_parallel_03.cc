@@ -125,9 +125,9 @@ private:
   void
   local_assemble(
     const FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
-      &                           cell,
+                                 &cell,
     Assembly::Scratch::Data<dim> &scratch,
-    Assembly::Copy::Data &        data);
+    Assembly::Copy::Data         &data);
   void
   copy_local_to_global(const Assembly::Copy::Data &data);
 
@@ -302,7 +302,7 @@ void
 LaplaceProblem<dim>::local_assemble(
   const FilteredIterator<typename DoFHandler<dim>::active_cell_iterator> &cell,
   Assembly::Scratch::Data<dim> &scratch,
-  Assembly::Copy::Data &        data)
+  Assembly::Copy::Data         &data)
 {
   const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
 

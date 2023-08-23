@@ -239,12 +239,12 @@ public:
 
   virtual void
   prolongate(const unsigned int    to_level,
-             Vector<number> &      dst,
+             Vector<number>       &dst,
              const Vector<number> &src) const override;
 
   virtual void
   restrict_and_add(const unsigned int    from_level,
-                   Vector<number> &      dst,
+                   Vector<number>       &dst,
                    const Vector<number> &src) const override;
 
   /**
@@ -256,8 +256,8 @@ public:
   template <int dim, typename number2, int spacedim>
   void
   copy_to_mg(const DoFHandler<dim, spacedim> &mg_dof,
-             MGLevelObject<Vector<number>> &  dst,
-             const Vector<number2> &          src) const;
+             MGLevelObject<Vector<number>>   &dst,
+             const Vector<number2>           &src) const;
 
   /**
    * Transfer from multilevel vector to normal vector.
@@ -267,8 +267,8 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg(const DoFHandler<dim, spacedim> &    mg_dof,
-               Vector<number2> &                    dst,
+  copy_from_mg(const DoFHandler<dim, spacedim>     &mg_dof,
+               Vector<number2>                     &dst,
                const MGLevelObject<Vector<number>> &src) const;
 
   /**
@@ -278,8 +278,8 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg_add(const DoFHandler<dim, spacedim> &    mg_dof,
-                   Vector<number2> &                    dst,
+  copy_from_mg_add(const DoFHandler<dim, spacedim>     &mg_dof,
+                   Vector<number2>                     &dst,
                    const MGLevelObject<Vector<number>> &src) const;
 
   /**
@@ -291,8 +291,8 @@ public:
   template <int dim, typename number2, int spacedim>
   void
   copy_to_mg(const DoFHandler<dim, spacedim> &mg_dof,
-             MGLevelObject<Vector<number>> &  dst,
-             const BlockVector<number2> &     src) const;
+             MGLevelObject<Vector<number>>   &dst,
+             const BlockVector<number2>      &src) const;
 
   /**
    * Transfer from multilevel vector to normal vector.
@@ -302,8 +302,8 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg(const DoFHandler<dim, spacedim> &    mg_dof,
-               BlockVector<number2> &               dst,
+  copy_from_mg(const DoFHandler<dim, spacedim>     &mg_dof,
+               BlockVector<number2>                &dst,
                const MGLevelObject<Vector<number>> &src) const;
 
   /**
@@ -313,8 +313,8 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg_add(const DoFHandler<dim, spacedim> &    mg_dof,
-                   BlockVector<number2> &               dst,
+  copy_from_mg_add(const DoFHandler<dim, spacedim>     &mg_dof,
+                   BlockVector<number2>                &dst,
                    const MGLevelObject<Vector<number>> &src) const;
 
   /**
@@ -329,8 +329,8 @@ private:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  do_copy_from_mg(const DoFHandler<dim, spacedim> &    mg_dof,
-                  OutVector &                          dst,
+  do_copy_from_mg(const DoFHandler<dim, spacedim>     &mg_dof,
+                  OutVector                           &dst,
                   const MGLevelObject<Vector<number>> &src) const;
 
   /**
@@ -338,8 +338,8 @@ private:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  do_copy_from_mg_add(const DoFHandler<dim, spacedim> &    mg_dof,
-                      OutVector &                          dst,
+  do_copy_from_mg_add(const DoFHandler<dim, spacedim>     &mg_dof,
+                      OutVector                           &dst,
                       const MGLevelObject<Vector<number>> &src) const;
 
   /**
@@ -348,8 +348,8 @@ private:
   template <int dim, class InVector, int spacedim>
   void
   do_copy_to_mg(const DoFHandler<dim, spacedim> &mg_dof,
-                MGLevelObject<Vector<number>> &  dst,
-                const InVector &                 src) const;
+                MGLevelObject<Vector<number>>   &dst,
+                const InVector                  &src) const;
   /**
    * Selected component of global vector.
    */

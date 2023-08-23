@@ -93,8 +93,8 @@ test()
 
 
   auto cell_integrator = [&H1_norm, &solution, &scalar](const Iterator &cell,
-                                                        ScratchData &   s,
-                                                        CopyData &      c) {
+                                                        ScratchData    &s,
+                                                        CopyData       &c) {
     const auto &fev = s.reinit(cell);
     const auto &JxW = s.get_JxW_values();
 

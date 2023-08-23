@@ -42,7 +42,7 @@
  * The correct constrains are written in a log to make a unit test.
  */
 
-//#define FEQH_DEBUG_OUTPUT
+// #define FEQH_DEBUG_OUTPUT
 
 
 template <int dim>

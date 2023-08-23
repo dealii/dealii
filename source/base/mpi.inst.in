@@ -67,25 +67,25 @@ for (S : MPI_SCALARS)
                          const MPI_Comm,
                          const ArrayView<S> &);
 
-    template S reduce(const S &                                     vec,
+    template S reduce(const S                                      &vec,
                       const MPI_Comm                                comm,
                       const std::function<S(const S &, const S &)> &process,
                       const unsigned int root_process);
 
     template std::vector<S> reduce(
-      const std::vector<S> &                                       vec,
+      const std::vector<S>                                        &vec,
       const MPI_Comm                                               comm,
       const std::function<std::vector<S>(const std::vector<S> &,
                                          const std::vector<S> &)> &process,
       const unsigned int root_process);
 
     template S all_reduce(
-      const S &                                     vec,
+      const S                                      &vec,
       const MPI_Comm                                comm,
       const std::function<S(const S &, const S &)> &process);
 
     template std::vector<S> all_reduce(
-      const std::vector<S> &                                       vec,
+      const std::vector<S>                                        &vec,
       const MPI_Comm                                               comm,
       const std::function<std::vector<S>(const std::vector<S> &,
                                          const std::vector<S> &)> &process);

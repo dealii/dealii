@@ -51,7 +51,7 @@ template <int dim,
 class MatrixFreeTest
 {
 public:
-  MatrixFreeTest(const DoFHandler<dim> &          dof_handler,
+  MatrixFreeTest(const DoFHandler<dim>           &dof_handler,
                  const AffineConstraints<double> &constraints)
     : dof_handler(dof_handler)
     , constraints(constraints)
@@ -89,7 +89,7 @@ public:
   };
 
 private:
-  const DoFHandler<dim> &          dof_handler;
+  const DoFHandler<dim>           &dof_handler;
   const AffineConstraints<double> &constraints;
 };
 
@@ -97,7 +97,7 @@ private:
 
 template <int dim, int fe_degree, typename number>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints,
         const unsigned int               parallel_option = 0)
 {

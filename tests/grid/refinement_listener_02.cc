@@ -27,7 +27,7 @@
 
 template <int dim, int spacedim>
 void
-pre_refinement_notification(const std::string &                 prefix,
+pre_refinement_notification(const std::string                  &prefix,
                             const Triangulation<dim, spacedim> &tria)
 {
   deallog << prefix << ' ' << "Pre-refinement: " << tria.n_active_cells()
@@ -37,7 +37,7 @@ pre_refinement_notification(const std::string &                 prefix,
 
 template <int dim, int spacedim>
 void
-post_refinement_notification(const std::string &                 prefix,
+post_refinement_notification(const std::string                  &prefix,
                              const Triangulation<dim, spacedim> &tria)
 {
   deallog << prefix << ' ' << "Post-refinement: " << tria.n_active_cells()
@@ -47,7 +47,7 @@ post_refinement_notification(const std::string &                 prefix,
 
 template <int dim, int spacedim>
 void
-copy_notification(const std::string &                 prefix,
+copy_notification(const std::string                  &prefix,
                   const Triangulation<dim, spacedim> &old_tria,
                   const Triangulation<dim, spacedim> &new_tria)
 {
@@ -58,7 +58,7 @@ copy_notification(const std::string &                 prefix,
 
 template <int dim, int spacedim>
 void
-create_notification(const std::string &                 prefix,
+create_notification(const std::string                  &prefix,
                     const Triangulation<dim, spacedim> &tria)
 {
   deallog << prefix << ' ' << "Create: " << tria.n_active_cells() << std::endl;

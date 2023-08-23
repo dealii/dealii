@@ -219,7 +219,7 @@ public:
    */
   template <typename block_number>
   void
-  vmult(BlockVector<block_number> &      dst,
+  vmult(BlockVector<block_number>       &dst,
         const BlockVector<block_number> &src) const;
 
   /**
@@ -228,7 +228,7 @@ public:
    */
   template <typename block_number, typename nonblock_number>
   void
-  vmult(BlockVector<block_number> &    dst,
+  vmult(BlockVector<block_number>     &dst,
         const Vector<nonblock_number> &src) const;
 
   /**
@@ -237,7 +237,7 @@ public:
    */
   template <typename block_number, typename nonblock_number>
   void
-  vmult(Vector<nonblock_number> &        dst,
+  vmult(Vector<nonblock_number>         &dst,
         const BlockVector<block_number> &src) const;
 
   /**
@@ -255,7 +255,7 @@ public:
    */
   template <typename block_number>
   void
-  Tvmult(BlockVector<block_number> &      dst,
+  Tvmult(BlockVector<block_number>       &dst,
          const BlockVector<block_number> &src) const;
 
   /**
@@ -264,7 +264,7 @@ public:
    */
   template <typename block_number, typename nonblock_number>
   void
-  Tvmult(BlockVector<block_number> &    dst,
+  Tvmult(BlockVector<block_number>     &dst,
          const Vector<nonblock_number> &src) const;
 
   /**
@@ -273,7 +273,7 @@ public:
    */
   template <typename block_number, typename nonblock_number>
   void
-  Tvmult(Vector<nonblock_number> &        dst,
+  Tvmult(Vector<nonblock_number>         &dst,
          const BlockVector<block_number> &src) const;
 
   /**
@@ -282,7 +282,7 @@ public:
    */
   template <typename nonblock_number>
   void
-  Tvmult(Vector<nonblock_number> &      dst,
+  Tvmult(Vector<nonblock_number>       &dst,
          const Vector<nonblock_number> &src) const;
   /** @} */
 
@@ -299,7 +299,7 @@ public:
    */
   template <typename BlockVectorType>
   void
-  precondition_Jacobi(BlockVectorType &      dst,
+  precondition_Jacobi(BlockVectorType       &dst,
                       const BlockVectorType &src,
                       const number           omega = 1.) const;
 
@@ -310,7 +310,7 @@ public:
    */
   template <typename number2>
   void
-  precondition_Jacobi(Vector<number2> &      dst,
+  precondition_Jacobi(Vector<number2>       &dst,
                       const Vector<number2> &src,
                       const number           omega = 1.) const;
   /** @} */
@@ -340,11 +340,11 @@ public:
    * applied to a large matrix!
    */
   void
-  print_formatted(std::ostream &     out,
+  print_formatted(std::ostream      &out,
                   const unsigned int precision   = 3,
                   const bool         scientific  = true,
                   const unsigned int width       = 0,
-                  const char *       zero_string = " ",
+                  const char        *zero_string = " ",
                   const double       denominator = 1.) const;
   /** @} */
   /**
@@ -393,7 +393,7 @@ BlockSparseMatrix<number>::operator=(const double d)
 template <typename number>
 template <typename block_number>
 inline void
-BlockSparseMatrix<number>::vmult(BlockVector<block_number> &      dst,
+BlockSparseMatrix<number>::vmult(BlockVector<block_number>       &dst,
                                  const BlockVector<block_number> &src) const
 {
   BaseClass::vmult_block_block(dst, src);
@@ -404,7 +404,7 @@ BlockSparseMatrix<number>::vmult(BlockVector<block_number> &      dst,
 template <typename number>
 template <typename block_number, typename nonblock_number>
 inline void
-BlockSparseMatrix<number>::vmult(BlockVector<block_number> &    dst,
+BlockSparseMatrix<number>::vmult(BlockVector<block_number>     &dst,
                                  const Vector<nonblock_number> &src) const
 {
   BaseClass::vmult_block_nonblock(dst, src);
@@ -415,7 +415,7 @@ BlockSparseMatrix<number>::vmult(BlockVector<block_number> &    dst,
 template <typename number>
 template <typename block_number, typename nonblock_number>
 inline void
-BlockSparseMatrix<number>::vmult(Vector<nonblock_number> &        dst,
+BlockSparseMatrix<number>::vmult(Vector<nonblock_number>         &dst,
                                  const BlockVector<block_number> &src) const
 {
   BaseClass::vmult_nonblock_block(dst, src);
@@ -426,7 +426,7 @@ BlockSparseMatrix<number>::vmult(Vector<nonblock_number> &        dst,
 template <typename number>
 template <typename nonblock_number>
 inline void
-BlockSparseMatrix<number>::vmult(Vector<nonblock_number> &      dst,
+BlockSparseMatrix<number>::vmult(Vector<nonblock_number>       &dst,
                                  const Vector<nonblock_number> &src) const
 {
   BaseClass::vmult_nonblock_nonblock(dst, src);
@@ -437,7 +437,7 @@ BlockSparseMatrix<number>::vmult(Vector<nonblock_number> &      dst,
 template <typename number>
 template <typename block_number>
 inline void
-BlockSparseMatrix<number>::Tvmult(BlockVector<block_number> &      dst,
+BlockSparseMatrix<number>::Tvmult(BlockVector<block_number>       &dst,
                                   const BlockVector<block_number> &src) const
 {
   BaseClass::Tvmult_block_block(dst, src);
@@ -448,7 +448,7 @@ BlockSparseMatrix<number>::Tvmult(BlockVector<block_number> &      dst,
 template <typename number>
 template <typename block_number, typename nonblock_number>
 inline void
-BlockSparseMatrix<number>::Tvmult(BlockVector<block_number> &    dst,
+BlockSparseMatrix<number>::Tvmult(BlockVector<block_number>     &dst,
                                   const Vector<nonblock_number> &src) const
 {
   BaseClass::Tvmult_block_nonblock(dst, src);
@@ -459,7 +459,7 @@ BlockSparseMatrix<number>::Tvmult(BlockVector<block_number> &    dst,
 template <typename number>
 template <typename block_number, typename nonblock_number>
 inline void
-BlockSparseMatrix<number>::Tvmult(Vector<nonblock_number> &        dst,
+BlockSparseMatrix<number>::Tvmult(Vector<nonblock_number>         &dst,
                                   const BlockVector<block_number> &src) const
 {
   BaseClass::Tvmult_nonblock_block(dst, src);
@@ -470,7 +470,7 @@ BlockSparseMatrix<number>::Tvmult(Vector<nonblock_number> &        dst,
 template <typename number>
 template <typename nonblock_number>
 inline void
-BlockSparseMatrix<number>::Tvmult(Vector<nonblock_number> &      dst,
+BlockSparseMatrix<number>::Tvmult(Vector<nonblock_number>       &dst,
                                   const Vector<nonblock_number> &src) const
 {
   BaseClass::Tvmult_nonblock_nonblock(dst, src);
@@ -481,7 +481,7 @@ BlockSparseMatrix<number>::Tvmult(Vector<nonblock_number> &      dst,
 template <typename number>
 template <typename BlockVectorType>
 inline void
-BlockSparseMatrix<number>::precondition_Jacobi(BlockVectorType &      dst,
+BlockSparseMatrix<number>::precondition_Jacobi(BlockVectorType       &dst,
                                                const BlockVectorType &src,
                                                const number omega) const
 {
@@ -502,7 +502,7 @@ BlockSparseMatrix<number>::precondition_Jacobi(BlockVectorType &      dst,
 template <typename number>
 template <typename number2>
 inline void
-BlockSparseMatrix<number>::precondition_Jacobi(Vector<number2> &      dst,
+BlockSparseMatrix<number>::precondition_Jacobi(Vector<number2>       &dst,
                                                const Vector<number2> &src,
                                                const number omega) const
 {

@@ -177,7 +177,7 @@ namespace hp
     template <int dim, int spacedim>
     void
     p_adaptivity_from_flags(const DoFHandler<dim, spacedim> &dof_handler,
-                            const std::vector<bool> &        p_flags);
+                            const std::vector<bool>         &p_flags);
 
     /**
      * Adapt which finite element to use on cells whose criteria meet a certain
@@ -208,7 +208,7 @@ namespace hp
     void
     p_adaptivity_from_absolute_threshold(
       const DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &           criteria,
+      const Vector<Number>            &criteria,
       const Number                     p_refine_threshold,
       const Number                     p_coarsen_threshold,
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
@@ -251,7 +251,7 @@ namespace hp
     void
     p_adaptivity_from_relative_threshold(
       const DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &           criteria,
+      const Vector<Number>            &criteria,
       const double                     p_refine_fraction  = 0.5,
       const double                     p_coarsen_fraction = 0.5,
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
@@ -295,7 +295,7 @@ namespace hp
     void
     p_adaptivity_fixed_number(
       const DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &           criteria,
+      const Vector<Number>            &criteria,
       const double                     p_refine_fraction  = 0.5,
       const double                     p_coarsen_fraction = 0.5,
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
@@ -358,8 +358,8 @@ namespace hp
     void
     p_adaptivity_from_reference(
       const DoFHandler<dim, spacedim> &dof_handler,
-      const Vector<Number> &           criteria,
-      const Vector<Number> &           references,
+      const Vector<Number>            &criteria,
+      const Vector<Number>            &references,
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
         &compare_refine,
       const ComparisonFunction<std_cxx20::type_identity_t<Number>>
@@ -596,8 +596,8 @@ namespace hp
     template <int dim, typename Number, int spacedim>
     void
     predict_error(const DoFHandler<dim, spacedim> &dof_handler,
-                  const Vector<Number> &           error_indicators,
-                  Vector<Number> &                 predicted_errors,
+                  const Vector<Number>            &error_indicators,
+                  Vector<Number>                  &predicted_errors,
                   const double                     gamma_p = std::sqrt(0.4),
                   const double                     gamma_h = 2.,
                   const double                     gamma_n = 1.);

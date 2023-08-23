@@ -162,7 +162,7 @@ private:
 
   void
   dummy_operation_1(const MatrixFree<dim, Number, VectorizedArrayType> &,
-                    VectorType &      dst,
+                    VectorType       &dst,
                     const VectorType &src,
                     const std::pair<unsigned int, unsigned int> &) const
   {

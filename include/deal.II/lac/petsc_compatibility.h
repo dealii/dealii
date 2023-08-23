@@ -69,7 +69,7 @@ namespace PETScWrappers
    * before 3.0.0 since the corresponding function did not take this argument.
    */
   inline void
-  set_matrix_option(Mat &           matrix,
+  set_matrix_option(Mat            &matrix,
                     const MatOption option_name,
                     const PetscBool option_value = PETSC_FALSE)
   {

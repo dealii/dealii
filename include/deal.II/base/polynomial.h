@@ -142,7 +142,7 @@ namespace Polynomials
     void
     value(const Number2      x,
           const unsigned int n_derivatives,
-          Number2 *          values) const;
+          Number2           *values) const;
 
     /**
      * Similar to the function above, but evaluate the polynomials on several
@@ -160,7 +160,7 @@ namespace Polynomials
     void
     values_of_array(const std::array<Number2, n_entries> &points,
                     const unsigned int                    n_derivatives,
-                    std::array<Number2, n_entries> *      values) const;
+                    std::array<Number2, n_entries>       *values) const;
 
     /**
      * Degree of the polynomial. This is the degree reflected by the number of
@@ -846,7 +846,7 @@ namespace Polynomials
   inline void
   Polynomial<number>::value(const Number2      x,
                             const unsigned int n_derivatives,
-                            Number2 *          values) const
+                            Number2           *values) const
   {
     values_of_array(std::array<Number2, 1ul>{{x}},
                     n_derivatives,
@@ -861,7 +861,7 @@ namespace Polynomials
   Polynomial<number>::values_of_array(
     const std::array<Number2, n_entries> &x,
     const unsigned int                    n_derivatives,
-    std::array<Number2, n_entries> *      values) const
+    std::array<Number2, n_entries>       *values) const
   {
     // evaluate Lagrange polynomial and derivatives
     if (in_lagrange_product_form == true)

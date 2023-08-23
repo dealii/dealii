@@ -76,7 +76,7 @@ test(Utilities::CUDA::Handle &cuda_handle)
 
   LinearAlgebra::CUDAWrappers::Vector<double> solution_dev(size);
   const std::array<std::string, 3>            solver_names{
-    {"Cholesky", "LU_dense", "LU_host"}};
+               {"Cholesky", "LU_dense", "LU_host"}};
 
   for (auto solver_type : solver_names)
     {

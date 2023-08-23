@@ -87,7 +87,7 @@ MappingQCache<dim, spacedim>::preserves_vertex_locations() const
 template <int dim, int spacedim>
 void
 MappingQCache<dim, spacedim>::initialize(
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const Triangulation<dim, spacedim> &triangulation)
 {
   // FE and FEValues in the case they are needed
@@ -177,11 +177,11 @@ MappingQCache<dim, spacedim>::initialize(
 template <int dim, int spacedim>
 void
 MappingQCache<dim, spacedim>::initialize(
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const Triangulation<dim, spacedim> &tria,
   const std::function<Point<spacedim>(
     const typename Triangulation<dim, spacedim>::cell_iterator &,
-    const Point<spacedim> &)> &       transformation_function,
+    const Point<spacedim> &)>        &transformation_function,
   const bool                          function_describes_relative_displacement)
 {
   // FE and FEValues in the case they are needed
@@ -243,9 +243,9 @@ MappingQCache<dim, spacedim>::initialize(
 template <int dim, int spacedim>
 void
 MappingQCache<dim, spacedim>::initialize(
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const Triangulation<dim, spacedim> &tria,
-  const Function<spacedim> &          transformation_function,
+  const Function<spacedim>           &transformation_function,
   const bool                          function_describes_relative_displacement)
 {
   AssertDimension(transformation_function.n_components, spacedim);
@@ -288,9 +288,9 @@ template <int dim, int spacedim>
 template <typename VectorType>
 void
 MappingQCache<dim, spacedim>::initialize(
-  const Mapping<dim, spacedim> &   mapping,
+  const Mapping<dim, spacedim>    &mapping,
   const DoFHandler<dim, spacedim> &dof_handler,
-  const VectorType &               vector,
+  const VectorType                &vector,
   const bool                       vector_describes_relative_displacement)
 {
   AssertDimension(dof_handler.get_fe_collection().size(), 1);
@@ -484,7 +484,7 @@ template <int dim, int spacedim>
 template <typename VectorType>
 void
 MappingQCache<dim, spacedim>::initialize(
-  const Mapping<dim, spacedim> &   mapping,
+  const Mapping<dim, spacedim>    &mapping,
   const DoFHandler<dim, spacedim> &dof_handler,
   const MGLevelObject<VectorType> &vectors,
   const bool                       vector_describes_relative_displacement)

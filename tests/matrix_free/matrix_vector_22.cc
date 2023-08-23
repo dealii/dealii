@@ -51,10 +51,10 @@
 template <int dim, int fe_degree, typename Number>
 void
 helmholtz_operator(
-  const MatrixFree<dim, Number> &                                  data,
-  std::vector<LinearAlgebra::distributed::Vector<Number> *> &      dst,
+  const MatrixFree<dim, Number>                                   &data,
+  std::vector<LinearAlgebra::distributed::Vector<Number> *>       &dst,
   const std::vector<LinearAlgebra::distributed::Vector<Number> *> &src,
-  const std::pair<unsigned int, unsigned int> &                    cell_range)
+  const std::pair<unsigned int, unsigned int>                     &cell_range)
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 2, Number> fe_eval(data);
   const unsigned int n_q_points = fe_eval.n_q_points;
@@ -91,7 +91,7 @@ public:
 
   void
   vmult(
-    std::vector<LinearAlgebra::distributed::Vector<Number> *> &      dst,
+    std::vector<LinearAlgebra::distributed::Vector<Number> *>       &dst,
     const std::vector<LinearAlgebra::distributed::Vector<Number> *> &src) const
   {
     for (unsigned int i = 0; i < dst.size(); ++i)

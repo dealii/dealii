@@ -322,9 +322,9 @@ test(const bool filtered_compression)
         non_matching_fe_values.get_surface_fe_values();
 
 
-      auto test_fe_values = [&](const auto &         fe_values,
+      auto test_fe_values = [&](const auto          &fe_values,
                                 std::vector<double> &solution_values_out,
-                                Vector<double> &     dst) {
+                                Vector<double>      &dst) {
         if (fe_values)
           {
             std::vector<Tensor<1, dim>> solution_gradients(

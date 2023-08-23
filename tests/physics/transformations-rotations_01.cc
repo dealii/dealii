@@ -62,8 +62,8 @@ test_rotation_matrix_3d(const Tensor<1, 3> &axis, const double angle)
   const Tensor<1, 3> u        = axis / axis.norm(); // Ensure unit vector
   const Tensor<2, 3> u_dyad_u = outer_product(u, u);
   const double       u_skew_array[3][3] = {{0.0, -u[2], u[1]},
-                                     {u[2], 0.0, -u[0]},
-                                     {-u[1], u[0], 0.0}};
+                                           {u[2], 0.0, -u[0]},
+                                           {-u[1], u[0], 0.0}};
 
   const Tensor<2, 3> R_rodrigues =
     u_dyad_u +

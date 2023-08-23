@@ -42,9 +42,9 @@ namespace Functions
 
   template <int dim, typename RangeNumberType>
   SymbolicFunction<dim, RangeNumberType>::SymbolicFunction(
-    const std::vector<Differentiation::SD::Expression> &   functions,
+    const std::vector<Differentiation::SD::Expression>    &functions,
     const Tensor<1, dim, Differentiation::SD::Expression> &argument,
-    const Differentiation::SD::Expression &                time,
+    const Differentiation::SD::Expression                 &time,
     const Differentiation::SD::types::substitution_map &user_substitution_map)
     : Function<dim, RangeNumberType>(functions.size(), 0.0)
     , user_function(functions)
@@ -227,7 +227,7 @@ namespace Functions
   template <int dim, typename RangeNumberType>
   RangeNumberType
   SymbolicFunction<dim, RangeNumberType>::value(
-    const Point<dim> & p,
+    const Point<dim>  &p,
     const unsigned int component) const
   {
     update_values();
@@ -241,7 +241,7 @@ namespace Functions
   template <int dim, typename RangeNumberType>
   Tensor<1, dim, RangeNumberType>
   SymbolicFunction<dim, RangeNumberType>::gradient(
-    const Point<dim> & p,
+    const Point<dim>  &p,
     const unsigned int component) const
   {
     update_first_derivatives();
@@ -255,7 +255,7 @@ namespace Functions
   template <int dim, typename RangeNumberType>
   RangeNumberType
   SymbolicFunction<dim, RangeNumberType>::laplacian(
-    const Point<dim> & p,
+    const Point<dim>  &p,
     const unsigned int component) const
   {
     update_second_derivatives();
@@ -269,7 +269,7 @@ namespace Functions
   template <int dim, typename RangeNumberType>
   SymmetricTensor<2, dim, RangeNumberType>
   SymbolicFunction<dim, RangeNumberType>::hessian(
-    const Point<dim> & p,
+    const Point<dim>  &p,
     const unsigned int component) const
   {
     update_second_derivatives();

@@ -499,11 +499,11 @@ double matv[] = {
 
 
 void
-check(Epetra_FECrsMatrix &    mat,
+check(Epetra_FECrsMatrix     &mat,
       Teuchos::ParameterList &parameter_list,
-      Epetra_FEVector &       x1,
-      Epetra_FEVector &       x2,
-      Epetra_FEVector &       b)
+      Epetra_FEVector        &x1,
+      Epetra_FEVector        &x2,
+      Epetra_FEVector        &b)
 {
   int ierr;
   {

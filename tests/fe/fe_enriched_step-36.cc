@@ -85,8 +85,8 @@ class EnrichmentFunction : public Function<dim>
 {
 public:
   EnrichmentFunction(const Point<dim> &origin,
-                     const double &    Z,
-                     const double &    radius)
+                     const double     &Z,
+                     const double     &radius)
     : Function<dim>(1)
     , origin(origin)
     , Z(Z)

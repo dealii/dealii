@@ -50,8 +50,8 @@ using namespace dealii;
 
 template <int dim, typename Number>
 void
-do_test(const FiniteElement<dim> &   fe_fine,
-        const FiniteElement<dim> &   fe_coarse,
+do_test(const FiniteElement<dim>    &fe_fine,
+        const FiniteElement<dim>    &fe_coarse,
         const Function<dim, Number> &function)
 {
   // create coarse grid

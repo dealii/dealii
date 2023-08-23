@@ -129,8 +129,8 @@ namespace internal
             typename number>
   void
   set_dof_values(const DoFCellAccessor<dim, spacedim, lda> &cell,
-                 const Vector<number> &                     local_values,
-                 OutputVector &                             values,
+                 const Vector<number>                      &local_values,
+                 OutputVector                              &values,
                  const bool                                 perform_check)
   {
     (void)perform_check;
@@ -173,13 +173,13 @@ namespace internal
             typename number>
   void
   process_by_interpolation(
-    const DoFCellAccessor<dim, spacedim, lda> &      cell,
-    const Vector<number> &                           local_values,
-    OutputVector &                                   values,
+    const DoFCellAccessor<dim, spacedim, lda>       &cell,
+    const Vector<number>                            &local_values,
+    OutputVector                                    &values,
     const types::fe_index                            fe_index_,
     const std::function<void(const DoFCellAccessor<dim, spacedim, lda> &cell,
                              const Vector<number> &local_values,
-                             OutputVector &        values)> &processor)
+                             OutputVector         &values)> &processor)
   {
     const types::fe_index fe_index =
       (cell.get_dof_handler().has_hp_capabilities() == false &&
@@ -267,7 +267,7 @@ template <class OutputVector, typename number>
 void
 DoFCellAccessor<dim, spacedim, lda>::set_dof_values_by_interpolation(
   const Vector<number> &local_values,
-  OutputVector &        values,
+  OutputVector         &values,
   const types::fe_index fe_index_,
   const bool            perform_check) const
 {
@@ -277,8 +277,8 @@ DoFCellAccessor<dim, spacedim, lda>::set_dof_values_by_interpolation(
     values,
     fe_index_,
     [perform_check](const DoFCellAccessor<dim, spacedim, lda> &cell,
-                    const Vector<number> &                     local_values,
-                    OutputVector &                             values) {
+                    const Vector<number>                      &local_values,
+                    OutputVector                              &values) {
       internal::set_dof_values(cell, local_values, values, perform_check);
     });
 }
@@ -290,7 +290,7 @@ void
 DoFCellAccessor<dim, spacedim, lda>::
   distribute_local_to_global_by_interpolation(
     const Vector<number> &local_values,
-    OutputVector &        values,
+    OutputVector         &values,
     const types::fe_index fe_index_) const
 {
   internal::process_by_interpolation<dim, spacedim, lda, OutputVector, number>(
@@ -299,8 +299,8 @@ DoFCellAccessor<dim, spacedim, lda>::
     values,
     fe_index_,
     [](const DoFCellAccessor<dim, spacedim, lda> &cell,
-       const Vector<number> &                     local_values,
-       OutputVector &                             values) {
+       const Vector<number>                      &local_values,
+       OutputVector                              &values) {
       std::vector<types::global_dof_index> dof_indices(
         cell.get_fe().n_dofs_per_cell());
       cell.get_dof_indices(dof_indices);

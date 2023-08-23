@@ -53,7 +53,7 @@ static int counter = 0;
 template <int dim, typename Fu>
 void
 do_test(const unsigned int degree,
-        const Fu &         fu,
+        const Fu          &fu,
         const bool         is_displacement_function)
 {
   Triangulation<dim> tria;

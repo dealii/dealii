@@ -130,7 +130,7 @@ namespace Utilities
     template <typename T>
     inline void
     copy_to_host(const ArrayView<const T, MemorySpace::CUDA> &in,
-                 ArrayView<T, MemorySpace::Host> &            out)
+                 ArrayView<T, MemorySpace::Host>             &out)
     {
       AssertDimension(in.size(), out.size());
       cudaError_t cuda_error_code = cudaMemcpy(out.data(),
@@ -146,7 +146,7 @@ namespace Utilities
     template <typename T>
     inline void
     copy_to_dev(const ArrayView<const T, MemorySpace::Host> &in,
-                ArrayView<T, MemorySpace::CUDA> &            out)
+                ArrayView<T, MemorySpace::CUDA>             &out)
     {
       AssertDimension(in.size(), out.size());
       cudaError_t cuda_error_code = cudaMemcpy(out.data(),

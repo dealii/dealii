@@ -124,7 +124,7 @@ public:
       template <typename SP>
       SparseMatrix(const IndexSet &local,
                    const IndexSet &,
-                   SP &           sp,
+                   SP            &sp,
                    const MPI_Comm comm = MPI_COMM_WORLD)
       {}
 

@@ -293,7 +293,7 @@ namespace parallel
        */
       virtual void
       create_triangulation(const std::vector<Point<spacedim>> &vertices,
-                           const std::vector<CellData<dim>> &  cells,
+                           const std::vector<CellData<dim>>   &cells,
                            const SubCellData &subcelldata) override;
 
       /**
@@ -426,7 +426,7 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     template <class Archive>
-    void Triangulation<dim, spacedim>::load(Archive &          ar,
+    void Triangulation<dim, spacedim>::load(Archive           &ar,
                                             const unsigned int version)
     {
       dealii::Triangulation<dim, spacedim>::load(ar, version);

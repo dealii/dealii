@@ -109,7 +109,7 @@ namespace TrilinosWrappers
 
 
     Vector::Vector(const IndexSet &parallel_partitioner,
-                   const Vector &  v,
+                   const Vector   &v,
                    const MPI_Comm  communicator)
       : Vector()
     {
@@ -543,7 +543,7 @@ namespace TrilinosWrappers
 
     void
     Vector::import_nonlocal_data_for_fe(const TrilinosWrappers::SparseMatrix &m,
-                                        const Vector &                        v)
+                                        const Vector                         &v)
     {
       Assert(m.trilinos_matrix().Filled() == true,
              ExcMessage("Matrix is not compressed. "
@@ -760,7 +760,7 @@ namespace TrilinosWrappers
     {
       // get a representation of the vector and
       // loop over all the elements
-      TrilinosScalar *      start_ptr = (*vector)[0];
+      TrilinosScalar       *start_ptr = (*vector)[0];
       const TrilinosScalar *ptr       = start_ptr,
                            *eptr = start_ptr + vector->Map().NumMyElements();
       unsigned int flag          = 0;
@@ -790,7 +790,7 @@ namespace TrilinosWrappers
     {
       // get a representation of the vector and
       // loop over all the elements
-      TrilinosScalar *      start_ptr = (*vector)[0];
+      TrilinosScalar       *start_ptr = (*vector)[0];
       const TrilinosScalar *ptr       = start_ptr,
                            *eptr = start_ptr + vector->Map().NumMyElements();
       unsigned int flag          = 0;
@@ -814,7 +814,7 @@ namespace TrilinosWrappers
 
 
     void
-    Vector::print(std::ostream &     out,
+    Vector::print(std::ostream      &out,
                   const unsigned int precision,
                   const bool         scientific,
                   const bool         across) const

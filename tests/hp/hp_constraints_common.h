@@ -64,7 +64,7 @@ test();
 
 template <int dim>
 void
-do_check(const Triangulation<dim> &   triangulation,
+do_check(const Triangulation<dim>    &triangulation,
          const hp::FECollection<dim> &fe)
 {
   DoFHandler<dim> dof_handler(triangulation);
@@ -325,7 +325,7 @@ test_with_2d_deformed_refined_mesh(const hp::FECollection<dim> &fe)
 // error. we do so with every pair of finite elements given
 template <int dim>
 void
-test_interpolation_base(const hp::FECollection<dim> &    fe,
+test_interpolation_base(const hp::FECollection<dim>     &fe,
                         const std::vector<unsigned int> &polynomial_degrees,
                         const bool                       do_refine)
 {
@@ -460,7 +460,7 @@ test_interpolation_base(const hp::FECollection<dim> &    fe,
 
 template <int dim>
 void
-test_interpolation(const hp::FECollection<dim> &    fe,
+test_interpolation(const hp::FECollection<dim>     &fe,
                    const std::vector<unsigned int> &polynomial_degrees)
 {
   test_interpolation_base(fe, polynomial_degrees, false);

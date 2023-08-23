@@ -154,7 +154,7 @@ namespace Step9
   class RightHandSide : public Function<dim>
   {
   public:
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
 
   private:
@@ -184,7 +184,7 @@ namespace Step9
   // one past the last (i.e. again the half-open interval so often used in the
   // C++ standard library):
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & p,
+  double RightHandSide<dim>::value(const Point<dim>  &p,
                                    const unsigned int component) const
   {
     (void)component;
@@ -203,14 +203,14 @@ namespace Step9
   class BoundaryValues : public Function<dim>
   {
   public:
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double BoundaryValues<dim>::value(const Point<dim> & p,
+  double BoundaryValues<dim>::value(const Point<dim>  &p,
                                     const unsigned int component) const
   {
     (void)component;
@@ -309,8 +309,8 @@ namespace Step9
     void assemble_system();
     void local_assemble_system(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      AssemblyScratchData &                                 scratch,
-      AssemblyCopyData &                                    copy_data);
+      AssemblyScratchData                                  &scratch,
+      AssemblyCopyData                                     &copy_data);
     void copy_local_to_global(const AssemblyCopyData &copy_data);
 
 
@@ -412,8 +412,8 @@ namespace Step9
   public:
     template <int dim>
     static void estimate(const DoFHandler<dim> &dof,
-                         const Vector<double> & solution,
-                         Vector<float> &        error_per_cell);
+                         const Vector<double>  &solution,
+                         Vector<float>         &error_per_cell);
 
     DeclException2(ExcInvalidVectorLength,
                    int,
@@ -427,8 +427,8 @@ namespace Step9
     struct EstimateScratchData
     {
       EstimateScratchData(const FiniteElement<dim> &fe,
-                          const Vector<double> &    solution,
-                          Vector<float> &           error_per_cell);
+                          const Vector<double>     &solution,
+                          Vector<float>            &error_per_cell);
       EstimateScratchData(const EstimateScratchData &data);
 
       FEValues<dim> fe_midpoint_value;
@@ -436,7 +436,7 @@ namespace Step9
         active_neighbors;
 
       const Vector<double> &solution;
-      Vector<float> &       error_per_cell;
+      Vector<float>        &error_per_cell;
 
       std::vector<double> cell_midpoint_value;
       std::vector<double> neighbor_midpoint_value;
@@ -449,7 +449,7 @@ namespace Step9
     static void
     estimate_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
                   EstimateScratchData<dim> &scratch_data,
-                  const EstimateCopyData &  copy_data);
+                  const EstimateCopyData   &copy_data);
   };
 
 
@@ -606,8 +606,8 @@ namespace Step9
   template <int dim>
   void AdvectionProblem<dim>::local_assemble_system(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    AssemblyScratchData &                                 scratch_data,
-    AssemblyCopyData &                                    copy_data)
+    AssemblyScratchData                                  &scratch_data,
+    AssemblyCopyData                                     &copy_data)
   {
     // We define some abbreviations to avoid unnecessarily long lines:
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
@@ -898,8 +898,8 @@ namespace Step9
   template <int dim>
   GradientEstimation::EstimateScratchData<dim>::EstimateScratchData(
     const FiniteElement<dim> &fe,
-    const Vector<double> &    solution,
-    Vector<float> &           error_per_cell)
+    const Vector<double>     &solution,
+    Vector<float>            &error_per_cell)
     : fe_midpoint_value(fe,
                         QMidpoint<dim>(),
                         update_values | update_quadrature_points)
@@ -943,8 +943,8 @@ namespace Step9
   // well worth the effort to check for such things.
   template <int dim>
   void GradientEstimation::estimate(const DoFHandler<dim> &dof_handler,
-                                    const Vector<double> & solution,
-                                    Vector<float> &        error_per_cell)
+                                    const Vector<double>  &solution,
+                                    Vector<float>         &error_per_cell)
   {
     Assert(
       error_per_cell.size() == dof_handler.get_triangulation().n_active_cells(),
@@ -1009,7 +1009,7 @@ namespace Step9
   template <int dim>
   void GradientEstimation::estimate_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    EstimateScratchData<dim> &                            scratch_data,
+    EstimateScratchData<dim>                             &scratch_data,
     const EstimateCopyData &)
   {
     // We need space for the tensor <code>Y</code>, which is the sum of

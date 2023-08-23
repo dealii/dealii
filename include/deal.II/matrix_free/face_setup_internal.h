@@ -93,9 +93,9 @@ namespace internal
        */
       void
       generate_faces(
-        const dealii::Triangulation<dim> &                        triangulation,
+        const dealii::Triangulation<dim>                         &triangulation,
         const std::vector<std::pair<unsigned int, unsigned int>> &cell_levels,
-        TaskInfo &                                                task_info);
+        TaskInfo                                                 &task_info);
 
       /**
        * Fills the information about the cell, the face number, and numbers
@@ -144,8 +144,8 @@ namespace internal
     void
     collect_faces_vectorization(
       const std::vector<FaceToCellTopology<1>> &faces_in,
-      const std::vector<bool> &                 hard_vectorization_boundary,
-      std::vector<unsigned int> &               face_partition_data,
+      const std::vector<bool>                  &hard_vectorization_boundary,
+      std::vector<unsigned int>                &face_partition_data,
       std::vector<FaceToCellTopology<vectorization_width>> &faces_out);
 
 
@@ -735,9 +735,9 @@ namespace internal
     template <int dim>
     void
     FaceSetup<dim>::generate_faces(
-      const dealii::Triangulation<dim> &                        triangulation,
+      const dealii::Triangulation<dim>                         &triangulation,
       const std::vector<std::pair<unsigned int, unsigned int>> &cell_levels,
-      TaskInfo &                                                task_info)
+      TaskInfo                                                 &task_info)
     {
       const bool is_mixed_mesh = triangulation.is_mixed_mesh();
 
@@ -1068,8 +1068,8 @@ namespace internal
      */
     inline bool
     compare_faces_for_vectorization(
-      const FaceToCellTopology<1> &    face1,
-      const FaceToCellTopology<1> &    face2,
+      const FaceToCellTopology<1>     &face1,
+      const FaceToCellTopology<1>     &face2,
       const std::vector<unsigned int> &active_fe_indices,
       const unsigned int               length)
     {
@@ -1185,10 +1185,10 @@ namespace internal
     void
     collect_faces_vectorization(
       const std::vector<FaceToCellTopology<1>> &faces_in,
-      const std::vector<bool> &                 hard_vectorization_boundary,
-      std::vector<unsigned int> &               face_partition_data,
+      const std::vector<bool>                  &hard_vectorization_boundary,
+      std::vector<unsigned int>                &face_partition_data,
       std::vector<FaceToCellTopology<vectorization_width>> &faces_out,
-      const std::vector<unsigned int> &                     active_fe_indices)
+      const std::vector<unsigned int>                      &active_fe_indices)
     {
       FaceToCellTopology<vectorization_width> face_batch;
       std::vector<std::vector<unsigned int>>  faces_type;

@@ -47,7 +47,7 @@
 
 template <int dim>
 inline void
-print_matrix(Triangulation<dim> &      tr,
+print_matrix(Triangulation<dim>       &tr,
              unsigned int              level,
              const FiniteElement<dim> &finel,
              const char * /*name*/)

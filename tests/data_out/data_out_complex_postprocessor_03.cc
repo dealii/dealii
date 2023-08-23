@@ -53,7 +53,7 @@ namespace DataPostprocessors
     virtual void
     evaluate_vector_field(
       const DataPostprocessorInputs::Vector<dim> &inputs,
-      std::vector<Vector<double>> &               computed_quantities) const;
+      std::vector<Vector<double>>                &computed_quantities) const;
   };
 
   template <int dim>
@@ -66,7 +66,7 @@ namespace DataPostprocessors
   void
   ComplexMagnitude<dim>::evaluate_vector_field(
     const DataPostprocessorInputs::Vector<dim> &inputs,
-    std::vector<Vector<double>> &               computed_quantities) const
+    std::vector<Vector<double>>                &computed_quantities) const
   {
     Assert(computed_quantities.size() == inputs.solution_values.size(),
            ExcDimensionMismatch(computed_quantities.size(),
@@ -96,7 +96,7 @@ namespace DataPostprocessors
     virtual void
     evaluate_vector_field(
       const DataPostprocessorInputs::Vector<dim> &inputs,
-      std::vector<Vector<double>> &               computed_quantities) const;
+      std::vector<Vector<double>>                &computed_quantities) const;
   };
 
   template <int dim>
@@ -109,7 +109,7 @@ namespace DataPostprocessors
   void
   ComplexPhase<dim>::evaluate_vector_field(
     const DataPostprocessorInputs::Vector<dim> &inputs,
-    std::vector<Vector<double>> &               computed_quantities) const
+    std::vector<Vector<double>>                &computed_quantities) const
   {
     Assert(computed_quantities.size() == inputs.solution_values.size(),
            ExcDimensionMismatch(computed_quantities.size(),

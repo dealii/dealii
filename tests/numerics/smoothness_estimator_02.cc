@@ -98,7 +98,7 @@ PolyFunction<dim>::value(const Point<dim> &point, const unsigned int) const
 
 template <typename CoefficientType>
 void
-prepare_symmetric_coefficients(Table<1, CoefficientType> &         coeff,
+prepare_symmetric_coefficients(Table<1, CoefficientType>          &coeff,
                                const std::vector<CoefficientType> &coeff_1d)
 {
   Assert(coeff.size(0) == coeff_1d.size(), ExcInternalError());
@@ -109,7 +109,7 @@ prepare_symmetric_coefficients(Table<1, CoefficientType> &         coeff,
 
 template <typename CoefficientType>
 void
-prepare_symmetric_coefficients(Table<2, CoefficientType> &         coeff,
+prepare_symmetric_coefficients(Table<2, CoefficientType>          &coeff,
                                const std::vector<CoefficientType> &coeff_1d)
 {
   for (unsigned int d = 0; d < 2; ++d)
@@ -122,7 +122,7 @@ prepare_symmetric_coefficients(Table<2, CoefficientType> &         coeff,
 
 template <typename CoefficientType>
 void
-prepare_symmetric_coefficients(Table<3, CoefficientType> &         coeff,
+prepare_symmetric_coefficients(Table<3, CoefficientType>          &coeff,
                                const std::vector<CoefficientType> &coeff_1d)
 {
   for (unsigned int d = 0; d < 3; ++d)

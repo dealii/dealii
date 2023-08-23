@@ -93,7 +93,7 @@ public:
    * If @p transpose is <code>true</code>, $R^Tx=y$ is solved instead.
    */
   void
-  solve(Vector<Number> &      x,
+  solve(Vector<Number>       &x,
         const Vector<Number> &y,
         const bool            transpose = false) const;
 
@@ -406,8 +406,8 @@ public:
   boost::signals2::connection
   connect_append_column_slot(
     const std::function<bool(const Vector<Number> &u,
-                             const Number &        rho2,
-                             const Number &        col_norm_sqr)> &slot);
+                             const Number         &rho2,
+                             const Number         &col_norm_sqr)> &slot);
 
 private:
   /**
@@ -425,8 +425,8 @@ private:
    * linearly independent.
    */
   boost::signals2::signal<bool(const Vector<Number> &u,
-                               const Number &        rho,
-                               const Number &        col_norm_sqr)>
+                               const Number         &rho,
+                               const Number         &col_norm_sqr)>
     column_signal;
 };
 
@@ -448,9 +448,9 @@ namespace internal
               const char            trans,
               const char            diag,
               const types::blas_int n,
-              const Number *        a,
+              const Number         *a,
               const types::blas_int lda,
-              Number *              x,
+              Number               *x,
               const types::blas_int incx);
 
     template <typename Number>
@@ -460,11 +460,11 @@ namespace internal
                const char            diag,
                const types::blas_int n,
                const types::blas_int nrhs,
-               const Number *        a,
+               const Number         *a,
                const types::blas_int lda,
-               Number *              b,
+               Number               *b,
                const types::blas_int ldb,
-               types::blas_int *     info);
+               types::blas_int      *info);
   } // namespace QRImplementation
 } // namespace internal
 
@@ -499,7 +499,7 @@ BaseQR<VectorType>::get_R() const
 
 template <typename VectorType>
 void
-BaseQR<VectorType>::solve(Vector<Number> &      x,
+BaseQR<VectorType>::solve(Vector<Number>       &x,
                           const Vector<Number> &y,
                           const bool            transpose) const
 {
@@ -533,7 +533,7 @@ BaseQR<VectorType>::solve(Vector<Number> &      x,
 
 template <typename VectorType>
 void
-BaseQR<VectorType>::multiply_with_cols(VectorType &          y,
+BaseQR<VectorType>::multiply_with_cols(VectorType           &y,
                                        const Vector<Number> &x) const
 {
   Assert(x.size() == this->current_size,
@@ -548,7 +548,7 @@ BaseQR<VectorType>::multiply_with_cols(VectorType &          y,
 
 template <typename VectorType>
 void
-BaseQR<VectorType>::multiply_with_colsT(Vector<Number> &  y,
+BaseQR<VectorType>::multiply_with_colsT(Vector<Number>   &y,
                                         const VectorType &x) const
 {
   Assert(y.size() == this->current_size,
@@ -576,8 +576,8 @@ template <typename VectorType>
 boost::signals2::connection
 ImplicitQR<VectorType>::connect_append_column_slot(
   const std::function<bool(const Vector<Number> &u,
-                           const Number &        rho,
-                           const Number &        col_norm_sqr)> &slot)
+                           const Number         &rho,
+                           const Number         &col_norm_sqr)> &slot)
 {
   return column_signal.connect(slot);
 }
@@ -698,7 +698,7 @@ ImplicitQR<VectorType>::remove_column(const unsigned int k)
 
 template <typename VectorType>
 void
-ImplicitQR<VectorType>::multiply_with_Q(VectorType &          y,
+ImplicitQR<VectorType>::multiply_with_Q(VectorType           &y,
                                         const Vector<Number> &x) const
 {
   // A = QR
@@ -712,7 +712,7 @@ ImplicitQR<VectorType>::multiply_with_Q(VectorType &          y,
 
 template <typename VectorType>
 void
-ImplicitQR<VectorType>::multiply_with_QT(Vector<Number> &  y,
+ImplicitQR<VectorType>::multiply_with_QT(Vector<Number>   &y,
                                          const VectorType &x) const
 {
   // A = QR
@@ -726,7 +726,7 @@ ImplicitQR<VectorType>::multiply_with_QT(Vector<Number> &  y,
 
 template <typename VectorType>
 void
-ImplicitQR<VectorType>::multiply_with_A(VectorType &          y,
+ImplicitQR<VectorType>::multiply_with_A(VectorType           &y,
                                         const Vector<Number> &x) const
 {
   BaseQR<VectorType>::multiply_with_cols(y, x);
@@ -736,7 +736,7 @@ ImplicitQR<VectorType>::multiply_with_A(VectorType &          y,
 
 template <typename VectorType>
 void
-ImplicitQR<VectorType>::multiply_with_AT(Vector<Number> &  y,
+ImplicitQR<VectorType>::multiply_with_AT(Vector<Number>   &y,
                                          const VectorType &x) const
 {
   BaseQR<VectorType>::multiply_with_colsT(y, x);

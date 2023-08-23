@@ -51,8 +51,8 @@ template <class PRECONDITIONER,
           typename VectorType,
           class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
 void
-test_preconditioner_block(const MatrixType &     A,
-                          const VectorType &     b,
+test_preconditioner_block(const MatrixType      &A,
+                          const VectorType      &b,
                           const ADDITIONAL_DATA &data = ADDITIONAL_DATA())
 {
   const auto lo_A = linear_operator<VectorType>(A);
@@ -86,8 +86,8 @@ test_preconditioner_block(const MatrixType &     A,
 // does not define vector_type
 template <class PRECONDITIONER>
 void
-test_preconditioner(const SparseMatrix<double> &                   A,
-                    const Vector<double> &                         b,
+test_preconditioner(const SparseMatrix<double>                    &A,
+                    const Vector<double>                          &b,
                     const typename PRECONDITIONER::AdditionalData &data =
                       typename PRECONDITIONER::AdditionalData())
 {

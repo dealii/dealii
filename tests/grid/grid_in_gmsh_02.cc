@@ -36,7 +36,7 @@ using namespace dealii;
 template <int dim>
 void
 print_mesh_info(const Triangulation<dim> &triangulation,
-                const std::string &       filename)
+                const std::string        &filename)
 {
   deallog << "Mesh info:" << std::endl
           << " dimension: " << dim << std::endl

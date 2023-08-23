@@ -49,9 +49,9 @@ public:
     : data(data_in){};
 
   void
-  local_apply(const MatrixFree<dim, Number> &              data,
-              Vector<Number> &                             dst,
-              const Vector<Number> &                       src,
+  local_apply(const MatrixFree<dim, Number>               &data,
+              Vector<Number>                              &dst,
+              const Vector<Number>                        &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     std::pair<unsigned int, unsigned int> subrange_deg =

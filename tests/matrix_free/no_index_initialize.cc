@@ -66,7 +66,7 @@ public:
   void
   operator()(const MatrixFree<dim, Number> &data,
              Vector<Number> &,
-             const Vector<Number> &                       src,
+             const Vector<Number>                        &src,
              const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(data);
@@ -114,7 +114,7 @@ protected:
 
 template <int dim, int fe_degree, typename number>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints)
 {
   // use this for info on problem

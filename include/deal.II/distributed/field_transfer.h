@@ -65,7 +65,7 @@ namespace parallel
          */
         void
         prepare_for_coarsening_and_refinement(
-          const VectorType & in,
+          const VectorType  &in,
           const unsigned int fe_nothing_index);
 
         /**
@@ -76,9 +76,9 @@ namespace parallel
          * AffineConstraints after refinement.
          */
         void
-        interpolate(const Number &                   new_value,
+        interpolate(const Number                    &new_value,
                     const AffineConstraints<Number> &affine_constraints,
-                    VectorType &                     out);
+                    VectorType                      &out);
 
       private:
         /**

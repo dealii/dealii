@@ -198,7 +198,7 @@ namespace PETScWrappers
     // object and link the given matrix A
     // to the matrix-vector multiplication
     // of this MatrixFree object,
-    void *               this_object;
+    void                *this_object;
     const PetscErrorCode ierr = MatShellGetContext(A, &this_object);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 

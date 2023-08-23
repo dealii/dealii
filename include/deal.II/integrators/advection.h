@@ -72,9 +72,9 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    cell_matrix(FullMatrix<double> &                        M,
-                const FEValuesBase<dim> &                   fe,
-                const FEValuesBase<dim> &                   fetest,
+    cell_matrix(FullMatrix<double>                         &M,
+                const FEValuesBase<dim>                    &fe,
+                const FEValuesBase<dim>                    &fetest,
                 const ArrayView<const std::vector<double>> &velocity,
                 const double                                factor = 1.)
     {
@@ -128,9 +128,9 @@ namespace LocalIntegrators
      */
     template <int dim>
     inline void
-    cell_residual(Vector<double> &                            result,
-                  const FEValuesBase<dim> &                   fe,
-                  const std::vector<Tensor<1, dim>> &         input,
+    cell_residual(Vector<double>                             &result,
+                  const FEValuesBase<dim>                    &fe,
+                  const std::vector<Tensor<1, dim>>          &input,
                   const ArrayView<const std::vector<double>> &velocity,
                   double                                      factor = 1.)
     {
@@ -171,10 +171,10 @@ namespace LocalIntegrators
      */
     template <int dim>
     inline void
-    cell_residual(Vector<double> &                                    result,
-                  const FEValuesBase<dim> &                           fe,
+    cell_residual(Vector<double>                                     &result,
+                  const FEValuesBase<dim>                            &fe,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
-                  const ArrayView<const std::vector<double>> &        velocity,
+                  const ArrayView<const std::vector<double>>         &velocity,
                   double factor = 1.)
     {
       const unsigned int nq     = fe.n_quadrature_points;
@@ -213,9 +213,9 @@ namespace LocalIntegrators
      */
     template <int dim>
     inline void
-    cell_residual(Vector<double> &                            result,
-                  const FEValuesBase<dim> &                   fe,
-                  const std::vector<double> &                 input,
+    cell_residual(Vector<double>                             &result,
+                  const FEValuesBase<dim>                    &fe,
+                  const std::vector<double>                  &input,
                   const ArrayView<const std::vector<double>> &velocity,
                   double                                      factor = 1.)
     {
@@ -253,8 +253,8 @@ namespace LocalIntegrators
      */
     template <int dim>
     inline void
-    cell_residual(Vector<double> &                            result,
-                  const FEValuesBase<dim> &                   fe,
+    cell_residual(Vector<double>                             &result,
+                  const FEValuesBase<dim>                    &fe,
                   const ArrayView<const std::vector<double>> &input,
                   const ArrayView<const std::vector<double>> &velocity,
                   double                                      factor = 1.)
@@ -307,9 +307,9 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    upwind_value_matrix(FullMatrix<double> &                        M,
-                        const FEValuesBase<dim> &                   fe,
-                        const FEValuesBase<dim> &                   fetest,
+    upwind_value_matrix(FullMatrix<double>                         &M,
+                        const FEValuesBase<dim>                    &fe,
+                        const FEValuesBase<dim>                    &fetest,
                         const ArrayView<const std::vector<double>> &velocity,
                         double                                      factor = 1.)
     {
@@ -380,10 +380,10 @@ namespace LocalIntegrators
      */
     template <int dim>
     inline void
-    upwind_value_residual(Vector<double> &                            result,
-                          const FEValuesBase<dim> &                   fe,
-                          const std::vector<double> &                 input,
-                          const std::vector<double> &                 data,
+    upwind_value_residual(Vector<double>                             &result,
+                          const FEValuesBase<dim>                    &fe,
+                          const std::vector<double>                  &input,
+                          const std::vector<double>                  &data,
                           const ArrayView<const std::vector<double>> &velocity,
                           double factor = 1.)
     {
@@ -447,8 +447,8 @@ namespace LocalIntegrators
      */
     template <int dim>
     inline void
-    upwind_value_residual(Vector<double> &                            result,
-                          const FEValuesBase<dim> &                   fe,
+    upwind_value_residual(Vector<double>                             &result,
+                          const FEValuesBase<dim>                    &fe,
                           const ArrayView<const std::vector<double>> &input,
                           const ArrayView<const std::vector<double>> &data,
                           const ArrayView<const std::vector<double>> &velocity,
@@ -514,14 +514,14 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    upwind_value_matrix(FullMatrix<double> &                        M11,
-                        FullMatrix<double> &                        M12,
-                        FullMatrix<double> &                        M21,
-                        FullMatrix<double> &                        M22,
-                        const FEValuesBase<dim> &                   fe1,
-                        const FEValuesBase<dim> &                   fe2,
-                        const FEValuesBase<dim> &                   fetest1,
-                        const FEValuesBase<dim> &                   fetest2,
+    upwind_value_matrix(FullMatrix<double>                         &M11,
+                        FullMatrix<double>                         &M12,
+                        FullMatrix<double>                         &M21,
+                        FullMatrix<double>                         &M22,
+                        const FEValuesBase<dim>                    &fe1,
+                        const FEValuesBase<dim>                    &fe2,
+                        const FEValuesBase<dim>                    &fetest1,
+                        const FEValuesBase<dim>                    &fetest2,
                         const ArrayView<const std::vector<double>> &velocity,
                         const double                                factor = 1.)
     {
@@ -599,12 +599,12 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    upwind_face_residual(Vector<double> &                            result1,
-                         Vector<double> &                            result2,
-                         const FEValuesBase<dim> &                   fe1,
-                         const FEValuesBase<dim> &                   fe2,
-                         const std::vector<double> &                 input1,
-                         const std::vector<double> &                 input2,
+    upwind_face_residual(Vector<double>                             &result1,
+                         Vector<double>                             &result2,
+                         const FEValuesBase<dim>                    &fe1,
+                         const FEValuesBase<dim>                    &fe2,
+                         const std::vector<double>                  &input1,
+                         const std::vector<double>                  &input2,
                          const ArrayView<const std::vector<double>> &velocity,
                          const double factor = 1.)
     {
@@ -676,10 +676,10 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    upwind_face_residual(Vector<double> &                            result1,
-                         Vector<double> &                            result2,
-                         const FEValuesBase<dim> &                   fe1,
-                         const FEValuesBase<dim> &                   fe2,
+    upwind_face_residual(Vector<double>                             &result1,
+                         Vector<double>                             &result2,
+                         const FEValuesBase<dim>                    &fe1,
+                         const FEValuesBase<dim>                    &fe2,
                          const ArrayView<const std::vector<double>> &input1,
                          const ArrayView<const std::vector<double>> &input2,
                          const ArrayView<const std::vector<double>> &velocity,

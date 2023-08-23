@@ -102,7 +102,7 @@ namespace LinearAlgebra
     void
     Vector::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<double> &                             elements) const
+      ArrayView<double>                              &elements) const
     {
       AssertDimension(indices.size(), elements.size());
       const auto &vector = trilinos_vector();
@@ -202,7 +202,7 @@ namespace LinearAlgebra
 
       // The TargetMap and the SourceMap have their roles inverted.
       Epetra_FEVector source_vector(import_map.TargetMap());
-      double *        values = source_vector.Values();
+      double         *values = source_vector.Values();
       std::copy(V.begin(), V.end(), values);
 
       if (operation == VectorOperation::insert)
@@ -406,7 +406,7 @@ namespace LinearAlgebra
     {
       // get a representation of the vector and
       // loop over all the elements
-      double *      start_ptr = (*vector)[0];
+      double       *start_ptr = (*vector)[0];
       const double *ptr = start_ptr, *eptr = start_ptr + vector->MyLength();
       unsigned int  flag = 0;
       while (ptr != eptr)
@@ -580,7 +580,7 @@ namespace LinearAlgebra
 
 
     void
-    Vector::print(std::ostream &     out,
+    Vector::print(std::ostream      &out,
                   const unsigned int precision,
                   const bool         scientific,
                   const bool         across) const

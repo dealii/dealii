@@ -45,8 +45,8 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   FEFieldFunction<dim, VectorType, spacedim>::FEFieldFunction(
     const DoFHandler<dim, spacedim> &mydh,
-    const VectorType &               myv,
-    const Mapping<dim> &             mymapping)
+    const VectorType                &myv,
+    const Mapping<dim>              &mymapping)
     : Function<dim, typename VectorType::value_type>(
         mydh.get_fe(0).n_components())
     , dh(&mydh, "FEFieldFunction")
@@ -71,7 +71,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   void
   FEFieldFunction<dim, VectorType, spacedim>::vector_value(
-    const Point<dim> &                       p,
+    const Point<dim>                        &p,
     Vector<typename VectorType::value_type> &values) const
   {
     Assert(values.size() == this->n_components,
@@ -118,7 +118,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
   FEFieldFunction<dim, VectorType, spacedim>::value(
-    const Point<dim> & p,
+    const Point<dim>  &p,
     const unsigned int comp) const
   {
     Vector<typename VectorType::value_type> values(this->n_components);
@@ -131,7 +131,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   void
   FEFieldFunction<dim, VectorType, spacedim>::vector_gradient(
-    const Point<dim> &                                            p,
+    const Point<dim>                                             &p,
     std::vector<Tensor<1, dim, typename VectorType::value_type>> &gradients)
     const
   {
@@ -195,7 +195,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   Tensor<1, dim, typename VectorType::value_type>
   FEFieldFunction<dim, VectorType, spacedim>::gradient(
-    const Point<dim> & p,
+    const Point<dim>  &p,
     const unsigned int comp) const
   {
     std::vector<Tensor<1, dim, typename VectorType::value_type>> grads(
@@ -209,7 +209,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   void
   FEFieldFunction<dim, VectorType, spacedim>::vector_laplacian(
-    const Point<dim> &                       p,
+    const Point<dim>                        &p,
     Vector<typename VectorType::value_type> &values) const
   {
     Assert(values.size() == this->n_components,
@@ -256,7 +256,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   typename VectorType::value_type
   FEFieldFunction<dim, VectorType, spacedim>::laplacian(
-    const Point<dim> & p,
+    const Point<dim>  &p,
     const unsigned int comp) const
   {
     Vector<typename VectorType::value_type> lap(this->n_components);
@@ -271,7 +271,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   void
   FEFieldFunction<dim, VectorType, spacedim>::vector_value_list(
-    const std::vector<Point<dim>> &                       points,
+    const std::vector<Point<dim>>                        &points,
     std::vector<Vector<typename VectorType::value_type>> &values) const
   {
     Assert(points.size() == values.size(),
@@ -324,7 +324,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   void
   FEFieldFunction<dim, VectorType, spacedim>::value_list(
-    const std::vector<Point<dim>> &               points,
+    const std::vector<Point<dim>>                &points,
     std::vector<typename VectorType::value_type> &values,
     const unsigned int                            component) const
   {
@@ -413,7 +413,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   void
   FEFieldFunction<dim, VectorType, spacedim>::gradient_list(
-    const std::vector<Point<dim>> &                               points,
+    const std::vector<Point<dim>>                                &points,
     std::vector<Tensor<1, dim, typename VectorType::value_type>> &values,
     const unsigned int component) const
   {
@@ -440,7 +440,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   void
   FEFieldFunction<dim, VectorType, spacedim>::vector_laplacian_list(
-    const std::vector<Point<dim>> &                       points,
+    const std::vector<Point<dim>>                        &points,
     std::vector<Vector<typename VectorType::value_type>> &values) const
   {
     Assert(points.size() == values.size(),
@@ -495,7 +495,7 @@ namespace Functions
   template <int dim, typename VectorType, int spacedim>
   void
   FEFieldFunction<dim, VectorType, spacedim>::laplacian_list(
-    const std::vector<Point<dim>> &               points,
+    const std::vector<Point<dim>>                &points,
     std::vector<typename VectorType::value_type> &values,
     const unsigned int                            component) const
   {
@@ -523,8 +523,8 @@ namespace Functions
   FEFieldFunction<dim, VectorType, spacedim>::compute_point_locations(
     const std::vector<Point<dim>> &points,
     std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>
-      &                                     cells,
-    std::vector<std::vector<Point<dim>>> &  qpoints,
+                                           &cells,
+    std::vector<std::vector<Point<dim>>>   &qpoints,
     std::vector<std::vector<unsigned int>> &maps) const
   {
     // Calling the GridTools routine and preparing output
@@ -551,7 +551,7 @@ namespace Functions
   std::optional<Point<dim>>
   FEFieldFunction<dim, VectorType, spacedim>::get_reference_coordinates(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-    const Point<dim> &                                              point) const
+    const Point<dim>                                               &point) const
   {
     try
       {

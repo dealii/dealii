@@ -193,9 +193,9 @@ public:
   /**
    * Constructor.
    */
-  SolverCG(SolverControl &           cn,
+  SolverCG(SolverControl            &cn,
            VectorMemory<VectorType> &mem,
-           const AdditionalData &    data = AdditionalData());
+           const AdditionalData     &data = AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
@@ -213,9 +213,9 @@ public:
    */
   template <typename MatrixType, typename PreconditionerType>
   void
-  solve(const MatrixType &        A,
-        VectorType &              x,
-        const VectorType &        b,
+  solve(const MatrixType         &A,
+        VectorType               &x,
+        const VectorType         &b,
         const PreconditionerType &preconditioner);
 
   /**
@@ -258,9 +258,9 @@ protected:
    */
   virtual void
   print_vectors(const unsigned int step,
-                const VectorType & x,
-                const VectorType & r,
-                const VectorType & d) const;
+                const VectorType  &x,
+                const VectorType  &r,
+                const VectorType  &d) const;
 
   /**
    * Estimates the eigenvalues from diagonal and offdiagonal. Uses these
@@ -272,7 +272,7 @@ protected:
     const std::vector<typename VectorType::value_type> &diagonal,
     const std::vector<typename VectorType::value_type> &offdiagonal,
     const boost::signals2::signal<void(const std::vector<double> &)>
-      &                                          eigenvalues_signal,
+                                                &eigenvalues_signal,
     const boost::signals2::signal<void(double)> &cond_signal);
 
   /**
@@ -370,15 +370,15 @@ public:
   /**
    * Constructor.
    */
-  SolverFlexibleCG(SolverControl &           cn,
+  SolverFlexibleCG(SolverControl            &cn,
                    VectorMemory<VectorType> &mem,
-                   const AdditionalData &    data = AdditionalData());
+                   const AdditionalData     &data = AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverFlexibleCG(SolverControl &       cn,
+  SolverFlexibleCG(SolverControl        &cn,
                    const AdditionalData &data = AdditionalData());
 };
 
@@ -392,9 +392,9 @@ public:
 
 
 template <typename VectorType>
-SolverCG<VectorType>::SolverCG(SolverControl &           cn,
+SolverCG<VectorType>::SolverCG(SolverControl            &cn,
                                VectorMemory<VectorType> &mem,
-                               const AdditionalData &    data)
+                               const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
   , determine_beta_by_flexible_formula(false)
@@ -427,7 +427,7 @@ SolverCG<VectorType>::compute_eigs_and_cond(
   const std::vector<typename VectorType::value_type> &diagonal,
   const std::vector<typename VectorType::value_type> &offdiagonal,
   const boost::signals2::signal<void(const std::vector<double> &)>
-    &                                          eigenvalues_signal,
+                                              &eigenvalues_signal,
   const boost::signals2::signal<void(double)> &cond_signal)
 {
   // Avoid computing eigenvalues unless they are needed.
@@ -485,10 +485,10 @@ namespace internal
     {
       using Number = typename VectorType::value_type;
 
-      const MatrixType &        A;
+      const MatrixType         &A;
       const PreconditionerType &preconditioner;
       const bool                flexible;
-      VectorType &              x;
+      VectorType               &x;
 
       typename VectorMemory<VectorType>::Pointer r_pointer;
       typename VectorMemory<VectorType>::Pointer p_pointer;
@@ -512,11 +512,11 @@ namespace internal
       double residual_norm;
       Number previous_alpha;
 
-      IterationWorkerBase(const MatrixType &        A,
+      IterationWorkerBase(const MatrixType         &A,
                           const PreconditionerType &preconditioner,
                           const bool                flexible,
                           VectorMemory<VectorType> &memory,
-                          VectorType &              x)
+                          VectorType               &x)
         : A(A)
         , preconditioner(preconditioner)
         , flexible(flexible)
@@ -575,11 +575,11 @@ namespace internal
       using BaseClass =
         IterationWorkerBase<VectorType, MatrixType, PreconditionerType>;
 
-      IterationWorker(const MatrixType &        A,
+      IterationWorker(const MatrixType         &A,
                       const PreconditionerType &preconditioner,
                       const bool                flexible,
                       VectorMemory<VectorType> &memory,
-                      VectorType &              x)
+                      VectorType               &x)
         : BaseClass(A, preconditioner, flexible, memory, x)
       {}
 
@@ -717,11 +717,11 @@ namespace internal
       Number next_r_dot_preconditioner_dot_r;
       Number previous_beta;
 
-      IterationWorker(const MatrixType &        A,
+      IterationWorker(const MatrixType         &A,
                       const PreconditionerType &preconditioner,
                       const bool                flexible,
                       VectorMemory<VectorType> &memory,
-                      VectorType &              x)
+                      VectorType               &x)
         : IterationWorkerBase<VectorType, MatrixType, PreconditionerType>(
             A,
             preconditioner,
@@ -795,10 +795,10 @@ namespace internal
                             const unsigned int start_range,
                             const unsigned int end_range) const
       {
-        Number *               x       = this->x.begin();
-        Number *               r       = this->r.begin();
-        Number *               p       = this->p.begin();
-        Number *               v       = this->v.begin();
+        Number                *x       = this->x.begin();
+        Number                *r       = this->r.begin();
+        Number                *p       = this->p.begin();
+        Number                *v       = this->v.begin();
         const Number           alpha   = this->alpha;
         const Number           beta    = this->beta;
         constexpr unsigned int n_lanes = VectorizedArray<Number>::size();
@@ -933,9 +933,9 @@ namespace internal
         const unsigned int                      end_range,
         std::array<VectorizedArray<Number>, 7> &vectorized_sums) const
       {
-        const Number *                         r       = this->r.begin();
-        const Number *                         p       = this->p.begin();
-        const Number *                         v       = this->v.begin();
+        const Number                          *r       = this->r.begin();
+        const Number                          *p       = this->p.begin();
+        const Number                          *v       = this->v.begin();
         std::array<VectorizedArray<Number>, 7> my_sums = {};
         constexpr unsigned int n_lanes = VectorizedArray<Number>::size();
         const unsigned int     end_regular =
@@ -1021,10 +1021,10 @@ namespace internal
                             const unsigned int start_range,
                             const unsigned int end_range) const
       {
-        Number *                       x     = this->x.begin() + start_range;
-        Number *                       r     = this->r.begin() + start_range;
-        Number *                       p     = this->p.begin() + start_range;
-        Number *                       v     = this->v.begin() + start_range;
+        Number                        *x     = this->x.begin() + start_range;
+        Number                        *r     = this->r.begin() + start_range;
+        Number                        *p     = this->p.begin() + start_range;
+        Number                        *v     = this->v.begin() + start_range;
         const Number                   alpha = this->alpha;
         const Number                   beta  = this->beta;
         constexpr unsigned int         grain_size = 128;
@@ -1147,9 +1147,9 @@ namespace internal
         const unsigned int                      end_range,
         std::array<VectorizedArray<Number>, 7> &vectorized_sums) const
       {
-        const Number *                         r          = this->r.begin();
-        const Number *                         p          = this->p.begin();
-        const Number *                         v          = this->v.begin();
+        const Number                          *r          = this->r.begin();
+        const Number                          *p          = this->p.begin();
+        const Number                          *v          = this->v.begin();
         std::array<VectorizedArray<Number>, 7> my_sums    = {};
         constexpr unsigned int                 grain_size = 128;
         Assert(grain_size % VectorizedArray<Number>::size() == 0,
@@ -1224,9 +1224,9 @@ namespace internal
           {
             const unsigned int end_range = this->x.locally_owned_size();
 
-            Number *     x = this->x.begin();
-            Number *     r = this->r.begin();
-            Number *     p = this->p.begin();
+            Number      *x = this->x.begin();
+            Number      *r = this->r.begin();
+            Number      *p = this->p.begin();
             const Number alpha_plus_previous_alpha_over_beta =
               this->alpha + this->previous_alpha / this->beta;
             const Number previous_alpha_over_beta =
@@ -1261,9 +1261,9 @@ namespace internal
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
-SolverCG<VectorType>::solve(const MatrixType &        A,
-                            VectorType &              x,
-                            const VectorType &        b,
+SolverCG<VectorType>::solve(const MatrixType         &A,
+                            VectorType               &x,
+                            const VectorType         &b,
                             const PreconditionerType &preconditioner)
 {
   using number = typename VectorType::value_type;
@@ -1387,7 +1387,7 @@ SolverCG<VectorType>::connect_eigenvalues_slot(
 
 
 template <typename VectorType>
-SolverFlexibleCG<VectorType>::SolverFlexibleCG(SolverControl &           cn,
+SolverFlexibleCG<VectorType>::SolverFlexibleCG(SolverControl            &cn,
                                                VectorMemory<VectorType> &mem,
                                                const AdditionalData &)
   : SolverCG<VectorType>(cn, mem)

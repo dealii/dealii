@@ -380,9 +380,9 @@ namespace parallel
       const typename Triangulation<dim, spacedim>::cell_iterator &cell_,
       const CellStatus                                            status,
       const boost::iterator_range<std::vector<char>::const_iterator>
-        &                        data_range,
+                                &data_range,
       std::vector<VectorType *> &all_out,
-      VectorType &               valence)
+      VectorType                &valence)
     {
       typename DoFHandler<dim, spacedim>::cell_iterator cell(*cell_,
                                                              dof_handler);

@@ -55,7 +55,7 @@ namespace Functions
       Sphere(const Point<dim> &center = Point<dim>(), const double radius = 1);
 
       double
-      value(const Point<dim> & point,
+      value(const Point<dim>  &point,
             const unsigned int component = 0) const override;
 
       /**
@@ -68,7 +68,7 @@ namespace Functions
        * singularity.
        */
       Tensor<1, dim>
-      gradient(const Point<dim> & point,
+      gradient(const Point<dim>  &point,
                const unsigned int component = 0) const override;
 
       /**
@@ -81,7 +81,7 @@ namespace Functions
        * singularity.
        */
       SymmetricTensor<2, dim>
-      hessian(const Point<dim> & point,
+      hessian(const Point<dim>  &point,
               const unsigned int component = 0) const override;
 
     private:
@@ -111,7 +111,7 @@ namespace Functions
       Plane(const Point<dim> &point, const Tensor<1, dim> &normal);
 
       double
-      value(const Point<dim> & point,
+      value(const Point<dim>  &point,
             const unsigned int component = 0) const override;
 
       Tensor<1, dim>
@@ -153,13 +153,13 @@ namespace Functions
        * @param tolerance Tolerance of the distance computation.
        * @param max_iter Max. number of iteration of the distance computation algorithm.
        */
-      Ellipsoid(const Point<dim> &             center,
+      Ellipsoid(const Point<dim>              &center,
                 const std::array<double, dim> &radii,
                 const double                   tolerance = 1e-14,
                 const unsigned int             max_iter  = 10);
 
       double
-      value(const Point<dim> & point,
+      value(const Point<dim>  &point,
             const unsigned int component = 0) const override;
 
       /**
@@ -254,7 +254,7 @@ namespace Functions
        * rectangle.
        */
       double
-      value(const Point<dim> & p,
+      value(const Point<dim>  &p,
             const unsigned int component = 0) const override;
 
     private:
@@ -303,7 +303,7 @@ namespace Functions
        * disk.
        */
       double
-      value(const Point<dim> & p,
+      value(const Point<dim>  &p,
             const unsigned int component = 0) const override;
 
     private:

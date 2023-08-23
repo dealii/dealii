@@ -101,7 +101,7 @@ template <int dim>
 void
 test_global_refinement_parallel(
   void (*test_block_list)(const parallel::distributed::Triangulation<dim> &tr,
-                          const FiniteElement<dim> &                       fe))
+                          const FiniteElement<dim>                        &fe))
 {
   parallel::distributed::Triangulation<dim> trl(
     MPI_COMM_WORLD,

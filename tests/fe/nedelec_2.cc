@@ -44,7 +44,7 @@
 void
 plot_diff(const Vector<double> &v1,
           const Vector<double> &v2,
-          const Tensor<1, 2> &  n)
+          const Tensor<1, 2>   &n)
 {
   AssertDimension(v1.size(), 2);
   AssertDimension(v2.size(), 2);
@@ -60,7 +60,7 @@ plot_diff(const Vector<double> &v1,
 void
 plot_diff(const Vector<double> &v1,
           const Vector<double> &v2,
-          const Tensor<1, 3> &  n)
+          const Tensor<1, 3>   &n)
 {
   AssertDimension(v1.size(), 3);
   AssertDimension(v2.size(), 3);

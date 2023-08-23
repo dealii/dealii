@@ -416,8 +416,8 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
 template <int dim, int spacedim>
 FE_Q_Base<dim, spacedim>::FE_Q_Base(
   const ScalarPolynomialsBase<dim> &poly_space,
-  const FiniteElementData<dim> &    fe_data,
-  const std::vector<bool> &         restriction_is_additive_flags)
+  const FiniteElementData<dim>     &fe_data,
+  const std::vector<bool>          &restriction_is_additive_flags)
   : FE_Poly<dim, spacedim>(
       poly_space,
       fe_data,
@@ -511,7 +511,7 @@ template <int dim, int spacedim>
 void
 FE_Q_Base<dim, spacedim>::get_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double>                 &interpolation_matrix) const
 {
   // go through the list of elements we can interpolate from
   if (const FE_Q_Base<dim, spacedim> *source_fe =
@@ -611,7 +611,7 @@ template <int dim, int spacedim>
 void
 FE_Q_Base<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
-  FullMatrix<double> &                interpolation_matrix,
+  FullMatrix<double>                 &interpolation_matrix,
   const unsigned int                  face_no) const
 {
   get_subface_interpolation_matrix(source_fe,
@@ -627,7 +627,7 @@ void
 FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
   const unsigned int                  subface,
-  FullMatrix<double> &                interpolation_matrix,
+  FullMatrix<double>                 &interpolation_matrix,
   const unsigned int                  face_no) const
 {
   Assert(interpolation_matrix.m() == source_fe.n_dofs_per_face(face_no),

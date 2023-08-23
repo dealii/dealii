@@ -341,14 +341,14 @@ public:
   template <typename Number>
   static void
   estimate(
-    const Mapping<dim, spacedim> &   mapping,
+    const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
-    const Quadrature<dim - 1> &      quadrature,
+    const Quadrature<dim - 1>       &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                       neumann_bc,
+                             &neumann_bc,
     const ReadVector<Number> &solution,
-    Vector<float> &           error,
-    const ComponentMask &     component_mask = {},
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -363,12 +363,12 @@ public:
   static void
   estimate(
     const DoFHandler<dim, spacedim> &dof,
-    const Quadrature<dim - 1> &      quadrature,
+    const Quadrature<dim - 1>       &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                       neumann_bc,
+                             &neumann_bc,
     const ReadVector<Number> &solution,
-    Vector<float> &           error,
-    const ComponentMask &     component_mask = {},
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -391,15 +391,15 @@ public:
   template <typename Number>
   static void
   estimate(
-    const Mapping<dim, spacedim> &   mapping,
+    const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
-    const Quadrature<dim - 1> &      quadrature,
+    const Quadrature<dim - 1>       &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                          neumann_bc,
+                                                &neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &                        component_mask = {},
-    const Function<spacedim> *                   coefficients   = nullptr,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
     const unsigned int        n_threads    = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
@@ -413,13 +413,13 @@ public:
   static void
   estimate(
     const DoFHandler<dim, spacedim> &dof,
-    const Quadrature<dim - 1> &      quadrature,
+    const Quadrature<dim - 1>       &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                          neumann_bc,
+                                                &neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &                        component_mask = {},
-    const Function<spacedim> *                   coefficients   = nullptr,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
     const unsigned int        n_threads    = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
@@ -433,14 +433,14 @@ public:
   template <typename Number>
   static void
   estimate(
-    const Mapping<dim, spacedim> &   mapping,
+    const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim - 1> & quadrature,
+    const hp::QCollection<dim - 1>  &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                       neumann_bc,
+                             &neumann_bc,
     const ReadVector<Number> &solution,
-    Vector<float> &           error,
-    const ComponentMask &     component_mask = {},
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -456,12 +456,12 @@ public:
   static void
   estimate(
     const DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim - 1> & quadrature,
+    const hp::QCollection<dim - 1>  &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                       neumann_bc,
+                             &neumann_bc,
     const ReadVector<Number> &solution,
-    Vector<float> &           error,
-    const ComponentMask &     component_mask = {},
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -476,15 +476,15 @@ public:
   template <typename Number>
   static void
   estimate(
-    const Mapping<dim, spacedim> &   mapping,
+    const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim - 1> & quadrature,
+    const hp::QCollection<dim - 1>  &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                          neumann_bc,
+                                                &neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &                        component_mask = {},
-    const Function<spacedim> *                   coefficients   = nullptr,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
     const unsigned int        n_threads    = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
@@ -499,13 +499,13 @@ public:
   static void
   estimate(
     const DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim - 1> & quadrature,
+    const hp::QCollection<dim - 1>  &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                          neumann_bc,
+                                                &neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &                        component_mask = {},
-    const Function<spacedim> *                   coefficients   = nullptr,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
     const unsigned int        n_threads    = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
@@ -621,14 +621,14 @@ public:
   template <typename Number>
   static void
   estimate(
-    const Mapping<1, spacedim> &   mapping,
+    const Mapping<1, spacedim>    &mapping,
     const DoFHandler<1, spacedim> &dof,
-    const Quadrature<0> &          quadrature,
+    const Quadrature<0>           &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                       neumann_bc,
+                             &neumann_bc,
     const ReadVector<Number> &solution,
-    Vector<float> &           error,
-    const ComponentMask &     component_mask = {},
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
     const Function<spacedim> *coefficient    = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -645,12 +645,12 @@ public:
   static void
   estimate(
     const DoFHandler<1, spacedim> &dof,
-    const Quadrature<0> &          quadrature,
+    const Quadrature<0>           &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                       neumann_bc,
+                             &neumann_bc,
     const ReadVector<Number> &solution,
-    Vector<float> &           error,
-    const ComponentMask &     component_mask = {},
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -675,15 +675,15 @@ public:
   template <typename Number>
   static void
   estimate(
-    const Mapping<1, spacedim> &   mapping,
+    const Mapping<1, spacedim>    &mapping,
     const DoFHandler<1, spacedim> &dof,
-    const Quadrature<0> &          quadrature,
+    const Quadrature<0>           &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                          neumann_bc,
+                                                &neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &                        component_mask = {},
-    const Function<spacedim> *                   coefficients   = nullptr,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
     const unsigned int        n_threads    = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
@@ -699,13 +699,13 @@ public:
   static void
   estimate(
     const DoFHandler<1, spacedim> &dof,
-    const Quadrature<0> &          quadrature,
+    const Quadrature<0>           &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                          neumann_bc,
+                                                &neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &                        component_mask = {},
-    const Function<spacedim> *                   coefficients   = nullptr,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
     const unsigned int        n_threads    = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
@@ -720,14 +720,14 @@ public:
   template <typename Number>
   static void
   estimate(
-    const Mapping<1, spacedim> &   mapping,
+    const Mapping<1, spacedim>    &mapping,
     const DoFHandler<1, spacedim> &dof,
-    const hp::QCollection<0> &     quadrature,
+    const hp::QCollection<0>      &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                       neumann_bc,
+                             &neumann_bc,
     const ReadVector<Number> &solution,
-    Vector<float> &           error,
-    const ComponentMask &     component_mask = {},
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -744,12 +744,12 @@ public:
   static void
   estimate(
     const DoFHandler<1, spacedim> &dof,
-    const hp::QCollection<0> &     quadrature,
+    const hp::QCollection<0>      &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                       neumann_bc,
+                             &neumann_bc,
     const ReadVector<Number> &solution,
-    Vector<float> &           error,
-    const ComponentMask &     component_mask = {},
+    Vector<float>            &error,
+    const ComponentMask      &component_mask = {},
     const Function<spacedim> *coefficients   = nullptr,
     const unsigned int        n_threads      = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
@@ -765,15 +765,15 @@ public:
   template <typename Number>
   static void
   estimate(
-    const Mapping<1, spacedim> &   mapping,
+    const Mapping<1, spacedim>    &mapping,
     const DoFHandler<1, spacedim> &dof,
-    const hp::QCollection<0> &     quadrature,
+    const hp::QCollection<0>      &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                          neumann_bc,
+                                                &neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &                        component_mask = {},
-    const Function<spacedim> *                   coefficients   = nullptr,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
     const unsigned int        n_threads    = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,
@@ -789,13 +789,13 @@ public:
   static void
   estimate(
     const DoFHandler<1, spacedim> &dof,
-    const hp::QCollection<0> &     quadrature,
+    const hp::QCollection<0>      &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
-      &                                          neumann_bc,
+                                                &neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *> &                 errors,
-    const ComponentMask &                        component_mask = {},
-    const Function<spacedim> *                   coefficients   = nullptr,
+    ArrayView<Vector<float> *>                  &errors,
+    const ComponentMask                         &component_mask = {},
+    const Function<spacedim>                    *coefficients   = nullptr,
     const unsigned int        n_threads    = numbers::invalid_unsigned_int,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
     const types::material_id  material_id  = numbers::invalid_material_id,

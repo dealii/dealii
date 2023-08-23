@@ -185,8 +185,8 @@ namespace internal
       const unsigned int                            n_components,
       const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
       const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                       Number::size()> &            constraint_mask,
-      Number *                                      values)
+                       Number::size()>             &constraint_mask,
+      Number                                       *values)
     {
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
@@ -524,9 +524,9 @@ namespace internal
     }
 
     static inline DEAL_II_ALWAYS_INLINE_RELEASE void
-    set_value(T1 &                           result,
+    set_value(T1                            &result,
               const typename T1::value_type &value,
-              const index_type &             i)
+              const index_type              &i)
     {
       result[i] = value;
     }
@@ -757,16 +757,16 @@ namespace internal
   public:
     inline DEAL_II_ALWAYS_INLINE_RELEASE
     HelperBase(
-      const T &                                                    t,
-      const unsigned int &                                         given_degree,
-      const bool &                                                 type_x,
-      const bool &                                                 type_y,
-      const bool &                                                 type_z,
+      const T                                                     &t,
+      const unsigned int                                          &given_degree,
+      const bool                                                  &type_x,
+      const bool                                                  &type_y,
+      const bool                                                  &type_z,
       const typename Trait<Number, VectorizationType>::index_type &v,
       const std::array<
         AlignedVector<
           typename Trait<Number, VectorizationType>::interpolation_type>,
-        2> &  interpolation_matrices,
+        2>   &interpolation_matrices,
       Number *values)
       : t(t)
       , given_degree(given_degree)
@@ -1088,16 +1088,16 @@ namespace internal
     }
 
   private:
-    const T &                                                    t;
-    const unsigned int &                                         given_degree;
-    const bool &                                                 type_x;
-    const bool &                                                 type_y;
-    const bool &                                                 type_z;
+    const T                                                     &t;
+    const unsigned int                                          &given_degree;
+    const bool                                                  &type_x;
+    const bool                                                  &type_y;
+    const bool                                                  &type_z;
     const typename Trait<Number, VectorizationType>::index_type &v;
     const std::array<
       AlignedVector<
         typename Trait<Number, VectorizationType>::interpolation_type>,
-      2> &  interpolation_matrices;
+      2>   &interpolation_matrices;
     Number *values;
   };
 
@@ -1146,14 +1146,14 @@ namespace internal
   public:
     inline DEAL_II_ALWAYS_INLINE_RELEASE
     Helper(const unsigned int &given_degree,
-           const bool &        type_x,
-           const bool &        type_y,
-           const bool &        type_z,
+           const bool         &type_x,
+           const bool         &type_y,
+           const bool         &type_z,
            const typename Trait<Number, VectorizationType>::index_type &v,
            const std::array<
              AlignedVector<
                typename Trait<Number, VectorizationType>::interpolation_type>,
-             2> &  interpolation_matrices,
+             2>   &interpolation_matrices,
            Number *values)
       : HelperBase<Helper<HelperType::dynamic,
                           Number,
@@ -1249,8 +1249,8 @@ namespace internal
            {{0, points *points - points, 0, points *points - points}}}}}},
        {{{{{{points * points * points - points * points,
              points *points *points - points *points + points - 1,
-             points *                         points - points,
-             points *                         points - 1}},
+             points                          *points - points,
+             points                          *points - 1}},
            {{0, points - 1, points *points - points, points *points - 1}}}},
          {{{{points * points * points - points * points,
              points *points *points - points *points + points - 1,
@@ -1261,13 +1261,13 @@ namespace internal
     const dealii::ndarray<unsigned int, 3, 2, 2, 3> lines_array = {
       {{{{{{{points * points - points,
              points *points *points - points *points,
-             points *points *points - points}},
+             points *points                  *points - points}},
            {{0, points *points - points, points *points *points - points}}}},
          {{{{0,
              points *points *points - points *points,
-             points *points *points - points}},
+             points *points                  *points - points}},
            {{0,
-             points *points - points,
+             points         *points - points,
              points *points *points - points *points}}}}}},
        {{{{{{points - 1,
              points *points *points - points *points,
@@ -1306,14 +1306,14 @@ namespace internal
   public:
     inline DEAL_II_ALWAYS_INLINE_RELEASE
     Helper(const unsigned int &given_degree,
-           const bool &        type_x,
-           const bool &        type_y,
-           const bool &        type_z,
+           const bool         &type_x,
+           const bool         &type_y,
+           const bool         &type_z,
            const typename Trait<Number, VectorizationType>::index_type &v,
            const std::array<
              AlignedVector<
                typename Trait<Number, VectorizationType>::interpolation_type>,
-             2> &  interpolation_matrices,
+             2>   &interpolation_matrices,
            Number *values)
       : HelperBase<Helper<HelperType::constant,
                           Number,
@@ -1531,8 +1531,8 @@ namespace internal
       const unsigned int                            n_desired_components,
       const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
       const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                       Number::size()> &            constraint_mask,
-      Number *                                      values)
+                       Number::size()>             &constraint_mask,
+      Number                                       *values)
     {
       const unsigned int given_degree =
         fe_degree != -1 ? fe_degree : shape_info.data.front().fe_degree;
@@ -1710,8 +1710,8 @@ namespace internal
         const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
         const bool                                    transpose,
         const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                         Number::size()> &            c_mask,
-        Number *                                      values)
+                         Number::size()>             &c_mask,
+        Number                                       *values)
     {
       using RunnerType =
         FEEvaluationImplHangingNodesRunner<used_runner_type<fe_degree>(),

@@ -108,10 +108,10 @@ namespace GraphColoring
     template <typename Iterator>
     std::vector<std::vector<Iterator>>
     create_partitioning(
-      const Iterator &                            begin,
+      const Iterator                             &begin,
       const std_cxx20::type_identity_t<Iterator> &end,
       const std::function<std::vector<types::global_dof_index>(
-        const Iterator &)> &                      get_conflict_indices)
+        const Iterator &)>                       &get_conflict_indices)
     {
       // Number of iterators.
       unsigned int n_iterators = 0;
@@ -221,9 +221,9 @@ namespace GraphColoring
     template <typename Iterator>
     void
     make_dsatur_coloring(
-      std::vector<Iterator> &             partition,
+      std::vector<Iterator>              &partition,
       const std::function<std::vector<types::global_dof_index>(
-        const Iterator &)> &              get_conflict_indices,
+        const Iterator &)>               &get_conflict_indices,
       std::vector<std::vector<Iterator>> &partition_coloring)
     {
       partition_coloring.clear();
@@ -539,8 +539,8 @@ namespace GraphColoring
   template <typename Iterator>
   std::vector<std::vector<Iterator>>
   make_graph_coloring(
-    const Iterator &                                  begin,
-    const std_cxx20::type_identity_t<Iterator> &      end,
+    const Iterator                                   &begin,
+    const std_cxx20::type_identity_t<Iterator>       &end,
     const std::function<std::vector<types::global_dof_index>(
       const std_cxx20::type_identity_t<Iterator> &)> &get_conflict_indices)
   {
@@ -577,7 +577,7 @@ namespace GraphColoring
    * For further details, refer to SparsityTools::color_sparsity_pattern.
    */
   unsigned int
-  color_sparsity_pattern(const SparsityPattern &    sparsity_pattern,
+  color_sparsity_pattern(const SparsityPattern     &sparsity_pattern,
                          std::vector<unsigned int> &color_indices);
 
 } // namespace GraphColoring

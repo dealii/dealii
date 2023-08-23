@@ -67,7 +67,7 @@ namespace python
     PointWrapper
     project_real_point_to_unit_point_on_face(CellAccessorWrapper &cell,
                                              const unsigned int   face_no,
-                                             PointWrapper &       point);
+                                             PointWrapper        &point);
 
     /**
      * Get the underlying mapping.

@@ -228,7 +228,7 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
 
     template unsigned int GridTools::find_closest_vertex(
       const std::map<unsigned int, Point<deal_II_space_dimension>> &vertices,
-      const Point<deal_II_space_dimension> &                        p);
+      const Point<deal_II_space_dimension>                         &p);
 
     template std::vector<std::vector<BoundingBox<deal_II_space_dimension>>>
     GridTools::exchange_local_bounding_boxes(
@@ -368,19 +368,19 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       get_face_connectivity_of_cells(
         const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &                     triangulation,
+                               &triangulation,
         DynamicSparsityPattern &cell_connectivity);
 
       template void
       get_vertex_connectivity_of_cells(
         const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &                     triangulation,
+                               &triangulation,
         DynamicSparsityPattern &cell_connectivity);
 
       template void
       get_vertex_connectivity_of_cells_on_level(
         const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &                     triangulation,
+                               &triangulation,
         const unsigned int      level,
         DynamicSparsityPattern &cell_connectivity);
 
@@ -476,8 +476,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template void
       laplace_transform(
         const std::map<unsigned int, Point<deal_II_dimension>> &new_points,
-        Triangulation<deal_II_dimension> &                      triangulation,
-        const Function<deal_II_dimension> *                     coefficient,
+        Triangulation<deal_II_dimension>                       &triangulation,
+        const Function<deal_II_dimension>                      *coefficient,
         const bool);
 
       template Triangulation<deal_II_dimension,

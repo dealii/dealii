@@ -103,7 +103,7 @@ namespace dealii
     template <int dim, int spacedim, typename VectorType>
     void
     get_position_vector(const DoFHandler<dim, spacedim> &dof_handler_dim,
-                        VectorType &                  euler_coordinates_vector,
+                        VectorType                   &euler_coordinates_vector,
                         const Mapping<dim, spacedim> &mapping)
     {
       FEValues<dim, spacedim> fe_eval(
@@ -146,11 +146,11 @@ namespace dealii
 template <int dim, int spacedim, typename VectorType>
 void
 test_1(const Triangulation<dim, spacedim> &surface_mesh,
-       const Mapping<dim, spacedim> &      surface_mapping,
-       const Quadrature<dim> &             surface_quadrature,
-       const Mapping<spacedim> &           mapping,
-       const DoFHandler<spacedim> &        dof_handler_dim,
-       const VectorType &                  normal_solution)
+       const Mapping<dim, spacedim>       &surface_mapping,
+       const Quadrature<dim>              &surface_quadrature,
+       const Mapping<spacedim>            &mapping,
+       const DoFHandler<spacedim>         &dof_handler_dim,
+       const VectorType                   &normal_solution)
 {
   using T = Point<spacedim>;
 
@@ -277,11 +277,11 @@ test_1(const Triangulation<dim, spacedim> &surface_mesh,
 template <int dim, int spacedim, typename VectorType>
 void
 test_2(const Triangulation<dim, spacedim> &surface_mesh,
-       const Mapping<dim, spacedim> &      surface_mapping,
-       const Quadrature<dim> &             surface_quadrature,
-       const Mapping<spacedim> &           mapping,
-       const DoFHandler<spacedim> &        dof_handler_dim,
-       const VectorType &                  normal_solution)
+       const Mapping<dim, spacedim>       &surface_mapping,
+       const Quadrature<dim>              &surface_quadrature,
+       const Mapping<spacedim>            &mapping,
+       const DoFHandler<spacedim>         &dof_handler_dim,
+       const VectorType                   &normal_solution)
 {
   using T = Point<spacedim>;
 

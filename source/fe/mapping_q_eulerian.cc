@@ -47,7 +47,7 @@ template <int dim, typename VectorType, int spacedim>
 MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
   const unsigned int               degree,
   const DoFHandler<dim, spacedim> &euler_dof_handler,
-  const VectorType &               euler_vector,
+  const VectorType                &euler_vector,
   const unsigned int               level)
   : MappingQ<dim, spacedim>(degree)
   , euler_vector(&euler_vector)
@@ -195,7 +195,7 @@ CellSimilarity::Similarity
 MappingQEulerian<dim, VectorType, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity,
-  const Quadrature<dim> &                                  quadrature,
+  const Quadrature<dim>                                   &quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const

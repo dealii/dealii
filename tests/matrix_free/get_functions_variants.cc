@@ -54,9 +54,9 @@ public:
     : data(data_in){};
 
   void
-  operator()(const MatrixFree<dim, Number> &              data,
-             VectorType &                                 dst,
-             const VectorType &                           src,
+  operator()(const MatrixFree<dim, Number>               &data,
+             VectorType                                  &dst,
+             const VectorType                            &src,
              const std::pair<unsigned int, unsigned int> &cell_range) const;
 
   void
@@ -92,7 +92,7 @@ void
 MatrixFreeTest<dim, fe_degree, Number>::operator()(
   const MatrixFree<dim, Number> &data,
   VectorType &,
-  const VectorType &                           src,
+  const VectorType                            &src,
   const std::pair<unsigned int, unsigned int> &cell_range) const
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(data);

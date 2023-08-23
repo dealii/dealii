@@ -94,10 +94,10 @@ namespace Particles
     template <int dim, int spacedim, typename number = double>
     void
     create_interpolation_sparsity_pattern(
-      const DoFHandler<dim, spacedim> &                space_dh,
+      const DoFHandler<dim, spacedim>                 &space_dh,
       const Particles::ParticleHandler<dim, spacedim> &particle_handler,
-      SparsityPatternBase &                            sparsity,
-      const AffineConstraints<number> &                constraints =
+      SparsityPatternBase                             &sparsity,
+      const AffineConstraints<number>                 &constraints =
         AffineConstraints<number>(),
       const ComponentMask &space_comps = {});
 
@@ -147,9 +147,9 @@ namespace Particles
     template <int dim, int spacedim, typename MatrixType>
     void
     create_interpolation_matrix(
-      const DoFHandler<dim, spacedim> &                space_dh,
+      const DoFHandler<dim, spacedim>                 &space_dh,
       const Particles::ParticleHandler<dim, spacedim> &particle_handler,
-      MatrixType &                                     matrix,
+      MatrixType                                      &matrix,
       const AffineConstraints<typename MatrixType::value_type> &constraints =
         AffineConstraints<typename MatrixType::value_type>(),
       const ComponentMask &space_comps = {});
@@ -182,11 +182,11 @@ namespace Particles
               typename OutputVectorType>
     void
     interpolate_field_on_particles(
-      const DoFHandler<dim, spacedim> &                field_dh,
+      const DoFHandler<dim, spacedim>                 &field_dh,
       const Particles::ParticleHandler<dim, spacedim> &particle_handler,
-      const InputVectorType &                          field_vector,
-      OutputVectorType &                               interpolated_field,
-      const ComponentMask &                            field_comps = {})
+      const InputVectorType                           &field_vector,
+      OutputVectorType                                &interpolated_field,
+      const ComponentMask                             &field_comps = {})
     {
       if (particle_handler.n_locally_owned_particles() == 0)
         {

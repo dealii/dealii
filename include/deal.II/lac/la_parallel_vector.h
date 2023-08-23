@@ -798,7 +798,7 @@ namespace LinearAlgebra
        */
       void
       add(const std::vector<size_type> &indices,
-          const std::vector<Number> &   values);
+          const std::vector<Number>    &values);
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
@@ -900,7 +900,7 @@ namespace LinearAlgebra
        * Print the vector to the output stream @p out.
        */
       void
-      print(std::ostream &     out,
+      print(std::ostream      &out,
             const unsigned int precision  = 3,
             const bool         scientific = true,
             const bool         across     = true) const;
@@ -931,7 +931,7 @@ namespace LinearAlgebra
        */
       template <typename OtherNumber>
       void
-      add(const std::vector<size_type> &       indices,
+      add(const std::vector<size_type>        &indices,
           const ::dealii::Vector<OtherNumber> &values);
 
       /**
@@ -941,7 +941,7 @@ namespace LinearAlgebra
       template <typename OtherNumber>
       void
       add(const size_type    n_elements,
-          const size_type *  indices,
+          const size_type   *indices,
           const OtherNumber *values);
 
       /**
@@ -1110,7 +1110,7 @@ namespace LinearAlgebra
       template <typename OtherNumber>
       void
       extract_subvector_to(const std::vector<size_type> &indices,
-                           std::vector<OtherNumber> &    values) const;
+                           std::vector<OtherNumber>     &values) const;
 
       /**
        * Extract a range of elements all at once.
@@ -1668,7 +1668,7 @@ namespace LinearAlgebra
     inline void
     Vector<Number, MemorySpace>::extract_subvector_to(
       const std::vector<size_type> &indices,
-      std::vector<OtherNumber> &    values) const
+      std::vector<OtherNumber>     &values) const
     {
       for (size_type i = 0; i < indices.size(); ++i)
         values[i] = operator()(indices[i]);
@@ -1698,7 +1698,7 @@ namespace LinearAlgebra
     template <typename OtherNumber>
     inline void
     Vector<Number, MemorySpace>::add(
-      const std::vector<size_type> &       indices,
+      const std::vector<size_type>        &indices,
       const ::dealii::Vector<OtherNumber> &values)
     {
       AssertDimension(indices.size(), values.size());
@@ -1718,7 +1718,7 @@ namespace LinearAlgebra
     template <typename OtherNumber>
     inline void
     Vector<Number, MemorySpace>::add(const size_type    n_elements,
-                                     const size_type *  indices,
+                                     const size_type   *indices,
                                      const OtherNumber *values)
     {
       for (size_type i = 0; i < n_elements; ++i, ++indices, ++values)
@@ -1860,7 +1860,7 @@ namespace internal
 #endif
                                  MatrixType> * = nullptr>
       static void
-      reinit_domain_vector(MatrixType &                                mat,
+      reinit_domain_vector(MatrixType                                 &mat,
                            LinearAlgebra::distributed::Vector<Number> &vec,
                            bool /*omit_zeroing_entries*/)
       {
@@ -1879,7 +1879,7 @@ namespace internal
 #endif
                                  MatrixType> * = nullptr>
       static void
-      reinit_domain_vector(MatrixType &                                mat,
+      reinit_domain_vector(MatrixType                                 &mat,
                            LinearAlgebra::distributed::Vector<Number> &vec,
                            bool omit_zeroing_entries)
       {
@@ -1902,7 +1902,7 @@ namespace internal
 #endif
                                  MatrixType> * = nullptr>
       static void
-      reinit_range_vector(MatrixType &                                mat,
+      reinit_range_vector(MatrixType                                 &mat,
                           LinearAlgebra::distributed::Vector<Number> &vec,
                           bool /*omit_zeroing_entries*/)
       {
@@ -1921,7 +1921,7 @@ namespace internal
 #endif
                                  MatrixType> * = nullptr>
       static void
-      reinit_range_vector(MatrixType &                                mat,
+      reinit_range_vector(MatrixType                                 &mat,
                           LinearAlgebra::distributed::Vector<Number> &vec,
                           bool omit_zeroing_entries)
       {

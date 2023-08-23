@@ -151,7 +151,7 @@ namespace PETScWrappers
 
 
 
-  PreconditionJacobi::PreconditionJacobi(const MatrixBase &    matrix,
+  PreconditionJacobi::PreconditionJacobi(const MatrixBase     &matrix,
                                          const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -175,7 +175,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionJacobi::initialize(const MatrixBase &    matrix_,
+  PreconditionJacobi::initialize(const MatrixBase     &matrix_,
                                  const AdditionalData &additional_data_)
   {
     clear();
@@ -209,7 +209,7 @@ namespace PETScWrappers
 
 
   PreconditionBlockJacobi::PreconditionBlockJacobi(
-    const MatrixBase &    matrix,
+    const MatrixBase     &matrix,
     const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -231,7 +231,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionBlockJacobi::initialize(const MatrixBase &    matrix_,
+  PreconditionBlockJacobi::initialize(const MatrixBase     &matrix_,
                                       const AdditionalData &additional_data_)
   {
     clear();
@@ -257,7 +257,7 @@ namespace PETScWrappers
 
 
 
-  PreconditionSOR::PreconditionSOR(const MatrixBase &    matrix,
+  PreconditionSOR::PreconditionSOR(const MatrixBase     &matrix,
                                    const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -266,7 +266,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionSOR::initialize(const MatrixBase &    matrix_,
+  PreconditionSOR::initialize(const MatrixBase     &matrix_,
                               const AdditionalData &additional_data_)
   {
     clear();
@@ -301,7 +301,7 @@ namespace PETScWrappers
 
 
 
-  PreconditionSSOR::PreconditionSSOR(const MatrixBase &    matrix,
+  PreconditionSSOR::PreconditionSSOR(const MatrixBase     &matrix,
                                      const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -310,7 +310,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionSSOR::initialize(const MatrixBase &    matrix_,
+  PreconditionSSOR::initialize(const MatrixBase     &matrix_,
                                const AdditionalData &additional_data_)
   {
     clear();
@@ -349,7 +349,7 @@ namespace PETScWrappers
 
 
 
-  PreconditionICC::PreconditionICC(const MatrixBase &    matrix,
+  PreconditionICC::PreconditionICC(const MatrixBase     &matrix,
                                    const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -358,7 +358,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionICC::initialize(const MatrixBase &    matrix_,
+  PreconditionICC::initialize(const MatrixBase     &matrix_,
                               const AdditionalData &additional_data_)
   {
     clear();
@@ -393,7 +393,7 @@ namespace PETScWrappers
 
 
 
-  PreconditionILU::PreconditionILU(const MatrixBase &    matrix,
+  PreconditionILU::PreconditionILU(const MatrixBase     &matrix,
                                    const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -402,7 +402,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionILU::initialize(const MatrixBase &    matrix_,
+  PreconditionILU::initialize(const MatrixBase     &matrix_,
                               const AdditionalData &additional_data_)
   {
     clear();
@@ -562,7 +562,7 @@ namespace PETScWrappers
 
 
   PreconditionBoomerAMG::PreconditionBoomerAMG(
-    const MatrixBase &    matrix,
+    const MatrixBase     &matrix,
     const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -682,7 +682,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionBoomerAMG::initialize(const MatrixBase &    matrix_,
+  PreconditionBoomerAMG::initialize(const MatrixBase     &matrix_,
                                     const AdditionalData &additional_data_)
   {
 #  ifdef DEAL_II_PETSC_WITH_HYPRE
@@ -727,7 +727,7 @@ namespace PETScWrappers
 
 
   PreconditionParaSails::PreconditionParaSails(
-    const MatrixBase &    matrix,
+    const MatrixBase     &matrix,
     const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -736,7 +736,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionParaSails::initialize(const MatrixBase &    matrix_,
+  PreconditionParaSails::initialize(const MatrixBase     &matrix_,
                                     const AdditionalData &additional_data_)
   {
     clear();
@@ -824,7 +824,7 @@ namespace PETScWrappers
 
 
 
-  PreconditionNone::PreconditionNone(const MatrixBase &    matrix,
+  PreconditionNone::PreconditionNone(const MatrixBase     &matrix,
                                      const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -833,7 +833,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionNone::initialize(const MatrixBase &    matrix_,
+  PreconditionNone::initialize(const MatrixBase     &matrix_,
                                const AdditionalData &additional_data_)
   {
     clear();
@@ -868,7 +868,7 @@ namespace PETScWrappers
 
 
 
-  PreconditionLU::PreconditionLU(const MatrixBase &    matrix,
+  PreconditionLU::PreconditionLU(const MatrixBase     &matrix,
                                  const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -877,7 +877,7 @@ namespace PETScWrappers
 
 
   void
-  PreconditionLU::initialize(const MatrixBase &    matrix_,
+  PreconditionLU::initialize(const MatrixBase     &matrix_,
                              const AdditionalData &additional_data_)
   {
     clear();
@@ -945,7 +945,7 @@ namespace PETScWrappers
 
 
   template <int dim>
-  PreconditionBDDC<dim>::PreconditionBDDC(const MatrixBase &    matrix,
+  PreconditionBDDC<dim>::PreconditionBDDC(const MatrixBase     &matrix,
                                           const AdditionalData &additional_data)
     : PreconditionBase(matrix.get_mpi_communicator())
   {
@@ -1039,7 +1039,7 @@ namespace PETScWrappers
 
   template <int dim>
   void
-  PreconditionBDDC<dim>::initialize(const MatrixBase &    matrix_,
+  PreconditionBDDC<dim>::initialize(const MatrixBase     &matrix_,
                                     const AdditionalData &additional_data_)
   {
     clear();

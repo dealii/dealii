@@ -263,7 +263,7 @@ namespace Differentiation
        */
       void
       print_tape_stats(const typename Types<ad_type>::tape_index tape_index,
-                       std::ostream &                            stream) const;
+                       std::ostream                             &stream) const;
 
       /** @} */
 
@@ -781,7 +781,7 @@ namespace Differentiation
        */
       void
       register_dependent_variable(const unsigned int index,
-                                  const ad_type &    func);
+                                  const ad_type     &func);
 
       /** @} */
 
@@ -924,7 +924,7 @@ namespace Differentiation
       template <typename VectorType>
       void
       register_dof_values(
-        const VectorType &                                  values,
+        const VectorType                                   &values,
         const std::vector<dealii::types::global_dof_index> &local_dof_indices);
 
       /**
@@ -999,7 +999,7 @@ namespace Differentiation
       template <typename VectorType>
       void
       set_dof_values(
-        const VectorType &                                  values,
+        const VectorType                                   &values,
         const std::vector<dealii::types::global_dof_index> &local_dof_indices);
 
       /** @} */
@@ -2433,9 +2433,9 @@ namespace Differentiation
        */
       template <typename TensorType, typename NumberType>
       inline void
-      set_tensor_entry(TensorType &       t,
+      set_tensor_entry(TensorType        &t,
                        const unsigned int unrolled_index,
-                       const NumberType & value)
+                       const NumberType  &value)
       {
         // Where possible, set values using TableIndices
         AssertIndexRange(unrolled_index, t.n_independent_components);
@@ -2451,7 +2451,7 @@ namespace Differentiation
       inline void
       set_tensor_entry(Tensor<0, dim, NumberType> &t,
                        const unsigned int          unrolled_index,
-                       const NumberType &          value)
+                       const NumberType           &value)
       {
         AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
@@ -2466,9 +2466,9 @@ namespace Differentiation
        */
       template <typename NumberType>
       inline void
-      set_tensor_entry(NumberType &       t,
+      set_tensor_entry(NumberType        &t,
                        const unsigned int unrolled_index,
-                       const NumberType & value)
+                       const NumberType  &value)
       {
         AssertIndexRange(unrolled_index, 1);
         (void)unrolled_index;
@@ -2486,7 +2486,7 @@ namespace Differentiation
       set_tensor_entry(SymmetricTensor<4, dim, NumberType> &t,
                        const unsigned int                   unrolled_index_row,
                        const unsigned int                   unrolled_index_col,
-                       const NumberType &                   value)
+                       const NumberType                    &value)
       {
         // Fourth order symmetric tensors require a specialized interface
         // to extract values.
@@ -2785,7 +2785,7 @@ namespace Differentiation
        */
       template <typename ValueType, typename ExtractorType>
       void
-      register_independent_variable(const ValueType &    value,
+      register_independent_variable(const ValueType     &value,
                                     const ExtractorType &extractor);
 
       /**
@@ -2896,7 +2896,7 @@ namespace Differentiation
        */
       template <typename ValueType, typename ExtractorType>
       void
-      set_independent_variable(const ValueType &    value,
+      set_independent_variable(const ValueType     &value,
                                const ExtractorType &extractor);
 
       /** @} */
@@ -3254,7 +3254,7 @@ namespace Differentiation
       static typename internal::
         ScalarFieldGradient<dim, scalar_type, ExtractorType_Row>::type
         extract_gradient_component(const Vector<scalar_type> &gradient,
-                                   const ExtractorType_Row &  extractor_row);
+                                   const ExtractorType_Row   &extractor_row);
 
       /**
        * Extract the function Hessian for a subset of independent variables
@@ -3300,8 +3300,8 @@ namespace Differentiation
                                                    ExtractorType_Row,
                                                    ExtractorType_Col>::type
       extract_hessian_component(const FullMatrix<scalar_type> &hessian,
-                                const ExtractorType_Row &      extractor_row,
-                                const ExtractorType_Col &      extractor_col);
+                                const ExtractorType_Row       &extractor_row,
+                                const ExtractorType_Col       &extractor_col);
 
       /**
        * Extract the function Hessian for a subset of independent variables
@@ -3318,7 +3318,7 @@ namespace Differentiation
        */
       static Tensor<0, dim, scalar_type>
       extract_hessian_component(
-        const FullMatrix<scalar_type> &   hessian,
+        const FullMatrix<scalar_type>    &hessian,
         const FEValuesExtractors::Scalar &extractor_row,
         const FEValuesExtractors::Scalar &extractor_col);
 
@@ -3335,7 +3335,7 @@ namespace Differentiation
        */
       static SymmetricTensor<4, dim, scalar_type>
       extract_hessian_component(
-        const FullMatrix<scalar_type> &               hessian,
+        const FullMatrix<scalar_type>                &hessian,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_col);
 
@@ -3592,7 +3592,7 @@ namespace Differentiation
        */
       template <typename ValueType, typename ExtractorType>
       void
-      register_dependent_variable(const ValueType &    funcs,
+      register_dependent_variable(const ValueType     &funcs,
                                   const ExtractorType &extractor);
 
       /**
@@ -3640,7 +3640,7 @@ namespace Differentiation
       static typename internal::
         VectorFieldValue<dim, scalar_type, ExtractorType_Row>::type
         extract_value_component(const Vector<scalar_type> &values,
-                                const ExtractorType_Row &  extractor_row);
+                                const ExtractorType_Row   &extractor_row);
 
       /**
        * Extract the Jacobian of the subset of dependent functions
@@ -3695,8 +3695,8 @@ namespace Differentiation
                                                     ExtractorType_Row,
                                                     ExtractorType_Col>::type
       extract_jacobian_component(const FullMatrix<scalar_type> &jacobian,
-                                 const ExtractorType_Row &      extractor_row,
-                                 const ExtractorType_Col &      extractor_col);
+                                 const ExtractorType_Row       &extractor_row,
+                                 const ExtractorType_Col       &extractor_col);
 
       /**
        * Extract the Jacobian of the subset of dependent functions
@@ -3715,7 +3715,7 @@ namespace Differentiation
        */
       static Tensor<0, dim, scalar_type>
       extract_jacobian_component(
-        const FullMatrix<scalar_type> &   jacobian,
+        const FullMatrix<scalar_type>    &jacobian,
         const FEValuesExtractors::Scalar &extractor_row,
         const FEValuesExtractors::Scalar &extractor_col);
 
@@ -3734,7 +3734,7 @@ namespace Differentiation
        */
       static SymmetricTensor<4, dim, scalar_type>
       extract_jacobian_component(
-        const FullMatrix<scalar_type> &               jacobian,
+        const FullMatrix<scalar_type>                &jacobian,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_col);
 
@@ -3764,7 +3764,7 @@ namespace Differentiation
     template <typename VectorType>
     void
     CellLevelBase<ADNumberTypeCode, ScalarType>::register_dof_values(
-      const VectorType &                                  values,
+      const VectorType                                   &values,
       const std::vector<dealii::types::global_dof_index> &local_dof_indices)
     {
       // This is actually the same thing the set_dof_values() function,
@@ -3789,7 +3789,7 @@ namespace Differentiation
     template <typename VectorType>
     void
     CellLevelBase<ADNumberTypeCode, ScalarType>::set_dof_values(
-      const VectorType &                                  values,
+      const VectorType                                   &values,
       const std::vector<dealii::types::global_dof_index> &local_dof_indices)
     {
       Assert(local_dof_indices.size() == this->n_independent_variables(),
@@ -3812,7 +3812,7 @@ namespace Differentiation
     template <typename ValueType, typename ExtractorType>
     void
     PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
-      register_independent_variable(const ValueType &    value,
+      register_independent_variable(const ValueType     &value,
                                     const ExtractorType &extractor)
     {
       // This is actually the same thing as the set_independent_variable
@@ -3848,7 +3848,7 @@ namespace Differentiation
     template <typename ValueType, typename ExtractorType>
     void
     PointLevelFunctionsBase<dim, ADNumberTypeCode, ScalarType>::
-      set_independent_variable(const ValueType &    value,
+      set_independent_variable(const ValueType     &value,
                                const ExtractorType &extractor)
     {
       const std::vector<unsigned int> index_set(
@@ -3923,7 +3923,7 @@ namespace Differentiation
       ExtractorType_Row>::type
     ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_gradient_component(const Vector<scalar_type> &gradient,
-                                 const ExtractorType_Row &  extractor_row)
+                                 const ExtractorType_Row   &extractor_row)
     {
       // NOTE: The order of components must be consistently defined throughout
       // this class.
@@ -3955,8 +3955,8 @@ namespace Differentiation
       ExtractorType_Col>::type
     ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_hessian_component(const FullMatrix<scalar_type> &hessian,
-                                const ExtractorType_Row &      extractor_row,
-                                const ExtractorType_Col &      extractor_col)
+                                const ExtractorType_Row       &extractor_row,
+                                const ExtractorType_Col       &extractor_col)
     {
       using InternalHessian      = internal::ScalarFieldHessian<dim,
                                                            scalar_type,
@@ -4018,7 +4018,7 @@ namespace Differentiation
     template <typename ValueType, typename ExtractorType>
     void
     VectorFunction<dim, ADNumberTypeCode, ScalarType>::
-      register_dependent_variable(const ValueType &    funcs,
+      register_dependent_variable(const ValueType     &funcs,
                                   const ExtractorType &extractor)
     {
       const std::vector<unsigned int> index_set(
@@ -4045,7 +4045,7 @@ namespace Differentiation
       ExtractorType_Row>::type
     VectorFunction<dim, ADNumberTypeCode, ScalarType>::extract_value_component(
       const Vector<scalar_type> &values,
-      const ExtractorType_Row &  extractor_row)
+      const ExtractorType_Row   &extractor_row)
     {
       // NOTE: The order of components must be consistently defined throughout
       // this class.
@@ -4077,8 +4077,8 @@ namespace Differentiation
       ExtractorType_Col>::type
     VectorFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_jacobian_component(const FullMatrix<scalar_type> &jacobian,
-                                 const ExtractorType_Row &      extractor_row,
-                                 const ExtractorType_Col &      extractor_col)
+                                 const ExtractorType_Row       &extractor_row,
+                                 const ExtractorType_Col       &extractor_col)
     {
       using InternalJacobian     = internal::VectorFieldJacobian<dim,
                                                              scalar_type,

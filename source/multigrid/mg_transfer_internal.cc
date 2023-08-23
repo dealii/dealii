@@ -60,7 +60,7 @@ namespace internal
     void
     fill_copy_indices(
       const DoFHandler<dim, spacedim> &dof_handler,
-      const MGConstrainedDoFs *        mg_constrained_dofs,
+      const MGConstrainedDoFs         *mg_constrained_dofs,
       std::vector<std::vector<
         std::pair<types::global_dof_index, types::global_dof_index>>>
         &copy_indices,
@@ -69,7 +69,7 @@ namespace internal
         &copy_indices_global_mine,
       std::vector<std::vector<
         std::pair<types::global_dof_index, types::global_dof_index>>>
-        &        copy_indices_level_mine,
+                &copy_indices_level_mine,
       const bool skip_interface_dofs)
     {
       // Now we are filling the variables copy_indices*, which are essentially
@@ -99,7 +99,7 @@ namespace internal
       for (unsigned int level = 0; level < n_levels; ++level)
         {
           std::vector<bool> dof_touched(owned_dofs.n_elements(), false);
-          const IndexSet &  owned_level_dofs =
+          const IndexSet   &owned_level_dofs =
             dof_handler.locally_owned_mg_dofs(level);
 
           // for the most common case where copy_indices are locally owned
@@ -396,10 +396,10 @@ namespace internal
     // content in copy_indices_global_mine)
     void
     reinit_level_partitioner(
-      const IndexSet &                      locally_owned,
+      const IndexSet                       &locally_owned,
       std::vector<types::global_dof_index> &ghosted_level_dofs,
       const std::shared_ptr<const Utilities::MPI::Partitioner>
-        &                                                 external_partitioner,
+                                                         &external_partitioner,
       const MPI_Comm                                      communicator,
       std::shared_ptr<const Utilities::MPI::Partitioner> &target_partitioner,
       Table<2, unsigned int> &copy_indices_global_mine)
@@ -462,10 +462,10 @@ namespace internal
     // Transform the ghost indices to local index space for the vector
     inline void
     copy_indices_to_mpi_local_numbers(
-      const Utilities::MPI::Partitioner &         part,
+      const Utilities::MPI::Partitioner          &part,
       const std::vector<types::global_dof_index> &mine,
       const std::vector<types::global_dof_index> &remote,
-      std::vector<unsigned int> &                 localized_indices)
+      std::vector<unsigned int>                  &localized_indices)
     {
       localized_indices.resize(mine.size() + remote.size(),
                                numbers::invalid_unsigned_int);
@@ -518,9 +518,9 @@ namespace internal
       const unsigned int                          child,
       const unsigned int                          fe_shift_1d,
       const unsigned int                          fe_degree,
-      const std::vector<unsigned int> &           lexicographic_numbering,
+      const std::vector<unsigned int>            &lexicographic_numbering,
       const std::vector<types::global_dof_index> &local_dof_indices,
-      types::global_dof_index *                   target_indices)
+      types::global_dof_index                    *target_indices)
     {
       const unsigned int n_child_dofs_1d = fe_degree + 1 + fe_shift_1d;
       const unsigned int shift =
@@ -551,9 +551,9 @@ namespace internal
 
     template <int dim, typename Number>
     void
-    setup_element_info(ElementInfo<Number> &   elem_info,
+    setup_element_info(ElementInfo<Number>    &elem_info,
                        const FiniteElement<1> &fe,
-                       const DoFHandler<dim> & dof_handler)
+                       const DoFHandler<dim>  &dof_handler)
     {
       // currently, we have only FE_Q and FE_DGQ type elements implemented
       elem_info.n_components = dof_handler.get_fe().element_multiplicity(0);
@@ -616,17 +616,17 @@ namespace internal
     template <int dim, typename Number>
     void
     setup_transfer(
-      const DoFHandler<dim> &  dof_handler,
+      const DoFHandler<dim>   &dof_handler,
       const MGConstrainedDoFs *mg_constrained_dofs,
       const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-        &                                     external_partitioners,
-      ElementInfo<Number> &                   elem_info,
+                                             &external_partitioners,
+      ElementInfo<Number>                    &elem_info,
       std::vector<std::vector<unsigned int>> &level_dof_indices,
       std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-        &                        parent_child_connect,
+                                &parent_child_connect,
       std::vector<unsigned int> &n_owned_level_cells,
       std::vector<std::vector<std::vector<unsigned short>>> &dirichlet_indices,
-      std::vector<std::vector<Number>> &                     weights_on_refined,
+      std::vector<std::vector<Number>>                      &weights_on_refined,
       std::vector<Table<2, unsigned int>> &copy_indices_global_mine,
       MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>>
         &target_partitioners)
@@ -974,7 +974,7 @@ namespace internal
 
     void
     resolve_identity_constraints(
-      const MGConstrainedDoFs *             mg_constrained_dofs,
+      const MGConstrainedDoFs              *mg_constrained_dofs,
       const unsigned int                    level,
       std::vector<types::global_dof_index> &dof_indices)
     {

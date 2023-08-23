@@ -49,7 +49,7 @@ namespace internal
   template <typename number>
   void
   reinit(MatrixBlock<dealii::SparseMatrix<number>> &v,
-         const BlockSparsityPattern &               p);
+         const BlockSparsityPattern                &p);
 } // namespace internal
 
 /**
@@ -183,7 +183,7 @@ public:
   template <typename number>
   void
   add(const std::vector<size_type> &indices,
-      const FullMatrix<number> &    full_matrix,
+      const FullMatrix<number>     &full_matrix,
       const bool                    elide_zero_values = true);
 
   /**
@@ -204,7 +204,7 @@ public:
   void
   add(const std::vector<size_type> &row_indices,
       const std::vector<size_type> &col_indices,
-      const FullMatrix<number> &    full_matrix,
+      const FullMatrix<number>     &full_matrix,
       const bool                    elide_zero_values = true);
 
   /**
@@ -227,7 +227,7 @@ public:
   void
   add(const size_type               row_index,
       const std::vector<size_type> &col_indices,
-      const std::vector<number> &   values,
+      const std::vector<number>    &values,
       const bool                    elide_zero_values = true);
 
   /**
@@ -244,7 +244,7 @@ public:
   add(const size_type  row,
       const size_type  n_cols,
       const size_type *col_indices,
-      const number *   values,
+      const number    *values,
       const bool       elide_zero_values      = true,
       const bool       col_indices_are_sorted = false);
 
@@ -336,7 +336,7 @@ private:
   template <typename number>
   friend void
   internal::reinit(MatrixBlock<dealii::SparseMatrix<number>> &v,
-                   const BlockSparsityPattern &               p);
+                   const BlockSparsityPattern                &p);
 };
 
 
@@ -625,7 +625,7 @@ namespace internal
   template <typename number>
   void
   reinit(MatrixBlock<dealii::SparseMatrix<number>> &v,
-         const BlockSparsityPattern &               p)
+         const BlockSparsityPattern                &p)
   {
     v.row_indices    = p.get_row_indices();
     v.column_indices = p.get_column_indices();
@@ -695,7 +695,7 @@ template <typename number>
 inline void
 MatrixBlock<MatrixType>::add(const std::vector<size_type> &r_indices,
                              const std::vector<size_type> &c_indices,
-                             const FullMatrix<number> &    values,
+                             const FullMatrix<number>     &values,
                              const bool                    elide_zero_values)
 {
   Assert(row_indices.size() != 0, ExcNotInitialized());
@@ -719,7 +719,7 @@ inline void
 MatrixBlock<MatrixType>::add(const size_type  b_row,
                              const size_type  n_cols,
                              const size_type *col_indices,
-                             const number *   values,
+                             const number    *values,
                              const bool,
                              const bool)
 {
@@ -737,7 +737,7 @@ MatrixBlock<MatrixType>::add(const size_type  b_row,
   // leave it at this. While it may
   // not be the most efficient way,
   // it is at least thread safe.
-  //#ifdef DEBUG
+  // #ifdef DEBUG
   Assert(bi.first == row, ExcBlockIndexMismatch(bi.first, row));
 
   for (size_type j = 0; j < n_cols; ++j)
@@ -748,7 +748,7 @@ MatrixBlock<MatrixType>::add(const size_type  b_row,
 
       matrix.add(bi.second, bj.second, values[j]);
     }
-  //#endif
+  // #endif
 }
 
 
@@ -756,7 +756,7 @@ template <typename MatrixType>
 template <typename number>
 inline void
 MatrixBlock<MatrixType>::add(const std::vector<size_type> &indices,
-                             const FullMatrix<number> &    values,
+                             const FullMatrix<number>     &values,
                              const bool                    elide_zero_values)
 {
   Assert(row_indices.size() != 0, ExcNotInitialized());
@@ -780,7 +780,7 @@ template <typename number>
 inline void
 MatrixBlock<MatrixType>::add(const size_type               row,
                              const std::vector<size_type> &col_indices,
-                             const std::vector<number> &   values,
+                             const std::vector<number>    &values,
                              const bool                    elide_zero_values)
 {
   Assert(row_indices.size() != 0, ExcNotInitialized());

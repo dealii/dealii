@@ -224,14 +224,14 @@ namespace Step21
       : Function<dim>(dim + 2)
     {}
 
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override
     {
       return Functions::ZeroFunction<dim>(dim + 2).value(p, component);
     }
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  values) const override
+                              Vector<double>   &values) const override
     {
       Functions::ZeroFunction<dim>(dim + 2).vector_value(p, values);
     }
@@ -265,7 +265,7 @@ namespace Step21
 
       virtual void
       value_list(const std::vector<Point<dim>> &points,
-                 std::vector<Tensor<2, dim>> &  values) const override
+                 std::vector<Tensor<2, dim>>   &values) const override
       {
         AssertDimension(points.size(), values.size());
 
@@ -333,7 +333,7 @@ namespace Step21
 
       virtual void
       value_list(const std::vector<Point<dim>> &points,
-                 std::vector<Tensor<2, dim>> &  values) const override
+                 std::vector<Tensor<2, dim>>   &values) const override
       {
         AssertDimension(points.size(), values.size());
 
@@ -374,8 +374,8 @@ namespace Step21
 
 
     template <int dim>
-    std::vector<Point<dim>>
-      KInverse<dim>::centers = KInverse<dim>::get_centers();
+    std::vector<Point<dim>> KInverse<dim>::centers =
+      KInverse<dim>::get_centers();
   } // namespace RandomMedium
 
 
@@ -440,7 +440,7 @@ namespace Step21
   class SchurComplement : public Subscriptor
   {
   public:
-    SchurComplement(const BlockSparseMatrix<double> &          A,
+    SchurComplement(const BlockSparseMatrix<double>           &A,
                     const InverseMatrix<SparseMatrix<double>> &Minv)
       : system_matrix(&A)
       , m_inverse(&Minv)

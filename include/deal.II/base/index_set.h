@@ -1069,7 +1069,7 @@ private:
   void
   add_ranges_internal(
     boost::container::small_vector<std::pair<size_type, size_type>, 200>
-      &        tmp_ranges,
+              &tmp_ranges,
     const bool ranges_are_sorted);
 };
 
@@ -1107,7 +1107,7 @@ complete_index_set(const IndexSet::size_type N)
 /* IntervalAccessor */
 
 inline IndexSet::IntervalAccessor::IntervalAccessor(
-  const IndexSet *          idxset,
+  const IndexSet           *idxset,
   const IndexSet::size_type range_idx)
   : index_set(idxset)
   , range_idx(range_idx)
@@ -1240,7 +1240,7 @@ IndexSet::IntervalAccessor::advance()
 /* IntervalIterator */
 
 inline IndexSet::IntervalIterator::IntervalIterator(
-  const IndexSet *          idxset,
+  const IndexSet           *idxset,
   const IndexSet::size_type range_idx)
   : accessor(idxset, range_idx)
 {}
@@ -1348,7 +1348,7 @@ IndexSet::IntervalIterator::operator-(
 /* ElementIterator */
 
 inline IndexSet::ElementIterator::ElementIterator(
-  const IndexSet *          idxset,
+  const IndexSet           *idxset,
   const IndexSet::size_type range_idx,
   const IndexSet::size_type index)
   : index_set(idxset)

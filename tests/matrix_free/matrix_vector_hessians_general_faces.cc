@@ -49,7 +49,7 @@
 template <int dim>
 void
 test_hessians(const unsigned int                             degree,
-              const dealii::FE_Poly<dim> &                   fe,
+              const dealii::FE_Poly<dim>                    &fe,
               const dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
 {
   using namespace dealii;

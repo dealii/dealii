@@ -108,8 +108,8 @@ namespace PETScWrappers
 
 
     void
-    BlockSparseMatrix::reinit(const std::vector<IndexSet> &      rows,
-                              const std::vector<IndexSet> &      cols,
+    BlockSparseMatrix::reinit(const std::vector<IndexSet>       &rows,
+                              const std::vector<IndexSet>       &cols,
                               const BlockDynamicSparsityPattern &bdsp,
                               const MPI_Comm                     com)
     {
@@ -147,7 +147,7 @@ namespace PETScWrappers
     }
 
     void
-    BlockSparseMatrix::reinit(const std::vector<IndexSet> &      sizes,
+    BlockSparseMatrix::reinit(const std::vector<IndexSet>       &sizes,
                               const BlockDynamicSparsityPattern &bdsp,
                               const MPI_Comm                     com)
     {

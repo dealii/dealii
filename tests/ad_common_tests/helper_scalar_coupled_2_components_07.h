@@ -104,14 +104,14 @@ struct FunctionsTestSymmetricTensorTensorCoupled
 
   static NumberType
   psi(const SymmetricTensor<2, dim, NumberType> &t1,
-      const Tensor<2, dim, NumberType> &         t2)
+      const Tensor<2, dim, NumberType>          &t2)
   {
     return pow(det_t(t1), 2) * pow(det_t(t2), 3);
   };
 
   static SymmetricTensor<2, dim, NumberType>
   dpsi_dt1(const SymmetricTensor<2, dim, NumberType> &t1,
-           const Tensor<2, dim, NumberType> &         t2)
+           const Tensor<2, dim, NumberType>          &t2)
   {
     return SymmetricTensor<2, dim, NumberType>(
       2.0 * pow(det_t(t1), 1) * ddet_t_dt(t1) * pow(det_t(t2), 3));
@@ -119,14 +119,14 @@ struct FunctionsTestSymmetricTensorTensorCoupled
 
   static Tensor<2, dim, NumberType>
   dpsi_dt2(const SymmetricTensor<2, dim, NumberType> &t1,
-           const Tensor<2, dim, NumberType> &         t2)
+           const Tensor<2, dim, NumberType>          &t2)
   {
     return pow(det_t(t1), 2) * 3.0 * pow(det_t(t2), 2) * ddet_t_dt(t2);
   };
 
   static SymmetricTensor<4, dim, NumberType>
   d2psi_dt1_dt1(const SymmetricTensor<2, dim, NumberType> &t1,
-                const Tensor<2, dim, NumberType> &         t2)
+                const Tensor<2, dim, NumberType>          &t2)
   {
     return SymmetricTensor<4, dim, NumberType>(
       2.0 * pow(det_t(t2), 3) *
@@ -136,7 +136,7 @@ struct FunctionsTestSymmetricTensorTensorCoupled
 
   static Tensor<4, dim, NumberType>
   d2psi_dt2_dt1(const SymmetricTensor<2, dim, NumberType> &t1,
-                const Tensor<2, dim, NumberType> &         t2)
+                const Tensor<2, dim, NumberType>          &t2)
   {
     return 2.0 * pow(det_t(t1), 1) * 3.0 * pow(det_t(t2), 2) *
            outer_product(static_cast<Tensor<2, dim, NumberType>>(ddet_t_dt(t1)),
@@ -145,7 +145,7 @@ struct FunctionsTestSymmetricTensorTensorCoupled
 
   static Tensor<4, dim, NumberType>
   d2psi_dt1_dt2(const SymmetricTensor<2, dim, NumberType> &t1,
-                const Tensor<2, dim, NumberType> &         t2)
+                const Tensor<2, dim, NumberType>          &t2)
   {
     return 2.0 * pow(det_t(t1), 1) * 3.0 * pow(det_t(t2), 2) *
            outer_product(ddet_t_dt(t2),
@@ -155,7 +155,7 @@ struct FunctionsTestSymmetricTensorTensorCoupled
 
   static Tensor<4, dim, NumberType>
   d2psi_dt2_dt2(const SymmetricTensor<2, dim, NumberType> &t1,
-                const Tensor<2, dim, NumberType> &         t2)
+                const Tensor<2, dim, NumberType>          &t2)
   {
     return pow(det_t(t1), 2) * 3.0 *
            (2.0 * pow(det_t(t2), 1) *

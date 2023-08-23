@@ -73,7 +73,7 @@ public:
 
 template <int dim>
 void
-check_boundary(const DoFHandler<dim> &           dof,
+check_boundary(const DoFHandler<dim>            &dof,
                const hp::MappingCollection<dim> &mapping)
 {
   MySquareFunction<dim>                               coefficient;

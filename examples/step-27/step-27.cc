@@ -127,7 +127,7 @@ namespace Step27
   class RightHandSide : public Function<dim>
   {
   public:
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component) const override;
   };
 

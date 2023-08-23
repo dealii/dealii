@@ -65,7 +65,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     std::vector<value_type>
     preserve(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-               &              parent,
+                             &parent,
              const value_type parent_value);
 
     /**
@@ -84,7 +84,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     std::vector<value_type>
     split(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-            &              parent,
+                          &parent,
           const value_type parent_value);
 
     /**
@@ -103,7 +103,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     std::vector<value_type>
     l2_norm(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-              &              parent,
+                            &parent,
             const value_type parent_value);
   } // namespace Refinement
 
@@ -130,7 +130,7 @@ namespace AdaptationStrategies
     value_type
     check_equality(
       const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-        &                            parent,
+                                    &parent,
       const std::vector<value_type> &children_values);
 
     /**
@@ -148,7 +148,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     value_type
     sum(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-          &                            parent,
+                                      &parent,
         const std::vector<value_type> &children_values);
 
     /**
@@ -166,7 +166,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     value_type
     l2_norm(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-              &                            parent,
+                                          &parent,
             const std::vector<value_type> &children_values);
 
     /**
@@ -181,7 +181,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     value_type
     mean(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-           &                            parent,
+                                       &parent,
          const std::vector<value_type> &children_values);
 
     /**
@@ -196,7 +196,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     value_type
     max(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-          &                            parent,
+                                      &parent,
         const std::vector<value_type> &children_values);
   } // namespace Coarsening
 } // namespace AdaptationStrategies
@@ -214,7 +214,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     std::vector<value_type>
     preserve(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-               &              parent,
+                             &parent,
              const value_type parent_value)
     {
       Assert(parent->n_children() > 0, ExcInternalError());
@@ -226,7 +226,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     std::vector<value_type>
     split(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-            &              parent,
+                          &parent,
           const value_type parent_value)
     {
       static_assert(std::is_arithmetic_v<value_type> &&
@@ -244,7 +244,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     std::vector<value_type>
     l2_norm(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-              &              parent,
+                            &parent,
             const value_type parent_value)
     {
       static_assert(std::is_arithmetic_v<value_type> &&
@@ -325,7 +325,7 @@ namespace AdaptationStrategies
     template <int dim, int spacedim, typename value_type>
     value_type
     mean(const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-           &                            parent,
+                                       &parent,
          const std::vector<value_type> &children_values)
     {
       return sum<dim, spacedim, value_type>(parent, children_values) /

@@ -619,7 +619,7 @@ namespace Differentiation
                                   NumberTypes::adolc_taped>>::
       print_tape_stats(
         const typename Types<ADNumberType>::tape_index tape_index,
-        std::ostream &                                 stream) const
+        std::ostream                                  &stream) const
     {
       // See ADOL-C manual section 2.1
       // and adolc/taping.h
@@ -690,7 +690,7 @@ namespace Differentiation
                                   NumberTypes::adolc_taped>>::
       gradient(const typename Types<ADNumberType>::tape_index active_tape_index,
                const std::vector<scalar_type> &independent_variables,
-               Vector<scalar_type> &           gradient) const
+               Vector<scalar_type>            &gradient) const
     {
       Assert(AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >=
                1,
@@ -722,7 +722,7 @@ namespace Differentiation
                                   NumberTypes::adolc_taped>>::
       hessian(const typename Types<ADNumberType>::tape_index active_tape_index,
               const std::vector<scalar_type> &independent_variables,
-              FullMatrix<scalar_type> &       hessian) const
+              FullMatrix<scalar_type>        &hessian) const
     {
       Assert(AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >=
                2,
@@ -765,7 +765,7 @@ namespace Differentiation
       values(const typename Types<ADNumberType>::tape_index active_tape_index,
              const unsigned int              n_dependent_variables,
              const std::vector<scalar_type> &independent_variables,
-             Vector<scalar_type> &           values) const
+             Vector<scalar_type>            &values) const
     {
       Assert(values.size() == n_dependent_variables,
              ExcDimensionMismatch(values.size(), n_dependent_variables));
@@ -793,7 +793,7 @@ namespace Differentiation
       jacobian(const typename Types<ADNumberType>::tape_index active_tape_index,
                const unsigned int              n_dependent_variables,
                const std::vector<scalar_type> &independent_variables,
-               FullMatrix<scalar_type> &       jacobian) const
+               FullMatrix<scalar_type>        &jacobian) const
     {
       Assert(AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >=
                1,
@@ -1295,7 +1295,7 @@ namespace Differentiation
                                   NumberTypes::adolc_taped>>::
       print_tape_stats(
         const typename Types<ADNumberType>::tape_index tape_index,
-        std::ostream &                                 stream) const
+        std::ostream                                  &stream) const
     {
       // ADOL-C only supports 'double', not 'float', so we can forward to
       // the 'double' implementation of this function
@@ -1331,7 +1331,7 @@ namespace Differentiation
                                   NumberTypes::adolc_taped>>::
       gradient(const typename Types<ADNumberType>::tape_index active_tape_index,
                const std::vector<scalar_type> &independent_variables,
-               Vector<scalar_type> &           gradient) const
+               Vector<scalar_type>            &gradient) const
     {
       Vector<double> gradient_double(gradient.size());
       // ADOL-C only supports 'double', not 'float', so we can forward to
@@ -1351,7 +1351,7 @@ namespace Differentiation
                                   NumberTypes::adolc_taped>>::
       hessian(const typename Types<ADNumberType>::tape_index active_tape_index,
               const std::vector<scalar_type> &independent_variables,
-              FullMatrix<scalar_type> &       hessian) const
+              FullMatrix<scalar_type>        &hessian) const
     {
       FullMatrix<double> hessian_double(hessian.m(), hessian.n());
       // ADOL-C only supports 'double', not 'float', so we can forward to
@@ -1372,7 +1372,7 @@ namespace Differentiation
       values(const typename Types<ADNumberType>::tape_index active_tape_index,
              const unsigned int              n_dependent_variables,
              const std::vector<scalar_type> &independent_variables,
-             Vector<scalar_type> &           values) const
+             Vector<scalar_type>            &values) const
     {
       Vector<double> values_double(values.size());
       // ADOL-C only supports 'double', not 'float', so we can forward to
@@ -1394,7 +1394,7 @@ namespace Differentiation
       jacobian(const typename Types<ADNumberType>::tape_index active_tape_index,
                const unsigned int              n_dependent_variables,
                const std::vector<scalar_type> &independent_variables,
-               FullMatrix<scalar_type> &       jacobian) const
+               FullMatrix<scalar_type>        &jacobian) const
     {
       FullMatrix<double> jacobian_double(jacobian.m(), jacobian.n());
       // ADOL-C only supports 'double', not 'float', so we can forward to
@@ -1755,7 +1755,7 @@ namespace Differentiation
                                        NumberTypes::sacado_rad_dfad>>::
       gradient(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               Vector<ScalarType> &             gradient) const
+               Vector<ScalarType>              &gradient) const
     {
       Assert(AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >=
                1,
@@ -1790,7 +1790,7 @@ namespace Differentiation
                                        NumberTypes::sacado_rad_dfad>>::
       hessian(const std::vector<ADNumberType> &independent_variables,
               const std::vector<ADNumberType> &dependent_variables,
-              FullMatrix<ScalarType> &         hessian) const
+              FullMatrix<ScalarType>          &hessian) const
     {
       Assert(AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >=
                2,
@@ -1843,7 +1843,7 @@ namespace Differentiation
                                      ADNumberTraits<ADNumberType>::type_code ==
                                        NumberTypes::sacado_rad_dfad>>::
       values(const std::vector<ADNumberType> &dependent_variables,
-             Vector<ScalarType> &             values) const
+             Vector<ScalarType>              &values) const
     {
       Assert(values.size() == dependent_variables.size(),
              ExcDimensionMismatch(values.size(), dependent_variables.size()));
@@ -1865,7 +1865,7 @@ namespace Differentiation
                                        NumberTypes::sacado_rad_dfad>>::
       jacobian(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               FullMatrix<ScalarType> &         jacobian) const
+               FullMatrix<ScalarType>          &jacobian) const
     {
       Assert(AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >=
                1,
@@ -2030,7 +2030,7 @@ namespace Differentiation
                                        NumberTypes::sacado_dfad_dfad>>::
       gradient(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               Vector<ScalarType> &             gradient) const
+               Vector<ScalarType>              &gradient) const
     {
       Assert(AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >=
                1,
@@ -2065,7 +2065,7 @@ namespace Differentiation
                                        NumberTypes::sacado_dfad_dfad>>::
       hessian(const std::vector<ADNumberType> &independent_variables,
               const std::vector<ADNumberType> &dependent_variables,
-              FullMatrix<ScalarType> &         hessian) const
+              FullMatrix<ScalarType>          &hessian) const
     {
       Assert(AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >=
                2,
@@ -2118,7 +2118,7 @@ namespace Differentiation
                                      ADNumberTraits<ADNumberType>::type_code ==
                                        NumberTypes::sacado_dfad_dfad>>::
       values(const std::vector<ADNumberType> &dependent_variables,
-             Vector<ScalarType> &             values) const
+             Vector<ScalarType>              &values) const
     {
       Assert(values.size() == dependent_variables.size(),
              ExcDimensionMismatch(values.size(), dependent_variables.size()));
@@ -2142,7 +2142,7 @@ namespace Differentiation
                                        NumberTypes::sacado_dfad_dfad>>::
       jacobian(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               FullMatrix<ScalarType> &         jacobian) const
+               FullMatrix<ScalarType>          &jacobian) const
     {
       Assert(AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >=
                1,

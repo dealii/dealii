@@ -43,7 +43,7 @@
 #include "../tests.h"
 
 // uncomment when debugging
-//#define DATA_OUT_FE_ENRICHED
+// #define DATA_OUT_FE_ENRICHED
 
 /*
  * Predicate function needed by ColorEnriched::internal::color_predicates

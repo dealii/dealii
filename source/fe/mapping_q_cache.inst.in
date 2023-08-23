@@ -27,16 +27,16 @@ for (deal_II_vec : REAL_NONBLOCK_VECTORS; deal_II_dimension : DIMENSIONS;
 #if deal_II_dimension <= deal_II_space_dimension
     template void
     MappingQCache<deal_II_dimension, deal_II_space_dimension>::initialize(
-      const Mapping<deal_II_dimension, deal_II_space_dimension> &   mapping,
+      const Mapping<deal_II_dimension, deal_II_space_dimension>    &mapping,
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
-      const deal_II_vec &                                           vector,
+      const deal_II_vec                                            &vector,
       const bool vector_describes_relative_displacement);
 
     template void
     MappingQCache<deal_II_dimension, deal_II_space_dimension>::initialize(
-      const Mapping<deal_II_dimension, deal_II_space_dimension> &   mapping,
+      const Mapping<deal_II_dimension, deal_II_space_dimension>    &mapping,
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
-      const MGLevelObject<deal_II_vec> &                            vector,
+      const MGLevelObject<deal_II_vec>                             &vector,
       const bool vector_describes_relative_displacement);
 #endif
   }

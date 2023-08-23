@@ -234,8 +234,8 @@ namespace internal
     template <int dim, typename Number>
     void
     ParserImplementation<dim, Number>::initialize(
-      const std::string &                  variables,
-      const std::vector<std::string> &     expressions,
+      const std::string                   &variables,
+      const std::vector<std::string>      &expressions,
       const std::map<std::string, double> &constants,
       const bool                           time_dependent)
     {
@@ -423,7 +423,7 @@ namespace internal
     template <int dim, typename Number>
     void
     ParserImplementation<dim, Number>::do_all_values(
-      const Point<dim> & p,
+      const Point<dim>  &p,
       const double       time,
       ArrayView<Number> &values) const
     {

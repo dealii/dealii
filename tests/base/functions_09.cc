@@ -86,7 +86,7 @@ check()
   FillTensor<rank, dim>::fill_tensor(value, 0);
 
   ConstantTensorFunction<rank, dim> tensor_function(value);
-  TensorFunction<rank, dim> *       foo = &tensor_function;
+  TensorFunction<rank, dim>        *foo = &tensor_function;
 
 
   Point<dim> point;

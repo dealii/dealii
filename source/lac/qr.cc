@@ -33,9 +33,9 @@ namespace internal
               const char            trans,
               const char            diag,
               const types::blas_int n,
-              const Number *        a,
+              const Number         *a,
               const types::blas_int lda,
-              Number *              x,
+              Number               *x,
               const types::blas_int incx)
     {
       trmv(&uplo, &trans, &diag, &n, a, &lda, x, &incx);
@@ -48,11 +48,11 @@ namespace internal
                const char            diag,
                const types::blas_int n,
                const types::blas_int nrhs,
-               const Number *        a,
+               const Number         *a,
                const types::blas_int lda,
-               Number *              b,
+               Number               *b,
                const types::blas_int ldb,
-               types::blas_int *     info)
+               types::blas_int      *info)
     {
       trtrs(&uplo, &trans, &diag, &n, &nrhs, a, &lda, b, &ldb, info);
     }

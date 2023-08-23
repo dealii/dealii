@@ -36,7 +36,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   Particle<dim, spacedim>::Particle(const Point<spacedim> &location,
-                                    const Point<dim> &     reference_location,
+                                    const Point<dim>      &reference_location,
                                     const types::particle_index id)
     : property_pool(&global_property_pool)
     , property_pool_handle(property_pool->register_particle())
@@ -74,7 +74,7 @@ namespace Particles
 
   template <int dim, int spacedim>
   Particle<dim, spacedim>::Particle(
-    const void *&                      data,
+    const void                       *&data,
     PropertyPool<dim, spacedim> *const new_property_pool)
     : property_pool(new_property_pool != nullptr ? new_property_pool :
                                                    &global_property_pool)

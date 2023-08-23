@@ -199,7 +199,7 @@ namespace NonMatching
      */
     QuadratureGenerator(
       const hp::QCollection<1> &quadratures1D,
-      const AdditionalData &    additional_data = AdditionalData());
+      const AdditionalData     &additional_data = AdditionalData());
 
     /**
      * Clears the inside, outside and surface quadratures.
@@ -227,7 +227,7 @@ namespace NonMatching
      * existing quadrature instead.
      */
     void
-    generate_append(const Function<dim> &   level_set,
+    generate_append(const Function<dim>    &level_set,
                     const BoundingBox<dim> &box);
 
     /**
@@ -317,7 +317,7 @@ namespace NonMatching
      */
     FaceQuadratureGenerator(
       const hp::QCollection<1> &quadratures1D,
-      const AdditionalData &    additional_data = AdditionalData());
+      const AdditionalData     &additional_data = AdditionalData());
 
     /**
      * Clears the inside, outside and surface quadratures.
@@ -338,7 +338,7 @@ namespace NonMatching
      * incoming function.
      */
     void
-    generate(const Function<dim> &   level_set,
+    generate(const Function<dim>    &level_set,
              const BoundingBox<dim> &box,
              const unsigned int      face_index);
 
@@ -347,7 +347,7 @@ namespace NonMatching
      * existing quadrature instead.
      */
     void
-    generate_append(const Function<dim> &   level_set,
+    generate_append(const Function<dim>    &level_set,
                     const BoundingBox<dim> &box,
                     const unsigned int      face_index);
 
@@ -430,7 +430,7 @@ namespace NonMatching
      */
     FaceQuadratureGenerator(
       const hp::QCollection<1> &quadratures1D,
-      const AdditionalData &    additional_data = AdditionalData());
+      const AdditionalData     &additional_data = AdditionalData());
 
     /**
      * Does nothing. Exists for compatibility reasons.
@@ -448,7 +448,7 @@ namespace NonMatching
      * get_surface_quadrature().
      */
     void
-    generate(const Function<1> &   level_set,
+    generate(const Function<1>    &level_set,
              const BoundingBox<1> &box,
              const unsigned int    face_index);
 
@@ -457,7 +457,7 @@ namespace NonMatching
      * existing quadrature instead.
      */
     void
-    generate_append(const Function<1> &   level_set,
+    generate_append(const Function<1>    &level_set,
                     const BoundingBox<1> &box,
                     const unsigned int    face_index);
 
@@ -547,9 +547,9 @@ namespace NonMatching
     template <typename VectorType>
     DiscreteQuadratureGenerator(
       const hp::QCollection<1> &quadratures1D,
-      const DoFHandler<dim> &   dof_handler,
-      const VectorType &        level_set,
-      const AdditionalData &    additional_data = AdditionalData());
+      const DoFHandler<dim>    &dof_handler,
+      const VectorType         &level_set,
+      const AdditionalData     &additional_data = AdditionalData());
 
     /**
      * Construct immersed quadratures rules based on the discrete level
@@ -609,9 +609,9 @@ namespace NonMatching
     template <typename VectorType>
     DiscreteFaceQuadratureGenerator(
       const hp::QCollection<1> &quadratures1D,
-      const DoFHandler<dim> &   dof_handler,
-      const VectorType &        level_set,
-      const AdditionalData &    additional_data = AdditionalData());
+      const DoFHandler<dim>    &dof_handler,
+      const VectorType         &level_set,
+      const AdditionalData     &additional_data = AdditionalData());
 
     /**
      * Construct immersed quadratures rules based on the discrete level
@@ -711,9 +711,9 @@ namespace NonMatching
          */
         void
         find_roots(const std::vector<std::reference_wrapper<const Function<1>>>
-                     &                   functions,
+                                        &functions,
                    const BoundingBox<1> &interval,
-                   std::vector<double> & roots);
+                   std::vector<double>  &roots);
 
       private:
         /**
@@ -722,10 +722,10 @@ namespace NonMatching
          * of times this function has been called recursively.
          */
         void
-        find_roots(const Function<1> &   function,
+        find_roots(const Function<1>    &function,
                    const BoundingBox<1> &interval,
                    const unsigned int    recursion_depth,
-                   std::vector<double> & roots);
+                   std::vector<double>  &roots);
 
         const AdditionalData additional_data;
       };
@@ -901,7 +901,7 @@ namespace NonMatching
          * Constructor. Takes the same parameters as QuadratureGenerator.
          */
         UpThroughDimensionCreator(
-          const hp::QCollection<1> &      q_collection1D,
+          const hp::QCollection<1>       &q_collection1D,
           const AdditionalQGeneratorData &additional_data);
 
         /**
@@ -911,11 +911,11 @@ namespace NonMatching
          */
         void
         generate(const std::vector<std::reference_wrapper<const Function<dim>>>
-                   &                        level_sets,
-                 const BoundingBox<dim> &   box,
+                                           &level_sets,
+                 const BoundingBox<dim>    &box,
                  const Quadrature<dim - 1> &low_dim_quadrature,
                  const unsigned int         height_function_direction,
-                 QPartitioning<dim> &       q_partitioning);
+                 QPartitioning<dim>        &q_partitioning);
 
         /**
          * Set which 1d-quadrature in the collection passed to the constructor
@@ -938,8 +938,8 @@ namespace NonMatching
           const Point<dim - 1> &point,
           const double          weight,
           const std::vector<std::reference_wrapper<const Function<dim>>>
-            &                             level_sets,
-          const BoundingBox<dim> &        box,
+                                         &level_sets,
+          const BoundingBox<dim>         &box,
           const unsigned int              height_function_direction,
           ImmersedSurfaceQuadrature<dim> &surface_quadrature);
 
@@ -1027,7 +1027,7 @@ namespace NonMatching
       class QGeneratorBase
       {
       public:
-        QGeneratorBase(const hp::QCollection<1> &      q_collection1D,
+        QGeneratorBase(const hp::QCollection<1>       &q_collection1D,
                        const AdditionalQGeneratorData &additional_data);
 
         /**
@@ -1157,7 +1157,7 @@ namespace NonMatching
         /**
          * Constructor. Takes the same parameters QuadratureGenerator.
          */
-        QGenerator(const hp::QCollection<1> &      q_collection1D,
+        QGenerator(const hp::QCollection<1>       &q_collection1D,
                    const AdditionalQGeneratorData &additional_data);
 
         /**
@@ -1172,7 +1172,7 @@ namespace NonMatching
          */
         void
         generate(const std::vector<std::reference_wrapper<const Function<dim>>>
-                   &                     level_sets,
+                                        &level_sets,
                  const BoundingBox<dim> &box,
                  const unsigned int      n_box_splits);
 
@@ -1194,7 +1194,7 @@ namespace NonMatching
         create_low_dim_quadratures(
           const unsigned int height_function_direction,
           const std::vector<std::reference_wrapper<const Function<dim>>>
-            &                     level_sets,
+                                 &level_sets,
           const BoundingBox<dim> &box,
           const unsigned int      n_box_splits);
 
@@ -1207,7 +1207,7 @@ namespace NonMatching
         create_high_dim_quadratures(
           const unsigned int height_function_direction,
           const std::vector<std::reference_wrapper<const Function<dim>>>
-            &                     level_sets,
+                                 &level_sets,
           const BoundingBox<dim> &box);
 
         /**
@@ -1218,8 +1218,8 @@ namespace NonMatching
         void
         split_box_and_recurse(
           const std::vector<std::reference_wrapper<const Function<dim>>>
-            &                                       level_sets,
-          const BoundingBox<dim> &                  box,
+                                                   &level_sets,
+          const BoundingBox<dim>                   &box,
           const std::optional<HeightDirectionData> &direction_data,
           const unsigned int                        n_box_splits);
 
@@ -1235,7 +1235,7 @@ namespace NonMatching
         void
         use_midpoint_method(
           const std::vector<std::reference_wrapper<const Function<dim>>>
-            &                     level_sets,
+                                 &level_sets,
           const BoundingBox<dim> &box);
 
         /**
@@ -1280,7 +1280,7 @@ namespace NonMatching
         /**
          * Constructor. Takes the same parameters QuadratureGenerator.
          */
-        QGenerator(const hp::QCollection<1> &      quadratures1D,
+        QGenerator(const hp::QCollection<1>       &quadratures1D,
                    const AdditionalQGeneratorData &additional_data);
 
         /**
@@ -1291,7 +1291,7 @@ namespace NonMatching
          */
         void
         generate(const std::vector<std::reference_wrapper<const Function<1>>>
-                   &                   level_sets,
+                                      &level_sets,
                  const BoundingBox<1> &box,
                  const unsigned int    n_box_splits);
 
@@ -1349,7 +1349,7 @@ namespace NonMatching
       void
       tensor_point_with_1D_quadrature(const Point<dim - 1> &point,
                                       const double          weight,
-                                      const Quadrature<1> & quadrature1D,
+                                      const Quadrature<1>  &quadrature1D,
                                       const double          start,
                                       const double          end,
                                       const unsigned int    component_in_dim,
@@ -1366,7 +1366,7 @@ namespace NonMatching
       Definiteness
       pointwise_definiteness(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &               functions,
+                         &functions,
         const Point<dim> &point);
 
 
@@ -1472,7 +1472,7 @@ namespace NonMatching
          */
         virtual void
         set_subcell(const std::vector<unsigned int> &mask,
-                    const BoundingBox<dim> &         subcell_box) = 0;
+                    const BoundingBox<dim>          &subcell_box) = 0;
 
         /**
          * Returns flag indicating if the finite element is FE_Q_iso_Q1.

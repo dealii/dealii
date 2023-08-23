@@ -25,7 +25,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         multiply_dof_numbers(
           const std::vector<
             const FiniteElement<deal_II_dimension, deal_II_space_dimension> *>
-            &                              fes,
+                                          &fes,
           const std::vector<unsigned int> &multiplicities,
           bool);
 
@@ -46,7 +46,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         compute_restriction_is_additive_flags(
           const std::vector<
             const FiniteElement<deal_II_dimension, deal_II_space_dimension> *>
-            &                              fes,
+                                          &fes,
           const std::vector<unsigned int> &multiplicities);
 
         template std::vector<bool>
@@ -66,7 +66,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         compute_nonzero_components(
           const std::vector<
             const FiniteElement<deal_II_dimension, deal_II_space_dimension> *>
-            &                              fes,
+                                          &fes,
           const std::vector<unsigned int> &multiplicities,
           const bool                       do_tensor_product);
 
@@ -89,7 +89,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           std::vector<std::pair<std::pair<unsigned int, unsigned int>,
                                 unsigned int>> &system_to_base_table,
           std::vector<std::pair<unsigned int, unsigned int>>
-            &                                   system_to_component_table,
+                                               &system_to_component_table,
           std::vector<std::pair<std::pair<unsigned int, unsigned int>,
                                 unsigned int>> &component_to_base_table,
           const FiniteElement<deal_II_dimension, deal_II_space_dimension> &fe,

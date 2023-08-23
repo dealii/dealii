@@ -2247,7 +2247,7 @@ struct GeometryInfo
    * additional argument, defaulting to isotropic refinement of the face.
    */
   static unsigned int
-  child_cell_on_face(const RefinementCase<dim> &    ref_case,
+  child_cell_on_face(const RefinementCase<dim>     &ref_case,
                      const unsigned int             face,
                      const unsigned int             subface,
                      const bool                     face_orientation = true,
@@ -2444,7 +2444,7 @@ struct GeometryInfo
    * depends on the number of the child.
    */
   static Point<dim>
-  cell_to_child_coordinates(const Point<dim> &        p,
+  cell_to_child_coordinates(const Point<dim>         &p,
                             const unsigned int        child_index,
                             const RefinementCase<dim> refine_case =
                               RefinementCase<dim>::isotropic_refinement);
@@ -2455,7 +2455,7 @@ struct GeometryInfo
    * mother cell.
    */
   static Point<dim>
-  child_to_cell_coordinates(const Point<dim> &        p,
+  child_to_cell_coordinates(const Point<dim>         &p,
                             const unsigned int        child_index,
                             const RefinementCase<dim> refine_case =
                               RefinementCase<dim>::isotropic_refinement);
@@ -2673,15 +2673,15 @@ struct GeometryInfo
 
 template <>
 Tensor<1, 1>
-GeometryInfo<1>::d_linear_shape_function_gradient(const Point<1> &   xi,
+GeometryInfo<1>::d_linear_shape_function_gradient(const Point<1>    &xi,
                                                   const unsigned int i);
 template <>
 Tensor<1, 2>
-GeometryInfo<2>::d_linear_shape_function_gradient(const Point<2> &   xi,
+GeometryInfo<2>::d_linear_shape_function_gradient(const Point<2>    &xi,
                                                   const unsigned int i);
 template <>
 Tensor<1, 3>
-GeometryInfo<3>::d_linear_shape_function_gradient(const Point<3> &   xi,
+GeometryInfo<3>::d_linear_shape_function_gradient(const Point<3>    &xi,
                                                   const unsigned int i);
 
 
@@ -2867,7 +2867,7 @@ RefinementCase<dim>::serialize(Archive &ar, const unsigned int)
   // serialization can't deal with bitfields, so copy from/to a full sized
   // std::uint8_t
   std::uint8_t uchar_value = value;
-  ar &         uchar_value;
+  ar          &uchar_value;
   value = uchar_value;
 }
 
@@ -3003,7 +3003,7 @@ GeometryInfo<dim>::child_cell_from_point(const Point<dim> &)
 
 template <>
 inline Point<1>
-GeometryInfo<1>::cell_to_child_coordinates(const Point<1> &        p,
+GeometryInfo<1>::cell_to_child_coordinates(const Point<1>         &p,
                                            const unsigned int      child_index,
                                            const RefinementCase<1> refine_case)
 
@@ -3019,7 +3019,7 @@ GeometryInfo<1>::cell_to_child_coordinates(const Point<1> &        p,
 
 template <>
 inline Point<2>
-GeometryInfo<2>::cell_to_child_coordinates(const Point<2> &        p,
+GeometryInfo<2>::cell_to_child_coordinates(const Point<2>         &p,
                                            const unsigned int      child_index,
                                            const RefinementCase<2> refine_case)
 
@@ -3054,7 +3054,7 @@ GeometryInfo<2>::cell_to_child_coordinates(const Point<2> &        p,
 
 template <>
 inline Point<3>
-GeometryInfo<3>::cell_to_child_coordinates(const Point<3> &        p,
+GeometryInfo<3>::cell_to_child_coordinates(const Point<3>         &p,
                                            const unsigned int      child_index,
                                            const RefinementCase<3> refine_case)
 
@@ -3141,7 +3141,7 @@ GeometryInfo<dim>::cell_to_child_coordinates(
 
 template <>
 inline Point<1>
-GeometryInfo<1>::child_to_cell_coordinates(const Point<1> &        p,
+GeometryInfo<1>::child_to_cell_coordinates(const Point<1>         &p,
                                            const unsigned int      child_index,
                                            const RefinementCase<1> refine_case)
 
@@ -3157,7 +3157,7 @@ GeometryInfo<1>::child_to_cell_coordinates(const Point<1> &        p,
 
 template <>
 inline Point<3>
-GeometryInfo<3>::child_to_cell_coordinates(const Point<3> &        p,
+GeometryInfo<3>::child_to_cell_coordinates(const Point<3>         &p,
                                            const unsigned int      child_index,
                                            const RefinementCase<3> refine_case)
 
@@ -3230,7 +3230,7 @@ GeometryInfo<3>::child_to_cell_coordinates(const Point<3> &        p,
 
 template <>
 inline Point<2>
-GeometryInfo<2>::child_to_cell_coordinates(const Point<2> &        p,
+GeometryInfo<2>::child_to_cell_coordinates(const Point<2>         &p,
                                            const unsigned int      child_index,
                                            const RefinementCase<2> refine_case)
 {
@@ -4761,7 +4761,7 @@ GeometryInfo<dim>::distance_to_unit_cell(const Point<dim> &p)
 
 template <int dim>
 inline double
-GeometryInfo<dim>::d_linear_shape_function(const Point<dim> & xi,
+GeometryInfo<dim>::d_linear_shape_function(const Point<dim>  &xi,
                                            const unsigned int i)
 {
   AssertIndexRange(i, GeometryInfo<dim>::vertices_per_cell);
@@ -4856,7 +4856,7 @@ Tensor<1, 1> inline GeometryInfo<1>::d_linear_shape_function_gradient(
 
 template <>
 Tensor<1, 2> inline GeometryInfo<2>::d_linear_shape_function_gradient(
-  const Point<2> &   xi,
+  const Point<2>    &xi,
   const unsigned int i)
 {
   AssertIndexRange(i, GeometryInfo<2>::vertices_per_cell);
@@ -4881,7 +4881,7 @@ Tensor<1, 2> inline GeometryInfo<2>::d_linear_shape_function_gradient(
 
 template <>
 Tensor<1, 3> inline GeometryInfo<3>::d_linear_shape_function_gradient(
-  const Point<3> &   xi,
+  const Point<3>    &xi,
   const unsigned int i)
 {
   AssertIndexRange(i, GeometryInfo<3>::vertices_per_cell);

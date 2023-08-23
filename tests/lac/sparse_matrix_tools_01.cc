@@ -39,7 +39,7 @@
 template <int dim, int spacedim>
 void
 reinit_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
-                        SparsityPattern &                sparsity_pattern)
+                        SparsityPattern                 &sparsity_pattern)
 {
   std::vector<unsigned int> counter(dof_handler.n_dofs(), 0);
 
@@ -60,7 +60,7 @@ reinit_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
 
 template <int dim, int spacedim>
 void
-reinit_sparsity_pattern(const DoFHandler<dim, spacedim> &  dof_handler,
+reinit_sparsity_pattern(const DoFHandler<dim, spacedim>   &dof_handler,
                         TrilinosWrappers::SparsityPattern &sparsity_pattern)
 {
   sparsity_pattern.reinit(dof_handler.locally_owned_dofs(),

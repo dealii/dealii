@@ -34,7 +34,7 @@ void
 test_leak()
 {
   GrowingVectorMemory<VectorType> mem;
-  VectorType *                    v = mem.alloc();
+  VectorType                     *v = mem.alloc();
   v->reinit(5);
 }
 

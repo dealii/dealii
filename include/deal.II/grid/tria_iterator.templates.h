@@ -63,7 +63,7 @@ inline TriaRawIterator<Accessor>::TriaRawIterator(
   const TriaAccessorBase<Accessor::structure_dimension,
                          Accessor::dimension,
                          Accessor::space_dimension> &tria_accessor,
-  const typename Accessor::AccessorData *            local_data)
+  const typename Accessor::AccessorData             *local_data)
   : accessor(nullptr, -2, -2, local_data)
 {
   accessor.copy_from(tria_accessor);
@@ -105,7 +105,7 @@ inline TriaRawIterator<Accessor>
 TriaRawIterator<Accessor>::operator++(int)
 {
   TriaRawIterator<Accessor> tmp(*this);
-                            operator++();
+  operator++();
 
   return tmp;
 }
@@ -116,7 +116,7 @@ inline TriaRawIterator<Accessor>
 TriaRawIterator<Accessor>::operator--(int)
 {
   TriaRawIterator<Accessor> tmp(*this);
-                            operator--();
+  operator--();
 
   return tmp;
 }
@@ -180,7 +180,7 @@ inline TriaIterator<Accessor>::TriaIterator(
   const TriaAccessorBase<Accessor::structure_dimension,
                          Accessor::dimension,
                          Accessor::space_dimension> &tria_accessor,
-  const typename Accessor::AccessorData *            local_data)
+  const typename Accessor::AccessorData             *local_data)
   : TriaRawIterator<Accessor>(tria_accessor, local_data)
 {
 #ifdef DEBUG
@@ -271,7 +271,7 @@ inline TriaIterator<Accessor>
 TriaIterator<Accessor>::operator++(int)
 {
   TriaIterator<Accessor> tmp(*this);
-                         operator++();
+  operator++();
 
   return tmp;
 }
@@ -294,7 +294,7 @@ inline TriaIterator<Accessor>
 TriaIterator<Accessor>::operator--(int)
 {
   TriaIterator<Accessor> tmp(*this);
-                         operator--();
+  operator--();
 
   return tmp;
 }
@@ -381,7 +381,7 @@ inline TriaActiveIterator<Accessor>::TriaActiveIterator(
   const TriaAccessorBase<Accessor::structure_dimension,
                          Accessor::dimension,
                          Accessor::space_dimension> &tria_accessor,
-  const typename Accessor::AccessorData *            local_data)
+  const typename Accessor::AccessorData             *local_data)
   : TriaIterator<Accessor>(tria_accessor, local_data)
 {
 #ifdef DEBUG
@@ -517,7 +517,7 @@ inline TriaActiveIterator<Accessor>
 TriaActiveIterator<Accessor>::operator++(int)
 {
   TriaActiveIterator<Accessor> tmp(*this);
-                               operator++();
+  operator++();
 
   return tmp;
 }
@@ -540,7 +540,7 @@ inline TriaActiveIterator<Accessor>
 TriaActiveIterator<Accessor>::operator--(int)
 {
   TriaActiveIterator<Accessor> tmp(*this);
-                               operator--();
+  operator--();
 
   return tmp;
 }

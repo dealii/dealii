@@ -413,17 +413,17 @@ namespace internal
     template <typename VectorType>
     void
     set_zero_all(const std::vector<types::global_dof_index> &cm,
-                 VectorType &                                vec);
+                 VectorType                                 &vec);
 
     template <class T>
     void
     set_zero_all(const std::vector<types::global_dof_index> &cm,
-                 dealii::Vector<T> &                         vec);
+                 dealii::Vector<T>                          &vec);
 
     template <class T>
     void
     set_zero_all(const std::vector<types::global_dof_index> &cm,
-                 dealii::BlockVector<T> &                    vec);
+                 dealii::BlockVector<T>                     &vec);
   } // namespace AffineConstraintsImplementation
 } // namespace internal
 #endif
@@ -668,7 +668,7 @@ public:
    */
   void
   add_selected_constraints(const AffineConstraints &constraints_in,
-                           const IndexSet &         filter);
+                           const IndexSet          &filter);
 
   /**
    * @name Adding constraints
@@ -1209,9 +1209,9 @@ public:
    */
   template <class InVector, class OutVector>
   void
-  distribute_local_to_global(const InVector &              local_vector,
+  distribute_local_to_global(const InVector               &local_vector,
                              const std::vector<size_type> &local_dof_indices,
-                             OutVector &                   global_vector) const;
+                             OutVector                    &global_vector) const;
 
   /**
    * This function takes a vector of local contributions (@p local_vector)
@@ -1262,10 +1262,10 @@ public:
    */
   template <typename VectorType>
   void
-  distribute_local_to_global(const Vector<number> &        local_vector,
+  distribute_local_to_global(const Vector<number>         &local_vector,
                              const std::vector<size_type> &local_dof_indices,
-                             VectorType &                  global_vector,
-                             const FullMatrix<number> &    local_matrix) const;
+                             VectorType                   &global_vector,
+                             const FullMatrix<number>     &local_matrix) const;
 
   /**
    * Same as the previous function, except that it uses two (possibly) different
@@ -1289,11 +1289,11 @@ public:
   template <typename VectorType>
   void
   distribute_local_to_global(
-    const Vector<number> &        local_vector,
+    const Vector<number>         &local_vector,
     const std::vector<size_type> &local_dof_indices_row,
     const std::vector<size_type> &local_dof_indices_col,
-    VectorType &                  global_vector,
-    const FullMatrix<number> &    local_matrix,
+    VectorType                   &global_vector,
+    const FullMatrix<number>     &local_matrix,
     bool                          diagonal = false) const;
 
   /**
@@ -1303,7 +1303,7 @@ public:
   void
   distribute_local_to_global(const size_type index,
                              const number    value,
-                             VectorType &    global_vector) const;
+                             VectorType     &global_vector) const;
 
   /**
    * This function takes a pointer to a vector of local contributions (@p
@@ -1344,7 +1344,7 @@ public:
   distribute_local_to_global(ForwardIteratorVec local_vector_begin,
                              ForwardIteratorVec local_vector_end,
                              ForwardIteratorInd local_indices_begin,
-                             VectorType &       global_vector) const;
+                             VectorType        &global_vector) const;
 
   /**
    * This function takes a matrix of local contributions (@p local_matrix)
@@ -1399,9 +1399,9 @@ public:
    */
   template <typename MatrixType>
   void
-  distribute_local_to_global(const FullMatrix<number> &    local_matrix,
+  distribute_local_to_global(const FullMatrix<number>     &local_matrix,
                              const std::vector<size_type> &local_dof_indices,
-                             MatrixType &                  global_matrix) const;
+                             MatrixType                   &global_matrix) const;
 
   /**
    * This function does almost the same as the function above but can treat
@@ -1432,10 +1432,10 @@ public:
    */
   template <typename MatrixType>
   void
-  distribute_local_to_global(const FullMatrix<number> &    local_matrix,
+  distribute_local_to_global(const FullMatrix<number>     &local_matrix,
                              const std::vector<size_type> &row_indices,
                              const std::vector<size_type> &col_indices,
-                             MatrixType &                  global_matrix) const;
+                             MatrixType                   &global_matrix) const;
 
   /**
    * This function does almost the same as the function above for general
@@ -1455,11 +1455,11 @@ public:
    */
   template <typename MatrixType>
   void
-  distribute_local_to_global(const FullMatrix<number> &    local_matrix,
+  distribute_local_to_global(const FullMatrix<number>     &local_matrix,
                              const std::vector<size_type> &row_indices,
                              const AffineConstraints &column_affine_constraints,
                              const std::vector<size_type> &column_indices,
-                             MatrixType &                  global_matrix) const;
+                             MatrixType                   &global_matrix) const;
 
   /**
    * This function simultaneously writes elements into matrix and vector,
@@ -1483,11 +1483,11 @@ public:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global(const FullMatrix<number> &    local_matrix,
-                             const Vector<number> &        local_vector,
+  distribute_local_to_global(const FullMatrix<number>     &local_matrix,
+                             const Vector<number>         &local_vector,
                              const std::vector<size_type> &local_dof_indices,
-                             MatrixType &                  global_matrix,
-                             VectorType &                  global_vector,
+                             MatrixType                   &global_matrix,
+                             VectorType                   &global_vector,
                              bool use_inhomogeneities_for_rhs = false) const;
 
   /**
@@ -1546,9 +1546,9 @@ public:
   void
   add_entries_local_to_global(
     const std::vector<size_type> &local_dof_indices,
-    SparsityPatternBase &         sparsity_pattern,
+    SparsityPatternBase          &sparsity_pattern,
     const bool                    keep_constrained_entries = true,
-    const Table<2, bool> &        dof_mask = Table<2, bool>()) const;
+    const Table<2, bool>         &dof_mask = Table<2, bool>()) const;
 
   /**
    * Similar to the other function, but for non-quadratic sparsity patterns.
@@ -1557,9 +1557,9 @@ public:
   add_entries_local_to_global(
     const std::vector<size_type> &row_indices,
     const std::vector<size_type> &col_indices,
-    SparsityPatternBase &         sparsity_pattern,
+    SparsityPatternBase          &sparsity_pattern,
     const bool                    keep_constrained_entries = true,
-    const Table<2, bool> &        dof_mask = Table<2, bool>()) const;
+    const Table<2, bool>         &dof_mask = Table<2, bool>()) const;
 
   /**
    * Similar to the other function, but for non-quadratic sparsity patterns, and
@@ -1567,12 +1567,12 @@ public:
    */
   void
   add_entries_local_to_global(
-    const std::vector<size_type> &   row_indices,
+    const std::vector<size_type>    &row_indices,
     const AffineConstraints<number> &col_constraints,
-    const std::vector<size_type> &   col_indices,
-    SparsityPatternBase &            sparsity_pattern,
+    const std::vector<size_type>    &col_indices,
+    SparsityPatternBase             &sparsity_pattern,
     const bool                       keep_constrained_entries = true,
-    const Table<2, bool> &           dof_mask = Table<2, bool>()) const;
+    const Table<2, bool>            &dof_mask = Table<2, bool>()) const;
 
   /**
    * This function imports values from a global vector (@p global_vector) by
@@ -1597,7 +1597,7 @@ public:
             typename ForwardIteratorInd,
             typename VectorType>
   void
-  get_dof_values(const VectorType & global_vector,
+  get_dof_values(const VectorType  &global_vector,
                  ForwardIteratorInd local_indices_begin,
                  ForwardIteratorVec local_vector_begin,
                  ForwardIteratorVec local_vector_end) const;
@@ -1775,7 +1775,7 @@ public:
    */
   bool
   is_consistent_in_parallel(const std::vector<IndexSet> &locally_owned_dofs,
-                            const IndexSet &             locally_active_dofs,
+                            const IndexSet              &locally_active_dofs,
                             const MPI_Comm               mpi_communicator,
                             const bool                   verbose = false) const;
 
@@ -1976,11 +1976,11 @@ private:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global(const FullMatrix<number> &    local_matrix,
-                             const Vector<number> &        local_vector,
+  distribute_local_to_global(const FullMatrix<number>     &local_matrix,
+                             const Vector<number>         &local_vector,
                              const std::vector<size_type> &local_dof_indices,
-                             MatrixType &                  global_matrix,
-                             VectorType &                  global_vector,
+                             MatrixType                   &global_matrix,
+                             VectorType                   &global_vector,
                              const bool use_inhomogeneities_for_rhs,
                              const std::integral_constant<bool, false>) const;
 
@@ -1990,11 +1990,11 @@ private:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global(const FullMatrix<number> &    local_matrix,
-                             const Vector<number> &        local_vector,
+  distribute_local_to_global(const FullMatrix<number>     &local_matrix,
+                             const Vector<number>         &local_vector,
                              const std::vector<size_type> &local_dof_indices,
-                             MatrixType &                  global_matrix,
-                             VectorType &                  global_vector,
+                             MatrixType                   &global_matrix,
+                             VectorType                   &global_vector,
                              const bool use_inhomogeneities_for_rhs,
                              const std::integral_constant<bool, true>) const;
 
@@ -2019,7 +2019,7 @@ private:
    */
   void
   make_sorted_row_list(const std::vector<size_type> &local_dof_indices,
-                       std::vector<size_type> &      active_dofs) const;
+                       std::vector<size_type>       &active_dofs) const;
 
   /**
    * Internal helper function for distribute_local_to_global function.
@@ -2029,8 +2029,8 @@ private:
   resolve_vector_entry(
     const size_type                                                 i,
     const internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows,
-    const Vector<VectorScalar> &    local_vector,
-    const std::vector<size_type> &  local_dof_indices,
+    const Vector<VectorScalar>     &local_vector,
+    const std::vector<size_type>   &local_dof_indices,
     const FullMatrix<MatrixScalar> &local_matrix) const;
 };
 
@@ -2299,7 +2299,7 @@ inline void
 AffineConstraints<number>::distribute_local_to_global(
   const size_type index,
   const number    value,
-  VectorType &    global_vector) const
+  VectorType     &global_vector) const
 {
   Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
 
@@ -2324,7 +2324,7 @@ AffineConstraints<number>::distribute_local_to_global(
   ForwardIteratorVec local_vector_begin,
   ForwardIteratorVec local_vector_end,
   ForwardIteratorInd local_indices_begin,
-  VectorType &       global_vector) const
+  VectorType        &global_vector) const
 {
   Assert(lines.empty() || sorted == true, ExcMatrixNotClosed());
   for (; local_vector_begin != local_vector_end;
@@ -2351,9 +2351,9 @@ template <typename number>
 template <class InVector, class OutVector>
 inline void
 AffineConstraints<number>::distribute_local_to_global(
-  const InVector &              local_vector,
+  const InVector               &local_vector,
   const std::vector<size_type> &local_dof_indices,
-  OutVector &                   global_vector) const
+  OutVector                    &global_vector) const
 {
   Assert(local_vector.size() == local_dof_indices.size(),
          ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
@@ -2369,7 +2369,7 @@ template <typename ForwardIteratorVec,
           typename VectorType>
 inline void
 AffineConstraints<number>::get_dof_values(
-  const VectorType & global_vector,
+  const VectorType  &global_vector,
   ForwardIteratorInd local_indices_begin,
   ForwardIteratorVec local_vector_begin,
   ForwardIteratorVec local_vector_end) const
@@ -2652,9 +2652,9 @@ template <typename number>
 template <typename MatrixType>
 inline void
 AffineConstraints<number>::distribute_local_to_global(
-  const FullMatrix<number> &    local_matrix,
+  const FullMatrix<number>     &local_matrix,
   const std::vector<size_type> &local_dof_indices,
-  MatrixType &                  global_matrix) const
+  MatrixType                   &global_matrix) const
 {
   // create a dummy and hand on to the function actually implementing this
   // feature in the cm.templates.h file.
@@ -2677,11 +2677,11 @@ template <typename number>
 template <typename MatrixType, typename VectorType>
 inline void
 AffineConstraints<number>::distribute_local_to_global(
-  const FullMatrix<number> &    local_matrix,
-  const Vector<number> &        local_vector,
+  const FullMatrix<number>     &local_matrix,
+  const Vector<number>         &local_vector,
   const std::vector<size_type> &local_dof_indices,
-  MatrixType &                  global_matrix,
-  VectorType &                  global_vector,
+  MatrixType                   &global_matrix,
+  VectorType                   &global_vector,
   bool                          use_inhomogeneities_for_rhs) const
 {
   // enter the internal function with the respective block information set,
@@ -2702,7 +2702,7 @@ AffineConstraints<number>::distribute_local_to_global(
 
 template <typename number>
 inline AffineConstraints<number>::ConstraintLine::ConstraintLine(
-  const size_type &                                                  index,
+  const size_type                                                   &index,
   const typename AffineConstraints<number>::ConstraintLine::Entries &entries,
   const number inhomogeneity)
   : index(index)

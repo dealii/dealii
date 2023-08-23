@@ -103,7 +103,7 @@ namespace Functions
   template <int dim>
   CutOffFunctionTensorProduct<dim>::CutOffFunctionTensorProduct(
     double             radius,
-    const Point<dim> & center,
+    const Point<dim>  &center,
     const unsigned int n_components,
     const unsigned int select,
     const bool         integrate_to_one)
@@ -143,7 +143,7 @@ namespace Functions
 
   template <int dim>
   double
-  CutOffFunctionTensorProduct<dim>::value(const Point<dim> & p,
+  CutOffFunctionTensorProduct<dim>::value(const Point<dim>  &p,
                                           const unsigned int component) const
   {
     Assert(initialized, ExcNotInitialized());
@@ -157,7 +157,7 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  CutOffFunctionTensorProduct<dim>::gradient(const Point<dim> & p,
+  CutOffFunctionTensorProduct<dim>::gradient(const Point<dim>  &p,
                                              const unsigned int component) const
   {
     Assert(initialized, ExcNotInitialized());
@@ -221,7 +221,7 @@ namespace Functions
 
   template <int dim>
   double
-  CutOffFunctionLinfty<dim>::value(const Point<dim> & p,
+  CutOffFunctionLinfty<dim>::value(const Point<dim>  &p,
                                    const unsigned int component) const
   {
     if (this->selected == CutOffFunctionBase<dim>::no_component ||
@@ -234,7 +234,7 @@ namespace Functions
   template <int dim>
   void
   CutOffFunctionLinfty<dim>::value_list(const std::vector<Point<dim>> &points,
-                                        std::vector<double> &          values,
+                                        std::vector<double>           &values,
                                         const unsigned int component) const
   {
     Assert(values.size() == points.size(),
@@ -257,7 +257,7 @@ namespace Functions
   void
   CutOffFunctionLinfty<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+    std::vector<Vector<double>>   &values) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -294,7 +294,7 @@ namespace Functions
 
   template <int dim>
   double
-  CutOffFunctionW1<dim>::value(const Point<dim> & p,
+  CutOffFunctionW1<dim>::value(const Point<dim>  &p,
                                const unsigned int component) const
   {
     if (this->selected == CutOffFunctionBase<dim>::no_component ||
@@ -312,7 +312,7 @@ namespace Functions
   template <int dim>
   void
   CutOffFunctionW1<dim>::value_list(const std::vector<Point<dim>> &points,
-                                    std::vector<double> &          values,
+                                    std::vector<double>           &values,
                                     const unsigned int component) const
   {
     Assert(values.size() == points.size(),
@@ -337,7 +337,7 @@ namespace Functions
   void
   CutOffFunctionW1<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+    std::vector<Vector<double>>   &values) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -378,7 +378,7 @@ namespace Functions
 
   template <int dim>
   double
-  CutOffFunctionCinfty<dim>::value(const Point<dim> & p,
+  CutOffFunctionCinfty<dim>::value(const Point<dim>  &p,
                                    const unsigned int component) const
   {
     if (this->selected == CutOffFunctionBase<dim>::no_component ||
@@ -398,7 +398,7 @@ namespace Functions
   template <int dim>
   void
   CutOffFunctionCinfty<dim>::value_list(const std::vector<Point<dim>> &points,
-                                        std::vector<double> &          values,
+                                        std::vector<double>           &values,
                                         const unsigned int component) const
   {
     Assert(values.size() == points.size(),
@@ -431,7 +431,7 @@ namespace Functions
   void
   CutOffFunctionCinfty<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+    std::vector<Vector<double>>   &values) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -497,7 +497,7 @@ namespace Functions
 
   template <int dim>
   double
-  CutOffFunctionC1<dim>::value(const Point<dim> & p,
+  CutOffFunctionC1<dim>::value(const Point<dim>  &p,
                                const unsigned int component) const
   {
     if (this->selected == CutOffFunctionBase<dim>::no_component ||
@@ -516,7 +516,7 @@ namespace Functions
   template <int dim>
   void
   CutOffFunctionC1<dim>::value_list(const std::vector<Point<dim>> &points,
-                                    std::vector<double> &          values,
+                                    std::vector<double>           &values,
                                     const unsigned int component) const
   {
     Assert(values.size() == points.size(),
@@ -548,7 +548,7 @@ namespace Functions
   void
   CutOffFunctionC1<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+    std::vector<Vector<double>>   &values) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));

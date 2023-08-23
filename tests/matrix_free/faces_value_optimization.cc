@@ -68,7 +68,7 @@ private:
   local_apply_face(
     const MatrixFree<dim, number> &data,
     Vector<number> &,
-    const Vector<number> &                       src,
+    const Vector<number>                        &src,
     const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, fe_degree + 1, 1, number> ref(data, true);

@@ -106,7 +106,7 @@ public:
    */
   CellId(const types::coarse_cell_id coarse_cell_id,
          const unsigned int          n_child_indices,
-         const std::uint8_t *        child_indices);
+         const std::uint8_t         *child_indices);
 
   /**
    * Construct a CellId object with a given binary representation that was

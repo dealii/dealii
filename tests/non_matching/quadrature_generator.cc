@@ -51,7 +51,7 @@ using NonMatching::QuadratureGenerator;
 template <int dim>
 void
 create_and_print_quadratures(
-  const Function<dim> &                                    level_set,
+  const Function<dim>                                     &level_set,
   const unsigned int                                       n_1D_points = 2,
   const typename QuadratureGenerator<dim>::AdditionalData &additional_data =
     typename QuadratureGenerator<dim>::AdditionalData())

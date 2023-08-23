@@ -131,8 +131,8 @@ namespace VectorTools
 
   template <typename VectorType, int dim, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
-  void add_constant(VectorType &                          solution,
-                    const DoFHandler<dim, spacedim> &     dof_handler,
+  void add_constant(VectorType                           &solution,
+                    const DoFHandler<dim, spacedim>      &dof_handler,
                     const unsigned int                    component,
                     const typename VectorType::value_type constant_adjustment)
   {
@@ -293,9 +293,9 @@ namespace VectorTools
   Number
   compute_mean_value(
     const hp::MappingCollection<dim, spacedim> &mapping_collection,
-    const DoFHandler<dim, spacedim> &           dof,
-    const hp::QCollection<dim> &                q_collection,
-    const ReadVector<Number> &                  v,
+    const DoFHandler<dim, spacedim>            &dof,
+    const hp::QCollection<dim>                 &q_collection,
+    const ReadVector<Number>                   &v,
     const unsigned int                          component)
   {
     const hp::FECollection<dim, spacedim> &fe_collection =
@@ -370,10 +370,10 @@ namespace VectorTools
 
   template <int dim, typename Number, int spacedim>
   Number
-  compute_mean_value(const Mapping<dim, spacedim> &   mapping,
+  compute_mean_value(const Mapping<dim, spacedim>    &mapping,
                      const DoFHandler<dim, spacedim> &dof,
-                     const Quadrature<dim> &          quadrature,
-                     const ReadVector<Number> &       v,
+                     const Quadrature<dim>           &quadrature,
+                     const ReadVector<Number>        &v,
                      const unsigned int               component)
   {
     return compute_mean_value(hp::MappingCollection<dim, spacedim>(mapping),
@@ -387,8 +387,8 @@ namespace VectorTools
   template <int dim, typename Number, int spacedim>
   Number
   compute_mean_value(const DoFHandler<dim, spacedim> &dof,
-                     const Quadrature<dim> &          quadrature,
-                     const ReadVector<Number> &       v,
+                     const Quadrature<dim>           &quadrature,
+                     const ReadVector<Number>        &v,
                      const unsigned int               component)
   {
     return compute_mean_value(get_default_linear_mapping(

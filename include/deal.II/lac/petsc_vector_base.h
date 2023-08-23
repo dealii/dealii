@@ -458,7 +458,7 @@ namespace PETScWrappers
      * the corresponding values in the second.
      */
     void
-    set(const std::vector<size_type> &  indices,
+    set(const std::vector<size_type>   &indices,
         const std::vector<PetscScalar> &values);
 
     /**
@@ -478,7 +478,7 @@ namespace PETScWrappers
      */
     void
     extract_subvector_to(const std::vector<size_type> &indices,
-                         std::vector<PetscScalar> &    values) const;
+                         std::vector<PetscScalar>     &values) const;
 
     /**
      * Extract a range of elements all at once.
@@ -486,7 +486,7 @@ namespace PETScWrappers
     virtual void
     extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<PetscScalar> &                        elements) const override;
+      ArrayView<PetscScalar>                         &elements) const override;
 
     /**
      * Instead of getting individual elements of a vector via operator(),
@@ -526,7 +526,7 @@ namespace PETScWrappers
      * stored in @p values to the vector components specified by @p indices.
      */
     void
-    add(const std::vector<size_type> &  indices,
+    add(const std::vector<size_type>   &indices,
         const std::vector<PetscScalar> &values);
 
     /**
@@ -534,7 +534,7 @@ namespace PETScWrappers
      * function takes a deal.II vector of values.
      */
     void
-    add(const std::vector<size_type> &       indices,
+    add(const std::vector<size_type>        &indices,
         const ::dealii::Vector<PetscScalar> &values);
 
     /**
@@ -544,7 +544,7 @@ namespace PETScWrappers
      */
     void
     add(const size_type    n_elements,
-        const size_type *  indices,
+        const size_type   *indices,
         const PetscScalar *values);
 
     /**
@@ -719,7 +719,7 @@ namespace PETScWrappers
      * separate line each.
      */
     void
-    print(std::ostream &     out,
+    print(std::ostream      &out,
           const unsigned int precision  = 3,
           const bool         scientific = true,
           const bool         across     = true) const;
@@ -806,7 +806,7 @@ namespace PETScWrappers
      */
     void
     do_set_add_operation(const size_type    n_elements,
-                         const size_type *  indices,
+                         const size_type   *indices,
                          const PetscScalar *values,
                          const bool         add_values);
 
@@ -1145,7 +1145,7 @@ namespace PETScWrappers
 
   inline void
   VectorBase::extract_subvector_to(const std::vector<size_type> &indices,
-                                   std::vector<PetscScalar> &    values) const
+                                   std::vector<PetscScalar>     &values) const
   {
     Assert(indices.size() <= values.size(),
            ExcDimensionMismatch(indices.size(), values.size()));
@@ -1155,7 +1155,7 @@ namespace PETScWrappers
   inline void
   VectorBase::extract_subvector_to(
     const ArrayView<const types::global_dof_index> &indices,
-    ArrayView<PetscScalar> &                        elements) const
+    ArrayView<PetscScalar>                         &elements) const
   {
     AssertDimension(indices.size(), elements.size());
     extract_subvector_to(indices.begin(), indices.end(), elements.begin());

@@ -289,7 +289,7 @@ namespace Differentiation
         independent_variable(const scalar_type &in,
                              const unsigned int index,
                              const unsigned int n_independent_variables,
-                             ad_type &          out)
+                             ad_type           &out)
         {
           // It is required that we first initialize the outer number before
           // any of the nested ones.
@@ -332,7 +332,7 @@ namespace Differentiation
         independent_variable(const scalar_type &in,
                              const unsigned int index,
                              const unsigned int n_independent_variables,
-                             ad_type &          out)
+                             ad_type           &out)
         {
           // For Sacado::Rad::ADvar numbers, we have to initialize the
           // ADNumber with an already fully-configured value. This means

@@ -334,7 +334,7 @@ struct ExtractLevelVisitor
    * @p target_level of the tree.
    */
   inline ExtractLevelVisitor(
-    const Translator & translator,
+    const Translator  &translator,
     const unsigned int target_level,
     std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes);
 
@@ -520,7 +520,7 @@ template <typename Value,
           typename Allocators>
 ExtractLevelVisitor<Value, Options, Translator, Box, Allocators>::
   ExtractLevelVisitor(
-    const Translator & translator,
+    const Translator  &translator,
     const unsigned int target_level,
     std::vector<BoundingBox<boost::geometry::dimension<Box>::value>> &boxes)
   : translator(translator)
@@ -730,7 +730,7 @@ template <typename Value,
           typename Box,
           typename Allocators>
 NodeVisitor<Value, Options, Translator, Box, Allocators>::NodeVisitor(
-  const Translator & translator,
+  const Translator  &translator,
   const unsigned int target_level,
   std::vector<std::vector<BoundingBox<boost::geometry::dimension<Box>::value>>>
     &bb_in_boxes)

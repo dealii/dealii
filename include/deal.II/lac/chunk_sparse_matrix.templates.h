@@ -178,11 +178,11 @@ namespace internal
     vmult_add_on_subrange(const ChunkSparsityPattern &cols,
                           const unsigned int          begin_row,
                           const unsigned int          end_row,
-                          const number *              values,
-                          const std::size_t *         rowstart,
-                          const size_type *           colnums,
-                          const InVector &            src,
-                          OutVector &                 dst)
+                          const number               *values,
+                          const std::size_t          *rowstart,
+                          const size_type            *colnums,
+                          const InVector             &src,
+                          OutVector                  &dst)
     {
       const size_type m          = cols.n_rows();
       const size_type n          = cols.n_cols();
@@ -328,7 +328,7 @@ ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparsityPattern &c)
 
 template <typename number>
 ChunkSparseMatrix<number>::ChunkSparseMatrix(const ChunkSparsityPattern &c,
-                                             const IdentityMatrix &      id)
+                                             const IdentityMatrix       &id)
   : cols(nullptr, "ChunkSparseMatrix")
   , val(nullptr)
   , max_len(0)
@@ -576,8 +576,8 @@ ChunkSparseMatrix<number>::add(const number                         factor,
 
   // add everything, including padding elements
   const size_type     chunk_size = cols->get_chunk_size();
-  number *            val_ptr    = val.get();
-  const somenumber *  matrix_ptr = matrix.val.get();
+  number             *val_ptr    = val.get();
+  const somenumber   *matrix_ptr = matrix.val.get();
   const number *const end_ptr =
     val.get() +
     cols->sparsity_pattern.n_nonzero_elements() * chunk_size * chunk_size;
@@ -592,9 +592,9 @@ template <typename number>
 void
 ChunkSparseMatrix<number>::extract_row_copy(const size_type row,
                                             const size_type array_length,
-                                            size_type &     row_length,
-                                            size_type *     column_indices,
-                                            number *        values) const
+                                            size_type      &row_length,
+                                            size_type      *column_indices,
+                                            number         *values) const
 {
   (void)array_length;
   AssertIndexRange(cols->row_length(row), array_length + 1);
@@ -748,7 +748,7 @@ ChunkSparseMatrix<number>::Tvmult_add(OutVector &dst, const InVector &src) const
 
   // like in vmult_add, but don't keep an iterator into dst around since we're
   // not traversing it sequentially this time
-  const number *   val_ptr    = val.get();
+  const number    *val_ptr    = val.get();
   const size_type *colnum_ptr = cols->sparsity_pattern.colnums.get();
 
   for (size_type chunk_row = 0; chunk_row < n_regular_chunk_rows; ++chunk_row)
@@ -838,7 +838,7 @@ ChunkSparseMatrix<number>::matrix_norm_square(const Vector<somenumber> &v) const
   const size_type n_regular_chunk_rows =
     (rows_have_padding ? n_chunk_rows - 1 : n_chunk_rows);
 
-  const number *   val_ptr    = val.get();
+  const number    *val_ptr    = val.get();
   const size_type *colnum_ptr = cols->sparsity_pattern.colnums.get();
   typename Vector<somenumber>::const_iterator v_ptr = v.begin();
 
@@ -937,7 +937,7 @@ ChunkSparseMatrix<number>::matrix_scalar_product(
   const size_type n_regular_chunk_rows =
     (rows_have_padding ? n_chunk_rows - 1 : n_chunk_rows);
 
-  const number *   val_ptr    = val.get();
+  const number    *val_ptr    = val.get();
   const size_type *colnum_ptr = cols->sparsity_pattern.colnums.get();
   typename Vector<somenumber>::const_iterator u_ptr = u.begin();
 
@@ -1098,7 +1098,7 @@ ChunkSparseMatrix<number>::frobenius_norm() const
 template <typename number>
 template <typename somenumber>
 somenumber
-ChunkSparseMatrix<number>::residual(Vector<somenumber> &      dst,
+ChunkSparseMatrix<number>::residual(Vector<somenumber>       &dst,
                                     const Vector<somenumber> &u,
                                     const Vector<somenumber> &b) const
 {
@@ -1129,7 +1129,7 @@ ChunkSparseMatrix<number>::residual(Vector<somenumber> &      dst,
   const size_type n_regular_chunk_rows =
     (rows_have_padding ? n_chunk_rows - 1 : n_chunk_rows);
 
-  const number *   val_ptr    = val.get();
+  const number    *val_ptr    = val.get();
   const size_type *colnum_ptr = cols->sparsity_pattern.colnums.get();
   typename Vector<somenumber>::iterator dst_ptr = dst.begin();
 
@@ -1208,7 +1208,7 @@ ChunkSparseMatrix<number>::residual(Vector<somenumber> &      dst,
 template <typename number>
 template <typename somenumber>
 void
-ChunkSparseMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
+ChunkSparseMatrix<number>::precondition_Jacobi(Vector<somenumber>       &dst,
                                                const Vector<somenumber> &src,
                                                const number /*om*/) const
 {
@@ -1230,7 +1230,7 @@ ChunkSparseMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
 template <typename number>
 template <typename somenumber>
 void
-ChunkSparseMatrix<number>::precondition_SSOR(Vector<somenumber> &      dst,
+ChunkSparseMatrix<number>::precondition_SSOR(Vector<somenumber>       &dst,
                                              const Vector<somenumber> &src,
                                              const number /*om*/) const
 {
@@ -1253,7 +1253,7 @@ ChunkSparseMatrix<number>::precondition_SSOR(Vector<somenumber> &      dst,
 template <typename number>
 template <typename somenumber>
 void
-ChunkSparseMatrix<number>::precondition_SOR(Vector<somenumber> &      dst,
+ChunkSparseMatrix<number>::precondition_SOR(Vector<somenumber>       &dst,
                                             const Vector<somenumber> &src,
                                             const number              om) const
 {
@@ -1271,7 +1271,7 @@ ChunkSparseMatrix<number>::precondition_SOR(Vector<somenumber> &      dst,
 template <typename number>
 template <typename somenumber>
 void
-ChunkSparseMatrix<number>::precondition_TSOR(Vector<somenumber> &      dst,
+ChunkSparseMatrix<number>::precondition_TSOR(Vector<somenumber>       &dst,
                                              const Vector<somenumber> &src,
                                              const number              om) const
 {
@@ -1324,7 +1324,7 @@ template <typename number>
 template <typename somenumber>
 void
 ChunkSparseMatrix<number>::PSOR(
-  Vector<somenumber> &          dst,
+  Vector<somenumber>           &dst,
   const std::vector<size_type> &permutation,
   const std::vector<size_type> &inverse_permutation,
   const number /*om*/) const
@@ -1351,7 +1351,7 @@ template <typename number>
 template <typename somenumber>
 void
 ChunkSparseMatrix<number>::TPSOR(
-  Vector<somenumber> &          dst,
+  Vector<somenumber>           &dst,
   const std::vector<size_type> &permutation,
   const std::vector<size_type> &inverse_permutation,
   const number /*om*/) const
@@ -1378,7 +1378,7 @@ ChunkSparseMatrix<number>::TPSOR(
 template <typename number>
 template <typename somenumber>
 void
-ChunkSparseMatrix<number>::SOR_step(Vector<somenumber> &      v,
+ChunkSparseMatrix<number>::SOR_step(Vector<somenumber>       &v,
                                     const Vector<somenumber> &b,
                                     const number /*om*/) const
 {
@@ -1400,7 +1400,7 @@ ChunkSparseMatrix<number>::SOR_step(Vector<somenumber> &      v,
 template <typename number>
 template <typename somenumber>
 void
-ChunkSparseMatrix<number>::TSOR_step(Vector<somenumber> &      v,
+ChunkSparseMatrix<number>::TSOR_step(Vector<somenumber>       &v,
                                      const Vector<somenumber> &b,
                                      const number /*om*/) const
 {
@@ -1422,7 +1422,7 @@ ChunkSparseMatrix<number>::TSOR_step(Vector<somenumber> &      v,
 template <typename number>
 template <typename somenumber>
 void
-ChunkSparseMatrix<number>::SSOR_step(Vector<somenumber> &      v,
+ChunkSparseMatrix<number>::SSOR_step(Vector<somenumber>       &v,
                                      const Vector<somenumber> &b,
                                      const number              om) const
 {
@@ -1468,11 +1468,11 @@ ChunkSparseMatrix<number>::print(std::ostream &out) const
 
 template <typename number>
 void
-ChunkSparseMatrix<number>::print_formatted(std::ostream &     out,
+ChunkSparseMatrix<number>::print_formatted(std::ostream      &out,
                                            const unsigned int precision,
                                            const bool         scientific,
                                            const unsigned int width_,
-                                           const char *       zero_string,
+                                           const char        *zero_string,
                                            const double       denominator) const
 {
   AssertThrow(out.fail() == false, ExcIO());

@@ -351,7 +351,7 @@ namespace Patterns
        * Convert a string to a NormType.
        */
       static VectorTools::NormType
-      to_value(const std::string &          str,
+      to_value(const std::string           &str,
                const Patterns::PatternBase &p =
                  *Convert<VectorTools::NormType>::to_pattern())
       {

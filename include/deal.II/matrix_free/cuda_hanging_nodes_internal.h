@@ -54,7 +54,7 @@ namespace CUDAWrappers
     DEAL_II_HOST_DEVICE inline bool
     is_constrained_dof_2d(
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-        &                constraint_mask,
+                        &constraint_mask,
       const unsigned int x_idx,
       const unsigned int y_idx)
     {
@@ -78,7 +78,7 @@ namespace CUDAWrappers
     DEAL_II_HOST_DEVICE inline bool
     is_constrained_dof_3d(
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-        &                constraint_mask,
+                        &constraint_mask,
       const unsigned int x_idx,
       const unsigned int y_idx,
       const unsigned int z_idx,
@@ -131,7 +131,7 @@ namespace CUDAWrappers
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         constraint_weights,
       const dealii::internal::MatrixFreeFunctions::ConstraintKinds
-        &                                                   constraint_mask,
+                                                           &constraint_mask,
       Kokkos::View<Number *,
                    MemorySpace::Default::kokkos_space::execution_space::
                      scratch_memory_space,

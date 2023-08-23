@@ -47,9 +47,9 @@ public:
 };
 
 void
-output(const DoFHandler<2> &                             dof_handler,
+output(const DoFHandler<2>                              &dof_handler,
        const LinearAlgebra::distributed::Vector<double> &vector,
-       const std::string &                               file_name)
+       const std::string                                &file_name)
 {
   DataOut<2> data_out;
   data_out.attach_dof_handler(dof_handler);

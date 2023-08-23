@@ -54,7 +54,7 @@ public:
   {}
 
   void
-  vmult(LinearAlgebra::distributed::Vector<Number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<Number>       &dst,
         const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     const std::function<void(const MatrixFree<dim, Number> &,

@@ -62,7 +62,7 @@ void
 check_cont(unsigned int          ncells,
            unsigned int          nsub,
            DataOutBase::EpsFlags flags,
-           std::ostream &        out)
+           std::ostream         &out)
 {
   std::vector<DataOutBase::Patch<dim, dim>> patches;
 
@@ -89,7 +89,7 @@ check_all(std::ostream &log)
 #endif
 
   char                  name[100];
-  const char *          format = "%d%d%d%s.eps";
+  const char           *format = "%d%d%d%s.eps";
   DataOutBase::EpsFlags flags;
 
   if (true)

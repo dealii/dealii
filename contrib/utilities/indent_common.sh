@@ -39,7 +39,7 @@ checks() {
 
   # Add the location 'download_clang_format' or 'compile_clang_format'
   # installs clang-format to the local PATH.
-  CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-11/bin"
+  CLANG_FORMAT_PATH="$(cd "$(dirname "$0")" && pwd)/programs/clang-16/bin"
   export PATH="${CLANG_FORMAT_PATH}:${PATH}"
 
   if ! [ -x "$(command -v "${DEAL_II_CLANG_FORMAT}")" ]; then
@@ -56,8 +56,8 @@ checks() {
   CLANG_FORMAT_MAJOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*\([0-9]*\).*$/\1/g')
   CLANG_FORMAT_MINOR_VERSION=$(echo "${CLANG_FORMAT_VERSION}" | sed 's/^[^0-9]*[0-9]*\.\([0-9]*\).*$/\1/g')
 
-  if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 11 ] || [ "${CLANG_FORMAT_MINOR_VERSION}" -ne 1 ]; then
-    echo "***   This indent script requires clang-format version 11.1,"
+  if [ "${CLANG_FORMAT_MAJOR_VERSION}" -ne 16 ] || [ "${CLANG_FORMAT_MINOR_VERSION}" -ne 0 ]; then
+    echo "***   This indent script requires clang-format version 16.0,"
     echo "***   but version ${CLANG_FORMAT_MAJOR_VERSION}.${CLANG_FORMAT_MINOR_VERSION} was found instead."
     echo "***"
     echo "***   You can run the './contrib/utilities/download_clang_format'"

@@ -94,7 +94,7 @@ namespace OpenCASCADE
     virtual Point<spacedim>
     project_to_manifold(
       const ArrayView<const Point<spacedim>> &surrounding_points,
-      const Point<spacedim> &                 candidate) const override;
+      const Point<spacedim>                  &candidate) const override;
 
 
   protected:
@@ -139,7 +139,7 @@ namespace OpenCASCADE
      * Construct a Manifold object which will project points on the
      * TopoDS_Shape @p sh, along the given @p direction.
      */
-    DirectionalProjectionManifold(const TopoDS_Shape &       sh,
+    DirectionalProjectionManifold(const TopoDS_Shape        &sh,
                                   const Tensor<1, spacedim> &direction,
                                   const double               tolerance = 1e-7);
 
@@ -161,7 +161,7 @@ namespace OpenCASCADE
     virtual Point<spacedim>
     project_to_manifold(
       const ArrayView<const Point<spacedim>> &surrounding_points,
-      const Point<spacedim> &                 candidate) const override;
+      const Point<spacedim>                  &candidate) const override;
 
   protected:
     /**
@@ -253,7 +253,7 @@ namespace OpenCASCADE
     virtual Point<spacedim>
     project_to_manifold(
       const ArrayView<const Point<spacedim>> &surrounding_points,
-      const Point<spacedim> &                 candidate) const override;
+      const Point<spacedim>                  &candidate) const override;
 
   protected:
     /**

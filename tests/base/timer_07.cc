@@ -28,7 +28,7 @@ main(int argc, char **argv)
 
   // capture cerr for testing purposes
   std::stringstream captured_cerr;
-  std::streambuf *  old_cerr = std::cerr.rdbuf(captured_cerr.rdbuf());
+  std::streambuf   *old_cerr = std::cerr.rdbuf(captured_cerr.rdbuf());
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   // Test printing from TimerOutput

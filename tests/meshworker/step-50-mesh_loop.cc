@@ -127,8 +127,8 @@ namespace Step50
     template <class IteratorType>
     void
     assemble_cell(const IteratorType &cell,
-                  ScratchData<dim> &  scratch_data,
-                  CopyData &          copy_data);
+                  ScratchData<dim>   &scratch_data,
+                  CopyData           &copy_data);
 
     void
     assemble_system_and_multigrid();
@@ -173,7 +173,7 @@ namespace Step50
 
     virtual void
     value_list(const std::vector<Point<dim>> &points,
-               std::vector<double> &          values,
+               std::vector<double>           &values,
                const unsigned int             component = 0) const;
   };
 
@@ -194,7 +194,7 @@ namespace Step50
   template <int dim>
   void
   Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
-                               std::vector<double> &          values,
+                               std::vector<double>           &values,
                                const unsigned int             component) const
   {
     (void)component;
@@ -309,8 +309,8 @@ namespace Step50
   template <class IteratorType>
   void
   LaplaceProblem<dim>::assemble_cell(const IteratorType &cell,
-                                     ScratchData<dim> &  scratch_data,
-                                     CopyData &          copy_data)
+                                     ScratchData<dim>   &scratch_data,
+                                     CopyData           &copy_data)
   {
     const unsigned int level = cell->level();
     copy_data.level          = level;
@@ -376,14 +376,14 @@ namespace Step50
 
     auto cell_worker_active =
       [&](const decltype(mg_dof_handler.begin_active()) &cell,
-          ScratchData<dim> &                             scratch_data,
-          CopyData &                                     copy_data) {
+          ScratchData<dim>                              &scratch_data,
+          CopyData                                      &copy_data) {
         this->assemble_cell(cell, scratch_data, copy_data);
       };
 
     auto cell_worker_mg = [&](const decltype(mg_dof_handler.begin_mg()) &cell,
                               ScratchData<dim> &scratch_data,
-                              CopyData &        copy_data) {
+                              CopyData         &copy_data) {
       this->assemble_cell(cell, scratch_data, copy_data);
     };
 

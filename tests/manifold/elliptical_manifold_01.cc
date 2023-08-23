@@ -86,19 +86,19 @@ namespace
   //
   void
   build_simple_hyper_shell(Triangulation<2, 2> &grid,
-                           const Point<2> &     center,
+                           const Point<2>      &center,
                            const double         inner_radius,
                            const double         outer_radius,
                            const double         eccentricity)
   {
     unsigned int          cell[][4] = {{5, 6, 0, 1},
-                              {6, 7, 1, 2},
-                              {8, 3, 7, 2},
-                              {9, 4, 8, 3},
-                              {5, 0, 13, 10},
-                              {13, 10, 14, 11},
-                              {15, 14, 12, 11},
-                              {9, 15, 4, 12}};
+                                       {6, 7, 1, 2},
+                                       {8, 3, 7, 2},
+                                       {9, 4, 8, 3},
+                                       {5, 0, 13, 10},
+                                       {13, 10, 14, 11},
+                                       {15, 14, 12, 11},
+                                       {9, 15, 4, 12}};
     std::vector<Point<2>> points =
       generate_shell_points(center, inner_radius, outer_radius, eccentricity);
     std::vector<CellData<2>> cells(8, CellData<2>());

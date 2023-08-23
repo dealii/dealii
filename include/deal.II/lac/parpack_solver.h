@@ -37,97 +37,97 @@ extern "C"
   // http://www.mathkeisan.com/usersguide/man/pdnaupd.html
   void
   pdnaupd_(MPI_Fint *comm,
-           int *     ido,
-           char *    bmat,
-           int *     n,
-           char *    which,
-           int *     nev,
-           double *  tol,
-           double *  resid,
-           int *     ncv,
-           double *  v,
-           int *     nloc,
-           int *     iparam,
-           int *     ipntr,
-           double *  workd,
-           double *  workl,
-           int *     lworkl,
-           int *     info);
+           int      *ido,
+           char     *bmat,
+           int      *n,
+           char     *which,
+           int      *nev,
+           double   *tol,
+           double   *resid,
+           int      *ncv,
+           double   *v,
+           int      *nloc,
+           int      *iparam,
+           int      *ipntr,
+           double   *workd,
+           double   *workl,
+           int      *lworkl,
+           int      *info);
 
   // http://www.mathkeisan.com/usersguide/man/pdsaupd.html
   void
   pdsaupd_(MPI_Fint *comm,
-           int *     ido,
-           char *    bmat,
-           int *     n,
-           char *    which,
-           int *     nev,
-           double *  tol,
-           double *  resid,
-           int *     ncv,
-           double *  v,
-           int *     nloc,
-           int *     iparam,
-           int *     ipntr,
-           double *  workd,
-           double *  workl,
-           int *     lworkl,
-           int *     info);
+           int      *ido,
+           char     *bmat,
+           int      *n,
+           char     *which,
+           int      *nev,
+           double   *tol,
+           double   *resid,
+           int      *ncv,
+           double   *v,
+           int      *nloc,
+           int      *iparam,
+           int      *ipntr,
+           double   *workd,
+           double   *workl,
+           int      *lworkl,
+           int      *info);
 
   // http://www.mathkeisan.com/usersguide/man/pdneupd.html
   void
   pdneupd_(MPI_Fint *comm,
-           int *     rvec,
-           char *    howmany,
-           int *     select,
-           double *  d,
-           double *  di,
-           double *  z,
-           int *     ldz,
-           double *  sigmar,
-           double *  sigmai,
-           double *  workev,
-           char *    bmat,
-           int *     n,
-           char *    which,
-           int *     nev,
-           double *  tol,
-           double *  resid,
-           int *     ncv,
-           double *  v,
-           int *     nloc,
-           int *     iparam,
-           int *     ipntr,
-           double *  workd,
-           double *  workl,
-           int *     lworkl,
-           int *     info);
+           int      *rvec,
+           char     *howmany,
+           int      *select,
+           double   *d,
+           double   *di,
+           double   *z,
+           int      *ldz,
+           double   *sigmar,
+           double   *sigmai,
+           double   *workev,
+           char     *bmat,
+           int      *n,
+           char     *which,
+           int      *nev,
+           double   *tol,
+           double   *resid,
+           int      *ncv,
+           double   *v,
+           int      *nloc,
+           int      *iparam,
+           int      *ipntr,
+           double   *workd,
+           double   *workl,
+           int      *lworkl,
+           int      *info);
 
   // http://www.mathkeisan.com/usersguide/man/pdseupd.html
   void
   pdseupd_(MPI_Fint *comm,
-           int *     rvec,
-           char *    howmany,
-           int *     select,
-           double *  d,
-           double *  z,
-           int *     ldz,
-           double *  sigmar,
-           char *    bmat,
-           int *     n,
-           char *    which,
-           int *     nev,
-           double *  tol,
-           double *  resid,
-           int *     ncv,
-           double *  v,
-           int *     nloc,
-           int *     iparam,
-           int *     ipntr,
-           double *  workd,
-           double *  workl,
-           int *     lworkl,
-           int *     info);
+           int      *rvec,
+           char     *howmany,
+           int      *select,
+           double   *d,
+           double   *z,
+           int      *ldz,
+           double   *sigmar,
+           char     *bmat,
+           int      *n,
+           char     *which,
+           int      *nev,
+           double   *tol,
+           double   *resid,
+           int      *ncv,
+           double   *v,
+           int      *nloc,
+           int      *iparam,
+           int      *ipntr,
+           double   *workd,
+           double   *workl,
+           int      *lworkl,
+           int      *info);
 
   // other resources:
   //    http://acts.nersc.gov/superlu/example5/pnslac.c.html
@@ -294,7 +294,7 @@ public:
   /**
    * Constructor.
    */
-  PArpackSolver(SolverControl &       control,
+  PArpackSolver(SolverControl        &control,
                 const MPI_Comm        mpi_communicator,
                 const AdditionalData &data = AdditionalData());
 
@@ -311,7 +311,7 @@ public:
    * blockvectors used.
    */
   void
-  reinit(const IndexSet &             locally_owned_dofs,
+  reinit(const IndexSet              &locally_owned_dofs,
          const std::vector<IndexSet> &partitioning);
 
   /**
@@ -348,11 +348,11 @@ public:
    */
   template <typename MatrixType1, typename MatrixType2, typename INVERSE>
   void
-  solve(const MatrixType1 &                A,
-        const MatrixType2 &                B,
-        const INVERSE &                    inverse,
+  solve(const MatrixType1                 &A,
+        const MatrixType2                 &B,
+        const INVERSE                     &inverse,
         std::vector<std::complex<double>> &eigenvalues,
-        std::vector<VectorType> &          eigenvectors,
+        std::vector<VectorType>           &eigenvectors,
         const unsigned int                 n_eigenvalues);
 
   /**
@@ -360,11 +360,11 @@ public:
    */
   template <typename MatrixType1, typename MatrixType2, typename INVERSE>
   void
-  solve(const MatrixType1 &                A,
-        const MatrixType2 &                B,
-        const INVERSE &                    inverse,
+  solve(const MatrixType1                 &A,
+        const MatrixType2                 &B,
+        const INVERSE                     &inverse,
         std::vector<std::complex<double>> &eigenvalues,
-        std::vector<VectorType *> &        eigenvectors,
+        std::vector<VectorType *>         &eigenvectors,
         const unsigned int                 n_eigenvalues);
 
   /**
@@ -637,7 +637,7 @@ PArpackSolver<VectorType>::AdditionalData::AdditionalData(
 
 
 template <typename VectorType>
-PArpackSolver<VectorType>::PArpackSolver(SolverControl &       control,
+PArpackSolver<VectorType>::PArpackSolver(SolverControl        &control,
                                          const MPI_Comm        mpi_communicator,
                                          const AdditionalData &data)
   : solver_control(control)
@@ -767,9 +767,9 @@ PArpackSolver<VectorType>::reinit(const IndexSet &locally_owned_dofs,
 template <typename VectorType>
 template <typename MatrixType1, typename MatrixType2, typename INVERSE>
 void
-PArpackSolver<VectorType>::solve(const MatrixType1 &                A,
-                                 const MatrixType2 &                B,
-                                 const INVERSE &                    inverse,
+PArpackSolver<VectorType>::solve(const MatrixType1                 &A,
+                                 const MatrixType2                 &B,
+                                 const INVERSE                     &inverse,
                                  std::vector<std::complex<double>> &eigenvalues,
                                  std::vector<VectorType> &eigenvectors,
                                  const unsigned int       n_eigenvalues)
@@ -787,7 +787,7 @@ template <typename MatrixType1, typename MatrixType2, typename INVERSE>
 void
 PArpackSolver<VectorType>::solve(const MatrixType1 &system_matrix,
                                  const MatrixType2 &mass_matrix,
-                                 const INVERSE &    inverse,
+                                 const INVERSE     &inverse,
                                  std::vector<std::complex<double>> &eigenvalues,
                                  std::vector<VectorType *> &eigenvectors,
                                  const unsigned int         n_eigenvalues)

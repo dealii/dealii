@@ -115,7 +115,7 @@ namespace LinearAlgebra
     void
     Vector<Number>::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<Number> &                             elements) const
+      ArrayView<Number>                              &elements) const
     {
       AssertDimension(indices.size(), elements.size());
       const auto &vector = trilinos_vector();
@@ -465,7 +465,7 @@ namespace LinearAlgebra
     {
       // get a representation of the vector and
       // loop over all the elements
-      Number *      start_ptr = vector->getDataNonConst().get();
+      Number       *start_ptr = vector->getDataNonConst().get();
       const Number *ptr       = start_ptr,
                    *eptr      = start_ptr + vector->getLocalLength();
       unsigned int flag       = 0;
@@ -628,7 +628,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    Vector<Number>::print(std::ostream &     out,
+    Vector<Number>::print(std::ostream      &out,
                           const unsigned int precision,
                           const bool         scientific,
                           const bool         across) const

@@ -127,9 +127,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static NumberType
   psi(const SymmetricTensor<2, dim, NumberType> &st,
-      const Tensor<2, dim, NumberType> &         t,
-      const Tensor<1, dim, NumberType> &         v,
-      const NumberType &                         s)
+      const Tensor<2, dim, NumberType>          &t,
+      const Tensor<1, dim, NumberType>          &v,
+      const NumberType                          &s)
   {
     return pow(det_t(st), 2) * pow(det_t(t), 2) * pow(v_squ(v), 3) * pow(s, sf);
   };
@@ -141,9 +141,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static SymmetricTensor<2, dim, NumberType>
   dpsi_dst(const SymmetricTensor<2, dim, NumberType> &st,
-           const Tensor<2, dim, NumberType> &         t,
-           const Tensor<1, dim, NumberType> &         v,
-           const NumberType &                         s)
+           const Tensor<2, dim, NumberType>          &t,
+           const Tensor<1, dim, NumberType>          &v,
+           const NumberType                          &s)
   {
     return 2.0 * pow(det_t(st), 1) * ddet_t_dt(st) * pow(det_t(t), 2) *
            pow(v_squ(v), 3) * pow(s, sf);
@@ -151,9 +151,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<2, dim, NumberType>
   dpsi_dt(const SymmetricTensor<2, dim, NumberType> &st,
-          const Tensor<2, dim, NumberType> &         t,
-          const Tensor<1, dim, NumberType> &         v,
-          const NumberType &                         s)
+          const Tensor<2, dim, NumberType>          &t,
+          const Tensor<1, dim, NumberType>          &v,
+          const NumberType                          &s)
   {
     return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * ddet_t_dt(t) *
            pow(v_squ(v), 3) * pow(s, sf);
@@ -161,9 +161,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<1, dim, NumberType>
   dpsi_dv(const SymmetricTensor<2, dim, NumberType> &st,
-          const Tensor<2, dim, NumberType> &         t,
-          const Tensor<1, dim, NumberType> &         v,
-          const NumberType &                         s)
+          const Tensor<2, dim, NumberType>          &t,
+          const Tensor<1, dim, NumberType>          &v,
+          const NumberType                          &s)
   {
     return pow(det_t(st), 2) * pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) *
            dv_squ_dv(v) * pow(s, sf);
@@ -171,9 +171,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static NumberType
   dpsi_ds(const SymmetricTensor<2, dim, NumberType> &st,
-          const Tensor<2, dim, NumberType> &         t,
-          const Tensor<1, dim, NumberType> &         v,
-          const NumberType &                         s)
+          const Tensor<2, dim, NumberType>          &t,
+          const Tensor<1, dim, NumberType>          &v,
+          const NumberType                          &s)
   {
     return pow(det_t(st), 2) * pow(det_t(t), 2) * pow(v_squ(v), 3) * sf *
            pow(s, sf - 1.0);
@@ -181,9 +181,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static SymmetricTensor<4, dim, NumberType>
   d2psi_dst_x_dst(const SymmetricTensor<2, dim, NumberType> &st,
-                  const Tensor<2, dim, NumberType> &         t,
-                  const Tensor<1, dim, NumberType> &         v,
-                  const NumberType &                         s)
+                  const Tensor<2, dim, NumberType>          &t,
+                  const Tensor<1, dim, NumberType>          &v,
+                  const NumberType                          &s)
   {
     return 2.0 * pow(det_t(t), 2) * pow(v_squ(v), 3) *
            (pow(det_t(st), 0) * outer_product(ddet_t_dt(st), ddet_t_dt(st)) +
@@ -193,9 +193,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<4, dim, NumberType>
   d2psi_dst_x_dt(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 4.0 * pow(det_t(st), 1) * pow(det_t(t), 1) *
            outer_product(Tensor<2, dim, NumberType>(ddet_t_dt(st)),
@@ -205,9 +205,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<3, dim, NumberType>
   d2psi_dst_x_dv(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 2.0 * pow(det_t(t), 2) * pow(det_t(st), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(Tensor<2, dim, NumberType>(ddet_t_dt(st)),
@@ -217,9 +217,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static SymmetricTensor<2, dim, NumberType>
   d2psi_dst_x_ds(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 2.0 * pow(det_t(st), 1) * ddet_t_dt(st) * pow(det_t(t), 2) *
            pow(v_squ(v), 3) * sf * pow(s, sf - 1.0);
@@ -227,9 +227,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<4, dim, NumberType>
   d2psi_dt_x_dst(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 4.0 * pow(det_t(st), 1) * pow(det_t(t), 1) *
            outer_product(ddet_t_dt(t),
@@ -239,9 +239,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<4, dim, NumberType>
   d2psi_dt_x_dt(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * pow(det_t(st), 2) * pow(v_squ(v), 3) *
            (pow(det_t(t), 0) * outer_product(ddet_t_dt(t), ddet_t_dt(t)) +
@@ -251,9 +251,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<3, dim, NumberType>
   d2psi_dt_x_dv(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(ddet_t_dt(t), dv_squ_dv(v)) * pow(s, sf);
@@ -261,9 +261,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<2, dim, NumberType>
   d2psi_dt_x_ds(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * ddet_t_dt(t) *
            pow(v_squ(v), 3) * sf * pow(s, sf - 1.0);
@@ -271,9 +271,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<3, dim, NumberType>
   d2psi_dv_x_dst(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 2.0 * pow(det_t(t), 2) * pow(det_t(st), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(dv_squ_dv(v),
@@ -283,9 +283,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<3, dim, NumberType>
   d2psi_dv_x_dt(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(dv_squ_dv(v), ddet_t_dt(t)) * pow(s, sf);
@@ -293,9 +293,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<2, dim, NumberType>
   d2psi_dv_x_dv(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return pow(det_t(st), 2) * pow(det_t(t), 2) * 3.0 *
            (2.0 * pow(v_squ(v), 1) * outer_product(dv_squ_dv(v), dv_squ_dv(v)) +
@@ -305,9 +305,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<1, dim, NumberType>
   d2psi_dv_x_ds(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return pow(det_t(st), 2) * pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) *
            dv_squ_dv(v) * sf * pow(s, sf - 1.0);
@@ -315,9 +315,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static SymmetricTensor<2, dim, NumberType>
   d2psi_ds_x_dst(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 2.0 * ddet_t_dt(st) * pow(det_t(t), 2) * pow(det_t(st), 1) *
            pow(v_squ(v), 3) * sf * pow(s, sf - 1.0);
@@ -325,9 +325,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<2, dim, NumberType>
   d2psi_ds_x_dt(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * pow(det_t(st), 2) * pow(det_t(t), 1) * ddet_t_dt(t) *
            pow(v_squ(v), 3) * sf * pow(s, sf - 1.0);
@@ -335,9 +335,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static Tensor<1, dim, NumberType>
   d2psi_ds_x_dv(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return pow(det_t(st), 2) * pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) *
            dv_squ_dv(v) * sf * pow(s, sf - 1.0);
@@ -345,9 +345,9 @@ struct FunctionsTestSymmetricTensorTensorVectorScalarCoupled
 
   static NumberType
   d2psi_ds_x_ds(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return pow(det_t(st), 2) * pow(det_t(t), 2) * pow(v_squ(v), 3) * sf *
            (sf - 1.0) * pow(s, sf - 2.0);

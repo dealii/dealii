@@ -64,9 +64,9 @@ namespace LinearAdvectionTest
     void
     calculate_flux_terms(
       const TriaActiveIterator<DoFCellAccessor<dim, dim, false>> &current_cell,
-      FEFaceValues<dim> &                                   current_face_values,
+      FEFaceValues<dim>                                    &current_face_values,
       const TriaIterator<DoFCellAccessor<dim, dim, false>> &neighbor_cell,
-      FEFaceValues<dim> & neighbor_face_values,
+      FEFaceValues<dim>  &neighbor_face_values,
       FullMatrix<double> &current_to_current_flux,
       FullMatrix<double> &current_to_neighbor_flux,
       FullMatrix<double> &neighbor_to_current_flux,
@@ -145,9 +145,9 @@ namespace LinearAdvectionTest
   void
   AdvectionProblem<dim>::calculate_flux_terms(
     const TriaActiveIterator<DoFCellAccessor<dim, dim, false>> &current_cell,
-    FEFaceValues<dim> &                                   current_face_values,
+    FEFaceValues<dim>                                    &current_face_values,
     const TriaIterator<DoFCellAccessor<dim, dim, false>> &neighbor_cell,
-    FEFaceValues<dim> &                                   neighbor_face_values,
+    FEFaceValues<dim>                                    &neighbor_face_values,
     FullMatrix<double> &current_to_current_flux,
     FullMatrix<double> &current_to_neighbor_flux,
     FullMatrix<double> &neighbor_to_current_flux,
@@ -310,7 +310,8 @@ namespace LinearAdvectionTest
                       }
                   }
                 else // boundary face: skip for the purposes of this test
-                  {}
+                  {
+                  }
               }
           }
       }

@@ -28,13 +28,13 @@
 
 
 void
-check_matrix(const SparseMatrix<double> &        A,
+check_matrix(const SparseMatrix<double>         &A,
              CUDAWrappers::SparseMatrix<double> &A_dev)
 {
   cudaError_t cuda_error_code;
-  double *    val_dev          = nullptr;
-  int *       column_index_dev = nullptr;
-  int *       row_ptr_dev      = nullptr;
+  double     *val_dev          = nullptr;
+  int        *column_index_dev = nullptr;
+  int        *row_ptr_dev      = nullptr;
   std::tie(val_dev, column_index_dev, row_ptr_dev, std::ignore, std::ignore) =
     A_dev.get_cusparse_matrix();
 
@@ -68,7 +68,7 @@ check_matrix(const SparseMatrix<double> &        A,
 }
 
 void
-check_vector(const Vector<double> &                        a,
+check_vector(const Vector<double>                         &a,
              const LinearAlgebra::ReadWriteVector<double> &b)
 {
   unsigned int size = a.size();

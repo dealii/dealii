@@ -121,7 +121,7 @@ public:
 
   // for documentation, see the Mapping base class
   virtual void
-  transform(const ArrayView<const Tensor<1, dim>> &                  input,
+  transform(const ArrayView<const Tensor<1, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<1, spacedim>> &output) const override;
@@ -135,7 +135,7 @@ public:
 
   // for documentation, see the Mapping base class
   virtual void
-  transform(const ArrayView<const Tensor<2, dim>> &                  input,
+  transform(const ArrayView<const Tensor<2, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const override;
@@ -149,7 +149,7 @@ public:
 
   // for documentation, see the Mapping base class
   virtual void
-  transform(const ArrayView<const Tensor<3, dim>> &                  input,
+  transform(const ArrayView<const Tensor<3, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const override;
@@ -178,7 +178,7 @@ public:
   void
   fill_mapping_data_for_generic_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const ArrayView<const Point<dim>> &                         unit_points,
+    const ArrayView<const Point<dim>>                          &unit_points,
     const UpdateFlags                                           update_flags,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
@@ -261,8 +261,8 @@ private:
   fill_fe_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellSimilarity::Similarity                            cell_similarity,
-    const Quadrature<dim> &                                     quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim>                                      &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
@@ -273,8 +273,8 @@ private:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const hp::QCollection<dim - 1> &                            quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const hp::QCollection<dim - 1>                             &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
@@ -284,8 +284,8 @@ private:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          subface_no,
-    const Quadrature<dim - 1> &                                 quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim - 1>                                  &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
@@ -293,8 +293,8 @@ private:
   virtual void
   fill_fe_immersed_surface_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const NonMatching::ImmersedSurfaceQuadrature<dim>          &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
@@ -310,7 +310,7 @@ private:
   update_cell_extents(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellSimilarity::Similarity                            cell_similarity,
-    const InternalData &                                        data) const;
+    const InternalData                                         &data) const;
 
   /**
    * Compute the quadrature points if the UpdateFlags of the incoming
@@ -321,7 +321,7 @@ private:
   void
   maybe_update_cell_quadrature_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const InternalData &                                        data,
+    const InternalData                                         &data,
     std::vector<Point<dim>> &quadrature_points) const;
 
   /**
@@ -334,7 +334,7 @@ private:
   maybe_update_face_quadrature_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const InternalData &                                        data,
+    const InternalData                                         &data,
     std::vector<Point<dim>> &quadrature_points) const;
 
   /**
@@ -348,7 +348,7 @@ private:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
-    const InternalData &                                        data,
+    const InternalData                                         &data,
     std::vector<Point<dim>> &quadrature_points) const;
 
   /**
@@ -360,8 +360,8 @@ private:
   void
   transform_quadrature_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const InternalData &                                        data,
-    const typename QProjector<dim>::DataSetDescriptor &         offset,
+    const InternalData                                         &data,
+    const typename QProjector<dim>::DataSetDescriptor          &offset,
     std::vector<Point<dim>> &quadrature_points) const;
 
   /**
@@ -371,7 +371,7 @@ private:
   void
   maybe_update_normal_vectors(
     const unsigned int           face_no,
-    const InternalData &         data,
+    const InternalData          &data,
     std::vector<Tensor<1, dim>> &normal_vectors) const;
 
   /**
@@ -381,7 +381,7 @@ private:
    */
   void
   maybe_update_jacobian_derivatives(
-    const InternalData &             data,
+    const InternalData              &data,
     const CellSimilarity::Similarity cell_similarity,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
@@ -400,7 +400,7 @@ private:
    */
   void
   maybe_update_jacobians(
-    const InternalData &             data,
+    const InternalData              &data,
     const CellSimilarity::Similarity cell_similarity,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
@@ -411,7 +411,7 @@ private:
    */
   void
   maybe_update_inverse_jacobians(
-    const InternalData &             data,
+    const InternalData              &data,
     const CellSimilarity::Similarity cell_similarity,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;

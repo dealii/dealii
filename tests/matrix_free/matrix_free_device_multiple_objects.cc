@@ -54,9 +54,9 @@ do_test(const DoFHandler<2> &dof,
           fe_degree,
           double,
           LinearAlgebra::distributed::Vector<double, MemorySpace::Default>,
-          n_q_points_1d> &               mf,
+          n_q_points_1d>                &mf,
         unsigned int                     n_dofs,
-        MappingQ<2> &                    mapping,
+        MappingQ<2>                     &mapping,
         const AffineConstraints<double> &constraints)
 {
   Vector<double>                         in_host(n_dofs), out_host(n_dofs);

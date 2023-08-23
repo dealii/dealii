@@ -141,7 +141,7 @@ assign_data(Container<Number> &data)
 // This function tests parallel write and gets the group by reference
 template <template <class...> class Container, typename Number>
 void
-write_test(HDF5::Group &              root_group,
+write_test(HDF5::Group               &root_group,
            const std::vector<hsize_t> dataset_dimensions,
            MPI_Comm                   mpi_communicator,
            ConditionalOStream         pcout)

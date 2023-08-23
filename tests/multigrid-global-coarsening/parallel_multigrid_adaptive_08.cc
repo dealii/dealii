@@ -71,7 +71,7 @@ class MyLaplaceOperator : public MatrixFreeOperators::LaplaceOperator<
 public:
   void
   initialize(std::shared_ptr<const MatrixFree<dim, Number>> data,
-             const MGConstrainedDoFs &                      mg_constrained_dofs,
+             const MGConstrainedDoFs                       &mg_constrained_dofs,
              const unsigned int                             level)
   {
     MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<Number>>::
@@ -95,7 +95,7 @@ public:
 
   void
   initialize(std::shared_ptr<const MatrixFree<dim, Number>> data,
-             const std::vector<unsigned int> &              mask = {})
+             const std::vector<unsigned int>               &mask = {})
   {
     MatrixFreeOperators::Base<dim, LinearAlgebra::distributed::Vector<Number>>::
       initialize(data, mask);
@@ -103,7 +103,7 @@ public:
 
 
   void
-  vmult(LinearAlgebra::distributed::Vector<Number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<Number>       &dst,
         const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     adjust_ghost_range_if_necessary(src);
@@ -135,8 +135,8 @@ public:
 
 private:
   void
-  local_apply(const MatrixFree<dim, Number> &                   data,
-              LinearAlgebra::distributed::Vector<Number> &      dst,
+  local_apply(const MatrixFree<dim, Number>                    &data,
+              LinearAlgebra::distributed::Vector<Number>       &dst,
               const LinearAlgebra::distributed::Vector<Number> &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
@@ -195,7 +195,7 @@ public:
 
   virtual void
   operator()(const unsigned int                                level,
-             LinearAlgebra::distributed::Vector<Number> &      dst,
+             LinearAlgebra::distributed::Vector<Number>       &dst,
              const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     ReductionControl solver_control(1e4, 1e-50, 1e-10);

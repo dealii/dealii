@@ -41,7 +41,7 @@ namespace MatrixFreeTools
   template <int dim, typename AdditionalData>
   void
   categorize_by_boundary_ids(const Triangulation<dim> &tria,
-                             AdditionalData &          additional_data);
+                             AdditionalData           &additional_data);
 
   /**
    * Compute the diagonal of a linear operator (@p diagonal_global), given
@@ -61,7 +61,7 @@ namespace MatrixFreeTools
   void
   compute_diagonal(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    VectorType &                                        diagonal_global,
+    VectorType                                         &diagonal_global,
     const std::function<void(FEEvaluation<dim,
                                           fe_degree,
                                           n_q_points_1d,
@@ -86,14 +86,14 @@ namespace MatrixFreeTools
   void
   compute_diagonal(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    VectorType &                                        diagonal_global,
+    VectorType                                         &diagonal_global,
     void (CLASS::*cell_operation)(FEEvaluation<dim,
                                                fe_degree,
                                                n_q_points_1d,
                                                n_components,
                                                Number,
                                                VectorizedArrayType> &) const,
-    const CLASS *      owning_class,
+    const CLASS       *owning_class,
     const unsigned int dof_no                   = 0,
     const unsigned int quad_no                  = 0,
     const unsigned int first_selected_component = 0);
@@ -116,9 +116,9 @@ namespace MatrixFreeTools
             typename MatrixType>
   void
   compute_matrix(
-    const MatrixFree<dim, Number, VectorizedArrayType> &            matrix_free,
-    const AffineConstraints<Number> &                               constraints,
-    MatrixType &                                                    matrix,
+    const MatrixFree<dim, Number, VectorizedArrayType>             &matrix_free,
+    const AffineConstraints<Number>                                &constraints,
+    MatrixType                                                     &matrix,
     const std::function<void(FEEvaluation<dim,
                                           fe_degree,
                                           n_q_points_1d,
@@ -143,15 +143,15 @@ namespace MatrixFreeTools
   void
   compute_matrix(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const AffineConstraints<Number> &                   constraints,
-    MatrixType &                                        matrix,
+    const AffineConstraints<Number>                    &constraints,
+    MatrixType                                         &matrix,
     void (CLASS::*cell_operation)(FEEvaluation<dim,
                                                fe_degree,
                                                n_q_points_1d,
                                                n_components,
                                                Number,
                                                VectorizedArrayType> &) const,
-    const CLASS *      owning_class,
+    const CLASS       *owning_class,
     const unsigned int dof_no                   = 0,
     const unsigned int quad_no                  = 0,
     const unsigned int first_selected_component = 0);
@@ -235,12 +235,12 @@ namespace MatrixFreeTools
                 VectorTypeOut &,
                 const VectorTypeIn &,
                 const std::pair<unsigned int, unsigned int> &)> &cell_operation,
-              VectorTypeOut &                                    dst,
-              const VectorTypeIn &                               src,
+              VectorTypeOut                                     &dst,
+              const VectorTypeIn                                &src,
               const bool zero_dst_vector = false) const
     {
       const auto ebd_cell_operation = [&](const auto &matrix_free,
-                                          auto &      dst,
+                                          auto       &dst,
                                           const auto &src,
                                           const auto &range) {
         const auto category = matrix_free.get_cell_range_category(range);
@@ -280,12 +280,12 @@ namespace MatrixFreeTools
                 const VectorTypeIn &,
                 const std::pair<unsigned int, unsigned int> &,
                 const bool)> &boundary_operation,
-         VectorTypeOut &      dst,
-         const VectorTypeIn & src,
+         VectorTypeOut       &dst,
+         const VectorTypeIn  &src,
          const bool           zero_dst_vector = false) const
     {
       const auto ebd_cell_operation = [&](const auto &matrix_free,
-                                          auto &      dst,
+                                          auto       &dst,
                                           const auto &src,
                                           const auto &range) {
         const auto category = matrix_free.get_cell_range_category(range);
@@ -298,7 +298,7 @@ namespace MatrixFreeTools
 
       const auto ebd_internal_or_boundary_face_operation =
         [&](const auto &matrix_free,
-            auto &      dst,
+            auto       &dst,
             const auto &src,
             const auto &range) {
           const auto category = matrix_free.get_face_range_category(range);
@@ -346,7 +346,7 @@ namespace MatrixFreeTools
   template <int dim, typename AdditionalData>
   void
   categorize_by_boundary_ids(const Triangulation<dim> &tria,
-                             AdditionalData &          additional_data)
+                             AdditionalData           &additional_data)
   {
     // ... determine if we are on an active or a multigrid level
     const unsigned int level = additional_data.mg_level;
@@ -476,9 +476,9 @@ namespace MatrixFreeTools
         this->phi->reinit(cell);
 
         // STEP 1: get relevant information from FEEvaluation
-        const auto &       dof_info        = phi->get_dof_info();
+        const auto        &dof_info        = phi->get_dof_info();
         const unsigned int n_fe_components = dof_info.start_components.back();
-        const auto &       matrix_free     = phi->get_matrix_free();
+        const auto        &matrix_free     = phi->get_matrix_free();
 
         // if we have a block vector with components with the same DoFHandler,
         // each component is described with same set of constraints and
@@ -978,7 +978,7 @@ namespace MatrixFreeTools
   void
   compute_diagonal(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    VectorType &                                        diagonal_global,
+    VectorType                                         &diagonal_global,
     const std::function<void(FEEvaluation<dim,
                                           fe_degree,
                                           n_q_points_1d,
@@ -1078,14 +1078,14 @@ namespace MatrixFreeTools
   void
   compute_diagonal(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    VectorType &                                        diagonal_global,
+    VectorType                                         &diagonal_global,
     void (CLASS::*cell_operation)(FEEvaluation<dim,
                                                fe_degree,
                                                n_q_points_1d,
                                                n_components,
                                                Number,
                                                VectorizedArrayType> &) const,
-    const CLASS *      owning_class,
+    const CLASS       *owning_class,
     const unsigned int dof_no,
     const unsigned int quad_no,
     const unsigned int first_selected_component)
@@ -1164,8 +1164,8 @@ namespace MatrixFreeTools
   void
   compute_matrix(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const AffineConstraints<Number> &                   constraints_in,
-    MatrixType &                                        matrix,
+    const AffineConstraints<Number>                    &constraints_in,
+    MatrixType                                         &matrix,
     const std::function<void(FEEvaluation<dim,
                                           fe_degree,
                                           n_q_points_1d,
@@ -1276,15 +1276,15 @@ namespace MatrixFreeTools
   void
   compute_matrix(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const AffineConstraints<Number> &                   constraints,
-    MatrixType &                                        matrix,
+    const AffineConstraints<Number>                    &constraints,
+    MatrixType                                         &matrix,
     void (CLASS::*cell_operation)(FEEvaluation<dim,
                                                fe_degree,
                                                n_q_points_1d,
                                                n_components,
                                                Number,
                                                VectorizedArrayType> &) const,
-    const CLASS *      owning_class,
+    const CLASS       *owning_class,
     const unsigned int dof_no,
     const unsigned int quad_no,
     const unsigned int first_selected_component)

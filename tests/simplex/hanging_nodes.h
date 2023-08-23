@@ -90,7 +90,7 @@ refine(const std::vector<unsigned int> &n_refinements, Triangulation<dim> &tria)
 template <int dim>
 void
 set_active_fe_indices(const std::vector<unsigned int> &fe_indices,
-                      DoFHandler<dim> &                dofh)
+                      DoFHandler<dim>                 &dofh)
 {
   AssertDimension(fe_indices.size(), dofh.get_triangulation().n_cells(0));
 
@@ -122,7 +122,7 @@ print_dof_indices_on_faces(const DoFHandler<dim> &dofh)
 
   for (const auto &cell : dofh.active_cell_iterators())
     {
-      const auto &       fe       = cell->get_fe();
+      const auto        &fe       = cell->get_fe();
       const unsigned int fe_index = cell->active_fe_index();
 
       for (unsigned int f = 0; f < cell->n_faces(); ++f)
@@ -146,7 +146,7 @@ print_dof_indices_on_faces(const DoFHandler<dim> &dofh)
           // in this case, only one fe should be active on the subface.
           for (unsigned int sf = 0; sf < face->n_children(); ++sf)
             {
-              const auto &       subface = face->child(sf);
+              const auto        &subface = face->child(sf);
               const unsigned int subface_fe_index =
                 subface->nth_active_fe_index(0);
               Assert(subface->n_active_fe_indices() == 1, ExcInternalError());
@@ -199,9 +199,9 @@ print_dof_points(const DoFHandler<dim> &dofh)
  */
 template <int dim>
 void
-test(const std::vector<unsigned int> &                n_refinements,
-     const std::vector<unsigned int> &                fe_indices,
-     const hp::FECollection<dim> &                    fe_collection,
+test(const std::vector<unsigned int>                 &n_refinements,
+     const std::vector<unsigned int>                 &fe_indices,
+     const hp::FECollection<dim>                     &fe_collection,
      const std::function<void(Triangulation<dim> &)> &grid_generator)
 {
   // setup grid

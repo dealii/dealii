@@ -101,7 +101,7 @@ test()
 
   MatrixFree<dim, double> mf_data;
   const QGauss<1>         quad(n_q_points_1d > 0 ? n_q_points_1d :
-                                                   dof.get_fe().degree + 1);
+                                           dof.get_fe().degree + 1);
   typename MatrixFree<dim, double>::AdditionalData data;
   data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
   data.tasks_block_size      = 3;

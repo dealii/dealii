@@ -37,7 +37,7 @@ namespace LACExceptions
 #ifdef DEAL_II_WITH_PETSC
     // PetscErrorMessage changes the value in a pointer to refer to a
     // statically allocated description of the current error message.
-    const char *         petsc_message;
+    const char          *petsc_message;
     const PetscErrorCode ierr =
       PetscErrorMessage(static_cast<PetscErrorCode>(error_code),
                         &petsc_message,

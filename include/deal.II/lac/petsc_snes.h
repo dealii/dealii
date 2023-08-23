@@ -411,7 +411,7 @@ namespace PETScWrappers
      * See there for a description of how to deal with errors and other
      * requirements and conventions.
      */
-    std::function<void(const VectorType & x,
+    std::function<void(const VectorType  &x,
                        const unsigned int step_number,
                        const real_type    f_norm)>
       monitor;

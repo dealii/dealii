@@ -72,8 +72,8 @@ namespace PETScWrappers
   template <typename F, typename... Args>
   int
   call_and_possibly_capture_ts_exception(
-    const F &                    f,
-    std::exception_ptr &         eptr,
+    const F                     &f,
+    std::exception_ptr          &eptr,
     const std::function<void()> &recoverable_action,
     Args &&...args)
   {
@@ -465,7 +465,7 @@ namespace PETScWrappers
                                        PetscInt nv,
                                        Vec      vin[],
                                        Vec      vout[],
-                                       void *   ctx) -> PetscErrorCode {
+                                       void    *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
       auto user = static_cast<TimeStepper *>(ctx);
 
@@ -685,7 +685,7 @@ namespace PETScWrappers
                                  PetscReal s,
                                  Mat       A,
                                  Mat       P,
-                                 void *    ctx) -> PetscErrorCode {
+                                 void     *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
       auto user = static_cast<TimeStepper *>(ctx);
 
@@ -743,7 +743,7 @@ namespace PETScWrappers
                                             PetscReal s,
                                             Mat       A,
                                             Mat       P,
-                                            void *    ctx) -> PetscErrorCode {
+                                            void     *ctx) -> PetscErrorCode {
       PetscFunctionBeginUser;
       auto user = static_cast<TimeStepper *>(ctx);
 
@@ -1007,7 +1007,7 @@ namespace PETScWrappers
     // approximation of the tangent operator.
     if (solve_with_jacobian)
       {
-        solve_with_jacobian_pc.vmult = [&](VectorBase &      indst,
+        solve_with_jacobian_pc.vmult = [&](VectorBase       &indst,
                                            const VectorBase &insrc) -> void {
           VectorType       dst(static_cast<const Vec &>(indst));
           const VectorType src(static_cast<const Vec &>(insrc));
@@ -1215,7 +1215,7 @@ namespace PETScWrappers
                  Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
                          std::constructible_from<AMatrixType, Mat>))
   unsigned int TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(
-    VectorType & y,
+    VectorType  &y,
     PMatrixType &P)
   {
     set_matrix(P);
@@ -1235,7 +1235,7 @@ namespace PETScWrappers
                  Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
                          std::constructible_from<AMatrixType, Mat>))
   unsigned int TimeStepper<VectorType, PMatrixType, AMatrixType>::solve(
-    VectorType & y,
+    VectorType  &y,
     AMatrixType &A,
     PMatrixType &P)
   {

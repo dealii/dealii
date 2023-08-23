@@ -60,7 +60,7 @@ class Test
 
 public:
   Test(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-       const AffineConstraints<Number> &                   constraints,
+       const AffineConstraints<Number>                    &constraints,
        const std::function<void(FEEvaluation<dim,
                                              fe_degree,
                                              n_points,
@@ -215,8 +215,8 @@ public:
 
   void
   cell_operation_range(const MatrixFree<dim, Number, VectorizedArrayType> &data,
-                       VectorType &                                        dst,
-                       const VectorType &                                  src,
+                       VectorType                                         &dst,
+                       const VectorType                                   &src,
                        const std::pair<unsigned int, unsigned int> &pair) const
   {
     FEEvaluation<dim,
@@ -247,7 +247,7 @@ public:
   }
 
   const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free;
-  const AffineConstraints<Number> &                   constraints;
+  const AffineConstraints<Number>                    &constraints;
   const std::function<void(FEEvaluation<dim,
                                         fe_degree,
                                         n_points,

@@ -83,7 +83,7 @@ template <int dim>
 void
 extract_locally_active_level_dofs(const DoFHandler<dim> &dof_handler,
                                   const unsigned int     level,
-                                  IndexSet &             dof_set)
+                                  IndexSet              &dof_set)
 {
   dof_set = IndexSet(dof_handler.n_dofs(level));
 

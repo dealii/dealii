@@ -92,7 +92,7 @@ TestMap1<dim>::value(const Point<dim> &p, const unsigned int component) const
 template <int dim>
 void
 TestMap1<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+                            Vector<double>   &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -149,7 +149,7 @@ TestDef1<dim>::value(const Point<dim> &p, const unsigned int component) const
 template <int dim>
 void
 TestDef1<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+                            Vector<double>   &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -200,7 +200,7 @@ TestDef2<dim>::value(const Point<dim> &p, const unsigned int component) const
 template <int dim>
 void
 TestDef2<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+                            Vector<double>   &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -252,7 +252,7 @@ TestDef3<dim>::value(const Point<dim> &p, const unsigned int component) const
 template <int dim>
 void
 TestDef3<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+                            Vector<double>   &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -309,7 +309,7 @@ TestPoly<dim>::value(const Point<dim> &p, const unsigned int component) const
 template <int dim>
 void
 TestPoly<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+                            Vector<double>   &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -417,7 +417,7 @@ main()
   deallog.get_file_stream() << std::fixed;
 
   Triangulation<2> tria_test;
-  DoFHandler<2> *  dof_handler, *dof_handler_def;
+  DoFHandler<2>   *dof_handler, *dof_handler_def;
   Point<2>         p1(0, 0), p2(1, 1);
 
   GridGenerator::hyper_rectangle(tria_test, p1, p2);

@@ -729,7 +729,7 @@ operator*(const Range &u, const LinearOperator<Range, Domain, Payload> &op)
 template <typename Range, typename Domain, typename Payload>
 PackagedOperation<Range>
 operator*(const LinearOperator<Range, Domain, Payload> &op,
-          const PackagedOperation<Domain> &             comp)
+          const PackagedOperation<Domain>              &comp)
 {
   PackagedOperation<Range> return_comp;
 
@@ -772,7 +772,7 @@ operator*(const LinearOperator<Range, Domain, Payload> &op,
  */
 template <typename Range, typename Domain, typename Payload>
 PackagedOperation<Domain>
-operator*(const PackagedOperation<Range> &              comp,
+operator*(const PackagedOperation<Range>               &comp,
           const LinearOperator<Range, Domain, Payload> &op)
 {
   PackagedOperation<Range> return_comp;

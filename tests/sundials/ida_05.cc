@@ -68,7 +68,7 @@ public:
     time_stepper.residual = [&](const double      t,
                                 const VectorType &y,
                                 const VectorType &y_dot,
-                                VectorType &      res) {
+                                VectorType       &res) {
       deallog << "Evaluating residual at t=" << t << std::endl;
 
       if (t > last_residual_eval_time + 0.1)
@@ -96,8 +96,8 @@ public:
       };
 
     time_stepper.output_step = [&](const double       t,
-                                   const VectorType & sol,
-                                   const VectorType & sol_dot,
+                                   const VectorType  &sol,
+                                   const VectorType  &sol_dot,
                                    const unsigned int step_number) {
       deallog << "Intermediate output:" << std::endl;
       deallog << "  t =" << t << std::endl;

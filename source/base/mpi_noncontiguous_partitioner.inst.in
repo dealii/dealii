@@ -24,13 +24,13 @@ for (S : REAL_SCALARS)
         template void
         NoncontiguousPartitioner::export_to_ghosted_array(
           const ArrayView<const S> &src,
-          const ArrayView<S> &      dst) const;
+          const ArrayView<S>       &dst) const;
 
         template void
         NoncontiguousPartitioner::import_from_ghosted_array(
           const VectorOperation::values vector_operation,
-          const ArrayView<S> &          src,
-          const ArrayView<S> &          dst) const;
+          const ArrayView<S>           &src,
+          const ArrayView<S>           &dst) const;
       \}
     \}
   }

@@ -1350,8 +1350,8 @@ public:
   TimeStepBase_Tria(
     const double                   time,
     const Triangulation<dim, dim> &coarse_grid,
-    const Flags &                  flags,
-    const RefinementFlags &        refinement_flags = RefinementFlags());
+    const Flags                   &flags,
+    const RefinementFlags         &refinement_flags = RefinementFlags());
 
   /**
    * Destructor. At present, this does not more than releasing the lock on the

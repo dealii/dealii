@@ -110,7 +110,7 @@ namespace Step29
 
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const override
+                      std::vector<Vector<double>>   &value_list) const override
     {
       AssertDimension(value_list.size(), points.size());
 
@@ -323,7 +323,7 @@ namespace Step29
   template <int dim>
   void ComputeIntensity<dim>::evaluate_vector_field(
     const DataPostprocessorInputs::Vector<dim> &inputs,
-    std::vector<Vector<double>> &               computed_quantities) const
+    std::vector<Vector<double>>                &computed_quantities) const
   {
     AssertDimension(computed_quantities.size(), inputs.solution_values.size());
 

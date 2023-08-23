@@ -92,8 +92,8 @@ public:
   {}
 
   void
-  initialize(const Point<dim> & center,
-             const double &     sigma,
+  initialize(const Point<dim>  &center,
+             const double      &sigma,
              const std::string &func_expr);
   double
   value(const Point<dim> &p, const unsigned int component = 0) const;
@@ -101,13 +101,13 @@ public:
   gradient(const Point<dim> &p, const unsigned int component = 0) const;
   virtual void
   value_list(const std::vector<Point<dim>> &points,
-             std::vector<double> &          value_list) const;
+             std::vector<double>           &value_list) const;
 };
 
 template <int dim>
 void
-SigmaFunction<dim>::initialize(const Point<dim> & _center,
-                               const double &     sigma,
+SigmaFunction<dim>::initialize(const Point<dim>  &_center,
+                               const double      &sigma,
                                const std::string &func_expr)
 {
   center = _center;
@@ -135,7 +135,7 @@ SigmaFunction<dim>::initialize(const Point<dim> & _center,
 
 template <int dim>
 inline double
-SigmaFunction<dim>::value(const Point<dim> & p,
+SigmaFunction<dim>::value(const Point<dim>  &p,
                           const unsigned int component) const
 {
   const Point<dim> d(p - center);
@@ -145,7 +145,7 @@ SigmaFunction<dim>::value(const Point<dim> & p,
 
 template <int dim>
 inline Tensor<1, dim>
-SigmaFunction<dim>::gradient(const Point<dim> & p,
+SigmaFunction<dim>::gradient(const Point<dim>  &p,
                              const unsigned int component) const
 {
   const Point<dim> d(p - center);
@@ -155,7 +155,7 @@ SigmaFunction<dim>::gradient(const Point<dim> & p,
 template <int dim>
 void
 SigmaFunction<dim>::value_list(const std::vector<Point<dim>> &points,
-                               std::vector<double> &          value_list) const
+                               std::vector<double>           &value_list) const
 {
   const unsigned int n_points = points.size();
 
@@ -203,7 +203,7 @@ template <int dim>
 class SplineEnrichmentFunction : public Function<dim>
 {
 public:
-  SplineEnrichmentFunction(const Point<dim> &         origin,
+  SplineEnrichmentFunction(const Point<dim>          &origin,
                            const std::vector<double> &interpolation_points_1d,
                            const std::vector<double> &interpolation_values_1d)
     : Function<dim>(1)
@@ -267,23 +267,23 @@ struct ParameterCollection
 {
   ParameterCollection(const std::string &file_name);
 
-  ParameterCollection(const int &                dim,
-                      const double &             size,
-                      const unsigned int &       shape,
-                      const unsigned int &       global_refinement,
-                      const unsigned int &       cycles,
-                      const unsigned int &       fe_base_degree,
-                      const unsigned int &       fe_enriched_degree,
-                      const unsigned int &       max_iterations,
-                      const double &             tolerance,
-                      const std::string &        rhs_value_expr,
-                      const std::string &        boundary_value_expr,
-                      const std::string &        rhs_radial_problem,
-                      const std::string &        boundary_radial_problem,
-                      const std::string &        exact_soln_expr,
-                      const unsigned int &       patches,
-                      const unsigned int &       debug_level,
-                      const unsigned int &       n_enrichments,
+  ParameterCollection(const int                 &dim,
+                      const double              &size,
+                      const unsigned int        &shape,
+                      const unsigned int        &global_refinement,
+                      const unsigned int        &cycles,
+                      const unsigned int        &fe_base_degree,
+                      const unsigned int        &fe_enriched_degree,
+                      const unsigned int        &max_iterations,
+                      const double              &tolerance,
+                      const std::string         &rhs_value_expr,
+                      const std::string         &boundary_value_expr,
+                      const std::string         &rhs_radial_problem,
+                      const std::string         &boundary_radial_problem,
+                      const std::string         &exact_soln_expr,
+                      const unsigned int        &patches,
+                      const unsigned int        &debug_level,
+                      const unsigned int        &n_enrichments,
                       const std::vector<double> &points_enrichments,
                       const std::vector<double> &radii_predicates,
                       const std::vector<double> &sigmas);
@@ -503,23 +503,23 @@ ParameterCollection::ParameterCollection(const std::string &file_name)
 
 
 ParameterCollection::ParameterCollection(
-  const int &                dim,
-  const double &             size,
-  const unsigned int &       shape,
-  const unsigned int &       global_refinement,
-  const unsigned int &       cycles,
-  const unsigned int &       fe_base_degree,
-  const unsigned int &       fe_enriched_degree,
-  const unsigned int &       max_iterations,
-  const double &             tolerance,
-  const std::string &        rhs_value_expr,
-  const std::string &        boundary_value_expr,
-  const std::string &        rhs_radial_problem,
-  const std::string &        boundary_radial_problem,
-  const std::string &        exact_soln_expr,
-  const unsigned int &       patches,
-  const unsigned int &       debug_level,
-  const unsigned int &       n_enrichments,
+  const int                 &dim,
+  const double              &size,
+  const unsigned int        &shape,
+  const unsigned int        &global_refinement,
+  const unsigned int        &cycles,
+  const unsigned int        &fe_base_degree,
+  const unsigned int        &fe_enriched_degree,
+  const unsigned int        &max_iterations,
+  const double              &tolerance,
+  const std::string         &rhs_value_expr,
+  const std::string         &boundary_value_expr,
+  const std::string         &rhs_radial_problem,
+  const std::string         &boundary_radial_problem,
+  const std::string         &exact_soln_expr,
+  const unsigned int        &patches,
+  const unsigned int        &debug_level,
+  const unsigned int        &n_enrichments,
   const std::vector<double> &points_enrichments,
   const std::vector<double> &radii_predicates,
   const std::vector<double> &sigmas)
@@ -609,16 +609,16 @@ ParameterCollection::print()
 class EstimateEnrichmentFunction
 {
 public:
-  EstimateEnrichmentFunction(const Point<1> &   center,
-                             const double &     domain_size,
-                             const double &     sigma,
+  EstimateEnrichmentFunction(const Point<1>    &center,
+                             const double      &domain_size,
+                             const double      &sigma,
                              const std::string &rhs_expr,
                              const std::string &boundary_expr,
                              const unsigned int refinement = 11);
-  EstimateEnrichmentFunction(const Point<1> &   center,
-                             const double &     left_bound,
-                             const double &     right_bound,
-                             const double &     sigma,
+  EstimateEnrichmentFunction(const Point<1>    &center,
+                             const double      &left_bound,
+                             const double      &right_bound,
+                             const double      &sigma,
                              const std::string &rhs_expr,
                              const std::string &boundary_expr,
                              const unsigned int refinement = 11);
@@ -667,9 +667,9 @@ private:
 };
 
 EstimateEnrichmentFunction::EstimateEnrichmentFunction(
-  const Point<1> &   center,
-  const double &     domain_size,
-  const double &     sigma,
+  const Point<1>    &center,
+  const double      &domain_size,
+  const double      &sigma,
   const std::string &rhs_expr,
   const std::string &boundary_expr,
   const unsigned int refinement)
@@ -689,10 +689,10 @@ EstimateEnrichmentFunction::EstimateEnrichmentFunction(
 
 
 EstimateEnrichmentFunction::EstimateEnrichmentFunction(
-  const Point<1> &   center,
-  const double &     left_bound,
-  const double &     right_bound,
-  const double &     sigma,
+  const Point<1>    &center,
+  const double      &left_bound,
+  const double      &right_bound,
+  const double      &sigma,
   const std::string &rhs_expr,
   const std::string &boundary_expr,
   const unsigned int refinement)
@@ -910,7 +910,7 @@ EstimateEnrichmentFunction::evaluate_at_x_values(
 
 
 double
-EstimateEnrichmentFunction::value(const Point<1> &    p,
+EstimateEnrichmentFunction::value(const Point<1>     &p,
                                   const unsigned int &component)
 {
   return VectorTools::point_value(dof_handler, solution, p);

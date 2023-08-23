@@ -369,7 +369,7 @@ namespace Utilities
           append_index_origin(const unsigned int index_within_dictionary,
                               const unsigned int rank_of_request,
                               const unsigned int rank_of_owner,
-                              unsigned int &     owner_index_guess);
+                              unsigned int      &owner_index_guess);
         };
 
         /* ------------------------- inline functions ----------------------- */

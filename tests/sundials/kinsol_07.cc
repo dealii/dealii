@@ -76,7 +76,7 @@ main()
 
 
   kinsol.solve_with_jacobian = [&](const VectorType &rhs,
-                                   VectorType &      dst,
+                                   VectorType       &dst,
                                    double) { dst[0] = J_inverse * rhs[0]; };
 
   VectorType v(N);

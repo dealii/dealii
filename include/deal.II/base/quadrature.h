@@ -187,7 +187,7 @@ public:
    * You will want to have the weights sum up to one, but this is not checked.
    */
   Quadrature(const std::vector<Point<dim>> &points,
-             const std::vector<double> &    weights);
+             const std::vector<double>     &weights);
 
   /**
    * Construct a quadrature formula from given vectors of quadrature points
@@ -242,7 +242,7 @@ public:
    */
   void
   initialize(const std::vector<Point<dim>> &points,
-             const std::vector<double> &    weights);
+             const std::vector<double>     &weights);
 
   /**
    * Number of quadrature points.
@@ -439,7 +439,7 @@ public:
    *
    * @note We require that `intervals.front() == 0` and `interval.back() == 1`.
    */
-  QIterated(const Quadrature<1> &        base_quadrature,
+  QIterated(const Quadrature<1>         &base_quadrature,
             const std::vector<Point<1>> &intervals);
 
   /**

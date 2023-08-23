@@ -101,7 +101,7 @@ VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 template <int dim>
 void
 VectorFunction<dim>::vector_value(const Point<dim> &p,
-                                  Vector<double> &  values) const
+                                  Vector<double>   &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);

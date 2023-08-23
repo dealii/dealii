@@ -42,10 +42,10 @@ public:
    */
   FE_SimplexPoly(
     const BarycentricPolynomials<dim>              polynomials,
-    const FiniteElementData<dim> &                 fe_data,
-    const std::vector<Point<dim>> &                unit_support_points,
+    const FiniteElementData<dim>                  &fe_data,
+    const std::vector<Point<dim>>                 &unit_support_points,
     const std::vector<std::vector<Point<dim - 1>>> unit_face_support_points,
-    const FullMatrix<double> &                     interface_constraints);
+    const FullMatrix<double>                      &interface_constraints);
 
   /**
    * Return a list of constant modes of the element. For this element, the
@@ -91,7 +91,7 @@ public:
   get_subface_interpolation_matrix(
     const FiniteElement<dim, spacedim> &x_source_fe,
     const unsigned int                  subface,
-    FullMatrix<double> &                interpolation_matrix,
+    FullMatrix<double>                 &interpolation_matrix,
     const unsigned int                  face_no) const override;
 
   /**
@@ -106,7 +106,7 @@ public:
   virtual void
   convert_generalized_support_point_values_to_dof_values(
     const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              nodal_values) const override;
+    std::vector<double>               &nodal_values) const override;
 
 protected:
   /**

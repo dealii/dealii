@@ -385,7 +385,7 @@ namespace Differentiation
       void
       print_tape_stats(
         const typename Types<ADNumberType>::tape_index tape_index,
-        std::ostream &                                 stream) const;
+        std::ostream                                  &stream) const;
 
       /** @} */
 
@@ -424,7 +424,7 @@ namespace Differentiation
       void
       gradient(const typename Types<ADNumberType>::tape_index active_tape_index,
                const std::vector<ScalarType> &independent_variables,
-               Vector<ScalarType> &           gradient) const;
+               Vector<ScalarType>            &gradient) const;
 
       /**
        * Compute the Hessian of the scalar field with respect to all
@@ -442,7 +442,7 @@ namespace Differentiation
       void
       hessian(const typename Types<ADNumberType>::tape_index active_tape_index,
               const std::vector<ScalarType> &independent_variables,
-              FullMatrix<ScalarType> &       hessian) const;
+              FullMatrix<ScalarType>        &hessian) const;
 
       /** @} */
 
@@ -467,7 +467,7 @@ namespace Differentiation
       values(const typename Types<ADNumberType>::tape_index active_tape_index,
              const unsigned int             n_dependent_variables,
              const std::vector<ScalarType> &independent_variables,
-             Vector<ScalarType> &           values) const;
+             Vector<ScalarType>            &values) const;
 
       /**
        * Compute the Jacobian of the vector field.
@@ -491,7 +491,7 @@ namespace Differentiation
       jacobian(const typename Types<ADNumberType>::tape_index active_tape_index,
                const unsigned int             n_dependent_variables,
                const std::vector<ScalarType> &independent_variables,
-               FullMatrix<ScalarType> &       jacobian) const;
+               FullMatrix<ScalarType>        &jacobian) const;
 
       /** @} */
     };
@@ -607,7 +607,7 @@ namespace Differentiation
       void
       gradient(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               Vector<ScalarType> &             gradient) const;
+               Vector<ScalarType>              &gradient) const;
 
       /**
        * Compute the Hessian of the scalar field with respect to all
@@ -625,7 +625,7 @@ namespace Differentiation
       void
       hessian(const std::vector<ADNumberType> &independent_variables,
               const std::vector<ADNumberType> &dependent_variables,
-              FullMatrix<ScalarType> &         hessian) const;
+              FullMatrix<ScalarType>          &hessian) const;
 
       /** @} */
 
@@ -645,7 +645,7 @@ namespace Differentiation
        */
       void
       values(const std::vector<ADNumberType> &dependent_variables,
-             Vector<ScalarType> &             values) const;
+             Vector<ScalarType>              &values) const;
 
       /**
        * Compute the Jacobian of the vector field.
@@ -667,7 +667,7 @@ namespace Differentiation
       void
       jacobian(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               FullMatrix<ScalarType> &         jacobian) const;
+               FullMatrix<ScalarType>          &jacobian) const;
 
       /** @} */
     };
@@ -832,7 +832,7 @@ namespace Differentiation
       void
       print_tape_stats(
         const typename Types<ADNumberType>::tape_index tape_index,
-        std::ostream &                                 stream) const;
+        std::ostream                                  &stream) const;
 
       /** @} */
 
@@ -848,12 +848,12 @@ namespace Differentiation
       void
       gradient(const typename Types<ADNumberType>::tape_index active_tape_index,
                const std::vector<scalar_type> &independent_variables,
-               Vector<scalar_type> &           gradient) const;
+               Vector<scalar_type>            &gradient) const;
 
       void
       hessian(const typename Types<ADNumberType>::tape_index active_tape_index,
               const std::vector<scalar_type> &independent_variables,
-              FullMatrix<scalar_type> &       hessian) const;
+              FullMatrix<scalar_type>        &hessian) const;
 
       /** @} */
 
@@ -866,13 +866,13 @@ namespace Differentiation
       values(const typename Types<ADNumberType>::tape_index active_tape_index,
              const unsigned int              n_dependent_variables,
              const std::vector<scalar_type> &independent_variables,
-             Vector<scalar_type> &           values) const;
+             Vector<scalar_type>            &values) const;
 
       void
       jacobian(const typename Types<ADNumberType>::tape_index active_tape_index,
                const unsigned int              n_dependent_variables,
                const std::vector<scalar_type> &independent_variables,
-               FullMatrix<scalar_type> &       jacobian) const;
+               FullMatrix<scalar_type>        &jacobian) const;
 
       /** @} */
 
@@ -1151,7 +1151,7 @@ namespace Differentiation
       void
       print_tape_stats(
         const typename Types<ADNumberType>::tape_index tape_index,
-        std::ostream &                                 stream) const;
+        std::ostream                                  &stream) const;
 
       /** @} */
 
@@ -1167,12 +1167,12 @@ namespace Differentiation
       void
       gradient(const typename Types<ADNumberType>::tape_index active_tape_index,
                const std::vector<scalar_type> &independent_variables,
-               Vector<scalar_type> &           gradient) const;
+               Vector<scalar_type>            &gradient) const;
 
       void
       hessian(const typename Types<ADNumberType>::tape_index active_tape_index,
               const std::vector<scalar_type> &independent_variables,
-              FullMatrix<scalar_type> &       hessian) const;
+              FullMatrix<scalar_type>        &hessian) const;
 
       /** @} */
 
@@ -1185,13 +1185,13 @@ namespace Differentiation
       values(const typename Types<ADNumberType>::tape_index active_tape_index,
              const unsigned int              n_dependent_variables,
              const std::vector<scalar_type> &independent_variables,
-             Vector<scalar_type> &           values) const;
+             Vector<scalar_type>            &values) const;
 
       void
       jacobian(const typename Types<ADNumberType>::tape_index active_tape_index,
                const unsigned int              n_dependent_variables,
                const std::vector<scalar_type> &independent_variables,
-               FullMatrix<scalar_type> &       jacobian) const;
+               FullMatrix<scalar_type>        &jacobian) const;
 
       /** @} */
 
@@ -1268,12 +1268,12 @@ namespace Differentiation
       void
       gradient(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               Vector<ScalarType> &             gradient) const;
+               Vector<ScalarType>              &gradient) const;
 
       void
       hessian(const std::vector<ADNumberType> &independent_variables,
               const std::vector<ADNumberType> &dependent_variables,
-              FullMatrix<ScalarType> &         hessian) const;
+              FullMatrix<ScalarType>          &hessian) const;
 
       /** @} */
 
@@ -1284,12 +1284,12 @@ namespace Differentiation
 
       void
       values(const std::vector<ADNumberType> &dependent_variables,
-             Vector<ScalarType> &             values) const;
+             Vector<ScalarType>              &values) const;
 
       void
       jacobian(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               FullMatrix<ScalarType> &         jacobian) const;
+               FullMatrix<ScalarType>          &jacobian) const;
 
       /** @} */
 
@@ -1360,12 +1360,12 @@ namespace Differentiation
       void
       gradient(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               Vector<ScalarType> &             gradient) const;
+               Vector<ScalarType>              &gradient) const;
 
       void
       hessian(const std::vector<ADNumberType> &independent_variables,
               const std::vector<ADNumberType> &dependent_variables,
-              FullMatrix<ScalarType> &         hessian) const;
+              FullMatrix<ScalarType>          &hessian) const;
 
       /** @} */
 
@@ -1376,12 +1376,12 @@ namespace Differentiation
 
       void
       values(const std::vector<ADNumberType> &dependent_variables,
-             Vector<ScalarType> &             values) const;
+             Vector<ScalarType>              &values) const;
 
       void
       jacobian(const std::vector<ADNumberType> &independent_variables,
                const std::vector<ADNumberType> &dependent_variables,
-               FullMatrix<ScalarType> &         jacobian) const;
+               FullMatrix<ScalarType>          &jacobian) const;
 
       /** @} */
 

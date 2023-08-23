@@ -60,7 +60,7 @@ namespace internal
     internal::is_supported_operation<has_n_blocks_t, T>;
 
   template <typename T>
-  constexpr bool is_block_vector = has_block<T> &&has_n_blocks<T>;
+  constexpr bool is_block_vector = has_block<T> && has_n_blocks<T>;
 } // namespace internal
 
 /**
@@ -197,7 +197,7 @@ namespace internal
        * Constructor used internally in this class. The arguments match
        * exactly the values of the respective member variables.
        */
-      Iterator(BlockVector &   parent,
+      Iterator(BlockVector    &parent,
                const size_type global_index,
                const size_type current_block,
                const size_type index_within_block,
@@ -651,7 +651,7 @@ public:
   template <typename OtherNumber>
   void
   extract_subvector_to(const std::vector<size_type> &indices,
-                       std::vector<OtherNumber> &    values) const;
+                       std::vector<OtherNumber>     &values) const;
 
   virtual void
   extract_subvector_to(const ArrayView<const types::global_dof_index> &indices,
@@ -858,7 +858,7 @@ public:
   void
   add(const size_type  n_elements,
       const size_type *indices,
-      const Number *   values);
+      const Number    *values);
 
   /**
    * $U(0-DIM)+=s$.  Addition of <tt>s</tt> to all components. Note that
@@ -1023,7 +1023,7 @@ namespace internal
 
     template <typename BlockVectorType, bool Constness>
     inline Iterator<BlockVectorType, Constness>::Iterator(
-      BlockVector &   parent,
+      BlockVector    &parent,
       const size_type global_index,
       const size_type current_block,
       const size_type index_within_block,
@@ -1330,7 +1330,7 @@ namespace internal
 
 
     template <typename BlockVectorType, bool Constness>
-    Iterator<BlockVectorType, Constness>::Iterator(BlockVector &   parent,
+    Iterator<BlockVectorType, Constness>::Iterator(BlockVector    &parent,
                                                    const size_type global_index)
       : parent(&parent)
       , global_index(global_index)
@@ -1707,8 +1707,8 @@ template <typename VectorType>
 typename BlockVectorBase<VectorType>::value_type
 BlockVectorBase<VectorType>::add_and_dot(
   const typename BlockVectorBase<VectorType>::value_type a,
-  const BlockVectorBase<VectorType> &                    V,
-  const BlockVectorBase<VectorType> &                    W)
+  const BlockVectorBase<VectorType>                     &V,
+  const BlockVectorBase<VectorType>                     &W)
 {
   AssertDimension(n_blocks(), V.n_blocks());
   AssertDimension(n_blocks(), W.n_blocks());
@@ -1759,7 +1759,7 @@ template <typename VectorType>
 template <typename Number>
 inline void
 BlockVectorBase<VectorType>::add(const std::vector<size_type> &indices,
-                                 const std::vector<Number> &   values)
+                                 const std::vector<Number>    &values)
 {
   Assert(indices.size() == values.size(),
          ExcDimensionMismatch(indices.size(), values.size()));
@@ -1772,7 +1772,7 @@ template <typename VectorType>
 template <typename Number>
 inline void
 BlockVectorBase<VectorType>::add(const std::vector<size_type> &indices,
-                                 const Vector<Number> &        values)
+                                 const Vector<Number>         &values)
 {
   Assert(indices.size() == values.size(),
          ExcDimensionMismatch(indices.size(), values.size()));
@@ -1788,7 +1788,7 @@ template <typename Number>
 inline void
 BlockVectorBase<VectorType>::add(const size_type  n_indices,
                                  const size_type *indices,
-                                 const Number *   values)
+                                 const Number    *values)
 {
   for (size_type i = 0; i < n_indices; ++i)
     (*this)(indices[i]) += values[i];
@@ -2144,7 +2144,7 @@ template <typename OtherNumber>
 inline void
 BlockVectorBase<VectorType>::extract_subvector_to(
   const std::vector<size_type> &indices,
-  std::vector<OtherNumber> &    values) const
+  std::vector<OtherNumber>     &values) const
 {
   for (size_type i = 0; i < indices.size(); ++i)
     values[i] = operator()(indices[i]);
@@ -2156,7 +2156,7 @@ template <typename VectorType>
 inline void
 BlockVectorBase<VectorType>::extract_subvector_to(
   const ArrayView<const types::global_dof_index> &indices,
-  ArrayView<value_type> &                         entries) const
+  ArrayView<value_type>                          &entries) const
 {
   AssertDimension(indices.size(), entries.size());
   for (unsigned int i = 0; i < indices.size(); ++i)

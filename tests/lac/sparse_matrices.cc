@@ -49,8 +49,8 @@
 template <typename MatrixType>
 void
 check_vmult_quadratic(std::vector<double> &residuals,
-                      const MatrixType &   A,
-                      const char *         prefix)
+                      const MatrixType    &A,
+                      const char          *prefix)
 {
   deallog.push(prefix);
 
@@ -168,9 +168,9 @@ check_vmult_quadratic(std::vector<double> &residuals,
 
 
 void
-check_vmult_quadratic(std::vector<double> &            residuals,
+check_vmult_quadratic(std::vector<double>             &residuals,
                       const BlockSparseMatrix<double> &A,
-                      const char *                     prefix)
+                      const char                      *prefix)
 {
   deallog.push(prefix);
 

@@ -41,9 +41,9 @@ public:
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-    CUDAWrappers::SharedData<dim, double> *                     shared_data,
-    const double *                                              src,
-    double *                                                    dst) const;
+    CUDAWrappers::SharedData<dim, double>                      *shared_data,
+    const double                                               *src,
+    double                                                     *dst) const;
 
   static const unsigned int n_dofs_1d = fe_degree + 1;
   static const unsigned int n_local_dofs =
@@ -59,7 +59,7 @@ DEAL_II_HOST_DEVICE void
 DummyOperator<dim, fe_degree>::operator()(
   const unsigned int                                          cell,
   const typename CUDAWrappers::MatrixFree<dim, double>::Data *gpu_data,
-  CUDAWrappers::SharedData<dim, double> *                     shared_data,
+  CUDAWrappers::SharedData<dim, double>                      *shared_data,
   const double *,
   double *dst) const
 {

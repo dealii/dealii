@@ -89,15 +89,15 @@ public:
   /**
    * Constructor.
    */
-  SolverRichardson(SolverControl &           cn,
+  SolverRichardson(SolverControl            &cn,
                    VectorMemory<VectorType> &mem,
-                   const AdditionalData &    data = AdditionalData());
+                   const AdditionalData     &data = AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverRichardson(SolverControl &       cn,
+  SolverRichardson(SolverControl        &cn,
                    const AdditionalData &data = AdditionalData());
 
   /**
@@ -110,9 +110,9 @@ public:
    */
   template <typename MatrixType, typename PreconditionerType>
   void
-  solve(const MatrixType &        A,
-        VectorType &              x,
-        const VectorType &        b,
+  solve(const MatrixType         &A,
+        VectorType               &x,
+        const VectorType         &b,
         const PreconditionerType &preconditioner);
 
   /**
@@ -120,9 +120,9 @@ public:
    */
   template <typename MatrixType, typename PreconditionerType>
   void
-  Tsolve(const MatrixType &        A,
-         VectorType &              x,
-         const VectorType &        b,
+  Tsolve(const MatrixType         &A,
+         VectorType               &x,
+         const VectorType         &b,
          const PreconditionerType &preconditioner);
 
   /**
@@ -138,9 +138,9 @@ public:
    */
   virtual void
   print_vectors(const unsigned int step,
-                const VectorType & x,
-                const VectorType & r,
-                const VectorType & d) const;
+                const VectorType  &x,
+                const VectorType  &r,
+                const VectorType  &d) const;
 
 protected:
   /**
@@ -173,9 +173,9 @@ inline SolverRichardson<VectorType>::AdditionalData::AdditionalData(
 
 
 template <typename VectorType>
-SolverRichardson<VectorType>::SolverRichardson(SolverControl &           cn,
+SolverRichardson<VectorType>::SolverRichardson(SolverControl            &cn,
                                                VectorMemory<VectorType> &mem,
-                                               const AdditionalData &    data)
+                                               const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
@@ -183,7 +183,7 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl &           cn,
 
 
 template <typename VectorType>
-SolverRichardson<VectorType>::SolverRichardson(SolverControl &       cn,
+SolverRichardson<VectorType>::SolverRichardson(SolverControl        &cn,
                                                const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
@@ -194,9 +194,9 @@ SolverRichardson<VectorType>::SolverRichardson(SolverControl &       cn,
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
-SolverRichardson<VectorType>::solve(const MatrixType &        A,
-                                    VectorType &              x,
-                                    const VectorType &        b,
+SolverRichardson<VectorType>::solve(const MatrixType         &A,
+                                    VectorType               &x,
+                                    const VectorType         &b,
                                     const PreconditionerType &preconditioner)
 {
   SolverControl::State conv = SolverControl::iterate;
@@ -251,9 +251,9 @@ SolverRichardson<VectorType>::solve(const MatrixType &        A,
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
-SolverRichardson<VectorType>::Tsolve(const MatrixType &        A,
-                                     VectorType &              x,
-                                     const VectorType &        b,
+SolverRichardson<VectorType>::Tsolve(const MatrixType         &A,
+                                     VectorType               &x,
+                                     const VectorType         &b,
                                      const PreconditionerType &preconditioner)
 {
   SolverControl::State conv           = SolverControl::iterate;

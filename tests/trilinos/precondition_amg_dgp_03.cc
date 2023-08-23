@@ -56,14 +56,14 @@ class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   void
-  cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+  cell(MeshWorker::DoFInfo<dim>                  &dinfo,
        typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
-  boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+  boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
            typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
-  face(MeshWorker::DoFInfo<dim> &                 dinfo1,
-       MeshWorker::DoFInfo<dim> &                 dinfo2,
+  face(MeshWorker::DoFInfo<dim>                  &dinfo1,
+       MeshWorker::DoFInfo<dim>                  &dinfo2,
        typename MeshWorker::IntegrationInfo<dim> &info1,
        typename MeshWorker::IntegrationInfo<dim> &info2) const;
 };
@@ -71,7 +71,7 @@ public:
 template <int dim>
 void
 MatrixIntegrator<dim>::cell(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
+  MeshWorker::DoFInfo<dim>                  &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
@@ -81,7 +81,7 @@ MatrixIntegrator<dim>::cell(
 template <int dim>
 void
 MatrixIntegrator<dim>::boundary(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
+  MeshWorker::DoFInfo<dim>                  &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const unsigned int deg = info.fe_values(0).get_fe().degree;
@@ -94,8 +94,8 @@ MatrixIntegrator<dim>::boundary(
 template <int dim>
 void
 MatrixIntegrator<dim>::face(
-  MeshWorker::DoFInfo<dim> &                 dinfo1,
-  MeshWorker::DoFInfo<dim> &                 dinfo2,
+  MeshWorker::DoFInfo<dim>                  &dinfo1,
+  MeshWorker::DoFInfo<dim>                  &dinfo2,
   typename MeshWorker::IntegrationInfo<dim> &info1,
   typename MeshWorker::IntegrationInfo<dim> &info2) const
 {

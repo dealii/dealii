@@ -114,7 +114,7 @@ check()
 
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         {
-          const auto &       this_qp = qp[i];
+          const auto        &this_qp = qp[i];
           const unsigned int i_group = fe.system_to_base_index(i).first.first;
           const unsigned int i_comp  = fe.system_to_component_index(i).first;
           if (i_group == 0)

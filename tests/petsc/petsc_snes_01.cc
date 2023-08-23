@@ -155,7 +155,7 @@ main(int argc, char **argv)
     };
 
     solver.solve_with_jacobian = [&](const VectorType &src,
-                                     VectorType &      dst) -> void {
+                                     VectorType       &dst) -> void {
       dst.block(0)[0] =
         Jinv(0, 0) * src.block(0)[0] + Jinv(0, 1) * src.block(1)[0];
       dst.block(1)[0] =

@@ -139,7 +139,7 @@ namespace internal
       static void (&quadrant_childrenv)(const types<2>::quadrant *q,
                                         types<2>::quadrant        c[]);
 
-      static int (&quadrant_overlaps_tree)(types<2>::tree *          tree,
+      static int (&quadrant_overlaps_tree)(types<2>::tree           *tree,
                                            const types<2>::quadrant *q);
 
       static void (&quadrant_set_morton)(types<2>::quadrant *quadrant,
@@ -158,7 +158,7 @@ namespace internal
       static int (&quadrant_ancestor_id)(const types<2>::quadrant *q,
                                          int                       level);
 
-      static int (&comm_find_owner)(types<2>::forest *        p4est,
+      static int (&comm_find_owner)(types<2>::forest         *p4est,
                                     const types<2>::locidx    which_tree,
                                     const types<2>::quadrant *q,
                                     const int                 guess);
@@ -173,14 +173,14 @@ namespace internal
         types<2>::topidx        num_vertices,
         types<2>::topidx        num_trees,
         types<2>::topidx        num_corners,
-        const double *          vertices,
+        const double           *vertices,
         const types<2>::topidx *ttv,
         const types<2>::topidx *ttt,
-        const int8_t *          ttf,
+        const int8_t           *ttf,
         const types<2>::topidx *ttc,
         const types<2>::topidx *coff,
         const types<2>::topidx *ctt,
-        const int8_t *          ctc);
+        const int8_t           *ctc);
 
       static void (&connectivity_join_faces)(types<2>::connectivity *conn,
                                              types<2>::topidx        tree_left,
@@ -201,7 +201,7 @@ namespace internal
         int                     fill_uniform,
         std::size_t             data_size,
         p4est_init_t            init_fn,
-        void *                  user_pointer);
+        void                   *user_pointer);
 
       static types<2>::forest *(&copy_forest)(types<2>::forest *input,
                                               int               copy_data);
@@ -218,7 +218,7 @@ namespace internal
                              p4est_coarsen_t   coarsen_fn,
                              p4est_init_t      init_fn);
 
-      static void (&balance)(types<2>::forest *     p4est,
+      static void (&balance)(types<2>::forest      *p4est,
                              types<2>::balance_type btype,
                              p4est_init_t           init_fn);
 
@@ -226,7 +226,7 @@ namespace internal
                                            int partition_for_coarsening,
                                            p4est_weight_t weight_fn);
 
-      static void (&save)(const char *      filename,
+      static void (&save)(const char       *filename,
                           types<2>::forest *p4est,
                           int               save_data);
 
@@ -236,15 +236,15 @@ namespace internal
                                            int         load_data,
                                            int         autopartition,
                                            int         broadcasthead,
-                                           void *      user_pointer,
+                                           void       *user_pointer,
                                            types<2>::connectivity **p4est);
 
-      static int (&connectivity_save)(const char *            filename,
+      static int (&connectivity_save)(const char             *filename,
                                       types<2>::connectivity *connectivity);
 
       static int (&connectivity_is_valid)(types<2>::connectivity *connectivity);
 
-      static types<2>::connectivity *(&connectivity_load)(const char * filename,
+      static types<2>::connectivity *(&connectivity_load)(const char  *filename,
                                                           std::size_t *length);
 
       static unsigned int (&checksum)(types<2>::forest *p4est);
@@ -253,7 +253,7 @@ namespace internal
                                     p4est_geometry_t *,
                                     const char *baseName);
 
-      static types<2>::ghost *(&ghost_new)(types<2>::forest *     p4est,
+      static types<2>::ghost *(&ghost_new)(types<2>::forest      *p4est,
                                            types<2>::balance_type btype);
 
       static void (&ghost_destroy)(types<2>::ghost *ghost);
@@ -261,7 +261,7 @@ namespace internal
       static void (&reset_data)(types<2>::forest *p4est,
                                 std::size_t       data_size,
                                 p4est_init_t      init_fn,
-                                void *            user_pointer);
+                                void             *user_pointer);
 
       static std::size_t (&forest_memory_used)(types<2>::forest *p4est);
 
@@ -271,8 +271,8 @@ namespace internal
       template <int spacedim>
       static void
       iterate(dealii::internal::p4est::types<2>::forest *parallel_forest,
-              dealii::internal::p4est::types<2>::ghost * parallel_ghost,
-              void *                                     user_data);
+              dealii::internal::p4est::types<2>::ghost  *parallel_ghost,
+              void                                      *user_data);
 
       static constexpr unsigned int max_level = P4EST_MAXLEVEL;
 
@@ -280,8 +280,8 @@ namespace internal
                                     const types<2>::gloidx *src_gfq,
                                     MPI_Comm                mpicomm,
                                     int                     tag,
-                                    void *                  dest_data,
-                                    const void *            src_data,
+                                    void                   *dest_data,
+                                    const void             *src_data,
                                     std::size_t             data_size);
 
       static types<2>::transfer_context *(&transfer_fixed_begin)(
@@ -289,8 +289,8 @@ namespace internal
         const types<2>::gloidx *src_gfq,
         MPI_Comm                mpicomm,
         int                     tag,
-        void *                  dest_data,
-        const void *            src_data,
+        void                   *dest_data,
+        const void             *src_data,
         std::size_t             data_size);
 
       static void (&transfer_fixed_end)(types<2>::transfer_context *tc);
@@ -299,34 +299,34 @@ namespace internal
                                      const types<2>::gloidx *src_gfq,
                                      MPI_Comm                mpicomm,
                                      int                     tag,
-                                     void *                  dest_data,
-                                     const int *             dest_sizes,
-                                     const void *            src_data,
-                                     const int *             src_sizes);
+                                     void                   *dest_data,
+                                     const int              *dest_sizes,
+                                     const void             *src_data,
+                                     const int              *src_sizes);
 
       static types<2>::transfer_context *(&transfer_custom_begin)(
         const types<2>::gloidx *dest_gfq,
         const types<2>::gloidx *src_gfq,
         MPI_Comm                mpicomm,
         int                     tag,
-        void *                  dest_data,
-        const int *             dest_sizes,
-        const void *            src_data,
-        const int *             src_sizes);
+        void                   *dest_data,
+        const int              *dest_sizes,
+        const void             *src_data,
+        const int              *src_sizes);
 
       static void (&transfer_custom_end)(types<2>::transfer_context *tc);
 
 #  ifdef P4EST_SEARCH_LOCAL
       static void (&search_partition)(
-        types<2>::forest *                  forest,
+        types<2>::forest                   *forest,
         int                                 call_post,
         types<2>::search_partition_callback quadrant_fn,
         types<2>::search_partition_callback point_fn,
-        sc_array_t *                        points);
+        sc_array_t                         *points);
 #  endif
 
       static void (&quadrant_coord_to_vertex)(
-        types<2>::connectivity * connectivity,
+        types<2>::connectivity  *connectivity,
         types<2>::topidx         treeid,
         types<2>::quadrant_coord x,
         types<2>::quadrant_coord y,
@@ -342,7 +342,7 @@ namespace internal
       static void (&quadrant_childrenv)(const types<3>::quadrant *q,
                                         types<3>::quadrant        c[]);
 
-      static int (&quadrant_overlaps_tree)(types<3>::tree *          tree,
+      static int (&quadrant_overlaps_tree)(types<3>::tree           *tree,
                                            const types<3>::quadrant *q);
 
       static void (&quadrant_set_morton)(types<3>::quadrant *quadrant,
@@ -360,7 +360,7 @@ namespace internal
       static int (&quadrant_ancestor_id)(const types<3>::quadrant *q,
                                          int                       level);
 
-      static int (&comm_find_owner)(types<3>::forest *        p4est,
+      static int (&comm_find_owner)(types<3>::forest         *p4est,
                                     const types<3>::locidx    which_tree,
                                     const types<3>::quadrant *q,
                                     const int                 guess);
@@ -378,18 +378,18 @@ namespace internal
         types<3>::topidx        num_trees,
         types<3>::topidx        num_edges,
         types<3>::topidx        num_corners,
-        const double *          vertices,
+        const double           *vertices,
         const types<3>::topidx *ttv,
         const types<3>::topidx *ttt,
-        const int8_t *          ttf,
+        const int8_t           *ttf,
         const types<3>::topidx *tte,
         const types<3>::topidx *eoff,
         const types<3>::topidx *ett,
-        const int8_t *          ete,
+        const int8_t           *ete,
         const types<3>::topidx *ttc,
         const types<3>::topidx *coff,
         const types<3>::topidx *ctt,
-        const int8_t *          ctc);
+        const int8_t           *ctc);
 
       static void (&connectivity_join_faces)(types<3>::connectivity *conn,
                                              types<3>::topidx        tree_left,
@@ -408,7 +408,7 @@ namespace internal
         int                     fill_uniform,
         std::size_t             data_size,
         p8est_init_t            init_fn,
-        void *                  user_pointer);
+        void                   *user_pointer);
 
       static types<3>::forest *(&copy_forest)(types<3>::forest *input,
                                               int               copy_data);
@@ -425,7 +425,7 @@ namespace internal
                              p8est_coarsen_t   coarsen_fn,
                              p8est_init_t      init_fn);
 
-      static void (&balance)(types<3>::forest *     p8est,
+      static void (&balance)(types<3>::forest      *p8est,
                              types<3>::balance_type btype,
                              p8est_init_t           init_fn);
 
@@ -433,7 +433,7 @@ namespace internal
                                            int partition_for_coarsening,
                                            p8est_weight_t weight_fn);
 
-      static void (&save)(const char *      filename,
+      static void (&save)(const char       *filename,
                           types<3>::forest *p4est,
                           int               save_data);
 
@@ -443,15 +443,15 @@ namespace internal
                                            int         load_data,
                                            int         autopartition,
                                            int         broadcasthead,
-                                           void *      user_pointer,
+                                           void       *user_pointer,
                                            types<3>::connectivity **p4est);
 
-      static int (&connectivity_save)(const char *            filename,
+      static int (&connectivity_save)(const char             *filename,
                                       types<3>::connectivity *connectivity);
 
       static int (&connectivity_is_valid)(types<3>::connectivity *connectivity);
 
-      static types<3>::connectivity *(&connectivity_load)(const char * filename,
+      static types<3>::connectivity *(&connectivity_load)(const char  *filename,
                                                           std::size_t *length);
 
       static unsigned int (&checksum)(types<3>::forest *p8est);
@@ -459,7 +459,7 @@ namespace internal
       static void (&vtk_write_file)(types<3>::forest *p8est,
                                     p8est_geometry_t *,
                                     const char *baseName);
-      static types<3>::ghost *(&ghost_new)(types<3>::forest *     p4est,
+      static types<3>::ghost *(&ghost_new)(types<3>::forest      *p4est,
                                            types<3>::balance_type btype);
 
       static void (&ghost_destroy)(types<3>::ghost *ghost);
@@ -467,7 +467,7 @@ namespace internal
       static void (&reset_data)(types<3>::forest *p4est,
                                 std::size_t       data_size,
                                 p8est_init_t      init_fn,
-                                void *            user_pointer);
+                                void             *user_pointer);
 
       static std::size_t (&forest_memory_used)(types<3>::forest *p4est);
 
@@ -480,8 +480,8 @@ namespace internal
                                     const types<3>::gloidx *src_gfq,
                                     MPI_Comm                mpicomm,
                                     int                     tag,
-                                    void *                  dest_data,
-                                    const void *            src_data,
+                                    void                   *dest_data,
+                                    const void             *src_data,
                                     std::size_t             data_size);
 
       static types<3>::transfer_context *(&transfer_fixed_begin)(
@@ -489,8 +489,8 @@ namespace internal
         const types<3>::gloidx *src_gfq,
         MPI_Comm                mpicomm,
         int                     tag,
-        void *                  dest_data,
-        const void *            src_data,
+        void                   *dest_data,
+        const void             *src_data,
         std::size_t             data_size);
 
       static void (&transfer_fixed_end)(types<3>::transfer_context *tc);
@@ -499,34 +499,34 @@ namespace internal
                                      const types<3>::gloidx *src_gfq,
                                      MPI_Comm                mpicomm,
                                      int                     tag,
-                                     void *                  dest_data,
-                                     const int *             dest_sizes,
-                                     const void *            src_data,
-                                     const int *             src_sizes);
+                                     void                   *dest_data,
+                                     const int              *dest_sizes,
+                                     const void             *src_data,
+                                     const int              *src_sizes);
 
       static types<3>::transfer_context *(&transfer_custom_begin)(
         const types<3>::gloidx *dest_gfq,
         const types<3>::gloidx *src_gfq,
         MPI_Comm                mpicomm,
         int                     tag,
-        void *                  dest_data,
-        const int *             dest_sizes,
-        const void *            src_data,
-        const int *             src_sizes);
+        void                   *dest_data,
+        const int              *dest_sizes,
+        const void             *src_data,
+        const int              *src_sizes);
 
       static void (&transfer_custom_end)(types<3>::transfer_context *tc);
 
 #  ifdef P4EST_SEARCH_LOCAL
       static void (&search_partition)(
-        types<3>::forest *                  forest,
+        types<3>::forest                   *forest,
         int                                 call_post,
         types<3>::search_partition_callback quadrant_fn,
         types<3>::search_partition_callback point_fn,
-        sc_array_t *                        points);
+        sc_array_t                         *points);
 #  endif
 
       static void (&quadrant_coord_to_vertex)(
-        types<3>::connectivity * connectivity,
+        types<3>::connectivity  *connectivity,
         types<3>::topidx         treeid,
         types<3>::quadrant_coord x,
         types<3>::quadrant_coord y,

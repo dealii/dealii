@@ -48,7 +48,7 @@ namespace PETScWrappers
 
   void
   CommunicationPattern::reinit(const types::global_dof_index local_size,
-                               const IndexSet &              ghost_indices,
+                               const IndexSet               &ghost_indices,
                                const MPI_Comm                communicator)
   {
     clear();
@@ -275,7 +275,7 @@ namespace PETScWrappers
   void
   CommunicationPattern::export_to_ghosted_array_start(
     const ArrayView<const Number> &src,
-    const ArrayView<Number> &      dst) const
+    const ArrayView<Number>       &dst) const
   {
     auto datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
@@ -293,7 +293,7 @@ namespace PETScWrappers
   void
   CommunicationPattern::export_to_ghosted_array_finish(
     const ArrayView<const Number> &src,
-    const ArrayView<Number> &      dst) const
+    const ArrayView<Number>       &dst) const
   {
     auto datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
 
@@ -311,7 +311,7 @@ namespace PETScWrappers
   void
   CommunicationPattern::export_to_ghosted_array(
     const ArrayView<const Number> &src,
-    const ArrayView<Number> &      dst) const
+    const ArrayView<Number>       &dst) const
   {
     export_to_ghosted_array_start(src, dst);
     export_to_ghosted_array_finish(src, dst);
@@ -324,7 +324,7 @@ namespace PETScWrappers
   CommunicationPattern::import_from_ghosted_array_start(
     const VectorOperation::values  op,
     const ArrayView<const Number> &src,
-    const ArrayView<Number> &      dst) const
+    const ArrayView<Number>       &dst) const
   {
     MPI_Op mpiop    = (op == VectorOperation::insert) ? MPI_REPLACE : MPI_SUM;
     auto   datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
@@ -340,7 +340,7 @@ namespace PETScWrappers
   CommunicationPattern::import_from_ghosted_array_finish(
     const VectorOperation::values  op,
     const ArrayView<const Number> &src,
-    const ArrayView<Number> &      dst) const
+    const ArrayView<Number>       &dst) const
   {
     MPI_Op mpiop    = (op == VectorOperation::insert) ? MPI_REPLACE : MPI_SUM;
     auto   datatype = Utilities::MPI::mpi_type_id_for_type<Number>;
@@ -355,7 +355,7 @@ namespace PETScWrappers
   CommunicationPattern::import_from_ghosted_array(
     const VectorOperation::values  op,
     const ArrayView<const Number> &src,
-    const ArrayView<Number> &      dst) const
+    const ArrayView<Number>       &dst) const
   {
     import_from_ghosted_array_start(op, src, dst);
     import_from_ghosted_array_finish(op, src, dst);
@@ -446,7 +446,7 @@ namespace PETScWrappers
   void
   Partitioner::export_to_ghosted_array_finish(
     const ArrayView<const Number> &src,
-    const ArrayView<Number> &      dst) const
+    const ArrayView<Number>       &dst) const
   {
     if (dst.size() == n_ghost_indices_larger)
       {
@@ -461,7 +461,7 @@ namespace PETScWrappers
   template <typename Number>
   void
   Partitioner::export_to_ghosted_array(const ArrayView<const Number> &src,
-                                       const ArrayView<Number> &      dst) const
+                                       const ArrayView<Number>       &dst) const
   {
     export_to_ghosted_array_start(src, dst);
     export_to_ghosted_array_finish(src, dst);
@@ -472,7 +472,7 @@ namespace PETScWrappers
   Partitioner::import_from_ghosted_array_start(
     const VectorOperation::values  op,
     const ArrayView<const Number> &src,
-    const ArrayView<Number> &      dst) const
+    const ArrayView<Number>       &dst) const
   {
     if (src.size() == n_ghost_indices_larger)
       {
@@ -489,7 +489,7 @@ namespace PETScWrappers
   Partitioner::import_from_ghosted_array_finish(
     const VectorOperation::values  op,
     const ArrayView<const Number> &src,
-    const ArrayView<Number> &      dst) const
+    const ArrayView<Number>       &dst) const
   {
     if (src.size() == n_ghost_indices_larger)
       {

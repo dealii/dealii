@@ -428,9 +428,9 @@ public:
    * printed as well.
    */
   void
-  compute_statistics(size_type &             used,
-                     size_type &             allocated,
-                     size_type &             reserved,
+  compute_statistics(size_type              &used,
+                     size_type              &allocated,
+                     size_type              &reserved,
                      std::vector<size_type> &used_by_line,
                      const bool              compute_by_line) const;
   /** @} */
@@ -491,7 +491,7 @@ public:
   template <typename number2>
   void
   add(const std::vector<size_type> &indices,
-      const FullMatrix<number2> &   full_matrix,
+      const FullMatrix<number2>    &full_matrix,
       const bool                    elide_zero_values = true);
 
   /**
@@ -503,7 +503,7 @@ public:
   void
   add(const std::vector<size_type> &row_indices,
       const std::vector<size_type> &col_indices,
-      const FullMatrix<number2> &   full_matrix,
+      const FullMatrix<number2>    &full_matrix,
       const bool                    elide_zero_values = true);
 
   /**
@@ -519,7 +519,7 @@ public:
   void
   add(const size_type               row,
       const std::vector<size_type> &col_indices,
-      const std::vector<number2> &  values,
+      const std::vector<number2>   &values,
       const bool                    elide_zero_values = true);
 
   /**
@@ -536,7 +536,7 @@ public:
   add(const size_type  row,
       const size_type  n_cols,
       const size_type *col_indices,
-      const number2 *  values,
+      const number2   *values,
       const bool       elide_zero_values      = true,
       const bool       col_indices_are_sorted = false);
 
@@ -658,7 +658,7 @@ public:
    */
   template <typename somenumber>
   void
-  precondition_Jacobi(Vector<somenumber> &      dst,
+  precondition_Jacobi(Vector<somenumber>       &dst,
                       const Vector<somenumber> &src,
                       const number              omega = 1.) const;
 
@@ -667,8 +667,8 @@ public:
    */
   template <typename somenumber>
   void
-  precondition_SSOR(Vector<somenumber> &            dst,
-                    const Vector<somenumber> &      src,
+  precondition_SSOR(Vector<somenumber>             &dst,
+                    const Vector<somenumber>       &src,
                     const number                    om = 1.,
                     const std::vector<std::size_t> &pos_right_of_diagonal =
                       std::vector<std::size_t>()) const;
@@ -679,7 +679,7 @@ public:
    */
   template <typename somenumber>
   void
-  precondition_SOR(Vector<somenumber> &      dst,
+  precondition_SOR(Vector<somenumber>       &dst,
                    const Vector<somenumber> &src,
                    const number              om = 1.) const;
 
@@ -689,7 +689,7 @@ public:
    */
   template <typename somenumber>
   void
-  precondition_TSOR(Vector<somenumber> &      dst,
+  precondition_TSOR(Vector<somenumber>       &dst,
                     const Vector<somenumber> &src,
                     const number              om = 1.) const;
 
@@ -769,11 +769,11 @@ public:
    * large matrix!
    */
   void
-  print_formatted(std::ostream &     out,
+  print_formatted(std::ostream      &out,
                   const unsigned int precision   = 3,
                   const bool         scientific  = true,
                   const unsigned int width       = 0,
-                  const char *       zero_string = " ",
+                  const char        *zero_string = " ",
                   const double       denominator = 1.) const;
 
   /**
@@ -851,7 +851,7 @@ private:
    */
   template <typename somenumber>
   void
-  threaded_vmult(Vector<somenumber> &      dst,
+  threaded_vmult(Vector<somenumber>       &dst,
                  const Vector<somenumber> &src,
                  const size_type           begin_row,
                  const size_type           end_row) const;
@@ -866,7 +866,7 @@ private:
   threaded_matrix_norm_square(const Vector<somenumber> &v,
                               const size_type           begin_row,
                               const size_type           end_row,
-                              somenumber *              partial_sum) const;
+                              somenumber               *partial_sum) const;
 
   /**
    * Version of @p matrix_scalar_product which only performs its actions on
@@ -879,7 +879,7 @@ private:
                                  const Vector<somenumber> &v,
                                  const size_type           begin_row,
                                  const size_type           end_row,
-                                 somenumber *              partial_sum) const;
+                                 somenumber               *partial_sum) const;
 
   /**
    * Number of columns. This is used to check vector dimensions only.
@@ -914,7 +914,7 @@ private:
 
 template <typename number>
 inline SparseMatrixEZ<number>::Entry::Entry(const size_type column,
-                                            const number &  value)
+                                            const number   &value)
   : column(column)
   , value(value)
 {}
@@ -1112,7 +1112,7 @@ SparseMatrixEZ<number>::locate(const size_type row, const size_type col)
   AssertIndexRange(row, m());
   AssertIndexRange(col, n());
 
-  const RowInfo & r   = row_info[row];
+  const RowInfo  &r   = row_info[row];
   const size_type end = r.start + r.length;
   for (size_type i = r.start; i < end; ++i)
     {
@@ -1143,7 +1143,7 @@ SparseMatrixEZ<number>::allocate(const size_type row, const size_type col)
   AssertIndexRange(row, m());
   AssertIndexRange(col, n());
 
-  RowInfo &       r   = row_info[row];
+  RowInfo        &r   = row_info[row];
   const size_type end = r.start + r.length;
 
   size_type i = r.start;
@@ -1285,7 +1285,7 @@ template <typename number>
 template <typename number2>
 void
 SparseMatrixEZ<number>::add(const std::vector<size_type> &indices,
-                            const FullMatrix<number2> &   full_matrix,
+                            const FullMatrix<number2>    &full_matrix,
                             const bool                    elide_zero_values)
 {
   // TODO: This function can surely be made more efficient
@@ -1302,7 +1302,7 @@ template <typename number2>
 void
 SparseMatrixEZ<number>::add(const std::vector<size_type> &row_indices,
                             const std::vector<size_type> &col_indices,
-                            const FullMatrix<number2> &   full_matrix,
+                            const FullMatrix<number2>    &full_matrix,
                             const bool                    elide_zero_values)
 {
   // TODO: This function can surely be made more efficient
@@ -1319,7 +1319,7 @@ template <typename number2>
 void
 SparseMatrixEZ<number>::add(const size_type               row,
                             const std::vector<size_type> &col_indices,
-                            const std::vector<number2> &  values,
+                            const std::vector<number2>   &values,
                             const bool                    elide_zero_values)
 {
   // TODO: This function can surely be made more efficient
@@ -1336,7 +1336,7 @@ void
 SparseMatrixEZ<number>::add(const size_type  row,
                             const size_type  n_cols,
                             const size_type *col_indices,
-                            const number2 *  values,
+                            const number2   *values,
                             const bool       elide_zero_values,
                             const bool /*col_indices_are_sorted*/)
 {

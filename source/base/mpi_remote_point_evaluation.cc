@@ -64,7 +64,7 @@ namespace Utilities
     RemotePointEvaluation<dim, spacedim>::reinit(
       const std::vector<Point<spacedim>> &points,
       const Triangulation<dim, spacedim> &tria,
-      const Mapping<dim, spacedim> &      mapping)
+      const Mapping<dim, spacedim>       &mapping)
     {
 #ifndef DEAL_II_WITH_MPI
       Assert(false, ExcNeedsMPI());
@@ -113,8 +113,8 @@ namespace Utilities
     RemotePointEvaluation<dim, spacedim>::reinit(
       const GridTools::internal::
         DistributedComputePointLocationsInternal<dim, spacedim> &data,
-      const Triangulation<dim, spacedim> &                       tria,
-      const Mapping<dim, spacedim> &                             mapping)
+      const Triangulation<dim, spacedim>                        &tria,
+      const Mapping<dim, spacedim>                              &mapping)
     {
       this->tria    = &tria;
       this->mapping = &mapping;

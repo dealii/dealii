@@ -113,7 +113,7 @@ public:
    */
   MappingQEulerian(const unsigned int               degree,
                    const DoFHandler<dim, spacedim> &euler_dof_handler,
-                   const VectorType &               euler_vector,
+                   const VectorType                &euler_vector,
                    const unsigned int level = numbers::invalid_unsigned_int);
 
   /**
@@ -167,8 +167,8 @@ protected:
   fill_fe_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellSimilarity::Similarity                            cell_similarity,
-    const Quadrature<dim> &                                     quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim>                                      &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 

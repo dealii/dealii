@@ -50,9 +50,9 @@ const bool errors = false;
 template <int dim>
 void
 check(const unsigned int        level,
-      const Mapping<dim> &      mapping,
+      const Mapping<dim>       &mapping,
       const FiniteElement<dim> &element,
-      const Quadrature<dim> &   quadrature)
+      const Quadrature<dim>    &quadrature)
 {
   Triangulation<dim> tr;
 

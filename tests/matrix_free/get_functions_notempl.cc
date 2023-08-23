@@ -29,10 +29,10 @@
 
 template <int dim, int fe_degree, int n_q_points_1d, typename number>
 void
-sub_test(const DoFHandler<dim> &          dof,
+sub_test(const DoFHandler<dim>           &dof,
          const AffineConstraints<double> &constraints,
-         MatrixFree<dim, number> &        mf_data,
-         Vector<number> &                 solution)
+         MatrixFree<dim, number>         &mf_data,
+         Vector<number>                  &solution)
 {
   deallog << "Test with fe_degree " << fe_degree
           << ", n_q_points_1d: " << (n_q_points_1d) << std::endl;

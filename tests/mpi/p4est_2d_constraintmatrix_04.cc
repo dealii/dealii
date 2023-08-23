@@ -85,7 +85,7 @@ TemperatureInitialValues<dim>::value(const Point<dim> &p,
 template <int dim>
 void
 TemperatureInitialValues<dim>::vector_value(const Point<dim> &p,
-                                            Vector<double> &  values) const
+                                            Vector<double>   &values) const
 {
   for (unsigned int c = 0; c < this->n_components; ++c)
     values(c) = TemperatureInitialValues<dim>::value(p, c);
@@ -260,7 +260,7 @@ test()
       return cell;
     },
 
-    [](const Triangulation<dim> &                        t,
+    [](const Triangulation<dim>                         &t,
        const typename Triangulation<dim>::cell_iterator &old_cell) ->
     typename Triangulation<dim>::cell_iterator {
       if (old_cell != t.end())

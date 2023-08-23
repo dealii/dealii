@@ -30,7 +30,7 @@
 
 template <int dim>
 void
-verify(Triangulation<dim> & tr,
+verify(Triangulation<dim>  &tr,
        const Vector<float> &criteria,
        const float          refinement_fraction,
        const float          coarsening_fraction)

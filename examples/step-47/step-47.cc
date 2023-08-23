@@ -104,7 +104,7 @@ namespace Step47
       }
 
       virtual void
-      hessian_list(const std::vector<Point<dim>> &       points,
+      hessian_list(const std::vector<Point<dim>>        &points,
                    std::vector<SymmetricTensor<2, dim>> &hessians,
                    const unsigned int /*component*/ = 0) const override
       {
@@ -274,7 +274,7 @@ namespace Step47
   template <int dim>
   struct ScratchData
   {
-    ScratchData(const Mapping<dim> &      mapping,
+    ScratchData(const Mapping<dim>       &mapping,
                 const FiniteElement<dim> &fe,
                 const unsigned int        quadrature_degree,
                 const UpdateFlags         update_flags,
@@ -396,9 +396,9 @@ namespace Step47
     // we could have left the call to `fe_values.shape_hessian(j,qpoint)`
     // in the instruction that computes the scalar product between
     // the two terms.
-    auto cell_worker = [&](const Iterator &  cell,
+    auto cell_worker = [&](const Iterator   &cell,
                            ScratchData<dim> &scratch_data,
-                           CopyData &        copy_data) {
+                           CopyData         &copy_data) {
       copy_data.cell_matrix = 0;
       copy_data.cell_rhs    = 0;
 
@@ -462,14 +462,14 @@ namespace Step47
     // `copy_data.face_data()` is really all that the later `copier` function
     // gets to see when it copies the contributions of each cell to the global
     // matrix and right hand side objects.
-    auto face_worker = [&](const Iterator &    cell,
+    auto face_worker = [&](const Iterator     &cell,
                            const unsigned int &f,
                            const unsigned int &sf,
-                           const Iterator &    ncell,
+                           const Iterator     &ncell,
                            const unsigned int &nf,
                            const unsigned int &nsf,
-                           ScratchData<dim> &  scratch_data,
-                           CopyData &          copy_data) {
+                           ScratchData<dim>   &scratch_data,
+                           CopyData           &copy_data) {
       FEInterfaceValues<dim> &fe_interface_values =
         scratch_data.fe_interface_values;
       fe_interface_values.reinit(cell, f, sf, ncell, nf, nsf);
@@ -586,10 +586,10 @@ namespace Step47
     //
     // As before, the first part of the function simply sets up some
     // helper objects:
-    auto boundary_worker = [&](const Iterator &    cell,
+    auto boundary_worker = [&](const Iterator     &cell,
                                const unsigned int &face_no,
-                               ScratchData<dim> &  scratch_data,
-                               CopyData &          copy_data) {
+                               ScratchData<dim>   &scratch_data,
+                               CopyData           &copy_data) {
       FEInterfaceValues<dim> &fe_interface_values =
         scratch_data.fe_interface_values;
       fe_interface_values.reinit(cell, face_no);

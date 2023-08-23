@@ -589,7 +589,7 @@ namespace Physics
        */
       template <int dim, typename Number>
       void
-      to_tensor(const FullMatrix<Number> &       mtrx,
+      to_tensor(const FullMatrix<Number>        &mtrx,
                 SymmetricTensor<2, dim, Number> &st);
 
 
@@ -620,7 +620,7 @@ namespace Physics
        */
       template <int dim, typename Number>
       void
-      to_tensor(const FullMatrix<Number> &       mtrx,
+      to_tensor(const FullMatrix<Number>        &mtrx,
                 SymmetricTensor<4, dim, Number> &st);
 
 
@@ -1326,7 +1326,7 @@ namespace Physics
 
       template <int dim, typename Number>
       void
-      to_tensor(const FullMatrix<Number> &       mtrx,
+      to_tensor(const FullMatrix<Number>        &mtrx,
                 SymmetricTensor<2, dim, Number> &st)
       {
         // Its impossible to fit the (dim^2 + dim)/2 entries into a square
@@ -1527,7 +1527,7 @@ namespace Physics
 
       template <int dim, typename Number>
       void
-      to_tensor(const FullMatrix<Number> &       mtrx,
+      to_tensor(const FullMatrix<Number>        &mtrx,
                 SymmetricTensor<4, dim, Number> &st)
       {
         Assert((mtrx.m() ==

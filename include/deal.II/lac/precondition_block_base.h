@@ -148,7 +148,7 @@ public:
   template <typename number2>
   void
   inverse_vmult(size_type              i,
-                Vector<number2> &      dst,
+                Vector<number2>       &dst,
                 const Vector<number2> &src) const;
 
   /**
@@ -157,7 +157,7 @@ public:
   template <typename number2>
   void
   inverse_Tvmult(size_type              i,
-                 Vector<number2> &      dst,
+                 Vector<number2>       &dst,
                  const Vector<number2> &src) const;
 
   /**
@@ -417,7 +417,7 @@ template <typename number>
 template <typename number2>
 inline void
 PreconditionBlockBase<number>::inverse_vmult(size_type              i,
-                                             Vector<number2> &      dst,
+                                             Vector<number2>       &dst,
                                              const Vector<number2> &src) const
 {
   const size_type ii = same_diagonal() ? 0U : i;
@@ -446,7 +446,7 @@ template <typename number>
 template <typename number2>
 inline void
 PreconditionBlockBase<number>::inverse_Tvmult(size_type              i,
-                                              Vector<number2> &      dst,
+                                              Vector<number2>       &dst,
                                               const Vector<number2> &src) const
 {
   const size_type ii = same_diagonal() ? 0U : i;
@@ -650,9 +650,11 @@ PreconditionBlockBase<number>::log_statistics() const
               << ']' << std::endl;
     }
   else if (inversion == householder)
-    {}
+    {
+    }
   else if (inversion == gauss_jordan)
-    {}
+    {
+    }
   else
     {
       Assert(false, ExcNotImplemented());

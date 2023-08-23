@@ -152,7 +152,7 @@ template <int dim>
 void
 FE_Q_Hierarchical<dim>::get_interpolation_matrix(
   const FiniteElement<dim> &source,
-  FullMatrix<double> &      matrix) const
+  FullMatrix<double>       &matrix) const
 {
   // support interpolation between FE_Q_Hierarchical only.
   if (const FE_Q_Hierarchical<dim> *source_fe =
@@ -931,7 +931,7 @@ template <int dim>
 void
 FE_Q_Hierarchical<dim>::get_face_interpolation_matrix(
   const FiniteElement<dim> &x_source_fe,
-  FullMatrix<double> &      interpolation_matrix,
+  FullMatrix<double>       &interpolation_matrix,
   const unsigned int        face_no) const
 {
   // this is only implemented, if the
@@ -1020,7 +1020,7 @@ void
 FE_Q_Hierarchical<dim>::get_subface_interpolation_matrix(
   const FiniteElement<dim> &x_source_fe,
   const unsigned int        subface,
-  FullMatrix<double> &      interpolation_matrix,
+  FullMatrix<double>       &interpolation_matrix,
   const unsigned int        face_no) const
 {
   // this is only implemented, if the

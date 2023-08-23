@@ -46,7 +46,7 @@ namespace Differentiation
 
 #  ifndef DOXYGEN
     Expression
-    make_symbolic_function(const std::string &             symbol,
+    make_symbolic_function(const std::string              &symbol,
                            const SD::types::symbol_vector &arguments)
     {
       return Expression(symbol, arguments);
@@ -54,7 +54,7 @@ namespace Differentiation
 
 
     Expression
-    make_symbolic_function(const std::string &                symbol,
+    make_symbolic_function(const std::string                 &symbol,
                            const SD::types::substitution_map &arguments)
     {
       return make_symbolic_function(symbol,
@@ -127,7 +127,7 @@ namespace Differentiation
 
       void
       set_value_in_symbol_map(
-        types::substitution_map &                     substitution_map,
+        types::substitution_map                      &substitution_map,
         const SymEngine::RCP<const SymEngine::Basic> &symbol,
         const SymEngine::RCP<const SymEngine::Basic> &value)
       {
@@ -148,8 +148,8 @@ namespace Differentiation
 
     void
     set_value_in_symbol_map(types::substitution_map &substitution_map,
-                            const Expression &       symbol,
-                            const Expression &       value)
+                            const Expression        &symbol,
+                            const Expression        &value)
     {
       internal::set_value_in_symbol_map(substitution_map,
                                         symbol.get_RCP(),
@@ -158,7 +158,7 @@ namespace Differentiation
 
 
     void
-    set_value_in_symbol_map(types::substitution_map &      substitution_map,
+    set_value_in_symbol_map(types::substitution_map       &substitution_map,
                             const types::substitution_map &symbol_values)
     {
       for (const auto &entry : symbol_values)
@@ -184,7 +184,7 @@ namespace Differentiation
 
 
     void
-    merge_substitution_maps(types::substitution_map &      symb_map_out,
+    merge_substitution_maps(types::substitution_map       &symb_map_out,
                             const types::substitution_map &symb_map_in)
     {
       // Do this by hand so that we can perform some sanity checks
@@ -221,7 +221,7 @@ namespace Differentiation
           // Instead of checking by value (and thus having
           // to store a temporary value), we check to see
           // if the hash of the map entry changes.
-          Expression & out = entry.second;
+          Expression  &out = entry.second;
           SE::hash_t   hash_old;
           SE::hash_t   hash_new = out.get_RCP()->hash();
           unsigned int iter     = 0;
@@ -260,7 +260,7 @@ namespace Differentiation
 
 
     Expression
-    substitute(const Expression &             expression,
+    substitute(const Expression              &expression,
                const types::substitution_map &substitution_map)
     {
       return expression.substitute(substitution_map);

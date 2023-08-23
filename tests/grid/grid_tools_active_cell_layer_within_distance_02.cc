@@ -22,7 +22,7 @@
 
 
 // write VTK files for visual inspection
-//#define WRITE_VTK
+// #define WRITE_VTK
 
 
 #include <deal.II/grid/grid_generator.h>

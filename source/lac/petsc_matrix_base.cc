@@ -46,7 +46,7 @@ namespace PETScWrappers
 
       // get a representation of the present row
       PetscInt           ncols;
-      const PetscInt *   colnums;
+      const PetscInt    *colnums;
       const PetscScalar *values;
 
       PetscErrorCode ierr =
@@ -395,7 +395,7 @@ namespace PETScWrappers
     // get a representation of the present
     // row
     PetscInt           ncols;
-    const PetscInt *   colnums;
+    const PetscInt    *colnums;
     const PetscScalar *values;
 
     // TODO: this is probably horribly inefficient; we should lobby for a way to
@@ -568,7 +568,7 @@ namespace PETScWrappers
     void
     perform_mmult(const MatrixBase &inputleft,
                   const MatrixBase &inputright,
-                  MatrixBase &      result,
+                  MatrixBase       &result,
                   const VectorBase &V,
                   const bool        transpose_left)
     {
@@ -638,7 +638,7 @@ namespace PETScWrappers
   } // namespace internals
 
   void
-  MatrixBase::mmult(MatrixBase &      C,
+  MatrixBase::mmult(MatrixBase       &C,
                     const MatrixBase &B,
                     const VectorBase &V) const
   {
@@ -646,7 +646,7 @@ namespace PETScWrappers
   }
 
   void
-  MatrixBase::Tmmult(MatrixBase &      C,
+  MatrixBase::Tmmult(MatrixBase       &C,
                      const MatrixBase &B,
                      const VectorBase &V) const
   {
@@ -654,7 +654,7 @@ namespace PETScWrappers
   }
 
   PetscScalar
-  MatrixBase::residual(VectorBase &      dst,
+  MatrixBase::residual(VectorBase       &dst,
                        const VectorBase &x,
                        const VectorBase &b) const
   {
@@ -750,7 +750,7 @@ namespace PETScWrappers
       local_range();
 
     PetscInt           ncols;
-    const PetscInt *   colnums;
+    const PetscInt    *colnums;
     const PetscScalar *values;
 
     MatrixBase::size_type row;

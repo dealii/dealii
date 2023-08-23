@@ -258,7 +258,7 @@ namespace SLEPcWrappers
 
   void
   SolverBase::get_eigenpair(const unsigned int         index,
-                            PetscScalar &              eigenvalues,
+                            PetscScalar               &eigenvalues,
                             PETScWrappers::VectorBase &eigenvectors)
   {
     // get converged eigenpair
@@ -271,8 +271,8 @@ namespace SLEPcWrappers
 
   void
   SolverBase::get_eigenpair(const unsigned int         index,
-                            double &                   real_eigenvalues,
-                            double &                   imag_eigenvalues,
+                            double                    &real_eigenvalues,
+                            double                    &imag_eigenvalues,
                             PETScWrappers::VectorBase &real_eigenvectors,
                             PETScWrappers::VectorBase &imag_eigenvectors)
   {
@@ -359,7 +359,7 @@ namespace SLEPcWrappers
 
 
   /* ---------------------- SolverKrylovSchur ------------------------ */
-  SolverKrylovSchur::SolverKrylovSchur(SolverControl &       cn,
+  SolverKrylovSchur::SolverKrylovSchur(SolverControl        &cn,
                                        const MPI_Comm        mpi_communicator,
                                        const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
@@ -380,7 +380,7 @@ namespace SLEPcWrappers
 
 
 
-  SolverArnoldi::SolverArnoldi(SolverControl &       cn,
+  SolverArnoldi::SolverArnoldi(SolverControl        &cn,
                                const MPI_Comm        mpi_communicator,
                                const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
@@ -407,7 +407,7 @@ namespace SLEPcWrappers
 
 
 
-  SolverLanczos::SolverLanczos(SolverControl &       cn,
+  SolverLanczos::SolverLanczos(SolverControl        &cn,
                                const MPI_Comm        mpi_communicator,
                                const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
@@ -423,7 +423,7 @@ namespace SLEPcWrappers
 
 
   /* ----------------------- Power ------------------------- */
-  SolverPower::SolverPower(SolverControl &       cn,
+  SolverPower::SolverPower(SolverControl        &cn,
                            const MPI_Comm        mpi_communicator,
                            const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
@@ -444,7 +444,7 @@ namespace SLEPcWrappers
 
 
   SolverGeneralizedDavidson::SolverGeneralizedDavidson(
-    SolverControl &       cn,
+    SolverControl        &cn,
     const MPI_Comm        mpi_communicator,
     const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)
@@ -476,7 +476,7 @@ namespace SLEPcWrappers
 
 
   /* ---------------------- LAPACK ------------------------- */
-  SolverLAPACK::SolverLAPACK(SolverControl &       cn,
+  SolverLAPACK::SolverLAPACK(SolverControl        &cn,
                              const MPI_Comm        mpi_communicator,
                              const AdditionalData &data)
     : SolverBase(cn, mpi_communicator)

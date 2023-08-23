@@ -118,8 +118,8 @@ namespace NonMatching
      * surface normals. The points, weights and normals should be with respect
      * to reference space, and the normals should be normalized.
      */
-    ImmersedSurfaceQuadrature(const std::vector<Point<dim>> &         points,
-                              const std::vector<double> &             weights,
+    ImmersedSurfaceQuadrature(const std::vector<Point<dim>>          &points,
+                              const std::vector<double>              &weights,
                               const std::vector<Tensor<1, spacedim>> &normals);
 
     /**
@@ -144,7 +144,7 @@ namespace NonMatching
      * quadrature formula.
      */
     void
-    push_back(const Point<dim> &         point,
+    push_back(const Point<dim>          &point,
               const double               weight,
               const Tensor<1, spacedim> &normal);
 

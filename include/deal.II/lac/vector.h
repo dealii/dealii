@@ -661,7 +661,7 @@ public:
   template <typename OtherNumber>
   void
   extract_subvector_to(const std::vector<size_type> &indices,
-                       std::vector<OtherNumber> &    values) const;
+                       std::vector<OtherNumber>     &values) const;
 
   /**
    * Extract a range of elements all at once.
@@ -732,7 +732,7 @@ public:
    */
   template <typename OtherNumber>
   void
-  add(const std::vector<size_type> &  indices,
+  add(const std::vector<size_type>   &indices,
       const std::vector<OtherNumber> &values);
 
   /**
@@ -751,7 +751,7 @@ public:
   template <typename OtherNumber>
   void
   add(const size_type    n_elements,
-      const size_type *  indices,
+      const size_type   *indices,
       const OtherNumber *values);
 
   /**
@@ -868,7 +868,7 @@ public:
    * while if @p false then the elements are printed on a separate line each.
    */
   void
-  print(std::ostream &     out,
+  print(std::ostream      &out,
         const unsigned int precision  = 3,
         const bool         scientific = true,
         const bool         across     = true) const;
@@ -1237,7 +1237,7 @@ template <typename Number>
 template <typename OtherNumber>
 inline void
 Vector<Number>::extract_subvector_to(const std::vector<size_type> &indices,
-                                     std::vector<OtherNumber> &    values) const
+                                     std::vector<OtherNumber>     &values) const
 {
   for (size_type i = 0; i < indices.size(); ++i)
     values[i] = operator()(indices[i]);
@@ -1278,7 +1278,7 @@ Vector<Number>::operator/=(const Number factor)
 template <typename Number>
 template <typename OtherNumber>
 inline void
-Vector<Number>::add(const std::vector<size_type> &  indices,
+Vector<Number>::add(const std::vector<size_type>   &indices,
                     const std::vector<OtherNumber> &values)
 {
   Assert(indices.size() == values.size(),
@@ -1292,7 +1292,7 @@ template <typename Number>
 template <typename OtherNumber>
 inline void
 Vector<Number>::add(const std::vector<size_type> &indices,
-                    const Vector<OtherNumber> &   values)
+                    const Vector<OtherNumber>    &values)
 {
   Assert(indices.size() == values.size(),
          ExcDimensionMismatch(indices.size(), values.size()));
@@ -1305,7 +1305,7 @@ template <typename Number>
 template <typename OtherNumber>
 inline void
 Vector<Number>::add(const size_type    n_indices,
-                    const size_type *  indices,
+                    const size_type   *indices,
                     const OtherNumber *values)
 {
   for (size_type i = 0; i < n_indices; ++i)
@@ -1333,7 +1333,8 @@ Vector<Number>::operator!=(const Vector<Number2> &v) const
 
 
 template <typename Number>
-inline void Vector<Number>::compress(VectorOperation::values) const
+inline void
+Vector<Number>::compress(VectorOperation::values) const
 {}
 
 

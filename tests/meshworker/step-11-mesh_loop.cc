@@ -173,7 +173,7 @@ namespace Step11
   template <int dim>
   struct ScratchData
   {
-    ScratchData(const Mapping<dim> &      mapping,
+    ScratchData(const Mapping<dim>       &mapping,
                 const FiniteElement<dim> &fe,
                 const unsigned int        quadrature_degree)
       : fe_values(mapping,
@@ -219,9 +219,9 @@ namespace Step11
   {
     using Iterator = decltype(dof_handler.begin_active());
 
-    auto cell_worker = [](const Iterator &  cell,
+    auto cell_worker = [](const Iterator   &cell,
                           ScratchData<dim> &scratch_data,
-                          CopyData &        copy_data) {
+                          CopyData         &copy_data) {
       const unsigned int dofs_per_cell =
         scratch_data.fe_values.get_fe().dofs_per_cell;
       const unsigned int n_q_points =
@@ -257,10 +257,10 @@ namespace Step11
           }
     };
 
-    auto boundary_worker = [](const Iterator &    cell,
+    auto boundary_worker = [](const Iterator     &cell,
                               const unsigned int &face_no,
-                              ScratchData<dim> &  scratch_data,
-                              CopyData &          copy_data) {
+                              ScratchData<dim>   &scratch_data,
+                              CopyData           &copy_data) {
       const unsigned int dofs_per_cell =
         scratch_data.fe_values.get_fe().dofs_per_cell;
       const unsigned int n_face_q_points =

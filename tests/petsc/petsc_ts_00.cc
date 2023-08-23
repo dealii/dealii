@@ -73,7 +73,7 @@ public:
                      bool                                           setjac,
                      bool                                           implicit,
                      bool                                           user,
-                     std::ostream &                                 _out)
+                     std::ostream                                  &_out)
     : time_stepper(data)
     , out(_out)
     , kappa(_kappa)
@@ -84,7 +84,7 @@ public:
         time_stepper.implicit_function = [&](const real_type   t,
                                              const VectorType &y,
                                              const VectorType &y_dot,
-                                             VectorType &      res) -> void {
+                                             VectorType       &res) -> void {
           res(0) = y_dot(0) - y(1);
           res(1) = y_dot(1) + kappa * kappa * y(0);
           res.compress(VectorOperation::insert);
@@ -107,8 +107,8 @@ public:
                                                  const VectorType &y,
                                                  const VectorType &y_dot,
                                                  const real_type   shift,
-                                                 MatrixType &      A,
-                                                 MatrixType &      P) -> void {
+                                                 MatrixType       &A,
+                                                 MatrixType       &P) -> void {
               P.set(0, 0, shift);
               P.set(0, 1, -1);
               P.set(1, 0, kappa * kappa);
@@ -159,8 +159,8 @@ public:
           {
             time_stepper.explicit_jacobian = [&](const real_type   t,
                                                  const VectorType &y,
-                                                 MatrixType &      A,
-                                                 MatrixType &      P) -> void {
+                                                 MatrixType       &A,
+                                                 MatrixType       &P) -> void {
               P.set(0, 0, 0);
               P.set(0, 1, 1);
               P.set(1, 0, -kappa * kappa);
@@ -173,7 +173,7 @@ public:
     // Monitoring routine. Here we print diagnostic for the exact
     // solution to the log file.
     time_stepper.monitor = [&](const real_type    t,
-                               const VectorType & y,
+                               const VectorType  &y,
                                const unsigned int step_number) -> void {
       std::vector<real_type> exact(2);
       exact[0] = std::sin(kappa * t);

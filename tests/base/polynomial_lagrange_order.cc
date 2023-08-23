@@ -29,7 +29,7 @@ using namespace Polynomials;
 
 void
 check_interpolation(const std::vector<Polynomial<double>> &p,
-                    const std::vector<Point<1>> &          x)
+                    const std::vector<Point<1>>           &x)
 {
   for (unsigned int i = 0; i < p.size(); ++i)
     {

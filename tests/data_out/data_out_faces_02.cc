@@ -38,8 +38,8 @@ my_check_this(const DoFHandler<1> &,
 template <int dim>
 void
 my_check_this(const DoFHandler<dim> &dof_handler,
-              const Vector<double> & v_node_x,
-              const Vector<double> & v_cell_x)
+              const Vector<double>  &v_node_x,
+              const Vector<double>  &v_cell_x)
 {
   BlockVector<double> v_node, v_cell;
   make_block_vector(v_node_x, v_node);
@@ -73,8 +73,8 @@ my_check_this(const DoFHandler<dim> &dof_handler,
 template <int dim>
 void
 check_this(const DoFHandler<dim> &dof_handler,
-           const Vector<double> & v_node,
-           const Vector<double> & v_cell)
+           const Vector<double>  &v_node,
+           const Vector<double>  &v_cell)
 {
   // since we can't forward declare
   // check_this in this file (it is forward

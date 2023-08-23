@@ -24,7 +24,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim>
 FunctionDerivative<dim>::FunctionDerivative(const Function<dim> &f,
-                                            const Point<dim> &   dir,
+                                            const Point<dim>    &dir,
                                             const double         h)
   : AutoDerivativeFunction<dim>(h, f.n_components, f.get_time())
   , f(f)
@@ -37,7 +37,7 @@ FunctionDerivative<dim>::FunctionDerivative(const Function<dim> &f,
 
 
 template <int dim>
-FunctionDerivative<dim>::FunctionDerivative(const Function<dim> &          f,
+FunctionDerivative<dim>::FunctionDerivative(const Function<dim>           &f,
                                             const std::vector<Point<dim>> &dir,
                                             const double                   h)
   : AutoDerivativeFunction<dim>(h, f.n_components, f.get_time())
@@ -89,7 +89,7 @@ FunctionDerivative<dim>::set_h(const double new_h)
 
 template <int dim>
 double
-FunctionDerivative<dim>::value(const Point<dim> & p,
+FunctionDerivative<dim>::value(const Point<dim>  &p,
                                const unsigned int component) const
 {
   Assert(incr.size() == 1,
@@ -121,7 +121,7 @@ FunctionDerivative<dim>::value(const Point<dim> & p,
 template <int dim>
 void
 FunctionDerivative<dim>::vector_value(const Point<dim> &p,
-                                      Vector<double> &  result) const
+                                      Vector<double>   &result) const
 {
   Assert(incr.size() == 1,
          ExcMessage(
@@ -163,7 +163,7 @@ FunctionDerivative<dim>::vector_value(const Point<dim> &p,
 template <int dim>
 void
 FunctionDerivative<dim>::value_list(const std::vector<Point<dim>> &points,
-                                    std::vector<double> &          values,
+                                    std::vector<double>           &values,
                                     const unsigned int component) const
 {
   const unsigned int n                  = points.size();

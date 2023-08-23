@@ -98,8 +98,8 @@ namespace Utilities
 
             int          blocklengths[2]  = {1, 1};
             MPI_Aint     displacements[2] = {0,
-                                         static_cast<MPI_Aint>(n_chunks) *
-                                           size_old * max_signed_int};
+                                             static_cast<MPI_Aint>(n_chunks) *
+                                               size_old * max_signed_int};
             MPI_Datatype types[2]         = {chunks, remainder};
             ierr                          = MPI_Type_create_struct(
               2, blocklengths, displacements, types, newtype);
@@ -151,7 +151,7 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      Send_c(const void * buf,
+      Send_c(const void  *buf,
              MPI_Count    count,
              MPI_Datatype datatype,
              int          dest,
@@ -190,13 +190,13 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      Recv_c(void *       buf,
+      Recv_c(void        *buf,
              MPI_Count    count,
              MPI_Datatype datatype,
              int          source,
              int          tag,
              MPI_Comm     comm,
-             MPI_Status * status)
+             MPI_Status  *status)
       {
 #  if MPI_VERSION >= 4
         return MPI_Recv_c(buf, count, datatype, source, tag, comm, status);
@@ -232,7 +232,7 @@ namespace Utilities
        * See the MPI 4.x standard for details.
        */
       inline int
-      Bcast_c(void *       buf,
+      Bcast_c(void        *buf,
               MPI_Count    count,
               MPI_Datatype datatype,
               unsigned int root_mpi_rank,
@@ -272,10 +272,10 @@ namespace Utilities
       inline int
       File_write_at_c(MPI_File     fh,
                       MPI_Offset   offset,
-                      const void * buf,
+                      const void  *buf,
                       MPI_Count    count,
                       MPI_Datatype datatype,
-                      MPI_Status * status)
+                      MPI_Status  *status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_write_at(fh, offset, buf, count, datatype, status);
@@ -308,10 +308,10 @@ namespace Utilities
       inline int
       File_write_at_all_c(MPI_File     fh,
                           MPI_Offset   offset,
-                          const void * buf,
+                          const void  *buf,
                           MPI_Count    count,
                           MPI_Datatype datatype,
-                          MPI_Status * status)
+                          MPI_Status  *status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_write_at_all(
@@ -343,10 +343,10 @@ namespace Utilities
        */
       inline int
       File_write_ordered_c(MPI_File     fh,
-                           const void * buf,
+                           const void  *buf,
                            MPI_Count    count,
                            MPI_Datatype datatype,
-                           MPI_Status * status)
+                           MPI_Status  *status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_write_ordered(fh, buf, count, datatype, status);
@@ -379,10 +379,10 @@ namespace Utilities
       inline int
       File_read_at_c(MPI_File     fh,
                      MPI_Offset   offset,
-                     void *       buf,
+                     void        *buf,
                      MPI_Count    count,
                      MPI_Datatype datatype,
-                     MPI_Status * status)
+                     MPI_Status  *status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_read_at(fh, offset, buf, count, datatype, status);
@@ -415,10 +415,10 @@ namespace Utilities
       inline int
       File_read_at_all_c(MPI_File     fh,
                          MPI_Offset   offset,
-                         void *       buf,
+                         void        *buf,
                          MPI_Count    count,
                          MPI_Datatype datatype,
-                         MPI_Status * status)
+                         MPI_Status  *status)
       {
         if (count <= LargeCount::mpi_max_int_count)
           return MPI_File_read_at_all(fh, offset, buf, count, datatype, status);

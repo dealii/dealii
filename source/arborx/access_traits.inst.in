@@ -36,7 +36,7 @@ for (DIM : DIMENSIONS; SCALAR : REAL_SCALARS)
           &spheres);
       template SphereNearestPredicate::SphereNearestPredicate(
         const std::vector<std::pair<dealii::Point<DIM, SCALAR>, SCALAR>>
-          &                spheres,
+                          &spheres,
         const unsigned int n_nearest_neighbors);
     \}
     DEAL_II_NAMESPACE_CLOSE

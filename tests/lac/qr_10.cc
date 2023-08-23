@@ -103,8 +103,8 @@ test()
   v[4] = 8.;
 
   const auto fun = [&](const Vector<number> &u,
-                       const number &        rho2,
-                       const number &        col_l2_norm2) {
+                       const number         &rho2,
+                       const number         &col_l2_norm2) {
     deallog << "Linearly dependent column" << std::endl;
     deallog << "u:" << std::endl;
     u.print(deallog.get_file_stream());

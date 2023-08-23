@@ -116,7 +116,7 @@ namespace TrilinosWrappers
     void
     BlockVector::reinit(
       const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-        &        partitioners,
+                &partitioners,
       const bool make_ghosted,
       const bool vector_writable)
     {
@@ -168,7 +168,7 @@ namespace TrilinosWrappers
     void
     BlockVector::import_nonlocal_data_for_fe(
       const TrilinosWrappers::BlockSparseMatrix &m,
-      const BlockVector &                        v)
+      const BlockVector                         &v)
     {
       AssertDimension(m.n_block_rows(), v.n_blocks());
       AssertDimension(m.n_block_cols(), v.n_blocks());
@@ -187,7 +187,7 @@ namespace TrilinosWrappers
 
 
     void
-    BlockVector::print(std::ostream &     out,
+    BlockVector::print(std::ostream      &out,
                        const unsigned int precision,
                        const bool         scientific,
                        const bool         across) const

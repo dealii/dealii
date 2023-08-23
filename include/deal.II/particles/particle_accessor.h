@@ -435,7 +435,7 @@ namespace Particles
      */
     ParticleAccessor(
       const typename particle_container::iterator particles_in_cell,
-      const PropertyPool<dim, spacedim> &         property_pool,
+      const PropertyPool<dim, spacedim>          &property_pool,
       const unsigned int                          particle_index_within_cell);
 
     /**
@@ -485,9 +485,9 @@ namespace Particles
   {
     unsigned int n_properties = 0;
 
-    Point<spacedim>       location;
-    Point<dim>            reference_location;
-    types::particle_index id;
+    Point<spacedim>                       location;
+    Point<dim>                            reference_location;
+    types::particle_index                 id;
     ar &location &reference_location &id &n_properties;
 
     set_location(location);
@@ -548,7 +548,7 @@ namespace Particles
   template <int dim, int spacedim>
   inline ParticleAccessor<dim, spacedim>::ParticleAccessor(
     const typename particle_container::iterator particles_in_cell,
-    const PropertyPool<dim, spacedim> &         property_pool,
+    const PropertyPool<dim, spacedim>          &property_pool,
     const unsigned int                          particle_index_within_cell)
     : particles_in_cell(particles_in_cell)
     , property_pool(const_cast<PropertyPool<dim, spacedim> *>(&property_pool))

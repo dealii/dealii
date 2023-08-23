@@ -49,7 +49,7 @@ public:
    * not be the same vector.
    */
   void
-  vmult(dealii::PETScWrappers::VectorBase &      dst,
+  vmult(dealii::PETScWrappers::VectorBase       &dst,
         const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
@@ -63,7 +63,7 @@ public:
    * not be the same vector.
    */
   void
-  Tvmult(dealii::PETScWrappers::VectorBase &      dst,
+  Tvmult(dealii::PETScWrappers::VectorBase       &dst,
          const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
@@ -77,7 +77,7 @@ public:
    * not be the same vector.
    */
   void
-  vmult_add(dealii::PETScWrappers::VectorBase &      dst,
+  vmult_add(dealii::PETScWrappers::VectorBase       &dst,
             const dealii::PETScWrappers::VectorBase &src) const;
 
   /**
@@ -94,7 +94,7 @@ public:
    * not be the same vector.
    */
   void
-  Tvmult_add(dealii::PETScWrappers::VectorBase &      dst,
+  Tvmult_add(dealii::PETScWrappers::VectorBase       &dst,
              const dealii::PETScWrappers::VectorBase &src) const;
 
 private:
@@ -121,7 +121,7 @@ inline PetscFDMatrix::PetscFDMatrix(unsigned int size, unsigned int dim)
 
 
 inline void
-PetscFDMatrix::vmult_add(dealii::PETScWrappers::VectorBase &      dst,
+PetscFDMatrix::vmult_add(dealii::PETScWrappers::VectorBase       &dst,
                          const dealii::PETScWrappers::VectorBase &src) const
 {
   for (unsigned int i = 0; i <= ny - 2; ++i)
@@ -152,7 +152,7 @@ PetscFDMatrix::vmult_add(dealii::PETScWrappers::VectorBase &      dst,
 
 
 inline void
-PetscFDMatrix::vmult(dealii::PETScWrappers::VectorBase &      dst,
+PetscFDMatrix::vmult(dealii::PETScWrappers::VectorBase       &dst,
                      const dealii::PETScWrappers::VectorBase &src) const
 {
   dst = 0;
@@ -162,7 +162,7 @@ PetscFDMatrix::vmult(dealii::PETScWrappers::VectorBase &      dst,
 
 
 inline void
-PetscFDMatrix::Tvmult(dealii::PETScWrappers::VectorBase &      dst,
+PetscFDMatrix::Tvmult(dealii::PETScWrappers::VectorBase       &dst,
                       const dealii::PETScWrappers::VectorBase &src) const
 {
   dst = 0;
@@ -172,7 +172,7 @@ PetscFDMatrix::Tvmult(dealii::PETScWrappers::VectorBase &      dst,
 
 
 inline void
-PetscFDMatrix::Tvmult_add(dealii::PETScWrappers::VectorBase &      dst,
+PetscFDMatrix::Tvmult_add(dealii::PETScWrappers::VectorBase       &dst,
                           const dealii::PETScWrappers::VectorBase &src) const
 {
   vmult_add(dst, src);

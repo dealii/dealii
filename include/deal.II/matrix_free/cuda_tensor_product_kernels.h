@@ -362,7 +362,7 @@ namespace CUDAWrappers
 
       DEAL_II_HOST_DEVICE
       EvaluatorTensorProduct(
-        const TeamHandle &                                         team_member,
+        const TeamHandle                                          &team_member,
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values,
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
           shape_gradients,
@@ -487,7 +487,7 @@ namespace CUDAWrappers
                            n_q_points_1d,
                            Number>::
       EvaluatorTensorProduct(
-        const TeamHandle &                                         team_member,
+        const TeamHandle                                          &team_member,
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values,
         Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
           shape_gradients,

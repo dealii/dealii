@@ -85,7 +85,7 @@ namespace Algorithms
 
     LogStream::Prefix prefix("Theta");
 
-    VectorType &                    solution = *out.entry<VectorType *>(0);
+    VectorType                     &solution = *out.entry<VectorType *>(0);
     GrowingVectorMemory<VectorType> mem;
     typename VectorMemory<VectorType>::Pointer aux(mem);
     aux->reinit(solution);

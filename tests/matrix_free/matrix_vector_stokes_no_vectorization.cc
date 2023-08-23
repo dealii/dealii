@@ -61,8 +61,8 @@ public:
 
   void
   local_apply(const MatrixFree<dim, Number, VectorizedArrayType> &data,
-              VectorType &                                        dst,
-              const VectorType &                                  src,
+              VectorType                                         &dst,
+              const VectorType                                   &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     using vector_t = VectorizedArrayType;

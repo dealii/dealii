@@ -106,7 +106,7 @@ const Point<3> RightHandSide<3>::center_point = Point<3>(-0.75, -0.75, -0.75);
 // C++ standard library):
 template <int dim>
 double
-RightHandSide<dim>::value(const Point<dim> & p,
+RightHandSide<dim>::value(const Point<dim>  &p,
                           const unsigned int component) const
 {
   (void)component;
@@ -127,7 +127,7 @@ public:
 
 template <int dim>
 double
-BoundaryValues<dim>::value(const Point<dim> & p,
+BoundaryValues<dim>::value(const Point<dim>  &p,
                            const unsigned int component) const
 {
   (void)component;
@@ -212,8 +212,8 @@ template <int dim>
 void
 local_assemble_system(
   const typename DoFHandler<dim>::active_cell_iterator &cell,
-  AssemblyScratchData<dim> &                            scratch_data,
-  AssemblyCopyData &                                    copy_data)
+  AssemblyScratchData<dim>                             &scratch_data,
+  AssemblyCopyData                                     &copy_data)
 {
   // We define some abbreviations to avoid unnecessarily long lines:
   const unsigned int dofs_per_cell =
@@ -394,7 +394,7 @@ assemble()
 
   auto worker = [&](const typename DoFHandler<dim>::active_cell_iterator &cell,
                     AssemblyScratchData<dim> &scratch_data,
-                    AssemblyCopyData &        copy_data) {
+                    AssemblyCopyData         &copy_data) {
     local_assemble_system(cell, scratch_data, copy_data);
   };
 

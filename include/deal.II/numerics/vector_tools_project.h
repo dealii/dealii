@@ -145,12 +145,12 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void project(
-    const Mapping<dim, spacedim> &                             mapping,
-    const DoFHandler<dim, spacedim> &                          dof,
-    const AffineConstraints<typename VectorType::value_type> & constraints,
-    const Quadrature<dim> &                                    quadrature,
+    const Mapping<dim, spacedim>                              &mapping,
+    const DoFHandler<dim, spacedim>                           &dof,
+    const AffineConstraints<typename VectorType::value_type>  &constraints,
+    const Quadrature<dim>                                     &quadrature,
     const Function<spacedim, typename VectorType::value_type> &function,
-    VectorType &                                               vec,
+    VectorType                                                &vec,
     const bool                 enforce_zero_boundary = false,
     const Quadrature<dim - 1> &q_boundary = (dim > 1 ? QGauss<dim - 1>(2) :
                                                        Quadrature<dim - 1>(0)),
@@ -165,11 +165,11 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void project(
-    const DoFHandler<dim, spacedim> &                          dof,
-    const AffineConstraints<typename VectorType::value_type> & constraints,
-    const Quadrature<dim> &                                    quadrature,
+    const DoFHandler<dim, spacedim>                           &dof,
+    const AffineConstraints<typename VectorType::value_type>  &constraints,
+    const Quadrature<dim>                                     &quadrature,
     const Function<spacedim, typename VectorType::value_type> &function,
-    VectorType &                                               vec,
+    VectorType                                                &vec,
     const bool                 enforce_zero_boundary = false,
     const Quadrature<dim - 1> &q_boundary = (dim > 1 ? QGauss<dim - 1>(2) :
                                                        Quadrature<dim - 1>(0)),
@@ -183,12 +183,12 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void project(
-    const hp::MappingCollection<dim, spacedim> &               mapping,
-    const DoFHandler<dim, spacedim> &                          dof,
-    const AffineConstraints<typename VectorType::value_type> & constraints,
-    const hp::QCollection<dim> &                               quadrature,
+    const hp::MappingCollection<dim, spacedim>                &mapping,
+    const DoFHandler<dim, spacedim>                           &dof,
+    const AffineConstraints<typename VectorType::value_type>  &constraints,
+    const hp::QCollection<dim>                                &quadrature,
     const Function<spacedim, typename VectorType::value_type> &function,
-    VectorType &                                               vec,
+    VectorType                                                &vec,
     const bool                      enforce_zero_boundary = false,
     const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
       dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
@@ -203,11 +203,11 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void project(
-    const DoFHandler<dim, spacedim> &                          dof,
-    const AffineConstraints<typename VectorType::value_type> & constraints,
-    const hp::QCollection<dim> &                               quadrature,
+    const DoFHandler<dim, spacedim>                           &dof,
+    const AffineConstraints<typename VectorType::value_type>  &constraints,
+    const hp::QCollection<dim>                                &quadrature,
     const Function<spacedim, typename VectorType::value_type> &function,
-    VectorType &                                               vec,
+    VectorType                                                &vec,
     const bool                      enforce_zero_boundary = false,
     const hp::QCollection<dim - 1> &q_boundary = hp::QCollection<dim - 1>(
       dim > 1 ? QGauss<dim - 1>(2) : Quadrature<dim - 1>(0)),
@@ -242,14 +242,14 @@ namespace VectorTools
   template <int dim, typename VectorType, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
   void project(
-    const Mapping<dim, spacedim> &                            mapping,
-    const DoFHandler<dim, spacedim> &                         dof,
+    const Mapping<dim, spacedim>                             &mapping,
+    const DoFHandler<dim, spacedim>                          &dof,
     const AffineConstraints<typename VectorType::value_type> &constraints,
-    const Quadrature<dim> &                                   quadrature,
+    const Quadrature<dim>                                    &quadrature,
     const std::function<typename VectorType::value_type(
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &,
-      const unsigned int)> &                                  func,
-    VectorType &                                              vec_result);
+      const unsigned int)>                                   &func,
+    VectorType                                               &vec_result);
 
   /**
    * The same as above for projection of scalar-valued MatrixFree quadrature
@@ -292,8 +292,8 @@ namespace VectorTools
     const unsigned int                                        n_q_points_1d,
     const std::function<VectorizedArray<typename VectorType::value_type>(
       const unsigned int,
-      const unsigned int)> &                                  func,
-    VectorType &                                              vec_result,
+      const unsigned int)>                                   &func,
+    VectorType                                               &vec_result,
     const unsigned int                                        fe_component = 0);
 
   /**
@@ -312,8 +312,8 @@ namespace VectorTools
     const AffineConstraints<typename VectorType::value_type> &constraints,
     const std::function<VectorizedArray<typename VectorType::value_type>(
       const unsigned int,
-      const unsigned int)> &                                  func,
-    VectorType &                                              vec_result,
+      const unsigned int)>                                   &func,
+    VectorType                                               &vec_result,
     const unsigned int                                        fe_component = 0);
 
   /** @} */

@@ -68,7 +68,7 @@ namespace SUNDIALS
      */
     template <typename F, typename... Args>
     int
-    call_and_possibly_capture_exception(const F &           f,
+    call_and_possibly_capture_exception(const F            &f,
                                         std::exception_ptr &eptr,
                                         Args &&...args)
     {
@@ -183,7 +183,8 @@ namespace SUNDIALS
 
 
 
-    SUNLinearSolver_Type arkode_linsol_get_type(SUNLinearSolver)
+    SUNLinearSolver_Type
+    arkode_linsol_get_type(SUNLinearSolver)
     {
       return SUNLINEARSOLVER_ITERATIVE;
     }
@@ -244,7 +245,8 @@ namespace SUNDIALS
 
 
     template <typename VectorType>
-    int arkode_linsol_initialize(SUNLinearSolver)
+    int
+    arkode_linsol_initialize(SUNLinearSolver)
     {
       // this method is currently only provided because SUNDIALS 4.0.0 requires
       // it - no user-set action is implemented so far
@@ -269,7 +271,7 @@ namespace SUNDIALS
     template <typename VectorType>
     int
     arkode_linsol_set_preconditioner(SUNLinearSolver LS,
-                                     void *          P_data,
+                                     void           *P_data,
                                      PSetupFn        p_setup,
                                      PSolveFn        p_solve)
     {
@@ -287,7 +289,7 @@ namespace SUNDIALS
   template <typename VectorType>
   internal::LinearSolverWrapper<VectorType>::LinearSolverWrapper(
     const LinearSolveFunction<VectorType> &lsolve,
-    std::exception_ptr &                   pending_exception
+    std::exception_ptr                    &pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     ,
     SUNContext linsol_ctx
@@ -340,7 +342,7 @@ namespace SUNDIALS
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   template <typename VectorType>
-  SundialsOperator<VectorType>::SundialsOperator(void *     A_data,
+  SundialsOperator<VectorType>::SundialsOperator(void      *A_data,
                                                  ATimesFn   a_times_fn,
                                                  SUNContext linsol_ctx)
     : A_data(A_data)
@@ -353,7 +355,7 @@ namespace SUNDIALS
   }
 #  else
   template <typename VectorType>
-  SundialsOperator<VectorType>::SundialsOperator(void *A_data,
+  SundialsOperator<VectorType>::SundialsOperator(void    *A_data,
                                                  ATimesFn a_times_fn)
     : A_data(A_data)
     , a_times_fn(a_times_fn)
@@ -367,7 +369,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  SundialsOperator<VectorType>::vmult(VectorType &      dst,
+  SundialsOperator<VectorType>::vmult(VectorType       &dst,
                                       const VectorType &src) const
   {
     auto sun_dst = internal::make_nvector_view(dst
@@ -392,7 +394,7 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   template <typename VectorType>
   SundialsPreconditioner<VectorType>::SundialsPreconditioner(
-    void *     P_data,
+    void      *P_data,
     PSolveFn   p_solve_fn,
     SUNContext linsol_ctx,
     double     tol)
@@ -404,9 +406,9 @@ namespace SUNDIALS
 #  else
   template <typename VectorType>
   SundialsPreconditioner<VectorType>::SundialsPreconditioner(
-    void *P_data,
+    void    *P_data,
     PSolveFn p_solve_fn,
-    double tol)
+    double   tol)
     : P_data(P_data)
     , p_solve_fn(p_solve_fn)
     , tol(tol)
@@ -417,7 +419,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  SundialsPreconditioner<VectorType>::vmult(VectorType &      dst,
+  SundialsPreconditioner<VectorType>::vmult(VectorType       &dst,
                                             const VectorType &src) const
   {
     // apply identity preconditioner if nothing else specified

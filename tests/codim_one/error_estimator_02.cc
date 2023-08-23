@@ -142,7 +142,7 @@ check()
   dof.distribute_dofs(element);
 
   MappingQ<dim, spacedim> mapping(3);
-  Quadrature<dim - 1> &   q_face = get_q_face<dim>();
+  Quadrature<dim - 1>    &q_face = get_q_face<dim>();
 
   Vector<double> v(dof.n_dofs());
   VectorTools::interpolate(mapping, dof, function, v);

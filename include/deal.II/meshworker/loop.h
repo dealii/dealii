@@ -191,16 +191,16 @@ namespace MeshWorker
   cell_action(
     ITERATOR                  cell,
     DoFInfoBox<dim, DOFINFO> &dof_info,
-    INFOBOX &                 info,
+    INFOBOX                  &info,
     const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
       &cell_worker,
     const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
-      &                                                      boundary_worker,
+                                                            &boundary_worker,
     const std::function<void(DOFINFO &,
                              DOFINFO &,
                              typename INFOBOX::CellInfo &,
                              typename INFOBOX::CellInfo &)> &face_worker,
-    const LoopControl &                                      loop_control)
+    const LoopControl                                       &loop_control)
   {
     const bool ignore_subdomain =
       (cell->get_triangulation().locally_owned_subdomain() ==
@@ -438,17 +438,17 @@ namespace MeshWorker
   void
   loop(ITERATOR                             begin,
        std_cxx20::type_identity_t<ITERATOR> end,
-       DOFINFO &                            dinfo,
-       INFOBOX &                            info,
+       DOFINFO                             &dinfo,
+       INFOBOX                             &info,
        const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
          &cell_worker,
        const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
-         &                                                      boundary_worker,
+                                                               &boundary_worker,
        const std::function<void(DOFINFO &,
                                 DOFINFO &,
                                 typename INFOBOX::CellInfo &,
                                 typename INFOBOX::CellInfo &)> &face_worker,
-       ASSEMBLER &                                              assembler,
+       ASSEMBLER                                               &assembler,
        const LoopControl &lctrl = LoopControl())
   {
     DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
@@ -492,11 +492,11 @@ namespace MeshWorker
   void
   integration_loop(ITERATOR                              begin,
                    std_cxx20::type_identity_t<ITERATOR>  end,
-                   DoFInfo<dim, spacedim> &              dof_info,
-                   IntegrationInfoBox<dim, spacedim> &   box,
+                   DoFInfo<dim, spacedim>               &dof_info,
+                   IntegrationInfoBox<dim, spacedim>    &box,
                    const LocalIntegrator<dim, spacedim> &integrator,
-                   ASSEMBLER &                           assembler,
-                   const LoopControl &                   lctrl = LoopControl())
+                   ASSEMBLER                            &assembler,
+                   const LoopControl                    &lctrl = LoopControl())
   {
     std::function<void(DoFInfo<dim, spacedim> &,
                        IntegrationInfo<dim, spacedim> &)>
@@ -511,20 +511,20 @@ namespace MeshWorker
       face_worker;
     if (integrator.use_cell)
       cell_worker =
-        [&integrator](DoFInfo<dim, spacedim> &        dof_info,
+        [&integrator](DoFInfo<dim, spacedim>         &dof_info,
                       IntegrationInfo<dim, spacedim> &integration_info) {
           integrator.cell(dof_info, integration_info);
         };
     if (integrator.use_boundary)
       boundary_worker =
-        [&integrator](DoFInfo<dim, spacedim> &        dof_info,
+        [&integrator](DoFInfo<dim, spacedim>         &dof_info,
                       IntegrationInfo<dim, spacedim> &integration_info) {
           integrator.boundary(dof_info, integration_info);
         };
     if (integrator.use_face)
       face_worker =
-        [&integrator](DoFInfo<dim, spacedim> &        dof_info_1,
-                      DoFInfo<dim, spacedim> &        dof_info_2,
+        [&integrator](DoFInfo<dim, spacedim>         &dof_info_1,
+                      DoFInfo<dim, spacedim>         &dof_info_2,
                       IntegrationInfo<dim, spacedim> &integration_info_1,
                       IntegrationInfo<dim, spacedim> &integration_info_2) {
           integrator.face(dof_info_1,

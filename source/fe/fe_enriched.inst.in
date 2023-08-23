@@ -47,10 +47,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           DoFHandler<deal_II_dimension, deal_II_space_dimension> &dof_handler,
           const std::vector<
             predicate_function<deal_II_dimension, deal_II_space_dimension>>
-            &                              predicates,
+                                          &predicates,
           const std::vector<unsigned int> &predicate_colors,
           std::map<unsigned int, std::map<unsigned int, unsigned int>>
-            &                                  cellwise_color_predicate_map,
+                                              &cellwise_color_predicate_map,
           std::vector<std::set<unsigned int>> &fe_sets);
 
 
@@ -61,7 +61,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           const std::vector<std::shared_ptr<Function<deal_II_space_dimension>>>
             &enrichments,
           const std::map<unsigned int, std::map<unsigned int, unsigned int>>
-            &       cellwise_color_predicate_map,
+                   &cellwise_color_predicate_map,
           std::vector<std::function<const Function<deal_II_space_dimension> *(
             const typename Triangulation<deal_II_dimension,
                                          deal_II_space_dimension>::cell_iterator

@@ -240,7 +240,7 @@ public:
    */
   template <typename number>
   void
-  add_data_vector(const Vector<number> &          vec,
+  add_data_vector(const Vector<number>           &vec,
                   const std::vector<std::string> &names);
 
   /**

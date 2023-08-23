@@ -108,9 +108,9 @@ namespace Utilities
     std::vector<std::array<std::uint64_t, effective_dim>>
     inverse_Hilbert_space_filling_curve_effective(
       const std::vector<Point<dim, Number>> &points,
-      const Point<dim, Number> &             bl,
-      const std::array<LongDouble, dim> &    extents,
-      const std::bitset<dim> &               valid_extents,
+      const Point<dim, Number>              &bl,
+      const std::array<LongDouble, dim>     &extents,
+      const std::bitset<dim>                &valid_extents,
       const int                              min_bits,
       const Integer                          max_int)
     {
@@ -1014,7 +1014,7 @@ namespace Utilities
     get_time()
     {
       std::time_t time1 = std::time(nullptr);
-      std::tm *   time  = std::localtime(&time1);
+      std::tm    *time  = std::localtime(&time1);
 
       std::ostringstream o;
       o << time->tm_hour << ":" << (time->tm_min < 10 ? "0" : "")
@@ -1030,7 +1030,7 @@ namespace Utilities
     get_date()
     {
       std::time_t time1 = std::time(nullptr);
-      std::tm *   time  = std::localtime(&time1);
+      std::tm    *time  = std::localtime(&time1);
 
       std::ostringstream o;
       o << time->tm_year + 1900 << "/" << time->tm_mon + 1 << "/"

@@ -49,7 +49,7 @@ namespace FEValuesViews
     void
     do_function_values(
       const ArrayView<const Number> &dof_values,
-      const Table<2, double> &       shape_values,
+      const Table<2, double>        &shape_values,
       const std::vector<typename Scalar<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
       std::vector<typename ProductType<Number, double>::type> &values);
@@ -61,7 +61,7 @@ namespace FEValuesViews
     template <int order, int dim, int spacedim, typename Number>
     void
     do_function_derivatives(
-      const ArrayView<const Number> &                  dof_values,
+      const ArrayView<const Number>                   &dof_values,
       const Table<2, dealii::Tensor<order, spacedim>> &shape_derivatives,
       const std::vector<typename Scalar<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
@@ -75,7 +75,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_laplacians(
-      const ArrayView<const Number> &              dof_values,
+      const ArrayView<const Number>               &dof_values,
       const Table<2, dealii::Tensor<2, spacedim>> &shape_hessians,
       const std::vector<typename Scalar<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
@@ -91,7 +91,7 @@ namespace FEValuesViews
     void
     do_function_values(
       const ArrayView<const Number> &dof_values,
-      const Table<2, double> &       shape_values,
+      const Table<2, double>        &shape_values,
       const std::vector<typename Vector<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
       std::vector<
@@ -105,7 +105,7 @@ namespace FEValuesViews
     template <int order, int dim, int spacedim, typename Number>
     void
     do_function_derivatives(
-      const ArrayView<const Number> &                  dof_values,
+      const ArrayView<const Number>                   &dof_values,
       const Table<2, dealii::Tensor<order, spacedim>> &shape_derivatives,
       const std::vector<typename Vector<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
@@ -119,7 +119,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_symmetric_gradients(
-      const ArrayView<const Number> &              dof_values,
+      const ArrayView<const Number>               &dof_values,
       const Table<2, dealii::Tensor<1, spacedim>> &shape_gradients,
       const std::vector<typename Vector<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
@@ -134,7 +134,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_divergences(
-      const ArrayView<const Number> &              dof_values,
+      const ArrayView<const Number>               &dof_values,
       const Table<2, dealii::Tensor<1, spacedim>> &shape_gradients,
       const std::vector<typename Vector<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
@@ -147,7 +147,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_curls(
-      const ArrayView<const Number> &              dof_values,
+      const ArrayView<const Number>               &dof_values,
       const Table<2, dealii::Tensor<1, spacedim>> &shape_gradients,
       const std::vector<typename Vector<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
@@ -161,7 +161,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_laplacians(
-      const ArrayView<const Number> &              dof_values,
+      const ArrayView<const Number>               &dof_values,
       const Table<2, dealii::Tensor<2, spacedim>> &shape_hessians,
       const std::vector<typename Vector<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
@@ -176,7 +176,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_values(
-      const ArrayView<const Number> & dof_values,
+      const ArrayView<const Number>  &dof_values,
       const dealii::Table<2, double> &shape_values,
       const std::vector<
         typename SymmetricTensor<2, dim, spacedim>::ShapeFunctionData>
@@ -192,7 +192,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_divergences(
-      const ArrayView<const Number> &              dof_values,
+      const ArrayView<const Number>               &dof_values,
       const Table<2, dealii::Tensor<1, spacedim>> &shape_gradients,
       const std::vector<
         typename SymmetricTensor<2, dim, spacedim>::ShapeFunctionData>
@@ -208,7 +208,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_values(
-      const ArrayView<const Number> & dof_values,
+      const ArrayView<const Number>  &dof_values,
       const dealii::Table<2, double> &shape_values,
       const std::vector<typename Tensor<2, dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
@@ -222,7 +222,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_divergences(
-      const ArrayView<const Number> &              dof_values,
+      const ArrayView<const Number>               &dof_values,
       const Table<2, dealii::Tensor<1, spacedim>> &shape_gradients,
       const std::vector<typename Tensor<2, dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
@@ -235,7 +235,7 @@ namespace FEValuesViews
     template <int dim, int spacedim, typename Number>
     void
     do_function_gradients(
-      const ArrayView<const Number> &              dof_values,
+      const ArrayView<const Number>               &dof_values,
       const Table<2, dealii::Tensor<1, spacedim>> &shape_gradients,
       const std::vector<typename Tensor<2, dim, spacedim>::ShapeFunctionData>
         &shape_function_data,

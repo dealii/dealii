@@ -126,7 +126,7 @@ PolynomialSpace<dim>::set_numbering(const std::vector<unsigned int> &renumber)
 template <int dim>
 double
 PolynomialSpace<dim>::compute_value(const unsigned int i,
-                                    const Point<dim> & p) const
+                                    const Point<dim>  &p) const
 {
   const auto ix = compute_index(i);
   // take the product of the
@@ -143,7 +143,7 @@ PolynomialSpace<dim>::compute_value(const unsigned int i,
 template <int dim>
 Tensor<1, dim>
 PolynomialSpace<dim>::compute_grad(const unsigned int i,
-                                   const Point<dim> & p) const
+                                   const Point<dim>  &p) const
 {
   const auto ix = compute_index(i);
 
@@ -168,7 +168,7 @@ PolynomialSpace<dim>::compute_grad(const unsigned int i,
 template <int dim>
 Tensor<2, dim>
 PolynomialSpace<dim>::compute_grad_grad(const unsigned int i,
-                                        const Point<dim> & p) const
+                                        const Point<dim>  &p) const
 {
   const auto ix = compute_index(i);
 
@@ -203,8 +203,8 @@ PolynomialSpace<dim>::compute_grad_grad(const unsigned int i,
 template <int dim>
 void
 PolynomialSpace<dim>::evaluate(
-  const Point<dim> &           p,
-  std::vector<double> &        values,
+  const Point<dim>            &p,
+  std::vector<double>         &values,
   std::vector<Tensor<1, dim>> &grads,
   std::vector<Tensor<2, dim>> &grad_grads,
   std::vector<Tensor<3, dim>> &third_derivatives,

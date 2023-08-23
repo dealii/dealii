@@ -103,7 +103,7 @@ private:
 template <int dim, int components, int fe_degree>
 void
 do_project(const parallel::distributed::Triangulation<dim> &triangulation,
-           const FiniteElement<dim> &                       fe,
+           const FiniteElement<dim>                        &fe,
            const unsigned int                               order_difference)
 {
   const unsigned int p = fe_degree;

@@ -56,7 +56,7 @@ public:
   LaplaceOperator(){};
 
   void
-  initialize(const Mapping<dim> &   mapping,
+  initialize(const Mapping<dim>    &mapping,
              const DoFHandler<dim> &dof_handler,
              const unsigned int     level = numbers::invalid_unsigned_int)
   {
@@ -122,7 +122,7 @@ private:
 
   void
   local_diagonal_face(
-    const MatrixFree<dim, number> &             data,
+    const MatrixFree<dim, number>              &data,
     LinearAlgebra::distributed::Vector<number> &dst,
     const int &,
     const std::pair<unsigned int, unsigned int> &face_range) const
@@ -215,7 +215,7 @@ private:
 
   void
   local_diagonal_boundary(
-    const MatrixFree<dim, number> &             data,
+    const MatrixFree<dim, number>              &data,
     LinearAlgebra::distributed::Vector<number> &dst,
     const int &,
     const std::pair<unsigned int, unsigned int> &face_range) const
@@ -258,7 +258,7 @@ private:
 
   void
   local_diagonal_by_cell(
-    const MatrixFree<dim, number> &             data,
+    const MatrixFree<dim, number>              &data,
     LinearAlgebra::distributed::Vector<number> &dst,
     const int &,
     const std::pair<unsigned int, unsigned int> &cell_range) const

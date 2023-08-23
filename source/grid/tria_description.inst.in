@@ -34,7 +34,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
         create_description_from_triangulation_in_groups(
           const std::function<void(
             dealii::Triangulation<deal_II_dimension, deal_II_space_dimension>
-              &)> &               serial_grid_generator,
+              &)>                &serial_grid_generator,
           const std::function<void(
             dealii::Triangulation<deal_II_dimension, deal_II_space_dimension> &,
             const MPI_Comm,
@@ -57,7 +57,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : DIMENSIONS)
           const Triangulation<deal_II_dimension, deal_II_space_dimension> &tria,
           const LinearAlgebra::distributed::Vector<double> &partition,
           const std::vector<LinearAlgebra::distributed::Vector<double>>
-            &                                      mg_partitions,
+                                                  &mg_partitions,
           const TriangulationDescription::Settings settings);
 #endif
       \}

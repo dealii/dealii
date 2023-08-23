@@ -69,7 +69,7 @@ test()
   if (myid > 0)
     {
       unsigned int local_index = partitioner->global_to_local(1);
-      double *     values_dev  = v.get_values();
+      double      *values_dev  = v.get_values();
       Kokkos::deep_copy(
         Kokkos::View<double, MemorySpace::Default::kokkos_space>(values_dev +
                                                                  local_index),
@@ -116,7 +116,7 @@ test()
   if (myid == 0)
     {
       unsigned int local_index = partitioner->global_to_local(1);
-      double *     values_dev  = v.get_values();
+      double      *values_dev  = v.get_values();
       Kokkos::deep_copy(Kokkos::subview(v_device, local_index), 2);
     }
   if (myid > 0)

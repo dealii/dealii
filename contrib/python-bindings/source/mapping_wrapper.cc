@@ -91,7 +91,7 @@ namespace python
     project_real_point_to_unit_point_on_face(void *mapping_ptr,
                                              void *cell_accessor_ptr,
                                              const unsigned int face_no,
-                                             void *             point_ptr)
+                                             void              *point_ptr)
     {
       const MappingQ<dim, spacedim> *mapping =
         static_cast<const MappingQ<dim, spacedim> *>(mapping_ptr);
@@ -218,7 +218,7 @@ namespace python
 
   PointWrapper
   MappingQWrapper::transform_unit_to_real_cell(CellAccessorWrapper &cell,
-                                               PointWrapper &       p)
+                                               PointWrapper        &p)
   {
     AssertThrow(
       dim == p.get_dim(),
@@ -243,7 +243,7 @@ namespace python
 
   PointWrapper
   MappingQWrapper::transform_real_to_unit_cell(CellAccessorWrapper &cell,
-                                               PointWrapper &       p)
+                                               PointWrapper        &p)
   {
     AssertThrow(
       spacedim == p.get_dim(),
@@ -270,7 +270,7 @@ namespace python
   MappingQWrapper::project_real_point_to_unit_point_on_face(
     CellAccessorWrapper &cell,
     const unsigned int   face_no,
-    PointWrapper &       p)
+    PointWrapper        &p)
   {
     AssertThrow(
       spacedim == p.get_dim(),

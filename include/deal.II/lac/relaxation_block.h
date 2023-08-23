@@ -91,7 +91,7 @@ public:
       const typename PreconditionBlockBase<InverseNumberType>::Inversion
         inversion = PreconditionBlockBase<InverseNumberType>::gauss_jordan,
       const double threshold         = 0.,
-      VectorType * temp_ghost_vector = nullptr);
+      VectorType  *temp_ghost_vector = nullptr);
 
     /**
      * The mapping from indices to blocks. Each row of this pattern enumerates
@@ -236,7 +236,7 @@ protected:
    * @p prev after this.
    */
   void
-  do_step(VectorType &      dst,
+  do_step(VectorType       &dst,
           const VectorType &prev,
           const VectorType &src,
           const bool        backward) const;

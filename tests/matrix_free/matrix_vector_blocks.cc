@@ -54,7 +54,7 @@ public:
   {}
 
   void
-  vmult(LinearAlgebra::distributed::BlockVector<Number> &      dst,
+  vmult(LinearAlgebra::distributed::BlockVector<Number>       &dst,
         const LinearAlgebra::distributed::BlockVector<Number> &src) const
   {
     data.cell_loop(&MatrixFreeBlock::local_apply, this, dst, src, true);
@@ -62,8 +62,8 @@ public:
 
 private:
   void
-  local_apply(const MatrixFree<dim, Number> &                        data,
-              LinearAlgebra::distributed::BlockVector<Number> &      dst,
+  local_apply(const MatrixFree<dim, Number>                         &data,
+              LinearAlgebra::distributed::BlockVector<Number>       &dst,
               const LinearAlgebra::distributed::BlockVector<Number> &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {

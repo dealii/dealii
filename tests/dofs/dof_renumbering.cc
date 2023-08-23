@@ -82,7 +82,7 @@ void
 check_renumbering(DoFHandler<dim> &mgdof, bool discontinuous)
 {
   const FiniteElement<dim> &element = mgdof.get_fe();
-  DoFHandler<dim> &         dof     = mgdof;
+  DoFHandler<dim>          &dof     = mgdof;
 
   // Prepare a reordering of
   // components for later use

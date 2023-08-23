@@ -373,8 +373,8 @@ BlockSparsityPattern::BlockSparsityPattern(const size_type n_rows,
 
 void
 BlockSparsityPattern::reinit(
-  const BlockIndices &                          rows,
-  const BlockIndices &                          cols,
+  const BlockIndices                           &rows,
+  const BlockIndices                           &cols,
   const std::vector<std::vector<unsigned int>> &row_lengths)
 {
   AssertDimension(row_lengths.size(), cols.size());

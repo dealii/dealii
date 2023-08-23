@@ -75,7 +75,7 @@ namespace
     {}
 
     const FiniteElement<dim> &fe_collection;
-    const Quadrature<dim> &   quadrature_collection;
+    const Quadrature<dim>    &quadrature_collection;
 
     FEValues<dim> x_fe_values;
 
@@ -108,7 +108,7 @@ zero_element(std::vector<double> &dst, const unsigned int i)
 template <int dim>
 void
 mass_assembler(const typename Triangulation<dim>::active_cell_iterator &cell,
-               Scratch<dim> &                                           data,
+               Scratch<dim>                                            &data,
                CopyData &copy_data)
 {
   data.x_fe_values.reinit(cell);

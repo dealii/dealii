@@ -297,8 +297,8 @@ template <typename Range_1,
 PackagedOperation<Range_2>
 condense_schur_rhs(const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
                    const LinearOperator<Range_2, Domain_1, Payload> &C,
-                   const Range_1 &                                   f,
-                   const Range_2 &                                   g)
+                   const Range_1                                    &f,
+                   const Range_2                                    &g)
 {
   // We return the result of the compound PackagedOperation
   // directly, so as to ensure that the underlying Payload
@@ -336,8 +336,8 @@ PackagedOperation<Domain_1>
 postprocess_schur_solution(
   const LinearOperator<Range_1, Domain_1, Payload> &A_inv,
   const LinearOperator<Range_1, Domain_2, Payload> &B,
-  const Domain_2 &                                  y,
-  const Range_1 &                                   f)
+  const Domain_2                                   &y,
+  const Range_1                                    &f)
 {
   // We return the result of the compound PackagedOperation
   // directly, so as to ensure that the underlying Payload

@@ -54,7 +54,7 @@ namespace NonMatching
       void
       tensor_point_with_1D_quadrature(const Point<dim - 1> &point,
                                       const double          weight,
-                                      const Quadrature<1> & quadrature1D,
+                                      const Quadrature<1>  &quadrature1D,
                                       const double          start,
                                       const double          end,
                                       const unsigned int    component_in_dim,
@@ -82,7 +82,7 @@ namespace NonMatching
       template <int dim>
       void
       add_tensor_product(const Quadrature<dim - 1> &lower,
-                         const Quadrature<1> &      quadrature1D,
+                         const Quadrature<1>       &quadrature1D,
                          const double               start,
                          const double               end,
                          const unsigned int         component_in_dim,
@@ -106,7 +106,7 @@ namespace NonMatching
       Definiteness
       pointwise_definiteness(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &               functions,
+                         &functions,
         const Point<dim> &point)
       {
         Assert(functions.size() > 0,
@@ -149,8 +149,8 @@ namespace NonMatching
        */
       template <int dim>
       void
-      take_min_max_at_vertices(const Function<dim> &      function,
-                               const BoundingBox<dim> &   box,
+      take_min_max_at_vertices(const Function<dim>       &function,
+                               const BoundingBox<dim>    &box,
                                std::pair<double, double> &value_bounds)
       {
         const ReferenceCell &cube = ReferenceCells::get_hypercube<dim>();
@@ -179,8 +179,8 @@ namespace NonMatching
       void
       estimate_function_bounds(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                               functions,
-        const BoundingBox<dim> &          box,
+                                         &functions,
+        const BoundingBox<dim>           &box,
         std::vector<FunctionBounds<dim>> &all_function_bounds)
       {
         all_function_bounds.clear();
@@ -363,8 +363,8 @@ namespace NonMatching
        */
       template <int dim>
       void
-      map_quadrature_to_box(const Quadrature<dim> &    unit_quadrature,
-                            const BoundingBox<dim> &   box,
+      map_quadrature_to_box(const Quadrature<dim>     &unit_quadrature,
+                            const BoundingBox<dim>    &box,
                             ExtendableQuadrature<dim> &quadrature)
       {
         for (unsigned int i = 0; i < unit_quadrature.size(); ++i)
@@ -392,8 +392,8 @@ namespace NonMatching
       void
       restrict_to_top_and_bottom(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                                                     functions,
-        const BoundingBox<dim> &                                box,
+                                                               &functions,
+        const BoundingBox<dim>                                 &box,
         const unsigned int                                      direction,
         std::vector<Functions::CoordinateRestriction<dim - 1>> &restrictions)
       {
@@ -428,8 +428,8 @@ namespace NonMatching
       void
       restrict_to_point(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                                                functions,
-        const Point<dim - 1> &                             point,
+                                                          &functions,
+        const Point<dim - 1>                              &point,
         const unsigned int                                 open_direction,
         std::vector<Functions::PointRestriction<dim - 1>> &restrictions)
       {
@@ -462,16 +462,16 @@ namespace NonMatching
       template <int dim>
       void
       distribute_points_between_roots(
-        const Quadrature<1> &      quadrature1D,
-        const BoundingBox<1> &     interval,
+        const Quadrature<1>       &quadrature1D,
+        const BoundingBox<1>      &interval,
         const std::vector<double> &roots,
-        const Point<dim - 1> &     point,
+        const Point<dim - 1>      &point,
         const double               weight,
         const unsigned int         height_function_direction,
         const std::vector<std::reference_wrapper<const Function<1>>>
-          &                             level_sets,
+                                       &level_sets,
         const AdditionalQGeneratorData &additional_data,
-        QPartitioning<dim> &            q_partitioning)
+        QPartitioning<dim>             &q_partitioning)
       {
         // Make this int to avoid a warning signed/unsigned comparison.
         const int n_roots = roots.size();
@@ -533,8 +533,8 @@ namespace NonMatching
       void
       RootFinder::find_roots(
         const std::vector<std::reference_wrapper<const Function<1>>> &functions,
-        const BoundingBox<1> &                                        interval,
-        std::vector<double> &                                         roots)
+        const BoundingBox<1>                                         &interval,
+        std::vector<double>                                          &roots)
       {
         for (const Function<1> &function : functions)
           {
@@ -554,10 +554,10 @@ namespace NonMatching
 
 
       void
-      RootFinder::find_roots(const Function<1> &   function,
+      RootFinder::find_roots(const Function<1>    &function,
                              const BoundingBox<1> &interval,
                              const unsigned int    recursion_depth,
-                             std::vector<double> & roots)
+                             std::vector<double>  &roots)
       {
         // Compute function values at end points.
         const double left_value  = function.value(interval.vertex(0));
@@ -704,10 +704,10 @@ namespace NonMatching
        */
       template <int dim>
       Point<dim>
-      face_projection_closest_zero_contour(const Point<dim - 1> &  point,
+      face_projection_closest_zero_contour(const Point<dim - 1>   &point,
                                            const unsigned int      direction,
                                            const BoundingBox<dim> &box,
-                                           const Function<dim> &   level_set)
+                                           const Function<dim>    &level_set)
       {
         const Point<dim> bottom_point =
           dealii::internal::create_higher_dim_point(point,
@@ -731,7 +731,7 @@ namespace NonMatching
 
       template <int dim, int spacedim>
       UpThroughDimensionCreator<dim, spacedim>::UpThroughDimensionCreator(
-        const hp::QCollection<1> &      q_collection1D,
+        const hp::QCollection<1>       &q_collection1D,
         const AdditionalQGeneratorData &additional_data)
         : q_collection1D(&q_collection1D)
         , additional_data(additional_data)
@@ -748,11 +748,11 @@ namespace NonMatching
       void
       UpThroughDimensionCreator<dim, spacedim>::generate(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                        level_sets,
-        const BoundingBox<dim> &   box,
+                                  &level_sets,
+        const BoundingBox<dim>    &box,
         const Quadrature<dim - 1> &low_dim_quadrature,
         const unsigned int         height_function_direction,
-        QPartitioning<dim> &       q_partitioning)
+        QPartitioning<dim>        &q_partitioning)
       {
         const Quadrature<1> &quadrature1D = (*q_collection1D)[q_index];
 
@@ -806,8 +806,8 @@ namespace NonMatching
         const Point<dim - 1> &point,
         const double          weight,
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                             level_sets,
-        const BoundingBox<dim> &        box,
+                                       &level_sets,
+        const BoundingBox<dim>         &box,
         const unsigned int              height_function_direction,
         ImmersedSurfaceQuadrature<dim> &surface_quadrature)
       {
@@ -867,7 +867,7 @@ namespace NonMatching
 
       template <int dim, int spacedim>
       QGeneratorBase<dim, spacedim>::QGeneratorBase(
-        const hp::QCollection<1> &      q_collection1D,
+        const hp::QCollection<1>       &q_collection1D,
         const AdditionalQGeneratorData &additional_data)
         : additional_data(additional_data)
         , q_collection1D(&q_collection1D)
@@ -879,7 +879,7 @@ namespace NonMatching
 
       template <int dim, int spacedim>
       QGenerator<dim, spacedim>::QGenerator(
-        const hp::QCollection<1> &      q_collection1D,
+        const hp::QCollection<1>       &q_collection1D,
         const AdditionalQGeneratorData &additional_data)
         : QGeneratorBase<dim, spacedim>(q_collection1D, additional_data)
         , low_dim_algorithm(q_collection1D, additional_data)
@@ -913,7 +913,7 @@ namespace NonMatching
       void
       QGenerator<dim, spacedim>::generate(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                     level_sets,
+                               &level_sets,
         const BoundingBox<dim> &box,
         const unsigned int      n_box_splits)
       {
@@ -1017,7 +1017,7 @@ namespace NonMatching
       template <int dim>
       unsigned int
       compute_split_direction(
-        const BoundingBox<dim> &                  box,
+        const BoundingBox<dim>                   &box,
         const std::optional<HeightDirectionData> &height_direction_data)
       {
         const std::optional<unsigned int> direction =
@@ -1079,8 +1079,8 @@ namespace NonMatching
       void
       QGenerator<dim, spacedim>::split_box_and_recurse(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                                       level_sets,
-        const BoundingBox<dim> &                  box,
+                                                 &level_sets,
+        const BoundingBox<dim>                   &box,
         const std::optional<HeightDirectionData> &direction_data,
         const unsigned int                        n_box_splits)
       {
@@ -1113,7 +1113,7 @@ namespace NonMatching
       QGenerator<dim, spacedim>::create_low_dim_quadratures(
         const unsigned int height_function_direction,
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                     level_sets,
+                               &level_sets,
         const BoundingBox<dim> &box,
         const unsigned int      n_box_splits)
       {
@@ -1142,7 +1142,7 @@ namespace NonMatching
       QGenerator<dim, spacedim>::create_high_dim_quadratures(
         const unsigned int height_function_direction,
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                     level_sets,
+                               &level_sets,
         const BoundingBox<dim> &box)
       {
         const QPartitioning<dim - 1> &low_dim_quadratures =
@@ -1178,7 +1178,7 @@ namespace NonMatching
       void
       QGenerator<dim, spacedim>::use_midpoint_method(
         const std::vector<std::reference_wrapper<const Function<dim>>>
-          &                     level_sets,
+                               &level_sets,
         const BoundingBox<dim> &box)
       {
         const Point<dim>   center = box.center();
@@ -1208,7 +1208,7 @@ namespace NonMatching
 
       template <int spacedim>
       QGenerator<1, spacedim>::QGenerator(
-        const hp::QCollection<1> &      q_collection1D,
+        const hp::QCollection<1>       &q_collection1D,
         const AdditionalQGeneratorData &additional_data)
         : QGeneratorBase<1, spacedim>(q_collection1D, additional_data)
         , root_finder(
@@ -1225,7 +1225,7 @@ namespace NonMatching
       void
       QGenerator<1, spacedim>::generate(
         const std::vector<std::reference_wrapper<const Function<1>>>
-          &                   level_sets,
+                             &level_sets,
         const BoundingBox<1> &box,
         const unsigned int    n_box_splits)
       {
@@ -1344,7 +1344,7 @@ namespace NonMatching
          * object.
          */
         RefSpaceFEFieldFunction(const DoFHandler<dim> &dof_handler,
-                                const VectorType &     dof_values);
+                                const VectorType      &dof_values);
 
         /**
          * @copydoc CellWiseFunction::set_active_cell()
@@ -1358,7 +1358,7 @@ namespace NonMatching
          */
         void
         set_subcell(const std::vector<unsigned int> &mask,
-                    const BoundingBox<dim> &         subcell_box) override;
+                    const BoundingBox<dim>          &subcell_box) override;
 
         /**
          * @copydoc CellWiseFunction::is_fe_q_iso_q1()
@@ -1380,7 +1380,7 @@ namespace NonMatching
          * checked.
          */
         double
-        value(const Point<dim> & point,
+        value(const Point<dim>  &point,
               const unsigned int component = 0) const override;
 
         /**
@@ -1391,7 +1391,7 @@ namespace NonMatching
          * checked.
          */
         Tensor<1, dim>
-        gradient(const Point<dim> & point,
+        gradient(const Point<dim>  &point,
                  const unsigned int component = 0) const override;
 
         /**
@@ -1402,7 +1402,7 @@ namespace NonMatching
          * checked.
          */
         SymmetricTensor<2, dim>
-        hessian(const Point<dim> & point,
+        hessian(const Point<dim>  &point,
                 const unsigned int component = 0) const override;
 
       private:
@@ -1480,7 +1480,7 @@ namespace NonMatching
       template <int dim, typename VectorType>
       RefSpaceFEFieldFunction<dim, VectorType>::RefSpaceFEFieldFunction(
         const DoFHandler<dim> &dof_handler,
-        const VectorType &     dof_values)
+        const VectorType      &dof_values)
         : dof_handler(&dof_handler)
         , global_dof_values(&dof_values)
         , n_subdivisions_per_line(numbers::invalid_unsigned_int)
@@ -1570,7 +1570,7 @@ namespace NonMatching
       void
       RefSpaceFEFieldFunction<dim, VectorType>::set_subcell(
         const std::vector<unsigned int> &mask,
-        const BoundingBox<dim> &         subcell_box)
+        const BoundingBox<dim>          &subcell_box)
       {
         for (unsigned int i = 0; i < local_dof_values_subcell.size(); ++i)
           local_dof_values_subcell[i] = local_dof_values[renumber[mask[i]]];
@@ -1612,7 +1612,7 @@ namespace NonMatching
       template <int dim, typename VectorType>
       double
       RefSpaceFEFieldFunction<dim, VectorType>::value(
-        const Point<dim> & point,
+        const Point<dim>  &point,
         const unsigned int component) const
       {
         AssertIndexRange(component, this->n_components);
@@ -1645,7 +1645,7 @@ namespace NonMatching
       template <int dim, typename VectorType>
       Tensor<1, dim>
       RefSpaceFEFieldFunction<dim, VectorType>::gradient(
-        const Point<dim> & point,
+        const Point<dim>  &point,
         const unsigned int component) const
       {
         AssertIndexRange(component, this->n_components);
@@ -1681,7 +1681,7 @@ namespace NonMatching
       template <int dim, typename VectorType>
       SymmetricTensor<2, dim>
       RefSpaceFEFieldFunction<dim, VectorType>::hessian(
-        const Point<dim> & point,
+        const Point<dim>  &point,
         const unsigned int component) const
       {
         AssertIndexRange(component, this->n_components);
@@ -1713,7 +1713,7 @@ namespace NonMatching
 
       template <int dim>
       BoundingBox<dim>
-      create_subcell_box(const BoundingBox<dim> &             unit_box,
+      create_subcell_box(const BoundingBox<dim>              &unit_box,
                          const std::array<unsigned int, dim> &subcell_indices,
                          const unsigned int                   n_subdivisions)
       {
@@ -1786,7 +1786,7 @@ namespace NonMatching
   template <int dim>
   QuadratureGenerator<dim>::QuadratureGenerator(
     const hp::QCollection<1> &q_collection,
-    const AdditionalData &    additional_data)
+    const AdditionalData     &additional_data)
     : q_generator(q_collection, additional_data)
   {
     Assert(q_collection.size() > 0,
@@ -1806,7 +1806,7 @@ namespace NonMatching
 
   template <int dim>
   void
-  QuadratureGenerator<dim>::generate(const Function<dim> &   level_set,
+  QuadratureGenerator<dim>::generate(const Function<dim>    &level_set,
                                      const BoundingBox<dim> &box)
   {
     clear_quadratures();
@@ -1817,7 +1817,7 @@ namespace NonMatching
 
   template <int dim>
   void
-  QuadratureGenerator<dim>::generate_append(const Function<dim> &   level_set,
+  QuadratureGenerator<dim>::generate_append(const Function<dim>    &level_set,
                                             const BoundingBox<dim> &box)
   {
     Assert(level_set.n_components == 1,
@@ -1883,7 +1883,7 @@ namespace NonMatching
   template <int dim>
   FaceQuadratureGenerator<dim>::FaceQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
-    const AdditionalData &    additional_data)
+    const AdditionalData     &additional_data)
     : quadrature_generator(quadratures1D, additional_data)
   {}
 
@@ -1901,7 +1901,7 @@ namespace NonMatching
 
   template <int dim>
   void
-  FaceQuadratureGenerator<dim>::generate(const Function<dim> &   level_set,
+  FaceQuadratureGenerator<dim>::generate(const Function<dim>    &level_set,
                                          const BoundingBox<dim> &box,
                                          const unsigned int      face_index)
   {
@@ -2002,7 +2002,7 @@ namespace NonMatching
 
   FaceQuadratureGenerator<1>::FaceQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
-    const AdditionalData &    additional_data)
+    const AdditionalData     &additional_data)
   {
     (void)quadratures1D;
     (void)additional_data;
@@ -2019,7 +2019,7 @@ namespace NonMatching
 
 
   void
-  FaceQuadratureGenerator<1>::generate(const Function<1> &   level_set,
+  FaceQuadratureGenerator<1>::generate(const Function<1>    &level_set,
                                        const BoundingBox<1> &box,
                                        const unsigned int    face_index)
   {
@@ -2030,7 +2030,7 @@ namespace NonMatching
 
 
   void
-  FaceQuadratureGenerator<1>::generate_append(const Function<1> &   level_set,
+  FaceQuadratureGenerator<1>::generate_append(const Function<1>    &level_set,
                                               const BoundingBox<1> &box,
                                               const unsigned int    face_index)
   {
@@ -2100,9 +2100,9 @@ namespace NonMatching
   template <typename VectorType>
   DiscreteQuadratureGenerator<dim>::DiscreteQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
-    const DoFHandler<dim> &   dof_handler,
-    const VectorType &        level_set,
-    const AdditionalData &    additional_data)
+    const DoFHandler<dim>    &dof_handler,
+    const VectorType         &level_set,
+    const AdditionalData     &additional_data)
     : QuadratureGenerator<dim>(quadratures1D, additional_data)
     , reference_space_level_set(
         std::make_unique<internal::DiscreteQuadratureGeneratorImplementation::
@@ -2193,9 +2193,9 @@ namespace NonMatching
   template <typename VectorType>
   DiscreteFaceQuadratureGenerator<dim>::DiscreteFaceQuadratureGenerator(
     const hp::QCollection<1> &quadratures1D,
-    const DoFHandler<dim> &   dof_handler,
-    const VectorType &        level_set,
-    const AdditionalData &    additional_data)
+    const DoFHandler<dim>    &dof_handler,
+    const VectorType         &level_set,
+    const AdditionalData     &additional_data)
     : FaceQuadratureGenerator<dim>(quadratures1D, additional_data)
     , reference_space_level_set(
         std::make_unique<internal::DiscreteQuadratureGeneratorImplementation::

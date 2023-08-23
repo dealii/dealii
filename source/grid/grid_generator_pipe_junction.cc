@@ -103,8 +103,8 @@ namespace
        */
       Manifold(const Tensor<1, spacedim> &normal_direction,
                const Tensor<1, spacedim> &direction,
-               const Point<spacedim> &    point_on_axis,
-               const AdditionalData &     data,
+               const Point<spacedim>     &point_on_axis,
+               const AdditionalData      &data,
                const double               tolerance = 1e-10);
 
       /**
@@ -171,8 +171,8 @@ namespace
     Manifold<dim, spacedim>::Manifold(
       const Tensor<1, spacedim> &normal_direction,
       const Tensor<1, spacedim> &direction,
-      const Point<spacedim> &    point_on_axis,
-      const AdditionalData &     data,
+      const Point<spacedim>     &point_on_axis,
+      const AdditionalData      &data,
       const double               tolerance)
       : ChartManifold<dim, spacedim, 3>(Tensor<1, 3>({0, 2. * numbers::PI, 0}))
       , normal_direction(normal_direction)
@@ -279,9 +279,9 @@ namespace GridGenerator
 
   template <>
   void
-  pipe_junction(Triangulation<3, 3> &                           tria,
+  pipe_junction(Triangulation<3, 3>                            &tria,
                 const std::vector<std::pair<Point<3>, double>> &openings,
-                const std::pair<Point<3>, double> &             bifurcation,
+                const std::pair<Point<3>, double>              &bifurcation,
                 const double                                    aspect_ratio)
   {
     constexpr unsigned int dim      = 3;

@@ -608,7 +608,7 @@ namespace Utilities
    */
   template <typename T>
   size_t
-  pack(const T &          object,
+  pack(const T           &object,
        std::vector<char> &dest_buffer,
        const bool         allow_compression = true);
 
@@ -1168,7 +1168,7 @@ namespace Utilities
     inline void
     append_vector_of_trivially_copyable_to_buffer(
       const std::vector<T> &object,
-      std::vector<char> &   dest_buffer)
+      std::vector<char>    &dest_buffer)
     {
       const typename std::vector<T>::size_type vector_size = object.size();
 
@@ -1198,7 +1198,7 @@ namespace Utilities
     inline void
     append_vector_of_trivially_copyable_to_buffer(
       const std::vector<std::vector<T>> &object,
-      std::vector<char> &                dest_buffer)
+      std::vector<char>                 &dest_buffer)
     {
       using size_type             = typename std::vector<T>::size_type;
       const size_type vector_size = object.size();
@@ -1259,7 +1259,7 @@ namespace Utilities
     create_vector_of_trivially_copyable_from_buffer(
       const std::vector<char>::const_iterator &cbegin,
       const std::vector<char>::const_iterator &cend,
-      std::vector<T> &                         object)
+      std::vector<T>                          &object)
     {
       // The size of the object vector can be found in cbegin of the buffer.
       // The data starts at cbegin + sizeof(vector_size).
@@ -1294,7 +1294,7 @@ namespace Utilities
     create_vector_of_trivially_copyable_from_buffer(
       const std::vector<char>::const_iterator &cbegin,
       const std::vector<char>::const_iterator &cend,
-      std::vector<std::vector<T>> &            object)
+      std::vector<std::vector<T>>             &object)
     {
       // First get the size of the vector, and resize the output object
       using size_type = typename std::vector<T>::size_type;
@@ -1340,7 +1340,7 @@ namespace Utilities
 
   template <typename T>
   size_t
-  pack(const T &          object,
+  pack(const T           &object,
        std::vector<char> &dest_buffer,
        const bool         allow_compression)
   {

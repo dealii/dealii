@@ -74,18 +74,18 @@ namespace FEConforimityTest
 
     void
     get_function_jump(const FEInterfaceValues<dim> &fe_interface_values,
-                      const Vector<double> &        dof_vector,
-                      std::vector<double> &         jumps);
+                      const Vector<double>         &dof_vector,
+                      std::vector<double>          &jumps);
 
     void
     get_normal_jump(const FEInterfaceValues<dim> &fe_interface_values,
-                    const Vector<double> &        dof_vector,
-                    std::vector<double> &         jumps);
+                    const Vector<double>         &dof_vector,
+                    std::vector<double>          &jumps);
 
     void
     get_tangential_jump(const FEInterfaceValues<dim> &fe_interface_values,
-                        const Vector<double> &        dof_vector,
-                        std::vector<double> &         jumps);
+                        const Vector<double>         &dof_vector,
+                        std::vector<double>          &jumps);
 
     SmartPointer<const FiniteElement<dim>> fe_ptr;
     Triangulation<dim>                     triangulation;
@@ -279,8 +279,8 @@ namespace FEConforimityTest
   void
   FEConformityTest<dim>::get_function_jump(
     const FEInterfaceValues<dim> &fe_interface_values,
-    const Vector<double> &        dof_vector,
-    std::vector<double> &         jumps)
+    const Vector<double>         &dof_vector,
+    std::vector<double>          &jumps)
   {
     const unsigned n_q = fe_interface_values.n_quadrature_points;
 
@@ -306,8 +306,8 @@ namespace FEConforimityTest
   void
   FEConformityTest<dim>::get_normal_jump(
     const FEInterfaceValues<dim> &fe_interface_values,
-    const Vector<double> &        dof_vector,
-    std::vector<double> &         jumps)
+    const Vector<double>         &dof_vector,
+    std::vector<double>          &jumps)
   {
     const unsigned n_q = fe_interface_values.n_quadrature_points;
 
@@ -344,8 +344,8 @@ namespace FEConforimityTest
   void
   FEConformityTest<2>::get_tangential_jump(
     const FEInterfaceValues<2> &fe_interface_values,
-    const Vector<double> &      dof_vector,
-    std::vector<double> &       jumps)
+    const Vector<double>       &dof_vector,
+    std::vector<double>        &jumps)
   {
     const unsigned n_q = fe_interface_values.n_quadrature_points;
 
@@ -380,8 +380,8 @@ namespace FEConforimityTest
   void
   FEConformityTest<3>::get_tangential_jump(
     const FEInterfaceValues<3> &fe_interface_values,
-    const Vector<double> &      dof_vector,
-    std::vector<double> &       jumps)
+    const Vector<double>       &dof_vector,
+    std::vector<double>        &jumps)
   {
     const unsigned n_q = fe_interface_values.n_quadrature_points;
 

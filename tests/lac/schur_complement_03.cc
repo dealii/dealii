@@ -102,7 +102,7 @@ namespace Step22
 
   template <int dim>
   double
-  BoundaryValues<dim>::value(const Point<dim> & p,
+  BoundaryValues<dim>::value(const Point<dim>  &p,
                              const unsigned int component) const
   {
     Assert(component < this->n_components,
@@ -115,7 +115,7 @@ namespace Step22
   template <int dim>
   void
   BoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                    Vector<double> &  values) const
+                                    Vector<double>   &values) const
   {
     for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = BoundaryValues<dim>::value(p, c);
@@ -145,7 +145,7 @@ namespace Step22
   template <int dim>
   void
   RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                   Vector<double> &  values) const
+                                   Vector<double>   &values) const
   {
     for (unsigned int c = 0; c < this->n_components; ++c)
       values(c) = RightHandSide<dim>::value(p, c);
@@ -321,8 +321,8 @@ namespace Step22
     SolverCG<>       solver_S(solver_control_S);
     const auto       S_inv = inverse_operator(S, solver_S, M_inv);
 
-    Vector<double> &      x   = solution.block(0);
-    Vector<double> &      y   = solution.block(1);
+    Vector<double>       &x   = solution.block(0);
+    Vector<double>       &y   = solution.block(1);
     const Vector<double> &f   = system_rhs.block(0);
     const Vector<double> &g   = system_rhs.block(1);
     auto                  rhs = condense_schur_rhs(A_inv, C, f, g);

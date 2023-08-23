@@ -58,7 +58,7 @@ FullMatrix<number>::FullMatrix(const size_type m, const size_type n)
 template <typename number>
 FullMatrix<number>::FullMatrix(const size_type m,
                                const size_type n,
-                               const number *  entries)
+                               const number   *entries)
   : Table<2, number>(m, n)
 {
   this->fill(entries);
@@ -122,7 +122,7 @@ FullMatrix<number>::all_zero() const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
 
-  const number *      p = this->values.data();
+  const number       *p = this->values.data();
   const number *const e = this->values.data() + this->n_elements();
   while (p != e)
     if (*p++ != number(0.0))
@@ -161,7 +161,7 @@ FullMatrix<number>::operator/=(const number factor)
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::vmult(Vector<number2> &      dst,
+FullMatrix<number>::vmult(Vector<number2>       &dst,
                           const Vector<number2> &src,
                           const bool             adding) const
 {
@@ -176,7 +176,7 @@ FullMatrix<number>::vmult(Vector<number2> &      dst,
   // get access to the data in order to
   // avoid copying it when using the ()
   // operator
-  const number2 * src_ptr = src.begin();
+  const number2  *src_ptr = src.begin();
   const size_type size_m = m(), size_n = n();
   for (size_type i = 0; i < size_m; ++i)
     {
@@ -192,7 +192,7 @@ FullMatrix<number>::vmult(Vector<number2> &      dst,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::Tvmult(Vector<number2> &      dst,
+FullMatrix<number>::Tvmult(Vector<number2>       &dst,
                            const Vector<number2> &src,
                            const bool             adding) const
 {
@@ -203,8 +203,8 @@ FullMatrix<number>::Tvmult(Vector<number2> &      dst,
 
   Assert(&src != &dst, ExcSourceEqualsDestination());
 
-  const number *  e       = this->values.data();
-  number2 *       dst_ptr = &dst(0);
+  const number   *e       = this->values.data();
+  number2        *dst_ptr = &dst(0);
   const size_type size_m = m(), size_n = n();
 
   // zero out data if we are not adding
@@ -226,7 +226,7 @@ FullMatrix<number>::Tvmult(Vector<number2> &      dst,
 template <typename number>
 template <typename number2, typename number3>
 number
-FullMatrix<number>::residual(Vector<number2> &      dst,
+FullMatrix<number>::residual(Vector<number2>       &dst,
                              const Vector<number2> &src,
                              const Vector<number3> &right) const
 {
@@ -256,7 +256,7 @@ FullMatrix<number>::residual(Vector<number2> &      dst,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::forward(Vector<number2> &      dst,
+FullMatrix<number>::forward(Vector<number2>       &dst,
                             const Vector<number2> &src) const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
@@ -282,7 +282,7 @@ FullMatrix<number>::forward(Vector<number2> &      dst,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::backward(Vector<number2> &      dst,
+FullMatrix<number>::backward(Vector<number2>       &dst,
                              const Vector<number2> &src) const
 {
   Assert(!this->empty(), ExcEmptyMatrix());
@@ -330,7 +330,7 @@ FullMatrix<number>::fill(const FullMatrix<number2> &src,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::fill_permutation(const FullMatrix<number2> &   src,
+FullMatrix<number>::fill_permutation(const FullMatrix<number2>    &src,
                                      const std::vector<size_type> &p_rows,
                                      const std::vector<size_type> &p_cols)
 {
@@ -505,7 +505,7 @@ FullMatrix<number>::equ(const number               a,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
+FullMatrix<number>::mmult(FullMatrix<number2>       &dst,
                           const FullMatrix<number2> &src,
                           const bool                 adding) const
 {
@@ -539,7 +539,7 @@ FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
         const types::blas_int m       = static_cast<types::blas_int>(src.n());
         const types::blas_int n       = static_cast<types::blas_int>(this->m());
         const types::blas_int k       = static_cast<types::blas_int>(this->n());
-        const char *          notrans = "n";
+        const char           *notrans = "n";
 
         const number alpha = 1.;
         const number beta  = (adding == true) ? 1. : 0.;
@@ -586,7 +586,7 @@ FullMatrix<number>::mmult(FullMatrix<number2> &      dst,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
+FullMatrix<number>::Tmmult(FullMatrix<number2>       &dst,
                            const FullMatrix<number2> &src,
                            const bool                 adding) const
 {
@@ -621,8 +621,8 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
         const types::blas_int m       = static_cast<types::blas_int>(src.n());
         const types::blas_int n       = static_cast<types::blas_int>(this->n());
         const types::blas_int k       = static_cast<types::blas_int>(this->m());
-        const char *          trans   = "t";
-        const char *          notrans = "n";
+        const char           *trans   = "t";
+        const char           *notrans = "n";
 
         const number alpha = 1.;
         const number beta  = (adding == true) ? 1. : 0.;
@@ -690,7 +690,7 @@ FullMatrix<number>::Tmmult(FullMatrix<number2> &      dst,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
+FullMatrix<number>::mTmult(FullMatrix<number2>       &dst,
                            const FullMatrix<number2> &src,
                            const bool                 adding) const
 {
@@ -724,8 +724,8 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
         const types::blas_int m       = static_cast<types::blas_int>(src.m());
         const types::blas_int n       = static_cast<types::blas_int>(this->m());
         const types::blas_int k       = static_cast<types::blas_int>(this->n());
-        const char *          notrans = "n";
-        const char *          trans   = "t";
+        const char           *notrans = "n";
+        const char           *trans   = "t";
 
         const number alpha = 1.;
         const number beta  = (adding == true) ? 1. : 0.;
@@ -790,7 +790,7 @@ FullMatrix<number>::mTmult(FullMatrix<number2> &      dst,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::TmTmult(FullMatrix<number2> &      dst,
+FullMatrix<number>::TmTmult(FullMatrix<number2>       &dst,
                             const FullMatrix<number2> &src,
                             const bool                 adding) const
 {
@@ -825,7 +825,7 @@ FullMatrix<number>::TmTmult(FullMatrix<number2> &      dst,
         const types::blas_int m     = static_cast<types::blas_int>(src.m());
         const types::blas_int n     = static_cast<types::blas_int>(this->n());
         const types::blas_int k     = static_cast<types::blas_int>(this->m());
-        const char *          trans = "t";
+        const char           *trans = "t";
 
         const number alpha = 1.;
         const number beta  = (adding == true) ? 1. : 0.;
@@ -938,13 +938,13 @@ FullMatrix<number>::matrix_norm_square(const Vector<number2> &v) const
 
   number2         sum     = 0.;
   const size_type n_rows  = m();
-  const number *  val_ptr = this->values.data();
+  const number   *val_ptr = this->values.data();
 
   for (size_type row = 0; row < n_rows; ++row)
     {
       number2             s              = 0.;
       const number *const val_end_of_row = val_ptr + n_rows;
-      const number2 *     v_ptr          = v.begin();
+      const number2      *v_ptr          = v.begin();
       while (val_ptr != val_end_of_row)
         s += number2(*val_ptr++) * number2(*v_ptr++);
 
@@ -969,13 +969,13 @@ FullMatrix<number>::matrix_scalar_product(const Vector<number2> &u,
   number2         sum     = 0.;
   const size_type n_rows  = m();
   const size_type n_cols  = n();
-  const number *  val_ptr = this->values.data();
+  const number   *val_ptr = this->values.data();
 
   for (size_type row = 0; row < n_rows; ++row)
     {
       number2             s              = number2(0.);
       const number *const val_end_of_row = val_ptr + n_cols;
-      const number2 *     v_ptr          = v.begin();
+      const number2      *v_ptr          = v.begin();
       while (val_ptr != val_end_of_row)
         s += number2(*val_ptr++) * number2(*v_ptr++);
 
@@ -1666,7 +1666,7 @@ FullMatrix<number>::right_invert(const FullMatrix<number2> &A)
 template <typename number>
 template <typename somenumber>
 void
-FullMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
+FullMatrix<number>::precondition_Jacobi(Vector<somenumber>       &dst,
                                         const Vector<somenumber> &src,
                                         const number              om) const
 {
@@ -1675,7 +1675,7 @@ FullMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
   Assert(src.size() == n(), ExcDimensionMismatch(src.size(), n()));
 
   const std::size_t n       = src.size();
-  somenumber *      dst_ptr = dst.begin();
+  somenumber       *dst_ptr = dst.begin();
   const somenumber *src_ptr = src.begin();
 
   for (size_type i = 0; i < n; ++i, ++dst_ptr, ++src_ptr)
@@ -1686,11 +1686,11 @@ FullMatrix<number>::precondition_Jacobi(Vector<somenumber> &      dst,
 
 template <typename number>
 void
-FullMatrix<number>::print_formatted(std::ostream &     out,
+FullMatrix<number>::print_formatted(std::ostream      &out,
                                     const unsigned int precision,
                                     const bool         scientific,
                                     const unsigned int width_,
-                                    const char *       zero_string,
+                                    const char        *zero_string,
                                     const double       denominator,
                                     const double       threshold) const
 {

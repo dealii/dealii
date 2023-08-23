@@ -260,7 +260,7 @@ public:
    */
   template <int dim>
   void
-  copy_to(Tensor<2, dim> &   T,
+  copy_to(Tensor<2, dim>    &T,
           const size_type    src_r_i = 0,
           const size_type    src_r_j = dim - 1,
           const size_type    src_c_i = 0,
@@ -282,7 +282,7 @@ public:
    */
   template <typename MatrixType, typename index_type>
   void
-  extract_submatrix_from(const MatrixType &             matrix,
+  extract_submatrix_from(const MatrixType              &matrix,
                          const std::vector<index_type> &row_index_set,
                          const std::vector<index_type> &column_index_set);
 
@@ -302,7 +302,7 @@ public:
   void
   scatter_matrix_to(const std::vector<index_type> &row_index_set,
                     const std::vector<index_type> &column_index_set,
-                    MatrixType &                   matrix) const;
+                    MatrixType                    &matrix) const;
 
   /**
    * Fill rectangular block.
@@ -343,7 +343,7 @@ public:
    */
   template <typename number2>
   void
-  fill_permutation(const FullMatrix<number2> &   src,
+  fill_permutation(const FullMatrix<number2>    &src,
                    const std::vector<size_type> &p_rows,
                    const std::vector<size_type> &p_cols);
 
@@ -489,7 +489,7 @@ public:
    */
   template <typename StreamType>
   void
-  print(StreamType &       s,
+  print(StreamType        &s,
         const unsigned int width     = 5,
         const unsigned int precision = 2) const;
 
@@ -516,11 +516,11 @@ public:
    * this are considered zero.
    */
   void
-  print_formatted(std::ostream &     out,
+  print_formatted(std::ostream      &out,
                   const unsigned int precision   = 3,
                   const bool         scientific  = true,
                   const unsigned int width       = 0,
-                  const char *       zero_string = " ",
+                  const char        *zero_string = " ",
                   const double       denominator = 1.,
                   const double       threshold   = 0.) const;
 
@@ -690,7 +690,7 @@ public:
   add(const size_type   row,
       const size_type   n_cols,
       const index_type *col_indices,
-      const number2 *   values,
+      const number2    *values,
       const bool        elide_zero_values      = true,
       const bool        col_indices_are_sorted = false);
 
@@ -876,7 +876,7 @@ public:
    */
   template <typename number2>
   void
-  mmult(FullMatrix<number2> &      C,
+  mmult(FullMatrix<number2>       &C,
         const FullMatrix<number2> &B,
         const bool                 adding = false) const;
 
@@ -900,7 +900,7 @@ public:
    */
   template <typename number2>
   void
-  Tmmult(FullMatrix<number2> &      C,
+  Tmmult(FullMatrix<number2>       &C,
          const FullMatrix<number2> &B,
          const bool                 adding = false) const;
 
@@ -924,7 +924,7 @@ public:
    */
   template <typename number2>
   void
-  mTmult(FullMatrix<number2> &      C,
+  mTmult(FullMatrix<number2>       &C,
          const FullMatrix<number2> &B,
          const bool                 adding = false) const;
 
@@ -949,7 +949,7 @@ public:
    */
   template <typename number2>
   void
-  TmTmult(FullMatrix<number2> &      C,
+  TmTmult(FullMatrix<number2>       &C,
           const FullMatrix<number2> &B,
           const bool                 adding = false) const;
 
@@ -985,7 +985,7 @@ public:
    */
   template <typename number2>
   void
-  vmult(Vector<number2> &      w,
+  vmult(Vector<number2>       &w,
         const Vector<number2> &v,
         const bool             adding = false) const;
 
@@ -1013,7 +1013,7 @@ public:
    */
   template <typename number2>
   void
-  Tvmult(Vector<number2> &      w,
+  Tvmult(Vector<number2>       &w,
          const Vector<number2> &v,
          const bool             adding = false) const;
 
@@ -1034,7 +1034,7 @@ public:
    */
   template <typename somenumber>
   void
-  precondition_Jacobi(Vector<somenumber> &      dst,
+  precondition_Jacobi(Vector<somenumber>       &dst,
                       const Vector<somenumber> &src,
                       const number              omega = 1.) const;
 
@@ -1046,7 +1046,7 @@ public:
    */
   template <typename number2, typename number3>
   number
-  residual(Vector<number2> &      dst,
+  residual(Vector<number2>       &dst,
            const Vector<number2> &x,
            const Vector<number3> &b) const;
 
@@ -1224,7 +1224,7 @@ FullMatrix<number>::copy_from(const Tensor<2, dim> &T,
 template <typename number>
 template <int dim>
 void
-FullMatrix<number>::copy_to(Tensor<2, dim> &   T,
+FullMatrix<number>::copy_to(Tensor<2, dim>    &T,
                             const size_type    src_r_i,
                             const size_type    src_r_j,
                             const size_type    src_c_i,
@@ -1277,7 +1277,7 @@ template <typename number>
 template <typename MatrixType, typename index_type>
 inline void
 FullMatrix<number>::extract_submatrix_from(
-  const MatrixType &             matrix,
+  const MatrixType              &matrix,
   const std::vector<index_type> &row_index_set,
   const std::vector<index_type> &column_index_set)
 {
@@ -1301,7 +1301,7 @@ inline void
 FullMatrix<number>::scatter_matrix_to(
   const std::vector<index_type> &row_index_set,
   const std::vector<index_type> &column_index_set,
-  MatrixType &                   matrix) const
+  MatrixType                    &matrix) const
 {
   AssertDimension(row_index_set.size(), this->n_rows());
   AssertDimension(column_index_set.size(), this->n_cols());
@@ -1331,7 +1331,7 @@ FullMatrix<number>::set(const size_type i,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::vmult_add(Vector<number2> &      w,
+FullMatrix<number>::vmult_add(Vector<number2>       &w,
                               const Vector<number2> &v) const
 {
   vmult(w, v, true);
@@ -1341,7 +1341,7 @@ FullMatrix<number>::vmult_add(Vector<number2> &      w,
 template <typename number>
 template <typename number2>
 void
-FullMatrix<number>::Tvmult_add(Vector<number2> &      w,
+FullMatrix<number>::Tvmult_add(Vector<number2>       &w,
                                const Vector<number2> &v) const
 {
   Tvmult(w, v, true);
@@ -1407,7 +1407,7 @@ inline void
 FullMatrix<number>::add(const size_type   row,
                         const size_type   n_cols,
                         const index_type *col_indices,
-                        const number2 *   values,
+                        const number2    *values,
                         const bool,
                         const bool)
 {
@@ -1423,7 +1423,7 @@ FullMatrix<number>::add(const size_type   row,
 template <typename number>
 template <typename StreamType>
 inline void
-FullMatrix<number>::print(StreamType &       s,
+FullMatrix<number>::print(StreamType        &s,
                           const unsigned int w,
                           const unsigned int p) const
 {

@@ -437,7 +437,7 @@ namespace parallel
        */
       virtual void
       create_triangulation(const std::vector<Point<spacedim>> &vertices,
-                           const std::vector<CellData<dim>> &  cells,
+                           const std::vector<CellData<dim>>   &cells,
                            const SubCellData &subcelldata) override;
 
       /**

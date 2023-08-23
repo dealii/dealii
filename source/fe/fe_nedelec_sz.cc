@@ -1471,8 +1471,8 @@ template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_edge_values(
   const typename Triangulation<dim, dim>::cell_iterator &cell,
-  const Quadrature<dim> &                                quadrature,
-  const InternalData &                                   fe_data) const
+  const Quadrature<dim>                                 &quadrature,
+  const InternalData                                    &fe_data) const
 {
   // This function handles the cell-dependent construction of the EDGE-based
   // shape functions.
@@ -2023,8 +2023,8 @@ template <int dim, int spacedim>
 void
 FE_NedelecSZ<dim, spacedim>::fill_face_values(
   const typename Triangulation<dim, dim>::cell_iterator &cell,
-  const Quadrature<dim> &                                quadrature,
-  const InternalData &                                   fe_data) const
+  const Quadrature<dim>                                 &quadrature,
+  const InternalData                                    &fe_data) const
 {
   // This function handles the cell-dependent construction of the FACE-based
   // shape functions.
@@ -2602,11 +2602,11 @@ void
 FE_NedelecSZ<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, dim>::cell_iterator &cell,
   const CellSimilarity::Similarity /*cell_similarity*/,
-  const Quadrature<dim> &                             quadrature,
-  const Mapping<dim, dim> &                           mapping,
+  const Quadrature<dim>                              &quadrature,
+  const Mapping<dim, dim>                            &mapping,
   const typename Mapping<dim, dim>::InternalDataBase &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, dim>
-    &                                                       mapping_data,
+                                                           &mapping_data,
   const typename FiniteElement<dim, dim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
     &data) const
@@ -2783,11 +2783,11 @@ void
 FE_NedelecSZ<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, dim>::cell_iterator &cell,
   const unsigned int                                     face_no,
-  const hp::QCollection<dim - 1> &                       quadrature,
-  const Mapping<dim, dim> &                              mapping,
-  const typename Mapping<dim, dim>::InternalDataBase &   mapping_internal,
+  const hp::QCollection<dim - 1>                        &quadrature,
+  const Mapping<dim, dim>                               &mapping,
+  const typename Mapping<dim, dim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, dim>
-    &                                                       mapping_data,
+                                                           &mapping_data,
   const typename FiniteElement<dim, dim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
     &data) const

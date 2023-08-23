@@ -43,7 +43,7 @@ SparseVanka<number>::SparseVanka()
 
 template <typename number>
 SparseVanka<number>::SparseVanka(const SparseMatrix<number> &M,
-                                 const std::vector<bool> &   selected_dofs)
+                                 const std::vector<bool>    &selected_dofs)
   : matrix(&M, typeid(*this).name())
   , selected(&selected_dofs)
   , inverses(M.m(), nullptr)
@@ -76,7 +76,7 @@ SparseVanka<number>::~SparseVanka()
 template <typename number>
 void
 SparseVanka<number>::initialize(const SparseMatrix<number> &M,
-                                const AdditionalData &      additional_data)
+                                const AdditionalData       &additional_data)
 {
   matrix   = &M;
   selected = &(additional_data.selected);
@@ -206,7 +206,7 @@ SparseVanka<number>::compute_inverse(const size_type         row,
 template <typename number>
 template <typename number2>
 void
-SparseVanka<number>::vmult(Vector<number2> &      dst,
+SparseVanka<number>::vmult(Vector<number2>       &dst,
                            const Vector<number2> &src) const
 {
   Assert(matrix != nullptr, ExcNotInitialized());
@@ -224,8 +224,8 @@ template <typename number>
 template <typename number2>
 void
 SparseVanka<number>::apply_preconditioner(
-  Vector<number2> &              dst,
-  const Vector<number2> &        src,
+  Vector<number2>               &dst,
+  const Vector<number2>         &src,
   const std::vector<bool> *const dof_mask) const
 {
   Assert(dst.size() == src.size(),
@@ -385,7 +385,7 @@ SparseVanka<number>::AdditionalData::AdditionalData(
 template <typename number>
 SparseBlockVanka<number>::SparseBlockVanka(
   const SparseMatrix<number> &M,
-  const std::vector<bool> &   selected,
+  const std::vector<bool>    &selected,
   const unsigned int          n_blocks,
   const BlockingStrategy      blocking_strategy)
   : SparseVanka<number>(M, selected)
@@ -400,7 +400,7 @@ template <typename number>
 void
 SparseBlockVanka<number>::compute_dof_masks(
   const SparseMatrix<number> &M,
-  const std::vector<bool> &   selected,
+  const std::vector<bool>    &selected,
   const BlockingStrategy      blocking_strategy)
 {
   Assert(n_blocks > 0, ExcInternalError());
@@ -561,7 +561,7 @@ SparseBlockVanka<number>::compute_dof_masks(
 template <typename number>
 template <typename number2>
 void
-SparseBlockVanka<number>::vmult(Vector<number2> &      dst,
+SparseBlockVanka<number>::vmult(Vector<number2>       &dst,
                                 const Vector<number2> &src) const
 {
   dst = 0;

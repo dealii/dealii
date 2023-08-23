@@ -91,9 +91,9 @@ namespace internal
       const FiniteElement<dim, dim> &fe_in,
       const FiniteElement<dim, dim> &fe,
       const unsigned int             base_element_number,
-      ElementType &                  element_type,
-      std::vector<unsigned int> &    scalar_lexicographic,
-      std::vector<unsigned int> &    lexicographic_numbering)
+      ElementType                   &element_type,
+      std::vector<unsigned int>     &scalar_lexicographic,
+      std::vector<unsigned int>     &lexicographic_numbering)
     {
       element_type = tensor_general;
 
@@ -215,7 +215,7 @@ namespace internal
     template <typename Number>
     template <int dim, int spacedim, int dim_q>
     inline ShapeInfo<Number>::ShapeInfo(
-      const Quadrature<dim_q> &           quad,
+      const Quadrature<dim_q>            &quad,
       const FiniteElement<dim, spacedim> &fe_in,
       const unsigned int                  base_element_number)
       : element_type(tensor_general)
@@ -234,7 +234,7 @@ namespace internal
     template <typename Number>
     template <int dim, int spacedim, int dim_q>
     void
-    ShapeInfo<Number>::reinit(const Quadrature<dim_q> &           quad_in,
+    ShapeInfo<Number>::reinit(const Quadrature<dim_q>            &quad_in,
                               const FiniteElement<dim, spacedim> &fe_in,
                               const unsigned int base_element_number)
     {
@@ -728,7 +728,7 @@ namespace internal
     template <int dim, int spacedim>
     Point<dim>
     get_unit_point(const FiniteElement<dim, spacedim> &fe,
-                   const std::vector<unsigned int> &   lexicographic)
+                   const std::vector<unsigned int>    &lexicographic)
     {
       Point<dim> unit_point;
       // to evaluate 1d polynomials, evaluate along the line with the first
@@ -754,8 +754,8 @@ namespace internal
     void
     UnivariateShapeData<Number>::evaluate_shape_functions(
       const FiniteElement<dim, spacedim> &fe,
-      const Quadrature<1> &               quad,
-      const std::vector<unsigned int> &   lexicographic,
+      const Quadrature<1>                &quad,
+      const std::vector<unsigned int>    &lexicographic,
       const unsigned int                  direction)
     {
       const unsigned int n_dofs_1d =
@@ -845,8 +845,8 @@ namespace internal
     void
     UnivariateShapeData<Number>::evaluate_collocation_space(
       const FiniteElement<dim, spacedim> &fe,
-      const Quadrature<1> &               quad,
-      const std::vector<unsigned int> &   lexicographic)
+      const Quadrature<1>                &quad,
+      const std::vector<unsigned int>    &lexicographic)
     {
       const unsigned int n_dofs_1d =
         std::min(fe.n_dofs_per_cell(), fe_degree + 1);

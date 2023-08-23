@@ -88,14 +88,14 @@ namespace Step68
 
     virtual void
     vector_value(const Point<dim> &point,
-                 Vector<double> &  values) const override;
+                 Vector<double>   &values) const override;
   };
 
 
   template <int dim>
   void
   Vortex<dim>::vector_value(const Point<dim> &point,
-                            Vector<double> &  values) const
+                            Vector<double>   &values) const
   {
     const double T = 4;
     const double t = this->get_time();

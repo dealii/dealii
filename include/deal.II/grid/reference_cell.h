@@ -168,7 +168,7 @@ public:
    */
   template <int dim>
   Tensor<1, dim>
-  d_linear_shape_function_gradient(const Point<dim> & xi,
+  d_linear_shape_function_gradient(const Point<dim>  &xi,
                                    const unsigned int i) const;
 
   /**
@@ -2170,7 +2170,7 @@ ReferenceCell::n_vertices_to_type(const int dim, const unsigned int n_vertices)
 
 template <int dim>
 inline double
-ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
+ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
                                        const unsigned int i) const
 {
   AssertDimension(dim, get_dimension());
@@ -2259,7 +2259,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim> & xi,
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::d_linear_shape_function_gradient(const Point<dim> & xi,
+ReferenceCell::d_linear_shape_function_gradient(const Point<dim>  &xi,
                                                 const unsigned int i) const
 {
   AssertDimension(dim, get_dimension());
@@ -2627,7 +2627,7 @@ namespace internal
     /**
      * Constructor.
      */
-    NoPermutation(const ReferenceCell &     entity_type,
+    NoPermutation(const ReferenceCell      &entity_type,
                   const ArrayView<const T> &vertices_0,
                   const ArrayView<const T> &vertices_1)
       : entity_type(entity_type)

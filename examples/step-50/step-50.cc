@@ -101,7 +101,7 @@ using namespace dealii;
 namespace ChangeVectorTypes
 {
   template <typename number>
-  void copy(LA::MPI::Vector &                                 out,
+  void copy(LA::MPI::Vector                                  &out,
             const LinearAlgebra::distributed::Vector<number> &in)
   {
     LinearAlgebra::ReadWriteVector<double> rwv(out.locally_owned_elements());
@@ -119,7 +119,7 @@ namespace ChangeVectorTypes
 
   template <typename number>
   void copy(LinearAlgebra::distributed::Vector<number> &out,
-            const LA::MPI::Vector &                     in)
+            const LA::MPI::Vector                      &in)
   {
     LinearAlgebra::ReadWriteVector<double> rwv;
 #ifdef USE_PETSC_LA
@@ -1210,7 +1210,7 @@ void LaplaceProblem<dim, degree>::solve()
 template <int dim>
 struct ScratchData
 {
-  ScratchData(const Mapping<dim> &      mapping,
+  ScratchData(const Mapping<dim>       &mapping,
               const FiniteElement<dim> &fe,
               const unsigned int        quadrature_degree,
               const UpdateFlags         update_flags,
@@ -1277,9 +1277,9 @@ void LaplaceProblem<dim, degree>::estimate()
   using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
   // Assembler for cell residual $h^2 \| f + \epsilon \triangle u \|_K^2$
-  auto cell_worker = [&](const Iterator &  cell,
+  auto cell_worker = [&](const Iterator   &cell,
                          ScratchData<dim> &scratch_data,
-                         CopyData &        copy_data) {
+                         CopyData         &copy_data) {
     FEValues<dim> &fe_values = scratch_data.fe_values;
     fe_values.reinit(cell);
 
@@ -1306,14 +1306,14 @@ void LaplaceProblem<dim, degree>::estimate()
 
   // Assembler for face term $\sum_F h_F \| \jump{\epsilon \nabla u \cdot n}
   // \|_F^2$
-  auto face_worker = [&](const Iterator &    cell,
+  auto face_worker = [&](const Iterator     &cell,
                          const unsigned int &f,
                          const unsigned int &sf,
-                         const Iterator &    ncell,
+                         const Iterator     &ncell,
                          const unsigned int &nf,
                          const unsigned int &nsf,
-                         ScratchData<dim> &  scratch_data,
-                         CopyData &          copy_data) {
+                         ScratchData<dim>   &scratch_data,
+                         CopyData           &copy_data) {
     FEInterfaceValues<dim> &fe_interface_values =
       scratch_data.fe_interface_values;
     fe_interface_values.reinit(cell, f, sf, ncell, nf, nsf);

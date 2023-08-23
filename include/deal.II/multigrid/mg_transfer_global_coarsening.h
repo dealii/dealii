@@ -137,7 +137,7 @@ namespace MGTransferGlobalCoarseningTools
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
-    Triangulation<dim, spacedim> &                        tria,
+    Triangulation<dim, spacedim>                         &tria,
     const RepartitioningPolicyTools::Base<dim, spacedim> &policy,
     const bool preserve_fine_triangulation,
     const bool repartition_fine_triangulation);
@@ -150,7 +150,7 @@ namespace MGTransferGlobalCoarseningTools
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
-    const Triangulation<dim, spacedim> &                  tria,
+    const Triangulation<dim, spacedim>                   &tria,
     const RepartitioningPolicyTools::Base<dim, spacedim> &policy,
     const bool repartition_fine_triangulation = false);
 
@@ -260,7 +260,7 @@ protected:
    */
   virtual void
   prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const = 0;
 
   /**
@@ -268,7 +268,7 @@ protected:
    */
   virtual void
   restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const = 0;
 
   /**
@@ -311,7 +311,7 @@ protected:
     internal::MatrixFreeFunctions::ConstraintInfo<
       dim,
       VectorizedArray<Number, width>> &constraint_info_coarse,
-    std::vector<unsigned int> &        dof_indices_fine);
+    std::vector<unsigned int>         &dof_indices_fine);
 
   /**
    * Flag if the finite elements on the fine cells are continuous. If yes,
@@ -442,8 +442,8 @@ public:
    */
   void
   reinit_geometric_transfer(
-    const DoFHandler<dim> &          dof_handler_fine,
-    const DoFHandler<dim> &          dof_handler_coarse,
+    const DoFHandler<dim>           &dof_handler_fine,
+    const DoFHandler<dim>           &dof_handler_coarse,
     const AffineConstraints<Number> &constraint_fine =
       AffineConstraints<Number>(),
     const AffineConstraints<Number> &constraint_coarse =
@@ -462,8 +462,8 @@ public:
    */
   void
   reinit_polynomial_transfer(
-    const DoFHandler<dim> &          dof_handler_fine,
-    const DoFHandler<dim> &          dof_handler_coarse,
+    const DoFHandler<dim>           &dof_handler_fine,
+    const DoFHandler<dim>           &dof_handler_coarse,
     const AffineConstraints<Number> &constraint_fine =
       AffineConstraints<Number>(),
     const AffineConstraints<Number> &constraint_coarse =
@@ -485,8 +485,8 @@ public:
    *   check if the given polynomial coarsening strategy is supported.
    */
   void
-  reinit(const DoFHandler<dim> &          dof_handler_fine,
-         const DoFHandler<dim> &          dof_handler_coarse,
+  reinit(const DoFHandler<dim>           &dof_handler_fine,
+         const DoFHandler<dim>           &dof_handler_coarse,
          const AffineConstraints<Number> &constraint_fine =
            AffineConstraints<Number>(),
          const AffineConstraints<Number> &constraint_coarse =
@@ -512,7 +512,7 @@ public:
    */
   void
   interpolate(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
@@ -535,12 +535,12 @@ public:
 protected:
   void
   prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   void
   restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
 private:
@@ -711,10 +711,10 @@ public:
    * @p dof_handler_fine and @p dof_handler_coarse).
    */
   void
-  reinit(const DoFHandler<dim> &          dof_handler_fine,
-         const DoFHandler<dim> &          dof_handler_coarse,
-         const Mapping<dim> &             mapping_fine,
-         const Mapping<dim> &             mapping_coarse,
+  reinit(const DoFHandler<dim>           &dof_handler_fine,
+         const DoFHandler<dim>           &dof_handler_coarse,
+         const Mapping<dim>              &mapping_fine,
+         const Mapping<dim>              &mapping_coarse,
          const AffineConstraints<Number> &constraint_fine =
            AffineConstraints<Number>(),
          const AffineConstraints<Number> &constraint_coarse =
@@ -728,7 +728,7 @@ public:
    */
   void
   interpolate(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
@@ -754,7 +754,7 @@ protected:
    */
   void
   prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
@@ -762,7 +762,7 @@ protected:
    */
   void
   restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
 private:
@@ -772,7 +772,7 @@ private:
   template <int n_components>
   void
   prolongate_and_add_internal_comp(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
@@ -781,7 +781,7 @@ private:
   template <int n_components>
   void
   restrict_and_add_internal_comp(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
@@ -971,24 +971,24 @@ public:
    */
   void
   prolongate(const unsigned int to_level,
-             VectorType &       dst,
-             const VectorType & src) const override;
+             VectorType        &dst,
+             const VectorType  &src) const override;
 
   /**
    * Perform prolongation.
    */
   void
   prolongate_and_add(const unsigned int to_level,
-                     VectorType &       dst,
-                     const VectorType & src) const override;
+                     VectorType        &dst,
+                     const VectorType  &src) const override;
 
   /**
    * Perform restriction.
    */
   virtual void
   restrict_and_add(const unsigned int from_level,
-                   VectorType &       dst,
-                   const VectorType & src) const override;
+                   VectorType        &dst,
+                   const VectorType  &src) const override;
 
   /**
    * Initialize internal vectors and copy @p src vector to the finest
@@ -998,9 +998,9 @@ public:
    */
   template <class InVector>
   void
-  copy_to_mg(const DoFHandler<dim> &    dof_handler,
+  copy_to_mg(const DoFHandler<dim>     &dof_handler,
              MGLevelObject<VectorType> &dst,
-             const InVector &           src) const;
+             const InVector            &src) const;
 
   /**
    * Initialize internal vectors and copy the values on the finest
@@ -1010,8 +1010,8 @@ public:
    */
   template <class OutVector>
   void
-  copy_from_mg(const DoFHandler<dim> &          dof_handler,
-               OutVector &                      dst,
+  copy_from_mg(const DoFHandler<dim>           &dof_handler,
+               OutVector                       &dst,
                const MGLevelObject<VectorType> &src) const;
 
   /**
@@ -1038,9 +1038,9 @@ public:
    */
   template <class InVector>
   void
-  interpolate_to_mg(const DoFHandler<dim> &    dof_handler,
+  interpolate_to_mg(const DoFHandler<dim>     &dof_handler,
                     MGLevelObject<VectorType> &dst,
-                    const InVector &           src) const;
+                    const InVector            &src) const;
 
   /** @} */
 
@@ -1087,7 +1087,7 @@ private:
    */
   void
   intitialize_internal_transfer(
-    const DoFHandler<dim> &                      dof_handler,
+    const DoFHandler<dim>                       &dof_handler,
     const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs);
 
   /**
@@ -1104,8 +1104,8 @@ private:
   template <class InVector>
   void
   initialize_dof_vector(const unsigned int level,
-                        VectorType &       vector,
-                        const InVector &   vector_reference,
+                        VectorType        &vector,
+                        const InVector    &vector_reference,
                         const bool         omit_zeroing_entries) const;
 
   /**
@@ -1280,8 +1280,8 @@ template <class InVector>
 void
 MGTransferMF<dim, Number>::initialize_dof_vector(
   const unsigned int level,
-  VectorType &       vec,
-  const InVector &   vec_reference,
+  VectorType        &vec,
+  const InVector    &vec_reference,
   const bool         omit_zeroing_entries) const
 {
   std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
@@ -1326,9 +1326,9 @@ MGTransferMF<dim, Number>::initialize_dof_vector(
 template <int dim, typename Number>
 template <class InVector>
 void
-MGTransferMF<dim, Number>::copy_to_mg(const DoFHandler<dim> &    dof_handler,
+MGTransferMF<dim, Number>::copy_to_mg(const DoFHandler<dim>     &dof_handler,
                                       MGLevelObject<VectorType> &dst,
-                                      const InVector &           src) const
+                                      const InVector            &src) const
 {
   (void)dof_handler;
 
@@ -1385,8 +1385,8 @@ template <int dim, typename Number>
 template <class OutVector>
 void
 MGTransferMF<dim, Number>::copy_from_mg(
-  const DoFHandler<dim> &          dof_handler,
-  OutVector &                      dst,
+  const DoFHandler<dim>           &dof_handler,
+  OutVector                       &dst,
   const MGLevelObject<VectorType> &src) const
 {
   (void)dof_handler;

@@ -172,11 +172,11 @@ namespace Step7
   class Solution : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
 
     virtual Tensor<1, dim>
-    gradient(const Point<dim> & p,
+    gradient(const Point<dim>  &p,
              const unsigned int component = 0) const override;
   };
 
@@ -268,7 +268,7 @@ namespace Step7
   class RightHandSide : public Function<dim>, protected SolutionBase<dim>
   {
   public:
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
   };
 

@@ -126,7 +126,7 @@ namespace LinearAlgebra
 
         static void
         resize_val(const types::global_dof_index new_alloc_size,
-                   types::global_dof_index &     allocated_size,
+                   types::global_dof_index      &allocated_size,
                    ::dealii::MemorySpace::
                      MemorySpaceData<Number, ::dealii::MemorySpace::Host> &data,
                    const MPI_Comm comm_shared)
@@ -252,7 +252,7 @@ namespace LinearAlgebra
           const ::dealii::LinearAlgebra::ReadWriteVector<Number> &V,
           VectorOperation::values                                 operation,
           const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-            &             communication_pattern,
+                         &communication_pattern,
           const IndexSet &locally_owned_elem,
           ::dealii::MemorySpace::MemorySpaceData<Number,
                                                  ::dealii::MemorySpace::Host>
@@ -306,7 +306,7 @@ namespace LinearAlgebra
                             Number,
                             ::dealii::MemorySpace::Host> &data,
                           const unsigned int              size,
-                          RealType &                      max)
+                          RealType                       &max)
         {
           for (size_type i = 0; i < size; ++i)
             max =
@@ -324,10 +324,10 @@ namespace LinearAlgebra
         static void
         resize_val(
           const types::global_dof_index new_alloc_size,
-          types::global_dof_index &     allocated_size,
+          types::global_dof_index      &allocated_size,
           ::dealii::MemorySpace::MemorySpaceData<Number,
                                                  ::dealii::MemorySpace::Default>
-            &            data,
+                        &data,
           const MPI_Comm comm_sm)
         {
           (void)comm_sm;
@@ -358,7 +358,7 @@ namespace LinearAlgebra
           const ReadWriteVector<Number> &V,
           VectorOperation::values        operation,
           std::shared_ptr<const Utilities::MPI::Partitioner>
-            &             communication_pattern,
+                         &communication_pattern,
           const IndexSet &locally_owned_elem,
           ::dealii::MemorySpace::MemorySpaceData<Number,
                                                  ::dealii::MemorySpace::Default>
@@ -378,7 +378,7 @@ namespace LinearAlgebra
           // including ghost entries. this is not really efficient right now
           // because indices are translated twice, once by nth_index_in_set(i)
           // and once for operator() of tmp_vector
-          const IndexSet &                  v_stored = V.get_stored_elements();
+          const IndexSet                   &v_stored = V.get_stored_elements();
           const size_type                   n_elements = v_stored.n_elements();
           Kokkos::DefaultHostExecutionSpace host_exec;
           Kokkos::View<size_type *, Kokkos::HostSpace> indices(
@@ -466,7 +466,7 @@ namespace LinearAlgebra
                             Number,
                             ::dealii::MemorySpace::Default> &data,
                           const unsigned int                 size,
-                          RealType &                         result)
+                          RealType                          &result)
         {
           static_assert(std::is_same_v<Number, RealType>,
                         "RealType should be the same type as Number");
@@ -1551,7 +1551,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpaceType>
     void
     Vector<Number, MemorySpaceType>::add(const std::vector<size_type> &indices,
-                                         const std::vector<Number> &   values)
+                                         const std::vector<Number>    &values)
     {
       for (std::size_t i = 0; i < indices.size(); ++i)
         {
@@ -1698,7 +1698,7 @@ namespace LinearAlgebra
     void
     Vector<Number, MemorySpaceType>::extract_subvector_to(
       const ArrayView<const types::global_dof_index> &indices,
-      ArrayView<Number> &                             elements) const
+      ArrayView<Number>                              &elements) const
     {
       AssertDimension(indices.size(), elements.size());
       for (unsigned int i = 0; i < indices.size(); ++i)
@@ -2014,7 +2014,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpaceType>
     void
-    Vector<Number, MemorySpaceType>::print(std::ostream &     out,
+    Vector<Number, MemorySpaceType>::print(std::ostream      &out,
                                            const unsigned int precision,
                                            const bool         scientific,
                                            const bool         across) const

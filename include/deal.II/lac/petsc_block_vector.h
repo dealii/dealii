@@ -255,7 +255,7 @@ namespace PETScWrappers
       void
       reinit(
         const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-          &        partitioners,
+                  &partitioners,
         const bool make_ghosted = true);
 
       /**
@@ -341,7 +341,7 @@ namespace PETScWrappers
        * Print to a stream.
        */
       void
-      print(std::ostream &     out,
+      print(std::ostream      &out,
             const unsigned int precision  = 3,
             const bool         scientific = true,
             const bool         across     = true) const;
@@ -585,7 +585,7 @@ namespace PETScWrappers
     inline void
     BlockVector::reinit(
       const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-        &        partitioners,
+                &partitioners,
       const bool make_ghosted)
     {
       // update the number of blocks
@@ -635,7 +635,7 @@ namespace PETScWrappers
 
 
     inline void
-    BlockVector::print(std::ostream &     out,
+    BlockVector::print(std::ostream      &out,
                        const unsigned int precision,
                        const bool         scientific,
                        const bool         across) const
@@ -685,7 +685,7 @@ namespace internal
     public:
       template <typename Matrix>
       static void
-      reinit_range_vector(const Matrix &                   matrix,
+      reinit_range_vector(const Matrix                    &matrix,
                           PETScWrappers::MPI::BlockVector &v,
                           bool /*omit_zeroing_entries*/)
       {
@@ -695,7 +695,7 @@ namespace internal
 
       template <typename Matrix>
       static void
-      reinit_domain_vector(const Matrix &                   matrix,
+      reinit_domain_vector(const Matrix                    &matrix,
                            PETScWrappers::MPI::BlockVector &v,
                            bool /*omit_zeroing_entries*/)
       {

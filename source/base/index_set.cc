@@ -56,7 +56,7 @@ IndexSet::IndexSet(const Epetra_BlockMap &map)
   else
     {
       const size_type n_indices = map.NumMyElements();
-      size_type *     indices =
+      size_type      *indices =
         reinterpret_cast<size_type *>(map.MyGlobalElements64());
       add_indices(indices, indices + n_indices);
     }
@@ -83,7 +83,7 @@ IndexSet::IndexSet(const Epetra_BlockMap &map)
   else
     {
       const size_type n_indices = map.NumMyElements();
-      unsigned int *  indices =
+      unsigned int   *indices =
         reinterpret_cast<unsigned int *>(map.MyGlobalElements());
       add_indices(indices, indices + n_indices);
     }
@@ -404,7 +404,7 @@ IndexSet::add_range_lower_bound(const Range &new_range)
 void
 IndexSet::add_ranges_internal(
   boost::container::small_vector<std::pair<size_type, size_type>, 200>
-    &        tmp_ranges,
+            &tmp_ranges,
   const bool ranges_are_sorted)
 {
   if (!ranges_are_sorted)

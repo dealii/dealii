@@ -131,7 +131,7 @@ void make_grid(Triangulation<2> &triangulation)
 // gnuplot program that we will use for visualization in the results
 // section.
 void write_dof_locations(const DoFHandler<2> &dof_handler,
-                         const std::string &  filename)
+                         const std::string   &filename)
 {
   std::map<types::global_dof_index, Point<2>> dof_location_map =
     DoFTools::map_dofs_to_support_points(MappingQ1<2>(), dof_handler);

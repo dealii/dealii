@@ -474,7 +474,7 @@ public:
   template <typename number>
   void
   set(const std::vector<size_type> &indices,
-      const FullMatrix<number> &    full_matrix,
+      const FullMatrix<number>     &full_matrix,
       const bool                    elide_zero_values = false);
 
   /**
@@ -486,7 +486,7 @@ public:
   void
   set(const std::vector<size_type> &row_indices,
       const std::vector<size_type> &col_indices,
-      const FullMatrix<number> &    full_matrix,
+      const FullMatrix<number>     &full_matrix,
       const bool                    elide_zero_values = false);
 
   /**
@@ -503,7 +503,7 @@ public:
   void
   set(const size_type               row,
       const std::vector<size_type> &col_indices,
-      const std::vector<number> &   values,
+      const std::vector<number>    &values,
       const bool                    elide_zero_values = false);
 
   /**
@@ -520,7 +520,7 @@ public:
   set(const size_type  row,
       const size_type  n_cols,
       const size_type *col_indices,
-      const number *   values,
+      const number    *values,
       const bool       elide_zero_values = false);
 
   /**
@@ -548,7 +548,7 @@ public:
   template <typename number>
   void
   add(const std::vector<size_type> &indices,
-      const FullMatrix<number> &    full_matrix,
+      const FullMatrix<number>     &full_matrix,
       const bool                    elide_zero_values = true);
 
   /**
@@ -560,7 +560,7 @@ public:
   void
   add(const std::vector<size_type> &row_indices,
       const std::vector<size_type> &col_indices,
-      const FullMatrix<number> &    full_matrix,
+      const FullMatrix<number>     &full_matrix,
       const bool                    elide_zero_values = true);
 
   /**
@@ -576,7 +576,7 @@ public:
   void
   add(const size_type               row,
       const std::vector<size_type> &col_indices,
-      const std::vector<number> &   values,
+      const std::vector<number>    &values,
       const bool                    elide_zero_values = true);
 
   /**
@@ -593,7 +593,7 @@ public:
   add(const size_type  row,
       const size_type  n_cols,
       const size_type *col_indices,
-      const number *   values,
+      const number    *values,
       const bool       elide_zero_values      = true,
       const bool       col_indices_are_sorted = false);
 
@@ -720,7 +720,7 @@ public:
    */
   template <typename BlockVectorType>
   value_type
-  residual(BlockVectorType &      dst,
+  residual(BlockVectorType       &dst,
            const BlockVectorType &x,
            const BlockVectorType &b) const;
 
@@ -1652,7 +1652,7 @@ template <typename number>
 inline void
 BlockMatrixBase<MatrixType>::set(const std::vector<size_type> &row_indices,
                                  const std::vector<size_type> &col_indices,
-                                 const FullMatrix<number> &    values,
+                                 const FullMatrix<number>     &values,
                                  const bool elide_zero_values)
 {
   Assert(row_indices.size() == values.m(),
@@ -1674,7 +1674,7 @@ template <typename MatrixType>
 template <typename number>
 inline void
 BlockMatrixBase<MatrixType>::set(const std::vector<size_type> &indices,
-                                 const FullMatrix<number> &    values,
+                                 const FullMatrix<number>     &values,
                                  const bool elide_zero_values)
 {
   Assert(indices.size() == values.m(),
@@ -1696,7 +1696,7 @@ template <typename number>
 inline void
 BlockMatrixBase<MatrixType>::set(const size_type               row,
                                  const std::vector<size_type> &col_indices,
-                                 const std::vector<number> &   values,
+                                 const std::vector<number>    &values,
                                  const bool elide_zero_values)
 {
   Assert(col_indices.size() == values.size(),
@@ -1720,7 +1720,7 @@ inline void
 BlockMatrixBase<MatrixType>::set(const size_type  row,
                                  const size_type  n_cols,
                                  const size_type *col_indices,
-                                 const number *   values,
+                                 const number    *values,
                                  const bool       elide_zero_values)
 {
   prepare_set_operation();
@@ -1852,7 +1852,7 @@ template <typename number>
 inline void
 BlockMatrixBase<MatrixType>::add(const std::vector<size_type> &row_indices,
                                  const std::vector<size_type> &col_indices,
-                                 const FullMatrix<number> &    values,
+                                 const FullMatrix<number>     &values,
                                  const bool elide_zero_values)
 {
   Assert(row_indices.size() == values.m(),
@@ -1874,7 +1874,7 @@ template <typename MatrixType>
 template <typename number>
 inline void
 BlockMatrixBase<MatrixType>::add(const std::vector<size_type> &indices,
-                                 const FullMatrix<number> &    values,
+                                 const FullMatrix<number>     &values,
                                  const bool elide_zero_values)
 {
   Assert(indices.size() == values.m(),
@@ -1896,7 +1896,7 @@ template <typename number>
 inline void
 BlockMatrixBase<MatrixType>::add(const size_type               row,
                                  const std::vector<size_type> &col_indices,
-                                 const std::vector<number> &   values,
+                                 const std::vector<number>    &values,
                                  const bool elide_zero_values)
 {
   Assert(col_indices.size() == values.size(),
@@ -1920,7 +1920,7 @@ inline void
 BlockMatrixBase<MatrixType>::add(const size_type  row,
                                  const size_type  n_cols,
                                  const size_type *col_indices,
-                                 const number *   values,
+                                 const number    *values,
                                  const bool       elide_zero_values,
                                  const bool       col_indices_are_sorted)
 {
@@ -2209,7 +2209,7 @@ BlockMatrixBase<MatrixType>::get_column_indices() const
 template <typename MatrixType>
 template <typename BlockVectorType>
 void
-BlockMatrixBase<MatrixType>::vmult_block_block(BlockVectorType &      dst,
+BlockMatrixBase<MatrixType>::vmult_block_block(BlockVectorType       &dst,
                                                const BlockVectorType &src) const
 {
   Assert(dst.n_blocks() == n_block_rows(),
@@ -2231,7 +2231,7 @@ template <typename MatrixType>
 template <typename BlockVectorType, typename VectorType>
 void
 BlockMatrixBase<MatrixType>::vmult_nonblock_block(
-  VectorType &           dst,
+  VectorType            &dst,
   const BlockVectorType &src) const
 {
   Assert(n_block_rows() == 1, ExcDimensionMismatch(1, n_block_rows()));
@@ -2248,7 +2248,7 @@ BlockMatrixBase<MatrixType>::vmult_nonblock_block(
 template <typename MatrixType>
 template <typename BlockVectorType, typename VectorType>
 void
-BlockMatrixBase<MatrixType>::vmult_block_nonblock(BlockVectorType & dst,
+BlockMatrixBase<MatrixType>::vmult_block_nonblock(BlockVectorType  &dst,
                                                   const VectorType &src) const
 {
   Assert(dst.n_blocks() == n_block_rows(),
@@ -2265,7 +2265,7 @@ template <typename MatrixType>
 template <typename VectorType>
 void
 BlockMatrixBase<MatrixType>::vmult_nonblock_nonblock(
-  VectorType &      dst,
+  VectorType       &dst,
   const VectorType &src) const
 {
   Assert(1 == n_block_rows(), ExcDimensionMismatch(1, n_block_rows()));
@@ -2279,7 +2279,7 @@ BlockMatrixBase<MatrixType>::vmult_nonblock_nonblock(
 template <typename MatrixType>
 template <typename BlockVectorType>
 void
-BlockMatrixBase<MatrixType>::vmult_add(BlockVectorType &      dst,
+BlockMatrixBase<MatrixType>::vmult_add(BlockVectorType       &dst,
                                        const BlockVectorType &src) const
 {
   Assert(dst.n_blocks() == n_block_rows(),
@@ -2298,7 +2298,7 @@ template <typename MatrixType>
 template <typename BlockVectorType>
 void
 BlockMatrixBase<MatrixType>::Tvmult_block_block(
-  BlockVectorType &      dst,
+  BlockVectorType       &dst,
   const BlockVectorType &src) const
 {
   Assert(dst.n_blocks() == n_block_cols(),
@@ -2320,7 +2320,7 @@ BlockMatrixBase<MatrixType>::Tvmult_block_block(
 template <typename MatrixType>
 template <typename BlockVectorType, typename VectorType>
 void
-BlockMatrixBase<MatrixType>::Tvmult_block_nonblock(BlockVectorType & dst,
+BlockMatrixBase<MatrixType>::Tvmult_block_nonblock(BlockVectorType  &dst,
                                                    const VectorType &src) const
 {
   Assert(dst.n_blocks() == n_block_cols(),
@@ -2339,7 +2339,7 @@ template <typename MatrixType>
 template <typename BlockVectorType, typename VectorType>
 void
 BlockMatrixBase<MatrixType>::Tvmult_nonblock_block(
-  VectorType &           dst,
+  VectorType            &dst,
   const BlockVectorType &src) const
 {
   Assert(1 == n_block_cols(), ExcDimensionMismatch(1, n_block_cols()));
@@ -2358,7 +2358,7 @@ template <typename MatrixType>
 template <typename VectorType>
 void
 BlockMatrixBase<MatrixType>::Tvmult_nonblock_nonblock(
-  VectorType &      dst,
+  VectorType       &dst,
   const VectorType &src) const
 {
   Assert(1 == n_block_cols(), ExcDimensionMismatch(1, n_block_cols()));
@@ -2372,7 +2372,7 @@ BlockMatrixBase<MatrixType>::Tvmult_nonblock_nonblock(
 template <typename MatrixType>
 template <typename BlockVectorType>
 void
-BlockMatrixBase<MatrixType>::Tvmult_add(BlockVectorType &      dst,
+BlockMatrixBase<MatrixType>::Tvmult_add(BlockVectorType       &dst,
                                         const BlockVectorType &src) const
 {
   Assert(dst.n_blocks() == n_block_cols(),
@@ -2456,7 +2456,7 @@ BlockMatrixBase<MatrixType>::matrix_scalar_product(
 template <typename MatrixType>
 template <typename BlockVectorType>
 typename BlockMatrixBase<MatrixType>::value_type
-BlockMatrixBase<MatrixType>::residual(BlockVectorType &      dst,
+BlockMatrixBase<MatrixType>::residual(BlockVectorType       &dst,
                                       const BlockVectorType &x,
                                       const BlockVectorType &b) const
 {

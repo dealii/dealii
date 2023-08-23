@@ -106,14 +106,14 @@ namespace Step68
 
     virtual void
     vector_value(const Point<dim> &point,
-                 Vector<double> &  values) const override;
+                 Vector<double>   &values) const override;
   };
 
 
   template <int dim>
   void
   Vortex<dim>::vector_value(const Point<dim> &point,
-                            Vector<double> &  values) const
+                            Vector<double>   &values) const
   {
     const double T = 4;
     const double t = this->get_time();
@@ -208,7 +208,7 @@ namespace Step68
   unsigned int
   ParticleTracking<dim>::cell_weight(
     const typename parallel::distributed::Triangulation<dim>::cell_iterator
-      &                                                                  cell,
+                                                                        &cell,
     const typename parallel::distributed::Triangulation<dim>::CellStatus status)
     const
   {

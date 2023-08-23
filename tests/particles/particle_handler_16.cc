@@ -41,7 +41,7 @@
 template <int dim, int spacedim>
 void
 insert(
-  Particles::ParticleHandler<dim, spacedim> &            particle_handler,
+  Particles::ParticleHandler<dim, spacedim>             &particle_handler,
   unsigned int                                           n_points,
   unsigned                                               starting_id,
   const std::vector<std::vector<BoundingBox<spacedim>>> &global_bounding_boxes)
@@ -51,8 +51,8 @@ insert(
 
   std::vector<Point<spacedim>>       points(n_points);
   std::vector<std::vector<double>>   properties(n_points,
-                                              {my_cpu + 1000.0,
-                                               my_cpu + 1000.0});
+                                                {my_cpu + 1000.0,
+                                                 my_cpu + 1000.0});
   std::vector<types::particle_index> ids(n_points);
 
   for (unsigned int i = 0; i < n_points; ++i)

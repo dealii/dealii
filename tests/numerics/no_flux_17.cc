@@ -127,9 +127,9 @@ compare_constraints(const AffineConstraints<double> &constraints1,
 template <int dim>
 void
 get_constraints_on_active_cells(
-  const Triangulation<dim> &          tria,
+  const Triangulation<dim>           &tria,
   const std::set<types::boundary_id> &no_normal_flux_boundaries,
-  AffineConstraints<double> &         constraints)
+  AffineConstraints<double>          &constraints)
 {
   MappingQ<dim> mapping(4);
 
@@ -149,8 +149,8 @@ get_constraints_on_active_cells(
 template <int dim>
 void
 get_constraints_on_levels(
-  const Triangulation<dim> &                triangulation,
-  const std::set<types::boundary_id> &      no_flux_boundary,
+  const Triangulation<dim>                 &triangulation,
+  const std::set<types::boundary_id>       &no_flux_boundary,
   MGLevelObject<AffineConstraints<double>> &level_constraints)
 {
   FESystem<dim>   fe(FE_Q<dim>(1), dim);
@@ -190,7 +190,7 @@ get_constraints_on_levels(
 
 template <int dim>
 void
-run(Triangulation<dim> &         triangulation,
+run(Triangulation<dim>          &triangulation,
     std::set<types::boundary_id> no_flux_boundary)
 {
   const unsigned int                     n_levels = 2;

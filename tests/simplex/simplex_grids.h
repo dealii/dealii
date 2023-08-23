@@ -23,10 +23,10 @@ namespace dealii
     template <int dim, int spacedim>
     void
     subdivided_hyper_rectangle_with_wedges(
-      Triangulation<dim, spacedim> &   tria,
+      Triangulation<dim, spacedim>    &tria,
       const std::vector<unsigned int> &repetitions,
-      const Point<dim> &               p1,
-      const Point<dim> &               p2,
+      const Point<dim>                &p1,
+      const Point<dim>                &p2,
       const bool                       colorize = false)
     {
       AssertDimension(dim, spacedim);
@@ -132,10 +132,10 @@ namespace dealii
     template <int dim, int spacedim>
     void
     subdivided_hyper_rectangle_with_pyramids(
-      Triangulation<dim, spacedim> &   tria,
+      Triangulation<dim, spacedim>    &tria,
       const std::vector<unsigned int> &repetitions,
-      const Point<dim> &               p1,
-      const Point<dim> &               p2,
+      const Point<dim>                &p1,
+      const Point<dim>                &p2,
       const bool                       colorize = false)
     {
       AssertDimension(dim, spacedim);
@@ -278,10 +278,10 @@ namespace dealii
     template <int dim, int spacedim>
     void
     subdivided_hyper_rectangle_with_simplices_mix(
-      Triangulation<dim, spacedim> &   tria,
+      Triangulation<dim, spacedim>    &tria,
       const std::vector<unsigned int> &repetitions,
-      const Point<dim> &               p1,
-      const Point<dim> &               p2,
+      const Point<dim>                &p1,
+      const Point<dim>                &p2,
       const bool                       colorize = false)
     {
       AssertDimension(dim, spacedim);

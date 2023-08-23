@@ -64,12 +64,12 @@ namespace internal
        */
       void
       initialize(
-        const dealii::Triangulation<dim> &                        tria,
+        const dealii::Triangulation<dim>                         &tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const FaceInfo<VectorizedArrayType::size()> &             face_info,
+        const FaceInfo<VectorizedArrayType::size()>              &face_info,
         const std::vector<unsigned int> &active_fe_index,
         const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping,
-        const std::vector<dealii::hp::QCollection<dim>> &          quad,
+        const std::vector<dealii::hp::QCollection<dim>>           &quad,
         const UpdateFlags update_flags_cells,
         const UpdateFlags update_flags_boundary_faces,
         const UpdateFlags update_flags_inner_faces,
@@ -84,9 +84,9 @@ namespace internal
        */
       void
       update_mapping(
-        const dealii::Triangulation<dim> &                        tria,
+        const dealii::Triangulation<dim>                         &tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const FaceInfo<VectorizedArrayType::size()> &             face_info,
+        const FaceInfo<VectorizedArrayType::size()>              &face_info,
         const std::vector<unsigned int> &active_fe_index,
         const std::shared_ptr<dealii::hp::MappingCollection<dim>> &mapping);
 
@@ -114,7 +114,7 @@ namespace internal
        */
       template <typename StreamType>
       void
-      print_memory_consumption(StreamType &    out,
+      print_memory_consumption(StreamType     &out,
                                const TaskInfo &task_info) const;
 
       /**
@@ -224,9 +224,9 @@ namespace internal
        */
       void
       compute_mapping_q(
-        const dealii::Triangulation<dim> &                        tria,
+        const dealii::Triangulation<dim>                         &tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const FaceInfo<VectorizedArrayType::size()> &             face_info);
+        const FaceInfo<VectorizedArrayType::size()>              &face_info);
 
       /**
        * Computes the information in the given cells, called within
@@ -234,9 +234,9 @@ namespace internal
        */
       void
       initialize_cells(
-        const dealii::Triangulation<dim> &                        tria,
+        const dealii::Triangulation<dim>                         &tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const std::vector<unsigned int> &         active_fe_index,
+        const std::vector<unsigned int>          &active_fe_index,
         const dealii::hp::MappingCollection<dim> &mapping);
 
       /**
@@ -245,11 +245,11 @@ namespace internal
        */
       void
       initialize_faces(
-        const dealii::Triangulation<dim> &                        tria,
+        const dealii::Triangulation<dim>                         &tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
         const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
-          &                                       faces,
-        const std::vector<unsigned int> &         active_fe_index,
+                                                 &faces,
+        const std::vector<unsigned int>          &active_fe_index,
         const dealii::hp::MappingCollection<dim> &mapping);
 
       /**
@@ -258,10 +258,10 @@ namespace internal
        */
       void
       initialize_faces_by_cells(
-        const dealii::Triangulation<dim> &                        tria,
+        const dealii::Triangulation<dim>                         &tria,
         const std::vector<std::pair<unsigned int, unsigned int>> &cells,
-        const FaceInfo<VectorizedArrayType::size()> &             face_info,
-        const dealii::hp::MappingCollection<dim> &                mapping);
+        const FaceInfo<VectorizedArrayType::size()>              &face_info,
+        const dealii::hp::MappingCollection<dim>                 &mapping);
     };
 
 

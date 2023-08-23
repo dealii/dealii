@@ -144,7 +144,7 @@ namespace Utilities
      * the conversion
      */
     void
-    parse_arguments(const std::string &          value_string,
+    parse_arguments(const std::string           &value_string,
                     const Patterns::PatternBase &pattern =
                       *Patterns::Tools::Convert<TupleType>::to_pattern());
 
@@ -233,7 +233,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   template <typename FunctionType>
   MutableBind<ReturnType, FunctionArgs...>::MutableBind(FunctionType function,
-                                                        TupleType && arguments)
+                                                        TupleType  &&arguments)
     : function(function)
     , arguments(std::move(arguments))
   {}
@@ -279,7 +279,7 @@ namespace Utilities
   template <typename ReturnType, class... FunctionArgs>
   void
   MutableBind<ReturnType, FunctionArgs...>::parse_arguments(
-    const std::string &          value_string,
+    const std::string           &value_string,
     const Patterns::PatternBase &pattern)
   {
     arguments =
@@ -301,7 +301,7 @@ namespace Utilities
 
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
-    mutable_bind(ReturnType (*function)(FunctionArgs...))
+  mutable_bind(ReturnType (*function)(FunctionArgs...))
   {
     return MutableBind<ReturnType, FunctionArgs...>(function);
   }

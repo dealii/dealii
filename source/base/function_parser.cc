@@ -71,7 +71,7 @@ FunctionParser<dim>::FunctionParser(const std::string &expression,
 
 template <int dim>
 void
-FunctionParser<dim>::initialize(const std::string &             variables,
+FunctionParser<dim>::initialize(const std::string              &variables,
                                 const std::vector<std::string> &expressions,
                                 const std::map<std::string, double> &constants,
                                 const bool time_dependent)
@@ -86,8 +86,8 @@ FunctionParser<dim>::initialize(const std::string &             variables,
 
 template <int dim>
 void
-FunctionParser<dim>::initialize(const std::string &                  vars,
-                                const std::string &                  expression,
+FunctionParser<dim>::initialize(const std::string                   &vars,
+                                const std::string                   &expression,
                                 const std::map<std::string, double> &constants,
                                 const bool time_dependent)
 {
@@ -101,7 +101,7 @@ FunctionParser<dim>::initialize(const std::string &                  vars,
 
 template <int dim>
 double
-FunctionParser<dim>::value(const Point<dim> & p,
+FunctionParser<dim>::value(const Point<dim>  &p,
                            const unsigned int component) const
 {
   return this->do_value(p, this->get_time(), component);

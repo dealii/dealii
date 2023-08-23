@@ -655,7 +655,7 @@ namespace SUNDIALS
     std::function<void(const double      t,
                        const VectorType &y,
                        const VectorType &y_dot,
-                       VectorType &      res)>
+                       VectorType       &res)>
       residual;
 
     /**
@@ -754,8 +754,8 @@ namespace SUNDIALS
      * computed.
      */
     std::function<void(const double       t,
-                       const VectorType & sol,
-                       const VectorType & sol_dot,
+                       const VectorType  &sol,
+                       const VectorType  &sol_dot,
                        const unsigned int step_number)>
       output_step;
 

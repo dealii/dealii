@@ -99,7 +99,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static NumberType
   psi(const Tensor<2, dim, NumberType> &t,
       const Tensor<1, dim, NumberType> &v,
-      const NumberType &                s)
+      const NumberType                 &s)
   {
     return pow(det_t(t), 2) * pow(v_squ(v), 3) * pow(s, sf);
   };
@@ -107,7 +107,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<2, dim, NumberType>
   dpsi_dt(const Tensor<2, dim, NumberType> &t,
           const Tensor<1, dim, NumberType> &v,
-          const NumberType &                s)
+          const NumberType                 &s)
   {
     return 2.0 * pow(det_t(t), 1) * ddet_t_dt(t) * pow(v_squ(v), 3) *
            pow(s, sf);
@@ -116,7 +116,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<1, dim, NumberType>
   dpsi_dv(const Tensor<2, dim, NumberType> &t,
           const Tensor<1, dim, NumberType> &v,
-          const NumberType &                s)
+          const NumberType                 &s)
   {
     return pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) * dv_squ_dv(v) *
            pow(s, sf);
@@ -125,7 +125,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static NumberType
   dpsi_ds(const Tensor<2, dim, NumberType> &t,
           const Tensor<1, dim, NumberType> &v,
-          const NumberType &                s)
+          const NumberType                 &s)
   {
     return pow(det_t(t), 2) * pow(v_squ(v), 3) * sf * pow(s, sf - 1.0);
   };
@@ -133,7 +133,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<4, dim, NumberType>
   d2psi_dt_dt(const Tensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &v,
-              const NumberType &                s)
+              const NumberType                 &s)
   {
     return 2.0 * pow(v_squ(v), 3) *
            (pow(det_t(t), 0) * outer_product(ddet_t_dt(t), ddet_t_dt(t)) +
@@ -144,7 +144,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<3, dim, NumberType>
   d2psi_dv_dt(const Tensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &v,
-              const NumberType &                s)
+              const NumberType                 &s)
   {
     return 2.0 * pow(det_t(t), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(ddet_t_dt(t), dv_squ_dv(v)) * pow(s, sf);
@@ -153,7 +153,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<2, dim, NumberType>
   d2psi_ds_dt(const Tensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &v,
-              const NumberType &                s)
+              const NumberType                 &s)
   {
     return 2.0 * pow(det_t(t), 1) * ddet_t_dt(t) * pow(v_squ(v), 3) * sf *
            pow(s, sf - 1.0);
@@ -162,7 +162,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<3, dim, NumberType>
   d2psi_dt_dv(const Tensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &v,
-              const NumberType &                s)
+              const NumberType                 &s)
   {
     return 2.0 * pow(det_t(t), 1) * 3.0 * pow(v_squ(v), 2) *
            outer_product(dv_squ_dv(v), ddet_t_dt(t)) * pow(s, sf);
@@ -171,7 +171,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<2, dim, NumberType>
   d2psi_dv_dv(const Tensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &v,
-              const NumberType &                s)
+              const NumberType                 &s)
   {
     return pow(det_t(t), 2) * 3.0 *
            (2.0 * pow(v_squ(v), 1) * outer_product(dv_squ_dv(v), dv_squ_dv(v)) +
@@ -182,7 +182,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<1, dim, NumberType>
   d2psi_ds_dv(const Tensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &v,
-              const NumberType &                s)
+              const NumberType                 &s)
   {
     return pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) * dv_squ_dv(v) * sf *
            pow(s, sf - 1.0);
@@ -191,7 +191,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<2, dim, NumberType>
   d2psi_dt_ds(const Tensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &v,
-              const NumberType &                s)
+              const NumberType                 &s)
   {
     return 2.0 * pow(det_t(t), 1) * ddet_t_dt(t) * pow(v_squ(v), 3) * sf *
            pow(s, sf - 1.0);
@@ -200,7 +200,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static Tensor<1, dim, NumberType>
   d2psi_dv_ds(const Tensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &v,
-              const NumberType &                s)
+              const NumberType                 &s)
   {
     return pow(det_t(t), 2) * 3.0 * pow(v_squ(v), 2) * dv_squ_dv(v) * sf *
            pow(s, sf - 1.0);
@@ -209,7 +209,7 @@ struct FunctionsTestTensorVectorScalarCoupled
   static NumberType
   d2psi_ds_ds(const Tensor<2, dim, NumberType> &t,
               const Tensor<1, dim, NumberType> &v,
-              const NumberType &                s)
+              const NumberType                 &s)
   {
     return pow(det_t(t), 2) * pow(v_squ(v), 3) * sf * (sf - 1.0) *
            pow(s, sf - 2.0);

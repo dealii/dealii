@@ -121,9 +121,9 @@ namespace Differentiation
          * their numerical value be correctly set up and maintained.
          */
         void
-        call(ReturnType *                output_values,
+        call(ReturnType                 *output_values,
              const types::symbol_vector &independent_symbols,
-             const ReturnType *          substitution_values);
+             const ReturnType           *substitution_values);
 
         /**
          * Write the data of this object to a stream for the purpose
@@ -226,9 +226,9 @@ namespace Differentiation
          * function apply here as well.
          */
         void
-        call(ReturnType *                output_values,
+        call(ReturnType                 *output_values,
              const SymEngine::vec_basic &independent_symbols,
-             const ReturnType *          substitution_values);
+             const ReturnType           *substitution_values);
 
       private:
         // Note: It would be more efficient to store this data in native
@@ -300,7 +300,7 @@ namespace Differentiation
          */
         void
         init(const types::symbol_vector &independent_symbols,
-             const Expression &          dependent_function,
+             const Expression           &dependent_function,
              const bool                  use_cse = false);
 
         /**
@@ -328,7 +328,7 @@ namespace Differentiation
         // The following definition is required due to base class CRTP.
         void
         init(const SymEngine::vec_basic &independent_symbols,
-             const SymEngine::Basic &    dependent_function,
+             const SymEngine::Basic     &dependent_function,
              const bool                  use_cse = false);
 
         /**
@@ -634,9 +634,9 @@ namespace Differentiation
       template <typename ReturnType, typename ExpressionType>
       void
       CSEDictionaryVisitor<ReturnType, ExpressionType>::call(
-        ReturnType *                    output_values,
+        ReturnType                     *output_values,
         const SD::types::symbol_vector &independent_symbols,
-        const ReturnType *              substitution_values)
+        const ReturnType               *substitution_values)
       {
         call(output_values,
              Utilities::convert_expression_vector_to_basic_vector(
@@ -649,9 +649,9 @@ namespace Differentiation
       template <typename ReturnType, typename ExpressionType>
       void
       CSEDictionaryVisitor<ReturnType, ExpressionType>::call(
-        ReturnType *                output_values,
+        ReturnType                 *output_values,
         const SymEngine::vec_basic &independent_symbols,
-        const ReturnType *          substitution_values)
+        const ReturnType           *substitution_values)
       {
         Assert(n_reduced_expressions() > 0, ExcInternalError());
 
@@ -793,7 +793,7 @@ namespace Differentiation
       void
       DictionarySubstitutionVisitor<ReturnType, ExpressionType>::init(
         const types::symbol_vector &inputs,
-        const SD::Expression &      output,
+        const SD::Expression       &output,
         const bool                  use_cse)
       {
         init(inputs, types::symbol_vector{output}, use_cse);
@@ -805,7 +805,7 @@ namespace Differentiation
       void
       DictionarySubstitutionVisitor<ReturnType, ExpressionType>::init(
         const SymEngine::vec_basic &inputs,
-        const SymEngine::Basic &    output,
+        const SymEngine::Basic     &output,
         const bool                  use_cse)
       {
         init(Utilities::convert_basic_vector_to_expression_vector(inputs),
@@ -880,7 +880,7 @@ namespace Differentiation
       template <typename ReturnType, typename ExpressionType>
       void
       DictionarySubstitutionVisitor<ReturnType, ExpressionType>::call(
-        ReturnType *      output_values,
+        ReturnType       *output_values,
         const ReturnType *substitution_values)
       {
         // Check to see if CSE has been performed
@@ -916,7 +916,7 @@ namespace Differentiation
       template <class Archive>
       void
       DictionarySubstitutionVisitor<ReturnType, ExpressionType>::save(
-        Archive &          ar,
+        Archive           &ar,
         const unsigned int version) const
       {
         // Add some dynamic information to determine if CSE has been used,
@@ -939,7 +939,7 @@ namespace Differentiation
       template <class Archive>
       void
       DictionarySubstitutionVisitor<ReturnType, ExpressionType>::load(
-        Archive &          ar,
+        Archive           &ar,
         const unsigned int version)
       {
         Assert(cse.executed() == false, ExcInternalError());

@@ -95,7 +95,7 @@ public:
    * Optimized function for adding new entries to a given row.
    */
   virtual void
-  add_row_entries(const size_type &                 row,
+  add_row_entries(const size_type                  &row,
                   const ArrayView<const size_type> &columns,
                   const bool indices_are_sorted = false) = 0;
 

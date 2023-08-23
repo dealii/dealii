@@ -156,8 +156,8 @@ main()
     constexpr Tensor<2, 3>       a{a_init};
     DEAL_II_CONSTEXPR const auto inverted       = invert(a);
     constexpr double             ref_init[3][3] = {{1., 0., 0.},
-                                       {-2., 1., 0.},
-                                       {1., -2., 1}};
+                                                   {-2., 1., 0.},
+                                                   {1., -2., 1}};
     constexpr Tensor<2, 3>       ref{ref_init};
     Assert(inverted == ref, ExcInternalError());
   }

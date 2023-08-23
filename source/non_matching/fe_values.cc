@@ -46,12 +46,12 @@ namespace NonMatching
   template <int dim>
   template <typename VectorType>
   FEValues<dim>::FEValues(const hp::FECollection<dim> &fe_collection,
-                          const Quadrature<1> &        quadrature,
+                          const Quadrature<1>         &quadrature,
                           const RegionUpdateFlags      region_update_flags,
-                          const MeshClassifier<dim> &  mesh_classifier,
-                          const DoFHandler<dim> &      dof_handler,
-                          const VectorType &           level_set,
-                          const AdditionalData &       additional_data)
+                          const MeshClassifier<dim>   &mesh_classifier,
+                          const DoFHandler<dim>       &dof_handler,
+                          const VectorType            &level_set,
+                          const AdditionalData        &additional_data)
     : mapping_collection(&dealii::hp::StaticMappingQ1<dim>::mapping_collection)
     , fe_collection(&fe_collection)
     , q_collection_1D(quadrature)
@@ -76,14 +76,14 @@ namespace NonMatching
   template <int dim>
   template <typename VectorType>
   FEValues<dim>::FEValues(const hp::MappingCollection<dim> &mapping_collection,
-                          const hp::FECollection<dim> &     fe_collection,
-                          const hp::QCollection<dim> &      q_collection,
-                          const hp::QCollection<1> &        q_collection_1D,
+                          const hp::FECollection<dim>      &fe_collection,
+                          const hp::QCollection<dim>       &q_collection,
+                          const hp::QCollection<1>         &q_collection_1D,
                           const RegionUpdateFlags           region_update_flags,
-                          const MeshClassifier<dim> &       mesh_classifier,
-                          const DoFHandler<dim> &           dof_handler,
-                          const VectorType &                level_set,
-                          const AdditionalData &            additional_data)
+                          const MeshClassifier<dim>        &mesh_classifier,
+                          const DoFHandler<dim>            &dof_handler,
+                          const VectorType                 &level_set,
+                          const AdditionalData             &additional_data)
     : mapping_collection(&mapping_collection)
     , fe_collection(&fe_collection)
     , q_collection_1D(q_collection_1D)
@@ -272,12 +272,12 @@ namespace NonMatching
   template <typename VectorType>
   FEInterfaceValues<dim>::FEInterfaceValues(
     const hp::FECollection<dim> &fe_collection,
-    const Quadrature<1> &        quadrature,
+    const Quadrature<1>         &quadrature,
     const RegionUpdateFlags      region_update_flags,
-    const MeshClassifier<dim> &  mesh_classifier,
-    const DoFHandler<dim> &      dof_handler,
-    const VectorType &           level_set,
-    const AdditionalData &       additional_data)
+    const MeshClassifier<dim>   &mesh_classifier,
+    const DoFHandler<dim>       &dof_handler,
+    const VectorType            &level_set,
+    const AdditionalData        &additional_data)
     : mapping_collection(&dealii::hp::StaticMappingQ1<dim>::mapping_collection)
     , fe_collection(&fe_collection)
     , q_collection_1D(quadrature)
@@ -303,14 +303,14 @@ namespace NonMatching
   template <typename VectorType>
   FEInterfaceValues<dim>::FEInterfaceValues(
     const hp::MappingCollection<dim> &mapping_collection,
-    const hp::FECollection<dim> &     fe_collection,
-    const hp::QCollection<dim - 1> &  q_collection,
-    const hp::QCollection<1> &        q_collection_1D,
+    const hp::FECollection<dim>      &fe_collection,
+    const hp::QCollection<dim - 1>   &q_collection,
+    const hp::QCollection<1>         &q_collection_1D,
     const RegionUpdateFlags           region_update_flags,
-    const MeshClassifier<dim> &       mesh_classifier,
-    const DoFHandler<dim> &           dof_handler,
-    const VectorType &                level_set,
-    const AdditionalData &            additional_data)
+    const MeshClassifier<dim>        &mesh_classifier,
+    const DoFHandler<dim>            &dof_handler,
+    const VectorType                 &level_set,
+    const AdditionalData             &additional_data)
     : mapping_collection(&mapping_collection)
     , fe_collection(&fe_collection)
     , q_collection_1D(q_collection_1D)

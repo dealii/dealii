@@ -13,7 +13,7 @@
 //
 //-----------------------------------------------------------
 
-//#include <deal.II/base/parameter_handler.h>
+// #include <deal.II/base/parameter_handler.h>
 
 #include <deal.II/lac/petsc_ts.h>
 #include <deal.II/lac/petsc_vector.h>
@@ -47,7 +47,7 @@ public:
     implicit_function = [&](const real_type   t,
                             const VectorType &y,
                             const VectorType &y_dot,
-                            VectorType &      res) -> void {
+                            VectorType       &res) -> void {
       res(0) = y_dot(0) - y(0);
       res(1) = y(1) - y(0);
       res.compress(VectorOperation::insert);

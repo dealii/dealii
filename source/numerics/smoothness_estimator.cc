@@ -100,9 +100,9 @@ namespace SmoothnessEstimator
     template <int dim, int spacedim, typename VectorType>
     void
     coefficient_decay(FESeries::Legendre<dim, spacedim> &fe_legendre,
-                      const DoFHandler<dim, spacedim> &  dof_handler,
-                      const VectorType &                 solution,
-                      Vector<float> &                    smoothness_indicators,
+                      const DoFHandler<dim, spacedim>   &dof_handler,
+                      const VectorType                  &solution,
+                      Vector<float>                     &smoothness_indicators,
                       const VectorTools::NormType        regression_strategy,
                       const double smallest_abs_coefficient,
                       const bool   only_flagged_cells)
@@ -181,10 +181,10 @@ namespace SmoothnessEstimator
     void
     coefficient_decay_per_direction(
       FESeries::Legendre<dim, spacedim> &fe_legendre,
-      const DoFHandler<dim, spacedim> &  dof_handler,
-      const VectorType &                 solution,
-      Vector<float> &                    smoothness_indicators,
-      const ComponentMask &              coefficients_predicate,
+      const DoFHandler<dim, spacedim>   &dof_handler,
+      const VectorType                  &solution,
+      Vector<float>                     &smoothness_indicators,
+      const ComponentMask               &coefficients_predicate,
       const double                       smallest_abs_coefficient,
       const bool                         only_flagged_cells)
     {
@@ -367,9 +367,9 @@ namespace SmoothnessEstimator
     template <int dim, int spacedim, typename VectorType>
     void
     coefficient_decay(FESeries::Fourier<dim, spacedim> &fe_fourier,
-                      const DoFHandler<dim, spacedim> & dof_handler,
-                      const VectorType &                solution,
-                      Vector<float> &                   smoothness_indicators,
+                      const DoFHandler<dim, spacedim>  &dof_handler,
+                      const VectorType                 &solution,
+                      Vector<float>                    &smoothness_indicators,
                       const VectorTools::NormType       regression_strategy,
                       const double smallest_abs_coefficient,
                       const bool   only_flagged_cells)
@@ -466,10 +466,10 @@ namespace SmoothnessEstimator
     void
     coefficient_decay_per_direction(
       FESeries::Fourier<dim, spacedim> &fe_fourier,
-      const DoFHandler<dim, spacedim> & dof_handler,
-      const VectorType &                solution,
-      Vector<float> &                   smoothness_indicators,
-      const ComponentMask &             coefficients_predicate,
+      const DoFHandler<dim, spacedim>  &dof_handler,
+      const VectorType                 &solution,
+      Vector<float>                    &smoothness_indicators,
+      const ComponentMask              &coefficients_predicate,
       const double                      smallest_abs_coefficient,
       const bool                        only_flagged_cells)
     {

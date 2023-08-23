@@ -239,7 +239,7 @@ namespace Polynomials
     // well if necessary. copy the polynomial to
     // do this
     std::unique_ptr<Polynomial<number>> q_data;
-    const Polynomial<number> *          q = nullptr;
+    const Polynomial<number>           *q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
         q_data = std::make_unique<Polynomial<number>>(p);
@@ -283,7 +283,7 @@ namespace Polynomials
     // well if necessary. copy the polynomial to
     // do this
     std::unique_ptr<Polynomial<number>> q_data;
-    const Polynomial<number> *          q = nullptr;
+    const Polynomial<number>           *q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
         q_data = std::make_unique<Polynomial<number>>(p);
@@ -319,7 +319,7 @@ namespace Polynomials
     // well if necessary. copy the polynomial to
     // do this
     std::unique_ptr<Polynomial<number>> q_data;
-    const Polynomial<number> *          q = nullptr;
+    const Polynomial<number>           *q = nullptr;
     if (p.in_lagrange_product_form == true)
       {
         q_data = std::make_unique<Polynomial<number>>(p);
@@ -464,7 +464,7 @@ namespace Polynomials
       return Monomial<number>(0, 0.);
 
     std::unique_ptr<Polynomial<number>> q_data;
-    const Polynomial<number> *          q = nullptr;
+    const Polynomial<number>           *q = nullptr;
     if (in_lagrange_product_form == true)
       {
         q_data = std::make_unique<Polynomial<number>>(*this);
@@ -490,7 +490,7 @@ namespace Polynomials
     // no simple form possible for Lagrange
     // polynomial on product form
     std::unique_ptr<Polynomial<number>> q_data;
-    const Polynomial<number> *          q = nullptr;
+    const Polynomial<number>           *q = nullptr;
     if (in_lagrange_product_form == true)
       {
         q_data = std::make_unique<Polynomial<number>>(*this);

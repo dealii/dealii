@@ -94,7 +94,7 @@ public:
 
   virtual void
   value_list(const std::vector<Point<dim>> &points,
-             std::vector<double> &          values,
+             std::vector<double>           &values,
              const unsigned int             component = 0) const;
 };
 
@@ -114,7 +114,7 @@ Coefficient<dim>::value(const Point<dim> &p,
 template <int dim>
 void
 Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
-                             std::vector<double> &          values,
+                             std::vector<double>           &values,
                              const unsigned int             component) const
 {
   Assert(values.size() == points.size(),

@@ -62,7 +62,7 @@ public:
   }
 
   virtual void
-  vector_value(const Point<dim> &              p,
+  vector_value(const Point<dim>               &p,
                Vector<VectorType::value_type> &values) const
   {
     values(0) = value(p, 0);
@@ -158,7 +158,7 @@ check()
       p[2][d] = 1. / 3.;
     }
   Vector<VectorType::value_type> value(1);
-  const auto &                   mapping = get_default_linear_mapping(tria);
+  const auto                    &mapping = get_default_linear_mapping(tria);
   for (unsigned int i = 0; i < 3; ++i)
     {
       {

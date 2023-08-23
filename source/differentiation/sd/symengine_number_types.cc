@@ -82,7 +82,7 @@ namespace Differentiation
 
 
     Expression::Expression(const std::vector<std::pair<Expression, Expression>>
-                             &               condition_expression,
+                                            &condition_expression,
                            const Expression &expression_otherwise)
     {
       SE::PiecewiseVec piecewise_function;
@@ -142,7 +142,7 @@ namespace Differentiation
     }
 
 
-    Expression::Expression(const std::string &         symbol_func,
+    Expression::Expression(const std::string          &symbol_func,
                            const types::symbol_vector &arguments)
       : expression(SE::function_symbol(
           symbol_func,

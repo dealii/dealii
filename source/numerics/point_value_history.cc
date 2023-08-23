@@ -40,8 +40,8 @@ namespace internal
   {
     template <int dim>
     PointGeometryData<dim>::PointGeometryData(
-      const Point<dim> &                          new_requested_location,
-      const std::vector<Point<dim>> &             new_locations,
+      const Point<dim>                           &new_requested_location,
+      const std::vector<Point<dim>>              &new_locations,
       const std::vector<types::global_dof_index> &new_sol_indices)
     {
       requested_location      = new_requested_location;
@@ -454,7 +454,7 @@ PointValueHistory<dim>::add_points(const std::vector<Point<dim>> &locations)
 
 template <int dim>
 void
-PointValueHistory<dim>::add_field_name(const std::string &  vector_name,
+PointValueHistory<dim>::add_field_name(const std::string   &vector_name,
                                        const ComponentMask &mask)
 {
   // can't be closed to add additional points
@@ -511,7 +511,7 @@ PointValueHistory<dim>::add_field_name(const std::string &vector_name,
 template <int dim>
 void
 PointValueHistory<dim>::add_component_names(
-  const std::string &             vector_name,
+  const std::string              &vector_name,
   const std::vector<std::string> &component_names)
 {
   typename std::map<std::string, std::vector<std::string>>::iterator names =
@@ -577,7 +577,7 @@ template <int dim>
 template <typename VectorType>
 void
 PointValueHistory<dim>::evaluate_field(const std::string &vector_name,
-                                       const VectorType & solution)
+                                       const VectorType  &solution)
 {
   // must be closed to add data to internal
   // members.
@@ -646,9 +646,9 @@ template <typename VectorType>
 void
 PointValueHistory<dim>::evaluate_field(
   const std::vector<std::string> &vector_names,
-  const VectorType &              solution,
-  const DataPostprocessor<dim> &  data_postprocessor,
-  const Quadrature<dim> &         quadrature)
+  const VectorType               &solution,
+  const DataPostprocessor<dim>   &data_postprocessor,
+  const Quadrature<dim>          &quadrature)
 {
   // must be closed to add data to internal
   // members.
@@ -877,10 +877,10 @@ template <int dim>
 template <typename VectorType>
 void
 PointValueHistory<dim>::evaluate_field(
-  const std::string &           vector_name,
-  const VectorType &            solution,
+  const std::string            &vector_name,
+  const VectorType             &solution,
   const DataPostprocessor<dim> &data_postprocessor,
-  const Quadrature<dim> &       quadrature)
+  const Quadrature<dim>        &quadrature)
 {
   std::vector<std::string> vector_names;
   vector_names.push_back(vector_name);
@@ -894,7 +894,7 @@ template <typename VectorType>
 void
 PointValueHistory<dim>::evaluate_field_at_requested_location(
   const std::string &vector_name,
-  const VectorType & solution)
+  const VectorType  &solution)
 {
   using number = typename VectorType::value_type;
   // must be closed to add data to internal
@@ -999,7 +999,7 @@ PointValueHistory<dim>::push_back_independent(
 template <int dim>
 void
 PointValueHistory<dim>::write_gnuplot(
-  const std::string &            base_name,
+  const std::string             &base_name,
   const std::vector<Point<dim>> &postprocessor_locations)
 {
   AssertThrow(closed, ExcInvalidState());
@@ -1254,7 +1254,7 @@ PointValueHistory<dim>::get_support_locations(
 template <int dim>
 void
 PointValueHistory<dim>::get_postprocessor_locations(
-  const Quadrature<dim> &  quadrature,
+  const Quadrature<dim>   &quadrature,
   std::vector<Point<dim>> &locations)
 {
   Assert(!cleared, ExcInvalidState());

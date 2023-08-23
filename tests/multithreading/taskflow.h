@@ -24,12 +24,12 @@ namespace taskflow_v1
             typename ScratchData,
             typename CopyData>
   void
-  run(const Iterator &                            begin,
+  run(const Iterator                             &begin,
       const std_cxx20::type_identity_t<Iterator> &end,
       Worker                                      worker,
       Copier                                      copier,
-      const ScratchData &                         sample_scratch_data,
-      const CopyData &                            sample_copy_data,
+      const ScratchData                          &sample_scratch_data,
+      const CopyData                             &sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
       const unsigned int chunk_size   = 8)
   {
@@ -78,7 +78,7 @@ namespace taskflow_v1
                                        &worker]() {
                                // std::cout << "worker " << idx << std::endl;
                                ScratchData scratch = sample_scratch_data;
-                               auto &      copy    = copy_datas[idx];
+                               auto       &copy    = copy_datas[idx];
                                copy =
                                  std::make_unique<CopyData>(sample_copy_data);
 
@@ -115,13 +115,13 @@ namespace taskflow_v1
             typename ScratchData,
             typename CopyData>
   void
-  run(const Iterator &                            begin,
+  run(const Iterator                             &begin,
       const std_cxx20::type_identity_t<Iterator> &end,
-      MainClass &                                 main_object,
+      MainClass                                  &main_object,
       void (MainClass::*worker)(const Iterator &, ScratchData &, CopyData &),
       void (MainClass::*copier)(const CopyData &),
       const ScratchData &sample_scratch_data,
-      const CopyData &   sample_copy_data,
+      const CopyData    &sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
       const unsigned int chunk_size   = 8)
   {
@@ -130,8 +130,8 @@ namespace taskflow_v1
       begin,
       end,
       [&main_object, worker](const Iterator &iterator,
-                             ScratchData &   scratch_data,
-                             CopyData &      copy_data) {
+                             ScratchData    &scratch_data,
+                             CopyData       &copy_data) {
         (main_object.*worker)(iterator, scratch_data, copy_data);
       },
       [&main_object, copier](const CopyData &copy_data) {

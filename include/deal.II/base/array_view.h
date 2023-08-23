@@ -327,7 +327,7 @@ public:
    * In case the container is empty a nullptr is returned.
    */
   DEAL_II_HOST_DEVICE value_type *
-                      data() const noexcept;
+  data() const noexcept;
 
   /**
    * Return an iterator pointing to the beginning of the array view.
@@ -398,7 +398,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView()
 
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  value_type *      starting_element,
+  value_type       *starting_element,
   const std::size_t n_elements)
   : starting_element(starting_element)
   , n_elements(n_elements)
@@ -917,7 +917,8 @@ make_array_view(SymmetricTensor<rank, dim, Number> &tensor)
  * @relatesalso ArrayView
  */
 template <typename ElementType, int N>
-inline ArrayView<ElementType> make_array_view(ElementType (&array)[N])
+inline ArrayView<ElementType>
+make_array_view(ElementType (&array)[N])
 {
   return ArrayView<ElementType>(array, N);
 }
@@ -1224,7 +1225,7 @@ make_array_view(const std::array<ElementType, N> &array)
  */
 template <typename ElementType>
 inline ArrayView<ElementType>
-make_array_view(Table<2, ElementType> &                         table,
+make_array_view(Table<2, ElementType>                          &table,
                 const typename Table<2, ElementType>::size_type row)
 {
   AssertIndexRange(row, table.size()[0]);
@@ -1351,7 +1352,7 @@ make_array_view(const LAPACKFullMatrix<ElementType> &matrix)
  */
 template <typename ElementType>
 inline ArrayView<const ElementType>
-make_array_view(const Table<2, ElementType> &                   table,
+make_array_view(const Table<2, ElementType>                    &table,
                 const typename Table<2, ElementType>::size_type row)
 {
   AssertIndexRange(row, table.size()[0]);
@@ -1381,7 +1382,7 @@ make_array_view(const Table<2, ElementType> &                   table,
  */
 template <typename ElementType>
 inline ArrayView<ElementType>
-make_array_view(Table<2, ElementType> &                         table,
+make_array_view(Table<2, ElementType>                          &table,
                 const typename Table<2, ElementType>::size_type row,
                 const typename Table<2, ElementType>::size_type starting_column,
                 const std::size_t                               size_of_view)
@@ -1418,7 +1419,7 @@ make_array_view(Table<2, ElementType> &                         table,
  */
 template <typename ElementType>
 inline ArrayView<const ElementType>
-make_array_view(const Table<2, ElementType> &                   table,
+make_array_view(const Table<2, ElementType>                    &table,
                 const typename Table<2, ElementType>::size_type row,
                 const typename Table<2, ElementType>::size_type starting_column,
                 const std::size_t                               size_of_view)

@@ -64,7 +64,7 @@
 
 #include "../tests.h"
 
-//#define DEBUG_OUTPUT_VTK
+// #define DEBUG_OUTPUT_VTK
 unsigned int counter = 0;
 
 const double eps = 1e-10;
@@ -293,7 +293,7 @@ test2cells(const FiniteElement<dim> &fe_0,
             less_than_key<dim>());
   for (unsigned int p = 0; p < pairs_point_value.size(); ++p)
     {
-      const Point<dim> &    pt  = pairs_point_value[p].first;
+      const Point<dim>     &pt  = pairs_point_value[p].first;
       const Vector<double> &val = pairs_point_value[p].second;
 
       Assert(val.size() == n_comp, ExcInternalError());

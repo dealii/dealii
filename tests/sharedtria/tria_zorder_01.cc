@@ -32,7 +32,7 @@
 
 template <int dim>
 void
-compare_meshes(parallel::shared::Triangulation<dim> &     shared_tria,
+compare_meshes(parallel::shared::Triangulation<dim>      &shared_tria,
                parallel::distributed::Triangulation<dim> &p4est_tria)
 {
   AssertThrow(shared_tria.n_locally_owned_active_cells() ==

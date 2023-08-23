@@ -238,9 +238,9 @@ namespace PETScWrappers
      * This function calls MatrixBase::mmult() to do the actual work.
      */
     void
-    mmult(SparseMatrix &      C,
+    mmult(SparseMatrix       &C,
           const SparseMatrix &B,
-          const MPI::Vector & V = MPI::Vector()) const;
+          const MPI::Vector  &V = MPI::Vector()) const;
 
     /**
      * Perform the matrix-matrix multiplication with the transpose of
@@ -250,9 +250,9 @@ namespace PETScWrappers
      * This function calls MatrixBase::Tmmult() to do the actual work.
      */
     void
-    Tmmult(SparseMatrix &      C,
+    Tmmult(SparseMatrix       &C,
            const SparseMatrix &B,
-           const MPI::Vector & V = MPI::Vector()) const;
+           const MPI::Vector  &V = MPI::Vector()) const;
 
   private:
     /**
@@ -433,7 +433,7 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       SparseMatrix(const MPI_Comm                communicator,
-                   const SparsityPatternType &   sparsity_pattern,
+                   const SparsityPatternType    &sparsity_pattern,
                    const std::vector<size_type> &local_rows_per_process,
                    const std::vector<size_type> &local_columns_per_process,
                    const unsigned int            this_process,
@@ -481,7 +481,7 @@ namespace PETScWrappers
       template <typename SparsityPatternType>
       void
       reinit(const MPI_Comm                communicator,
-             const SparsityPatternType &   sparsity_pattern,
+             const SparsityPatternType    &sparsity_pattern,
              const std::vector<size_type> &local_rows_per_process,
              const std::vector<size_type> &local_columns_per_process,
              const unsigned int            this_process,
@@ -495,7 +495,7 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      reinit(const IndexSet &           local_partitioning,
+      reinit(const IndexSet            &local_partitioning,
              const SparsityPatternType &sparsity_pattern,
              const MPI_Comm             communicator);
 
@@ -507,8 +507,8 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      reinit(const IndexSet &           local_rows,
-             const IndexSet &           local_columns,
+      reinit(const IndexSet            &local_rows,
+             const IndexSet            &local_columns,
              const SparsityPatternType &sparsity_pattern,
              const MPI_Comm             communicator);
 
@@ -531,10 +531,10 @@ namespace PETScWrappers
        */
       template <typename SparsityPatternType>
       void
-      reinit(const IndexSet &           local_rows,
-             const IndexSet &           local_active_rows,
-             const IndexSet &           local_columns,
-             const IndexSet &           local_active_columns,
+      reinit(const IndexSet            &local_rows,
+             const IndexSet            &local_active_rows,
+             const IndexSet            &local_columns,
+             const IndexSet            &local_active_columns,
              const SparsityPatternType &sparsity_pattern,
              const MPI_Comm             communicator);
 
@@ -604,9 +604,9 @@ namespace PETScWrappers
        * This function calls MatrixBase::mmult() to do the actual work.
        */
       void
-      mmult(SparseMatrix &      C,
+      mmult(SparseMatrix       &C,
             const SparseMatrix &B,
-            const MPI::Vector & V = MPI::Vector()) const;
+            const MPI::Vector  &V = MPI::Vector()) const;
 
       /**
        * Perform the matrix-matrix multiplication with the transpose of
@@ -616,9 +616,9 @@ namespace PETScWrappers
        * This function calls MatrixBase::Tmmult() to do the actual work.
        */
       void
-      Tmmult(SparseMatrix &      C,
+      Tmmult(SparseMatrix       &C,
              const SparseMatrix &B,
-             const MPI::Vector & V = MPI::Vector()) const;
+             const MPI::Vector  &V = MPI::Vector()) const;
 
     private:
       /**
@@ -627,7 +627,7 @@ namespace PETScWrappers
       template <typename SparsityPatternType>
       void
       do_reinit(const MPI_Comm                comm,
-                const SparsityPatternType &   sparsity_pattern,
+                const SparsityPatternType    &sparsity_pattern,
                 const std::vector<size_type> &local_rows_per_process,
                 const std::vector<size_type> &local_columns_per_process,
                 const unsigned int            this_process,
@@ -639,8 +639,8 @@ namespace PETScWrappers
       template <typename SparsityPatternType>
       void
       do_reinit(const MPI_Comm             comm,
-                const IndexSet &           local_rows,
-                const IndexSet &           local_columns,
+                const IndexSet            &local_rows,
+                const IndexSet            &local_columns,
                 const SparsityPatternType &sparsity_pattern);
 
       /**
@@ -650,10 +650,10 @@ namespace PETScWrappers
       template <typename SparsityPatternType>
       void
       do_reinit(const MPI_Comm             comm,
-                const IndexSet &           local_rows,
-                const IndexSet &           local_active_rows,
-                const IndexSet &           local_columns,
-                const IndexSet &           local_active_columns,
+                const IndexSet            &local_rows,
+                const IndexSet            &local_active_rows,
+                const IndexSet            &local_columns,
+                const IndexSet            &local_active_columns,
                 const SparsityPatternType &sparsity_pattern);
 
       // To allow calling protected prepare_add() and prepare_set().

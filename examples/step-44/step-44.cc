@@ -853,16 +853,16 @@ namespace Step44
 
     void assemble_system_one_cell(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      ScratchData_ASM &                                     scratch,
-      PerTaskData_ASM &                                     data) const;
+      ScratchData_ASM                                      &scratch,
+      PerTaskData_ASM                                      &data) const;
 
     // And similar to perform global static condensation:
     void assemble_sc();
 
     void assemble_sc_one_cell(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      ScratchData_SC &                                      scratch,
-      PerTaskData_SC &                                      data);
+      ScratchData_SC                                       &scratch,
+      PerTaskData_SC                                       &data);
 
     void copy_local_to_global_sc(const PerTaskData_SC &data);
 
@@ -875,8 +875,8 @@ namespace Step44
 
     void update_qph_incremental_one_cell(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      ScratchData_UQPH &                                    scratch,
-      PerTaskData_UQPH &                                    data);
+      ScratchData_UQPH                                     &scratch,
+      PerTaskData_UQPH                                     &data);
 
     void copy_local_to_global_UQPH(const PerTaskData_UQPH & /*data*/)
     {}
@@ -1007,7 +1007,7 @@ namespace Step44
     void get_error_residual(Errors &error_residual);
 
     void get_error_update(const BlockVector<double> &newton_update,
-                          Errors &                   error_update);
+                          Errors                    &error_update);
 
     std::pair<double, double> get_error_dilation() const;
 
@@ -1182,9 +1182,9 @@ namespace Step44
     std::vector<std::vector<SymmetricTensor<2, dim>>> symm_grad_Nx;
 
     ScratchData_ASM(const FiniteElement<dim> &fe_cell,
-                    const QGauss<dim> &       qf_cell,
+                    const QGauss<dim>        &qf_cell,
                     const UpdateFlags         uf_cell,
-                    const QGauss<dim - 1> &   qf_face,
+                    const QGauss<dim - 1>    &qf_face,
                     const UpdateFlags         uf_face)
       : fe_values(fe_cell, qf_cell, uf_cell)
       , fe_face_values(fe_cell, qf_face, uf_face)
@@ -1328,8 +1328,8 @@ namespace Step44
 
     FEValues<dim> fe_values;
 
-    ScratchData_UQPH(const FiniteElement<dim> & fe_cell,
-                     const QGauss<dim> &        qf_cell,
+    ScratchData_UQPH(const FiniteElement<dim>  &fe_cell,
+                     const QGauss<dim>         &qf_cell,
                      const UpdateFlags          uf_cell,
                      const BlockVector<double> &solution_total)
       : solution_total(solution_total)
@@ -1602,7 +1602,7 @@ namespace Step44
   template <int dim>
   void Solid<dim>::update_qph_incremental_one_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    ScratchData_UQPH &                                    scratch,
+    ScratchData_UQPH                                     &scratch,
     PerTaskData_UQPH & /*data*/)
   {
     const std::vector<std::shared_ptr<PointHistory<dim>>> lqph =
@@ -1902,7 +1902,7 @@ namespace Step44
   // Determine the true Newton update error for the problem
   template <int dim>
   void Solid<dim>::get_error_update(const BlockVector<double> &newton_update,
-                                    Errors &                   error_update)
+                                    Errors                    &error_update)
   {
     BlockVector<double> error_ud(dofs_per_block);
     for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
@@ -1963,8 +1963,8 @@ namespace Step44
     WorkStream::run(
       dof_handler.active_cell_iterators(),
       [this](const typename DoFHandler<dim>::active_cell_iterator &cell,
-             ScratchData_ASM &                                     scratch,
-             PerTaskData_ASM &                                     data) {
+             ScratchData_ASM                                      &scratch,
+             PerTaskData_ASM                                      &data) {
         this->assemble_system_one_cell(cell, scratch, data);
       },
       [this](const PerTaskData_ASM &data) {
@@ -1991,8 +1991,8 @@ namespace Step44
   template <int dim>
   void Solid<dim>::assemble_system_one_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    ScratchData_ASM &                                     scratch,
-    PerTaskData_ASM &                                     data) const
+    ScratchData_ASM                                      &scratch,
+    PerTaskData_ASM                                      &data) const
   {
     data.reset();
     scratch.reset();
@@ -2063,7 +2063,7 @@ namespace Step44
 
         // Next we define some aliases to make the assembly process easier to
         // follow.
-        const std::vector<double> &                 N = scratch.Nx[q_point];
+        const std::vector<double>                  &N = scratch.Nx[q_point];
         const std::vector<SymmetricTensor<2, dim>> &symm_grad_Nx =
           scratch.symm_grad_Nx[q_point];
         const std::vector<Tensor<2, dim>> &grad_Nx = scratch.grad_Nx[q_point];
@@ -2476,8 +2476,8 @@ namespace Step44
   template <int dim>
   void Solid<dim>::assemble_sc_one_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    ScratchData_SC &                                      scratch,
-    PerTaskData_SC &                                      data)
+    ScratchData_SC                                       &scratch,
+    PerTaskData_SC                                       &data)
   {
     data.reset();
     scratch.reset();

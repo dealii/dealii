@@ -37,8 +37,8 @@ namespace internal
     const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
     const bool                                                 transpose,
     const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                     VectorizedArrayType::size()> &            c_mask,
-    VectorizedArrayType *                                      values)
+                     VectorizedArrayType::size()>             &c_mask,
+    VectorizedArrayType                                       *values)
   {
     instantiation_helper_degree_run<
       1,

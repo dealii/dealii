@@ -74,7 +74,7 @@ namespace TrilinosWrappers
     Domain,
     TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload>
   linear_operator(const TrilinosWrappers::SparseMatrix &operator_exemplar,
-                  const Matrix &                        matrix)
+                  const Matrix                         &matrix)
   {
     using OperatorExemplar = TrilinosWrappers::SparseMatrix;
     using Payload =
@@ -137,7 +137,7 @@ namespace TrilinosWrappers
       Range,
       Domain,
       TrilinosWrappers::internal::LinearOperatorImplementation::TrilinosPayload>
-      &           operator_exemplar,
+                 &operator_exemplar,
     const Matrix &matrix)
   {
     using Payload =

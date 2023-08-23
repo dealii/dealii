@@ -521,9 +521,9 @@ namespace Utilities
       export_to_ghosted_array_start(
         const unsigned int                              communication_channel,
         const ArrayView<const Number, MemorySpaceType> &locally_owned_array,
-        const ArrayView<Number, MemorySpaceType> &      temporary_storage,
-        const ArrayView<Number, MemorySpaceType> &      ghost_array,
-        std::vector<MPI_Request> &                      requests) const;
+        const ArrayView<Number, MemorySpaceType>       &temporary_storage,
+        const ArrayView<Number, MemorySpaceType>       &ghost_array,
+        std::vector<MPI_Request>                       &requests) const;
 
       /**
        * Finish the exportation of the data in a locally owned array to the
@@ -546,7 +546,7 @@ namespace Utilities
       void
       export_to_ghosted_array_finish(
         const ArrayView<Number, MemorySpaceType> &ghost_array,
-        std::vector<MPI_Request> &                requests) const;
+        std::vector<MPI_Request>                 &requests) const;
 
       /**
        * Start importing the data on an array indexed by the ghost indices of
@@ -592,7 +592,7 @@ namespace Utilities
         const unsigned int                        communication_channel,
         const ArrayView<Number, MemorySpaceType> &ghost_array,
         const ArrayView<Number, MemorySpaceType> &temporary_storage,
-        std::vector<MPI_Request> &                requests) const;
+        std::vector<MPI_Request>                 &requests) const;
 
       /**
        * Finish importing the data from an array indexed by the ghost
@@ -633,9 +633,9 @@ namespace Utilities
       import_from_ghosted_array_finish(
         const VectorOperation::values                   vector_operation,
         const ArrayView<const Number, MemorySpaceType> &temporary_storage,
-        const ArrayView<Number, MemorySpaceType> &      locally_owned_storage,
-        const ArrayView<Number, MemorySpaceType> &      ghost_array,
-        std::vector<MPI_Request> &                      requests) const;
+        const ArrayView<Number, MemorySpaceType>       &locally_owned_storage,
+        const ArrayView<Number, MemorySpaceType>       &ghost_array,
+        std::vector<MPI_Request>                       &requests) const;
 #endif
 
       /**

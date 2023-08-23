@@ -137,7 +137,7 @@ public:
    */
   template <class Matrix>
   void
-  build_patches(const Matrix &     matrix,
+  build_patches(const Matrix      &matrix,
                 const std::string &name,
                 const Options      options = Options(false, 1, false));
 
@@ -183,10 +183,10 @@ private:
    */
   template <class Matrix>
   static double
-  get_gridpoint_value(const Matrix &  matrix,
+  get_gridpoint_value(const Matrix   &matrix,
                       const size_type i,
                       const size_type j,
-                      const Options & options);
+                      const Options  &options);
 };
 
 
@@ -266,7 +266,7 @@ namespace internal
      */
     template <class Matrix>
     double
-    get_element(const Matrix &                matrix,
+    get_element(const Matrix                 &matrix,
                 const types::global_dof_index i,
                 const types::global_dof_index j)
     {
@@ -279,10 +279,10 @@ namespace internal
 
 template <class Matrix>
 inline double
-MatrixOut::get_gridpoint_value(const Matrix &  matrix,
+MatrixOut::get_gridpoint_value(const Matrix   &matrix,
                                const size_type i,
                                const size_type j,
-                               const Options & options)
+                               const Options  &options)
 {
   // special case if block size is
   // one since we then don't need all
@@ -322,7 +322,7 @@ MatrixOut::get_gridpoint_value(const Matrix &  matrix,
 
 template <class Matrix>
 void
-MatrixOut::build_patches(const Matrix &     matrix,
+MatrixOut::build_patches(const Matrix      &matrix,
                          const std::string &name,
                          const Options      options)
 {

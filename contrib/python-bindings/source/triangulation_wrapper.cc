@@ -39,7 +39,7 @@ namespace python
     void
     create_triangulation(const boost::python::list &vertices_list,
                          const boost::python::list &cells_vertices,
-                         void *                     triangulation)
+                         void                      *triangulation)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
@@ -77,7 +77,7 @@ namespace python
     generate_hyper_cube(const double left,
                         const double right,
                         const bool   colorize,
-                        void *       triangulation)
+                        void        *triangulation)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
@@ -90,7 +90,7 @@ namespace python
     template <int dim>
     void
     generate_simplex(std::vector<PointWrapper> &wrapped_points,
-                     void *                     triangulation)
+                     void                      *triangulation)
     {
       // Cast the PointWrapper objects to Point<dim>
       std::vector<Point<dim>> points(dim + 1);
@@ -111,7 +111,7 @@ namespace python
     generate_subdivided_hyper_cube(const unsigned int repetitions,
                                    const double       left,
                                    const double       right,
-                                   void *             triangulation)
+                                   void              *triangulation)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
@@ -126,7 +126,7 @@ namespace python
     generate_hyper_rectangle(PointWrapper &p1,
                              PointWrapper &p2,
                              const bool    colorize,
-                             void *        triangulation)
+                             void         *triangulation)
     {
       AssertThrow(
         p1.get_dim() == dim,
@@ -154,7 +154,7 @@ namespace python
                                               const double       L,
                                               const unsigned int repetitions,
                                               const bool         colorize,
-                                              void *             triangulation)
+                                              void              *triangulation)
     {
       Triangulation<dim> *tria =
         static_cast<Triangulation<dim> *>(triangulation);
@@ -169,10 +169,10 @@ namespace python
     void
     generate_subdivided_hyper_rectangle(
       const std::vector<unsigned int> &repetitions,
-      PointWrapper &                   p1,
-      PointWrapper &                   p2,
+      PointWrapper                    &p1,
+      PointWrapper                    &p2,
       const bool                       colorize,
-      void *                           triangulation)
+      void                            *triangulation)
     {
       AssertThrow(
         p1.get_dim() == dim,
@@ -199,10 +199,10 @@ namespace python
     void
     generate_subdivided_steps_hyper_rectangle(
       const std::vector<std::vector<double>> &step_sizes,
-      PointWrapper &                          p1,
-      PointWrapper &                          p2,
+      PointWrapper                           &p1,
+      PointWrapper                           &p2,
       const bool                              colorize,
-      void *                                  triangulation)
+      void                                   *triangulation)
     {
       AssertThrow(
         p1.get_dim() == dim,
@@ -229,10 +229,10 @@ namespace python
     void
     generate_subdivided_material_hyper_rectangle(
       const std::vector<std::vector<double>> &spacing,
-      PointWrapper &                          p,
-      const Table<dim, types::material_id> &  material_ids,
+      PointWrapper                           &p,
+      const Table<dim, types::material_id>   &material_ids,
       const bool                              colorize,
-      void *                                  triangulation)
+      void                                   *triangulation)
     {
       AssertThrow(
         p.get_dim() == dim,
@@ -265,7 +265,7 @@ namespace python
     void
     generate_general_cell(std::vector<PointWrapper> &wrapped_points,
                           const bool                 colorize,
-                          void *                     triangulation)
+                          void                      *triangulation)
     {
       // Cast the PointWrapper objects to Point<dim>
       const unsigned int      size = wrapped_points.size();
@@ -286,7 +286,7 @@ namespace python
     void
     generate_parallelogram(std::vector<PointWrapper> &wrapped_points,
                            const bool                 colorize,
-                           void *                     triangulation)
+                           void                      *triangulation)
     {
       // Cast the PointWrapper objects to Point<dim>
       Point<dim> points[dim];
@@ -306,7 +306,7 @@ namespace python
     void
     generate_parallelepiped(std::vector<PointWrapper> &wrapped_points,
                             const bool                 colorize,
-                            void *                     triangulation)
+                            void                      *triangulation)
     {
       // Cast the PointWrapper objects to Point<dim>
       Point<dim> points[dim];
@@ -328,7 +328,7 @@ namespace python
       unsigned int               n_subdivisions,
       std::vector<PointWrapper> &wrapped_points,
       const bool                 colorize,
-      void *                     triangulation)
+      void                      *triangulation)
     {
       // Cast the PointWrapper objects to Point<dim>
       Point<dim> points[dim];
@@ -353,7 +353,7 @@ namespace python
       std::vector<unsigned int> &n_subdivisions,
       std::vector<PointWrapper> &wrapped_points,
       const bool                 colorize,
-      void *                     triangulation)
+      void                      *triangulation)
     {
       // Cast the PointWrapper objects to Point<dim>
       Point<dim>   points[dim];
@@ -382,7 +382,7 @@ namespace python
                                  const double right,
                                  const double thickness,
                                  const bool   colorize,
-                                 void *       triangulation)
+                                 void        *triangulation)
     {
       Triangulation<dim> *tria =
         static_cast<Triangulation<dim> *>(triangulation);
@@ -397,7 +397,7 @@ namespace python
     void
     generate_hyper_ball(PointWrapper &center,
                         const double  radius,
-                        void *        triangulation)
+                        void         *triangulation)
     {
       // Cast the PointWrapper object to Point<dim>
       Point<dim> center_point =
@@ -415,7 +415,7 @@ namespace python
     void
     generate_hyper_sphere(PointWrapper &center,
                           const double  radius,
-                          void *        triangulation)
+                          void         *triangulation)
     {
       // Cast the PointWrapper object to Point<dim>
       Point<spacedim> center_point =
@@ -430,12 +430,12 @@ namespace python
 
     template <int dim>
     void
-    generate_hyper_shell(PointWrapper & center,
+    generate_hyper_shell(PointWrapper  &center,
                          const double   inner_radius,
                          const double   outer_radius,
                          const unsigned n_cells,
                          bool           colorize,
-                         void *         triangulation)
+                         void          *triangulation)
     {
       // Cast the PointWrapper object to Point<dim>
       Point<dim> center_point =
@@ -453,7 +453,7 @@ namespace python
     void
     generate_quarter_hyper_ball(PointWrapper &center,
                                 const double  radius,
-                                void *        triangulation)
+                                void         *triangulation)
     {
       // Cast the PointWrapper object to Point<dim>
       Point<dim> center_point =
@@ -471,7 +471,7 @@ namespace python
     void
     generate_half_hyper_ball(PointWrapper &center,
                              const double  radius,
-                             void *        triangulation)
+                             void         *triangulation)
     {
       // Cast the PointWrapper object to Point<dim>
       Point<dim> center_point =
@@ -515,7 +515,7 @@ namespace python
     template <int dim, int spacedim>
     void
     merge_triangulations(boost::python::list &triangulations,
-                         void *               triangulation,
+                         void                *triangulation,
                          const double         duplicated_vertex_tolerance,
                          const bool           copy_manifold_ids)
     {
@@ -557,7 +557,7 @@ namespace python
 
     template <int dim, int spacedim>
     void
-    convert_hypercube_to_simplex_mesh(void *                triangulation,
+    convert_hypercube_to_simplex_mesh(void                 *triangulation,
                                       TriangulationWrapper &tria_out)
     {
       Triangulation<dim, spacedim> *tria =
@@ -572,9 +572,9 @@ namespace python
 
     template <int dim, int spacedim>
     void
-    replicate_triangulation(TriangulationWrapper &     tria_in,
+    replicate_triangulation(TriangulationWrapper      &tria_in,
                             const boost::python::list &extents,
-                            void *                     tria_out)
+                            void                      *tria_out)
     {
       Triangulation<dim, spacedim> *replicated_triangulation =
         static_cast<Triangulation<dim, spacedim> *>(tria_out);
@@ -598,7 +598,7 @@ namespace python
     void
     distort_random(const double factor,
                    const bool   keep_boundary,
-                   void *       triangulation)
+                   void        *triangulation)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
@@ -640,9 +640,9 @@ namespace python
 
     template <int dim, int spacedim>
     std::pair<int, int>
-    find_active_cell_around_point(PointWrapper &   p,
+    find_active_cell_around_point(PointWrapper    &p,
                                   MappingQWrapper &mapping_wrapper,
-                                  void *           triangulation)
+                                  void            *triangulation)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
@@ -671,8 +671,8 @@ namespace python
     template <int dim, int spacedim>
     boost::python::list
     compute_aspect_ratio_of_cells(
-      const MappingQWrapper &     mapping_wrapper,
-      const QuadratureWrapper &   quadrature_wrapper,
+      const MappingQWrapper      &mapping_wrapper,
+      const QuadratureWrapper    &quadrature_wrapper,
       const TriangulationWrapper &triangulation_wrapper)
     {
       const Triangulation<dim, spacedim> *tria =
@@ -783,7 +783,7 @@ namespace python
     void
     write(const std::string &filename,
           const std::string &format,
-          const void *       triangulation)
+          const void        *triangulation)
     {
       const Triangulation<dim, spacedim> *tria =
         static_cast<const Triangulation<dim, spacedim> *>(triangulation);
@@ -824,7 +824,7 @@ namespace python
     void
     read(const std::string &filename,
          const std::string &format,
-         void *             triangulation)
+         void              *triangulation)
     {
       Triangulation<dim, spacedim> *tria =
         static_cast<Triangulation<dim, spacedim> *>(triangulation);
@@ -1046,8 +1046,8 @@ namespace python
   void
   TriangulationWrapper::generate_subdivided_hyper_rectangle(
     boost::python::list &repetition_list,
-    PointWrapper &       p1,
-    PointWrapper &       p2,
+    PointWrapper        &p1,
+    PointWrapper        &p2,
     const bool           colorize)
   {
     AssertThrow(
@@ -1076,8 +1076,8 @@ namespace python
   void
   TriangulationWrapper::generate_subdivided_steps_hyper_rectangle(
     boost::python::list &step_sizes_list,
-    PointWrapper &       p1,
-    PointWrapper &       p2,
+    PointWrapper        &p1,
+    PointWrapper        &p2,
     const bool           colorize)
   {
     AssertThrow(
@@ -1112,7 +1112,7 @@ namespace python
   void
   TriangulationWrapper::generate_subdivided_material_hyper_rectangle(
     boost::python::list &spacing_list,
-    PointWrapper &       p,
+    PointWrapper        &p,
     boost::python::list &material_id_list,
     const bool           colorize)
   {
@@ -1375,7 +1375,7 @@ namespace python
 
 
   void
-  TriangulationWrapper::generate_hyper_shell(PointWrapper & center,
+  TriangulationWrapper::generate_hyper_shell(PointWrapper  &center,
                                              const double   inner_radius,
                                              const double   outer_radius,
                                              const unsigned n_cells,
@@ -1604,7 +1604,7 @@ namespace python
   void
   TriangulationWrapper::replicate_triangulation(
     TriangulationWrapper &triangulation_in,
-    boost::python::list & extents)
+    boost::python::list  &extents)
   {
     AssertThrow(
       boost::python::len(extents) == dim,
@@ -1661,7 +1661,7 @@ namespace python
 
 
   CellAccessorWrapper
-  TriangulationWrapper::find_active_cell_around_point(PointWrapper &  p,
+  TriangulationWrapper::find_active_cell_around_point(PointWrapper   &p,
                                                       MappingQWrapper mapping)
   {
     std::pair<int, int> level_index_pair;
@@ -1704,7 +1704,7 @@ namespace python
 
   boost::python::list
   TriangulationWrapper::compute_aspect_ratio_of_cells(
-    const MappingQWrapper &  mapping,
+    const MappingQWrapper   &mapping,
     const QuadratureWrapper &quadrature)
   {
     if ((dim == 2) && (spacedim == 2))

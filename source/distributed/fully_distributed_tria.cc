@@ -219,9 +219,9 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::create_triangulation(
-      const std::vector<Point<spacedim>> &      vertices,
+      const std::vector<Point<spacedim>>       &vertices,
       const std::vector<dealii::CellData<dim>> &cells,
-      const SubCellData &                       subcelldata)
+      const SubCellData                        &subcelldata)
     {
       Assert(
         currently_processing_create_triangulation_for_internal_usage,
@@ -299,7 +299,7 @@ namespace parallel
     void Triangulation<dim, spacedim>::set_partitioner(
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
                                const unsigned int)> &partitioner,
-      const TriangulationDescription::Settings &     settings)
+      const TriangulationDescription::Settings      &settings)
     {
       this->partitioner = partitioner;
       this->settings    = settings;
@@ -311,7 +311,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::set_partitioner(
       const RepartitioningPolicyTools::Base<dim, spacedim> &partitioner,
-      const TriangulationDescription::Settings &            settings)
+      const TriangulationDescription::Settings             &settings)
     {
       this->partitioner_distributed = &partitioner;
       this->settings                = settings;

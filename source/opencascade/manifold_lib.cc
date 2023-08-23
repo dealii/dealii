@@ -129,7 +129,7 @@ namespace OpenCASCADE
   Point<spacedim>
   NormalProjectionManifold<dim, spacedim>::project_to_manifold(
     const ArrayView<const Point<spacedim>> &surrounding_points,
-    const Point<spacedim> &                 candidate) const
+    const Point<spacedim>                  &candidate) const
   {
     (void)surrounding_points;
 #  ifdef DEBUG
@@ -146,7 +146,7 @@ namespace OpenCASCADE
   /*===================== DirectionalProjectionManifold ======================*/
   template <int dim, int spacedim>
   DirectionalProjectionManifold<dim, spacedim>::DirectionalProjectionManifold(
-    const TopoDS_Shape &       sh,
+    const TopoDS_Shape        &sh,
     const Tensor<1, spacedim> &direction,
     const double               tolerance)
     : sh(sh)
@@ -172,7 +172,7 @@ namespace OpenCASCADE
   Point<spacedim>
   DirectionalProjectionManifold<dim, spacedim>::project_to_manifold(
     const ArrayView<const Point<spacedim>> &surrounding_points,
-    const Point<spacedim> &                 candidate) const
+    const Point<spacedim>                  &candidate) const
   {
     (void)surrounding_points;
 #  ifdef DEBUG
@@ -227,10 +227,10 @@ namespace OpenCASCADE
     template <>
     Point<3>
     internal_project_to_manifold(
-      const TopoDS_Shape &             sh,
+      const TopoDS_Shape              &sh,
       const double                     tolerance,
       const ArrayView<const Point<3>> &surrounding_points,
-      const Point<3> &                 candidate)
+      const Point<3>                  &candidate)
     {
       constexpr int       spacedim = 3;
       TopoDS_Shape        out_shape;
@@ -394,7 +394,7 @@ namespace OpenCASCADE
   Point<spacedim>
   NormalToMeshProjectionManifold<dim, spacedim>::project_to_manifold(
     const ArrayView<const Point<spacedim>> &surrounding_points,
-    const Point<spacedim> &                 candidate) const
+    const Point<spacedim>                  &candidate) const
   {
     return internal_project_to_manifold(sh,
                                         tolerance,

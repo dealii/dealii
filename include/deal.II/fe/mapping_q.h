@@ -179,7 +179,7 @@ public:
   virtual void
   transform_points_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const ArrayView<const Point<spacedim>> &                    real_points,
+    const ArrayView<const Point<spacedim>>                     &real_points,
     const ArrayView<Point<dim>> &unit_points) const override;
 
   /**
@@ -193,7 +193,7 @@ public:
 
   // for documentation, see the Mapping base class
   virtual void
-  transform(const ArrayView<const Tensor<1, dim>> &                  input,
+  transform(const ArrayView<const Tensor<1, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<1, spacedim>> &output) const override;
@@ -207,7 +207,7 @@ public:
 
   // for documentation, see the Mapping base class
   virtual void
-  transform(const ArrayView<const Tensor<2, dim>> &                  input,
+  transform(const ArrayView<const Tensor<2, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const override;
@@ -221,7 +221,7 @@ public:
 
   // for documentation, see the Mapping base class
   virtual void
-  transform(const ArrayView<const Tensor<3, dim>> &                  input,
+  transform(const ArrayView<const Tensor<3, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const override;
@@ -250,7 +250,7 @@ public:
   void
   fill_mapping_data_for_generic_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const ArrayView<const Point<dim>> &                         unit_points,
+    const ArrayView<const Point<dim>>                          &unit_points,
     const UpdateFlags                                           update_flags,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
@@ -281,8 +281,8 @@ public:
   fill_mapping_data_for_face_quadrature(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_number,
-    const Quadrature<dim - 1> &                                 face_quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim - 1>                                  &face_quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
 
@@ -486,8 +486,8 @@ protected:
   fill_fe_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellSimilarity::Similarity                            cell_similarity,
-    const Quadrature<dim> &                                     quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim>                                      &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
@@ -498,8 +498,8 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const hp::QCollection<dim - 1> &                            quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const hp::QCollection<dim - 1>                             &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
@@ -509,8 +509,8 @@ protected:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          subface_no,
-    const Quadrature<dim - 1> &                                 quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim - 1>                                  &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
@@ -518,8 +518,8 @@ protected:
   virtual void
   fill_fe_immersed_surface_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const NonMatching::ImmersedSurfaceQuadrature<dim>          &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 
@@ -645,7 +645,7 @@ protected:
   Point<dim>
   transform_real_to_unit_cell_internal(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const Point<spacedim> &                                     p,
+    const Point<spacedim>                                      &p,
     const Point<dim> &initial_p_unit) const;
 
   /**
@@ -664,7 +664,7 @@ protected:
   virtual void
   add_line_support_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim>> &                              a) const;
+    std::vector<Point<spacedim>>                               &a) const;
 
   /**
    * Append the support points of all shape functions located on bounding
@@ -683,7 +683,7 @@ protected:
   virtual void
   add_quad_support_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim>> &                              a) const;
+    std::vector<Point<spacedim>>                               &a) const;
 
   // Make MappingQCache a friend since it needs to call the
   // compute_mapping_support_points() function.

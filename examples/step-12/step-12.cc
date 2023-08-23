@@ -82,7 +82,7 @@ namespace Step12
   public:
     BoundaryValues() = default;
     virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
+                            std::vector<double>           &values,
                             const unsigned int component = 0) const override;
   };
 
@@ -93,7 +93,7 @@ namespace Step12
   // scheme.
   template <int dim>
   void BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
-                                       std::vector<double> &          values,
+                                       std::vector<double>           &values,
                                        const unsigned int component) const
   {
     (void)component;
@@ -142,9 +142,9 @@ namespace Step12
   template <int dim>
   struct ScratchData
   {
-    ScratchData(const Mapping<dim> &       mapping,
-                const FiniteElement<dim> & fe,
-                const Quadrature<dim> &    quadrature,
+    ScratchData(const Mapping<dim>        &mapping,
+                const FiniteElement<dim>  &fe,
+                const Quadrature<dim>     &quadrature,
                 const Quadrature<dim - 1> &quadrature_face,
                 const UpdateFlags          update_flags = update_values |
                                                  update_gradients |
@@ -301,9 +301,9 @@ namespace Step12
     const BoundaryValues<dim> boundary_function;
 
     // This is the function that will be executed for each cell.
-    const auto cell_worker = [&](const Iterator &  cell,
+    const auto cell_worker = [&](const Iterator   &cell,
                                  ScratchData<dim> &scratch_data,
-                                 CopyData &        copy_data) {
+                                 CopyData         &copy_data) {
       const unsigned int n_dofs =
         scratch_data.fe_values.get_fe().n_dofs_per_cell();
       copy_data.reinit(cell, n_dofs);
@@ -311,7 +311,7 @@ namespace Step12
 
       const auto &q_points = scratch_data.fe_values.get_quadrature_points();
 
-      const FEValues<dim> &      fe_v = scratch_data.fe_values;
+      const FEValues<dim>       &fe_v = scratch_data.fe_values;
       const std::vector<double> &JxW  = fe_v.get_JxW_values();
 
       // We solve a homogeneous equation, thus no right hand side shows up in
@@ -334,10 +334,10 @@ namespace Step12
     // This is the function called for boundary faces and consists of a normal
     // integration using FEFaceValues. New is the logic to decide if the term
     // goes into the system matrix (outflow) or the right-hand side (inflow).
-    const auto boundary_worker = [&](const Iterator &    cell,
+    const auto boundary_worker = [&](const Iterator     &cell,
                                      const unsigned int &face_no,
-                                     ScratchData<dim> &  scratch_data,
-                                     CopyData &          copy_data) {
+                                     ScratchData<dim>   &scratch_data,
+                                     CopyData           &copy_data) {
       scratch_data.fe_interface_values.reinit(cell, face_no);
       const FEFaceValuesBase<dim> &fe_face =
         scratch_data.fe_interface_values.get_fe_face_values(0);
@@ -345,7 +345,7 @@ namespace Step12
       const auto &q_points = fe_face.get_quadrature_points();
 
       const unsigned int n_facet_dofs = fe_face.get_fe().n_dofs_per_cell();
-      const std::vector<double> &        JxW     = fe_face.get_JxW_values();
+      const std::vector<double>         &JxW     = fe_face.get_JxW_values();
       const std::vector<Tensor<1, dim>> &normals = fe_face.get_normal_vectors();
 
       std::vector<double> g(q_points.size());
@@ -377,14 +377,14 @@ namespace Step12
     // This is the function called on interior faces. The arguments specify
     // cells, face and subface indices (for adaptive refinement). We just pass
     // them along to the reinit() function of FEInterfaceValues.
-    const auto face_worker = [&](const Iterator &    cell,
+    const auto face_worker = [&](const Iterator     &cell,
                                  const unsigned int &f,
                                  const unsigned int &sf,
-                                 const Iterator &    ncell,
+                                 const Iterator     &ncell,
                                  const unsigned int &nf,
                                  const unsigned int &nsf,
-                                 ScratchData<dim> &  scratch_data,
-                                 CopyData &          copy_data) {
+                                 ScratchData<dim>   &scratch_data,
+                                 CopyData           &copy_data) {
       FEInterfaceValues<dim> &fe_iv = scratch_data.fe_interface_values;
       fe_iv.reinit(cell, f, sf, ncell, nf, nsf);
       const auto &q_points = fe_iv.get_quadrature_points();
@@ -397,7 +397,7 @@ namespace Step12
 
       copy_data_face.cell_matrix.reinit(n_dofs, n_dofs);
 
-      const std::vector<double> &        JxW     = fe_iv.get_JxW_values();
+      const std::vector<double>         &JxW     = fe_iv.get_JxW_values();
       const std::vector<Tensor<1, dim>> &normals = fe_iv.get_normal_vectors();
 
       for (unsigned int qpoint = 0; qpoint < q_points.size(); ++qpoint)

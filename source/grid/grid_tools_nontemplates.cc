@@ -31,7 +31,7 @@ namespace GridTools
 {
   template <>
   double
-  cell_measure<1>(const std::vector<Point<1>> &        all_vertices,
+  cell_measure<1>(const std::vector<Point<1>>         &all_vertices,
                   const ArrayView<const unsigned int> &vertex_indices)
   {
     AssertDimension(vertex_indices.size(), GeometryInfo<1>::vertices_per_cell);
@@ -44,7 +44,7 @@ namespace GridTools
 
   template <>
   double
-  cell_measure<2>(const std::vector<Point<2>> &        all_vertices,
+  cell_measure<2>(const std::vector<Point<2>>         &all_vertices,
                   const ArrayView<const unsigned int> &vertex_indices)
   {
     if (vertex_indices.size() == 3) // triangle
@@ -118,7 +118,7 @@ namespace GridTools
 
   template <>
   double
-  cell_measure<3>(const std::vector<Point<3>> &        all_vertices,
+  cell_measure<3>(const std::vector<Point<3>>         &all_vertices,
                   const ArrayView<const unsigned int> &vertex_indices)
   {
     if (vertex_indices.size() == 4) // tetrahedron

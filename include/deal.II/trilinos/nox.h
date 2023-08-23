@@ -168,7 +168,7 @@ namespace TrilinosWrappers
      * An overview of possible parameters is given at
      * https://docs.trilinos.org/dev/packages/nox/doc/html/parameters.html.
      */
-    NOXSolver(AdditionalData &                            additional_data,
+    NOXSolver(AdditionalData                             &additional_data,
               const Teuchos::RCP<Teuchos::ParameterList> &parameters =
                 Teuchos::rcp(new Teuchos::ParameterList));
 
@@ -337,8 +337,8 @@ namespace TrilinosWrappers
      */
     std::function<SolverControl::State(const unsigned int i,
                                        const double       norm_f,
-                                       const VectorType & current_u,
-                                       const VectorType & f)>
+                                       const VectorType  &current_u,
+                                       const VectorType  &f)>
       check_iteration_status;
 
     /**

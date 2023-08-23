@@ -53,7 +53,7 @@ ScalarLagrangePolynomialWedge<dim>::ScalarLagrangePolynomialWedge(
 template <int dim>
 double
 ScalarLagrangePolynomialWedge<dim>::compute_value(const unsigned int i,
-                                                  const Point<dim> & p) const
+                                                  const Point<dim>  &p) const
 {
   const auto pair = this->degree() == 1 ? internal::wedge_table_1[i] :
                                           internal::wedge_table_2[i];
@@ -72,7 +72,7 @@ ScalarLagrangePolynomialWedge<dim>::compute_value(const unsigned int i,
 template <int dim>
 Tensor<1, dim>
 ScalarLagrangePolynomialWedge<dim>::compute_grad(const unsigned int i,
-                                                 const Point<dim> & p) const
+                                                 const Point<dim>  &p) const
 {
   const auto pair = this->degree() == 1 ? internal::wedge_table_1[i] :
                                           internal::wedge_table_2[i];
@@ -112,8 +112,8 @@ ScalarLagrangePolynomialWedge<dim>::compute_grad_grad(const unsigned int i,
 template <int dim>
 void
 ScalarLagrangePolynomialWedge<dim>::evaluate(
-  const Point<dim> &           unit_point,
-  std::vector<double> &        values,
+  const Point<dim>            &unit_point,
+  std::vector<double>         &values,
   std::vector<Tensor<1, dim>> &grads,
   std::vector<Tensor<2, dim>> &grad_grads,
   std::vector<Tensor<3, dim>> &third_derivatives,
@@ -139,7 +139,7 @@ template <int dim>
 Tensor<1, dim>
 ScalarLagrangePolynomialWedge<dim>::compute_1st_derivative(
   const unsigned int i,
-  const Point<dim> & p) const
+  const Point<dim>  &p) const
 {
   return compute_grad(i, p);
 }
@@ -150,7 +150,7 @@ template <int dim>
 Tensor<2, dim>
 ScalarLagrangePolynomialWedge<dim>::compute_2nd_derivative(
   const unsigned int i,
-  const Point<dim> & p) const
+  const Point<dim>  &p) const
 {
   (void)i;
   (void)p;
@@ -166,7 +166,7 @@ template <int dim>
 Tensor<3, dim>
 ScalarLagrangePolynomialWedge<dim>::compute_3rd_derivative(
   const unsigned int i,
-  const Point<dim> & p) const
+  const Point<dim>  &p) const
 {
   (void)i;
   (void)p;
@@ -182,7 +182,7 @@ template <int dim>
 Tensor<4, dim>
 ScalarLagrangePolynomialWedge<dim>::compute_4th_derivative(
   const unsigned int i,
-  const Point<dim> & p) const
+  const Point<dim>  &p) const
 {
   (void)i;
   (void)p;

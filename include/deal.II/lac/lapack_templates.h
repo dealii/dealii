@@ -32,263 +32,263 @@ extern "C"
 {
   void DEAL_II_FORTRAN_MANGLE(saxpy,
                               SAXPY)(const dealii::types::blas_int *n,
-                                     const float *                  sa,
-                                     const float *                  sx,
+                                     const float                   *sa,
+                                     const float                   *sx,
                                      const dealii::types::blas_int *incx,
-                                     float *                        sy,
+                                     float                         *sy,
                                      const dealii::types::blas_int *incy);
 
   void DEAL_II_FORTRAN_MANGLE(daxpy,
                               DAXPY)(const dealii::types::blas_int *n,
-                                     const double *                 da,
-                                     const double *                 dx,
+                                     const double                  *da,
+                                     const double                  *dx,
                                      const dealii::types::blas_int *incx,
-                                     double *                       dy,
+                                     double                        *dy,
                                      const dealii::types::blas_int *incy);
 
   void DEAL_II_FORTRAN_MANGLE(caxpy,
                               CAXPY)(const dealii::types::blas_int *n,
-                                     const std::complex<float> *    ca,
-                                     const std::complex<float> *    cx,
+                                     const std::complex<float>     *ca,
+                                     const std::complex<float>     *cx,
                                      const dealii::types::blas_int *incx,
-                                     std::complex<float> *          cy,
+                                     std::complex<float>           *cy,
                                      const dealii::types::blas_int *incy);
 
   void DEAL_II_FORTRAN_MANGLE(zaxpy,
                               ZAXPY)(const dealii::types::blas_int *n,
-                                     const std::complex<double> *   za,
-                                     const std::complex<double> *   zx,
+                                     const std::complex<double>    *za,
+                                     const std::complex<double>    *zx,
                                      const dealii::types::blas_int *incx,
-                                     std::complex<double> *         zy,
+                                     std::complex<double>          *zy,
                                      const dealii::types::blas_int *incy);
 
   void DEAL_II_FORTRAN_MANGLE(sgeev,
-                              SGEEV)(const char *                   jobvl,
-                                     const char *                   jobvr,
+                              SGEEV)(const char                    *jobvl,
+                                     const char                    *jobvr,
                                      const dealii::types::blas_int *n,
-                                     float *                        a,
+                                     float                         *a,
                                      const dealii::types::blas_int *lda,
-                                     float *                        wr,
-                                     float *                        wi,
-                                     float *                        vl,
+                                     float                         *wr,
+                                     float                         *wi,
+                                     float                         *vl,
                                      const dealii::types::blas_int *ldvl,
-                                     float *                        vr,
+                                     float                         *vr,
                                      const dealii::types::blas_int *ldvr,
-                                     float *                        work,
+                                     float                         *work,
                                      const dealii::types::blas_int *lwork,
-                                     dealii::types::blas_int *      info);
+                                     dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dgeev,
-                              DGEEV)(const char *                   jobvl,
-                                     const char *                   jobvr,
+                              DGEEV)(const char                    *jobvl,
+                                     const char                    *jobvr,
                                      const dealii::types::blas_int *n,
-                                     double *                       a,
+                                     double                        *a,
                                      const dealii::types::blas_int *lda,
-                                     double *                       wr,
-                                     double *                       wi,
-                                     double *                       vl,
+                                     double                        *wr,
+                                     double                        *wi,
+                                     double                        *vl,
                                      const dealii::types::blas_int *ldvl,
-                                     double *                       vr,
+                                     double                        *vr,
                                      const dealii::types::blas_int *ldvr,
-                                     double *                       work,
+                                     double                        *work,
                                      const dealii::types::blas_int *lwork,
-                                     dealii::types::blas_int *      info);
+                                     dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cgeev,
-                              CGEEV)(const char *                   jobvl,
-                                     const char *                   jobvr,
+                              CGEEV)(const char                    *jobvl,
+                                     const char                    *jobvr,
                                      const dealii::types::blas_int *n,
-                                     std::complex<float> *          a,
+                                     std::complex<float>           *a,
                                      const dealii::types::blas_int *lda,
-                                     std::complex<float> *          w,
-                                     std::complex<float> *          vl,
+                                     std::complex<float>           *w,
+                                     std::complex<float>           *vl,
                                      const dealii::types::blas_int *ldvl,
-                                     std::complex<float> *          vr,
+                                     std::complex<float>           *vr,
                                      const dealii::types::blas_int *ldvr,
-                                     std::complex<float> *          work,
+                                     std::complex<float>           *work,
                                      const dealii::types::blas_int *lwork,
-                                     float *                        rwork,
-                                     dealii::types::blas_int *      info);
+                                     float                         *rwork,
+                                     dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zgeev,
-                              ZGEEV)(const char *                   jobvl,
-                                     const char *                   jobvr,
+                              ZGEEV)(const char                    *jobvl,
+                                     const char                    *jobvr,
                                      const dealii::types::blas_int *n,
-                                     std::complex<double> *         a,
+                                     std::complex<double>          *a,
                                      const dealii::types::blas_int *lda,
-                                     std::complex<double> *         w,
-                                     std::complex<double> *         vl,
+                                     std::complex<double>          *w,
+                                     std::complex<double>          *vl,
                                      const dealii::types::blas_int *ldvl,
-                                     std::complex<double> *         vr,
+                                     std::complex<double>          *vr,
                                      const dealii::types::blas_int *ldvr,
-                                     std::complex<double> *         work,
+                                     std::complex<double>          *work,
                                      const dealii::types::blas_int *lwork,
-                                     double *                       rwork,
-                                     dealii::types::blas_int *      info);
+                                     double                        *rwork,
+                                     dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sgeevx,
-                              SGEEVX)(const char *                   balanc,
-                                      const char *                   jobvl,
-                                      const char *                   jobvr,
-                                      const char *                   sense,
+                              SGEEVX)(const char                    *balanc,
+                                      const char                    *jobvl,
+                                      const char                    *jobvr,
+                                      const char                    *sense,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        wr,
-                                      float *                        wi,
-                                      float *                        vl,
+                                      float                         *wr,
+                                      float                         *wi,
+                                      float                         *vl,
                                       const dealii::types::blas_int *ldvl,
-                                      float *                        vr,
+                                      float                         *vr,
                                       const dealii::types::blas_int *ldvr,
-                                      dealii::types::blas_int *      ilo,
-                                      dealii::types::blas_int *      ihi,
-                                      float *                        scale,
-                                      float *                        abnrm,
-                                      float *                        rconde,
-                                      float *                        rcondv,
-                                      float *                        work,
+                                      dealii::types::blas_int       *ilo,
+                                      dealii::types::blas_int       *ihi,
+                                      float                         *scale,
+                                      float                         *abnrm,
+                                      float                         *rconde,
+                                      float                         *rcondv,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dgeevx,
-                              DGEEVX)(const char *                   balanc,
-                                      const char *                   jobvl,
-                                      const char *                   jobvr,
-                                      const char *                   sense,
+                              DGEEVX)(const char                    *balanc,
+                                      const char                    *jobvl,
+                                      const char                    *jobvr,
+                                      const char                    *sense,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       wr,
-                                      double *                       wi,
-                                      double *                       vl,
+                                      double                        *wr,
+                                      double                        *wi,
+                                      double                        *vl,
                                       const dealii::types::blas_int *ldvl,
-                                      double *                       vr,
+                                      double                        *vr,
                                       const dealii::types::blas_int *ldvr,
-                                      dealii::types::blas_int *      ilo,
-                                      dealii::types::blas_int *      ihi,
-                                      double *                       scale,
-                                      double *                       abnrm,
-                                      double *                       rconde,
-                                      double *                       rcondv,
-                                      double *                       work,
+                                      dealii::types::blas_int       *ilo,
+                                      dealii::types::blas_int       *ihi,
+                                      double                        *scale,
+                                      double                        *abnrm,
+                                      double                        *rconde,
+                                      double                        *rcondv,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cgeevx,
-                              CGEEVX)(const char *                   balanc,
-                                      const char *                   jobvl,
-                                      const char *                   jobvr,
-                                      const char *                   sense,
+                              CGEEVX)(const char                    *balanc,
+                                      const char                    *jobvl,
+                                      const char                    *jobvr,
+                                      const char                    *sense,
                                       const dealii::types::blas_int *n,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<float> *          w,
-                                      std::complex<float> *          vl,
+                                      std::complex<float>           *w,
+                                      std::complex<float>           *vl,
                                       const dealii::types::blas_int *ldvl,
-                                      std::complex<float> *          vr,
+                                      std::complex<float>           *vr,
                                       const dealii::types::blas_int *ldvr,
-                                      dealii::types::blas_int *      ilo,
-                                      dealii::types::blas_int *      ihi,
-                                      float *                        scale,
-                                      float *                        abnrm,
-                                      float *                        rconde,
-                                      float *                        rcondv,
-                                      std::complex<float> *          work,
+                                      dealii::types::blas_int       *ilo,
+                                      dealii::types::blas_int       *ihi,
+                                      float                         *scale,
+                                      float                         *abnrm,
+                                      float                         *rconde,
+                                      float                         *rcondv,
+                                      std::complex<float>           *work,
                                       const dealii::types::blas_int *lwork,
-                                      float *                        rwork,
-                                      dealii::types::blas_int *      info);
+                                      float                         *rwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zgeevx,
-                              ZGEEVX)(const char *                   balanc,
-                                      const char *                   jobvl,
-                                      const char *                   jobvr,
-                                      const char *                   sense,
+                              ZGEEVX)(const char                    *balanc,
+                                      const char                    *jobvl,
+                                      const char                    *jobvr,
+                                      const char                    *sense,
                                       const dealii::types::blas_int *n,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<double> *         w,
-                                      std::complex<double> *         vl,
+                                      std::complex<double>          *w,
+                                      std::complex<double>          *vl,
                                       const dealii::types::blas_int *ldvl,
-                                      std::complex<double> *         vr,
+                                      std::complex<double>          *vr,
                                       const dealii::types::blas_int *ldvr,
-                                      dealii::types::blas_int *      ilo,
-                                      dealii::types::blas_int *      ihi,
-                                      double *                       scale,
-                                      double *                       abnrm,
-                                      double *                       rconde,
-                                      double *                       rcondv,
-                                      std::complex<double> *         work,
+                                      dealii::types::blas_int       *ilo,
+                                      dealii::types::blas_int       *ihi,
+                                      double                        *scale,
+                                      double                        *abnrm,
+                                      double                        *rconde,
+                                      double                        *rcondv,
+                                      std::complex<double>          *work,
                                       const dealii::types::blas_int *lwork,
-                                      double *                       rwork,
-                                      dealii::types::blas_int *      info);
+                                      double                        *rwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sgelsd,
                               SGELSD)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        b,
+                                      float                         *b,
                                       const dealii::types::blas_int *ldb,
-                                      float *                        s,
-                                      const float *                  rcond,
-                                      dealii::types::blas_int *      rank,
-                                      float *                        work,
+                                      float                         *s,
+                                      const float                   *rcond,
+                                      dealii::types::blas_int       *rank,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dgelsd,
                               DGELSD)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       b,
+                                      double                        *b,
                                       const dealii::types::blas_int *ldb,
-                                      double *                       s,
-                                      const double *                 rcond,
-                                      dealii::types::blas_int *      rank,
-                                      double *                       work,
+                                      double                        *s,
+                                      const double                  *rcond,
+                                      dealii::types::blas_int       *rank,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cgelsd,
                               CGELSD)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<float> *          b,
+                                      std::complex<float>           *b,
                                       const dealii::types::blas_int *ldb,
-                                      float *                        s,
-                                      const float *                  rcond,
-                                      dealii::types::blas_int *      rank,
-                                      std::complex<float> *          work,
+                                      float                         *s,
+                                      const float                   *rcond,
+                                      dealii::types::blas_int       *rank,
+                                      std::complex<float>           *work,
                                       const dealii::types::blas_int *lwork,
-                                      float *                        rwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      float                         *rwork,
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zgelsd,
                               ZGELSD)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<double> *         b,
+                                      std::complex<double>          *b,
                                       const dealii::types::blas_int *ldb,
-                                      double *                       s,
-                                      const double *                 rcond,
-                                      dealii::types::blas_int *      rank,
-                                      std::complex<double> *         work,
+                                      double                        *s,
+                                      const double                  *rcond,
+                                      dealii::types::blas_int       *rank,
+                                      std::complex<double>          *work,
                                       const dealii::types::blas_int *lwork,
-                                      double *                       rwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      double                        *rwork,
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sgemm, SGEMM)(const char *transa,
                                             const char *transb,
@@ -298,10 +298,10 @@ extern "C"
                                             const float *alpha,
                                             const float *a,
                                             const dealii::types::blas_int *lda,
-                                            const float *                  b,
+                                            const float                   *b,
                                             const dealii::types::blas_int *ldb,
-                                            const float *                  beta,
-                                            float *                        c,
+                                            const float                   *beta,
+                                            float                         *c,
                                             const dealii::types::blas_int *ldc);
 
   void DEAL_II_FORTRAN_MANGLE(dgemm, DGEMM)(const char *transa,
@@ -312,10 +312,10 @@ extern "C"
                                             const double *alpha,
                                             const double *a,
                                             const dealii::types::blas_int *lda,
-                                            const double *                 b,
+                                            const double                  *b,
                                             const dealii::types::blas_int *ldb,
-                                            const double *                 beta,
-                                            double *                       c,
+                                            const double                  *beta,
+                                            double                        *c,
                                             const dealii::types::blas_int *ldc);
 
   void DEAL_II_FORTRAN_MANGLE(cgemm, CGEMM)(const char *transa,
@@ -326,10 +326,10 @@ extern "C"
                                             const std::complex<float> *alpha,
                                             const std::complex<float> *a,
                                             const dealii::types::blas_int *lda,
-                                            const std::complex<float> *    b,
+                                            const std::complex<float>     *b,
                                             const dealii::types::blas_int *ldb,
-                                            const std::complex<float> *    beta,
-                                            std::complex<float> *          c,
+                                            const std::complex<float>     *beta,
+                                            std::complex<float>           *c,
                                             const dealii::types::blas_int *ldc);
 
   void DEAL_II_FORTRAN_MANGLE(zgemm, ZGEMM)(const char *transa,
@@ -340,878 +340,878 @@ extern "C"
                                             const std::complex<double> *alpha,
                                             const std::complex<double> *a,
                                             const dealii::types::blas_int *lda,
-                                            const std::complex<double> *   b,
+                                            const std::complex<double>    *b,
                                             const dealii::types::blas_int *ldb,
-                                            const std::complex<double> *   beta,
-                                            std::complex<double> *         c,
+                                            const std::complex<double>    *beta,
+                                            std::complex<double>          *c,
                                             const dealii::types::blas_int *ldc);
 
   void DEAL_II_FORTRAN_MANGLE(sgemv,
-                              SGEMV)(const char *                   trans,
+                              SGEMV)(const char                    *trans,
                                      const dealii::types::blas_int *m,
                                      const dealii::types::blas_int *n,
-                                     const float *                  alpha,
-                                     const float *                  a,
+                                     const float                   *alpha,
+                                     const float                   *a,
                                      const dealii::types::blas_int *lda,
-                                     const float *                  x,
+                                     const float                   *x,
                                      const dealii::types::blas_int *incx,
-                                     const float *                  beta,
-                                     float *                        y,
+                                     const float                   *beta,
+                                     float                         *y,
                                      const dealii::types::blas_int *incy);
 
   void DEAL_II_FORTRAN_MANGLE(dgemv,
-                              DGEMV)(const char *                   trans,
+                              DGEMV)(const char                    *trans,
                                      const dealii::types::blas_int *m,
                                      const dealii::types::blas_int *n,
-                                     const double *                 alpha,
-                                     const double *                 a,
+                                     const double                  *alpha,
+                                     const double                  *a,
                                      const dealii::types::blas_int *lda,
-                                     const double *                 x,
+                                     const double                  *x,
                                      const dealii::types::blas_int *incx,
-                                     const double *                 beta,
-                                     double *                       y,
+                                     const double                  *beta,
+                                     double                        *y,
                                      const dealii::types::blas_int *incy);
 
   void DEAL_II_FORTRAN_MANGLE(cgemv,
-                              CGEMV)(const char *                   trans,
+                              CGEMV)(const char                    *trans,
                                      const dealii::types::blas_int *m,
                                      const dealii::types::blas_int *n,
-                                     const std::complex<float> *    alpha,
-                                     const std::complex<float> *    a,
+                                     const std::complex<float>     *alpha,
+                                     const std::complex<float>     *a,
                                      const dealii::types::blas_int *lda,
-                                     const std::complex<float> *    x,
+                                     const std::complex<float>     *x,
                                      const dealii::types::blas_int *incx,
-                                     const std::complex<float> *    beta,
-                                     std::complex<float> *          y,
+                                     const std::complex<float>     *beta,
+                                     std::complex<float>           *y,
                                      const dealii::types::blas_int *incy);
 
   void DEAL_II_FORTRAN_MANGLE(zgemv,
-                              ZGEMV)(const char *                   trans,
+                              ZGEMV)(const char                    *trans,
                                      const dealii::types::blas_int *m,
                                      const dealii::types::blas_int *n,
-                                     const std::complex<double> *   alpha,
-                                     const std::complex<double> *   a,
+                                     const std::complex<double>    *alpha,
+                                     const std::complex<double>    *a,
                                      const dealii::types::blas_int *lda,
-                                     const std::complex<double> *   x,
+                                     const std::complex<double>    *x,
                                      const dealii::types::blas_int *incx,
-                                     const std::complex<double> *   beta,
-                                     std::complex<double> *         y,
+                                     const std::complex<double>    *beta,
+                                     std::complex<double>          *y,
                                      const dealii::types::blas_int *incy);
 
   void DEAL_II_FORTRAN_MANGLE(sgeqrf,
                               SGEQRF)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        tau,
-                                      float *                        work,
+                                      float                         *tau,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dgeqrf,
                               DGEQRF)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       tau,
-                                      double *                       work,
+                                      double                        *tau,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cgeqrf,
                               CGEQRF)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<float> *          tau,
-                                      std::complex<float> *          work,
+                                      std::complex<float>           *tau,
+                                      std::complex<float>           *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zgeqrf,
                               ZGEQRF)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<double> *         tau,
-                                      std::complex<double> *         work,
+                                      std::complex<double>          *tau,
+                                      std::complex<double>          *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sgesdd,
-                              SGESDD)(const char *                   jobz,
+                              SGESDD)(const char                    *jobz,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        s,
-                                      float *                        u,
+                                      float                         *s,
+                                      float                         *u,
                                       const dealii::types::blas_int *ldu,
-                                      float *                        vt,
+                                      float                         *vt,
                                       const dealii::types::blas_int *ldvt,
-                                      float *                        work,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dgesdd,
-                              DGESDD)(const char *                   jobz,
+                              DGESDD)(const char                    *jobz,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       s,
-                                      double *                       u,
+                                      double                        *s,
+                                      double                        *u,
                                       const dealii::types::blas_int *ldu,
-                                      double *                       vt,
+                                      double                        *vt,
                                       const dealii::types::blas_int *ldvt,
-                                      double *                       work,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cgesdd,
-                              CGESDD)(const char *                   jobz,
+                              CGESDD)(const char                    *jobz,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        s,
-                                      std::complex<float> *          u,
+                                      float                         *s,
+                                      std::complex<float>           *u,
                                       const dealii::types::blas_int *ldu,
-                                      std::complex<float> *          vt,
+                                      std::complex<float>           *vt,
                                       const dealii::types::blas_int *ldvt,
-                                      std::complex<float> *          work,
+                                      std::complex<float>           *work,
                                       const dealii::types::blas_int *lwork,
-                                      float *                        rwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      float                         *rwork,
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zgesdd,
-                              ZGESDD)(const char *                   jobz,
+                              ZGESDD)(const char                    *jobz,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       s,
-                                      std::complex<double> *         u,
+                                      double                        *s,
+                                      std::complex<double>          *u,
                                       const dealii::types::blas_int *ldu,
-                                      std::complex<double> *         vt,
+                                      std::complex<double>          *vt,
                                       const dealii::types::blas_int *ldvt,
-                                      std::complex<double> *         work,
+                                      std::complex<double>          *work,
                                       const dealii::types::blas_int *lwork,
-                                      double *                       rwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      double                        *rwork,
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sgesvd,
-                              SGESVD)(const char *                   jobu,
-                                      const char *                   jobvt,
+                              SGESVD)(const char                    *jobu,
+                                      const char                    *jobvt,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        s,
-                                      float *                        u,
+                                      float                         *s,
+                                      float                         *u,
                                       const dealii::types::blas_int *ldu,
-                                      float *                        vt,
+                                      float                         *vt,
                                       const dealii::types::blas_int *ldvt,
-                                      float *                        work,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dgesvd,
-                              DGESVD)(const char *                   jobu,
-                                      const char *                   jobvt,
+                              DGESVD)(const char                    *jobu,
+                                      const char                    *jobvt,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       s,
-                                      double *                       u,
+                                      double                        *s,
+                                      double                        *u,
                                       const dealii::types::blas_int *ldu,
-                                      double *                       vt,
+                                      double                        *vt,
                                       const dealii::types::blas_int *ldvt,
-                                      double *                       work,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cgesvd,
-                              CGESVD)(const char *                   jobu,
-                                      const char *                   jobvt,
+                              CGESVD)(const char                    *jobu,
+                                      const char                    *jobvt,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        s,
-                                      std::complex<float> *          u,
+                                      float                         *s,
+                                      std::complex<float>           *u,
                                       const dealii::types::blas_int *ldu,
-                                      std::complex<float> *          vt,
+                                      std::complex<float>           *vt,
                                       const dealii::types::blas_int *ldvt,
-                                      std::complex<float> *          work,
+                                      std::complex<float>           *work,
                                       const dealii::types::blas_int *lwork,
-                                      float *                        rwork,
-                                      dealii::types::blas_int *      info);
+                                      float                         *rwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zgesvd,
-                              ZGESVD)(const char *                   jobu,
-                                      const char *                   jobvt,
+                              ZGESVD)(const char                    *jobu,
+                                      const char                    *jobvt,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       s,
-                                      std::complex<double> *         u,
+                                      double                        *s,
+                                      std::complex<double>          *u,
                                       const dealii::types::blas_int *ldu,
-                                      std::complex<double> *         vt,
+                                      std::complex<double>          *vt,
                                       const dealii::types::blas_int *ldvt,
-                                      std::complex<double> *         work,
+                                      std::complex<double>          *work,
                                       const dealii::types::blas_int *lwork,
-                                      double *                       rwork,
-                                      dealii::types::blas_int *      info);
+                                      double                        *rwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sgetrf,
                               SGETRF)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      ipiv,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *ipiv,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dgetrf,
                               DGETRF)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      ipiv,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *ipiv,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cgetrf,
                               CGETRF)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      ipiv,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *ipiv,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zgetrf,
                               ZGETRF)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      ipiv,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *ipiv,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sgetri,
                               SGETRI)(const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
                                       const dealii::types::blas_int *ipiv,
-                                      float *                        work,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dgetri,
                               DGETRI)(const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
                                       const dealii::types::blas_int *ipiv,
-                                      double *                       work,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cgetri,
                               CGETRI)(const dealii::types::blas_int *n,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
                                       const dealii::types::blas_int *ipiv,
-                                      std::complex<float> *          work,
+                                      std::complex<float>           *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zgetri,
                               ZGETRI)(const dealii::types::blas_int *n,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
                                       const dealii::types::blas_int *ipiv,
-                                      std::complex<double> *         work,
+                                      std::complex<double>          *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sgetrs,
-                              SGETRS)(const char *                   trans,
+                              SGETRS)(const char                    *trans,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const float *                  a,
+                                      const float                   *a,
                                       const dealii::types::blas_int *lda,
                                       const dealii::types::blas_int *ipiv,
-                                      float *                        b,
+                                      float                         *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dgetrs,
-                              DGETRS)(const char *                   trans,
+                              DGETRS)(const char                    *trans,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const double *                 a,
+                                      const double                  *a,
                                       const dealii::types::blas_int *lda,
                                       const dealii::types::blas_int *ipiv,
-                                      double *                       b,
+                                      double                        *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cgetrs,
-                              CGETRS)(const char *                   trans,
+                              CGETRS)(const char                    *trans,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const std::complex<float> *    a,
+                                      const std::complex<float>     *a,
                                       const dealii::types::blas_int *lda,
                                       const dealii::types::blas_int *ipiv,
-                                      std::complex<float> *          b,
+                                      std::complex<float>           *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zgetrs,
-                              ZGETRS)(const char *                   trans,
+                              ZGETRS)(const char                    *trans,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const std::complex<double> *   a,
+                                      const std::complex<double>    *a,
                                       const dealii::types::blas_int *lda,
                                       const dealii::types::blas_int *ipiv,
-                                      std::complex<double> *         b,
+                                      std::complex<double>          *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   float DEAL_II_FORTRAN_MANGLE(slamch, SLAMCH)(const char *cmach);
 
   double DEAL_II_FORTRAN_MANGLE(dlamch, DLAMCH)(const char *cmach);
 
   float DEAL_II_FORTRAN_MANGLE(slange,
-                               SLANGE)(const char *                   norm,
+                               SLANGE)(const char                    *norm,
                                        const dealii::types::blas_int *m,
                                        const dealii::types::blas_int *n,
-                                       const float *                  a,
+                                       const float                   *a,
                                        const dealii::types::blas_int *lda,
-                                       float *                        work);
+                                       float                         *work);
 
   double DEAL_II_FORTRAN_MANGLE(dlange,
-                                DLANGE)(const char *                   norm,
+                                DLANGE)(const char                    *norm,
                                         const dealii::types::blas_int *m,
                                         const dealii::types::blas_int *n,
-                                        const double *                 a,
+                                        const double                  *a,
                                         const dealii::types::blas_int *lda,
-                                        double *                       work);
+                                        double                        *work);
 
   float DEAL_II_FORTRAN_MANGLE(clange,
-                               CLANGE)(const char *                   norm,
+                               CLANGE)(const char                    *norm,
                                        const dealii::types::blas_int *m,
                                        const dealii::types::blas_int *n,
-                                       const std::complex<float> *    a,
+                                       const std::complex<float>     *a,
                                        const dealii::types::blas_int *lda,
-                                       float *                        work);
+                                       float                         *work);
 
   double DEAL_II_FORTRAN_MANGLE(zlange,
-                                ZLANGE)(const char *                   norm,
+                                ZLANGE)(const char                    *norm,
                                         const dealii::types::blas_int *m,
                                         const dealii::types::blas_int *n,
-                                        const std::complex<double> *   a,
+                                        const std::complex<double>    *a,
                                         const dealii::types::blas_int *lda,
-                                        double *                       work);
+                                        double                        *work);
 
   float DEAL_II_FORTRAN_MANGLE(slansy,
-                               SLANSY)(const char *                   norm,
-                                       const char *                   uplo,
+                               SLANSY)(const char                    *norm,
+                                       const char                    *uplo,
                                        const dealii::types::blas_int *n,
-                                       const float *                  a,
+                                       const float                   *a,
                                        const dealii::types::blas_int *lda,
-                                       float *                        work);
+                                       float                         *work);
 
   double DEAL_II_FORTRAN_MANGLE(dlansy,
-                                DLANSY)(const char *                   norm,
-                                        const char *                   uplo,
+                                DLANSY)(const char                    *norm,
+                                        const char                    *uplo,
                                         const dealii::types::blas_int *n,
-                                        const double *                 a,
+                                        const double                  *a,
                                         const dealii::types::blas_int *lda,
-                                        double *                       work);
+                                        double                        *work);
 
   float DEAL_II_FORTRAN_MANGLE(clansy,
-                               CLANSY)(const char *                   norm,
-                                       const char *                   uplo,
+                               CLANSY)(const char                    *norm,
+                                       const char                    *uplo,
                                        const dealii::types::blas_int *n,
-                                       const std::complex<float> *    a,
+                                       const std::complex<float>     *a,
                                        const dealii::types::blas_int *lda,
-                                       float *                        work);
+                                       float                         *work);
 
   double DEAL_II_FORTRAN_MANGLE(zlansy,
-                                ZLANSY)(const char *                   norm,
-                                        const char *                   uplo,
+                                ZLANSY)(const char                    *norm,
+                                        const char                    *uplo,
                                         const dealii::types::blas_int *n,
-                                        const std::complex<double> *   a,
+                                        const std::complex<double>    *a,
                                         const dealii::types::blas_int *lda,
-                                        double *                       work);
+                                        double                        *work);
 
   void DEAL_II_FORTRAN_MANGLE(slascl,
-                              SLASCL)(const char *                   type,
+                              SLASCL)(const char                    *type,
                                       const dealii::types::blas_int *kl,
                                       const dealii::types::blas_int *ku,
-                                      const float *                  cfrom,
-                                      const float *                  cto,
+                                      const float                   *cfrom,
+                                      const float                   *cto,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dlascl,
-                              DLASCL)(const char *                   type,
+                              DLASCL)(const char                    *type,
                                       const dealii::types::blas_int *kl,
                                       const dealii::types::blas_int *ku,
-                                      const double *                 cfrom,
-                                      const double *                 cto,
+                                      const double                  *cfrom,
+                                      const double                  *cto,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(clascl,
-                              CLASCL)(const char *                   type,
+                              CLASCL)(const char                    *type,
                                       const dealii::types::blas_int *kl,
                                       const dealii::types::blas_int *ku,
-                                      const float *                  cfrom,
-                                      const float *                  cto,
+                                      const float                   *cfrom,
+                                      const float                   *cto,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zlascl,
-                              ZLASCL)(const char *                   type,
+                              ZLASCL)(const char                    *type,
                                       const dealii::types::blas_int *kl,
                                       const dealii::types::blas_int *ku,
-                                      const double *                 cfrom,
-                                      const double *                 cto,
+                                      const double                  *cfrom,
+                                      const double                  *cto,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sorgqr,
                               SORGQR)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *k,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      const float *                  tau,
-                                      float *                        work,
+                                      const float                   *tau,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dorgqr,
                               DORGQR)(const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *k,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      const double *                 tau,
-                                      double *                       work,
+                                      const double                  *tau,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(sormqr,
-                              SORMQR)(const char *                   side,
-                                      const char *                   trans,
+                              SORMQR)(const char                    *side,
+                                      const char                    *trans,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *k,
-                                      const float *                  a,
+                                      const float                   *a,
                                       const dealii::types::blas_int *lda,
-                                      const float *                  tau,
-                                      float *                        c,
+                                      const float                   *tau,
+                                      float                         *c,
                                       const dealii::types::blas_int *ldc,
-                                      float *                        work,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dormqr,
-                              DORMQR)(const char *                   side,
-                                      const char *                   trans,
+                              DORMQR)(const char                    *side,
+                                      const char                    *trans,
                                       const dealii::types::blas_int *m,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *k,
-                                      const double *                 a,
+                                      const double                  *a,
                                       const dealii::types::blas_int *lda,
-                                      const double *                 tau,
-                                      double *                       c,
+                                      const double                  *tau,
+                                      double                        *c,
                                       const dealii::types::blas_int *ldc,
-                                      double *                       work,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(spocon,
-                              SPOCON)(const char *                   uplo,
+                              SPOCON)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      const float *                  a,
+                                      const float                   *a,
                                       const dealii::types::blas_int *lda,
-                                      const float *                  anorm,
-                                      float *                        rcond,
-                                      float *                        work,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      const float                   *anorm,
+                                      float                         *rcond,
+                                      float                         *work,
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dpocon,
-                              DPOCON)(const char *                   uplo,
+                              DPOCON)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      const double *                 a,
+                                      const double                  *a,
                                       const dealii::types::blas_int *lda,
-                                      const double *                 anorm,
-                                      double *                       rcond,
-                                      double *                       work,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      const double                  *anorm,
+                                      double                        *rcond,
+                                      double                        *work,
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cpocon,
-                              CPOCON)(const char *                   uplo,
+                              CPOCON)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      const std::complex<float> *    a,
+                                      const std::complex<float>     *a,
                                       const dealii::types::blas_int *lda,
-                                      const float *                  anorm,
-                                      float *                        rcond,
-                                      std::complex<float> *          work,
-                                      float *                        rwork,
-                                      dealii::types::blas_int *      info);
+                                      const float                   *anorm,
+                                      float                         *rcond,
+                                      std::complex<float>           *work,
+                                      float                         *rwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zpocon,
-                              ZPOCON)(const char *                   uplo,
+                              ZPOCON)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      const std::complex<double> *   a,
+                                      const std::complex<double>    *a,
                                       const dealii::types::blas_int *lda,
-                                      const double *                 anorm,
-                                      double *                       rcond,
-                                      std::complex<double> *         work,
-                                      double *                       rwork,
-                                      dealii::types::blas_int *      info);
+                                      const double                  *anorm,
+                                      double                        *rcond,
+                                      std::complex<double>          *work,
+                                      double                        *rwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(spotrf,
-                              SPOTRF)(const char *                   uplo,
+                              SPOTRF)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dpotrf,
-                              DPOTRF)(const char *                   uplo,
+                              DPOTRF)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cpotrf,
-                              CPOTRF)(const char *                   uplo,
+                              CPOTRF)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zpotrf,
-                              ZPOTRF)(const char *                   uplo,
+                              ZPOTRF)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(spotri,
-                              SPOTRI)(const char *                   uplo,
+                              SPOTRI)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dpotri,
-                              DPOTRI)(const char *                   uplo,
+                              DPOTRI)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cpotri,
-                              CPOTRI)(const char *                   uplo,
+                              CPOTRI)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      std::complex<float> *          a,
+                                      std::complex<float>           *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zpotri,
-                              ZPOTRI)(const char *                   uplo,
+                              ZPOTRI)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      std::complex<double> *         a,
+                                      std::complex<double>          *a,
                                       const dealii::types::blas_int *lda,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(spotrs,
-                              SPOTRS)(const char *                   uplo,
+                              SPOTRS)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const float *                  a,
+                                      const float                   *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        b,
+                                      float                         *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dpotrs,
-                              DPOTRS)(const char *                   uplo,
+                              DPOTRS)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const double *                 a,
+                                      const double                  *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       b,
+                                      double                        *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(cpotrs,
-                              CPOTRS)(const char *                   uplo,
+                              CPOTRS)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const std::complex<float> *    a,
+                                      const std::complex<float>     *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<float> *          b,
+                                      std::complex<float>           *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(zpotrs,
-                              ZPOTRS)(const char *                   uplo,
+                              ZPOTRS)(const char                    *uplo,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const std::complex<double> *   a,
+                                      const std::complex<double>    *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<double> *         b,
+                                      std::complex<double>          *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
-  void DEAL_II_FORTRAN_MANGLE(sstev, SSTEV)(const char *                   jobz,
+  void DEAL_II_FORTRAN_MANGLE(sstev, SSTEV)(const char                    *jobz,
                                             const dealii::types::blas_int *n,
-                                            float *                        d,
-                                            float *                        e,
-                                            float *                        z,
+                                            float                         *d,
+                                            float                         *e,
+                                            float                         *z,
                                             const dealii::types::blas_int *ldz,
-                                            float *                        work,
+                                            float                         *work,
                                             dealii::types::blas_int *info);
 
-  void DEAL_II_FORTRAN_MANGLE(dstev, DSTEV)(const char *                   jobz,
+  void DEAL_II_FORTRAN_MANGLE(dstev, DSTEV)(const char                    *jobz,
                                             const dealii::types::blas_int *n,
-                                            double *                       d,
-                                            double *                       e,
-                                            double *                       z,
+                                            double                        *d,
+                                            double                        *e,
+                                            double                        *z,
                                             const dealii::types::blas_int *ldz,
-                                            double *                       work,
+                                            double                        *work,
                                             dealii::types::blas_int *info);
 
   void DEAL_II_FORTRAN_MANGLE(ssyev,
-                              SSYEV)(const char *                   jobz,
-                                     const char *                   uplo,
+                              SSYEV)(const char                    *jobz,
+                                     const char                    *uplo,
                                      const dealii::types::blas_int *n,
-                                     float *                        a,
+                                     float                         *a,
                                      const dealii::types::blas_int *lda,
-                                     float *                        w,
-                                     float *                        work,
+                                     float                         *w,
+                                     float                         *work,
                                      const dealii::types::blas_int *lwork,
-                                     dealii::types::blas_int *      info);
+                                     dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dsyev,
-                              DSYEV)(const char *                   jobz,
-                                     const char *                   uplo,
+                              DSYEV)(const char                    *jobz,
+                                     const char                    *uplo,
                                      const dealii::types::blas_int *n,
-                                     double *                       a,
+                                     double                        *a,
                                      const dealii::types::blas_int *lda,
-                                     double *                       w,
-                                     double *                       work,
+                                     double                        *w,
+                                     double                        *work,
                                      const dealii::types::blas_int *lwork,
-                                     dealii::types::blas_int *      info);
+                                     dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(ssyevr,
-                              SSYEVR)(const char *                   jobz,
-                                      const char *                   range,
-                                      const char *                   uplo,
+                              SSYEVR)(const char                    *jobz,
+                                      const char                    *range,
+                                      const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      const float *                  vl,
-                                      const float *                  vu,
+                                      const float                   *vl,
+                                      const float                   *vu,
                                       const dealii::types::blas_int *il,
                                       const dealii::types::blas_int *iu,
-                                      const float *                  abstol,
-                                      dealii::types::blas_int *      m,
-                                      float *                        w,
-                                      float *                        z,
+                                      const float                   *abstol,
+                                      dealii::types::blas_int       *m,
+                                      float                         *w,
+                                      float                         *z,
                                       const dealii::types::blas_int *ldz,
-                                      dealii::types::blas_int *      isuppz,
-                                      float *                        work,
+                                      dealii::types::blas_int       *isuppz,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
+                                      dealii::types::blas_int       *iwork,
                                       const dealii::types::blas_int *liwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dsyevr,
-                              DSYEVR)(const char *                   jobz,
-                                      const char *                   range,
-                                      const char *                   uplo,
+                              DSYEVR)(const char                    *jobz,
+                                      const char                    *range,
+                                      const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      const double *                 vl,
-                                      const double *                 vu,
+                                      const double                  *vl,
+                                      const double                  *vu,
                                       const dealii::types::blas_int *il,
                                       const dealii::types::blas_int *iu,
-                                      const double *                 abstol,
-                                      dealii::types::blas_int *      m,
-                                      double *                       w,
-                                      double *                       z,
+                                      const double                  *abstol,
+                                      dealii::types::blas_int       *m,
+                                      double                        *w,
+                                      double                        *z,
                                       const dealii::types::blas_int *ldz,
-                                      dealii::types::blas_int *      isuppz,
-                                      double *                       work,
+                                      dealii::types::blas_int       *isuppz,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
+                                      dealii::types::blas_int       *iwork,
                                       const dealii::types::blas_int *liwork,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(ssyevx,
-                              SSYEVX)(const char *                   jobz,
-                                      const char *                   range,
-                                      const char *                   uplo,
+                              SSYEVX)(const char                    *jobz,
+                                      const char                    *range,
+                                      const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      const float *                  vl,
-                                      const float *                  vu,
+                                      const float                   *vl,
+                                      const float                   *vu,
                                       const dealii::types::blas_int *il,
                                       const dealii::types::blas_int *iu,
-                                      const float *                  abstol,
-                                      dealii::types::blas_int *      m,
-                                      float *                        w,
-                                      float *                        z,
+                                      const float                   *abstol,
+                                      dealii::types::blas_int       *m,
+                                      float                         *w,
+                                      float                         *z,
                                       const dealii::types::blas_int *ldz,
-                                      float *                        work,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      ifail,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *ifail,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dsyevx,
-                              DSYEVX)(const char *                   jobz,
-                                      const char *                   range,
-                                      const char *                   uplo,
+                              DSYEVX)(const char                    *jobz,
+                                      const char                    *range,
+                                      const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      const double *                 vl,
-                                      const double *                 vu,
+                                      const double                  *vl,
+                                      const double                  *vu,
                                       const dealii::types::blas_int *il,
                                       const dealii::types::blas_int *iu,
-                                      const double *                 abstol,
-                                      dealii::types::blas_int *      m,
-                                      double *                       w,
-                                      double *                       z,
+                                      const double                  *abstol,
+                                      dealii::types::blas_int       *m,
+                                      double                        *w,
+                                      double                        *z,
                                       const dealii::types::blas_int *ldz,
-                                      double *                       work,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      ifail,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *ifail,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(ssygv,
                               SSYGV)(const dealii::types::blas_int *itype,
-                                     const char *                   jobz,
-                                     const char *                   uplo,
+                                     const char                    *jobz,
+                                     const char                    *uplo,
                                      const dealii::types::blas_int *n,
-                                     float *                        a,
+                                     float                         *a,
                                      const dealii::types::blas_int *lda,
-                                     float *                        b,
+                                     float                         *b,
                                      const dealii::types::blas_int *ldb,
-                                     float *                        w,
-                                     float *                        work,
+                                     float                         *w,
+                                     float                         *work,
                                      const dealii::types::blas_int *lwork,
-                                     dealii::types::blas_int *      info);
+                                     dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dsygv,
                               DSYGV)(const dealii::types::blas_int *itype,
-                                     const char *                   jobz,
-                                     const char *                   uplo,
+                                     const char                    *jobz,
+                                     const char                    *uplo,
                                      const dealii::types::blas_int *n,
-                                     double *                       a,
+                                     double                        *a,
                                      const dealii::types::blas_int *lda,
-                                     double *                       b,
+                                     double                        *b,
                                      const dealii::types::blas_int *ldb,
-                                     double *                       w,
-                                     double *                       work,
+                                     double                        *w,
+                                     double                        *work,
                                      const dealii::types::blas_int *lwork,
-                                     dealii::types::blas_int *      info);
+                                     dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(ssygvx,
                               SSYGVX)(const dealii::types::blas_int *itype,
-                                      const char *                   jobz,
-                                      const char *                   range,
-                                      const char *                   uplo,
+                                      const char                    *jobz,
+                                      const char                    *range,
+                                      const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      float *                        a,
+                                      float                         *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        b,
+                                      float                         *b,
                                       const dealii::types::blas_int *ldb,
-                                      const float *                  vl,
-                                      const float *                  vu,
+                                      const float                   *vl,
+                                      const float                   *vu,
                                       const dealii::types::blas_int *il,
                                       const dealii::types::blas_int *iu,
-                                      const float *                  abstol,
-                                      dealii::types::blas_int *      m,
-                                      float *                        w,
-                                      float *                        z,
+                                      const float                   *abstol,
+                                      dealii::types::blas_int       *m,
+                                      float                         *w,
+                                      float                         *z,
                                       const dealii::types::blas_int *ldz,
-                                      float *                        work,
+                                      float                         *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      ifail,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *ifail,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dsygvx,
                               DSYGVX)(const dealii::types::blas_int *itype,
-                                      const char *                   jobz,
-                                      const char *                   range,
-                                      const char *                   uplo,
+                                      const char                    *jobz,
+                                      const char                    *range,
+                                      const char                    *uplo,
                                       const dealii::types::blas_int *n,
-                                      double *                       a,
+                                      double                        *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       b,
+                                      double                        *b,
                                       const dealii::types::blas_int *ldb,
-                                      const double *                 vl,
-                                      const double *                 vu,
+                                      const double                  *vl,
+                                      const double                  *vu,
                                       const dealii::types::blas_int *il,
                                       const dealii::types::blas_int *iu,
-                                      const double *                 abstol,
-                                      dealii::types::blas_int *      m,
-                                      double *                       w,
-                                      double *                       z,
+                                      const double                  *abstol,
+                                      dealii::types::blas_int       *m,
+                                      double                        *w,
+                                      double                        *z,
                                       const dealii::types::blas_int *ldz,
-                                      double *                       work,
+                                      double                        *work,
                                       const dealii::types::blas_int *lwork,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      ifail,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *ifail,
+                                      dealii::types::blas_int       *info);
 
-  void DEAL_II_FORTRAN_MANGLE(ssyr, SSYR)(const char *                   uplo,
+  void DEAL_II_FORTRAN_MANGLE(ssyr, SSYR)(const char                    *uplo,
                                           const dealii::types::blas_int *n,
-                                          const float *                  alpha,
-                                          const float *                  x,
+                                          const float                   *alpha,
+                                          const float                   *x,
                                           const dealii::types::blas_int *incx,
-                                          float *                        a,
+                                          float                         *a,
                                           const dealii::types::blas_int *lda);
 
-  void DEAL_II_FORTRAN_MANGLE(dsyr, DSYR)(const char *                   uplo,
+  void DEAL_II_FORTRAN_MANGLE(dsyr, DSYR)(const char                    *uplo,
                                           const dealii::types::blas_int *n,
-                                          const double *                 alpha,
-                                          const double *                 x,
+                                          const double                  *alpha,
+                                          const double                  *x,
                                           const dealii::types::blas_int *incx,
-                                          double *                       a,
+                                          double                        *a,
                                           const dealii::types::blas_int *lda);
 
   void DEAL_II_FORTRAN_MANGLE(ssyrk, SSYRK)(const char *uplo,
@@ -1221,8 +1221,8 @@ extern "C"
                                             const float *alpha,
                                             const float *a,
                                             const dealii::types::blas_int *lda,
-                                            const float *                  beta,
-                                            float *                        c,
+                                            const float                   *beta,
+                                            float                         *c,
                                             const dealii::types::blas_int *ldc);
 
   void DEAL_II_FORTRAN_MANGLE(dsyrk, DSYRK)(const char *uplo,
@@ -1232,8 +1232,8 @@ extern "C"
                                             const double *alpha,
                                             const double *a,
                                             const dealii::types::blas_int *lda,
-                                            const double *                 beta,
-                                            double *                       c,
+                                            const double                  *beta,
+                                            double                        *c,
                                             const dealii::types::blas_int *ldc);
 
   void DEAL_II_FORTRAN_MANGLE(csyrk, CSYRK)(const char *uplo,
@@ -1243,8 +1243,8 @@ extern "C"
                                             const std::complex<float> *alpha,
                                             const std::complex<float> *a,
                                             const dealii::types::blas_int *lda,
-                                            const std::complex<float> *    beta,
-                                            std::complex<float> *          c,
+                                            const std::complex<float>     *beta,
+                                            std::complex<float>           *c,
                                             const dealii::types::blas_int *ldc);
 
   void DEAL_II_FORTRAN_MANGLE(zsyrk, ZSYRK)(const char *uplo,
@@ -1254,145 +1254,145 @@ extern "C"
                                             const std::complex<double> *alpha,
                                             const std::complex<double> *a,
                                             const dealii::types::blas_int *lda,
-                                            const std::complex<double> *   beta,
-                                            std::complex<double> *         c,
+                                            const std::complex<double>    *beta,
+                                            std::complex<double>          *c,
                                             const dealii::types::blas_int *ldc);
 
   void DEAL_II_FORTRAN_MANGLE(strcon,
-                              STRCON)(const char *                   norm,
-                                      const char *                   uplo,
-                                      const char *                   diag,
+                              STRCON)(const char                    *norm,
+                                      const char                    *uplo,
+                                      const char                    *diag,
                                       const dealii::types::blas_int *n,
-                                      const float *                  a,
+                                      const float                   *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        rcond,
-                                      float *                        work,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      float                         *rcond,
+                                      float                         *work,
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dtrcon,
-                              DTRCON)(const char *                   norm,
-                                      const char *                   uplo,
-                                      const char *                   diag,
+                              DTRCON)(const char                    *norm,
+                                      const char                    *uplo,
+                                      const char                    *diag,
                                       const dealii::types::blas_int *n,
-                                      const double *                 a,
+                                      const double                  *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       rcond,
-                                      double *                       work,
-                                      dealii::types::blas_int *      iwork,
-                                      dealii::types::blas_int *      info);
+                                      double                        *rcond,
+                                      double                        *work,
+                                      dealii::types::blas_int       *iwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(ctrcon,
-                              CTRCON)(const char *                   norm,
-                                      const char *                   uplo,
-                                      const char *                   diag,
+                              CTRCON)(const char                    *norm,
+                                      const char                    *uplo,
+                                      const char                    *diag,
                                       const dealii::types::blas_int *n,
-                                      const std::complex<float> *    a,
+                                      const std::complex<float>     *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        rcond,
-                                      std::complex<float> *          work,
-                                      float *                        rwork,
-                                      dealii::types::blas_int *      info);
+                                      float                         *rcond,
+                                      std::complex<float>           *work,
+                                      float                         *rwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(ztrcon,
-                              ZTRCON)(const char *                   norm,
-                                      const char *                   uplo,
-                                      const char *                   diag,
+                              ZTRCON)(const char                    *norm,
+                                      const char                    *uplo,
+                                      const char                    *diag,
                                       const dealii::types::blas_int *n,
-                                      const std::complex<double> *   a,
+                                      const std::complex<double>    *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       rcond,
-                                      std::complex<double> *         work,
-                                      double *                       rwork,
-                                      dealii::types::blas_int *      info);
+                                      double                        *rcond,
+                                      std::complex<double>          *work,
+                                      double                        *rwork,
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(strmv,
-                              STRMV)(const char *                   uplo,
-                                     const char *                   trans,
-                                     const char *                   diag,
+                              STRMV)(const char                    *uplo,
+                                     const char                    *trans,
+                                     const char                    *diag,
                                      const dealii::types::blas_int *n,
-                                     const float *                  a,
+                                     const float                   *a,
                                      const dealii::types::blas_int *lda,
-                                     float *                        x,
+                                     float                         *x,
                                      const dealii::types::blas_int *incx);
 
   void DEAL_II_FORTRAN_MANGLE(dtrmv,
-                              DTRMV)(const char *                   uplo,
-                                     const char *                   trans,
-                                     const char *                   diag,
+                              DTRMV)(const char                    *uplo,
+                                     const char                    *trans,
+                                     const char                    *diag,
                                      const dealii::types::blas_int *n,
-                                     const double *                 a,
+                                     const double                  *a,
                                      const dealii::types::blas_int *lda,
-                                     double *                       x,
+                                     double                        *x,
                                      const dealii::types::blas_int *incx);
 
   void DEAL_II_FORTRAN_MANGLE(ctrmv,
-                              CTRMV)(const char *                   uplo,
-                                     const char *                   trans,
-                                     const char *                   diag,
+                              CTRMV)(const char                    *uplo,
+                                     const char                    *trans,
+                                     const char                    *diag,
                                      const dealii::types::blas_int *n,
-                                     const std::complex<float> *    a,
+                                     const std::complex<float>     *a,
                                      const dealii::types::blas_int *lda,
-                                     std::complex<float> *          x,
+                                     std::complex<float>           *x,
                                      const dealii::types::blas_int *incx);
 
   void DEAL_II_FORTRAN_MANGLE(ztrmv,
-                              ZTRMV)(const char *                   uplo,
-                                     const char *                   trans,
-                                     const char *                   diag,
+                              ZTRMV)(const char                    *uplo,
+                                     const char                    *trans,
+                                     const char                    *diag,
                                      const dealii::types::blas_int *n,
-                                     const std::complex<double> *   a,
+                                     const std::complex<double>    *a,
                                      const dealii::types::blas_int *lda,
-                                     std::complex<double> *         x,
+                                     std::complex<double>          *x,
                                      const dealii::types::blas_int *incx);
 
   void DEAL_II_FORTRAN_MANGLE(strtrs,
-                              STRTRS)(const char *                   uplo,
-                                      const char *                   trans,
-                                      const char *                   diag,
+                              STRTRS)(const char                    *uplo,
+                                      const char                    *trans,
+                                      const char                    *diag,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const float *                  a,
+                                      const float                   *a,
                                       const dealii::types::blas_int *lda,
-                                      float *                        b,
+                                      float                         *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(dtrtrs,
-                              DTRTRS)(const char *                   uplo,
-                                      const char *                   trans,
-                                      const char *                   diag,
+                              DTRTRS)(const char                    *uplo,
+                                      const char                    *trans,
+                                      const char                    *diag,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const double *                 a,
+                                      const double                  *a,
                                       const dealii::types::blas_int *lda,
-                                      double *                       b,
+                                      double                        *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(ctrtrs,
-                              CTRTRS)(const char *                   uplo,
-                                      const char *                   trans,
-                                      const char *                   diag,
+                              CTRTRS)(const char                    *uplo,
+                                      const char                    *trans,
+                                      const char                    *diag,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const std::complex<float> *    a,
+                                      const std::complex<float>     *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<float> *          b,
+                                      std::complex<float>           *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 
   void DEAL_II_FORTRAN_MANGLE(ztrtrs,
-                              ZTRTRS)(const char *                   uplo,
-                                      const char *                   trans,
-                                      const char *                   diag,
+                              ZTRTRS)(const char                    *uplo,
+                                      const char                    *trans,
+                                      const char                    *diag,
                                       const dealii::types::blas_int *n,
                                       const dealii::types::blas_int *nrhs,
-                                      const std::complex<double> *   a,
+                                      const std::complex<double>    *a,
                                       const dealii::types::blas_int *lda,
-                                      std::complex<double> *         b,
+                                      std::complex<double>          *b,
                                       const dealii::types::blas_int *ldb,
-                                      dealii::types::blas_int *      info);
+                                      dealii::types::blas_int       *info);
 }
 #endif
 
@@ -1416,10 +1416,10 @@ axpy(const dealii::types::blas_int *,
 
 inline void
 axpy(const dealii::types::blas_int *n,
-     const float *                  sa,
-     const float *                  sx,
+     const float                   *sa,
+     const float                   *sx,
      const dealii::types::blas_int *incx,
-     float *                        sy,
+     float                         *sy,
      const dealii::types::blas_int *incy)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -1439,10 +1439,10 @@ axpy(const dealii::types::blas_int *n,
 
 inline void
 axpy(const dealii::types::blas_int *n,
-     const double *                 da,
-     const double *                 dx,
+     const double                  *da,
+     const double                  *dx,
      const dealii::types::blas_int *incx,
-     double *                       dy,
+     double                        *dy,
      const dealii::types::blas_int *incy)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -1462,10 +1462,10 @@ axpy(const dealii::types::blas_int *n,
 
 inline void
 axpy(const dealii::types::blas_int *n,
-     const std::complex<float> *    ca,
-     const std::complex<float> *    cx,
+     const std::complex<float>     *ca,
+     const std::complex<float>     *cx,
      const dealii::types::blas_int *incx,
-     std::complex<float> *          cy,
+     std::complex<float>           *cy,
      const dealii::types::blas_int *incy)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -1485,10 +1485,10 @@ axpy(const dealii::types::blas_int *n,
 
 inline void
 axpy(const dealii::types::blas_int *n,
-     const std::complex<double> *   za,
-     const std::complex<double> *   zx,
+     const std::complex<double>    *za,
+     const std::complex<double>    *zx,
      const dealii::types::blas_int *incx,
-     std::complex<double> *         zy,
+     std::complex<double>          *zy,
      const dealii::types::blas_int *incy)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -1534,20 +1534,20 @@ geev(const char *,
 
 
 inline void
-geev(const char *                   jobvl,
-     const char *                   jobvr,
+geev(const char                    *jobvl,
+     const char                    *jobvr,
      const dealii::types::blas_int *n,
-     float *                        a,
+     float                         *a,
      const dealii::types::blas_int *lda,
-     float *                        wr,
-     float *                        wi,
-     float *                        vl,
+     float                         *wr,
+     float                         *wi,
+     float                         *vl,
      const dealii::types::blas_int *ldvl,
-     float *                        vr,
+     float                         *vr,
      const dealii::types::blas_int *ldvr,
-     float *                        work,
+     float                         *work,
      const dealii::types::blas_int *lwork,
-     dealii::types::blas_int *      info)
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sgeev, SGEEV)
@@ -1574,20 +1574,20 @@ geev(const char *                   jobvl,
 
 
 inline void
-geev(const char *                   jobvl,
-     const char *                   jobvr,
+geev(const char                    *jobvl,
+     const char                    *jobvr,
      const dealii::types::blas_int *n,
-     double *                       a,
+     double                        *a,
      const dealii::types::blas_int *lda,
-     double *                       wr,
-     double *                       wi,
-     double *                       vl,
+     double                        *wr,
+     double                        *wi,
+     double                        *vl,
      const dealii::types::blas_int *ldvl,
-     double *                       vr,
+     double                        *vr,
      const dealii::types::blas_int *ldvr,
-     double *                       work,
+     double                        *work,
      const dealii::types::blas_int *lwork,
-     dealii::types::blas_int *      info)
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dgeev, DGEEV)
@@ -1614,20 +1614,20 @@ geev(const char *                   jobvl,
 
 
 inline void
-geev(const char *                   jobvl,
-     const char *                   jobvr,
+geev(const char                    *jobvl,
+     const char                    *jobvr,
      const dealii::types::blas_int *n,
-     std::complex<float> *          a,
+     std::complex<float>           *a,
      const dealii::types::blas_int *lda,
-     std::complex<float> *          w,
-     std::complex<float> *          vl,
+     std::complex<float>           *w,
+     std::complex<float>           *vl,
      const dealii::types::blas_int *ldvl,
-     std::complex<float> *          vr,
+     std::complex<float>           *vr,
      const dealii::types::blas_int *ldvr,
-     std::complex<float> *          work,
+     std::complex<float>           *work,
      const dealii::types::blas_int *lwork,
-     float *                        rwork,
-     dealii::types::blas_int *      info)
+     float                         *rwork,
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cgeev, CGEEV)
@@ -1654,20 +1654,20 @@ geev(const char *                   jobvl,
 
 
 inline void
-geev(const char *                   jobvl,
-     const char *                   jobvr,
+geev(const char                    *jobvl,
+     const char                    *jobvr,
      const dealii::types::blas_int *n,
-     std::complex<double> *         a,
+     std::complex<double>          *a,
      const dealii::types::blas_int *lda,
-     std::complex<double> *         w,
-     std::complex<double> *         vl,
+     std::complex<double>          *w,
+     std::complex<double>          *vl,
      const dealii::types::blas_int *ldvl,
-     std::complex<double> *         vr,
+     std::complex<double>          *vr,
      const dealii::types::blas_int *ldvr,
-     std::complex<double> *         work,
+     std::complex<double>          *work,
      const dealii::types::blas_int *lwork,
-     double *                       rwork,
-     dealii::types::blas_int *      info)
+     double                        *rwork,
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zgeev, ZGEEV)
@@ -1734,29 +1734,29 @@ geevx(const char *,
 
 
 inline void
-geevx(const char *                   balanc,
-      const char *                   jobvl,
-      const char *                   jobvr,
-      const char *                   sense,
+geevx(const char                    *balanc,
+      const char                    *jobvl,
+      const char                    *jobvr,
+      const char                    *sense,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      float *                        wr,
-      float *                        wi,
-      float *                        vl,
+      float                         *wr,
+      float                         *wi,
+      float                         *vl,
       const dealii::types::blas_int *ldvl,
-      float *                        vr,
+      float                         *vr,
       const dealii::types::blas_int *ldvr,
-      dealii::types::blas_int *      ilo,
-      dealii::types::blas_int *      ihi,
-      float *                        scale,
-      float *                        abnrm,
-      float *                        rconde,
-      float *                        rcondv,
-      float *                        work,
+      dealii::types::blas_int       *ilo,
+      dealii::types::blas_int       *ihi,
+      float                         *scale,
+      float                         *abnrm,
+      float                         *rconde,
+      float                         *rcondv,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sgeevx, SGEEVX)
@@ -1814,29 +1814,29 @@ geevx(const char *                   balanc,
 
 
 inline void
-geevx(const char *                   balanc,
-      const char *                   jobvl,
-      const char *                   jobvr,
-      const char *                   sense,
+geevx(const char                    *balanc,
+      const char                    *jobvl,
+      const char                    *jobvr,
+      const char                    *sense,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      double *                       wr,
-      double *                       wi,
-      double *                       vl,
+      double                        *wr,
+      double                        *wi,
+      double                        *vl,
       const dealii::types::blas_int *ldvl,
-      double *                       vr,
+      double                        *vr,
       const dealii::types::blas_int *ldvr,
-      dealii::types::blas_int *      ilo,
-      dealii::types::blas_int *      ihi,
-      double *                       scale,
-      double *                       abnrm,
-      double *                       rconde,
-      double *                       rcondv,
-      double *                       work,
+      dealii::types::blas_int       *ilo,
+      dealii::types::blas_int       *ihi,
+      double                        *scale,
+      double                        *abnrm,
+      double                        *rconde,
+      double                        *rcondv,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dgeevx, DGEEVX)
@@ -1894,28 +1894,28 @@ geevx(const char *                   balanc,
 
 
 inline void
-geevx(const char *                   balanc,
-      const char *                   jobvl,
-      const char *                   jobvr,
-      const char *                   sense,
+geevx(const char                    *balanc,
+      const char                    *jobvl,
+      const char                    *jobvr,
+      const char                    *sense,
       const dealii::types::blas_int *n,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
-      std::complex<float> *          w,
-      std::complex<float> *          vl,
+      std::complex<float>           *w,
+      std::complex<float>           *vl,
       const dealii::types::blas_int *ldvl,
-      std::complex<float> *          vr,
+      std::complex<float>           *vr,
       const dealii::types::blas_int *ldvr,
-      dealii::types::blas_int *      ilo,
-      dealii::types::blas_int *      ihi,
-      float *                        scale,
-      float *                        abnrm,
-      float *                        rconde,
-      float *                        rcondv,
-      std::complex<float> *          work,
+      dealii::types::blas_int       *ilo,
+      dealii::types::blas_int       *ihi,
+      float                         *scale,
+      float                         *abnrm,
+      float                         *rconde,
+      float                         *rcondv,
+      std::complex<float>           *work,
       const dealii::types::blas_int *lwork,
-      float *                        rwork,
-      dealii::types::blas_int *      info)
+      float                         *rwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cgeevx, CGEEVX)
@@ -1971,28 +1971,28 @@ geevx(const char *                   balanc,
 
 
 inline void
-geevx(const char *                   balanc,
-      const char *                   jobvl,
-      const char *                   jobvr,
-      const char *                   sense,
+geevx(const char                    *balanc,
+      const char                    *jobvl,
+      const char                    *jobvr,
+      const char                    *sense,
       const dealii::types::blas_int *n,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
-      std::complex<double> *         w,
-      std::complex<double> *         vl,
+      std::complex<double>          *w,
+      std::complex<double>          *vl,
       const dealii::types::blas_int *ldvl,
-      std::complex<double> *         vr,
+      std::complex<double>          *vr,
       const dealii::types::blas_int *ldvr,
-      dealii::types::blas_int *      ilo,
-      dealii::types::blas_int *      ihi,
-      double *                       scale,
-      double *                       abnrm,
-      double *                       rconde,
-      double *                       rcondv,
-      std::complex<double> *         work,
+      dealii::types::blas_int       *ilo,
+      dealii::types::blas_int       *ihi,
+      double                        *scale,
+      double                        *abnrm,
+      double                        *rconde,
+      double                        *rcondv,
+      std::complex<double>          *work,
       const dealii::types::blas_int *lwork,
-      double *                       rwork,
-      dealii::types::blas_int *      info)
+      double                        *rwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zgeevx, ZGEEVX)
@@ -2077,17 +2077,17 @@ inline void
 gelsd(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      float *                        b,
+      float                         *b,
       const dealii::types::blas_int *ldb,
-      float *                        s,
-      const float *                  rcond,
-      dealii::types::blas_int *      rank,
-      float *                        work,
+      float                         *s,
+      const float                   *rcond,
+      dealii::types::blas_int       *rank,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sgelsd, SGELSD)
@@ -2117,17 +2117,17 @@ inline void
 gelsd(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      double *                       b,
+      double                        *b,
       const dealii::types::blas_int *ldb,
-      double *                       s,
-      const double *                 rcond,
-      dealii::types::blas_int *      rank,
-      double *                       work,
+      double                        *s,
+      const double                  *rcond,
+      dealii::types::blas_int       *rank,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dgelsd, DGELSD)
@@ -2157,18 +2157,18 @@ inline void
 gelsd(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
-      std::complex<float> *          b,
+      std::complex<float>           *b,
       const dealii::types::blas_int *ldb,
-      float *                        s,
-      const float *                  rcond,
-      dealii::types::blas_int *      rank,
-      std::complex<float> *          work,
+      float                         *s,
+      const float                   *rcond,
+      dealii::types::blas_int       *rank,
+      std::complex<float>           *work,
       const dealii::types::blas_int *lwork,
-      float *                        rwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      float                         *rwork,
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cgelsd, CGELSD)
@@ -2199,18 +2199,18 @@ inline void
 gelsd(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
-      std::complex<double> *         b,
+      std::complex<double>          *b,
       const dealii::types::blas_int *ldb,
-      double *                       s,
-      const double *                 rcond,
-      dealii::types::blas_int *      rank,
-      std::complex<double> *         work,
+      double                        *s,
+      const double                  *rcond,
+      dealii::types::blas_int       *rank,
+      std::complex<double>          *work,
       const dealii::types::blas_int *lwork,
-      double *                       rwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      double                        *rwork,
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zgelsd, ZGELSD)
@@ -2263,18 +2263,18 @@ gemm(const char *,
 
 
 inline void
-gemm(const char *                   transa,
-     const char *                   transb,
+gemm(const char                    *transa,
+     const char                    *transb,
      const dealii::types::blas_int *m,
      const dealii::types::blas_int *n,
      const dealii::types::blas_int *k,
-     const float *                  alpha,
-     const float *                  a,
+     const float                   *alpha,
+     const float                   *a,
      const dealii::types::blas_int *lda,
-     const float *                  b,
+     const float                   *b,
      const dealii::types::blas_int *ldb,
-     const float *                  beta,
-     float *                        c,
+     const float                   *beta,
+     float                         *c,
      const dealii::types::blas_int *ldc)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -2301,18 +2301,18 @@ gemm(const char *                   transa,
 
 
 inline void
-gemm(const char *                   transa,
-     const char *                   transb,
+gemm(const char                    *transa,
+     const char                    *transb,
      const dealii::types::blas_int *m,
      const dealii::types::blas_int *n,
      const dealii::types::blas_int *k,
-     const double *                 alpha,
-     const double *                 a,
+     const double                  *alpha,
+     const double                  *a,
      const dealii::types::blas_int *lda,
-     const double *                 b,
+     const double                  *b,
      const dealii::types::blas_int *ldb,
-     const double *                 beta,
-     double *                       c,
+     const double                  *beta,
+     double                        *c,
      const dealii::types::blas_int *ldc)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -2339,18 +2339,18 @@ gemm(const char *                   transa,
 
 
 inline void
-gemm(const char *                   transa,
-     const char *                   transb,
+gemm(const char                    *transa,
+     const char                    *transb,
      const dealii::types::blas_int *m,
      const dealii::types::blas_int *n,
      const dealii::types::blas_int *k,
-     const std::complex<float> *    alpha,
-     const std::complex<float> *    a,
+     const std::complex<float>     *alpha,
+     const std::complex<float>     *a,
      const dealii::types::blas_int *lda,
-     const std::complex<float> *    b,
+     const std::complex<float>     *b,
      const dealii::types::blas_int *ldb,
-     const std::complex<float> *    beta,
-     std::complex<float> *          c,
+     const std::complex<float>     *beta,
+     std::complex<float>           *c,
      const dealii::types::blas_int *ldc)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -2377,18 +2377,18 @@ gemm(const char *                   transa,
 
 
 inline void
-gemm(const char *                   transa,
-     const char *                   transb,
+gemm(const char                    *transa,
+     const char                    *transb,
      const dealii::types::blas_int *m,
      const dealii::types::blas_int *n,
      const dealii::types::blas_int *k,
-     const std::complex<double> *   alpha,
-     const std::complex<double> *   a,
+     const std::complex<double>    *alpha,
+     const std::complex<double>    *a,
      const dealii::types::blas_int *lda,
-     const std::complex<double> *   b,
+     const std::complex<double>    *b,
      const dealii::types::blas_int *ldb,
-     const std::complex<double> *   beta,
-     std::complex<double> *         c,
+     const std::complex<double>    *beta,
+     std::complex<double>          *c,
      const dealii::types::blas_int *ldc)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -2438,16 +2438,16 @@ gemv(const char *,
 
 
 inline void
-gemv(const char *                   trans,
+gemv(const char                    *trans,
      const dealii::types::blas_int *m,
      const dealii::types::blas_int *n,
-     const float *                  alpha,
-     const float *                  a,
+     const float                   *alpha,
+     const float                   *a,
      const dealii::types::blas_int *lda,
-     const float *                  x,
+     const float                   *x,
      const dealii::types::blas_int *incx,
-     const float *                  beta,
-     float *                        y,
+     const float                   *beta,
+     float                         *y,
      const dealii::types::blas_int *incy)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -2472,16 +2472,16 @@ gemv(const char *                   trans,
 
 
 inline void
-gemv(const char *                   trans,
+gemv(const char                    *trans,
      const dealii::types::blas_int *m,
      const dealii::types::blas_int *n,
-     const double *                 alpha,
-     const double *                 a,
+     const double                  *alpha,
+     const double                  *a,
      const dealii::types::blas_int *lda,
-     const double *                 x,
+     const double                  *x,
      const dealii::types::blas_int *incx,
-     const double *                 beta,
-     double *                       y,
+     const double                  *beta,
+     double                        *y,
      const dealii::types::blas_int *incy)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -2506,16 +2506,16 @@ gemv(const char *                   trans,
 
 
 inline void
-gemv(const char *                   trans,
+gemv(const char                    *trans,
      const dealii::types::blas_int *m,
      const dealii::types::blas_int *n,
-     const std::complex<float> *    alpha,
-     const std::complex<float> *    a,
+     const std::complex<float>     *alpha,
+     const std::complex<float>     *a,
      const dealii::types::blas_int *lda,
-     const std::complex<float> *    x,
+     const std::complex<float>     *x,
      const dealii::types::blas_int *incx,
-     const std::complex<float> *    beta,
-     std::complex<float> *          y,
+     const std::complex<float>     *beta,
+     std::complex<float>           *y,
      const dealii::types::blas_int *incy)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -2540,16 +2540,16 @@ gemv(const char *                   trans,
 
 
 inline void
-gemv(const char *                   trans,
+gemv(const char                    *trans,
      const dealii::types::blas_int *m,
      const dealii::types::blas_int *n,
-     const std::complex<double> *   alpha,
-     const std::complex<double> *   a,
+     const std::complex<double>    *alpha,
+     const std::complex<double>    *a,
      const dealii::types::blas_int *lda,
-     const std::complex<double> *   x,
+     const std::complex<double>    *x,
      const dealii::types::blas_int *incx,
-     const std::complex<double> *   beta,
-     std::complex<double> *         y,
+     const std::complex<double>    *beta,
+     std::complex<double>          *y,
      const dealii::types::blas_int *incy)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -2592,12 +2592,12 @@ geqrf(const dealii::types::blas_int *,
 inline void
 geqrf(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      float *                        tau,
-      float *                        work,
+      float                         *tau,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sgeqrf, SGEQRF)(m, n, a, lda, tau, work, lwork, info);
@@ -2619,12 +2619,12 @@ geqrf(const dealii::types::blas_int *m,
 inline void
 geqrf(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      double *                       tau,
-      double *                       work,
+      double                        *tau,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dgeqrf, DGEQRF)(m, n, a, lda, tau, work, lwork, info);
@@ -2646,12 +2646,12 @@ geqrf(const dealii::types::blas_int *m,
 inline void
 geqrf(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
-      std::complex<float> *          tau,
-      std::complex<float> *          work,
+      std::complex<float>           *tau,
+      std::complex<float>           *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cgeqrf, CGEQRF)(m, n, a, lda, tau, work, lwork, info);
@@ -2673,12 +2673,12 @@ geqrf(const dealii::types::blas_int *m,
 inline void
 geqrf(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
-      std::complex<double> *         tau,
-      std::complex<double> *         work,
+      std::complex<double>          *tau,
+      std::complex<double>          *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zgeqrf, ZGEQRF)(m, n, a, lda, tau, work, lwork, info);
@@ -2724,20 +2724,20 @@ gesdd(const char *,
 
 
 inline void
-gesdd(const char *                   jobz,
+gesdd(const char                    *jobz,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      float *                        s,
-      float *                        u,
+      float                         *s,
+      float                         *u,
       const dealii::types::blas_int *ldu,
-      float *                        vt,
+      float                         *vt,
       const dealii::types::blas_int *ldvt,
-      float *                        work,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sgesdd, SGESDD)
@@ -2764,20 +2764,20 @@ gesdd(const char *                   jobz,
 
 
 inline void
-gesdd(const char *                   jobz,
+gesdd(const char                    *jobz,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      double *                       s,
-      double *                       u,
+      double                        *s,
+      double                        *u,
       const dealii::types::blas_int *ldu,
-      double *                       vt,
+      double                        *vt,
       const dealii::types::blas_int *ldvt,
-      double *                       work,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dgesdd, DGESDD)
@@ -2804,21 +2804,21 @@ gesdd(const char *                   jobz,
 
 
 inline void
-gesdd(const char *                   jobz,
+gesdd(const char                    *jobz,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
-      float *                        s,
-      std::complex<float> *          u,
+      float                         *s,
+      std::complex<float>           *u,
       const dealii::types::blas_int *ldu,
-      std::complex<float> *          vt,
+      std::complex<float>           *vt,
       const dealii::types::blas_int *ldvt,
-      std::complex<float> *          work,
+      std::complex<float>           *work,
       const dealii::types::blas_int *lwork,
-      float *                        rwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      float                         *rwork,
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cgesdd, CGESDD)
@@ -2846,21 +2846,21 @@ gesdd(const char *                   jobz,
 
 
 inline void
-gesdd(const char *                   jobz,
+gesdd(const char                    *jobz,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
-      double *                       s,
-      std::complex<double> *         u,
+      double                        *s,
+      std::complex<double>          *u,
       const dealii::types::blas_int *ldu,
-      std::complex<double> *         vt,
+      std::complex<double>          *vt,
       const dealii::types::blas_int *ldvt,
-      std::complex<double> *         work,
+      std::complex<double>          *work,
       const dealii::types::blas_int *lwork,
-      double *                       rwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      double                        *rwork,
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zgesdd, ZGESDD)
@@ -2914,20 +2914,20 @@ gesvd(const char *,
 
 
 inline void
-gesvd(const char *                   jobu,
-      const char *                   jobvt,
+gesvd(const char                    *jobu,
+      const char                    *jobvt,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      float *                        s,
-      float *                        u,
+      float                         *s,
+      float                         *u,
       const dealii::types::blas_int *ldu,
-      float *                        vt,
+      float                         *vt,
       const dealii::types::blas_int *ldvt,
-      float *                        work,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sgesvd, SGESVD)
@@ -2954,20 +2954,20 @@ gesvd(const char *                   jobu,
 
 
 inline void
-gesvd(const char *                   jobu,
-      const char *                   jobvt,
+gesvd(const char                    *jobu,
+      const char                    *jobvt,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      double *                       s,
-      double *                       u,
+      double                        *s,
+      double                        *u,
       const dealii::types::blas_int *ldu,
-      double *                       vt,
+      double                        *vt,
       const dealii::types::blas_int *ldvt,
-      double *                       work,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dgesvd, DGESVD)
@@ -2994,21 +2994,21 @@ gesvd(const char *                   jobu,
 
 
 inline void
-gesvd(const char *                   jobu,
-      const char *                   jobvt,
+gesvd(const char                    *jobu,
+      const char                    *jobvt,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
-      float *                        s,
-      std::complex<float> *          u,
+      float                         *s,
+      std::complex<float>           *u,
       const dealii::types::blas_int *ldu,
-      std::complex<float> *          vt,
+      std::complex<float>           *vt,
       const dealii::types::blas_int *ldvt,
-      std::complex<float> *          work,
+      std::complex<float>           *work,
       const dealii::types::blas_int *lwork,
-      float *                        rwork,
-      dealii::types::blas_int *      info)
+      float                         *rwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cgesvd, CGESVD)
@@ -3036,21 +3036,21 @@ gesvd(const char *                   jobu,
 
 
 inline void
-gesvd(const char *                   jobu,
-      const char *                   jobvt,
+gesvd(const char                    *jobu,
+      const char                    *jobvt,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
-      double *                       s,
-      std::complex<double> *         u,
+      double                        *s,
+      std::complex<double>          *u,
       const dealii::types::blas_int *ldu,
-      std::complex<double> *         vt,
+      std::complex<double>          *vt,
       const dealii::types::blas_int *ldvt,
-      std::complex<double> *         work,
+      std::complex<double>          *work,
       const dealii::types::blas_int *lwork,
-      double *                       rwork,
-      dealii::types::blas_int *      info)
+      double                        *rwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zgesvd, ZGESVD)
@@ -3094,10 +3094,10 @@ getrf(const dealii::types::blas_int *,
 inline void
 getrf(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      ipiv,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *ipiv,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sgetrf, SGETRF)(m, n, a, lda, ipiv, info);
@@ -3117,10 +3117,10 @@ getrf(const dealii::types::blas_int *m,
 inline void
 getrf(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      ipiv,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *ipiv,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dgetrf, DGETRF)(m, n, a, lda, ipiv, info);
@@ -3140,10 +3140,10 @@ getrf(const dealii::types::blas_int *m,
 inline void
 getrf(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      ipiv,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *ipiv,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cgetrf, CGETRF)(m, n, a, lda, ipiv, info);
@@ -3163,10 +3163,10 @@ getrf(const dealii::types::blas_int *m,
 inline void
 getrf(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      ipiv,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *ipiv,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zgetrf, ZGETRF)(m, n, a, lda, ipiv, info);
@@ -3200,12 +3200,12 @@ getri(const dealii::types::blas_int *,
 
 inline void
 getri(const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
       const dealii::types::blas_int *ipiv,
-      float *                        work,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sgetri, SGETRI)(n, a, lda, ipiv, work, lwork, info);
@@ -3225,12 +3225,12 @@ getri(const dealii::types::blas_int *n,
 
 inline void
 getri(const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
       const dealii::types::blas_int *ipiv,
-      double *                       work,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dgetri, DGETRI)(n, a, lda, ipiv, work, lwork, info);
@@ -3250,12 +3250,12 @@ getri(const dealii::types::blas_int *n,
 
 inline void
 getri(const dealii::types::blas_int *n,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
       const dealii::types::blas_int *ipiv,
-      std::complex<float> *          work,
+      std::complex<float>           *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cgetri, CGETRI)(n, a, lda, ipiv, work, lwork, info);
@@ -3275,12 +3275,12 @@ getri(const dealii::types::blas_int *n,
 
 inline void
 getri(const dealii::types::blas_int *n,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
       const dealii::types::blas_int *ipiv,
-      std::complex<double> *         work,
+      std::complex<double>          *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zgetri, ZGETRI)(n, a, lda, ipiv, work, lwork, info);
@@ -3316,15 +3316,15 @@ getrs(const char *,
 
 
 inline void
-getrs(const char *                   trans,
+getrs(const char                    *trans,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const float *                  a,
+      const float                   *a,
       const dealii::types::blas_int *lda,
       const dealii::types::blas_int *ipiv,
-      float *                        b,
+      float                         *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sgetrs, SGETRS)
@@ -3346,15 +3346,15 @@ getrs(const char *                   trans,
 
 
 inline void
-getrs(const char *                   trans,
+getrs(const char                    *trans,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const double *                 a,
+      const double                  *a,
       const dealii::types::blas_int *lda,
       const dealii::types::blas_int *ipiv,
-      double *                       b,
+      double                        *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dgetrs, DGETRS)
@@ -3376,15 +3376,15 @@ getrs(const char *                   trans,
 
 
 inline void
-getrs(const char *                   trans,
+getrs(const char                    *trans,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const std::complex<float> *    a,
+      const std::complex<float>     *a,
       const dealii::types::blas_int *lda,
       const dealii::types::blas_int *ipiv,
-      std::complex<float> *          b,
+      std::complex<float>           *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cgetrs, CGETRS)
@@ -3406,15 +3406,15 @@ getrs(const char *                   trans,
 
 
 inline void
-getrs(const char *                   trans,
+getrs(const char                    *trans,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const std::complex<double> *   a,
+      const std::complex<double>    *a,
       const dealii::types::blas_int *lda,
       const dealii::types::blas_int *ipiv,
-      std::complex<double> *         b,
+      std::complex<double>          *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zgetrs, ZGETRS)
@@ -3491,12 +3491,12 @@ lange(const char *,
 
 
 inline float
-lange(const char *                   norm,
+lange(const char                    *norm,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      const float *                  a,
+      const float                   *a,
       const dealii::types::blas_int *lda,
-      float *                        work)
+      float                         *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return DEAL_II_FORTRAN_MANGLE(slange, SLANGE)(norm, m, n, a, lda, work);
@@ -3515,12 +3515,12 @@ lange(const char *                   norm,
 
 
 inline double
-lange(const char *                   norm,
+lange(const char                    *norm,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      const double *                 a,
+      const double                  *a,
       const dealii::types::blas_int *lda,
-      double *                       work)
+      double                        *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return DEAL_II_FORTRAN_MANGLE(dlange, DLANGE)(norm, m, n, a, lda, work);
@@ -3539,12 +3539,12 @@ lange(const char *                   norm,
 
 
 inline float
-lange(const char *                   norm,
+lange(const char                    *norm,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      const std::complex<float> *    a,
+      const std::complex<float>     *a,
       const dealii::types::blas_int *lda,
-      float *                        work)
+      float                         *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return DEAL_II_FORTRAN_MANGLE(clange, CLANGE)(norm, m, n, a, lda, work);
@@ -3563,12 +3563,12 @@ lange(const char *                   norm,
 
 
 inline double
-lange(const char *                   norm,
+lange(const char                    *norm,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      const std::complex<double> *   a,
+      const std::complex<double>    *a,
       const dealii::types::blas_int *lda,
-      double *                       work)
+      double                        *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return DEAL_II_FORTRAN_MANGLE(zlange, ZLANGE)(norm, m, n, a, lda, work);
@@ -3602,12 +3602,12 @@ lansy(const char *,
 
 
 inline float
-lansy(const char *                   norm,
-      const char *                   uplo,
+lansy(const char                    *norm,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      const float *                  a,
+      const float                   *a,
       const dealii::types::blas_int *lda,
-      float *                        work)
+      float                         *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return DEAL_II_FORTRAN_MANGLE(slansy, SLANSY)(norm, uplo, n, a, lda, work);
@@ -3626,12 +3626,12 @@ lansy(const char *                   norm,
 
 
 inline double
-lansy(const char *                   norm,
-      const char *                   uplo,
+lansy(const char                    *norm,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      const double *                 a,
+      const double                  *a,
       const dealii::types::blas_int *lda,
-      double *                       work)
+      double                        *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return DEAL_II_FORTRAN_MANGLE(dlansy, DLANSY)(norm, uplo, n, a, lda, work);
@@ -3650,12 +3650,12 @@ lansy(const char *                   norm,
 
 
 inline float
-lansy(const char *                   norm,
-      const char *                   uplo,
+lansy(const char                    *norm,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      const std::complex<float> *    a,
+      const std::complex<float>     *a,
       const dealii::types::blas_int *lda,
-      float *                        work)
+      float                         *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return DEAL_II_FORTRAN_MANGLE(clansy, CLANSY)(norm, uplo, n, a, lda, work);
@@ -3674,12 +3674,12 @@ lansy(const char *                   norm,
 
 
 inline double
-lansy(const char *                   norm,
-      const char *                   uplo,
+lansy(const char                    *norm,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      const std::complex<double> *   a,
+      const std::complex<double>    *a,
       const dealii::types::blas_int *lda,
-      double *                       work)
+      double                        *work)
 {
 #ifdef DEAL_II_WITH_LAPACK
   return DEAL_II_FORTRAN_MANGLE(zlansy, ZLANSY)(norm, uplo, n, a, lda, work);
@@ -3716,16 +3716,16 @@ lascl(const char *,
 
 
 inline void
-lascl(const char *                   type,
+lascl(const char                    *type,
       const dealii::types::blas_int *kl,
       const dealii::types::blas_int *ku,
-      const float *                  cfrom,
-      const float *                  cto,
+      const float                   *cfrom,
+      const float                   *cto,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(slascl, SLASCL)
@@ -3748,16 +3748,16 @@ lascl(const char *                   type,
 
 
 inline void
-lascl(const char *                   type,
+lascl(const char                    *type,
       const dealii::types::blas_int *kl,
       const dealii::types::blas_int *ku,
-      const double *                 cfrom,
-      const double *                 cto,
+      const double                  *cfrom,
+      const double                  *cto,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dlascl, DLASCL)
@@ -3780,16 +3780,16 @@ lascl(const char *                   type,
 
 
 inline void
-lascl(const char *                   type,
+lascl(const char                    *type,
       const dealii::types::blas_int *kl,
       const dealii::types::blas_int *ku,
-      const float *                  cfrom,
-      const float *                  cto,
+      const float                   *cfrom,
+      const float                   *cto,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(clascl, CLASCL)
@@ -3812,16 +3812,16 @@ lascl(const char *                   type,
 
 
 inline void
-lascl(const char *                   type,
+lascl(const char                    *type,
       const dealii::types::blas_int *kl,
       const dealii::types::blas_int *ku,
-      const double *                 cfrom,
-      const double *                 cto,
+      const double                  *cfrom,
+      const double                  *cto,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zlascl, ZLASCL)
@@ -3864,12 +3864,12 @@ inline void
 orgqr(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *k,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      const float *                  tau,
-      float *                        work,
+      const float                   *tau,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sorgqr, SORGQR)
@@ -3894,12 +3894,12 @@ inline void
 orgqr(const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *k,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      const double *                 tau,
-      double *                       work,
+      const double                  *tau,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dorgqr, DORGQR)
@@ -3945,19 +3945,19 @@ ormqr(const char *,
 
 
 inline void
-ormqr(const char *                   side,
-      const char *                   trans,
+ormqr(const char                    *side,
+      const char                    *trans,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *k,
-      const float *                  a,
+      const float                   *a,
       const dealii::types::blas_int *lda,
-      const float *                  tau,
-      float *                        c,
+      const float                   *tau,
+      float                         *c,
       const dealii::types::blas_int *ldc,
-      float *                        work,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sormqr, SORMQR)
@@ -3983,19 +3983,19 @@ ormqr(const char *                   side,
 
 
 inline void
-ormqr(const char *                   side,
-      const char *                   trans,
+ormqr(const char                    *side,
+      const char                    *trans,
       const dealii::types::blas_int *m,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *k,
-      const double *                 a,
+      const double                  *a,
       const dealii::types::blas_int *lda,
-      const double *                 tau,
-      double *                       c,
+      const double                  *tau,
+      double                        *c,
       const dealii::types::blas_int *ldc,
-      double *                       work,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dormqr, DORMQR)
@@ -4041,15 +4041,15 @@ pocon(const char *,
 
 
 inline void
-pocon(const char *                   uplo,
+pocon(const char                    *uplo,
       const dealii::types::blas_int *n,
-      const float *                  a,
+      const float                   *a,
       const dealii::types::blas_int *lda,
-      const float *                  anorm,
-      float *                        rcond,
-      float *                        work,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      const float                   *anorm,
+      float                         *rcond,
+      float                         *work,
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(spocon, SPOCON)
@@ -4071,15 +4071,15 @@ pocon(const char *                   uplo,
 
 
 inline void
-pocon(const char *                   uplo,
+pocon(const char                    *uplo,
       const dealii::types::blas_int *n,
-      const double *                 a,
+      const double                  *a,
       const dealii::types::blas_int *lda,
-      const double *                 anorm,
-      double *                       rcond,
-      double *                       work,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      const double                  *anorm,
+      double                        *rcond,
+      double                        *work,
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dpocon, DPOCON)
@@ -4101,15 +4101,15 @@ pocon(const char *                   uplo,
 
 
 inline void
-pocon(const char *                   uplo,
+pocon(const char                    *uplo,
       const dealii::types::blas_int *n,
-      const std::complex<float> *    a,
+      const std::complex<float>     *a,
       const dealii::types::blas_int *lda,
-      const float *                  anorm,
-      float *                        rcond,
-      std::complex<float> *          work,
-      float *                        rwork,
-      dealii::types::blas_int *      info)
+      const float                   *anorm,
+      float                         *rcond,
+      std::complex<float>           *work,
+      float                         *rwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cpocon, CPOCON)
@@ -4131,15 +4131,15 @@ pocon(const char *                   uplo,
 
 
 inline void
-pocon(const char *                   uplo,
+pocon(const char                    *uplo,
       const dealii::types::blas_int *n,
-      const std::complex<double> *   a,
+      const std::complex<double>    *a,
       const dealii::types::blas_int *lda,
-      const double *                 anorm,
-      double *                       rcond,
-      std::complex<double> *         work,
-      double *                       rwork,
-      dealii::types::blas_int *      info)
+      const double                  *anorm,
+      double                        *rcond,
+      std::complex<double>          *work,
+      double                        *rwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zpocon, ZPOCON)
@@ -4174,11 +4174,11 @@ potrf(const char *,
 
 
 inline void
-potrf(const char *                   uplo,
+potrf(const char                    *uplo,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(spotrf, SPOTRF)(uplo, n, a, lda, info);
@@ -4195,11 +4195,11 @@ potrf(const char *                   uplo,
 
 
 inline void
-potrf(const char *                   uplo,
+potrf(const char                    *uplo,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dpotrf, DPOTRF)(uplo, n, a, lda, info);
@@ -4216,11 +4216,11 @@ potrf(const char *                   uplo,
 
 
 inline void
-potrf(const char *                   uplo,
+potrf(const char                    *uplo,
       const dealii::types::blas_int *n,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cpotrf, CPOTRF)(uplo, n, a, lda, info);
@@ -4237,11 +4237,11 @@ potrf(const char *                   uplo,
 
 
 inline void
-potrf(const char *                   uplo,
+potrf(const char                    *uplo,
       const dealii::types::blas_int *n,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zpotrf, ZPOTRF)(uplo, n, a, lda, info);
@@ -4271,11 +4271,11 @@ potri(const char *,
 
 
 inline void
-potri(const char *                   uplo,
+potri(const char                    *uplo,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(spotri, SPOTRI)(uplo, n, a, lda, info);
@@ -4292,11 +4292,11 @@ potri(const char *                   uplo,
 
 
 inline void
-potri(const char *                   uplo,
+potri(const char                    *uplo,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dpotri, DPOTRI)(uplo, n, a, lda, info);
@@ -4313,11 +4313,11 @@ potri(const char *                   uplo,
 
 
 inline void
-potri(const char *                   uplo,
+potri(const char                    *uplo,
       const dealii::types::blas_int *n,
-      std::complex<float> *          a,
+      std::complex<float>           *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cpotri, CPOTRI)(uplo, n, a, lda, info);
@@ -4334,11 +4334,11 @@ potri(const char *                   uplo,
 
 
 inline void
-potri(const char *                   uplo,
+potri(const char                    *uplo,
       const dealii::types::blas_int *n,
-      std::complex<double> *         a,
+      std::complex<double>          *a,
       const dealii::types::blas_int *lda,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zpotri, ZPOTRI)(uplo, n, a, lda, info);
@@ -4371,14 +4371,14 @@ potrs(const char *,
 
 
 inline void
-potrs(const char *                   uplo,
+potrs(const char                    *uplo,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const float *                  a,
+      const float                   *a,
       const dealii::types::blas_int *lda,
-      float *                        b,
+      float                         *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(spotrs, SPOTRS)(uplo, n, nrhs, a, lda, b, ldb, info);
@@ -4398,14 +4398,14 @@ potrs(const char *                   uplo,
 
 
 inline void
-potrs(const char *                   uplo,
+potrs(const char                    *uplo,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const double *                 a,
+      const double                  *a,
       const dealii::types::blas_int *lda,
-      double *                       b,
+      double                        *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dpotrs, DPOTRS)(uplo, n, nrhs, a, lda, b, ldb, info);
@@ -4425,14 +4425,14 @@ potrs(const char *                   uplo,
 
 
 inline void
-potrs(const char *                   uplo,
+potrs(const char                    *uplo,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const std::complex<float> *    a,
+      const std::complex<float>     *a,
       const dealii::types::blas_int *lda,
-      std::complex<float> *          b,
+      std::complex<float>           *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(cpotrs, CPOTRS)(uplo, n, nrhs, a, lda, b, ldb, info);
@@ -4452,14 +4452,14 @@ potrs(const char *                   uplo,
 
 
 inline void
-potrs(const char *                   uplo,
+potrs(const char                    *uplo,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const std::complex<double> *   a,
+      const std::complex<double>    *a,
       const dealii::types::blas_int *lda,
-      std::complex<double> *         b,
+      std::complex<double>          *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(zpotrs, ZPOTRS)(uplo, n, nrhs, a, lda, b, ldb, info);
@@ -4498,14 +4498,14 @@ stev(const char *,
 
 
 inline void
-stev(const char *                   jobz,
+stev(const char                    *jobz,
      const dealii::types::blas_int *n,
-     float *                        d,
-     float *                        e,
-     float *                        z,
+     float                         *d,
+     float                         *e,
+     float                         *z,
      const dealii::types::blas_int *ldz,
-     float *                        work,
-     dealii::types::blas_int *      info)
+     float                         *work,
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(sstev, SSTEV)(jobz, n, d, e, z, ldz, work, info);
@@ -4525,14 +4525,14 @@ stev(const char *                   jobz,
 
 
 inline void
-stev(const char *                   jobz,
+stev(const char                    *jobz,
      const dealii::types::blas_int *n,
-     double *                       d,
-     double *                       e,
-     double *                       z,
+     double                        *d,
+     double                        *e,
+     double                        *z,
      const dealii::types::blas_int *ldz,
-     double *                       work,
-     dealii::types::blas_int *      info)
+     double                        *work,
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dstev, DSTEV)(jobz, n, d, e, z, ldz, work, info);
@@ -4569,15 +4569,15 @@ syev(const char *,
 
 
 inline void
-syev(const char *                   jobz,
-     const char *                   uplo,
+syev(const char                    *jobz,
+     const char                    *uplo,
      const dealii::types::blas_int *n,
-     float *                        a,
+     float                         *a,
      const dealii::types::blas_int *lda,
-     float *                        w,
-     float *                        work,
+     float                         *w,
+     float                         *work,
      const dealii::types::blas_int *lwork,
-     dealii::types::blas_int *      info)
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(ssyev, SSYEV)
@@ -4599,15 +4599,15 @@ syev(const char *                   jobz,
 
 
 inline void
-syev(const char *                   jobz,
-     const char *                   uplo,
+syev(const char                    *jobz,
+     const char                    *uplo,
      const dealii::types::blas_int *n,
-     double *                       a,
+     double                        *a,
      const dealii::types::blas_int *lda,
-     double *                       w,
-     double *                       work,
+     double                        *w,
+     double                        *work,
      const dealii::types::blas_int *lwork,
-     dealii::types::blas_int *      info)
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dsyev, DSYEV)
@@ -4664,27 +4664,27 @@ syevr(const char *,
 
 
 inline void
-syevr(const char *                   jobz,
-      const char *                   range,
-      const char *                   uplo,
+syevr(const char                    *jobz,
+      const char                    *range,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      const float *                  vl,
-      const float *                  vu,
+      const float                   *vl,
+      const float                   *vu,
       const dealii::types::blas_int *il,
       const dealii::types::blas_int *iu,
-      const float *                  abstol,
-      dealii::types::blas_int *      m,
-      float *                        w,
-      float *                        z,
+      const float                   *abstol,
+      dealii::types::blas_int       *m,
+      float                         *w,
+      float                         *z,
       const dealii::types::blas_int *ldz,
-      dealii::types::blas_int *      isuppz,
-      float *                        work,
+      dealii::types::blas_int       *isuppz,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
+      dealii::types::blas_int       *iwork,
       const dealii::types::blas_int *liwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   // Netlib and Atlas Lapack perform floating point tests (e.g. divide-by-zero)
@@ -4749,27 +4749,27 @@ syevr(const char *                   jobz,
 
 
 inline void
-syevr(const char *                   jobz,
-      const char *                   range,
-      const char *                   uplo,
+syevr(const char                    *jobz,
+      const char                    *range,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      const double *                 vl,
-      const double *                 vu,
+      const double                  *vl,
+      const double                  *vu,
       const dealii::types::blas_int *il,
       const dealii::types::blas_int *iu,
-      const double *                 abstol,
-      dealii::types::blas_int *      m,
-      double *                       w,
-      double *                       z,
+      const double                  *abstol,
+      dealii::types::blas_int       *m,
+      double                        *w,
+      double                        *z,
       const dealii::types::blas_int *ldz,
-      dealii::types::blas_int *      isuppz,
-      double *                       work,
+      dealii::types::blas_int       *isuppz,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
+      dealii::types::blas_int       *iwork,
       const dealii::types::blas_int *liwork,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   // Netlib and Atlas Lapack perform floating point tests (e.g. divide-by-zero)
@@ -4868,26 +4868,26 @@ syevx(const char *,
 
 
 inline void
-syevx(const char *                   jobz,
-      const char *                   range,
-      const char *                   uplo,
+syevx(const char                    *jobz,
+      const char                    *range,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      const float *                  vl,
-      const float *                  vu,
+      const float                   *vl,
+      const float                   *vu,
       const dealii::types::blas_int *il,
       const dealii::types::blas_int *iu,
-      const float *                  abstol,
-      dealii::types::blas_int *      m,
-      float *                        w,
-      float *                        z,
+      const float                   *abstol,
+      dealii::types::blas_int       *m,
+      float                         *w,
+      float                         *z,
       const dealii::types::blas_int *ldz,
-      float *                        work,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      ifail,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *ifail,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(ssyevx, SSYEVX)
@@ -4939,26 +4939,26 @@ syevx(const char *                   jobz,
 
 
 inline void
-syevx(const char *                   jobz,
-      const char *                   range,
-      const char *                   uplo,
+syevx(const char                    *jobz,
+      const char                    *range,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      const double *                 vl,
-      const double *                 vu,
+      const double                  *vl,
+      const double                  *vu,
       const dealii::types::blas_int *il,
       const dealii::types::blas_int *iu,
-      const double *                 abstol,
-      dealii::types::blas_int *      m,
-      double *                       w,
-      double *                       z,
+      const double                  *abstol,
+      dealii::types::blas_int       *m,
+      double                        *w,
+      double                        *z,
       const dealii::types::blas_int *ldz,
-      double *                       work,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      ifail,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *ifail,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dsyevx, DSYEVX)
@@ -5034,17 +5034,17 @@ sygv(const dealii::types::blas_int *,
 
 inline void
 sygv(const dealii::types::blas_int *itype,
-     const char *                   jobz,
-     const char *                   uplo,
+     const char                    *jobz,
+     const char                    *uplo,
      const dealii::types::blas_int *n,
-     float *                        a,
+     float                         *a,
      const dealii::types::blas_int *lda,
-     float *                        b,
+     float                         *b,
      const dealii::types::blas_int *ldb,
-     float *                        w,
-     float *                        work,
+     float                         *w,
+     float                         *work,
      const dealii::types::blas_int *lwork,
-     dealii::types::blas_int *      info)
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(ssygv, SSYGV)
@@ -5070,17 +5070,17 @@ sygv(const dealii::types::blas_int *itype,
 
 inline void
 sygv(const dealii::types::blas_int *itype,
-     const char *                   jobz,
-     const char *                   uplo,
+     const char                    *jobz,
+     const char                    *uplo,
      const dealii::types::blas_int *n,
-     double *                       a,
+     double                        *a,
      const dealii::types::blas_int *lda,
-     double *                       b,
+     double                        *b,
      const dealii::types::blas_int *ldb,
-     double *                       w,
-     double *                       work,
+     double                        *w,
+     double                        *work,
      const dealii::types::blas_int *lwork,
-     dealii::types::blas_int *      info)
+     dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dsygv, DSYGV)
@@ -5144,28 +5144,28 @@ sygvx(const dealii::types::blas_int *,
 
 inline void
 sygvx(const dealii::types::blas_int *itype,
-      const char *                   jobz,
-      const char *                   range,
-      const char *                   uplo,
+      const char                    *jobz,
+      const char                    *range,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      float *                        a,
+      float                         *a,
       const dealii::types::blas_int *lda,
-      float *                        b,
+      float                         *b,
       const dealii::types::blas_int *ldb,
-      const float *                  vl,
-      const float *                  vu,
+      const float                   *vl,
+      const float                   *vu,
       const dealii::types::blas_int *il,
       const dealii::types::blas_int *iu,
-      const float *                  abstol,
-      dealii::types::blas_int *      m,
-      float *                        w,
-      float *                        z,
+      const float                   *abstol,
+      dealii::types::blas_int       *m,
+      float                         *w,
+      float                         *z,
       const dealii::types::blas_int *ldz,
-      float *                        work,
+      float                         *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      ifail,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *ifail,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(ssygvx, SSYGVX)
@@ -5224,28 +5224,28 @@ sygvx(const dealii::types::blas_int *itype,
 
 inline void
 sygvx(const dealii::types::blas_int *itype,
-      const char *                   jobz,
-      const char *                   range,
-      const char *                   uplo,
+      const char                    *jobz,
+      const char                    *range,
+      const char                    *uplo,
       const dealii::types::blas_int *n,
-      double *                       a,
+      double                        *a,
       const dealii::types::blas_int *lda,
-      double *                       b,
+      double                        *b,
       const dealii::types::blas_int *ldb,
-      const double *                 vl,
-      const double *                 vu,
+      const double                  *vl,
+      const double                  *vu,
       const dealii::types::blas_int *il,
       const dealii::types::blas_int *iu,
-      const double *                 abstol,
-      dealii::types::blas_int *      m,
-      double *                       w,
-      double *                       z,
+      const double                  *abstol,
+      dealii::types::blas_int       *m,
+      double                        *w,
+      double                        *z,
       const dealii::types::blas_int *ldz,
-      double *                       work,
+      double                        *work,
       const dealii::types::blas_int *lwork,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      ifail,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *ifail,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dsygvx, DSYGVX)
@@ -5318,12 +5318,12 @@ syr(const char *,
 
 
 inline void
-syr(const char *                   uplo,
+syr(const char                    *uplo,
     const dealii::types::blas_int *n,
-    const float *                  alpha,
-    const float *                  x,
+    const float                   *alpha,
+    const float                   *x,
     const dealii::types::blas_int *incx,
-    float *                        a,
+    float                         *a,
     const dealii::types::blas_int *lda)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5343,12 +5343,12 @@ syr(const char *                   uplo,
 
 
 inline void
-syr(const char *                   uplo,
+syr(const char                    *uplo,
     const dealii::types::blas_int *n,
-    const double *                 alpha,
-    const double *                 x,
+    const double                  *alpha,
+    const double                  *x,
     const dealii::types::blas_int *incx,
-    double *                       a,
+    double                        *a,
     const dealii::types::blas_int *lda)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5389,15 +5389,15 @@ syrk(const char *,
 
 
 inline void
-syrk(const char *                   uplo,
-     const char *                   trans,
+syrk(const char                    *uplo,
+     const char                    *trans,
      const dealii::types::blas_int *n,
      const dealii::types::blas_int *k,
-     const float *                  alpha,
-     const float *                  a,
+     const float                   *alpha,
+     const float                   *a,
      const dealii::types::blas_int *lda,
-     const float *                  beta,
-     float *                        c,
+     const float                   *beta,
+     float                         *c,
      const dealii::types::blas_int *ldc)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5421,15 +5421,15 @@ syrk(const char *                   uplo,
 
 
 inline void
-syrk(const char *                   uplo,
-     const char *                   trans,
+syrk(const char                    *uplo,
+     const char                    *trans,
      const dealii::types::blas_int *n,
      const dealii::types::blas_int *k,
-     const double *                 alpha,
-     const double *                 a,
+     const double                  *alpha,
+     const double                  *a,
      const dealii::types::blas_int *lda,
-     const double *                 beta,
-     double *                       c,
+     const double                  *beta,
+     double                        *c,
      const dealii::types::blas_int *ldc)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5453,15 +5453,15 @@ syrk(const char *                   uplo,
 
 
 inline void
-syrk(const char *                   uplo,
-     const char *                   trans,
+syrk(const char                    *uplo,
+     const char                    *trans,
      const dealii::types::blas_int *n,
      const dealii::types::blas_int *k,
-     const std::complex<float> *    alpha,
-     const std::complex<float> *    a,
+     const std::complex<float>     *alpha,
+     const std::complex<float>     *a,
      const dealii::types::blas_int *lda,
-     const std::complex<float> *    beta,
-     std::complex<float> *          c,
+     const std::complex<float>     *beta,
+     std::complex<float>           *c,
      const dealii::types::blas_int *ldc)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5485,15 +5485,15 @@ syrk(const char *                   uplo,
 
 
 inline void
-syrk(const char *                   uplo,
-     const char *                   trans,
+syrk(const char                    *uplo,
+     const char                    *trans,
      const dealii::types::blas_int *n,
      const dealii::types::blas_int *k,
-     const std::complex<double> *   alpha,
-     const std::complex<double> *   a,
+     const std::complex<double>    *alpha,
+     const std::complex<double>    *a,
      const dealii::types::blas_int *lda,
-     const std::complex<double> *   beta,
-     std::complex<double> *         c,
+     const std::complex<double>    *beta,
+     std::complex<double>          *c,
      const dealii::types::blas_int *ldc)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5535,16 +5535,16 @@ trcon(const char *,
 
 
 inline void
-trcon(const char *                   norm,
-      const char *                   uplo,
-      const char *                   diag,
+trcon(const char                    *norm,
+      const char                    *uplo,
+      const char                    *diag,
       const dealii::types::blas_int *n,
-      const float *                  a,
+      const float                   *a,
       const dealii::types::blas_int *lda,
-      float *                        rcond,
-      float *                        work,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      float                         *rcond,
+      float                         *work,
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(strcon, STRCON)
@@ -5567,16 +5567,16 @@ trcon(const char *                   norm,
 
 
 inline void
-trcon(const char *                   norm,
-      const char *                   uplo,
-      const char *                   diag,
+trcon(const char                    *norm,
+      const char                    *uplo,
+      const char                    *diag,
       const dealii::types::blas_int *n,
-      const double *                 a,
+      const double                  *a,
       const dealii::types::blas_int *lda,
-      double *                       rcond,
-      double *                       work,
-      dealii::types::blas_int *      iwork,
-      dealii::types::blas_int *      info)
+      double                        *rcond,
+      double                        *work,
+      dealii::types::blas_int       *iwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dtrcon, DTRCON)
@@ -5599,16 +5599,16 @@ trcon(const char *                   norm,
 
 
 inline void
-trcon(const char *                   norm,
-      const char *                   uplo,
-      const char *                   diag,
+trcon(const char                    *norm,
+      const char                    *uplo,
+      const char                    *diag,
       const dealii::types::blas_int *n,
-      const std::complex<float> *    a,
+      const std::complex<float>     *a,
       const dealii::types::blas_int *lda,
-      float *                        rcond,
-      std::complex<float> *          work,
-      float *                        rwork,
-      dealii::types::blas_int *      info)
+      float                         *rcond,
+      std::complex<float>           *work,
+      float                         *rwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(ctrcon, CTRCON)
@@ -5631,16 +5631,16 @@ trcon(const char *                   norm,
 
 
 inline void
-trcon(const char *                   norm,
-      const char *                   uplo,
-      const char *                   diag,
+trcon(const char                    *norm,
+      const char                    *uplo,
+      const char                    *diag,
       const dealii::types::blas_int *n,
-      const std::complex<double> *   a,
+      const std::complex<double>    *a,
       const dealii::types::blas_int *lda,
-      double *                       rcond,
-      std::complex<double> *         work,
-      double *                       rwork,
-      dealii::types::blas_int *      info)
+      double                        *rcond,
+      std::complex<double>          *work,
+      double                        *rwork,
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(ztrcon, ZTRCON)
@@ -5679,13 +5679,13 @@ trmv(const char *,
 
 
 inline void
-trmv(const char *                   uplo,
-     const char *                   trans,
-     const char *                   diag,
+trmv(const char                    *uplo,
+     const char                    *trans,
+     const char                    *diag,
      const dealii::types::blas_int *n,
-     const float *                  a,
+     const float                   *a,
      const dealii::types::blas_int *lda,
-     float *                        x,
+     float                         *x,
      const dealii::types::blas_int *incx)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5706,13 +5706,13 @@ trmv(const char *                   uplo,
 
 
 inline void
-trmv(const char *                   uplo,
-     const char *                   trans,
-     const char *                   diag,
+trmv(const char                    *uplo,
+     const char                    *trans,
+     const char                    *diag,
      const dealii::types::blas_int *n,
-     const double *                 a,
+     const double                  *a,
      const dealii::types::blas_int *lda,
-     double *                       x,
+     double                        *x,
      const dealii::types::blas_int *incx)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5733,13 +5733,13 @@ trmv(const char *                   uplo,
 
 
 inline void
-trmv(const char *                   uplo,
-     const char *                   trans,
-     const char *                   diag,
+trmv(const char                    *uplo,
+     const char                    *trans,
+     const char                    *diag,
      const dealii::types::blas_int *n,
-     const std::complex<float> *    a,
+     const std::complex<float>     *a,
      const dealii::types::blas_int *lda,
-     std::complex<float> *          x,
+     std::complex<float>           *x,
      const dealii::types::blas_int *incx)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5760,13 +5760,13 @@ trmv(const char *                   uplo,
 
 
 inline void
-trmv(const char *                   uplo,
-     const char *                   trans,
-     const char *                   diag,
+trmv(const char                    *uplo,
+     const char                    *trans,
+     const char                    *diag,
      const dealii::types::blas_int *n,
-     const std::complex<double> *   a,
+     const std::complex<double>    *a,
      const dealii::types::blas_int *lda,
-     std::complex<double> *         x,
+     std::complex<double>          *x,
      const dealii::types::blas_int *incx)
 {
 #ifdef DEAL_II_WITH_LAPACK
@@ -5805,16 +5805,16 @@ trtrs(const char *,
 
 
 inline void
-trtrs(const char *                   uplo,
-      const char *                   trans,
-      const char *                   diag,
+trtrs(const char                    *uplo,
+      const char                    *trans,
+      const char                    *diag,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const float *                  a,
+      const float                   *a,
       const dealii::types::blas_int *lda,
-      float *                        b,
+      float                         *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(strtrs, STRTRS)
@@ -5837,16 +5837,16 @@ trtrs(const char *                   uplo,
 
 
 inline void
-trtrs(const char *                   uplo,
-      const char *                   trans,
-      const char *                   diag,
+trtrs(const char                    *uplo,
+      const char                    *trans,
+      const char                    *diag,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const double *                 a,
+      const double                  *a,
       const dealii::types::blas_int *lda,
-      double *                       b,
+      double                        *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(dtrtrs, DTRTRS)
@@ -5869,16 +5869,16 @@ trtrs(const char *                   uplo,
 
 
 inline void
-trtrs(const char *                   uplo,
-      const char *                   trans,
-      const char *                   diag,
+trtrs(const char                    *uplo,
+      const char                    *trans,
+      const char                    *diag,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const std::complex<float> *    a,
+      const std::complex<float>     *a,
       const dealii::types::blas_int *lda,
-      std::complex<float> *          b,
+      std::complex<float>           *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(ctrtrs, CTRTRS)
@@ -5901,16 +5901,16 @@ trtrs(const char *                   uplo,
 
 
 inline void
-trtrs(const char *                   uplo,
-      const char *                   trans,
-      const char *                   diag,
+trtrs(const char                    *uplo,
+      const char                    *trans,
+      const char                    *diag,
       const dealii::types::blas_int *n,
       const dealii::types::blas_int *nrhs,
-      const std::complex<double> *   a,
+      const std::complex<double>    *a,
       const dealii::types::blas_int *lda,
-      std::complex<double> *         b,
+      std::complex<double>          *b,
       const dealii::types::blas_int *ldb,
-      dealii::types::blas_int *      info)
+      dealii::types::blas_int       *info)
 {
 #ifdef DEAL_II_WITH_LAPACK
   DEAL_II_FORTRAN_MANGLE(ztrtrs, ZTRTRS)

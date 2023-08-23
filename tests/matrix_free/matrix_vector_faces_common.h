@@ -91,8 +91,8 @@ public:
 private:
   void
   local_apply(const MatrixFree<dim, number, VectorizedArrayType> &data,
-              VectorType &                                        dst,
-              const VectorType &                                  src,
+              VectorType                                         &dst,
+              const VectorType                                   &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim,
@@ -118,9 +118,9 @@ private:
   void
   local_apply_face(
     const MatrixFree<dim, number, VectorizedArrayType> &data,
-    VectorType &                                        dst,
-    const VectorType &                                  src,
-    const std::pair<unsigned int, unsigned int> &       face_range) const
+    VectorType                                         &dst,
+    const VectorType                                   &src,
+    const std::pair<unsigned int, unsigned int>        &face_range) const
   {
     FEFaceEvaluation<dim,
                      fe_degree,
@@ -191,9 +191,9 @@ private:
   void
   local_apply_boundary_face(
     const MatrixFree<dim, number, VectorizedArrayType> &data,
-    VectorType &                                        dst,
-    const VectorType &                                  src,
-    const std::pair<unsigned int, unsigned int> &       face_range) const
+    VectorType                                         &dst,
+    const VectorType                                   &src,
+    const std::pair<unsigned int, unsigned int>        &face_range) const
   {
     FEFaceEvaluation<dim,
                      fe_degree,
@@ -297,8 +297,8 @@ public:
 private:
   void
   local_apply(const MatrixFree<dim, number, VectorizedArrayType> &data,
-              VectorType &                                        dst,
-              const VectorType &                                  src,
+              VectorType                                         &dst,
+              const VectorType                                   &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim,
@@ -322,9 +322,9 @@ private:
   void
   local_apply_face(
     const MatrixFree<dim, number, VectorizedArrayType> &data,
-    VectorType &                                        dst,
-    const VectorType &                                  src,
-    const std::pair<unsigned int, unsigned int> &       face_range) const
+    VectorType                                         &dst,
+    const VectorType                                   &src,
+    const std::pair<unsigned int, unsigned int>        &face_range) const
   {
     FEFaceEvaluation<dim,
                      fe_degree,
@@ -397,9 +397,9 @@ private:
   void
   local_apply_boundary_face(
     const MatrixFree<dim, number, VectorizedArrayType> &data,
-    VectorType &                                        dst,
-    const VectorType &                                  src,
-    const std::pair<unsigned int, unsigned int> &       face_range) const
+    VectorType                                         &dst,
+    const VectorType                                   &src,
+    const std::pair<unsigned int, unsigned int>        &face_range) const
   {
     FEFaceEvaluation<dim,
                      fe_degree,
@@ -451,7 +451,7 @@ private:
 
 template <int dim, int n_components, typename Number>
 Tensor<1, n_components, Tensor<1, dim, Number>>
-multiply_by_advection(const Tensor<1, dim, Number> &         advection,
+multiply_by_advection(const Tensor<1, dim, Number>          &advection,
                       const Tensor<1, n_components, Number> &values)
 {
   Tensor<1, n_components, Tensor<1, dim, Number>> out;
@@ -466,7 +466,7 @@ multiply_by_advection(const Tensor<1, dim, Number> &         advection,
 template <int dim, typename Number>
 Tensor<1, dim, Number>
 multiply_by_advection(const Tensor<1, dim, Number> &advection,
-                      const Number &                values)
+                      const Number                 &values)
 {
   Tensor<1, dim, Number> out;
   for (unsigned int d = 0; d < dim; ++d)
@@ -533,8 +533,8 @@ public:
 private:
   void
   local_apply(const MatrixFree<dim, number, VectorizedArrayType> &data,
-              VectorType &                                        dst,
-              const VectorType &                                  src,
+              VectorType                                         &dst,
+              const VectorType                                   &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim,
@@ -560,9 +560,9 @@ private:
   void
   local_apply_face(
     const MatrixFree<dim, number, VectorizedArrayType> &data,
-    VectorType &                                        dst,
-    const VectorType &                                  src,
-    const std::pair<unsigned int, unsigned int> &       face_range) const
+    VectorType                                         &dst,
+    const VectorType                                   &src,
+    const std::pair<unsigned int, unsigned int>        &face_range) const
   {
     FEFaceEvaluation<dim,
                      fe_degree,
@@ -615,9 +615,9 @@ private:
   void
   local_apply_boundary_face(
     const MatrixFree<dim, number, VectorizedArrayType> &data,
-    VectorType &                                        dst,
-    const VectorType &                                  src,
-    const std::pair<unsigned int, unsigned int> &       face_range) const
+    VectorType                                         &dst,
+    const VectorType                                   &src,
+    const std::pair<unsigned int, unsigned int>        &face_range) const
   {
     FEFaceEvaluation<dim,
                      fe_degree,
@@ -672,14 +672,14 @@ class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
 {
 public:
   void
-  cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+  cell(MeshWorker::DoFInfo<dim>                  &dinfo,
        typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
-  boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+  boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
            typename MeshWorker::IntegrationInfo<dim> &info) const;
   void
-  face(MeshWorker::DoFInfo<dim> &                 dinfo1,
-       MeshWorker::DoFInfo<dim> &                 dinfo2,
+  face(MeshWorker::DoFInfo<dim>                  &dinfo1,
+       MeshWorker::DoFInfo<dim>                  &dinfo2,
        typename MeshWorker::IntegrationInfo<dim> &info1,
        typename MeshWorker::IntegrationInfo<dim> &info2) const;
 };
@@ -689,7 +689,7 @@ public:
 template <int dim>
 void
 MatrixIntegrator<dim>::cell(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
+  MeshWorker::DoFInfo<dim>                  &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
@@ -701,8 +701,8 @@ MatrixIntegrator<dim>::cell(
 template <int dim>
 void
 MatrixIntegrator<dim>::face(
-  MeshWorker::DoFInfo<dim> &                 dinfo1,
-  MeshWorker::DoFInfo<dim> &                 dinfo2,
+  MeshWorker::DoFInfo<dim>                  &dinfo1,
+  MeshWorker::DoFInfo<dim>                  &dinfo2,
   typename MeshWorker::IntegrationInfo<dim> &info1,
   typename MeshWorker::IntegrationInfo<dim> &info2) const
 {
@@ -737,7 +737,7 @@ MatrixIntegrator<dim>::face(
 template <int dim>
 void
 MatrixIntegrator<dim>::boundary(
-  MeshWorker::DoFInfo<dim> &                 dinfo,
+  MeshWorker::DoFInfo<dim>                  &dinfo,
   typename MeshWorker::IntegrationInfo<dim> &info) const
 {
   const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
@@ -761,7 +761,7 @@ template <int dim,
           typename number,
           typename VectorizedArrayType = VectorizedArray<number>>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints,
         const bool                       also_test_parallel = false)
 {

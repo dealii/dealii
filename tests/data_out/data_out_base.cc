@@ -33,7 +33,7 @@
 template <int dim, int spacedim>
 void
 write_patches(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
-              std::ostream &                                        out)
+              std::ostream                                         &out)
 {
   std::vector<std::string> names(2);
   names[0] = std::string("first name");

@@ -27,7 +27,7 @@ namespace Particles
   void
   DataOut<dim, spacedim>::build_patches(
     const Particles::ParticleHandler<dim, spacedim> &particles,
-    const std::vector<std::string> &                 data_component_names,
+    const std::vector<std::string>                  &data_component_names,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
       &data_component_interpretations_)
   {

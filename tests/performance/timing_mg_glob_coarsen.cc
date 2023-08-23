@@ -89,10 +89,10 @@ public:
   LaplaceOperator(){};
 
   void
-  initialize(const Mapping<dim> &             mapping,
-             const DoFHandler<dim> &          dof_handler,
+  initialize(const Mapping<dim>              &mapping,
+             const DoFHandler<dim>           &dof_handler,
              const AffineConstraints<number> &constraints,
-             const DoFHandler<dim> &          dg_dof_handler)
+             const DoFHandler<dim>           &dg_dof_handler)
   {
     const QGauss<1> quad(dof_handler.get_fe().degree + 1);
     const QGauss<1> dg_quad(dg_dof_handler.get_fe().degree + 1);
@@ -116,8 +116,8 @@ public:
   }
 
   void
-  initialize(const Mapping<dim> &             mapping,
-             const DoFHandler<dim> &          dof_handler,
+  initialize(const Mapping<dim>              &mapping,
+             const DoFHandler<dim>           &dof_handler,
              const AffineConstraints<number> &constraints)
   {
     const QGauss<1> quad(dof_handler.get_fe().degree + 1);
@@ -139,7 +139,7 @@ public:
   }
 
   void
-  vmult(VectorType &      dst,
+  vmult(VectorType       &dst,
         const VectorType &src,
         const std::function<void(const unsigned int, const unsigned int)>
           &operation_before_loop,
@@ -180,7 +180,7 @@ public:
   }
 
   void
-  initialize_dof_vector(VectorType &       vector,
+  initialize_dof_vector(VectorType        &vector,
                         const unsigned int component = 0) const
   {
     data.initialize_dof_vector(vector, component);
@@ -221,9 +221,9 @@ public:
 
 private:
   void
-  local_apply(const MatrixFree<dim, number> &              data,
-              VectorType &                                 dst,
-              const VectorType &                           src,
+  local_apply(const MatrixFree<dim, number>               &data,
+              VectorType                                  &dst,
+              const VectorType                            &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, -1, 0, 1, number> eval(data);
@@ -246,7 +246,7 @@ private:
 
 template <typename Number>
 void
-make_zero_mean(const std::vector<unsigned int> &           constrained_dofs,
+make_zero_mean(const std::vector<unsigned int>            &constrained_dofs,
                LinearAlgebra::distributed::Vector<Number> &vec)
 {
   // set constrained entries to zero
@@ -285,7 +285,7 @@ public:
 
   void
   initialize(const MGSmootherBase<VectorType> &coarse_smooth,
-             const std::vector<unsigned int> & constrained_dofs)
+             const std::vector<unsigned int>  &constrained_dofs)
   {
     this->coarse_smooth    = &coarse_smooth;
     this->constrained_dofs = &constrained_dofs;
@@ -293,8 +293,8 @@ public:
 
   void
   operator()(const unsigned int level,
-             VectorType &       dst,
-             const VectorType & src) const override
+             VectorType        &dst,
+             const VectorType  &src) const override
   {
     src_copy.reinit(src, true);
     src_copy.copy_locally_owned_data_from(src);
@@ -305,7 +305,7 @@ public:
 
 private:
   SmartPointer<const MGSmootherBase<VectorType>> coarse_smooth;
-  const std::vector<unsigned int> *              constrained_dofs;
+  const std::vector<unsigned int>               *constrained_dofs;
 
   mutable VectorType src_copy;
 };

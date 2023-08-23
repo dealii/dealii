@@ -1027,7 +1027,7 @@ namespace MatrixTableIterators
     template <bool OtherConstness>
     friend bool
     operator==(
-      const AccessorBase<TableType, Constness, storage_order> &     left,
+      const AccessorBase<TableType, Constness, storage_order>      &left,
       const AccessorBase<TableType, OtherConstness, storage_order> &right)
     {
       return left.container == right.container &&

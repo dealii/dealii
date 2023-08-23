@@ -297,9 +297,9 @@ namespace internal
 
     void
     DoFInfo::reorder_cells(
-      const TaskInfo &                  task_info,
-      const std::vector<unsigned int> & renumbering,
-      const std::vector<unsigned int> & constraint_pool_row_index,
+      const TaskInfo                   &task_info,
+      const std::vector<unsigned int>  &renumbering,
+      const std::vector<unsigned int>  &constraint_pool_row_index,
       const std::vector<unsigned char> &irregular_cells)
     {
       (void)constraint_pool_row_index;
@@ -894,7 +894,7 @@ namespace internal
 
     void
     DoFInfo::compute_tight_partitioners(
-      const Table<2, ShapeInfo<double>> &       shape_info,
+      const Table<2, ShapeInfo<double>>        &shape_info,
       const unsigned int                        n_owned_cells,
       const unsigned int                        n_lanes,
       const std::vector<FaceToCellTopology<1>> &inner_faces,
@@ -1277,8 +1277,8 @@ namespace internal
       void
       compute_row_lengths(const unsigned int         begin,
                           const unsigned int         end,
-                          const DoFInfo &            dof_info,
-                          std::vector<std::mutex> &  mutexes,
+                          const DoFInfo             &dof_info,
+                          std::vector<std::mutex>   &mutexes,
                           std::vector<unsigned int> &row_lengths)
       {
         std::vector<unsigned int> scratch;
@@ -1316,10 +1316,10 @@ namespace internal
       void
       fill_connectivity_dofs(const unsigned int               begin,
                              const unsigned int               end,
-                             const DoFInfo &                  dof_info,
+                             const DoFInfo                   &dof_info,
                              const std::vector<unsigned int> &row_lengths,
-                             std::vector<std::mutex> &        mutexes,
-                             dealii::SparsityPattern &        connectivity_dof)
+                             std::vector<std::mutex>         &mutexes,
+                             dealii::SparsityPattern         &connectivity_dof)
       {
         std::vector<unsigned int> scratch;
         const unsigned int n_components = dof_info.start_components.back();
@@ -1354,10 +1354,10 @@ namespace internal
       void
       fill_connectivity(const unsigned int               begin,
                         const unsigned int               end,
-                        const DoFInfo &                  dof_info,
+                        const DoFInfo                   &dof_info,
                         const std::vector<unsigned int> &renumbering,
-                        const dealii::SparsityPattern &  connectivity_dof,
-                        DynamicSparsityPattern &         connectivity)
+                        const dealii::SparsityPattern   &connectivity_dof,
+                        DynamicSparsityPattern          &connectivity)
       {
         ordered_vector     row_entries;
         const unsigned int n_components = dof_info.start_components.back();
@@ -1389,9 +1389,9 @@ namespace internal
 
     void
     DoFInfo::make_connectivity_graph(
-      const TaskInfo &                 task_info,
+      const TaskInfo                  &task_info,
       const std::vector<unsigned int> &renumbering,
-      DynamicSparsityPattern &         connectivity) const
+      DynamicSparsityPattern          &connectivity) const
     {
       unsigned int n_rows = (vector_partitioner->local_range().second -
                              vector_partitioner->local_range().first) +

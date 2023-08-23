@@ -225,16 +225,16 @@ namespace Step75
     LaplaceOperator() = default;
 
     LaplaceOperator(const hp::MappingCollection<dim> &mapping,
-                    const DoFHandler<dim> &           dof_handler,
-                    const hp::QCollection<dim> &      quad,
-                    const AffineConstraints<number> & constraints,
-                    VectorType &                      system_rhs);
+                    const DoFHandler<dim>            &dof_handler,
+                    const hp::QCollection<dim>       &quad,
+                    const AffineConstraints<number>  &constraints,
+                    VectorType                       &system_rhs);
 
     void reinit(const hp::MappingCollection<dim> &mapping,
-                const DoFHandler<dim> &           dof_handler,
-                const hp::QCollection<dim> &      quad,
-                const AffineConstraints<number> & constraints,
-                VectorType &                      system_rhs);
+                const DoFHandler<dim>            &dof_handler,
+                const hp::QCollection<dim>       &quad,
+                const AffineConstraints<number>  &constraints,
+                VectorType                       &system_rhs);
 
     types::global_dof_index m() const;
 
@@ -254,14 +254,14 @@ namespace Step75
     void do_cell_integral_local(FECellIntegrator &integrator) const;
 
     void do_cell_integral_global(FECellIntegrator &integrator,
-                                 VectorType &      dst,
+                                 VectorType       &dst,
                                  const VectorType &src) const;
 
 
     void do_cell_integral_range(
-      const MatrixFree<dim, number> &              matrix_free,
-      VectorType &                                 dst,
-      const VectorType &                           src,
+      const MatrixFree<dim, number>               &matrix_free,
+      VectorType                                  &dst,
+      const VectorType                            &src,
       const std::pair<unsigned int, unsigned int> &range) const;
 
     MatrixFree<dim, number> matrix_free;
@@ -287,10 +287,10 @@ namespace Step75
   template <int dim, typename number>
   LaplaceOperator<dim, number>::LaplaceOperator(
     const hp::MappingCollection<dim> &mapping,
-    const DoFHandler<dim> &           dof_handler,
-    const hp::QCollection<dim> &      quad,
-    const AffineConstraints<number> & constraints,
-    VectorType &                      system_rhs)
+    const DoFHandler<dim>            &dof_handler,
+    const hp::QCollection<dim>       &quad,
+    const AffineConstraints<number>  &constraints,
+    VectorType                       &system_rhs)
   {
     this->reinit(mapping, dof_handler, quad, constraints, system_rhs);
   }
@@ -300,10 +300,10 @@ namespace Step75
   template <int dim, typename number>
   void LaplaceOperator<dim, number>::reinit(
     const hp::MappingCollection<dim> &mapping,
-    const DoFHandler<dim> &           dof_handler,
-    const hp::QCollection<dim> &      quad,
-    const AffineConstraints<number> & constraints,
-    VectorType &                      system_rhs)
+    const DoFHandler<dim>            &dof_handler,
+    const hp::QCollection<dim>       &quad,
+    const AffineConstraints<number>  &constraints,
+    VectorType                       &system_rhs)
   {
     // Clear internal data structures (in the case that the operator is reused).
     this->system_matrix.clear();
@@ -401,7 +401,7 @@ namespace Step75
   // over all cells and evaluating the effect of the cell integrals (see also:
   // `do_cell_integral_local()` and `do_cell_integral_global()`).
   template <int dim, typename number>
-  void LaplaceOperator<dim, number>::vmult(VectorType &      dst,
+  void LaplaceOperator<dim, number>::vmult(VectorType       &dst,
                                            const VectorType &src) const
   {
     this->matrix_free.cell_loop(
@@ -413,7 +413,7 @@ namespace Step75
   // Perform the transposed operator evaluation. Since we are considering
   // symmetric "matrices", this function can simply delegate it task to vmult().
   template <int dim, typename number>
-  void LaplaceOperator<dim, number>::Tvmult(VectorType &      dst,
+  void LaplaceOperator<dim, number>::Tvmult(VectorType       &dst,
                                             const VectorType &src) const
   {
     this->vmult(dst, src);
@@ -502,7 +502,7 @@ namespace Step75
   template <int dim, typename number>
   void LaplaceOperator<dim, number>::do_cell_integral_global(
     FECellIntegrator &integrator,
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src) const
   {
     integrator.gather_evaluate(src, EvaluationFlags::gradients);
@@ -519,9 +519,9 @@ namespace Step75
   // calls the above function.
   template <int dim, typename number>
   void LaplaceOperator<dim, number>::do_cell_integral_range(
-    const MatrixFree<dim, number> &              matrix_free,
-    VectorType &                                 dst,
-    const VectorType &                           src,
+    const MatrixFree<dim, number>               &matrix_free,
+    VectorType                                  &dst,
+    const VectorType                            &src,
     const std::pair<unsigned int, unsigned int> &range) const
   {
     FECellIntegrator integrator(matrix_free, range);
@@ -549,14 +549,14 @@ namespace Step75
             typename LevelMatrixType,
             typename MGTransferType>
   static void
-  mg_solve(SolverControl &            solver_control,
-           VectorType &               dst,
-           const VectorType &         src,
+  mg_solve(SolverControl             &solver_control,
+           VectorType                &dst,
+           const VectorType          &src,
            const MultigridParameters &mg_data,
-           const DoFHandler<dim> &    dof,
-           const SystemMatrixType &   fine_matrix,
+           const DoFHandler<dim>     &dof,
+           const SystemMatrixType    &fine_matrix,
            const MGLevelObject<std::unique_ptr<LevelMatrixType>> &mg_matrices,
-           const MGTransferType &                                 mg_transfer)
+           const MGTransferType                                  &mg_transfer)
   {
     AssertThrow(mg_data.coarse_solver.type == "cg_with_amg",
                 ExcNotImplemented());
@@ -641,14 +641,14 @@ namespace Step75
   // particular the operators, and the transfer operator as a
   // MGTransferGlobalCoarsening object.
   template <typename VectorType, typename OperatorType, int dim>
-  void solve_with_gmg(SolverControl &                  solver_control,
-                      const OperatorType &             system_matrix,
-                      VectorType &                     dst,
-                      const VectorType &               src,
-                      const MultigridParameters &      mg_data,
+  void solve_with_gmg(SolverControl                   &solver_control,
+                      const OperatorType              &system_matrix,
+                      VectorType                      &dst,
+                      const VectorType                &src,
+                      const MultigridParameters       &mg_data,
                       const hp::MappingCollection<dim> mapping_collection,
-                      const DoFHandler<dim> &          dof_handler,
-                      const hp::QCollection<dim> &     quadrature_collection)
+                      const DoFHandler<dim>           &dof_handler,
+                      const hp::QCollection<dim>      &quadrature_collection)
   {
     // Create a DoFHandler and operator for each multigrid level,
     // as well as, create transfer operators. To be able to
@@ -778,7 +778,7 @@ namespace Step75
     for (unsigned int level = minlevel; level <= maxlevel; ++level)
       {
         const auto &dof_handler = dof_handlers[level];
-        auto &      constraint  = constraints[level];
+        auto       &constraint  = constraints[level];
 
         const IndexSet locally_relevant_dofs =
           DoFTools::extract_locally_relevant_dofs(dof_handler);

@@ -33,7 +33,7 @@ struct MyDiagonalMatrix
   {}
 
   void
-  vmult(LinearAlgebra::distributed::Vector<double> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<double>       &dst,
         const LinearAlgebra::distributed::Vector<double> &src) const
   {
     dst = src;
@@ -42,8 +42,8 @@ struct MyDiagonalMatrix
 
   void
   vmult(
-    LinearAlgebra::distributed::Vector<double> &                       dst,
-    const LinearAlgebra::distributed::Vector<double> &                 src,
+    LinearAlgebra::distributed::Vector<double>                        &dst,
+    const LinearAlgebra::distributed::Vector<double>                  &src,
     const std::function<void(const unsigned int, const unsigned int)> &before,
     const std::function<void(const unsigned int, const unsigned int)> &after)
     const

@@ -36,8 +36,8 @@
 template <int dim>
 void
 check_this(const DoFHandler<dim> &dof_handler,
-           const Vector<double> & v_node,
-           const Vector<double> & v_cell)
+           const Vector<double>  &v_node,
+           const Vector<double>  &v_cell)
 {
   std::vector<DataComponentInterpretation::DataComponentInterpretation>
     data_component_interpretation(

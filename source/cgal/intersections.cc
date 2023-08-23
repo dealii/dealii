@@ -154,7 +154,7 @@ namespace CGALWrappers
 
 
     void
-    mark_domains(CDT &                 ct,
+    mark_domains(CDT                  &ct,
                  Face_handle           start,
                  int                   index,
                  std::list<CDT::Edge> &border)
@@ -407,7 +407,7 @@ namespace CGALWrappers
 
       if (!intersection_test.empty())
         {
-          const auto &       poly      = intersection_test[0].outer_boundary();
+          const auto        &poly      = intersection_test[0].outer_boundary();
           const unsigned int size_poly = poly.size();
           if (size_poly == 3)
             {
@@ -827,8 +827,8 @@ namespace CGALWrappers
   compute_intersection_of_cells(
     const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
     const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-    const Mapping<dim0, spacedim> &                              mapping0,
-    const Mapping<dim1, spacedim> &                              mapping1,
+    const Mapping<dim0, spacedim>                               &mapping0,
+    const Mapping<dim1, spacedim>                               &mapping1,
     const double                                                 tol)
   {
     Assert(mapping0.get_vertices(cell0).size() ==
@@ -880,8 +880,8 @@ std::vector<std::array<Point<spacedim>, dim1 + 1>>
 compute_intersection_of_cells(
   const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
   const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-  const Mapping<dim0, spacedim> &                              mapping0,
-  const Mapping<dim1, spacedim> &                              mapping1,
+  const Mapping<dim0, spacedim>                               &mapping0,
+  const Mapping<dim1, spacedim>                               &mapping1,
   const double                                                 tol)
 {
   (void)cell0;

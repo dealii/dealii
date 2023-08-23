@@ -363,7 +363,7 @@ namespace Step50
   class MGCoarseAMG : public MGCoarseGridBase<VECTOR>
   {
   public:
-    MGCoarseAMG(const LA::MPI::SparseMatrix &                  coarse_matrix,
+    MGCoarseAMG(const LA::MPI::SparseMatrix                   &coarse_matrix,
                 const LA::MPI::PreconditionAMG::AdditionalData additional_data)
       : count(0)
     {
@@ -468,7 +468,7 @@ namespace Step50
   void
   LaplaceProblem<dim>::solve()
   {
-    matrix_t &         coarse_matrix = mg_matrices[0];
+    matrix_t          &coarse_matrix = mg_matrices[0];
     SolverControl      coarse_solver_control(1000, 1e-8, false, false);
     SolverCG<vector_t> coarse_solver(coarse_solver_control);
 

@@ -118,9 +118,9 @@ public:
    */
   template <class Matrix, class Preconditioner>
   void
-  solve(const Matrix &        A,
-        VectorType &          x,
-        const VectorType &    b,
+  solve(const Matrix         &A,
+        VectorType           &x,
+        const VectorType     &b,
         const Preconditioner &precond) const;
 
   /**
@@ -248,7 +248,7 @@ private:
 
 template <typename VectorType>
 SolverSelector<VectorType>::SolverSelector(const std::string &name,
-                                           SolverControl &    solver_control)
+                                           SolverControl     &solver_control)
   : solver_name(name)
   , control(&solver_control)
 {}
@@ -267,9 +267,9 @@ SolverSelector<VectorType>::select(const std::string &name)
 template <typename VectorType>
 template <class Matrix, class Preconditioner>
 void
-SolverSelector<VectorType>::solve(const Matrix &        A,
-                                  VectorType &          x,
-                                  const VectorType &    b,
+SolverSelector<VectorType>::solve(const Matrix         &A,
+                                  VectorType           &x,
+                                  const VectorType     &b,
                                   const Preconditioner &precond) const
 {
   if (solver_name == "richardson")

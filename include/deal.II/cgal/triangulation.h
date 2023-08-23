@@ -118,7 +118,7 @@ namespace CGALWrappers
   template <typename CGALTriangulation, int dim, int spacedim>
   void
   cgal_triangulation_to_dealii_triangulation(
-    const CGALTriangulation &     cgal_triangulation,
+    const CGALTriangulation      &cgal_triangulation,
     Triangulation<dim, spacedim> &dealii_triangulation);
 
   /**
@@ -152,7 +152,7 @@ namespace CGALWrappers
     const CGAL::Mesh_complex_3_in_triangulation_3<CGALTriangulationType,
                                                   CornerIndexType,
                                                   CurveIndexType>
-      &               cgal_triangulation,
+                     &cgal_triangulation,
     Triangulation<3> &dealii_triangulation);
 
   /**
@@ -221,7 +221,7 @@ namespace CGALWrappers
     const CGAL::Mesh_complex_3_in_triangulation_3<CGALTriangulationType,
                                                   CornerIndexType,
                                                   CurveIndexType>
-      &               cgal_triangulation,
+                     &cgal_triangulation,
     Triangulation<3> &dealii_triangulation)
   {
     using C3T3 = CGAL::Mesh_complex_3_in_triangulation_3<CGALTriangulationType,
@@ -312,7 +312,7 @@ namespace CGALWrappers
   template <typename CGALTriangulation, int dim, int spacedim>
   void
   cgal_triangulation_to_dealii_triangulation(
-    const CGALTriangulation &     cgal_triangulation,
+    const CGALTriangulation      &cgal_triangulation,
     Triangulation<dim, spacedim> &dealii_triangulation)
   {
     AssertThrow(cgal_triangulation.dimension() == dim,
@@ -370,8 +370,8 @@ namespace CGALWrappers
             {
               // An edge is identified by a face and a vertex index in the
               // face
-              const auto &  f = e.first;
-              const auto &  i = e.second;
+              const auto   &f = e.first;
+              const auto   &i = e.second;
               CellData<dim> cell(ReferenceCells::Line.n_vertices());
               unsigned int  id = 0;
               // Since an edge is identified by a face (a triangle) and the
@@ -410,8 +410,8 @@ namespace CGALWrappers
             {
               // A facet is identified by a cell and the opposite vertex index
               // in the face
-              const auto &  c = facet.first;
-              const auto &  i = facet.second;
+              const auto   &c = facet.first;
+              const auto   &i = facet.second;
               CellData<dim> cell(ReferenceCells::Triangle.n_vertices());
               unsigned int  id = 0;
               // Since a face is identified by a cell (a tetrahedron) and the

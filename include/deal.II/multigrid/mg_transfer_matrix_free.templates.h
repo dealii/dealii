@@ -27,7 +27,7 @@ template <int dim, typename Number, typename TransferType>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::prolongate(
   const unsigned int                                     to_level,
-  LinearAlgebra::distributed::BlockVector<Number> &      dst,
+  LinearAlgebra::distributed::BlockVector<Number>       &dst,
   const LinearAlgebra::distributed::BlockVector<Number> &src) const
 {
   const unsigned int n_blocks = src.n_blocks();
@@ -47,7 +47,7 @@ template <int dim, typename Number, typename TransferType>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::prolongate_and_add(
   const unsigned int                                     to_level,
-  LinearAlgebra::distributed::BlockVector<Number> &      dst,
+  LinearAlgebra::distributed::BlockVector<Number>       &dst,
   const LinearAlgebra::distributed::BlockVector<Number> &src) const
 {
   const unsigned int n_blocks = src.n_blocks();
@@ -67,7 +67,7 @@ template <int dim, typename Number, typename TransferType>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::restrict_and_add(
   const unsigned int                                     from_level,
-  LinearAlgebra::distributed::BlockVector<Number> &      dst,
+  LinearAlgebra::distributed::BlockVector<Number>       &dst,
   const LinearAlgebra::distributed::BlockVector<Number> &src) const
 {
   const unsigned int n_blocks = src.n_blocks();

@@ -35,7 +35,7 @@ template <int dim>
 void
 do_test(const bool                     enforce_unique_map,
         const std::vector<Point<dim>> &evaluation_points,
-        const std::pair<bool, bool> &  expected_result)
+        const std::pair<bool, bool>   &expected_result)
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::subdivided_hyper_rectangle(tria, {2, 1}, {0, 0}, {2, 1});

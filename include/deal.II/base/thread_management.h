@@ -288,7 +288,7 @@ namespace Threads
     struct return_value<RT &>
     {
     private:
-      RT * value;
+      RT  *value;
       bool value_is_initialized;
 
     public:
@@ -444,7 +444,7 @@ namespace Threads
      */
     template <typename Function>
     DEAL_II_CXX20_REQUIRES((std::invocable<Function>))
-    void evaluate_and_set_promise(Function &          function,
+    void evaluate_and_set_promise(Function           &function,
                                   std::promise<void> &promise)
     {
       function();

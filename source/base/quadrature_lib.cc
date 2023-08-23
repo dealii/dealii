@@ -534,7 +534,7 @@ QGaussLog<1>::get_quadrature_weights(const unsigned int n)
 
 template <>
 QGaussLogR<1>::QGaussLogR(const unsigned int n,
-                          const Point<1> &   origin,
+                          const Point<1>    &origin,
                           const double       alpha,
                           const bool         factor_out_singularity)
   : Quadrature<1>(
@@ -634,7 +634,7 @@ QGaussOneOverR<2>::quad_size(const Point<2> &singularity, const unsigned int n)
 
 template <>
 QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
-                                  const Point<2> &   singularity,
+                                  const Point<2>    &singularity,
                                   const bool         factor_out_singularity)
   : Quadrature<2>(quad_size(singularity, n))
 {
@@ -720,7 +720,7 @@ QGaussOneOverR<2>::QGaussOneOverR(const unsigned int n,
   // And we get rid of R to take into account the singularity,
   // unless specified differently in the constructor.
   std::vector<Point<2>> &ps  = this->quadrature_points;
-  std::vector<double> &  ws  = this->weights;
+  std::vector<double>   &ws  = this->weights;
   double                 pi4 = numbers::PI / 4;
 
   for (unsigned int q = 0; q < gauss.size(); ++q)
@@ -861,7 +861,7 @@ QWeddle<dim>::QWeddle()
 
 template <int dim>
 QTelles<dim>::QTelles(const Quadrature<1> &base_quad,
-                      const Point<dim> &   singularity)
+                      const Point<dim>    &singularity)
   : // We need the explicit implementation if dim == 1. If dim > 1 we use the
     // former implementation and apply a tensorial product to obtain the higher
     // dimensions.

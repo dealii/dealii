@@ -101,7 +101,7 @@ struct QData
 template <typename VectorType, int dim>
 void
 do_project(const parallel::distributed::Triangulation<dim> &triangulation,
-           const FiniteElement<dim> &                       fe,
+           const FiniteElement<dim>                        &fe,
            const unsigned int                               p)
 {
   AssertThrow(fe.n_components() == 1, ExcNotImplemented());

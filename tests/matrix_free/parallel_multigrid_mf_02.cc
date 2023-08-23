@@ -68,7 +68,7 @@ public:
 
   virtual void
   operator()(const unsigned int                                level,
-             LinearAlgebra::distributed::Vector<Number> &      dst,
+             LinearAlgebra::distributed::Vector<Number>       &dst,
              const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     ReductionControl solver_control(1e4, 1e-50, 1e-10);

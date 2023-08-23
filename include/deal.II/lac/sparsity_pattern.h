@@ -731,7 +731,7 @@ public:
               const bool      indices_are_sorted = false);
 
   virtual void
-  add_row_entries(const size_type &                 row,
+  add_row_entries(const size_type                  &row,
                   const ArrayView<const size_type> &columns,
                   const bool indices_are_sorted = false) override;
 
@@ -1492,7 +1492,7 @@ SparsityPattern::copy_from(const size_type       n_rows,
     typename std::iterator_traits<ForwardIterator>::value_type::const_iterator;
   for (ForwardIterator i = begin; i != end; ++i, ++row)
     {
-      size_type *          cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
+      size_type           *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
       const inner_iterator end_of_row = i->end();
       for (inner_iterator j = i->begin(); j != end_of_row; ++j)
         {

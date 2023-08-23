@@ -45,7 +45,7 @@ namespace internal
     void
     fill_copy_indices(
       const DoFHandler<dim, spacedim> &dof_handler,
-      const MGConstrainedDoFs *        mg_constrained_dofs,
+      const MGConstrainedDoFs         *mg_constrained_dofs,
       std::vector<std::vector<
         std::pair<types::global_dof_index, types::global_dof_index>>>
         &copy_indices,
@@ -54,7 +54,7 @@ namespace internal
         &copy_indices_global_mine,
       std::vector<std::vector<
         std::pair<types::global_dof_index, types::global_dof_index>>>
-        &        copy_indices_level_mine,
+                &copy_indices_level_mine,
       const bool skip_interface_dofs = true);
 
 
@@ -122,17 +122,17 @@ namespace internal
     template <int dim, typename Number>
     void
     setup_transfer(
-      const DoFHandler<dim> &  dof_handler,
+      const DoFHandler<dim>   &dof_handler,
       const MGConstrainedDoFs *mg_constrained_dofs,
       const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-        &                                     external_partitioners,
-      ElementInfo<Number> &                   elem_info,
+                                             &external_partitioners,
+      ElementInfo<Number>                    &elem_info,
       std::vector<std::vector<unsigned int>> &level_dof_indices,
       std::vector<std::vector<std::pair<unsigned int, unsigned int>>>
-        &                        parent_child_connect,
+                                &parent_child_connect,
       std::vector<unsigned int> &n_owned_level_cells,
       std::vector<std::vector<std::vector<unsigned short>>> &dirichlet_indices,
-      std::vector<std::vector<Number>> &                     weights_on_refined,
+      std::vector<std::vector<Number>>                      &weights_on_refined,
       std::vector<Table<2, unsigned int>> &copy_indices_global_mine,
       MGLevelObject<std::shared_ptr<const Utilities::MPI::Partitioner>>
         &vector_partitioners);
@@ -146,7 +146,7 @@ namespace internal
      */
     void
     resolve_identity_constraints(
-      const MGConstrainedDoFs *             mg_constrained_dofs,
+      const MGConstrainedDoFs              *mg_constrained_dofs,
       const unsigned int                    level,
       std::vector<types::global_dof_index> &dof_indices);
 

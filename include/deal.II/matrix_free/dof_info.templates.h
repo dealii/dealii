@@ -44,10 +44,10 @@ namespace internal
       const std::vector<types::global_dof_index> &local_indices_resolved,
       const std::vector<types::global_dof_index> &local_indices,
       const bool                                  cell_has_hanging_nodes,
-      const dealii::AffineConstraints<number> &   constraints,
+      const dealii::AffineConstraints<number>    &constraints,
       const unsigned int                          cell_number,
-      ConstraintValues<double> &                  constraint_values,
-      bool &                                      cell_at_subdomain_boundary)
+      ConstraintValues<double>                   &constraint_values,
+      bool                                       &cell_at_subdomain_boundary)
     {
       Assert(vector_partitioner.get() != nullptr, ExcInternalError());
       const types::global_dof_index first_owned =
@@ -75,7 +75,7 @@ namespace internal
           for (; i < next; ++i)
             {
               types::global_dof_index current_dof = local_indices_resolved[i];
-              const auto *            entries_ptr =
+              const auto             *entries_ptr =
                 constraints.get_constraint_entries(current_dof);
 
               // dof is constrained
@@ -93,7 +93,7 @@ namespace internal
                   // check whether this dof is identity constrained to another
                   // dof. then we can simply insert that dof and there is no
                   // need to actually resolve the constraint entries
-                  const auto &                  entries   = *entries_ptr;
+                  const auto                   &entries   = *entries_ptr;
                   const types::global_dof_index n_entries = entries.size();
                   if (n_entries == 1 &&
                       std::abs(entries[0].second - 1.) <
@@ -209,11 +209,11 @@ namespace internal
     template <int dim>
     bool
     DoFInfo::process_hanging_node_constraints(
-      const HangingNodes<dim> &                     hanging_nodes,
+      const HangingNodes<dim>                      &hanging_nodes,
       const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
       const unsigned int                            cell_number,
       const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
-      std::vector<types::global_dof_index> &                dof_indices)
+      std::vector<types::global_dof_index>                 &dof_indices)
     {
       if (this->hanging_node_constraint_masks_comp.empty())
         return false;
@@ -374,7 +374,7 @@ namespace internal
     template <int length>
     void
     DoFInfo::compute_vector_zero_access_pattern(
-      const TaskInfo &                               task_info,
+      const TaskInfo                                &task_info,
       const std::vector<FaceToCellTopology<length>> &faces)
     {
       // compute a list that tells us the first time a degree of freedom is
@@ -615,7 +615,7 @@ namespace internal
 
     template <typename StreamType>
     void
-    DoFInfo::print_memory_consumption(StreamType &    out,
+    DoFInfo::print_memory_consumption(StreamType     &out,
                                       const TaskInfo &task_info) const
     {
       out << "       Memory row starts indices:    ";
@@ -642,9 +642,9 @@ namespace internal
 
     template <typename Number>
     void
-    DoFInfo::print(const std::vector<Number> &      constraint_pool_data,
+    DoFInfo::print(const std::vector<Number>       &constraint_pool_data,
                    const std::vector<unsigned int> &constraint_pool_row_index,
-                   std::ostream &                   out) const
+                   std::ostream                    &out) const
     {
       const unsigned int n_rows = row_starts.size() - 1;
       for (unsigned int row = 0; row < n_rows; ++row)

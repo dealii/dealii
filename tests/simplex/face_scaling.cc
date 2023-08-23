@@ -27,8 +27,8 @@ using namespace dealii;
 template <int dim, int spacedim = dim>
 void
 test(const Triangulation<dim, spacedim> &tria,
-     const Mapping<dim, spacedim> &      mapping,
-     const Quadrature<dim - 1> &         face_quadrature)
+     const Mapping<dim, spacedim>       &mapping,
+     const Quadrature<dim - 1>          &face_quadrature)
 {
   Assert(tria.get_reference_cells().size() == 1, ExcNotImplemented());
   const ReferenceCell reference_cell = tria.get_reference_cells().front();

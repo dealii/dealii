@@ -134,7 +134,7 @@ template <int dim, typename VectorType, int spacedim>
 void
 SolutionTransfer<dim, VectorType, spacedim>::refine_interpolate(
   const VectorType &in,
-  VectorType &      out) const
+  VectorType       &out) const
 {
   Assert(prepared_for == pure_refinement, ExcNotPrepared());
   Assert(in.size() == n_dofs_old, ExcDimensionMismatch(in.size(), n_dofs_old));
@@ -216,7 +216,7 @@ namespace internal
    */
   template <int dim, int spacedim>
   void
-  extract_interpolation_matrices(const DoFHandler<dim, spacedim> &     dof,
+  extract_interpolation_matrices(const DoFHandler<dim, spacedim>      &dof,
                                  dealii::Table<2, FullMatrix<double>> &matrices)
   {
     if (dof.has_hp_capabilities() == false)
@@ -445,7 +445,7 @@ template <int dim, typename VectorType, int spacedim>
 void
 SolutionTransfer<dim, VectorType, spacedim>::interpolate(
   const std::vector<VectorType> &all_in,
-  std::vector<VectorType> &      all_out) const
+  std::vector<VectorType>       &all_out) const
 {
   const unsigned int size = all_in.size();
 #ifdef DEBUG

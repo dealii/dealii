@@ -37,7 +37,7 @@ class Ball : public FlatManifold<dim>
 public:
   virtual Point<dim>
   get_new_point(const ArrayView<const Point<dim>> &surrounding_points,
-                const ArrayView<const double> &    weights) const override
+                const ArrayView<const double>     &weights) const override
   {
     Point<dim> middle =
       FlatManifold<dim>::get_new_point(surrounding_points, weights);

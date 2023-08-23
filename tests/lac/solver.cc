@@ -37,10 +37,10 @@ template <typename SolverType,
           typename VectorType,
           class PRECONDITION>
 void
-check_solve(SolverType &        solver,
-            const MatrixType &  A,
-            VectorType &        u,
-            VectorType &        f,
+check_solve(SolverType         &solver,
+            const MatrixType   &A,
+            VectorType         &u,
+            VectorType         &f,
             const PRECONDITION &P)
 {
   u = 0.;
@@ -60,10 +60,10 @@ template <typename SolverType,
           typename VectorType,
           class PRECONDITION>
 void
-check_Tsolve(SolverType &        solver,
-             const MatrixType &  A,
-             VectorType &        u,
-             VectorType &        f,
+check_Tsolve(SolverType         &solver,
+             const MatrixType   &A,
+             VectorType         &u,
+             VectorType         &f,
              const PRECONDITION &P)
 {
   u = 0.;

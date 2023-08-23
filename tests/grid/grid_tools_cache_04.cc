@@ -67,8 +67,8 @@ test(unsigned int n_points)
 
   const auto cell_qpoint_map =
     GridTools::compute_point_locations(cache, points);
-  const auto & cells   = std::get<0>(cell_qpoint_map);
-  const auto & maps    = std::get<2>(cell_qpoint_map);
+  const auto  &cells   = std::get<0>(cell_qpoint_map);
+  const auto  &maps    = std::get<2>(cell_qpoint_map);
   unsigned int n_cells = cells.size();
 
   for (unsigned int c = 0; c < n_cells; ++c)

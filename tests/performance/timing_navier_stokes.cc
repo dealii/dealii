@@ -118,9 +118,9 @@ namespace NavierStokes_DG
     perform_time_step(const Operator &pde_operator,
                       const double    current_time,
                       const double    time_step,
-                      VectorType &    solution,
-                      VectorType &    vec_ri,
-                      VectorType &    vec_ki) const
+                      VectorType     &solution,
+                      VectorType     &vec_ri,
+                      VectorType     &vec_ki) const
     {
       AssertDimension(ai.size() + 1, bi.size());
 
@@ -169,7 +169,7 @@ namespace NavierStokes_DG
 
   template <int dim>
   double
-  ExactSolution<dim>::value(const Point<dim> & x,
+  ExactSolution<dim>::value(const Point<dim>  &x,
                             const unsigned int component) const
   {
     const double c0 = 1. / Ma;
@@ -250,7 +250,7 @@ namespace NavierStokes_DG
   inline DEAL_II_ALWAYS_INLINE //
     Tensor<1, n_components, Number>
     operator*(const Tensor<1, n_components, Tensor<1, dim, Number>> &matrix,
-              const Tensor<1, dim, Number> &                         vector)
+              const Tensor<1, dim, Number>                          &vector)
   {
     Tensor<1, n_components, Number> result;
     for (unsigned int d = 0; d < n_components; ++d)
@@ -263,7 +263,7 @@ namespace NavierStokes_DG
     Tensor<1, dim + 2, Number>
     euler_numerical_flux(const Tensor<1, dim + 2, Number> &u_m,
                          const Tensor<1, dim + 2, Number> &u_p,
-                         const Tensor<1, dim, Number> &    normal)
+                         const Tensor<1, dim, Number>     &normal)
   {
     const auto velocity_m = fluid_velocity<dim>(u_m);
     const auto velocity_p = fluid_velocity<dim>(u_p);
@@ -290,7 +290,7 @@ namespace NavierStokes_DG
   inline DEAL_II_ALWAYS_INLINE //
     Tensor<2, dim, Number>
     fluid_velocity_gradient(
-      const Tensor<1, dim + 2, Number> &                conserved_variables,
+      const Tensor<1, dim + 2, Number>                 &conserved_variables,
       const Tensor<1, dim + 2, Tensor<1, dim, Number>> &gradients)
   {
     const Number inverse_density = Number(1.) / conserved_variables[0];
@@ -320,7 +320,7 @@ namespace NavierStokes_DG
   inline DEAL_II_ALWAYS_INLINE //
     Tensor<1, dim, Number>
     fluid_temperature_gradient(
-      const Tensor<1, dim + 2, Number> &                conserved_variables,
+      const Tensor<1, dim + 2, Number>                 &conserved_variables,
       const Tensor<1, dim + 2, Tensor<1, dim, Number>> &gradients)
   {
     const Number inverse_R = 1. / R;
@@ -365,7 +365,7 @@ namespace NavierStokes_DG
 
   template <int dim, typename VectorizedArrayType>
   VectorizedArrayType
-  evaluate_function(const Function<dim> &                  function,
+  evaluate_function(const Function<dim>                   &function,
                     const Point<dim, VectorizedArrayType> &p_vectorized,
                     const unsigned int                     component)
   {
@@ -384,7 +384,7 @@ namespace NavierStokes_DG
 
   template <int dim, typename VectorizedArrayType, int n_components = dim + 2>
   Tensor<1, n_components, VectorizedArrayType>
-  evaluate_function(const Function<dim> &                  function,
+  evaluate_function(const Function<dim>                   &function,
                     const Point<dim, VectorizedArrayType> &p_vectorized)
   {
     AssertDimension(function.n_components, n_components);
@@ -436,7 +436,7 @@ namespace NavierStokes_DG
                   const Number                                      bi,
                   const Number                                      ai,
                   const LinearAlgebra::distributed::Vector<Number> &current_ri,
-                  LinearAlgebra::distributed::Vector<Number> &      vec_ki,
+                  LinearAlgebra::distributed::Vector<Number>       &vec_ki,
                   LinearAlgebra::distributed::Vector<Number> &solution) const;
 
     void
@@ -446,16 +446,16 @@ namespace NavierStokes_DG
       const Number                                      bi,
       const Number                                      ai,
       const LinearAlgebra::distributed::Vector<Number> &current_ri,
-      LinearAlgebra::distributed::Vector<Number> &      vec_ki,
-      LinearAlgebra::distributed::Vector<Number> &      solution) const;
+      LinearAlgebra::distributed::Vector<Number>       &vec_ki,
+      LinearAlgebra::distributed::Vector<Number>       &solution) const;
 
     void
-    project(const Function<dim> &                       function,
+    project(const Function<dim>                        &function,
             LinearAlgebra::distributed::Vector<Number> &solution) const;
 
     std::array<double, 3>
     compute_errors(
-      const Function<dim> &                             function,
+      const Function<dim>                              &function,
       const LinearAlgebra::distributed::Vector<Number> &solution) const;
 
     std::array<double, 2>
@@ -486,35 +486,35 @@ namespace NavierStokes_DG
 
     void
     operation_on_cell(const MatrixFree<dim, Number, VectorizedArrayType> &mf,
-                      LinearAlgebra::distributed::Vector<Number> &        dst,
-                      const LinearAlgebra::distributed::Vector<Number> &  src,
+                      LinearAlgebra::distributed::Vector<Number>         &dst,
+                      const LinearAlgebra::distributed::Vector<Number>   &src,
                       const std::pair<unsigned int, unsigned int> &range) const;
 
     void
     operation_cell(const MatrixFree<dim, Number, VectorizedArrayType> &mf,
-                   LinearAlgebra::distributed::Vector<Number> &        dst,
-                   const LinearAlgebra::distributed::Vector<Number> &  src,
+                   LinearAlgebra::distributed::Vector<Number>         &dst,
+                   const LinearAlgebra::distributed::Vector<Number>   &src,
                    const std::pair<unsigned int, unsigned int> &range) const;
 
     void
     operation_face(const MatrixFree<dim, Number, VectorizedArrayType> &mf,
-                   LinearAlgebra::distributed::Vector<Number> &        dst,
-                   const LinearAlgebra::distributed::Vector<Number> &  src,
+                   LinearAlgebra::distributed::Vector<Number>         &dst,
+                   const LinearAlgebra::distributed::Vector<Number>   &src,
                    const std::pair<unsigned int, unsigned int> &range) const;
 
     void
     operation_boundary(
       const MatrixFree<dim, Number, VectorizedArrayType> &mf,
-      LinearAlgebra::distributed::Vector<Number> &        dst,
-      const LinearAlgebra::distributed::Vector<Number> &  src,
-      const std::pair<unsigned int, unsigned int> &       range) const;
+      LinearAlgebra::distributed::Vector<Number>         &dst,
+      const LinearAlgebra::distributed::Vector<Number>   &src,
+      const std::pair<unsigned int, unsigned int>        &range) const;
 
     void
     local_apply_inverse_mass_matrix(
       const MatrixFree<dim, Number> &,
-      LinearAlgebra::distributed::Vector<Number> &      dst,
+      LinearAlgebra::distributed::Vector<Number>       &dst,
       const LinearAlgebra::distributed::Vector<Number> &src,
-      const std::pair<unsigned int, unsigned int> &     cell_range) const;
+      const std::pair<unsigned int, unsigned int>      &cell_range) const;
 
     mutable double                                      ai;
     mutable double                                      bi;
@@ -570,7 +570,7 @@ namespace NavierStokes_DG
   template <int dim, int degree, int n_points_1d>
   void
   NavierStokesOperator<dim, degree, n_points_1d>::reinit(
-    const Mapping<dim> &   mapping,
+    const Mapping<dim>    &mapping,
     const DoFHandler<dim> &dof_handler)
   {
     const std::vector<const DoFHandler<dim> *> dof_handlers = {&dof_handler};
@@ -612,8 +612,8 @@ namespace NavierStokes_DG
     const Number                                      bi,
     const Number                                      ai,
     const LinearAlgebra::distributed::Vector<Number> &current_ri,
-    LinearAlgebra::distributed::Vector<Number> &      vec_ki,
-    LinearAlgebra::distributed::Vector<Number> &      solution) const
+    LinearAlgebra::distributed::Vector<Number>       &vec_ki,
+    LinearAlgebra::distributed::Vector<Number>       &solution) const
   {
     for (auto &i : inflow_boundaries)
       i.second->set_time(current_time);
@@ -640,9 +640,9 @@ namespace NavierStokes_DG
   void
   NavierStokesOperator<dim, degree, n_points_1d>::operation_on_cell(
     const MatrixFree<dim, Number, VectorizedArrayType> &data,
-    LinearAlgebra::distributed::Vector<Number> &        vec_ki,
-    const LinearAlgebra::distributed::Vector<Number> &  current_ri,
-    const std::pair<unsigned int, unsigned int> &       cell_range) const
+    LinearAlgebra::distributed::Vector<Number>         &vec_ki,
+    const LinearAlgebra::distributed::Vector<Number>   &current_ri,
+    const std::pair<unsigned int, unsigned int>        &cell_range) const
   {
     using FECellIntegral = FEEvaluation<dim,
                                         degree,
@@ -1061,8 +1061,8 @@ namespace NavierStokes_DG
     const Number                                      bi,
     const Number                                      ai,
     const LinearAlgebra::distributed::Vector<Number> &current_ri,
-    LinearAlgebra::distributed::Vector<Number> &      vec_ki,
-    LinearAlgebra::distributed::Vector<Number> &      solution) const
+    LinearAlgebra::distributed::Vector<Number>       &vec_ki,
+    LinearAlgebra::distributed::Vector<Number>       &solution) const
   {
     for (auto &i : inflow_boundaries)
       i.second->set_time(current_time);
@@ -1135,9 +1135,9 @@ namespace NavierStokes_DG
   void
   NavierStokesOperator<dim, degree, n_points_1d>::operation_cell(
     const MatrixFree<dim, Number, VectorizedArrayType> &data,
-    LinearAlgebra::distributed::Vector<Number> &        dst,
-    const LinearAlgebra::distributed::Vector<Number> &  src,
-    const std::pair<unsigned int, unsigned int> &       cell_range) const
+    LinearAlgebra::distributed::Vector<Number>         &dst,
+    const LinearAlgebra::distributed::Vector<Number>   &src,
+    const std::pair<unsigned int, unsigned int>        &cell_range) const
   {
     using FECellIntegral = FEEvaluation<dim,
                                         degree,
@@ -1204,9 +1204,9 @@ namespace NavierStokes_DG
   void
   NavierStokesOperator<dim, degree, n_points_1d>::operation_face(
     const MatrixFree<dim, Number, VectorizedArrayType> &data,
-    LinearAlgebra::distributed::Vector<Number> &        dst,
-    const LinearAlgebra::distributed::Vector<Number> &  src,
-    const std::pair<unsigned int, unsigned int> &       face_range) const
+    LinearAlgebra::distributed::Vector<Number>         &dst,
+    const LinearAlgebra::distributed::Vector<Number>   &src,
+    const std::pair<unsigned int, unsigned int>        &face_range) const
   {
     using FEFaceIntegral = FEFaceEvaluation<dim,
                                             degree,
@@ -1276,9 +1276,9 @@ namespace NavierStokes_DG
   void
   NavierStokesOperator<dim, degree, n_points_1d>::operation_boundary(
     const MatrixFree<dim, Number, VectorizedArrayType> &data,
-    LinearAlgebra::distributed::Vector<Number> &        dst,
-    const LinearAlgebra::distributed::Vector<Number> &  src,
-    const std::pair<unsigned int, unsigned int> &       face_range) const
+    LinearAlgebra::distributed::Vector<Number>         &dst,
+    const LinearAlgebra::distributed::Vector<Number>   &src,
+    const std::pair<unsigned int, unsigned int>        &face_range) const
   {
     AssertThrow(false, ExcNotImplemented());
     FEFaceEvaluation<dim,
@@ -1385,9 +1385,9 @@ namespace NavierStokes_DG
   NavierStokesOperator<dim, degree, n_points_1d>::
     local_apply_inverse_mass_matrix(
       const MatrixFree<dim, Number> &,
-      LinearAlgebra::distributed::Vector<Number> &      dst,
+      LinearAlgebra::distributed::Vector<Number>       &dst,
       const LinearAlgebra::distributed::Vector<Number> &src,
-      const std::pair<unsigned int, unsigned int> &     cell_range) const
+      const std::pair<unsigned int, unsigned int>      &cell_range) const
   {
     FEEvaluation<dim, degree, degree + 1, dim + 2, Number> phi(data, 0, 1);
     MatrixFreeOperators::CellwiseInverseMassMatrix<dim, degree, dim + 2, Number>
@@ -1492,7 +1492,7 @@ namespace NavierStokes_DG
   template <int dim, int degree, int n_points_1d>
   void
   NavierStokesOperator<dim, degree, n_points_1d>::project(
-    const Function<dim> &                       function,
+    const Function<dim>                        &function,
     LinearAlgebra::distributed::Vector<Number> &solution) const
   {
     FEEvaluation<dim, degree, degree + 1, dim + 2, Number, VectorizedArrayType>
@@ -1523,7 +1523,7 @@ namespace NavierStokes_DG
   template <int dim, int degree, int n_points_1d>
   std::array<double, 3>
   NavierStokesOperator<dim, degree, n_points_1d>::compute_errors(
-    const Function<dim> &                             function,
+    const Function<dim>                              &function,
     const LinearAlgebra::distributed::Vector<Number> &solution) const
   {
     double errors_squared[3] = {};
@@ -1687,7 +1687,7 @@ namespace NavierStokes_DG
                   const Number       bi,
                   const Number       ai,
                   const LinearAlgebra::distributed::Vector<Number> &current_ri,
-                  LinearAlgebra::distributed::Vector<Number> &      vec_ki,
+                  LinearAlgebra::distributed::Vector<Number>       &vec_ki,
                   LinearAlgebra::distributed::Vector<Number> &solution) const
     {
       ns_operator.perform_stage_face(
@@ -1770,7 +1770,7 @@ namespace NavierStokes_DG
   void
   FlowProblem<dim>::Postprocessor::evaluate_vector_field(
     const DataPostprocessorInputs::Vector<dim> &inputs,
-    std::vector<Vector<double>> &               computed_quantities) const
+    std::vector<Vector<double>>                &computed_quantities) const
   {
     const unsigned int n_evaluation_points = inputs.solution_values.size();
 

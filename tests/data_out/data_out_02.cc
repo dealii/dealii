@@ -30,8 +30,8 @@
 template <int dim>
 void
 check_this(const DoFHandler<dim> &dof_handler,
-           const Vector<double> & v_node_x,
-           const Vector<double> & v_cell_x)
+           const Vector<double>  &v_node_x,
+           const Vector<double>  &v_cell_x)
 {
   BlockVector<double> v_node, v_cell;
   make_block_vector(v_node_x, v_node);

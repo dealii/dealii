@@ -134,12 +134,12 @@ namespace Step66
 
   private:
     virtual void apply_add(
-      LinearAlgebra::distributed::Vector<number> &      dst,
+      LinearAlgebra::distributed::Vector<number>       &dst,
       const LinearAlgebra::distributed::Vector<number> &src) const override;
 
     void
-    local_apply(const MatrixFree<dim, number> &                   data,
-                LinearAlgebra::distributed::Vector<number> &      dst,
+    local_apply(const MatrixFree<dim, number>                    &data,
+                LinearAlgebra::distributed::Vector<number>       &dst,
                 const LinearAlgebra::distributed::Vector<number> &src,
                 const std::pair<unsigned int, unsigned int> &cell_range) const;
 
@@ -230,10 +230,10 @@ namespace Step66
   // the global vector <code> dst</code>.
   template <int dim, int fe_degree, typename number>
   void JacobianOperator<dim, fe_degree, number>::local_apply(
-    const MatrixFree<dim, number> &                   data,
-    LinearAlgebra::distributed::Vector<number> &      dst,
+    const MatrixFree<dim, number>                    &data,
+    LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src,
-    const std::pair<unsigned int, unsigned int> &     cell_range) const
+    const std::pair<unsigned int, unsigned int>      &cell_range) const
   {
     FECellIntegrator phi(data);
 
@@ -268,7 +268,7 @@ namespace Step66
   // cells computing the cell contribution to the matrix-vector product.
   template <int dim, int fe_degree, typename number>
   void JacobianOperator<dim, fe_degree, number>::apply_add(
-    LinearAlgebra::distributed::Vector<number> &      dst,
+    LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
     this->data->cell_loop(&JacobianOperator::local_apply, this, dst, src);
@@ -375,14 +375,14 @@ namespace Step66
     void setup_system();
 
     void evaluate_residual(
-      LinearAlgebra::distributed::Vector<double> &      dst,
+      LinearAlgebra::distributed::Vector<double>       &dst,
       const LinearAlgebra::distributed::Vector<double> &src) const;
 
     void local_evaluate_residual(
-      const MatrixFree<dim, double> &                   data,
-      LinearAlgebra::distributed::Vector<double> &      dst,
+      const MatrixFree<dim, double>                    &data,
+      LinearAlgebra::distributed::Vector<double>       &dst,
       const LinearAlgebra::distributed::Vector<double> &src,
-      const std::pair<unsigned int, unsigned int> &     cell_range) const;
+      const std::pair<unsigned int, unsigned int>      &cell_range) const;
 
     void assemble_rhs();
 
@@ -649,7 +649,7 @@ namespace Step66
   // MatrixFree::cell_loop().
   template <int dim, int fe_degree>
   void GelfandProblem<dim, fe_degree>::evaluate_residual(
-    LinearAlgebra::distributed::Vector<double> &      dst,
+    LinearAlgebra::distributed::Vector<double>       &dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
     auto matrix_free = system_matrix.get_matrix_free();
@@ -673,10 +673,10 @@ namespace Step66
   // the input vector might have constrained DOFs.
   template <int dim, int fe_degree>
   void GelfandProblem<dim, fe_degree>::local_evaluate_residual(
-    const MatrixFree<dim, double> &                   data,
-    LinearAlgebra::distributed::Vector<double> &      dst,
+    const MatrixFree<dim, double>                    &data,
+    LinearAlgebra::distributed::Vector<double>       &dst,
     const LinearAlgebra::distributed::Vector<double> &src,
-    const std::pair<unsigned int, unsigned int> &     cell_range) const
+    const std::pair<unsigned int, unsigned int>      &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double> phi(data);
 

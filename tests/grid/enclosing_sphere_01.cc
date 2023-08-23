@@ -185,7 +185,7 @@ test()
       create_triangulation(case_no, tria);
       const std::pair<Point<dim>, double> smallest_sphere =
         tria.begin_active()->enclosing_ball();
-      const double &    radius = smallest_sphere.second;
+      const double     &radius = smallest_sphere.second;
       const Point<dim> &center = smallest_sphere.first;
 
       deallog << "dim" << dim << ":case" << case_no << ":diameter=" << radius

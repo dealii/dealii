@@ -163,8 +163,8 @@ namespace internal
   // We assume that if both begin() and local_element()
   // exist, then begin() + offset == local_element(offset)
   template <typename T>
-  constexpr bool   has_exchange_on_subset =
-    has_begin<T> &&has_local_element<T> &&has_partitioners_are_compatible<T>;
+  constexpr bool has_exchange_on_subset =
+    has_begin<T> && has_local_element<T> && has_partitioners_are_compatible<T>;
 
 
 

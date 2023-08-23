@@ -41,7 +41,7 @@ test_vertices_orientation(
   const Triangulation<s_dim, spacedim> &boundary_mesh,
   std::map<typename Triangulation<s_dim, spacedim>::cell_iterator,
            typename Triangulation<s_dim + 1, spacedim>::face_iterator>
-    &       surface_to_volume_mapping,
+           &surface_to_volume_mapping,
   const int verbosity = 1)
 {
   typename Triangulation<s_dim, spacedim>::active_cell_iterator

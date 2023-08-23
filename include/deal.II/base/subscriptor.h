@@ -115,7 +115,7 @@ public:
    */
   void
   subscribe(std::atomic<bool> *const validity,
-            const std::string &      identifier = "") const;
+            const std::string       &identifier = "") const;
 
   /**
    * Unsubscribes a user from the object.
@@ -125,7 +125,7 @@ public:
    */
   void
   unsubscribe(std::atomic<bool> *const validity,
-              const std::string &      identifier = "") const;
+              const std::string       &identifier = "") const;
 
   /**
    * Return the present number of subscriptions to this object. This allows to

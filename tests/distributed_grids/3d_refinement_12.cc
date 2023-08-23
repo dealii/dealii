@@ -62,7 +62,7 @@ public:
              smoothing_option = dealii::Triangulation<dim>::none);
   void
   run(std::vector<unsigned int> &n_cell,
-      std::set<Location<dim>> &  position_list);
+      std::set<Location<dim>>   &position_list);
 
 private:
   void
@@ -218,7 +218,7 @@ TriaTest<dim>::TriaTest(
 template <int dim>
 void
 TriaTest<dim>::run(std::vector<unsigned int> &n_cell,
-                   std::set<Location<dim>> &  position_list)
+                   std::set<Location<dim>>   &position_list)
 {
   n_cell.clear();
   position_list.clear();

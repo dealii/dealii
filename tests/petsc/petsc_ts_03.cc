@@ -78,7 +78,7 @@ public:
         time_stepper.implicit_function = [&](const real_type   t,
                                              const VectorType &y,
                                              const VectorType &y_dot,
-                                             VectorType &      res) -> void {
+                                             VectorType       &res) -> void {
           deallog << "Evaluating implicit function at t=" << t << std::endl;
           res(0) = y_dot(0) + kappa * y(0);
           res.compress(VectorOperation::insert);
@@ -101,8 +101,8 @@ public:
                                                  const VectorType &y,
                                                  const VectorType &y_dot,
                                                  const real_type   shift,
-                                                 MatrixType &      A,
-                                                 MatrixType &      P) -> void {
+                                                 MatrixType       &A,
+                                                 MatrixType       &P) -> void {
               deallog << "Evaluating implicit Jacobian at t=" << t << std::endl;
               P.set(0, 0, shift + kappa);
               P.compress(VectorOperation::insert);
@@ -151,8 +151,8 @@ public:
           {
             time_stepper.explicit_jacobian = [&](const real_type   t,
                                                  const VectorType &y,
-                                                 MatrixType &      A,
-                                                 MatrixType &      P) -> void {
+                                                 MatrixType       &A,
+                                                 MatrixType       &P) -> void {
               deallog << "Evaluating explicit Jacobian at t=" << t << std::endl;
               P.set(0, 0, -kappa);
               P.compress(VectorOperation::insert);

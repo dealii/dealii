@@ -75,11 +75,11 @@ namespace parallel
       const bool                        transfer_variable_size_data,
       const std::function<std::vector<value_type>(
         const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-          &              parent,
+                        &parent,
         const value_type parent_value)> refinement_strategy,
       const std::function<value_type(
         const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-          &                            parent,
+                                      &parent,
         const std::vector<value_type> &children_values)> coarsening_strategy)
       : triangulation(&triangulation, typeid(*this).name())
       , transfer_variable_size_data(transfer_variable_size_data)
@@ -309,7 +309,7 @@ namespace parallel
         cell_iterator &cell,
       const CellStatus status,
       const boost::iterator_range<std::vector<char>::const_iterator>
-        &                        data_range,
+                                &data_range,
       std::vector<VectorType *> &all_out)
     {
       std::vector<value_type> cell_data;

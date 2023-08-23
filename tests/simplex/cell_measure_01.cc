@@ -33,7 +33,7 @@
 template <int dim, int spacedim>
 void
 process(const std::vector<Point<spacedim>> &vertices,
-        const std::vector<CellData<dim>> &  cells)
+        const std::vector<CellData<dim>>   &cells)
 {
   Triangulation<dim, spacedim> tria;
   tria.create_triangulation(vertices, cells, SubCellData());

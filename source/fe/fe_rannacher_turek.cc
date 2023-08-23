@@ -112,7 +112,7 @@ template <int dim>
 void
 FE_RannacherTurek<dim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
-  std::vector<double> &              nodal_values) const
+  std::vector<double>               &nodal_values) const
 {
   AssertDimension(support_point_values.size(),
                   this->generalized_support_points.size());

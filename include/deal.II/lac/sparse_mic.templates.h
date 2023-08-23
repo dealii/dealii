@@ -61,7 +61,7 @@ template <typename number>
 template <typename somenumber>
 inline void
 SparseMIC<number>::initialize(const SparseMatrix<somenumber> &matrix,
-                              const AdditionalData &          data)
+                              const AdditionalData           &data)
 {
   Assert(matrix.m() == matrix.n(), ExcNotQuadratic());
   Assert(data.strengthen_diagonal >= 0,
@@ -138,7 +138,7 @@ SparseMIC<number>::get_rowsum(const size_type row) const
 template <typename number>
 template <typename somenumber>
 void
-SparseMIC<number>::vmult(Vector<somenumber> &      dst,
+SparseMIC<number>::vmult(Vector<somenumber>       &dst,
                          const Vector<somenumber> &src) const
 {
   Assert(dst.size() == src.size(),

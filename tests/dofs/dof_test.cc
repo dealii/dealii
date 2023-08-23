@@ -191,7 +191,7 @@ public:
 
 private:
   Triangulation<dim> *tria;
-  DoFHandler<dim> *   dof;
+  DoFHandler<dim>    *dof;
   CurvedLine<dim>     curved_line;
   Ball<dim>           ball;
 };

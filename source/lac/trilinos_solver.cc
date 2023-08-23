@@ -55,8 +55,8 @@ namespace TrilinosWrappers
 
 
   SolverBase::SolverBase(const SolverBase::SolverName solver_name,
-                         SolverControl &              cn,
-                         const AdditionalData &       data)
+                         SolverControl               &cn,
+                         const AdditionalData        &data)
     : solver_name(solver_name)
     , solver_control(cn)
     , additional_data(data)
@@ -73,9 +73,9 @@ namespace TrilinosWrappers
 
 
   void
-  SolverBase::solve(const SparseMatrix &    A,
-                    MPI::Vector &           x,
-                    const MPI::Vector &     b,
+  SolverBase::solve(const SparseMatrix     &A,
+                    MPI::Vector            &x,
+                    const MPI::Vector      &b,
                     const PreconditionBase &preconditioner)
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
@@ -93,9 +93,9 @@ namespace TrilinosWrappers
   // Note: "A" is set as a constant reference so that all patterns for ::solve
   //       can be used by the inverse_operator of LinearOperator
   void
-  SolverBase::solve(const Epetra_Operator & A,
-                    MPI::Vector &           x,
-                    const MPI::Vector &     b,
+  SolverBase::solve(const Epetra_Operator  &A,
+                    MPI::Vector            &x,
+                    const MPI::Vector      &b,
                     const PreconditionBase &preconditioner)
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
@@ -115,8 +115,8 @@ namespace TrilinosWrappers
   //       can be used by the inverse_operator of LinearOperator
   void
   SolverBase::solve(const Epetra_Operator &A,
-                    MPI::Vector &          x,
-                    const MPI::Vector &    b,
+                    MPI::Vector           &x,
+                    const MPI::Vector     &b,
                     const Epetra_Operator &preconditioner)
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
@@ -135,10 +135,10 @@ namespace TrilinosWrappers
   // Note: "A" is set as a constant reference so that all patterns for ::solve
   //       can be used by the inverse_operator of LinearOperator
   void
-  SolverBase::solve(const Epetra_Operator &   A,
-                    Epetra_MultiVector &      x,
+  SolverBase::solve(const Epetra_Operator    &A,
+                    Epetra_MultiVector       &x,
                     const Epetra_MultiVector &b,
-                    const PreconditionBase &  preconditioner)
+                    const PreconditionBase   &preconditioner)
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -156,10 +156,10 @@ namespace TrilinosWrappers
   // Note: "A" is set as a constant reference so that all patterns for ::solve
   //       can be used by the inverse_operator of LinearOperator
   void
-  SolverBase::solve(const Epetra_Operator &   A,
-                    Epetra_MultiVector &      x,
+  SolverBase::solve(const Epetra_Operator    &A,
+                    Epetra_MultiVector       &x,
                     const Epetra_MultiVector &b,
-                    const Epetra_Operator &   preconditioner)
+                    const Epetra_Operator    &preconditioner)
   {
     // We need an Epetra_LinearProblem object to let the AztecOO solver know
     // about the matrix and vectors.
@@ -175,10 +175,10 @@ namespace TrilinosWrappers
 
 
   void
-  SolverBase::solve(const SparseMatrix &          A,
-                    dealii::Vector<double> &      x,
+  SolverBase::solve(const SparseMatrix           &A,
+                    dealii::Vector<double>       &x,
                     const dealii::Vector<double> &b,
-                    const PreconditionBase &      preconditioner)
+                    const PreconditionBase       &preconditioner)
   {
     // In case we call the solver with deal.II vectors, we create views of the
     // vectors in Epetra format.
@@ -205,10 +205,10 @@ namespace TrilinosWrappers
 
 
   void
-  SolverBase::solve(Epetra_Operator &             A,
-                    dealii::Vector<double> &      x,
+  SolverBase::solve(Epetra_Operator              &A,
+                    dealii::Vector<double>       &x,
                     const dealii::Vector<double> &b,
-                    const PreconditionBase &      preconditioner)
+                    const PreconditionBase       &preconditioner)
   {
     Epetra_Vector ep_x(View, A.OperatorDomainMap(), x.begin());
     Epetra_Vector ep_b(View,
@@ -225,8 +225,8 @@ namespace TrilinosWrappers
 
 
   void
-  SolverBase::solve(const SparseMatrix &                                      A,
-                    dealii::LinearAlgebra::distributed::Vector<double> &      x,
+  SolverBase::solve(const SparseMatrix                                       &A,
+                    dealii::LinearAlgebra::distributed::Vector<double>       &x,
                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
                     const PreconditionBase &preconditioner)
   {
@@ -253,8 +253,8 @@ namespace TrilinosWrappers
 
 
   void
-  SolverBase::solve(Epetra_Operator &                                         A,
-                    dealii::LinearAlgebra::distributed::Vector<double> &      x,
+  SolverBase::solve(Epetra_Operator                                          &A,
+                    dealii::LinearAlgebra::distributed::Vector<double>       &x,
                     const dealii::LinearAlgebra::distributed::Vector<double> &b,
                     const PreconditionBase &preconditioner)
   {
@@ -564,7 +564,7 @@ namespace TrilinosWrappers
 
   template <>
   void
-  SolverBase::set_preconditioner(AztecOO &               solver,
+  SolverBase::set_preconditioner(AztecOO                &solver,
                                  const PreconditionBase &preconditioner)
   {
     // Introduce the preconditioner, if the identity preconditioner is used,
@@ -582,7 +582,7 @@ namespace TrilinosWrappers
 
   template <>
   void
-  SolverBase::set_preconditioner(AztecOO &              solver,
+  SolverBase::set_preconditioner(AztecOO               &solver,
                                  const Epetra_Operator &preconditioner)
   {
     const int ierr =
@@ -727,7 +727,7 @@ namespace TrilinosWrappers
 
   void
   SolverDirect::solve(
-    dealii::LinearAlgebra::distributed::Vector<double> &      x,
+    dealii::LinearAlgebra::distributed::Vector<double>       &x,
     const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
     Epetra_Vector ep_x(View,
@@ -813,8 +813,8 @@ namespace TrilinosWrappers
 
   void
   SolverDirect::solve(const SparseMatrix &A,
-                      MPI::Vector &       x,
-                      const MPI::Vector & b)
+                      MPI::Vector        &x,
+                      const MPI::Vector  &b)
   {
     // We need an Epetra_LinearProblem object to let the Amesos solver know
     // about the matrix and vectors.
@@ -829,8 +829,8 @@ namespace TrilinosWrappers
 
 
   void
-  SolverDirect::solve(const SparseMatrix &          A,
-                      dealii::Vector<double> &      x,
+  SolverDirect::solve(const SparseMatrix           &A,
+                      dealii::Vector<double>       &x,
                       const dealii::Vector<double> &b)
   {
     // In case we call the solver with deal.II vectors, we create views of the
@@ -856,8 +856,8 @@ namespace TrilinosWrappers
 
   void
   SolverDirect::solve(
-    const SparseMatrix &                                      A,
-    dealii::LinearAlgebra::distributed::Vector<double> &      x,
+    const SparseMatrix                                       &A,
+    dealii::LinearAlgebra::distributed::Vector<double>       &x,
     const dealii::LinearAlgebra::distributed::Vector<double> &b)
   {
     AssertDimension(x.locally_owned_size(),

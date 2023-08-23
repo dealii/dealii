@@ -870,7 +870,7 @@ namespace
   template <>
   std::pair<Point<3>, double>
   project_to_quad(const std::array<Point<3>, 3> &vertices,
-                  const Point<3> &               p,
+                  const Point<3>                &p,
                   const ReferenceCell            face_reference_cell)
   {
     Assert(face_reference_cell == ReferenceCells::Triangle ||

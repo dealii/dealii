@@ -99,11 +99,11 @@ make_grid(Triangulation<2> &triangulation)
 template <int dim>
 void
 test(const Triangulation<dim> &tria,
-     const Mapping<dim> &      mapping,
+     const Mapping<dim>       &mapping,
      const FiniteElement<dim> &fe1,
-     const std::string &       fe_string1,
+     const std::string        &fe_string1,
      const FiniteElement<dim> &fe2,
-     const std::string &       fe_string2,
+     const std::string        &fe_string2,
      const unsigned int        testcase)
 {
   DoFHandler<dim> dof_handler1(tria);

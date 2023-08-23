@@ -79,7 +79,7 @@ namespace Step39
 
     parallel::distributed::Triangulation<dim> triangulation;
     const MappingQ<dim>                       mapping;
-    const FiniteElement<dim> &                fe;
+    const FiniteElement<dim>                 &fe;
     DoFHandler<dim>                           dof_handler;
 
     IndexSet locally_relevant_set;

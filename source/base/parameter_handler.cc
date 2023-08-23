@@ -284,7 +284,7 @@ namespace
   recursively_sort_parameters(
     const char                      separator,
     const std::vector<std::string> &target_subsection_path,
-    boost::property_tree::ptree &   tree)
+    boost::property_tree::ptree    &tree)
   {
     boost::property_tree::ptree &current_section =
       tree.get_child(collate_path_string(separator, target_subsection_path));
@@ -339,7 +339,7 @@ namespace
    */
   void
   recursively_demangle(const boost::property_tree::ptree &tree_in,
-                       boost::property_tree::ptree &      tree_out,
+                       boost::property_tree::ptree       &tree_out,
                        const bool is_parameter_or_alias_node = false)
   {
     for (const auto &p : tree_in)
@@ -410,7 +410,7 @@ ParameterHandler::get_current_full_path(const std::string &name) const
 std::string
 ParameterHandler::get_current_full_path(
   const std::vector<std::string> &sub_path,
-  const std::string &             name) const
+  const std::string              &name) const
 {
   std::string path = get_current_path();
   if (path.empty() == false)
@@ -427,7 +427,7 @@ ParameterHandler::get_current_full_path(
 
 
 void
-ParameterHandler::parse_input(std::istream &     input,
+ParameterHandler::parse_input(std::istream      &input,
                               const std::string &filename,
                               const std::string &last_line,
                               const bool         skip_undefined)
@@ -608,7 +608,7 @@ namespace
   void
   read_xml_recursively(
     const boost::property_tree::ptree &source,
-    const std::string &                current_path,
+    const std::string                 &current_path,
     const char                         path_separator,
     const std::vector<std::unique_ptr<const Patterns::PatternBase>> &patterns,
     const bool        skip_undefined,
@@ -715,7 +715,8 @@ namespace
             p.second.put_value<std::string>(temp);
           }
         else if (p.second.get_optional<std::string>("alias"))
-          {}
+          {
+          }
         else
           {
             // it must be a subsection
@@ -824,10 +825,10 @@ ParameterHandler::clear()
 
 
 void
-ParameterHandler::declare_entry(const std::string &          entry,
-                                const std::string &          default_value,
+ParameterHandler::declare_entry(const std::string           &entry,
+                                const std::string           &default_value,
                                 const Patterns::PatternBase &pattern,
-                                const std::string &          documentation,
+                                const std::string           &documentation,
                                 const bool                   has_to_be_set)
 {
   entries->put(get_current_full_path(entry) + path_separator + "value",
@@ -871,7 +872,7 @@ ParameterHandler::declare_entry(const std::string &          entry,
 
 void
 ParameterHandler::add_action(
-  const std::string &                             entry,
+  const std::string                              &entry,
   const std::function<void(const std::string &)> &action,
   const bool                                      execute_action)
 {
@@ -1035,7 +1036,7 @@ ParameterHandler::get(const std::string &entry_string) const
 
 std::string
 ParameterHandler::get(const std::vector<std::string> &entry_subsection_path,
-                      const std::string &             entry_string) const
+                      const std::string              &entry_string) const
 {
   // assert that the entry is indeed
   // declared
@@ -1076,7 +1077,7 @@ ParameterHandler::get_integer(const std::string &entry_string) const
 long int
 ParameterHandler::get_integer(
   const std::vector<std::string> &entry_subsection_path,
-  const std::string &             entry_string) const
+  const std::string              &entry_string) const
 {
   try
     {
@@ -1120,7 +1121,7 @@ ParameterHandler::get_double(const std::string &entry_string) const
 double
 ParameterHandler::get_double(
   const std::vector<std::string> &entry_subsection_path,
-  const std::string &             entry_string) const
+  const std::string              &entry_string) const
 {
   try
     {
@@ -1162,7 +1163,7 @@ ParameterHandler::get_bool(const std::string &entry_string) const
 bool
 ParameterHandler::get_bool(
   const std::vector<std::string> &entry_subsection_path,
-  const std::string &             entry_string) const
+  const std::string              &entry_string) const
 {
   const std::string s = get(entry_subsection_path, entry_string);
 
@@ -1280,7 +1281,7 @@ ParameterHandler::set(const std::string &entry_string, const bool new_value)
 
 
 std::ostream &
-ParameterHandler::print_parameters(std::ostream &    out,
+ParameterHandler::print_parameters(std::ostream     &out,
                                    const OutputStyle style) const
 {
   AssertThrow(out.fail() == false, ExcIO());
@@ -1387,7 +1388,7 @@ ParameterHandler::print_parameters(std::ostream &    out,
 
 void
 ParameterHandler::print_parameters(
-  const std::string &                 filename,
+  const std::string                  &filename,
   const ParameterHandler::OutputStyle style) const
 {
   std::string extension = filename.substr(filename.find_last_of('.') + 1);
@@ -1413,10 +1414,10 @@ ParameterHandler::print_parameters(
 void
 ParameterHandler::recursively_print_parameters(
   const boost::property_tree::ptree &tree,
-  const std::vector<std::string> &   target_subsection_path,
+  const std::vector<std::string>    &target_subsection_path,
   const OutputStyle                  style,
   const unsigned int                 indent_level,
-  std::ostream &                     out) const
+  std::ostream                      &out) const
 {
   AssertThrow(out.fail() == false, ExcIO());
 
@@ -1798,7 +1799,7 @@ ParameterHandler::log_parameters(LogStream &out, const OutputStyle style)
 
 
 void
-ParameterHandler::log_parameters_section(LogStream &       out,
+ParameterHandler::log_parameters_section(LogStream        &out,
                                          const OutputStyle style)
 {
   // Create entries copy and sort it, if needed.
@@ -2129,7 +2130,7 @@ MultipleParameterLoop::MultipleParameterLoop()
 
 
 void
-MultipleParameterLoop::parse_input(std::istream &     input,
+MultipleParameterLoop::parse_input(std::istream      &input,
                                    const std::string &filename,
                                    const std::string &last_line,
                                    const bool         skip_undefined)
@@ -2292,8 +2293,8 @@ MultipleParameterLoop::memory_consumption() const
 
 
 MultipleParameterLoop::Entry::Entry(const std::vector<std::string> &ssp,
-                                    const std::string &             Name,
-                                    const std::string &             Value)
+                                    const std::string              &Name,
+                                    const std::string              &Value)
   : subsection_path(ssp)
   , entry_name(Name)
   , entry_value(Value)

@@ -98,7 +98,7 @@ template <int dim>
 void
 test_projection(const FiniteElement<dim> &fe1,
                 const FiniteElement<dim> &fe2,
-                std::ostream &            out)
+                std::ostream             &out)
 {
   out << fe1.get_name() << " -> " << fe2.get_name() << std::endl;
 

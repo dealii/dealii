@@ -59,10 +59,10 @@ namespace internal
       const unsigned int               n_subdivisions,
       const unsigned int               n_patches_per_circle,
       const std::vector<unsigned int> &n_postprocessor_outputs,
-      const Mapping<dim, spacedim> &   mapping,
+      const Mapping<dim, spacedim>    &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &               finite_elements,
+                       &finite_elements,
       const UpdateFlags update_flags)
       : internal::DataOutImplementation::ParallelDataBase<dim, spacedim>(
           n_datasets,
@@ -107,7 +107,7 @@ namespace internal
 template <int dim, int spacedim>
 void
 DataOutRotation<dim, spacedim>::build_one_patch(
-  const cell_iterator *                                                 cell,
+  const cell_iterator                                                  *cell,
   internal::DataOutRotationImplementation::ParallelData<dim, spacedim> &data,
   std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> &my_patches)
 {
@@ -540,7 +540,7 @@ DataOutRotation<dim, spacedim>::build_patches(
     [this](
       const cell_iterator *cell,
       internal::DataOutRotationImplementation::ParallelData<dim, spacedim>
-        &                                                         data,
+                                                                 &data,
       std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> &my_patches) {
       this->build_one_patch(cell, data, my_patches);
     },

@@ -81,10 +81,10 @@ ParameterAcceptor::get_section_name() const
 
 void
 ParameterAcceptor::initialize(
-  const std::string &                 filename,
-  const std::string &                 output_filename,
+  const std::string                  &filename,
+  const std::string                  &output_filename,
   const ParameterHandler::OutputStyle output_style_for_output_filename,
-  ParameterHandler &                  prm,
+  ParameterHandler                   &prm,
   const ParameterHandler::OutputStyle output_style_for_filename)
 {
   declare_all_parameters(prm);

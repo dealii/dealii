@@ -28,8 +28,8 @@
 
 template <int dim>
 void
-check_found(const Triangulation<dim> &     tria,
-            const GridTools::Cache<dim> &  cache,
+check_found(const Triangulation<dim>      &tria,
+            const GridTools::Cache<dim>   &cache,
             const std::vector<Point<dim>> &points)
 {
   auto cell_qpoint_map =

@@ -182,8 +182,8 @@ test(const unsigned int v, const unsigned int degree, const bool do_helmholtz)
 
   const auto solve_and_postprocess =
     [&](const auto &poisson_operator,
-        auto &      x,
-        auto &      b) -> std::pair<unsigned int, double> {
+        auto       &x,
+        auto       &b) -> std::pair<unsigned int, double> {
     ReductionControl                               reduction_control;
     SolverCG<std::remove_reference_t<decltype(x)>> solver(reduction_control);
     solver.solve(poisson_operator, x, b, PreconditionIdentity());

@@ -160,7 +160,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    curl_curl_matrix(FullMatrix<double> &     M,
+    curl_curl_matrix(FullMatrix<double>      &M,
                      const FEValuesBase<dim> &fe,
                      const double             factor = 1.)
     {
@@ -213,7 +213,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    curl_matrix(FullMatrix<double> &     M,
+    curl_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const FEValuesBase<dim> &fetest,
                 double                   factor = 1.)
@@ -262,7 +262,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    nitsche_curl_matrix(FullMatrix<double> &     M,
+    nitsche_curl_matrix(FullMatrix<double>      &M,
                         const FEValuesBase<dim> &fe,
                         const unsigned int       face_no,
                         double                   penalty,
@@ -325,7 +325,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    tangential_trace_matrix(FullMatrix<double> &     M,
+    tangential_trace_matrix(FullMatrix<double>      &M,
                             const FEValuesBase<dim> &fe,
                             double                   factor = 1.)
     {
@@ -382,10 +382,10 @@ namespace LocalIntegrators
      */
     template <int dim>
     inline void
-    ip_curl_matrix(FullMatrix<double> &     M11,
-                   FullMatrix<double> &     M12,
-                   FullMatrix<double> &     M21,
-                   FullMatrix<double> &     M22,
+    ip_curl_matrix(FullMatrix<double>      &M11,
+                   FullMatrix<double>      &M12,
+                   FullMatrix<double>      &M21,
+                   FullMatrix<double>      &M22,
                    const FEValuesBase<dim> &fe1,
                    const FEValuesBase<dim> &fe2,
                    const double             pen,

@@ -37,11 +37,11 @@
 
 template <typename SolverType, typename MatrixType, typename VectorType>
 void
-check_solve(SolverType &              solver,
+check_solve(SolverType               &solver,
             const unsigned int        solver_number,
-            const SolverControl &     solver_control,
-            const MatrixType &        A,
-            std::vector<VectorType> & u,
+            const SolverControl      &solver_control,
+            const MatrixType         &A,
+            std::vector<VectorType>  &u,
             std::vector<PetscScalar> &v)
 {
   deallog << "Solver type: " << typeid(solver).name() << std::endl;

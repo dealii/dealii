@@ -245,7 +245,7 @@ copy_with_offdiagonals_2<DynamicSparsityPattern>()
 void
 do_copy_from(
   const std::list<std::set<unsigned int, std::greater<unsigned int>>> &sparsity,
-  SparsityPattern &                                                    sp4)
+  SparsityPattern                                                     &sp4)
 {
   sp4.copy_from((N - 1) * (N - 1),
                 (N - 1) * (N - 1),
@@ -258,7 +258,7 @@ do_copy_from(
 void
 do_copy_from(
   const std::list<std::set<unsigned int, std::greater<unsigned int>>> &sparsity,
-  ChunkSparsityPattern &                                               sp4)
+  ChunkSparsityPattern                                                &sp4)
 {
   sp4.copy_from((N - 1) * (N - 1),
                 (N - 1) * (N - 1),

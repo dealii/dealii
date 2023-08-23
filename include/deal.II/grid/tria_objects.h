@@ -532,15 +532,15 @@ namespace internal
     void
     TriaObjects::serialize(Archive &ar, const unsigned int)
     {
-      ar &structdim;
-      ar &cells &children;
-      ar &       refinement_cases;
-      ar &       used;
-      ar &       user_flags;
-      ar &       boundary_or_material_id;
-      ar &       manifold_id;
+      ar                                   &structdim;
+      ar &cells                            &children;
+      ar                                   &refinement_cases;
+      ar                                   &used;
+      ar                                   &user_flags;
+      ar                                   &boundary_or_material_id;
+      ar                                   &manifold_id;
       ar &next_free_single &next_free_pair &reverse_order_next_free_single;
-      ar &user_data &user_data_type;
+      ar &user_data                        &user_data_type;
     }
 
 

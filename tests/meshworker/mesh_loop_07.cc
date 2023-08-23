@@ -59,8 +59,8 @@ run()
     CopyData    copy(1);
 
     auto cell_worker = [](const CellIteratorType &cell,
-                          ScratchData &           scratch_data,
-                          CopyData &              copy_data) {
+                          ScratchData            &scratch_data,
+                          CopyData               &copy_data) {
       const auto &fe_values = scratch_data.reinit(cell);
 
       for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
@@ -107,8 +107,8 @@ run()
 
     auto boundary_worker = [](const CellIteratorType &cell,
                               const unsigned int      face,
-                              ScratchData &           scratch_data,
-                              CopyData &              copy_data) {
+                              ScratchData            &scratch_data,
+                              CopyData               &copy_data) {
       const auto &fe_face_values = scratch_data.reinit(cell, face);
 
       for (unsigned int q_point = 0;

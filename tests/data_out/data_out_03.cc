@@ -70,8 +70,8 @@ public:
 template <int dim>
 void
 check_this(const DoFHandler<dim> &dof_handler,
-           const Vector<double> & v_node,
-           const Vector<double> & v_cell)
+           const Vector<double>  &v_node,
+           const Vector<double>  &v_cell)
 {
   XDataOut<dim> data_out;
   data_out.attach_dof_handler(dof_handler);

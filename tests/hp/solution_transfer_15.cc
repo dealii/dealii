@@ -47,11 +47,11 @@
 
 template <typename DH>
 void
-initialize_indexsets(IndexSet &             locally_owned_dofs,
-                     IndexSet &             locally_relevant_dofs,
+initialize_indexsets(IndexSet              &locally_owned_dofs,
+                     IndexSet              &locally_relevant_dofs,
                      std::vector<IndexSet> &locally_owned_partitioning,
                      std::vector<IndexSet> &locally_relevant_partitioning,
-                     const DH &             dof_handler,
+                     const DH              &dof_handler,
                      const std::vector<unsigned int> &block_component,
                      const unsigned int               this_mpi_process)
 {

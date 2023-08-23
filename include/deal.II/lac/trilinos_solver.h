@@ -141,7 +141,7 @@ namespace TrilinosWrappers
     /**
      * Constructor. Takes the solver control object and creates the solver.
      */
-    SolverBase(SolverControl &       cn,
+    SolverBase(SolverControl        &cn,
                const AdditionalData &data = AdditionalData());
 
     /**
@@ -149,7 +149,7 @@ namespace TrilinosWrappers
      * specifies the solver name and sets the appropriate Krylov method.
      */
     SolverBase(const enum SolverName solver_name,
-               SolverControl &       cn,
+               SolverControl        &cn,
                const AdditionalData &data = AdditionalData());
 
     /**
@@ -163,9 +163,9 @@ namespace TrilinosWrappers
      * one of the linear solvers and preconditioners of Trilinos is chosen.
      */
     void
-    solve(const SparseMatrix &    A,
-          MPI::Vector &           x,
-          const MPI::Vector &     b,
+    solve(const SparseMatrix     &A,
+          MPI::Vector            &x,
+          const MPI::Vector      &b,
           const PreconditionBase &preconditioner);
 
     /**
@@ -176,9 +176,9 @@ namespace TrilinosWrappers
      * Trilinos is chosen.
      */
     void
-    solve(const Epetra_Operator & A,
-          MPI::Vector &           x,
-          const MPI::Vector &     b,
+    solve(const Epetra_Operator  &A,
+          MPI::Vector            &x,
+          const MPI::Vector      &b,
           const PreconditionBase &preconditioner);
 
     /**
@@ -192,8 +192,8 @@ namespace TrilinosWrappers
      */
     void
     solve(const Epetra_Operator &A,
-          MPI::Vector &          x,
-          const MPI::Vector &    b,
+          MPI::Vector           &x,
+          const MPI::Vector     &b,
           const Epetra_Operator &preconditioner);
 
     /**
@@ -206,10 +206,10 @@ namespace TrilinosWrappers
      * of Trilinos is chosen.
      */
     void
-    solve(const Epetra_Operator &   A,
-          Epetra_MultiVector &      x,
+    solve(const Epetra_Operator    &A,
+          Epetra_MultiVector       &x,
           const Epetra_MultiVector &b,
-          const PreconditionBase &  preconditioner);
+          const PreconditionBase   &preconditioner);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where both <tt>A</tt> and its
@@ -222,10 +222,10 @@ namespace TrilinosWrappers
      * of Trilinos is chosen.
      */
     void
-    solve(const Epetra_Operator &   A,
-          Epetra_MultiVector &      x,
+    solve(const Epetra_Operator    &A,
+          Epetra_MultiVector       &x,
           const Epetra_MultiVector &b,
-          const Epetra_Operator &   preconditioner);
+          const Epetra_Operator    &preconditioner);
 
 
 
@@ -240,10 +240,10 @@ namespace TrilinosWrappers
      * will be thrown.
      */
     void
-    solve(const SparseMatrix &          A,
-          dealii::Vector<double> &      x,
+    solve(const SparseMatrix           &A,
+          dealii::Vector<double>       &x,
           const dealii::Vector<double> &b,
-          const PreconditionBase &      preconditioner);
+          const PreconditionBase       &preconditioner);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> where <tt>A</tt> is an operator.
@@ -257,10 +257,10 @@ namespace TrilinosWrappers
      * exception will be thrown.
      */
     void
-    solve(Epetra_Operator &             A,
-          dealii::Vector<double> &      x,
+    solve(Epetra_Operator              &A,
+          dealii::Vector<double>       &x,
           const dealii::Vector<double> &b,
-          const PreconditionBase &      preconditioner);
+          const PreconditionBase       &preconditioner);
 
     /**
      * Solve the linear system <tt>Ax=b</tt> for deal.II's parallel
@@ -269,8 +269,8 @@ namespace TrilinosWrappers
      * solvers and preconditioners of Trilinos is chosen.
      */
     void
-    solve(const SparseMatrix &                                      A,
-          dealii::LinearAlgebra::distributed::Vector<double> &      x,
+    solve(const SparseMatrix                                       &A,
+          dealii::LinearAlgebra::distributed::Vector<double>       &x,
           const dealii::LinearAlgebra::distributed::Vector<double> &b,
           const PreconditionBase &preconditioner);
 
@@ -282,8 +282,8 @@ namespace TrilinosWrappers
      * Trilinos is chosen.
      */
     void
-    solve(Epetra_Operator &                                         A,
-          dealii::LinearAlgebra::distributed::Vector<double> &      x,
+    solve(Epetra_Operator                                          &A,
+          dealii::LinearAlgebra::distributed::Vector<double>       &x,
           const dealii::LinearAlgebra::distributed::Vector<double> &b,
           const PreconditionBase &preconditioner);
 
@@ -356,12 +356,12 @@ namespace TrilinosWrappers
   // provide a declaration for two explicit specializations
   template <>
   void
-  SolverBase::set_preconditioner(AztecOO &               solver,
+  SolverBase::set_preconditioner(AztecOO                &solver,
                                  const PreconditionBase &preconditioner);
 
   template <>
   void
-  SolverBase::set_preconditioner(AztecOO &              solver,
+  SolverBase::set_preconditioner(AztecOO               &solver,
                                  const Epetra_Operator &preconditioner);
 
 
@@ -419,7 +419,7 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverGMRES(SolverControl &       cn,
+    SolverGMRES(SolverControl        &cn,
                 const AdditionalData &data = AdditionalData());
   };
 
@@ -441,7 +441,7 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverBicgstab(SolverControl &       cn,
+    SolverBicgstab(SolverControl        &cn,
                    const AdditionalData &data = AdditionalData());
   };
 
@@ -463,7 +463,7 @@ namespace TrilinosWrappers
      * The last argument takes a structure with additional, solver dependent
      * flags for tuning.
      */
-    SolverTFQMR(SolverControl &       cn,
+    SolverTFQMR(SolverControl        &cn,
                 const AdditionalData &data = AdditionalData());
   };
 
@@ -526,7 +526,7 @@ namespace TrilinosWrappers
     /**
      * Constructor. Takes the solver control object and creates the solver.
      */
-    SolverDirect(SolverControl &       cn,
+    SolverDirect(SolverControl        &cn,
                  const AdditionalData &data = AdditionalData());
 
     /**
@@ -557,7 +557,7 @@ namespace TrilinosWrappers
      * refactorized during this call.
      */
     void
-    solve(dealii::LinearAlgebra::distributed::Vector<double> &      x,
+    solve(dealii::LinearAlgebra::distributed::Vector<double>       &x,
           const dealii::LinearAlgebra::distributed::Vector<double> &b);
 
     /**
@@ -577,8 +577,8 @@ namespace TrilinosWrappers
      * exception will be thrown.
      */
     void
-    solve(const SparseMatrix &          A,
-          dealii::Vector<double> &      x,
+    solve(const SparseMatrix           &A,
+          dealii::Vector<double>       &x,
           const dealii::Vector<double> &b);
 
     /**
@@ -588,8 +588,8 @@ namespace TrilinosWrappers
      * there is no need for a preconditioner here.
      */
     void
-    solve(const SparseMatrix &                                      A,
-          dealii::LinearAlgebra::distributed::Vector<double> &      x,
+    solve(const SparseMatrix                                       &A,
+          dealii::LinearAlgebra::distributed::Vector<double>       &x,
           const dealii::LinearAlgebra::distributed::Vector<double> &b);
 
     /**
@@ -700,8 +700,8 @@ namespace TrilinosWrappers
     /**
      * Constructor.
      */
-    SolverBelos(SolverControl &                             solver_control,
-                const AdditionalData &                      additional_data,
+    SolverBelos(SolverControl                              &solver_control,
+                const AdditionalData                       &additional_data,
                 const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters);
 
     /**
@@ -709,13 +709,13 @@ namespace TrilinosWrappers
      */
     template <typename OperatorType, typename PreconditionerType>
     void
-    solve(const OperatorType &      a,
-          VectorType &              x,
-          const VectorType &        b,
+    solve(const OperatorType       &a,
+          VectorType               &x,
+          const VectorType         &b,
           const PreconditionerType &p);
 
   private:
-    SolverControl &                             solver_control;
+    SolverControl                              &solver_control;
     const AdditionalData                        additional_data;
     const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters;
   };
@@ -925,7 +925,7 @@ namespace TrilinosWrappers
        */
       virtual void
       MvTimesMatAddMv(const value_type                                   alpha,
-                      const Belos::MultiVec<value_type> &                A_,
+                      const Belos::MultiVec<value_type>                 &A_,
                       const Teuchos::SerialDenseMatrix<int, value_type> &B,
                       const value_type                                   beta)
       {
@@ -997,7 +997,7 @@ namespace TrilinosWrappers
        */
       virtual void
       MvTransMv(const value_type                             alpha,
-                const Belos::MultiVec<value_type> &          A_,
+                const Belos::MultiVec<value_type>           &A_,
                 Teuchos::SerialDenseMatrix<int, value_type> &B) const
       {
         const auto &A = try_to_get_underlying_vector(A_);
@@ -1021,7 +1021,7 @@ namespace TrilinosWrappers
        */
       virtual void
       MvDot(const Belos::MultiVec<value_type> &A_,
-            std::vector<value_type> &          b) const
+            std::vector<value_type>           &b) const
       {
         const auto &A = try_to_get_underlying_vector(A_);
 
@@ -1039,7 +1039,7 @@ namespace TrilinosWrappers
       virtual void
       MvNorm(
         std::vector<typename Teuchos::ScalarTraits<value_type>::magnitudeType>
-          &             normvec,
+                       &normvec,
         Belos::NormType type = Belos::TwoNorm) const
       {
         AssertThrow(type == Belos::TwoNorm, ExcNotImplemented());
@@ -1054,7 +1054,7 @@ namespace TrilinosWrappers
        */
       virtual void
       SetBlock(const Belos::MultiVec<value_type> &A,
-               const std::vector<int> &           index)
+               const std::vector<int>            &index)
       {
         AssertThrow(false, ExcNotImplemented());
         (void)A;
@@ -1213,7 +1213,7 @@ namespace TrilinosWrappers
        */
       virtual void
       Apply(const Belos::MultiVec<value_type> &x,
-            Belos::MultiVec<value_type> &      y,
+            Belos::MultiVec<value_type>       &y,
             Belos::ETrans                      trans = Belos::NOTRANS) const
       {
         // TODO: check for Tvmult
@@ -1248,8 +1248,8 @@ namespace TrilinosWrappers
 
   template <typename VectorType>
   SolverBelos<VectorType>::SolverBelos(
-    SolverControl &                             solver_control,
-    const AdditionalData &                      additional_data,
+    SolverControl                              &solver_control,
+    const AdditionalData                       &additional_data,
     const Teuchos::RCP<Teuchos::ParameterList> &belos_parameters)
     : solver_control(solver_control)
     , additional_data(additional_data)
@@ -1261,9 +1261,9 @@ namespace TrilinosWrappers
   template <typename VectorType>
   template <typename OperatorType, typename PreconditionerType>
   void
-  SolverBelos<VectorType>::solve(const OperatorType &      A_dealii,
-                                 VectorType &              x_dealii,
-                                 const VectorType &        b_dealii,
+  SolverBelos<VectorType>::solve(const OperatorType       &A_dealii,
+                                 VectorType               &x_dealii,
+                                 const VectorType         &b_dealii,
                                  const PreconditionerType &P_dealii)
   {
     using value_type = typename VectorType::value_type;

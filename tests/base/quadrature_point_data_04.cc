@@ -100,7 +100,7 @@ struct Mat2 : MaterialBase
 
 void
 initialize_data(const Triangulation<2> &tria,
-                QuadratureStorage &     storage,
+                QuadratureStorage      &storage,
                 const unsigned int      n_data_points_per_cell)
 {
   deallog << "Initializing quadrature cell data" << std::endl;
@@ -120,8 +120,8 @@ initialize_data(const Triangulation<2> &tria,
 
 void
 assign_value_to_data(const Triangulation<2> &tria,
-                     FEValues<2> &           fe_values,
-                     QuadratureStorage &     storage,
+                     FEValues<2>            &fe_values,
+                     QuadratureStorage      &storage,
                      const unsigned int      n_data_points_per_cell)
 {
   deallog << "Assigning quadrature cell data" << std::endl;
@@ -154,8 +154,8 @@ DeclException3(ExcWrongValue,
                << ", delta = " << arg3);
 
 void
-check_data(const Triangulation<2> & tria,
-           FEValues<2> &            fe_values,
+check_data(const Triangulation<2>  &tria,
+           FEValues<2>             &fe_values,
            const QuadratureStorage &storage,
            const unsigned int       n_data_points_per_cell)
 {

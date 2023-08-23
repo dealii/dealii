@@ -158,9 +158,9 @@ const unsigned int FEValues<dim, spacedim>::integral_dimension;
 
 
 template <int dim, int spacedim>
-FEValues<dim, spacedim>::FEValues(const Mapping<dim, spacedim> &      mapping,
+FEValues<dim, spacedim>::FEValues(const Mapping<dim, spacedim>       &mapping,
                                   const FiniteElement<dim, spacedim> &fe,
-                                  const Quadrature<dim> &             q,
+                                  const Quadrature<dim>              &q,
                                   const UpdateFlags update_flags)
   : FEValuesBase<dim, spacedim>(q.size(),
                                 fe.n_dofs_per_cell(),
@@ -175,9 +175,9 @@ FEValues<dim, spacedim>::FEValues(const Mapping<dim, spacedim> &      mapping,
 
 
 template <int dim, int spacedim>
-FEValues<dim, spacedim>::FEValues(const Mapping<dim, spacedim> &      mapping,
+FEValues<dim, spacedim>::FEValues(const Mapping<dim, spacedim>       &mapping,
                                   const FiniteElement<dim, spacedim> &fe,
-                                  const hp::QCollection<dim> &        q,
+                                  const hp::QCollection<dim>         &q,
                                   const UpdateFlags update_flags)
   : FEValues(mapping, fe, q[0], update_flags)
 {
@@ -188,7 +188,7 @@ FEValues<dim, spacedim>::FEValues(const Mapping<dim, spacedim> &      mapping,
 
 template <int dim, int spacedim>
 FEValues<dim, spacedim>::FEValues(const FiniteElement<dim, spacedim> &fe,
-                                  const Quadrature<dim> &             q,
+                                  const Quadrature<dim>              &q,
                                   const UpdateFlags update_flags)
   : FEValuesBase<dim, spacedim>(
       q.size(),
@@ -205,7 +205,7 @@ FEValues<dim, spacedim>::FEValues(const FiniteElement<dim, spacedim> &fe,
 
 template <int dim, int spacedim>
 FEValues<dim, spacedim>::FEValues(const FiniteElement<dim, spacedim> &fe,
-                                  const hp::QCollection<dim> &        q,
+                                  const hp::QCollection<dim>         &q,
                                   const UpdateFlags update_flags)
   : FEValues(fe, q[0], update_flags)
 {
@@ -377,9 +377,9 @@ template <int dim, int spacedim>
 FEFaceValuesBase<dim, spacedim>::FEFaceValuesBase(
   const unsigned int                  dofs_per_cell,
   const UpdateFlags                   flags,
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe,
-  const Quadrature<dim - 1> &         quadrature)
+  const Quadrature<dim - 1>          &quadrature)
   : FEFaceValuesBase<dim, spacedim>(dofs_per_cell,
                                     flags,
                                     mapping,
@@ -393,9 +393,9 @@ template <int dim, int spacedim>
 FEFaceValuesBase<dim, spacedim>::FEFaceValuesBase(
   const unsigned int dofs_per_cell,
   const UpdateFlags,
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe,
-  const hp::QCollection<dim - 1> &    quadrature)
+  const hp::QCollection<dim - 1>     &quadrature)
   : FEValuesBase<dim, spacedim>(quadrature.max_n_quadrature_points(),
                                 dofs_per_cell,
                                 update_default,
@@ -446,9 +446,9 @@ const unsigned int FEFaceValues<dim, spacedim>::integral_dimension;
 
 template <int dim, int spacedim>
 FEFaceValues<dim, spacedim>::FEFaceValues(
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe,
-  const Quadrature<dim - 1> &         quadrature,
+  const Quadrature<dim - 1>          &quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValues<dim, spacedim>(mapping,
                                 fe,
@@ -460,9 +460,9 @@ FEFaceValues<dim, spacedim>::FEFaceValues(
 
 template <int dim, int spacedim>
 FEFaceValues<dim, spacedim>::FEFaceValues(
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe,
-  const hp::QCollection<dim - 1> &    quadrature,
+  const hp::QCollection<dim - 1>     &quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValuesBase<dim, spacedim>(fe.n_dofs_per_cell(),
                                     update_flags,
@@ -478,7 +478,7 @@ FEFaceValues<dim, spacedim>::FEFaceValues(
 template <int dim, int spacedim>
 FEFaceValues<dim, spacedim>::FEFaceValues(
   const FiniteElement<dim, spacedim> &fe,
-  const Quadrature<dim - 1> &         quadrature,
+  const Quadrature<dim - 1>          &quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValues<dim, spacedim>(fe,
                                 hp::QCollection<dim - 1>(quadrature),
@@ -490,7 +490,7 @@ FEFaceValues<dim, spacedim>::FEFaceValues(
 template <int dim, int spacedim>
 FEFaceValues<dim, spacedim>::FEFaceValues(
   const FiniteElement<dim, spacedim> &fe,
-  const hp::QCollection<dim - 1> &    quadrature,
+  const hp::QCollection<dim - 1>     &quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValuesBase<dim, spacedim>(
       fe.n_dofs_per_cell(),
@@ -596,7 +596,7 @@ template <int dim, int spacedim>
 template <bool lda>
 void
 FEFaceValues<dim, spacedim>::reinit(
-  const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &   cell,
+  const TriaIterator<DoFCellAccessor<dim, spacedim, lda>>    &cell,
   const typename Triangulation<dim, spacedim>::face_iterator &face)
 {
   const auto face_n = cell->face_iterator_to_index(face);
@@ -685,9 +685,9 @@ const unsigned int FESubfaceValues<dim, spacedim>::integral_dimension;
 
 template <int dim, int spacedim>
 FESubfaceValues<dim, spacedim>::FESubfaceValues(
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe,
-  const Quadrature<dim - 1> &         quadrature,
+  const Quadrature<dim - 1>          &quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValuesBase<dim, spacedim>(fe.n_dofs_per_cell(),
                                     update_flags,
@@ -702,9 +702,9 @@ FESubfaceValues<dim, spacedim>::FESubfaceValues(
 
 template <int dim, int spacedim>
 FESubfaceValues<dim, spacedim>::FESubfaceValues(
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe,
-  const hp::QCollection<dim - 1> &    quadrature,
+  const hp::QCollection<dim - 1>     &quadrature,
   const UpdateFlags                   update_flags)
   : FESubfaceValues(mapping, fe, quadrature[0], update_flags)
 {
@@ -716,7 +716,7 @@ FESubfaceValues<dim, spacedim>::FESubfaceValues(
 template <int dim, int spacedim>
 FESubfaceValues<dim, spacedim>::FESubfaceValues(
   const FiniteElement<dim, spacedim> &fe,
-  const Quadrature<dim - 1> &         quadrature,
+  const Quadrature<dim - 1>          &quadrature,
   const UpdateFlags                   update_flags)
   : FEFaceValuesBase<dim, spacedim>(
       fe.n_dofs_per_cell(),
@@ -733,7 +733,7 @@ FESubfaceValues<dim, spacedim>::FESubfaceValues(
 template <int dim, int spacedim>
 FESubfaceValues<dim, spacedim>::FESubfaceValues(
   const FiniteElement<dim, spacedim> &fe,
-  const hp::QCollection<dim - 1> &    quadrature,
+  const hp::QCollection<dim - 1>     &quadrature,
   const UpdateFlags                   update_flags)
   : FESubfaceValues(fe, quadrature[0], update_flags)
 {
@@ -839,7 +839,7 @@ template <int dim, int spacedim>
 template <bool lda>
 void
 FESubfaceValues<dim, spacedim>::reinit(
-  const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &   cell,
+  const TriaIterator<DoFCellAccessor<dim, spacedim, lda>>    &cell,
   const typename Triangulation<dim, spacedim>::face_iterator &face,
   const typename Triangulation<dim, spacedim>::face_iterator &subface)
 {

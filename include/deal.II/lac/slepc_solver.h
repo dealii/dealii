@@ -178,8 +178,8 @@ namespace SLEPcWrappers
     template <typename OutputVector>
     void
     solve(const PETScWrappers::MatrixBase &A,
-          std::vector<PetscScalar> &       eigenvalues,
-          std::vector<OutputVector> &      eigenvectors,
+          std::vector<PetscScalar>        &eigenvalues,
+          std::vector<OutputVector>       &eigenvectors,
           const unsigned int               n_eigenpairs = 1);
 
     /**
@@ -191,8 +191,8 @@ namespace SLEPcWrappers
     void
     solve(const PETScWrappers::MatrixBase &A,
           const PETScWrappers::MatrixBase &B,
-          std::vector<PetscScalar> &       eigenvalues,
-          std::vector<OutputVector> &      eigenvectors,
+          std::vector<PetscScalar>        &eigenvalues,
+          std::vector<OutputVector>       &eigenvectors,
           const unsigned int               n_eigenpairs = 1);
 
     /**
@@ -204,10 +204,10 @@ namespace SLEPcWrappers
     void
     solve(const PETScWrappers::MatrixBase &A,
           const PETScWrappers::MatrixBase &B,
-          std::vector<double> &            real_eigenvalues,
-          std::vector<double> &            imag_eigenvalues,
-          std::vector<OutputVector> &      real_eigenvectors,
-          std::vector<OutputVector> &      imag_eigenvectors,
+          std::vector<double>             &real_eigenvalues,
+          std::vector<double>             &imag_eigenvalues,
+          std::vector<OutputVector>       &real_eigenvectors,
+          std::vector<OutputVector>       &imag_eigenvectors,
           const unsigned int               n_eigenpairs = 1);
 
     /**
@@ -317,7 +317,7 @@ namespace SLEPcWrappers
      */
     void
     get_eigenpair(const unsigned int         index,
-                  PetscScalar &              eigenvalues,
+                  PetscScalar               &eigenvalues,
                   PETScWrappers::VectorBase &eigenvectors);
 
     /**
@@ -327,8 +327,8 @@ namespace SLEPcWrappers
      */
     void
     get_eigenpair(const unsigned int         index,
-                  double &                   real_eigenvalues,
-                  double &                   imag_eigenvalues,
+                  double                    &real_eigenvalues,
+                  double                    &imag_eigenvalues,
                   PETScWrappers::VectorBase &real_eigenvectors,
                   PETScWrappers::VectorBase &imag_eigenvectors);
 
@@ -371,8 +371,8 @@ namespace SLEPcWrappers
                      PetscScalar real_eigenvalue,
                      PetscScalar imag_eigenvalue,
                      PetscReal   residual_norm,
-                     PetscReal * estimated_error,
-                     void *      solver_control);
+                     PetscReal  *estimated_error,
+                     void       *solver_control);
   };
 
 
@@ -405,7 +405,7 @@ namespace SLEPcWrappers
      * behavior as the PETScWrappers, but you can change that.
      */
     explicit SolverKrylovSchur(
-      SolverControl &       cn,
+      SolverControl        &cn,
       const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
       const AdditionalData &data             = AdditionalData());
 
@@ -599,7 +599,7 @@ namespace SLEPcWrappers
      * behavior as the PETScWrappers, but you can change that.
      */
     explicit SolverGeneralizedDavidson(
-      SolverControl &       cn,
+      SolverControl        &cn,
       const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
       const AdditionalData &data             = AdditionalData());
 
@@ -640,7 +640,7 @@ namespace SLEPcWrappers
      * behavior as the PETScWrappers, but you can change that.
      */
     explicit SolverJacobiDavidson(
-      SolverControl &       cn,
+      SolverControl        &cn,
       const MPI_Comm        mpi_communicator = PETSC_COMM_SELF,
       const AdditionalData &data             = AdditionalData());
 
@@ -704,8 +704,8 @@ namespace SLEPcWrappers
   template <typename OutputVector>
   void
   SolverBase::solve(const PETScWrappers::MatrixBase &A,
-                    std::vector<PetscScalar> &       eigenvalues,
-                    std::vector<OutputVector> &      eigenvectors,
+                    std::vector<PetscScalar>        &eigenvalues,
+                    std::vector<OutputVector>       &eigenvectors,
                     const unsigned int               n_eigenpairs)
   {
     // Panic if the number of eigenpairs wanted is out of bounds.
@@ -737,8 +737,8 @@ namespace SLEPcWrappers
   void
   SolverBase::solve(const PETScWrappers::MatrixBase &A,
                     const PETScWrappers::MatrixBase &B,
-                    std::vector<PetscScalar> &       eigenvalues,
-                    std::vector<OutputVector> &      eigenvectors,
+                    std::vector<PetscScalar>        &eigenvalues,
+                    std::vector<OutputVector>       &eigenvectors,
                     const unsigned int               n_eigenpairs)
   {
     // Guard against incompatible matrix sizes:
@@ -775,10 +775,10 @@ namespace SLEPcWrappers
   void
   SolverBase::solve(const PETScWrappers::MatrixBase &A,
                     const PETScWrappers::MatrixBase &B,
-                    std::vector<double> &            real_eigenvalues,
-                    std::vector<double> &            imag_eigenvalues,
-                    std::vector<OutputVector> &      real_eigenvectors,
-                    std::vector<OutputVector> &      imag_eigenvectors,
+                    std::vector<double>             &real_eigenvalues,
+                    std::vector<double>             &imag_eigenvalues,
+                    std::vector<OutputVector>       &real_eigenvectors,
+                    std::vector<OutputVector>       &imag_eigenvectors,
                     const unsigned int               n_eigenpairs)
   {
     // Guard against incompatible matrix sizes:

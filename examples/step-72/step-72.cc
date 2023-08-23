@@ -182,7 +182,7 @@ namespace Step72
   class BoundaryValues : public Function<dim>
   {
   public:
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
   };
 
@@ -322,12 +322,12 @@ namespace Step72
     // initialize the cell DoF indices, knowing that the local matrix
     // and vector are already correctly sized.
     const auto cell_worker = [this](const CellIteratorType &cell,
-                                    ScratchData &           scratch_data,
-                                    CopyData &              copy_data) {
+                                    ScratchData            &scratch_data,
+                                    CopyData               &copy_data) {
       const auto &fe_values = scratch_data.reinit(cell);
 
-      FullMatrix<double> &                  cell_matrix = copy_data.matrices[0];
-      Vector<double> &                      cell_rhs    = copy_data.vectors[0];
+      FullMatrix<double>                   &cell_matrix = copy_data.matrices[0];
+      Vector<double>                       &cell_rhs    = copy_data.vectors[0];
       std::vector<types::global_dof_index> &local_dof_indices =
         copy_data.local_dof_indices[0];
       cell->get_dof_indices(local_dof_indices);
@@ -383,7 +383,7 @@ namespace Step72
     // `cell_worker`.
     const auto copier = [dofs_per_cell, this](const CopyData &copy_data) {
       const FullMatrix<double> &cell_matrix = copy_data.matrices[0];
-      const Vector<double> &    cell_rhs    = copy_data.vectors[0];
+      const Vector<double>     &cell_rhs    = copy_data.vectors[0];
       const std::vector<types::global_dof_index> &local_dof_indices =
         copy_data.local_dof_indices[0];
 
@@ -490,13 +490,13 @@ namespace Step72
     // to compute the cell contributions to the Jacobian matrix and
     // the right hand side:
     const auto cell_worker = [&u_fe, this](const CellIteratorType &cell,
-                                           ScratchData &           scratch_data,
-                                           CopyData &              copy_data) {
-      const auto &       fe_values     = scratch_data.reinit(cell);
+                                           ScratchData            &scratch_data,
+                                           CopyData               &copy_data) {
+      const auto        &fe_values     = scratch_data.reinit(cell);
       const unsigned int dofs_per_cell = fe_values.get_fe().n_dofs_per_cell();
 
-      FullMatrix<double> &                  cell_matrix = copy_data.matrices[0];
-      Vector<double> &                      cell_rhs    = copy_data.vectors[0];
+      FullMatrix<double>                   &cell_matrix = copy_data.matrices[0];
+      Vector<double>                       &cell_rhs    = copy_data.vectors[0];
       std::vector<types::global_dof_index> &local_dof_indices =
         copy_data.local_dof_indices[0];
       cell->get_dof_indices(local_dof_indices);
@@ -615,7 +615,7 @@ namespace Step72
     // The remainder of the function equals what we had previously:
     const auto copier = [dofs_per_cell, this](const CopyData &copy_data) {
       const FullMatrix<double> &cell_matrix = copy_data.matrices[0];
-      const Vector<double> &    cell_rhs    = copy_data.vectors[0];
+      const Vector<double>     &cell_rhs    = copy_data.vectors[0];
       const std::vector<types::global_dof_index> &local_dof_indices =
         copy_data.local_dof_indices[0];
 
@@ -716,12 +716,12 @@ namespace Step72
     // results from an energy functional is necessarily square (and also,
     // incidentally, symmetric).
     const auto cell_worker = [&u_fe, this](const CellIteratorType &cell,
-                                           ScratchData &           scratch_data,
-                                           CopyData &              copy_data) {
+                                           ScratchData            &scratch_data,
+                                           CopyData               &copy_data) {
       const auto &fe_values = scratch_data.reinit(cell);
 
-      FullMatrix<double> &                  cell_matrix = copy_data.matrices[0];
-      Vector<double> &                      cell_rhs    = copy_data.vectors[0];
+      FullMatrix<double>                   &cell_matrix = copy_data.matrices[0];
+      Vector<double>                       &cell_rhs    = copy_data.vectors[0];
       std::vector<types::global_dof_index> &local_dof_indices =
         copy_data.local_dof_indices[0];
       cell->get_dof_indices(local_dof_indices);
@@ -783,7 +783,7 @@ namespace Step72
     // before:
     const auto copier = [dofs_per_cell, this](const CopyData &copy_data) {
       const FullMatrix<double> &cell_matrix = copy_data.matrices[0];
-      const Vector<double> &    cell_rhs    = copy_data.vectors[0];
+      const Vector<double>     &cell_rhs    = copy_data.vectors[0];
       const std::vector<types::global_dof_index> &local_dof_indices =
         copy_data.local_dof_indices[0];
 

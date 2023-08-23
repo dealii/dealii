@@ -43,10 +43,10 @@ namespace internal
       ParallelData(const unsigned int               n_datasets,
                    const unsigned int               n_subdivisions,
                    const std::vector<unsigned int> &n_postprocessor_outputs,
-                   const Mapping<dim, spacedim> &   mapping,
+                   const Mapping<dim, spacedim>    &mapping,
                    const std::vector<
                      std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-                     &               finite_elements,
+                                    &finite_elements,
                    const UpdateFlags update_flags);
 
       std::vector<Point<spacedim>> patch_evaluation_points;
@@ -240,7 +240,7 @@ private:
   build_one_patch(
     const FaceDescriptor *cell_and_face,
     internal::DataOutFacesImplementation::ParallelData<dim, spacedim> &data,
-    DataOutBase::Patch<patch_dim, patch_spacedim> &                    patch);
+    DataOutBase::Patch<patch_dim, patch_spacedim>                     &patch);
 };
 
 

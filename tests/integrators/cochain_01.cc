@@ -57,7 +57,7 @@ const bool debugging = false;
 
 template <int dim>
 void
-cell_matrix(MeshWorker::DoFInfo<dim> &                      dinfo,
+cell_matrix(MeshWorker::DoFInfo<dim>                       &dinfo,
             typename MeshWorker::IntegrationInfo<dim, dim> &info)
 {
   unsigned int dm = 0; // Matrix index

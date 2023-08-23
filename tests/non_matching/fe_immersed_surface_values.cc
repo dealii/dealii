@@ -281,7 +281,7 @@ run_test()
   const MappingQ<dim>         mapping_q(polynomial_degree);
 
   const std::vector<std::string>   mapping_names = {"MappingCartesian",
-                                                  "MappingQ"};
+                                                    "MappingQ"};
   const hp::MappingCollection<dim> mappings(mapping_cartesian, mapping_q);
 
   for (unsigned int i = 0; i < mappings.size(); i++)

@@ -106,7 +106,7 @@ namespace Step8
   template <int dim>
   void
   right_hand_side(const std::vector<Point<dim>> &points,
-                  std::vector<Tensor<1, dim>> &  values)
+                  std::vector<Tensor<1, dim>>   &values)
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));

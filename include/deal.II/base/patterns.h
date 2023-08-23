@@ -779,7 +779,7 @@ namespace Patterns
      * Constructor.
      */
     Tuple(const std::vector<std::unique_ptr<PatternBase>> &patterns,
-          const std::string &                              separator = ":");
+          const std::string                               &separator = ":");
 
     /**
      * Constructor. Same as above, specialized for const char *. This is
@@ -787,7 +787,7 @@ namespace Patterns
      * provided below.
      */
     Tuple(const std::vector<std::unique_ptr<PatternBase>> &patterns,
-          const char *                                     separator);
+          const char                                      *separator);
 
 
     /**
@@ -1320,7 +1320,7 @@ namespace Patterns
        * class template for particular kinds of template arguments @p T.
        */
       static std::string
-      to_string(const T &                    s,
+      to_string(const T                     &s,
                 const Patterns::PatternBase &p = *Convert<T>::to_pattern()) =
         delete;
 
@@ -1334,7 +1334,7 @@ namespace Patterns
        * class template for particular kinds of template arguments @p T.
        */
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &p = *Convert<T>::to_pattern()) =
         delete;
     };
@@ -1515,7 +1515,7 @@ namespace Patterns
       }
 
       static std::string
-      to_string(const T &                    value,
+      to_string(const T                     &value,
                 const Patterns::PatternBase &p = *Convert<T>::to_pattern())
       {
         std::stringstream str;
@@ -1531,7 +1531,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &p = *Convert<T>::to_pattern())
       {
         AssertThrow(p.match(s), ExcNoMatch(s, p.description()));
@@ -1773,7 +1773,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
@@ -1799,7 +1799,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
@@ -1844,7 +1844,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         const auto *p = dynamic_cast<const Patterns::Map *>(&pattern);
@@ -1873,7 +1873,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
@@ -1923,7 +1923,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
@@ -1949,7 +1949,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
@@ -1990,7 +1990,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
@@ -2014,7 +2014,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
@@ -2050,7 +2050,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         return Convert<Tensor<1, dim, Number>>::to_string(
@@ -2058,7 +2058,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         return T(Convert<Tensor<1, dim, Number>>::to_value(s, pattern));
@@ -2087,7 +2087,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
@@ -2108,7 +2108,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
@@ -2144,7 +2144,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         std::vector<bool> mask(t.size());
@@ -2155,7 +2155,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         const auto mask = Convert<std::vector<bool>>::to_value(s, pattern);
@@ -2184,7 +2184,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         const auto *p = dynamic_cast<const Patterns::List *>(&pattern);
@@ -2206,7 +2206,7 @@ namespace Patterns
        * Convert a string to a value, using the given pattern, or a default one.
        */
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
@@ -2240,7 +2240,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         AssertThrow(pattern.match(t), ExcNoMatch(t, pattern.description()));
@@ -2248,7 +2248,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
@@ -2275,7 +2275,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         std::tuple<Key, Value> m(t);
@@ -2285,7 +2285,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         std::tuple<Key, Value> m;
@@ -2312,7 +2312,7 @@ namespace Patterns
 
       static std::string
       to_string(
-        const T &                    t,
+        const T                     &t,
         const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         const auto *p = dynamic_cast<const Patterns::Tuple *>(&pattern);
@@ -2330,7 +2330,7 @@ namespace Patterns
       }
 
       static T
-      to_value(const std::string &          s,
+      to_value(const std::string           &s,
                const Patterns::PatternBase &pattern = *Convert<T>::to_pattern())
       {
         AssertThrow(pattern.match(s), ExcNoMatch(s, pattern.description()));
@@ -2348,7 +2348,7 @@ namespace Patterns
     private:
       template <std::size_t... U>
       static std::array<std::string, std::tuple_size<T>::value>
-      to_string_internal_1(const T &              t,
+      to_string_internal_1(const T               &t,
                            const Patterns::Tuple &pattern,
                            std::index_sequence<U...>)
       {
@@ -2368,7 +2368,7 @@ namespace Patterns
       template <std::size_t... U>
       static T
       to_value_internal_1(const std::vector<std::string> &s,
-                          const Patterns::Tuple &         pattern,
+                          const Patterns::Tuple          &pattern,
                           std::index_sequence<U...>)
       {
         return std::make_tuple(
@@ -2378,7 +2378,7 @@ namespace Patterns
 
       static T
       to_value_internal_2(const std::vector<std::string> &s,
-                          const Patterns::Tuple &         pattern)
+                          const Patterns::Tuple          &pattern)
       {
         return Convert<T>::to_value_internal_1(
           s, pattern, std::make_index_sequence<std::tuple_size<T>::value>{});

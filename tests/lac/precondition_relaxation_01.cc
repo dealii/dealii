@@ -68,7 +68,7 @@ class MyDiagonalMatrixWithPreAndPost
 {
 public:
   void
-  vmult(VectorType &      dst,
+  vmult(VectorType       &dst,
         const VectorType &src,
         const std::function<void(const unsigned int, const unsigned int)>
           &operation_before_matrix_vector_product = {},
@@ -107,7 +107,7 @@ public:
 
   template <typename VectorType>
   void
-  vmult(VectorType &      dst,
+  vmult(VectorType       &dst,
         const VectorType &src,
         const std::function<void(const unsigned int, const unsigned int)>
           &operation_before_matrix_vector_product,
@@ -129,7 +129,7 @@ private:
 template <typename PreconditionerType, typename VectorType>
 std::tuple<double, double, double, double>
 test(const PreconditionerType &preconditioner,
-     const VectorType &        src,
+     const VectorType         &src,
      const bool                test_transposed = true)
 {
   VectorType dst;

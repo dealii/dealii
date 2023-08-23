@@ -124,7 +124,7 @@ public:
    */
   template <typename number2>
   double
-  least_squares(BlockVector<number2> &      dst,
+  least_squares(BlockVector<number2>       &dst,
                 const BlockVector<number2> &src) const;
 
   /**
@@ -234,7 +234,7 @@ Householder<number>::Householder(const FullMatrix<number2> &M)
 template <typename number>
 template <typename number2>
 double
-Householder<number>::least_squares(Vector<number2> &      dst,
+Householder<number>::least_squares(Vector<number2>       &dst,
                                    const Vector<number2> &src) const
 {
   Assert(!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
@@ -279,7 +279,7 @@ Householder<number>::least_squares(Vector<number2> &      dst,
 template <typename number>
 template <typename number2>
 double
-Householder<number>::least_squares(BlockVector<number2> &      dst,
+Householder<number>::least_squares(BlockVector<number2>       &dst,
                                    const BlockVector<number2> &src) const
 {
   Assert(!storage.empty(), typename FullMatrix<number2>::ExcEmptyMatrix());

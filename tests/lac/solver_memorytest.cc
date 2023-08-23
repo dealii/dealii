@@ -39,9 +39,9 @@
 
 template <typename SolverType, typename MatrixType, typename VectorType>
 void
-check_solve(const MatrixType &                         A,
-            VectorType &                               u,
-            VectorType &                               f,
+check_solve(const MatrixType                          &A,
+            VectorType                                &u,
+            VectorType                                &f,
             const typename SolverType::AdditionalData &additional_data =
               typename SolverType::AdditionalData())
 {

@@ -83,7 +83,7 @@ namespace parallel
     void
     parallel_for(Iterator           x_begin,
                  Iterator           x_end,
-                 const Functor &    functor,
+                 const Functor     &functor,
                  const unsigned int grainsize)
     {
       tbb::parallel_for(tbb::blocked_range<Iterator>(x_begin, x_end, grainsize),
@@ -100,7 +100,7 @@ namespace parallel
     void
     parallel_for(Iterator                                          x_begin,
                  Iterator                                          x_end,
-                 const Functor &                                   functor,
+                 const Functor                                    &functor,
                  const unsigned int                                grainsize,
                  const std::shared_ptr<tbb::affinity_partitioner> &partitioner)
     {
@@ -166,7 +166,7 @@ namespace parallel
   void transform(const InputIterator &begin_in,
                  const InputIterator &end_in,
                  OutputIterator       out,
-                 const Function &     function,
+                 const Function      &function,
                  const unsigned int   grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
@@ -242,7 +242,7 @@ namespace parallel
                  const InputIterator1 &end_in1,
                  InputIterator2        in2,
                  OutputIterator        out,
-                 const Function &      function,
+                 const Function       &function,
                  const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
@@ -325,7 +325,7 @@ namespace parallel
                  InputIterator2        in2,
                  InputIterator3        in3,
                  OutputIterator        out,
-                 const Function &      function,
+                 const Function       &function,
                  const unsigned int    grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
@@ -369,7 +369,7 @@ namespace parallel
     template <typename Iterator, typename Function>
     DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
     void apply_to_subranges(const tbb::blocked_range<Iterator> &range,
-                            const Function &                    f)
+                            const Function                     &f)
     {
       f(range.begin(), range.end());
     }
@@ -450,9 +450,9 @@ namespace parallel
    */
   template <typename Iterator, typename Function>
   DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
-  void apply_to_subranges(const Iterator &                            begin,
+  void apply_to_subranges(const Iterator                             &begin,
                           const std_cxx20::type_identity_t<Iterator> &end,
-                          const Function &                            f,
+                          const Function                             &f,
                           const unsigned int                          grainsize)
   {
 #ifndef DEAL_II_WITH_TBB
@@ -606,8 +606,8 @@ namespace parallel
      std::convertible_to<std::invoke_result_t<Function, Iterator, Iterator>,
                          ResultType>))
   ResultType
-    accumulate_from_subranges(const Function &                            f,
-                              const Iterator &                            begin,
+    accumulate_from_subranges(const Function                             &f,
+                              const Iterator                             &begin,
                               const std_cxx20::type_identity_t<Iterator> &end,
                               const unsigned int grainsize)
   {

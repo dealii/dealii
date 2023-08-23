@@ -23,8 +23,8 @@ for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS)
     compute_intersection_of_cells<dim0, dim1, spacedim>(
       const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
       const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-      const Mapping<dim0, spacedim> &                              mapping0,
-      const Mapping<dim1, spacedim> &                              mapping1,
+      const Mapping<dim0, spacedim>                               &mapping0,
+      const Mapping<dim1, spacedim>                               &mapping1,
       const double                                                 tol);
 
     template std::vector<std::array<Point<spacedim>, dim1 + 1>>

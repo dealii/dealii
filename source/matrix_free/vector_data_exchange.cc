@@ -87,11 +87,11 @@ namespace internal
       void
       PartitionerWrapper::export_to_ghosted_array_start(
         const unsigned int                          communication_channel,
-        const ArrayView<const double> &             locally_owned_array,
+        const ArrayView<const double>              &locally_owned_array,
         const std::vector<ArrayView<const double>> &shared_arrays,
-        const ArrayView<double> &                   ghost_array,
-        const ArrayView<double> &                   temporary_storage,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<double>                    &ghost_array,
+        const ArrayView<double>                    &temporary_storage,
+        std::vector<MPI_Request>                   &requests) const
       {
         (void)shared_arrays;
 #ifndef DEAL_II_WITH_MPI
@@ -113,10 +113,10 @@ namespace internal
 
       void
       PartitionerWrapper::export_to_ghosted_array_finish(
-        const ArrayView<const double> &             locally_owned_array,
+        const ArrayView<const double>              &locally_owned_array,
         const std::vector<ArrayView<const double>> &shared_arrays,
-        const ArrayView<double> &                   ghost_array,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<double>                    &ghost_array,
+        std::vector<MPI_Request>                   &requests) const
       {
         (void)locally_owned_array;
         (void)shared_arrays;
@@ -134,11 +134,11 @@ namespace internal
       PartitionerWrapper::import_from_ghosted_array_start(
         const VectorOperation::values               vector_operation,
         const unsigned int                          communication_channel,
-        const ArrayView<const double> &             locally_owned_array,
+        const ArrayView<const double>              &locally_owned_array,
         const std::vector<ArrayView<const double>> &shared_arrays,
-        const ArrayView<double> &                   ghost_array,
-        const ArrayView<double> &                   temporary_storage,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<double>                    &ghost_array,
+        const ArrayView<double>                    &temporary_storage,
+        std::vector<MPI_Request>                   &requests) const
       {
         (void)locally_owned_array;
         (void)shared_arrays;
@@ -162,11 +162,11 @@ namespace internal
       void
       PartitionerWrapper::import_from_ghosted_array_finish(
         const VectorOperation::values               vector_operation,
-        const ArrayView<double> &                   locally_owned_storage,
+        const ArrayView<double>                    &locally_owned_storage,
         const std::vector<ArrayView<const double>> &shared_arrays,
-        const ArrayView<double> &                   ghost_array,
-        const ArrayView<const double> &             temporary_storage,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<double>                    &ghost_array,
+        const ArrayView<const double>              &temporary_storage,
+        std::vector<MPI_Request>                   &requests) const
       {
         (void)shared_arrays;
 #ifndef DEAL_II_WITH_MPI
@@ -198,11 +198,11 @@ namespace internal
       void
       PartitionerWrapper::export_to_ghosted_array_start(
         const unsigned int                         communication_channel,
-        const ArrayView<const float> &             locally_owned_array,
+        const ArrayView<const float>              &locally_owned_array,
         const std::vector<ArrayView<const float>> &shared_arrays,
-        const ArrayView<float> &                   ghost_array,
-        const ArrayView<float> &                   temporary_storage,
-        std::vector<MPI_Request> &                 requests) const
+        const ArrayView<float>                    &ghost_array,
+        const ArrayView<float>                    &temporary_storage,
+        std::vector<MPI_Request>                  &requests) const
       {
         (void)shared_arrays;
 #ifndef DEAL_II_WITH_MPI
@@ -224,10 +224,10 @@ namespace internal
 
       void
       PartitionerWrapper::export_to_ghosted_array_finish(
-        const ArrayView<const float> &             locally_owned_array,
+        const ArrayView<const float>              &locally_owned_array,
         const std::vector<ArrayView<const float>> &shared_arrays,
-        const ArrayView<float> &                   ghost_array,
-        std::vector<MPI_Request> &                 requests) const
+        const ArrayView<float>                    &ghost_array,
+        std::vector<MPI_Request>                  &requests) const
       {
         (void)locally_owned_array;
         (void)shared_arrays;
@@ -245,11 +245,11 @@ namespace internal
       PartitionerWrapper::import_from_ghosted_array_start(
         const VectorOperation::values              vector_operation,
         const unsigned int                         communication_channel,
-        const ArrayView<const float> &             locally_owned_array,
+        const ArrayView<const float>              &locally_owned_array,
         const std::vector<ArrayView<const float>> &shared_arrays,
-        const ArrayView<float> &                   ghost_array,
-        const ArrayView<float> &                   temporary_storage,
-        std::vector<MPI_Request> &                 requests) const
+        const ArrayView<float>                    &ghost_array,
+        const ArrayView<float>                    &temporary_storage,
+        std::vector<MPI_Request>                  &requests) const
       {
         (void)locally_owned_array;
         (void)shared_arrays;
@@ -273,11 +273,11 @@ namespace internal
       void
       PartitionerWrapper::import_from_ghosted_array_finish(
         const VectorOperation::values              vector_operation,
-        const ArrayView<float> &                   locally_owned_storage,
+        const ArrayView<float>                    &locally_owned_storage,
         const std::vector<ArrayView<const float>> &shared_arrays,
-        const ArrayView<float> &                   ghost_array,
-        const ArrayView<const float> &             temporary_storage,
-        std::vector<MPI_Request> &                 requests) const
+        const ArrayView<float>                    &ghost_array,
+        const ArrayView<const float>              &temporary_storage,
+        std::vector<MPI_Request>                  &requests) const
       {
         (void)shared_arrays;
 #ifndef DEAL_II_WITH_MPI
@@ -688,11 +688,11 @@ namespace internal
       void
       Full::export_to_ghosted_array_start(
         const unsigned int                          communication_channel,
-        const ArrayView<const double> &             locally_owned_array,
+        const ArrayView<const double>              &locally_owned_array,
         const std::vector<ArrayView<const double>> &shared_arrays,
-        const ArrayView<double> &                   ghost_array,
-        const ArrayView<double> &                   temporary_storage,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<double>                    &ghost_array,
+        const ArrayView<double>                    &temporary_storage,
+        std::vector<MPI_Request>                   &requests) const
       {
         export_to_ghosted_array_start_impl(communication_channel,
                                            locally_owned_array,
@@ -706,10 +706,10 @@ namespace internal
 
       void
       Full::export_to_ghosted_array_finish(
-        const ArrayView<const double> &             locally_owned_array,
+        const ArrayView<const double>              &locally_owned_array,
         const std::vector<ArrayView<const double>> &shared_arrays,
-        const ArrayView<double> &                   ghost_array,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<double>                    &ghost_array,
+        std::vector<MPI_Request>                   &requests) const
       {
         export_to_ghosted_array_finish_impl(locally_owned_array,
                                             shared_arrays,
@@ -723,11 +723,11 @@ namespace internal
       Full::import_from_ghosted_array_start(
         const VectorOperation::values               vector_operation,
         const unsigned int                          communication_channel,
-        const ArrayView<const double> &             locally_owned_array,
+        const ArrayView<const double>              &locally_owned_array,
         const std::vector<ArrayView<const double>> &shared_arrays,
-        const ArrayView<double> &                   ghost_array,
-        const ArrayView<double> &                   temporary_storage,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<double>                    &ghost_array,
+        const ArrayView<double>                    &temporary_storage,
+        std::vector<MPI_Request>                   &requests) const
       {
         import_from_ghosted_array_start_impl(vector_operation,
                                              communication_channel,
@@ -743,11 +743,11 @@ namespace internal
       void
       Full::import_from_ghosted_array_finish(
         const VectorOperation::values               vector_operation,
-        const ArrayView<double> &                   locally_owned_storage,
+        const ArrayView<double>                    &locally_owned_storage,
         const std::vector<ArrayView<const double>> &shared_arrays,
-        const ArrayView<double> &                   ghost_array,
-        const ArrayView<const double> &             temporary_storage,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<double>                    &ghost_array,
+        const ArrayView<const double>              &temporary_storage,
+        std::vector<MPI_Request>                   &requests) const
       {
         import_from_ghosted_array_finish_impl(vector_operation,
                                               locally_owned_storage,
@@ -762,11 +762,11 @@ namespace internal
       void
       Full::export_to_ghosted_array_start(
         const unsigned int                         communication_channel,
-        const ArrayView<const float> &             locally_owned_array,
+        const ArrayView<const float>              &locally_owned_array,
         const std::vector<ArrayView<const float>> &shared_arrays,
-        const ArrayView<float> &                   ghost_array,
-        const ArrayView<float> &                   temporary_storage,
-        std::vector<MPI_Request> &                 requests) const
+        const ArrayView<float>                    &ghost_array,
+        const ArrayView<float>                    &temporary_storage,
+        std::vector<MPI_Request>                  &requests) const
       {
         export_to_ghosted_array_start_impl(communication_channel,
                                            locally_owned_array,
@@ -780,10 +780,10 @@ namespace internal
 
       void
       Full::export_to_ghosted_array_finish(
-        const ArrayView<const float> &             locally_owned_array,
+        const ArrayView<const float>              &locally_owned_array,
         const std::vector<ArrayView<const float>> &shared_arrays,
-        const ArrayView<float> &                   ghost_array,
-        std::vector<MPI_Request> &                 requests) const
+        const ArrayView<float>                    &ghost_array,
+        std::vector<MPI_Request>                  &requests) const
       {
         export_to_ghosted_array_finish_impl(locally_owned_array,
                                             shared_arrays,
@@ -797,11 +797,11 @@ namespace internal
       Full::import_from_ghosted_array_start(
         const VectorOperation::values              vector_operation,
         const unsigned int                         communication_channel,
-        const ArrayView<const float> &             locally_owned_array,
+        const ArrayView<const float>              &locally_owned_array,
         const std::vector<ArrayView<const float>> &shared_arrays,
-        const ArrayView<float> &                   ghost_array,
-        const ArrayView<float> &                   temporary_storage,
-        std::vector<MPI_Request> &                 requests) const
+        const ArrayView<float>                    &ghost_array,
+        const ArrayView<float>                    &temporary_storage,
+        std::vector<MPI_Request>                  &requests) const
       {
         import_from_ghosted_array_start_impl(vector_operation,
                                              communication_channel,
@@ -817,11 +817,11 @@ namespace internal
       void
       Full::import_from_ghosted_array_finish(
         const VectorOperation::values              vector_operation,
-        const ArrayView<float> &                   locally_owned_storage,
+        const ArrayView<float>                    &locally_owned_storage,
         const std::vector<ArrayView<const float>> &shared_arrays,
-        const ArrayView<float> &                   ghost_array,
-        const ArrayView<const float> &             temporary_storage,
-        std::vector<MPI_Request> &                 requests) const
+        const ArrayView<float>                    &ghost_array,
+        const ArrayView<const float>              &temporary_storage,
+        std::vector<MPI_Request>                  &requests) const
       {
         import_from_ghosted_array_finish_impl(vector_operation,
                                               locally_owned_storage,
@@ -837,11 +837,11 @@ namespace internal
       void
       Full::export_to_ghosted_array_start_impl(
         const unsigned int                          communication_channel,
-        const ArrayView<const Number> &             data_this,
+        const ArrayView<const Number>              &data_this,
         const std::vector<ArrayView<const Number>> &data_others,
-        const ArrayView<Number> &                   buffer,
-        const ArrayView<Number> &                   temporary_storage,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<Number>                    &buffer,
+        const ArrayView<Number>                    &temporary_storage,
+        std::vector<MPI_Request>                   &requests) const
       {
 #ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNeedsMPI());
@@ -936,10 +936,10 @@ namespace internal
       template <typename Number>
       void
       Full::export_to_ghosted_array_finish_impl(
-        const ArrayView<const Number> &             data_this,
+        const ArrayView<const Number>              &data_this,
         const std::vector<ArrayView<const Number>> &data_others,
-        const ArrayView<Number> &                   ghost_array,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<Number>                    &ghost_array,
+        std::vector<MPI_Request>                   &requests) const
       {
         (void)data_this;
 
@@ -1077,11 +1077,11 @@ namespace internal
       Full::import_from_ghosted_array_start_impl(
         const VectorOperation::values               operation,
         const unsigned int                          communication_channel,
-        const ArrayView<const Number> &             data_this,
+        const ArrayView<const Number>              &data_this,
         const std::vector<ArrayView<const Number>> &data_others,
-        const ArrayView<Number> &                   buffer,
-        const ArrayView<Number> &                   temporary_storage,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<Number>                    &buffer,
+        const ArrayView<Number>                    &temporary_storage,
+        std::vector<MPI_Request>                   &requests) const
       {
         (void)data_this;
 
@@ -1186,8 +1186,8 @@ namespace internal
             const int ierr =
               MPI_Irecv(temporary_storage.data() + import_targets_data[i][1],
                         import_targets_data[i][2],
-                        Utilities::MPI::mpi_type_id_for_type<decltype(
-                          *temporary_storage.data())>,
+                        Utilities::MPI::mpi_type_id_for_type<
+                          decltype(*temporary_storage.data())>,
                         import_targets_data[i][0],
                         communication_channel + 0,
                         comm,
@@ -1205,11 +1205,11 @@ namespace internal
       void
       Full::import_from_ghosted_array_finish_impl(
         const VectorOperation::values               operation,
-        const ArrayView<Number> &                   data_this,
+        const ArrayView<Number>                    &data_this,
         const std::vector<ArrayView<const Number>> &data_others,
-        const ArrayView<Number> &                   buffer,
-        const ArrayView<const Number> &             temporary_storage,
-        std::vector<MPI_Request> &                  requests) const
+        const ArrayView<Number>                    &buffer,
+        const ArrayView<const Number>              &temporary_storage,
+        std::vector<MPI_Request>                   &requests) const
       {
 #ifndef DEAL_II_WITH_MPI
         Assert(false, ExcNeedsMPI());

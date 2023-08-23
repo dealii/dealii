@@ -5,7 +5,7 @@
 template <int dim>
 void
 test(const ReferenceCell &reference_cell,
-     const Point<dim> &   p,
+     const Point<dim>    &p,
      const bool           print = true)
 {
   const Point<dim> projected       = reference_cell.closest_point(p);

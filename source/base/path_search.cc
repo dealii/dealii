@@ -111,7 +111,7 @@ PathSearch::PathSearch(const std::string &cls, const unsigned int debug)
 std::string
 PathSearch::find(const std::string &filename,
                  const std::string &suffix,
-                 const char *       open_mode)
+                 const char        *open_mode)
 {
   std::vector<std::string>::const_iterator       path;
   const std::vector<std::string>::const_iterator endp = my_path_list.end();

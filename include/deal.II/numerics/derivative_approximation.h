@@ -177,10 +177,10 @@ namespace DerivativeApproximation
    */
   template <int dim, class InputVector, int spacedim>
   void
-  approximate_gradient(const Mapping<dim, spacedim> &   mapping,
+  approximate_gradient(const Mapping<dim, spacedim>    &mapping,
                        const DoFHandler<dim, spacedim> &dof,
-                       const InputVector &              solution,
-                       Vector<float> &                  derivative_norm,
+                       const InputVector               &solution,
+                       Vector<float>                   &derivative_norm,
                        const unsigned int               component = 0);
 
   /**
@@ -189,8 +189,8 @@ namespace DerivativeApproximation
   template <int dim, class InputVector, int spacedim>
   void
   approximate_gradient(const DoFHandler<dim, spacedim> &dof,
-                       const InputVector &              solution,
-                       Vector<float> &                  derivative_norm,
+                       const InputVector               &solution,
+                       Vector<float>                   &derivative_norm,
                        const unsigned int               component = 0);
 
   /**
@@ -212,10 +212,10 @@ namespace DerivativeApproximation
    */
   template <int dim, class InputVector, int spacedim>
   void
-  approximate_second_derivative(const Mapping<dim, spacedim> &   mapping,
+  approximate_second_derivative(const Mapping<dim, spacedim>    &mapping,
                                 const DoFHandler<dim, spacedim> &dof,
-                                const InputVector &              solution,
-                                Vector<float> &    derivative_norm,
+                                const InputVector               &solution,
+                                Vector<float>     &derivative_norm,
                                 const unsigned int component = 0);
 
   /**
@@ -224,8 +224,8 @@ namespace DerivativeApproximation
   template <int dim, class InputVector, int spacedim>
   void
   approximate_second_derivative(const DoFHandler<dim, spacedim> &dof,
-                                const InputVector &              solution,
-                                Vector<float> &    derivative_norm,
+                                const InputVector               &solution,
+                                Vector<float>     &derivative_norm,
                                 const unsigned int component = 0);
 
   /**
@@ -244,9 +244,9 @@ namespace DerivativeApproximation
   template <int dim, int spacedim, class InputVector, int order>
   void
   approximate_derivative_tensor(
-    const Mapping<dim, spacedim> &   mapping,
+    const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
-    const InputVector &              solution,
+    const InputVector               &solution,
 #ifndef _MSC_VER
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
 #else
@@ -263,7 +263,7 @@ namespace DerivativeApproximation
   void
   approximate_derivative_tensor(
     const DoFHandler<dim, spacedim> &dof,
-    const InputVector &              solution,
+    const InputVector               &solution,
 #ifndef _MSC_VER
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
 #else

@@ -1253,7 +1253,7 @@ inline TriaAccessor<structdim, dim, spacedim>::TriaAccessor(
   const Triangulation<dim, spacedim> *parent,
   const int                           level,
   const int                           index,
-  const AccessorData *                local_data)
+  const AccessorData                 *local_data)
   : TriaAccessorBase<structdim, dim, spacedim>(parent, level, index, local_data)
 {}
 
@@ -3382,7 +3382,7 @@ inline CellAccessor<dim, spacedim>::CellAccessor(
   const Triangulation<dim, spacedim> *parent,
   const int                           level,
   const int                           index,
-  const AccessorData *                local_data)
+  const AccessorData                 *local_data)
   : TriaAccessor<dim, dim, spacedim>(parent, level, index, local_data)
 {}
 

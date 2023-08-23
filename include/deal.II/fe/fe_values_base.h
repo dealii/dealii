@@ -201,7 +201,7 @@ public:
   FEValuesBase(const unsigned int                  n_q_points,
                const unsigned int                  dofs_per_cell,
                const UpdateFlags                   update_flags,
-               const Mapping<dim, spacedim> &      mapping,
+               const Mapping<dim, spacedim>       &mapping,
                const FiniteElement<dim, spacedim> &fe);
 
   /**
@@ -462,7 +462,7 @@ public:
   template <typename Number>
   void
   get_function_values(const ReadVector<Number> &fe_function,
-                      std::vector<Number> &     values) const;
+                      std::vector<Number>      &values) const;
 
   /**
    * This function does the same as the other get_function_values(), but
@@ -479,7 +479,7 @@ public:
    */
   template <typename Number>
   void
-  get_function_values(const ReadVector<Number> &   fe_function,
+  get_function_values(const ReadVector<Number>    &fe_function,
                       std::vector<Vector<Number>> &values) const;
 
   /**
@@ -636,7 +636,7 @@ public:
   template <typename Number>
   void
   get_function_gradients(
-    const ReadVector<Number> &                fe_function,
+    const ReadVector<Number>                 &fe_function,
     std::vector<Tensor<1, spacedim, Number>> &gradients) const;
 
   /**
@@ -658,7 +658,7 @@ public:
   template <typename Number>
   void
   get_function_gradients(
-    const ReadVector<Number> &                             fe_function,
+    const ReadVector<Number>                              &fe_function,
     std::vector<std::vector<Tensor<1, spacedim, Number>>> &gradients) const;
 
   /**
@@ -672,9 +672,9 @@ public:
   template <typename Number>
   void
   get_function_gradients(
-    const ReadVector<Number> &                      fe_function,
+    const ReadVector<Number>                       &fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<Tensor<1, spacedim, Number>> &      gradients) const;
+    std::vector<Tensor<1, spacedim, Number>>       &gradients) const;
 
   /**
    * This function relates to the first of the get_function_gradients() function
@@ -687,8 +687,8 @@ public:
   template <typename Number>
   void
   get_function_gradients(
-    const ReadVector<Number> &                          fe_function,
-    const ArrayView<const types::global_dof_index> &    indices,
+    const ReadVector<Number>                           &fe_function,
+    const ArrayView<const types::global_dof_index>     &indices,
     ArrayView<std::vector<Tensor<1, spacedim, Number>>> gradients,
     const bool quadrature_points_fastest = false) const;
 
@@ -738,7 +738,7 @@ public:
   template <typename Number>
   void
   get_function_hessians(
-    const ReadVector<Number> &                fe_function,
+    const ReadVector<Number>                 &fe_function,
     std::vector<Tensor<2, spacedim, Number>> &hessians) const;
 
   /**
@@ -761,7 +761,7 @@ public:
   template <typename Number>
   void
   get_function_hessians(
-    const ReadVector<Number> &                             fe_function,
+    const ReadVector<Number>                              &fe_function,
     std::vector<std::vector<Tensor<2, spacedim, Number>>> &hessians,
     const bool quadrature_points_fastest = false) const;
 
@@ -776,9 +776,9 @@ public:
   template <typename Number>
   void
   get_function_hessians(
-    const ReadVector<Number> &                      fe_function,
+    const ReadVector<Number>                       &fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<Tensor<2, spacedim, Number>> &      hessians) const;
+    std::vector<Tensor<2, spacedim, Number>>       &hessians) const;
 
   /**
    * This function relates to the first of the get_function_hessians() function
@@ -791,8 +791,8 @@ public:
   template <typename Number>
   void
   get_function_hessians(
-    const ReadVector<Number> &                          fe_function,
-    const ArrayView<const types::global_dof_index> &    indices,
+    const ReadVector<Number>                           &fe_function,
+    const ArrayView<const types::global_dof_index>     &indices,
     ArrayView<std::vector<Tensor<2, spacedim, Number>>> hessians,
     const bool quadrature_points_fastest = false) const;
 
@@ -839,7 +839,7 @@ public:
   template <typename Number>
   void
   get_function_laplacians(const ReadVector<Number> &fe_function,
-                          std::vector<Number> &     laplacians) const;
+                          std::vector<Number>      &laplacians) const;
 
   /**
    * This function does the same as the other get_function_laplacians(), but
@@ -862,7 +862,7 @@ public:
    */
   template <typename Number>
   void
-  get_function_laplacians(const ReadVector<Number> &   fe_function,
+  get_function_laplacians(const ReadVector<Number>    &fe_function,
                           std::vector<Vector<Number>> &laplacians) const;
 
   /**
@@ -876,9 +876,9 @@ public:
   template <typename Number>
   void
   get_function_laplacians(
-    const ReadVector<Number> &                      fe_function,
+    const ReadVector<Number>                       &fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<Number> &                           laplacians) const;
+    std::vector<Number>                            &laplacians) const;
 
   /**
    * This function relates to the first of the get_function_laplacians()
@@ -891,9 +891,9 @@ public:
   template <typename Number>
   void
   get_function_laplacians(
-    const ReadVector<Number> &                      fe_function,
+    const ReadVector<Number>                       &fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<Vector<Number>> &                   laplacians) const;
+    std::vector<Vector<Number>>                    &laplacians) const;
 
   /**
    * This function relates to the first of the get_function_laplacians()
@@ -906,9 +906,9 @@ public:
   template <typename Number>
   void
   get_function_laplacians(
-    const ReadVector<Number> &                      fe_function,
+    const ReadVector<Number>                       &fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<std::vector<Number>> &              laplacians,
+    std::vector<std::vector<Number>>               &laplacians,
     const bool quadrature_points_fastest = false) const;
 
   /** @} */
@@ -956,7 +956,7 @@ public:
   template <typename Number>
   void
   get_function_third_derivatives(
-    const ReadVector<Number> &                fe_function,
+    const ReadVector<Number>                 &fe_function,
     std::vector<Tensor<3, spacedim, Number>> &third_derivatives) const;
 
   /**
@@ -980,7 +980,7 @@ public:
   template <typename Number>
   void
   get_function_third_derivatives(
-    const ReadVector<Number> &                             fe_function,
+    const ReadVector<Number>                              &fe_function,
     std::vector<std::vector<Tensor<3, spacedim, Number>>> &third_derivatives,
     const bool quadrature_points_fastest = false) const;
 
@@ -995,9 +995,9 @@ public:
   template <typename Number>
   void
   get_function_third_derivatives(
-    const ReadVector<Number> &                      fe_function,
+    const ReadVector<Number>                       &fe_function,
     const ArrayView<const types::global_dof_index> &indices,
-    std::vector<Tensor<3, spacedim, Number>> &      third_derivatives) const;
+    std::vector<Tensor<3, spacedim, Number>>       &third_derivatives) const;
 
   /**
    * This function relates to the first of the get_function_third_derivatives()
@@ -1010,8 +1010,8 @@ public:
   template <typename Number>
   void
   get_function_third_derivatives(
-    const ReadVector<Number> &                          fe_function,
-    const ArrayView<const types::global_dof_index> &    indices,
+    const ReadVector<Number>                           &fe_function,
+    const ArrayView<const types::global_dof_index>     &indices,
     ArrayView<std::vector<Tensor<3, spacedim, Number>>> third_derivatives,
     const bool quadrature_points_fastest = false) const;
   /** @} */
@@ -1594,20 +1594,20 @@ protected:
     template <typename Number>
     void
     get_interpolated_dof_values(const ReadVector<Number> &in,
-                                Vector<Number> &          out) const;
+                                Vector<Number>           &out) const;
 
     /**
      * Call @p get_interpolated_dof_values of the iterator with the
      * given arguments.
      */
     void
-    get_interpolated_dof_values(const IndexSet &              in,
+    get_interpolated_dof_values(const IndexSet               &in,
                                 Vector<IndexSet::value_type> &out) const;
 
   private:
     bool                                                 initialized;
     typename Triangulation<dim, spacedim>::cell_iterator cell;
-    const DoFHandler<dim, spacedim> *                    dof_handler;
+    const DoFHandler<dim, spacedim>                     *dof_handler;
     bool                                                 level_dof_access;
   };
 

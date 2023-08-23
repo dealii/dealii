@@ -64,9 +64,9 @@ public:
   /**
    * Constructor.
    */
-  FE_PolyFace(const PolynomialType &        poly_space,
+  FE_PolyFace(const PolynomialType         &poly_space,
               const FiniteElementData<dim> &fe_data,
-              const std::vector<bool> &     restriction_is_additive_flags);
+              const std::vector<bool>      &restriction_is_additive_flags);
 
   /**
    * Return the polynomial degree of this finite element, i.e. the value
@@ -92,7 +92,7 @@ protected:
   get_data(
     const UpdateFlags             update_flags,
     const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim> &       quadrature,
+    const Quadrature<dim>        &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
       &output_data) const override
@@ -109,7 +109,7 @@ protected:
   std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_face_data(
     const UpdateFlags               update_flags,
-    const Mapping<dim, spacedim> &  mapping,
+    const Mapping<dim, spacedim>   &mapping,
     const hp::QCollection<dim - 1> &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -171,7 +171,7 @@ protected:
   get_subface_data(
     const UpdateFlags             update_flags,
     const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim - 1> &   quadrature,
+    const Quadrature<dim - 1>    &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
       &output_data) const override
@@ -188,11 +188,11 @@ protected:
   fill_fe_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellSimilarity::Similarity                            cell_similarity,
-    const Quadrature<dim> &                                     quadrature,
-    const Mapping<dim, spacedim> &                              mapping,
+    const Quadrature<dim>                                      &quadrature,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                                                            mapping_data,
+                                                                  &mapping_data,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -204,11 +204,11 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const hp::QCollection<dim - 1> &                            quadrature,
-    const Mapping<dim, spacedim> &                              mapping,
+    const hp::QCollection<dim - 1>                             &quadrature,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                                                            mapping_data,
+                                                                  &mapping_data,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -219,11 +219,11 @@ protected:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
-    const Quadrature<dim - 1> &                                 quadrature,
-    const Mapping<dim, spacedim> &                              mapping,
+    const Quadrature<dim - 1>                                  &quadrature,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                                                            mapping_data,
+                                                                  &mapping_data,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>

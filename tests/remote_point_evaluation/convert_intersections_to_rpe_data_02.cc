@@ -36,7 +36,7 @@ using namespace dealii;
 template <int dim>
 std::vector<std::vector<BoundingBox<dim>>>
 get_global_bboxes(const Triangulation<dim> &tria,
-                  const Mapping<dim> &      mapping,
+                  const Mapping<dim>       &mapping,
                   const unsigned int        rtree_level = 0)
 {
   std::vector<dealii::BoundingBox<dim>> local_boxes;

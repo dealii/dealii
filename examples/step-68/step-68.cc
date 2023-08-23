@@ -181,7 +181,7 @@ namespace Step68
 
 
     virtual void vector_value(const Point<dim> &point,
-                              Vector<double> &  values) const override;
+                              Vector<double>   &values) const override;
   };
 
 
@@ -190,7 +190,7 @@ namespace Step68
   // simulation (t) must be gathered from the Function object.
   template <int dim>
   void Vortex<dim>::vector_value(const Point<dim> &point,
-                                 Vector<double> &  values) const
+                                 Vector<double>   &values) const
   {
     const double T = 4;
     const double t = this->get_time();
@@ -253,7 +253,7 @@ namespace Step68
     // `private`.
     unsigned int cell_weight(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
-        &              cell,
+                      &cell,
       const CellStatus status) const;
 
     // The following two functions are responsible for outputting the simulation
@@ -328,7 +328,7 @@ namespace Step68
   template <int dim>
   unsigned int ParticleTracking<dim>::cell_weight(
     const typename parallel::distributed::Triangulation<dim>::cell_iterator
-      &              cell,
+                    &cell,
     const CellStatus status) const
   {
     // First, we introduce a base weight that will be assigned to every cell.

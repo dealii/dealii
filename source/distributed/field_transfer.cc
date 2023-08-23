@@ -40,7 +40,7 @@ namespace parallel
         const auto coarsening_strategy =
           [this](
             const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-              &                                parent,
+                                              &parent,
             const std::vector<Vector<Number>> &children_values) {
             // get the equivalent DoFCellAccessor
             typename DoFHandler<dim, spacedim>::cell_iterator dof_cell_iterator(
@@ -132,7 +132,7 @@ namespace parallel
       void
       FieldTransfer<dim, VectorType, spacedim>::
         prepare_for_coarsening_and_refinement(
-          const VectorType & in,
+          const VectorType  &in,
           const unsigned int fe_nothing_index)
       {
         const unsigned int dofs_per_cell =
@@ -172,9 +172,9 @@ namespace parallel
       template <int dim, typename VectorType, int spacedim>
       void
       FieldTransfer<dim, VectorType, spacedim>::interpolate(
-        const Number &                   new_value,
+        const Number                    &new_value,
         const AffineConstraints<Number> &affine_constraints,
-        VectorType &                     out)
+        VectorType                      &out)
       {
         const unsigned int dofs_per_cell =
           dof_handler.get_fe_collection().max_dofs_per_cell();

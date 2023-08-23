@@ -81,9 +81,9 @@ namespace PETScWrappers
 
 
   void
-  SolverBase::solve(const MatrixBase &      A,
-                    VectorBase &            x,
-                    const VectorBase &      b,
+  SolverBase::solve(const MatrixBase       &A,
+                    VectorBase             &x,
+                    const VectorBase       &b,
                     const PreconditionBase &preconditioner)
   {
     // first create a solver object if this
@@ -168,7 +168,7 @@ namespace PETScWrappers
                                const PetscInt      iteration,
                                const PetscReal     residual_norm,
                                KSPConvergedReason *reason,
-                               void *              solver_control_x)
+                               void               *solver_control_x)
   {
     PetscFunctionBeginUser;
     SolverControl &solver_control =
@@ -254,7 +254,7 @@ namespace PETScWrappers
 
 
 
-  SolverRichardson::SolverRichardson(SolverControl &       cn,
+  SolverRichardson::SolverRichardson(SolverControl        &cn,
                                      const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
@@ -305,7 +305,7 @@ namespace PETScWrappers
 
   /* ---------------------- SolverChebychev ------------------------ */
 
-  SolverChebychev::SolverChebychev(SolverControl &       cn,
+  SolverChebychev::SolverChebychev(SolverControl        &cn,
                                    const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
@@ -639,7 +639,7 @@ namespace PETScWrappers
 
   /* ---------------------- SparseDirectMUMPS------------------------ */
 
-  SparseDirectMUMPS::SparseDirectMUMPS(SolverControl &       cn,
+  SparseDirectMUMPS::SparseDirectMUMPS(SolverControl        &cn,
                                        const AdditionalData &data)
     : SolverBase(cn)
     , additional_data(data)
@@ -683,7 +683,7 @@ namespace PETScWrappers
 
   void
   SparseDirectMUMPS::solve(const MatrixBase &A,
-                           VectorBase &      x,
+                           VectorBase       &x,
                            const VectorBase &b)
   {
 #  ifdef DEAL_II_PETSC_WITH_MUMPS

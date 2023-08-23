@@ -40,20 +40,20 @@
 
 template <typename NumberType, int dim, typename ExtractorType>
 void
-test_feiv_view(const Vector<double> &         solution,
-               const FEInterfaceValues<dim> & fe_iv,
-               const unsigned int &           n_q_points,
-               const ExtractorType &          extractor,
+test_feiv_view(const Vector<double>          &solution,
+               const FEInterfaceValues<dim>  &fe_iv,
+               const unsigned int            &n_q_points,
+               const ExtractorType           &extractor,
                const std::vector<NumberType> &local_dof_values);
 
 // Scalar view
 template <typename NumberType, int dim>
 void
-test_feiv_view(const Vector<double> &            solution,
-               const FEInterfaceValues<dim> &    fe_iv,
-               const unsigned int &              n_q_points,
+test_feiv_view(const Vector<double>             &solution,
+               const FEInterfaceValues<dim>     &fe_iv,
+               const unsigned int               &n_q_points,
                const FEValuesExtractors::Scalar &extractor,
-               const std::vector<NumberType> &   local_dof_values)
+               const std::vector<NumberType>    &local_dof_values)
 {
   using View =
     std::remove_reference_t<std::remove_const_t<decltype(fe_iv[extractor])>>;
@@ -170,11 +170,11 @@ test_feiv_view(const Vector<double> &            solution,
 // Vector view
 template <typename NumberType, int dim>
 void
-test_feiv_view(const Vector<double> &            solution,
-               const FEInterfaceValues<dim> &    fe_iv,
-               const unsigned int &              n_q_points,
+test_feiv_view(const Vector<double>             &solution,
+               const FEInterfaceValues<dim>     &fe_iv,
+               const unsigned int               &n_q_points,
                const FEValuesExtractors::Vector &extractor,
-               const std::vector<NumberType> &   local_dof_values)
+               const std::vector<NumberType>    &local_dof_values)
 {
   using View =
     std::remove_reference_t<std::remove_const_t<decltype(fe_iv[extractor])>>;

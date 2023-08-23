@@ -63,7 +63,7 @@ namespace ResFlow
   template <int dim>
   void
   FluxBoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  bdry_flux) const
+                                        Vector<double>   &bdry_flux) const
   {
     Assert(bdry_flux.size() == dim,
            ExcDimensionMismatch(bdry_flux.size(), dim));

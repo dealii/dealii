@@ -45,10 +45,10 @@ namespace
   void
   get_vertex_to_cell_mappings(
     const Triangulation<dim, spacedim> &triangulation,
-    std::vector<unsigned int> &         vertex_touch_count,
+    std::vector<unsigned int>          &vertex_touch_count,
     std::vector<std::list<
       std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
-                unsigned int>>> &       vertex_to_cell)
+                unsigned int>>>        &vertex_to_cell)
   {
     vertex_touch_count.resize(triangulation.n_vertices());
     vertex_to_cell.resize(triangulation.n_vertices());
@@ -67,10 +67,10 @@ namespace
   void
   get_edge_to_cell_mappings(
     const Triangulation<dim, spacedim> &triangulation,
-    std::vector<unsigned int> &         edge_touch_count,
+    std::vector<unsigned int>          &edge_touch_count,
     std::vector<std::list<
       std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
-                unsigned int>>> &       edge_to_cell)
+                unsigned int>>>        &edge_to_cell)
   {
     Assert(triangulation.n_levels() == 1, ExcInternalError());
 
@@ -95,12 +95,12 @@ namespace
   void
   set_vertex_and_cell_info(
     const Triangulation<dim, spacedim> &triangulation,
-    const std::vector<unsigned int> &   vertex_touch_count,
+    const std::vector<unsigned int>    &vertex_touch_count,
     const std::vector<std::list<
       std::pair<typename Triangulation<dim, spacedim>::active_cell_iterator,
-                unsigned int>>> &       vertex_to_cell,
+                unsigned int>>>        &vertex_to_cell,
     const std::vector<types::global_dof_index>
-      &        coarse_cell_to_p4est_tree_permutation,
+              &coarse_cell_to_p4est_tree_permutation,
     const bool set_vertex_info,
     typename internal::p4est::types<dim>::connectivity *connectivity)
   {
@@ -329,13 +329,13 @@ namespace
   template <int dim, int spacedim>
   void
   determine_level_subdomain_id_recursively(
-    const typename internal::p4est::types<dim>::tree &          tree,
-    const typename internal::p4est::types<dim>::locidx &        tree_index,
+    const typename internal::p4est::types<dim>::tree           &tree,
+    const typename internal::p4est::types<dim>::locidx         &tree_index,
     const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
-    const typename internal::p4est::types<dim>::quadrant &      p4est_cell,
-    typename internal::p4est::types<dim>::forest &              forest,
+    const typename internal::p4est::types<dim>::quadrant       &p4est_cell,
+    typename internal::p4est::types<dim>::forest               &forest,
     const types::subdomain_id                                   my_subdomain,
-    const std::vector<std::vector<bool>> &                      marked_vertices)
+    const std::vector<std::vector<bool>>                       &marked_vertices)
   {
     if (dealii_cell->level_subdomain_id() == numbers::artificial_subdomain_id)
       {
@@ -445,10 +445,10 @@ namespace
   template <int dim, int spacedim>
   void
   match_tree_recursively(
-    const typename internal::p4est::types<dim>::tree &          tree,
+    const typename internal::p4est::types<dim>::tree           &tree,
     const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
-    const typename internal::p4est::types<dim>::quadrant &      p4est_cell,
-    const typename internal::p4est::types<dim>::forest &        forest,
+    const typename internal::p4est::types<dim>::quadrant       &p4est_cell,
+    const typename internal::p4est::types<dim>::forest         &forest,
     const types::subdomain_id                                   my_subdomain)
   {
     // check if this cell exists in the local p4est cell
@@ -528,7 +528,7 @@ namespace
   template <int dim, int spacedim>
   void
   match_quadrant(
-    const dealii::Triangulation<dim, spacedim> *          tria,
+    const dealii::Triangulation<dim, spacedim>           *tria,
     unsigned int                                          dealii_index,
     const typename internal::p4est::types<dim>::quadrant &ghost_quadrant,
     types::subdomain_id                                   ghost_owner)
@@ -612,12 +612,12 @@ namespace
      * does not belong to a quadrant.
      */
     static int
-    local_point_fn(typename internal::p4est::types<dim>::forest *  forest,
+    local_point_fn(typename internal::p4est::types<dim>::forest   *forest,
                    typename internal::p4est::types<dim>::topidx    which_tree,
                    typename internal::p4est::types<dim>::quadrant *quadrant,
                    int                                             rank_begin,
                    int                                             rank_end,
-                   void *                                          point);
+                   void                                           *point);
 
   private:
     /**
@@ -631,7 +631,7 @@ namespace
 
       void
       set_cell_vertices(
-        typename internal::p4est::types<dim>::forest *  forest,
+        typename internal::p4est::types<dim>::forest   *forest,
         typename internal::p4est::types<dim>::topidx    which_tree,
         typename internal::p4est::types<dim>::quadrant *quadrant,
         const typename internal::p4est::types<dim>::quadrant_coord
@@ -671,7 +671,7 @@ namespace
   template <int dim>
   int
   PartitionSearch<dim>::local_quadrant_fn(
-    typename internal::p4est::types<dim>::forest *  forest,
+    typename internal::p4est::types<dim>::forest   *forest,
     typename internal::p4est::types<dim>::topidx    which_tree,
     typename internal::p4est::types<dim>::quadrant *quadrant,
     int /* rank_begin */,
@@ -912,7 +912,7 @@ namespace
   template <>
   void
   PartitionSearch<2>::QuadrantData::set_cell_vertices(
-    typename internal::p4est::types<2>::forest *  forest,
+    typename internal::p4est::types<2>::forest   *forest,
     typename internal::p4est::types<2>::topidx    which_tree,
     typename internal::p4est::types<2>::quadrant *quadrant,
     const typename internal::p4est::types<2>::quadrant_coord
@@ -996,7 +996,7 @@ namespace
   template <>
   void
   PartitionSearch<3>::QuadrantData::set_cell_vertices(
-    typename internal::p4est::types<3>::forest *  forest,
+    typename internal::p4est::types<3>::forest   *forest,
     typename internal::p4est::types<3>::topidx    which_tree,
     typename internal::p4est::types<3>::quadrant *quadrant,
     const typename internal::p4est::types<3>::quadrant_coord
@@ -1169,7 +1169,7 @@ namespace
      */
     static int
     refine_callback(
-      typename internal::p4est::types<dim>::forest *  forest,
+      typename internal::p4est::types<dim>::forest   *forest,
       typename internal::p4est::types<dim>::topidx    coarse_cell_index,
       typename internal::p4est::types<dim>::quadrant *quadrant);
 
@@ -1179,7 +1179,7 @@ namespace
      */
     static int
     coarsen_callback(
-      typename internal::p4est::types<dim>::forest *  forest,
+      typename internal::p4est::types<dim>::forest   *forest,
       typename internal::p4est::types<dim>::topidx    coarse_cell_index,
       typename internal::p4est::types<dim>::quadrant *children[]);
 
@@ -1198,7 +1198,7 @@ namespace
     void
     build_lists(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-      const typename internal::p4est::types<dim>::quadrant &      p4est_cell,
+      const typename internal::p4est::types<dim>::quadrant       &p4est_cell,
       const types::subdomain_id                                   myid);
   };
 
@@ -1218,7 +1218,7 @@ namespace
   RefineAndCoarsenList<dim, spacedim>::RefineAndCoarsenList(
     const Triangulation<dim, spacedim> &triangulation,
     const std::vector<types::global_dof_index>
-      &                       p4est_tree_to_coarse_cell_permutation,
+                             &p4est_tree_to_coarse_cell_permutation,
     const types::subdomain_id my_subdomain)
   {
     // count how many flags are set and allocate that much memory
@@ -1284,7 +1284,7 @@ namespace
   void
   RefineAndCoarsenList<dim, spacedim>::build_lists(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const typename internal::p4est::types<dim>::quadrant &      p4est_cell,
+    const typename internal::p4est::types<dim>::quadrant       &p4est_cell,
     const types::subdomain_id                                   my_subdomain)
   {
     if (cell->is_active())
@@ -1329,7 +1329,7 @@ namespace
   template <int dim, int spacedim>
   int
   RefineAndCoarsenList<dim, spacedim>::refine_callback(
-    typename internal::p4est::types<dim>::forest *  forest,
+    typename internal::p4est::types<dim>::forest   *forest,
     typename internal::p4est::types<dim>::topidx    coarse_cell_index,
     typename internal::p4est::types<dim>::quadrant *quadrant)
   {
@@ -1379,7 +1379,7 @@ namespace
   template <int dim, int spacedim>
   int
   RefineAndCoarsenList<dim, spacedim>::coarsen_callback(
-    typename internal::p4est::types<dim>::forest *  forest,
+    typename internal::p4est::types<dim>::forest   *forest,
     typename internal::p4est::types<dim>::topidx    coarse_cell_index,
     typename internal::p4est::types<dim>::quadrant *children[])
   {
@@ -1536,8 +1536,8 @@ namespace
   template <int dim, int spacedim>
   inline void
   add_single_cell_relation(
-    std::vector<cell_relation_t<dim, spacedim>> &               cell_rel,
-    const typename dealii::internal::p4est::types<dim>::tree &  tree,
+    std::vector<cell_relation_t<dim, spacedim>>                &cell_rel,
+    const typename dealii::internal::p4est::types<dim>::tree   &tree,
     const unsigned int                                          idx,
     const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
     const CellStatus                                            status)
@@ -1565,9 +1565,9 @@ namespace
   template <int dim, int spacedim>
   void
   update_cell_relations_recursively(
-    std::vector<cell_relation_t<dim, spacedim>> &                 cell_rel,
-    const typename dealii::internal::p4est::types<dim>::tree &    tree,
-    const typename Triangulation<dim, spacedim>::cell_iterator &  dealii_cell,
+    std::vector<cell_relation_t<dim, spacedim>>                  &cell_rel,
+    const typename dealii::internal::p4est::types<dim>::tree     &tree,
+    const typename Triangulation<dim, spacedim>::cell_iterator   &dealii_cell,
     const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell)
   {
     // find index of p4est_cell in the quadrants array of the corresponding tree
@@ -1746,8 +1746,8 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::create_triangulation(
       const std::vector<Point<spacedim>> &vertices,
-      const std::vector<CellData<dim>> &  cells,
-      const SubCellData &                 subcelldata)
+      const std::vector<CellData<dim>>   &cells,
+      const SubCellData                  &subcelldata)
     {
       try
         {
@@ -2262,7 +2262,8 @@ namespace parallel
 #  ifndef DOXYGEN
 
     template <>
-    void Triangulation<2, 2>::copy_new_triangulation_to_p4est(
+    void
+    Triangulation<2, 2>::copy_new_triangulation_to_p4est(
       std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2, spacedim = 2;
@@ -2322,7 +2323,8 @@ namespace parallel
     // TODO: This is a verbatim copy of the 2,2 case. However, we can't just
     // specialize the dim template argument, but let spacedim open
     template <>
-    void Triangulation<2, 3>::copy_new_triangulation_to_p4est(
+    void
+    Triangulation<2, 3>::copy_new_triangulation_to_p4est(
       std::integral_constant<int, 2>)
     {
       const unsigned int dim = 2, spacedim = 3;
@@ -2380,7 +2382,8 @@ namespace parallel
 
 
     template <>
-    void Triangulation<3, 3>::copy_new_triangulation_to_p4est(
+    void
+    Triangulation<3, 3>::copy_new_triangulation_to_p4est(
       std::integral_constant<int, 3>)
     {
       const int dim = 3, spacedim = 3;
@@ -3654,9 +3657,9 @@ namespace parallel
       for (unsigned int repetition = 0; repetition < dim; ++repetition)
         for (const auto &it : this->get_periodic_face_map())
           {
-            const cell_iterator & cell_1           = it.first.first;
+            const cell_iterator  &cell_1           = it.first.first;
             const unsigned int    face_no_1        = it.first.second;
-            const cell_iterator & cell_2           = it.second.first.first;
+            const cell_iterator  &cell_2           = it.second.first.first;
             const unsigned int    face_no_2        = it.second.first.second;
             const std::bitset<3> &face_orientation = it.second.second;
 

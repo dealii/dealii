@@ -150,7 +150,7 @@ namespace internal
     void
     TriaFaces::serialize(Archive &ar, const unsigned int)
     {
-      ar &dim;
+      ar                                        &dim;
       ar &quads &lines &quads_line_orientations &quad_is_quadrilateral;
     }
   } // namespace TriangulationImplementation

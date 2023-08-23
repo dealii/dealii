@@ -127,7 +127,7 @@ namespace Step58
 
   template <int dim>
   std::complex<double>
-  InitialValues<dim>::value(const Point<dim> & p,
+  InitialValues<dim>::value(const Point<dim>  &p,
                             const unsigned int component) const
   {
     static_assert(dim == 2, "This initial condition only works in 2d.");
@@ -163,14 +163,14 @@ namespace Step58
   {
   public:
     Potential() = default;
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double Potential<dim>::value(const Point<dim> & p,
+  double Potential<dim>::value(const Point<dim>  &p,
                                const unsigned int component) const
   {
     (void)component;
@@ -475,7 +475,7 @@ namespace Step58
     template <int dim>
     void ComplexAmplitude<dim>::evaluate_vector_field(
       const DataPostprocessorInputs::Vector<dim> &inputs,
-      std::vector<Vector<double>> &               computed_quantities) const
+      std::vector<Vector<double>>                &computed_quantities) const
     {
       AssertDimension(computed_quantities.size(),
                       inputs.solution_values.size());
@@ -531,7 +531,7 @@ namespace Step58
     template <int dim>
     void ComplexPhase<dim>::evaluate_vector_field(
       const DataPostprocessorInputs::Vector<dim> &inputs,
-      std::vector<Vector<double>> &               computed_quantities) const
+      std::vector<Vector<double>>                &computed_quantities) const
     {
       AssertDimension(computed_quantities.size(),
                       inputs.solution_values.size());

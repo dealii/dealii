@@ -137,15 +137,15 @@ public:
   /**
    * Constructor.
    */
-  SolverIDR(SolverControl &           cn,
+  SolverIDR(SolverControl            &cn,
             VectorMemory<VectorType> &mem,
-            const AdditionalData &    data = AdditionalData());
+            const AdditionalData     &data = AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  explicit SolverIDR(SolverControl &       cn,
+  explicit SolverIDR(SolverControl        &cn,
                      const AdditionalData &data = AdditionalData());
 
   /**
@@ -158,9 +158,9 @@ public:
    */
   template <typename MatrixType, typename PreconditionerType>
   void
-  solve(const MatrixType &        A,
-        VectorType &              x,
-        const VectorType &        b,
+  solve(const MatrixType         &A,
+        VectorType               &x,
+        const VectorType         &b,
         const PreconditionerType &preconditioner);
 
 protected:
@@ -171,9 +171,9 @@ protected:
    */
   virtual void
   print_vectors(const unsigned int step,
-                const VectorType & x,
-                const VectorType & r,
-                const VectorType & d) const;
+                const VectorType  &x,
+                const VectorType  &r,
+                const VectorType  &d) const;
 
 private:
   /**
@@ -216,7 +216,7 @@ namespace internal
     template <typename VectorType>
     inline VectorType &
     TmpVectors<VectorType>::operator()(const unsigned int i,
-                                       const VectorType & temp)
+                                       const VectorType  &temp)
     {
       AssertIndexRange(i, data.size());
       if (data[i] == nullptr)
@@ -279,9 +279,9 @@ namespace internal
 
 
 template <typename VectorType>
-SolverIDR<VectorType>::SolverIDR(SolverControl &           cn,
+SolverIDR<VectorType>::SolverIDR(SolverControl            &cn,
                                  VectorMemory<VectorType> &mem,
-                                 const AdditionalData &    data)
+                                 const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
@@ -309,9 +309,9 @@ SolverIDR<VectorType>::print_vectors(const unsigned int,
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
-SolverIDR<VectorType>::solve(const MatrixType &        A,
-                             VectorType &              x,
-                             const VectorType &        b,
+SolverIDR<VectorType>::solve(const MatrixType         &A,
+                             VectorType               &x,
+                             const VectorType         &b,
                              const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("IDR(s)");

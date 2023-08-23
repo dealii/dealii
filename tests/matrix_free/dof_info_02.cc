@@ -101,7 +101,7 @@ test(const bool adaptive_ref = true)
   }
 
   const unsigned int     n_cells         = mf_data->n_cell_batches();
-  const auto &           dof_info        = mf_data->get_dof_info();
+  const auto            &dof_info        = mf_data->get_dof_info();
   constexpr unsigned int n_vectorization = VectorizedArray<number>::size();
 
   std::vector<unsigned int> my_rows;

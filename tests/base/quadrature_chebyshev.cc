@@ -100,7 +100,7 @@ check_quadrature(double *exact_monomials)
     {
       quadrature_type              quadrature(n);
       const std::vector<Point<1>> &points  = quadrature.get_points();
-      const std::vector<double> &  weights = quadrature.get_weights();
+      const std::vector<double>   &weights = quadrature.get_weights();
 
 
       for (unsigned int i = 0; i < 32; ++i)
@@ -136,7 +136,7 @@ check_GRC_right(double *exact_monomials)
     {
       QGaussRadauChebyshev<1> quadrature(n, QGaussRadauChebyshev<1>::right);
       const std::vector<Point<1>> &points  = quadrature.get_points();
-      const std::vector<double> &  weights = quadrature.get_weights();
+      const std::vector<double>   &weights = quadrature.get_weights();
 
 
       for (unsigned int i = 0; i < 32; ++i)

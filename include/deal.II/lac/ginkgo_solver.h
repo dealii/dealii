@@ -130,8 +130,8 @@ namespace GinkgoWrappers
      */
     void
     solve(const SparseMatrix<ValueType> &matrix,
-          Vector<ValueType> &            solution,
-          const Vector<ValueType> &      rhs);
+          Vector<ValueType>             &solution,
+          const Vector<ValueType>       &rhs);
 
     /**
      * Access to the object that controls convergence.
@@ -232,8 +232,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverCG(SolverControl &       solver_control,
-             const std::string &   exec_type,
+    SolverCG(SolverControl        &solver_control,
+             const std::string    &exec_type,
              const AdditionalData &data = AdditionalData());
 
     /**
@@ -249,10 +249,10 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverCG(SolverControl &                           solver_control,
-             const std::string &                       exec_type,
+    SolverCG(SolverControl                            &solver_control,
+             const std::string                        &exec_type,
              const std::shared_ptr<gko::LinOpFactory> &preconditioner,
-             const AdditionalData &                    data = AdditionalData());
+             const AdditionalData                     &data = AdditionalData());
 
   protected:
     /**
@@ -288,8 +288,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverBicgstab(SolverControl &       solver_control,
-                   const std::string &   exec_type,
+    SolverBicgstab(SolverControl        &solver_control,
+                   const std::string    &exec_type,
                    const AdditionalData &data = AdditionalData());
 
     /**
@@ -305,8 +305,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverBicgstab(SolverControl &                           solver_control,
-                   const std::string &                       exec_type,
+    SolverBicgstab(SolverControl                            &solver_control,
+                   const std::string                        &exec_type,
                    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
                    const AdditionalData &data = AdditionalData());
 
@@ -346,8 +346,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverCGS(SolverControl &       solver_control,
-              const std::string &   exec_type,
+    SolverCGS(SolverControl        &solver_control,
+              const std::string    &exec_type,
               const AdditionalData &data = AdditionalData());
 
     /**
@@ -363,8 +363,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverCGS(SolverControl &                           solver_control,
-              const std::string &                       exec_type,
+    SolverCGS(SolverControl                            &solver_control,
+              const std::string                        &exec_type,
               const std::shared_ptr<gko::LinOpFactory> &preconditioner,
               const AdditionalData &data = AdditionalData());
 
@@ -413,8 +413,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverFCG(SolverControl &       solver_control,
-              const std::string &   exec_type,
+    SolverFCG(SolverControl        &solver_control,
+              const std::string    &exec_type,
               const AdditionalData &data = AdditionalData());
 
     /**
@@ -430,8 +430,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverFCG(SolverControl &                           solver_control,
-              const std::string &                       exec_type,
+    SolverFCG(SolverControl                            &solver_control,
+              const std::string                        &exec_type,
               const std::shared_ptr<gko::LinOpFactory> &preconditioner,
               const AdditionalData &data = AdditionalData());
 
@@ -479,8 +479,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverGMRES(SolverControl &       solver_control,
-                const std::string &   exec_type,
+    SolverGMRES(SolverControl        &solver_control,
+                const std::string    &exec_type,
                 const AdditionalData &data = AdditionalData());
 
     /**
@@ -496,8 +496,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverGMRES(SolverControl &                           solver_control,
-                const std::string &                       exec_type,
+    SolverGMRES(SolverControl                            &solver_control,
+                const std::string                        &exec_type,
                 const std::shared_ptr<gko::LinOpFactory> &preconditioner,
                 const AdditionalData &data = AdditionalData());
 
@@ -538,8 +538,8 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverIR(SolverControl &       solver_control,
-             const std::string &   exec_type,
+    SolverIR(SolverControl        &solver_control,
+             const std::string    &exec_type,
              const AdditionalData &data = AdditionalData());
 
     /**
@@ -555,10 +555,10 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverIR(SolverControl &                           solver_control,
-             const std::string &                       exec_type,
+    SolverIR(SolverControl                            &solver_control,
+             const std::string                        &exec_type,
              const std::shared_ptr<gko::LinOpFactory> &inner_solver,
-             const AdditionalData &                    data = AdditionalData());
+             const AdditionalData                     &data = AdditionalData());
 
   protected:
     /**

@@ -146,13 +146,13 @@ namespace VectorTools
    */
   template <int dim, typename Number, class OutVector, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
-  void integrate_difference(const Mapping<dim, spacedim> &    mapping,
-                            const DoFHandler<dim, spacedim> & dof,
-                            const ReadVector<Number> &        fe_function,
+  void integrate_difference(const Mapping<dim, spacedim>     &mapping,
+                            const DoFHandler<dim, spacedim>  &dof,
+                            const ReadVector<Number>         &fe_function,
                             const Function<spacedim, Number> &exact_solution,
-                            OutVector &                       difference,
-                            const Quadrature<dim> &           q,
-                            const NormType &                  norm,
+                            OutVector                        &difference,
+                            const Quadrature<dim>            &q,
+                            const NormType                   &norm,
                             const Function<spacedim, double> *weight = nullptr,
                             const double                      exponent = 2.);
 
@@ -165,12 +165,12 @@ namespace VectorTools
    */
   template <int dim, typename Number, class OutVector, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
-  void integrate_difference(const DoFHandler<dim, spacedim> & dof,
-                            const ReadVector<Number> &        fe_function,
+  void integrate_difference(const DoFHandler<dim, spacedim>  &dof,
+                            const ReadVector<Number>         &fe_function,
                             const Function<spacedim, Number> &exact_solution,
-                            OutVector &                       difference,
-                            const Quadrature<dim> &           q,
-                            const NormType &                  norm,
+                            OutVector                        &difference,
+                            const Quadrature<dim>            &q,
+                            const NormType                   &norm,
                             const Function<spacedim, double> *weight = nullptr,
                             const double                      exponent = 2.);
 
@@ -183,12 +183,12 @@ namespace VectorTools
   template <int dim, typename Number, class OutVector, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
   void integrate_difference(const hp::MappingCollection<dim, spacedim> &mapping,
-                            const DoFHandler<dim, spacedim> &           dof,
-                            const ReadVector<Number> &        fe_function,
+                            const DoFHandler<dim, spacedim>            &dof,
+                            const ReadVector<Number>         &fe_function,
                             const Function<spacedim, Number> &exact_solution,
-                            OutVector &                       difference,
-                            const hp::QCollection<dim> &      q,
-                            const NormType &                  norm,
+                            OutVector                        &difference,
+                            const hp::QCollection<dim>       &q,
+                            const NormType                   &norm,
                             const Function<spacedim, double> *weight = nullptr,
                             const double                      exponent = 2.);
 
@@ -201,12 +201,12 @@ namespace VectorTools
    */
   template <int dim, typename Number, class OutVector, int spacedim>
   DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<OutVector>)
-  void integrate_difference(const DoFHandler<dim, spacedim> & dof,
-                            const ReadVector<Number> &        fe_function,
+  void integrate_difference(const DoFHandler<dim, spacedim>  &dof,
+                            const ReadVector<Number>         &fe_function,
                             const Function<spacedim, Number> &exact_solution,
-                            OutVector &                       difference,
-                            const hp::QCollection<dim> &      q,
-                            const NormType &                  norm,
+                            OutVector                        &difference,
+                            const hp::QCollection<dim>       &q,
+                            const NormType                   &norm,
                             const Function<spacedim, double> *weight = nullptr,
                             const double                      exponent = 2.);
 

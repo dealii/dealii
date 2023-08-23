@@ -68,7 +68,7 @@ test()
             << std::endl;
 
     std::vector<char> data(particle.serialized_size_in_bytes());
-    void *            write_pointer = static_cast<void *>(&data.front());
+    void             *write_pointer = static_cast<void *>(&data.front());
 
     write_pointer = particle.write_particle_data_to_memory(write_pointer);
 

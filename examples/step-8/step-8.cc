@@ -136,7 +136,7 @@ namespace Step8
   // just fine in 3d, however.
   template <int dim>
   void right_hand_side(const std::vector<Point<dim>> &points,
-                       std::vector<Tensor<1, dim>> &  values)
+                       std::vector<Tensor<1, dim>>   &values)
   {
     AssertDimension(values.size(), points.size());
     Assert(dim >= 2, ExcNotImplemented());

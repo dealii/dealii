@@ -58,9 +58,9 @@ namespace FETools
   template <int dim, int spacedim, class InVector, class OutVector>
   void
   interpolate(const DoFHandler<dim, spacedim> &dof1,
-              const InVector &                 u1,
+              const InVector                  &u1,
               const DoFHandler<dim, spacedim> &dof2,
-              OutVector &                      u2)
+              OutVector                       &u2)
   {
     AffineConstraints<typename OutVector::value_type> dummy;
     dummy.close();
@@ -72,11 +72,11 @@ namespace FETools
   template <int dim, int spacedim, class InVector, class OutVector>
   void
   interpolate(
-    const DoFHandler<dim, spacedim> &                        dof1,
-    const InVector &                                         u1,
-    const DoFHandler<dim, spacedim> &                        dof2,
+    const DoFHandler<dim, spacedim>                         &dof1,
+    const InVector                                          &u1,
+    const DoFHandler<dim, spacedim>                         &dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints,
-    OutVector &                                              u2)
+    OutVector                                               &u2)
   {
     Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
            ExcTriangulationMismatch());
@@ -255,10 +255,10 @@ namespace FETools
 
   template <int dim, class InVector, class OutVector, int spacedim>
   void
-  back_interpolate(const DoFHandler<dim, spacedim> &   dof1,
-                   const InVector &                    u1,
+  back_interpolate(const DoFHandler<dim, spacedim>    &dof1,
+                   const InVector                     &u1,
                    const FiniteElement<dim, spacedim> &fe2,
-                   OutVector &                         u1_interpolated)
+                   OutVector                          &u1_interpolated)
   {
     Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),
@@ -350,12 +350,12 @@ namespace FETools
     template <int dim, int spacedim, class InVector>
     std::enable_if_t<is_serial_vector<InVector>::value>
     back_interpolate(
-      const DoFHandler<dim, spacedim> &                       dof1,
+      const DoFHandler<dim, spacedim>                        &dof1,
       const AffineConstraints<typename InVector::value_type> &constraints1,
-      const InVector &                                        u1,
-      const DoFHandler<dim, spacedim> &                       dof2,
+      const InVector                                         &u1,
+      const DoFHandler<dim, spacedim>                        &dof2,
       const AffineConstraints<typename InVector::value_type> &constraints2,
-      InVector &                                              u1_interpolated)
+      InVector                                               &u1_interpolated)
     {
       Vector<typename InVector::value_type> u2(dof2.n_dofs());
       interpolate(dof1, u1, dof2, constraints2, u2);
@@ -371,11 +371,11 @@ namespace FETools
     back_interpolate(
       const DoFHandler<dim, spacedim> &dof1,
       const AffineConstraints<PETScWrappers::MPI::Vector::value_type>
-        &                               constraints1,
+                                       &constraints1,
       const PETScWrappers::MPI::Vector &u1,
-      const DoFHandler<dim, spacedim> & dof2,
+      const DoFHandler<dim, spacedim>  &dof2,
       const AffineConstraints<PETScWrappers::MPI::Vector::value_type>
-        &                         constraints2,
+                                 &constraints2,
       PETScWrappers::MPI::Vector &u1_interpolated)
     {
       // if u1 is a parallel distributed PETSc vector, we create a
@@ -421,11 +421,11 @@ namespace FETools
       const DoFHandler<dim, spacedim> &dof1,
       const AffineConstraints<
         typename TrilinosWrappers::MPI::Vector::value_type> &constraints1,
-      const TrilinosWrappers::MPI::Vector &                  u1,
-      const DoFHandler<dim, spacedim> &                      dof2,
+      const TrilinosWrappers::MPI::Vector                   &u1,
+      const DoFHandler<dim, spacedim>                       &dof2,
       const AffineConstraints<
         typename TrilinosWrappers::MPI::Vector::value_type> &constraints2,
-      TrilinosWrappers::MPI::Vector &                        u1_interpolated)
+      TrilinosWrappers::MPI::Vector                         &u1_interpolated)
     {
       // if u1 is a parallel distributed Trilinos vector, we create a
       // vector u2 with based on the sets of locally owned and relevant
@@ -452,8 +452,8 @@ namespace FETools
       const DoFHandler<dim, spacedim> &dof1,
       const AffineConstraints<
         typename TrilinosWrappers::MPI::BlockVector::value_type> &constraints1,
-      const TrilinosWrappers::MPI::BlockVector &                  u1,
-      const DoFHandler<dim, spacedim> &                           dof2,
+      const TrilinosWrappers::MPI::BlockVector                   &u1,
+      const DoFHandler<dim, spacedim>                            &dof2,
       const AffineConstraints<
         typename TrilinosWrappers::MPI::BlockVector::value_type> &constraints2,
       TrilinosWrappers::MPI::BlockVector &u1_interpolated)
@@ -516,12 +516,12 @@ namespace FETools
     template <int dim, int spacedim, typename Number>
     void
     back_interpolate(
-      const DoFHandler<dim, spacedim> &                 dof1,
-      const AffineConstraints<Number> &                 constraints1,
+      const DoFHandler<dim, spacedim>                  &dof1,
+      const AffineConstraints<Number>                  &constraints1,
       const LinearAlgebra::distributed::Vector<Number> &u1,
-      const DoFHandler<dim, spacedim> &                 dof2,
-      const AffineConstraints<Number> &                 constraints2,
-      LinearAlgebra::distributed::Vector<Number> &      u1_interpolated)
+      const DoFHandler<dim, spacedim>                  &dof2,
+      const AffineConstraints<Number>                  &constraints2,
+      LinearAlgebra::distributed::Vector<Number>       &u1_interpolated)
     {
       const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
       IndexSet        dof2_locally_relevant_dofs;
@@ -557,12 +557,12 @@ namespace FETools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   back_interpolate(
-    const DoFHandler<dim, spacedim> &                        dof1,
+    const DoFHandler<dim, spacedim>                         &dof1,
     const AffineConstraints<typename OutVector::value_type> &constraints1,
-    const InVector &                                         u1,
-    const DoFHandler<dim, spacedim> &                        dof2,
+    const InVector                                          &u1,
+    const DoFHandler<dim, spacedim>                         &dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints2,
-    OutVector &                                              u1_interpolated)
+    OutVector                                               &u1_interpolated)
   {
     // For discontinuous elements without constraints take the simpler version
     // of the back_interpolate function.
@@ -592,10 +592,10 @@ namespace FETools
 
   template <int dim, class InVector, class OutVector, int spacedim>
   void
-  interpolation_difference(const DoFHandler<dim, spacedim> &   dof1,
-                           const InVector &                    u1,
+  interpolation_difference(const DoFHandler<dim, spacedim>    &dof1,
+                           const InVector                     &u1,
                            const FiniteElement<dim, spacedim> &fe2,
-                           OutVector &                         u1_difference)
+                           OutVector                          &u1_difference)
   {
     Assert(dof1.get_fe(0).n_components() == fe2.n_components(),
            ExcDimensionMismatch(dof1.get_fe(0).n_components(),
@@ -670,12 +670,12 @@ namespace FETools
     template <int dim, class InVector, class OutVector, int spacedim>
     void
     interpolation_difference(
-      const DoFHandler<dim, spacedim> &                        dof1,
+      const DoFHandler<dim, spacedim>                         &dof1,
       const AffineConstraints<typename OutVector::value_type> &constraints1,
-      const InVector &                                         u1,
-      const DoFHandler<dim, spacedim> &                        dof2,
+      const InVector                                          &u1,
+      const DoFHandler<dim, spacedim>                         &dof2,
       const AffineConstraints<typename OutVector::value_type> &constraints2,
-      OutVector &                                              u1_difference)
+      OutVector                                               &u1_difference)
     {
       back_interpolate(
         dof1, constraints1, u1, dof2, constraints2, u1_difference);
@@ -689,11 +689,11 @@ namespace FETools
     interpolation_difference(
       const DoFHandler<dim, spacedim> &dof1,
       const AffineConstraints<TrilinosWrappers::MPI::Vector::value_type>
-        &                                  constraints1,
+                                          &constraints1,
       const TrilinosWrappers::MPI::Vector &u1,
-      const DoFHandler<dim, spacedim> &    dof2,
+      const DoFHandler<dim, spacedim>     &dof2,
       const AffineConstraints<TrilinosWrappers::MPI::Vector::value_type>
-        &                            constraints2,
+                                    &constraints2,
       TrilinosWrappers::MPI::Vector &u1_difference)
     {
       back_interpolate(
@@ -717,12 +717,12 @@ namespace FETools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   interpolation_difference(
-    const DoFHandler<dim, spacedim> &                        dof1,
+    const DoFHandler<dim, spacedim>                         &dof1,
     const AffineConstraints<typename OutVector::value_type> &constraints1,
-    const InVector &                                         u1,
-    const DoFHandler<dim, spacedim> &                        dof2,
+    const InVector                                          &u1,
+    const DoFHandler<dim, spacedim>                         &dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints2,
-    OutVector &                                              u1_difference)
+    OutVector                                               &u1_difference)
   {
     // For discontinuous elements
     // without constraints take the
@@ -744,9 +744,9 @@ namespace FETools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   project_dg(const DoFHandler<dim, spacedim> &dof1,
-             const InVector &                 u1,
+             const InVector                  &u1,
              const DoFHandler<dim, spacedim> &dof2,
-             OutVector &                      u2)
+             OutVector                       &u2)
   {
     Assert(&dof1.get_triangulation() == &dof2.get_triangulation(),
            ExcTriangulationMismatch());

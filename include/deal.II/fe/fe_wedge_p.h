@@ -40,7 +40,7 @@ public:
    * Constructor.
    */
   FE_WedgePoly(const unsigned int                                degree,
-               const internal::GenericDoFsPerObject &            dpos,
+               const internal::GenericDoFsPerObject             &dpos,
                const typename FiniteElementData<dim>::Conformity conformity);
 
   /**
@@ -49,7 +49,7 @@ public:
   virtual void
   convert_generalized_support_point_values_to_dof_values(
     const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              nodal_values) const override;
+    std::vector<double>               &nodal_values) const override;
 };
 
 /**

@@ -27,9 +27,9 @@
 
 void
 test(const unsigned int chunk_size,
-     Vector<double> &   v,
-     Vector<double> &   w,
-     Vector<double> &   x)
+     Vector<double>    &v,
+     Vector<double>    &w,
+     Vector<double>    &x)
 {
   // set some entries in the
   // matrix. actually, set them all

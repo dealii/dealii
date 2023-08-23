@@ -50,7 +50,7 @@ Quadrature<dim>::Quadrature(const unsigned int n_q)
 template <int dim>
 void
 Quadrature<dim>::initialize(const std::vector<Point<dim>> &p,
-                            const std::vector<double> &    w)
+                            const std::vector<double>     &w)
 {
   AssertDimension(w.size(), p.size());
   quadrature_points      = p;
@@ -62,7 +62,7 @@ Quadrature<dim>::initialize(const std::vector<Point<dim>> &p,
 
 template <int dim>
 Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points,
-                            const std::vector<double> &    weights)
+                            const std::vector<double>     &weights)
   : quadrature_points(points)
   , weights(weights)
   , is_tensor_product_flag(dim == 1)
@@ -75,7 +75,7 @@ Quadrature<dim>::Quadrature(const std::vector<Point<dim>> &points,
 
 template <int dim>
 Quadrature<dim>::Quadrature(std::vector<Point<dim>> &&points,
-                            std::vector<double> &&    weights)
+                            std::vector<double>     &&weights)
   : quadrature_points(std::move(points))
   , weights(std::move(weights))
   , is_tensor_product_flag(dim == 1)
@@ -500,7 +500,7 @@ QIterated<0>::QIterated(const Quadrature<1> &, const unsigned int)
 
 
 template <>
-QIterated<1>::QIterated(const Quadrature<1> &        base_quadrature,
+QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
                         const std::vector<Point<1>> &intervals)
   : Quadrature<1>(
       internal::QIteratedImplementation::uses_both_endpoints(base_quadrature) ?
@@ -627,7 +627,7 @@ QIterated<1>::QIterated(const Quadrature<1> &base_quadrature,
 // construct higher dimensional quadrature formula by tensor product
 // of lower dimensional iterated quadrature formulae
 template <int dim>
-QIterated<dim>::QIterated(const Quadrature<1> &        base_quadrature,
+QIterated<dim>::QIterated(const Quadrature<1>         &base_quadrature,
                           const std::vector<Point<1>> &intervals)
   : Quadrature<dim>(QIterated<dim - 1>(base_quadrature, intervals),
                     QIterated<1>(base_quadrature, intervals))

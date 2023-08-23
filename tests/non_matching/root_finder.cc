@@ -106,7 +106,7 @@ public:
   };
 
   Tensor<1, 1>
-  gradient(const Point<1> &   point,
+  gradient(const Point<1>    &point,
            const unsigned int component = 0) const override
   {
     Tensor<1, 1> grad;
@@ -116,7 +116,7 @@ public:
   };
 
   SymmetricTensor<2, 1>
-  hessian(const Point<1> &   point,
+  hessian(const Point<1>    &point,
           const unsigned int component = 0) const override
   {
     SymmetricTensor<2, 1> grad;

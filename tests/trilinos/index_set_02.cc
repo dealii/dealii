@@ -47,7 +47,8 @@ test()
       set_ghost.add_range(45, 100);
     }
   else
-    {}
+    {
+    }
 
   auto check = [&](IndexSet &idxset) {
     deallog << "IndexSet before size=" << idxset.size() << " values: ";

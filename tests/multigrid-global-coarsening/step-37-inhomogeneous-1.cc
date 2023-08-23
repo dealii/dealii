@@ -131,7 +131,7 @@ namespace Step37
 
   template <int dim>
   double
-  Coefficient<dim>::value(const Point<dim> & p,
+  Coefficient<dim>::value(const Point<dim>  &p,
                           const unsigned int component) const
   {
     return value<double>(p, component);
@@ -166,20 +166,20 @@ namespace Step37
   private:
     virtual void
     apply_add(
-      LinearAlgebra::distributed::Vector<number> &      dst,
+      LinearAlgebra::distributed::Vector<number>       &dst,
       const LinearAlgebra::distributed::Vector<number> &src) const override;
 
     void
-    local_apply(const MatrixFree<dim, number> &                   data,
-                LinearAlgebra::distributed::Vector<number> &      dst,
+    local_apply(const MatrixFree<dim, number>                    &data,
+                LinearAlgebra::distributed::Vector<number>       &dst,
                 const LinearAlgebra::distributed::Vector<number> &src,
                 const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     void
     local_compute_diagonal(
-      const MatrixFree<dim, number> &              data,
-      LinearAlgebra::distributed::Vector<number> & dst,
-      const unsigned int &                         dummy,
+      const MatrixFree<dim, number>               &data,
+      LinearAlgebra::distributed::Vector<number>  &dst,
+      const unsigned int                          &dummy,
       const std::pair<unsigned int, unsigned int> &cell_range) const;
 
     Table<2, VectorizedArray<number>> coefficient;
@@ -229,10 +229,10 @@ namespace Step37
   template <int dim, int fe_degree, typename number>
   void
   LaplaceOperator<dim, fe_degree, number>::local_apply(
-    const MatrixFree<dim, number> &                   data,
-    LinearAlgebra::distributed::Vector<number> &      dst,
+    const MatrixFree<dim, number>                    &data,
+    LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src,
-    const std::pair<unsigned int, unsigned int> &     cell_range) const
+    const std::pair<unsigned int, unsigned int>      &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
 
@@ -256,7 +256,7 @@ namespace Step37
   template <int dim, int fe_degree, typename number>
   void
   LaplaceOperator<dim, fe_degree, number>::apply_add(
-    LinearAlgebra::distributed::Vector<number> &      dst,
+    LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src) const
   {
     this->data->cell_loop(&LaplaceOperator::local_apply, this, dst, src);
@@ -296,7 +296,7 @@ namespace Step37
   template <int dim, int fe_degree, typename number>
   void
   LaplaceOperator<dim, fe_degree, number>::local_compute_diagonal(
-    const MatrixFree<dim, number> &             data,
+    const MatrixFree<dim, number>              &data,
     LinearAlgebra::distributed::Vector<number> &dst,
     const unsigned int &,
     const std::pair<unsigned int, unsigned int> &cell_range) const

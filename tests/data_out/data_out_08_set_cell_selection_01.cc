@@ -99,7 +99,7 @@ check()
       return cell;
     },
 
-    [](const Triangulation<dim> &                        t,
+    [](const Triangulation<dim>                         &t,
        const typename Triangulation<dim>::cell_iterator &old_cell) ->
     typename Triangulation<dim>::cell_iterator {
       if (old_cell != t.end())

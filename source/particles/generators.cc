@@ -63,8 +63,8 @@ namespace Particles
       std::vector<double>
       compute_local_cumulative_cell_weights(
         const Triangulation<dim, spacedim> &triangulation,
-        const Mapping<dim, spacedim> &      mapping,
-        const Function<spacedim> &          probability_density_function)
+        const Mapping<dim, spacedim>       &mapping,
+        const Function<spacedim>           &probability_density_function)
       {
         std::vector<double> cumulative_cell_weights(
           triangulation.n_active_cells());
@@ -119,7 +119,7 @@ namespace Particles
       random_location_in_cell(
         const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
         const Mapping<dim, spacedim> &mapping,
-        std::mt19937 &                random_number_generator)
+        std::mt19937                 &random_number_generator)
       {
         Assert(cell->reference_cell().is_hyper_cube() == true,
                ExcNotImplemented());
@@ -182,9 +182,9 @@ namespace Particles
     void
     regular_reference_locations(
       const Triangulation<dim, spacedim> &triangulation,
-      const std::vector<Point<dim>> &     particle_reference_locations,
-      ParticleHandler<dim, spacedim> &    particle_handler,
-      const Mapping<dim, spacedim> &      mapping)
+      const std::vector<Point<dim>>      &particle_reference_locations,
+      ParticleHandler<dim, spacedim>     &particle_handler,
+      const Mapping<dim, spacedim>       &mapping)
     {
       types::particle_index particle_index = 0;
       types::particle_index n_particles_to_generate =
@@ -239,7 +239,7 @@ namespace Particles
     random_particle_in_cell(
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
       const types::particle_index                                        id,
-      std::mt19937 &                random_number_generator,
+      std::mt19937                 &random_number_generator,
       const Mapping<dim, spacedim> &mapping)
     {
       const auto position_and_reference_position =
@@ -256,9 +256,9 @@ namespace Particles
     random_particle_in_cell_insert(
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
       const types::particle_index                                        id,
-      std::mt19937 &                  random_number_generator,
+      std::mt19937                   &random_number_generator,
       ParticleHandler<dim, spacedim> &particle_handler,
-      const Mapping<dim, spacedim> &  mapping)
+      const Mapping<dim, spacedim>   &mapping)
     {
       const auto position_and_reference_position =
         random_location_in_cell(cell, mapping, random_number_generator);
@@ -275,11 +275,11 @@ namespace Particles
     void
     probabilistic_locations(
       const Triangulation<dim, spacedim> &triangulation,
-      const Function<spacedim> &          probability_density_function,
+      const Function<spacedim>           &probability_density_function,
       const bool                          random_cell_selection,
       const types::particle_index         n_particles_to_create,
-      ParticleHandler<dim, spacedim> &    particle_handler,
-      const Mapping<dim, spacedim> &      mapping,
+      ParticleHandler<dim, spacedim>     &particle_handler,
+      const Mapping<dim, spacedim>       &mapping,
       const unsigned int                  random_number_seed)
     {
       unsigned int combined_seed = random_number_seed;
@@ -455,10 +455,10 @@ namespace Particles
     void
     dof_support_points(const DoFHandler<dim, spacedim> &dof_handler,
                        const std::vector<std::vector<BoundingBox<spacedim>>>
-                         &                             global_bounding_boxes,
+                                                      &global_bounding_boxes,
                        ParticleHandler<dim, spacedim> &particle_handler,
-                       const Mapping<dim, spacedim> &  mapping,
-                       const ComponentMask &           components,
+                       const Mapping<dim, spacedim>   &mapping,
+                       const ComponentMask            &components,
                        const std::vector<std::vector<double>> &properties)
     {
       const auto &fe = dof_handler.get_fe();
@@ -489,12 +489,12 @@ namespace Particles
     void
     quadrature_points(
       const Triangulation<dim, spacedim> &triangulation,
-      const Quadrature<dim> &             quadrature,
+      const Quadrature<dim>              &quadrature,
       // const std::vector<Point<dim>> &     particle_reference_locations,
       const std::vector<std::vector<BoundingBox<spacedim>>>
-        &                                     global_bounding_boxes,
-      ParticleHandler<dim, spacedim> &        particle_handler,
-      const Mapping<dim, spacedim> &          mapping,
+                                             &global_bounding_boxes,
+      ParticleHandler<dim, spacedim>         &particle_handler,
+      const Mapping<dim, spacedim>           &mapping,
       const std::vector<std::vector<double>> &properties)
     {
       const std::vector<Point<dim>> &particle_reference_locations =

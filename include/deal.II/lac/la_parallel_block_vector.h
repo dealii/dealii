@@ -188,7 +188,7 @@ namespace LinearAlgebra
        */
       BlockVector(
         const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-          &             partitioners,
+                       &partitioners,
         const MPI_Comm &comm_sm = MPI_COMM_SELF);
 
       /**
@@ -359,7 +359,7 @@ namespace LinearAlgebra
       void
       reinit(
         const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-          &             partitioners,
+                       &partitioners,
         const MPI_Comm &comm_sm = MPI_COMM_SELF);
 
       /**
@@ -371,7 +371,7 @@ namespace LinearAlgebra
       void
       reinit(
         const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-          &             partitioners,
+                       &partitioners,
         const bool      make_ghosted,
         const MPI_Comm &comm_sm = MPI_COMM_SELF);
 
@@ -459,7 +459,7 @@ namespace LinearAlgebra
        */
       template <typename OtherNumber>
       void
-      add(const std::vector<size_type> &       indices,
+      add(const std::vector<size_type>        &indices,
           const ::dealii::Vector<OtherNumber> &values);
 
       /**
@@ -591,7 +591,7 @@ namespace LinearAlgebra
        */
       template <typename FullMatrixType>
       void
-      multivector_inner_product(FullMatrixType &           matrix,
+      multivector_inner_product(FullMatrixType            &matrix,
                                 const BlockVector<Number> &V,
                                 const bool symmetric = false) const;
 
@@ -613,7 +613,7 @@ namespace LinearAlgebra
        */
       template <typename FullMatrixType>
       Number
-      multivector_inner_product_with_metric(const FullMatrixType &     matrix,
+      multivector_inner_product_with_metric(const FullMatrixType      &matrix,
                                             const BlockVector<Number> &V,
                                             const bool symmetric = false) const;
 
@@ -628,7 +628,7 @@ namespace LinearAlgebra
        */
       template <typename FullMatrixType>
       void
-      mmult(BlockVector<Number> & V,
+      mmult(BlockVector<Number>  &V,
             const FullMatrixType &matrix,
             const Number          s = Number(0.),
             const Number          b = Number(1.)) const;
@@ -660,7 +660,7 @@ namespace LinearAlgebra
        */
       void
       add(const std::vector<size_type> &indices,
-          const std::vector<Number> &   values);
+          const std::vector<Number>    &values);
 
       /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this =
@@ -760,7 +760,7 @@ namespace LinearAlgebra
        * Print the vector to the output stream @p out.
        */
       void
-      print(std::ostream &     out,
+      print(std::ostream      &out,
             const unsigned int precision  = 3,
             const bool         scientific = true,
             const bool         across     = true) const;

@@ -245,7 +245,7 @@ public:
   template <typename Type, typename Arg, typename... Args>
   Type &
   get_or_add_object_with_name(const std::string &name,
-                              Arg &              argument,
+                              Arg               &argument,
                               Args &...arguments);
 
   /**
@@ -272,7 +272,7 @@ public:
   template <typename Type, typename Arg, typename... Args>
   Type &
   get_or_add_object_with_name(const std::string &name,
-                              Arg &&             argument,
+                              Arg              &&argument,
                               Args &&...arguments);
 
   /**
@@ -391,7 +391,7 @@ GeneralDataStorage::add_unique_copy(const std::string &name, const Type &entry)
 template <typename Type>
 void
 GeneralDataStorage::add_or_overwrite_copy(const std::string &name,
-                                          const Type &       entry)
+                                          const Type        &entry)
 {
   any_data[name] = entry;
 }
@@ -409,7 +409,7 @@ GeneralDataStorage::add_unique_reference(const std::string &name, Type &entry)
 template <typename Type>
 void
 GeneralDataStorage::add_or_overwrite_reference(const std::string &name,
-                                               Type &             entry)
+                                               Type              &entry)
 {
   Type *ptr      = &entry;
   any_data[name] = ptr;
@@ -478,7 +478,7 @@ GeneralDataStorage::get_object_with_name(const std::string &name) const
 template <typename Type, typename Arg>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
-                                                Arg &              argument)
+                                                Arg               &argument)
 {
   if (!stores_object_with_name(name))
     add_unique_copy(name, Type(argument));
@@ -491,7 +491,7 @@ GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
 template <typename Type, typename Arg, typename... Args>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
-                                                Arg &              argument,
+                                                Arg               &argument,
                                                 Args &...arguments)
 {
   if (!stores_object_with_name(name))
@@ -505,7 +505,7 @@ GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
 template <typename Type, typename Arg>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
-                                                Arg &&             argument)
+                                                Arg              &&argument)
 {
   if (!stores_object_with_name(name))
     add_unique_copy(name, Type(std::forward<Arg>(argument)));
@@ -518,7 +518,7 @@ GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
 template <typename Type, typename Arg, typename... Args>
 Type &
 GeneralDataStorage::get_or_add_object_with_name(const std::string &name,
-                                                Arg &&             argument,
+                                                Arg              &&argument,
                                                 Args &&...arguments)
 {
   if (!stores_object_with_name(name))

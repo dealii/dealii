@@ -51,8 +51,8 @@ template <class PRECONDITIONER,
           class VECTOR,
           class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
 void
-test_preconditioner(const MATRIX &         A,
-                    const VECTOR &         b,
+test_preconditioner(const MATRIX          &A,
+                    const VECTOR          &b,
                     const ADDITIONAL_DATA &data = ADDITIONAL_DATA())
 {
   const auto lo_A = linear_operator<VECTOR>(A);

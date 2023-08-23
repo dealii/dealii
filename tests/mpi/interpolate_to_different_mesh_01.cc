@@ -60,7 +60,7 @@ public:
 template <int dim>
 void
 setup(DoFHandler<dim> &dh,
-      FE_Q<dim> &      fe,
+      FE_Q<dim>       &fe,
       LA::MPI::Vector &vec,
       LA::MPI::Vector &lr_vec)
 {
@@ -73,8 +73,8 @@ setup(DoFHandler<dim> &dh,
 
 template <int dim>
 void
-output(DoFHandler<dim> & dh,
-       LA::MPI::Vector & v,
+output(DoFHandler<dim>  &dh,
+       LA::MPI::Vector  &v,
        unsigned int      loop,
        const std::string filename_)
 {

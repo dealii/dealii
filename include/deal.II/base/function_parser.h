@@ -309,9 +309,9 @@ public:
    * do not consider time.
    */
   virtual void
-  initialize(const std::string &             vars,
+  initialize(const std::string              &vars,
              const std::vector<std::string> &expressions,
-             const ConstMap &                constants,
+             const ConstMap                 &constants,
              const bool                      time_dependent = false) override;
 
   /**
@@ -324,7 +324,7 @@ public:
   void
   initialize(const std::string &vars,
              const std::string &expression,
-             const ConstMap &   constants,
+             const ConstMap    &constants,
              const bool         time_dependent = false);
 
   /**

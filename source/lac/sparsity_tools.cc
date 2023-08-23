@@ -54,10 +54,10 @@ namespace SparsityTools
   namespace
   {
     void
-    partition_metis(const SparsityPattern &          sparsity_pattern,
+    partition_metis(const SparsityPattern           &sparsity_pattern,
                     const std::vector<unsigned int> &cell_weights,
                     const unsigned int               n_partitions,
-                    std::vector<unsigned int> &      partition_indices)
+                    std::vector<unsigned int>       &partition_indices)
     {
       // Make sure that METIS is actually
       // installed and detected
@@ -254,7 +254,7 @@ namespace SparsityTools
                   ZOLTAN_ID_PTR /*localID*/,
                   int * /*num_edges*/,
                   ZOLTAN_ID_PTR nborGID,
-                  int *         nborProc,
+                  int          *nborProc,
                   int /*wgt_dim*/,
                   float * /*ewgts*/,
                   int *ierr)
@@ -263,7 +263,7 @@ namespace SparsityTools
       *ierr                  = ZOLTAN_OK;
 
       ZOLTAN_ID_PTR nextNborGID  = nborGID;
-      int *         nextNborProc = nborProc;
+      int          *nextNborProc = nborProc;
 
       // Loop through rows corresponding to indices in globalID implicitly
       for (SparsityPattern::size_type i = 0;
@@ -289,10 +289,10 @@ namespace SparsityTools
 
 
     void
-    partition_zoltan(const SparsityPattern &          sparsity_pattern,
+    partition_zoltan(const SparsityPattern           &sparsity_pattern,
                      const std::vector<unsigned int> &cell_weights,
                      const unsigned int               n_partitions,
-                     std::vector<unsigned int> &      partition_indices)
+                     std::vector<unsigned int>       &partition_indices)
     {
       // Make sure that ZOLTAN is actually
       // installed and detected
@@ -354,13 +354,13 @@ namespace SparsityTools
       int           num_import        = 0;
       ZOLTAN_ID_PTR import_global_ids = nullptr;
       ZOLTAN_ID_PTR import_local_ids  = nullptr;
-      int *         import_procs      = nullptr;
-      int *         import_to_part    = nullptr;
+      int          *import_procs      = nullptr;
+      int          *import_to_part    = nullptr;
       int           num_export        = 0;
       ZOLTAN_ID_PTR export_global_ids = nullptr;
       ZOLTAN_ID_PTR export_local_ids  = nullptr;
-      int *         export_procs      = nullptr;
-      int *         export_to_part    = nullptr;
+      int          *export_procs      = nullptr;
+      int          *export_to_part    = nullptr;
 
       // call partitioner
       const int rc = zz->LB_Partition(changes,
@@ -396,7 +396,7 @@ namespace SparsityTools
 
 
   void
-  partition(const SparsityPattern &    sparsity_pattern,
+  partition(const SparsityPattern     &sparsity_pattern,
             const unsigned int         n_partitions,
             std::vector<unsigned int> &partition_indices,
             const Partitioner          partitioner)
@@ -413,10 +413,10 @@ namespace SparsityTools
 
 
   void
-  partition(const SparsityPattern &          sparsity_pattern,
+  partition(const SparsityPattern           &sparsity_pattern,
             const std::vector<unsigned int> &cell_weights,
             const unsigned int               n_partitions,
-            std::vector<unsigned int> &      partition_indices,
+            std::vector<unsigned int>       &partition_indices,
             const Partitioner                partitioner)
   {
     Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
@@ -452,7 +452,7 @@ namespace SparsityTools
 
 
   unsigned int
-  color_sparsity_pattern(const SparsityPattern &    sparsity_pattern,
+  color_sparsity_pattern(const SparsityPattern     &sparsity_pattern,
                          std::vector<unsigned int> &color_indices)
   {
     // Make sure that ZOLTAN is actually
@@ -486,12 +486,12 @@ namespace SparsityTools
     zz->Set_Edge_List_Multi_Fn(get_edge_list, &graph);
 
     // Variables needed by coloring function
-    int num_gid_entries = 1;
-    const int num_objects = graph.n_rows();
+    int       num_gid_entries = 1;
+    const int num_objects     = graph.n_rows();
 
     // Preallocate input variables. Element type fixed by ZOLTAN.
     std::vector<ZOLTAN_ID_TYPE> global_ids(num_objects);
-    std::vector<int> color_exp(num_objects);
+    std::vector<int>            color_exp(num_objects);
 
     // Set ids for which coloring needs to be done
     for (int i = 0; i < num_objects; ++i)
@@ -530,7 +530,7 @@ namespace SparsityTools
      */
     DynamicSparsityPattern::size_type
     find_unnumbered_starting_index(
-      const DynamicSparsityPattern &                        sparsity,
+      const DynamicSparsityPattern                         &sparsity,
       const std::vector<DynamicSparsityPattern::size_type> &new_indices)
     {
       DynamicSparsityPattern::size_type starting_point =
@@ -577,8 +577,8 @@ namespace SparsityTools
 
   void
   reorder_Cuthill_McKee(
-    const DynamicSparsityPattern &                        sparsity,
-    std::vector<DynamicSparsityPattern::size_type> &      new_indices,
+    const DynamicSparsityPattern                         &sparsity,
+    std::vector<DynamicSparsityPattern::size_type>       &new_indices,
     const std::vector<DynamicSparsityPattern::size_type> &starting_indices)
   {
     Assert(sparsity.n_rows() == sparsity.n_cols(),
@@ -724,7 +724,7 @@ namespace SparsityTools
   {
     void
     reorder_hierarchical(
-      const DynamicSparsityPattern &                  connectivity,
+      const DynamicSparsityPattern                   &connectivity,
       std::vector<DynamicSparsityPattern::size_type> &renumbering)
     {
       AssertDimension(connectivity.n_rows(), connectivity.n_cols());
@@ -896,7 +896,7 @@ namespace SparsityTools
 
   void
   reorder_hierarchical(
-    const DynamicSparsityPattern &                  connectivity,
+    const DynamicSparsityPattern                   &connectivity,
     std::vector<DynamicSparsityPattern::size_type> &renumbering)
   {
     // the internal renumbering keeps the numbering the wrong way around (but
@@ -912,9 +912,9 @@ namespace SparsityTools
 
   void
   gather_sparsity_pattern(DynamicSparsityPattern &dsp,
-                          const IndexSet &        locally_owned_rows,
+                          const IndexSet         &locally_owned_rows,
                           const MPI_Comm          mpi_comm,
-                          const IndexSet &        locally_relevant_rows)
+                          const IndexSet         &locally_relevant_rows)
   {
     using map_vec_t =
       std::map<unsigned int, std::vector<DynamicSparsityPattern::size_type>>;
@@ -1004,10 +1004,10 @@ namespace SparsityTools
 
   void
   distribute_sparsity_pattern(
-    DynamicSparsityPattern &                              dsp,
+    DynamicSparsityPattern                               &dsp,
     const std::vector<DynamicSparsityPattern::size_type> &rows_per_cpu,
     const MPI_Comm                                        mpi_comm,
-    const IndexSet &                                      myrange)
+    const IndexSet                                       &myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
     std::vector<DynamicSparsityPattern::size_type> start_index(
@@ -1026,9 +1026,9 @@ namespace SparsityTools
 
   void
   distribute_sparsity_pattern(DynamicSparsityPattern &dsp,
-                              const IndexSet &        locally_owned_rows,
+                              const IndexSet         &locally_owned_rows,
                               const MPI_Comm          mpi_comm,
-                              const IndexSet &        locally_relevant_rows)
+                              const IndexSet         &locally_relevant_rows)
   {
     IndexSet requested_rows(locally_relevant_rows);
     requested_rows.subtract_set(locally_owned_rows);
@@ -1095,7 +1095,7 @@ namespace SparsityTools
   distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
                               const std::vector<IndexSet> &owned_set_per_cpu,
                               const MPI_Comm               mpi_comm,
-                              const IndexSet &             myrange)
+                              const IndexSet              &myrange)
   {
     const unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
     distribute_sparsity_pattern(dsp,
@@ -1108,7 +1108,7 @@ namespace SparsityTools
 
   void
   distribute_sparsity_pattern(BlockDynamicSparsityPattern &dsp,
-                              const IndexSet &             locally_owned_rows,
+                              const IndexSet              &locally_owned_rows,
                               const MPI_Comm               mpi_comm,
                               const IndexSet &locally_relevant_rows)
   {

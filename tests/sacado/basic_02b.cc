@@ -56,8 +56,8 @@ void
 df(const double &x,
    const double &y,
    const double &z,
-   double &      df_dx,
-   double &      df_dy)
+   double       &df_dx,
+   double       &df_dy)
 {
   df_dx = z * (3.0 * x * x + 0.5 * y * y);
   df_dy = z * (2.0 * z * y + x * y);
@@ -66,8 +66,8 @@ void
 dg(const double &x,
    const double &y,
    const double &z,
-   double &      dg_dx,
-   double &      dg_dy)
+   double       &dg_dx,
+   double       &dg_dy)
 {
   dg_dx = z * std::cos(x * z) * std::cos(y / z);
   dg_dy = -(1.0 / z) * std::sin(x * z) * std::sin(y / z);
@@ -76,8 +76,8 @@ void
 dh(const double &x,
    const double &y,
    const double &z,
-   double &      dh_dx,
-   double &      dh_dy)
+   double       &dh_dx,
+   double       &dh_dy)
 {
   dh_dx = 2 * x * y * y * z;
   dh_dy = 2 * x * x * y * z;
@@ -88,9 +88,9 @@ void
 d2f(const double &x,
     const double &y,
     const double &z,
-    double &      d2f_dx_dx,
-    double &      d2f_dy_dy,
-    double &      d2f_dy_dx)
+    double       &d2f_dx_dx,
+    double       &d2f_dy_dy,
+    double       &d2f_dy_dx)
 {
   d2f_dx_dx = z * (6.0 * x);
   d2f_dy_dx = z * y;
@@ -100,9 +100,9 @@ void
 d2g(const double &x,
     const double &y,
     const double &z,
-    double &      d2g_dx_dx,
-    double &      d2g_dy_dy,
-    double &      d2g_dy_dx)
+    double       &d2g_dx_dx,
+    double       &d2g_dy_dy,
+    double       &d2g_dy_dx)
 {
   d2g_dx_dx = -z * z * std::sin(x * z) * std::cos(y / z);
   d2g_dy_dx = -std::cos(x * z) * std::sin(y / z);
@@ -112,9 +112,9 @@ void
 d2h(const double &x,
     const double &y,
     const double &z,
-    double &      d2h_dx_dx,
-    double &      d2h_dy_dy,
-    double &      d2h_dy_dx)
+    double       &d2h_dx_dx,
+    double       &d2h_dy_dy,
+    double       &d2h_dy_dx)
 {
   d2h_dx_dx = 2 * y * y * z;
   d2h_dy_dx = 4 * x * y * z;

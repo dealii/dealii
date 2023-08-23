@@ -17,7 +17,7 @@
  * Author: Timo Heister, Clemson University, 2016
  */
 
-//#define HEX
+// #define HEX
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -131,13 +131,13 @@ namespace Step55
 
     private:
       const SmartPointer<const Matrix> matrix;
-      const Preconditioner &           preconditioner;
+      const Preconditioner            &preconditioner;
     };
 
 
     template <class Matrix, class Preconditioner>
     InverseMatrix<Matrix, Preconditioner>::InverseMatrix(
-      const Matrix &        m,
+      const Matrix         &m,
       const Preconditioner &preconditioner)
       : matrix(&m)
       , preconditioner(preconditioner)
@@ -148,7 +148,7 @@ namespace Step55
     template <class Matrix, class Preconditioner>
     template <typename VectorType>
     void
-    InverseMatrix<Matrix, Preconditioner>::vmult(VectorType &      dst,
+    InverseMatrix<Matrix, Preconditioner>::vmult(VectorType       &dst,
                                                  const VectorType &src) const
     {
       SolverControl             solver_control(src.size(),
@@ -198,7 +198,7 @@ namespace Step55
     template <class PreconditionerA, class PreconditionerS>
     void
     BlockDiagonalPreconditioner<PreconditionerA, PreconditionerS>::vmult(
-      LA::MPI::BlockVector &      dst,
+      LA::MPI::BlockVector       &dst,
       const LA::MPI::BlockVector &src) const
     {
       preconditioner_A.vmult(dst.block(0), src.block(0));
@@ -228,7 +228,7 @@ namespace Step55
   template <int dim>
   void
   RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                   Vector<double> &  values) const
+                                   Vector<double>   &values) const
   {
     const double R_x = p[0];
     const double R_y = p[1];
@@ -265,7 +265,7 @@ namespace Step55
   template <int dim>
   void
   ExactSolution<dim>::vector_value(const Point<dim> &p,
-                                   Vector<double> &  values) const
+                                   Vector<double>   &values) const
   {
     const double R_x = p[0];
     const double R_y = p[1];

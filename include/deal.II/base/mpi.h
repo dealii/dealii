@@ -576,7 +576,7 @@ namespace Utilities
     create_group(const MPI_Comm   comm,
                  const MPI_Group &group,
                  const int        tag,
-                 MPI_Comm *       new_comm);
+                 MPI_Comm        *new_comm);
 #endif
 
     /**
@@ -727,7 +727,7 @@ namespace Utilities
     void
     sum(const ArrayView<const T> &values,
         const MPI_Comm            mpi_communicator,
-        const ArrayView<T> &      sums);
+        const ArrayView<T>       &sums);
 
     /**
      * Perform an MPI sum of the entries of a symmetric tensor.
@@ -761,7 +761,7 @@ namespace Utilities
     void
     sum(const SparseMatrix<Number> &local,
         const MPI_Comm              mpi_communicator,
-        SparseMatrix<Number> &      global);
+        SparseMatrix<Number>       &global);
 
     /**
      * Return the maximum over all processors of the value @p t. This function
@@ -812,7 +812,7 @@ namespace Utilities
     void
     max(const ArrayView<const T> &values,
         const MPI_Comm            mpi_communicator,
-        const ArrayView<T> &      maxima);
+        const ArrayView<T>       &maxima);
 
     /**
      * Return the minimum over all processors of the value @p t. This function
@@ -863,7 +863,7 @@ namespace Utilities
     void
     min(const ArrayView<const T> &values,
         const MPI_Comm            mpi_communicator,
-        const ArrayView<T> &      minima);
+        const ArrayView<T>       &minima);
 
     /**
      * Performs a <i>logical or</i> operation over all processors of the value
@@ -923,7 +923,7 @@ namespace Utilities
     void
     logical_or(const ArrayView<const T> &values,
                const MPI_Comm            mpi_communicator,
-               const ArrayView<T> &      results);
+               const ArrayView<T>       &results);
 
     /**
      * A data structure to store the result of the min_max_avg() function.
@@ -1033,7 +1033,7 @@ namespace Utilities
      */
     void
     min_max_avg(const ArrayView<const double> &my_values,
-                const ArrayView<MinMaxAvg> &   result,
+                const ArrayView<MinMaxAvg>    &result,
                 const MPI_Comm                 mpi_communicator);
 
 
@@ -1129,8 +1129,8 @@ namespace Utilities
        * <code>main()</code>.
        */
       MPI_InitFinalize(
-        int &              argc,
-        char **&           argv,
+        int               &argc,
+        char            **&argv,
         const unsigned int max_num_threads = numbers::invalid_unsigned_int);
 
       /**
@@ -1282,7 +1282,7 @@ namespace Utilities
     template <typename T>
     std::vector<T>
     gather(const MPI_Comm     comm,
-           const T &          object_to_send,
+           const T           &object_to_send,
            const unsigned int root_process = 0);
 
     /**
@@ -1343,7 +1343,7 @@ namespace Utilities
     template <typename T>
     std::enable_if_t<is_mpi_type<T> == false, T>
     broadcast(const MPI_Comm     comm,
-              const T &          object_to_send,
+              const T           &object_to_send,
               const unsigned int root_process = 0);
 
     /**
@@ -1371,7 +1371,7 @@ namespace Utilities
     template <typename T>
     std::enable_if_t<is_mpi_type<T> == true, T>
     broadcast(const MPI_Comm     comm,
-              const T &          object_to_send,
+              const T           &object_to_send,
               const unsigned int root_process = 0);
 
     /**
@@ -1392,7 +1392,7 @@ namespace Utilities
      */
     template <typename T>
     void
-    broadcast(T *                buffer,
+    broadcast(T                 *buffer,
               const size_t       count,
               const unsigned int root,
               const MPI_Comm     comm);
@@ -1411,7 +1411,7 @@ namespace Utilities
      */
     template <typename T>
     T
-    reduce(const T &                                     local_value,
+    reduce(const T                                      &local_value,
            const MPI_Comm                                comm,
            const std::function<T(const T &, const T &)> &combiner,
            const unsigned int                            root_process = 0);
@@ -1427,7 +1427,7 @@ namespace Utilities
      */
     template <typename T>
     T
-    all_reduce(const T &                                     local_value,
+    all_reduce(const T                                      &local_value,
                const MPI_Comm                                comm,
                const std::function<T(const T &, const T &)> &combiner);
 
@@ -1454,7 +1454,7 @@ namespace Utilities
      */
     template <typename T>
     Future<void>
-    isend(const T &          object,
+    isend(const T           &object,
           MPI_Comm           communicator,
           const unsigned int target_rank,
           const unsigned int mpi_tag = 0);
@@ -1728,8 +1728,8 @@ namespace Utilities
      * not satisfied.
      */
     template <typename T>
-    const MPI_Datatype
-      mpi_type_id_for_type = internal::MPIDataTypes::mpi_type_id(
+    const MPI_Datatype mpi_type_id_for_type =
+      internal::MPIDataTypes::mpi_type_id(
         static_cast<std::remove_cv_t<std::remove_reference_t<T>> *>(nullptr));
 #endif
 
@@ -1739,10 +1739,10 @@ namespace Utilities
       // declaration for an internal function that lives in mpi.templates.h
       template <typename T>
       void
-      all_reduce(const MPI_Op &            mpi_op,
+      all_reduce(const MPI_Op             &mpi_op,
                  const ArrayView<const T> &values,
                  const MPI_Comm            mpi_communicator,
-                 const ArrayView<T> &      output);
+                 const ArrayView<T>       &output);
     } // namespace internal
 
 
@@ -2037,7 +2037,7 @@ namespace Utilities
     template <typename T>
     std::vector<T>
     gather(const MPI_Comm     comm,
-           const T &          object_to_send,
+           const T           &object_to_send,
            const unsigned int root_process)
     {
 #  ifndef DEAL_II_WITH_MPI
@@ -2194,7 +2194,7 @@ namespace Utilities
 
     template <typename T>
     void
-    broadcast(T *                buffer,
+    broadcast(T                 *buffer,
               const size_t       count,
               const unsigned int root,
               const MPI_Comm     comm)
@@ -2234,7 +2234,7 @@ namespace Utilities
     template <typename T>
     std::enable_if_t<is_mpi_type<T> == false, T>
     broadcast(const MPI_Comm     comm,
-              const T &          object_to_send,
+              const T           &object_to_send,
               const unsigned int root_process)
     {
 #  ifndef DEAL_II_WITH_MPI
@@ -2284,7 +2284,7 @@ namespace Utilities
     template <typename T>
     std::enable_if_t<is_mpi_type<T> == true, T>
     broadcast(const MPI_Comm     comm,
-              const T &          object_to_send,
+              const T           &object_to_send,
               const unsigned int root_process)
     {
 #  ifndef DEAL_II_WITH_MPI
@@ -2305,7 +2305,7 @@ namespace Utilities
 
     template <typename T>
     Future<void>
-    isend(const T &          object,
+    isend(const T           &object,
           MPI_Comm           communicator,
           const unsigned int target_rank,
           const unsigned int mpi_tag)

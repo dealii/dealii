@@ -237,7 +237,7 @@ template <int dim, typename Number>
 void
 MGTransferMatrixFree<dim, Number>::prolongate(
   const unsigned int                                to_level,
-  LinearAlgebra::distributed::Vector<Number> &      dst,
+  LinearAlgebra::distributed::Vector<Number>       &dst,
   const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   dst = 0;
@@ -250,7 +250,7 @@ template <int dim, typename Number>
 void
 MGTransferMatrixFree<dim, Number>::prolongate_and_add(
   const unsigned int                                to_level,
-  LinearAlgebra::distributed::Vector<Number> &      dst,
+  LinearAlgebra::distributed::Vector<Number>       &dst,
   const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   Assert((to_level >= 1) && (to_level <= level_dof_indices.size()),
@@ -329,7 +329,7 @@ template <int dim, typename Number>
 void
 MGTransferMatrixFree<dim, Number>::restrict_and_add(
   const unsigned int                                from_level,
-  LinearAlgebra::distributed::Vector<Number> &      dst,
+  LinearAlgebra::distributed::Vector<Number>       &dst,
   const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   Assert((from_level >= 1) && (from_level <= level_dof_indices.size()),
@@ -408,7 +408,7 @@ template <int degree>
 void
 MGTransferMatrixFree<dim, Number>::do_prolongate_add(
   const unsigned int                                to_level,
-  LinearAlgebra::distributed::Vector<Number> &      dst,
+  LinearAlgebra::distributed::Vector<Number>       &dst,
   const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const unsigned int vec_size        = VectorizedArray<Number>::size();
@@ -552,7 +552,7 @@ template <int degree>
 void
 MGTransferMatrixFree<dim, Number>::do_restrict_add(
   const unsigned int                                from_level,
-  LinearAlgebra::distributed::Vector<Number> &      dst,
+  LinearAlgebra::distributed::Vector<Number>       &dst,
   const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const unsigned int vec_size        = VectorizedArray<Number>::size();

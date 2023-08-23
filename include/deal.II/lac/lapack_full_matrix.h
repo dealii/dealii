@@ -341,7 +341,7 @@ public:
    */
   template <typename number2>
   void
-  vmult(Vector<number2> &      w,
+  vmult(Vector<number2>       &w,
         const Vector<number2> &v,
         const bool             adding = false) const;
 
@@ -349,7 +349,7 @@ public:
    * Specialization of above function for compatible Vector::value_type.
    */
   void
-  vmult(Vector<number> &      w,
+  vmult(Vector<number>       &w,
         const Vector<number> &v,
         const bool            adding = false) const;
 
@@ -382,7 +382,7 @@ public:
    */
   template <typename number2>
   void
-  Tvmult(Vector<number2> &      w,
+  Tvmult(Vector<number2>       &w,
          const Vector<number2> &v,
          const bool             adding = false) const;
 
@@ -390,7 +390,7 @@ public:
    * Specialization of above function for compatible Vector::value_type.
    */
   void
-  Tvmult(Vector<number> &      w,
+  Tvmult(Vector<number>       &w,
          const Vector<number> &v,
          const bool            adding = false) const;
 
@@ -426,7 +426,7 @@ public:
    * @p This function uses the BLAS function Xgemm.
    */
   void
-  mmult(LAPACKFullMatrix<number> &      C,
+  mmult(LAPACKFullMatrix<number>       &C,
         const LAPACKFullMatrix<number> &B,
         const bool                      adding = false) const;
 
@@ -435,7 +435,7 @@ public:
    * LAPACKFullMatrix.
    */
   void
-  mmult(FullMatrix<number> &            C,
+  mmult(FullMatrix<number>             &C,
         const LAPACKFullMatrix<number> &B,
         const bool                      adding = false) const;
 
@@ -454,7 +454,7 @@ public:
    * @note This function uses the BLAS function Xgemm.
    */
   void
-  Tmmult(LAPACKFullMatrix<number> &      C,
+  Tmmult(LAPACKFullMatrix<number>       &C,
          const LAPACKFullMatrix<number> &B,
          const bool                      adding = false) const;
 
@@ -463,7 +463,7 @@ public:
    * LAPACKFullMatrix.
    */
   void
-  Tmmult(FullMatrix<number> &            C,
+  Tmmult(FullMatrix<number>             &C,
          const LAPACKFullMatrix<number> &B,
          const bool                      adding = false) const;
 
@@ -484,9 +484,9 @@ public:
    * function.
    */
   void
-  Tmmult(LAPACKFullMatrix<number> &      C,
+  Tmmult(LAPACKFullMatrix<number>       &C,
          const LAPACKFullMatrix<number> &B,
-         const Vector<number> &          V,
+         const Vector<number>           &V,
          const bool                      adding = false) const;
 
   /**
@@ -504,7 +504,7 @@ public:
    * @note This function uses the BLAS function Xgemm.
    */
   void
-  mTmult(LAPACKFullMatrix<number> &      C,
+  mTmult(LAPACKFullMatrix<number>       &C,
          const LAPACKFullMatrix<number> &B,
          const bool                      adding = false) const;
 
@@ -513,7 +513,7 @@ public:
    * LAPACKFullMatrix.
    */
   void
-  mTmult(FullMatrix<number> &            C,
+  mTmult(FullMatrix<number>             &C,
          const LAPACKFullMatrix<number> &B,
          const bool                      adding = false) const;
 
@@ -533,7 +533,7 @@ public:
    * @note This function uses the BLAS function Xgemm.
    */
   void
-  TmTmult(LAPACKFullMatrix<number> &      C,
+  TmTmult(LAPACKFullMatrix<number>       &C,
           const LAPACKFullMatrix<number> &B,
           const bool                      adding = false) const;
 
@@ -542,7 +542,7 @@ public:
    * LAPACKFullMatrix.
    */
   void
-  TmTmult(FullMatrix<number> &            C,
+  TmTmult(FullMatrix<number>             &C,
           const LAPACKFullMatrix<number> &B,
           const bool                      adding = false) const;
 
@@ -717,7 +717,7 @@ public:
   compute_eigenvalues_symmetric(const number        lower_bound,
                                 const number        upper_bound,
                                 const number        abs_accuracy,
-                                Vector<number> &    eigenvalues,
+                                Vector<number>     &eigenvalues,
                                 FullMatrix<number> &eigenvectors);
 
   /**
@@ -748,11 +748,11 @@ public:
    */
   void
   compute_generalized_eigenvalues_symmetric(
-    LAPACKFullMatrix<number> &   B,
+    LAPACKFullMatrix<number>    &B,
     const number                 lower_bound,
     const number                 upper_bound,
     const number                 abs_accuracy,
-    Vector<number> &             eigenvalues,
+    Vector<number>              &eigenvalues,
     std::vector<Vector<number>> &eigenvectors,
     const types::blas_int        itype = 1);
 
@@ -773,7 +773,7 @@ public:
    */
   void
   compute_generalized_eigenvalues_symmetric(
-    LAPACKFullMatrix<number> &   B,
+    LAPACKFullMatrix<number>    &B,
     std::vector<Vector<number>> &eigenvectors,
     const types::blas_int        itype = 1);
 
@@ -907,11 +907,11 @@ public:
    * function is not allowed.
    */
   void
-  print_formatted(std::ostream &     out,
+  print_formatted(std::ostream      &out,
                   const unsigned int precision   = 3,
                   const bool         scientific  = true,
                   const unsigned int width       = 0,
-                  const char *       zero_string = " ",
+                  const char        *zero_string = " ",
                   const double       denominator = 1.,
                   const double       threshold   = 0.) const;
 

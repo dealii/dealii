@@ -1070,7 +1070,7 @@ namespace Patterns
 
 
   Tuple::Tuple(const std::vector<std::unique_ptr<PatternBase>> &ps,
-               const std::string &                              separator)
+               const std::string                               &separator)
     : separator(separator)
   {
     Assert(ps.size() > 0,
@@ -1085,7 +1085,7 @@ namespace Patterns
 
 
   Tuple::Tuple(const std::vector<std::unique_ptr<PatternBase>> &ps,
-               const char *                                     separator)
+               const char                                      *separator)
     : Tuple(ps, std::string(separator))
   {}
 

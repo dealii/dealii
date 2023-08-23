@@ -119,9 +119,9 @@ public:
   virtual ~MatrixFreeTest(){};
 
   void
-  operator()(const MatrixFree<dim, Number> &              data,
-             Vector<Number> &                             dst,
-             const Vector<Number> &                       src,
+  operator()(const MatrixFree<dim, Number>               &data,
+             Vector<Number>                              &dst,
+             const Vector<Number>                        &src,
              const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, n_q_points_1d, dim, Number> fe_eval(data);
@@ -154,7 +154,7 @@ public:
   };
 
 protected:
-  const MatrixFree<dim, Number> &  data;
+  const MatrixFree<dim, Number>   &data;
   EvaluationFlags::EvaluationFlags evaluation_flag;
   const TestType                   test_type;
 };
@@ -162,7 +162,7 @@ protected:
 
 template <int dim, int, typename Number>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints,
         const TestType                   test_type)
 {

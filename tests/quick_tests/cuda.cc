@@ -38,8 +38,8 @@ main()
   std::array<double, n> host_y{};
 
   // Copy input data to device.
-  double *    device_x;
-  double *    device_y;
+  double     *device_x;
+  double     *device_y;
   cudaError_t cuda_error = cudaMalloc(&device_x, n * sizeof(double));
   AssertCuda(cuda_error);
   cuda_error = cudaMalloc(&device_y, n * sizeof(double));

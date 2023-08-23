@@ -57,7 +57,7 @@ check_cells(std::vector<Quadrature<dim> *> &quadratures)
     {
       quadrature                             = *quadratures[n];
       const std::vector<Point<dim>> &points  = quadrature.get_points();
-      const std::vector<double> &    weights = quadrature.get_weights();
+      const std::vector<double>     &weights = quadrature.get_weights();
 
       deallog << "Quadrature no." << n;
 
@@ -119,7 +119,7 @@ check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
           QProjector<dim>::project_to_all_subfaces(
             ReferenceCells::get_hypercube<dim>(), *quadratures[n]));
       const std::vector<Point<dim>> &points  = quadrature.get_points();
-      const std::vector<double> &    weights = quadrature.get_weights();
+      const std::vector<double>     &weights = quadrature.get_weights();
 
       deallog << "Quadrature no." << n;
 

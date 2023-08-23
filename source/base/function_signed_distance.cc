@@ -37,7 +37,7 @@ namespace Functions
 
     template <int dim>
     double
-    Sphere<dim>::value(const Point<dim> & point,
+    Sphere<dim>::value(const Point<dim>  &point,
                        const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
@@ -50,7 +50,7 @@ namespace Functions
 
     template <int dim>
     Tensor<1, dim>
-    Sphere<dim>::gradient(const Point<dim> & point,
+    Sphere<dim>::gradient(const Point<dim>  &point,
                           const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
@@ -65,7 +65,7 @@ namespace Functions
 
     template <int dim>
     SymmetricTensor<2, dim>
-    Sphere<dim>::hessian(const Point<dim> & point,
+    Sphere<dim>::hessian(const Point<dim>  &point,
                          const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
@@ -96,7 +96,7 @@ namespace Functions
 
     template <int dim>
     double
-    Plane<dim>::value(const Point<dim> & point,
+    Plane<dim>::value(const Point<dim>  &point,
                       const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
@@ -132,7 +132,7 @@ namespace Functions
 
 
     template <int dim>
-    Ellipsoid<dim>::Ellipsoid(const Point<dim> &             center,
+    Ellipsoid<dim>::Ellipsoid(const Point<dim>              &center,
                               const std::array<double, dim> &radii,
                               const double                   tolerance,
                               const unsigned int             max_iter)
@@ -149,7 +149,7 @@ namespace Functions
 
     template <int dim>
     double
-    Ellipsoid<dim>::value(const Point<dim> & point,
+    Ellipsoid<dim>::value(const Point<dim>  &point,
                           const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
@@ -169,7 +169,7 @@ namespace Functions
 
     template <int dim>
     Tensor<1, dim>
-    Ellipsoid<dim>::gradient(const Point<dim> & point,
+    Ellipsoid<dim>::gradient(const Point<dim>  &point,
                              const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
@@ -352,7 +352,7 @@ namespace Functions
 
     template <int dim>
     double
-    Rectangle<dim>::value(const Point<dim> & p,
+    Rectangle<dim>::value(const Point<dim>  &p,
                           const unsigned int component) const
     {
       AssertDimension(component, 0);
@@ -404,7 +404,7 @@ namespace Functions
 
     template <int dim>
     double
-    ZalesakDisk<dim>::value(const Point<dim> & p,
+    ZalesakDisk<dim>::value(const Point<dim>  &p,
                             const unsigned int component) const
     {
       (void)component;
