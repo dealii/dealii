@@ -42,6 +42,10 @@
 #  include <deal.II/lac/cuda_vector.h>
 #endif
 
+#ifdef DEAL_II_WITH_GINKGO
+#  include <deal.II/lac/ginkgo_vector.h>
+#endif
+
 #include <boost/io/ios_state.hpp>
 
 DEAL_II_NAMESPACE_OPEN
@@ -972,6 +976,37 @@ namespace LinearAlgebra
   }
 #endif
 
+
+#ifdef DEAL_II_WITH_GINKGO
+  template <typename Number>
+  void
+  ReadWriteVector<Number>::import(
+    const GinkgoWrappers::Vector<Number> &ginkgo_vec,
+    VectorOperation::values               operation,
+    const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
+      & /*communication_pattern*/)
+  {
+    auto host_exec = ginkgo_vec.get_gko_object()->get_executor()->get_master();
+
+    reinit(ginkgo_vec.size(), true);
+
+    auto this_view =
+      GinkgoWrappers::Vector<Number>::create_view(host_exec, *this);
+
+    if (operation == VectorOperation::values::add)
+      {
+        *this_view += ginkgo_vec;
+      }
+    else if (operation == VectorOperation::values::insert)
+      {
+        *this_view = ginkgo_vec;
+      }
+    else
+      {
+        AssertThrow(false, ExcNotImplemented());
+      }
+  }
+#endif
 
 
   template <typename Number>

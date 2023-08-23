@@ -1,0 +1,11 @@
+
+DEAL:can_set_to_number:OK
+DEAL:can_scale_with_number:OK
+DEAL:can_divide_by_number:OK
+DEAL:can_add_vector:OK
+DEAL:can_substract_vector:OK
+DEAL:can_add_number:OK
+DEAL:can_add_number_vector:OK
+DEAL:can_add_number_vector_number_vector:OK
+DEAL:can_sadd_number_number_vector:OK
+DEAL:can_equ:OK

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2018 - 2022 by the deal.II authors
+// Copyright (C) 2018 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,11 +23,20 @@
 
 #  include <deal.II/lac/block_sparse_matrix.h>
 #  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/ginkgo_preconditioner.h>
+#  include <deal.II/lac/ginkgo_sparse_matrix.h>
 #  include <deal.II/lac/solver_control.h>
-#  include <deal.II/lac/sparse_matrix.h>
 #  include <deal.II/lac/vector.h>
 
-#  include <ginkgo/ginkgo.hpp>
+#  include <ginkgo/core/log/convergence.hpp>
+#  include <ginkgo/core/solver/bicgstab.hpp>
+#  include <ginkgo/core/solver/cg.hpp>
+#  include <ginkgo/core/solver/cgs.hpp>
+#  include <ginkgo/core/solver/fcg.hpp>
+#  include <ginkgo/core/solver/gmres.hpp>
+#  include <ginkgo/core/solver/ir.hpp>
+#  include <ginkgo/core/stop/iteration.hpp>
+#  include <ginkgo/core/stop/residual_norm.hpp>
 
 #  include <memory>
 
@@ -35,6 +44,39 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace GinkgoWrappers
 {
+  namespace detail
+  {
+    // move to .cc when deprecated constructors are removed
+    std::shared_ptr<gko::Executor>
+    exec_from_name(const std::string &exec_type)
+    {
+      if (exec_type == "reference")
+        {
+          return gko::ReferenceExecutor::create();
+        }
+      if (exec_type == "omp")
+        {
+          return gko::OmpExecutor::create();
+        }
+      if (exec_type == "cuda" && gko::CudaExecutor::get_num_devices() > 0)
+        {
+          return gko::CudaExecutor::create(0, gko::OmpExecutor::create());
+        }
+      if (exec_type == "hip" && gko::HipExecutor::get_num_devices() > 0)
+        {
+          return gko::HipExecutor::create(0, gko::OmpExecutor::create());
+        }
+      if (exec_type == "dpcpp" &&
+          gko::DpcppExecutor::get_num_devices("all") > 0)
+        {
+          return gko::DpcppExecutor::create(0, gko::OmpExecutor::create());
+        }
+      Assert(
+        false,
+        ExcMessage(
+          " exec_type needs to be one of the following strings: \"cuda\", \"dpcpp\", \"hip\", \"omp\", or \"reference\" "));
+    }
+  } // namespace detail
   /**
    * This class forms the base class for all of Ginkgo's iterative solvers.
    * The various derived classes only take
@@ -103,6 +145,8 @@ namespace GinkgoWrappers
      * deal.II iterative solvers.
      */
     SolverBase(SolverControl &solver_control, const std::string &exec_type);
+    SolverBase(std::shared_ptr<const gko::Executor> exec,
+               SolverControl &                      solver_control);
 
     /**
      * Destructor.
@@ -112,26 +156,37 @@ namespace GinkgoWrappers
     /**
      * Initialize the matrix and copy over its data to Ginkgo's data structures.
      */
-    void
-    initialize(const SparseMatrix<ValueType> &matrix);
+    [[deprecated(
+      "Create GinkgoWrapper objects directly and call solve on them")]] void
+    initialize(const ::dealii::SparseMatrix<ValueType> &matrix);
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Dependent on the information
      * provided by derived classes one of Ginkgo's linear solvers is
      * chosen.
      */
-    void
-    apply(Vector<ValueType> &solution, const Vector<ValueType> &rhs);
+    [[deprecated(
+      "Create GinkgoWrapper objects directly and call solve on them")]] void
+    apply(::dealii::Vector<ValueType> &      solution,
+          const ::dealii::Vector<ValueType> &rhs);
 
     /**
      * Solve the linear system <tt>Ax=b</tt>. Dependent on the information
      * provided by derived classes one of Ginkgo's linear solvers is
      * chosen.
      */
+    [[deprecated(
+      "Create GinkgoWrapper objects directly and call solve on them")]] void
+    solve(const ::dealii::SparseMatrix<ValueType> &matrix,
+          ::dealii::Vector<ValueType> &            solution,
+          const ::dealii::Vector<ValueType> &      rhs);
+
     void
-    solve(const SparseMatrix<ValueType> &matrix,
-          Vector<ValueType> &            solution,
-          const Vector<ValueType> &      rhs);
+    solve(const AbstractMatrix<ValueType, IndexType> &  matrix,
+          Vector<ValueType> &                           solution,
+          const Vector<ValueType> &                     rhs,
+          const PreconditionBase<ValueType, IndexType> &preconditioner =
+            PreconditionIdentity<ValueType, IndexType>());
 
     /**
      * Access to the object that controls convergence.
@@ -139,8 +194,14 @@ namespace GinkgoWrappers
     SolverControl &
     control() const;
 
-
   protected:
+    virtual void
+    solve_impl(
+      const AbstractMatrix<ValueType, IndexType> &  matrix,
+      Vector<ValueType> &                           solution,
+      const Vector<ValueType> &                     rhs,
+      const PreconditionBase<ValueType, IndexType> &preconditioner) = 0;
+
     /**
      * Reference to the object that controls convergence of the iterative
      * solvers.
@@ -148,16 +209,91 @@ namespace GinkgoWrappers
     SolverControl &solver_control;
 
     /**
+     * The execution paradigm in Ginkgo. The choices are between
+     * `gko::OmpExecutor`, `gko::CudaExecutor` and `gko::ReferenceExecutor`
+     * and more details can be found in Ginkgo's documentation.
+     */
+    std::shared_ptr<const gko::Executor> executor;
+
+  private:
+    /**
+     * Ginkgo matrix data structure. First template parameter is for storing the
+     * array of the non-zeros of the matrix. The second is for the row pointers
+     * and the column indices.
+     *
+     * @todo Templatize based on Matrix type.
+     */
+    Csr<ValueType, IndexType> system_matrix;
+  };
+
+
+  namespace detail
+  {
+    template <template <class, class> class Solver>
+    struct solver_traits;
+  }
+
+
+  template <typename ValueType,
+            typename IndexType,
+            template <class>
+            class GinkgoType,
+            typename AdditionalDataType>
+  class EnableSolverBase : public SolverBase<ValueType, IndexType>
+  {
+  public:
+    using ginkgo_type     = GinkgoType<ValueType>;
+    using parameters_type = decltype(std::declval<ginkgo_type>().build());
+    using AdditionalData  = AdditionalDataType;
+
+    EnableSolverBase(std::shared_ptr<const gko::Executor> exec,
+                     SolverControl &                      solver_control,
+                     const AdditionalData &               data = {})
+      : SolverBase<ValueType, IndexType>(exec, solver_control)
+      , parameters_(ginkgo_type::build())
+    {
+      data.enhance_parameters(parameters_);
+      combined_factory =
+        gko::stop::Combined::build()
+          .with_criteria(gko::stop::ResidualNormReduction<ValueType>::build()
+                           .with_reduction_factor(
+                             static_cast<gko::remove_complex<ValueType>>(
+                               solver_control.tolerance()))
+                           .on(this->executor),
+                         gko::stop::Iteration::build()
+                           .with_max_iters(solver_control.max_steps())
+                           .on(this->executor))
+          .on(this->executor);
+    }
+
+  protected:
+    EnableSolverBase(std::shared_ptr<const gko::Executor>      exec,
+                     SolverControl &                           solver_control,
+                     const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+                     const AdditionalData &                    data = {});
+
+    void
+    solve_impl(
+      const AbstractMatrix<ValueType, IndexType> &  matrix,
+      Vector<ValueType> &                           solution,
+      const Vector<ValueType> &                     rhs,
+      const PreconditionBase<ValueType, IndexType> &preconditioner) override;
+
+    /**
+     * Initialize the Ginkgo logger object with event masks. Refer to
+     * <a
+     * href="https://github.com/ginkgo-project/ginkgo/blob/develop/include/ginkgo/core/log/logger.hpp">Ginkgo's
+     * logging event masks.</a>
+     */
+    void
+    initialize_ginkgo_log();
+
+    parameters_type parameters_;
+
+    /**
      * The Ginkgo generated solver factory object.
      */
     std::shared_ptr<gko::LinOpFactory> solver_gen;
-
-    /**
-     * The residual criterion object that controls the reduction of the residual
-     * based on the tolerance set in the solver_control member.
-     */
-    std::shared_ptr<gko::stop::ResidualNormReduction<>::Factory>
-      residual_criterion;
 
     /**
      * The Ginkgo convergence logger used to check for convergence and other
@@ -170,40 +306,39 @@ namespace GinkgoWrappers
      * criterion to be passed to the solver.
      */
     std::shared_ptr<gko::stop::Combined::Factory> combined_factory;
-
-    /**
-     * The execution paradigm in Ginkgo. The choices are between
-     * `gko::OmpExecutor`, `gko::CudaExecutor` and `gko::ReferenceExecutor`
-     * and more details can be found in Ginkgo's documentation.
-     */
-    std::shared_ptr<gko::Executor> executor;
-
-  private:
-    /**
-     * Initialize the Ginkgo logger object with event masks. Refer to
-     * <a
-     * href="https://github.com/ginkgo-project/ginkgo/blob/develop/include/ginkgo/core/log/logger.hpp">Ginkgo's
-     * logging event masks.</a>
-     */
-    void
-    initialize_ginkgo_log();
-
-    /**
-     * Ginkgo matrix data structure. First template parameter is for storing the
-     * array of the non-zeros of the matrix. The second is for the row pointers
-     * and the column indices.
-     *
-     * @todo Templatize based on Matrix type.
-     */
-    std::shared_ptr<gko::matrix::Csr<ValueType, IndexType>> system_matrix;
-
-    /**
-     * The execution paradigm as a string to be set by the user. The choices
-     * are between `omp`, `cuda` and `reference` and more details can be found
-     * in Ginkgo's documentation.
-     */
-    const std::string exec_type;
   };
+
+
+  namespace detail
+  {
+    struct EmptyAdditionalData
+    {
+      template <typename ParametersType>
+      void
+      enhance_parameters(ParametersType &) const
+      {}
+    };
+
+    struct GmresAdditionalData
+    {
+      /**
+       * Maximum number of tmp vectors.
+       */
+      unsigned int restart_parameter = 30;
+
+      /**
+       * Should flexible GMRES be used?
+       */
+      bool flexible = false;
+
+      template <typename ParametersType>
+      void
+      enhance_parameters(ParametersType &parameters) const
+      {
+        parameters.with_krylov_dim(restart_parameter).with_flexible(flexible);
+      }
+    };
+  } // namespace detail
 
 
   /**
@@ -212,14 +347,19 @@ namespace GinkgoWrappers
    * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
-  class SolverCG : public SolverBase<ValueType, IndexType>
+  class SolverCG : public EnableSolverBase<ValueType,
+                                           IndexType,
+                                           gko::solver::Cg,
+                                           detail::EmptyAdditionalData>
   {
+    using Base = EnableSolverBase<ValueType,
+                                  IndexType,
+                                  gko::solver::Cg,
+                                  detail::EmptyAdditionalData>;
+
   public:
-    /**
-     * A standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {};
+    using Base::Base;
+    using typename Base::AdditionalData;
 
     /**
      * Constructor.
@@ -232,9 +372,12 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverCG(SolverControl &       solver_control,
-             const std::string &   exec_type,
-             const AdditionalData &data = AdditionalData());
+    [[deprecated("Use constructor with ginkgo executor")]] SolverCG(
+      SolverControl &       solver_control,
+      const std::string &   exec_type,
+      const AdditionalData &data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type), solver_control, data)
+    {}
 
     /**
      * Constructor.
@@ -249,16 +392,16 @@ namespace GinkgoWrappers
      *
      * @param[in] data The additional data required by the solver.
      */
-    SolverCG(SolverControl &                           solver_control,
-             const std::string &                       exec_type,
-             const std::shared_ptr<gko::LinOpFactory> &preconditioner,
-             const AdditionalData &                    data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the settings for this particular solver.
-     */
-    const AdditionalData additional_data;
+    [[deprecated("Provide preconditioner to solve method directly")]] SolverCG(
+      SolverControl &                           solver_control,
+      const std::string &                       exec_type,
+      const std::shared_ptr<gko::LinOpFactory> &preconditioner,
+      const AdditionalData &                    data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type),
+             solver_control,
+             preconditioner,
+             data)
+    {}
   };
 
 
@@ -268,14 +411,19 @@ namespace GinkgoWrappers
    * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
-  class SolverBicgstab : public SolverBase<ValueType, IndexType>
+  class SolverBicgstab : public EnableSolverBase<ValueType,
+                                                 IndexType,
+                                                 gko::solver::Bicgstab,
+                                                 detail::EmptyAdditionalData>
   {
+    using Base = EnableSolverBase<ValueType,
+                                  IndexType,
+                                  gko::solver::Bicgstab,
+                                  detail::EmptyAdditionalData>;
+
   public:
-    /**
-     * A standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {};
+    using Base::Base;
+    using typename Base::AdditionalData;
 
     /**
      * Constructor.
@@ -290,7 +438,9 @@ namespace GinkgoWrappers
      */
     SolverBicgstab(SolverControl &       solver_control,
                    const std::string &   exec_type,
-                   const AdditionalData &data = AdditionalData());
+                   const AdditionalData &data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type), solver_control, data)
+    {}
 
     /**
      * Constructor.
@@ -308,13 +458,12 @@ namespace GinkgoWrappers
     SolverBicgstab(SolverControl &                           solver_control,
                    const std::string &                       exec_type,
                    const std::shared_ptr<gko::LinOpFactory> &preconditioner,
-                   const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the settings for this particular solver.
-     */
-    const AdditionalData additional_data;
+                   const AdditionalData &data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type),
+             solver_control,
+             preconditioner,
+             data)
+    {}
   };
 
   /**
@@ -326,14 +475,19 @@ namespace GinkgoWrappers
    * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
-  class SolverCGS : public SolverBase<ValueType, IndexType>
+  class SolverCGS : public EnableSolverBase<ValueType,
+                                            IndexType,
+                                            gko::solver::Cgs,
+                                            detail::EmptyAdditionalData>
   {
+    using Base = EnableSolverBase<ValueType,
+                                  IndexType,
+                                  gko::solver::Cgs,
+                                  detail::EmptyAdditionalData>;
+
   public:
-    /**
-     * A standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {};
+    using Base::Base;
+    using typename Base::AdditionalData;
 
     /**
      * Constructor.
@@ -348,7 +502,9 @@ namespace GinkgoWrappers
      */
     SolverCGS(SolverControl &       solver_control,
               const std::string &   exec_type,
-              const AdditionalData &data = AdditionalData());
+              const AdditionalData &data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type), solver_control, data)
+    {}
 
     /**
      * Constructor.
@@ -366,13 +522,12 @@ namespace GinkgoWrappers
     SolverCGS(SolverControl &                           solver_control,
               const std::string &                       exec_type,
               const std::shared_ptr<gko::LinOpFactory> &preconditioner,
-              const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the settings for this particular solver.
-     */
-    const AdditionalData additional_data;
+              const AdditionalData &                    data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type),
+             solver_control,
+             preconditioner,
+             data)
+    {}
   };
 
   /**
@@ -393,14 +548,19 @@ namespace GinkgoWrappers
    * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
-  class SolverFCG : public SolverBase<ValueType, IndexType>
+  class SolverFCG : public EnableSolverBase<ValueType,
+                                            IndexType,
+                                            gko::solver::Fcg,
+                                            detail::EmptyAdditionalData>
   {
+    using Base = EnableSolverBase<ValueType,
+                                  IndexType,
+                                  gko::solver::Fcg,
+                                  detail::EmptyAdditionalData>;
+
   public:
-    /**
-     * A standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {};
+    using Base::Base;
+    using typename Base::AdditionalData;
 
     /**
      * Constructor.
@@ -415,7 +575,9 @@ namespace GinkgoWrappers
      */
     SolverFCG(SolverControl &       solver_control,
               const std::string &   exec_type,
-              const AdditionalData &data = AdditionalData());
+              const AdditionalData &data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type), solver_control, data)
+    {}
 
     /**
      * Constructor.
@@ -433,13 +595,12 @@ namespace GinkgoWrappers
     SolverFCG(SolverControl &                           solver_control,
               const std::string &                       exec_type,
               const std::shared_ptr<gko::LinOpFactory> &preconditioner,
-              const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the settings for this particular solver.
-     */
-    const AdditionalData additional_data;
+              const AdditionalData &                    data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type),
+             solver_control,
+             preconditioner,
+             data)
+    {}
   };
 
   /**
@@ -448,25 +609,19 @@ namespace GinkgoWrappers
    * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
-  class SolverGMRES : public SolverBase<ValueType, IndexType>
+  class SolverGMRES : public EnableSolverBase<ValueType,
+                                              IndexType,
+                                              gko::solver::Gmres,
+                                              detail::GmresAdditionalData>
   {
-  public:
-    /**
-     * A standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {
-      /**
-       * Constructor. By default, set the number of temporary vectors to 30,
-       * i.e. do a restart every 30 iterations.
-       */
-      AdditionalData(const unsigned int restart_parameter = 30);
+    using Base = EnableSolverBase<ValueType,
+                                  IndexType,
+                                  gko::solver::Gmres,
+                                  detail::GmresAdditionalData>;
 
-      /**
-       * Maximum number of tmp vectors.
-       */
-      unsigned int restart_parameter;
-    };
+  public:
+    using Base::Base;
+    using typename Base::AdditionalData;
 
     /**
      * Constructor.
@@ -481,7 +636,9 @@ namespace GinkgoWrappers
      */
     SolverGMRES(SolverControl &       solver_control,
                 const std::string &   exec_type,
-                const AdditionalData &data = AdditionalData());
+                const AdditionalData &data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type), solver_control, data)
+    {}
 
     /**
      * Constructor.
@@ -499,13 +656,12 @@ namespace GinkgoWrappers
     SolverGMRES(SolverControl &                           solver_control,
                 const std::string &                       exec_type,
                 const std::shared_ptr<gko::LinOpFactory> &preconditioner,
-                const AdditionalData &data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the settings for this particular solver.
-     */
-    const AdditionalData additional_data;
+                const AdditionalData &data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type),
+             solver_control,
+             preconditioner,
+             data)
+    {}
   };
 
   /**
@@ -518,14 +674,19 @@ namespace GinkgoWrappers
    * @ingroup GinkgoWrappers
    */
   template <typename ValueType = double, typename IndexType = int32_t>
-  class SolverIR : public SolverBase<ValueType, IndexType>
+  class SolverIR : public EnableSolverBase<ValueType,
+                                           IndexType,
+                                           gko::solver::Ir,
+                                           detail::EmptyAdditionalData>
   {
+    using Base = EnableSolverBase<ValueType,
+                                  IndexType,
+                                  gko::solver::Ir,
+                                  detail::EmptyAdditionalData>;
+
   public:
-    /**
-     * A standardized data struct to pipe additional data to the solver.
-     */
-    struct AdditionalData
-    {};
+    using Base::Base;
+    using typename Base::AdditionalData;
 
     /**
      * Constructor.
@@ -540,7 +701,9 @@ namespace GinkgoWrappers
      */
     SolverIR(SolverControl &       solver_control,
              const std::string &   exec_type,
-             const AdditionalData &data = AdditionalData());
+             const AdditionalData &data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type), solver_control, data)
+    {}
 
     /**
      * Constructor.
@@ -558,13 +721,13 @@ namespace GinkgoWrappers
     SolverIR(SolverControl &                           solver_control,
              const std::string &                       exec_type,
              const std::shared_ptr<gko::LinOpFactory> &inner_solver,
-             const AdditionalData &                    data = AdditionalData());
-
-  protected:
-    /**
-     * Store a copy of the settings for this particular solver.
-     */
-    const AdditionalData additional_data;
+             const AdditionalData &                    data = AdditionalData())
+      : Base(detail::exec_from_name(exec_type), solver_control, data)
+    {
+      this->solver_gen = this->parameters_.with_criteria(this->combined_factory)
+                           .with_solver(inner_solver)
+                           .on(this->executor);
+    }
   };
 
 
