@@ -293,10 +293,19 @@ namespace internal
               data[direction].quadrature    = quad;
               data[direction].n_q_points_1d = n_q_points_1d;
               data[direction].fe_degree     = fe.degree - direction;
-            }
+              const std::vector<unsigned int> &lexicographic =
+                direction == 0 ? lex_normal : lex_tangent;
 
-          data[0].evaluate_shape_functions(fe, quad, lex_normal, 0);
-          data[1].evaluate_shape_functions(fe, quad, lex_tangent, 1);
+              data[direction].evaluate_shape_functions(fe,
+                                                       quad,
+                                                       lexicographic,
+                                                       direction);
+              data[direction].evaluate_collocation_space(fe,
+                                                         quad,
+                                                         lexicographic,
+                                                         direction);
+              data[direction].check_and_set_shapes_symmetric();
+            }
 
           return;
         }
@@ -594,7 +603,8 @@ namespace internal
 
       univariate_shape_data.evaluate_collocation_space(fe,
                                                        quad,
-                                                       scalar_lexicographic);
+                                                       scalar_lexicographic,
+                                                       0);
 
       const auto &shape_data_on_face = univariate_shape_data.shape_data_on_face;
 
@@ -846,7 +856,8 @@ namespace internal
     UnivariateShapeData<Number>::evaluate_collocation_space(
       const FiniteElement<dim, spacedim> &fe,
       const Quadrature<1>                &quad,
-      const std::vector<unsigned int>    &lexicographic)
+      const std::vector<unsigned int>    &lexicographic,
+      const unsigned int                  direction)
     {
       const unsigned int n_dofs_1d =
         std::min(fe.n_dofs_per_cell(), fe_degree + 1);
@@ -955,10 +966,10 @@ namespace internal
             for (unsigned int j = 0; j < n_dofs_1d; ++j)
               {
                 Point<dim> q_point = get_unit_point(fe, lexicographic);
-                q_point[0]         = quad_project.point(i)[0];
+                q_point[direction] = quad_project.point(i)[0];
 
                 transform_from_gauss(i, j) =
-                  fe.shape_value(lexicographic[j], q_point);
+                  fe.shape_value_component(lexicographic[j], q_point, 0);
               }
           Householder<double> H(transform_from_gauss);
           Vector<double>      in(n_dofs_1d), out(n_dofs_1d);

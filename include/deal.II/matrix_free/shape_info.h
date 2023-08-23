@@ -168,10 +168,10 @@ namespace internal
        */
       template <int dim, int spacedim>
       void
-      evaluate_collocation_space(
-        const FiniteElement<dim, spacedim> &fe,
-        const Quadrature<1>                &quad,
-        const std::vector<unsigned int>    &lexicographic);
+      evaluate_collocation_space(const FiniteElement<dim, spacedim> &fe,
+                                 const Quadrature<1>                &quad,
+                                 const std::vector<unsigned int> &lexicographic,
+                                 const unsigned int               direction);
 
       /**
        * Check whether we have symmetries in the shape values. In that case,
