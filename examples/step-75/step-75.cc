@@ -110,16 +110,18 @@ namespace Step75
   public:
     Solution()
       : Function<dim>()
-    {}
+    {
+      Assert(dim > 1, ExcNotImplemented());
+    }
 
     virtual double value(const Point<dim> &p,
                          const unsigned int /*component*/) const override
     {
-      const std::array<double, dim> p_sphere =
-        GeometricUtilities::Coordinates::to_spherical(p);
+      const std::array<double, 2> polar =
+        GeometricUtilities::Coordinates::to_spherical(Point<2>(p[0], p[1]));
 
       constexpr const double alpha = 2. / 3.;
-      return std::pow(p_sphere[0], alpha) * std::sin(alpha * p_sphere[1]);
+      return std::pow(polar[0], alpha) * std::sin(alpha * polar[1]);
     }
   };
 
