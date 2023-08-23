@@ -414,7 +414,7 @@ namespace LinearAlgebra
        * Prints the vector to the output stream @p out.
        */
       void
-      print(std::ostream &     out,
+      print(std::ostream      &out,
             const unsigned int precision  = 3,
             const bool         scientific = true,
             const bool         across     = true) const;

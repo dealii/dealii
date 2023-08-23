@@ -80,7 +80,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 
-//#define HEX
+// #define HEX
 
 const unsigned int degree = 1;
 
@@ -290,7 +290,7 @@ namespace Step18
 
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const override;
+                      std::vector<Vector<double>>   &value_list) const override;
   };
 
 
@@ -320,7 +320,7 @@ namespace Step18
   void
   BodyForce<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  value_list) const
+    std::vector<Vector<double>>   &value_list) const
   {
     const unsigned int n_points = points.size();
 
@@ -345,7 +345,7 @@ namespace Step18
 
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const override;
+                      std::vector<Vector<double>>   &value_list) const override;
 
   private:
     const double velocity;
@@ -382,7 +382,7 @@ namespace Step18
   void
   IncrementalBoundaryValues<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  value_list) const
+    std::vector<Vector<double>>   &value_list) const
   {
     const unsigned int n_points = points.size();
 

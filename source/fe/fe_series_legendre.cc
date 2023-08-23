@@ -72,8 +72,8 @@ namespace
   template <int dim, int spacedim>
   double
   integrate(const FiniteElement<dim, spacedim> &fe,
-            const Quadrature<dim> &             quadrature,
-            const TableIndices<dim> &           indices,
+            const Quadrature<dim>              &quadrature,
+            const TableIndices<dim>            &indices,
             const unsigned int                  dof,
             const unsigned int                  component)
   {
@@ -97,12 +97,12 @@ namespace
   template <int spacedim>
   void
   ensure_existence(
-    const std::vector<unsigned int> &    n_coefficients_per_direction,
+    const std::vector<unsigned int>     &n_coefficients_per_direction,
     const hp::FECollection<1, spacedim> &fe_collection,
-    const hp::QCollection<1> &           q_collection,
+    const hp::QCollection<1>            &q_collection,
     const unsigned int                   fe,
     const unsigned int                   component,
-    std::vector<FullMatrix<double>> &    legendre_transform_matrices)
+    std::vector<FullMatrix<double>>     &legendre_transform_matrices)
   {
     AssertIndexRange(fe, fe_collection.size());
 
@@ -126,12 +126,12 @@ namespace
   template <int spacedim>
   void
   ensure_existence(
-    const std::vector<unsigned int> &    n_coefficients_per_direction,
+    const std::vector<unsigned int>     &n_coefficients_per_direction,
     const hp::FECollection<2, spacedim> &fe_collection,
-    const hp::QCollection<2> &           q_collection,
+    const hp::QCollection<2>            &q_collection,
     const unsigned int                   fe,
     const unsigned int                   component,
-    std::vector<FullMatrix<double>> &    legendre_transform_matrices)
+    std::vector<FullMatrix<double>>     &legendre_transform_matrices)
   {
     AssertIndexRange(fe, fe_collection.size());
 
@@ -159,12 +159,12 @@ namespace
   template <int spacedim>
   void
   ensure_existence(
-    const std::vector<unsigned int> &    n_coefficients_per_direction,
+    const std::vector<unsigned int>     &n_coefficients_per_direction,
     const hp::FECollection<3, spacedim> &fe_collection,
-    const hp::QCollection<3> &           q_collection,
+    const hp::QCollection<3>            &q_collection,
     const unsigned int                   fe,
     const unsigned int                   component,
-    std::vector<FullMatrix<double>> &    legendre_transform_matrices)
+    std::vector<FullMatrix<double>>     &legendre_transform_matrices)
   {
     AssertIndexRange(fe, fe_collection.size());
 
@@ -197,9 +197,9 @@ namespace FESeries
 {
   template <int dim, int spacedim>
   Legendre<dim, spacedim>::Legendre(
-    const std::vector<unsigned int> &      n_coefficients_per_direction,
+    const std::vector<unsigned int>       &n_coefficients_per_direction,
     const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           q_collection,
+    const hp::QCollection<dim>            &q_collection,
     const unsigned int                     component_)
     : n_coefficients_per_direction(n_coefficients_per_direction)
     , fe_collection(&fe_collection)
@@ -282,7 +282,7 @@ namespace FESeries
   Legendre<dim, spacedim>::calculate(
     const dealii::Vector<Number> &local_dof_values,
     const unsigned int            cell_active_fe_index,
-    Table<dim, CoefficientType> & legendre_coefficients)
+    Table<dim, CoefficientType>  &legendre_coefficients)
   {
     for (unsigned int d = 0; d < dim; ++d)
       AssertDimension(legendre_coefficients.size(d),

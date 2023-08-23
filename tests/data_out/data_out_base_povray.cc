@@ -62,7 +62,7 @@ void
 check_cont(unsigned int             ncells,
            unsigned int             nsub,
            DataOutBase::PovrayFlags flags,
-           std::ostream &           out)
+           std::ostream            &out)
 {
   std::vector<DataOutBase::Patch<dim, dim>> patches;
 

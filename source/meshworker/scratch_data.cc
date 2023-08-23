@@ -23,12 +23,12 @@ namespace MeshWorker
 {
   template <int dim, int spacedim>
   ScratchData<dim, spacedim>::ScratchData(
-    const Mapping<dim, spacedim> &      mapping,
+    const Mapping<dim, spacedim>       &mapping,
     const FiniteElement<dim, spacedim> &fe,
-    const Quadrature<dim> &             quadrature,
-    const UpdateFlags &                 update_flags,
-    const Quadrature<dim - 1> &         face_quadrature,
-    const UpdateFlags &                 face_update_flags)
+    const Quadrature<dim>              &quadrature,
+    const UpdateFlags                  &update_flags,
+    const Quadrature<dim - 1>          &face_quadrature,
+    const UpdateFlags                  &face_update_flags)
     : mapping(&mapping)
     , fe(&fe)
     , cell_quadrature(quadrature)
@@ -46,14 +46,14 @@ namespace MeshWorker
 
   template <int dim, int spacedim>
   ScratchData<dim, spacedim>::ScratchData(
-    const Mapping<dim, spacedim> &      mapping,
+    const Mapping<dim, spacedim>       &mapping,
     const FiniteElement<dim, spacedim> &fe,
-    const Quadrature<dim> &             quadrature,
-    const UpdateFlags &                 update_flags,
-    const UpdateFlags &                 neighbor_update_flags,
-    const Quadrature<dim - 1> &         face_quadrature,
-    const UpdateFlags &                 face_update_flags,
-    const UpdateFlags &                 neighbor_face_update_flags)
+    const Quadrature<dim>              &quadrature,
+    const UpdateFlags                  &update_flags,
+    const UpdateFlags                  &neighbor_update_flags,
+    const Quadrature<dim - 1>          &face_quadrature,
+    const UpdateFlags                  &face_update_flags,
+    const UpdateFlags                  &neighbor_face_update_flags)
     : mapping(&mapping)
     , fe(&fe)
     , cell_quadrature(quadrature)
@@ -72,10 +72,10 @@ namespace MeshWorker
   template <int dim, int spacedim>
   ScratchData<dim, spacedim>::ScratchData(
     const FiniteElement<dim, spacedim> &fe,
-    const Quadrature<dim> &             quadrature,
-    const UpdateFlags &                 update_flags,
-    const Quadrature<dim - 1> &         face_quadrature,
-    const UpdateFlags &                 face_update_flags)
+    const Quadrature<dim>              &quadrature,
+    const UpdateFlags                  &update_flags,
+    const Quadrature<dim - 1>          &face_quadrature,
+    const UpdateFlags                  &face_update_flags)
     : ScratchData(fe.reference_cell()
                     .template get_default_linear_mapping<dim, spacedim>(),
                   fe,
@@ -90,12 +90,12 @@ namespace MeshWorker
   template <int dim, int spacedim>
   ScratchData<dim, spacedim>::ScratchData(
     const FiniteElement<dim, spacedim> &fe,
-    const Quadrature<dim> &             quadrature,
-    const UpdateFlags &                 update_flags,
-    const UpdateFlags &                 neighbor_update_flags,
-    const Quadrature<dim - 1> &         face_quadrature,
-    const UpdateFlags &                 face_update_flags,
-    const UpdateFlags &                 neighbor_face_update_flags)
+    const Quadrature<dim>              &quadrature,
+    const UpdateFlags                  &update_flags,
+    const UpdateFlags                  &neighbor_update_flags,
+    const Quadrature<dim - 1>          &face_quadrature,
+    const UpdateFlags                  &face_update_flags,
+    const UpdateFlags                  &neighbor_face_update_flags)
     : ScratchData(fe.reference_cell()
                     .template get_default_linear_mapping<dim, spacedim>(),
                   fe,
@@ -112,11 +112,11 @@ namespace MeshWorker
   template <int dim, int spacedim>
   ScratchData<dim, spacedim>::ScratchData(
     const hp::MappingCollection<dim, spacedim> &mapping_collection,
-    const hp::FECollection<dim, spacedim> &     fe_collection,
-    const hp::QCollection<dim> &                cell_quadrature_collection,
-    const UpdateFlags &                         cell_update_flags,
-    const hp::QCollection<dim - 1> &            face_quadrature_collection,
-    const UpdateFlags &                         face_update_flags)
+    const hp::FECollection<dim, spacedim>      &fe_collection,
+    const hp::QCollection<dim>                 &cell_quadrature_collection,
+    const UpdateFlags                          &cell_update_flags,
+    const hp::QCollection<dim - 1>             &face_quadrature_collection,
+    const UpdateFlags                          &face_update_flags)
     : mapping_collection(&mapping_collection)
     , fe_collection(&fe_collection)
     , cell_quadrature_collection(cell_quadrature_collection)
@@ -136,13 +136,13 @@ namespace MeshWorker
   template <int dim, int spacedim>
   ScratchData<dim, spacedim>::ScratchData(
     const hp::MappingCollection<dim, spacedim> &mapping_collection,
-    const hp::FECollection<dim, spacedim> &     fe_collection,
-    const hp::QCollection<dim> &                cell_quadrature_collection,
-    const UpdateFlags &                         cell_update_flags,
-    const UpdateFlags &                         neighbor_cell_update_flags,
-    const hp::QCollection<dim - 1> &            face_quadrature_collection,
-    const UpdateFlags &                         face_update_flags,
-    const UpdateFlags &                         neighbor_face_update_flags)
+    const hp::FECollection<dim, spacedim>      &fe_collection,
+    const hp::QCollection<dim>                 &cell_quadrature_collection,
+    const UpdateFlags                          &cell_update_flags,
+    const UpdateFlags                          &neighbor_cell_update_flags,
+    const hp::QCollection<dim - 1>             &face_quadrature_collection,
+    const UpdateFlags                          &face_update_flags,
+    const UpdateFlags                          &neighbor_face_update_flags)
     : mapping_collection(&mapping_collection)
     , fe_collection(&fe_collection)
     , cell_quadrature_collection(cell_quadrature_collection)
@@ -162,10 +162,10 @@ namespace MeshWorker
   template <int dim, int spacedim>
   ScratchData<dim, spacedim>::ScratchData(
     const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           cell_quadrature_collection,
-    const UpdateFlags &                    cell_update_flags,
-    const hp::QCollection<dim - 1> &       face_quadrature_collection,
-    const UpdateFlags &                    face_update_flags)
+    const hp::QCollection<dim>            &cell_quadrature_collection,
+    const UpdateFlags                     &cell_update_flags,
+    const hp::QCollection<dim - 1>        &face_quadrature_collection,
+    const UpdateFlags                     &face_update_flags)
     : ScratchData(fe_collection.get_reference_cell_default_linear_mapping(),
                   fe_collection,
                   cell_quadrature_collection,
@@ -179,12 +179,12 @@ namespace MeshWorker
   template <int dim, int spacedim>
   ScratchData<dim, spacedim>::ScratchData(
     const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           cell_quadrature_collection,
-    const UpdateFlags &                    cell_update_flags,
-    const UpdateFlags &                    neighbor_cell_update_flags,
-    const hp::QCollection<dim - 1> &       face_quadrature_collection,
-    const UpdateFlags &                    face_update_flags,
-    const UpdateFlags &                    neighbor_face_update_flags)
+    const hp::QCollection<dim>            &cell_quadrature_collection,
+    const UpdateFlags                     &cell_update_flags,
+    const UpdateFlags                     &neighbor_cell_update_flags,
+    const hp::QCollection<dim - 1>        &face_quadrature_collection,
+    const UpdateFlags                     &face_update_flags,
+    const UpdateFlags                     &neighbor_face_update_flags)
     : ScratchData(fe_collection.get_reference_cell_default_linear_mapping(),
                   fe_collection,
                   cell_quadrature_collection,
@@ -294,7 +294,7 @@ namespace MeshWorker
   ScratchData<dim, spacedim>::reinit(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator
-      &                neighbor_cell,
+                      &neighbor_cell,
     const unsigned int face_no)
   {
     Assert(hp_capability_enabled, ExcOnlyAvailableWithHP());
@@ -383,7 +383,7 @@ namespace MeshWorker
   ScratchData<dim, spacedim>::reinit(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator
-      &                neighbor_cell,
+                      &neighbor_cell,
     const unsigned int face_no,
     const unsigned int subface_no)
   {
@@ -451,7 +451,7 @@ namespace MeshWorker
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face_no,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator
-      &                cell_neighbor,
+                      &cell_neighbor,
     const unsigned int face_no_neighbor)
   {
     return reinit(cell,
@@ -471,7 +471,7 @@ namespace MeshWorker
     const unsigned int                                              face_no,
     const unsigned int                                              sub_face_no,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator
-      &                cell_neighbor,
+                      &cell_neighbor,
     const unsigned int face_no_neighbor,
     const unsigned int sub_face_no_neighbor)
   {
@@ -605,7 +605,7 @@ namespace MeshWorker
   ScratchData<dim, spacedim>::reinit_neighbor(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator
-      &                neighbor_cell,
+                      &neighbor_cell,
     const unsigned int face_no)
   {
     Assert(hp_capability_enabled, ExcOnlyAvailableWithHP());
@@ -695,7 +695,7 @@ namespace MeshWorker
   ScratchData<dim, spacedim>::reinit_neighbor(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator
-      &                neighbor_cell,
+                      &neighbor_cell,
     const unsigned int face_no,
     const unsigned int subface_no)
   {

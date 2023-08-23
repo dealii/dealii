@@ -44,7 +44,7 @@ template <typename Number>
 void
 DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
   const ReadVector<Number> &values,
-  Vector<Number> &          interpolated_values,
+  Vector<Number>           &interpolated_values,
   const types::fe_index     fe_index_) const
 {
   const types::fe_index fe_index =

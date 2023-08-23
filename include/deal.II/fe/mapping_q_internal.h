@@ -64,7 +64,7 @@ namespace internal
     inline Point<1>
     transform_real_to_unit_cell(
       const std::array<Point<spacedim>, GeometryInfo<1>::vertices_per_cell>
-        &                    vertices,
+                            &vertices,
       const Point<spacedim> &p)
     {
       Assert(spacedim == 1, ExcInternalError());
@@ -78,7 +78,7 @@ namespace internal
     inline Point<2>
     transform_real_to_unit_cell(
       const std::array<Point<spacedim>, GeometryInfo<2>::vertices_per_cell>
-        &                    vertices,
+                            &vertices,
       const Point<spacedim> &p)
     {
       Assert(spacedim == 2, ExcInternalError());
@@ -215,7 +215,7 @@ namespace internal
      */
     template <int dim>
     std::vector<Point<dim>>
-    unit_support_points(const std::vector<Point<1>> &    line_support_points,
+    unit_support_points(const std::vector<Point<1>>     &line_support_points,
                         const std::vector<unsigned int> &renumbering)
     {
       AssertDimension(Utilities::pow(line_support_points.size(), dim),
@@ -318,7 +318,7 @@ namespace internal
         for (unsigned int j = 0; j < M; ++j)
           for (unsigned int k = 0; k < M; ++k)
             {
-              const Point<3> &   p = gl.point((i + 1) * (M + 2) * (M + 2) +
+              const Point<3>    &p = gl.point((i + 1) * (M + 2) * (M + 2) +
                                            (j + 1) * (M + 2) + (k + 1));
               const unsigned int index_table = i * M * M + j * M + k;
 
@@ -476,11 +476,11 @@ namespace internal
     template <int dim, int spacedim, typename Number>
     inline Point<dim, Number>
     do_transform_real_to_unit_cell_internal(
-      const Point<spacedim, Number> &                     p,
-      const Point<dim, Number> &                          initial_p_unit,
-      const std::vector<Point<spacedim>> &                points,
+      const Point<spacedim, Number>                      &p,
+      const Point<dim, Number>                           &initial_p_unit,
+      const std::vector<Point<spacedim>>                 &points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
-      const std::vector<unsigned int> &                   renumber,
+      const std::vector<unsigned int>                    &renumber,
       const bool print_iterations_to_deallog = false)
     {
       if (print_iterations_to_deallog)
@@ -733,11 +733,11 @@ namespace internal
     template <int dim>
     inline Point<dim>
     do_transform_real_to_unit_cell_internal_codim1(
-      const Point<dim + 1> &                              p,
-      const Point<dim> &                                  initial_p_unit,
-      const std::vector<Point<dim + 1>> &                 points,
+      const Point<dim + 1>                               &p,
+      const Point<dim>                                   &initial_p_unit,
+      const std::vector<Point<dim + 1>>                  &points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
-      const std::vector<unsigned int> &                   renumber)
+      const std::vector<unsigned int>                    &renumber)
     {
       const unsigned int spacedim = dim + 1;
 
@@ -835,7 +835,7 @@ namespace internal
        */
       InverseQuadraticApproximation(
         const std::vector<Point<spacedim>> &real_support_points,
-        const std::vector<Point<dim>> &     unit_support_points)
+        const std::vector<Point<dim>>      &unit_support_points)
         : normalization_shift(real_support_points[0])
         , normalization_length(
             1. / real_support_points[0].distance(real_support_points[1]))
@@ -1057,7 +1057,7 @@ namespace internal
     maybe_update_q_points_Jacobians_and_grads_tensor(
       const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
-      std::vector<Point<spacedim>> &                 quadrature_points,
+      std::vector<Point<spacedim>>                  &quadrature_points,
       std::vector<DerivativeForm<1, dim, spacedim>> &jacobians,
       std::vector<DerivativeForm<1, spacedim, dim>> &inverse_jacobians,
       std::vector<DerivativeForm<2, dim, spacedim>> &jacobian_grads)
@@ -1245,7 +1245,7 @@ namespace internal
       const unsigned int n_points,
       const unsigned int cur_index,
       const DerivativeForm<1, dim, spacedim, VectorizedArray<double>>
-        &                                            derivative,
+                                                    &derivative,
       std::vector<DerivativeForm<1, dim, spacedim>> &result_array)
     {
       AssertDimension(result_array.size(), n_points);
@@ -1256,7 +1256,7 @@ namespace internal
           for (unsigned int j = 0; j < n_lanes; ++j)
             indices[j] = j * dim * spacedim;
           const unsigned int even       = (dim * spacedim) / 4 * 4;
-          double *           result_ptr = &result_array[cur_index][0][0];
+          double            *result_ptr = &result_array[cur_index][0][0];
           const VectorizedArray<double> *derivative_ptr = &derivative[0][0];
           vectorized_transpose_and_store(
             false, even, derivative_ptr, indices.data(), result_ptr);
@@ -1278,10 +1278,10 @@ namespace internal
     maybe_update_q_points_Jacobians_generic(
       const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
-      const ArrayView<const Point<dim>> &                           unit_points,
+      const ArrayView<const Point<dim>>                            &unit_points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
       const std::vector<unsigned int> &renumber_lexicographic_to_hierarchic,
-      std::vector<Point<spacedim>> &   quadrature_points,
+      std::vector<Point<spacedim>>    &quadrature_points,
       std::vector<DerivativeForm<1, dim, spacedim>> &jacobians,
       std::vector<DerivativeForm<1, spacedim, dim>> &inverse_jacobians)
     {
@@ -1436,7 +1436,7 @@ namespace internal
     maybe_update_jacobian_grads(
       const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
-      const ArrayView<const Point<dim>> &                           unit_points,
+      const ArrayView<const Point<dim>>                            &unit_points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
       const std::vector<unsigned int> &renumber_lexicographic_to_hierarchic,
       std::vector<DerivativeForm<2, dim, spacedim>> &jacobian_grads)
@@ -1478,9 +1478,9 @@ namespace internal
     maybe_update_jacobian_pushed_forward_grads(
       const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
-      const ArrayView<const Point<dim>> &                           unit_points,
+      const ArrayView<const Point<dim>>                            &unit_points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
-      const std::vector<unsigned int> & renumber_lexicographic_to_hierarchic,
+      const std::vector<unsigned int>  &renumber_lexicographic_to_hierarchic,
       std::vector<Tensor<3, spacedim>> &jacobian_pushed_forward_grads)
     {
       if (data.update_each & update_jacobian_pushed_forward_grads)
@@ -1593,7 +1593,7 @@ namespace internal
     maybe_update_jacobian_2nd_derivatives(
       const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
-      const ArrayView<const Point<dim>> &                           unit_points,
+      const ArrayView<const Point<dim>>                            &unit_points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
       const std::vector<unsigned int> &renumber_lexicographic_to_hierarchic,
       std::vector<DerivativeForm<3, dim, spacedim>> &jacobian_2nd_derivatives)
@@ -1633,9 +1633,9 @@ namespace internal
     maybe_update_jacobian_pushed_forward_2nd_derivatives(
       const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
-      const ArrayView<const Point<dim>> &                           unit_points,
+      const ArrayView<const Point<dim>>                            &unit_points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
-      const std::vector<unsigned int> & renumber_lexicographic_to_hierarchic,
+      const std::vector<unsigned int>  &renumber_lexicographic_to_hierarchic,
       std::vector<Tensor<4, spacedim>> &jacobian_pushed_forward_2nd_derivatives)
     {
       if (data.update_each & update_jacobian_pushed_forward_2nd_derivatives)
@@ -1780,7 +1780,7 @@ namespace internal
     maybe_update_jacobian_3rd_derivatives(
       const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
-      const ArrayView<const Point<dim>> &                           unit_points,
+      const ArrayView<const Point<dim>>                            &unit_points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
       const std::vector<unsigned int> &renumber_lexicographic_to_hierarchic,
       std::vector<DerivativeForm<4, dim, spacedim>> &jacobian_3rd_derivatives)
@@ -1820,9 +1820,9 @@ namespace internal
     maybe_update_jacobian_pushed_forward_3rd_derivatives(
       const CellSimilarity::Similarity cell_similarity,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
-      const ArrayView<const Point<dim>> &                           unit_points,
+      const ArrayView<const Point<dim>>                            &unit_points,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
-      const std::vector<unsigned int> & renumber_lexicographic_to_hierarchic,
+      const std::vector<unsigned int>  &renumber_lexicographic_to_hierarchic,
       std::vector<Tensor<5, spacedim>> &jacobian_pushed_forward_3rd_derivatives)
     {
       if (data.update_each & update_jacobian_pushed_forward_3rd_derivatives)
@@ -1934,7 +1934,7 @@ namespace internal
       const unsigned int                                            face_no,
       const unsigned int                                            subface_no,
       const unsigned int                                            n_q_points,
-      const std::vector<double> &                                   weights,
+      const std::vector<double>                                    &weights,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
         &output_data)
@@ -2086,7 +2086,7 @@ namespace internal
       const unsigned int                                            face_no,
       const unsigned int                                            subface_no,
       const typename QProjector<dim>::DataSetDescriptor             data_set,
-      const Quadrature<dim - 1> &                                   quadrature,
+      const Quadrature<dim - 1>                                    &quadrature,
       const typename dealii::MappingQ<dim, spacedim>::InternalData &data,
       const std::vector<Polynomials::Polynomial<double>> &polynomials_1d,
       const std::vector<unsigned int> &renumber_lexicographic_to_hierarchic,
@@ -2179,10 +2179,10 @@ namespace internal
     template <int dim, int spacedim, int rank>
     inline void
     transform_fields(
-      const ArrayView<const Tensor<rank, dim>> &               input,
+      const ArrayView<const Tensor<rank, dim>>                &input,
       const MappingKind                                        mapping_kind,
       const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-      const ArrayView<Tensor<rank, spacedim>> &                output)
+      const ArrayView<Tensor<rank, spacedim>>                 &output)
     {
       AssertDimension(input.size(), output.size());
       Assert((dynamic_cast<
@@ -2259,10 +2259,10 @@ namespace internal
     template <int dim, int spacedim, int rank>
     inline void
     transform_gradients(
-      const ArrayView<const Tensor<rank, dim>> &               input,
+      const ArrayView<const Tensor<rank, dim>>                &input,
       const MappingKind                                        mapping_kind,
       const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-      const ArrayView<Tensor<rank, spacedim>> &                output)
+      const ArrayView<Tensor<rank, spacedim>>                 &output)
     {
       AssertDimension(input.size(), output.size());
       Assert((dynamic_cast<
@@ -2361,10 +2361,10 @@ namespace internal
     template <int dim, int spacedim>
     inline void
     transform_hessians(
-      const ArrayView<const Tensor<3, dim>> &                  input,
+      const ArrayView<const Tensor<3, dim>>                   &input,
       const MappingKind                                        mapping_kind,
       const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-      const ArrayView<Tensor<3, spacedim>> &                   output)
+      const ArrayView<Tensor<3, spacedim>>                    &output)
     {
       AssertDimension(input.size(), output.size());
       Assert((dynamic_cast<
@@ -2540,8 +2540,8 @@ namespace internal
     transform_differential_forms(
       const ArrayView<const DerivativeForm<rank, dim, spacedim>> &input,
       const MappingKind                                           mapping_kind,
-      const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_data,
-      const ArrayView<Tensor<rank + 1, spacedim>> &               output)
+      const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_data,
+      const ArrayView<Tensor<rank + 1, spacedim>>                &output)
     {
       AssertDimension(input.size(), output.size());
       Assert((dynamic_cast<

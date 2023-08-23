@@ -404,7 +404,7 @@ namespace PETScWrappers
      * values are inserted/replaced.
      */
     void
-    set(const std::vector<size_type> & indices,
+    set(const std::vector<size_type>  &indices,
         const FullMatrix<PetscScalar> &full_matrix,
         const bool                     elide_zero_values = false);
 
@@ -414,8 +414,8 @@ namespace PETScWrappers
      * rows and columns, respectively.
      */
     void
-    set(const std::vector<size_type> & row_indices,
-        const std::vector<size_type> & col_indices,
+    set(const std::vector<size_type>  &row_indices,
+        const std::vector<size_type>  &col_indices,
         const FullMatrix<PetscScalar> &full_matrix,
         const bool                     elide_zero_values = false);
 
@@ -435,7 +435,7 @@ namespace PETScWrappers
      */
     void
     set(const size_type                 row,
-        const std::vector<size_type> &  col_indices,
+        const std::vector<size_type>   &col_indices,
         const std::vector<PetscScalar> &values,
         const bool                      elide_zero_values = false);
 
@@ -456,7 +456,7 @@ namespace PETScWrappers
     void
     set(const size_type    row,
         const size_type    n_cols,
-        const size_type *  col_indices,
+        const size_type   *col_indices,
         const PetscScalar *values,
         const bool         elide_zero_values = false);
 
@@ -492,7 +492,7 @@ namespace PETScWrappers
      * <tt>true</tt>, i.e., zero values won't be added into the matrix.
      */
     void
-    add(const std::vector<size_type> & indices,
+    add(const std::vector<size_type>  &indices,
         const FullMatrix<PetscScalar> &full_matrix,
         const bool                     elide_zero_values = true);
 
@@ -502,8 +502,8 @@ namespace PETScWrappers
      * rows and columns, respectively.
      */
     void
-    add(const std::vector<size_type> & row_indices,
-        const std::vector<size_type> & col_indices,
+    add(const std::vector<size_type>  &row_indices,
+        const std::vector<size_type>  &col_indices,
         const FullMatrix<PetscScalar> &full_matrix,
         const bool                     elide_zero_values = true);
 
@@ -523,7 +523,7 @@ namespace PETScWrappers
      */
     void
     add(const size_type                 row,
-        const std::vector<size_type> &  col_indices,
+        const std::vector<size_type>   &col_indices,
         const std::vector<PetscScalar> &values,
         const bool                      elide_zero_values = true);
 
@@ -544,7 +544,7 @@ namespace PETScWrappers
     void
     add(const size_type    row,
         const size_type    n_cols,
-        const size_type *  col_indices,
+        const size_type   *col_indices,
         const PetscScalar *values,
         const bool         elide_zero_values      = true,
         const bool         col_indices_are_sorted = false);
@@ -1275,7 +1275,7 @@ namespace PETScWrappers
 
 
   inline void
-  MatrixBase::set(const std::vector<size_type> & indices,
+  MatrixBase::set(const std::vector<size_type>  &indices,
                   const FullMatrix<PetscScalar> &values,
                   const bool                     elide_zero_values)
   {
@@ -1294,8 +1294,8 @@ namespace PETScWrappers
 
 
   inline void
-  MatrixBase::set(const std::vector<size_type> & row_indices,
-                  const std::vector<size_type> & col_indices,
+  MatrixBase::set(const std::vector<size_type>  &row_indices,
+                  const std::vector<size_type>  &col_indices,
                   const FullMatrix<PetscScalar> &values,
                   const bool                     elide_zero_values)
   {
@@ -1316,7 +1316,7 @@ namespace PETScWrappers
 
   inline void
   MatrixBase::set(const size_type                 row,
-                  const std::vector<size_type> &  col_indices,
+                  const std::vector<size_type>   &col_indices,
                   const std::vector<PetscScalar> &values,
                   const bool                      elide_zero_values)
   {
@@ -1335,7 +1335,7 @@ namespace PETScWrappers
   inline void
   MatrixBase::set(const size_type    row,
                   const size_type    n_cols,
-                  const size_type *  col_indices,
+                  const size_type   *col_indices,
                   const PetscScalar *values,
                   const bool         elide_zero_values)
   {
@@ -1416,7 +1416,7 @@ namespace PETScWrappers
 
 
   inline void
-  MatrixBase::add(const std::vector<size_type> & indices,
+  MatrixBase::add(const std::vector<size_type>  &indices,
                   const FullMatrix<PetscScalar> &values,
                   const bool                     elide_zero_values)
   {
@@ -1435,8 +1435,8 @@ namespace PETScWrappers
 
 
   inline void
-  MatrixBase::add(const std::vector<size_type> & row_indices,
-                  const std::vector<size_type> & col_indices,
+  MatrixBase::add(const std::vector<size_type>  &row_indices,
+                  const std::vector<size_type>  &col_indices,
                   const FullMatrix<PetscScalar> &values,
                   const bool                     elide_zero_values)
   {
@@ -1457,7 +1457,7 @@ namespace PETScWrappers
 
   inline void
   MatrixBase::add(const size_type                 row,
-                  const std::vector<size_type> &  col_indices,
+                  const std::vector<size_type>   &col_indices,
                   const std::vector<PetscScalar> &values,
                   const bool                      elide_zero_values)
   {
@@ -1476,7 +1476,7 @@ namespace PETScWrappers
   inline void
   MatrixBase::add(const size_type    row,
                   const size_type    n_cols,
-                  const size_type *  col_indices,
+                  const size_type   *col_indices,
                   const PetscScalar *values,
                   const bool         elide_zero_values,
                   const bool /*col_indices_are_sorted*/)

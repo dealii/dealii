@@ -53,8 +53,8 @@ public:
   void
   face(MeshWorker::DoFInfo<dim> &dinfo1,
        MeshWorker::DoFInfo<dim> &dinfo2,
-       CellInfo &                info1,
-       CellInfo &                info2) const;
+       CellInfo                 &info1,
+       CellInfo                 &info2) const;
 
   bool cells;
   bool faces;

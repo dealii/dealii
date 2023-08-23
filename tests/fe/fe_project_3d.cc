@@ -154,7 +154,7 @@ VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 template <int dim>
 void
 VectorFunction<dim>::vector_value(const Point<dim> &p,
-                                  Vector<double> &  values) const
+                                  Vector<double>   &values) const
 {
   for (int i = 0; i < dim; ++i)
     values(i) = value(p, i);
@@ -162,7 +162,7 @@ VectorFunction<dim>::vector_value(const Point<dim> &p,
 
 template <>
 Tensor<1, 3>
-VectorFunction<3>::gradient(const Point<3> &   p,
+VectorFunction<3>::gradient(const Point<3>    &p,
                             const unsigned int component) const
 {
   const double PI = numbers::PI;
@@ -192,7 +192,7 @@ VectorFunction<3>::gradient(const Point<3> &   p,
 
 void
 create_tria(Triangulation<3> &triangulation,
-            const Point<3> *  vertices_parallelograms)
+            const Point<3>   *vertices_parallelograms)
 {
   const std::vector<Point<3>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
@@ -229,7 +229,7 @@ void
 test(const FiniteElement<dim> &fe,
      unsigned                  n_cycles,
      bool                      global,
-     const Point<dim> *        vertices_parallelograms)
+     const Point<dim>         *vertices_parallelograms)
 {
   deallog << "dim: " << dim << "\t" << fe.get_name() << std::endl;
   deallog

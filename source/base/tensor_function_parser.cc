@@ -72,8 +72,8 @@ TensorFunctionParser<rank, dim, Number>::TensorFunctionParser(
 template <int rank, int dim, typename Number>
 void
 TensorFunctionParser<rank, dim, Number>::initialize(
-  const std::string &                  variables,
-  const std::vector<std::string> &     expressions,
+  const std::string                   &variables,
+  const std::vector<std::string>      &expressions,
   const std::map<std::string, double> &constants,
   const bool                           time_dependent)
 {
@@ -88,8 +88,8 @@ TensorFunctionParser<rank, dim, Number>::initialize(
 template <int rank, int dim, typename Number>
 void
 TensorFunctionParser<rank, dim, Number>::initialize(
-  const std::string &                  vars,
-  const std::string &                  expression,
+  const std::string                   &vars,
+  const std::string                   &expression,
   const std::map<std::string, double> &constants,
   const bool                           time_dependent)
 {
@@ -119,7 +119,7 @@ TensorFunctionParser<rank, dim, Number>::value(const Point<dim> &p) const
 template <int rank, int dim, typename Number>
 void
 TensorFunctionParser<rank, dim, Number>::value_list(
-  const std::vector<Point<dim>> &         p,
+  const std::vector<Point<dim>>          &p,
   std::vector<Tensor<rank, dim, Number>> &values) const
 {
   Assert(p.size() == values.size(),

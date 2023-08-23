@@ -68,11 +68,11 @@ namespace internal
     ParallelDataBase<dim, spacedim>::ParallelDataBase(
       const unsigned int                    n_datasets,
       const unsigned int                    n_subdivisions,
-      const std::vector<unsigned int> &     n_postprocessor_outputs,
+      const std::vector<unsigned int>      &n_postprocessor_outputs,
       const dealii::Mapping<dim, spacedim> &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &               finite_elements,
+                       &finite_elements,
       const UpdateFlags update_flags,
       const bool        use_face_values)
       : ParallelDataBase<dim, spacedim>(
@@ -128,7 +128,7 @@ namespace internal
     generate_simplex_evaluation_points_recursively(
       const std::vector<Point<2>> &bounding_vertices,
       const unsigned int           n_subdivisions,
-      std::vector<Point<2>> &      evaluation_points)
+      std::vector<Point<2>>       &evaluation_points)
     {
       if (n_subdivisions == 0)
         {
@@ -214,7 +214,7 @@ namespace internal
       const dealii::hp::MappingCollection<dim, spacedim> &mapping_collection,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &               finite_elements,
+                       &finite_elements,
       const UpdateFlags update_flags,
       const bool        use_face_values,
       std::vector<std::shared_ptr<dealii::hp::FEValues<dim, spacedim>>>
@@ -235,7 +235,7 @@ namespace internal
       // to test there if dim<3.
       static const auto has_fe_with_reference_cell =
         [](const dealii::hp::FECollection<dim, spacedim> &fe_collection,
-           const ReferenceCell &                          reference_cell) {
+           const ReferenceCell                           &reference_cell) {
           for (unsigned int i = 0; i < fe_collection.size(); ++i)
             if (fe_collection[i].reference_cell() == reference_cell)
               return true;
@@ -476,7 +476,7 @@ namespace internal
       const dealii::hp::MappingCollection<dim, spacedim> &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &               finite_elements,
+                       &finite_elements,
       const UpdateFlags update_flags,
       const bool        use_face_values)
       : n_datasets(n_datasets)
@@ -640,7 +640,7 @@ namespace internal
     template <int dim, int spacedim>
     void
     append_patch_to_list(
-      const DataOutBase::Patch<dim, spacedim> &       patch,
+      const DataOutBase::Patch<dim, spacedim>        &patch,
       std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
     {
       patches.push_back(patch);
@@ -722,7 +722,7 @@ namespace internal
     template <int dim, int spacedim>
     DataEntryBase<dim, spacedim>::DataEntryBase(
       const DoFHandler<dim, spacedim> *dofs,
-      const std::vector<std::string> & names_in,
+      const std::vector<std::string>  &names_in,
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
         &data_component_interpretation)
@@ -757,7 +757,7 @@ namespace internal
 
     template <int dim, int spacedim>
     DataEntryBase<dim, spacedim>::DataEntryBase(
-      const DoFHandler<dim, spacedim> *  dofs,
+      const DoFHandler<dim, spacedim>   *dofs,
       const DataPostprocessor<spacedim> *data_postprocessor)
       : dof_handler(
           dofs,
@@ -800,7 +800,7 @@ namespace internal
       template <typename VectorType, typename Number>
       void
       copy_locally_owned_data_from(
-        const VectorType &                          src,
+        const VectorType                           &src,
         LinearAlgebra::distributed::Vector<Number> &dst)
       {
         LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp;
@@ -818,7 +818,7 @@ namespace internal
       template <typename Number>
       void
       copy_locally_owned_data_from(
-        const TrilinosWrappers::MPI::Vector &       src,
+        const TrilinosWrappers::MPI::Vector        &src,
         LinearAlgebra::distributed::Vector<Number> &dst)
       {
         // ReadWriteVector does not work for ghosted
@@ -840,8 +840,8 @@ namespace internal
                   * = nullptr>
       void
       create_dof_vector(
-        const DoFHandler<dim, spacedim> &                dof_handler,
-        const VectorType &                               src,
+        const DoFHandler<dim, spacedim>                 &dof_handler,
+        const VectorType                                &src,
         LinearAlgebra::distributed::BlockVector<Number> &dst,
         const unsigned int level = numbers::invalid_unsigned_int)
       {
@@ -908,8 +908,8 @@ namespace internal
                   * = nullptr>
       void
       create_dof_vector(
-        const DoFHandler<dim, spacedim> &                dof_handler,
-        const VectorType &                               src,
+        const DoFHandler<dim, spacedim>                 &dof_handler,
+        const VectorType                                &src,
         LinearAlgebra::distributed::BlockVector<Number> &dst,
         const unsigned int level = numbers::invalid_unsigned_int)
       {
@@ -950,7 +950,7 @@ namespace internal
                 std::enable_if_t<IsBlockVector<VectorType>::value, VectorType>
                   * = nullptr>
       void
-      create_cell_vector(const VectorType &                               src,
+      create_cell_vector(const VectorType                                &src,
                          LinearAlgebra::distributed::BlockVector<Number> &dst)
       {
         dst.reinit(src.n_blocks());
@@ -973,7 +973,7 @@ namespace internal
                 std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
                   * = nullptr>
       void
-      create_cell_vector(const VectorType &                               src,
+      create_cell_vector(const VectorType                                &src,
                          LinearAlgebra::distributed::BlockVector<Number> &dst)
       {
         dst.reinit(1);
@@ -1004,11 +1004,11 @@ namespace internal
        */
       template <typename DataVectorType, typename VectorType>
       DataEntry(const DoFHandler<dim, spacedim> *dofs,
-                const VectorType *               data,
-                const std::vector<std::string> & names,
+                const VectorType                *data,
+                const std::vector<std::string>  &names,
                 const std::vector<
                   DataComponentInterpretation::DataComponentInterpretation>
-                  &                  data_component_interpretation,
+                                    &data_component_interpretation,
                 const DataVectorType actual_type);
 
       /**
@@ -1017,8 +1017,8 @@ namespace internal
        * the postprocessor.
        */
       template <typename VectorType>
-      DataEntry(const DoFHandler<dim, spacedim> *  dofs,
-                const VectorType *                 data,
+      DataEntry(const DoFHandler<dim, spacedim>   *dofs,
+                const VectorType                  *data,
                 const DataPostprocessor<spacedim> *data_postprocessor);
 
       /**
@@ -1058,7 +1058,7 @@ namespace internal
       get_function_gradients(
         const FEValuesBase<dim, spacedim> &fe_patch_values,
         const ComponentExtractor           extract_component,
-        std::vector<Tensor<1, spacedim>> & patch_gradients) const override;
+        std::vector<Tensor<1, spacedim>>  &patch_gradients) const override;
 
       /**
        * Given a FEValuesBase object, extract the gradients on the present
@@ -1079,7 +1079,7 @@ namespace internal
       get_function_hessians(
         const FEValuesBase<dim, spacedim> &fe_patch_values,
         const ComponentExtractor           extract_component,
-        std::vector<Tensor<2, spacedim>> & patch_hessians) const override;
+        std::vector<Tensor<2, spacedim>>  &patch_hessians) const override;
 
       /**
        * Given a FEValuesBase object, extract the second derivatives on the
@@ -1127,11 +1127,11 @@ namespace internal
     template <typename DataVectorType, typename VectorType>
     DataEntry<dim, spacedim, ScalarType>::DataEntry(
       const DoFHandler<dim, spacedim> *dofs,
-      const VectorType *               data,
-      const std::vector<std::string> & names,
+      const VectorType                *data,
+      const std::vector<std::string>  &names,
       const std::vector<
         DataComponentInterpretation::DataComponentInterpretation>
-        &                  data_component_interpretation,
+                          &data_component_interpretation,
       const DataVectorType actual_type)
       : DataEntryBase<dim, spacedim>(dofs, names, data_component_interpretation)
     {
@@ -1148,8 +1148,8 @@ namespace internal
     template <int dim, int spacedim, typename ScalarType>
     template <typename VectorType>
     DataEntry<dim, spacedim, ScalarType>::DataEntry(
-      const DoFHandler<dim, spacedim> *  dofs,
-      const VectorType *                 data,
+      const DoFHandler<dim, spacedim>   *dofs,
+      const VectorType                  *data,
       const DataPostprocessor<spacedim> *data_postprocessor)
       : DataEntryBase<dim, spacedim>(dofs, data_postprocessor)
     {
@@ -1175,7 +1175,7 @@ namespace internal
     template <int dim, int spacedim, typename ScalarType>
     void
     DataEntry<dim, spacedim, ScalarType>::get_function_values(
-      const FEValuesBase<dim, spacedim> &  fe_patch_values,
+      const FEValuesBase<dim, spacedim>   &fe_patch_values,
       const ComponentExtractor             extract_component,
       std::vector<dealii::Vector<double>> &patch_values_system) const
     {
@@ -1224,7 +1224,7 @@ namespace internal
     DataEntry<dim, spacedim, ScalarType>::get_function_values(
       const FEValuesBase<dim, spacedim> &fe_patch_values,
       const ComponentExtractor           extract_component,
-      std::vector<double> &              patch_values) const
+      std::vector<double>               &patch_values) const
     {
       if constexpr (std::is_same_v<ScalarType, double>)
         {
@@ -1251,7 +1251,7 @@ namespace internal
     template <int dim, int spacedim, typename ScalarType>
     void
     DataEntry<dim, spacedim, ScalarType>::get_function_gradients(
-      const FEValuesBase<dim, spacedim> &            fe_patch_values,
+      const FEValuesBase<dim, spacedim>             &fe_patch_values,
       const ComponentExtractor                       extract_component,
       std::vector<std::vector<Tensor<1, spacedim>>> &patch_gradients_system)
       const
@@ -1304,7 +1304,7 @@ namespace internal
     DataEntry<dim, spacedim, ScalarType>::get_function_gradients(
       const FEValuesBase<dim, spacedim> &fe_patch_values,
       const ComponentExtractor           extract_component,
-      std::vector<Tensor<1, spacedim>> & patch_gradients) const
+      std::vector<Tensor<1, spacedim>>  &patch_gradients) const
     {
       if constexpr (std::is_same_v<ScalarType, double>)
         {
@@ -1332,7 +1332,7 @@ namespace internal
     template <int dim, int spacedim, typename ScalarType>
     void
     DataEntry<dim, spacedim, ScalarType>::get_function_hessians(
-      const FEValuesBase<dim, spacedim> &            fe_patch_values,
+      const FEValuesBase<dim, spacedim>             &fe_patch_values,
       const ComponentExtractor                       extract_component,
       std::vector<std::vector<Tensor<2, spacedim>>> &patch_hessians_system)
       const
@@ -1384,7 +1384,7 @@ namespace internal
     DataEntry<dim, spacedim, ScalarType>::get_function_hessians(
       const FEValuesBase<dim, spacedim> &fe_patch_values,
       const ComponentExtractor           extract_component,
-      std::vector<Tensor<2, spacedim>> & patch_hessians) const
+      std::vector<Tensor<2, spacedim>>  &patch_hessians) const
     {
       if constexpr (std::is_same_v<ScalarType, double>)
         {
@@ -1451,7 +1451,7 @@ namespace internal
       template <typename VectorType>
       MGDataEntry(const DoFHandler<dim, spacedim> *dofs,
                   const MGLevelObject<VectorType> *vectors,
-                  const std::vector<std::string> & names,
+                  const std::vector<std::string>  &names,
                   const std::vector<
                     DataComponentInterpretation::DataComponentInterpretation>
                     &data_component_interpretation)
@@ -1588,7 +1588,7 @@ namespace internal
       extract(const LinearAlgebra::distributed::BlockVector<ScalarType> &vector,
               const std::vector<types::global_dof_index> &indices,
               const ComponentExtractor                    extract_component,
-              std::vector<double> &                       values) const
+              std::vector<double>                        &values) const
       {
         for (unsigned int i = 0; i < values.size(); ++i)
           values[i] = get_component(vector[indices[i]], extract_component);
@@ -1617,7 +1617,7 @@ namespace internal
     MGDataEntry<dim, spacedim, ScalarType>::get_function_values(
       const FEValuesBase<dim, spacedim> &fe_patch_values,
       const ComponentExtractor           extract_component,
-      std::vector<double> &              patch_values) const
+      std::vector<double>               &patch_values) const
     {
       Assert(extract_component == ComponentExtractor::real_part,
              ExcNotImplemented());
@@ -1650,7 +1650,7 @@ namespace internal
     template <int dim, int spacedim, typename ScalarType>
     void
     MGDataEntry<dim, spacedim, ScalarType>::get_function_values(
-      const FEValuesBase<dim, spacedim> &  fe_patch_values,
+      const FEValuesBase<dim, spacedim>   &fe_patch_values,
       const ComponentExtractor             extract_component,
       std::vector<dealii::Vector<double>> &patch_values_system) const
     {
@@ -1753,8 +1753,8 @@ template <int dim, int patch_dim, int spacedim, int patch_spacedim>
 template <typename VectorType>
 void
 DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_data_vector(
-  const DoFHandler<dim, spacedim> &  dof_handler,
-  const VectorType &                 vec,
+  const DoFHandler<dim, spacedim>   &dof_handler,
+  const VectorType                  &vec,
   const DataPostprocessor<spacedim> &data_postprocessor)
 {
   // this is a specialized version of the other function where we have a
@@ -1798,11 +1798,11 @@ void
 DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
   add_data_vector_internal(
     const DoFHandler<dim, spacedim> *dof_handler,
-    const VectorType &               data_vector,
-    const std::vector<std::string> & names,
+    const VectorType                &data_vector,
+    const std::vector<std::string>  &names,
     const DataVectorType             type,
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      &        data_component_interpretation_,
+              &data_component_interpretation_,
     const bool deduce_output_names)
 {
   // Check available mesh information:
@@ -1929,7 +1929,7 @@ void
 DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
   const DoFHandler<dim, spacedim> &dof_handler,
   const MGLevelObject<VectorType> &data,
-  const std::string &              name)
+  const std::string               &name)
 {
   // forward the call to the vector version:
   std::vector<std::string> names(1, name);
@@ -1944,7 +1944,7 @@ void
 DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::add_mg_data_vector(
   const DoFHandler<dim, spacedim> &dof_handler,
   const MGLevelObject<VectorType> &data,
-  const std::vector<std::string> & names,
+  const std::vector<std::string>  &names,
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
     &data_component_interpretation_)
 {

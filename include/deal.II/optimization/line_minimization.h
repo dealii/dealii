@@ -110,9 +110,9 @@ namespace LineMinimization
            const NumberType                        x_hi,
            const NumberType                        f_hi,
            const NumberType                        g_hi,
-           const FiniteSizeHistory<NumberType> &   x_rec,
-           const FiniteSizeHistory<NumberType> &   f_rec,
-           const FiniteSizeHistory<NumberType> &   g_rec,
+           const FiniteSizeHistory<NumberType>    &x_rec,
+           const FiniteSizeHistory<NumberType>    &f_rec,
+           const FiniteSizeHistory<NumberType>    &g_rec,
            const std::pair<NumberType, NumberType> bounds);
 
   /**
@@ -127,9 +127,9 @@ namespace LineMinimization
                         const NumberType                        x_hi,
                         const NumberType                        f_hi,
                         const NumberType                        g_hi,
-                        const FiniteSizeHistory<NumberType> &   x_rec,
-                        const FiniteSizeHistory<NumberType> &   f_rec,
-                        const FiniteSizeHistory<NumberType> &   g_rec,
+                        const FiniteSizeHistory<NumberType>    &x_rec,
+                        const FiniteSizeHistory<NumberType>    &f_rec,
+                        const FiniteSizeHistory<NumberType>    &g_rec,
                         const std::pair<NumberType, NumberType> bounds);
 
 
@@ -323,7 +323,7 @@ namespace LineMinimization
   std::pair<NumberType, unsigned int>
   line_search(
     const std::function<std::pair<NumberType, NumberType>(const NumberType x)>
-      &              func,
+                    &func,
     const NumberType f0,
     const NumberType g0,
     const std::function<
@@ -333,9 +333,9 @@ namespace LineMinimization
                  const NumberType                        x_hi,
                  const NumberType                        f_hi,
                  const NumberType                        g_hi,
-                 const FiniteSizeHistory<NumberType> &   x_rec,
-                 const FiniteSizeHistory<NumberType> &   f_rec,
-                 const FiniteSizeHistory<NumberType> &   g_rec,
+                 const FiniteSizeHistory<NumberType>    &x_rec,
+                 const FiniteSizeHistory<NumberType>    &f_rec,
+                 const FiniteSizeHistory<NumberType>    &g_rec,
                  const std::pair<NumberType, NumberType> bounds)> &interpolate,
     const NumberType                                               a1,
     const NumberType                                               eta = 0.9,
@@ -521,7 +521,7 @@ namespace LineMinimization
   std::pair<NumberType, unsigned int>
   line_search(
     const std::function<std::pair<NumberType, NumberType>(const NumberType x)>
-      &              func,
+                    &func,
     const NumberType f0,
     const NumberType g0,
     const std::function<
@@ -531,9 +531,9 @@ namespace LineMinimization
                  const NumberType                        x_hi,
                  const NumberType                        f_hi,
                  const NumberType                        g_hi,
-                 const FiniteSizeHistory<NumberType> &   x_rec,
-                 const FiniteSizeHistory<NumberType> &   f_rec,
-                 const FiniteSizeHistory<NumberType> &   g_rec,
+                 const FiniteSizeHistory<NumberType>    &x_rec,
+                 const FiniteSizeHistory<NumberType>    &f_rec,
+                 const FiniteSizeHistory<NumberType>    &g_rec,
                  const std::pair<NumberType, NumberType> bounds)> &choose,
     const NumberType                                               a1,
     const NumberType                                               eta,

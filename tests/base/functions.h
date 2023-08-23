@@ -116,7 +116,7 @@ public:
   value(const Point<dim> &points, const unsigned int component) const;
   virtual void
   vector_value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Vector<double>> &  values) const;
+                    std::vector<Vector<double>>   &values) const;
 
 private:
   const Function<dim> &func;
@@ -142,7 +142,7 @@ template <int dim>
 void
 DerivativeTestFunction<dim>::vector_value_list(
   const std::vector<Point<dim>> &points,
-  std::vector<Vector<double>> &  values) const
+  std::vector<Vector<double>>   &values) const
 {
   func.vector_value_list(points, values);
 }
@@ -151,7 +151,7 @@ DerivativeTestFunction<dim>::vector_value_list(
 template <int dim>
 void
 DerivativeTestFunction<dim>::vector_value(const Point<dim> &point,
-                                          Vector<double> &  value) const
+                                          Vector<double>   &value) const
 {
   func.vector_value(point, value);
 }
@@ -159,7 +159,7 @@ DerivativeTestFunction<dim>::vector_value(const Point<dim> &point,
 
 template <int dim>
 double
-DerivativeTestFunction<dim>::value(const Point<dim> & point,
+DerivativeTestFunction<dim>::value(const Point<dim>  &point,
                                    const unsigned int comp) const
 {
   //  std::cerr << '[' << point << '!' << func.value(point, comp) << ']';

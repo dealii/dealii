@@ -90,13 +90,13 @@ namespace Step48
                  &src) const;
 
   private:
-    const MatrixFree<dim, double> &            data;
+    const MatrixFree<dim, double>             &data;
     const VectorizedArray<double>              delta_t_sqr;
     LinearAlgebra::distributed::Vector<double> inv_mass_matrix;
 
     void local_apply(
-      const MatrixFree<dim, double> &                                  data,
-      LinearAlgebra::distributed::Vector<double> &                     dst,
+      const MatrixFree<dim, double>                                   &data,
+      LinearAlgebra::distributed::Vector<double>                      &dst,
       const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
       const std::pair<unsigned int, unsigned int> &cell_range) const;
   };
@@ -185,8 +185,8 @@ namespace Step48
   // dst.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::local_apply(
-    const MatrixFree<dim> &                                          data,
-    LinearAlgebra::distributed::Vector<double> &                     dst,
+    const MatrixFree<dim>                                           &data,
+    LinearAlgebra::distributed::Vector<double>                      &dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
@@ -241,7 +241,7 @@ namespace Step48
   // inverse mass matrix.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::apply(
-    LinearAlgebra::distributed::Vector<double> &                     dst,
+    LinearAlgebra::distributed::Vector<double>                      &dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const
   {
     data.cell_loop(

@@ -25,8 +25,8 @@ namespace dealii
     // Compute harminic extent of all non-artificial cells.
     template <int dim>
     std::vector<std::array<double, dim>>
-    compute_harmonic_cell_extent(const Mapping<dim> &       mapping,
-                                 const Triangulation<dim> & triangulation,
+    compute_harmonic_cell_extent(const Mapping<dim>        &mapping,
+                                 const Triangulation<dim>  &triangulation,
                                  const Quadrature<dim - 1> &quadrature)
     {
       std::vector<std::array<double, dim>> result(
@@ -68,8 +68,8 @@ namespace dealii
     // of its neighbors. If there is no neigbor, its extent is zero.
     template <int dim>
     std::vector<dealii::ndarray<double, dim, 3>>
-    compute_harmonic_patch_extent(const Mapping<dim> &       mapping,
-                                  const Triangulation<dim> & triangulation,
+    compute_harmonic_patch_extent(const Mapping<dim>        &mapping,
+                                  const Triangulation<dim>  &triangulation,
                                   const Quadrature<dim - 1> &quadrature)
     {
       // 1) compute extent of each non-artificial cell

@@ -41,7 +41,7 @@ template <int dim>
 std::vector<char>
 pack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
-    &              cell,
+                  &cell,
   const CellStatus status)
 {
   static unsigned int       some_number = 1;
@@ -74,7 +74,7 @@ template <int dim>
 void
 unpack_function(
   const typename parallel::distributed::Triangulation<dim, dim>::cell_iterator
-    &                                                             cell,
+                                                                 &cell,
   const CellStatus                                                status,
   const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
 {

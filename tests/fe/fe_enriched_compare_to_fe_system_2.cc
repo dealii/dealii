@@ -121,23 +121,23 @@ private:
  */
 template <int dim>
 void
-check_consistency(const Point<dim> &    p,
-                  const Function<dim> & func1,
-                  const Function<dim> & func2,
-                  const Function<dim> & func3,
-                  const double &        v_e,
+check_consistency(const Point<dim>     &p,
+                  const Function<dim>  &func1,
+                  const Function<dim>  &func2,
+                  const Function<dim>  &func3,
+                  const double         &v_e,
                   const Tensor<1, dim> &g_e,
                   const Tensor<2, dim> &h_e,
-                  const double &        v_s0,
+                  const double         &v_s0,
                   const Tensor<1, dim> &g_s0,
                   const Tensor<2, dim> &h_s0,
-                  const double &        v_s1,
+                  const double         &v_s1,
                   const Tensor<1, dim> &g_s1,
                   const Tensor<2, dim> &h_s1,
-                  const double &        v_s2,
+                  const double         &v_s2,
                   const Tensor<1, dim> &g_s2,
                   const Tensor<2, dim> &h_s2,
-                  const double &        v_s3,
+                  const double         &v_s3,
                   const Tensor<1, dim> &g_s3,
                   const Tensor<2, dim> &h_s3)
 {
@@ -192,10 +192,10 @@ check_consistency(const Point<dim> &    p,
  */
 template <int dim>
 void
-test(const FiniteElement<dim> & fe_base,
-     const FiniteElement<dim> & fe_en1,
-     const FiniteElement<dim> & fe_en2,
-     const Quadrature<dim> &    volume_quad,
+test(const FiniteElement<dim>  &fe_base,
+     const FiniteElement<dim>  &fe_en1,
+     const FiniteElement<dim>  &fe_en2,
+     const Quadrature<dim>     &volume_quad,
      const Quadrature<dim - 1> &face_quad,
      const bool                 distort)
 {

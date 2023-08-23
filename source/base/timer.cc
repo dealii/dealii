@@ -209,16 +209,15 @@ Timer::stop()
       if (sync_lap_times)
         {
           wall_times.last_lap_time =
-            internal::TimerImplementation::from_seconds<decltype(
-              wall_times)::duration_type>(last_lap_wall_time_data.max);
-          cpu_times.last_lap_time =
-            internal::TimerImplementation::from_seconds<decltype(
-              cpu_times)::duration_type>(
-              Utilities::MPI::min_max_avg(
-                internal::TimerImplementation::to_seconds(
-                  cpu_times.last_lap_time),
-                mpi_communicator)
-                .max);
+            internal::TimerImplementation::from_seconds<
+              decltype(wall_times)::duration_type>(last_lap_wall_time_data.max);
+          cpu_times.last_lap_time = internal::TimerImplementation::from_seconds<
+            decltype(cpu_times)::duration_type>(
+            Utilities::MPI::min_max_avg(
+              internal::TimerImplementation::to_seconds(
+                cpu_times.last_lap_time),
+              mpi_communicator)
+              .max);
         }
       wall_times.accumulated_time += wall_times.last_lap_time;
       cpu_times.accumulated_time += cpu_times.last_lap_time;
@@ -298,7 +297,7 @@ Timer::reset()
 
 /* ---------------------------- TimerOutput -------------------------- */
 
-TimerOutput::TimerOutput(std::ostream &        stream,
+TimerOutput::TimerOutput(std::ostream         &stream,
                          const OutputFrequency output_frequency,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
@@ -310,7 +309,7 @@ TimerOutput::TimerOutput(std::ostream &        stream,
 
 
 
-TimerOutput::TimerOutput(ConditionalOStream &  stream,
+TimerOutput::TimerOutput(ConditionalOStream   &stream,
                          const OutputFrequency output_frequency,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
@@ -323,7 +322,7 @@ TimerOutput::TimerOutput(ConditionalOStream &  stream,
 
 
 TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
-                         std::ostream &        stream,
+                         std::ostream         &stream,
                          const OutputFrequency output_frequency,
                          const OutputType      output_type)
   : output_frequency(output_frequency)
@@ -336,7 +335,7 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
 
 
 TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
-                         ConditionalOStream &  stream,
+                         ConditionalOStream   &stream,
                          const OutputFrequency output_frequency,
                          const OutputType      output_type)
   : output_frequency(output_frequency)

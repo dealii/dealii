@@ -156,7 +156,7 @@ namespace internal
       template <int dim, int spacedim>
       void
       evaluate_shape_functions(const FiniteElement<dim, spacedim> &fe,
-                               const Quadrature<1> &               quad,
+                               const Quadrature<1>                &quad,
                                const std::vector<unsigned int> &lexicographic,
                                const unsigned int               direction);
 
@@ -170,8 +170,8 @@ namespace internal
       void
       evaluate_collocation_space(
         const FiniteElement<dim, spacedim> &fe,
-        const Quadrature<1> &               quad,
-        const std::vector<unsigned int> &   lexicographic);
+        const Quadrature<1>                &quad,
+        const std::vector<unsigned int>    &lexicographic);
 
       /**
        * Check whether we have symmetries in the shape values. In that case,
@@ -409,7 +409,7 @@ namespace internal
        * Constructor that initializes the data fields using the reinit method.
        */
       template <int dim, int spacedim, int dim_q>
-      ShapeInfo(const Quadrature<dim_q> &           quad,
+      ShapeInfo(const Quadrature<dim_q>            &quad,
                 const FiniteElement<dim, spacedim> &fe,
                 const unsigned int                  base_element = 0);
 
@@ -423,7 +423,7 @@ namespace internal
        */
       template <int dim, int spacedim, int dim_q>
       void
-      reinit(const Quadrature<dim_q> &           quad,
+      reinit(const Quadrature<dim_q>            &quad,
              const FiniteElement<dim, spacedim> &fe_dim,
              const unsigned int                  base_element = 0);
 

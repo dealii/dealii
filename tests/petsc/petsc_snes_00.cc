@@ -78,7 +78,7 @@ main(int argc, char **argv)
     };
 
     // Test attaching a user-defined monitoring routine
-    solver.monitor = [&](const VectorType & X,
+    solver.monitor = [&](const VectorType  &X,
                          const unsigned int step,
                          const real_type    fval) -> void {
       out << "#    " << step << ": " << fval << std::endl;
@@ -179,7 +179,7 @@ main(int argc, char **argv)
     // solvers can still be used in a Jacobian-free way and selected at command
     // line or within user code.
     solver.solve_with_jacobian = [&](const VectorType &src,
-                                     VectorType &      dst) -> void {
+                                     VectorType       &dst) -> void {
       dst(0) = Jinv(0, 0) * src(0) + Jinv(0, 1) * src(1);
       dst(1) = Jinv(1, 0) * src(0) + Jinv(1, 1) * src(1);
       dst.compress(VectorOperation::insert);

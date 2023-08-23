@@ -47,8 +47,8 @@ public:
   static void
   bdry(MeshWorker::DoFInfo<dim> &dinfo, MeshWorker::IntegrationInfo<dim> &info);
   static void
-  face(MeshWorker::DoFInfo<dim> &        dinfo1,
-       MeshWorker::DoFInfo<dim> &        dinfo2,
+  face(MeshWorker::DoFInfo<dim>         &dinfo1,
+       MeshWorker::DoFInfo<dim>         &dinfo2,
        MeshWorker::IntegrationInfo<dim> &info1,
        MeshWorker::IntegrationInfo<dim> &info2);
 };
@@ -56,11 +56,11 @@ public:
 
 template <int dim>
 void
-MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
+MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>         &dinfo,
                             MeshWorker::IntegrationInfo<dim> &info)
 {
   const FEValuesBase<dim> &fe           = info.fe_values();
-  FullMatrix<double> &     local_matrix = dinfo.matrix(0).matrix;
+  FullMatrix<double>      &local_matrix = dinfo.matrix(0).matrix;
 
   for (unsigned int k = 0; k < fe.n_quadrature_points; ++k)
     for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
@@ -72,11 +72,11 @@ MatrixIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
 
 template <int dim>
 void
-MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim> &        dinfo,
+MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim>         &dinfo,
                             MeshWorker::IntegrationInfo<dim> &info)
 {
   const FEValuesBase<dim> &fe           = info.fe_values();
-  FullMatrix<double> &     local_matrix = dinfo.matrix(0).matrix;
+  FullMatrix<double>      &local_matrix = dinfo.matrix(0).matrix;
 
   const unsigned int deg = fe.get_fe().tensor_degree();
   const double       penalty =
@@ -95,17 +95,17 @@ MatrixIntegrator<dim>::bdry(MeshWorker::DoFInfo<dim> &        dinfo,
 
 template <int dim>
 void
-MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &        dinfo1,
-                            MeshWorker::DoFInfo<dim> &        dinfo2,
+MatrixIntegrator<dim>::face(MeshWorker::DoFInfo<dim>         &dinfo1,
+                            MeshWorker::DoFInfo<dim>         &dinfo2,
                             MeshWorker::IntegrationInfo<dim> &info1,
                             MeshWorker::IntegrationInfo<dim> &info2)
 {
   const FEValuesBase<dim> &fe1         = info1.fe_values();
   const FEValuesBase<dim> &fe2         = info2.fe_values();
-  FullMatrix<double> &     matrix_v1u1 = dinfo1.matrix(0, false).matrix;
-  FullMatrix<double> &     matrix_v1u2 = dinfo1.matrix(0, true).matrix;
-  FullMatrix<double> &     matrix_v2u1 = dinfo2.matrix(0, true).matrix;
-  FullMatrix<double> &     matrix_v2u2 = dinfo2.matrix(0, false).matrix;
+  FullMatrix<double>      &matrix_v1u1 = dinfo1.matrix(0, false).matrix;
+  FullMatrix<double>      &matrix_v1u2 = dinfo1.matrix(0, true).matrix;
+  FullMatrix<double>      &matrix_v2u1 = dinfo2.matrix(0, true).matrix;
+  FullMatrix<double>      &matrix_v2u2 = dinfo2.matrix(0, false).matrix;
 
   const unsigned int deg = fe1.get_fe().tensor_degree();
   const double       penalty1 =
@@ -189,7 +189,7 @@ assemble(const DoFHandler<dim> &dof_handler, SparseMatrix<double> &matrix)
 
 template <int dim>
 void
-assemble(const DoFHandler<dim> &             dof_handler,
+assemble(const DoFHandler<dim>              &dof_handler,
          MGLevelObject<SparseMatrix<double>> matrix,
          MGLevelObject<SparseMatrix<double>> dg_up,
          MGLevelObject<SparseMatrix<double>> dg_down)
@@ -233,7 +233,7 @@ test_simple(DoFHandler<dim> &mgdofs)
   SparseMatrix<double> matrix;
   Vector<double>       v;
 
-  const DoFHandler<dim> &   dofs = mgdofs;
+  const DoFHandler<dim>    &dofs = mgdofs;
   const FiniteElement<dim> &fe   = dofs.get_fe();
   pattern.reinit(dofs.n_dofs(),
                  dofs.n_dofs(),

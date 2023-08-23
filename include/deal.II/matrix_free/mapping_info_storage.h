@@ -339,7 +339,7 @@ namespace internal
        */
       template <typename StreamType>
       void
-      print_memory_consumption(StreamType &    out,
+      print_memory_consumption(StreamType     &out,
                                const TaskInfo &task_info) const;
 
       /**

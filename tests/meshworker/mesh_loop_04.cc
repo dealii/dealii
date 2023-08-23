@@ -76,24 +76,24 @@ test()
       c.vectors[0][0] += w;
   };
 
-  auto boundary_worker = [](const Iterator &    cell,
+  auto boundary_worker = [](const Iterator     &cell,
                             const unsigned int &f,
-                            ScratchData &       s,
-                            CopyData &          c) {
+                            ScratchData        &s,
+                            CopyData           &c) {
     const auto &fev = s.reinit(cell, f);
     const auto &JxW = s.get_JxW_values();
     for (auto w : JxW)
       c.vectors[0][1] += w;
   };
 
-  auto face_worker = [](const Iterator &    cell,
+  auto face_worker = [](const Iterator     &cell,
                         const unsigned int &f,
                         const unsigned int &sf,
-                        const Iterator &    ncell,
+                        const Iterator     &ncell,
                         const unsigned int &nf,
                         const unsigned int &nsf,
-                        ScratchData &       s,
-                        CopyData &          c) {
+                        ScratchData        &s,
+                        CopyData           &c) {
     const auto &fev  = s.reinit(cell, f, sf);
     const auto &nfev = s.reinit_neighbor(ncell, nf, nsf);
 

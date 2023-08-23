@@ -87,7 +87,7 @@ namespace HDF5
 
 
   DataSet::DataSet(const std::string &name,
-                   const hid_t &      parent_group_id,
+                   const hid_t       &parent_group_id,
                    const bool         mpi)
     : HDF5Object(name, mpi)
     , query_io_mode(false)
@@ -141,9 +141,9 @@ namespace HDF5
 
 
 
-  DataSet::DataSet(const std::string &           name,
-                   const hid_t &                 parent_group_id,
-                   const std::vector<hsize_t> &  dimensions,
+  DataSet::DataSet(const std::string            &name,
+                   const hid_t                  &parent_group_id,
+                   const std::vector<hsize_t>   &dimensions,
                    const std::shared_ptr<hid_t> &t_type,
                    const bool                    mpi)
     : HDF5Object(name, mpi)
@@ -326,8 +326,8 @@ namespace HDF5
 
 
 
-  Group::Group(const std::string &   name,
-               const Group &         parentGroup,
+  Group::Group(const std::string    &name,
+               const Group          &parentGroup,
                const bool            mpi,
                const GroupAccessMode mode)
     : HDF5Object(name, mpi)
@@ -407,7 +407,7 @@ namespace HDF5
 
 
 
-  File::File(const std::string &  name,
+  File::File(const std::string   &name,
              const FileAccessMode mode,
              const MPI_Comm       mpi_communicator)
     : File(name, mode, true, mpi_communicator)
@@ -415,7 +415,7 @@ namespace HDF5
 
 
 
-  File::File(const std::string &  name,
+  File::File(const std::string   &name,
              const FileAccessMode mode,
              const bool           mpi,
              const MPI_Comm       mpi_communicator)

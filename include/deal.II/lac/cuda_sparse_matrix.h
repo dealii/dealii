@@ -82,7 +82,7 @@ namespace CUDAWrappers
      * host. The sparse matrix on the host is copied on the @ref GlossDevice "device" and the
      * elements are reordered according to the format supported by cuSPARSE.
      */
-    SparseMatrix(Utilities::CUDA::Handle &             handle,
+    SparseMatrix(Utilities::CUDA::Handle              &handle,
                  const ::dealii::SparseMatrix<Number> &sparse_matrix_host);
 
     /**
@@ -119,7 +119,7 @@ namespace CUDAWrappers
      * supported by cuSPARSE.
      */
     void
-    reinit(Utilities::CUDA::Handle &             handle,
+    reinit(Utilities::CUDA::Handle              &handle,
            const ::dealii::SparseMatrix<Number> &sparse_matrix_host);
     /** @} */
 
@@ -186,11 +186,11 @@ namespace CUDAWrappers
      * applied to a large matrix!
      */
     void
-    print_formatted(std::ostream &     out,
+    print_formatted(std::ostream      &out,
                     const unsigned int precision   = 3,
                     const bool         scientific  = true,
                     const unsigned int width       = 0,
-                    const char *       zero_string = " ",
+                    const char        *zero_string = " ",
                     const double       denominator = 1.) const;
     /** @} */
 
@@ -220,7 +220,7 @@ namespace CUDAWrappers
      * being this matrix.
      */
     void
-    vmult(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+    vmult(LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
           const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
@@ -229,7 +229,7 @@ namespace CUDAWrappers
      * takes this transposed matrix.
      */
     void
-    Tvmult(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+    Tvmult(LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
            const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
@@ -237,7 +237,7 @@ namespace CUDAWrappers
      * with $M$ being this matrix.
      */
     void
-    vmult_add(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+    vmult_add(LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
               const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
@@ -246,7 +246,7 @@ namespace CUDAWrappers
      * as vmult_add() but takes the transposed matrix.
      */
     void
-    Tvmult_add(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+    Tvmult_add(LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
                const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const;
 
     /**
@@ -278,7 +278,7 @@ namespace CUDAWrappers
      * Source $x$ and destination $dst$ must not be the same vector.
      */
     Number
-    residual(LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+    residual(LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
              const LinearAlgebra::CUDAWrappers::Vector<Number> &x,
              const LinearAlgebra::CUDAWrappers::Vector<Number> &b) const;
     /** @} */
@@ -462,11 +462,11 @@ namespace CUDAWrappers
 
   template <typename Number>
   void
-  SparseMatrix<Number>::print_formatted(std::ostream &     out,
+  SparseMatrix<Number>::print_formatted(std::ostream      &out,
                                         const unsigned int precision,
                                         const bool         scientific,
                                         const unsigned int width_,
-                                        const char *       zero_string,
+                                        const char        *zero_string,
                                         const double       denominator) const
   {
     Assert(column_index_dev != nullptr, ExcNotInitialized());

@@ -36,7 +36,7 @@ template <int dim>
 void
 check_function(const Functions::FlowFunction<dim> &f,
                unsigned int                        sub,
-               std::ostream &                      out)
+               std::ostream                       &out)
 {
   DerivativeTestFunction<dim> dtest1(f, 1.e-2);
   DerivativeTestFunction<dim> dtest2(f, 2.e-2);

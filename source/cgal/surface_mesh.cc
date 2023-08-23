@@ -26,9 +26,9 @@ namespace
   template <typename dealiiFace, typename CGAL_Mesh>
   void
   add_facet(
-    const dealiiFace &                                              face,
+    const dealiiFace                                               &face,
     const std::map<unsigned int, typename CGAL_Mesh::Vertex_index> &deal2cgal,
-    CGAL_Mesh &                                                     mesh,
+    CGAL_Mesh                                                      &mesh,
     const bool clockwise_ordering = true)
   {
     const auto reference_cell_type = face->reference_cell();
@@ -71,9 +71,9 @@ namespace
   template <typename dealiiFace, typename CGAL_Mesh>
   void
   map_vertices(
-    const dealiiFace &                                        cell,
+    const dealiiFace                                         &cell,
     std::map<unsigned int, typename CGAL_Mesh::Vertex_index> &deal2cgal,
-    CGAL_Mesh &                                               mesh)
+    CGAL_Mesh                                                &mesh)
   {
     for (const auto i : cell->vertex_indices())
       {
@@ -94,8 +94,8 @@ namespace CGALWrappers
   void
   dealii_cell_to_cgal_surface_mesh(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const Mapping<dim, spacedim> &                              mapping,
-    CGAL::Surface_mesh<CGALPointType> &                         mesh)
+    const Mapping<dim, spacedim>                               &mapping,
+    CGAL::Surface_mesh<CGALPointType>                          &mesh)
   {
     Assert(dim > 1, ExcImpossibleInDim(dim));
     using Mesh           = CGAL::Surface_mesh<CGALPointType>;
@@ -147,7 +147,7 @@ namespace CGALWrappers
   void
   dealii_tria_to_cgal_surface_mesh(
     const dealii::Triangulation<dim, spacedim> &tria,
-    CGAL::Surface_mesh<CGALPointType> &         mesh)
+    CGAL::Surface_mesh<CGALPointType>          &mesh)
   {
     Assert(tria.n_cells() > 0,
            ExcMessage(

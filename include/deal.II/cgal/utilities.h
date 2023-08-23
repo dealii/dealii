@@ -142,7 +142,7 @@ namespace CGALWrappers
   void
   cgal_surface_mesh_to_cgal_triangulation(
     CGAL::Surface_mesh<typename C3t3::Point::Point> &surface_mesh,
-    C3t3 &                                           triangulation,
+    C3t3                                            &triangulation,
     const AdditionalData<3> &data = AdditionalData<3>{});
 
   /**
@@ -193,8 +193,8 @@ namespace CGALWrappers
   compute_boolean_operation(
     const CGAL::Surface_mesh<CGALPointType> &surface_mesh_1,
     const CGAL::Surface_mesh<CGALPointType> &surface_mesh_2,
-    const BooleanOperation &                 boolean_operation,
-    CGAL::Surface_mesh<CGALPointType> &      output_surface_mesh);
+    const BooleanOperation                  &boolean_operation,
+    CGAL::Surface_mesh<CGALPointType>       &output_surface_mesh);
 
   /**
    * Given a CGAL Triangulation describing a polyhedral region, create
@@ -233,7 +233,7 @@ namespace CGALWrappers
     const typename dealii::Triangulation<dim0, spacedim>::cell_iterator &cell0,
     const typename dealii::Triangulation<dim1, spacedim>::cell_iterator &cell1,
     const unsigned int                                                   degree,
-    const BooleanOperation &       bool_op,
+    const BooleanOperation        &bool_op,
     const Mapping<dim0, spacedim> &mapping0 =
       (ReferenceCells::get_hypercube<dim0>()
          .template get_default_linear_mapping<dim0, spacedim>()),
@@ -296,7 +296,7 @@ namespace CGALWrappers
   template <typename CGALPointType>
   void
   remesh_surface(CGAL::Surface_mesh<CGALPointType> &surface_mesh,
-                 const AdditionalData<3> &          data = AdditionalData<3>{});
+                 const AdditionalData<3>           &data = AdditionalData<3>{});
 } // namespace CGALWrappers
 
 #  ifndef DOXYGEN
@@ -307,8 +307,8 @@ namespace CGALWrappers
   void
   cgal_surface_mesh_to_cgal_triangulation(
     CGAL::Surface_mesh<typename C3t3::Point::Point> &surface_mesh,
-    C3t3 &                                           triangulation,
-    const AdditionalData<3> &                        data)
+    C3t3                                            &triangulation,
+    const AdditionalData<3>                         &data)
   {
     using CGALPointType = typename C3t3::Point::Point;
     Assert(CGAL::is_closed(surface_mesh),
@@ -346,8 +346,8 @@ namespace CGALWrappers
   compute_boolean_operation(
     const CGAL::Surface_mesh<CGALPointType> &surface_mesh_1,
     const CGAL::Surface_mesh<CGALPointType> &surface_mesh_2,
-    const BooleanOperation &                 boolean_operation,
-    CGAL::Surface_mesh<CGALPointType> &      output_surface_mesh)
+    const BooleanOperation                  &boolean_operation,
+    CGAL::Surface_mesh<CGALPointType>       &output_surface_mesh)
   {
     Assert(output_surface_mesh.is_empty(),
            ExcMessage(
@@ -440,7 +440,7 @@ namespace CGALWrappers
     const typename dealii::Triangulation<dim0, spacedim>::cell_iterator &cell0,
     const typename dealii::Triangulation<dim1, spacedim>::cell_iterator &cell1,
     const unsigned int                                                   degree,
-    const BooleanOperation &       bool_op,
+    const BooleanOperation        &bool_op,
     const Mapping<dim0, spacedim> &mapping0,
     const Mapping<dim1, spacedim> &mapping1)
   {
@@ -526,7 +526,7 @@ namespace CGALWrappers
   template <typename CGALPointType>
   void
   remesh_surface(CGAL::Surface_mesh<CGALPointType> &cgal_mesh,
-                 const AdditionalData<3> &          data)
+                 const AdditionalData<3>           &data)
   {
     using K           = CGAL::Exact_predicates_inexact_constructions_kernel;
     using Mesh_domain = CGAL::Polyhedral_mesh_domain_with_features_3<K>;
@@ -628,7 +628,7 @@ namespace CGALWrappers
   std::vector<Point<spacedim>>
   get_vertices_in_cgal_order(
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
-    const Mapping<dim, spacedim> &                                      mapping)
+    const Mapping<dim, spacedim>                                       &mapping)
   {
     // Elements have to be rectangular or simplices
     const unsigned int n_vertices = cell->n_vertices();
@@ -661,7 +661,7 @@ namespace CGALWrappers
   get_vertices_in_cgal_order(
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                                  face_no,
-    const Mapping<dim, spacedim> &                                      mapping)
+    const Mapping<dim, spacedim>                                       &mapping)
   {
     // Elements have to be rectangular or simplices
     const unsigned int n_vertices = cell->face(face_no)->n_vertices();

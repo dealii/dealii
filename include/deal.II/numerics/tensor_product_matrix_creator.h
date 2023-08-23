@@ -66,10 +66,10 @@ namespace TensorProductMatrixCreator
   std::pair<std::array<FullMatrix<Number>, dim>,
             std::array<FullMatrix<Number>, dim>>
   create_laplace_tensor_product_matrix(
-    const FiniteElement<1> &                            fe,
-    const Quadrature<1> &                               quadrature,
+    const FiniteElement<1>                             &fe,
+    const Quadrature<1>                                &quadrature,
     const dealii::ndarray<LaplaceBoundaryType, dim, 2> &boundary_ids,
-    const dealii::ndarray<double, dim, 3> &             cell_extent,
+    const dealii::ndarray<double, dim, 3>              &cell_extent,
     const unsigned int                                  n_overlap = 1);
 
   /**
@@ -81,11 +81,11 @@ namespace TensorProductMatrixCreator
             std::array<FullMatrix<Number>, dim>>
   create_laplace_tensor_product_matrix(
     const typename Triangulation<dim>::cell_iterator &cell,
-    const std::set<types::boundary_id> &              dirichlet_boundaries,
-    const std::set<types::boundary_id> &              neumann_boundaries,
-    const FiniteElement<1> &                          fe,
-    const Quadrature<1> &                             quadrature,
-    const dealii::ndarray<double, dim, 3> &           cell_extent,
+    const std::set<types::boundary_id>               &dirichlet_boundaries,
+    const std::set<types::boundary_id>               &neumann_boundaries,
+    const FiniteElement<1>                           &fe,
+    const Quadrature<1>                              &quadrature,
+    const dealii::ndarray<double, dim, 3>            &cell_extent,
     const unsigned int                                n_overlap = 1);
 
 } // namespace TensorProductMatrixCreator
@@ -116,7 +116,7 @@ namespace TensorProductMatrixCreator
     std::tuple<FullMatrix<Number>, FullMatrix<Number>, bool>
     create_reference_mass_and_stiffness_matrices(
       const FiniteElement<1> &fe,
-      const Quadrature<1> &   quadrature)
+      const Quadrature<1>    &quadrature)
     {
       Triangulation<1> tria;
       GridGenerator::hyper_cube(tria);
@@ -174,10 +174,10 @@ namespace TensorProductMatrixCreator
   std::pair<std::array<FullMatrix<Number>, dim>,
             std::array<FullMatrix<Number>, dim>>
   create_laplace_tensor_product_matrix(
-    const FiniteElement<1> &                            fe,
-    const Quadrature<1> &                               quadrature,
+    const FiniteElement<1>                             &fe,
+    const Quadrature<1>                                &quadrature,
     const dealii::ndarray<LaplaceBoundaryType, dim, 2> &boundary_ids,
-    const dealii::ndarray<double, dim, 3> &             cell_extent,
+    const dealii::ndarray<double, dim, 3>              &cell_extent,
     const unsigned int                                  n_overlap)
   {
     // 1) create element mass and siffness matrix (without overlap)
@@ -305,11 +305,11 @@ namespace TensorProductMatrixCreator
             std::array<FullMatrix<Number>, dim>>
   create_laplace_tensor_product_matrix(
     const typename Triangulation<dim>::cell_iterator &cell,
-    const std::set<types::boundary_id> &              dirichlet_boundaries,
-    const std::set<types::boundary_id> &              neumann_boundaries,
-    const FiniteElement<1> &                          fe,
-    const Quadrature<1> &                             quadrature,
-    const dealii::ndarray<double, dim, 3> &           cell_extent,
+    const std::set<types::boundary_id>               &dirichlet_boundaries,
+    const std::set<types::boundary_id>               &neumann_boundaries,
+    const FiniteElement<1>                           &fe,
+    const Quadrature<1>                              &quadrature,
+    const dealii::ndarray<double, dim, 3>            &cell_extent,
     const unsigned int                                n_overlap)
   {
     dealii::ndarray<LaplaceBoundaryType, dim, 2> boundary_ids;

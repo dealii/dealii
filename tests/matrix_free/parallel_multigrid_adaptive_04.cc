@@ -69,7 +69,7 @@ public:
 
   virtual void
   operator()(const unsigned int                                level,
-             LinearAlgebra::distributed::Vector<double> &      dst,
+             LinearAlgebra::distributed::Vector<double>       &dst,
              const LinearAlgebra::distributed::Vector<double> &src) const
   {
     ReductionControl solver_control(1e4, 1e-50, 1e-10);
@@ -92,7 +92,8 @@ do_test(const DoFHandler<dim> &dof)
       deallog.push("float");
     }
   else
-    {}
+    {
+    }
 
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;

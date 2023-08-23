@@ -102,7 +102,7 @@ namespace Step8
   template <int dim>
   void
   right_hand_side(const std::vector<Point<dim>> &points,
-                  std::vector<Tensor<1, dim>> &  values)
+                  std::vector<Tensor<1, dim>>   &values)
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -329,7 +329,7 @@ namespace Step8
     virtual void
     evaluate_vector_field(
       const DataPostprocessorInputs::Vector<dim> &input_data,
-      std::vector<Vector<double>> &               computed_quantities) const
+      std::vector<Vector<double>>                &computed_quantities) const
     {
       AssertDimension(input_data.solution_gradients.size(),
                       computed_quantities.size());

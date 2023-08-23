@@ -92,7 +92,7 @@ public:
    * Triangulation::Signals::any_change of the underlying triangulation.
    */
   void
-  initialize(const Mapping<dim, spacedim> &      mapping,
+  initialize(const Mapping<dim, spacedim>       &mapping,
              const Triangulation<dim, spacedim> &triangulation);
 
   /**
@@ -140,20 +140,20 @@ public:
    * Triangulation::Signals::any_change of the underlying triangulation.
    */
   void
-  initialize(const Mapping<dim, spacedim> &      mapping,
+  initialize(const Mapping<dim, spacedim>       &mapping,
              const Triangulation<dim, spacedim> &tria,
              const std::function<Point<spacedim>(
                const typename Triangulation<dim, spacedim>::cell_iterator &,
-               const Point<spacedim> &)> &       transformation_function,
+               const Point<spacedim> &)>        &transformation_function,
              const bool function_describes_relative_displacement);
 
   /**
    * The same as above but taking a dealii::Function object.
    */
   void
-  initialize(const Mapping<dim, spacedim> &      mapping,
+  initialize(const Mapping<dim, spacedim>       &mapping,
              const Triangulation<dim, spacedim> &tria,
-             const Function<spacedim> &          transformation_function,
+             const Function<spacedim>           &transformation_function,
              const bool function_describes_relative_displacement);
 
   /**
@@ -169,9 +169,9 @@ public:
    */
   template <typename VectorType>
   void
-  initialize(const Mapping<dim, spacedim> &   mapping,
+  initialize(const Mapping<dim, spacedim>    &mapping,
              const DoFHandler<dim, spacedim> &dof_handler,
-             const VectorType &               vector,
+             const VectorType                &vector,
              const bool vector_describes_relative_displacement);
 
   /**
@@ -187,7 +187,7 @@ public:
    */
   template <typename VectorType>
   void
-  initialize(const Mapping<dim, spacedim> &   mapping,
+  initialize(const Mapping<dim, spacedim>    &mapping,
              const DoFHandler<dim, spacedim> &dof_handler,
              const MGLevelObject<VectorType> &vectors,
              const bool vector_describes_relative_displacement);

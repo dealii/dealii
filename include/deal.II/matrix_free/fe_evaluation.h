@@ -144,7 +144,7 @@ public:
   template <typename VectorType>
   void
   read_dof_values(
-    const VectorType &          src,
+    const VectorType           &src,
     const unsigned int          first_index = 0,
     const std::bitset<n_lanes> &mask        = std::bitset<n_lanes>().flip());
 
@@ -179,7 +179,7 @@ public:
   template <typename VectorType>
   void
   read_dof_values_plain(
-    const VectorType &          src,
+    const VectorType           &src,
     const unsigned int          first_index = 0,
     const std::bitset<n_lanes> &mask        = std::bitset<n_lanes>().flip());
 
@@ -217,7 +217,7 @@ public:
   template <typename VectorType>
   void
   distribute_local_to_global(
-    VectorType &                dst,
+    VectorType                 &dst,
     const unsigned int          first_index = 0,
     const std::bitset<n_lanes> &mask = std::bitset<n_lanes>().flip()) const;
 
@@ -262,7 +262,7 @@ public:
   template <typename VectorType>
   void
   set_dof_values(
-    VectorType &                dst,
+    VectorType                 &dst,
     const unsigned int          first_index = 0,
     const std::bitset<n_lanes> &mask = std::bitset<n_lanes>().flip()) const;
 
@@ -272,7 +272,7 @@ public:
   template <typename VectorType>
   void
   set_dof_values_plain(
-    VectorType &                dst,
+    VectorType                 &dst,
     const unsigned int          first_index = 0,
     const std::bitset<n_lanes> &mask = std::bitset<n_lanes>().flip()) const;
 
@@ -643,9 +643,9 @@ protected:
    * conditions.
    */
   FEEvaluationBase(
-    const Mapping<dim> &      mapping,
+    const Mapping<dim>       &mapping,
     const FiniteElement<dim> &fe,
-    const Quadrature<1> &     quadrature,
+    const Quadrature<1>      &quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
     const FEEvaluationData<dim, VectorizedArrayType, is_face> *other);
@@ -681,11 +681,11 @@ protected:
   template <typename VectorType, typename VectorOperation>
   void
   read_write_operation(
-    const VectorOperation &                        operation,
+    const VectorOperation                         &operation,
     const std::array<VectorType *, n_components_> &vectors,
     const std::array<
       const std::vector<ArrayView<const typename VectorType::value_type>> *,
-      n_components_> &          vectors_sm,
+      n_components_>           &vectors_sm,
     const std::bitset<n_lanes> &mask,
     const bool                  apply_constraints = true) const;
 
@@ -699,11 +699,11 @@ protected:
   template <typename VectorType, typename VectorOperation>
   void
   read_write_operation_contiguous(
-    const VectorOperation &                        operation,
+    const VectorOperation                         &operation,
     const std::array<VectorType *, n_components_> &vectors,
     const std::array<
       const std::vector<ArrayView<const typename VectorType::value_type>> *,
-      n_components_> &          vectors_sm,
+      n_components_>           &vectors_sm,
     const std::bitset<n_lanes> &mask) const;
 
   /**
@@ -716,7 +716,7 @@ protected:
   template <typename VectorType, typename VectorOperation>
   void
   read_write_operation_global(
-    const VectorOperation &                        operation,
+    const VectorOperation                         &operation,
     const std::array<VectorType *, n_components_> &vectors) const;
 
   /**
@@ -801,9 +801,9 @@ protected:
    * as FEValues, including matrix assembly.
    */
   FEEvaluationAccess(
-    const Mapping<dim> &      mapping,
+    const Mapping<dim>       &mapping,
     const FiniteElement<dim> &fe,
-    const Quadrature<1> &     quadrature,
+    const Quadrature<1>      &quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
     const FEEvaluationData<dim, VectorizedArrayType, is_face> *other);
@@ -958,9 +958,9 @@ protected:
    * as FEValues, including matrix assembly.
    */
   FEEvaluationAccess(
-    const Mapping<dim> &      mapping,
+    const Mapping<dim>       &mapping,
     const FiniteElement<dim> &fe,
-    const Quadrature<1> &     quadrature,
+    const Quadrature<1>      &quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
     const FEEvaluationData<dim, VectorizedArrayType, is_face> *other);
@@ -1136,9 +1136,9 @@ protected:
    * as FEValues, including matrix assembly.
    */
   FEEvaluationAccess(
-    const Mapping<dim> &      mapping,
+    const Mapping<dim>       &mapping,
     const FiniteElement<dim> &fe,
-    const Quadrature<1> &     quadrature,
+    const Quadrature<1>      &quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
     const FEEvaluationData<dim, VectorizedArrayType, is_face> *other);
@@ -1317,9 +1317,9 @@ protected:
    * as FEValues, including matrix assembly.
    */
   FEEvaluationAccess(
-    const Mapping<1> &      mapping,
+    const Mapping<1>       &mapping,
     const FiniteElement<1> &fe,
-    const Quadrature<1> &   quadrature,
+    const Quadrature<1>    &quadrature,
     const UpdateFlags       update_flags,
     const unsigned int      first_selected_component,
     const FEEvaluationData<1, VectorizedArrayType, is_face> *other);
@@ -2056,7 +2056,7 @@ public:
    * The rest of the arguments are the same as in the constructor above.
    */
   FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-               const std::pair<unsigned int, unsigned int> &       range,
+               const std::pair<unsigned int, unsigned int>        &range,
                const unsigned int                                  dof_no  = 0,
                const unsigned int                                  quad_no = 0,
                const unsigned int first_selected_component                 = 0);
@@ -2089,9 +2089,9 @@ public:
    * possibly within the element if the evaluate/integrate routines are
    * combined inside user code (e.g. for computing cell matrices).
    */
-  FEEvaluation(const Mapping<dim> &      mapping,
+  FEEvaluation(const Mapping<dim>       &mapping,
                const FiniteElement<dim> &fe,
-               const Quadrature<1> &     quadrature,
+               const Quadrature<1>      &quadrature,
                const UpdateFlags         update_flags,
                const unsigned int        first_selected_component = 0);
 
@@ -2101,7 +2101,7 @@ public:
    * (i.e., an object of type MappingQ(1)) implicitly.
    */
   FEEvaluation(const FiniteElement<dim> &fe,
-               const Quadrature<1> &     quadrature,
+               const Quadrature<1>      &quadrature,
                const UpdateFlags         update_flags,
                const unsigned int        first_selected_component = 0);
 
@@ -2115,7 +2115,7 @@ public:
    * use the FEEvaluation object in %parallel to the given one because
    * otherwise the intended sharing may create race conditions.
    */
-  FEEvaluation(const FiniteElement<dim> &                               fe,
+  FEEvaluation(const FiniteElement<dim>                                &fe,
                const FEEvaluationData<dim, VectorizedArrayType, false> &other,
                const unsigned int first_selected_component = 0);
 
@@ -2217,7 +2217,7 @@ public:
    * useful information (unless these values have been set manually).
    */
   void
-  evaluate(const VectorizedArrayType *            values_array,
+  evaluate(const VectorizedArrayType             *values_array,
            const EvaluationFlags::EvaluationFlags evaluation_flag);
 
   /**
@@ -2235,7 +2235,7 @@ public:
    */
   template <typename VectorType>
   void
-  gather_evaluate(const VectorType &                     input_vector,
+  gather_evaluate(const VectorType                      &input_vector,
                   const EvaluationFlags::EvaluationFlags evaluation_flag);
 
   /**
@@ -2264,7 +2264,7 @@ public:
    */
   void
   integrate(const EvaluationFlags::EvaluationFlags integration_flag,
-            VectorizedArrayType *                  values_array,
+            VectorizedArrayType                   *values_array,
             const bool                             sum_into_values = false);
 
   /**
@@ -2283,7 +2283,7 @@ public:
   template <typename VectorType>
   void
   integrate_scatter(const EvaluationFlags::EvaluationFlags integration_flag,
-                    VectorType &                           output_vector);
+                    VectorType                            &output_vector);
 
   /**
    * Return an object that can be thought of as an array containing all indices
@@ -2539,7 +2539,7 @@ public:
    */
   FEFaceEvaluation(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const std::pair<unsigned int, unsigned int> &       range,
+    const std::pair<unsigned int, unsigned int>        &range,
     const bool                                          is_interior_face = true,
     const unsigned int                                  dof_no           = 0,
     const unsigned int                                  quad_no          = 0,
@@ -2601,7 +2601,7 @@ public:
    * been set manually).
    */
   void
-  evaluate(const VectorizedArrayType *            values_array,
+  evaluate(const VectorizedArrayType             *values_array,
            const EvaluationFlags::EvaluationFlags evaluation_flag);
 
   /**
@@ -2617,7 +2617,7 @@ public:
    */
   template <typename VectorType>
   void
-  gather_evaluate(const VectorType &                     input_vector,
+  gather_evaluate(const VectorType                      &input_vector,
                   const EvaluationFlags::EvaluationFlags evaluation_flag);
 
   /**
@@ -2642,7 +2642,7 @@ public:
    */
   void
   integrate(const EvaluationFlags::EvaluationFlags integration_flag,
-            VectorizedArrayType *                  values_array);
+            VectorizedArrayType                   *values_array);
 
   /**
    * This function takes the values and/or gradients that are stored on
@@ -2658,7 +2658,7 @@ public:
   template <typename VectorType>
   void
   integrate_scatter(const EvaluationFlags::EvaluationFlags integration_flag,
-                    VectorType &                           output_vector);
+                    VectorType                            &output_vector);
 
   /**
    * @deprecated Please use the integrate_scatter() function with the EvaluationFlags argument.
@@ -2904,9 +2904,9 @@ inline FEEvaluationBase<dim,
                         is_face,
                         VectorizedArrayType>::
   FEEvaluationBase(
-    const Mapping<dim> &      mapping,
+    const Mapping<dim>       &mapping,
     const FiniteElement<dim> &fe,
-    const Quadrature<1> &     quadrature,
+    const Quadrature<1>      &quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
     const FEEvaluationData<dim, VectorizedArrayType, is_face> *other)
@@ -3256,11 +3256,11 @@ template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_write_operation(
-    const VectorOperation &                        operation,
+    const VectorOperation                         &operation,
     const std::array<VectorType *, n_components_> &src,
     const std::array<
       const std::vector<ArrayView<const typename VectorType::value_type>> *,
-      n_components_> &          src_sm,
+      n_components_>           &src_sm,
     const std::bitset<n_lanes> &mask,
     const bool                  apply_constraints) const
 {
@@ -3707,7 +3707,7 @@ template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_write_operation_global(
-    const VectorOperation &                        operation,
+    const VectorOperation                         &operation,
     const std::array<VectorType *, n_components_> &src) const
 {
   Assert(!local_dof_indices.empty(), ExcNotInitialized());
@@ -3739,11 +3739,11 @@ template <typename VectorType, typename VectorOperation>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   read_write_operation_contiguous(
-    const VectorOperation &                        operation,
+    const VectorOperation                         &operation,
     const std::array<VectorType *, n_components_> &src,
     const std::array<
       const std::vector<ArrayView<const typename VectorType::value_type>> *,
-      n_components_> &          vectors_sm,
+      n_components_>           &vectors_sm,
     const std::bitset<n_lanes> &mask) const
 {
   // This functions processes the functions read_dof_values,
@@ -3762,7 +3762,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const unsigned int n_active_lanes = mask.count();
 
   const internal::MatrixFreeFunctions::DoFInfo &dof_info = *this->dof_info;
-  const std::vector<unsigned int> &             dof_indices_cont =
+  const std::vector<unsigned int>              &dof_indices_cont =
     dof_info.dof_indices_contiguous[ind];
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
@@ -4159,7 +4159,7 @@ namespace internal
             std::enable_if_t<has_shared_vector_data<VectorType>, VectorType> * =
               nullptr>
   const std::vector<ArrayView<const typename VectorType::value_type>> *
-  get_shared_vector_data(VectorType *       vec,
+  get_shared_vector_data(VectorType        *vec,
                          const bool         is_valid_mode_for_sm,
                          const unsigned int active_fe_index,
                          const internal::MatrixFreeFunctions::DoFInfo *dof_info)
@@ -4197,7 +4197,7 @@ namespace internal
         VectorType,
         IsBlockVector<VectorType>::value>::BaseVectorType::value_type>> *,
       n_components>>
-  get_vector_data(VectorType &       src,
+  get_vector_data(VectorType        &src,
                   const unsigned int first_index,
                   const bool         is_valid_mode_for_sm,
                   const unsigned int active_fe_index,
@@ -4304,7 +4304,7 @@ template <int dim,
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_dof_values(const VectorType &          src,
+  read_dof_values(const VectorType           &src,
                   const unsigned int          first_index,
                   const std::bitset<n_lanes> &mask)
 {
@@ -4336,7 +4336,7 @@ template <int dim,
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  read_dof_values_plain(const VectorType &          src,
+  read_dof_values_plain(const VectorType           &src,
                         const unsigned int          first_index,
                         const std::bitset<n_lanes> &mask)
 {
@@ -4366,7 +4366,7 @@ template <int dim,
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  distribute_local_to_global(VectorType &                dst,
+  distribute_local_to_global(VectorType                 &dst,
                              const unsigned int          first_index,
                              const std::bitset<n_lanes> &mask) const
 {
@@ -4400,7 +4400,7 @@ template <int dim,
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  set_dof_values(VectorType &                dst,
+  set_dof_values(VectorType                 &dst,
                  const unsigned int          first_index,
                  const std::bitset<n_lanes> &mask) const
 {
@@ -4431,7 +4431,7 @@ template <int dim,
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  set_dof_values_plain(VectorType &                dst,
+  set_dof_values_plain(VectorType                 &dst,
                        const unsigned int          first_index,
                        const std::bitset<n_lanes> &mask) const
 {
@@ -5317,9 +5317,9 @@ inline FEEvaluationAccess<dim,
                           is_face,
                           VectorizedArrayType>::
   FEEvaluationAccess(
-    const Mapping<dim> &      mapping,
+    const Mapping<dim>       &mapping,
     const FiniteElement<dim> &fe,
-    const Quadrature<1> &     quadrature,
+    const Quadrature<1>      &quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
     const FEEvaluationData<dim, VectorizedArrayType, is_face> *other)
@@ -5416,9 +5416,9 @@ inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationAccess<dim, 1, Number, is_face, VectorizedArrayType>::
   FEEvaluationAccess(
-    const Mapping<dim> &      mapping,
+    const Mapping<dim>       &mapping,
     const FiniteElement<dim> &fe,
-    const Quadrature<1> &     quadrature,
+    const Quadrature<1>      &quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
     const FEEvaluationData<dim, VectorizedArrayType, is_face> *other)
@@ -5752,9 +5752,9 @@ inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   FEEvaluationAccess(
-    const Mapping<dim> &      mapping,
+    const Mapping<dim>       &mapping,
     const FiniteElement<dim> &fe,
-    const Quadrature<1> &     quadrature,
+    const Quadrature<1>      &quadrature,
     const UpdateFlags         update_flags,
     const unsigned int        first_selected_component,
     const FEEvaluationData<dim, VectorizedArrayType, is_face> *other)
@@ -6732,9 +6732,9 @@ inline FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
 template <typename Number, bool is_face, typename VectorizedArrayType>
 inline FEEvaluationAccess<1, 1, Number, is_face, VectorizedArrayType>::
   FEEvaluationAccess(
-    const Mapping<1> &      mapping,
+    const Mapping<1>       &mapping,
     const FiniteElement<1> &fe,
-    const Quadrature<1> &   quadrature,
+    const Quadrature<1>    &quadrature,
     const UpdateFlags       update_flags,
     const unsigned int      first_selected_component,
     const FEEvaluationData<1, VectorizedArrayType, is_face> *other)
@@ -7074,7 +7074,7 @@ inline FEEvaluation<dim,
                     Number,
                     VectorizedArrayType>::
   FEEvaluation(const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-               const std::pair<unsigned int, unsigned int> &       range,
+               const std::pair<unsigned int, unsigned int>        &range,
                const unsigned int                                  dof_no,
                const unsigned int                                  quad_no,
                const unsigned int first_selected_component)
@@ -7099,9 +7099,9 @@ inline FEEvaluation<dim,
                     n_components_,
                     Number,
                     VectorizedArrayType>::
-  FEEvaluation(const Mapping<dim> &      mapping,
+  FEEvaluation(const Mapping<dim>       &mapping,
                const FiniteElement<dim> &fe,
-               const Quadrature<1> &     quadrature,
+               const Quadrature<1>      &quadrature,
                const UpdateFlags         update_flags,
                const unsigned int        first_selected_component)
   : BaseClass(mapping,
@@ -7132,7 +7132,7 @@ inline FEEvaluation<dim,
                     Number,
                     VectorizedArrayType>::
   FEEvaluation(const FiniteElement<dim> &fe,
-               const Quadrature<1> &     quadrature,
+               const Quadrature<1>      &quadrature,
                const UpdateFlags         update_flags,
                const unsigned int        first_selected_component)
   : BaseClass(StaticMappingQ1<dim>::mapping,
@@ -7162,7 +7162,7 @@ inline FEEvaluation<dim,
                     n_components_,
                     Number,
                     VectorizedArrayType>::
-  FEEvaluation(const FiniteElement<dim> &                               fe,
+  FEEvaluation(const FiniteElement<dim>                                &fe,
                const FEEvaluationData<dim, VectorizedArrayType, false> &other,
                const unsigned int first_selected_component)
   : BaseClass(other.mapped_geometry->get_fe_values().get_mapping(),
@@ -7832,7 +7832,7 @@ FEEvaluation<dim,
              n_components_,
              Number,
              VectorizedArrayType>::
-  evaluate(const VectorizedArrayType *            values_array,
+  evaluate(const VectorizedArrayType             *values_array,
            const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
   const bool hessians_on_general_cells =
@@ -7893,7 +7893,7 @@ namespace internal
       return nullptr;
 
     const unsigned int cell     = fe_eval.get_cell_or_face_batch_id();
-    const auto &       dof_info = fe_eval.get_dof_info();
+    const auto        &dof_info = fe_eval.get_dof_info();
 
     // If the index storage is interleaved and contiguous and the vector
     // storage has the correct alignment, we can directly pass the pointer
@@ -7960,7 +7960,7 @@ FEEvaluation<dim,
              n_components_,
              Number,
              VectorizedArrayType>::
-  gather_evaluate(const VectorType &                     input_vector,
+  gather_evaluate(const VectorType                      &input_vector,
                   const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
   const VectorizedArrayType *src_ptr =
@@ -8015,7 +8015,7 @@ FEEvaluation<dim,
              Number,
              VectorizedArrayType>::
   integrate(const EvaluationFlags::EvaluationFlags integration_flag,
-            VectorizedArrayType *                  values_array,
+            VectorizedArrayType                   *values_array,
             const bool                             sum_into_values_array)
 {
 #  ifdef DEBUG
@@ -8118,7 +8118,7 @@ FEEvaluation<dim,
              Number,
              VectorizedArrayType>::
   integrate_scatter(const EvaluationFlags::EvaluationFlags integration_flag,
-                    VectorType &                           destination)
+                    VectorType                            &destination)
 {
   VectorizedArrayType *dst_ptr =
     internal::check_vector_access_inplace<Number, VectorizedArrayType>(
@@ -8209,7 +8209,7 @@ inline FEFaceEvaluation<dim,
                         VectorizedArrayType>::
   FEFaceEvaluation(
     const MatrixFree<dim, Number, VectorizedArrayType> &matrix_free,
-    const std::pair<unsigned int, unsigned int> &       range,
+    const std::pair<unsigned int, unsigned int>        &range,
     const bool                                          is_interior_face,
     const unsigned int                                  dof_no,
     const unsigned int                                  quad_no,
@@ -8518,7 +8518,7 @@ FEFaceEvaluation<dim,
                  n_components_,
                  Number,
                  VectorizedArrayType>::
-  evaluate(const VectorizedArrayType *            values_array,
+  evaluate(const VectorizedArrayType             *values_array,
            const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
   Assert((evaluation_flag &
@@ -8600,7 +8600,7 @@ FEFaceEvaluation<dim,
                  Number,
                  VectorizedArrayType>::
   integrate(const EvaluationFlags::EvaluationFlags integration_flag,
-            VectorizedArrayType *                  values_array)
+            VectorizedArrayType                   *values_array)
 {
   Assert((integration_flag &
           ~(EvaluationFlags::values | EvaluationFlags::gradients |
@@ -8673,7 +8673,7 @@ FEFaceEvaluation<dim,
                  n_components_,
                  Number,
                  VectorizedArrayType>::
-  gather_evaluate(const VectorType &                     input_vector,
+  gather_evaluate(const VectorType                      &input_vector,
                   const EvaluationFlags::EvaluationFlags evaluation_flag)
 {
   Assert((evaluation_flag &
@@ -8792,7 +8792,7 @@ FEFaceEvaluation<dim,
                  Number,
                  VectorizedArrayType>::
   integrate_scatter(const EvaluationFlags::EvaluationFlags integration_flag,
-                    VectorType &                           destination)
+                    VectorType                            &destination)
 {
   Assert((this->dof_access_index ==
             internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&

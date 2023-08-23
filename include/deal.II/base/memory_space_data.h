@@ -124,7 +124,7 @@ namespace MemorySpace
 
   template <typename T, typename MemorySpace>
   void
-  MemorySpaceData<T, MemorySpace>::copy_to(T *               begin,
+  MemorySpaceData<T, MemorySpace>::copy_to(T                *begin,
                                            const std::size_t n_elements)
   {
     Assert(n_elements <= values.extent(0),
@@ -145,7 +145,7 @@ namespace MemorySpace
 
   template <typename T, typename MemorySpace>
   void
-  MemorySpaceData<T, MemorySpace>::copy_from(const T *         begin,
+  MemorySpaceData<T, MemorySpace>::copy_from(const T          *begin,
                                              const std::size_t n_elements)
   {
     Assert(n_elements <= values.extent(0),

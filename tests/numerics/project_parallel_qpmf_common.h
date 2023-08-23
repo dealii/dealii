@@ -103,7 +103,7 @@ private:
 template <int fe_degree, int n_q_points_1d, int dim>
 void
 do_project(const parallel::distributed::Triangulation<dim> &triangulation,
-           const std::vector<const FiniteElement<dim> *> &  fes,
+           const std::vector<const FiniteElement<dim> *>   &fes,
            const unsigned int                               p,
            const unsigned int                               fe_index = 0)
 {

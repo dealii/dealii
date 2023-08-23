@@ -46,8 +46,8 @@ namespace TrilinosWrappers
     const unsigned int                    smoother_sweeps,
     const unsigned int                    smoother_overlap,
     const bool                            output_details,
-    const char *                          smoother_type,
-    const char *                          coarse_type)
+    const char                           *smoother_type,
+    const char                           *coarse_type)
     : elliptic(elliptic)
     , higher_order_elements(higher_order_elements)
     , n_cycles(n_cycles)
@@ -65,9 +65,9 @@ namespace TrilinosWrappers
 
   void
   PreconditionAMG::AdditionalData::set_parameters(
-    Teuchos::ParameterList &             parameter_list,
+    Teuchos::ParameterList              &parameter_list,
     std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
-    const Epetra_RowMatrix &             matrix) const
+    const Epetra_RowMatrix              &matrix) const
   {
     if (elliptic == true)
       {
@@ -125,9 +125,9 @@ namespace TrilinosWrappers
 
   void
   PreconditionAMG::AdditionalData::set_operator_null_space(
-    Teuchos::ParameterList &             parameter_list,
+    Teuchos::ParameterList              &parameter_list,
     std::unique_ptr<Epetra_MultiVector> &ptr_distributed_constant_modes,
-    const Epetra_RowMatrix &             matrix) const
+    const Epetra_RowMatrix              &matrix) const
   {
     const Epetra_Map &domain_map = matrix.OperatorDomainMap();
 
@@ -186,9 +186,9 @@ namespace TrilinosWrappers
 
   void
   PreconditionAMG::AdditionalData::set_parameters(
-    Teuchos::ParameterList &             parameter_list,
+    Teuchos::ParameterList              &parameter_list,
     std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
-    const SparseMatrix &                 matrix) const
+    const SparseMatrix                  &matrix) const
   {
     return set_parameters(parameter_list,
                           distributed_constant_modes,
@@ -199,9 +199,9 @@ namespace TrilinosWrappers
 
   void
   PreconditionAMG::AdditionalData::set_operator_null_space(
-    Teuchos::ParameterList &             parameter_list,
+    Teuchos::ParameterList              &parameter_list,
     std::unique_ptr<Epetra_MultiVector> &distributed_constant_modes,
-    const SparseMatrix &                 matrix) const
+    const SparseMatrix                  &matrix) const
   {
     return set_operator_null_space(parameter_list,
                                    distributed_constant_modes,
@@ -219,7 +219,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionAMG::initialize(const SparseMatrix &  matrix,
+  PreconditionAMG::initialize(const SparseMatrix   &matrix,
                               const AdditionalData &additional_data)
   {
     initialize(matrix.trilinos_matrix(), additional_data);
@@ -229,7 +229,7 @@ namespace TrilinosWrappers
 
   void
   PreconditionAMG::initialize(const Epetra_RowMatrix &matrix,
-                              const AdditionalData &  additional_data)
+                              const AdditionalData   &additional_data)
   {
     // Build the AMG preconditioner.
     Teuchos::ParameterList              ml_parameters;
@@ -254,7 +254,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionAMG::initialize(const SparseMatrix &          matrix,
+  PreconditionAMG::initialize(const SparseMatrix           &matrix,
                               const Teuchos::ParameterList &ml_parameters)
   {
     initialize(matrix.trilinos_matrix(), ml_parameters);
@@ -263,7 +263,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionAMG::initialize(const Epetra_RowMatrix &      matrix,
+  PreconditionAMG::initialize(const Epetra_RowMatrix       &matrix,
                               const Teuchos::ParameterList &ml_parameters)
   {
     preconditioner.reset(
@@ -276,9 +276,9 @@ namespace TrilinosWrappers
   void
   PreconditionAMG::initialize(
     const ::dealii::SparseMatrix<number> &deal_ii_sparse_matrix,
-    const AdditionalData &                additional_data,
+    const AdditionalData                 &additional_data,
     const double                          drop_tolerance,
-    const ::dealii::SparsityPattern *     use_this_sparsity)
+    const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     preconditioner.reset();
     const size_type n_rows = deal_ii_sparse_matrix.m();

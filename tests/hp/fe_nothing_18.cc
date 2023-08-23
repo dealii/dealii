@@ -163,7 +163,7 @@ public:
 template <int dim>
 inline void
 BoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                  Vector<double> &  values) const
+                                  Vector<double>   &values) const
 {
   values(0) = -0.001;
 }
@@ -186,11 +186,11 @@ public:
                      // components the function consists; default - 1
   virtual void
   vector_value(const Point<dim> &p,
-               Vector<double> &  values)
+               Vector<double>   &values)
     const; // returns calculated values in the second argument;
   virtual void
   vector_value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Vector<double>> &  value_list)
+                    std::vector<Vector<double>>   &value_list)
     const; // values at several points at once
   // prevent from calling virtual function "vector_value" to frequently
 };
@@ -204,7 +204,7 @@ ConstrainValues<dim>::ConstrainValues()
 template <int dim>
 inline void
 ConstrainValues<dim>::vector_value(const Point<dim> &p,
-                                   Vector<double> &  values) const
+                                   Vector<double>   &values) const
 {
   Assert(values.size() == dim,
          ExcDimensionMismatch(values.size(),
@@ -217,7 +217,7 @@ template <int dim>
 void
 ConstrainValues<dim>::vector_value_list(
   const std::vector<Point<dim>> &points,
-  std::vector<Vector<double>> &  value_list) const
+  std::vector<Vector<double>>   &value_list) const
 {
   Assert(
     value_list.size() == points.size(),

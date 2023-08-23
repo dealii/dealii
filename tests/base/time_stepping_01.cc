@@ -149,7 +149,7 @@ my_exact_solution(const double t)
 }
 
 void
-test(TimeStepping::RungeKutta<Vector<double>> &                          solver,
+test(TimeStepping::RungeKutta<Vector<double>>                           &solver,
      std::function<Vector<double>(const double, const Vector<double> &)> f,
      std::function<Vector<double>(const double,
                                   const double,
@@ -220,7 +220,7 @@ test2(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> &solver,
 
 void
 test_convergence(
-  TimeStepping::RungeKutta<Vector<double>> &                          solver,
+  TimeStepping::RungeKutta<Vector<double>>                           &solver,
   std::function<Vector<double>(const double, const Vector<double> &)> f,
   std::function<Vector<double>(const double,
                                const double,

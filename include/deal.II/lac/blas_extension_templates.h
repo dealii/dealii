@@ -61,9 +61,9 @@ omatcopy(char                    ordering,
          dealii::types::blas_int rows,
          dealii::types::blas_int cols,
          const float             alpha,
-         const float *           A,
+         const float            *A,
          dealii::types::blas_int lda,
-         float *                 B,
+         float                  *B,
          dealii::types::blas_int ldb)
 {
 #ifdef DEAL_II_LAPACK_WITH_MKL
@@ -90,9 +90,9 @@ omatcopy(char                    ordering,
          dealii::types::blas_int rows,
          dealii::types::blas_int cols,
          const double            alpha,
-         const double *          A,
+         const double           *A,
          dealii::types::blas_int lda,
-         double *                B,
+         double                 *B,
          dealii::types::blas_int ldb)
 {
 #ifdef DEAL_II_LAPACK_WITH_MKL
@@ -121,7 +121,7 @@ omatcopy(char                       ordering,
          const std::complex<float>  alpha,
          const std::complex<float> *A,
          dealii::types::blas_int    lda,
-         std::complex<float> *      B,
+         std::complex<float>       *B,
          dealii::types::blas_int    ldb)
 {
 #ifdef DEAL_II_LAPACK_WITH_MKL
@@ -150,7 +150,7 @@ omatcopy(char                        ordering,
          const std::complex<double>  alpha,
          const std::complex<double> *A,
          dealii::types::blas_int     lda,
-         std::complex<double> *      B,
+         std::complex<double>       *B,
          dealii::types::blas_int     ldb)
 {
 #ifdef DEAL_II_LAPACK_WITH_MKL

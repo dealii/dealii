@@ -43,7 +43,7 @@ template <int dim>
 struct MyFESystem
 {
   MyFESystem(const std::vector<const FiniteElement<dim> *> &fes,
-             const std::vector<unsigned int> &              multiplicities)
+             const std::vector<unsigned int>               &multiplicities)
   {
     deallog << "Constructing FESystem from list." << std::endl;
   }

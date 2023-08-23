@@ -61,7 +61,7 @@ collect_lines(const AffineConstraints<Number> &constraints,
 template <int dim, int spacedim>
 void
 test(const DoFHandler<dim, spacedim> &dof_handler,
-     const IndexSet &                 locally_relevant_dofs)
+     const IndexSet                  &locally_relevant_dofs)
 {
   AffineConstraints<double> constraints;
 

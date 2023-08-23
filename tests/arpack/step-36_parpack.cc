@@ -115,7 +115,7 @@ class PETScInverse
 {
 public:
   PETScInverse(const dealii::PETScWrappers::MatrixBase &A,
-               dealii::SolverControl &                  cn,
+               dealii::SolverControl                   &cn,
                const MPI_Comm mpi_communicator = PETSC_COMM_SELF)
     : solver(cn)
     , matrix(A)
@@ -123,7 +123,7 @@ public:
   {}
 
   void
-  vmult(dealii::PETScWrappers::MPI::Vector &      dst,
+  vmult(dealii::PETScWrappers::MPI::Vector       &dst,
         const dealii::PETScWrappers::MPI::Vector &src) const
   {
     ;

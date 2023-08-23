@@ -67,7 +67,7 @@ public:
    * should be generated.
    */
   DataOutResample(const Triangulation<patch_dim, spacedim> &patch_tria,
-                  const Mapping<patch_dim, spacedim> &      patch_mapping);
+                  const Mapping<patch_dim, spacedim>       &patch_mapping);
 
   /**
    * Update the @p mapping of original triangulation. One needs to call this

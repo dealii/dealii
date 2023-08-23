@@ -59,8 +59,8 @@ public:
     : data(data_in){};
 
   void
-  local_apply(const MatrixFree<dim, Number> &                   data,
-              LinearAlgebra::distributed::Vector<Number> &      dst,
+  local_apply(const MatrixFree<dim, Number>                    &data,
+              LinearAlgebra::distributed::Vector<Number>       &dst,
               const LinearAlgebra::distributed::Vector<Number> &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
@@ -68,7 +68,7 @@ public:
   }
 
   void
-  vmult(LinearAlgebra::distributed::Vector<Number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<Number>       &dst,
         const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     dst = 0;

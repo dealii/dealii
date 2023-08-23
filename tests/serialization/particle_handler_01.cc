@@ -30,7 +30,7 @@
 template <int dim, int spacedim>
 void
 create_regular_particle_distribution(
-  Particles::ParticleHandler<dim, spacedim> &                particle_handler,
+  Particles::ParticleHandler<dim, spacedim>                 &particle_handler,
   const parallel::distributed::Triangulation<dim, spacedim> &tr,
   const unsigned int particles_per_direction = 3)
 {

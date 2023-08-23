@@ -28,7 +28,7 @@ template <int dim>
 std::vector<Point<dim>>
 get_vertices(const typename Triangulation<dim>::cell_iterator &cell,
              const typename Triangulation<dim>::face_iterator &face,
-             const Mapping<dim> &                              mapping)
+             const Mapping<dim>                               &mapping)
 {
   std::vector<Point<dim>> vertices(face->n_vertices());
 

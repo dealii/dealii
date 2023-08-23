@@ -66,7 +66,7 @@ public:
                     const std::pair<unsigned int, unsigned int> &) {};
 
   void
-  vmult(LinearAlgebra::distributed::Vector<Number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<Number>       &dst,
         const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     const std::function<void(const MatrixFree<dim, Number> &,

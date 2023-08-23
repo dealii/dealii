@@ -29,7 +29,7 @@
 #include "../tests.h"
 
 void
-test_face(const std::vector<Point<3>> &   vertices_,
+test_face(const std::vector<Point<3>>    &vertices_,
           const std::vector<CellData<3>> &cell_data_,
           const unsigned int              face_n)
 {

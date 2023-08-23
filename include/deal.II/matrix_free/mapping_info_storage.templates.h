@@ -197,7 +197,7 @@ namespace internal
     template <typename StreamType>
     void
     MappingInfoStorage<structdim, spacedim, Number>::print_memory_consumption(
-      StreamType &    out,
+      StreamType     &out,
       const TaskInfo &task_info) const
     {
       // print_memory_statistics involves global communication, so we can

@@ -173,11 +173,11 @@ BlockSparseMatrix<number>::get_sparsity_pattern() const
 
 template <typename number>
 void
-BlockSparseMatrix<number>::print_formatted(std::ostream &     out,
+BlockSparseMatrix<number>::print_formatted(std::ostream      &out,
                                            const unsigned int precision,
                                            const bool         scientific,
                                            const unsigned int width,
-                                           const char *       zero_string,
+                                           const char        *zero_string,
                                            const double       denominator) const
 {
   for (size_type r = 0; r < this->n_block_rows(); ++r)

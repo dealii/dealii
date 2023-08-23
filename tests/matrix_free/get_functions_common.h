@@ -68,7 +68,7 @@ public:
              update_values | update_gradients | update_hessians){};
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in,
-                 const Mapping<dim> &           mapping)
+                 const Mapping<dim>            &mapping)
     : data(data_in)
     , fe_val(mapping,
              data.get_dof_handler().get_fe(),
@@ -83,7 +83,7 @@ public:
   virtual void
   operator()(const MatrixFree<dim, Number> &data,
              Vector<Number> &,
-             const Vector<Number> &                       src,
+             const Vector<Number>                        &src,
              const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(data);
@@ -235,7 +235,7 @@ public:
 
 template <int dim, int fe_degree, typename number>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints)
 {
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;

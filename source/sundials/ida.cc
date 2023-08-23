@@ -180,8 +180,8 @@ namespace SUNDIALS
   void
   IDA<VectorType>::reset(const double current_time,
                          const double current_time_step,
-                         VectorType & solution,
-                         VectorType & solution_dot)
+                         VectorType  &solution,
+                         VectorType  &solution_dot)
   {
     bool first_step = (current_time == data.initial_time);
 

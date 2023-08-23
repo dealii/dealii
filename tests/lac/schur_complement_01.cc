@@ -177,8 +177,8 @@ main()
       Vector<double> &g = b.block(0);
 
       BlockVector<double> s(blks, rc);
-      Vector<double> &    x = s.block(1);
-      Vector<double> &    y = s.block(0);
+      Vector<double>     &x = s.block(1);
+      Vector<double>     &y = s.block(0);
 
       SolverControl            solver_control_A(1, 1.0e-10, false, false);
       SolverCG<Vector<double>> solver_A(solver_control_A);

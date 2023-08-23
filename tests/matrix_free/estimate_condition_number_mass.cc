@@ -47,9 +47,9 @@ output_double_number(double input, const std::string &text)
 
 template <int dim, int fe_degree, typename Number>
 void
-mass_operator(const MatrixFree<dim, Number> &              data,
-              Vector<Number> &                             dst,
-              const Vector<Number> &                       src,
+mass_operator(const MatrixFree<dim, Number>               &data,
+              Vector<Number>                              &dst,
+              const Vector<Number>                        &src,
               const std::pair<unsigned int, unsigned int> &cell_range)
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(data);

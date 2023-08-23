@@ -82,7 +82,7 @@ namespace internal
      */
     template <typename Accessor>
     types::global_cell_index
-    translate(const TriaIterator<Accessor> & cell,
+    translate(const TriaIterator<Accessor>  &cell,
               const types::global_cell_index i) const;
 
     /**
@@ -205,7 +205,7 @@ namespace internal
   template <int dim>
   template <typename Accessor>
   types::global_cell_index
-  CellIDTranslator<dim>::translate(const TriaIterator<Accessor> & cell,
+  CellIDTranslator<dim>::translate(const TriaIterator<Accessor>  &cell,
                                    const types::global_cell_index i) const
   {
     static_assert(dim == Accessor::dimension &&

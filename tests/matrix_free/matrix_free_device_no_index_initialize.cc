@@ -44,9 +44,9 @@ public:
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-    CUDAWrappers::SharedData<dim, Number> *                     shared_data,
-    const Number *                                              src,
-    Number *                                                    dst) const
+    CUDAWrappers::SharedData<dim, Number>                      *shared_data,
+    const Number                                               *src,
+    Number                                                     *dst) const
   {
     CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
       fe_eval(gpu_data, shared_data);
@@ -113,7 +113,7 @@ const unsigned int
 
 template <int dim, int fe_degree, typename number>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints)
 {
   CUDAWrappers::MatrixFree<dim, number> mf_data;

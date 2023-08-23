@@ -22,39 +22,39 @@ for (S : MPI_SCALARS)
       template void
       CommunicationPattern::export_to_ghosted_array(
         const ArrayView<const S> &src,
-        const ArrayView<S> &      dst) const;
+        const ArrayView<S>       &dst) const;
 
       template void
       CommunicationPattern::export_to_ghosted_array_start(
         const ArrayView<const S> &src,
-        const ArrayView<S> &      dst) const;
+        const ArrayView<S>       &dst) const;
 
       template void
       CommunicationPattern::export_to_ghosted_array_finish(
         const ArrayView<const S> &src,
-        const ArrayView<S> &      dst) const;
+        const ArrayView<S>       &dst) const;
 
       template void
       CommunicationPattern::import_from_ghosted_array(
         const VectorOperation::values op,
-        const ArrayView<const S> &    src,
-        const ArrayView<S> &          dst) const;
+        const ArrayView<const S>     &src,
+        const ArrayView<S>           &dst) const;
 
       template void
       CommunicationPattern::import_from_ghosted_array_start(
         const VectorOperation::values op,
-        const ArrayView<const S> &    src,
-        const ArrayView<S> &          dst) const;
+        const ArrayView<const S>     &src,
+        const ArrayView<S>           &dst) const;
 
       template void
       CommunicationPattern::import_from_ghosted_array_finish(
         const VectorOperation::values op,
-        const ArrayView<const S> &    src,
-        const ArrayView<S> &          dst) const;
+        const ArrayView<const S>     &src,
+        const ArrayView<S>           &dst) const;
 
       template void
       Partitioner::export_to_ghosted_array(const ArrayView<const S> &src,
-                                           const ArrayView<S> &      dst) const;
+                                           const ArrayView<S>       &dst) const;
 
       template void
       Partitioner::export_to_ghosted_array_start(const ArrayView<const S> &src,
@@ -63,23 +63,23 @@ for (S : MPI_SCALARS)
       template void
       Partitioner::export_to_ghosted_array_finish(
         const ArrayView<const S> &src,
-        const ArrayView<S> &      dst) const;
+        const ArrayView<S>       &dst) const;
 
       template void
       Partitioner::import_from_ghosted_array(const VectorOperation::values op,
-                                             const ArrayView<const S> &    src,
+                                             const ArrayView<const S>     &src,
                                              const ArrayView<S> &dst) const;
 
       template void
       Partitioner::import_from_ghosted_array_start(
         const VectorOperation::values op,
-        const ArrayView<const S> &    src,
-        const ArrayView<S> &          dst) const;
+        const ArrayView<const S>     &src,
+        const ArrayView<S>           &dst) const;
 
       template void
       Partitioner::import_from_ghosted_array_finish(
         const VectorOperation::values op,
-        const ArrayView<const S> &    src,
-        const ArrayView<S> &          dst) const;
+        const ArrayView<const S>     &src,
+        const ArrayView<S>           &dst) const;
     \}
   }

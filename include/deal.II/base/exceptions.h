@@ -1426,11 +1426,11 @@ namespace deal_II_exceptions
     template <typename ExceptionType>
     [[noreturn]] void
     issue_error_noreturn(ExceptionHandling handling,
-                         const char *      file,
+                         const char       *file,
                          int               line,
-                         const char *      function,
-                         const char *      cond,
-                         const char *      exc_name,
+                         const char       *function,
+                         const char       *cond,
+                         const char       *exc_name,
                          ExceptionType     e)
     {
       // Fill the fields of the exception object
@@ -1475,11 +1475,11 @@ namespace deal_II_exceptions
      */
     template <typename ExceptionType>
     void
-    issue_error_nothrow(const char *  file,
+    issue_error_nothrow(const char   *file,
                         int           line,
-                        const char *  function,
-                        const char *  cond,
-                        const char *  exc_name,
+                        const char   *function,
+                        const char   *cond,
+                        const char   *exc_name,
                         ExceptionType e) noexcept
     {
       static_assert(std::is_base_of_v<ExceptionBase, ExceptionType>,

@@ -136,7 +136,7 @@ namespace internal
     const FESystem<dim, spacedim> &fe,
     const unsigned int             base_no,
     const UpdateFlags              base_flags,
-    const Table<2, unsigned int> & base_to_system_table,
+    const Table<2, unsigned int>  &base_to_system_table,
     const FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
       &base_data,
     FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
@@ -483,7 +483,7 @@ FESystem<dim, spacedim>::FESystem(const FiniteElement<dim, spacedim> &fe1,
 template <int dim, int spacedim>
 FESystem<dim, spacedim>::FESystem(
   const std::vector<const FiniteElement<dim, spacedim> *> &fes,
-  const std::vector<unsigned int> &                        multiplicities)
+  const std::vector<unsigned int>                         &multiplicities)
   : FiniteElement<dim, spacedim>(
       FETools::Compositing::multiply_dof_numbers(fes, multiplicities),
       FETools::Compositing::compute_restriction_is_additive_flags(
@@ -575,7 +575,7 @@ FESystem<dim, spacedim>::get_sub_fe(
 template <int dim, int spacedim>
 double
 FESystem<dim, spacedim>::shape_value(const unsigned int i,
-                                     const Point<dim> & p) const
+                                     const Point<dim>  &p) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
   Assert(this->is_primitive(i),
@@ -592,7 +592,7 @@ template <int dim, int spacedim>
 double
 FESystem<dim, spacedim>::shape_value_component(
   const unsigned int i,
-  const Point<dim> & p,
+  const Point<dim>  &p,
   const unsigned int component) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
@@ -627,7 +627,7 @@ FESystem<dim, spacedim>::shape_value_component(
 template <int dim, int spacedim>
 Tensor<1, dim>
 FESystem<dim, spacedim>::shape_grad(const unsigned int i,
-                                    const Point<dim> & p) const
+                                    const Point<dim>  &p) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
   Assert(this->is_primitive(i),
@@ -644,7 +644,7 @@ template <int dim, int spacedim>
 Tensor<1, dim>
 FESystem<dim, spacedim>::shape_grad_component(
   const unsigned int i,
-  const Point<dim> & p,
+  const Point<dim>  &p,
   const unsigned int component) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
@@ -672,7 +672,7 @@ FESystem<dim, spacedim>::shape_grad_component(
 template <int dim, int spacedim>
 Tensor<2, dim>
 FESystem<dim, spacedim>::shape_grad_grad(const unsigned int i,
-                                         const Point<dim> & p) const
+                                         const Point<dim>  &p) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
   Assert(this->is_primitive(i),
@@ -689,7 +689,7 @@ template <int dim, int spacedim>
 Tensor<2, dim>
 FESystem<dim, spacedim>::shape_grad_grad_component(
   const unsigned int i,
-  const Point<dim> & p,
+  const Point<dim>  &p,
   const unsigned int component) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
@@ -717,7 +717,7 @@ FESystem<dim, spacedim>::shape_grad_grad_component(
 template <int dim, int spacedim>
 Tensor<3, dim>
 FESystem<dim, spacedim>::shape_3rd_derivative(const unsigned int i,
-                                              const Point<dim> & p) const
+                                              const Point<dim>  &p) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
   Assert(this->is_primitive(i),
@@ -734,7 +734,7 @@ template <int dim, int spacedim>
 Tensor<3, dim>
 FESystem<dim, spacedim>::shape_3rd_derivative_component(
   const unsigned int i,
-  const Point<dim> & p,
+  const Point<dim>  &p,
   const unsigned int component) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
@@ -762,7 +762,7 @@ FESystem<dim, spacedim>::shape_3rd_derivative_component(
 template <int dim, int spacedim>
 Tensor<4, dim>
 FESystem<dim, spacedim>::shape_4th_derivative(const unsigned int i,
-                                              const Point<dim> & p) const
+                                              const Point<dim>  &p) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
   Assert(this->is_primitive(i),
@@ -779,7 +779,7 @@ template <int dim, int spacedim>
 Tensor<4, dim>
 FESystem<dim, spacedim>::shape_4th_derivative_component(
   const unsigned int i,
-  const Point<dim> & p,
+  const Point<dim>  &p,
   const unsigned int component) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
@@ -808,7 +808,7 @@ template <int dim, int spacedim>
 void
 FESystem<dim, spacedim>::get_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double>                 &interpolation_matrix) const
 {
   // check that the size of the matrices is correct. for historical
   // reasons, if you call matrix.reinit(8,0), it sets the sizes
@@ -1102,7 +1102,7 @@ std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FESystem<dim, spacedim>::get_data(
   const UpdateFlags             flags,
   const Mapping<dim, spacedim> &mapping,
-  const Quadrature<dim> &       quadrature,
+  const Quadrature<dim>        &quadrature,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
     & /*output_data*/) const
@@ -1164,7 +1164,7 @@ template <int dim, int spacedim>
 std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FESystem<dim, spacedim>::get_face_data(
   const UpdateFlags               flags,
-  const Mapping<dim, spacedim> &  mapping,
+  const Mapping<dim, spacedim>   &mapping,
   const hp::QCollection<dim - 1> &quadrature,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -1228,7 +1228,7 @@ std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FESystem<dim, spacedim>::get_subface_data(
   const UpdateFlags             flags,
   const Mapping<dim, spacedim> &mapping,
-  const Quadrature<dim - 1> &   quadrature,
+  const Quadrature<dim - 1>    &quadrature,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
     & /*output_data*/) const
@@ -1289,11 +1289,11 @@ void
 FESystem<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity                            cell_similarity,
-  const Quadrature<dim> &                                     quadrature,
-  const Mapping<dim, spacedim> &                              mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const Quadrature<dim>                                      &quadrature,
+  const Mapping<dim, spacedim>                               &mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    &                                                            mapping_data,
+                                                                &mapping_data,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -1318,11 +1318,11 @@ void
 FESystem<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const hp::QCollection<dim - 1> &                            quadrature,
-  const Mapping<dim, spacedim> &                              mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const hp::QCollection<dim - 1>                             &quadrature,
+  const Mapping<dim, spacedim>                               &mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    &                                                            mapping_data,
+                                                                &mapping_data,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -1348,11 +1348,11 @@ FESystem<dim, spacedim>::fill_fe_subface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          sub_no,
-  const Quadrature<dim - 1> &                                 quadrature,
-  const Mapping<dim, spacedim> &                              mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const Quadrature<dim - 1>                                  &quadrature,
+  const Mapping<dim, spacedim>                               &mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    &                                                            mapping_data,
+                                                                &mapping_data,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -1376,13 +1376,13 @@ template <int dim, int spacedim>
 template <class Q_or_QC>
 void
 FESystem<dim, spacedim>::compute_fill(
-  const Mapping<dim, spacedim> &                              mapping,
+  const Mapping<dim, spacedim>                               &mapping,
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          sub_no,
-  const Q_or_QC &                                             quadrature,
+  const Q_or_QC                                              &quadrature,
   const CellSimilarity::Similarity                            cell_similarity,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &mapping_data,
@@ -1423,9 +1423,9 @@ FESystem<dim, spacedim>::compute_fill(
 
         // If we have mixed meshes we need to support a QCollection here, hence
         // this pointer casting workaround:
-        const Quadrature<dim> *         cell_quadrature     = nullptr;
+        const Quadrature<dim>          *cell_quadrature     = nullptr;
         const hp::QCollection<dim - 1> *face_quadrature     = nullptr;
-        const Quadrature<dim - 1> *     sub_face_quadrature = nullptr;
+        const Quadrature<dim - 1>      *sub_face_quadrature = nullptr;
         unsigned int n_q_points = numbers::invalid_unsigned_int;
 
         // static cast through the common base class:
@@ -1647,88 +1647,90 @@ FESystem<dim, spacedim>::build_interface_constraints()
                   // then come the 12 sets of line indices
                   if (m < 5 * this->n_dofs_per_vertex() +
                             12 * this->n_dofs_per_line())
-                  {
-                    // for the meaning of all this, see the 2d part
-                    const unsigned int index_in_line =
-                      (m - 5 * this->n_dofs_per_vertex()) %
-                      this->n_dofs_per_line();
-                    const unsigned int sub_line =
-                      (m - 5 * this->n_dofs_per_vertex()) /
-                      this->n_dofs_per_line();
-                    Assert(sub_line < 12, ExcInternalError());
+                    {
+                      // for the meaning of all this, see the 2d part
+                      const unsigned int index_in_line =
+                        (m - 5 * this->n_dofs_per_vertex()) %
+                        this->n_dofs_per_line();
+                      const unsigned int sub_line =
+                        (m - 5 * this->n_dofs_per_vertex()) /
+                        this->n_dofs_per_line();
+                      Assert(sub_line < 12, ExcInternalError());
 
-                    const unsigned int tmp1 =
-                      4 * this->n_dofs_per_vertex() + index_in_line;
-                    m_index.first =
-                      this->face_system_to_base_table[face_no][tmp1].first;
+                      const unsigned int tmp1 =
+                        4 * this->n_dofs_per_vertex() + index_in_line;
+                      m_index.first =
+                        this->face_system_to_base_table[face_no][tmp1].first;
 
-                    Assert(
-                      this->face_system_to_base_table[face_no][tmp1].second >=
+                      Assert(
+                        this->face_system_to_base_table[face_no][tmp1].second >=
+                          4 * base_element(m_index.first.first)
+                                .n_dofs_per_vertex(),
+                        ExcInternalError());
+                      const unsigned int tmp2 =
+                        this->face_system_to_base_table[face_no][tmp1].second -
                         4 *
-                          base_element(m_index.first.first).n_dofs_per_vertex(),
-                      ExcInternalError());
-                    const unsigned int tmp2 =
-                      this->face_system_to_base_table[face_no][tmp1].second -
-                      4 * base_element(m_index.first.first).n_dofs_per_vertex();
-                    Assert(tmp2 < base_element(m_index.first.first)
-                                    .n_dofs_per_line(),
-                           ExcInternalError());
-                    m_index.second =
-                      5 *
-                        base_element(m_index.first.first).n_dofs_per_vertex() +
-                      base_element(m_index.first.first).n_dofs_per_line() *
-                        sub_line +
-                      tmp2;
-                  }
-                else
-                  // on one of the four sub-quads
-                  {
-                    // for the meaning of all this, see the 2d part
-                    const unsigned int index_in_quad =
-                      (m - 5 * this->n_dofs_per_vertex() -
-                       12 * this->n_dofs_per_line()) %
-                      this->n_dofs_per_quad(face_no);
-                    Assert(index_in_quad < this->n_dofs_per_quad(face_no),
-                           ExcInternalError());
-                    const unsigned int sub_quad =
-                      ((m - 5 * this->n_dofs_per_vertex() -
-                        12 * this->n_dofs_per_line()) /
-                       this->n_dofs_per_quad(face_no));
-                    Assert(sub_quad < 4, ExcInternalError());
-
-                    const unsigned int tmp1 = 4 * this->n_dofs_per_vertex() +
-                                              4 * this->n_dofs_per_line() +
-                                              index_in_quad;
-                    Assert(tmp1 <
-                             this->face_system_to_base_table[face_no].size(),
-                           ExcInternalError());
-                    m_index.first =
-                      this->face_system_to_base_table[face_no][tmp1].first;
-
-                    Assert(
-                      this->face_system_to_base_table[face_no][tmp1].second >=
-                        4 * base_element(m_index.first.first)
+                          base_element(m_index.first.first).n_dofs_per_vertex();
+                      Assert(tmp2 < base_element(m_index.first.first)
+                                      .n_dofs_per_line(),
+                             ExcInternalError());
+                      m_index.second =
+                        5 * base_element(m_index.first.first)
                               .n_dofs_per_vertex() +
-                          4 *
-                            base_element(m_index.first.first).n_dofs_per_line(),
-                      ExcInternalError());
-                    const unsigned int tmp2 =
-                      this->face_system_to_base_table[face_no][tmp1].second -
-                      4 *
-                        base_element(m_index.first.first).n_dofs_per_vertex() -
-                      4 * base_element(m_index.first.first).n_dofs_per_line();
-                    Assert(tmp2 < base_element(m_index.first.first)
-                                    .n_dofs_per_quad(face_no),
-                           ExcInternalError());
-                    m_index.second =
-                      5 *
-                        base_element(m_index.first.first).n_dofs_per_vertex() +
-                      12 * base_element(m_index.first.first).n_dofs_per_line() +
-                      base_element(m_index.first.first)
-                          .n_dofs_per_quad(face_no) *
-                        sub_quad +
-                      tmp2;
-                  }
+                        base_element(m_index.first.first).n_dofs_per_line() *
+                          sub_line +
+                        tmp2;
+                    }
+                  else
+                    // on one of the four sub-quads
+                    {
+                      // for the meaning of all this, see the 2d part
+                      const unsigned int index_in_quad =
+                        (m - 5 * this->n_dofs_per_vertex() -
+                         12 * this->n_dofs_per_line()) %
+                        this->n_dofs_per_quad(face_no);
+                      Assert(index_in_quad < this->n_dofs_per_quad(face_no),
+                             ExcInternalError());
+                      const unsigned int sub_quad =
+                        ((m - 5 * this->n_dofs_per_vertex() -
+                          12 * this->n_dofs_per_line()) /
+                         this->n_dofs_per_quad(face_no));
+                      Assert(sub_quad < 4, ExcInternalError());
+
+                      const unsigned int tmp1 = 4 * this->n_dofs_per_vertex() +
+                                                4 * this->n_dofs_per_line() +
+                                                index_in_quad;
+                      Assert(tmp1 <
+                               this->face_system_to_base_table[face_no].size(),
+                             ExcInternalError());
+                      m_index.first =
+                        this->face_system_to_base_table[face_no][tmp1].first;
+
+                      Assert(
+                        this->face_system_to_base_table[face_no][tmp1].second >=
+                          4 * base_element(m_index.first.first)
+                                .n_dofs_per_vertex() +
+                            4 * base_element(m_index.first.first)
+                                  .n_dofs_per_line(),
+                        ExcInternalError());
+                      const unsigned int tmp2 =
+                        this->face_system_to_base_table[face_no][tmp1].second -
+                        4 * base_element(m_index.first.first)
+                              .n_dofs_per_vertex() -
+                        4 * base_element(m_index.first.first).n_dofs_per_line();
+                      Assert(tmp2 < base_element(m_index.first.first)
+                                      .n_dofs_per_quad(face_no),
+                             ExcInternalError());
+                      m_index.second =
+                        5 * base_element(m_index.first.first)
+                              .n_dofs_per_vertex() +
+                        12 *
+                          base_element(m_index.first.first).n_dofs_per_line() +
+                        base_element(m_index.first.first)
+                            .n_dofs_per_quad(face_no) *
+                          sub_quad +
+                        tmp2;
+                    }
 
                 break;
               }
@@ -1753,7 +1755,7 @@ template <int dim, int spacedim>
 void
 FESystem<dim, spacedim>::initialize(
   const std::vector<const FiniteElement<dim, spacedim> *> &fes,
-  const std::vector<unsigned int> &                        multiplicities)
+  const std::vector<unsigned int>                         &multiplicities)
 {
   Assert(fes.size() == multiplicities.size(),
          ExcDimensionMismatch(fes.size(), multiplicities.size()));
@@ -2078,7 +2080,7 @@ template <int dim, int spacedim>
 void
 FESystem<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
-  FullMatrix<double> &                interpolation_matrix,
+  FullMatrix<double>                 &interpolation_matrix,
   const unsigned int                  face_no) const
 {
   Assert(interpolation_matrix.n() == this->n_dofs_per_face(face_no),
@@ -2195,7 +2197,7 @@ void
 FESystem<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   const unsigned int                  subface,
-  FullMatrix<double> &                interpolation_matrix,
+  FullMatrix<double>                 &interpolation_matrix,
   const unsigned int                  face_no) const
 {
   AssertThrow(
@@ -2641,7 +2643,7 @@ template <int dim, int spacedim>
 void
 FESystem<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &point_values,
-  std::vector<double> &              dof_values) const
+  std::vector<double>               &dof_values) const
 {
   Assert(this->has_generalized_support_points(),
          ExcMessage("The FESystem does not have generalized support points"));
@@ -2662,7 +2664,7 @@ FESystem<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
       // We need access to the base_element, its multiplicity, the
       // number of generalized support points (n_base_points) and the
       // number of components we're dealing with.
-      const auto &       base_element      = this->base_element(base);
+      const auto        &base_element      = this->base_element(base);
       const unsigned int multiplicity      = this->element_multiplicity(base);
       const unsigned int n_base_dofs       = base_element.n_dofs_per_cell();
       const unsigned int n_base_components = base_element.n_components();

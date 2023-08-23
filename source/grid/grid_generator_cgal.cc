@@ -34,10 +34,10 @@ namespace GridGenerator
   template <int dim>
   void
   implicit_function(Triangulation<dim, 3> &tria,
-                    const Function<3> &    dealii_implicit_function,
+                    const Function<3>     &dealii_implicit_function,
                     const CGALWrappers::AdditionalData<dim> &data,
-                    const Point<3> &                         interior_point,
-                    const double &                           outer_ball_radius)
+                    const Point<3>                          &interior_point,
+                    const double                            &outer_ball_radius)
   {
 #  ifdef DEAL_II_WITH_CGAL
     Assert(dealii_implicit_function.n_components == 1,
@@ -150,7 +150,7 @@ namespace GridGenerator
 
   void
   surface_mesh_to_volumetric_mesh(const Triangulation<2, 3> &surface_tria,
-                                  Triangulation<3> &         vol_tria,
+                                  Triangulation<3>          &vol_tria,
                                   const CGALWrappers::AdditionalData<3> &data)
   {
 #  ifdef DEAL_II_WITH_CGAL

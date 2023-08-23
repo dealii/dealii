@@ -188,10 +188,10 @@ create_triangulation(Triangulation<3> &tria,
 }
 
 void
-evaluate(const FE_Nedelec<3> & fe,
-         const DoFHandler<3> & dof_handler_ref,
+evaluate(const FE_Nedelec<3>  &fe,
+         const DoFHandler<3>  &dof_handler_ref,
          const Vector<double> &u_ref,
-         const DoFHandler<3> & dof_handler,
+         const DoFHandler<3>  &dof_handler,
          const Vector<double> &u)
 {
   const FEValuesExtractors::Vector component(0);
@@ -232,9 +232,9 @@ set_reference_solution(Vector<double> &vector)
 }
 
 void
-set_solution(Vector<double> &      vector,
-             const DoFHandler<3> & dof_handler,
-             const DoFHandler<3> & dof_handler_ref,
+set_solution(Vector<double>       &vector,
+             const DoFHandler<3>  &dof_handler,
+             const DoFHandler<3>  &dof_handler_ref,
              const Vector<double> &u_ref)
 {
   AffineConstraints<double> constraints;

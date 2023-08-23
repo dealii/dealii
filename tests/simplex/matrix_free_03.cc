@@ -69,14 +69,14 @@ public:
   {}
   virtual void
   value_list(const std::vector<Point<dim>> &points,
-             std::vector<double> &          values,
+             std::vector<double>           &values,
              const unsigned int             component = 0) const override;
 };
 
 template <int dim>
 void
 SmoothSolution<dim>::value_list(const std::vector<Point<dim>> &points,
-                                std::vector<double> &          values,
+                                std::vector<double>           &values,
                                 const unsigned int /*component*/) const
 {
   for (unsigned int i = 0; i < values.size(); ++i)
@@ -92,14 +92,14 @@ public:
   {}
   virtual void
   value_list(const std::vector<Point<dim>> &points,
-             std::vector<double> &          values,
+             std::vector<double>           &values,
              const unsigned int /*component*/ = 0) const override;
 };
 
 template <int dim>
 void
 SmoothRightHandSide<dim>::value_list(const std::vector<Point<dim>> &points,
-                                     std::vector<double> &          values,
+                                     std::vector<double>           &values,
                                      const unsigned int /*component*/) const
 {
   for (unsigned int i = 0; i < values.size(); ++i)
@@ -324,8 +324,8 @@ test(const unsigned int degree)
 
   const auto solve_and_postprocess =
     [&](const auto &poisson_operator,
-        auto &      x,
-        auto &      b) -> std::pair<unsigned int, double> {
+        auto       &x,
+        auto       &b) -> std::pair<unsigned int, double> {
     ReductionControl reduction_control(1000, 1e-7, 1e-3);
     SolverCG<std::remove_reference_t<decltype(x)>> solver(reduction_control);
 
@@ -423,7 +423,7 @@ test(const unsigned int degree)
         const unsigned int   dofs_per_cell = fe_v.dofs_per_cell;
         copy_data.reinit(cell, dofs_per_cell);
 
-        const auto &       q_points    = scratch_data.get_quadrature_points();
+        const auto        &q_points    = scratch_data.get_quadrature_points();
         const unsigned int n_q_points  = q_points.size();
         const std::vector<double> &JxW = scratch_data.get_JxW_values();
 
@@ -446,17 +446,17 @@ test(const unsigned int degree)
             }
       };
 
-    const auto boundary_worker = [&](const auto &        cell,
+    const auto boundary_worker = [&](const auto         &cell,
                                      const unsigned int &face_no,
-                                     auto &              scratch_data,
-                                     auto &              copy_data) {
+                                     auto               &scratch_data,
+                                     auto               &copy_data) {
       const FEFaceValuesBase<dim> &fe_fv = scratch_data.reinit(cell, face_no);
 
-      const auto &       q_points      = scratch_data.get_quadrature_points();
+      const auto        &q_points      = scratch_data.get_quadrature_points();
       const unsigned int n_q_points    = q_points.size();
       const unsigned int dofs_per_cell = fe_fv.dofs_per_cell;
 
-      const std::vector<double> &        JxW = scratch_data.get_JxW_values();
+      const std::vector<double>         &JxW = scratch_data.get_JxW_values();
       const std::vector<Tensor<1, dim>> &normals =
         scratch_data.get_normal_vectors();
 
@@ -503,27 +503,27 @@ test(const unsigned int degree)
         }
     };
 
-    const auto face_worker = [&](const auto &        cell,
+    const auto face_worker = [&](const auto         &cell,
                                  const unsigned int &f,
                                  const unsigned int &sf,
-                                 const auto &        ncell,
+                                 const auto         &ncell,
                                  const unsigned int &nf,
                                  const unsigned int &nsf,
-                                 auto &              scratch_data,
-                                 auto &              copy_data) {
+                                 auto               &scratch_data,
+                                 auto               &copy_data) {
       const FEInterfaceValues<dim> &fe_iv =
         scratch_data.reinit(cell, f, sf, ncell, nf, nsf);
 
-      const auto &       q_points   = fe_iv.get_quadrature_points();
+      const auto        &q_points   = fe_iv.get_quadrature_points();
       const unsigned int n_q_points = q_points.size();
 
       copy_data.face_data.emplace_back();
-      CopyDataFace &     copy_data_face = copy_data.face_data.back();
+      CopyDataFace      &copy_data_face = copy_data.face_data.back();
       const unsigned int n_dofs_face    = fe_iv.n_current_interface_dofs();
       copy_data_face.joint_dof_indices  = fe_iv.get_interface_dof_indices();
       copy_data_face.cell_matrix.reinit(n_dofs_face, n_dofs_face);
 
-      const std::vector<double> &        JxW     = fe_iv.get_JxW_values();
+      const std::vector<double>         &JxW     = fe_iv.get_JxW_values();
       const std::vector<Tensor<1, dim>> &normals = fe_iv.get_normal_vectors();
 
       const double penalty = PENALTY;

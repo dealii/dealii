@@ -97,7 +97,7 @@ namespace PETScWrappers
      */
     void
     reinit(const types::global_dof_index local_size,
-           const IndexSet &              ghost_indices,
+           const IndexSet               &ghost_indices,
            const MPI_Comm                communicator);
 
     /**
@@ -107,7 +107,7 @@ namespace PETScWrappers
     template <typename Number>
     void
     export_to_ghosted_array(const ArrayView<const Number> &locally_owned_array,
-                            const ArrayView<Number> &      ghost_array) const;
+                            const ArrayView<Number>       &ghost_array) const;
 
     /**
      * Start the communication round to fill the vector @p ghost_array according
@@ -118,7 +118,7 @@ namespace PETScWrappers
     void
     export_to_ghosted_array_start(
       const ArrayView<const Number> &locally_owned_array,
-      const ArrayView<Number> &      ghost_array) const;
+      const ArrayView<Number>       &ghost_array) const;
 
     /**
      * Finish the communication round to fill the vector @p ghost_array according
@@ -129,7 +129,7 @@ namespace PETScWrappers
     void
     export_to_ghosted_array_finish(
       const ArrayView<const Number> &locally_owned_array,
-      const ArrayView<Number> &      ghost_array) const;
+      const ArrayView<Number>       &ghost_array) const;
 
     /**
      * Modify the vector @p locally_owned_array according to the precomputed communication
@@ -140,7 +140,7 @@ namespace PETScWrappers
     import_from_ghosted_array(
       const VectorOperation::values  op,
       const ArrayView<const Number> &ghost_array,
-      const ArrayView<Number> &      locally_owned_array) const;
+      const ArrayView<Number>       &locally_owned_array) const;
 
     /**
      * Start the communication round to modify the vector @p locally_owned_array according
@@ -153,7 +153,7 @@ namespace PETScWrappers
     import_from_ghosted_array_start(
       const VectorOperation::values  op,
       const ArrayView<const Number> &ghost_array,
-      const ArrayView<Number> &      locally_owned_array) const;
+      const ArrayView<Number>       &locally_owned_array) const;
 
     /**
      * Finish the communication round to modify the vector @p locally_owned_array according
@@ -166,7 +166,7 @@ namespace PETScWrappers
     import_from_ghosted_array_finish(
       const VectorOperation::values  op,
       const ArrayView<const Number> &ghost_array,
-      const ArrayView<Number> &      locally_owned_array) const;
+      const ArrayView<Number>       &locally_owned_array) const;
 
     /**
      * Return the underlying MPI communicator.
@@ -278,7 +278,7 @@ namespace PETScWrappers
     template <typename Number>
     void
     export_to_ghosted_array(const ArrayView<const Number> &locally_owned_array,
-                            const ArrayView<Number> &      ghost_array) const;
+                            const ArrayView<Number>       &ghost_array) const;
 
     /**
      * Start the communication round to fill the vector @p ghost_array according
@@ -292,7 +292,7 @@ namespace PETScWrappers
     void
     export_to_ghosted_array_start(
       const ArrayView<const Number> &locally_owned_array,
-      const ArrayView<Number> &      ghost_array) const;
+      const ArrayView<Number>       &ghost_array) const;
 
     /**
      * Finish the communication round to fill the vector @p ghost_array according
@@ -306,7 +306,7 @@ namespace PETScWrappers
     void
     export_to_ghosted_array_finish(
       const ArrayView<const Number> &locally_owned_array,
-      const ArrayView<Number> &      ghost_array) const;
+      const ArrayView<Number>       &ghost_array) const;
 
     /**
      * Modify the vector @p locally_owned_array according to the precomputed communication
@@ -317,7 +317,7 @@ namespace PETScWrappers
     import_from_ghosted_array(
       const VectorOperation::values  op,
       const ArrayView<const Number> &ghost_array,
-      const ArrayView<Number> &      locally_owned_array) const;
+      const ArrayView<Number>       &locally_owned_array) const;
 
     /**
      * Start the communication round to modify the vector @p locally_owned_array according
@@ -333,7 +333,7 @@ namespace PETScWrappers
     import_from_ghosted_array_start(
       const VectorOperation::values  op,
       const ArrayView<const Number> &ghost_array,
-      const ArrayView<Number> &      locally_owned_array) const;
+      const ArrayView<Number>       &locally_owned_array) const;
 
     /**
      * Finish the communication round to modify the vector @p locally_owned_array according
@@ -349,7 +349,7 @@ namespace PETScWrappers
     import_from_ghosted_array_finish(
       const VectorOperation::values  op,
       const ArrayView<const Number> &ghost_array,
-      const ArrayView<Number> &      locally_owned_array) const;
+      const ArrayView<Number>       &locally_owned_array) const;
 
     /**
      * Return the underlying MPI communicator.

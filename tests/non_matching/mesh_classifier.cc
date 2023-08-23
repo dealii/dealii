@@ -70,7 +70,7 @@ location_to_string(const NonMatching::LocationToLevelSet location)
 template <int dim>
 void
 print_cell_and_face_locations(
-  const NonMatching::MeshClassifier<dim> &                 classifier,
+  const NonMatching::MeshClassifier<dim>                  &classifier,
   const typename Triangulation<dim>::active_cell_iterator &cell)
 {
   const NonMatching::LocationToLevelSet cell_location =

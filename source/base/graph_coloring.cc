@@ -22,7 +22,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace GraphColoring
 {
   unsigned int
-  color_sparsity_pattern(const SparsityPattern &    sparsity_pattern,
+  color_sparsity_pattern(const SparsityPattern     &sparsity_pattern,
                          std::vector<unsigned int> &color_indices)
   {
     return SparsityTools::color_sparsity_pattern(sparsity_pattern,

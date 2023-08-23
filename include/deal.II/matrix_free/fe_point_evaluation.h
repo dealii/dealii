@@ -86,7 +86,7 @@ namespace internal
       }
 
       static void
-      write_value(VectorizedArrayType &        vector_entry,
+      write_value(VectorizedArrayType         &vector_entry,
                   const unsigned int           component,
                   const vectorized_value_type &result)
       {
@@ -97,7 +97,7 @@ namespace internal
       static void
       set_gradient(const interface_vectorized_gradient_type &value,
                    const unsigned int                        vector_lane,
-                   gradient_type &                           result)
+                   gradient_type                            &result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -109,7 +109,7 @@ namespace internal
       static void
       get_gradient(interface_vectorized_gradient_type &value,
                    const unsigned int                  vector_lane,
-                   const gradient_type &               result)
+                   const gradient_type                &result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -129,7 +129,7 @@ namespace internal
       static void
       set_value(const vectorized_value_type &value,
                 const unsigned int           vector_lane,
-                scalar_value_type &          result)
+                scalar_value_type           &result)
       {
         for (unsigned int i = 0; i < n_components; ++i)
           result[i] = value[i][vector_lane];
@@ -144,7 +144,7 @@ namespace internal
       }
 
       static void
-      get_value(vectorized_value_type &  value,
+      get_value(vectorized_value_type   &value,
                 const unsigned int       vector_lane,
                 const scalar_value_type &result)
       {
@@ -169,7 +169,7 @@ namespace internal
       }
 
       static void
-      access(value_type &        value,
+      access(value_type         &value,
              const unsigned int  vector_lane,
              const unsigned int  component,
              const ScalarNumber &shape_value)
@@ -179,7 +179,7 @@ namespace internal
       }
 
       static ScalarNumber
-      access(const value_type & value,
+      access(const value_type  &value,
              const unsigned int vector_lane,
              const unsigned int component)
       {
@@ -188,7 +188,7 @@ namespace internal
       }
 
       static void
-      access(gradient_type &                     value,
+      access(gradient_type                      &value,
              const unsigned int                  vector_lane,
              const unsigned int                  component,
              const Tensor<1, dim, ScalarNumber> &shape_gradient)
@@ -248,7 +248,7 @@ namespace internal
       static void
       set_gradient(const vectorized_gradient_type &value,
                    const unsigned int              vector_lane,
-                   scalar_gradient_type &          result)
+                   scalar_gradient_type           &result)
       {
         for (unsigned int d = 0; d < dim; ++d)
           result[d] = value[d][vector_lane];
@@ -263,7 +263,7 @@ namespace internal
       }
 
       static void
-      get_gradient(vectorized_gradient_type &  value,
+      get_gradient(vectorized_gradient_type   &value,
                    const unsigned int          vector_lane,
                    const scalar_gradient_type &result)
       {
@@ -290,7 +290,7 @@ namespace internal
       static void
       set_value(const vectorized_value_type &value,
                 const unsigned int           vector_lane,
-                scalar_value_type &          result)
+                scalar_value_type           &result)
       {
         result = value[vector_lane];
       }
@@ -304,7 +304,7 @@ namespace internal
       }
 
       static void
-      get_value(vectorized_value_type &  value,
+      get_value(vectorized_value_type   &value,
                 const unsigned int       vector_lane,
                 const scalar_value_type &result)
       {
@@ -326,7 +326,7 @@ namespace internal
       }
 
       static void
-      access(value_type &       value,
+      access(value_type        &value,
              const unsigned int vector_lane,
              const unsigned int,
              const ScalarNumber &shape_value)
@@ -336,7 +336,7 @@ namespace internal
       }
 
       static ScalarNumber
-      access(const value_type & value,
+      access(const value_type  &value,
              const unsigned int vector_lane,
              const unsigned int)
       {
@@ -344,7 +344,7 @@ namespace internal
       }
 
       static void
-      access(gradient_type &    value,
+      access(gradient_type     &value,
              const unsigned int vector_lane,
              const unsigned int,
              const scalar_gradient_type &shape_gradient)
@@ -393,7 +393,7 @@ namespace internal
       }
 
       static void
-      write_value(VectorizedArrayType &        vector_entry,
+      write_value(VectorizedArrayType         &vector_entry,
                   const unsigned int           component,
                   const vectorized_value_type &result)
       {
@@ -403,7 +403,7 @@ namespace internal
       static void
       set_gradient(const interface_vectorized_gradient_type &value,
                    const unsigned int                        vector_lane,
-                   gradient_type &                           result)
+                   gradient_type                            &result)
       {
         for (unsigned int i = 0; i < dim; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -415,7 +415,7 @@ namespace internal
       static void
       get_gradient(interface_vectorized_gradient_type &value,
                    const unsigned int                  vector_lane,
-                   const gradient_type &               result)
+                   const gradient_type                &result)
       {
         for (unsigned int i = 0; i < dim; ++i)
           for (unsigned int d = 0; d < dim; ++d)
@@ -435,7 +435,7 @@ namespace internal
       static void
       set_value(const vectorized_value_type &value,
                 const unsigned int           vector_lane,
-                scalar_value_type &          result)
+                scalar_value_type           &result)
       {
         for (unsigned int i = 0; i < dim; ++i)
           result[i] = value[i][vector_lane];
@@ -450,7 +450,7 @@ namespace internal
       }
 
       static void
-      get_value(vectorized_value_type &  value,
+      get_value(vectorized_value_type   &value,
                 const unsigned int       vector_lane,
                 const scalar_value_type &result)
       {
@@ -475,7 +475,7 @@ namespace internal
       }
 
       static void
-      access(value_type &        value,
+      access(value_type         &value,
              const unsigned int  vector_lane,
              const unsigned int  component,
              const ScalarNumber &shape_value)
@@ -485,7 +485,7 @@ namespace internal
       }
 
       static ScalarNumber
-      access(const value_type & value,
+      access(const value_type  &value,
              const unsigned int vector_lane,
              const unsigned int component)
       {
@@ -494,7 +494,7 @@ namespace internal
       }
 
       static void
-      access(gradient_type &                     value,
+      access(gradient_type                      &value,
              const unsigned int                  vector_lane,
              const unsigned int                  component,
              const Tensor<1, dim, ScalarNumber> &shape_gradient)
@@ -554,7 +554,7 @@ namespace internal
       static void
       set_gradient(const vectorized_gradient_type &value,
                    const unsigned int              vector_lane,
-                   scalar_gradient_type &          result)
+                   scalar_gradient_type           &result)
       {
         result[0] = value[0][vector_lane];
       }
@@ -568,7 +568,7 @@ namespace internal
       }
 
       static void
-      get_gradient(vectorized_gradient_type &  value,
+      get_gradient(vectorized_gradient_type   &value,
                    const unsigned int          vector_lane,
                    const scalar_gradient_type &result)
       {
@@ -592,7 +592,7 @@ namespace internal
       static void
       set_value(const vectorized_value_type &value,
                 const unsigned int           vector_lane,
-                scalar_value_type &          result)
+                scalar_value_type           &result)
       {
         result = value[vector_lane];
       }
@@ -606,7 +606,7 @@ namespace internal
       }
 
       static void
-      get_value(vectorized_value_type &  value,
+      get_value(vectorized_value_type   &value,
                 const unsigned int       vector_lane,
                 const scalar_value_type &result)
       {
@@ -628,7 +628,7 @@ namespace internal
       }
 
       static void
-      access(value_type &       value,
+      access(value_type        &value,
              const unsigned int vector_lane,
              const unsigned int,
              const ScalarNumber &shape_value)
@@ -638,7 +638,7 @@ namespace internal
       }
 
       static ScalarNumber
-      access(const value_type & value,
+      access(const value_type  &value,
              const unsigned int vector_lane,
              const unsigned int)
       {
@@ -646,7 +646,7 @@ namespace internal
       }
 
       static void
-      access(gradient_type &    value,
+      access(gradient_type     &value,
              const unsigned int vector_lane,
              const unsigned int,
              const scalar_gradient_type &shape_gradient)
@@ -757,7 +757,7 @@ public:
    * objects, this parameter allows to select a range of `n_components`
    * components starting from this parameter.
    */
-  FEPointEvaluation(const Mapping<dim> &      mapping,
+  FEPointEvaluation(const Mapping<dim>       &mapping,
                     const FiniteElement<dim> &fe,
                     const UpdateFlags         update_flags,
                     const unsigned int        first_selected_component = 0);
@@ -780,7 +780,7 @@ public:
    */
   FEPointEvaluation(
     NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim> &                       fe,
+    const FiniteElement<dim>                        &fe,
     const unsigned int first_selected_component = 0);
 
   /**
@@ -846,7 +846,7 @@ public:
    * evaluated at the points.
    */
   void
-  evaluate(const ArrayView<const ScalarNumber> &   solution_values,
+  evaluate(const ArrayView<const ScalarNumber>    &solution_values,
            const EvaluationFlags::EvaluationFlags &evaluation_flags);
 
   /**
@@ -868,7 +868,7 @@ public:
    *
    */
   void
-  integrate(const ArrayView<ScalarNumber> &         solution_values,
+  integrate(const ArrayView<ScalarNumber>          &solution_values,
             const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
@@ -894,7 +894,7 @@ public:
    *
    */
   void
-  test_and_sum(const ArrayView<ScalarNumber> &         solution_values,
+  test_and_sum(const ArrayView<ScalarNumber>          &solution_values,
                const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
@@ -1041,7 +1041,7 @@ private:
    */
   void
   prepare_evaluate_fast(
-    const ArrayView<const ScalarNumber> &   solution_values,
+    const ArrayView<const ScalarNumber>    &solution_values,
     const EvaluationFlags::EvaluationFlags &evaluation_flags);
 
   /**
@@ -1053,21 +1053,21 @@ private:
     const EvaluationFlags::EvaluationFlags &evaluation_flags,
     const unsigned int                      n_shapes,
     const unsigned int                      qb,
-    vectorized_value_type &                 value,
-    interface_vectorized_gradient_type &    gradient);
+    vectorized_value_type                  &value,
+    interface_vectorized_gradient_type     &gradient);
 
   /**
    * Fast path of the evaluate function.
    */
   void
-  evaluate_fast(const ArrayView<const ScalarNumber> &   solution_values,
+  evaluate_fast(const ArrayView<const ScalarNumber>    &solution_values,
                 const EvaluationFlags::EvaluationFlags &evaluation_flags);
 
   /**
    * Slow path of the evaluate function using FEValues.
    */
   void
-  evaluate_slow(const ArrayView<const ScalarNumber> &   solution_values,
+  evaluate_slow(const ArrayView<const ScalarNumber>    &solution_values,
                 const EvaluationFlags::EvaluationFlags &evaluation_flags);
 
   /**
@@ -1077,10 +1077,10 @@ private:
    */
   void
   compute_integrate_fast(
-    const EvaluationFlags::EvaluationFlags &  integration_flags,
+    const EvaluationFlags::EvaluationFlags   &integration_flags,
     const unsigned int                        n_shapes,
     const unsigned int                        qb,
-    const vectorized_value_type &             value,
+    const vectorized_value_type              &value,
     const interface_vectorized_gradient_type &gradient);
 
   /**
@@ -1090,7 +1090,7 @@ private:
    */
   void
   finish_integrate_fast(
-    const ArrayView<ScalarNumber> &         solution_values,
+    const ArrayView<ScalarNumber>          &solution_values,
     const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
@@ -1098,7 +1098,7 @@ private:
    */
   template <bool do_JxW>
   void
-  integrate_fast(const ArrayView<ScalarNumber> &         solution_values,
+  integrate_fast(const ArrayView<ScalarNumber>          &solution_values,
                  const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
@@ -1106,7 +1106,7 @@ private:
    */
   template <bool do_JxW>
   void
-  integrate_slow(const ArrayView<ScalarNumber> &         solution_values,
+  integrate_slow(const ArrayView<ScalarNumber>          &solution_values,
                  const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
@@ -1114,7 +1114,7 @@ private:
    */
   template <bool do_JxW>
   void
-  do_integrate(const ArrayView<ScalarNumber> &         solution_values,
+  do_integrate(const ArrayView<ScalarNumber>          &solution_values,
                const EvaluationFlags::EvaluationFlags &integration_flags);
 
   /**
@@ -1336,7 +1336,7 @@ private:
 
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
-  const Mapping<dim> &      mapping,
+  const Mapping<dim>       &mapping,
   const FiniteElement<dim> &fe,
   const UpdateFlags         update_flags,
   const unsigned int        first_selected_component)
@@ -1364,7 +1364,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
 template <int n_components_, int dim, int spacedim, typename Number>
 FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
   NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-  const FiniteElement<dim> &                       fe,
+  const FiniteElement<dim>                        &fe,
   const unsigned int                               first_selected_component)
   : n_q_points(numbers::invalid_unsigned_int)
   , n_q_points_scalar(numbers::invalid_unsigned_int)
@@ -1559,7 +1559,7 @@ template <int n_components_, int dim, int spacedim, typename Number>
 void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::reinit(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const ArrayView<const Point<dim>> &                         unit_points)
+  const ArrayView<const Point<dim>>                          &unit_points)
 {
   // reinit is only allowed for mapping computation on the fly
   AssertThrow(mapping_info_on_the_fly.get() != nullptr, ExcNotImplemented());
@@ -1741,7 +1741,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::do_reinit()
 template <int n_components_, int dim, int spacedim, typename Number>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::prepare_evaluate_fast(
-  const ArrayView<const ScalarNumber> &   solution_values,
+  const ArrayView<const ScalarNumber>    &solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flags)
 {
   if (use_face_path)
@@ -1823,8 +1823,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
   const EvaluationFlags::EvaluationFlags &evaluation_flags,
   const unsigned int                      n_shapes,
   const unsigned int                      qb,
-  vectorized_value_type &                 value,
-  interface_vectorized_gradient_type &    gradient)
+  vectorized_value_type                  &value,
+  interface_vectorized_gradient_type     &gradient)
 {
   if (use_face_path)
     {
@@ -1950,7 +1950,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
 template <int n_components_, int dim, int spacedim, typename Number>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_fast(
-  const ArrayView<const ScalarNumber> &   solution_values,
+  const ArrayView<const ScalarNumber>    &solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flags)
 {
   prepare_evaluate_fast(solution_values, evaluation_flags);
@@ -1996,7 +1996,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_fast(
 template <int n_components_, int dim, int spacedim, typename Number>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_slow(
-  const ArrayView<const ScalarNumber> &   solution_values,
+  const ArrayView<const ScalarNumber>    &solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flags)
 {
   // slow path with FEValues
@@ -2078,7 +2078,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate_slow(
 template <int n_components_, int dim, int spacedim, typename Number>
 void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
-  const ArrayView<const ScalarNumber> &   solution_values,
+  const ArrayView<const ScalarNumber>    &solution_values,
   const EvaluationFlags::EvaluationFlags &evaluation_flags)
 {
   if (!is_reinitialized)
@@ -2105,10 +2105,10 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
 template <int n_components_, int dim, int spacedim, typename Number>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_integrate_fast(
-  const EvaluationFlags::EvaluationFlags &  integration_flags,
+  const EvaluationFlags::EvaluationFlags   &integration_flags,
   const unsigned int                        n_shapes,
   const unsigned int                        qb,
-  const vectorized_value_type &             value,
+  const vectorized_value_type              &value,
   const interface_vectorized_gradient_type &gradient)
 {
   if (use_face_path)
@@ -2215,7 +2215,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_integrate_fast(
 template <int n_components_, int dim, int spacedim, typename Number>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
-  const ArrayView<ScalarNumber> &         solution_values,
+  const ArrayView<ScalarNumber>          &solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
   std::fill(solution_values.begin(), solution_values.end(), ScalarNumber());
@@ -2227,8 +2227,8 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::finish_integrate_fast(
       if (use_face_path)
         {
           const unsigned int size_input = 2 * dofs_per_component_face;
-          ScalarNumber *     input      = scratch_data_scalar.begin();
-          ScalarNumber *     output     = input + size_input;
+          ScalarNumber      *input      = scratch_data_scalar.begin();
+          ScalarNumber      *output     = input + size_input;
 
           for (unsigned int i = 0; i < 2 * dofs_per_component_face; ++i)
             {
@@ -2284,7 +2284,7 @@ template <int n_components_, int dim, int spacedim, typename Number>
 template <bool do_JxW>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
-  const ArrayView<ScalarNumber> &         solution_values,
+  const ArrayView<ScalarNumber>          &solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
   // fast path with tensor product integration
@@ -2374,7 +2374,7 @@ template <int n_components_, int dim, int spacedim, typename Number>
 template <bool do_JxW>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_slow(
-  const ArrayView<ScalarNumber> &         solution_values,
+  const ArrayView<ScalarNumber>          &solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
   // slow path with FEValues
@@ -2450,7 +2450,7 @@ template <int n_components_, int dim, int spacedim, typename Number>
 template <bool do_JxW>
 void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::do_integrate(
-  const ArrayView<ScalarNumber> &         solution_values,
+  const ArrayView<ScalarNumber>          &solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
   if (!is_reinitialized)
@@ -2489,7 +2489,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::do_integrate(
 template <int n_components_, int dim, int spacedim, typename Number>
 void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
-  const ArrayView<ScalarNumber> &         solution_values,
+  const ArrayView<ScalarNumber>          &solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
   do_integrate<true>(solution_values, integration_flags);
@@ -2500,7 +2500,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate(
 template <int n_components_, int dim, int spacedim, typename Number>
 void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::test_and_sum(
-  const ArrayView<ScalarNumber> &         solution_values,
+  const ArrayView<ScalarNumber>          &solution_values,
   const EvaluationFlags::EvaluationFlags &integration_flags)
 {
   do_integrate<false>(solution_values, integration_flags);
@@ -2551,7 +2551,7 @@ inline const typename FEPointEvaluation<n_components_, dim, spacedim, Number>::
 template <int n_components_, int dim, int spacedim, typename Number>
 inline void
 FEPointEvaluation<n_components_, dim, spacedim, Number>::submit_value(
-  const value_type & value,
+  const value_type  &value,
   const unsigned int point_index)
 {
   AssertIndexRange(point_index, n_q_points);

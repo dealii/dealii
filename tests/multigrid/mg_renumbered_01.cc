@@ -63,7 +63,7 @@
 template <int dim, typename number, int spacedim>
 void
 reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-              MGLevelObject<dealii::Vector<number>> &  v)
+              MGLevelObject<dealii::Vector<number>>   &v)
 {
   for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
     {
@@ -109,8 +109,8 @@ template <int dim>
 void
 print_diff(const DoFHandler<dim> &dof_1,
            const DoFHandler<dim> &dof_2,
-           const Vector<double> & u,
-           const Vector<double> & v)
+           const Vector<double>  &u,
+           const Vector<double>  &v)
 {
   Vector<double> diff;
   diff.reinit(u);
@@ -134,7 +134,7 @@ print_diff(const DoFHandler<dim> &dof_1,
 
 template <int dim>
 void
-print(const DoFHandler<dim> &         dof,
+print(const DoFHandler<dim>          &dof,
       std::vector<std::vector<bool>> &interface_dofs)
 {
   const unsigned int        dofs_per_cell = dof.get_fe().dofs_per_cell;

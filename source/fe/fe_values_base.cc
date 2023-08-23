@@ -166,7 +166,7 @@ template <typename Number>
 void
 FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
   const ReadVector<Number> &in,
-  Vector<Number> &          out) const
+  Vector<Number>           &out) const
 {
   Assert(is_initialized(), ExcNotReinited());
   Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
@@ -190,7 +190,7 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
 template <int dim, int spacedim>
 void
 FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
-  const IndexSet &              in,
+  const IndexSet               &in,
   Vector<IndexSet::value_type> &out) const
 {
   Assert(is_initialized(), ExcNotReinited());
@@ -218,7 +218,7 @@ FEValuesBase<dim, spacedim>::FEValuesBase(
   const unsigned int                  n_q_points,
   const unsigned int                  dofs_per_cell,
   const UpdateFlags                   flags,
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe)
   : n_quadrature_points(n_q_points)
   , max_n_quadrature_points(n_q_points)
@@ -257,9 +257,9 @@ namespace internal
 
   template <typename Number, typename Number2>
   void
-  do_function_values(const ArrayView<Number2> &      dof_values,
+  do_function_values(const ArrayView<Number2>       &dof_values,
                      const dealii::Table<2, double> &shape_values,
-                     std::vector<Number> &           values)
+                     std::vector<Number>            &values)
   {
     // scalar finite elements, so shape_values.size() == dofs_per_cell
     const unsigned int dofs_per_cell       = shape_values.n_rows();
@@ -299,8 +299,8 @@ namespace internal
   void
   do_function_values(
     const ArrayView<typename VectorType::value_type> &dof_values,
-    const dealii::Table<2, double> &                  shape_values,
-    const FiniteElement<dim, spacedim> &              fe,
+    const dealii::Table<2, double>                   &shape_values,
+    const FiniteElement<dim, spacedim>               &fe,
     const std::vector<unsigned int> &shape_function_to_row_table,
     ArrayView<VectorType>            values,
     const bool                       quadrature_points_fastest = false,
@@ -384,7 +384,7 @@ namespace internal
                 const unsigned int row =
                   shape_function_to_row_table[shape_func * n_components + c];
 
-                const double *     shape_value_ptr = &shape_values(row, 0);
+                const double      *shape_value_ptr = &shape_values(row, 0);
                 const unsigned int comp            = c + mc * n_components;
 
                 if (quadrature_points_fastest)
@@ -409,9 +409,9 @@ namespace internal
   template <int order, int spacedim, typename Number>
   void
   do_function_derivatives(
-    const ArrayView<Number> &                        dof_values,
+    const ArrayView<Number>                         &dof_values,
     const dealii::Table<2, Tensor<order, spacedim>> &shape_derivatives,
-    std::vector<Tensor<order, spacedim, Number>> &   derivatives)
+    std::vector<Tensor<order, spacedim, Number>>    &derivatives)
   {
     const unsigned int dofs_per_cell       = shape_derivatives.size()[0];
     const unsigned int n_quadrature_points = derivatives.size();
@@ -449,9 +449,9 @@ namespace internal
   template <int order, int dim, int spacedim, typename Number>
   void
   do_function_derivatives(
-    const ArrayView<Number> &                        dof_values,
+    const ArrayView<Number>                         &dof_values,
     const dealii::Table<2, Tensor<order, spacedim>> &shape_derivatives,
-    const FiniteElement<dim, spacedim> &             fe,
+    const FiniteElement<dim, spacedim>              &fe,
     const std::vector<unsigned int> &shape_function_to_row_table,
     ArrayView<std::vector<Tensor<order, spacedim, Number>>> derivatives,
     const bool         quadrature_points_fastest = false,
@@ -556,9 +556,9 @@ namespace internal
   template <int spacedim, typename Number, typename Number2>
   void
   do_function_laplacians(
-    const ArrayView<Number2> &                   dof_values,
+    const ArrayView<Number2>                    &dof_values,
     const dealii::Table<2, Tensor<2, spacedim>> &shape_hessians,
-    std::vector<Number> &                        laplacians)
+    std::vector<Number>                         &laplacians)
   {
     const unsigned int dofs_per_cell       = shape_hessians.size()[0];
     const unsigned int n_quadrature_points = laplacians.size();
@@ -593,11 +593,11 @@ namespace internal
   template <int dim, int spacedim, typename VectorType, typename Number>
   void
   do_function_laplacians(
-    const ArrayView<Number> &                    dof_values,
+    const ArrayView<Number>                     &dof_values,
     const dealii::Table<2, Tensor<2, spacedim>> &shape_hessians,
-    const FiniteElement<dim, spacedim> &         fe,
-    const std::vector<unsigned int> &            shape_function_to_row_table,
-    std::vector<VectorType> &                    laplacians,
+    const FiniteElement<dim, spacedim>          &fe,
+    const std::vector<unsigned int>             &shape_function_to_row_table,
+    std::vector<VectorType>                     &laplacians,
     const bool         quadrature_points_fastest = false,
     const unsigned int component_multiple        = 1)
   {
@@ -709,7 +709,7 @@ template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
   const ReadVector<Number> &fe_function,
-  std::vector<Number> &     values) const
+  std::vector<Number>      &values) const
 {
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
@@ -732,9 +732,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const ReadVector<Number> &                      fe_function,
+  const ReadVector<Number>                       &fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Number> &                           values) const
+  std::vector<Number>                            &values) const
 {
   Assert(this->update_flags & update_values,
          ExcAccessToUninitializedField("update_values"));
@@ -755,7 +755,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const ReadVector<Number> &   fe_function,
+  const ReadVector<Number>    &fe_function,
   std::vector<Vector<Number>> &values) const
 {
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -781,9 +781,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const ReadVector<Number> &                      fe_function,
+  const ReadVector<Number>                       &fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Vector<Number>> &                   values) const
+  std::vector<Vector<Number>>                    &values) const
 {
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
@@ -811,7 +811,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_values(
-  const ReadVector<Number> &                      fe_function,
+  const ReadVector<Number>                       &fe_function,
   const ArrayView<const types::global_dof_index> &indices,
   ArrayView<std::vector<Number>>                  values,
   const bool quadrature_points_fastest) const
@@ -843,7 +843,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const ReadVector<Number> &                fe_function,
+  const ReadVector<Number>                 &fe_function,
   std::vector<Tensor<1, spacedim, Number>> &gradients) const
 {
   Assert(this->update_flags & update_gradients,
@@ -867,9 +867,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const ReadVector<Number> &                      fe_function,
+  const ReadVector<Number>                       &fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Tensor<1, spacedim, Number>> &      gradients) const
+  std::vector<Tensor<1, spacedim, Number>>       &gradients) const
 {
   Assert(this->update_flags & update_gradients,
          ExcAccessToUninitializedField("update_gradients"));
@@ -890,7 +890,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const ReadVector<Number> &                             fe_function,
+  const ReadVector<Number>                              &fe_function,
   std::vector<std::vector<Tensor<1, spacedim, Number>>> &gradients) const
 {
   Assert(this->update_flags & update_gradients,
@@ -915,8 +915,8 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_gradients(
-  const ReadVector<Number> &                          fe_function,
-  const ArrayView<const types::global_dof_index> &    indices,
+  const ReadVector<Number>                           &fe_function,
+  const ArrayView<const types::global_dof_index>     &indices,
   ArrayView<std::vector<Tensor<1, spacedim, Number>>> gradients,
   const bool quadrature_points_fastest) const
 {
@@ -946,7 +946,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const ReadVector<Number> &                fe_function,
+  const ReadVector<Number>                 &fe_function,
   std::vector<Tensor<2, spacedim, Number>> &hessians) const
 {
   AssertDimension(fe->n_components(), 1);
@@ -970,9 +970,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const ReadVector<Number> &                      fe_function,
+  const ReadVector<Number>                       &fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Tensor<2, spacedim, Number>> &      hessians) const
+  std::vector<Tensor<2, spacedim, Number>>       &hessians) const
 {
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
@@ -993,7 +993,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const ReadVector<Number> &                             fe_function,
+  const ReadVector<Number>                              &fe_function,
   std::vector<std::vector<Tensor<2, spacedim, Number>>> &hessians,
   const bool quadrature_points_fastest) const
 {
@@ -1020,8 +1020,8 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_hessians(
-  const ReadVector<Number> &                          fe_function,
-  const ArrayView<const types::global_dof_index> &    indices,
+  const ReadVector<Number>                           &fe_function,
+  const ArrayView<const types::global_dof_index>     &indices,
   ArrayView<std::vector<Tensor<2, spacedim, Number>>> hessians,
   const bool quadrature_points_fastest) const
 {
@@ -1050,7 +1050,7 @@ template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
   const ReadVector<Number> &fe_function,
-  std::vector<Number> &     laplacians) const
+  std::vector<Number>      &laplacians) const
 {
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
@@ -1073,9 +1073,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const ReadVector<Number> &                      fe_function,
+  const ReadVector<Number>                       &fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Number> &                           laplacians) const
+  std::vector<Number>                            &laplacians) const
 {
   Assert(this->update_flags & update_hessians,
          ExcAccessToUninitializedField("update_hessians"));
@@ -1096,7 +1096,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const ReadVector<Number> &   fe_function,
+  const ReadVector<Number>    &fe_function,
   std::vector<Vector<Number>> &laplacians) const
 {
   Assert(present_cell.is_initialized(), ExcNotReinited());
@@ -1121,9 +1121,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const ReadVector<Number> &                      fe_function,
+  const ReadVector<Number>                       &fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Vector<Number>> &                   laplacians) const
+  std::vector<Vector<Number>>                    &laplacians) const
 {
   // Size of indices must be a multiple of dofs_per_cell such that an integer
   // number of function values is generated in each point.
@@ -1151,9 +1151,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_laplacians(
-  const ReadVector<Number> &                      fe_function,
+  const ReadVector<Number>                       &fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<std::vector<Number>> &              laplacians,
+  std::vector<std::vector<Number>>               &laplacians,
   const bool quadrature_points_fastest) const
 {
   Assert(indices.size() % dofs_per_cell == 0,
@@ -1180,7 +1180,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const ReadVector<Number> &                fe_function,
+  const ReadVector<Number>                 &fe_function,
   std::vector<Tensor<3, spacedim, Number>> &third_derivatives) const
 {
   AssertDimension(fe->n_components(), 1);
@@ -1204,9 +1204,9 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const ReadVector<Number> &                      fe_function,
+  const ReadVector<Number>                       &fe_function,
   const ArrayView<const types::global_dof_index> &indices,
-  std::vector<Tensor<3, spacedim, Number>> &      third_derivatives) const
+  std::vector<Tensor<3, spacedim, Number>>       &third_derivatives) const
 {
   Assert(this->update_flags & update_3rd_derivatives,
          ExcAccessToUninitializedField("update_3rd_derivatives"));
@@ -1226,7 +1226,7 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const ReadVector<Number> &                             fe_function,
+  const ReadVector<Number>                              &fe_function,
   std::vector<std::vector<Tensor<3, spacedim, Number>>> &third_derivatives,
   const bool quadrature_points_fastest) const
 {
@@ -1253,8 +1253,8 @@ template <int dim, int spacedim>
 template <typename Number>
 void
 FEValuesBase<dim, spacedim>::get_function_third_derivatives(
-  const ReadVector<Number> &                          fe_function,
-  const ArrayView<const types::global_dof_index> &    indices,
+  const ReadVector<Number>                           &fe_function,
+  const ArrayView<const types::global_dof_index>     &indices,
   ArrayView<std::vector<Tensor<3, spacedim, Number>>> third_derivatives,
   const bool quadrature_points_fastest) const
 {
@@ -1434,14 +1434,15 @@ FEValuesBase<dim, spacedim>::check_cell_similarity(
     // in MappingQ, data can have been modified during the last call. Then, we
     // can't use that data on the new cell.
     if (cell_similarity == CellSimilarity::invalid_next_cell)
-    cell_similarity = CellSimilarity::none;
-  else
-    cell_similarity =
-      (cell->is_translation_of(
-         static_cast<const typename Triangulation<dim, spacedim>::cell_iterator
-                       &>(this->present_cell)) ?
-         CellSimilarity::translation :
-         CellSimilarity::none);
+      cell_similarity = CellSimilarity::none;
+    else
+      cell_similarity =
+        (cell->is_translation_of(
+           static_cast<
+             const typename Triangulation<dim, spacedim>::cell_iterator &>(
+             this->present_cell)) ?
+           CellSimilarity::translation :
+           CellSimilarity::none);
 
   if ((dim < spacedim) && (cell_similarity == CellSimilarity::translation))
     {

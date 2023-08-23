@@ -77,7 +77,7 @@ template <int dim,
           typename VectorType,
           int n_q_points_1d>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<Number> &constraints,
         const unsigned int               n_locally_owned_cells,
         const bool                       constant_coefficient = true,

@@ -45,10 +45,10 @@ namespace internal
       const unsigned int               n_datasets,
       const unsigned int               n_subdivisions,
       const std::vector<unsigned int> &n_postprocessor_outputs,
-      const Mapping<dim, spacedim> &   mapping,
+      const Mapping<dim, spacedim>    &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &               finite_elements,
+                       &finite_elements,
       const UpdateFlags update_flags)
       : internal::DataOutImplementation::ParallelDataBase<dim, spacedim>(
           n_datasets,
@@ -97,7 +97,7 @@ void
 DataOutFaces<dim, spacedim>::build_one_patch(
   const FaceDescriptor *cell_and_face,
   internal::DataOutFacesImplementation::ParallelData<dim, spacedim> &data,
-  DataOutBase::Patch<patch_dim, patch_spacedim> &                    patch)
+  DataOutBase::Patch<patch_dim, patch_spacedim>                     &patch)
 {
   const cell_iterator cell        = cell_and_face->first;
   const unsigned int  face_number = cell_and_face->second;
@@ -268,28 +268,30 @@ DataOutFaces<dim, spacedim>::build_one_patch(
             // we treat single component functions separately for efficiency
             // reasons.
             if (n_components == 1)
-            {
-              this->dof_data[dataset]->get_function_values(
-                this_fe_patch_values,
-                internal::DataOutImplementation::ComponentExtractor::real_part,
-                data.patch_values_scalar.solution_values);
-              for (unsigned int q = 0; q < n_q_points; ++q)
-                patch.data(offset, q) =
-                  data.patch_values_scalar.solution_values[q];
-            }
-          else
-            {
-              data.resize_system_vectors(n_components);
-              this->dof_data[dataset]->get_function_values(
-                this_fe_patch_values,
-                internal::DataOutImplementation::ComponentExtractor::real_part,
-                data.patch_values_system.solution_values);
-              for (unsigned int component = 0; component < n_components;
-                   ++component)
+              {
+                this->dof_data[dataset]->get_function_values(
+                  this_fe_patch_values,
+                  internal::DataOutImplementation::ComponentExtractor::
+                    real_part,
+                  data.patch_values_scalar.solution_values);
                 for (unsigned int q = 0; q < n_q_points; ++q)
-                  patch.data(offset + component, q) =
-                    data.patch_values_system.solution_values[q](component);
-            }
+                  patch.data(offset, q) =
+                    data.patch_values_scalar.solution_values[q];
+              }
+            else
+              {
+                data.resize_system_vectors(n_components);
+                this->dof_data[dataset]->get_function_values(
+                  this_fe_patch_values,
+                  internal::DataOutImplementation::ComponentExtractor::
+                    real_part,
+                  data.patch_values_system.solution_values);
+                for (unsigned int component = 0; component < n_components;
+                     ++component)
+                  for (unsigned int q = 0; q < n_q_points; ++q)
+                    patch.data(offset + component, q) =
+                      data.patch_values_system.solution_values[q](component);
+              }
           // increment the counter for the actual data record
           offset += this->dof_data[dataset]->n_output_variables;
         }

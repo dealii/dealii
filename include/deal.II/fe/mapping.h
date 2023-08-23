@@ -453,7 +453,7 @@ public:
   virtual Point<spacedim>
   transform_unit_to_real_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const Point<dim> &                                          p) const = 0;
+    const Point<dim>                                           &p) const = 0;
 
   /**
    * Map the point @p p on the real @p cell to the corresponding point on the
@@ -486,7 +486,7 @@ public:
   virtual Point<dim>
   transform_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const Point<spacedim> &                                     p) const = 0;
+    const Point<spacedim>                                      &p) const = 0;
 
   /**
    * Map multiple points from the real point locations to points in reference
@@ -502,7 +502,7 @@ public:
   virtual void
   transform_points_real_to_unit_cell(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const ArrayView<const Point<spacedim>> &                    real_points,
+    const ArrayView<const Point<spacedim>>                     &real_points,
     const ArrayView<Point<dim>> &unit_points) const;
 
   /**
@@ -519,7 +519,7 @@ public:
   project_real_point_to_unit_point_on_face(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Point<spacedim> &                                     p) const;
+    const Point<spacedim>                                      &p) const;
 
   /**
    * @}
@@ -921,8 +921,8 @@ protected:
   fill_fe_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellSimilarity::Similarity                            cell_similarity,
-    const Quadrature<dim> &                                     quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim>                                      &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const = 0;
 
@@ -954,8 +954,8 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const hp::QCollection<dim - 1> &                            quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const hp::QCollection<dim - 1>                             &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
 
@@ -966,8 +966,8 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const Quadrature<dim - 1> &                                 quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim - 1>                                  &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
 
@@ -1002,8 +1002,8 @@ protected:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          subface_no,
-    const Quadrature<dim - 1> &                                 quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim - 1>                                  &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const = 0;
 
@@ -1016,8 +1016,8 @@ protected:
   virtual void
   fill_fe_immersed_surface_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const NonMatching::ImmersedSurfaceQuadrature<dim>          &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const;
 
@@ -1095,7 +1095,7 @@ public:
    * const, but the tensors it points to are not.)
    */
   virtual void
-  transform(const ArrayView<const Tensor<1, dim>> &                  input,
+  transform(const ArrayView<const Tensor<1, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<1, spacedim>> &output) const = 0;
@@ -1206,7 +1206,7 @@ public:
    * const, but the tensors it points to are not.)
    */
   virtual void
-  transform(const ArrayView<const Tensor<2, dim>> &                  input,
+  transform(const ArrayView<const Tensor<2, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<2, spacedim>> &output) const = 0;
@@ -1306,7 +1306,7 @@ public:
    * transformed objects should be placed.
    */
   virtual void
-  transform(const ArrayView<const Tensor<3, dim>> &                  input,
+  transform(const ArrayView<const Tensor<3, dim>>                   &input,
             const MappingKind                                        kind,
             const typename Mapping<dim, spacedim>::InternalDataBase &internal,
             const ArrayView<Tensor<3, spacedim>> &output) const = 0;

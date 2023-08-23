@@ -82,7 +82,7 @@ make_symengine_rcp(const std::string &name)
 }
 
 SE::RCP<const SE::Basic>
-make_symengine_rcp(const std::string &                          name,
+make_symengine_rcp(const std::string                           &name,
                    const std::vector<SE::RCP<const SE::Basic>> &args)
 {
   return SE::function_symbol(name, args);

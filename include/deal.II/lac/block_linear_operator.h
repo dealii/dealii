@@ -327,8 +327,8 @@ namespace internal
     void
     apply_with_intermediate_storage(const Function1 &first_op,
                                     const Function2 &loop_op,
-                                    Range &          v,
-                                    const Domain &   u,
+                                    Range           &v,
+                                    const Domain    &u,
                                     bool             add)
     {
       GrowingVectorMemory<Range> vector_memory;
@@ -393,15 +393,15 @@ namespace internal
 
         if (PointerComparison::equal(&v, &u))
           {
-            const auto first_op = [&op](Range &            v,
-                                        const Domain &     u,
+            const auto first_op = [&op](Range             &v,
+                                        const Domain      &u,
                                         const unsigned int i,
                                         const unsigned int j) {
               op.block(i, j).vmult(v.block(i), u.block(j));
             };
 
-            const auto loop_op = [&op](Range &            v,
-                                       const Domain &     u,
+            const auto loop_op = [&op](Range             &v,
+                                       const Domain      &u,
                                        const unsigned int i,
                                        const unsigned int j) {
               op.block(i, j).vmult_add(v.block(i), u.block(j));
@@ -428,15 +428,15 @@ namespace internal
 
         if (PointerComparison::equal(&v, &u))
           {
-            const auto first_op = [&op](Range &            v,
-                                        const Domain &     u,
+            const auto first_op = [&op](Range             &v,
+                                        const Domain      &u,
                                         const unsigned int i,
                                         const unsigned int j) {
               op.block(i, j).vmult(v.block(i), u.block(j));
             };
 
-            const auto loop_op = [&op](Range &            v,
-                                       const Domain &     u,
+            const auto loop_op = [&op](Range             &v,
+                                       const Domain      &u,
                                        const unsigned int i,
                                        const unsigned int j) {
               op.block(i, j).vmult_add(v.block(i), u.block(j));
@@ -460,15 +460,15 @@ namespace internal
 
         if (PointerComparison::equal(&v, &u))
           {
-            const auto first_op = [&op](Range &            v,
-                                        const Domain &     u,
+            const auto first_op = [&op](Range             &v,
+                                        const Domain      &u,
                                         const unsigned int i,
                                         const unsigned int j) {
               op.block(j, i).Tvmult(v.block(i), u.block(j));
             };
 
-            const auto loop_op = [&op](Range &            v,
-                                       const Domain &     u,
+            const auto loop_op = [&op](Range             &v,
+                                       const Domain      &u,
                                        const unsigned int i,
                                        const unsigned int j) {
               op.block(j, i).Tvmult_add(v.block(i), u.block(j));
@@ -495,15 +495,15 @@ namespace internal
 
         if (PointerComparison::equal(&v, &u))
           {
-            const auto first_op = [&op](Range &            v,
-                                        const Domain &     u,
+            const auto first_op = [&op](Range             &v,
+                                        const Domain      &u,
                                         const unsigned int i,
                                         const unsigned int j) {
               op.block(j, i).Tvmult(v.block(i), u.block(j));
             };
 
-            const auto loop_op = [&op](Range &            v,
-                                       const Domain &     u,
+            const auto loop_op = [&op](Range             &v,
+                                       const Domain      &u,
                                        const unsigned int i,
                                        const unsigned int j) {
               op.block(j, i).Tvmult_add(v.block(i), u.block(j));
@@ -882,7 +882,7 @@ block_forward_substitution(
   return_op.reinit_range_vector  = diagonal_inverse.reinit_range_vector;
   return_op.reinit_domain_vector = diagonal_inverse.reinit_domain_vector;
 
-  return_op.vmult = [block_operator, diagonal_inverse](Range &      v,
+  return_op.vmult = [block_operator, diagonal_inverse](Range       &v,
                                                        const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
     Assert(block_operator.n_block_cols() == m,
@@ -911,7 +911,7 @@ block_forward_substitution(
       }
   };
 
-  return_op.vmult_add = [block_operator, diagonal_inverse](Range &      v,
+  return_op.vmult_add = [block_operator, diagonal_inverse](Range       &v,
                                                            const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
     Assert(block_operator.n_block_cols() == m,
@@ -999,7 +999,7 @@ block_back_substitution(
   return_op.reinit_range_vector  = diagonal_inverse.reinit_range_vector;
   return_op.reinit_domain_vector = diagonal_inverse.reinit_domain_vector;
 
-  return_op.vmult = [block_operator, diagonal_inverse](Range &      v,
+  return_op.vmult = [block_operator, diagonal_inverse](Range       &v,
                                                        const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
     Assert(block_operator.n_block_cols() == m,
@@ -1029,7 +1029,7 @@ block_back_substitution(
       }
   };
 
-  return_op.vmult_add = [block_operator, diagonal_inverse](Range &      v,
+  return_op.vmult_add = [block_operator, diagonal_inverse](Range       &v,
                                                            const Range &u) {
     const unsigned int m = block_operator.n_block_rows();
     Assert(block_operator.n_block_cols() == m,

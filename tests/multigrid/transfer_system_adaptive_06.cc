@@ -45,7 +45,7 @@
 template <int dim, typename number, int spacedim>
 void
 reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-              MGLevelObject<dealii::Vector<number>> &  v)
+              MGLevelObject<dealii::Vector<number>>   &v)
 {
   for (unsigned int level = v.min_level(); level <= v.max_leve(); ++level)
     {
@@ -57,7 +57,7 @@ reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
 
 template <typename Transfer>
 void
-make_matrix(const Transfer &    transfer,
+make_matrix(const Transfer     &transfer,
             const unsigned int  high_level,
             FullMatrix<double> &matrix)
 {

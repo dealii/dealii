@@ -462,7 +462,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::set(const std::vector<size_type> &  indices,
+  VectorBase::set(const std::vector<size_type>   &indices,
                   const std::vector<PetscScalar> &values)
   {
     Assert(indices.size() == values.size(),
@@ -473,7 +473,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::add(const std::vector<size_type> &  indices,
+  VectorBase::add(const std::vector<size_type>   &indices,
                   const std::vector<PetscScalar> &values)
   {
     Assert(indices.size() == values.size(),
@@ -484,7 +484,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::add(const std::vector<size_type> &       indices,
+  VectorBase::add(const std::vector<size_type>        &indices,
                   const ::dealii::Vector<PetscScalar> &values)
   {
     Assert(indices.size() == values.size(),
@@ -496,7 +496,7 @@ namespace PETScWrappers
 
   void
   VectorBase::add(const size_type    n_elements,
-                  const size_type *  indices,
+                  const size_type   *indices,
                   const PetscScalar *values)
   {
     do_set_add_operation(n_elements, indices, values, true);
@@ -960,7 +960,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::print(std::ostream &     out,
+  VectorBase::print(std::ostream      &out,
                     const unsigned int precision,
                     const bool         scientific,
                     const bool         across) const
@@ -1056,7 +1056,7 @@ namespace PETScWrappers
 
   void
   VectorBase::do_set_add_operation(const size_type    n_elements,
-                                   const size_type *  indices,
+                                   const size_type   *indices,
                                    const PetscScalar *values,
                                    const bool         add_values)
   {

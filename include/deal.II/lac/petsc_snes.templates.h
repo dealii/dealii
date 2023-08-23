@@ -72,8 +72,8 @@ namespace PETScWrappers
   template <typename F, typename... Args>
   int
   call_and_possibly_capture_snes_exception(
-    const F &                    f,
-    std::exception_ptr &         eptr,
+    const F                     &f,
+    std::exception_ptr          &eptr,
     const std::function<void()> &recoverable_action,
     Args &&...args)
   {
@@ -589,7 +589,7 @@ namespace PETScWrappers
       PetscObjectComm(reinterpret_cast<PetscObject>(snes)));
     if (solve_with_jacobian)
       {
-        precond.vmult = [&](VectorBase &      indst,
+        precond.vmult = [&](VectorBase       &indst,
                             const VectorBase &insrc) -> void {
           VectorType       dst(static_cast<const Vec &>(indst));
           const VectorType src(static_cast<const Vec &>(insrc));
@@ -669,7 +669,7 @@ namespace PETScWrappers
                  Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
                          std::constructible_from<AMatrixType, Mat>))
   unsigned int NonlinearSolver<VectorType, PMatrixType, AMatrixType>::solve(
-    VectorType & x,
+    VectorType  &x,
     PMatrixType &P)
   {
     set_matrix(P);
@@ -689,7 +689,7 @@ namespace PETScWrappers
                  Mat>)&&(concepts::is_dealii_petsc_matrix_type<AMatrixType> ||
                          std::constructible_from<AMatrixType, Mat>))
   unsigned int NonlinearSolver<VectorType, PMatrixType, AMatrixType>::solve(
-    VectorType & x,
+    VectorType  &x,
     AMatrixType &A,
     PMatrixType &P)
   {

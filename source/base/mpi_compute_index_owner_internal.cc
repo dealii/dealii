@@ -456,8 +456,8 @@ namespace Utilities
 
 
         ConsensusAlgorithmsPayload::ConsensusAlgorithmsPayload(
-          const IndexSet &           owned_indices,
-          const IndexSet &           indices_to_look_up,
+          const IndexSet            &owned_indices,
+          const IndexSet            &indices_to_look_up,
           const MPI_Comm             comm,
           std::vector<unsigned int> &owning_ranks,
           const bool                 track_index_requests)
@@ -480,7 +480,7 @@ namespace Utilities
           const unsigned int                                     other_rank,
           const std::vector<std::pair<types::global_dof_index,
                                       types::global_dof_index>> &buffer_recv,
-          std::vector<unsigned int> &                            request_buffer)
+          std::vector<unsigned int>                             &request_buffer)
         {
           unsigned int owner_index_guess = 0;
           for (const auto &interval : buffer_recv)
@@ -736,7 +736,7 @@ namespace Utilities
           const unsigned int index_within_dict,
           const unsigned int rank_of_request,
           const unsigned int rank_of_owner,
-          unsigned int &     owner_index_guess)
+          unsigned int      &owner_index_guess)
         {
           // remember who requested which index. We want to use an
           // std::vector with simple addressing, via a good guess from the

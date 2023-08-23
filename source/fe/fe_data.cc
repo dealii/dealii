@@ -117,7 +117,7 @@ FiniteElementData<dim>::FiniteElementData(
   const unsigned int               n_components,
   const unsigned int               degree,
   const Conformity                 conformity,
-  const BlockIndices &             block_indices)
+  const BlockIndices              &block_indices)
   : FiniteElementData(dofs_per_object,
                       dim == 0 ?
                         ReferenceCells::Vertex :
@@ -137,7 +137,7 @@ FiniteElementData<dim>::FiniteElementData(
   const unsigned int               n_components,
   const unsigned int               degree,
   const Conformity                 conformity,
-  const BlockIndices &             block_indices)
+  const BlockIndices              &block_indices)
   : FiniteElementData(internal::expand(dim, dofs_per_object, cell_type),
                       cell_type,
                       n_components,
@@ -155,7 +155,7 @@ FiniteElementData<dim>::FiniteElementData(
   const unsigned int                    n_components,
   const unsigned int                    degree,
   const Conformity                      conformity,
-  const BlockIndices &                  block_indices)
+  const BlockIndices                   &block_indices)
   : reference_cell_kind(reference_cell)
   , number_of_unique_2d_subobjects(
       internal::number_unique_entries(data.dofs_per_object_inclusive[2]))

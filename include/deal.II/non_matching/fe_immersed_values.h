@@ -63,8 +63,8 @@ namespace NonMatching
      * @note Currently this class is only implemented for MappingCartesian,
      * MappingQ and MappingFEField.
      */
-    FEImmersedSurfaceValues(const Mapping<dim> &                  mapping,
-                            const FiniteElement<dim> &            element,
+    FEImmersedSurfaceValues(const Mapping<dim>                   &mapping,
+                            const FiniteElement<dim>             &element,
                             const ImmersedSurfaceQuadrature<dim> &quadrature,
                             const UpdateFlags                     update_flags);
 

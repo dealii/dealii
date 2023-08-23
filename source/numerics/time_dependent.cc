@@ -63,7 +63,7 @@ TimeDependent::~TimeDependent()
 
 void
 TimeDependent::insert_timestep(const TimeStepBase *position,
-                               TimeStepBase *      new_timestep)
+                               TimeStepBase       *new_timestep)
 {
   Assert((std::find(timesteps.begin(), timesteps.end(), position) !=
           timesteps.end()) ||
@@ -437,8 +437,8 @@ template <int dim>
 TimeStepBase_Tria<dim>::TimeStepBase_Tria(
   const double              time,
   const Triangulation<dim> &coarse_grid,
-  const Flags &             flags,
-  const RefinementFlags &   refinement_flags)
+  const Flags              &flags,
+  const RefinementFlags    &refinement_flags)
   : TimeStepBase(time)
   , tria(nullptr, typeid(*this).name())
   , coarse_grid(&coarse_grid, typeid(*this).name())
@@ -1002,58 +1002,58 @@ TimeStepBase_Tria<dim>::refine_grid(const RefinementData refinement_data)
           // which are to be coarsened, we
           // raise the limit for these too
           if (estimated_cells < previous_cells * (1. - delta_down))
-          {
-            // number of cells by which the
-            // new grid is to be enlarged
-            double delta_cells =
-              previous_cells * (1. - delta_down) - estimated_cells;
-            // heuristics: usually, if we
-            // add @p{delta_cells} to the
-            // present state, we end up
-            // with much more than only
-            // (1-delta_down)*prev_cells
-            // because of the effect of
-            // regularization and because
-            // of adaption to the
-            // following grid. Therefore,
-            // if we are not in the last
-            // correction loop, we try not
-            // to add as many cells as seem
-            // necessary at first and hope
-            // to get closer to the limit
-            // this way. Only in the last
-            // loop do we have to take the
-            // full number to guarantee the
-            // wanted result.
-            //
-            // The value 0.9 is taken from
-            // practice, as the additional
-            // number of cells introduced
-            // by regularization is
-            // approximately 10 per cent
-            // of the flagged cells.
-            if (loop != refinement_flags.cell_number_correction_steps - 1)
-              delta_cells *= 0.9;
+            {
+              // number of cells by which the
+              // new grid is to be enlarged
+              double delta_cells =
+                previous_cells * (1. - delta_down) - estimated_cells;
+              // heuristics: usually, if we
+              // add @p{delta_cells} to the
+              // present state, we end up
+              // with much more than only
+              // (1-delta_down)*prev_cells
+              // because of the effect of
+              // regularization and because
+              // of adaption to the
+              // following grid. Therefore,
+              // if we are not in the last
+              // correction loop, we try not
+              // to add as many cells as seem
+              // necessary at first and hope
+              // to get closer to the limit
+              // this way. Only in the last
+              // loop do we have to take the
+              // full number to guarantee the
+              // wanted result.
+              //
+              // The value 0.9 is taken from
+              // practice, as the additional
+              // number of cells introduced
+              // by regularization is
+              // approximately 10 per cent
+              // of the flagged cells.
+              if (loop != refinement_flags.cell_number_correction_steps - 1)
+                delta_cells *= 0.9;
 
-            // if more cells need to be
-            // refined, we need to lower
-            // the thresholds, i.e. to
-            // move to the beginning
-            // of sorted_criteria, which is
-            // sorted in ascending order
-            for (unsigned int i = 0; i < delta_cells;
-                 i += (GeometryInfo<dim>::max_children_per_cell - 1))
-              if (p_refinement_threshold != p_coarsening_threshold)
-                --refinement_threshold;
-              else if (p_coarsening_threshold != sorted_criteria.begin())
-                --p_coarsening_threshold, --p_refinement_threshold;
-              else
-                break;
-          }
-        else
-          // estimated cell number is ok,
-          // stop correction steps
-          break;
+              // if more cells need to be
+              // refined, we need to lower
+              // the thresholds, i.e. to
+              // move to the beginning
+              // of sorted_criteria, which is
+              // sorted in ascending order
+              for (unsigned int i = 0; i < delta_cells;
+                   i += (GeometryInfo<dim>::max_children_per_cell - 1))
+                if (p_refinement_threshold != p_coarsening_threshold)
+                  --refinement_threshold;
+                else if (p_coarsening_threshold != sorted_criteria.begin())
+                  --p_coarsening_threshold, --p_refinement_threshold;
+                else
+                  break;
+            }
+          else
+            // estimated cell number is ok,
+            // stop correction steps
+            break;
 
         if (p_refinement_threshold == sorted_criteria.end())
           {

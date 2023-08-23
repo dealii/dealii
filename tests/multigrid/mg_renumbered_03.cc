@@ -68,7 +68,7 @@
 template <int dim, typename number, int spacedim>
 void
 reinit_vector(const dealii::DoFHandler<dim, spacedim> &mg_dof,
-              MGLevelObject<dealii::Vector<number>> &  v)
+              MGLevelObject<dealii::Vector<number>>   &v)
 {
   for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
     {
@@ -115,9 +115,9 @@ initialize(const DoFHandler<dim> &dof, MGLevelObject<Vector<double>> &u)
 
 template <int dim>
 void
-diff(Vector<double> &       diff,
+diff(Vector<double>        &diff,
      const DoFHandler<dim> &dof,
-     const Vector<double> & v,
+     const Vector<double>  &v,
      const unsigned int     level)
 {
   diff.reinit(v);
@@ -144,11 +144,11 @@ diff(Vector<double> &       diff,
 
 template <int dim>
 void
-diff(Vector<double> &       diff,
+diff(Vector<double>        &diff,
      const DoFHandler<dim> &dof_1,
      const DoFHandler<dim> &dof_2,
-     const Vector<double> & u,
-     const Vector<double> & v,
+     const Vector<double>  &u,
+     const Vector<double>  &v,
      const unsigned int     level)
 {
   diff.reinit(u);
@@ -169,7 +169,7 @@ diff(Vector<double> &       diff,
 
 template <int dim>
 void
-print(const DoFHandler<dim> &         dof,
+print(const DoFHandler<dim>          &dof,
       std::vector<std::vector<bool>> &interface_dofs)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
@@ -199,10 +199,10 @@ public:
 
 template <int dim>
 void
-OutputCreator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
+OutputCreator<dim>::cell(MeshWorker::DoFInfo<dim>         &dinfo,
                          MeshWorker::IntegrationInfo<dim> &info)
 {
-  const FEValuesBase<dim> &               fe = info.fe_values();
+  const FEValuesBase<dim>                &fe = info.fe_values();
   const std::vector<std::vector<double>> &uh = info.values[0];
 
   const unsigned int square_root =
@@ -299,7 +299,7 @@ LaplaceProblem<dim>::setup_system()
 
 template <int dim>
 void
-LaplaceProblem<dim>::output_gpl(const DoFHandler<dim> &        dof,
+LaplaceProblem<dim>::output_gpl(const DoFHandler<dim>         &dof,
                                 MGLevelObject<Vector<double>> &v)
 {
   MeshWorker::IntegrationInfoBox<dim> info_box;

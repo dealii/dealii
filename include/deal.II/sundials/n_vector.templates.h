@@ -530,7 +530,8 @@ namespace SUNDIALS
 
     namespace NVectorOperations
     {
-      N_Vector_ID get_vector_id(N_Vector)
+      N_Vector_ID
+      get_vector_id(N_Vector)
       {
         return SUNDIALS_NVEC_CUSTOM;
       }
@@ -680,7 +681,7 @@ namespace SUNDIALS
       {
         // TODO copy can be avoided by a custom kernel
         VectorType tmp      = *unwrap_nvector_const<VectorType>(x);
-        auto *     w_dealii = unwrap_nvector_const<VectorType>(w);
+        auto      *w_dealii = unwrap_nvector_const<VectorType>(w);
         tmp.scale(*w_dealii);
         return tmp.l2_norm();
       }
@@ -750,7 +751,7 @@ namespace SUNDIALS
       {
         // TODO copy can be avoided by a custom kernel
         VectorType tmp      = *unwrap_nvector_const<VectorType>(x);
-        auto *     w_dealii = unwrap_nvector_const<VectorType>(w);
+        auto      *w_dealii = unwrap_nvector_const<VectorType>(w);
         const auto n        = tmp.size();
         tmp.scale(*w_dealii);
         return tmp.l2_norm() / std::sqrt(n);
@@ -764,8 +765,8 @@ namespace SUNDIALS
       {
         // TODO copy can be avoided by a custom kernel
         VectorType tmp         = *unwrap_nvector_const<VectorType>(x);
-        auto *     w_dealii    = unwrap_nvector_const<VectorType>(w);
-        auto *     mask_dealii = unwrap_nvector_const<VectorType>(mask);
+        auto      *w_dealii    = unwrap_nvector_const<VectorType>(w);
+        auto      *mask_dealii = unwrap_nvector_const<VectorType>(mask);
         const auto n           = tmp.size();
         tmp.scale(*w_dealii);
         tmp.scale(*mask_dealii);

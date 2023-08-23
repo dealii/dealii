@@ -72,8 +72,8 @@ generate_grid(Triangulation<2> &triangulation)
 
 std::vector<unsigned int>
 mark_vertices_at_boundary(const types::boundary_id boundary_id,
-                          const Triangulation<2> & triangulation,
-                          std::vector<bool> &      marked_vertices)
+                          const Triangulation<2>  &triangulation,
+                          std::vector<bool>       &marked_vertices)
 {
   std::vector<unsigned int> marked_cell_idxs;
 
@@ -98,8 +98,8 @@ mark_vertices_at_boundary(const types::boundary_id boundary_id,
 }
 
 int
-find_cell_at_point(const Point<2> &         p,
-                   const Triangulation<2> & triangulation,
+find_cell_at_point(const Point<2>          &p,
+                   const Triangulation<2>  &triangulation,
                    const std::vector<bool> &marked_vertices,
                    const Triangulation<2>::active_cell_iterator &cell_hint,
                    const double tolerance = 1e-6)

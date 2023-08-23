@@ -106,7 +106,7 @@ namespace Step25
     void         assemble_system();
     void         compute_nl_term(const Vector<double> &old_data,
                                  const Vector<double> &new_data,
-                                 Vector<double> &      nl_term) const;
+                                 Vector<double>       &nl_term) const;
     void         compute_nl_matrix(const Vector<double> &old_data,
                                    const Vector<double> &new_data,
                                    SparseMatrix<double> &nl_matrix) const;
@@ -223,7 +223,7 @@ namespace Step25
       : Function<dim>(n_components, time)
     {}
 
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override
     {
       return ExactSolution<dim>(1, this->get_time()).value(p, component);

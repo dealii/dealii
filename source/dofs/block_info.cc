@@ -64,7 +64,7 @@ BlockInfo::initialize_local(const DoFHandler<dim, spacedim> &dof)
   Assert(dof.has_hp_capabilities() == false,
          (typename DoFHandler<dim, spacedim>::ExcNotImplementedWithHP()));
 
-  const FiniteElement<dim, spacedim> & fe = dof.get_fe();
+  const FiniteElement<dim, spacedim>  &fe = dof.get_fe();
   std::vector<types::global_dof_index> sizes(fe.n_blocks());
 
   base_elements.resize(fe.n_blocks());

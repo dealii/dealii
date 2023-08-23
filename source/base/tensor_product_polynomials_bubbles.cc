@@ -67,7 +67,7 @@ TensorProductPolynomialsBubbles<dim>::set_numbering(
 template <int dim>
 double
 TensorProductPolynomialsBubbles<dim>::compute_value(const unsigned int i,
-                                                    const Point<dim> & p) const
+                                                    const Point<dim>  &p) const
 {
   const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
   const unsigned int max_q_indices = tensor_polys.n();
@@ -108,7 +108,7 @@ TensorProductPolynomialsBubbles<0>::compute_value(const unsigned int,
 template <int dim>
 Tensor<1, dim>
 TensorProductPolynomialsBubbles<dim>::compute_grad(const unsigned int i,
-                                                   const Point<dim> & p) const
+                                                   const Point<dim>  &p) const
 {
   const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
   const unsigned int max_q_indices = tensor_polys.n();
@@ -155,7 +155,7 @@ template <int dim>
 Tensor<2, dim>
 TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
   const unsigned int i,
-  const Point<dim> & p) const
+  const Point<dim>  &p) const
 {
   const unsigned int q_degree      = tensor_polys.polynomials.size() - 1;
   const unsigned int max_q_indices = tensor_polys.n();
@@ -258,8 +258,8 @@ TensorProductPolynomialsBubbles<dim>::compute_grad_grad(
 template <int dim>
 void
 TensorProductPolynomialsBubbles<dim>::evaluate(
-  const Point<dim> &           p,
-  std::vector<double> &        values,
+  const Point<dim>            &p,
+  std::vector<double>         &values,
   std::vector<Tensor<1, dim>> &grads,
   std::vector<Tensor<2, dim>> &grad_grads,
   std::vector<Tensor<3, dim>> &third_derivatives,

@@ -149,9 +149,9 @@ namespace Euler_DG
     void perform_time_step(const Operator &pde_operator,
                            const double    current_time,
                            const double    time_step,
-                           VectorType &    solution,
-                           VectorType &    vec_ri,
-                           VectorType &    vec_ki) const
+                           VectorType     &solution,
+                           VectorType     &vec_ri,
+                           VectorType     &vec_ki) const
     {
       AssertDimension(ai.size() + 1, bi.size());
 
@@ -201,14 +201,14 @@ namespace Euler_DG
       : Function<dim>(dim + 2, time)
     {}
 
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double ExactSolution<dim>::value(const Point<dim> & x,
+  double ExactSolution<dim>::value(const Point<dim>  &x,
                                    const unsigned int component) const
   {
     const double t = this->get_time();
@@ -323,7 +323,7 @@ namespace Euler_DG
   inline DEAL_II_ALWAYS_INLINE //
     Tensor<1, n_components, Number>
     operator*(const Tensor<1, n_components, Tensor<1, dim, Number>> &matrix,
-              const Tensor<1, dim, Number> &                         vector)
+              const Tensor<1, dim, Number>                          &vector)
   {
     Tensor<1, n_components, Number> result;
     for (unsigned int d = 0; d < n_components; ++d)
@@ -336,7 +336,7 @@ namespace Euler_DG
     Tensor<1, dim + 2, Number>
     euler_numerical_flux(const Tensor<1, dim + 2, Number> &u_m,
                          const Tensor<1, dim + 2, Number> &u_p,
-                         const Tensor<1, dim, Number> &    normal)
+                         const Tensor<1, dim, Number>     &normal)
   {
     const auto velocity_m = euler_velocity<dim>(u_m);
     const auto velocity_p = euler_velocity<dim>(u_p);
@@ -392,7 +392,7 @@ namespace Euler_DG
   // General-purpose utility functions from step-67:
   template <int dim, typename VectorizedArrayType>
   VectorizedArrayType
-  evaluate_function(const Function<dim> &                  function,
+  evaluate_function(const Function<dim>                   &function,
                     const Point<dim, VectorizedArrayType> &p_vectorized,
                     const unsigned int                     component)
   {
@@ -410,7 +410,7 @@ namespace Euler_DG
 
   template <int dim, typename VectorizedArrayType, int n_components = dim + 2>
   Tensor<1, n_components, VectorizedArrayType>
-  evaluate_function(const Function<dim> &                  function,
+  evaluate_function(const Function<dim>                   &function,
                     const Point<dim, VectorizedArrayType> &p_vectorized)
   {
     AssertDimension(function.n_components, n_components);
@@ -440,7 +440,7 @@ namespace Euler_DG
 
     ~EulerOperator();
 
-    void reinit(const Mapping<dim> &   mapping,
+    void reinit(const Mapping<dim>    &mapping,
                 const DoFHandler<dim> &dof_handler);
 
     void set_inflow_boundary(const types::boundary_id       boundary_id,
@@ -460,14 +460,14 @@ namespace Euler_DG
                   const Number                                      bi,
                   const Number                                      ai,
                   const LinearAlgebra::distributed::Vector<Number> &current_ri,
-                  LinearAlgebra::distributed::Vector<Number> &      vec_ki,
+                  LinearAlgebra::distributed::Vector<Number>       &vec_ki,
                   LinearAlgebra::distributed::Vector<Number> &solution) const;
 
-    void project(const Function<dim> &                       function,
+    void project(const Function<dim>                        &function,
                  LinearAlgebra::distributed::Vector<Number> &solution) const;
 
     std::array<double, 3> compute_errors(
-      const Function<dim> &                             function,
+      const Function<dim>                              &function,
       const LinearAlgebra::distributed::Vector<Number> &solution) const;
 
     double compute_cell_transport_speed(
@@ -553,7 +553,7 @@ namespace Euler_DG
   // the MPI-3.0 shared-memory capabilities are used:
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::reinit(
-    const Mapping<dim> &   mapping,
+    const Mapping<dim>    &mapping,
     const DoFHandler<dim> &dof_handler)
   {
     const std::vector<const DoFHandler<dim> *> dof_handlers = {&dof_handler};
@@ -619,8 +619,8 @@ namespace Euler_DG
     const Number                                      bi,
     const Number                                      ai,
     const LinearAlgebra::distributed::Vector<Number> &current_ri,
-    LinearAlgebra::distributed::Vector<Number> &      vec_ki,
-    LinearAlgebra::distributed::Vector<Number> &      solution) const
+    LinearAlgebra::distributed::Vector<Number>       &vec_ki,
+    LinearAlgebra::distributed::Vector<Number>       &solution) const
   {
     for (auto &i : inflow_boundaries)
       i.second->set_time(current_time);
@@ -1042,7 +1042,7 @@ namespace Euler_DG
 
   template <int dim, int degree, int n_points_1d>
   void EulerOperator<dim, degree, n_points_1d>::project(
-    const Function<dim> &                       function,
+    const Function<dim>                        &function,
     LinearAlgebra::distributed::Vector<Number> &solution) const
   {
     FEEvaluation<dim, degree, degree + 1, dim + 2, Number, VectorizedArrayType>
@@ -1072,7 +1072,7 @@ namespace Euler_DG
 
   template <int dim, int degree, int n_points_1d>
   std::array<double, 3> EulerOperator<dim, degree, n_points_1d>::compute_errors(
-    const Function<dim> &                             function,
+    const Function<dim>                              &function,
     const LinearAlgebra::distributed::Vector<Number> &solution) const
   {
     TimerOutput::Scope t(timer, "compute errors");
@@ -1245,7 +1245,7 @@ namespace Euler_DG
   template <int dim>
   void EulerProblem<dim>::Postprocessor::evaluate_vector_field(
     const DataPostprocessorInputs::Vector<dim> &inputs,
-    std::vector<Vector<double>> &               computed_quantities) const
+    std::vector<Vector<double>>                &computed_quantities) const
   {
     const unsigned int n_evaluation_points = inputs.solution_values.size();
 

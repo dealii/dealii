@@ -68,8 +68,8 @@ namespace CUDAWrappers
      * Constructor. Takes the solver control object and creates the solver.
      */
     SolverDirect(const Utilities::CUDA::Handle &handle,
-                 SolverControl &                cn,
-                 const AdditionalData &         data = AdditionalData());
+                 SolverControl                 &cn,
+                 const AdditionalData          &data = AdditionalData());
 
     /**
      * Destructor.
@@ -80,8 +80,8 @@ namespace CUDAWrappers
      * Solve the linear system <tt>Ax=b</tt>.
      */
     void
-    solve(const SparseMatrix<Number> &                       A,
-          LinearAlgebra::CUDAWrappers::Vector<Number> &      x,
+    solve(const SparseMatrix<Number>                        &A,
+          LinearAlgebra::CUDAWrappers::Vector<Number>       &x,
           const LinearAlgebra::CUDAWrappers::Vector<Number> &b);
 
     /**

@@ -30,7 +30,7 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
                                             SUNContext
 #endif
     );
-    template V<S> *      SUNDIALS::internal::unwrap_nvector<V<S>>(N_Vector);
+    template V<S>       *SUNDIALS::internal::unwrap_nvector<V<S>>(N_Vector);
     template const V<S> *SUNDIALS::internal::unwrap_nvector_const<V<S>>(
       N_Vector);
 

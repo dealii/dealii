@@ -169,12 +169,12 @@ namespace NonMatching
      */
     template <typename VectorType>
     FEValues(const hp::FECollection<dim> &fe_collection,
-             const Quadrature<1> &        quadrature,
+             const Quadrature<1>         &quadrature,
              const RegionUpdateFlags      region_update_flags,
-             const MeshClassifier<dim> &  mesh_classifier,
-             const DoFHandler<dim> &      dof_handler,
-             const VectorType &           level_set,
-             const AdditionalData &       additional_data = AdditionalData());
+             const MeshClassifier<dim>   &mesh_classifier,
+             const DoFHandler<dim>       &dof_handler,
+             const VectorType            &level_set,
+             const AdditionalData        &additional_data = AdditionalData());
 
     /**
      * Constructor.
@@ -204,13 +204,13 @@ namespace NonMatching
      */
     template <typename VectorType>
     FEValues(const hp::MappingCollection<dim> &mapping_collection,
-             const hp::FECollection<dim> &     fe_collection,
-             const hp::QCollection<dim> &      q_collection,
-             const hp::QCollection<1> &        q_collection_1d,
+             const hp::FECollection<dim>      &fe_collection,
+             const hp::QCollection<dim>       &q_collection,
+             const hp::QCollection<1>         &q_collection_1d,
              const RegionUpdateFlags           region_update_flags,
-             const MeshClassifier<dim> &       mesh_classifier,
-             const DoFHandler<dim> &           dof_handler,
-             const VectorType &                level_set,
+             const MeshClassifier<dim>        &mesh_classifier,
+             const DoFHandler<dim>            &dof_handler,
+             const VectorType                 &level_set,
              const AdditionalData &additional_data = AdditionalData());
 
     /**
@@ -462,11 +462,11 @@ namespace NonMatching
      */
     template <typename VectorType>
     FEInterfaceValues(const hp::FECollection<dim> &fe_collection,
-                      const Quadrature<1> &        quadrature,
+                      const Quadrature<1>         &quadrature,
                       const RegionUpdateFlags      region_update_flags,
-                      const MeshClassifier<dim> &  mesh_classifier,
-                      const DoFHandler<dim> &      dof_handler,
-                      const VectorType &           level_set,
+                      const MeshClassifier<dim>   &mesh_classifier,
+                      const DoFHandler<dim>       &dof_handler,
+                      const VectorType            &level_set,
                       const AdditionalData &additional_data = AdditionalData());
 
     /**
@@ -497,13 +497,13 @@ namespace NonMatching
      */
     template <typename VectorType>
     FEInterfaceValues(const hp::MappingCollection<dim> &mapping_collection,
-                      const hp::FECollection<dim> &     fe_collection,
-                      const hp::QCollection<dim - 1> &  q_collection,
-                      const hp::QCollection<1> &        q_collection_1d,
+                      const hp::FECollection<dim>      &fe_collection,
+                      const hp::QCollection<dim - 1>   &q_collection,
+                      const hp::QCollection<1>         &q_collection_1d,
                       const RegionUpdateFlags           region_update_flags,
-                      const MeshClassifier<dim> &       mesh_classifier,
-                      const DoFHandler<dim> &           dof_handler,
-                      const VectorType &                level_set,
+                      const MeshClassifier<dim>        &mesh_classifier,
+                      const DoFHandler<dim>            &dof_handler,
+                      const VectorType                 &level_set,
                       const AdditionalData &additional_data = AdditionalData());
 
     /**
@@ -521,7 +521,7 @@ namespace NonMatching
      */
     template <typename CellIteratorType, typename CellNeighborIteratorType>
     void
-    reinit(const CellIteratorType &        cell,
+    reinit(const CellIteratorType         &cell,
            const unsigned int              face_no,
            const unsigned int              sub_face_no,
            const CellNeighborIteratorType &cell_neighbor,
@@ -707,7 +707,7 @@ namespace NonMatching
   template <int dim>
   template <typename CellIteratorType, typename CellNeighborIteratorType>
   inline void
-  FEInterfaceValues<dim>::reinit(const CellIteratorType &        cell,
+  FEInterfaceValues<dim>::reinit(const CellIteratorType         &cell,
                                  const unsigned int              face_no,
                                  const unsigned int              sub_face_no,
                                  const CellNeighborIteratorType &cell_neighbor,

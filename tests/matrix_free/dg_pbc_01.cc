@@ -102,7 +102,7 @@ test()
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       Vector<double> solution_gather0(sol.size());
-      double *       sol_gather_ptr = solution_gather0.begin();
+      double        *sol_gather_ptr = solution_gather0.begin();
       for (unsigned int i = 0; i < sol.locally_owned_size(); ++i)
         *sol_gather_ptr++ = sol.local_element(i);
       for (unsigned int i = 1;

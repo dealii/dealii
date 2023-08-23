@@ -60,7 +60,7 @@ BoundaryFunction<dim>::vector_value(const Point<dim> &,
 
 template <int dim>
 void
-test_boundary_values(const FiniteElement<dim> & fe,
+test_boundary_values(const FiniteElement<dim>  &fe,
                      AffineConstraints<double> &constraints)
 {
   Triangulation<dim> triangulation;

@@ -82,7 +82,7 @@ namespace internal
           const dealii::hp::FECollection<dim, spacedim> &fes,
           const types::fe_index                          fe_index_1,
           const types::fe_index                          fe_index_2,
-          std::unique_ptr<DoFIdentities> &               identities,
+          std::unique_ptr<DoFIdentities>                &identities,
           const unsigned int face_no = numbers::invalid_unsigned_int)
         {
           Assert(structdim == 2 || face_no == numbers::invalid_unsigned_int,
@@ -938,7 +938,7 @@ namespace internal
           std::vector<types::global_dof_index> &new_dof_indices,
           const std::vector<
             std::map<types::global_dof_index, types::global_dof_index>>
-            &                           all_constrained_indices,
+                                       &all_constrained_indices,
           const types::global_dof_index start_dof_index)
         {
           // first preset the new DoF indices that are identities
@@ -1712,7 +1712,7 @@ namespace internal
         invalidate_dof_indices_on_weaker_ghost_cells_for_renumbering(
           std::vector<types::global_dof_index> &renumbering,
           const types::subdomain_id             subdomain_id,
-          const DoFHandler<dim, spacedim> &     dof_handler)
+          const DoFHandler<dim, spacedim>      &dof_handler)
         {
           std::vector<types::global_dof_index> local_dof_indices;
 
@@ -1808,8 +1808,8 @@ namespace internal
         static void
         renumber_face_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices_we_care_about,
-          DoFHandler<dim, spacedim> &                 dof_handler)
+          const IndexSet                             &indices_we_care_about,
+          DoFHandler<dim, spacedim>                  &dof_handler)
         {
           for (unsigned int d = 1; d < dim; ++d)
             for (auto &i : dof_handler.object_dof_indices[0][d])
@@ -1825,8 +1825,8 @@ namespace internal
         static void
         renumber_vertex_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices_we_care_about,
-          DoFHandler<dim, spacedim> &                 dof_handler,
+          const IndexSet                             &indices_we_care_about,
+          DoFHandler<dim, spacedim>                  &dof_handler,
           const bool                                  check_validity)
         {
           if (dof_handler.hp_capability_enabled == false)
@@ -1982,8 +1982,8 @@ namespace internal
         static void
         renumber_cell_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices_we_care_about,
-          DoFHandler<dim, spacedim> &                 dof_handler)
+          const IndexSet                             &indices_we_care_about,
+          DoFHandler<dim, spacedim>                  &dof_handler)
         {
           if (dof_handler.hp_capability_enabled == false)
             {
@@ -2068,8 +2068,8 @@ namespace internal
         static void
         renumber_face_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices_we_care_about,
-          DoFHandler<2, spacedim> &                   dof_handler)
+          const IndexSet                             &indices_we_care_about,
+          DoFHandler<2, spacedim>                    &dof_handler)
         {
           const unsigned int dim = 2;
 
@@ -2163,8 +2163,8 @@ namespace internal
         static void
         renumber_face_dofs(
           const std::vector<types::global_dof_index> &new_numbers,
-          const IndexSet &                            indices_we_care_about,
-          DoFHandler<3, spacedim> &                   dof_handler)
+          const IndexSet                             &indices_we_care_about,
+          DoFHandler<3, spacedim>                    &dof_handler)
         {
           const unsigned int dim = 3;
 
@@ -2334,7 +2334,7 @@ namespace internal
         template <int dim, int space_dim>
         static void
         renumber_dofs(const std::vector<types::global_dof_index> &new_numbers,
-                      const IndexSet &                  indices_we_care_about,
+                      const IndexSet                   &indices_we_care_about,
                       const DoFHandler<dim, space_dim> &dof_handler,
                       const bool                        check_validity)
         {
@@ -2383,7 +2383,7 @@ namespace internal
         static void
         renumber_vertex_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &           indices_we_care_about,
+          const IndexSet            &indices_we_care_about,
           DoFHandler<dim, spacedim> &dof_handler,
           const unsigned int         level)
         {
@@ -2434,7 +2434,7 @@ namespace internal
         static void
         renumber_cell_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &           indices_we_care_about,
+          const IndexSet            &indices_we_care_about,
           DoFHandler<dim, spacedim> &dof_handler,
           const unsigned int         level)
         {
@@ -2484,7 +2484,7 @@ namespace internal
         static void
         renumber_face_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &           indices_we_care_about,
+          const IndexSet            &indices_we_care_about,
           DoFHandler<dim, spacedim> &dof_handler,
           const unsigned int         level,
           const bool                 check_validity)
@@ -2595,7 +2595,7 @@ namespace internal
         static void
         renumber_mg_dofs(
           const std::vector<dealii::types::global_dof_index> &new_numbers,
-          const IndexSet &           indices_we_care_about,
+          const IndexSet            &indices_we_care_about,
           DoFHandler<dim, spacedim> &dof_handler,
           const unsigned int         level,
           const bool                 check_validity)
@@ -3401,7 +3401,7 @@ namespace internal
       {
         template <int dim, int spacedim>
         void
-        communicate_mg_ghost_cells(DoFHandler<dim, spacedim> &     dof_handler,
+        communicate_mg_ghost_cells(DoFHandler<dim, spacedim>      &dof_handler,
                                    std::vector<std::vector<bool>> &cell_marked)
         {
           const auto pack = [](const auto &cell) {
@@ -3499,7 +3499,7 @@ namespace internal
         void
         communicate_dof_indices_on_marked_cells(
           const DoFHandler<dim, spacedim> &dof_handler,
-          std::vector<bool> &              cell_marked)
+          std::vector<bool>               &cell_marked)
         {
 #  ifndef DEAL_II_WITH_MPI
           (void)dof_handler;

@@ -87,7 +87,7 @@ public:
    */
   void
   add_datasets(const std::vector<std::vector<double>> &datasets,
-               const std::vector<std::string> &        dataset_names);
+               const std::vector<std::string>         &dataset_names);
 
 protected:
   // Copy doc
@@ -165,7 +165,7 @@ template <int dim>
 void
 BoundingBoxDataOut<dim>::add_datasets(
   const std::vector<std::vector<double>> &datasets,
-  const std::vector<std::string> &        names)
+  const std::vector<std::string>         &names)
 {
   AssertDimension(datasets.size(), patches.size());
   dataset_names = names;

@@ -121,8 +121,8 @@ namespace
   public:
     CellProlongator(const AlignedVector<Number> &prolongation_matrix,
                     const AlignedVector<Number> &prolongation_matrix_1d,
-                    const Number *               evaluation_data_coarse,
-                    Number *                     evaluation_data_fine)
+                    const Number                *evaluation_data_coarse,
+                    Number                      *evaluation_data_fine)
       : prolongation_matrix(prolongation_matrix)
       , prolongation_matrix_1d(prolongation_matrix_1d)
       , evaluation_data_coarse(evaluation_data_coarse)
@@ -170,8 +170,8 @@ namespace
   private:
     const AlignedVector<Number> &prolongation_matrix;
     const AlignedVector<Number> &prolongation_matrix_1d;
-    const Number *               evaluation_data_coarse;
-    Number *                     evaluation_data_fine;
+    const Number                *evaluation_data_coarse;
+    Number                      *evaluation_data_fine;
   };
 
   /**
@@ -183,8 +183,8 @@ namespace
   public:
     CellRestrictor(const AlignedVector<Number> &prolongation_matrix,
                    const AlignedVector<Number> &prolongation_matrix_1d,
-                   Number *                     evaluation_data_fine,
-                   Number *                     evaluation_data_coarse)
+                   Number                      *evaluation_data_fine,
+                   Number                      *evaluation_data_coarse)
       : prolongation_matrix(prolongation_matrix)
       , prolongation_matrix_1d(prolongation_matrix_1d)
       , evaluation_data_fine(evaluation_data_fine)
@@ -235,8 +235,8 @@ namespace
   private:
     const AlignedVector<Number> &prolongation_matrix;
     const AlignedVector<Number> &prolongation_matrix_1d;
-    Number *                     evaluation_data_fine;
-    Number *                     evaluation_data_coarse;
+    Number                      *evaluation_data_fine;
+    Number                      *evaluation_data_coarse;
   };
 
   class CellProlongatorTest
@@ -259,9 +259,9 @@ namespace internal
   {
     template <typename MeshType, typename OPType>
     DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
-    void loop_over_active_or_level_cells(const MeshType &   tria,
+    void loop_over_active_or_level_cells(const MeshType    &tria,
                                          const unsigned int level,
-                                         const OPType &     op)
+                                         const OPType      &op)
     {
       if (level == numbers::invalid_unsigned_int)
         {
@@ -488,7 +488,7 @@ namespace internal
     FineDoFHandlerViewCell(
       const std::function<bool()> &has_children_function,
       const std::function<void(std::vector<types::global_dof_index> &)>
-        &                                  get_dof_indices_function,
+                                          &get_dof_indices_function,
       const std::function<unsigned int()> &active_fe_index_function)
       : has_children_function(has_children_function)
       , get_dof_indices_function(get_dof_indices_function)
@@ -1622,7 +1622,7 @@ namespace internal
     compute_weights(
       const dealii::AffineConstraints<Number> &constraints_fine,
       const MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
-        &                                         transfer,
+                                                 &transfer,
       LinearAlgebra::distributed::Vector<Number> &touch_count)
     {
       touch_count.reinit(transfer.partitioner_fine);
@@ -1716,7 +1716,7 @@ namespace internal
     template <int dim, typename Number>
     static std::shared_ptr<const Utilities::MPI::Partitioner>
     create_coarse_partitioner(
-      const DoFHandler<dim> &                  dof_handler_coarse,
+      const DoFHandler<dim>                   &dof_handler_coarse,
       const dealii::AffineConstraints<Number> &constraints_coarse,
       const unsigned int                       mg_level_coarse)
     {
@@ -1759,8 +1759,8 @@ namespace internal
     template <int dim, typename Number>
     static void
     reinit_geometric_transfer(
-      const DoFHandler<dim> &                  dof_handler_fine,
-      const DoFHandler<dim> &                  dof_handler_coarse,
+      const DoFHandler<dim>                   &dof_handler_fine,
+      const DoFHandler<dim>                   &dof_handler_coarse,
       const dealii::AffineConstraints<Number> &constraints_fine,
       const dealii::AffineConstraints<Number> &constraints_coarse,
       const unsigned int                       mg_level_fine,
@@ -2201,7 +2201,7 @@ namespace internal
           }
         else
           {
-            const auto &       fe              = fe_fine.base_element(0);
+            const auto        &fe              = fe_fine.base_element(0);
             const unsigned int n_dofs_per_cell = fe.n_dofs_per_cell();
 
             {
@@ -2299,8 +2299,8 @@ namespace internal
     template <int dim, typename Number>
     static void
     reinit_polynomial_transfer(
-      const DoFHandler<dim> &                  dof_handler_fine,
-      const DoFHandler<dim> &                  dof_handler_coarse,
+      const DoFHandler<dim>                   &dof_handler_fine,
+      const DoFHandler<dim>                   &dof_handler_coarse,
       const dealii::AffineConstraints<Number> &constraints_fine,
       const dealii::AffineConstraints<Number> &constraints_coarse,
       const unsigned int                       mg_level_fine,
@@ -2800,7 +2800,7 @@ namespace internal
   {
     SimpleVectorDataExchange(
       const std::shared_ptr<const Utilities::MPI::Partitioner>
-        &                    embedded_partitioner,
+                            &embedded_partitioner,
       AlignedVector<Number> &buffer)
       : embedded_partitioner(embedded_partitioner)
       , buffer(buffer)
@@ -2941,7 +2941,7 @@ namespace internal
   private:
     const std::shared_ptr<const Utilities::MPI::Partitioner>
                                      embedded_partitioner;
-    dealii::AlignedVector<Number> &  buffer;
+    dealii::AlignedVector<Number>   &buffer;
     mutable std::vector<MPI_Request> requests;
   };
 
@@ -3034,7 +3034,7 @@ namespace MGTransferGlobalCoarseningTools
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
-    Triangulation<dim, spacedim> &                        fine_triangulation_in,
+    Triangulation<dim, spacedim>                         &fine_triangulation_in,
     const RepartitioningPolicyTools::Base<dim, spacedim> &policy,
     const bool keep_fine_triangulation,
     const bool repartition_fine_triangulation)
@@ -3160,7 +3160,7 @@ namespace MGTransferGlobalCoarseningTools
   template <int dim, int spacedim>
   std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>>
   create_geometric_coarsening_sequence(
-    const Triangulation<dim, spacedim> &                  fine_triangulation_in,
+    const Triangulation<dim, spacedim>                   &fine_triangulation_in,
     const RepartitioningPolicyTools::Base<dim, spacedim> &policy,
     const bool repartition_fine_triangulation)
   {
@@ -3180,7 +3180,7 @@ template <typename Number>
 void
 MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
   prolongate_and_add(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const bool  use_dst_inplace = this->vec_fine.size() == 0;
@@ -3220,7 +3220,7 @@ template <int dim, typename Number>
 void
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const unsigned int n_lanes = VectorizedArrayType::size();
@@ -3228,7 +3228,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
 
-  const Number *             weights            = nullptr;
+  const Number              *weights            = nullptr;
   const VectorizedArrayType *weights_compressed = nullptr;
 
   if (this->fine_element_is_continuous)
@@ -3347,7 +3347,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 template <typename Number>
 void
 MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
-  restrict_and_add(LinearAlgebra::distributed::Vector<Number> &      dst,
+  restrict_and_add(LinearAlgebra::distributed::Vector<Number>       &dst,
                    const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const bool        use_src_inplace = this->vec_fine.size() == 0;
@@ -3396,7 +3396,7 @@ template <int dim, typename Number>
 void
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const unsigned int n_lanes = VectorizedArrayType::size();
@@ -3404,7 +3404,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   AlignedVector<VectorizedArrayType> evaluation_data_fine;
   AlignedVector<VectorizedArrayType> evaluation_data_coarse;
 
-  const Number *             weights            = nullptr;
+  const Number              *weights            = nullptr;
   const VectorizedArrayType *weights_compressed = nullptr;
 
   if (this->fine_element_is_continuous)
@@ -3524,7 +3524,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 template <int dim, typename Number>
 void
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  interpolate(LinearAlgebra::distributed::Vector<Number> &      dst,
+  interpolate(LinearAlgebra::distributed::Vector<Number>       &dst,
               const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   const unsigned int n_lanes = VectorizedArrayType::size();
@@ -3709,7 +3709,7 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     internal::MatrixFreeFunctions::ConstraintInfo<
       dim,
       VectorizedArray<Number, width>> &constraint_info_coarse,
-    std::vector<unsigned int> &        dof_indices_fine)
+    std::vector<unsigned int>         &dof_indices_fine)
 {
   if (this->partitioner_coarse->is_globally_compatible(
         *external_partitioner_coarse))
@@ -3781,8 +3781,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 template <int dim, typename Number>
 void
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
-  reinit_geometric_transfer(const DoFHandler<dim> &          dof_handler_fine,
-                            const DoFHandler<dim> &          dof_handler_coarse,
+  reinit_geometric_transfer(const DoFHandler<dim>           &dof_handler_fine,
+                            const DoFHandler<dim>           &dof_handler_coarse,
                             const AffineConstraints<Number> &constraints_fine,
                             const AffineConstraints<Number> &constraints_coarse,
                             const unsigned int               mg_level_fine,
@@ -3804,8 +3804,8 @@ template <int dim, typename Number>
 void
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   reinit_polynomial_transfer(
-    const DoFHandler<dim> &          dof_handler_fine,
-    const DoFHandler<dim> &          dof_handler_coarse,
+    const DoFHandler<dim>           &dof_handler_fine,
+    const DoFHandler<dim>           &dof_handler_coarse,
     const AffineConstraints<Number> &constraints_fine,
     const AffineConstraints<Number> &constraints_coarse,
     const unsigned int               mg_level_fine,
@@ -3826,8 +3826,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
 template <int dim, typename Number>
 void
 MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::reinit(
-  const DoFHandler<dim> &          dof_handler_fine,
-  const DoFHandler<dim> &          dof_handler_coarse,
+  const DoFHandler<dim>           &dof_handler_fine,
+  const DoFHandler<dim>           &dof_handler_coarse,
   const AffineConstraints<Number> &constraints_fine,
   const AffineConstraints<Number> &constraints_coarse,
   const unsigned int               mg_level_fine,
@@ -4048,7 +4048,7 @@ MGTransferMF<dim, Number>::initialize_constraints(
 template <int dim, typename Number>
 void
 MGTransferMF<dim, Number>::intitialize_internal_transfer(
-  const DoFHandler<dim> &                      dof_handler,
+  const DoFHandler<dim>                       &dof_handler,
   const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs)
 {
   const unsigned int min_level = 0;
@@ -4184,8 +4184,8 @@ MGTransferMF<dim, Number>::build(
 template <int dim, typename Number>
 void
 MGTransferMF<dim, Number>::prolongate(const unsigned int to_level,
-                                      VectorType &       dst,
-                                      const VectorType & src) const
+                                      VectorType        &dst,
+                                      const VectorType  &src) const
 {
   dst = 0;
   prolongate_and_add(to_level, dst, src);
@@ -4196,8 +4196,8 @@ MGTransferMF<dim, Number>::prolongate(const unsigned int to_level,
 template <int dim, typename Number>
 void
 MGTransferMF<dim, Number>::prolongate_and_add(const unsigned int to_level,
-                                              VectorType &       dst,
-                                              const VectorType & src) const
+                                              VectorType        &dst,
+                                              const VectorType  &src) const
 {
   this->transfer[to_level]->prolongate_and_add(dst, src);
 }
@@ -4207,8 +4207,8 @@ MGTransferMF<dim, Number>::prolongate_and_add(const unsigned int to_level,
 template <int dim, typename Number>
 void
 MGTransferMF<dim, Number>::restrict_and_add(const unsigned int from_level,
-                                            VectorType &       dst,
-                                            const VectorType & src) const
+                                            VectorType        &dst,
+                                            const VectorType  &src) const
 {
   this->transfer[from_level]->restrict_and_add(dst, src);
 }
@@ -4426,8 +4426,8 @@ namespace internal
                std::vector<unsigned int>,
                std::vector<types::global_dof_index>>
     support_point_indices_to_dof_indices(
-      const DoFHandler<dim, spacedim> &        dof_handler,
-      const DoFHandler<dim, spacedim> &        dof_handler_support_points,
+      const DoFHandler<dim, spacedim>         &dof_handler,
+      const DoFHandler<dim, spacedim>         &dof_handler_support_points,
       const dealii::AffineConstraints<Number> &constraint)
     {
       // in case a FE_DGQ space of order 0 is provided, DoFs indices are always
@@ -4659,8 +4659,8 @@ namespace internal
                std::vector<unsigned int>,
                std::vector<types::global_dof_index>>
     collect_unconstrained_unique_support_points(
-      const DoFHandler<dim> &                  dof_handler,
-      const Mapping<dim> &                     mapping,
+      const DoFHandler<dim>                   &dof_handler,
+      const Mapping<dim>                      &mapping,
       const dealii::AffineConstraints<Number> &constraint)
     {
       AssertThrow(dof_handler.get_fe().has_support_points(),
@@ -4696,7 +4696,7 @@ namespace internal
       for (unsigned int i = 0; i < local_support_point_indices.size(); ++i)
         indices_state[local_support_point_indices[i]] = i;
 
-      const auto &  fe_support_point = dof_handler_support_points->get_fe();
+      const auto   &fe_support_point = dof_handler_support_points->get_fe();
       FEValues<dim> fe_values(mapping,
                               fe_support_point,
                               Quadrature<dim>(
@@ -4741,10 +4741,10 @@ namespace internal
 template <int dim, typename Number>
 void
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  reinit(const DoFHandler<dim> &          dof_handler_fine,
-         const DoFHandler<dim> &          dof_handler_coarse,
-         const Mapping<dim> &             mapping_fine,
-         const Mapping<dim> &             mapping_coarse,
+  reinit(const DoFHandler<dim>           &dof_handler_fine,
+         const DoFHandler<dim>           &dof_handler_coarse,
+         const Mapping<dim>              &mapping_fine,
+         const Mapping<dim>              &mapping_coarse,
          const AffineConstraints<Number> &constraint_fine,
          const AffineConstraints<Number> &constraint_coarse)
 {
@@ -4837,7 +4837,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   constraint_info.finalize();
 
-  const auto &       fe_base      = dof_handler_coarse.get_fe().base_element(0);
+  const auto        &fe_base      = dof_handler_coarse.get_fe().base_element(0);
   const unsigned int n_components = dof_handler_coarse.get_fe().n_components();
 
   if (const auto fe = dynamic_cast<const FE_Q<dim> *>(&fe_base))
@@ -4891,7 +4891,7 @@ template <int n_components>
 void
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   prolongate_and_add_internal_comp(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   using Traits =
@@ -4998,7 +4998,7 @@ template <int dim, typename Number>
 void
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   prolongate_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   if (this->fe_coarse->n_components() == 1)
@@ -5016,7 +5016,7 @@ template <int n_components>
 void
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   restrict_and_add_internal_comp(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   using Traits =
@@ -5119,7 +5119,7 @@ template <int dim, typename Number>
 void
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   restrict_and_add_internal(
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   if (this->fe_coarse->n_components() == 1)
@@ -5135,7 +5135,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 template <int dim, typename Number>
 void
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
-  interpolate(LinearAlgebra::distributed::Vector<Number> &      dst,
+  interpolate(LinearAlgebra::distributed::Vector<Number>       &dst,
               const LinearAlgebra::distributed::Vector<Number> &src) const
 {
   AssertThrow(false, ExcNotImplemented());

@@ -126,7 +126,7 @@ main(int argc, char **argv)
                                              fe_enriched,
                                              vec_predicates,
                                              vec_enrichments);
-  const hp::FECollection<dim> &     fe_collection(
+  const hp::FECollection<dim>      &fe_collection(
     fe_space.build_fe_collection(dof_handler));
 
   // check if fe_collection is correctly constructed by function

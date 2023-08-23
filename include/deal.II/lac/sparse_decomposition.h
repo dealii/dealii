@@ -383,7 +383,7 @@ SparseLUDecomposition<number>::n() const
 template <typename number>
 template <class OutVector, class InVector>
 inline void
-SparseLUDecomposition<number>::vmult_add(OutVector &     dst,
+SparseLUDecomposition<number>::vmult_add(OutVector      &dst,
                                          const InVector &src) const
 {
   OutVector tmp;
@@ -399,7 +399,7 @@ SparseLUDecomposition<number>::vmult_add(OutVector &     dst,
 template <typename number>
 template <class OutVector, class InVector>
 inline void
-SparseLUDecomposition<number>::Tvmult_add(OutVector &     dst,
+SparseLUDecomposition<number>::Tvmult_add(OutVector      &dst,
                                           const InVector &src) const
 {
   OutVector tmp;

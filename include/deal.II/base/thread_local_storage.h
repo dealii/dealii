@@ -375,8 +375,8 @@ namespace Threads
     std::enable_if_t<
       std::is_copy_constructible_v<typename unpack_container<T>::type>,
       T &>
-    construct_element(std::map<std::thread::id, T> &  data,
-                      const std::thread::id &         id,
+    construct_element(std::map<std::thread::id, T>   &data,
+                      const std::thread::id          &id,
                       const std::shared_ptr<const T> &exemplar)
     {
       if (exemplar)
@@ -392,7 +392,7 @@ namespace Threads
       !std::is_copy_constructible_v<typename unpack_container<T>::type>,
       T &>
     construct_element(std::map<std::thread::id, T> &data,
-                      const std::thread::id &       id,
+                      const std::thread::id        &id,
                       const std::shared_ptr<const T> &)
     {
       return data[id];

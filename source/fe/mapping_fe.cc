@@ -284,7 +284,7 @@ namespace internal
         if (update_flags & update_quadrature_points)
           for (unsigned int point = 0; point < n_q_points; ++point)
             {
-              const double *  shape = &data.shape(point + data_set, 0);
+              const double   *shape = &data.shape(point + data_set, 0);
               Point<spacedim> result =
                 (shape[0] * data.mapping_support_points[0]);
               for (unsigned int k = 1; k < data.n_shape_functions; ++k)
@@ -562,7 +562,7 @@ namespace internal
         const typename QProjector<dim>::DataSetDescriptor data_set,
         const typename dealii::MappingFE<dim, spacedim>::InternalData &data,
         std::vector<Tensor<4, spacedim>>
-          &                jacobian_pushed_forward_2nd_derivatives,
+                          &jacobian_pushed_forward_2nd_derivatives,
         const unsigned int n_q_points)
       {
         const UpdateFlags update_flags = data.update_each;
@@ -724,7 +724,7 @@ namespace internal
         const typename QProjector<dim>::DataSetDescriptor data_set,
         const typename dealii::MappingFE<dim, spacedim>::InternalData &data,
         std::vector<Tensor<5, spacedim>>
-          &                jacobian_pushed_forward_3rd_derivatives,
+                          &jacobian_pushed_forward_3rd_derivatives,
         const unsigned int n_q_points)
       {
         const UpdateFlags update_flags = data.update_each;
@@ -901,7 +901,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 MappingFE<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const Point<dim> &                                          p) const
+  const Point<dim>                                           &p) const
 {
   const std::vector<Point<spacedim>> support_points =
     this->compute_mapping_support_points(cell);
@@ -920,7 +920,7 @@ template <int dim, int spacedim>
 Point<dim>
 MappingFE<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const Point<spacedim> &                                     p) const
+  const Point<spacedim>                                      &p) const
 {
   const std::vector<Point<spacedim>> support_points =
     this->compute_mapping_support_points(cell);
@@ -1111,8 +1111,8 @@ CellSimilarity::Similarity
 MappingFE<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity                            cell_similarity,
-  const Quadrature<dim> &                                     quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const Quadrature<dim>                                      &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -1342,7 +1342,7 @@ namespace internal
       maybe_compute_face_data(
         const dealii::MappingFE<dim, spacedim> &mapping,
         const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-          &                                               cell,
+                                                         &cell,
         const unsigned int                                face_no,
         const unsigned int                                subface_no,
         const unsigned int                                n_q_points,
@@ -1512,11 +1512,11 @@ namespace internal
       do_fill_fe_face_values(
         const dealii::MappingFE<dim, spacedim> &mapping,
         const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-          &                                               cell,
+                                                         &cell,
         const unsigned int                                face_no,
         const unsigned int                                subface_no,
         const typename QProjector<dim>::DataSetDescriptor data_set,
-        const Quadrature<dim - 1> &                       quadrature,
+        const Quadrature<dim - 1>                        &quadrature,
         const typename dealii::MappingFE<dim, spacedim>::InternalData &data,
         internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
           &output_data)
@@ -1587,8 +1587,8 @@ void
 MappingFE<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const hp::QCollection<dim - 1> &                            quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const hp::QCollection<dim - 1>                             &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -1634,8 +1634,8 @@ MappingFE<dim, spacedim>::fill_fe_subface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          subface_no,
-  const Quadrature<dim - 1> &                                 quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const Quadrature<dim - 1>                                  &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -1686,10 +1686,10 @@ namespace internal
       template <int dim, int spacedim, int rank>
       void
       transform_fields(
-        const ArrayView<const Tensor<rank, dim>> &               input,
+        const ArrayView<const Tensor<rank, dim>>                &input,
         const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-        const ArrayView<Tensor<rank, spacedim>> &                output)
+        const ArrayView<Tensor<rank, spacedim>>                 &output)
       {
         // In the case of wedges and pyramids, faces might have different
         // numbers of quadrature points on each face with the result
@@ -1771,10 +1771,10 @@ namespace internal
       template <int dim, int spacedim, int rank>
       void
       transform_gradients(
-        const ArrayView<const Tensor<rank, dim>> &               input,
+        const ArrayView<const Tensor<rank, dim>>                &input,
         const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-        const ArrayView<Tensor<rank, spacedim>> &                output)
+        const ArrayView<Tensor<rank, spacedim>>                 &output)
       {
         AssertDimension(input.size(), output.size());
         Assert(
@@ -1874,10 +1874,10 @@ namespace internal
       template <int dim, int spacedim>
       void
       transform_hessians(
-        const ArrayView<const Tensor<3, dim>> &                  input,
+        const ArrayView<const Tensor<3, dim>>                   &input,
         const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-        const ArrayView<Tensor<3, spacedim>> &                   output)
+        const ArrayView<Tensor<3, spacedim>>                    &output)
       {
         AssertDimension(input.size(), output.size());
         Assert(
@@ -2047,7 +2047,7 @@ namespace internal
         const ArrayView<const DerivativeForm<rank, dim, spacedim>> &input,
         const MappingKind                                        mapping_kind,
         const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-        const ArrayView<Tensor<rank + 1, spacedim>> &            output)
+        const ArrayView<Tensor<rank + 1, spacedim>>             &output)
       {
         AssertDimension(input.size(), output.size());
         Assert(
@@ -2087,10 +2087,10 @@ namespace internal
 template <int dim, int spacedim>
 void
 MappingFE<dim, spacedim>::transform(
-  const ArrayView<const Tensor<1, dim>> &                  input,
+  const ArrayView<const Tensor<1, dim>>                   &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<1, spacedim>> &                   output) const
+  const ArrayView<Tensor<1, spacedim>>                    &output) const
 {
   internal::MappingFEImplementation::transform_fields(input,
                                                       mapping_kind,
@@ -2106,7 +2106,7 @@ MappingFE<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<2, spacedim>> &                   output) const
+  const ArrayView<Tensor<2, spacedim>>                    &output) const
 {
   internal::MappingFEImplementation::transform_differential_forms(input,
                                                                   mapping_kind,
@@ -2119,10 +2119,10 @@ MappingFE<dim, spacedim>::transform(
 template <int dim, int spacedim>
 void
 MappingFE<dim, spacedim>::transform(
-  const ArrayView<const Tensor<2, dim>> &                  input,
+  const ArrayView<const Tensor<2, dim>>                   &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<2, spacedim>> &                   output) const
+  const ArrayView<Tensor<2, spacedim>>                    &output) const
 {
   switch (mapping_kind)
     {
@@ -2154,7 +2154,7 @@ MappingFE<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<3, spacedim>> &                   output) const
+  const ArrayView<Tensor<3, spacedim>>                    &output) const
 {
   AssertDimension(input.size(), output.size());
   Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
@@ -2200,10 +2200,10 @@ MappingFE<dim, spacedim>::transform(
 template <int dim, int spacedim>
 void
 MappingFE<dim, spacedim>::transform(
-  const ArrayView<const Tensor<3, dim>> &                  input,
+  const ArrayView<const Tensor<3, dim>>                   &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<3, spacedim>> &                   output) const
+  const ArrayView<Tensor<3, spacedim>>                    &output) const
 {
   switch (mapping_kind)
     {

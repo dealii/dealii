@@ -235,7 +235,7 @@ namespace Rol
      */
     void
     applyBinary(const ROL::Elementwise::BinaryFunction<value_type> &f,
-                const ROL::Vector<value_type> &                     rol_vector);
+                const ROL::Vector<value_type>                      &rol_vector);
 
     /**
      * Return the accumulated value on applying reduction operation @p r on
@@ -439,7 +439,7 @@ namespace Rol
   void
   VectorAdaptor<VectorType>::applyBinary(
     const ROL::Elementwise::BinaryFunction<value_type> &f,
-    const ROL::Vector<value_type> &                     rol_vector)
+    const ROL::Vector<value_type>                      &rol_vector)
   {
     Assert(this->dimension() == rol_vector.dimension(),
            ExcDimensionMismatch(this->dimension(), rol_vector.dimension()));

@@ -39,7 +39,7 @@
 
 template <int dim>
 double
-displacement(const Point<dim> & point,
+displacement(const Point<dim>  &point,
              const unsigned int component,
              const double       factor)
 {

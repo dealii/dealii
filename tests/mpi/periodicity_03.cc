@@ -73,7 +73,7 @@ namespace Step22
     void
     get_point_value(const Point<dim> point,
                     const int        proc,
-                    Vector<double> & value) const;
+                    Vector<double>  &value) const;
     void
     check_periodicity() const;
     void
@@ -109,13 +109,13 @@ namespace Step22
   class InverseMatrix : public Preconditioner
   {
   public:
-    InverseMatrix(const Matrix &        m,
+    InverseMatrix(const Matrix         &m,
                   const Preconditioner &preconditioner,
-                  const IndexSet &      locally_owned,
+                  const IndexSet       &locally_owned,
                   const MPI_Comm        mpi_communicator);
 
     void
-    vmult(TrilinosWrappers::MPI::Vector &      dst,
+    vmult(TrilinosWrappers::MPI::Vector       &dst,
           const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
@@ -128,9 +128,9 @@ namespace Step22
 
   template <class Matrix, class Preconditioner>
   InverseMatrix<Matrix, Preconditioner>::InverseMatrix(
-    const Matrix &        m,
+    const Matrix         &m,
     const Preconditioner &preconditioner,
-    const IndexSet &      locally_owned,
+    const IndexSet       &locally_owned,
     const MPI_Comm        mpi_communicator)
     : matrix(&m)
     , preconditioner(&preconditioner)
@@ -142,7 +142,7 @@ namespace Step22
   template <class Matrix, class Preconditioner>
   void
   InverseMatrix<Matrix, Preconditioner>::vmult(
-    TrilinosWrappers::MPI::Vector &      dst,
+    TrilinosWrappers::MPI::Vector       &dst,
     const TrilinosWrappers::MPI::Vector &src) const
   {
     SolverControl                           solver_control(src.size(),
@@ -164,12 +164,12 @@ namespace Step22
   public:
     SchurComplement(const TrilinosWrappers::BlockSparseMatrix &system_matrix,
                     const InverseMatrix<TrilinosWrappers::SparseMatrix,
-                                        Preconditioner> &      A_inverse,
-                    const IndexSet &                           owned_pres,
+                                        Preconditioner>       &A_inverse,
+                    const IndexSet                            &owned_pres,
                     const MPI_Comm mpi_communicator);
 
     void
-    vmult(TrilinosWrappers::MPI::Vector &      dst,
+    vmult(TrilinosWrappers::MPI::Vector       &dst,
           const TrilinosWrappers::MPI::Vector &src) const;
 
   private:
@@ -186,7 +186,7 @@ namespace Step22
   SchurComplement<Preconditioner>::SchurComplement(
     const TrilinosWrappers::BlockSparseMatrix &system_matrix,
     const InverseMatrix<TrilinosWrappers::SparseMatrix, Preconditioner>
-      &             A_inverse,
+                   &A_inverse,
     const IndexSet &owned_vel,
     const MPI_Comm  mpi_communicator)
     : system_matrix(&system_matrix)
@@ -199,7 +199,7 @@ namespace Step22
   template <class Preconditioner>
   void
   SchurComplement<Preconditioner>::vmult(
-    TrilinosWrappers::MPI::Vector &      dst,
+    TrilinosWrappers::MPI::Vector       &dst,
     const TrilinosWrappers::MPI::Vector &src) const
   {
     system_matrix->block(0, 1).vmult(tmp1, src);
@@ -505,7 +505,7 @@ namespace Step22
   void
   StokesProblem<dim>::get_point_value(const Point<dim> point,
                                       const int        proc,
-                                      Vector<double> & value) const
+                                      Vector<double>  &value) const
   {
     const typename DoFHandler<dim>::active_cell_iterator cell =
       GridTools::find_active_cell_around_point(dof_handler, point);

@@ -125,7 +125,7 @@ public:
    * In general, it is recommended to use powers of $2$, e.g. $16,32,64, \dots$.
    */
   ScaLAPACKMatrix(
-    const std::string &                                       filename,
+    const std::string                                        &filename,
     const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
     const size_type row_block_size    = 32,
     const size_type column_block_size = 32);
@@ -260,7 +260,7 @@ public:
    * with the same MPI communicator.
    */
   void
-  copy_to(ScaLAPACKMatrix<NumberType> &                B,
+  copy_to(ScaLAPACKMatrix<NumberType>                 &B,
           const std::pair<unsigned int, unsigned int> &offset_A,
           const std::pair<unsigned int, unsigned int> &offset_B,
           const std::pair<unsigned int, unsigned int> &submatrix_size) const;
@@ -341,7 +341,7 @@ public:
   mult(const NumberType                   b,
        const ScaLAPACKMatrix<NumberType> &B,
        const NumberType                   c,
-       ScaLAPACKMatrix<NumberType> &      C,
+       ScaLAPACKMatrix<NumberType>       &C,
        const bool                         transpose_A = false,
        const bool                         transpose_B = false) const;
 
@@ -363,7 +363,7 @@ public:
    * $NB_A=MB_B$ and $NB_B=NB_C$.
    */
   void
-  mmult(ScaLAPACKMatrix<NumberType> &      C,
+  mmult(ScaLAPACKMatrix<NumberType>       &C,
         const ScaLAPACKMatrix<NumberType> &B,
         const bool                         adding = false) const;
 
@@ -385,7 +385,7 @@ public:
    * $NB_A=MB_C$ and $NB_B=NB_C$.
    */
   void
-  Tmmult(ScaLAPACKMatrix<NumberType> &      C,
+  Tmmult(ScaLAPACKMatrix<NumberType>       &C,
          const ScaLAPACKMatrix<NumberType> &B,
          const bool                         adding = false) const;
 
@@ -407,7 +407,7 @@ public:
    * $NB_A=NB_B$ and $MB_B=NB_C$.
    */
   void
-  mTmult(ScaLAPACKMatrix<NumberType> &      C,
+  mTmult(ScaLAPACKMatrix<NumberType>       &C,
          const ScaLAPACKMatrix<NumberType> &B,
          const bool                         adding = false) const;
 
@@ -430,7 +430,7 @@ public:
    * $NB_A=MB_C$ and $MB_B=NB_C$.
    */
   void
-  TmTmult(ScaLAPACKMatrix<NumberType> &      C,
+  TmTmult(ScaLAPACKMatrix<NumberType>       &C,
           const ScaLAPACKMatrix<NumberType> &B,
           const bool                         adding = false) const;
 
@@ -455,7 +455,7 @@ public:
    * and <tt>chunk_size.second</tt> the number of columns.
    */
   void
-  save(const std::string &                          filename,
+  save(const std::string                           &filename,
        const std::pair<unsigned int, unsigned int> &chunk_size =
          std::make_pair(numbers::invalid_unsigned_int,
                         numbers::invalid_unsigned_int)) const;
@@ -855,7 +855,7 @@ private:
    * using serial routines
    */
   void
-  save_serial(const std::string &                          filename,
+  save_serial(const std::string                           &filename,
               const std::pair<unsigned int, unsigned int> &chunk_size) const;
 
   /*
@@ -870,7 +870,7 @@ private:
    * using parallel routines
    */
   void
-  save_parallel(const std::string &                          filename,
+  save_parallel(const std::string                           &filename,
                 const std::pair<unsigned int, unsigned int> &chunk_size) const;
 
   /*

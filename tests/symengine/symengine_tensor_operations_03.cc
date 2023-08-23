@@ -130,9 +130,9 @@ struct CoupledFunction
 
   static NumberType
   psi(const SymmetricTensor<2, dim, NumberType> &st,
-      const Tensor<2, dim, NumberType> &         t,
-      const Tensor<1, dim, NumberType> &         v,
-      const NumberType &                         s)
+      const Tensor<2, dim, NumberType>          &t,
+      const Tensor<1, dim, NumberType>          &v,
+      const NumberType                          &s)
   {
     return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) *
            std::pow(v_squ(v), 3) * std::pow(s, sf);
@@ -145,9 +145,9 @@ struct CoupledFunction
 
   static SymmetricTensor<2, dim, NumberType>
   dpsi_dst(const SymmetricTensor<2, dim, NumberType> &st,
-           const Tensor<2, dim, NumberType> &         t,
-           const Tensor<1, dim, NumberType> &         v,
-           const NumberType &                         s)
+           const Tensor<2, dim, NumberType>          &t,
+           const Tensor<1, dim, NumberType>          &v,
+           const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(st), 1) * ddet_t_dt(st) *
            std::pow(det_t(t), 2) * std::pow(v_squ(v), 3) * std::pow(s, sf);
@@ -155,9 +155,9 @@ struct CoupledFunction
 
   static Tensor<2, dim, NumberType>
   dpsi_dt(const SymmetricTensor<2, dim, NumberType> &st,
-          const Tensor<2, dim, NumberType> &         t,
-          const Tensor<1, dim, NumberType> &         v,
-          const NumberType &                         s)
+          const Tensor<2, dim, NumberType>          &t,
+          const Tensor<1, dim, NumberType>          &v,
+          const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * ddet_t_dt(t) *
            std::pow(v_squ(v), 3) * std::pow(s, sf);
@@ -165,9 +165,9 @@ struct CoupledFunction
 
   static Tensor<1, dim, NumberType>
   dpsi_dv(const SymmetricTensor<2, dim, NumberType> &st,
-          const Tensor<2, dim, NumberType> &         t,
-          const Tensor<1, dim, NumberType> &         v,
-          const NumberType &                         s)
+          const Tensor<2, dim, NumberType>          &t,
+          const Tensor<1, dim, NumberType>          &v,
+          const NumberType                          &s)
   {
     return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) * 3.0 *
            std::pow(v_squ(v), 2) * dv_squ_dv(v) * std::pow(s, sf);
@@ -175,9 +175,9 @@ struct CoupledFunction
 
   static NumberType
   dpsi_ds(const SymmetricTensor<2, dim, NumberType> &st,
-          const Tensor<2, dim, NumberType> &         t,
-          const Tensor<1, dim, NumberType> &         v,
-          const NumberType &                         s)
+          const Tensor<2, dim, NumberType>          &t,
+          const Tensor<1, dim, NumberType>          &v,
+          const NumberType                          &s)
   {
     return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) *
            std::pow(v_squ(v), 3) * sf * std::pow(s, sf - 1.0);
@@ -185,9 +185,9 @@ struct CoupledFunction
 
   static SymmetricTensor<4, dim, NumberType>
   d2psi_dst_x_dst(const SymmetricTensor<2, dim, NumberType> &st,
-                  const Tensor<2, dim, NumberType> &         t,
-                  const Tensor<1, dim, NumberType> &         v,
-                  const NumberType &                         s)
+                  const Tensor<2, dim, NumberType>          &t,
+                  const Tensor<1, dim, NumberType>          &v,
+                  const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(t), 2) * std::pow(v_squ(v), 3) *
            (std::pow(det_t(st), 0) *
@@ -198,9 +198,9 @@ struct CoupledFunction
 
   static Tensor<4, dim, NumberType>
   d2psi_dst_x_dt(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 4.0 * std::pow(det_t(st), 1) * std::pow(det_t(t), 1) *
            outer_product(Tensor<2, dim, NumberType>(ddet_t_dt(st)),
@@ -210,9 +210,9 @@ struct CoupledFunction
 
   static Tensor<3, dim, NumberType>
   d2psi_dst_x_dv(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(t), 2) * std::pow(det_t(st), 1) * 3.0 *
            std::pow(v_squ(v), 2) *
@@ -223,9 +223,9 @@ struct CoupledFunction
 
   static SymmetricTensor<2, dim, NumberType>
   d2psi_dst_x_ds(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(st), 1) * ddet_t_dt(st) *
            std::pow(det_t(t), 2) * std::pow(v_squ(v), 3) * sf *
@@ -234,9 +234,9 @@ struct CoupledFunction
 
   static Tensor<4, dim, NumberType>
   d2psi_dt_x_dst(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 4.0 * std::pow(det_t(st), 1) * std::pow(det_t(t), 1) *
            outer_product(ddet_t_dt(t),
@@ -246,9 +246,9 @@ struct CoupledFunction
 
   static Tensor<4, dim, NumberType>
   d2psi_dt_x_dt(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(st), 2) * std::pow(v_squ(v), 3) *
            (pow(det_t(t), 0) * outer_product(ddet_t_dt(t), ddet_t_dt(t)) +
@@ -258,9 +258,9 @@ struct CoupledFunction
 
   static Tensor<3, dim, NumberType>
   d2psi_dt_x_dv(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * 3.0 *
            std::pow(v_squ(v), 2) * outer_product(ddet_t_dt(t), dv_squ_dv(v)) *
@@ -269,9 +269,9 @@ struct CoupledFunction
 
   static Tensor<2, dim, NumberType>
   d2psi_dt_x_ds(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * ddet_t_dt(t) *
            std::pow(v_squ(v), 3) * sf * std::pow(s, sf - 1.0);
@@ -279,9 +279,9 @@ struct CoupledFunction
 
   static Tensor<3, dim, NumberType>
   d2psi_dv_x_dst(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(t), 2) * std::pow(det_t(st), 1) * 3.0 *
            std::pow(v_squ(v), 2) *
@@ -292,9 +292,9 @@ struct CoupledFunction
 
   static Tensor<3, dim, NumberType>
   d2psi_dv_x_dt(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * 3.0 *
            std::pow(v_squ(v), 2) * outer_product(dv_squ_dv(v), ddet_t_dt(t)) *
@@ -303,9 +303,9 @@ struct CoupledFunction
 
   static Tensor<2, dim, NumberType>
   d2psi_dv_x_dv(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) * 3.0 *
            (2.0 * std::pow(v_squ(v), 1) *
@@ -316,9 +316,9 @@ struct CoupledFunction
 
   static Tensor<1, dim, NumberType>
   d2psi_dv_x_ds(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) * 3.0 *
            std::pow(v_squ(v), 2) * dv_squ_dv(v) * sf * std::pow(s, sf - 1.0);
@@ -326,9 +326,9 @@ struct CoupledFunction
 
   static SymmetricTensor<2, dim, NumberType>
   d2psi_ds_x_dst(const SymmetricTensor<2, dim, NumberType> &st,
-                 const Tensor<2, dim, NumberType> &         t,
-                 const Tensor<1, dim, NumberType> &         v,
-                 const NumberType &                         s)
+                 const Tensor<2, dim, NumberType>          &t,
+                 const Tensor<1, dim, NumberType>          &v,
+                 const NumberType                          &s)
   {
     return 2.0 * ddet_t_dt(st) * std::pow(det_t(t), 2) *
            std::pow(det_t(st), 1) * std::pow(v_squ(v), 3) * sf *
@@ -337,9 +337,9 @@ struct CoupledFunction
 
   static Tensor<2, dim, NumberType>
   d2psi_ds_x_dt(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return 2.0 * std::pow(det_t(st), 2) * std::pow(det_t(t), 1) * ddet_t_dt(t) *
            std::pow(v_squ(v), 3) * sf * std::pow(s, sf - 1.0);
@@ -347,9 +347,9 @@ struct CoupledFunction
 
   static Tensor<1, dim, NumberType>
   d2psi_ds_x_dv(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) * 3.0 *
            std::pow(v_squ(v), 2) * dv_squ_dv(v) * sf * std::pow(s, sf - 1.0);
@@ -357,9 +357,9 @@ struct CoupledFunction
 
   static NumberType
   d2psi_ds_x_ds(const SymmetricTensor<2, dim, NumberType> &st,
-                const Tensor<2, dim, NumberType> &         t,
-                const Tensor<1, dim, NumberType> &         v,
-                const NumberType &                         s)
+                const Tensor<2, dim, NumberType>          &t,
+                const Tensor<1, dim, NumberType>          &v,
+                const NumberType                          &s)
   {
     return std::pow(det_t(st), 2) * std::pow(det_t(t), 2) *
            std::pow(v_squ(v), 3) * sf * (sf - 1.0) * std::pow(s, sf - 2.0);
@@ -377,16 +377,16 @@ print(Stream &stream, const std::string &name, const NumberType &val)
 }
 template <typename Stream, int dim, typename NumberType>
 void
-print(Stream &                          stream,
-      const std::string &               name,
+print(Stream                           &stream,
+      const std::string                &name,
       const Tensor<0, dim, NumberType> &val)
 {
   stream << name << ": " << val << std::endl;
 }
 template <typename Stream, int dim, typename NumberType>
 void
-print(Stream &                          stream,
-      const std::string &               name,
+print(Stream                           &stream,
+      const std::string                &name,
       const Tensor<1, dim, NumberType> &t)
 {
   for (unsigned int i = 0; i < dim; ++i)
@@ -394,8 +394,8 @@ print(Stream &                          stream,
 }
 template <typename Stream, int dim, typename NumberType>
 void
-print(Stream &                          stream,
-      const std::string &               name,
+print(Stream                           &stream,
+      const std::string                &name,
       const Tensor<2, dim, NumberType> &t)
 {
   for (unsigned int i = 0; i < dim; ++i)
@@ -404,8 +404,8 @@ print(Stream &                          stream,
 }
 template <typename Stream, int dim, typename NumberType>
 void
-print(Stream &                          stream,
-      const std::string &               name,
+print(Stream                           &stream,
+      const std::string                &name,
       const Tensor<3, dim, NumberType> &t)
 {
   for (unsigned int i = 0; i < dim; ++i)
@@ -416,8 +416,8 @@ print(Stream &                          stream,
 }
 template <typename Stream, int dim, typename NumberType>
 void
-print(Stream &                          stream,
-      const std::string &               name,
+print(Stream                           &stream,
+      const std::string                &name,
       const Tensor<4, dim, NumberType> &t)
 {
   for (unsigned int i = 0; i < dim; ++i)
@@ -432,9 +432,9 @@ template <int dim, typename number_t>
 void
 test_symmetric_tensor_tensor_vector_scalar_coupled(
   const SymmetricTensor<2, dim, number_t> &st,
-  const Tensor<2, dim, number_t> &         t,
-  const Tensor<1, dim, number_t> &         v,
-  const number_t &                         s)
+  const Tensor<2, dim, number_t>          &t,
+  const Tensor<1, dim, number_t>          &v,
+  const number_t                          &s)
 {
   using SDNumberType = SD::Expression;
 

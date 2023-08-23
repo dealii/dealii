@@ -63,7 +63,7 @@ public:
   LaplaceOperator(){};
 
   void
-  initialize(const Mapping<dim> &   mapping,
+  initialize(const Mapping<dim>    &mapping,
              const DoFHandler<dim> &dof_handler,
              const unsigned int     n_q_points_1d,
              const unsigned int     level = numbers::invalid_unsigned_int)
@@ -89,7 +89,7 @@ public:
   }
 
   void
-  vmult(LinearAlgebra::distributed::Vector<number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<number>       &dst,
         const LinearAlgebra::distributed::Vector<number> &src) const
   {
     dst = 0;
@@ -97,7 +97,7 @@ public:
   }
 
   void
-  Tvmult(LinearAlgebra::distributed::Vector<number> &      dst,
+  Tvmult(LinearAlgebra::distributed::Vector<number>       &dst,
          const LinearAlgebra::distributed::Vector<number> &src) const
   {
     dst = 0;
@@ -105,14 +105,14 @@ public:
   }
 
   void
-  Tvmult_add(LinearAlgebra::distributed::Vector<number> &      dst,
+  Tvmult_add(LinearAlgebra::distributed::Vector<number>       &dst,
              const LinearAlgebra::distributed::Vector<number> &src) const
   {
     vmult_add(dst, src);
   }
 
   void
-  vmult_add(LinearAlgebra::distributed::Vector<number> &      dst,
+  vmult_add(LinearAlgebra::distributed::Vector<number>       &dst,
             const LinearAlgebra::distributed::Vector<number> &src) const
   {
     if (!src.partitioners_are_globally_compatible(
@@ -177,8 +177,8 @@ public:
 
 private:
   void
-  local_apply(const MatrixFree<dim, number> &                   data,
-              LinearAlgebra::distributed::Vector<number> &      dst,
+  local_apply(const MatrixFree<dim, number>                    &data,
+              LinearAlgebra::distributed::Vector<number>       &dst,
               const LinearAlgebra::distributed::Vector<number> &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
@@ -198,10 +198,10 @@ private:
 
   void
   local_apply_face(
-    const MatrixFree<dim, number> &                   data,
-    LinearAlgebra::distributed::Vector<number> &      dst,
+    const MatrixFree<dim, number>                    &data,
+    LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src,
-    const std::pair<unsigned int, unsigned int> &     face_range) const
+    const std::pair<unsigned int, unsigned int>      &face_range) const
   {
     FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, true);
     FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval_neighbor(data, false);
@@ -247,10 +247,10 @@ private:
 
   void
   local_apply_boundary(
-    const MatrixFree<dim, number> &                   data,
-    LinearAlgebra::distributed::Vector<number> &      dst,
+    const MatrixFree<dim, number>                    &data,
+    LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src,
-    const std::pair<unsigned int, unsigned int> &     face_range) const
+    const std::pair<unsigned int, unsigned int>      &face_range) const
   {
     FEFaceEvaluation<dim, -1, 0, 1, number> fe_eval(data, true);
     for (unsigned int face = face_range.first; face < face_range.second; ++face)
@@ -299,7 +299,7 @@ private:
 
   void
   local_diagonal_cell(
-    const MatrixFree<dim, number> &             data,
+    const MatrixFree<dim, number>              &data,
     LinearAlgebra::distributed::Vector<number> &dst,
     const unsigned int &,
     const std::pair<unsigned int, unsigned int> &cell_range) const
@@ -331,7 +331,7 @@ private:
 
   void
   local_diagonal_face(
-    const MatrixFree<dim, number> &             data,
+    const MatrixFree<dim, number>              &data,
     LinearAlgebra::distributed::Vector<number> &dst,
     const unsigned int &,
     const std::pair<unsigned int, unsigned int> &face_range) const
@@ -419,7 +419,7 @@ private:
 
   void
   local_diagonal_boundary(
-    const MatrixFree<dim, number> &             data,
+    const MatrixFree<dim, number>              &data,
     LinearAlgebra::distributed::Vector<number> &dst,
     const unsigned int &,
     const std::pair<unsigned int, unsigned int> &face_range) const
@@ -486,7 +486,7 @@ public:
 
   virtual void
   operator()(const unsigned int,
-             LinearAlgebra::distributed::Vector<double> &      dst,
+             LinearAlgebra::distributed::Vector<double>       &dst,
              const LinearAlgebra::distributed::Vector<double> &src) const
   {
     ReductionControl solver_control(1e4, 1e-50, 1e-10, false, false);

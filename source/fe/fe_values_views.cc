@@ -360,7 +360,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_values(
-    const ReadVector<Number> &                fe_function,
+    const ReadVector<Number>                 &fe_function,
     std::vector<solution_value_type<Number>> &values) const
   {
     Assert(fe_values->update_flags & update_values,
@@ -411,7 +411,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_gradients(
-    const ReadVector<Number> &                   fe_function,
+    const ReadVector<Number>                    &fe_function,
     std::vector<solution_gradient_type<Number>> &gradients) const
   {
     Assert(fe_values->update_flags & update_gradients,
@@ -463,7 +463,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_hessians(
-    const ReadVector<Number> &                  fe_function,
+    const ReadVector<Number>                   &fe_function,
     std::vector<solution_hessian_type<Number>> &hessians) const
   {
     Assert(fe_values->update_flags & update_hessians,
@@ -515,7 +515,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_laplacians(
-    const ReadVector<Number> &                    fe_function,
+    const ReadVector<Number>                     &fe_function,
     std::vector<solution_laplacian_type<Number>> &laplacians) const
   {
     Assert(fe_values->update_flags & update_hessians,
@@ -567,7 +567,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Scalar<dim, spacedim>::get_function_third_derivatives(
-    const ReadVector<Number> &                           fe_function,
+    const ReadVector<Number>                            &fe_function,
     std::vector<solution_third_derivative_type<Number>> &third_derivatives)
     const
   {
@@ -621,7 +621,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Vector<dim, spacedim>::get_function_values(
-    const ReadVector<Number> &                fe_function,
+    const ReadVector<Number>                 &fe_function,
     std::vector<solution_value_type<Number>> &values) const
   {
     Assert(fe_values->update_flags & update_values,
@@ -671,7 +671,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Vector<dim, spacedim>::get_function_gradients(
-    const ReadVector<Number> &                   fe_function,
+    const ReadVector<Number>                    &fe_function,
     std::vector<solution_gradient_type<Number>> &gradients) const
   {
     Assert(fe_values->update_flags & update_gradients,
@@ -723,7 +723,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Vector<dim, spacedim>::get_function_symmetric_gradients(
-    const ReadVector<Number> &                             fe_function,
+    const ReadVector<Number>                              &fe_function,
     std::vector<solution_symmetric_gradient_type<Number>> &symmetric_gradients)
     const
   {
@@ -777,7 +777,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Vector<dim, spacedim>::get_function_divergences(
-    const ReadVector<Number> &                     fe_function,
+    const ReadVector<Number>                      &fe_function,
     std::vector<solution_divergence_type<Number>> &divergences) const
   {
     Assert(fe_values->update_flags & update_gradients,
@@ -830,7 +830,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Vector<dim, spacedim>::get_function_curls(
-    const ReadVector<Number> &               fe_function,
+    const ReadVector<Number>                &fe_function,
     std::vector<solution_curl_type<Number>> &curls) const
   {
     Assert(fe_values->update_flags & update_gradients,
@@ -882,7 +882,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Vector<dim, spacedim>::get_function_hessians(
-    const ReadVector<Number> &                  fe_function,
+    const ReadVector<Number>                   &fe_function,
     std::vector<solution_hessian_type<Number>> &hessians) const
   {
     Assert(fe_values->update_flags & update_hessians,
@@ -934,7 +934,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Vector<dim, spacedim>::get_function_laplacians(
-    const ReadVector<Number> &                fe_function,
+    const ReadVector<Number>                 &fe_function,
     std::vector<solution_value_type<Number>> &laplacians) const
   {
     Assert(fe_values->update_flags & update_hessians,
@@ -994,7 +994,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Vector<dim, spacedim>::get_function_third_derivatives(
-    const ReadVector<Number> &                           fe_function,
+    const ReadVector<Number>                            &fe_function,
     std::vector<solution_third_derivative_type<Number>> &third_derivatives)
     const
   {
@@ -1048,7 +1048,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   SymmetricTensor<2, dim, spacedim>::get_function_values(
-    const ReadVector<Number> &                fe_function,
+    const ReadVector<Number>                 &fe_function,
     std::vector<solution_value_type<Number>> &values) const
   {
     Assert(fe_values->update_flags & update_values,
@@ -1098,7 +1098,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   SymmetricTensor<2, dim, spacedim>::get_function_divergences(
-    const ReadVector<Number> &                     fe_function,
+    const ReadVector<Number>                      &fe_function,
     std::vector<solution_divergence_type<Number>> &divergences) const
   {
     Assert(fe_values->update_flags & update_gradients,
@@ -1152,7 +1152,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Tensor<2, dim, spacedim>::get_function_values(
-    const ReadVector<Number> &                fe_function,
+    const ReadVector<Number>                 &fe_function,
     std::vector<solution_value_type<Number>> &values) const
   {
     Assert(fe_values->update_flags & update_values,
@@ -1202,7 +1202,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Tensor<2, dim, spacedim>::get_function_divergences(
-    const ReadVector<Number> &                     fe_function,
+    const ReadVector<Number>                      &fe_function,
     std::vector<solution_divergence_type<Number>> &divergences) const
   {
     Assert(fe_values->update_flags & update_gradients,
@@ -1255,7 +1255,7 @@ namespace FEValuesViews
   template <typename Number>
   void
   Tensor<2, dim, spacedim>::get_function_gradients(
-    const ReadVector<Number> &                   fe_function,
+    const ReadVector<Number>                    &fe_function,
     std::vector<solution_gradient_type<Number>> &gradients) const
   {
     Assert(fe_values->update_flags & update_gradients,

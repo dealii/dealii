@@ -354,7 +354,7 @@ inline DerivedIterator
 LinearIndexIterator<DerivedIterator, AccessorType>::operator++(int)
 {
   const DerivedIterator copy(this->accessor);
-                        operator+=(1);
+  operator+=(1);
   return copy;
 }
 
@@ -374,7 +374,7 @@ inline DerivedIterator
 LinearIndexIterator<DerivedIterator, AccessorType>::operator--(int)
 {
   const DerivedIterator copy(this->accessor);
-                        operator+=(-1);
+  operator+=(-1);
   return copy;
 }
 

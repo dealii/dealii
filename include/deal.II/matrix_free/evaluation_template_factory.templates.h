@@ -34,8 +34,8 @@ namespace internal
   FEEvaluationFactory<dim, Number>::evaluate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
-    const Number *                         values_dofs,
-    FEEvaluationData<dim, Number, false> & fe_eval)
+    const Number                          *values_dofs,
+    FEEvaluationData<dim, Number, false>  &fe_eval)
   {
     instantiation_helper_run<1, FEEvaluationImplSelector<dim, Number, false>>(
       fe_eval.get_shape_info().data[0].fe_degree,
@@ -53,8 +53,8 @@ namespace internal
   FEEvaluationFactory<dim, Number>::integrate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags integration_flag,
-    Number *                               values_dofs,
-    FEEvaluationData<dim, Number, false> & fe_eval,
+    Number                                *values_dofs,
+    FEEvaluationData<dim, Number, false>  &fe_eval,
     const bool                             sum_into_values_array)
   {
     instantiation_helper_run<1, FEEvaluationImplSelector<dim, Number, true>>(
@@ -90,8 +90,8 @@ namespace internal
   CellwiseInverseMassFactory<dim, Number>::apply(
     const unsigned int                          n_components,
     const FEEvaluationData<dim, Number, false> &fe_eval,
-    const Number *                              in_array,
-    Number *                                    out_array)
+    const Number                               *in_array,
+    Number                                     *out_array)
   {
     const unsigned int fe_degree = fe_eval.get_shape_info().data[0].fe_degree;
     instantiation_helper_run<1,
@@ -106,10 +106,10 @@ namespace internal
   CellwiseInverseMassFactory<dim, Number>::apply(
     const unsigned int                          n_components,
     const FEEvaluationData<dim, Number, false> &fe_eval,
-    const ArrayView<const Number> &             inverse_coefficients,
+    const ArrayView<const Number>              &inverse_coefficients,
     const bool                                  dyadic_coefficients,
-    const Number *                              in_array,
-    Number *                                    out_array)
+    const Number                               *in_array,
+    Number                                     *out_array)
   {
     const unsigned int fe_degree = fe_eval.get_shape_info().data[0].fe_degree;
     instantiation_helper_run<
@@ -131,8 +131,8 @@ namespace internal
   CellwiseInverseMassFactory<dim, Number>::transform_from_q_points_to_basis(
     const unsigned int                          n_components,
     const FEEvaluationData<dim, Number, false> &fe_eval,
-    const Number *                              in_array,
-    Number *                                    out_array)
+    const Number                               *in_array,
+    Number                                     *out_array)
   {
     const unsigned int fe_degree = fe_eval.get_shape_info().data[0].fe_degree;
     const unsigned int n_q_points_1d =

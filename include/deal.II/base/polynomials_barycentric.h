@@ -206,7 +206,7 @@ protected:
    * exponents).
    */
   static TableIndices<dim + 1>
-  index_to_indices(const std::size_t &          index,
+  index_to_indices(const std::size_t           &index,
                    const TableIndices<dim + 1> &extent);
 };
 
@@ -269,8 +269,8 @@ public:
    * @copydoc ScalarPolynomialsBase::evaluate()
    */
   void
-  evaluate(const Point<dim> &           unit_point,
-           std::vector<double> &        values,
+  evaluate(const Point<dim>            &unit_point,
+           std::vector<double>         &values,
            std::vector<Tensor<1, dim>> &grads,
            std::vector<Tensor<2, dim>> &grad_grads,
            std::vector<Tensor<3, dim>> &third_derivatives,
@@ -287,28 +287,28 @@ public:
    */
   Tensor<1, dim>
   compute_1st_derivative(const unsigned int i,
-                         const Point<dim> & p) const override;
+                         const Point<dim>  &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
    */
   Tensor<2, dim>
   compute_2nd_derivative(const unsigned int i,
-                         const Point<dim> & p) const override;
+                         const Point<dim>  &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
    */
   Tensor<3, dim>
   compute_3rd_derivative(const unsigned int i,
-                         const Point<dim> & p) const override;
+                         const Point<dim>  &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
    */
   Tensor<4, dim>
   compute_4th_derivative(const unsigned int i,
-                         const Point<dim> & p) const override;
+                         const Point<dim>  &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_grad()
@@ -598,7 +598,7 @@ BarycentricPolynomial<dim, Number>::operator*(
 
   const auto &coef_1   = this->coefficients;
   const auto &coef_2   = multiplicand.coefficients;
-  auto &      coef_out = result.coefficients;
+  auto       &coef_out = result.coefficients;
 
   for (std::size_t i1 = 0; i1 < coef_1.n_elements(); ++i1)
     {
@@ -633,8 +633,8 @@ BarycentricPolynomial<dim, Number>::barycentric_derivative(
   deg[coordinate] -= 1;
   BarycentricPolynomial<dim, Number> result(deg,
                                             std::numeric_limits<Number>::max());
-  const auto &                       coeffs_in  = coefficients;
-  auto &                             coeffs_out = result.coefficients;
+  const auto                        &coeffs_in  = coefficients;
+  auto                              &coeffs_out = result.coefficients;
   for (std::size_t i = 0; i < coeffs_out.n_elements(); ++i)
     {
       const auto out_index   = index_to_indices(i, coeffs_out.size());
@@ -705,7 +705,7 @@ BarycentricPolynomial<dim, Number>::memory_consumption() const
 template <int dim, typename Number>
 TableIndices<dim + 1>
 BarycentricPolynomial<dim, Number>::index_to_indices(
-  const std::size_t &          index,
+  const std::size_t           &index,
   const TableIndices<dim + 1> &extent)
 {
   TableIndices<dim + 1> result;

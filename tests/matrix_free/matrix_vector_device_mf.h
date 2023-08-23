@@ -33,7 +33,7 @@ public:
   DEAL_II_HOST_DEVICE
   HelmholtzOperatorQuad(
     const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-    Number *                                                    coef,
+    Number                                                     *coef,
     int                                                         cell)
     : gpu_data(gpu_data)
     , coef(coef)
@@ -43,7 +43,7 @@ public:
   DEAL_II_HOST_DEVICE void
   operator()(
     CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number>
-      * fe_eval,
+       *fe_eval,
     int q_point) const;
 
   static const unsigned int n_q_points =
@@ -51,7 +51,7 @@ public:
 
 private:
   const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data;
-  Number *                                                    coef;
+  Number                                                     *coef;
   int                                                         cell;
 };
 
@@ -88,9 +88,9 @@ public:
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-    CUDAWrappers::SharedData<dim, Number> *                     shared_data,
-    const Number *                                              src,
-    Number *                                                    dst) const;
+    CUDAWrappers::SharedData<dim, Number>                      *shared_data,
+    const Number                                               *src,
+    Number                                                     *dst) const;
 
   Number *coef;
 };
@@ -102,9 +102,9 @@ DEAL_II_HOST_DEVICE void
 HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::operator()(
   const unsigned int                                          cell,
   const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-  CUDAWrappers::SharedData<dim, Number> *                     shared_data,
-  const Number *                                              src,
-  Number *                                                    dst) const
+  CUDAWrappers::SharedData<dim, Number>                      *shared_data,
+  const Number                                               *src,
+  Number                                                     *dst) const
 {
   CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
     gpu_data, shared_data);
@@ -197,7 +197,7 @@ public:
   types::global_dof_index internal_m;
 
 private:
-  const CUDAWrappers::MatrixFree<dim, Number> &                    data;
+  const CUDAWrappers::MatrixFree<dim, Number>                     &data;
   LinearAlgebra::distributed::Vector<double, MemorySpace::Default> coef;
 };
 
@@ -247,7 +247,7 @@ template <int dim,
           int n_q_points_1d>
 void
 MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d>::vmult(
-  VectorType &      dst,
+  VectorType       &dst,
   const VectorType &src) const
 {
   dst = static_cast<Number>(0.);

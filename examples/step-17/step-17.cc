@@ -182,7 +182,7 @@ namespace Step17
   {
   public:
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  values) const override
+                              Vector<double>   &values) const override
     {
       AssertDimension(values.size(), dim);
       Assert(dim >= 2, ExcInternalError());
@@ -205,7 +205,7 @@ namespace Step17
 
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const override
+                      std::vector<Vector<double>>   &value_list) const override
     {
       const unsigned int n_points = points.size();
 

@@ -227,7 +227,7 @@ namespace MeshWorker
        * <code>index</code> in the vector #matrix.
        */
       void
-      assemble(const FullMatrix<double> &                  M,
+      assemble(const FullMatrix<double>                   &M,
                const unsigned int                          index,
                const std::vector<types::global_dof_index> &i1,
                const std::vector<types::global_dof_index> &i2);
@@ -318,8 +318,8 @@ namespace MeshWorker
        * Assemble a single matrix into a global matrix.
        */
       void
-      assemble(MatrixType &                                G,
-               const FullMatrix<double> &                  M,
+      assemble(MatrixType                                 &G,
+               const FullMatrix<double>                   &M,
                const std::vector<types::global_dof_index> &i1,
                const std::vector<types::global_dof_index> &i2);
 
@@ -327,8 +327,8 @@ namespace MeshWorker
        * Assemble a single matrix into a global matrix.
        */
       void
-      assemble(MatrixType &                                G,
-               const FullMatrix<double> &                  M,
+      assemble(MatrixType                                 &G,
+               const FullMatrix<double>                   &M,
                const std::vector<types::global_dof_index> &i1,
                const std::vector<types::global_dof_index> &i2,
                const unsigned int                          level);
@@ -338,8 +338,8 @@ namespace MeshWorker
        */
 
       void
-      assemble_up(MatrixType &                                G,
-                  const FullMatrix<double> &                  M,
+      assemble_up(MatrixType                                 &G,
+                  const FullMatrix<double>                   &M,
                   const std::vector<types::global_dof_index> &i1,
                   const std::vector<types::global_dof_index> &i2,
                   const unsigned int level = numbers::invalid_unsigned_int);
@@ -348,8 +348,8 @@ namespace MeshWorker
        */
 
       void
-      assemble_down(MatrixType &                                G,
-                    const FullMatrix<double> &                  M,
+      assemble_down(MatrixType                                 &G,
+                    const FullMatrix<double>                   &M,
                     const std::vector<types::global_dof_index> &i1,
                     const std::vector<types::global_dof_index> &i2,
                     const unsigned int level = numbers::invalid_unsigned_int);
@@ -359,8 +359,8 @@ namespace MeshWorker
        */
 
       void
-      assemble_in(MatrixType &                                G,
-                  const FullMatrix<double> &                  M,
+      assemble_in(MatrixType                                 &G,
+                  const FullMatrix<double>                   &M,
                   const std::vector<types::global_dof_index> &i1,
                   const std::vector<types::global_dof_index> &i2,
                   const unsigned int level = numbers::invalid_unsigned_int);
@@ -370,8 +370,8 @@ namespace MeshWorker
        */
 
       void
-      assemble_out(MatrixType &                                G,
-                   const FullMatrix<double> &                  M,
+      assemble_out(MatrixType                                 &G,
+                   const FullMatrix<double>                   &M,
                    const std::vector<types::global_dof_index> &i1,
                    const std::vector<types::global_dof_index> &i2,
                    const unsigned int level = numbers::invalid_unsigned_int);
@@ -492,14 +492,14 @@ namespace MeshWorker
        * <code>index</code> in the vector #matrix.
        */
       void
-      assemble(const FullMatrix<double> &                  M,
-               const Vector<double> &                      vector,
+      assemble(const FullMatrix<double>                   &M,
+               const Vector<double>                       &vector,
                const unsigned int                          index,
                const std::vector<types::global_dof_index> &indices);
 
       void
-      assemble(const FullMatrix<double> &                  M,
-               const Vector<double> &                      vector,
+      assemble(const FullMatrix<double>                   &M,
+               const Vector<double>                       &vector,
                const unsigned int                          index,
                const std::vector<types::global_dof_index> &i1,
                const std::vector<types::global_dof_index> &i2);
@@ -643,7 +643,7 @@ namespace MeshWorker
     template <typename MatrixType>
     inline void
     MatrixSimple<MatrixType>::assemble(
-      const FullMatrix<double> &                  M,
+      const FullMatrix<double>                   &M,
       const unsigned int                          index,
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2)
@@ -831,8 +831,8 @@ namespace MeshWorker
     template <typename MatrixType>
     inline void
     MGMatrixSimple<MatrixType>::assemble(
-      MatrixType &                                G,
-      const FullMatrix<double> &                  M,
+      MatrixType                                 &G,
+      const FullMatrix<double>                   &M,
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2)
     {
@@ -851,8 +851,8 @@ namespace MeshWorker
     template <typename MatrixType>
     inline void
     MGMatrixSimple<MatrixType>::assemble(
-      MatrixType &                                G,
-      const FullMatrix<double> &                  M,
+      MatrixType                                 &G,
+      const FullMatrix<double>                   &M,
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
@@ -904,8 +904,8 @@ namespace MeshWorker
     template <typename MatrixType>
     inline void
     MGMatrixSimple<MatrixType>::assemble_up(
-      MatrixType &                                G,
-      const FullMatrix<double> &                  M,
+      MatrixType                                 &G,
+      const FullMatrix<double>                   &M,
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
@@ -933,8 +933,8 @@ namespace MeshWorker
     template <typename MatrixType>
     inline void
     MGMatrixSimple<MatrixType>::assemble_down(
-      MatrixType &                                G,
-      const FullMatrix<double> &                  M,
+      MatrixType                                 &G,
+      const FullMatrix<double>                   &M,
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
@@ -962,8 +962,8 @@ namespace MeshWorker
     template <typename MatrixType>
     inline void
     MGMatrixSimple<MatrixType>::assemble_in(
-      MatrixType &                                G,
-      const FullMatrix<double> &                  M,
+      MatrixType                                 &G,
+      const FullMatrix<double>                   &M,
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
@@ -1002,8 +1002,8 @@ namespace MeshWorker
     template <typename MatrixType>
     inline void
     MGMatrixSimple<MatrixType>::assemble_out(
-      MatrixType &                                G,
-      const FullMatrix<double> &                  M,
+      MatrixType                                 &G,
+      const FullMatrix<double>                   &M,
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2,
       const unsigned int                          level)
@@ -1248,8 +1248,8 @@ namespace MeshWorker
     template <typename MatrixType, typename VectorType>
     inline void
     SystemSimple<MatrixType, VectorType>::assemble(
-      const FullMatrix<double> &                  M,
-      const Vector<double> &                      vector,
+      const FullMatrix<double>                   &M,
+      const Vector<double>                       &vector,
       const unsigned int                          index,
       const std::vector<types::global_dof_index> &indices)
     {
@@ -1286,8 +1286,8 @@ namespace MeshWorker
     template <typename MatrixType, typename VectorType>
     inline void
     SystemSimple<MatrixType, VectorType>::assemble(
-      const FullMatrix<double> &                  M,
-      const Vector<double> &                      vector,
+      const FullMatrix<double>                   &M,
+      const Vector<double>                       &vector,
       const unsigned int                          index,
       const std::vector<types::global_dof_index> &i1,
       const std::vector<types::global_dof_index> &i2)

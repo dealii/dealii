@@ -20,9 +20,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     template class Mapping<deal_II_dimension, deal_II_space_dimension>;
 
-    template const Mapping<deal_II_dimension, deal_II_space_dimension>
-      &get_default_linear_mapping(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &triangulation);
+    template const Mapping<deal_II_dimension, deal_II_space_dimension> &
+    get_default_linear_mapping(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension>
+        &triangulation);
 #endif
   }

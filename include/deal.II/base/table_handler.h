@@ -535,7 +535,7 @@ public:
    * the description of TextOutputFormat for more information.
    */
   void
-  write_text(std::ostream &         out,
+  write_text(std::ostream          &out,
              const TextOutputFormat format = table_with_headers) const;
 
   /**
@@ -848,31 +848,31 @@ namespace internal
       {
         const int p = std::get<int>(value);
         char      c = 'i';
-        ar &c &p;
+        ar &c    &p;
       }
     else if (std::holds_alternative<unsigned int>(value))
       {
         const unsigned int p = std::get<unsigned int>(value);
         char               c = 'u';
-        ar &c &p;
+        ar &c             &p;
       }
     else if (std::holds_alternative<double>(value))
       {
         const double p = std::get<double>(value);
         char         c = 'd';
-        ar &c &p;
+        ar &c       &p;
       }
     else if (std::holds_alternative<std::string>(value))
       {
         const std::string p = std::get<std::string>(value);
         char              c = 's';
-        ar &c &p;
+        ar &c            &p;
       }
     else if (std::holds_alternative<std::uint64_t>(value))
       {
         const std::uint64_t p = std::get<std::uint64_t>(value);
         char                c = 'l';
-        ar &c &p;
+        ar &c              &p;
       }
     else
       Assert(false, ExcInternalError());
@@ -889,7 +889,7 @@ namespace internal
     // as a one-character id, and then read
     // the data
     char c;
-    ar & c;
+    ar  &c;
 
     switch (c)
       {
@@ -904,7 +904,7 @@ namespace internal
         case 'u':
           {
             unsigned int val;
-            ar &         val;
+            ar          &val;
             value = val;
             break;
           }
@@ -912,7 +912,7 @@ namespace internal
         case 'd':
           {
             double val;
-            ar &   val;
+            ar    &val;
             value = val;
             break;
           }
@@ -920,7 +920,7 @@ namespace internal
         case 's':
           {
             std::string val;
-            ar &        val;
+            ar         &val;
             value = val;
             break;
           }
@@ -928,7 +928,7 @@ namespace internal
         case 'l':
           {
             std::uint64_t val;
-            ar &          val;
+            ar           &val;
             value = val;
             break;
           }

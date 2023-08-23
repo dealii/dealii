@@ -29,7 +29,7 @@
 template <int dim, int spacedim = dim>
 void
 print_mesh_info(const Triangulation<dim, spacedim> &triangulation,
-                const std::string &                 filename)
+                const std::string                  &filename)
 {
   deallog << "Mesh info:" << std::endl
           << " dimension: " << dim << std::endl

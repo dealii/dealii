@@ -138,11 +138,11 @@ test()
   {
     deallog.push("Constructor with iterators");
     std::complex<double>              array[] = {std::complex<double>(0, 1),
-                                    std::complex<double>(1, 2),
-                                    std::complex<double>(2, 3),
-                                    std::complex<double>(3, 4),
-                                    std::complex<double>(4, 5),
-                                    std::complex<double>(5, 6)};
+                                                 std::complex<double>(1, 2),
+                                                 std::complex<double>(2, 3),
+                                                 std::complex<double>(3, 4),
+                                                 std::complex<double>(4, 5),
+                                                 std::complex<double>(5, 6)};
     BlockVector<std::complex<double>> v1(vector_indices, &array[0], &array[6]);
     for (unsigned int i = 0; i < v1.size(); ++i)
       deallog << v1(i) << ' ';

@@ -55,9 +55,9 @@ main()
       for (unsigned int i = 0; i < n_iterations; ++i)
         {
           std::vector<Point<3>> points  = {{-.1, -.1, .5},
-                                          {.1, -.1, .5},
-                                          {-.1, .1, .5},
-                                          {.1, .1, .5}};
+                                           {.1, -.1, .5},
+                                           {-.1, .1, .5},
+                                           {.1, .1, .5}};
           std::vector<double>   weights = {.25, .25, .25, .25};
 
           for (Point<3> &point : points)

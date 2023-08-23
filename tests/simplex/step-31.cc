@@ -102,7 +102,7 @@ namespace Step31
         : Function<dim>(1)
       {}
       virtual double
-      value(const Point<dim> & p,
+      value(const Point<dim>  &p,
             const unsigned int component = 0) const override
       {
         (void)component;
@@ -134,7 +134,7 @@ namespace Step31
     class InverseMatrix : public Subscriptor
     {
     public:
-      InverseMatrix(const MatrixType &        m,
+      InverseMatrix(const MatrixType         &m,
                     const PreconditionerType &preconditioner);
       template <typename VectorType>
       void
@@ -142,11 +142,11 @@ namespace Step31
 
     private:
       const SmartPointer<const MatrixType> matrix;
-      const PreconditionerType &           preconditioner;
+      const PreconditionerType            &preconditioner;
     };
     template <class MatrixType, class PreconditionerType>
     InverseMatrix<MatrixType, PreconditionerType>::InverseMatrix(
-      const MatrixType &        m,
+      const MatrixType         &m,
       const PreconditionerType &preconditioner)
       : matrix(&m)
       , preconditioner(preconditioner)
@@ -155,7 +155,7 @@ namespace Step31
     template <typename VectorType>
     void
     InverseMatrix<MatrixType, PreconditionerType>::vmult(
-      VectorType &      dst,
+      VectorType       &dst,
       const VectorType &src) const
     {
       SolverControl        solver_control(src.size(), 1e-7 * src.l2_norm());
@@ -178,9 +178,9 @@ namespace Step31
         const TrilinosWrappers::BlockSparseMatrix &S,
         const InverseMatrix<TrilinosWrappers::SparseMatrix,
                             PreconditionerTypeMp> &Mpinv,
-        const PreconditionerTypeA &                Apreconditioner);
+        const PreconditionerTypeA                 &Apreconditioner);
       void
-      vmult(TrilinosWrappers::MPI::BlockVector &      dst,
+      vmult(TrilinosWrappers::MPI::BlockVector       &dst,
             const TrilinosWrappers::MPI::BlockVector &src) const;
 
     private:
@@ -189,7 +189,7 @@ namespace Step31
       const SmartPointer<const InverseMatrix<TrilinosWrappers::SparseMatrix,
                                              PreconditionerTypeMp>>
                                             m_inverse;
-      const PreconditionerTypeA &           a_preconditioner;
+      const PreconditionerTypeA            &a_preconditioner;
       mutable TrilinosWrappers::MPI::Vector tmp;
     };
     template <class PreconditionerTypeA, class PreconditionerTypeMp>
@@ -198,7 +198,7 @@ namespace Step31
         const TrilinosWrappers::BlockSparseMatrix &S,
         const InverseMatrix<TrilinosWrappers::SparseMatrix,
                             PreconditionerTypeMp> &Mpinv,
-        const PreconditionerTypeA &                Apreconditioner)
+        const PreconditionerTypeA                 &Apreconditioner)
       : stokes_matrix(&S)
       , m_inverse(&Mpinv)
       , a_preconditioner(Apreconditioner)
@@ -207,7 +207,7 @@ namespace Step31
     template <class PreconditionerTypeA, class PreconditionerTypeMp>
     void
     BlockSchurPreconditioner<PreconditionerTypeA, PreconditionerTypeMp>::vmult(
-      TrilinosWrappers::MPI::BlockVector &      dst,
+      TrilinosWrappers::MPI::BlockVector       &dst,
       const TrilinosWrappers::MPI::BlockVector &src) const
     {
       a_preconditioner.vmult(dst.block(0), src.block(0));
@@ -249,15 +249,15 @@ namespace Step31
     refine_mesh(const unsigned int max_grid_level);
     double
     compute_viscosity(
-      const std::vector<double> &        old_temperature,
-      const std::vector<double> &        old_old_temperature,
+      const std::vector<double>         &old_temperature,
+      const std::vector<double>         &old_old_temperature,
       const std::vector<Tensor<1, dim>> &old_temperature_grads,
       const std::vector<Tensor<1, dim>> &old_old_temperature_grads,
-      const std::vector<double> &        old_temperature_laplacians,
-      const std::vector<double> &        old_old_temperature_laplacians,
+      const std::vector<double>         &old_temperature_laplacians,
+      const std::vector<double>         &old_old_temperature_laplacians,
       const std::vector<Tensor<1, dim>> &old_velocity_values,
       const std::vector<Tensor<1, dim>> &old_old_velocity_values,
-      const std::vector<double> &        gamma_values,
+      const std::vector<double>         &gamma_values,
       const double                       global_u_infty,
       const double                       global_T_variation,
       const double                       cell_diameter) const;
@@ -325,7 +325,7 @@ namespace Step31
   double
   BoussinesqFlowProblem<dim>::get_maximal_velocity() const
   {
-    const auto &                     quadrature_formula = quadrature_stokes;
+    const auto                      &quadrature_formula = quadrature_stokes;
     const unsigned int               n_q_points = quadrature_formula.size();
     FEValues<dim>                    fe_values(mapping,
                             stokes_fe,
@@ -348,7 +348,7 @@ namespace Step31
   std::pair<double, double>
   BoussinesqFlowProblem<dim>::get_extrapolated_temperature_range() const
   {
-    const auto &        quadrature_formula = quadrature_temperature;
+    const auto         &quadrature_formula = quadrature_temperature;
     const unsigned int  n_q_points         = quadrature_formula.size();
     FEValues<dim>       fe_values(mapping,
                             temperature_fe,
@@ -400,15 +400,15 @@ namespace Step31
   template <int dim>
   double
   BoussinesqFlowProblem<dim>::compute_viscosity(
-    const std::vector<double> &        old_temperature,
-    const std::vector<double> &        old_old_temperature,
+    const std::vector<double>         &old_temperature,
+    const std::vector<double>         &old_old_temperature,
     const std::vector<Tensor<1, dim>> &old_temperature_grads,
     const std::vector<Tensor<1, dim>> &old_old_temperature_grads,
-    const std::vector<double> &        old_temperature_laplacians,
-    const std::vector<double> &        old_old_temperature_laplacians,
+    const std::vector<double>         &old_temperature_laplacians,
+    const std::vector<double>         &old_old_temperature_laplacians,
     const std::vector<Tensor<1, dim>> &old_velocity_values,
     const std::vector<Tensor<1, dim>> &old_old_velocity_values,
-    const std::vector<double> &        gamma_values,
+    const std::vector<double>         &gamma_values,
     const double                       global_u_infty,
     const double                       global_T_variation,
     const double                       cell_diameter) const
@@ -555,7 +555,7 @@ namespace Step31
   BoussinesqFlowProblem<dim>::assemble_stokes_preconditioner()
   {
     stokes_preconditioner_matrix          = 0;
-    const auto &       quadrature_formula = quadrature_stokes;
+    const auto        &quadrature_formula = quadrature_stokes;
     FEValues<dim>      stokes_fe_values(mapping,
                                    stokes_fe,
                                    quadrature_formula,
@@ -629,7 +629,7 @@ namespace Step31
     if (rebuild_stokes_matrix == true)
       stokes_matrix = 0;
     stokes_rhs                       = 0;
-    const auto &  quadrature_formula = quadrature_stokes;
+    const auto   &quadrature_formula = quadrature_stokes;
     FEValues<dim> stokes_fe_values(
       mapping,
       stokes_fe,
@@ -715,7 +715,7 @@ namespace Step31
       return;
     temperature_mass_matrix               = 0;
     temperature_stiffness_matrix          = 0;
-    const auto &       quadrature_formula = quadrature_temperature;
+    const auto        &quadrature_formula = quadrature_temperature;
     FEValues<dim>      temperature_fe_values(mapping,
                                         temperature_fe,
                                         quadrature_formula,
@@ -779,7 +779,7 @@ namespace Step31
         temperature_matrix.add(time_step, temperature_stiffness_matrix);
       }
     temperature_rhs                       = 0;
-    const auto &       quadrature_formula = quadrature_temperature;
+    const auto        &quadrature_formula = quadrature_temperature;
     FEValues<dim>      temperature_fe_values(mapping,
                                         temperature_fe,
                                         quadrature_formula,

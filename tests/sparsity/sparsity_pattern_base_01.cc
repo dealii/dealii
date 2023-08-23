@@ -28,7 +28,7 @@ class TestPattern : public SparsityPatternBase
   using SparsityPatternBase::size_type;
 
   virtual void
-  add_row_entries(const size_type &                 row,
+  add_row_entries(const size_type                  &row,
                   const ArrayView<const size_type> &columns,
                   const bool indices_are_sorted = false) override
   {

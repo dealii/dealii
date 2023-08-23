@@ -25,9 +25,9 @@
 template <int dim>
 void
 print_intermediate_point(const Manifold<dim> &manifold,
-                         const std::string &  manifold_name,
-                         const Point<dim> &   p1,
-                         const Point<dim> &   p2,
+                         const std::string   &manifold_name,
+                         const Point<dim>    &p1,
+                         const Point<dim>    &p2,
                          const double         weight)
 {
   const std::vector<Point<dim>> points({p1, p2});

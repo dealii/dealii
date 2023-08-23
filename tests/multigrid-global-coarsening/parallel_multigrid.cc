@@ -61,8 +61,8 @@ public:
   LaplaceOperator(){};
 
   void
-  initialize(const Mapping<dim> &                mapping,
-             const DoFHandler<dim> &             dof_handler,
+  initialize(const Mapping<dim>                 &mapping,
+             const DoFHandler<dim>              &dof_handler,
              const std::set<types::boundary_id> &dirichlet_boundaries,
              const unsigned int level = numbers::invalid_unsigned_int)
   {
@@ -122,7 +122,7 @@ public:
   }
 
   void
-  vmult(LinearAlgebra::distributed::Vector<number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<number>       &dst,
         const LinearAlgebra::distributed::Vector<number> &src) const
   {
     dst = 0;
@@ -130,7 +130,7 @@ public:
   }
 
   void
-  Tvmult(LinearAlgebra::distributed::Vector<number> &      dst,
+  Tvmult(LinearAlgebra::distributed::Vector<number>       &dst,
          const LinearAlgebra::distributed::Vector<number> &src) const
   {
     dst = 0;
@@ -138,14 +138,14 @@ public:
   }
 
   void
-  Tvmult_add(LinearAlgebra::distributed::Vector<number> &      dst,
+  Tvmult_add(LinearAlgebra::distributed::Vector<number>       &dst,
              const LinearAlgebra::distributed::Vector<number> &src) const
   {
     vmult_add(dst, src);
   }
 
   void
-  vmult_add(LinearAlgebra::distributed::Vector<number> &      dst,
+  vmult_add(LinearAlgebra::distributed::Vector<number>       &dst,
             const LinearAlgebra::distributed::Vector<number> &src) const
   {
     data.cell_loop(&LaplaceOperator::local_apply, this, dst, src);
@@ -205,8 +205,8 @@ public:
 
 private:
   void
-  local_apply(const MatrixFree<dim, number> &                   data,
-              LinearAlgebra::distributed::Vector<number> &      dst,
+  local_apply(const MatrixFree<dim, number>                    &data,
+              LinearAlgebra::distributed::Vector<number>       &dst,
               const LinearAlgebra::distributed::Vector<number> &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
@@ -245,7 +245,7 @@ private:
 
   void
   local_diagonal_cell(
-    const MatrixFree<dim, number> &             data,
+    const MatrixFree<dim, number>              &data,
     LinearAlgebra::distributed::Vector<number> &dst,
     const unsigned int &,
     const std::pair<unsigned int, unsigned int> &cell_range) const
@@ -296,7 +296,7 @@ public:
 
   virtual void
   operator()(const unsigned int                                level,
-             LinearAlgebra::distributed::Vector<double> &      dst,
+             LinearAlgebra::distributed::Vector<double>       &dst,
              const LinearAlgebra::distributed::Vector<double> &src) const
   {
     ReductionControl solver_control(1e4, 1e-50, 1e-10);
@@ -319,7 +319,8 @@ do_test(const DoFHandler<dim> &dof)
       deallog.push("float");
     }
   else
-    {}
+    {
+    }
 
   deallog << "Testing " << dof.get_fe().get_name();
   deallog << std::endl;

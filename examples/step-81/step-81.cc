@@ -125,10 +125,10 @@ namespace Step81
   public:
     rank2_type epsilon(const Point<dim> &x, types::material_id material);
 
-    std::complex<double> mu_inv(const Point<dim> & x,
+    std::complex<double> mu_inv(const Point<dim>  &x,
                                 types::material_id material);
 
-    rank2_type sigma(const Point<dim> & x,
+    rank2_type sigma(const Point<dim>  &x,
                      types::material_id left,
                      types::material_id right);
 
@@ -572,7 +572,7 @@ namespace Step81
   template <int dim>
   DEAL_II_ALWAYS_INLINE inline Tensor<1, dim, std::complex<double>>
   tangential_part(const Tensor<1, dim, std::complex<double>> &tensor,
-                  const Tensor<1, dim> &                      normal)
+                  const Tensor<1, dim>                       &normal)
   {
     auto result = tensor;
     result[0]   = normal[1] * (tensor[0] * normal[1] - tensor[1] * normal[0]);

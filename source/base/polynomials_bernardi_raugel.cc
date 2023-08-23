@@ -69,7 +69,7 @@ PolynomialsBernardiRaugel<dim>::create_polynomials_Q()
 template <int dim>
 void
 PolynomialsBernardiRaugel<dim>::evaluate(
-  const Point<dim> &           unit_point,
+  const Point<dim>            &unit_point,
   std::vector<Tensor<1, dim>> &values,
   std::vector<Tensor<2, dim>> &grads,
   std::vector<Tensor<3, dim>> &grad_grads,

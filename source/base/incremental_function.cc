@@ -48,7 +48,7 @@ namespace Functions
   template <int dim, typename RangeNumberType>
   RangeNumberType
   IncrementalFunction<dim, RangeNumberType>::value(
-    const Point<dim> & p,
+    const Point<dim>  &p,
     const unsigned int comp) const
   {
     // since we modify a mutable member variable, lock the
@@ -77,7 +77,7 @@ namespace Functions
   template <int dim, typename RangeNumberType>
   void
   IncrementalFunction<dim, RangeNumberType>::vector_value(
-    const Point<dim> &       p,
+    const Point<dim>        &p,
     Vector<RangeNumberType> &values) const
   {
     // since we modify a mutable member variable, lock the

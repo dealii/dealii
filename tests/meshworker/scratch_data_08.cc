@@ -152,10 +152,10 @@ test()
           }
     };
 
-  auto boundary_worker = [gamma, &boundary_function](const Iterator &    cell,
+  auto boundary_worker = [gamma, &boundary_function](const Iterator     &cell,
                                                      const unsigned int &f,
-                                                     ScratchData &       s,
-                                                     CopyData &          c) {
+                                                     ScratchData        &s,
+                                                     CopyData           &c) {
     const auto &fev = s.reinit(cell, f);
     const auto &JxW = s.get_JxW_values();
     const auto &p   = s.get_quadrature_points();
@@ -181,14 +181,14 @@ test()
         }
   };
 
-  auto face_worker = [gamma](const Iterator &    cell,
+  auto face_worker = [gamma](const Iterator     &cell,
                              const unsigned int &f,
                              const unsigned int &sf,
-                             const Iterator &    ncell,
+                             const Iterator     &ncell,
                              const unsigned int &nf,
                              const unsigned int &nsf,
-                             ScratchData &       s,
-                             CopyData &          c) {
+                             ScratchData        &s,
+                             CopyData           &c) {
     const auto &fev = s.reinit(cell, f, sf, ncell, nf, nsf);
     const auto &JxW = s.get_JxW_values();
 

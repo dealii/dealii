@@ -60,7 +60,7 @@ test(const unsigned int degree)
       Vector<double>                 solution(dof_handler.n_dofs());
       Functions::CosineFunction<dim> function;
       AffineConstraints<double>      dummy;
-      const auto &                   mapping =
+      const auto                    &mapping =
         reference_cell.template get_default_linear_mapping<dim>();
       dummy.close();
       VectorTools::project(

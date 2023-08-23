@@ -71,7 +71,7 @@ namespace internal
        * element, FE_Nothing, is used internally for the underlying FEValues
        * object.
        */
-      MappingDataOnTheFly(const Mapping<dim> & mapping,
+      MappingDataOnTheFly(const Mapping<dim>  &mapping,
                           const Quadrature<1> &quadrature,
                           const UpdateFlags    update_flags);
 
@@ -171,7 +171,7 @@ namespace internal
 
     template <int dim, typename Number>
     inline MappingDataOnTheFly<dim, Number>::MappingDataOnTheFly(
-      const Mapping<dim> & mapping,
+      const Mapping<dim>  &mapping,
       const Quadrature<1> &quadrature,
       const UpdateFlags    update_flags)
       : fe_values(std::make_unique<dealii::FEValues<dim>>(

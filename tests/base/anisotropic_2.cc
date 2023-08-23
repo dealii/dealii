@@ -60,14 +60,14 @@ check_2d()
   // x or y direction
   {
     PolVector                 pols[2] = {Pol::generate_complete_basis(3),
-                         Pol::generate_complete_basis(1)};
+                                         Pol::generate_complete_basis(1)};
     std::vector<PolVector>    p(&pols[0], &pols[2]);
     AnisotropicPolynomials<2> aniso(p);
     print_2d(aniso);
   }
   {
     PolVector                 pols[2] = {Pol::generate_complete_basis(2),
-                         Pol::generate_complete_basis(3)};
+                                         Pol::generate_complete_basis(3)};
     std::vector<PolVector>    p(&pols[0], &pols[2]);
     AnisotropicPolynomials<2> aniso(p);
 
@@ -114,24 +114,24 @@ check_3d()
   // in x, y or z direction
   {
     PolVector                 pols[3] = {Pol::generate_complete_basis(3),
-                         Pol::generate_complete_basis(1),
-                         Pol::generate_complete_basis(1)};
+                                         Pol::generate_complete_basis(1),
+                                         Pol::generate_complete_basis(1)};
     std::vector<PolVector>    p(&pols[0], &pols[3]);
     AnisotropicPolynomials<3> aniso(p);
     print_3d(aniso);
   }
   {
     PolVector                 pols[3] = {Pol::generate_complete_basis(1),
-                         Pol::generate_complete_basis(3),
-                         Pol::generate_complete_basis(1)};
+                                         Pol::generate_complete_basis(3),
+                                         Pol::generate_complete_basis(1)};
     std::vector<PolVector>    p(&pols[0], &pols[3]);
     AnisotropicPolynomials<3> aniso(p);
     print_3d(aniso);
   }
   {
     PolVector                 pols[3] = {Pol::generate_complete_basis(1),
-                         Pol::generate_complete_basis(2),
-                         Pol::generate_complete_basis(3)};
+                                         Pol::generate_complete_basis(2),
+                                         Pol::generate_complete_basis(3)};
     std::vector<PolVector>    p(&pols[0], &pols[3]);
     AnisotropicPolynomials<3> aniso(p);
     print_3d(aniso);

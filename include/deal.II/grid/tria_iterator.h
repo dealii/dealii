@@ -298,7 +298,7 @@ public:
     const TriaAccessorBase<Accessor::structure_dimension,
                            Accessor::dimension,
                            Accessor::space_dimension> &tria_accessor,
-    const typename Accessor::AccessorData *            local_data);
+    const typename Accessor::AccessorData             *local_data);
 
   /**
    * Conversion constructor. Same as above with the difference that it
@@ -638,7 +638,7 @@ public:
   TriaIterator(const TriaAccessorBase<Accessor::structure_dimension,
                                       Accessor::dimension,
                                       Accessor::space_dimension> &tria_accessor,
-               const typename Accessor::AccessorData *            local_data);
+               const typename Accessor::AccessorData             *local_data);
 
   /**
    * Similar conversion operator to the above one, but does a check whether
@@ -824,7 +824,7 @@ public:
     const TriaAccessorBase<Accessor::structure_dimension,
                            Accessor::dimension,
                            Accessor::space_dimension> &tria_accessor,
-    const typename Accessor::AccessorData *            local_data);
+    const typename Accessor::AccessorData             *local_data);
 
   /**
    * Similar conversion operator to the above one, but does a check whether

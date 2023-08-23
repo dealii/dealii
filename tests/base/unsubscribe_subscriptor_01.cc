@@ -40,7 +40,7 @@ main()
 
   Subscriptor       subscriptor;
   std::atomic<bool> dummy_a;
-  const char *      foo        = "a";
+  const char       *foo        = "a";
   const std::string foo_string = "a";
   subscriptor.subscribe(&dummy_a, foo);
   subscriptor.unsubscribe(&dummy_a, foo_string.c_str());

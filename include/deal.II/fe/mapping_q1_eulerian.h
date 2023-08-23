@@ -110,7 +110,7 @@ public:
    * to the location of cells of the underlying triangulation.
    */
   MappingQ1Eulerian(const DoFHandler<dim, spacedim> &euler_dof_handler,
-                    const VectorType &               euler_vector);
+                    const VectorType                &euler_vector);
 
   /**
    * Return the mapped vertices of the cell. For the current class, this
@@ -158,8 +158,8 @@ protected:
   fill_fe_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellSimilarity::Similarity                            cell_similarity,
-    const Quadrature<dim> &                                     quadrature,
-    const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+    const Quadrature<dim>                                      &quadrature,
+    const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
     internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
       &output_data) const override;
 

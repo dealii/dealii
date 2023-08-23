@@ -70,7 +70,7 @@ template <int dim, int spacedim>
 void
 output_grid(
   const std::vector<std::shared_ptr<const Triangulation<dim, spacedim>>> &trias,
-  const std::string &                                                     label)
+  const std::string                                                      &label)
 {
   deallog.push(label);
   const auto comm    = trias.front()->get_communicator();

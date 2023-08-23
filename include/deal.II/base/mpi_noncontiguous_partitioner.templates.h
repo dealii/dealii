@@ -36,7 +36,7 @@ namespace Utilities
     void
     NoncontiguousPartitioner::export_to_ghosted_array(
       const ArrayView<const Number> &src,
-      const ArrayView<Number> &      dst) const
+      const ArrayView<Number>       &dst) const
     {
       // allocate internal memory since needed
       if (requests.size() != send_ranks.size() + recv_ranks.size())
@@ -61,9 +61,9 @@ namespace Utilities
     NoncontiguousPartitioner::export_to_ghosted_array(
       const unsigned int             communication_channel,
       const ArrayView<const Number> &locally_owned_array,
-      const ArrayView<Number> &      temporary_storage,
-      const ArrayView<Number> &      ghost_array,
-      std::vector<MPI_Request> &     requests) const
+      const ArrayView<Number>       &temporary_storage,
+      const ArrayView<Number>       &ghost_array,
+      std::vector<MPI_Request>      &requests) const
     {
       this->template export_to_ghosted_array_start<Number>(
         communication_channel,
@@ -82,8 +82,8 @@ namespace Utilities
     NoncontiguousPartitioner::export_to_ghosted_array_start(
       const unsigned int             communication_channel,
       const ArrayView<const Number> &src,
-      const ArrayView<Number> &      buffers,
-      std::vector<MPI_Request> &     requests) const
+      const ArrayView<Number>       &buffers,
+      std::vector<MPI_Request>      &requests) const
     {
 #ifndef DEAL_II_WITH_MPI
       (void)communication_channel;
@@ -154,8 +154,8 @@ namespace Utilities
     void
     NoncontiguousPartitioner::export_to_ghosted_array_finish(
       const ArrayView<const Number> &buffers,
-      const ArrayView<Number> &      dst,
-      std::vector<MPI_Request> &     requests) const
+      const ArrayView<Number>       &dst,
+      std::vector<MPI_Request>      &requests) const
     {
 #ifndef DEAL_II_WITH_MPI
       (void)buffers;
@@ -194,8 +194,8 @@ namespace Utilities
     void
     NoncontiguousPartitioner::import_from_ghosted_array(
       const VectorOperation::values vector_operation,
-      const ArrayView<Number> &     src,
-      const ArrayView<Number> &     dst) const
+      const ArrayView<Number>      &src,
+      const ArrayView<Number>      &dst) const
     {
       // allocate internal memory since needed
       if (requests.size() != send_ranks.size() + recv_ranks.size())
@@ -222,10 +222,10 @@ namespace Utilities
     NoncontiguousPartitioner::import_from_ghosted_array(
       const VectorOperation::values vector_operation,
       const unsigned int            communication_channel,
-      const ArrayView<Number> &     ghost_array,
-      const ArrayView<Number> &     temporary_storage,
-      const ArrayView<Number> &     locally_owned_array,
-      std::vector<MPI_Request> &    requests) const
+      const ArrayView<Number>      &ghost_array,
+      const ArrayView<Number>      &temporary_storage,
+      const ArrayView<Number>      &locally_owned_array,
+      std::vector<MPI_Request>     &requests) const
     {
       this->template import_from_ghosted_array_start<Number>(
         vector_operation,
@@ -244,9 +244,9 @@ namespace Utilities
     NoncontiguousPartitioner::import_from_ghosted_array_start(
       const VectorOperation::values vector_operation,
       const unsigned int            communication_channel,
-      const ArrayView<Number> &     src,
-      const ArrayView<Number> &     buffers,
-      std::vector<MPI_Request> &    requests) const
+      const ArrayView<Number>      &src,
+      const ArrayView<Number>      &buffers,
+      std::vector<MPI_Request>     &requests) const
     {
 #ifndef DEAL_II_WITH_MPI
       (void)vector_operation;
@@ -317,8 +317,8 @@ namespace Utilities
     NoncontiguousPartitioner::import_from_ghosted_array_finish(
       const VectorOperation::values  vector_operation,
       const ArrayView<const Number> &buffers,
-      const ArrayView<Number> &      dst,
-      std::vector<MPI_Request> &     requests) const
+      const ArrayView<Number>       &dst,
+      std::vector<MPI_Request>      &requests) const
     {
 #ifndef DEAL_II_WITH_MPI
       (void)vector_operation;

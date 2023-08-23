@@ -40,7 +40,7 @@ my(const double t)
 }
 
 void
-test(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> &          solver,
+test(TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>>           &solver,
      std::function<Vector<double>(const double, const Vector<double> &)> f,
      std::function<double(const double)>                                 my)
 {

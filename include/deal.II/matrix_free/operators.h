@@ -255,7 +255,7 @@ namespace MatrixFreeOperators
     void
     initialize(std::shared_ptr<
                  const MatrixFree<dim, value_type, VectorizedArrayType>> data,
-               const MGConstrainedDoFs &        mg_constrained_dofs,
+               const MGConstrainedDoFs         &mg_constrained_dofs,
                const unsigned int               level,
                const std::vector<unsigned int> &selected_row_blocks =
                  std::vector<unsigned int>());
@@ -279,7 +279,7 @@ namespace MatrixFreeOperators
                  const MatrixFree<dim, value_type, VectorizedArrayType>> data_,
                const std::vector<MGConstrainedDoFs> &mg_constrained_dofs,
                const unsigned int                    level,
-               const std::vector<unsigned int> &     selected_row_blocks =
+               const std::vector<unsigned int>      &selected_row_blocks =
                  std::vector<unsigned int>());
 
     /**
@@ -389,7 +389,7 @@ namespace MatrixFreeOperators
      * multiplies the result with the relaxation factor <tt>omega</tt>.
      */
     void
-    precondition_Jacobi(VectorType &      dst,
+    precondition_Jacobi(VectorType       &dst,
                         const VectorType &src,
                         const value_type  omega) const;
 
@@ -482,7 +482,7 @@ namespace MatrixFreeOperators
      * Tvmult_add (@p transpose = true).
      */
     void
-    mult_add(VectorType &      dst,
+    mult_add(VectorType       &dst,
              const VectorType &src,
              const bool        transpose) const;
 
@@ -649,8 +649,8 @@ namespace MatrixFreeOperators
     void
     apply(const AlignedVector<VectorizedArrayType> &inverse_coefficient,
           const unsigned int                        n_actual_components,
-          const VectorizedArrayType *               in_array,
-          VectorizedArrayType *                     out_array) const;
+          const VectorizedArrayType                *in_array,
+          VectorizedArrayType                      *out_array) const;
 
     /**
      * Applies the inverse @ref GlossMassMatrix "mass matrix" operation on an input array, using the
@@ -665,7 +665,7 @@ namespace MatrixFreeOperators
      */
     void
     apply(const VectorizedArrayType *in_array,
-          VectorizedArrayType *      out_array) const;
+          VectorizedArrayType       *out_array) const;
 
     /**
      * This operation applies the inverse @ref GlossMassMatrix "mass matrix"
@@ -681,9 +681,9 @@ namespace MatrixFreeOperators
      */
     void
     apply(const AlignedVector<Tensor<2, n_components, VectorizedArrayType>>
-            &                        inverse_dyadic_coefficients,
+                                    &inverse_dyadic_coefficients,
           const VectorizedArrayType *in_array,
-          VectorizedArrayType *      out_array) const;
+          VectorizedArrayType       *out_array) const;
 
     /**
      * This operation performs a projection from the data given in quadrature
@@ -831,9 +831,9 @@ namespace MatrixFreeOperators
     void
     local_apply_cell(
       const MatrixFree<dim, value_type, VectorizedArrayType> &data,
-      VectorType &                                            dst,
-      const VectorType &                                      src,
-      const std::pair<unsigned int, unsigned int> &           cell_range) const;
+      VectorType                                             &dst,
+      const VectorType                                       &src,
+      const std::pair<unsigned int, unsigned int>            &cell_range) const;
 
     /**
      * A shared pointer to a diagonal matrix that stores the
@@ -981,9 +981,9 @@ namespace MatrixFreeOperators
     void
     local_apply_cell(
       const MatrixFree<dim, value_type, VectorizedArrayType> &data,
-      VectorType &                                            dst,
-      const VectorType &                                      src,
-      const std::pair<unsigned int, unsigned int> &           cell_range) const;
+      VectorType                                             &dst,
+      const VectorType                                       &src,
+      const std::pair<unsigned int, unsigned int>            &cell_range) const;
 
     /**
      * Apply diagonal part of the Laplace operator on a cell.
@@ -991,7 +991,7 @@ namespace MatrixFreeOperators
     void
     local_diagonal_cell(
       const MatrixFree<dim, value_type, VectorizedArrayType> &data,
-      VectorType &                                            dst,
+      VectorType                                             &dst,
       const VectorType &,
       const std::pair<unsigned int, unsigned int> &cell_range) const;
 
@@ -1087,7 +1087,7 @@ namespace MatrixFreeOperators
     n_components,
     Number,
     VectorizedArrayType>::apply(const VectorizedArrayType *in_array,
-                                VectorizedArrayType *      out_array) const
+                                VectorizedArrayType       *out_array) const
   {
     if (fe_degree > -1)
       internal::CellwiseInverseMassMatrixImplBasic<dim, VectorizedArrayType>::
@@ -1112,8 +1112,8 @@ namespace MatrixFreeOperators
                             VectorizedArrayType>::
     apply(const AlignedVector<VectorizedArrayType> &inverse_coefficients,
           const unsigned int                        n_actual_components,
-          const VectorizedArrayType *               in_array,
-          VectorizedArrayType *                     out_array) const
+          const VectorizedArrayType                *in_array,
+          VectorizedArrayType                      *out_array) const
   {
     if (fe_degree > -1)
       internal::CellwiseInverseMassMatrixImplFlexible<
@@ -1147,9 +1147,9 @@ namespace MatrixFreeOperators
                             Number,
                             VectorizedArrayType>::
     apply(const AlignedVector<Tensor<2, n_components, VectorizedArrayType>>
-            &                        inverse_dyadic_coefficients,
+                                    &inverse_dyadic_coefficients,
           const VectorizedArrayType *in_array,
-          VectorizedArrayType *      out_array) const
+          VectorizedArrayType       *out_array) const
   {
     const unsigned int unrolled_size =
       inverse_dyadic_coefficients.size() * (n_components * n_components);
@@ -1191,7 +1191,7 @@ namespace MatrixFreeOperators
                             VectorizedArrayType>::
     transform_from_q_points_to_basis(const unsigned int n_actual_components,
                                      const VectorizedArrayType *in_array,
-                                     VectorizedArrayType *      out_array) const
+                                     VectorizedArrayType       *out_array) const
   {
     const auto n_q_points_1d = fe_eval.get_shape_info().data[0].n_q_points_1d;
 
@@ -1358,7 +1358,7 @@ namespace MatrixFreeOperators
   Base<dim, VectorType, VectorizedArrayType>::initialize(
     std::shared_ptr<const MatrixFree<dim, value_type, VectorizedArrayType>>
                                      data_,
-    const MGConstrainedDoFs &        mg_constrained_dofs,
+    const MGConstrainedDoFs         &mg_constrained_dofs,
     const unsigned int               level,
     const std::vector<unsigned int> &given_row_selection)
   {
@@ -1376,7 +1376,7 @@ namespace MatrixFreeOperators
                                           data_,
     const std::vector<MGConstrainedDoFs> &mg_constrained_dofs,
     const unsigned int                    level,
-    const std::vector<unsigned int> &     given_row_selection)
+    const std::vector<unsigned int>      &given_row_selection)
   {
     AssertThrow(level != numbers::invalid_unsigned_int,
                 ExcMessage("level is not set"));
@@ -1460,7 +1460,7 @@ namespace MatrixFreeOperators
 
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
-  Base<dim, VectorType, VectorizedArrayType>::vmult(VectorType &      dst,
+  Base<dim, VectorType, VectorizedArrayType>::vmult(VectorType       &dst,
                                                     const VectorType &src) const
   {
     using Number =
@@ -1474,7 +1474,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::vmult_add(
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src) const
   {
     mult_add(dst, src, false);
@@ -1485,7 +1485,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::Tvmult_add(
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src) const
   {
     mult_add(dst, src, true);
@@ -1538,7 +1538,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::preprocess_constraints(
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src) const
   {
     using Number =
@@ -1568,7 +1568,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::mult_add(
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src,
     const bool        transpose) const
   {
@@ -1588,7 +1588,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::postprocess_constraints(
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src) const
   {
     for (unsigned int j = 0; j < BlockHelper::n_blocks(dst); ++j)
@@ -1622,7 +1622,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::vmult_interface_down(
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src) const
   {
     using Number =
@@ -1676,7 +1676,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::vmult_interface_up(
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src) const
   {
     using Number =
@@ -1717,7 +1717,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::Tvmult(
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src) const
   {
     using Number =
@@ -1778,7 +1778,7 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::Tapply_add(
-    VectorType &      dst,
+    VectorType       &dst,
     const VectorType &src) const
   {
     apply_add(dst, src);
@@ -1789,8 +1789,8 @@ namespace MatrixFreeOperators
   template <int dim, typename VectorType, typename VectorizedArrayType>
   void
   Base<dim, VectorType, VectorizedArrayType>::precondition_Jacobi(
-    VectorType &                                                          dst,
-    const VectorType &                                                    src,
+    VectorType                                                           &dst,
+    const VectorType                                                     &src,
     const typename Base<dim, VectorType, VectorizedArrayType>::value_type omega)
     const
   {
@@ -1833,7 +1833,7 @@ namespace MatrixFreeOperators
   template <typename OperatorType>
   template <typename VectorType>
   void
-  MGInterfaceOperator<OperatorType>::vmult(VectorType &      dst,
+  MGInterfaceOperator<OperatorType>::vmult(VectorType       &dst,
                                            const VectorType &src) const
   {
 #ifndef DEAL_II_MSVC
@@ -1853,7 +1853,7 @@ namespace MatrixFreeOperators
   template <typename OperatorType>
   template <typename VectorType>
   void
-  MGInterfaceOperator<OperatorType>::Tvmult(VectorType &      dst,
+  MGInterfaceOperator<OperatorType>::Tvmult(VectorType       &dst,
                                             const VectorType &src) const
   {
 #ifndef DEAL_II_MSVC
@@ -2104,7 +2104,7 @@ namespace MatrixFreeOperators
                n_q_points_1d,
                n_components,
                VectorType,
-               VectorizedArrayType>::apply_add(VectorType &      dst,
+               VectorizedArrayType>::apply_add(VectorType       &dst,
                                                const VectorType &src) const
   {
     Base<dim, VectorType, VectorizedArrayType>::data->cell_loop(
@@ -2130,9 +2130,9 @@ namespace MatrixFreeOperators
       const MatrixFree<
         dim,
         typename Base<dim, VectorType, VectorizedArrayType>::value_type,
-        VectorizedArrayType> &                     data,
-      VectorType &                                 dst,
-      const VectorType &                           src,
+        VectorizedArrayType>                      &data,
+      VectorType                                  &dst,
+      const VectorType                            &src,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     using Number =
@@ -2299,7 +2299,7 @@ namespace MatrixFreeOperators
                   n_q_points_1d,
                   n_components,
                   VectorType,
-                  VectorizedArrayType>::apply_add(VectorType &      dst,
+                  VectorizedArrayType>::apply_add(VectorType       &dst,
                                                   const VectorType &src) const
   {
     Base<dim, VectorType, VectorizedArrayType>::data->cell_loop(
@@ -2405,9 +2405,9 @@ namespace MatrixFreeOperators
       const MatrixFree<
         dim,
         typename Base<dim, VectorType, VectorizedArrayType>::value_type,
-        VectorizedArrayType> &                     data,
-      VectorType &                                 dst,
-      const VectorType &                           src,
+        VectorizedArrayType>                      &data,
+      VectorType                                  &dst,
+      const VectorType                            &src,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     using Number =
@@ -2447,7 +2447,7 @@ namespace MatrixFreeOperators
         dim,
         typename Base<dim, VectorType, VectorizedArrayType>::value_type,
         VectorizedArrayType> &data,
-      VectorType &            dst,
+      VectorType             &dst,
       const VectorType &,
       const std::pair<unsigned int, unsigned int> &cell_range) const
   {

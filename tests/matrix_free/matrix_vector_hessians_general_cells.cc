@@ -44,8 +44,8 @@
 
 template <int dim>
 void
-test_hessians(const dealii::FE_Poly<dim> &                   fe,
-              const dealii::Quadrature<dim> &                quad,
+test_hessians(const dealii::FE_Poly<dim>                    &fe,
+              const dealii::Quadrature<dim>                 &quad,
               const dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
 {
   using namespace dealii;

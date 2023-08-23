@@ -31,7 +31,7 @@
 
 template <typename Stream, int dim>
 void
-print_triangulation_data(Stream &                  stream,
+print_triangulation_data(Stream                   &stream,
                          const Triangulation<dim> &triangulation)
 {
   // Boundary id count

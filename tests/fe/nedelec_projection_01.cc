@@ -48,7 +48,7 @@ public:
 
   void
   vector_value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Vector<double>> &  values) const override
+                    std::vector<Vector<double>>   &values) const override
   {
     for (unsigned int i = 0; i < points.size(); ++i)
       {

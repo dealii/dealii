@@ -96,14 +96,14 @@ namespace Step22
 
     void
     divergence_velocity(const BlockVector<double> &calc_solution,
-                        Vector<double> &           output_vector,
-                        const Quadrature<dim> &    quadrature,
+                        Vector<double>            &output_vector,
+                        const Quadrature<dim>     &quadrature,
                         bool                       norm);
 
     const unsigned int degree;
 
     Triangulation<dim> triangulation;
-    FESystem<dim> &    fe;
+    FESystem<dim>     &fe;
     DoFHandler<dim>    dof_handler;
 
     AffineConstraints<double> constraints;
@@ -142,7 +142,7 @@ namespace Step22
 
   template <int dim>
   double
-  ExactSolution<dim>::value(const Point<dim> & p,
+  ExactSolution<dim>::value(const Point<dim>  &p,
                             const unsigned int component) const
   {
     Assert(component < this->n_components,
@@ -176,7 +176,7 @@ namespace Step22
 
   template <int dim>
   Tensor<1, dim>
-  ExactSolution<dim>::gradient(const Point<dim> & p,
+  ExactSolution<dim>::gradient(const Point<dim>  &p,
                                const unsigned int component) const
   {
     Assert(component < this->n_components,
@@ -226,7 +226,7 @@ namespace Step22
 
   template <int dim>
   double
-  ExactSolution<dim>::laplacian(const Point<dim> & p,
+  ExactSolution<dim>::laplacian(const Point<dim>  &p,
                                 const unsigned int component) const
   {
     Assert(component < this->n_components,
@@ -268,7 +268,7 @@ namespace Step22
 
   template <int dim>
   double
-  JumpFunction<dim>::jump(const Point<dim> &    p,
+  JumpFunction<dim>::jump(const Point<dim>     &p,
                           const Tensor<1, dim> &normal) const
   {
     double x = p[0];
@@ -299,7 +299,7 @@ namespace Step22
 
   template <int dim>
   double
-  RightHandSide<dim>::value(const Point<dim> & p,
+  RightHandSide<dim>::value(const Point<dim>  &p,
                             const unsigned int component) const
   {
     Assert(component < this->n_components,
@@ -329,7 +329,7 @@ namespace Step22
 
   template <class Matrix, class Preconditioner>
   InverseMatrix<Matrix, Preconditioner>::InverseMatrix(
-    const Matrix &        m,
+    const Matrix         &m,
     const Preconditioner &preconditioner)
     : matrix(&m)
     , preconditioner(&preconditioner)
@@ -337,7 +337,7 @@ namespace Step22
 
   template <class Matrix, class Preconditioner>
   void
-  InverseMatrix<Matrix, Preconditioner>::vmult(Vector<double> &      dst,
+  InverseMatrix<Matrix, Preconditioner>::vmult(Vector<double>       &dst,
                                                const Vector<double> &src) const
   {
     SolverControl solver_control(src.size(), 1e-6 * src.l2_norm());
@@ -358,7 +358,7 @@ namespace Step22
   {
   public:
     SchurComplement(
-      const BlockSparseMatrix<double> &                          system_matrix,
+      const BlockSparseMatrix<double>                           &system_matrix,
       const InverseMatrix<SparseMatrix<double>, Preconditioner> &A_inverse);
 
     void
@@ -377,7 +377,7 @@ namespace Step22
 
   template <class Preconditioner>
   SchurComplement<Preconditioner>::SchurComplement(
-    const BlockSparseMatrix<double> &                          system_matrix,
+    const BlockSparseMatrix<double>                           &system_matrix,
     const InverseMatrix<SparseMatrix<double>, Preconditioner> &A_inverse)
     : system_matrix(&system_matrix)
     , A_inverse(&A_inverse)
@@ -388,7 +388,7 @@ namespace Step22
 
   template <class Preconditioner>
   void
-  SchurComplement<Preconditioner>::vmult(Vector<double> &      dst,
+  SchurComplement<Preconditioner>::vmult(Vector<double>       &dst,
                                          const Vector<double> &src) const
   {
     system_matrix->block(0, 1).vmult(tmp1, src);
@@ -398,7 +398,7 @@ namespace Step22
 
   template <int dim>
   StokesProblem<dim>::StokesProblem(const unsigned int degree,
-                                    FESystem<dim> &    fe_)
+                                    FESystem<dim>     &fe_)
     : degree(degree)
     , triangulation(Triangulation<dim>::maximum_smoothing)
     , fe(fe_)
@@ -911,8 +911,8 @@ namespace Step22
   void
   StokesProblem<dim>::divergence_velocity(
     const BlockVector<double> &calc_solution,
-    Vector<double> &           output_vector,
-    const Quadrature<dim> &    quadrature,
+    Vector<double>            &output_vector,
+    const Quadrature<dim>     &quadrature,
     bool                       norm)
   {
     output_vector = 0;

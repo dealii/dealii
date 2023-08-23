@@ -57,7 +57,7 @@ namespace Particles
      */
     ParticleIterator(
       const typename particle_container::iterator particles_in_cell,
-      const PropertyPool<dim, spacedim> &         property_pool,
+      const PropertyPool<dim, spacedim>          &property_pool,
       const unsigned int                          particle_index_within_cell);
 
     /**
@@ -163,7 +163,7 @@ namespace Particles
   template <int dim, int spacedim>
   inline ParticleIterator<dim, spacedim>::ParticleIterator(
     const typename particle_container::iterator particles_in_cell,
-    const PropertyPool<dim, spacedim> &         property_pool,
+    const PropertyPool<dim, spacedim>          &property_pool,
     const unsigned int                          particle_index_within_cell)
     : accessor(particles_in_cell, property_pool, particle_index_within_cell)
   {}
@@ -241,7 +241,7 @@ namespace Particles
   ParticleIterator<dim, spacedim>::operator++(int)
   {
     ParticleIterator tmp(*this);
-                     operator++();
+    operator++();
 
     return tmp;
   }
@@ -263,7 +263,7 @@ namespace Particles
   ParticleIterator<dim, spacedim>::operator--(int)
   {
     ParticleIterator tmp(*this);
-                     operator--();
+    operator--();
 
     return tmp;
   }

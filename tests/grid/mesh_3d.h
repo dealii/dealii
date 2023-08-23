@@ -31,11 +31,11 @@ void
 create_two_cubes(Triangulation<3> &coarse_grid)
 {
   const Point<3>        points[6] = {Point<3>(0, 0, 0),
-                              Point<3>(1, 0, 0),
-                              Point<3>(1, 1, 0),
-                              Point<3>(0, 1, 0),
-                              Point<3>(2, 0, 0),
-                              Point<3>(2, 1, 0)};
+                                     Point<3>(1, 0, 0),
+                                     Point<3>(1, 1, 0),
+                                     Point<3>(0, 1, 0),
+                                     Point<3>(2, 0, 0),
+                                     Point<3>(2, 1, 0)};
   std::vector<Point<3>> vertices;
   for (unsigned int i = 0; i < 6; ++i)
     vertices.push_back(points[i]);
@@ -71,17 +71,17 @@ create_two_cubes(Triangulation<3> &coarse_grid)
 // to store the face rotation (and face flip) in each cell
 
 void
-create_two_cubes_rotation(Triangulation<3> & coarse_grid,
+create_two_cubes_rotation(Triangulation<3>  &coarse_grid,
                           const unsigned int n_rotations)
 {
   Assert(n_rotations < 4, ExcNotImplemented());
 
   const Point<3>        points[6] = {Point<3>(0, 0, 0),
-                              Point<3>(1, 0, 0),
-                              Point<3>(1, 1, 0),
-                              Point<3>(0, 1, 0),
-                              Point<3>(2, 0, 0),
-                              Point<3>(2, 1, 0)};
+                                     Point<3>(1, 0, 0),
+                                     Point<3>(1, 1, 0),
+                                     Point<3>(0, 1, 0),
+                                     Point<3>(2, 0, 0),
+                                     Point<3>(2, 1, 0)};
   std::vector<Point<3>> vertices;
   for (unsigned int i = 0; i < 6; ++i)
     vertices.push_back(points[i]);

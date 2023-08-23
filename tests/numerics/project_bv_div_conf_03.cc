@@ -51,7 +51,7 @@ public:
   {}
 
   virtual double
-  value(const Point<dim> & point,
+  value(const Point<dim>  &point,
         const unsigned int component = 0) const override
   {
     Assert(component < dim, ExcNotImplemented());
@@ -69,7 +69,7 @@ public:
   {}
 
   virtual double
-  value(const Point<dim> & point,
+  value(const Point<dim>  &point,
         const unsigned int component = 0) const override
   {
     Assert(component < dim, ExcNotImplemented());
@@ -89,7 +89,7 @@ public:
   // To make interpolate_boundary_values happy, the pressure is assigned to
   // the 2*dim + 1th component
   virtual double
-  value(const Point<dim> & point,
+  value(const Point<dim>  &point,
         const unsigned int component = 0) const override
   {
     if (component != 2 * dim)

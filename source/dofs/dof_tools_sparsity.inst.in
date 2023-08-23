@@ -18,11 +18,11 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS)
     template void DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,
                                                            deal_II_dimension,
                                                            scalar>(
-      const DoFHandler<deal_II_dimension> &                        dof,
+      const DoFHandler<deal_II_dimension>                         &dof,
       const std::map<types::boundary_id,
                      const Function<deal_II_dimension, scalar> *> &boundary_ids,
       const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-      SparsityPatternBase &                       sparsity);
+      SparsityPatternBase                        &sparsity);
 
 #if deal_II_dimension < 3
 
@@ -33,9 +33,9 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS)
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
       const std::map<types::boundary_id,
                      const Function<deal_II_dimension + 1, scalar> *>
-        &                                         boundary_ids,
+                                                 &boundary_ids,
       const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-      SparsityPatternBase &                       sparsity);
+      SparsityPatternBase                        &sparsity);
 
 #endif
 
@@ -47,9 +47,9 @@ for (scalar : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS)
       const DoFHandler<deal_II_dimension, deal_II_dimension + 2> &dof,
       const std::map<types::boundary_id,
                      const Function<deal_II_dimension + 2, scalar> *>
-        &                                         boundary_ids,
+                                                 &boundary_ids,
       const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
-      SparsityPatternBase &                       sparsity);
+      SparsityPatternBase                        &sparsity);
 #endif
   }
 
@@ -58,7 +58,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
     template void
     DoFTools::make_sparsity_pattern<deal_II_dimension, deal_II_dimension>(
       const DoFHandler<deal_II_dimension, deal_II_dimension> &dof,
-      SparsityPatternBase &                                   sparsity,
+      SparsityPatternBase                                    &sparsity,
       const AffineConstraints<S> &,
       const bool,
       const types::subdomain_id);
@@ -75,7 +75,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
     template void
     DoFTools::make_flux_sparsity_pattern<deal_II_dimension, deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof,
-      SparsityPatternBase &                sparsity,
+      SparsityPatternBase                 &sparsity,
       const AffineConstraints<S> &,
       const bool,
       const Table<2, Coupling> &,
@@ -88,7 +88,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
     template void
     DoFTools::make_flux_sparsity_pattern<deal_II_dimension, deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof,
-      SparsityPatternBase &                sparsity,
+      SparsityPatternBase                 &sparsity,
       const AffineConstraints<S> &,
       const bool,
       const types::subdomain_id);
@@ -98,7 +98,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
     template void
     DoFTools::make_sparsity_pattern<deal_II_dimension, deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
-      SparsityPatternBase &                                       sparsity,
+      SparsityPatternBase                                        &sparsity,
       const AffineConstraints<S> &,
       const bool,
       const types::subdomain_id);
@@ -115,7 +115,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
     template void DoFTools::make_flux_sparsity_pattern<deal_II_dimension,
                                                        deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
-      SparsityPatternBase &                                       sparsity,
+      SparsityPatternBase                                        &sparsity,
       const AffineConstraints<S> &,
       const bool,
       const Table<2, Coupling> &,
@@ -129,7 +129,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
     template void DoFTools::make_flux_sparsity_pattern<deal_II_dimension,
                                                        deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
-      SparsityPatternBase &                                       sparsity,
+      SparsityPatternBase                                        &sparsity,
       const AffineConstraints<S> &,
       const bool,
       const types::subdomain_id);
@@ -140,7 +140,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
 
     template void DoFTools::make_sparsity_pattern<1, 3>(
       const DoFHandler<1, 3> &dof,
-      SparsityPatternBase &   sparsity,
+      SparsityPatternBase    &sparsity,
       const AffineConstraints<S> &,
       const bool,
       const types::subdomain_id);
@@ -155,7 +155,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
 
     template void DoFTools::make_flux_sparsity_pattern<1, 3>(
       const DoFHandler<1, 3> &dof,
-      SparsityPatternBase &   sparsity,
+      SparsityPatternBase    &sparsity,
       const AffineConstraints<S> &,
       const bool,
       const Table<2, Coupling> &,
@@ -167,7 +167,7 @@ for (deal_II_dimension : DIMENSIONS; S : REAL_AND_COMPLEX_SCALARS)
 
     template void DoFTools::make_flux_sparsity_pattern<1, 3>(
       const DoFHandler<1, 3> &dof,
-      SparsityPatternBase &   sparsity,
+      SparsityPatternBase    &sparsity,
       const AffineConstraints<S> &,
       const bool,
       const types::subdomain_id);
@@ -181,7 +181,7 @@ for (deal_II_dimension : DIMENSIONS)
     DoFTools::make_sparsity_pattern<deal_II_dimension, deal_II_dimension>(
       const DoFHandler<deal_II_dimension, deal_II_dimension> &dof_row,
       const DoFHandler<deal_II_dimension, deal_II_dimension> &dof_col,
-      SparsityPatternBase &                                   sparsity);
+      SparsityPatternBase                                    &sparsity);
 
     template void DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,
                                                            deal_II_dimension>(
@@ -196,7 +196,7 @@ for (deal_II_dimension : DIMENSIONS)
     template void
     DoFTools::make_flux_sparsity_pattern<deal_II_dimension, deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof,
-      SparsityPatternBase &                sparsity,
+      SparsityPatternBase                 &sparsity,
       const Table<2, Coupling> &,
       const Table<2, Coupling> &,
       const types::subdomain_id);
@@ -206,12 +206,12 @@ for (deal_II_dimension : DIMENSIONS)
     template void DoFTools::make_flux_sparsity_pattern<deal_II_dimension,
                                                        deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
-      SparsityPatternBase &                                       sparsity);
+      SparsityPatternBase                                        &sparsity);
 
     template void DoFTools::make_flux_sparsity_pattern<deal_II_dimension,
                                                        deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof,
-      SparsityPatternBase &                                       sparsity,
+      SparsityPatternBase                                        &sparsity,
       const Table<2, Coupling> &,
       const Table<2, Coupling> &,
       const types::subdomain_id);
@@ -220,7 +220,7 @@ for (deal_II_dimension : DIMENSIONS)
     DoFTools::make_sparsity_pattern<deal_II_dimension, deal_II_dimension + 1>(
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_row,
       const DoFHandler<deal_II_dimension, deal_II_dimension + 1> &dof_col,
-      SparsityPatternBase &                                       sparsity);
+      SparsityPatternBase                                        &sparsity);
 
     template void
     DoFTools::make_boundary_sparsity_pattern<deal_II_dimension,
@@ -237,7 +237,7 @@ for (deal_II_dimension : DIMENSIONS)
     template void DoFTools::make_sparsity_pattern<1, 3>(
       const DoFHandler<1, 3> &dof_row,
       const DoFHandler<1, 3> &dof_col,
-      SparsityPatternBase &   sparsity);
+      SparsityPatternBase    &sparsity);
 
     template void DoFTools::make_boundary_sparsity_pattern<1, 3>(
       const DoFHandler<1, 3> &dof,
@@ -249,7 +249,7 @@ for (deal_II_dimension : DIMENSIONS)
 
     template void DoFTools::make_flux_sparsity_pattern<1, 3>(
       const DoFHandler<1, 3> &dof,
-      SparsityPatternBase &   sparsity,
+      SparsityPatternBase    &sparsity,
       const Table<2, Coupling> &,
       const Table<2, Coupling> &,
       const types::subdomain_id);
@@ -262,10 +262,10 @@ for (deal_II_dimension : DIMENSIONS)
     template Table<2, DoFTools::Coupling>
     DoFTools::dof_couplings_from_component_couplings(
       const FiniteElement<deal_II_dimension> &fe,
-      const Table<2, DoFTools::Coupling> &    component_couplings);
+      const Table<2, DoFTools::Coupling>     &component_couplings);
 
     template std::vector<Table<2, DoFTools::Coupling>>
     DoFTools::dof_couplings_from_component_couplings(
       const hp::FECollection<deal_II_dimension> &fe,
-      const Table<2, DoFTools::Coupling> &       component_couplings);
+      const Table<2, DoFTools::Coupling>        &component_couplings);
   }

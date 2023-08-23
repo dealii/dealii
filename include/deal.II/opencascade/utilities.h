@@ -152,7 +152,7 @@ namespace OpenCASCADE
    */
   void
   write_STL(const TopoDS_Shape &shape,
-            const std::string & filename,
+            const std::string  &filename,
             const double        deflection,
             const bool          sew_different_faces = false,
             const double        sewer_tolerance     = 1e-6,
@@ -237,7 +237,7 @@ namespace OpenCASCADE
   template <int dim>
   TopoDS_Edge
   interpolation_curve(std::vector<Point<dim>> &curve_points,
-                      const Tensor<1, dim> &   direction = Tensor<1, dim>(),
+                      const Tensor<1, dim>    &direction = Tensor<1, dim>(),
                       const bool               closed    = false,
                       const double             tolerance = 1e-7);
 
@@ -247,9 +247,9 @@ namespace OpenCASCADE
    * shape, the respective container will be empty.
    */
   void
-  extract_geometrical_shapes(const TopoDS_Shape &        shape,
-                             std::vector<TopoDS_Face> &  faces,
-                             std::vector<TopoDS_Edge> &  edges,
+  extract_geometrical_shapes(const TopoDS_Shape         &shape,
+                             std::vector<TopoDS_Face>   &faces,
+                             std::vector<TopoDS_Edge>   &edges,
                              std::vector<TopoDS_Vertex> &vertices);
 
   /**
@@ -266,7 +266,7 @@ namespace OpenCASCADE
    */
   template <int spacedim>
   void
-  create_triangulation(const TopoDS_Face &         face,
+  create_triangulation(const TopoDS_Face          &face,
                        Triangulation<2, spacedim> &tria);
 
 
@@ -292,7 +292,7 @@ namespace OpenCASCADE
   std::vector<TopoDS_Edge>
   create_curves_from_triangulation_boundary(
     const Triangulation<2, spacedim> &triangulation,
-    const Mapping<2, spacedim> &      mapping =
+    const Mapping<2, spacedim>       &mapping =
       StaticMappingQ1<2, spacedim>::mapping);
 
   /**
@@ -301,12 +301,12 @@ namespace OpenCASCADE
    * compound, the respective container will be empty.
    */
   void
-  extract_compound_shapes(const TopoDS_Shape &           shape,
-                          std::vector<TopoDS_Compound> & compounds,
+  extract_compound_shapes(const TopoDS_Shape            &shape,
+                          std::vector<TopoDS_Compound>  &compounds,
                           std::vector<TopoDS_CompSolid> &compsolids,
-                          std::vector<TopoDS_Solid> &    solids,
-                          std::vector<TopoDS_Shell> &    shells,
-                          std::vector<TopoDS_Wire> &     wires);
+                          std::vector<TopoDS_Solid>     &solids,
+                          std::vector<TopoDS_Shell>     &shells,
+                          std::vector<TopoDS_Wire>      &wires);
 
   /**
    * Project the point @p origin on the topological shape given by @p
@@ -325,7 +325,7 @@ namespace OpenCASCADE
   template <int dim>
   std::tuple<Point<dim>, TopoDS_Shape, double, double>
   project_point_and_pull_back(const TopoDS_Shape &in_shape,
-                              const Point<dim> &  origin,
+                              const Point<dim>   &origin,
                               const double        tolerance = 1e-7);
 
   /**
@@ -337,7 +337,7 @@ namespace OpenCASCADE
   template <int dim>
   Point<dim>
   closest_point(const TopoDS_Shape &in_shape,
-                const Point<dim> &  origin,
+                const Point<dim>   &origin,
                 const double        tolerance = 1e-7);
 
   /**
@@ -374,7 +374,7 @@ namespace OpenCASCADE
    */
   std::tuple<Point<3>, Tensor<1, 3>, double, double>
   closest_point_and_differential_forms(const TopoDS_Shape &in_shape,
-                                       const Point<3> &    origin,
+                                       const Point<3>     &origin,
                                        const double        tolerance = 1e-7);
 
 
@@ -387,8 +387,8 @@ namespace OpenCASCADE
    */
   template <int dim>
   Point<dim>
-  line_intersection(const TopoDS_Shape &  in_shape,
-                    const Point<dim> &    origin,
+  line_intersection(const TopoDS_Shape   &in_shape,
+                    const Point<dim>     &origin,
                     const Tensor<1, dim> &direction,
                     const double          tolerance = 1e-7);
 
@@ -421,8 +421,8 @@ namespace OpenCASCADE
    */
   template <int dim>
   bool
-  point_compare(const Point<dim> &    p1,
-                const Point<dim> &    p2,
+  point_compare(const Point<dim>     &p1,
+                const Point<dim>     &p2,
                 const Tensor<1, dim> &direction = Tensor<1, dim>(),
                 const double          tolerance = 1e-10);
 

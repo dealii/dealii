@@ -84,7 +84,7 @@ namespace nonlinear_solver_selector_test
     setup_system(const bool initial_step);
     void
     solve(const Vector<double> &rhs,
-          Vector<double> &      solution,
+          Vector<double>       &solution,
           const double          tolerance);
     void
     refine_mesh();
@@ -96,7 +96,7 @@ namespace nonlinear_solver_selector_test
     compute_and_factorize_jacobian(const Vector<double> &evaluation_point);
     void
     compute_residual(const Vector<double> &evaluation_point,
-                     Vector<double> &      residual);
+                     Vector<double>       &residual);
 
     Triangulation<dim> triangulation;
 
@@ -255,7 +255,7 @@ namespace nonlinear_solver_selector_test
   void
   MinimalSurfaceProblem<dim>::compute_residual(
     const Vector<double> &evaluation_point,
-    Vector<double> &      residual)
+    Vector<double>       &residual)
   {
     deallog << "  Computing residual vector..." << std::flush;
     residual = 0.;
@@ -319,7 +319,7 @@ namespace nonlinear_solver_selector_test
   template <int dim>
   void
   MinimalSurfaceProblem<dim>::solve(const Vector<double> &rhs,
-                                    Vector<double> &      solution,
+                                    Vector<double>       &solution,
                                     const double /*tolerance*/)
   {
     deallog << "  Solving linear system" << std::endl;
@@ -367,7 +367,7 @@ namespace nonlinear_solver_selector_test
       };
 
       nonlinear_solver.residual = [&](const Vector<double> &evaluation_point,
-                                      Vector<double> &      residual) {
+                                      Vector<double>       &residual) {
         compute_residual(evaluation_point, residual);
       };
 
@@ -376,7 +376,7 @@ namespace nonlinear_solver_selector_test
       };
 
       nonlinear_solver.solve_with_jacobian = [&](const Vector<double> &rhs,
-                                                 Vector<double> &      dst,
+                                                 Vector<double>       &dst,
                                                  const double tolerance) {
         solve(rhs, dst, tolerance);
       };

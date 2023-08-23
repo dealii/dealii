@@ -45,9 +45,9 @@
 template <int dim, typename number, int spacedim>
 void
 reinit_vector_by_blocks(
-  const dealii::DoFHandler<dim, spacedim> &          mg_dof,
-  MGLevelObject<BlockVector<number>> &               v,
-  const std::vector<bool> &                          sel,
+  const dealii::DoFHandler<dim, spacedim>           &mg_dof,
+  MGLevelObject<BlockVector<number>>                &v,
+  const std::vector<bool>                           &sel,
   std::vector<std::vector<types::global_dof_index>> &ndofs)
 {
   std::vector<bool> selected = sel;
@@ -82,8 +82,8 @@ reinit_vector_by_blocks(
 
 template <int dim>
 void
-check_block(const FiniteElement<dim> & fe,
-            const std::vector<bool> &  selected,
+check_block(const FiniteElement<dim>  &fe,
+            const std::vector<bool>   &selected,
             const std::vector<double> &factors)
 {
   deallog << fe.get_name() << std::endl << "selected ";

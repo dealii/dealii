@@ -44,7 +44,7 @@ namespace Differentiation
 
     template <typename ReturnType>
     BatchOptimizer<ReturnType>::BatchOptimizer(
-      const enum OptimizerType &    optimization_method,
+      const enum OptimizerType     &optimization_method,
       const enum OptimizationFlags &optimization_flags)
       : BatchOptimizer()
     {
@@ -88,7 +88,7 @@ namespace Differentiation
     template <typename ReturnType>
     void
     BatchOptimizer<ReturnType>::set_optimization_method(
-      const enum OptimizerType &    optimization_method,
+      const enum OptimizerType     &optimization_method,
       const enum OptimizationFlags &optimization_flags)
     {
       Assert(
@@ -444,7 +444,7 @@ namespace Differentiation
     void
     BatchOptimizer<ReturnType>::substitute(
       const SD::types::symbol_vector &symbols,
-      const std::vector<ReturnType> & values) const
+      const std::vector<ReturnType>  &values) const
     {
       // Zip the two vectors and use the other function call
       // This ensures the ordering of the input vectors matches that of the
@@ -457,7 +457,7 @@ namespace Differentiation
     template <typename ReturnType>
     void
     BatchOptimizer<ReturnType>::substitute(
-      const SymEngine::vec_basic &   symbols,
+      const SymEngine::vec_basic    &symbols,
       const std::vector<ReturnType> &values) const
     {
       substitute(SD::Utilities::convert_basic_vector_to_expression_vector(
@@ -542,7 +542,7 @@ namespace Differentiation
     template <typename ReturnType>
     ReturnType
     BatchOptimizer<ReturnType>::extract(
-      const Expression &             func,
+      const Expression              &func,
       const std::vector<ReturnType> &cached_evaluation) const
     {
       // TODO[JPP]: Find a way to fix this bug that crops up in serialization

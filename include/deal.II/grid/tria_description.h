@@ -558,7 +558,7 @@ namespace TriangulationDescription
     create_description_from_triangulation(
       const Triangulation<dim, spacedim> &tria,
       const LinearAlgebra::distributed::Vector<double, MemorySpace::Host>
-        &                                      partition,
+                                              &partition,
       const TriangulationDescription::Settings settings =
         TriangulationDescription::Settings::default_setting);
 
@@ -574,7 +574,7 @@ namespace TriangulationDescription
         &partition,
       const std::vector<
         LinearAlgebra::distributed::Vector<double, MemorySpace::Host>>
-        &                                      mg_partitions,
+                                              &mg_partitions,
       const TriangulationDescription::Settings settings =
         TriangulationDescription::Settings::default_setting);
 
@@ -639,7 +639,7 @@ namespace TriangulationDescription
     Description<dim, spacedim>
     create_description_from_triangulation_in_groups(
       const std::function<void(dealii::Triangulation<dim, spacedim> &)>
-        &                                            serial_grid_generator,
+                                                    &serial_grid_generator,
       const std::function<void(dealii::Triangulation<dim, spacedim> &,
                                const MPI_Comm,
                                const unsigned int)> &serial_grid_partitioner,

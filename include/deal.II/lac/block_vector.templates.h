@@ -169,7 +169,7 @@ BlockVector<Number>::swap(BlockVector<Number> &v)
 
 template <typename Number>
 void
-BlockVector<Number>::print(std::ostream &     out,
+BlockVector<Number>::print(std::ostream      &out,
                            const unsigned int precision,
                            const bool         scientific,
                            const bool         across) const

@@ -43,7 +43,7 @@ namespace SUNDIALS
      */
     template <typename F, typename... Args>
     int
-    call_and_possibly_capture_exception(const F &           f,
+    call_and_possibly_capture_exception(const F            &f,
                                         std::exception_ptr &eptr,
                                         Args &&...args)
     {

@@ -131,14 +131,14 @@ namespace internal
     static void
     evaluate(const unsigned int                     n_components,
              const EvaluationFlags::EvaluationFlags evaluation_flag,
-             const Number *                         values_dofs_actual,
-             FEEvaluationData<dim, Number, false> & fe_eval);
+             const Number                          *values_dofs_actual,
+             FEEvaluationData<dim, Number, false>  &fe_eval);
 
     static void
     integrate(const unsigned int                     n_components,
               const EvaluationFlags::EvaluationFlags integration_flag,
-              Number *                               values_dofs_actual,
-              FEEvaluationData<dim, Number, false> & fe_eval,
+              Number                                *values_dofs_actual,
+              FEEvaluationData<dim, Number, false>  &fe_eval,
               const bool                             add_into_values_array);
 
     static Eval
@@ -177,14 +177,14 @@ namespace internal
     static void
     evaluate(const unsigned int                     n_components,
              const EvaluationFlags::EvaluationFlags evaluation_flag,
-             const Number *                         values_dofs_actual,
-             FEEvaluationData<dim, Number, false> & fe_eval);
+             const Number                          *values_dofs_actual,
+             FEEvaluationData<dim, Number, false>  &fe_eval);
 
     static void
     integrate(const unsigned int                     n_components,
               const EvaluationFlags::EvaluationFlags integration_flag,
-              Number *                               values_dofs_actual,
-              FEEvaluationData<dim, Number, false> & fe_eval,
+              Number                                *values_dofs_actual,
+              FEEvaluationData<dim, Number, false>  &fe_eval,
               const bool                             add_into_values_array);
   };
 
@@ -203,8 +203,8 @@ namespace internal
     static void
     evaluate_or_integrate(
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      Number *                               values_dofs_actual,
-      FEEvaluationData<dim, Number, false> & fe_eval,
+      Number                                *values_dofs_actual,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             add_into_values_array = false);
 
   private:
@@ -222,8 +222,8 @@ namespace internal
     static void
     evaluate_tensor_product_per_component(
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      Number *                               values_dofs_actual,
-      FEEvaluationData<dim, Number, false> & fe_eval,
+      Number                                *values_dofs_actual,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             add_into_values_array,
       std::integral_constant<bool, false>);
 
@@ -231,8 +231,8 @@ namespace internal
     static void
     evaluate_tensor_product_per_component(
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      Number *                               values_dofs_actual,
-      FEEvaluationData<dim, Number, false> & fe_eval,
+      Number                                *values_dofs_actual,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             add_into_values_array,
       std::integral_constant<bool, true>);
   };
@@ -248,8 +248,8 @@ namespace internal
   FEEvaluationImpl<type, dim, fe_degree, n_q_points_1d, Number>::evaluate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
-    const Number *                         values_dofs_actual,
-    FEEvaluationData<dim, Number, false> & fe_eval)
+    const Number                          *values_dofs_actual,
+    FEEvaluationData<dim, Number, false>  &fe_eval)
   {
     if (evaluation_flag == EvaluationFlags::nothing)
       return;
@@ -521,8 +521,8 @@ namespace internal
   FEEvaluationImpl<type, dim, fe_degree, n_q_points_1d, Number>::integrate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags integration_flag,
-    Number *                               values_dofs_actual,
-    FEEvaluationData<dim, Number, false> & fe_eval,
+    Number                                *values_dofs_actual,
+    FEEvaluationData<dim, Number, false>  &fe_eval,
     const bool                             add_into_values_array)
   {
     std::array<const MatrixFreeFunctions::UnivariateShapeData<Number2> *, 3>
@@ -835,8 +835,8 @@ namespace internal
     n_q_points_1d,
     Number>::evaluate(const unsigned int                     n_components,
                       const EvaluationFlags::EvaluationFlags evaluation_flag,
-                      const Number *                         values_dofs_actual,
-                      FEEvaluationData<dim, Number, false> & fe_eval)
+                      const Number                          *values_dofs_actual,
+                      FEEvaluationData<dim, Number, false>  &fe_eval)
   {
     Assert(!(evaluation_flag & EvaluationFlags::hessians), ExcNotImplemented());
 
@@ -854,8 +854,8 @@ namespace internal
     if (evaluation_flag & EvaluationFlags::values)
       {
         const auto *const shape_values = shape_data.front().shape_values.data();
-        auto *            values_quad_ptr        = fe_eval.begin_values();
-        const auto *      values_dofs_actual_ptr = values_dofs_actual;
+        auto             *values_quad_ptr        = fe_eval.begin_values();
+        const auto       *values_dofs_actual_ptr = values_dofs_actual;
 
         Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
         for (unsigned int c = 0; c < n_components; ++c)
@@ -872,7 +872,7 @@ namespace internal
       {
         const auto *const shape_gradients =
           shape_data.front().shape_gradients.data();
-        auto *      gradients_quad_ptr     = fe_eval.begin_gradients();
+        auto       *gradients_quad_ptr     = fe_eval.begin_gradients();
         const auto *values_dofs_actual_ptr = values_dofs_actual;
 
         for (unsigned int c = 0; c < n_components; ++c)
@@ -906,7 +906,7 @@ namespace internal
     n_q_points_1d,
     Number>::integrate(const unsigned int                     n_components,
                        const EvaluationFlags::EvaluationFlags integration_flag,
-                       Number *                              values_dofs_actual,
+                       Number                               *values_dofs_actual,
                        FEEvaluationData<dim, Number, false> &fe_eval,
                        const bool add_into_values_array)
   {
@@ -927,8 +927,8 @@ namespace internal
     if (integration_flag & EvaluationFlags::values)
       {
         const auto *const shape_values = shape_data.front().shape_values.data();
-        auto *            values_quad_ptr        = fe_eval.begin_values();
-        auto *            values_dofs_actual_ptr = values_dofs_actual;
+        auto             *values_quad_ptr        = fe_eval.begin_values();
+        auto             *values_dofs_actual_ptr = values_dofs_actual;
 
         Eval eval(shape_values, nullptr, nullptr, n_dofs, n_q_points);
         for (unsigned int c = 0; c < n_components; ++c)
@@ -989,8 +989,8 @@ namespace internal
                    Number>::
     evaluate_or_integrate(
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      Number *                               values_dofs_actual,
-      FEEvaluationData<dim, Number, false> & fe_eval,
+      Number                                *values_dofs_actual,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             add_into_values_array)
   {
     if (evaluation_flag == EvaluationFlags::nothing)
@@ -1036,8 +1036,8 @@ namespace internal
                    Number>::
     evaluate_tensor_product_per_component(
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      Number *                               values_dofs_actual,
-      FEEvaluationData<dim, Number, false> & fe_eval,
+      Number                                *values_dofs_actual,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             add_into_values_array,
       std::integral_constant<bool, false>)
   {
@@ -1231,8 +1231,8 @@ namespace internal
                    Number>::
     evaluate_tensor_product_per_component(
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      Number *                               values_dofs_actual,
-      FEEvaluationData<dim, Number, false> & fe_eval,
+      Number                                *values_dofs_actual,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             add_into_values_array,
       std::integral_constant<bool, true>)
   {
@@ -1483,8 +1483,8 @@ namespace internal
       static void
       do_forward(const unsigned int            n_components,
                  const AlignedVector<Number2> &transformation_matrix,
-                 const Number *                values_in,
-                 Number *                      values_out,
+                 const Number                 *values_in,
+                 Number                       *values_out,
                  const unsigned int            basis_size_1_variable =
                    numbers::invalid_unsigned_int,
                  const unsigned int basis_size_2_variable =
@@ -1513,8 +1513,8 @@ namespace internal
                              Number,
                              Number2>
                          eval_val(transformation_matrix,
-                 {},
-                 {},
+                                  {},
+                                  {},
                  basis_size_1_variable,
                  basis_size_2_variable);
       const unsigned int np_1 =
@@ -1606,8 +1606,8 @@ namespace internal
       do_backward(const unsigned int            n_components,
                   const AlignedVector<Number2> &transformation_matrix,
                   const bool                    add_into_result,
-                  Number *                      values_in,
-                  Number *                      values_out,
+                  Number                       *values_in,
+                  Number                       *values_out,
                   const unsigned int            basis_size_1_variable =
                     numbers::invalid_unsigned_int,
                   const unsigned int basis_size_2_variable =
@@ -1755,13 +1755,13 @@ namespace internal
     static void
     do_mass(const unsigned int            n_components,
             const AlignedVector<Number2> &transformation_matrix,
-            const AlignedVector<Number> & coefficients,
-            const Number *                values_in,
-            Number *                      scratch_data,
-            Number *                      values_out)
+            const AlignedVector<Number>  &coefficients,
+            const Number                 *values_in,
+            Number                       *scratch_data,
+            Number                       *values_out)
     {
       constexpr int next_dim = dim > 1 ? dim - 1 : dim;
-      Number *      my_scratch =
+      Number       *my_scratch =
         basis_size_1 != basis_size_2 ? scratch_data : values_out;
 
       const unsigned int size_per_component = Utilities::pow(basis_size_2, dim);
@@ -1853,29 +1853,29 @@ namespace internal
     static void
     evaluate(const unsigned int                     n_components,
              const EvaluationFlags::EvaluationFlags evaluation_flag,
-             const Number *                         values_dofs,
-             FEEvaluationData<dim, Number, false> & fe_eval);
+             const Number                          *values_dofs,
+             FEEvaluationData<dim, Number, false>  &fe_eval);
 
     static void
     do_evaluate(const MatrixFreeFunctions::UnivariateShapeData<Number2> &shape,
                 const EvaluationFlags::EvaluationFlags evaluation_flag,
-                const Number *                         values_dofs,
-                Number *                               gradients_quad,
-                Number *                               hessians_quad);
+                const Number                          *values_dofs,
+                Number                                *gradients_quad,
+                Number                                *hessians_quad);
 
     static void
     integrate(const unsigned int                     n_components,
               const EvaluationFlags::EvaluationFlags integration_flag,
-              Number *                               values_dofs,
-              FEEvaluationData<dim, Number, false> & fe_eval,
+              Number                                *values_dofs,
+              FEEvaluationData<dim, Number, false>  &fe_eval,
               const bool                             add_into_values_array);
 
     static void
     do_integrate(const MatrixFreeFunctions::UnivariateShapeData<Number2> &shape,
                  const EvaluationFlags::EvaluationFlags integration_flag,
-                 Number *                               values_dofs,
-                 Number *                               gradients_quad,
-                 const Number *                         hessians_quad,
+                 Number                                *values_dofs,
+                 Number                                *gradients_quad,
+                 const Number                          *hessians_quad,
                  const bool                             add_into_values_array);
   };
 
@@ -1886,8 +1886,8 @@ namespace internal
   FEEvaluationImplCollocation<dim, fe_degree, Number>::evaluate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
-    const Number *                         values_dofs,
-    FEEvaluationData<dim, Number, false> & fe_eval)
+    const Number                          *values_dofs,
+    FEEvaluationData<dim, Number, false>  &fe_eval)
   {
     constexpr std::size_t n_points = Utilities::pow(fe_degree + 1, dim);
 
@@ -1914,9 +1914,9 @@ namespace internal
   FEEvaluationImplCollocation<dim, fe_degree, Number>::do_evaluate(
     const MatrixFreeFunctions::UnivariateShapeData<Number2> &shape,
     const EvaluationFlags::EvaluationFlags                   evaluation_flag,
-    const Number *                                           values_dofs,
-    Number *                                                 gradients_quad,
-    Number *                                                 hessians_quad)
+    const Number                                            *values_dofs,
+    Number                                                  *gradients_quad,
+    Number                                                  *hessians_quad)
   {
     AssertDimension(shape.shape_gradients_collocation_eo.size(),
                     (fe_degree + 2) / 2 * (fe_degree + 1));
@@ -1970,8 +1970,8 @@ namespace internal
   FEEvaluationImplCollocation<dim, fe_degree, Number>::integrate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags integration_flag,
-    Number *                               values_dofs,
-    FEEvaluationData<dim, Number, false> & fe_eval,
+    Number                                *values_dofs,
+    FEEvaluationData<dim, Number, false>  &fe_eval,
     const bool                             add_into_values_array)
   {
     constexpr std::size_t n_points = Utilities::pow(fe_degree + 1, dim);
@@ -2008,9 +2008,9 @@ namespace internal
   FEEvaluationImplCollocation<dim, fe_degree, Number>::do_integrate(
     const MatrixFreeFunctions::UnivariateShapeData<Number2> &shape,
     const EvaluationFlags::EvaluationFlags                   integration_flag,
-    Number *                                                 values_dofs,
-    Number *                                                 gradients_quad,
-    const Number *                                           hessians_quad,
+    Number                                                  *values_dofs,
+    Number                                                  *gradients_quad,
+    const Number                                            *hessians_quad,
     const bool add_into_values_array)
   {
     AssertDimension(shape.shape_gradients_collocation_eo.size(),
@@ -2119,14 +2119,14 @@ namespace internal
     static void
     evaluate(const unsigned int                     n_components,
              const EvaluationFlags::EvaluationFlags evaluation_flag,
-             const Number *                         values_dofs,
-             FEEvaluationData<dim, Number, false> & fe_eval);
+             const Number                          *values_dofs,
+             FEEvaluationData<dim, Number, false>  &fe_eval);
 
     static void
     integrate(const unsigned int                     n_components,
               const EvaluationFlags::EvaluationFlags evaluation_flag,
-              Number *                               values_dofs,
-              FEEvaluationData<dim, Number, false> & fe_eval,
+              Number                                *values_dofs,
+              FEEvaluationData<dim, Number, false>  &fe_eval,
               const bool                             add_into_values_array);
   };
 
@@ -2140,8 +2140,8 @@ namespace internal
     n_q_points_1d,
     Number>::evaluate(const unsigned int                     n_components,
                       const EvaluationFlags::EvaluationFlags evaluation_flag,
-                      const Number *                         values_dofs,
-                      FEEvaluationData<dim, Number, false> & fe_eval)
+                      const Number                          *values_dofs,
+                      FEEvaluationData<dim, Number, false>  &fe_eval)
   {
     const auto &shape_data = fe_eval.get_shape_info().data.front();
 
@@ -2189,8 +2189,8 @@ namespace internal
     n_q_points_1d,
     Number>::integrate(const unsigned int                     n_components,
                        const EvaluationFlags::EvaluationFlags integration_flag,
-                       Number *                               values_dofs,
-                       FEEvaluationData<dim, Number, false> & fe_eval,
+                       Number                                *values_dofs,
+                       FEEvaluationData<dim, Number, false>  &fe_eval,
                        const bool add_into_values_array)
   {
     const auto &shape_data = fe_eval.get_shape_info().data.front();
@@ -2273,8 +2273,8 @@ namespace internal
     static bool
     run(const unsigned int                     n_components,
         const EvaluationFlags::EvaluationFlags evaluation_flag,
-        OtherNumber *                          values_dofs,
-        FEEvaluationData<dim, Number, false> & fe_eval,
+        OtherNumber                           *values_dofs,
+        FEEvaluationData<dim, Number, false>  &fe_eval,
         const bool                             sum_into_values_array = false)
     {
       // `OtherNumber` is either `const Number` (evaluate()) or `Number`
@@ -2408,8 +2408,8 @@ namespace internal
     evaluate_or_integrate(
       const unsigned int                     n_components,
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      const Number *                         values_dofs,
-      FEEvaluationData<dim, Number, false> & fe_eval,
+      const Number                          *values_dofs,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             sum_into_values_array,
       std::integral_constant<bool, false>)
     {
@@ -2423,8 +2423,8 @@ namespace internal
     evaluate_or_integrate(
       const unsigned int                     n_components,
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      Number *                               values_dofs,
-      FEEvaluationData<dim, Number, false> & fe_eval,
+      Number                                *values_dofs,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             sum_into_values_array,
       std::integral_constant<bool, true>)
     {
@@ -2440,8 +2440,8 @@ namespace internal
     evaluate_or_integrate(
       const unsigned int                     n_components,
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      OtherNumber *                          values_dofs,
-      FEEvaluationData<dim, Number, false> & fe_eval,
+      OtherNumber                           *values_dofs,
+      FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             sum_into_values_array)
     {
       evaluate_or_integrate<T>(n_components,
@@ -2513,11 +2513,11 @@ namespace internal
       const unsigned int                                       n_components,
       const EvaluationFlags::EvaluationFlags                   evaluation_flag,
       const MatrixFreeFunctions::UnivariateShapeData<Number2> &data,
-      Number *                                                 values_dofs,
-      Number *                                                 values_quad,
-      Number *                                                 gradients_quad,
-      Number *                                                 hessians_quad,
-      Number *                                                 scratch_data,
+      Number                                                  *values_dofs,
+      Number                                                  *values_quad,
+      Number                                                  *gradients_quad,
+      Number                                                  *hessians_quad,
+      Number                                                  *scratch_data,
       const unsigned int                                       subface_index)
     {
       Eval eval0 = create_evaluator_tensor_product(data, subface_index, 0);
@@ -2713,11 +2713,11 @@ namespace internal
       const unsigned int                                       n_components,
       const EvaluationFlags::EvaluationFlags                   integration_flag,
       const MatrixFreeFunctions::UnivariateShapeData<Number2> &data,
-      Number *                                                 values_dofs,
-      Number *                                                 values_quad,
-      Number *                                                 gradients_quad,
-      Number *                                                 hessians_quad,
-      Number *                                                 scratch_data,
+      Number                                                  *values_dofs,
+      Number                                                  *values_quad,
+      Number                                                  *gradients_quad,
+      Number                                                  *hessians_quad,
+      Number                                                  *scratch_data,
       const unsigned int                                       subface_index)
     {
       Eval eval0 = create_evaluator_tensor_product(data, subface_index, 0);
@@ -2979,9 +2979,9 @@ namespace internal
     static void
     evaluate_or_integrate_in_face(
       const EvaluationFlags::EvaluationFlags evaluation_flag,
-      Number *                               values_dofs,
-      FEEvaluationData<dim, Number, true> &  fe_eval,
-      Number *                               scratch_data,
+      Number                                *values_dofs,
+      FEEvaluationData<dim, Number, true>   &fe_eval,
+      Number                                *scratch_data,
       const unsigned int                     subface_index,
       const unsigned int                     face_no)
     {
@@ -3042,9 +3042,9 @@ namespace internal
     template <int normal_dir>
     static inline void
     evaluate_in_face_apply(
-      Number *                               values_dofs,
-      FEEvaluationData<dim, Number, true> &  fe_eval,
-      Number *                               scratch_data,
+      Number                                *values_dofs,
+      FEEvaluationData<dim, Number, true>   &fe_eval,
+      Number                                *scratch_data,
       const EvaluationFlags::EvaluationFlags evaluation_flag,
       const unsigned int                     face_direction,
       const unsigned int                     subface_index,
@@ -3246,9 +3246,9 @@ namespace internal
     template <int normal_dir>
     static inline void
     evaluate_in_face_apply(
-      Number *                               values_dofs,
-      FEEvaluationData<dim, Number, true> &  fe_eval,
-      Number *                               scratch_data,
+      Number                                *values_dofs,
+      FEEvaluationData<dim, Number, true>   &fe_eval,
+      Number                                *scratch_data,
       const EvaluationFlags::EvaluationFlags evaluation_flag,
       const unsigned int                     face_direction,
       const unsigned int                     subface_index,
@@ -3490,8 +3490,8 @@ namespace internal
     interpolate(const unsigned int                             n_components,
                 const EvaluationFlags::EvaluationFlags         flags,
                 const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
-                const Number *                                 input,
-                Number *                                       output,
+                const Number                                  *input,
+                Number                                        *output,
                 const unsigned int                             face_no)
     {
       Assert(static_cast<unsigned int>(fe_degree) ==
@@ -3523,8 +3523,8 @@ namespace internal
       const unsigned int                             n_components,
       const EvaluationFlags::EvaluationFlags         flags,
       const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
-      const Number *                                 input,
-      Number *                                       output,
+      const Number                                  *input,
+      Number                                        *output,
       const unsigned int                             face_no)
     {
       Assert(static_cast<unsigned int>(fe_degree + 1) ==
@@ -3548,8 +3548,8 @@ namespace internal
     template <bool do_evaluate, bool add_into_output, int face_direction = 0>
     static void
     interpolate_generic(const unsigned int                     n_components,
-                        const Number *                         input,
-                        Number *                               output,
+                        const Number                          *input,
+                        Number                                *output,
                         const EvaluationFlags::EvaluationFlags flag,
                         const unsigned int                     face_no,
                         const unsigned int                     n_points_1d,
@@ -3632,8 +3632,8 @@ namespace internal
     static void
     interpolate_generic_raviart_thomas(
       const unsigned int                             n_components,
-      const Number *                                 input,
-      Number *                                       output,
+      const Number                                  *input,
+      Number                                        *output,
       const EvaluationFlags::EvaluationFlags         flag,
       const unsigned int                             face_no,
       const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info)
@@ -3701,8 +3701,8 @@ namespace internal
     interpolate_generic_raviart_thomas_apply_face(
       const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
       const unsigned int                             face_no,
-      const Number *                                 input,
-      Number *                                       output)
+      const Number                                  *input,
+      Number                                        *output)
     {
       // These types are evaluators in either normal or tangential direction
       // depending on the face direction, with different normal directions for
@@ -3849,8 +3849,8 @@ namespace internal
   // internal helper function for reading data; base version of different types
   template <typename VectorizedArrayType, typename Number2>
   void
-  do_vectorized_gather(const Number2 *      src_ptr,
-                       const unsigned int * indices,
+  do_vectorized_gather(const Number2       *src_ptr,
+                       const unsigned int  *indices,
                        VectorizedArrayType &dst)
   {
     for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -3863,8 +3863,8 @@ namespace internal
   // can use a dedicated gather function
   template <typename Number, std::size_t width>
   void
-  do_vectorized_gather(const Number *                  src_ptr,
-                       const unsigned int *            indices,
+  do_vectorized_gather(const Number                   *src_ptr,
+                       const unsigned int             *indices,
                        VectorizedArray<Number, width> &dst)
   {
     dst.gather(src_ptr, indices);
@@ -3900,8 +3900,8 @@ namespace internal
   template <typename VectorizedArrayType, typename Number2>
   void
   do_vectorized_scatter_add(const VectorizedArrayType src,
-                            const unsigned int *      indices,
-                            Number2 *                 dst_ptr)
+                            const unsigned int       *indices,
+                            Number2                  *dst_ptr)
   {
     for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
       dst_ptr[indices[v]] += src[v];
@@ -3914,8 +3914,8 @@ namespace internal
   template <typename Number, std::size_t width>
   void
   do_vectorized_scatter_add(const VectorizedArray<Number, width> src,
-                            const unsigned int *                 indices,
-                            Number *                             dst_ptr)
+                            const unsigned int                  *indices,
+                            Number                              *dst_ptr)
   {
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512
     for (unsigned int v = 0; v < width; ++v)
@@ -3937,10 +3937,10 @@ namespace internal
                               const unsigned int *orientation,
                               const bool          integrate,
                               const std::size_t   n_q_points,
-                              Number *            tmp_values,
-                              Number *            values_quad,
-                              Number *            gradients_quad,
-                              Number *            hessians_quad)
+                              Number             *tmp_values,
+                              Number             *values_quad,
+                              Number             *gradients_quad,
+                              Number             *hessians_quad)
   {
     for (unsigned int c = 0; c < n_components; ++c)
       {
@@ -3999,13 +3999,13 @@ namespace internal
     const unsigned int                     n_components,
     const unsigned int                     v,
     const EvaluationFlags::EvaluationFlags flag,
-    const unsigned int *                   orientation,
+    const unsigned int                    *orientation,
     const bool                             integrate,
     const std::size_t                      n_q_points,
-    Number *                               tmp_values,
-    VectorizedArrayType *                  values_quad,
-    VectorizedArrayType *                  gradients_quad = nullptr,
-    VectorizedArrayType *                  hessians_quad  = nullptr)
+    Number                                *tmp_values,
+    VectorizedArrayType                   *values_quad,
+    VectorizedArrayType                   *gradients_quad = nullptr,
+    VectorizedArrayType                   *hessians_quad  = nullptr)
   {
     for (unsigned int c = 0; c < n_components; ++c)
       {
@@ -4067,8 +4067,8 @@ namespace internal
     static bool
     run(const unsigned int                     n_components,
         const EvaluationFlags::EvaluationFlags evaluation_flag,
-        const Number *                         values_dofs,
-        FEEvaluationData<dim, Number, true> &  fe_eval)
+        const Number                          *values_dofs,
+        FEEvaluationData<dim, Number, true>   &fe_eval)
     {
       const auto &shape_info = fe_eval.get_shape_info();
       const auto &shape_data = shape_info.data.front();
@@ -4111,7 +4111,7 @@ namespace internal
 
           if (evaluation_flag & EvaluationFlags::gradients)
             {
-              auto *      gradients_quad_ptr     = fe_eval.begin_gradients();
+              auto       *gradients_quad_ptr     = fe_eval.begin_gradients();
               const auto *values_dofs_actual_ptr = values_dofs;
 
               std::array<const Number2 *, dim> shape_gradients;
@@ -4306,8 +4306,8 @@ namespace internal
     static bool
     run(const unsigned int                     n_components,
         const EvaluationFlags::EvaluationFlags integration_flag,
-        Number *                               values_dofs,
-        FEEvaluationData<dim, Number, true> &  fe_eval)
+        Number                                *values_dofs,
+        FEEvaluationData<dim, Number, true>   &fe_eval)
     {
       const auto &shape_info = fe_eval.get_shape_info();
       const auto &shape_data = shape_info.data.front();
@@ -4545,13 +4545,13 @@ namespace internal
             const bool check_face_orientations = false>
   void
   fe_face_evaluation_process_and_io(
-    Processor &                            proc,
+    Processor                             &proc,
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
-    typename Processor::Number2_ *         global_vector_ptr,
+    typename Processor::Number2_          *global_vector_ptr,
     const std::vector<ArrayView<const typename Processor::Number2_>> *sm_ptr,
-    const EvaluationData &                                            fe_eval,
-    typename Processor::VectorizedArrayType_ *                        temp1)
+    const EvaluationData                                             &fe_eval,
+    typename Processor::VectorizedArrayType_                         *temp1)
   {
     constexpr int dim         = Processor::dim_;
     constexpr int fe_degree   = Processor::fe_degree_;
@@ -4561,10 +4561,10 @@ namespace internal
     using Number   = typename Processor::Number_;
     using Number2_ = typename Processor::Number2_;
 
-    const auto &       shape_data = fe_eval.get_shape_info().data.front();
+    const auto        &shape_data = fe_eval.get_shape_info().data.front();
     constexpr bool     integrate  = Processor::do_integrate;
     const unsigned int face_no    = fe_eval.get_face_no();
-    const auto &       dof_info   = fe_eval.get_dof_info();
+    const auto        &dof_info   = fe_eval.get_dof_info();
     const unsigned int cell       = fe_eval.get_cell_or_face_batch_id();
     const MatrixFreeFunctions::DoFInfo::DoFAccessIndex dof_access_index =
       fe_eval.get_dof_access_index();
@@ -5119,8 +5119,8 @@ namespace internal
     static bool
     run(const unsigned int                                n_components,
         const EvaluationFlags::EvaluationFlags            evaluation_flag,
-        const Number2 *                                   src_ptr,
-        const std::vector<ArrayView<const Number2>> *     sm_ptr,
+        const Number2                                    *src_ptr,
+        const std::vector<ArrayView<const Number2>>      *sm_ptr,
         FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval)
     {
       Assert(fe_degree > -1, ExcInternalError());
@@ -5231,8 +5231,8 @@ namespace internal
     template <typename Number3>
     static bool
     supports(const EvaluationFlags::EvaluationFlags             evaluation_flag,
-             const MatrixFreeFunctions::ShapeInfo<Number3> &    shape_info,
-             const Number2 *                                    vector_ptr,
+             const MatrixFreeFunctions::ShapeInfo<Number3>     &shape_info,
+             const Number2                                     *vector_ptr,
              MatrixFreeFunctions::DoFInfo::IndexStorageVariants storage)
     {
       const unsigned int fe_degree = shape_info.data.front().fe_degree;
@@ -5265,8 +5265,8 @@ namespace internal
 
       template <typename T0, typename T1, typename T2>
       void
-      hermite_grad_vectorized(T0 &      temp_1,
-                              T0 &      temp_2,
+      hermite_grad_vectorized(T0       &temp_1,
+                              T0       &temp_2,
                               const T1  src_ptr_1,
                               const T1  src_ptr_2,
                               const T2 &grad_weight)
@@ -5285,8 +5285,8 @@ namespace internal
 
       template <typename T0, typename T1, typename T2, typename T3>
       void
-      hermite_grad_vectorized_indexed(T0 &      temp_1,
-                                      T0 &      temp_2,
+      hermite_grad_vectorized_indexed(T0       &temp_1,
+                                      T0       &temp_2,
                                       const T1  src_ptr_1,
                                       const T1  src_ptr_2,
                                       const T2 &grad_weight,
@@ -5307,8 +5307,8 @@ namespace internal
 
       template <typename T0, typename T1, typename T2>
       void
-      hermite_grad(T0 &      temp_1,
-                   T0 &      temp_2,
+      hermite_grad(T0       &temp_1,
+                   T0       &temp_2,
                    const T1 &src_ptr_1,
                    const T1 &src_ptr_2,
                    const T2 &grad_weight)
@@ -5339,8 +5339,8 @@ namespace internal
     static bool
     run(const unsigned int                                n_components,
         const EvaluationFlags::EvaluationFlags            integration_flag,
-        Number2 *                                         dst_ptr,
-        const std::vector<ArrayView<const Number2>> *     sm_ptr,
+        Number2                                          *dst_ptr,
+        const std::vector<ArrayView<const Number2>>      *sm_ptr,
         FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval)
     {
       Assert(fe_degree > -1, ExcInternalError());
@@ -5509,8 +5509,8 @@ namespace internal
       void
       hermite_grad(const T0 &temp_1,
                    const T0 &temp_2,
-                   T1 &      dst_ptr_1,
-                   T1 &      dst_ptr_2,
+                   T1       &dst_ptr_1,
+                   T1       &dst_ptr_2,
                    const T2 &grad_weight)
       {
         // case 3a)
@@ -5546,8 +5546,8 @@ namespace internal
     static bool
     run(const unsigned int                          n_components,
         const FEEvaluationData<dim, Number, false> &fe_eval,
-        const Number *                              in_array,
-        Number *                                    out_array)
+        const Number                               *in_array,
+        Number                                     *out_array)
     {
       const unsigned int given_degree =
         (fe_degree > -1) ? fe_degree :
@@ -5576,7 +5576,7 @@ namespace internal
       for (unsigned int d = 0; d < n_components; ++d)
         {
           const Number *in  = in_array + d * dofs_per_component;
-          Number *      out = out_array + d * dofs_per_component;
+          Number       *out = out_array + d * dofs_per_component;
           // Need to select 'apply' method with hessian slot because values
           // assume symmetries that do not exist in the inverse shapes
           evaluator.template hessians<0, true, false>(in, out);
@@ -5622,10 +5622,10 @@ namespace internal
     static bool
     run(const unsigned int                          n_desired_components,
         const FEEvaluationData<dim, Number, false> &fe_eval,
-        const ArrayView<const Number> &             inverse_coefficients,
+        const ArrayView<const Number>              &inverse_coefficients,
         const bool                                  dyadic_coefficients,
-        const Number *                              in_array,
-        Number *                                    out_array)
+        const Number                               *in_array,
+        Number                                     *out_array)
     {
       const unsigned int given_degree =
         (fe_degree > -1) ? fe_degree :
@@ -5670,7 +5670,7 @@ namespace internal
                   given_degree + 1);
 
       const Number *in  = in_array;
-      Number *      out = out_array;
+      Number       *out = out_array;
 
       const Number *inv_coefficient = inverse_coefficients.data();
 
@@ -5686,7 +5686,7 @@ namespace internal
           for (unsigned int di = 0; di < n_comp_inner; ++di)
             {
               const Number *in_  = in + di * dofs_per_component;
-              Number *      out_ = out + di * dofs_per_component;
+              Number       *out_ = out + di * dofs_per_component;
               evaluator.template hessians<0, true, false>(in_, out_);
               if (dim > 1)
                 evaluator.template hessians<1, true, false>(out_, out_);
@@ -5740,9 +5740,9 @@ namespace internal
   private:
     template <int n_components>
     static inline void
-    vmult(const Number *     inverse_coefficients,
-          const Number *     src,
-          Number *           dst,
+    vmult(const Number      *inverse_coefficients,
+          const Number      *src,
+          Number            *dst,
           const unsigned int dofs_per_component,
           const unsigned int n_given_components = 0)
     {
@@ -5784,8 +5784,8 @@ namespace internal
     static bool
     run(const unsigned int                          n_desired_components,
         const FEEvaluationData<dim, Number, false> &fe_eval,
-        const Number *                              in_array,
-        Number *                                    out_array)
+        const Number                               *in_array,
+        Number                                     *out_array)
     {
       static const bool do_inplace =
         fe_degree > -1 && (fe_degree + 1 == n_q_points_1d);
@@ -5823,7 +5823,7 @@ namespace internal
       for (unsigned int d = 0; d < n_desired_components; ++d)
         {
           const Number *in  = in_array + d * n_q_points;
-          Number *      out = out_array + d * dofs_per_component;
+          Number       *out = out_array + d * dofs_per_component;
 
           auto *temp_1 = do_inplace ? out : fe_eval.get_scratch_data().begin();
           auto *temp_2 = do_inplace ?

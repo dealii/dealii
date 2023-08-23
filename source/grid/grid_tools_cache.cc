@@ -26,7 +26,7 @@ namespace GridTools
 {
   template <int dim, int spacedim>
   Cache<dim, spacedim>::Cache(const Triangulation<dim, spacedim> &tria,
-                              const Mapping<dim, spacedim> &      mapping)
+                              const Mapping<dim, spacedim>       &mapping)
     : update_flags(update_all)
     , tria(&tria)
     , mapping(&mapping)

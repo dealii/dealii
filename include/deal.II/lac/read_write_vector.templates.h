@@ -97,8 +97,8 @@ namespace LinearAlgebra
       static void
       import_elements(
         const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-          &                                               communication_pattern,
-        const Number *                                    values,
+                                                         &communication_pattern,
+        const Number                                     *values,
         const VectorOperation::values                     operation,
         ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
       {
@@ -125,8 +125,8 @@ namespace LinearAlgebra
       static void
       import_elements(
         const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-          &                                               communication_pattern,
-        const Number *                                    values,
+                                                         &communication_pattern,
+        const Number                                     *values,
         const VectorOperation::values                     operation,
         ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
       {
@@ -169,8 +169,8 @@ namespace LinearAlgebra
       static void
       import_elements(
         const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-          &                                               communication_pattern,
-        const Number *                                    values,
+                                                         &communication_pattern,
+        const Number                                     *values,
         const VectorOperation::values                     operation,
         ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
       {
@@ -418,7 +418,7 @@ namespace LinearAlgebra
   {
     template <typename VectorType, typename Number>
     void
-    import_serial_vector(const VectorType &       values,
+    import_serial_vector(const VectorType        &values,
                          VectorOperation::values  operation,
                          ReadWriteVector<Number> &rw_vector)
     {
@@ -504,7 +504,7 @@ namespace LinearAlgebra
     void
     copy_petsc_vector(const PETSC_Number *petsc_start_ptr,
                       const PETSC_Number *petsc_end_ptr,
-                      Number *            ptr)
+                      Number             *ptr)
     {
       std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
     }
@@ -513,7 +513,7 @@ namespace LinearAlgebra
     void
     copy_petsc_vector(const std::complex<PETSC_Number> *petsc_start_ptr,
                       const std::complex<PETSC_Number> *petsc_end_ptr,
-                      std::complex<Number> *            ptr)
+                      std::complex<Number>             *ptr)
     {
       std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
     }
@@ -567,7 +567,7 @@ namespace LinearAlgebra
                    dealii::is_tpetra_type<Number>::value>
   ReadWriteVector<Number>::import_elements(
     const Tpetra::Vector<Number, int, types::signed_global_dof_index> &vector,
-    const IndexSet &        source_elements,
+    const IndexSet         &source_elements,
     VectorOperation::values operation,
     const MPI_Comm          mpi_comm,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -684,7 +684,7 @@ namespace LinearAlgebra
   void
   ReadWriteVector<Number>::import_elements(
     const Epetra_MultiVector &multivector,
-    const IndexSet &          source_elements,
+    const IndexSet           &source_elements,
     VectorOperation::values   operation,
     const MPI_Comm            mpi_comm,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
@@ -1001,7 +1001,7 @@ namespace LinearAlgebra
 
   template <typename Number>
   void
-  ReadWriteVector<Number>::print(std::ostream &     out,
+  ReadWriteVector<Number>::print(std::ostream      &out,
                                  const unsigned int precision,
                                  const bool         scientific) const
   {

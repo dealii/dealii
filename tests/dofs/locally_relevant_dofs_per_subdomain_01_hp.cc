@@ -46,7 +46,7 @@
 template <int dim>
 void
 write_mesh(const parallel::shared::Triangulation<dim> &tria,
-           const char *                                filename_)
+           const char                                 *filename_)
 {
   DataOut<dim> data_out;
   data_out.attach_triangulation(tria);

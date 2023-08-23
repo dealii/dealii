@@ -283,11 +283,11 @@ namespace internal
       template <typename CellIterator>
       bool
       setup_constraints(
-        const CellIterator &                                      cell,
+        const CellIterator                                       &cell,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
         const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
-        std::vector<types::global_dof_index> &        dof_indices,
-        const ArrayView<ConstraintKinds> &            mask) const;
+        std::vector<types::global_dof_index>         &dof_indices,
+        const ArrayView<ConstraintKinds>             &mask) const;
 
       /**
        * Compute the supported components of all entries of the given
@@ -310,12 +310,12 @@ namespace internal
       template <typename CellIterator>
       void
       update_dof_indices(
-        const CellIterator &                                      cell,
+        const CellIterator                                       &cell,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
         const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
-        const std::vector<std::vector<bool>> &        component_mask,
-        const ConstraintKinds &                       refinement_configuration,
-        std::vector<types::global_dof_index> &        dof_indices) const;
+        const std::vector<std::vector<bool>>         &component_mask,
+        const ConstraintKinds                        &refinement_configuration,
+        std::vector<types::global_dof_index>         &dof_indices) const;
 
     private:
       /**
@@ -615,12 +615,12 @@ namespace internal
     template <typename CellIterator>
     inline void
     HangingNodes<dim>::update_dof_indices(
-      const CellIterator &                                      cell,
+      const CellIterator                                       &cell,
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
       const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
-      const std::vector<std::vector<bool>> &        supported_components,
-      const ConstraintKinds &                       refinement_configuration,
-      std::vector<types::global_dof_index> &        dof_indices) const
+      const std::vector<std::vector<bool>>         &supported_components,
+      const ConstraintKinds                        &refinement_configuration,
+      std::vector<types::global_dof_index>         &dof_indices) const
     {
       if (std::find(supported_components[cell->active_fe_index()].begin(),
                     supported_components[cell->active_fe_index()].end(),
@@ -862,11 +862,11 @@ namespace internal
     template <typename CellIterator>
     inline bool
     HangingNodes<dim>::setup_constraints(
-      const CellIterator &                                      cell,
+      const CellIterator                                       &cell,
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner,
       const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
-      std::vector<types::global_dof_index> &        dof_indices,
-      const ArrayView<ConstraintKinds> &            masks) const
+      std::vector<types::global_dof_index>         &dof_indices,
+      const ArrayView<ConstraintKinds>             &masks) const
     {
       // 1) check if finite elements support fast hanging-node algorithm
       const auto supported_components = compute_supported_components(

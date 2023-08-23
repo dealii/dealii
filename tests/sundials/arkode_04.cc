@@ -89,7 +89,7 @@ main()
   };
 
   ode.jacobian_times_vector = [&](const VectorType &src,
-                                  VectorType &      dst,
+                                  VectorType       &dst,
                                   double            t,
                                   const VectorType & /*y*/,
                                   const VectorType & /*fy*/) {

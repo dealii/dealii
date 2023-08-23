@@ -216,7 +216,7 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
 
 
 void
-LogStream::attach(std::ostream &                o,
+LogStream::attach(std::ostream                 &o,
                   const bool                    print_job_id,
                   const std::ios_base::fmtflags flags)
 {
@@ -402,7 +402,7 @@ LogStream::get_prefixes() const
 void
 LogStream::print_line_head()
 {
-  const std::string &   head   = get_prefix();
+  const std::string    &head   = get_prefix();
   const std::thread::id thread = std::this_thread::get_id();
 
   if (get_prefixes().size() <= std_depth)

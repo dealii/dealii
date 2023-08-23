@@ -356,16 +356,16 @@ namespace Step44
     static const SymmetricTensor<4, dim> dev_P;
   };
   template <int dim>
-  const SymmetricTensor<2, dim>
-    StandardTensors<dim>::I = unit_symmetric_tensor<dim>();
+  const SymmetricTensor<2, dim> StandardTensors<dim>::I =
+    unit_symmetric_tensor<dim>();
   template <int dim>
   const SymmetricTensor<4, dim> StandardTensors<dim>::IxI = outer_product(I, I);
   template <int dim>
-  const SymmetricTensor<4, dim>
-    StandardTensors<dim>::II = identity_tensor<dim>();
+  const SymmetricTensor<4, dim> StandardTensors<dim>::II =
+    identity_tensor<dim>();
   template <int dim>
-  const SymmetricTensor<4, dim>
-    StandardTensors<dim>::dev_P = deviator_tensor<dim>();
+  const SymmetricTensor<4, dim> StandardTensors<dim>::dev_P =
+    deviator_tensor<dim>();
   class Time
   {
   public:
@@ -426,7 +426,7 @@ namespace Step44
     template <typename NumberType>
     SymmetricTensor<2, dim, NumberType>
     get_tau(const Tensor<2, dim, NumberType> &F,
-            const NumberType &                p_tilde) const
+            const NumberType                 &p_tilde) const
     {
       return get_tau_iso(F) + get_tau_vol(F, p_tilde);
     }
@@ -444,7 +444,7 @@ namespace Step44
     template <typename NumberType>
     SymmetricTensor<2, dim, NumberType>
     get_tau_vol(const Tensor<2, dim, NumberType> &F,
-                const NumberType &                p_tilde) const
+                const NumberType                 &p_tilde) const
     {
       const NumberType det_F = determinant(F);
       // return p_tilde * det_F * StandardTensors<dim>::I;
@@ -498,7 +498,7 @@ namespace Step44
     template <typename NumberType>
     SymmetricTensor<2, dim, NumberType>
     get_tau(const Tensor<2, dim, NumberType> &F,
-            const NumberType &                p_tilde) const
+            const NumberType                 &p_tilde) const
     {
       return material->get_tau(F, p_tilde);
     }
@@ -537,8 +537,8 @@ namespace Step44
     void
     assemble_system_one_cell(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      ScratchData_ASM &                                     scratch,
-      PerTaskData_ASM &                                     data) const;
+      ScratchData_ASM                                      &scratch,
+      PerTaskData_ASM                                      &data) const;
     void
     copy_local_to_global_system(const PerTaskData_ASM &data);
     void
@@ -546,8 +546,8 @@ namespace Step44
     void
     assemble_sc_one_cell(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      ScratchData_SC &                                      scratch,
-      PerTaskData_SC &                                      data);
+      ScratchData_SC                                       &scratch,
+      PerTaskData_SC                                       &data);
     void
     copy_local_to_global_sc(const PerTaskData_SC &data);
     void
@@ -637,7 +637,7 @@ namespace Step44
     get_error_residual(Errors &error_residual);
     void
     get_error_update(const BlockVector<double> &newton_update,
-                     Errors &                   error_update);
+                     Errors                    &error_update);
     std::pair<double, double>
     get_error_dilation(const BlockVector<double> &solution_total) const;
     void
@@ -750,10 +750,10 @@ namespace Step44
     const BlockVector<double> &solution_total;
     FEValues<dim>              fe_values_ref;
     FEFaceValues<dim>          fe_face_values_ref;
-    ScratchData_ASM(const FiniteElement<dim> & fe_cell,
-                    const QGauss<dim> &        qf_cell,
+    ScratchData_ASM(const FiniteElement<dim>  &fe_cell,
+                    const QGauss<dim>         &qf_cell,
                     const UpdateFlags          uf_cell,
-                    const QGauss<dim - 1> &    qf_face,
+                    const QGauss<dim - 1>     &qf_face,
                     const UpdateFlags          uf_face,
                     const BlockVector<double> &solution_total)
       : solution_total(solution_total)
@@ -1096,7 +1096,7 @@ namespace Step44
   void
   Solid<dim, number_t, ad_type_code>::get_error_update(
     const BlockVector<double> &newton_update,
-    Errors &                   error_update)
+    Errors                    &error_update)
   {
     BlockVector<double> error_ud(dofs_per_block);
     for (unsigned int i = 0; i < dof_handler_ref.n_dofs(); ++i)
@@ -1173,8 +1173,8 @@ namespace Step44
   void
   Solid<dim, number_t, ad_type_code>::assemble_system_one_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    ScratchData_ASM &                                     scratch,
-    PerTaskData_ASM &                                     data) const
+    ScratchData_ASM                                      &scratch,
+    PerTaskData_ASM                                      &data) const
   {
     data.reset();
     scratch.reset();
@@ -1502,8 +1502,8 @@ namespace Step44
   void
   Solid<dim, number_t, ad_type_code>::assemble_sc_one_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    ScratchData_SC &                                      scratch,
-    PerTaskData_SC &                                      data)
+    ScratchData_SC                                       &scratch,
+    PerTaskData_SC                                       &data)
   {
     data.reset();
     scratch.reset();
@@ -1624,9 +1624,9 @@ namespace Step44
             const Vector<double> &f_u = system_rhs.block(u_dof);
             const Vector<double> &f_p = system_rhs.block(p_dof);
             const Vector<double> &f_J = system_rhs.block(J_dof);
-            Vector<double> &      d_u = newton_update.block(u_dof);
-            Vector<double> &      d_p = newton_update.block(p_dof);
-            Vector<double> &      d_J = newton_update.block(J_dof);
+            Vector<double>       &d_u = newton_update.block(u_dof);
+            Vector<double>       &d_p = newton_update.block(p_dof);
+            Vector<double>       &d_J = newton_update.block(J_dof);
             const auto            K_uu =
               linear_operator(tangent_matrix.block(u_dof, u_dof));
             const auto K_up =

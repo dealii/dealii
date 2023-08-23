@@ -50,8 +50,8 @@
 template <int dim>
 double
 compute_aspect_ratio_hyper_rectangle(
-  const Point<dim> &               left,
-  const Point<dim> &               right,
+  const Point<dim>                &left,
+  const Point<dim>                &right,
   const std::vector<unsigned int> &refinements,
   unsigned int                     degree     = 1,
   unsigned int                     n_q_points = 2,

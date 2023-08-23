@@ -106,13 +106,13 @@ namespace Step55
 
     private:
       const SmartPointer<const Matrix> matrix;
-      const Preconditioner &           preconditioner;
+      const Preconditioner            &preconditioner;
     };
 
 
     template <class Matrix, class Preconditioner>
     InverseMatrix<Matrix, Preconditioner>::InverseMatrix(
-      const Matrix &        m,
+      const Matrix         &m,
       const Preconditioner &preconditioner)
       : matrix(&m)
       , preconditioner(preconditioner)
@@ -123,7 +123,7 @@ namespace Step55
     template <class Matrix, class Preconditioner>
     template <typename VectorType>
     void
-    InverseMatrix<Matrix, Preconditioner>::vmult(VectorType &      dst,
+    InverseMatrix<Matrix, Preconditioner>::vmult(VectorType       &dst,
                                                  const VectorType &src) const
     {
       SolverControl        solver_control(src.size(), 1e-8 * src.l2_norm());
@@ -150,7 +150,7 @@ namespace Step55
       BlockDiagonalPreconditioner(const PreconditionerA &preconditioner_A,
                                   const PreconditionerS &preconditioner_S);
 
-      void vmult(LA::MPI::BlockVector &      dst,
+      void vmult(LA::MPI::BlockVector       &dst,
                  const LA::MPI::BlockVector &src) const;
 
     private:
@@ -169,7 +169,7 @@ namespace Step55
 
     template <class PreconditionerA, class PreconditionerS>
     void BlockDiagonalPreconditioner<PreconditionerA, PreconditionerS>::vmult(
-      LA::MPI::BlockVector &      dst,
+      LA::MPI::BlockVector       &dst,
       const LA::MPI::BlockVector &src) const
     {
       preconditioner_A.vmult(dst.block(0), src.block(0));
@@ -192,13 +192,13 @@ namespace Step55
     {}
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  value) const override;
+                              Vector<double>   &value) const override;
   };
 
 
   template <int dim>
   void RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
+                                        Vector<double>   &values) const
   {
     const double R_x = p[0];
     const double R_y = p[1];
@@ -235,12 +235,12 @@ namespace Step55
     {}
 
     virtual void vector_value(const Point<dim> &p,
-                              Vector<double> &  values) const override;
+                              Vector<double>   &values) const override;
   };
 
   template <int dim>
   void ExactSolution<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
+                                        Vector<double>   &values) const
   {
     const double R_x = p[0];
     const double R_y = p[1];

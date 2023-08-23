@@ -42,11 +42,11 @@ void
 create_two_cubes(Triangulation<3> &coarse_grid)
 {
   const Point<3>        points[6] = {Point<3>(0, 0, 0),
-                              Point<3>(1, 0, 0),
-                              Point<3>(1, 1, 0),
-                              Point<3>(0, 1, 0),
-                              Point<3>(2, 0, 0),
-                              Point<3>(2, 1, 0)};
+                                     Point<3>(1, 0, 0),
+                                     Point<3>(1, 1, 0),
+                                     Point<3>(0, 1, 0),
+                                     Point<3>(2, 0, 0),
+                                     Point<3>(2, 1, 0)};
   std::vector<Point<3>> vertices;
   for (unsigned int i = 0; i < 6; ++i)
     vertices.push_back(points[i]);

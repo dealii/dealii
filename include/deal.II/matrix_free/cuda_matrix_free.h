@@ -282,31 +282,31 @@ namespace CUDAWrappers
      */
     template <typename IteratorFiltersType>
     void
-    reinit(const Mapping<dim> &             mapping,
-           const DoFHandler<dim> &          dof_handler,
+    reinit(const Mapping<dim>              &mapping,
+           const DoFHandler<dim>           &dof_handler,
            const AffineConstraints<Number> &constraints,
-           const Quadrature<1> &            quad,
-           const IteratorFiltersType &      iterator_filter,
-           const AdditionalData &           additional_data = AdditionalData());
+           const Quadrature<1>             &quad,
+           const IteratorFiltersType       &iterator_filter,
+           const AdditionalData            &additional_data = AdditionalData());
 
     /**
      * Same as above using Iterators::LocallyOwnedCell() as predicate.
      */
     void
-    reinit(const Mapping<dim> &             mapping,
-           const DoFHandler<dim> &          dof_handler,
+    reinit(const Mapping<dim>              &mapping,
+           const DoFHandler<dim>           &dof_handler,
            const AffineConstraints<Number> &constraints,
-           const Quadrature<1> &            quad,
-           const AdditionalData &           additional_data = AdditionalData());
+           const Quadrature<1>             &quad,
+           const AdditionalData            &additional_data = AdditionalData());
 
     /**
      * Initializes the data structures. Same as above but using a Q1 mapping.
      */
     void
-    reinit(const DoFHandler<dim> &          dof_handler,
+    reinit(const DoFHandler<dim>           &dof_handler,
            const AffineConstraints<Number> &constraints,
-           const Quadrature<1> &            quad,
-           const AdditionalData &           additional_data = AdditionalData());
+           const Quadrature<1>             &quad,
+           const AdditionalData            &additional_data = AdditionalData());
 
     /**
      * Return the Data structure associated with @p color.
@@ -335,9 +335,9 @@ namespace CUDAWrappers
     // clang-format on
     template <typename Functor, typename VectorType>
     void
-    cell_loop(const Functor &   func,
+    cell_loop(const Functor    &func,
               const VectorType &src,
-              VectorType &      dst) const;
+              VectorType       &dst) const;
 
     /**
      * This method runs the loop over all cells and apply the local operation on
@@ -432,11 +432,11 @@ namespace CUDAWrappers
      */
     template <typename IteratorFiltersType>
     void
-    internal_reinit(const Mapping<dim> &                   mapping,
-                    const DoFHandler<dim> &                dof_handler,
-                    const AffineConstraints<Number> &      constraints,
-                    const Quadrature<1> &                  quad,
-                    const IteratorFiltersType &            iterator_filter,
+    internal_reinit(const Mapping<dim>                    &mapping,
+                    const DoFHandler<dim>                 &dof_handler,
+                    const AffineConstraints<Number>       &constraints,
+                    const Quadrature<1>                   &quad,
+                    const IteratorFiltersType             &iterator_filter,
                     const std::shared_ptr<const MPI_Comm> &comm,
                     const AdditionalData                   additional_data);
 
@@ -446,9 +446,9 @@ namespace CUDAWrappers
      */
     template <typename Functor, typename VectorType>
     void
-    serial_cell_loop(const Functor &   func,
+    serial_cell_loop(const Functor    &func,
                      const VectorType &src,
-                     VectorType &      dst) const;
+                     VectorType       &dst) const;
 
     /**
      * Helper function. Loop over all the cells and apply the functor on each
@@ -459,7 +459,7 @@ namespace CUDAWrappers
     distributed_cell_loop(
       const Functor &func,
       const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
-        &                                                               src,
+                                                                       &src,
       LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &dst)
       const;
 
@@ -472,9 +472,9 @@ namespace CUDAWrappers
     template <typename Functor>
     void
     distributed_cell_loop(
-      const Functor &                                    func,
+      const Functor                                     &func,
       const LinearAlgebra::CUDAWrappers::Vector<Number> &src,
-      LinearAlgebra::CUDAWrappers::Vector<Number> &      dst) const;
+      LinearAlgebra::CUDAWrappers::Vector<Number>       &dst) const;
 #endif
 
     /**
@@ -645,7 +645,7 @@ namespace CUDAWrappers
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
     DEAL_II_HOST_DEVICE
-    SharedData(const TeamHandle &  team_member,
+    SharedData(const TeamHandle   &team_member,
                const SharedView1D &values,
                const SharedView2D &gradients)
       : team_member(team_member)

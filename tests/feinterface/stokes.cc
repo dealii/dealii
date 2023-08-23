@@ -108,10 +108,10 @@ namespace StokesTests
 
   template <class MatrixType, class VectorType>
   inline void
-  copy(const CopyData &                 c,
+  copy(const CopyData                  &c,
        const AffineConstraints<double> &constraints,
-       MatrixType &                     system_matrix,
-       VectorType &                     system_rhs)
+       MatrixType                      &system_matrix,
+       VectorType                      &system_rhs)
   {
     constraints.distribute_local_to_global(c.cell_matrix,
                                            c.cell_rhs,
@@ -499,9 +499,9 @@ namespace StokesTests
              (1.0 / extent1 + 1.0 / extent2);
     };
 
-    auto cell_worker = [&](const Iterator &              cell,
+    auto cell_worker = [&](const Iterator               &cell,
                            MeshWorker::ScratchData<dim> &scratch_data,
-                           CopyData &                    copy_data) {
+                           CopyData                     &copy_data) {
       const FEValues<dim> &fe_v = scratch_data.reinit(cell);
 
       const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
@@ -547,15 +547,15 @@ namespace StokesTests
         }
     };
 
-    auto boundary_worker = [&](const Iterator &              cell,
-                               const unsigned int &          face_no,
+    auto boundary_worker = [&](const Iterator               &cell,
+                               const unsigned int           &face_no,
                                MeshWorker::ScratchData<dim> &scratch_data,
-                               CopyData &                    copy_data) {
+                               CopyData                     &copy_data) {
       const FEFaceValuesBase<dim> &fe_fv = scratch_data.reinit(cell, face_no);
 
       const auto &q_points = fe_fv.get_quadrature_points();
 
-      const std::vector<double> &        JxW     = fe_fv.get_JxW_values();
+      const std::vector<double>         &JxW     = fe_fv.get_JxW_values();
       const std::vector<Tensor<1, dim>> &normals = fe_fv.get_normal_vectors();
 
       std::vector<Vector<double>> g_values(q_points.size(),
@@ -625,14 +625,14 @@ namespace StokesTests
         }
     };
 
-    auto face_worker = [&](const Iterator &              cell,
-                           const unsigned int &          f,
-                           const unsigned int &          sf,
-                           const Iterator &              ncell,
-                           const unsigned int &          nf,
-                           const unsigned int &          nsf,
+    auto face_worker = [&](const Iterator               &cell,
+                           const unsigned int           &f,
+                           const unsigned int           &sf,
+                           const Iterator               &ncell,
+                           const unsigned int           &nf,
+                           const unsigned int           &nsf,
                            MeshWorker::ScratchData<dim> &scratch_data,
-                           CopyData &                    copy_data) {
+                           CopyData                     &copy_data) {
       const FEInterfaceValues<dim> &fe_fv =
         scratch_data.reinit(cell, f, sf, ncell, nf, nsf);
       FEInterfaceViews::Scalar<dim> interface_scalar(fe_fv, pressure.component);
@@ -640,13 +640,13 @@ namespace StokesTests
         fe_fv, velocities.first_vector_component);
 
       copy_data.face_data.emplace_back();
-      CopyDataFace &     copy_data_face = copy_data.face_data.back();
+      CopyDataFace      &copy_data_face = copy_data.face_data.back();
       const unsigned int dofs_per_cell  = fe_fv.n_current_interface_dofs();
 
       copy_data_face.joint_dof_indices = fe_fv.get_interface_dof_indices();
       copy_data_face.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
 
-      const std::vector<double> &        JxW     = fe_fv.get_JxW_values();
+      const std::vector<double>         &JxW     = fe_fv.get_JxW_values();
       const std::vector<Tensor<1, dim>> &normals = fe_fv.get_normal_vectors();
       const auto &q_points = fe_fv.get_quadrature_points();
 

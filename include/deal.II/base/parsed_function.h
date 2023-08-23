@@ -109,7 +109,7 @@ namespace Functions
      *  @endcode
      */
     static void
-    declare_parameters(ParameterHandler & prm,
+    declare_parameters(ParameterHandler  &prm,
                        const unsigned int n_components = 1);
 
     /**

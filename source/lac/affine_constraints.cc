@@ -157,12 +157,12 @@ namespace internal
   {
     template void
     set_zero_all(
-      const std::vector<types::global_dof_index> &                     cm,
+      const std::vector<types::global_dof_index>                      &cm,
       LinearAlgebra::distributed::Vector<float, MemorySpace::Default> &vec);
 
     template void
     set_zero_all(
-      const std::vector<types::global_dof_index> &                      cm,
+      const std::vector<types::global_dof_index>                       &cm,
       LinearAlgebra::distributed::Vector<double, MemorySpace::Default> &vec);
   } // namespace AffineConstraintsImplementation
 } // namespace internal

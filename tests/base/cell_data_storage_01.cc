@@ -81,7 +81,7 @@ template <int dim, typename DATA>
 void
 check_qph(Triangulation<dim> &tr,
           CellDataStorage<typename Triangulation<dim, dim>::cell_iterator, DATA>
-            &                    manager,
+                                &manager,
           const Quadrature<dim> &rhs_quadrature,
           const MyFunction<dim> &func)
 {
@@ -98,7 +98,7 @@ check_qph(Triangulation<dim> &tr,
         fe_values.reinit(dof_cell);
         const std::vector<Point<dim>> &q_points =
           fe_values.get_quadrature_points();
-        const auto &                             manager_const = manager;
+        const auto                              &manager_const = manager;
         const std::vector<std::shared_ptr<DATA>> qpd = manager.get_data(cell);
         const std::vector<std::shared_ptr<const DATA>> qpd_const =
           manager_const.get_data(cell);

@@ -145,7 +145,7 @@ public:
 
 template <int dim>
 double
-BoundaryValues<dim>::value(const Point<dim> & p,
+BoundaryValues<dim>::value(const Point<dim>  &p,
                            const unsigned int component) const
 {
   Assert(component < this->n_components,
@@ -160,7 +160,7 @@ BoundaryValues<dim>::value(const Point<dim> & p,
 template <int dim>
 void
 BoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                  Vector<double> &  values) const
+                                  Vector<double>   &values) const
 {
   for (unsigned int c = 0; c < this->n_components; ++c)
     values(c) = BoundaryValues<dim>::value(p, c);
@@ -180,7 +180,7 @@ public:
 
   virtual void
   value_list(const std::vector<Point<dim>> &p,
-             std::vector<Tensor<1, dim>> &  value) const override;
+             std::vector<Tensor<1, dim>>   &value) const override;
 };
 
 
@@ -195,7 +195,7 @@ RightHandSide<dim>::value(const Point<dim> & /*p*/) const
 template <int dim>
 void
 RightHandSide<dim>::value_list(const std::vector<Point<dim>> &vp,
-                               std::vector<Tensor<1, dim>> &  values) const
+                               std::vector<Tensor<1, dim>>   &values) const
 {
   for (unsigned int c = 0; c < vp.size(); ++c)
     {
@@ -221,7 +221,7 @@ private:
 
 template <class MatrixType, class PreconditionerType>
 InverseMatrix<MatrixType, PreconditionerType>::InverseMatrix(
-  const MatrixType &        m,
+  const MatrixType         &m,
   const PreconditionerType &preconditioner)
   : matrix(&m)
   , preconditioner(&preconditioner)
@@ -231,7 +231,7 @@ InverseMatrix<MatrixType, PreconditionerType>::InverseMatrix(
 template <class MatrixType, class PreconditionerType>
 void
 InverseMatrix<MatrixType, PreconditionerType>::vmult(
-  Vector<double> &      dst,
+  Vector<double>       &dst,
   const Vector<double> &src) const
 {
   SolverControl            solver_control(src.size(), 1e-6 * src.l2_norm());
@@ -266,7 +266,7 @@ private:
 
 template <class PreconditionerType>
 SchurComplement<PreconditionerType>::SchurComplement(
-  const BlockSparseMatrix<double> &                              system_matrix,
+  const BlockSparseMatrix<double>                               &system_matrix,
   const InverseMatrix<SparseMatrix<double>, PreconditionerType> &A_inverse)
   : system_matrix(&system_matrix)
   , A_inverse(&A_inverse)
@@ -277,7 +277,7 @@ SchurComplement<PreconditionerType>::SchurComplement(
 
 template <class PreconditionerType>
 void
-SchurComplement<PreconditionerType>::vmult(Vector<double> &      dst,
+SchurComplement<PreconditionerType>::vmult(Vector<double>       &dst,
                                            const Vector<double> &src) const
 {
   system_matrix->block(0, 1).vmult(tmp1, src);

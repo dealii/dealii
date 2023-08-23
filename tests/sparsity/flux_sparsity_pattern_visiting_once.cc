@@ -59,7 +59,7 @@ is_face_on_OY(const typename DoFHandler<dim>::active_cell_iterator &cell,
 template <int dim>
 void
 create_and_output_flux_sparsity_with_filter(
-  DoFHandler<dim> &                       dof_handler,
+  DoFHandler<dim>                        &dof_handler,
   std::function<bool(const typename DoFHandler<dim>::active_cell_iterator,
                      const unsigned int)> filter)
 {
@@ -74,7 +74,7 @@ create_and_output_flux_sparsity_with_filter(
                                        coupling,
                                        coupling,
                                        numbers::invalid_subdomain_id,
-                                       [&](const auto &       cell,
+                                       [&](const auto        &cell,
                                            const unsigned int face_index) {
                                          return filter(cell, face_index);
                                        });

@@ -64,19 +64,19 @@ namespace Step48
                         const double                   time_step);
 
     void
-    apply(LinearAlgebra::distributed::Vector<double> &                     dst,
+    apply(LinearAlgebra::distributed::Vector<double>                      &dst,
           const std::vector<LinearAlgebra::distributed::Vector<double> *> &src)
       const;
 
   private:
-    const MatrixFree<dim, double> &            data;
+    const MatrixFree<dim, double>             &data;
     const VectorizedArray<double>              delta_t_sqr;
     LinearAlgebra::distributed::Vector<double> inv_mass_matrix;
 
     void
     local_apply(
-      const MatrixFree<dim, double> &                                  data,
-      LinearAlgebra::distributed::Vector<double> &                     dst,
+      const MatrixFree<dim, double>                                   &data,
+      LinearAlgebra::distributed::Vector<double>                      &dst,
       const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
       const std::pair<unsigned int, unsigned int> &cell_range) const;
   };
@@ -120,8 +120,8 @@ namespace Step48
   template <int dim>
   void
   SineGordonOperation<dim>::local_apply(
-    const MatrixFree<dim> &                                          data,
-    LinearAlgebra::distributed::Vector<double> &                     dst,
+    const MatrixFree<dim>                                           &data,
+    LinearAlgebra::distributed::Vector<double>                      &dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
@@ -159,7 +159,7 @@ namespace Step48
   template <int dim>
   void
   SineGordonOperation<dim>::apply(
-    LinearAlgebra::distributed::Vector<double> &                     dst,
+    LinearAlgebra::distributed::Vector<double>                      &dst,
     const std::vector<LinearAlgebra::distributed::Vector<double> *> &src) const
   {
     dst = 0;

@@ -52,8 +52,8 @@
 
 template <int dim, int fe_degree, typename Number>
 void
-helmholtz_operator(const MatrixFree<dim, Number> &                        data,
-                   LinearAlgebra::distributed::BlockVector<Number> &      dst,
+helmholtz_operator(const MatrixFree<dim, Number>                         &data,
+                   LinearAlgebra::distributed::BlockVector<Number>       &dst,
                    const LinearAlgebra::distributed::BlockVector<Number> &src,
                    const std::pair<unsigned int, unsigned int> &cell_range)
 {
@@ -101,7 +101,7 @@ public:
     : data(data_in){};
 
   void
-  vmult(LinearAlgebra::distributed::BlockVector<Number> &      dst,
+  vmult(LinearAlgebra::distributed::BlockVector<Number>       &dst,
         const LinearAlgebra::distributed::BlockVector<Number> &src) const
   {
     for (unsigned int i = 0; i < dst.size(); ++i)

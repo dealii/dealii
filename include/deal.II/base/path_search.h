@@ -144,7 +144,7 @@ public:
   std::string
   find(const std::string &filename,
        const std::string &suffix,
-       const char *       open_mode = "r");
+       const char        *open_mode = "r");
 
   /**
    * Show the paths and suffixes used for this object.

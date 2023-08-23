@@ -46,7 +46,7 @@ public:
 
   virtual void
   vector_value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Vector<double>> &  values) const;
+                    std::vector<Vector<double>>   &values) const;
 
 private:
   unsigned int degree;
@@ -95,9 +95,9 @@ TestFunction<dim>::vector_value_list(const std::vector<Point<dim>> &points,
 template <int dim>
 double
 integrate_error(const DoFHandler<dim> &dof,
-                FEFaceValues<dim> &    fe,
-                const Vector<double> & u,
-                const Function<dim> &  f)
+                FEFaceValues<dim>     &fe,
+                const Vector<double>  &u,
+                const Function<dim>   &f)
 {
   double                      result = 0.;
   std::vector<Vector<double>> f_values(fe.n_quadrature_points,

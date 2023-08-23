@@ -36,7 +36,7 @@ template <int dim>
 double
 difference(const FiniteElement<dim> &fe,
            const std::vector<double> dofs,
-           const Function<dim> &     function)
+           const Function<dim>      &function)
 {
   double      result = 0.;
   QGauss<dim> quadrature(fe.degree + 1);
@@ -59,7 +59,7 @@ template <int dim>
 double
 vector_difference(const FiniteElement<dim> &fe,
                   const std::vector<double> dofs,
-                  const Function<dim> &     function,
+                  const Function<dim>      &function,
                   const unsigned int        offset)
 {
   double      result = 0.;
@@ -107,7 +107,7 @@ public:
 
   void
   value_list(const std::vector<Point<dim>> &points,
-             std::vector<double> &          values,
+             std::vector<double>           &values,
              const unsigned int             c) const
   {
     Assert(values.size() == points.size(),
@@ -126,7 +126,7 @@ public:
 
   void
   vector_value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Vector<double>> &  values) const
+                    std::vector<Vector<double>>   &values) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));
@@ -178,7 +178,7 @@ public:
 
   void
   value_list(const std::vector<Point<dim>> &points,
-             std::vector<double> &          values,
+             std::vector<double>           &values,
              const unsigned int             c) const
   {
     Assert(values.size() == points.size(),
@@ -194,7 +194,7 @@ public:
 
   void
   vector_value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Vector<double>> &  values) const
+                    std::vector<Vector<double>>   &values) const
   {
     Assert(values.size() == points.size(),
            ExcDimensionMismatch(values.size(), points.size()));

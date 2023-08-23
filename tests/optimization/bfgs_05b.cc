@@ -94,7 +94,7 @@ test()
     return rosenbrok(x_shifted, g);
   };
 
-  const auto preconditioner = [](VectorType &                         g,
+  const auto preconditioner = [](VectorType                          &g,
                                  const FiniteSizeHistory<VectorType> &s,
                                  const FiniteSizeHistory<VectorType> &y) {
     if (s.size() > 0)

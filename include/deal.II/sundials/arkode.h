@@ -534,7 +534,7 @@ namespace SUNDIALS
      *   calls to this function.
      */
     unsigned int
-    solve_ode_incrementally(VectorType & solution,
+    solve_ode_incrementally(VectorType  &solution,
                             const double intermediate_time,
                             const bool   reset_solver = false);
 
@@ -696,7 +696,7 @@ namespace SUNDIALS
      * can throw exceptions of type RecoverableUserCallbackError.
      */
     std::function<void(const VectorType &v,
-                       VectorType &      Jv,
+                       VectorType       &Jv,
                        const double      t,
                        const VectorType &y,
                        const VectorType &fy)>
@@ -827,7 +827,7 @@ namespace SUNDIALS
                        const VectorType &y,
                        const VectorType &fy,
                        const VectorType &r,
-                       VectorType &      z,
+                       VectorType       &z,
                        const double      gamma,
                        const double      tol,
                        const int         lr)>
@@ -879,7 +879,7 @@ namespace SUNDIALS
                        const VectorType &y,
                        const VectorType &fy,
                        const int         jok,
-                       int &             jcur,
+                       int              &jcur,
                        const double      gamma)>
       jacobian_preconditioner_setup;
 
@@ -912,7 +912,7 @@ namespace SUNDIALS
      */
     std::function<void(const double      t,
                        const VectorType &r,
-                       VectorType &      z,
+                       VectorType       &z,
                        const double      tol,
                        const int         lr)>
       mass_preconditioner_solve;
@@ -958,7 +958,7 @@ namespace SUNDIALS
      *   actually been computed.
      */
     std::function<void(const double       t,
-                       const VectorType & sol,
+                       const VectorType  &sol,
                        const unsigned int step_number)>
       output_step;
 
@@ -1029,7 +1029,7 @@ namespace SUNDIALS
      * Internal routine to call ARKode repeatedly.
      */
     int
-    do_evolve_time(VectorType &          solution,
+    do_evolve_time(VectorType           &solution,
                    dealii::DiscreteTime &time,
                    const bool            do_reset);
 

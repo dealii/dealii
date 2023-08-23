@@ -40,14 +40,14 @@ namespace internal
     static void
     evaluate(const unsigned int                     n_components,
              const EvaluationFlags::EvaluationFlags evaluation_flag,
-             const Number *                         values_dofs,
-             FEEvaluationData<dim, Number, false> & fe_eval);
+             const Number                          *values_dofs,
+             FEEvaluationData<dim, Number, false>  &fe_eval);
 
     static void
     integrate(const unsigned int                     n_components,
               const EvaluationFlags::EvaluationFlags integration_flag,
-              Number *                               values_dofs,
-              FEEvaluationData<dim, Number, false> & fe_eval,
+              Number                                *values_dofs,
+              FEEvaluationData<dim, Number, false>  &fe_eval,
               const bool                             sum_into_values_array);
 
     static bool
@@ -63,14 +63,14 @@ namespace internal
     static void
     evaluate(const unsigned int                     n_components,
              const EvaluationFlags::EvaluationFlags evaluation_flag,
-             const Number *                         values_dofs,
-             FEEvaluationData<dim, Number, true> &  fe_eval);
+             const Number                          *values_dofs,
+             FEEvaluationData<dim, Number, true>   &fe_eval);
 
     static void
     integrate(const unsigned int                     n_components,
               const EvaluationFlags::EvaluationFlags integration_flag,
-              Number *                               values_dofs,
-              FEEvaluationData<dim, Number, true> &  fe_eval);
+              Number                                *values_dofs,
+              FEEvaluationData<dim, Number, true>   &fe_eval);
 
     static bool
     fast_evaluation_supported(const unsigned int given_degree,
@@ -85,14 +85,14 @@ namespace internal
     static void
     evaluate(const unsigned int                                n_components,
              const EvaluationFlags::EvaluationFlags            evaluation_flag,
-             const Number *                                    src_ptr,
-             const std::vector<ArrayView<const Number>> *      sm_ptr,
+             const Number                                     *src_ptr,
+             const std::vector<ArrayView<const Number>>       *sm_ptr,
              FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval);
 
     static void
     integrate(const unsigned int                          n_components,
               const EvaluationFlags::EvaluationFlags      integration_flag,
-              Number *                                    dst_ptr,
+              Number                                     *dst_ptr,
               const std::vector<ArrayView<const Number>> *sm_ptr,
               FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval);
   };
@@ -105,23 +105,23 @@ namespace internal
     static void
     apply(const unsigned int                          n_components,
           const FEEvaluationData<dim, Number, false> &fe_eval,
-          const Number *                              in_array,
-          Number *                                    out_array);
+          const Number                               *in_array,
+          Number                                     *out_array);
 
     static void
     apply(const unsigned int                          n_components,
           const FEEvaluationData<dim, Number, false> &fe_eval,
-          const ArrayView<const Number> &             inverse_coefficients,
+          const ArrayView<const Number>              &inverse_coefficients,
           const bool                                  dyadic_coefficients,
-          const Number *                              in_array,
-          Number *                                    out_array);
+          const Number                               *in_array,
+          Number                                     *out_array);
 
     static void
     transform_from_q_points_to_basis(
       const unsigned int                          n_components,
       const FEEvaluationData<dim, Number, false> &fe_eval,
-      const Number *                              in_array,
-      Number *                                    out_array);
+      const Number                               *in_array,
+      Number                                     *out_array);
   };
 
   template <int dim,
@@ -135,8 +135,8 @@ namespace internal
           const MatrixFreeFunctions::ShapeInfo<VectorizedArrayType> &shape_info,
           const bool                                                 transpose,
           const std::array<MatrixFreeFunctions::compressed_constraint_kind,
-                           VectorizedArrayType::size()> &            c_mask,
-          VectorizedArrayType *                                      values);
+                           VectorizedArrayType::size()>             &c_mask,
+          VectorizedArrayType                                       *values);
   };
 
 } // end of namespace internal

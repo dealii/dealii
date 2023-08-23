@@ -118,7 +118,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   unsigned int
-  ARKode<VectorType>::solve_ode_incrementally(VectorType & solution,
+  ARKode<VectorType>::solve_ode_incrementally(VectorType  &solution,
                                               const double intermediate_time,
                                               const bool   reset_solver)
   {
@@ -137,7 +137,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   int
-  ARKode<VectorType>::do_evolve_time(VectorType &  solution,
+  ARKode<VectorType>::do_evolve_time(VectorType   &solution,
                                      DiscreteTime &time,
                                      const bool    do_reset)
   {
@@ -419,7 +419,7 @@ namespace SUNDIALS
                                                  realtype t,
                                                  N_Vector y,
                                                  N_Vector fy,
-                                                 void *   user_data,
+                                                 void    *user_data,
                                                  N_Vector) -> int {
           Assert(user_data != nullptr, ExcInternalError());
           ARKode<VectorType> &solver =
@@ -473,7 +473,7 @@ namespace SUNDIALS
                                                    realtype gamma,
                                                    realtype delta,
                                                    int      lr,
-                                                   void *   user_data) -> int {
+                                                   void    *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
               ARKode<VectorType> &solver =
                 *static_cast<ARKode<VectorType> *>(user_data);

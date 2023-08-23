@@ -40,7 +40,7 @@ using TeamHandle = Kokkos::TeamPolicy<
 template <int M, int N, int type, bool add, bool dof_to_quad>
 DEAL_II_HOST_DEVICE void
 evaluate_tensor_product(
-  const TeamHandle &                                         team_member,
+  const TeamHandle                                          &team_member,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_gradients,
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> co_shape_gradients,

@@ -152,7 +152,7 @@ namespace parallel
        *       triangulation.
        */
       virtual void
-      create_triangulation(const std::vector<Point<spacedim>> &      vertices,
+      create_triangulation(const std::vector<Point<spacedim>>       &vertices,
                            const std::vector<dealii::CellData<dim>> &cells,
                            const SubCellData &subcelldata) override;
 
@@ -191,7 +191,7 @@ namespace parallel
       set_partitioner(
         const std::function<void(dealii::Triangulation<dim, spacedim> &,
                                  const unsigned int)> &partitioner,
-        const TriangulationDescription::Settings &     settings);
+        const TriangulationDescription::Settings      &settings);
 
       /**
        * Register a partitioner, which is used within the method
@@ -200,7 +200,7 @@ namespace parallel
       void
       set_partitioner(
         const RepartitioningPolicyTools::Base<dim, spacedim> &partitioner,
-        const TriangulationDescription::Settings &            settings);
+        const TriangulationDescription::Settings             &settings);
 
       /**
        * Execute repartitioning and use the partitioner attached by the

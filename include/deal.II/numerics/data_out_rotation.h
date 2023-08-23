@@ -44,10 +44,10 @@ namespace internal
                    const unsigned int               n_subdivisions,
                    const unsigned int               n_patches_per_circle,
                    const std::vector<unsigned int> &n_postprocessor_outputs,
-                   const Mapping<dim, spacedim> &   mapping,
+                   const Mapping<dim, spacedim>    &mapping,
                    const std::vector<
                      std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-                     &               finite_elements,
+                                    &finite_elements,
                    const UpdateFlags update_flags);
 
       const unsigned int n_patches_per_circle;
@@ -197,7 +197,7 @@ private:
    */
   void
   build_one_patch(
-    const cell_iterator *                                                 cell,
+    const cell_iterator                                                  *cell,
     internal::DataOutRotationImplementation::ParallelData<dim, spacedim> &data,
     std::vector<DataOutBase::Patch<patch_dim, patch_spacedim>> &my_patches);
 };

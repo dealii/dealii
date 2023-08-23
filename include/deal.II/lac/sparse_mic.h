@@ -95,7 +95,7 @@ public:
   template <typename somenumber>
   void
   initialize(const SparseMatrix<somenumber> &matrix,
-             const AdditionalData &          parameters = AdditionalData());
+             const AdditionalData           &parameters = AdditionalData());
 
   /**
    * Apply the incomplete decomposition, i.e. do one forward-backward step

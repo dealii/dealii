@@ -126,9 +126,9 @@ public:
   {}
 
   void
-  operator_face(const MatrixFree<dim, Number> &              data,
-                Vector<Number> &                             dst,
-                const Vector<Number> &                       src,
+  operator_face(const MatrixFree<dim, Number>               &data,
+                Vector<Number>                              &dst,
+                const Vector<Number>                        &src,
                 const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, dim, Number> fe_eval(data,
@@ -169,9 +169,9 @@ public:
 
   void
   operator_boundary(
-    const MatrixFree<dim, Number> &              data,
-    Vector<Number> &                             dst,
-    const Vector<Number> &                       src,
+    const MatrixFree<dim, Number>               &data,
+    Vector<Number>                              &dst,
+    const Vector<Number>                        &src,
     const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, dim, Number> fe_eval(data,
@@ -210,7 +210,7 @@ public:
   };
 
 protected:
-  const MatrixFree<dim, Number> &  data;
+  const MatrixFree<dim, Number>   &data;
   EvaluationFlags::EvaluationFlags evaluation_flag;
   const TestType                   test_type;
 };
@@ -219,7 +219,7 @@ protected:
 
 template <int dim, int fe_degree, typename Number>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints,
         const TestType                   test_type)
 {

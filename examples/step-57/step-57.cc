@@ -153,12 +153,12 @@ namespace Step57
     BoundaryValues()
       : Function<dim>(dim + 1)
     {}
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component) const override;
   };
 
   template <int dim>
-  double BoundaryValues<dim>::value(const Point<dim> & p,
+  double BoundaryValues<dim>::value(const Point<dim>  &p,
                                     const unsigned int component) const
   {
     Assert(component < this->n_components,
@@ -190,8 +190,8 @@ namespace Step57
     BlockSchurPreconditioner(double                           gamma,
                              double                           viscosity,
                              const BlockSparseMatrix<double> &S,
-                             const SparseMatrix<double> &     P,
-                             const PreconditionerMp &         Mppreconditioner);
+                             const SparseMatrix<double>      &P,
+                             const PreconditionerMp          &Mppreconditioner);
 
     void vmult(BlockVector<double> &dst, const BlockVector<double> &src) const;
 
@@ -199,8 +199,8 @@ namespace Step57
     const double                     gamma;
     const double                     viscosity;
     const BlockSparseMatrix<double> &stokes_matrix;
-    const SparseMatrix<double> &     pressure_mass_matrix;
-    const PreconditionerMp &         mp_preconditioner;
+    const SparseMatrix<double>      &pressure_mass_matrix;
+    const PreconditionerMp          &mp_preconditioner;
     SparseDirectUMFPACK              A_inverse;
   };
 
@@ -214,8 +214,8 @@ namespace Step57
     double                           gamma,
     double                           viscosity,
     const BlockSparseMatrix<double> &S,
-    const SparseMatrix<double> &     P,
-    const PreconditionerMp &         Mppreconditioner)
+    const SparseMatrix<double>      &P,
+    const PreconditionerMp          &Mppreconditioner)
     : gamma(gamma)
     , viscosity(viscosity)
     , stokes_matrix(S)
@@ -227,7 +227,7 @@ namespace Step57
 
   template <class PreconditionerMp>
   void BlockSchurPreconditioner<PreconditionerMp>::vmult(
-    BlockVector<double> &      dst,
+    BlockVector<double>       &dst,
     const BlockVector<double> &src) const
   {
     Vector<double> utmp(src.block(0));

@@ -160,13 +160,13 @@ namespace
   template <int dim, int spacedim, typename Number>
   void
   fill_internal(
-    const DoFHandler<dim, spacedim> &           mg_dof,
+    const DoFHandler<dim, spacedim>            &mg_dof,
     SmartPointer<const MGConstrainedDoFs>       mg_constrained_dofs,
     const MPI_Comm                              mpi_communicator,
     const bool                                  transfer_solution_vectors,
-    std::vector<Table<2, unsigned int>> &       copy_indices,
-    std::vector<Table<2, unsigned int>> &       copy_indices_global_mine,
-    std::vector<Table<2, unsigned int>> &       copy_indices_level_mine,
+    std::vector<Table<2, unsigned int>>        &copy_indices,
+    std::vector<Table<2, unsigned int>>        &copy_indices_global_mine,
+    std::vector<Table<2, unsigned int>>        &copy_indices_level_mine,
     LinearAlgebra::distributed::Vector<Number> &ghosted_global_vector,
     MGLevelObject<LinearAlgebra::distributed::Vector<Number>>
       &ghosted_level_vector)
@@ -249,7 +249,7 @@ namespace
         auto translate_indices =
           [&](const std::vector<
                 std::pair<types::global_dof_index, types::global_dof_index>>
-                &                     global_copy_indices,
+                                     &global_copy_indices,
               Table<2, unsigned int> &local_copy_indices) {
             local_copy_indices.reinit(2, global_copy_indices.size());
             for (unsigned int i = 0; i < global_copy_indices.size(); ++i)

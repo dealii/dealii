@@ -50,9 +50,9 @@
 template <int dim>
 void
 build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
-                    TrilinosWrappers::MPI::BlockVector & vector,
-                    const FE_Q<dim> &                    fe_test,
-                    const FE_Q<dim> &                    fe_trial)
+                    TrilinosWrappers::MPI::BlockVector  &vector,
+                    const FE_Q<dim>                     &fe_test,
+                    const FE_Q<dim>                     &fe_trial)
 {
   deallog.push("build_matrix_vector");
 
@@ -141,7 +141,7 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
 
 void
 evaluate_ops(const TrilinosWrappers::BlockSparseMatrix &matrix,
-             const TrilinosWrappers::MPI::BlockVector & vector)
+             const TrilinosWrappers::MPI::BlockVector  &vector)
 {
   const double tol  = 1e-12;
   using MatrixType  = dealii::TrilinosWrappers::SparseMatrix;

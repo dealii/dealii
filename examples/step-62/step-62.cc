@@ -86,7 +86,7 @@ namespace step62
   public:
     RightHandSide(HDF5::Group &data);
 
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component) const override;
 
   private:
@@ -154,7 +154,7 @@ namespace step62
   public:
     Rho(HDF5::Group &data);
 
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
 
   private:
@@ -394,7 +394,7 @@ namespace step62
   // that the pulse has been cropped to $x_\textrm{min}<x<x_\textrm{max}$ and
   // $y_\textrm{min} <y<y_\textrm{max}$.
   template <int dim>
-  double RightHandSide<dim>::value(const Point<dim> & p,
+  double RightHandSide<dim>::value(const Point<dim>  &p,
                                    const unsigned int component) const
   {
     if (component == force_component)
@@ -450,7 +450,7 @@ namespace step62
   // The PML coefficient for the `x` component takes the form
   // $s'_x = a_x x^{\textrm{degree}}$
   template <int dim>
-  std::complex<double> PML<dim>::value(const Point<dim> & p,
+  std::complex<double> PML<dim>::value(const Point<dim>  &p,
                                        const unsigned int component) const
   {
     double calculated_pml_x_coeff = 0;

@@ -144,7 +144,7 @@ namespace internal
       &pack_callbacks_fixed,
     const std::vector<
       typename internal::CellAttachedData<dim, spacedim>::pack_callback_t>
-      &             pack_callbacks_variable,
+                   &pack_callbacks_variable,
     const MPI_Comm &mpi_communicator)
   {
     Assert(src_data_fixed.empty(),
@@ -504,7 +504,7 @@ namespace internal
   void CellAttachedDataSerializer<dim, spacedim>::unpack_data(
     const std::vector<
       typename CellAttachedDataSerializer<dim, spacedim>::cell_relation_t>
-      &                cell_relations,
+                      &cell_relations,
     const unsigned int handle,
     const std::function<
       void(const cell_iterator &,
@@ -672,7 +672,7 @@ namespace internal
     const unsigned int global_first_cell,
     const unsigned int global_num_cells,
     const std::string &filename,
-    const MPI_Comm &   mpi_communicator) const
+    const MPI_Comm    &mpi_communicator) const
   {
     Assert(sizes_fixed_cumulative.size() > 0,
            ExcMessage("No data has been packed!"));
@@ -904,7 +904,7 @@ namespace internal
     const std::string &filename,
     const unsigned int n_attached_deserialize_fixed,
     const unsigned int n_attached_deserialize_variable,
-    const MPI_Comm &   mpi_communicator)
+    const MPI_Comm    &mpi_communicator)
   {
     Assert(dest_data_fixed.empty(),
            ExcMessage("Previously loaded data has not been released yet!"));
@@ -1643,7 +1643,7 @@ namespace
     const typename Triangulation<dim, spacedim>::cell_iterator &cell_2,
     unsigned int                                                n_face_1,
     unsigned int                                                n_face_2,
-    const std::bitset<3> &                                      orientation,
+    const std::bitset<3>                                       &orientation,
     typename std::map<
       std::pair<typename Triangulation<dim, spacedim>::cell_iterator,
                 unsigned int>,
@@ -2046,7 +2046,7 @@ namespace internal
      * @note Used only for dim=3.
      */
     void
-    reserve_space(TriaFaces &        tria_faces,
+    reserve_space(TriaFaces         &tria_faces,
                   const unsigned int new_quads_in_pairs,
                   const unsigned int new_quads_single)
     {
@@ -2127,7 +2127,7 @@ namespace internal
      */
 
     void
-    reserve_space(TriaLevel &        tria_level,
+    reserve_space(TriaLevel         &tria_level,
                   const unsigned int total_cells,
                   const unsigned int dimension,
                   const unsigned int space_dimension)
@@ -2238,7 +2238,7 @@ namespace internal
      * should be called from the functions of the higher TriaLevel classes.
      */
     void
-    monitor_memory(const TriaLevel &  tria_level,
+    monitor_memory(const TriaLevel   &tria_level,
                    const unsigned int true_dimension)
     {
       (void)tria_level;
@@ -2268,7 +2268,7 @@ namespace internal
      * lines in the interior of refined cells can be stored as single lines.
      */
     void
-    reserve_space(TriaObjects &      tria_objects,
+    reserve_space(TriaObjects       &tria_objects,
                   const unsigned int new_objects_in_pairs,
                   const unsigned int new_objects_single = 0)
     {
@@ -2522,9 +2522,9 @@ namespace internal
        */
       virtual void
       delete_children(
-        Triangulation<dim, spacedim> &                        triangulation,
+        Triangulation<dim, spacedim>                         &triangulation,
         typename Triangulation<dim, spacedim>::cell_iterator &cell,
-        std::vector<unsigned int> &                           line_cell_count,
+        std::vector<unsigned int>                            &line_cell_count,
         std::vector<unsigned int> &quad_cell_count) = 0;
 
       /**
@@ -2584,9 +2584,9 @@ namespace internal
 
       void
       delete_children(
-        Triangulation<dim, spacedim> &                        tria,
+        Triangulation<dim, spacedim>                         &tria,
         typename Triangulation<dim, spacedim>::cell_iterator &cell,
-        std::vector<unsigned int> &                           line_cell_count,
+        std::vector<unsigned int>                            &line_cell_count,
         std::vector<unsigned int> &quad_cell_count) override
       {
         T::delete_children(tria, cell, line_cell_count, quad_cell_count);
@@ -2741,7 +2741,7 @@ namespace internal
       template <int dim, int spacedim>
       static void
       compute_number_cache_dim(
-        const Triangulation<dim, spacedim> &                   triangulation,
+        const Triangulation<dim, spacedim>                    &triangulation,
         const unsigned int                                     level_objects,
         internal::TriangulationImplementation::NumberCache<1> &number_cache)
       {
@@ -2829,7 +2829,7 @@ namespace internal
       template <int dim, int spacedim>
       static void
       compute_number_cache_dim(
-        const Triangulation<dim, spacedim> &                   triangulation,
+        const Triangulation<dim, spacedim>                    &triangulation,
         const unsigned int                                     level_objects,
         internal::TriangulationImplementation::NumberCache<2> &number_cache)
       {
@@ -2936,7 +2936,7 @@ namespace internal
       template <int dim, int spacedim>
       static void
       compute_number_cache_dim(
-        const Triangulation<dim, spacedim> &                   triangulation,
+        const Triangulation<dim, spacedim>                    &triangulation,
         const unsigned int                                     level_objects,
         internal::TriangulationImplementation::NumberCache<3> &number_cache)
       {
@@ -3029,7 +3029,7 @@ namespace internal
       template <int dim, int spacedim>
       static void
       compute_number_cache(
-        const Triangulation<dim, spacedim> &                     triangulation,
+        const Triangulation<dim, spacedim>                      &triangulation,
         const unsigned int                                       level_objects,
         internal::TriangulationImplementation::NumberCache<dim> &number_cache)
       {
@@ -3236,9 +3236,9 @@ namespace internal
       template <int dim, int spacedim>
       static void
       create_triangulation(const std::vector<Point<spacedim>> &vertices,
-                           const std::vector<CellData<dim>> &  cells,
-                           const SubCellData &                 subcelldata,
-                           Triangulation<dim, spacedim> &      tria)
+                           const std::vector<CellData<dim>>   &cells,
+                           const SubCellData                  &subcelldata,
+                           Triangulation<dim, spacedim>       &tria)
       {
         AssertThrow(vertices.size() > 0, ExcMessage("No vertices given"));
         AssertThrow(cells.size() > 0, ExcMessage("No cells given"));
@@ -3288,7 +3288,7 @@ namespace internal
             auto &lines_0 = tria.faces->lines; // data structure to be filled
 
             // get connectivity between quads and lines
-            const auto &       crs     = connectivity.entity_to_entities(1, 0);
+            const auto        &crs     = connectivity.entity_to_entities(1, 0);
             const unsigned int n_lines = crs.ptr.size() - 1;
 
             // allocate memory
@@ -3309,7 +3309,7 @@ namespace internal
             auto &faces   = *tria.faces;
 
             // get connectivity between quads and lines
-            const auto &       crs     = connectivity.entity_to_entities(2, 1);
+            const auto        &crs     = connectivity.entity_to_entities(2, 1);
             const unsigned int n_quads = crs.ptr.size() - 1;
 
             // allocate memory
@@ -3499,10 +3499,10 @@ namespace internal
       template <int structdim, int spacedim, typename T>
       static void
       process_subcelldata(
-        const CRS<T> &                          crs,
-        TriaObjects &                           obj,
+        const CRS<T>                           &crs,
+        TriaObjects                            &obj,
         const std::vector<CellData<structdim>> &boundary_objects_in,
-        const std::vector<Point<spacedim>> &    vertex_locations)
+        const std::vector<Point<spacedim>>     &vertex_locations)
       {
         AssertDimension(obj.structdim, structdim);
 
@@ -3606,7 +3606,7 @@ namespace internal
 
 
       static void
-      reserve_space_(TriaFaces &        faces,
+      reserve_space_(TriaFaces         &faces,
                      const unsigned     structdim,
                      const unsigned int size)
       {
@@ -3628,7 +3628,7 @@ namespace internal
 
 
       static void
-      reserve_space_(TriaLevel &        level,
+      reserve_space_(TriaLevel         &level,
                      const unsigned int spacedim,
                      const unsigned int size,
                      const bool         orientation_needed)
@@ -4591,7 +4591,7 @@ namespace internal
       static void
       create_children(
         Triangulation<2, spacedim> &triangulation,
-        unsigned int &              next_unused_vertex,
+        unsigned int               &next_unused_vertex,
         typename Triangulation<2, spacedim>::raw_line_iterator
           &next_unused_line,
         typename Triangulation<2, spacedim>::raw_cell_iterator
@@ -5140,11 +5140,11 @@ namespace internal
         typename Triangulation<dim, spacedim>::raw_line_iterator
           next_unused_line = triangulation.begin_raw_line();
 
-        const auto create_children = [](auto &        triangulation,
+        const auto create_children = [](auto         &triangulation,
                                         unsigned int &next_unused_vertex,
-                                        auto &        next_unused_line,
-                                        auto &        next_unused_cell,
-                                        const auto &  cell) {
+                                        auto         &next_unused_line,
+                                        auto         &next_unused_cell,
+                                        const auto   &cell) {
           const auto ref_case = cell->refine_flag_set();
           cell->clear_refine_flag();
 
@@ -12023,10 +12023,10 @@ namespace internal
       template <int dim, int spacedim>
       static void
       delete_children(
-        Triangulation<dim, spacedim> &                        triangulation,
+        Triangulation<dim, spacedim>                         &triangulation,
         typename Triangulation<dim, spacedim>::cell_iterator &cell,
-        std::vector<unsigned int> &                           line_cell_count,
-        std::vector<unsigned int> &                           quad_cell_count)
+        std::vector<unsigned int>                            &line_cell_count,
+        std::vector<unsigned int>                            &quad_cell_count)
       {
         AssertThrow(false, ExcNotImplemented());
         (void)triangulation;
@@ -12561,8 +12561,8 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::create_triangulation(
   const std::vector<Point<spacedim>> &v,
-  const std::vector<CellData<dim>> &  cells,
-  const SubCellData &                 subcelldata)
+  const std::vector<CellData<dim>>   &cells,
+  const SubCellData                  &subcelldata)
 {
   Assert((vertices.empty()) && (levels.empty()) && (faces == nullptr),
          ExcTriangulationNotEmpty(vertices.size(), levels.size()));
@@ -13160,7 +13160,7 @@ namespace
     unsigned int dim,
     std::vector<
       std::unique_ptr<internal::TriangulationImplementation::TriaLevel>>
-      &                                               levels,
+                                                     &levels,
     internal::TriangulationImplementation::TriaFaces *faces)
   {
     if (dim == 1)
@@ -13196,7 +13196,7 @@ namespace
     unsigned int dim,
     std::vector<
       std::unique_ptr<internal::TriangulationImplementation::TriaLevel>>
-      &                                               levels,
+                                                     &levels,
     internal::TriangulationImplementation::TriaFaces *faces)
   {
     if (dim == 1)
@@ -15925,7 +15925,7 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::register_data_attach(
   const std::function<std::vector<char>(const cell_iterator &,
                                         const ::dealii::CellStatus)>
-    &        pack_callback,
+            &pack_callback,
   const bool returns_variable_size_data)
 {
   unsigned int handle = numbers::invalid_unsigned_int;
@@ -17635,10 +17635,10 @@ void Triangulation<dim, spacedim>::write_bool_vector(
   const unsigned int       magic_number1,
   const std::vector<bool> &v,
   const unsigned int       magic_number2,
-  std::ostream &           out)
+  std::ostream            &out)
 {
   const unsigned int N     = v.size();
-  unsigned char *    flags = new unsigned char[N / 8 + 1];
+  unsigned char     *flags = new unsigned char[N / 8 + 1];
   for (unsigned int i = 0; i < N / 8 + 1; ++i)
     flags[i] = 0;
 
@@ -17670,7 +17670,7 @@ void Triangulation<dim, spacedim>::read_bool_vector(
   const unsigned int magic_number1,
   std::vector<bool> &v,
   const unsigned int magic_number2,
-  std::istream &     in)
+  std::istream      &in)
 {
   AssertThrow(in.fail() == false, ExcIO());
 
@@ -17682,7 +17682,7 @@ void Triangulation<dim, spacedim>::read_bool_vector(
   in >> N;
   v.resize(N);
 
-  unsigned char *    flags = new unsigned char[N / 8 + 1];
+  unsigned char     *flags = new unsigned char[N / 8 + 1];
   unsigned short int tmp;
   for (unsigned int i = 0; i < N / 8 + 1; ++i)
     {

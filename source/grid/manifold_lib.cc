@@ -286,7 +286,7 @@ namespace
   bool
   spherical_face_is_horizontal(
     const typename Triangulation<dim, spacedim>::face_iterator &face,
-    const Point<spacedim> &                                     manifold_center)
+    const Point<spacedim>                                      &manifold_center)
   {
     // We test whether a face is horizontal by checking that the vertices
     // all have roughly the same distance from the center: If the
@@ -325,7 +325,7 @@ template <int dim, int spacedim>
 Tensor<1, spacedim>
 PolarManifold<dim, spacedim>::normal_vector(
   const typename Triangulation<dim, spacedim>::face_iterator &face,
-  const Point<spacedim> &                                     p) const
+  const Point<spacedim>                                      &p) const
 {
   // Let us first test whether we are on a "horizontal" face
   // (tangential to the sphere).  In this case, the normal vector is
@@ -494,7 +494,7 @@ template <int dim, int spacedim>
 Tensor<1, spacedim>
 SphericalManifold<dim, spacedim>::normal_vector(
   const typename Triangulation<dim, spacedim>::face_iterator &face,
-  const Point<spacedim> &                                     p) const
+  const Point<spacedim>                                      &p) const
 {
   // Let us first test whether we are on a "horizontal" face
   // (tangential to the sphere).  In this case, the normal vector is
@@ -573,7 +573,7 @@ template <int dim, int spacedim>
 void
 SphericalManifold<dim, spacedim>::get_new_points(
   const ArrayView<const Point<spacedim>> &surrounding_points,
-  const Table<2, double> &                weights,
+  const Table<2, double>                 &weights,
   ArrayView<Point<spacedim>>              new_points) const
 {
   AssertDimension(new_points.size(), weights.size(0));
@@ -590,7 +590,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 SphericalManifold<dim, spacedim>::get_new_point(
   const ArrayView<const Point<spacedim>> &vertices,
-  const ArrayView<const double> &         weights) const
+  const ArrayView<const double>          &weights) const
 {
   // To avoid duplicating all of the logic in get_new_points, simply call it
   // for one position.
@@ -608,7 +608,7 @@ template <int dim, int spacedim>
 void
 SphericalManifold<dim, spacedim>::get_new_points(
   const ArrayView<const Point<spacedim>> &surrounding_points,
-  const ArrayView<const double> &         weights,
+  const ArrayView<const double>          &weights,
   ArrayView<Point<spacedim>>              new_points) const
 {
   AssertDimension(weights.size(),
@@ -817,8 +817,8 @@ template <int dim, int spacedim>
 std::pair<double, Tensor<1, spacedim>>
 SphericalManifold<dim, spacedim>::guess_new_point(
   const ArrayView<const Tensor<1, spacedim>> &directions,
-  const ArrayView<const double> &             distances,
-  const ArrayView<const double> &             weights) const
+  const ArrayView<const double>              &distances,
+  const ArrayView<const double>              &weights) const
 {
   const double        tolerance = 1e-10;
   double              rho       = 0.;
@@ -864,9 +864,9 @@ namespace
   template <>
   Point<3>
   do_get_new_point(const ArrayView<const Tensor<1, 3>> &directions,
-                   const ArrayView<const double> &      distances,
-                   const ArrayView<const double> &      weights,
-                   const Point<3> &                     candidate_point)
+                   const ArrayView<const double>       &distances,
+                   const ArrayView<const double>       &weights,
+                   const Point<3>                      &candidate_point)
   {
     (void)distances;
 
@@ -1002,9 +1002,9 @@ template <>
 Point<3>
 SphericalManifold<1, 3>::get_new_point(
   const ArrayView<const Tensor<1, 3>> &directions,
-  const ArrayView<const double> &      distances,
-  const ArrayView<const double> &      weights,
-  const Point<3> &                     candidate_point) const
+  const ArrayView<const double>       &distances,
+  const ArrayView<const double>       &weights,
+  const Point<3>                      &candidate_point) const
 {
   return do_get_new_point(directions, distances, weights, candidate_point);
 }
@@ -1015,9 +1015,9 @@ template <>
 Point<3>
 SphericalManifold<2, 3>::get_new_point(
   const ArrayView<const Tensor<1, 3>> &directions,
-  const ArrayView<const double> &      distances,
-  const ArrayView<const double> &      weights,
-  const Point<3> &                     candidate_point) const
+  const ArrayView<const double>       &distances,
+  const ArrayView<const double>       &weights,
+  const Point<3>                      &candidate_point) const
 {
   return do_get_new_point(directions, distances, weights, candidate_point);
 }
@@ -1028,9 +1028,9 @@ template <>
 Point<3>
 SphericalManifold<3, 3>::get_new_point(
   const ArrayView<const Tensor<1, 3>> &directions,
-  const ArrayView<const double> &      distances,
-  const ArrayView<const double> &      weights,
-  const Point<3> &                     candidate_point) const
+  const ArrayView<const double>       &distances,
+  const ArrayView<const double>       &weights,
+  const Point<3>                      &candidate_point) const
 {
   return do_get_new_point(directions, distances, weights, candidate_point);
 }
@@ -1058,7 +1058,7 @@ CylindricalManifold<dim, spacedim>::CylindricalManifold(const unsigned int axis,
 template <int dim, int spacedim>
 CylindricalManifold<dim, spacedim>::CylindricalManifold(
   const Tensor<1, spacedim> &direction,
-  const Point<spacedim> &    point_on_axis,
+  const Point<spacedim>     &point_on_axis,
   const double               tolerance)
   : ChartManifold<dim, spacedim, 3>(Tensor<1, 3>({0, 2. * numbers::PI, 0}))
   , normal_direction(internal::compute_normal(direction, true))
@@ -1088,7 +1088,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 CylindricalManifold<dim, spacedim>::get_new_point(
   const ArrayView<const Point<spacedim>> &surrounding_points,
-  const ArrayView<const double> &         weights) const
+  const ArrayView<const double>          &weights) const
 {
   Assert(spacedim == 3,
          ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
@@ -1205,7 +1205,7 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
 // ============================================================
 template <int dim, int spacedim>
 EllipticalManifold<dim, spacedim>::EllipticalManifold(
-  const Point<spacedim> &    center,
+  const Point<spacedim>     &center,
   const Tensor<1, spacedim> &major_axis_direction,
   const double               eccentricity)
   : ChartManifold<dim, spacedim, spacedim>(
@@ -1360,8 +1360,8 @@ EllipticalManifold<2, 2>::push_forward_gradient(
 // ============================================================
 template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
-  const Function<chartdim> & push_forward_function,
-  const Function<spacedim> & pull_back_function,
+  const Function<chartdim>  &push_forward_function,
+  const Function<spacedim>  &pull_back_function,
   const Tensor<1, chartdim> &periodicity,
   const double               tolerance)
   : ChartManifold<dim, spacedim, chartdim>(periodicity)
@@ -1382,7 +1382,7 @@ template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   std::unique_ptr<Function<chartdim>> push_forward,
   std::unique_ptr<Function<spacedim>> pull_back,
-  const Tensor<1, chartdim> &         periodicity,
+  const Tensor<1, chartdim>          &periodicity,
   const double                        tolerance)
   : ChartManifold<dim, spacedim, chartdim>(periodicity)
   , const_map()
@@ -1402,7 +1402,7 @@ template <int dim, int spacedim, int chartdim>
 FunctionManifold<dim, spacedim, chartdim>::FunctionManifold(
   const std::string                                 push_forward_expression,
   const std::string                                 pull_back_expression,
-  const Tensor<1, chartdim> &                       periodicity,
+  const Tensor<1, chartdim>                        &periodicity,
   const typename FunctionParser<spacedim>::ConstMap const_map,
   const std::string                                 chart_vars,
   const std::string                                 space_vars,
@@ -1726,7 +1726,7 @@ namespace
   template <typename AccessorType>
   Point<AccessorType::space_dimension>
   compute_transfinite_interpolation(const AccessorType &cell,
-                                    const Point<1> &    chart_point,
+                                    const Point<1>     &chart_point,
                                     const bool /*cell_is_flat*/)
   {
     return cell.vertex(0) * (1. - chart_point[0]) +
@@ -1737,7 +1737,7 @@ namespace
   template <typename AccessorType>
   Point<AccessorType::space_dimension>
   compute_transfinite_interpolation(const AccessorType &cell,
-                                    const Point<2> &    chart_point,
+                                    const Point<2>     &chart_point,
                                     const bool          cell_is_flat)
   {
     const unsigned int       dim             = AccessorType::dimension;
@@ -1852,7 +1852,7 @@ namespace
   template <typename AccessorType>
   Point<AccessorType::space_dimension>
   compute_transfinite_interpolation(const AccessorType &cell,
-                                    const Point<3> &    chart_point,
+                                    const Point<3>     &chart_point,
                                     const bool          cell_is_flat)
   {
     const unsigned int       dim             = AccessorType::dimension;
@@ -2035,7 +2035,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 TransfiniteInterpolationManifold<dim, spacedim>::push_forward(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const Point<dim> &                                          chart_point) const
+  const Point<dim>                                           &chart_point) const
 {
   AssertDimension(cell->level(), level_coarse);
 
@@ -2056,7 +2056,7 @@ template <int dim, int spacedim>
 DerivativeForm<1, dim, spacedim>
 TransfiniteInterpolationManifold<dim, spacedim>::push_forward_gradient(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const Point<dim> &                                          chart_point,
+  const Point<dim>                                           &chart_point,
   const Point<spacedim> &pushed_forward_chart_point) const
 {
   // compute the derivative with the help of finite differences
@@ -2085,7 +2085,7 @@ template <int dim, int spacedim>
 Point<dim>
 TransfiniteInterpolationManifold<dim, spacedim>::pull_back(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const Point<spacedim> &                                     point,
+  const Point<spacedim>                                      &point,
   const Point<dim> &initial_guess) const
 {
   Point<dim> outside;
@@ -2582,7 +2582,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 TransfiniteInterpolationManifold<dim, spacedim>::get_new_point(
   const ArrayView<const Point<spacedim>> &surrounding_points,
-  const ArrayView<const double> &         weights) const
+  const ArrayView<const double>          &weights) const
 {
   boost::container::small_vector<Point<dim>, 100> chart_points(
     surrounding_points.size());
@@ -2602,7 +2602,7 @@ template <int dim, int spacedim>
 void
 TransfiniteInterpolationManifold<dim, spacedim>::get_new_points(
   const ArrayView<const Point<spacedim>> &surrounding_points,
-  const Table<2, double> &                weights,
+  const Table<2, double>                 &weights,
   ArrayView<Point<spacedim>>              new_points) const
 {
   Assert(weights.size(0) > 0, ExcEmptyObject());

@@ -321,9 +321,9 @@ namespace MatrixTools
   void
   apply_boundary_values(
     const std::map<types::global_dof_index, number> &boundary_values,
-    SparseMatrix<number> &                           matrix,
-    Vector<number> &                                 solution,
-    Vector<number> &                                 right_hand_side,
+    SparseMatrix<number>                            &matrix,
+    Vector<number>                                  &solution,
+    Vector<number>                                  &right_hand_side,
     const bool                                       eliminate_columns = true);
 
   /**
@@ -335,9 +335,9 @@ namespace MatrixTools
   void
   apply_boundary_values(
     const std::map<types::global_dof_index, number> &boundary_values,
-    BlockSparseMatrix<number> &                      matrix,
-    BlockVector<number> &                            solution,
-    BlockVector<number> &                            right_hand_side,
+    BlockSparseMatrix<number>                       &matrix,
+    BlockVector<number>                             &solution,
+    BlockVector<number>                             &right_hand_side,
     const bool                                       eliminate_columns = true);
 
 #ifdef DEAL_II_WITH_PETSC
@@ -351,9 +351,9 @@ namespace MatrixTools
   void
   apply_boundary_values(
     const std::map<types::global_dof_index, PetscScalar> &boundary_values,
-    PETScWrappers::MatrixBase &                           matrix,
-    PETScWrappers::VectorBase &                           solution,
-    PETScWrappers::VectorBase &                           right_hand_side,
+    PETScWrappers::MatrixBase                            &matrix,
+    PETScWrappers::VectorBase                            &solution,
+    PETScWrappers::VectorBase                            &right_hand_side,
     const bool eliminate_columns = true);
 
   /**
@@ -362,9 +362,9 @@ namespace MatrixTools
   void
   apply_boundary_values(
     const std::map<types::global_dof_index, PetscScalar> &boundary_values,
-    PETScWrappers::MPI::BlockSparseMatrix &               matrix,
-    PETScWrappers::MPI::BlockVector &                     solution,
-    PETScWrappers::MPI::BlockVector &                     right_hand_side,
+    PETScWrappers::MPI::BlockSparseMatrix                &matrix,
+    PETScWrappers::MPI::BlockVector                      &solution,
+    PETScWrappers::MPI::BlockVector                      &right_hand_side,
     const bool eliminate_columns = true);
 
 #endif
@@ -406,9 +406,9 @@ namespace MatrixTools
   void
   apply_boundary_values(
     const std::map<types::global_dof_index, TrilinosScalar> &boundary_values,
-    TrilinosWrappers::SparseMatrix &                         matrix,
-    TrilinosWrappers::MPI::Vector &                          solution,
-    TrilinosWrappers::MPI::Vector &                          right_hand_side,
+    TrilinosWrappers::SparseMatrix                          &matrix,
+    TrilinosWrappers::MPI::Vector                           &solution,
+    TrilinosWrappers::MPI::Vector                           &right_hand_side,
     const bool eliminate_columns = true);
 
   /**
@@ -418,9 +418,9 @@ namespace MatrixTools
   void
   apply_boundary_values(
     const std::map<types::global_dof_index, TrilinosScalar> &boundary_values,
-    TrilinosWrappers::BlockSparseMatrix &                    matrix,
-    TrilinosWrappers::MPI::BlockVector &                     solution,
-    TrilinosWrappers::MPI::BlockVector &                     right_hand_side,
+    TrilinosWrappers::BlockSparseMatrix                     &matrix,
+    TrilinosWrappers::MPI::BlockVector                      &solution,
+    TrilinosWrappers::MPI::BlockVector                      &right_hand_side,
     const bool eliminate_columns = true);
 #endif
 
@@ -446,9 +446,9 @@ namespace MatrixTools
   void
   local_apply_boundary_values(
     const std::map<types::global_dof_index, number> &boundary_values,
-    const std::vector<types::global_dof_index> &     local_dof_indices,
-    FullMatrix<number> &                             local_matrix,
-    Vector<number> &                                 local_rhs,
+    const std::vector<types::global_dof_index>      &local_dof_indices,
+    FullMatrix<number>                              &local_matrix,
+    Vector<number>                                  &local_rhs,
     const bool                                       eliminate_columns);
 
   /**

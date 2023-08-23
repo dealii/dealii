@@ -298,17 +298,17 @@ namespace Functions
 
     // documentation inherited from the base class
     virtual Tensor<1, dim, RangeNumberType>
-    gradient(const Point<dim> & p,
+    gradient(const Point<dim>  &p,
              const unsigned int component = 0) const override;
 
     // documentation inherited from the base class
     virtual RangeNumberType
-    laplacian(const Point<dim> & p,
+    laplacian(const Point<dim>  &p,
               const unsigned int component = 0) const override;
 
     // documentation inherited from the base class
     virtual SymmetricTensor<2, dim, RangeNumberType>
-    hessian(const Point<dim> & p,
+    hessian(const Point<dim>  &p,
             const unsigned int component = 0) const override;
 
     /**

@@ -32,8 +32,8 @@ DEAL_II_NAMESPACE_OPEN
 template <typename VectorType>
 void
 MGSmootherBase<VectorType>::apply(const unsigned int level,
-                                  VectorType &       u,
-                                  const VectorType & rhs) const
+                                  VectorType        &u,
+                                  const VectorType  &rhs) const
 {
   u = typename VectorType::value_type(0.);
   smooth(level, u, rhs);
@@ -44,8 +44,8 @@ MGSmootherBase<VectorType>::apply(const unsigned int level,
 template <typename VectorType>
 void
 MGTransferBase<VectorType>::prolongate_and_add(const unsigned int to_level,
-                                               VectorType &       dst,
-                                               const VectorType & src) const
+                                               VectorType        &dst,
+                                               const VectorType  &src) const
 {
   VectorType temp;
   temp.reinit(dst, true);

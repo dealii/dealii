@@ -65,9 +65,9 @@ public:
               update_values | update_gradients | update_JxW_values){};
 
   void
-  operator()(const MatrixFree<dim, Number> &              data,
-             VectorType &                                 dst,
-             const VectorType &                           src,
+  operator()(const MatrixFree<dim, Number>               &data,
+             VectorType                                  &dst,
+             const VectorType                            &src,
              const std::pair<unsigned int, unsigned int> &cell_range) const;
 
   void
@@ -95,7 +95,7 @@ template <int dim, int fe_degree, typename Number>
 void
 MatrixFreeTest<dim, fe_degree, Number>::operator()(
   const MatrixFree<dim, Number> &data,
-  std::vector<Vector<Number>> &  dst,
+  std::vector<Vector<Number>>   &dst,
   const std::vector<Vector<Number>> &,
   const std::pair<unsigned int, unsigned int> &cell_range) const
 {

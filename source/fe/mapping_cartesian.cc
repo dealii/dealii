@@ -61,7 +61,7 @@ is_cartesian(const CellType &cell)
   const double abs_tol           = 1e-30;
   const double rel_tol           = 1e-28;
   const auto   bounding_box      = cell->bounding_box();
-  const auto & bounding_vertices = bounding_box.get_boundary_points();
+  const auto  &bounding_vertices = bounding_box.get_boundary_points();
   const auto   bb_diagonal_length_squared =
     bounding_vertices.first.distance_square(bounding_vertices.second);
 
@@ -231,7 +231,7 @@ void
 MappingCartesian<dim, spacedim>::update_cell_extents(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity                            cell_similarity,
-  const InternalData &                                        data) const
+  const InternalData                                         &data) const
 {
   // Compute start point and sizes
   // along axes.  Strange vertex
@@ -266,7 +266,7 @@ template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::maybe_update_cell_quadrature_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const InternalData &                                        data,
+  const InternalData                                         &data,
   std::vector<Point<dim>> &quadrature_points) const
 {
   if (data.update_each & update_quadrature_points)
@@ -284,7 +284,7 @@ void
 MappingCartesian<dim, spacedim>::maybe_update_face_quadrature_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const InternalData &                                        data,
+  const InternalData                                         &data,
   std::vector<Point<dim>> &quadrature_points) const
 {
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
@@ -312,7 +312,7 @@ MappingCartesian<dim, spacedim>::maybe_update_subface_quadrature_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          sub_no,
-  const InternalData &                                        data,
+  const InternalData                                         &data,
   std::vector<Point<dim>> &quadrature_points) const
 {
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
@@ -344,8 +344,8 @@ template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::transform_quadrature_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const InternalData &                                        data,
-  const typename QProjector<dim>::DataSetDescriptor &         offset,
+  const InternalData                                         &data,
+  const typename QProjector<dim>::DataSetDescriptor          &offset,
   std::vector<Point<dim>> &quadrature_points) const
 {
   // let @p{start} be the origin of a local coordinate system. it is chosen
@@ -367,7 +367,7 @@ template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::maybe_update_normal_vectors(
   const unsigned int           face_no,
-  const InternalData &         data,
+  const InternalData          &data,
   std::vector<Tensor<1, dim>> &normal_vectors) const
 {
   // compute normal vectors. All normals on a face have the same value.
@@ -385,7 +385,7 @@ MappingCartesian<dim, spacedim>::maybe_update_normal_vectors(
 template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::maybe_update_jacobian_derivatives(
-  const InternalData &             data,
+  const InternalData              &data,
   const CellSimilarity::Similarity cell_similarity,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
@@ -453,7 +453,7 @@ MappingCartesian<dim, spacedim>::maybe_update_volume_elements(
 template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::maybe_update_jacobians(
-  const InternalData &             data,
+  const InternalData              &data,
   const CellSimilarity::Similarity cell_similarity,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
@@ -475,7 +475,7 @@ MappingCartesian<dim, spacedim>::maybe_update_jacobians(
 template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::maybe_update_inverse_jacobians(
-  const InternalData &             data,
+  const InternalData              &data,
   const CellSimilarity::Similarity cell_similarity,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
@@ -499,8 +499,8 @@ CellSimilarity::Similarity
 MappingCartesian<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity                            cell_similarity,
-  const Quadrature<dim> &                                     quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const Quadrature<dim>                                      &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -547,7 +547,7 @@ template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::fill_mapping_data_for_generic_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const ArrayView<const Point<dim>> &                         unit_points,
+  const ArrayView<const Point<dim>>                          &unit_points,
   const UpdateFlags                                           update_flags,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
@@ -586,8 +586,8 @@ void
 MappingCartesian<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const hp::QCollection<dim - 1> &                            quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const hp::QCollection<dim - 1>                             &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -640,8 +640,8 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          subface_no,
-  const Quadrature<dim - 1> &                                 quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const Quadrature<dim - 1>                                  &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -697,8 +697,8 @@ template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const NonMatching::ImmersedSurfaceQuadrature<dim> &         quadrature,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   internal_data,
+  const NonMatching::ImmersedSurfaceQuadrature<dim>          &quadrature,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const
 {
@@ -760,10 +760,10 @@ MappingCartesian<dim, spacedim>::fill_fe_immersed_surface_values(
 template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::transform(
-  const ArrayView<const Tensor<1, dim>> &                  input,
+  const ArrayView<const Tensor<1, dim>>                   &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<1, spacedim>> &                   output) const
+  const ArrayView<Tensor<1, spacedim>>                    &output) const
 {
   AssertDimension(input.size(), output.size());
   Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
@@ -823,7 +823,7 @@ MappingCartesian<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<1, dim, spacedim>> &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<2, spacedim>> &                   output) const
+  const ArrayView<Tensor<2, spacedim>>                    &output) const
 {
   AssertDimension(input.size(), output.size());
   Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
@@ -930,10 +930,10 @@ MappingCartesian<dim, spacedim>::transform(
 template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::transform(
-  const ArrayView<const Tensor<2, dim>> &                  input,
+  const ArrayView<const Tensor<2, dim>>                   &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<2, spacedim>> &                   output) const
+  const ArrayView<Tensor<2, spacedim>>                    &output) const
 {
   AssertDimension(input.size(), output.size());
   Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
@@ -1043,7 +1043,7 @@ MappingCartesian<dim, spacedim>::transform(
   const ArrayView<const DerivativeForm<2, dim, spacedim>> &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<3, spacedim>> &                   output) const
+  const ArrayView<Tensor<3, spacedim>>                    &output) const
 {
   AssertDimension(input.size(), output.size());
   Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
@@ -1079,10 +1079,10 @@ MappingCartesian<dim, spacedim>::transform(
 template <int dim, int spacedim>
 void
 MappingCartesian<dim, spacedim>::transform(
-  const ArrayView<const Tensor<3, dim>> &                  input,
+  const ArrayView<const Tensor<3, dim>>                   &input,
   const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
-  const ArrayView<Tensor<3, spacedim>> &                   output) const
+  const ArrayView<Tensor<3, spacedim>>                    &output) const
 {
   AssertDimension(input.size(), output.size());
   Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
@@ -1168,7 +1168,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 MappingCartesian<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const Point<dim> &                                          p) const
+  const Point<dim>                                           &p) const
 {
   Assert(is_cartesian(cell), ExcCellNotCartesian());
 
@@ -1205,7 +1205,7 @@ template <int dim, int spacedim>
 Point<dim>
 MappingCartesian<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  const Point<spacedim> &                                     p) const
+  const Point<spacedim>                                      &p) const
 {
   Assert(is_cartesian(cell), ExcCellNotCartesian());
 

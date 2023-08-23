@@ -249,7 +249,7 @@ public:
    * as the overload which takes iterators.
    */
   virtual void
-  add_row_entries(const size_type &                 row,
+  add_row_entries(const size_type                  &row,
                   const ArrayView<const size_type> &columns,
                   const bool indices_are_sorted = false) override;
 
@@ -470,8 +470,8 @@ public:
    * optimized diagonals, while this is not done for the off-diagonal blocks.
    */
   void
-  reinit(const BlockIndices &                          row_indices,
-         const BlockIndices &                          col_indices,
+  reinit(const BlockIndices                           &row_indices,
+         const BlockIndices                           &col_indices,
          const std::vector<std::vector<unsigned int>> &row_lengths);
 
 
@@ -985,7 +985,7 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
 template <typename SparsityPatternType>
 void
 BlockSparsityPatternBase<SparsityPatternType>::add_row_entries(
-  const size_type &                 row,
+  const size_type                  &row,
   const ArrayView<const size_type> &columns,
   const bool                        indices_are_sorted)
 {

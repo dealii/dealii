@@ -90,7 +90,7 @@ public:
   }
 
   void
-  vmult(VectorType &      dst,
+  vmult(VectorType       &dst,
         const VectorType &src,
         const std::function<void(const unsigned int, const unsigned int)>
           &operation_before_loop,
@@ -126,7 +126,7 @@ struct MyDiagonalMatrix
   {}
 
   void
-  vmult(LinearAlgebra::distributed::Vector<Number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<Number>       &dst,
         const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     dst = src;
@@ -147,7 +147,7 @@ struct DiagonalMatrixSubrange
   {}
 
   void
-  vmult(LinearAlgebra::distributed::Vector<Number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<Number>       &dst,
         const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     dst = src;
@@ -157,14 +157,14 @@ struct DiagonalMatrixSubrange
   void
   apply_to_subrange(const unsigned int begin_range,
                     const unsigned int end_range,
-                    const Number *     src_pointer_to_current_range,
-                    Number *           dst_pointer_to_current_range) const
+                    const Number      *src_pointer_to_current_range,
+                    Number            *dst_pointer_to_current_range) const
   {
     AssertIndexRange(begin_range,
                      vec.locally_owned_elements().n_elements() + 1);
     AssertIndexRange(end_range, vec.locally_owned_elements().n_elements() + 1);
 
-    const Number *     diagonal_entry = vec.begin() + begin_range;
+    const Number      *diagonal_entry = vec.begin() + begin_range;
     const unsigned int length         = end_range - begin_range;
 
     DEAL_II_OPENMP_SIMD_PRAGMA

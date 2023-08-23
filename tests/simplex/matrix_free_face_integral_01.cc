@@ -75,10 +75,10 @@ test(const unsigned int v, const unsigned int degree)
       quad       = std::make_shared<QGaussWedge<dim>>(degree + 1);
       fe_mapping = std::make_shared<FE_WedgeP<dim>>(1);
       face_quad  = hp::QCollection<dim - 1>{QGaussSimplex<dim - 1>(degree + 1),
-                                           QGaussSimplex<dim - 1>(degree + 1),
-                                           QGauss<dim - 1>(degree + 1),
-                                           QGauss<dim - 1>(degree + 1),
-                                           QGauss<dim - 1>(degree + 1)};
+                                            QGaussSimplex<dim - 1>(degree + 1),
+                                            QGauss<dim - 1>(degree + 1),
+                                            QGauss<dim - 1>(degree + 1),
+                                            QGauss<dim - 1>(degree + 1)};
     }
   else if (v == 2)
     {
@@ -88,10 +88,10 @@ test(const unsigned int v, const unsigned int degree)
       quad       = std::make_shared<QGaussPyramid<dim>>(degree + 1);
       fe_mapping = std::make_shared<FE_PyramidP<dim>>(1);
       face_quad  = hp::QCollection<dim - 1>{QGauss<dim - 1>(degree + 1),
-                                           QGaussSimplex<dim - 1>(degree + 1),
-                                           QGaussSimplex<dim - 1>(degree + 1),
-                                           QGaussSimplex<dim - 1>(degree + 1),
-                                           QGaussSimplex<dim - 1>(degree + 1)};
+                                            QGaussSimplex<dim - 1>(degree + 1),
+                                            QGaussSimplex<dim - 1>(degree + 1),
+                                            QGaussSimplex<dim - 1>(degree + 1),
+                                            QGaussSimplex<dim - 1>(degree + 1)};
     }
   else
     Assert(false, ExcNotImplemented());

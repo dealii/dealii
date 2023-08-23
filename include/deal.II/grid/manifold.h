@@ -366,7 +366,7 @@ public:
    */
   virtual Point<spacedim>
   get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
-                const ArrayView<const double> &         weights) const;
+                const ArrayView<const double>          &weights) const;
 
 
   /**
@@ -391,7 +391,7 @@ public:
    */
   virtual void
   get_new_points(const ArrayView<const Point<spacedim>> &surrounding_points,
-                 const Table<2, double> &                weights,
+                 const Table<2, double>                 &weights,
                  ArrayView<Point<spacedim>>              new_points) const;
 
   /**
@@ -408,7 +408,7 @@ public:
   virtual Point<spacedim>
   project_to_manifold(
     const ArrayView<const Point<spacedim>> &surrounding_points,
-    const Point<spacedim> &                 candidate) const;
+    const Point<spacedim>                  &candidate) const;
 
   /**
    * Backward compatibility interface.  Return the point which shall become
@@ -597,7 +597,7 @@ public:
   virtual Tensor<1, spacedim>
   normal_vector(
     const typename Triangulation<dim, spacedim>::face_iterator &face,
-    const Point<spacedim> &                                     p) const;
+    const Point<spacedim>                                      &p) const;
 
   /**
    * Compute the normal vectors to the boundary at each vertex of the
@@ -694,7 +694,7 @@ public:
    */
   virtual Point<spacedim>
   get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
-                const ArrayView<const double> &         weights) const override;
+                const ArrayView<const double>          &weights) const override;
 
 
   /**
@@ -709,7 +709,7 @@ public:
    */
   virtual void
   get_new_points(const ArrayView<const Point<spacedim>> &surrounding_points,
-                 const Table<2, double> &                weights,
+                 const Table<2, double>                 &weights,
                  ArrayView<Point<spacedim>> new_points) const override;
 
   /**
@@ -944,7 +944,7 @@ public:
    */
   virtual Point<spacedim>
   get_new_point(const ArrayView<const Point<spacedim>> &surrounding_points,
-                const ArrayView<const double> &         weights) const override;
+                const ArrayView<const double>          &weights) const override;
 
   /**
    * Compute a new set of points that interpolate between the given points @p
@@ -969,7 +969,7 @@ public:
    */
   virtual void
   get_new_points(const ArrayView<const Point<spacedim>> &surrounding_points,
-                 const Table<2, double> &                weights,
+                 const Table<2, double>                 &weights,
                  ArrayView<Point<spacedim>> new_points) const override;
   /**
    * Pull back the given point in spacedim to the Euclidean chartdim

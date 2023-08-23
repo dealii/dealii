@@ -45,20 +45,20 @@
 
 template <typename NumberType, int dim, typename ExtractorType>
 void
-test_view(const Vector<double> &         solution,
-          const FEValues<dim> &          fe_values,
-          const unsigned int &           n_q_points,
-          const ExtractorType &          extractor,
+test_view(const Vector<double>          &solution,
+          const FEValues<dim>           &fe_values,
+          const unsigned int            &n_q_points,
+          const ExtractorType           &extractor,
           const std::vector<NumberType> &local_dof_values);
 
 // Scalar view
 template <typename NumberType, int dim>
 void
-test_view(const Vector<double> &            solution,
-          const FEValues<dim> &             fe_values,
-          const unsigned int &              n_q_points,
+test_view(const Vector<double>             &solution,
+          const FEValues<dim>              &fe_values,
+          const unsigned int               &n_q_points,
           const FEValuesExtractors::Scalar &extractor,
-          const std::vector<NumberType> &   local_dof_values)
+          const std::vector<NumberType>    &local_dof_values)
 {
   using View = std::remove_reference_t<
     std::remove_const_t<decltype(fe_values[extractor])>>;
@@ -100,11 +100,11 @@ test_view(const Vector<double> &            solution,
 // Vector view
 template <typename NumberType, int dim>
 void
-test_view(const Vector<double> &            solution,
-          const FEValues<dim> &             fe_values,
-          const unsigned int &              n_q_points,
+test_view(const Vector<double>             &solution,
+          const FEValues<dim>              &fe_values,
+          const unsigned int               &n_q_points,
           const FEValuesExtractors::Vector &extractor,
-          const std::vector<NumberType> &   local_dof_values)
+          const std::vector<NumberType>    &local_dof_values)
 {
   using View = std::remove_reference_t<
     std::remove_const_t<decltype(fe_values[extractor])>>;
@@ -165,11 +165,11 @@ test_view(const Vector<double> &            solution,
 // SymmetricTensor view
 template <typename NumberType, int dim>
 void
-test_view(const Vector<double> &                        solution,
-          const FEValues<dim> &                         fe_values,
-          const unsigned int &                          n_q_points,
+test_view(const Vector<double>                         &solution,
+          const FEValues<dim>                          &fe_values,
+          const unsigned int                           &n_q_points,
           const FEValuesExtractors::SymmetricTensor<2> &extractor,
-          const std::vector<NumberType> &               local_dof_values)
+          const std::vector<NumberType>                &local_dof_values)
 {
   using View = std::remove_reference_t<
     std::remove_const_t<decltype(fe_values[extractor])>>;
@@ -197,11 +197,11 @@ test_view(const Vector<double> &                        solution,
 // Tensor view
 template <typename NumberType, int dim>
 void
-test_view(const Vector<double> &               solution,
-          const FEValues<dim> &                fe_values,
-          const unsigned int &                 n_q_points,
+test_view(const Vector<double>                &solution,
+          const FEValues<dim>                 &fe_values,
+          const unsigned int                  &n_q_points,
           const FEValuesExtractors::Tensor<2> &extractor,
-          const std::vector<NumberType> &      local_dof_values)
+          const std::vector<NumberType>       &local_dof_values)
 {
   using View = std::remove_reference_t<
     std::remove_const_t<decltype(fe_values[extractor])>>;

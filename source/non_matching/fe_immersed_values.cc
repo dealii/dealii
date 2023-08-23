@@ -25,8 +25,8 @@ namespace NonMatching
 {
   template <int dim>
   FEImmersedSurfaceValues<dim>::FEImmersedSurfaceValues(
-    const Mapping<dim> &                  mapping,
-    const FiniteElement<dim> &            element,
+    const Mapping<dim>                   &mapping,
+    const FiniteElement<dim>             &element,
     const ImmersedSurfaceQuadrature<dim> &quadrature,
     const UpdateFlags                     update_flags)
     : FEValuesBase<dim, dim>(quadrature.size(),

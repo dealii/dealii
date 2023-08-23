@@ -58,9 +58,9 @@
 
 
 void
-laplace_solve(const SparseMatrix<double> &     S,
+laplace_solve(const SparseMatrix<double>      &S,
               const AffineConstraints<double> &constraints,
-              Vector<double> &                 u)
+              Vector<double>                  &u)
 {
   const unsigned int n_dofs = S.n();
   const auto         op     = linear_operator(S);

@@ -37,7 +37,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 test_push(const Tensor<1, spacedim> &axis,
           const double               eccentricity,
-          const Point<spacedim> &    space_point,
+          const Point<spacedim>     &space_point,
           unsigned int               ref = 1)
 {
   EllipticalManifold<dim, spacedim> manifold(Point<spacedim>(),
@@ -55,7 +55,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 test_pull(const Tensor<1, spacedim> &axis,
           const double               eccentricity,
-          const Point<spacedim> &    chart_point,
+          const Point<spacedim>     &chart_point,
           unsigned int               ref = 1)
 {
   EllipticalManifold<dim, spacedim> manifold(Point<spacedim>(),
@@ -73,7 +73,7 @@ test_pull(const Tensor<1, spacedim> &axis,
 void
 local_test(const Tensor<1, 2> &axis,
            const double        eccentricity,
-           const Point<2> &    space_point)
+           const Point<2>     &space_point)
 {
   const Point<2> pt1 = test_push<2, 2>(axis, eccentricity, space_point);
   const Point<2> pt2 = test_pull<2, 2>(axis, eccentricity, pt1);

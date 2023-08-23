@@ -34,8 +34,8 @@ namespace RepartitioningPolicyTools
     void
     add_indices_recursively_for_first_child_policy(
       const TriaIterator<CellAccessor<dim, spacedim>> &cell,
-      const internal::CellIDTranslator<dim> &          cell_id_translator,
-      IndexSet &                                       is_fine)
+      const internal::CellIDTranslator<dim>           &cell_id_translator,
+      IndexSet                                        &is_fine)
     {
       is_fine.add_index(cell_id_translator.translate(cell));
 
@@ -85,13 +85,14 @@ namespace RepartitioningPolicyTools
 
     unsigned int offset = 0;
 
-    const int ierr = MPI_Exscan(&process_has_active_locally_owned_cells,
-                                &offset,
-                                1,
-                                Utilities::MPI::mpi_type_id_for_type<decltype(
-                                  process_has_active_locally_owned_cells)>,
-                                MPI_SUM,
-                                comm);
+    const int ierr =
+      MPI_Exscan(&process_has_active_locally_owned_cells,
+                 &offset,
+                 1,
+                 Utilities::MPI::mpi_type_id_for_type<
+                   decltype(process_has_active_locally_owned_cells)>,
+                 MPI_SUM,
+                 comm);
     AssertThrowMPI(ierr);
 
     LinearAlgebra::distributed::Vector<double> partition(

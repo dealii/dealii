@@ -211,7 +211,7 @@ namespace python
                   ExcMessage("Wrong structdim-dim-spacedim combination."));
   }
 
-  TriaAccessorWrapper::TriaAccessorWrapper(void *    tria_accessor,
+  TriaAccessorWrapper::TriaAccessorWrapper(void     *tria_accessor,
                                            const int structdim,
                                            const int dim,
                                            const int spacedim)

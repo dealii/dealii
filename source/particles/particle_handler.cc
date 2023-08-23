@@ -77,7 +77,7 @@ namespace Particles
   template <int dim, int spacedim>
   ParticleHandler<dim, spacedim>::ParticleHandler(
     const Triangulation<dim, spacedim> &triangulation,
-    const Mapping<dim, spacedim> &      mapping,
+    const Mapping<dim, spacedim>       &mapping,
     const unsigned int                  n_properties)
     : triangulation(&triangulation, typeid(*this).name())
     , mapping(&mapping, typeid(*this).name())
@@ -117,7 +117,7 @@ namespace Particles
   void
   ParticleHandler<dim, spacedim>::initialize(
     const Triangulation<dim, spacedim> &new_triangulation,
-    const Mapping<dim, spacedim> &      new_mapping,
+    const Mapping<dim, spacedim>       &new_mapping,
     const unsigned int                  n_properties)
   {
     clear();
@@ -577,7 +577,7 @@ namespace Particles
   template <int dim, int spacedim>
   typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::insert_particle(
-    const Particle<dim, spacedim> &                                    particle,
+    const Particle<dim, spacedim>                                     &particle,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
   {
     return insert_particle(particle.get_location(),
@@ -623,7 +623,7 @@ namespace Particles
   template <int dim, int spacedim>
   typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::insert_particle(
-    const void *&                                                      data,
+    const void                                                       *&data,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
   {
     Assert(triangulation != nullptr, ExcInternalError());
@@ -648,8 +648,8 @@ namespace Particles
   template <int dim, int spacedim>
   typename ParticleHandler<dim, spacedim>::particle_iterator
   ParticleHandler<dim, spacedim>::insert_particle(
-    const Point<spacedim> &     position,
-    const Point<dim> &          reference_position,
+    const Point<spacedim>      &position,
+    const Point<dim>           &reference_position,
     const types::particle_index particle_index,
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
     const ArrayView<const double> &properties)
@@ -764,8 +764,8 @@ namespace Particles
   ParticleHandler<dim, spacedim>::insert_global_particles(
     const std::vector<Point<spacedim>> &positions,
     const std::vector<std::vector<BoundingBox<spacedim>>>
-      &                                       global_bounding_boxes,
-    const std::vector<std::vector<double>> &  properties,
+                                             &global_bounding_boxes,
+    const std::vector<std::vector<double>>   &properties,
     const std::vector<types::particle_index> &ids)
   {
     if (!properties.empty())
@@ -1190,7 +1190,7 @@ namespace Particles
     compare_particle_association(
       const unsigned int                 a,
       const unsigned int                 b,
-      const Tensor<1, dim> &             particle_direction,
+      const Tensor<1, dim>              &particle_direction,
       const std::vector<Tensor<1, dim>> &center_directions)
     {
       const double scalar_product_a = center_directions[a] * particle_direction;
@@ -1663,7 +1663,7 @@ namespace Particles
     const std::map<
       types::subdomain_id,
       std::vector<typename Triangulation<dim, spacedim>::active_cell_iterator>>
-      &        send_cells,
+              &send_cells,
     const bool build_cache)
   {
     Assert(triangulation != nullptr, ExcInternalError());
@@ -2067,7 +2067,7 @@ namespace Particles
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::register_additional_store_load_functions(
-    const std::function<std::size_t()> &                            size_callb,
+    const std::function<std::size_t()>                             &size_callb,
     const std::function<void *(const particle_iterator &, void *)> &store_callb,
     const std::function<const void *(const particle_iterator &, const void *)>
       &load_callb)
@@ -2196,7 +2196,7 @@ namespace Particles
 
     const auto callback_function =
       [this](const typename Triangulation<dim, spacedim>::cell_iterator
-               &              cell_iterator,
+                             &cell_iterator,
              const CellStatus cell_status) {
         return this->pack_callback(cell_iterator, cell_status);
       };
@@ -2271,7 +2271,7 @@ namespace Particles
       {
         const auto callback_function =
           [this](const typename Triangulation<dim, spacedim>::cell_iterator
-                   &              cell_iterator,
+                                 &cell_iterator,
                  const CellStatus cell_status,
                  const boost::iterator_range<std::vector<char>::const_iterator>
                    &range_iterator) {
@@ -2348,7 +2348,7 @@ namespace Particles
   template <int dim, int spacedim>
   void
   ParticleHandler<dim, spacedim>::unpack_callback(
-    const typename Triangulation<dim, spacedim>::cell_iterator &    cell,
+    const typename Triangulation<dim, spacedim>::cell_iterator     &cell,
     const CellStatus                                                status,
     const boost::iterator_range<std::vector<char>::const_iterator> &data_range)
   {

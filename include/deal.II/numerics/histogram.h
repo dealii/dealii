@@ -113,7 +113,7 @@ public:
   template <typename number>
   void
   evaluate(const std::vector<Vector<number>> &values,
-           const std::vector<double> &        y_values,
+           const std::vector<double>         &y_values,
            const unsigned int                 n_intervals,
            const IntervalSpacing              interval_spacing = linear);
 

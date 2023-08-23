@@ -57,9 +57,9 @@ protected:
 
   void
   local_apply_cell(
-    const dealii::MatrixFree<dim, Number> &      data,
-    BlockVectorType &                            dst,
-    const BlockVectorType &                      src,
+    const dealii::MatrixFree<dim, Number>       &data,
+    BlockVectorType                             &dst,
+    const BlockVectorType                       &src,
     const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     using vector_t = VectorizedArray<Number>;

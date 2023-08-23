@@ -452,7 +452,7 @@ namespace numbers
      * @note This function can also be used in @ref GlossDevice "device" code.
      */
     static constexpr DEAL_II_HOST_DEVICE const number &
-                                               conjugate(const number &x);
+    conjugate(const number &x);
 
     /**
      * Return the square of the absolute value of the given number. Since the
@@ -698,7 +698,7 @@ namespace internal
   struct NumberType
   {
     static constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE const T &
-                                                             value(const T &t)
+    value(const T &t)
     {
       return t;
     }

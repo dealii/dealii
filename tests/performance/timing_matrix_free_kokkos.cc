@@ -64,10 +64,10 @@ public:
   LaplaceOperator() = default;
 
   void
-  reinit(const Mapping<dim> &             mapping,
-         const DoFHandler<dim> &          dof_handler,
+  reinit(const Mapping<dim>              &mapping,
+         const DoFHandler<dim>           &dof_handler,
          const AffineConstraints<Number> &constraints,
-         const Quadrature<1> &            quadrature)
+         const Quadrature<1>             &quadrature)
   {
     typename MatrixFree<dim, Number>::AdditionalData additional_data;
     additional_data.mapping_update_flags = update_gradients;
@@ -90,9 +90,9 @@ public:
 
 private:
   void
-  local_apply(const MatrixFree<dim, Number> &              data,
-              VectorType &                                 dst,
-              const VectorType &                           src,
+  local_apply(const MatrixFree<dim, Number>               &data,
+              VectorType                                  &dst,
+              const VectorType                            &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> phi(data);
@@ -121,7 +121,7 @@ public:
   DEAL_II_HOST_DEVICE void
   operator()(
     CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number>
-      *       fe_eval,
+             *fe_eval,
     const int q_point) const
   {
     fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
@@ -136,9 +136,9 @@ public:
   operator()(
     const unsigned int                                          cell,
     const typename CUDAWrappers::MatrixFree<dim, Number>::Data *gpu_data,
-    CUDAWrappers::SharedData<dim, Number> *                     shared_data,
-    const Number *                                              src,
-    Number *                                                    dst) const
+    CUDAWrappers::SharedData<dim, Number>                      *shared_data,
+    const Number                                               *src,
+    Number                                                     *dst) const
   {
     (void)cell; // TODO?
 
@@ -166,10 +166,10 @@ public:
   LaplaceOperator() = default;
 
   void
-  reinit(const Mapping<dim> &             mapping,
-         const DoFHandler<dim> &          dof_handler,
+  reinit(const Mapping<dim>              &mapping,
+         const DoFHandler<dim>           &dof_handler,
          const AffineConstraints<Number> &constraints,
-         const Quadrature<1> &            quadrature)
+         const Quadrature<1>             &quadrature)
   {
     typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
       additional_data;

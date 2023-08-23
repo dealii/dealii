@@ -38,7 +38,7 @@
 template <int dim, int spacedim>
 void
 lost_particle_notification(
-  const typename Particles::ParticleIterator<dim, spacedim> &        particle,
+  const typename Particles::ParticleIterator<dim, spacedim>         &particle,
   const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
 {
   deallog << "Particle <" << particle->get_id()

@@ -203,7 +203,7 @@ namespace Step18
     vector_value(const Point<dim> &p, Vector<double> &values) const;
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const;
+                      std::vector<Vector<double>>   &value_list) const;
   };
   template <int dim>
   BodyForce<dim>::BodyForce()
@@ -224,7 +224,7 @@ namespace Step18
   void
   BodyForce<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  value_list) const
+    std::vector<Vector<double>>   &value_list) const
   {
     const unsigned int n_points = points.size();
     Assert(value_list.size() == n_points,
@@ -242,7 +242,7 @@ namespace Step18
     vector_value(const Point<dim> &p, Vector<double> &values) const;
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  value_list) const;
+                      std::vector<Vector<double>>   &value_list) const;
 
   private:
     const double velocity;
@@ -271,7 +271,7 @@ namespace Step18
   void
   IncrementalBoundaryValues<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  value_list) const
+    std::vector<Vector<double>>   &value_list) const
   {
     const unsigned int n_points = points.size();
     Assert(value_list.size() == n_points,

@@ -49,12 +49,12 @@ namespace
                            int                      m,
                            int                      nnz,
                            const cusparseMatDescr_t descrA,
-                           float *                  csrValA_valM,
-                           const int *              csrRowPtrA,
-                           const int *              csrColIndA,
+                           float                   *csrValA_valM,
+                           const int               *csrRowPtrA,
+                           const int               *csrColIndA,
                            csrilu02Info_t           info,
                            cusparseSolvePolicy_t    policy,
-                           void *                   pBuffer)
+                           void                    *pBuffer)
   {
     return cusparseScsrilu02(handle,
                              m,
@@ -74,12 +74,12 @@ namespace
                             int                      m,
                             int                      nnz,
                             const cusparseMatDescr_t descrA,
-                            double *                 csrValA_valM,
-                            const int *              csrRowPtrA,
-                            const int *              csrColIndA,
+                            double                  *csrValA_valM,
+                            const int               *csrRowPtrA,
+                            const int               *csrColIndA,
                             csrilu02Info_t           info,
                             cusparseSolvePolicy_t    policy,
-                            void *                   pBuffer)
+                            void                    *pBuffer)
   {
     return cusparseDcsrilu02(handle,
                              m,
@@ -176,12 +176,12 @@ namespace
                                     int                      m,
                                     int                      nnz,
                                     const cusparseMatDescr_t descrA,
-                                    const float *            csrValA,
-                                    const int *              csrRowPtrA,
-                                    const int *              csrColIndA,
+                                    const float             *csrValA,
+                                    const int               *csrRowPtrA,
+                                    const int               *csrColIndA,
                                     csrilu02Info_t           info,
                                     cusparseSolvePolicy_t    policy,
-                                    void *                   pBuffer)
+                                    void                    *pBuffer)
   {
     return cusparseScsrilu02_analysis(handle,
                                       m,
@@ -201,12 +201,12 @@ namespace
                                      int                      m,
                                      int                      nnz,
                                      const cusparseMatDescr_t descrA,
-                                     const double *           csrValA,
-                                     const int *              csrRowPtrA,
-                                     const int *              csrColIndA,
+                                     const double            *csrValA,
+                                     const int               *csrRowPtrA,
+                                     const int               *csrColIndA,
                                      csrilu02Info_t           info,
                                      cusparseSolvePolicy_t    policy,
-                                     void *                   pBuffer)
+                                     void                    *pBuffer)
   {
     return cusparseDcsrilu02_analysis(handle,
                                       m,
@@ -302,9 +302,9 @@ namespace
                                       int                      m,
                                       int                      nnz,
                                       const cusparseMatDescr_t descrA,
-                                      float *                  csrValA,
-                                      const int *              csrRowPtrA,
-                                      const int *              csrColIndA,
+                                      float                   *csrValA,
+                                      const int               *csrRowPtrA,
+                                      const int               *csrColIndA,
                                       csrilu02Info_t           info,
                                       int *pBufferSizeInBytes)
   {
@@ -325,9 +325,9 @@ namespace
                                        int                      m,
                                        int                      nnz,
                                        const cusparseMatDescr_t descrA,
-                                       double *                 csrValA,
-                                       const int *              csrRowPtrA,
-                                       const int *              csrColIndA,
+                                       double                  *csrValA,
+                                       const int               *csrRowPtrA,
+                                       const int               *csrColIndA,
                                        csrilu02Info_t           info,
                                        int *pBufferSizeInBytes)
   {
@@ -419,12 +419,12 @@ namespace
                           int                      m,
                           int                      nnz,
                           const cusparseMatDescr_t descrA,
-                          float *                  csrValA_valM,
-                          const int *              csrRowPtrA,
-                          const int *              csrColIndA,
+                          float                   *csrValA_valM,
+                          const int               *csrRowPtrA,
+                          const int               *csrColIndA,
                           csric02Info_t            info,
                           cusparseSolvePolicy_t    policy,
-                          void *                   pBuffer)
+                          void                    *pBuffer)
   {
     return cusparseScsric02(handle,
                             m,
@@ -444,12 +444,12 @@ namespace
                            int                      m,
                            int                      nnz,
                            const cusparseMatDescr_t descrA,
-                           double *                 csrValA_valM,
-                           const int *              csrRowPtrA,
-                           const int *              csrColIndA,
+                           double                  *csrValA_valM,
+                           const int               *csrRowPtrA,
+                           const int               *csrColIndA,
                            csric02Info_t            info,
                            cusparseSolvePolicy_t    policy,
-                           void *                   pBuffer)
+                           void                    *pBuffer)
   {
     return cusparseDcsric02(handle,
                             m,
@@ -550,16 +550,16 @@ namespace
                                cusparseOperation_t      transA,
                                int                      m,
                                int                      nnz,
-                               const float *            alpha,
+                               const float             *alpha,
                                const cusparseMatDescr_t descra,
-                               const float *            csrValA,
-                               const int *              csrRowPtrA,
-                               const int *              csrColIndA,
+                               const float             *csrValA,
+                               const int               *csrRowPtrA,
+                               const int               *csrColIndA,
                                csrsv2Info_t             info,
-                               const float *            x,
-                               float *                  y,
+                               const float             *x,
+                               float                   *y,
                                cusparseSolvePolicy_t    policy,
-                               void *                   pBuffer)
+                               void                    *pBuffer)
   {
     return cusparseScsrsv2_solve(handle,
                                  transA,
@@ -583,16 +583,16 @@ namespace
                                 cusparseOperation_t      transA,
                                 int                      m,
                                 int                      nnz,
-                                const double *           alpha,
+                                const double            *alpha,
                                 const cusparseMatDescr_t descra,
-                                const double *           csrValA,
-                                const int *              csrRowPtrA,
-                                const int *              csrColIndA,
+                                const double            *csrValA,
+                                const int               *csrRowPtrA,
+                                const int               *csrColIndA,
                                 csrsv2Info_t             info,
-                                const double *           x,
-                                double *                 y,
+                                const double            *x,
+                                double                  *y,
                                 cusparseSolvePolicy_t    policy,
-                                void *                   pBuffer)
+                                void                    *pBuffer)
   {
     return cusparseDcsrsv2_solve(handle,
                                  transA,
@@ -711,12 +711,12 @@ namespace
                                   int                      m,
                                   int                      nnz,
                                   const cusparseMatDescr_t descrA,
-                                  const float *            csrValA,
-                                  const int *              csrRowPtrA,
-                                  const int *              csrColIndA,
+                                  const float             *csrValA,
+                                  const int               *csrRowPtrA,
+                                  const int               *csrColIndA,
                                   csrsv2Info_t             info,
                                   cusparseSolvePolicy_t    policy,
-                                  void *                   pBuffer)
+                                  void                    *pBuffer)
   {
     return cusparseScsrsv2_analysis(handle,
                                     transA,
@@ -738,12 +738,12 @@ namespace
                                    int                      m,
                                    int                      nnz,
                                    const cusparseMatDescr_t descrA,
-                                   const double *           csrValA,
-                                   const int *              csrRowPtrA,
-                                   const int *              csrColIndA,
+                                   const double            *csrValA,
+                                   const int               *csrRowPtrA,
+                                   const int               *csrColIndA,
                                    csrsv2Info_t             info,
                                    cusparseSolvePolicy_t    policy,
-                                   void *                   pBuffer)
+                                   void                    *pBuffer)
   {
     return cusparseDcsrsv2_analysis(handle,
                                     transA,
@@ -844,12 +844,12 @@ namespace
                                    int                      m,
                                    int                      nnz,
                                    const cusparseMatDescr_t descrA,
-                                   const float *            csrValA,
-                                   const int *              csrRowPtrA,
-                                   const int *              csrColIndA,
+                                   const float             *csrValA,
+                                   const int               *csrRowPtrA,
+                                   const int               *csrColIndA,
                                    csric02Info_t            info,
                                    cusparseSolvePolicy_t    policy,
-                                   void *                   pBuffer)
+                                   void                    *pBuffer)
   {
     return cusparseScsric02_analysis(handle,
                                      m,
@@ -869,12 +869,12 @@ namespace
                                     int                      m,
                                     int                      nnz,
                                     const cusparseMatDescr_t descrA,
-                                    const double *           csrValA,
-                                    const int *              csrRowPtrA,
-                                    const int *              csrColIndA,
+                                    const double            *csrValA,
+                                    const int               *csrRowPtrA,
+                                    const int               *csrColIndA,
                                     csric02Info_t            info,
                                     cusparseSolvePolicy_t    policy,
-                                    void *                   pBuffer)
+                                    void                    *pBuffer)
   {
     return cusparseDcsric02_analysis(handle,
                                      m,
@@ -972,11 +972,11 @@ namespace
                                     int                      m,
                                     int                      nnz,
                                     const cusparseMatDescr_t descrA,
-                                    float *                  csrValA,
-                                    const int *              csrRowPtrA,
-                                    const int *              csrColIndA,
+                                    float                   *csrValA,
+                                    const int               *csrRowPtrA,
+                                    const int               *csrColIndA,
                                     csrsv2Info_t             info,
-                                    int *                    pBufferSizeInBytes)
+                                    int                     *pBufferSizeInBytes)
   {
     return cusparseScsrsv2_bufferSize(handle,
                                       transA,
@@ -997,9 +997,9 @@ namespace
                                      int                      m,
                                      int                      nnz,
                                      const cusparseMatDescr_t descrA,
-                                     double *                 csrValA,
-                                     const int *              csrRowPtrA,
-                                     const int *              csrColIndA,
+                                     double                  *csrValA,
+                                     const int               *csrRowPtrA,
+                                     const int               *csrColIndA,
                                      csrsv2Info_t             info,
                                      int *pBufferSizeInBytes)
   {
@@ -1097,9 +1097,9 @@ namespace
                                      int                      m,
                                      int                      nnz,
                                      const cusparseMatDescr_t descrA,
-                                     float *                  csrValA,
-                                     const int *              csrRowPtrA,
-                                     const int *              csrColIndA,
+                                     float                   *csrValA,
+                                     const int               *csrRowPtrA,
+                                     const int               *csrColIndA,
                                      csric02Info_t            info,
                                      int *pBufferSizeInBytes)
   {
@@ -1120,9 +1120,9 @@ namespace
                                       int                      m,
                                       int                      nnz,
                                       const cusparseMatDescr_t descrA,
-                                      double *                 csrValA,
-                                      const int *              csrRowPtrA,
-                                      const int *              csrColIndA,
+                                      double                  *csrValA,
+                                      const int               *csrRowPtrA,
+                                      const int               *csrColIndA,
                                       csric02Info_t            info,
                                       int *pBufferSizeInBytes)
   {
@@ -1429,7 +1429,7 @@ namespace CUDAWrappers
   template <typename Number>
   void
   PreconditionIC<Number>::vmult(
-    LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+    LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
     const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const
   {
     Assert(P_val_dev != nullptr, ExcNotInitialized());
@@ -1483,7 +1483,7 @@ namespace CUDAWrappers
   template <typename Number>
   void
   PreconditionIC<Number>::Tvmult(
-    LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+    LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
     const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const
   {
     // the constructed preconditioner is symmetric
@@ -1750,7 +1750,7 @@ namespace CUDAWrappers
   template <typename Number>
   void
   PreconditionILU<Number>::vmult(
-    LinearAlgebra::CUDAWrappers::Vector<Number> &      dst,
+    LinearAlgebra::CUDAWrappers::Vector<Number>       &dst,
     const LinearAlgebra::CUDAWrappers::Vector<Number> &src) const
   {
     Assert(P_val_dev != nullptr, ExcNotInitialized());

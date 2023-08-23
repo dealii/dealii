@@ -194,7 +194,7 @@ test()
       for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
         if (vertex_touched[cell->vertex_index(vertex_no)] == false)
           {
-            Point<dim> &   v = cell->vertex(vertex_no);
+            Point<dim>    &v = cell->vertex(vertex_no);
             Tensor<1, dim> d;
             for (unsigned int i = 0; i < dim; ++i)
               d[i] = displacement_function.value(v, i);

@@ -145,8 +145,8 @@ namespace python
      */
     void
     generate_subdivided_hyper_rectangle(boost::python::list &repetitions,
-                                        PointWrapper &       p1,
-                                        PointWrapper &       p2,
+                                        PointWrapper        &p1,
+                                        PointWrapper        &p2,
                                         const bool           colorize = false);
 
     /**
@@ -159,8 +159,8 @@ namespace python
      */
     void
     generate_subdivided_steps_hyper_rectangle(boost::python::list &step_sizes,
-                                              PointWrapper &       p1,
-                                              PointWrapper &       p2,
+                                              PointWrapper        &p1,
+                                              PointWrapper        &p2,
                                               const bool colorize = false);
 
     /**
@@ -174,7 +174,7 @@ namespace python
     void
     generate_subdivided_material_hyper_rectangle(
       boost::python::list &spacing,
-      PointWrapper &       p,
+      PointWrapper        &p,
       boost::python::list &material_id,
       const bool           colorize = false);
 
@@ -260,7 +260,7 @@ namespace python
     /*! @copydoc GridGenerator::hyper_shell
      */
     void
-    generate_hyper_shell(PointWrapper & center,
+    generate_hyper_shell(PointWrapper  &center,
                          const double   inner_radius,
                          const double   outer_radius,
                          const unsigned n_cells  = 0,
@@ -287,7 +287,7 @@ namespace python
      */
     void
     replicate_triangulation(TriangulationWrapper &tria_in,
-                            boost::python::list & extents);
+                            boost::python::list  &extents);
 
     /*! @copydoc GridGenerator::flatten_triangulation
      */
@@ -319,7 +319,7 @@ namespace python
     /*! @copydoc GridTools::find_active_cell_around_point
      */
     CellAccessorWrapper
-    find_active_cell_around_point(PointWrapper &  p,
+    find_active_cell_around_point(PointWrapper   &p,
                                   MappingQWrapper mapping = MappingQWrapper());
 
     /*! @copydoc GridTools::find_cells_adjacent_to_vertex
@@ -384,7 +384,7 @@ namespace python
     /*! @copydoc GridTools::compute_aspect_ratio_of_cells
      */
     boost::python::list
-    compute_aspect_ratio_of_cells(const MappingQWrapper &  mapping,
+    compute_aspect_ratio_of_cells(const MappingQWrapper   &mapping,
                                   const QuadratureWrapper &quadrature);
 
     /**

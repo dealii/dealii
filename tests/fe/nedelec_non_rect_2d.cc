@@ -80,17 +80,17 @@ namespace polytest
     {}
     void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  values) const;
+                      std::vector<Vector<double>>   &values) const;
 
     void
     rhs_value_list(const std::vector<Point<dim>> &points,
-                   std::vector<Vector<double>> &  values) const;
+                   std::vector<Vector<double>>   &values) const;
   };
   template <int dim>
   void
   SimplePolynomial<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+    std::vector<Vector<double>>   &values) const
   {
     Assert(dim == 2, ExcNotImplemented());
     Assert(values.size() == points.size(),
@@ -108,7 +108,7 @@ namespace polytest
   void
   SimplePolynomial<dim>::rhs_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+    std::vector<Vector<double>>   &values) const
   {
     Assert(dim == 2, ExcNotImplemented());
     Assert(values.size() == points.size(),

@@ -58,9 +58,9 @@ public:
              update_values | update_gradients | update_JxW_values){};
 
   void
-  operator()(const MatrixFree<dim, Number> &              data,
-             VectorType &                                 dst,
-             const VectorType &                           src,
+  operator()(const MatrixFree<dim, Number>               &data,
+             VectorType                                  &dst,
+             const VectorType                            &src,
              const std::pair<unsigned int, unsigned int> &cell_range) const;
 
   void

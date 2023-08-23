@@ -134,13 +134,13 @@ public:
   virtual void
   prolongate(
     const unsigned int                                to_level,
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   virtual void
   prolongate_and_add(
     const unsigned int                                to_level,
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
@@ -164,7 +164,7 @@ public:
   virtual void
   restrict_and_add(
     const unsigned int                                from_level,
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const override;
 
   /**
@@ -184,9 +184,9 @@ public:
   template <typename BlockVectorType2>
   void
   interpolate_to_mg(
-    const DoFHandler<dim> &                                    dof_handler,
+    const DoFHandler<dim>                                     &dof_handler,
     MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-    const BlockVectorType2 &                                   src) const;
+    const BlockVectorType2                                    &src) const;
 
   /**
    * Memory used by this object.
@@ -293,7 +293,7 @@ private:
   void
   do_prolongate_add(
     const unsigned int                                to_level,
-    LinearAlgebra::distributed::Vector<Number> &      dst,
+    LinearAlgebra::distributed::Vector<Number>       &dst,
     const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
@@ -302,7 +302,7 @@ private:
   template <int degree>
   void
   do_restrict_add(const unsigned int                                from_level,
-                  LinearAlgebra::distributed::Vector<Number> &      dst,
+                  LinearAlgebra::distributed::Vector<Number>       &dst,
                   const LinearAlgebra::distributed::Vector<Number> &src) const;
 };
 
@@ -339,13 +339,13 @@ public:
   virtual void
   prolongate(
     const unsigned int                                     to_level,
-    LinearAlgebra::distributed::BlockVector<Number> &      dst,
+    LinearAlgebra::distributed::BlockVector<Number>       &dst,
     const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
 
   virtual void
   prolongate_and_add(
     const unsigned int                                     to_level,
-    LinearAlgebra::distributed::BlockVector<Number> &      dst,
+    LinearAlgebra::distributed::BlockVector<Number>       &dst,
     const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
 
   /**
@@ -369,7 +369,7 @@ public:
   virtual void
   restrict_and_add(
     const unsigned int                                     from_level,
-    LinearAlgebra::distributed::BlockVector<Number> &      dst,
+    LinearAlgebra::distributed::BlockVector<Number>       &dst,
     const LinearAlgebra::distributed::BlockVector<Number> &src) const override;
 
   /**
@@ -385,9 +385,9 @@ public:
   template <typename BlockVectorType2>
   void
   copy_to_mg(
-    const DoFHandler<dim> &                                         dof_handler,
+    const DoFHandler<dim>                                          &dof_handler,
     MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
-    const BlockVectorType2 &                                        src) const;
+    const BlockVectorType2                                         &src) const;
 
   /**
    * Same as above for the case that each block has its own DoFHandler.
@@ -395,9 +395,9 @@ public:
   template <typename BlockVectorType2>
   void
   copy_to_mg(
-    const std::vector<const DoFHandler<dim> *> &                    dof_handler,
+    const std::vector<const DoFHandler<dim> *>                     &dof_handler,
     MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
-    const BlockVectorType2 &                                        src) const;
+    const BlockVectorType2                                         &src) const;
 
   /**
    * Transfer from multi-level block-vector to normal vector.
@@ -406,7 +406,7 @@ public:
   void
   copy_from_mg(
     const DoFHandler<dim> &dof_handler,
-    BlockVectorType2 &     dst,
+    BlockVectorType2      &dst,
     const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
     const;
 
@@ -417,7 +417,7 @@ public:
   void
   copy_from_mg(
     const std::vector<const DoFHandler<dim> *> &dof_handler,
-    BlockVectorType2 &                          dst,
+    BlockVectorType2                           &dst,
     const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
     const;
 
@@ -547,9 +547,9 @@ template <int dim, typename Number>
 template <typename BlockVectorType2>
 void
 MGTransferMatrixFree<dim, Number>::interpolate_to_mg(
-  const DoFHandler<dim> &                                    dof_handler,
+  const DoFHandler<dim>                                     &dof_handler,
   MGLevelObject<LinearAlgebra::distributed::Vector<Number>> &dst,
-  const BlockVectorType2 &                                   src) const
+  const BlockVectorType2                                    &src) const
 {
   const unsigned int min_level = dst.min_level();
   const unsigned int max_level = dst.max_level();
@@ -643,9 +643,9 @@ template <int dim, typename Number, typename TransferType>
 template <typename BlockVectorType2>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
-  const DoFHandler<dim> &                                         dof_handler,
+  const DoFHandler<dim>                                          &dof_handler,
   MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
-  const BlockVectorType2 &                                        src) const
+  const BlockVectorType2                                         &src) const
 {
   Assert(same_for_all,
          ExcMessage(
@@ -664,9 +664,9 @@ template <int dim, typename Number, typename TransferType>
 template <typename BlockVectorType2>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_to_mg(
-  const std::vector<const DoFHandler<dim> *> &                    dof_handler,
+  const std::vector<const DoFHandler<dim> *>                     &dof_handler,
   MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &dst,
-  const BlockVectorType2 &                                        src) const
+  const BlockVectorType2                                         &src) const
 {
   const unsigned int n_blocks = src.n_blocks();
   AssertDimension(dof_handler.size(), n_blocks);
@@ -704,7 +704,7 @@ template <typename BlockVectorType2>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
   const DoFHandler<dim> &dof_handler,
-  BlockVectorType2 &     dst,
+  BlockVectorType2      &dst,
   const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
   const
 {
@@ -724,7 +724,7 @@ template <typename BlockVectorType2>
 void
 MGTransferBlockMatrixFreeBase<dim, Number, TransferType>::copy_from_mg(
   const std::vector<const DoFHandler<dim> *> &dof_handler,
-  BlockVectorType2 &                          dst,
+  BlockVectorType2                           &dst,
   const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
   const
 {

@@ -300,7 +300,7 @@ namespace Differentiation
        * argument.
        */
       Expression(const std::vector<std::pair<Expression, Expression>>
-                   &               condition_expression,
+                                  &condition_expression,
                  const Expression &expression_otherwise);
 
       /**
@@ -355,7 +355,7 @@ namespace Differentiation
        * This constructor initializes a function symbol with a string
        * representing its symbolic name.
        */
-      Expression(const std::string &         symbol_func,
+      Expression(const std::string          &symbol_func,
                  const types::symbol_vector &arguments);
 
       /**
@@ -1252,7 +1252,7 @@ namespace Differentiation
       std::stringstream sstream;
       sstream << *this;
       const std::string expr = sstream.str();
-      ar &              expr;
+      ar               &expr;
     }
 
 
@@ -1261,7 +1261,7 @@ namespace Differentiation
     Expression::load(Archive &ar, const unsigned int /*version*/)
     {
       std::string expr;
-      ar &        expr;
+      ar         &expr;
       parse(expr);
     }
 

@@ -70,8 +70,8 @@ namespace MeshWorker
      * For every object, specify the size they should have.
      */
     explicit CopyData(
-      const ndarray<unsigned int, n_matrices, 2> &   matrix_sizes,
-      const std::array<unsigned int, n_vectors> &    vector_sizes,
+      const ndarray<unsigned int, n_matrices, 2>    &matrix_sizes,
+      const std::array<unsigned int, n_vectors>     &vector_sizes,
       const std::array<unsigned int, n_dof_indices> &dof_indices_sizes);
 
     /**
@@ -163,8 +163,8 @@ namespace MeshWorker
             int n_dof_indices,
             typename ScalarType>
   CopyData<n_matrices, n_vectors, n_dof_indices, ScalarType>::CopyData(
-    const ndarray<unsigned int, n_matrices, 2> &   matrix_sizes,
-    const std::array<unsigned int, n_vectors> &    vector_sizes,
+    const ndarray<unsigned int, n_matrices, 2>    &matrix_sizes,
+    const std::array<unsigned int, n_vectors>     &vector_sizes,
     const std::array<unsigned int, n_dof_indices> &dof_indices_sizes)
   {
     for (unsigned int i = 0; i < n_matrices; ++i)

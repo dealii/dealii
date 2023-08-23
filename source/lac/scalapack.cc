@@ -120,7 +120,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
 
 template <typename NumberType>
 ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
-  const std::string &                                       filename,
+  const std::string                                        &filename,
   const std::shared_ptr<const Utilities::MPI::ProcessGrid> &process_grid,
   const size_type                                           row_block_size,
   const size_type                                           column_block_size)
@@ -722,7 +722,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(FullMatrix<NumberType> &matrix) const
 template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::copy_to(
-  ScaLAPACKMatrix<NumberType> &                B,
+  ScaLAPACKMatrix<NumberType>                 &B,
   const std::pair<unsigned int, unsigned int> &offset_A,
   const std::pair<unsigned int, unsigned int> &offset_B,
   const std::pair<unsigned int, unsigned int> &submatrix_size) const
@@ -799,7 +799,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(
   std::array<int, 9> desc_A, desc_B;
 
   const NumberType *loc_vals_A = nullptr;
-  NumberType *      loc_vals_B = nullptr;
+  NumberType       *loc_vals_B = nullptr;
 
   // Note: the function pgemr2d has to be called for all processes in the union
   // BLACS context If the calling process is not part of the BLACS context of A,
@@ -925,7 +925,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
                       union_n_process_columns);
 
       const NumberType *loc_vals_source = nullptr;
-      NumberType *      loc_vals_dest   = nullptr;
+      NumberType       *loc_vals_dest   = nullptr;
 
       if (this->grid->mpi_process_is_active && (this->values.size() > 0))
         {
@@ -968,7 +968,7 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
   else
     // process is active in the process grid
     if (this->grid->mpi_process_is_active)
-    dest.values = this->values;
+      dest.values = this->values;
 
   dest.state    = state;
   dest.property = property;
@@ -1067,7 +1067,7 @@ void
 ScaLAPACKMatrix<NumberType>::mult(const NumberType                   b,
                                   const ScaLAPACKMatrix<NumberType> &B,
                                   const NumberType                   c,
-                                  ScaLAPACKMatrix<NumberType> &      C,
+                                  ScaLAPACKMatrix<NumberType>       &C,
                                   const bool transpose_A,
                                   const bool transpose_B) const
 {
@@ -1181,7 +1181,7 @@ ScaLAPACKMatrix<NumberType>::mult(const NumberType                   b,
 
 template <typename NumberType>
 void
-ScaLAPACKMatrix<NumberType>::mmult(ScaLAPACKMatrix<NumberType> &      C,
+ScaLAPACKMatrix<NumberType>::mmult(ScaLAPACKMatrix<NumberType>       &C,
                                    const ScaLAPACKMatrix<NumberType> &B,
                                    const bool adding) const
 {
@@ -1195,7 +1195,7 @@ ScaLAPACKMatrix<NumberType>::mmult(ScaLAPACKMatrix<NumberType> &      C,
 
 template <typename NumberType>
 void
-ScaLAPACKMatrix<NumberType>::Tmmult(ScaLAPACKMatrix<NumberType> &      C,
+ScaLAPACKMatrix<NumberType>::Tmmult(ScaLAPACKMatrix<NumberType>       &C,
                                     const ScaLAPACKMatrix<NumberType> &B,
                                     const bool adding) const
 {
@@ -1209,7 +1209,7 @@ ScaLAPACKMatrix<NumberType>::Tmmult(ScaLAPACKMatrix<NumberType> &      C,
 
 template <typename NumberType>
 void
-ScaLAPACKMatrix<NumberType>::mTmult(ScaLAPACKMatrix<NumberType> &      C,
+ScaLAPACKMatrix<NumberType>::mTmult(ScaLAPACKMatrix<NumberType>       &C,
                                     const ScaLAPACKMatrix<NumberType> &B,
                                     const bool adding) const
 {
@@ -1223,7 +1223,7 @@ ScaLAPACKMatrix<NumberType>::mTmult(ScaLAPACKMatrix<NumberType> &      C,
 
 template <typename NumberType>
 void
-ScaLAPACKMatrix<NumberType>::TmTmult(ScaLAPACKMatrix<NumberType> &      C,
+ScaLAPACKMatrix<NumberType>::TmTmult(ScaLAPACKMatrix<NumberType>       &C,
                                      const ScaLAPACKMatrix<NumberType> &B,
                                      const bool adding) const
 {
@@ -1473,7 +1473,7 @@ std::vector<NumberType>
 ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
   const bool                                   compute_eigenvectors,
   const std::pair<unsigned int, unsigned int> &eigenvalue_idx,
-  const std::pair<NumberType, NumberType> &    eigenvalue_limits)
+  const std::pair<NumberType, NumberType>     &eigenvalue_limits)
 {
   Assert(state == LAPACKSupport::matrix,
          ExcMessage(
@@ -1814,7 +1814,7 @@ std::vector<NumberType>
 ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
   const bool                                   compute_eigenvectors,
   const std::pair<unsigned int, unsigned int> &eigenvalue_idx,
-  const std::pair<NumberType, NumberType> &    eigenvalue_limits)
+  const std::pair<NumberType, NumberType>     &eigenvalue_limits)
 {
   Assert(state == LAPACKSupport::matrix,
          ExcMessage(
@@ -2616,7 +2616,7 @@ namespace internal
 template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::save(
-  const std::string &                          filename,
+  const std::string                           &filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
@@ -2658,7 +2658,7 @@ ScaLAPACKMatrix<NumberType>::save(
 template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::save_serial(
-  const std::string &                          filename,
+  const std::string                           &filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
@@ -2815,7 +2815,7 @@ ScaLAPACKMatrix<NumberType>::save_serial(
 template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::save_parallel(
-  const std::string &                          filename,
+  const std::string                           &filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
 {
 #  ifndef DEAL_II_WITH_HDF5
@@ -3463,7 +3463,7 @@ namespace internal
   {
     template <typename NumberType>
     void
-    scale_columns(ScaLAPACKMatrix<NumberType> &      matrix,
+    scale_columns(ScaLAPACKMatrix<NumberType>       &matrix,
                   const ArrayView<const NumberType> &factors)
     {
       Assert(matrix.n() == factors.size(),
@@ -3480,7 +3480,7 @@ namespace internal
 
     template <typename NumberType>
     void
-    scale_rows(ScaLAPACKMatrix<NumberType> &      matrix,
+    scale_rows(ScaLAPACKMatrix<NumberType>       &matrix,
                const ArrayView<const NumberType> &factors)
     {
       Assert(matrix.m() == factors.size(),

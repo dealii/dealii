@@ -58,9 +58,9 @@ namespace dealii
     void
     create_triangulation_with_marching_cube_algorithm(
       Triangulation<dim - 1, dim> &tria,
-      const Mapping<dim> &         mapping,
-      const DoFHandler<dim> &      background_dof_handler,
-      const VectorType &           ls_vector,
+      const Mapping<dim>          &mapping,
+      const DoFHandler<dim>       &background_dof_handler,
+      const VectorType            &ls_vector,
       const double                 iso_level,
       const unsigned int           n_subdivisions,
       const double                 tolerance = 1e-10)

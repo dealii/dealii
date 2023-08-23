@@ -19,10 +19,10 @@ for (deal_II_dimension : DIMENSIONS)
     // Explicit instantiations for dim = 2 and 3
     template std::vector<TopoDS_Edge> create_curves_from_triangulation_boundary(
       const Triangulation<2, deal_II_dimension> &triangulation,
-      const Mapping<2, deal_II_dimension> &      mapping);
+      const Mapping<2, deal_II_dimension>       &mapping);
 
-    template bool point_compare(const Point<deal_II_dimension> &    p1,
-                                const Point<deal_II_dimension> &    p2,
+    template bool point_compare(const Point<deal_II_dimension>     &p1,
+                                const Point<deal_II_dimension>     &p2,
                                 const Tensor<1, deal_II_dimension> &direction,
                                 const double                        tolerance);
 
@@ -42,8 +42,8 @@ for (deal_II_dimension : DIMENSIONS)
                                                    const double        v);
 
     template Point<deal_II_dimension> line_intersection(
-      const TopoDS_Shape &                in_shape,
-      const Point<deal_II_dimension> &    origin,
+      const TopoDS_Shape                 &in_shape,
+      const Point<deal_II_dimension>     &origin,
       const Tensor<1, deal_II_dimension> &direction,
       const double                        tolerance);
 
@@ -51,12 +51,12 @@ for (deal_II_dimension : DIMENSIONS)
       const TopoDS_Face &face, Triangulation<2, deal_II_dimension> &tria);
 
     template std::tuple<Point<deal_II_dimension>, TopoDS_Shape, double, double>
-    project_point_and_pull_back(const TopoDS_Shape &            in_shape,
+    project_point_and_pull_back(const TopoDS_Shape             &in_shape,
                                 const Point<deal_II_dimension> &origin,
                                 const double                    tolerance);
 
     template Point<deal_II_dimension> closest_point(
-      const TopoDS_Shape &            in_shape,
+      const TopoDS_Shape             &in_shape,
       const Point<deal_II_dimension> &origin,
       const double                    tolerance);
 

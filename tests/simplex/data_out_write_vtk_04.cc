@@ -59,7 +59,7 @@ public:
 
 template <int dim, int spacedim = dim>
 void
-test(const FiniteElement<dim, spacedim> &                       fe,
+test(const FiniteElement<dim, spacedim>                        &fe,
      const std::function<void(Triangulation<dim, spacedim> &)> &fu)
 {
   Triangulation<dim, spacedim> tria;

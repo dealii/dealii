@@ -39,8 +39,8 @@ void
 df(const double &x,
    const double &y,
    const double &z,
-   double &      df_dx,
-   double &      df_dy)
+   double       &df_dx,
+   double       &df_dy)
 {
   df_dx = z * (3.0 * x * x + 0.5 * y * y);
   df_dy = z * (2.0 * z * y + x * y);
@@ -51,9 +51,9 @@ void
 d2f(const double &x,
     const double &y,
     const double &z,
-    double &      d2f_dx_dx,
-    double &      d2f_dy_dy,
-    double &      d2f_dy_dx)
+    double       &d2f_dx_dx,
+    double       &d2f_dy_dy,
+    double       &d2f_dy_dx)
 {
   d2f_dx_dx = z * (6.0 * x);
   d2f_dy_dx = z * y;

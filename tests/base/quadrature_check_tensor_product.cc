@@ -26,7 +26,7 @@
 template <int dim>
 void
 check_tensor_product(const std::vector<Quadrature<dim>> &quadratures,
-                     const std::vector<std::string> &    quadrature_names)
+                     const std::vector<std::string>     &quadrature_names)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -34,7 +34,7 @@ check_tensor_product(const std::vector<Quadrature<dim>> &quadratures,
 template <>
 void
 check_tensor_product(const std::vector<Quadrature<1>> &quadratures,
-                     const std::vector<std::string> &  quadrature_names)
+                     const std::vector<std::string>   &quadrature_names)
 {
   for (unsigned int i = 0; i < quadratures.size(); ++i)
     {
@@ -67,7 +67,7 @@ check_tensor_product(const std::vector<Quadrature<1>> &quadratures,
 template <>
 void
 check_tensor_product(const std::vector<Quadrature<2>> &quadratures,
-                     const std::vector<std::string> &  quadrature_names)
+                     const std::vector<std::string>   &quadrature_names)
 {
   for (unsigned int i = 0; i < quadratures.size(); ++i)
     {
@@ -105,7 +105,7 @@ check_tensor_product(const std::vector<Quadrature<2>> &quadratures,
 template <>
 void
 check_tensor_product(const std::vector<Quadrature<3>> &quadratures,
-                     const std::vector<std::string> &  quadrature_names)
+                     const std::vector<std::string>   &quadrature_names)
 {
   for (unsigned int i = 0; i < quadratures.size(); ++i)
     {
@@ -150,7 +150,7 @@ check_tensor_product(const std::vector<Quadrature<3>> &quadratures,
 template <int dim>
 void
 fill_quadrature_vector(std::vector<Quadrature<dim>> &quadratures,
-                       std::vector<std::string> &    quadrature_names)
+                       std::vector<std::string>     &quadrature_names)
 {
   quadratures.push_back(Quadrature<dim>());
   quadrature_names.push_back("Quadrature");

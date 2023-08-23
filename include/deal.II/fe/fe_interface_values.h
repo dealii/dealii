@@ -65,7 +65,7 @@ namespace FEInterfaceViews
     template <class InputVector, class OutputVector>
     void
     get_local_dof_values(const InputVector &dof_values,
-                         OutputVector &     local_dof_values) const;
+                         OutputVector      &local_dof_values) const;
   };
 
 
@@ -1287,9 +1287,9 @@ public:
    * sides of the facet). The FEFaceValues objects will be initialized with
    * the given @p mapping, @p quadrature, and @p update_flags.
    */
-  FEInterfaceValues(const Mapping<dim, spacedim> &      mapping,
+  FEInterfaceValues(const Mapping<dim, spacedim>       &mapping,
                     const FiniteElement<dim, spacedim> &fe,
-                    const Quadrature<dim - 1> &         quadrature,
+                    const Quadrature<dim - 1>          &quadrature,
                     const UpdateFlags                   update_flags);
 
   /**
@@ -1297,9 +1297,9 @@ public:
    * so that different quadrature rules can be assigned to different
    * faces.
    */
-  FEInterfaceValues(const Mapping<dim, spacedim> &      mapping,
+  FEInterfaceValues(const Mapping<dim, spacedim>       &mapping,
                     const FiniteElement<dim, spacedim> &fe,
-                    const hp::QCollection<dim - 1> &    quadrature,
+                    const hp::QCollection<dim - 1>     &quadrature,
                     const UpdateFlags                   update_flags);
 
   /**
@@ -1309,7 +1309,7 @@ public:
    * See the constructor above.
    */
   FEInterfaceValues(const FiniteElement<dim, spacedim> &fe,
-                    const Quadrature<dim - 1> &         quadrature,
+                    const Quadrature<dim - 1>          &quadrature,
                     const UpdateFlags                   update_flags);
 
   /**
@@ -1318,8 +1318,8 @@ public:
    */
   FEInterfaceValues(
     const hp::MappingCollection<dim, spacedim> &mapping_collection,
-    const hp::FECollection<dim, spacedim> &     fe_collection,
-    const hp::QCollection<dim - 1> &            quadrature_collection,
+    const hp::FECollection<dim, spacedim>      &fe_collection,
+    const hp::QCollection<dim - 1>             &quadrature_collection,
     const UpdateFlags                           update_flags);
 
   /**
@@ -1445,7 +1445,7 @@ public:
    */
   template <typename CellIteratorType, typename CellNeighborIteratorType>
   void
-  reinit(const CellIteratorType &        cell,
+  reinit(const CellIteratorType         &cell,
          const unsigned int              face_no,
          const unsigned int              sub_face_no,
          const CellNeighborIteratorType &cell_neighbor,
@@ -1924,7 +1924,7 @@ public:
   template <class InputVector>
   void
   get_jump_in_function_values(
-    const InputVector &                            fe_function,
+    const InputVector                             &fe_function,
     std::vector<typename InputVector::value_type> &values) const;
 
   /**
@@ -1989,7 +1989,7 @@ public:
   template <class InputVector>
   void
   get_average_of_function_values(
-    const InputVector &                            fe_function,
+    const InputVector                             &fe_function,
     std::vector<typename InputVector::value_type> &values) const;
 
   /**
@@ -2179,9 +2179,9 @@ private:
 
 template <int dim, int spacedim>
 FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe,
-  const Quadrature<dim - 1> &         quadrature,
+  const Quadrature<dim - 1>          &quadrature,
   const UpdateFlags                   update_flags)
   : n_quadrature_points(quadrature.size())
   , fe_face_values(nullptr)
@@ -2213,7 +2213,7 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
 template <int dim, int spacedim>
 FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const FiniteElement<dim, spacedim> &fe,
-  const Quadrature<dim - 1> &         quadrature,
+  const Quadrature<dim - 1>          &quadrature,
   const UpdateFlags                   update_flags)
   : FEInterfaceValues(
       fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
@@ -2226,9 +2226,9 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
 
 template <int dim, int spacedim>
 FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
-  const Mapping<dim, spacedim> &      mapping,
+  const Mapping<dim, spacedim>       &mapping,
   const FiniteElement<dim, spacedim> &fe,
-  const hp::QCollection<dim - 1> &    quadrature,
+  const hp::QCollection<dim - 1>     &quadrature,
   const UpdateFlags                   update_flags)
   : n_quadrature_points(quadrature.max_n_quadrature_points())
   , fe_face_values(nullptr)
@@ -2260,8 +2260,8 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
 template <int dim, int spacedim>
 FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const hp::MappingCollection<dim, spacedim> &mapping_collection,
-  const hp::FECollection<dim, spacedim> &     fe_collection,
-  const hp::QCollection<dim - 1> &            quadrature_collection,
+  const hp::FECollection<dim, spacedim>      &fe_collection,
+  const hp::QCollection<dim - 1>             &quadrature_collection,
   const UpdateFlags                           update_flags)
   : n_quadrature_points(quadrature_collection.max_n_quadrature_points())
   , fe_face_values(nullptr)
@@ -2297,7 +2297,7 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
 template <int dim, int spacedim>
 FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const hp::FECollection<dim, spacedim> &fe_collection,
-  const hp::QCollection<dim - 1> &       quadrature_collection,
+  const hp::QCollection<dim - 1>        &quadrature_collection,
   const UpdateFlags                      update_flags)
   : FEInterfaceValues(fe_collection.get_reference_cell_default_linear_mapping(),
                       fe_collection,
@@ -2311,7 +2311,7 @@ template <int dim, int spacedim>
 template <typename CellIteratorType, typename CellNeighborIteratorType>
 void
 FEInterfaceValues<dim, spacedim>::reinit(
-  const CellIteratorType &        cell,
+  const CellIteratorType         &cell,
   const unsigned int              face_no,
   const unsigned int              sub_face_no,
   const CellNeighborIteratorType &cell_neighbor,
@@ -3030,7 +3030,7 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEInterfaceValues<dim, spacedim>::get_jump_in_function_values(
-  const InputVector &                            fe_function,
+  const InputVector                             &fe_function,
   std::vector<typename InputVector::value_type> &values) const
 {
   AssertDimension(values.size(), n_quadrature_points);
@@ -3095,7 +3095,7 @@ template <int dim, int spacedim>
 template <class InputVector>
 void
 FEInterfaceValues<dim, spacedim>::get_average_of_function_values(
-  const InputVector &                            fe_function,
+  const InputVector                             &fe_function,
   std::vector<typename InputVector::value_type> &values) const
 {
   AssertDimension(values.size(), n_quadrature_points);
@@ -3202,7 +3202,7 @@ namespace FEInterfaceViews
   void
   Base<dim, spacedim>::get_local_dof_values(
     const InputVector &dof_values,
-    OutputVector &     local_dof_values) const
+    OutputVector      &local_dof_values) const
   {
     const auto &interface_dof_indices =
       this->fe_interface->get_interface_dof_indices();

@@ -91,7 +91,7 @@ namespace NonMatching
          * Constructor.
          */
         DiscreteLevelSetDescription(const DoFHandler<dim> &dof_handler,
-                                    const VectorType &     level_set);
+                                    const VectorType      &level_set);
 
         /**
          * Return the FECollection of the DoFHandler passed to the constructor.
@@ -135,7 +135,7 @@ namespace NonMatching
       template <int dim, typename VectorType>
       DiscreteLevelSetDescription<dim, VectorType>::DiscreteLevelSetDescription(
         const DoFHandler<dim> &dof_handler,
-        const VectorType &     level_set)
+        const VectorType      &level_set)
         : dof_handler(&dof_handler)
         , level_set(&level_set)
       {}
@@ -198,7 +198,7 @@ namespace NonMatching
          * Constructor. Takes the Function that describes the geometry and the
          * element that this function should be interpolated to.
          */
-        AnalyticLevelSetDescription(const Function<dim> &     level_set,
+        AnalyticLevelSetDescription(const Function<dim>      &level_set,
                                     const FiniteElement<dim> &element);
 
         /**
@@ -249,7 +249,7 @@ namespace NonMatching
 
       template <int dim>
       AnalyticLevelSetDescription<dim>::AnalyticLevelSetDescription(
-        const Function<dim> &     level_set,
+        const Function<dim>      &level_set,
         const FiniteElement<dim> &element)
         : level_set(&level_set)
         , fe_collection(element)
@@ -305,7 +305,7 @@ namespace NonMatching
   template <int dim>
   template <typename VectorType>
   MeshClassifier<dim>::MeshClassifier(const DoFHandler<dim> &dof_handler,
-                                      const VectorType &     level_set)
+                                      const VectorType      &level_set)
     : triangulation(&dof_handler.get_triangulation())
     , level_set_description(
         std::make_unique<internal::MeshClassifierImplementation::
@@ -335,7 +335,7 @@ namespace NonMatching
 
   template <int dim>
   MeshClassifier<dim>::MeshClassifier(const Triangulation<dim> &triangulation,
-                                      const Function<dim> &     level_set,
+                                      const Function<dim>      &level_set,
                                       const FiniteElement<dim> &element)
     : triangulation(&triangulation)
     , level_set_description(
@@ -485,7 +485,7 @@ namespace NonMatching
     for (unsigned int i = 0; i < fe_collection.size(); i++)
       {
         const FiniteElement<dim> &element = fe_collection[i];
-        const FE_Q_Base<dim> *    fe_q =
+        const FE_Q_Base<dim>     *fe_q =
           dynamic_cast<const FE_Q_Base<dim> *>(&element);
         Assert(fe_q != nullptr, ExcNotImplemented());
 

@@ -38,12 +38,12 @@
 const unsigned int dim = 3;
 
 void
-apply_boundary_values(DoFHandler<dim> &          dof_handler,
+apply_boundary_values(DoFHandler<dim>           &dof_handler,
                       AffineConstraints<double> &constraints,
                       unsigned int               n_comps,
                       unsigned int               start_comp,
-                      Mapping<dim> &             mapping,
-                      Vector<double> &           dst)
+                      Mapping<dim>              &mapping,
+                      Vector<double>            &dst)
 {
   constraints.clear();
   for (unsigned int i = 0; i < 6; ++i)
@@ -62,12 +62,12 @@ apply_boundary_values(DoFHandler<dim> &          dof_handler,
 
 
 bool
-test_boundary_values(DoFHandler<dim> &   dof_handler,
-                     Mapping<dim> &      mapping,
+test_boundary_values(DoFHandler<dim>    &dof_handler,
+                     Mapping<dim>       &mapping,
                      FiniteElement<dim> &fe,
                      unsigned int        n_comps,
                      unsigned int        start_comp,
-                     Vector<double> &    vec)
+                     Vector<double>     &vec)
 {
   // Initialize
   QGaussLobatto<dim - 1> quadrature(3);

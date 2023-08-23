@@ -265,8 +265,8 @@ test(const unsigned int degree)
 
   const auto solve_and_postprocess =
     [&](const auto &poisson_operator,
-        auto &      x,
-        auto &      b) -> std::pair<unsigned int, double> {
+        auto       &x,
+        auto       &b) -> std::pair<unsigned int, double> {
     ReductionControl reduction_control(2000, 1e-7, 1e-2);
     SolverCG<std::remove_reference_t<decltype(x)>> solver(reduction_control);
 

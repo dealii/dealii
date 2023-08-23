@@ -55,7 +55,7 @@ test();
 
 template <int dim, int fe_degree, typename number, int n_q_points_1d>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints,
         const unsigned int               parallel_option = 0)
 {

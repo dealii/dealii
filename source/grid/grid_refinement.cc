@@ -47,7 +47,7 @@ namespace
   void
   refine_and_coarsen_fixed_fraction_via_l1_norm(
     Triangulation<dim, spacedim> &tria,
-    const Vector<Number> &        criteria,
+    const Vector<Number>         &criteria,
     const double                  top_fraction,
     const double                  bottom_fraction,
     const unsigned int            max_n_cells)
@@ -163,7 +163,7 @@ namespace
 template <int dim, typename Number, int spacedim>
 void
 GridRefinement::refine(Triangulation<dim, spacedim> &tria,
-                       const Vector<Number> &        criteria,
+                       const Vector<Number>         &criteria,
                        const double                  threshold,
                        const unsigned int            max_to_mark)
 {
@@ -213,7 +213,7 @@ GridRefinement::refine(Triangulation<dim, spacedim> &tria,
 template <int dim, typename Number, int spacedim>
 void
 GridRefinement::coarsen(Triangulation<dim, spacedim> &tria,
-                        const Vector<Number> &        criteria,
+                        const Vector<Number>         &criteria,
                         const double                  threshold)
 {
   Assert(criteria.size() == tria.n_active_cells(),
@@ -318,7 +318,7 @@ template <int dim, typename Number, int spacedim>
 void
 GridRefinement::refine_and_coarsen_fixed_number(
   Triangulation<dim, spacedim> &tria,
-  const Vector<Number> &        criteria,
+  const Vector<Number>         &criteria,
   const double                  top_fraction,
   const double                  bottom_fraction,
   const unsigned int            max_n_cells)
@@ -386,7 +386,7 @@ template <int dim, typename Number, int spacedim>
 void
 GridRefinement::refine_and_coarsen_fixed_fraction(
   Triangulation<dim, spacedim> &tria,
-  const Vector<Number> &        criteria,
+  const Vector<Number>         &criteria,
   const double                  top_fraction,
   const double                  bottom_fraction,
   const unsigned int            max_n_cells,

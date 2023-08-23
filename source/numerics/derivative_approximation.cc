@@ -106,7 +106,7 @@ namespace DerivativeApproximation
       template <class InputVector, int spacedim>
       static ProjectedDerivative
       get_projected_derivative(const FEValues<dim, spacedim> &fe_values,
-                               const InputVector &            solution,
+                               const InputVector             &solution,
                                const unsigned int             component);
 
       /**
@@ -137,7 +137,7 @@ namespace DerivativeApproximation
     inline typename Gradient<dim>::ProjectedDerivative
     Gradient<dim>::get_projected_derivative(
       const FEValues<dim, spacedim> &fe_values,
-      const InputVector &            solution,
+      const InputVector             &solution,
       const unsigned int             component)
     {
       if (fe_values.get_fe().n_components() == 1)
@@ -217,7 +217,7 @@ namespace DerivativeApproximation
       template <class InputVector, int spacedim>
       static ProjectedDerivative
       get_projected_derivative(const FEValues<dim, spacedim> &fe_values,
-                               const InputVector &            solution,
+                               const InputVector             &solution,
                                const unsigned int             component);
 
       /**
@@ -252,7 +252,7 @@ namespace DerivativeApproximation
     inline typename SecondDerivative<dim>::ProjectedDerivative
     SecondDerivative<dim>::get_projected_derivative(
       const FEValues<dim, spacedim> &fe_values,
-      const InputVector &            solution,
+      const InputVector             &solution,
       const unsigned int             component)
     {
       if (fe_values.get_fe().n_components() == 1)
@@ -556,7 +556,7 @@ namespace DerivativeApproximation
       template <class InputVector, int spacedim>
       static ProjectedDerivative
       get_projected_derivative(const FEValues<dim, spacedim> &fe_values,
-                               const InputVector &            solution,
+                               const InputVector             &solution,
                                const unsigned int             component);
 
       /**
@@ -591,7 +591,7 @@ namespace DerivativeApproximation
     inline typename ThirdDerivative<dim>::ProjectedDerivative
     ThirdDerivative<dim>::get_projected_derivative(
       const FEValues<dim, spacedim> &fe_values,
-      const InputVector &            solution,
+      const InputVector             &solution,
       const unsigned int             component)
     {
       if (fe_values.get_fe().n_components() == 1)
@@ -743,9 +743,9 @@ namespace DerivativeApproximation
               int spacedim>
     void
     approximate_cell(
-      const Mapping<dim, spacedim> &   mapping,
+      const Mapping<dim, spacedim>    &mapping,
       const DoFHandler<dim, spacedim> &dof_handler,
-      const InputVector &              solution,
+      const InputVector               &solution,
       const unsigned int               component,
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
       typename DerivativeDescription::Derivative &derivative)
@@ -921,9 +921,9 @@ namespace DerivativeApproximation
       const SynchronousIterators<
         std::tuple<typename DoFHandler<dim, spacedim>::active_cell_iterator,
                    Vector<float>::iterator>> &cell,
-      const Mapping<dim, spacedim> &          mapping,
-      const DoFHandler<dim, spacedim> &       dof_handler,
-      const InputVector &                     solution,
+      const Mapping<dim, spacedim>           &mapping,
+      const DoFHandler<dim, spacedim>        &dof_handler,
+      const InputVector                      &solution,
       const unsigned int                      component)
     {
       // if the cell is not locally owned, then there is nothing to do
@@ -965,11 +965,11 @@ namespace DerivativeApproximation
               class InputVector,
               int spacedim>
     void
-    approximate_derivative(const Mapping<dim, spacedim> &   mapping,
+    approximate_derivative(const Mapping<dim, spacedim>    &mapping,
                            const DoFHandler<dim, spacedim> &dof_handler,
-                           const InputVector &              solution,
+                           const InputVector               &solution,
                            const unsigned int               component,
-                           Vector<float> &                  derivative_norm)
+                           Vector<float>                   &derivative_norm)
     {
       Assert(derivative_norm.size() ==
                dof_handler.get_triangulation().n_active_cells(),
@@ -1014,10 +1014,10 @@ namespace DerivativeApproximation
 {
   template <int dim, class InputVector, int spacedim>
   void
-  approximate_gradient(const Mapping<dim, spacedim> &   mapping,
+  approximate_gradient(const Mapping<dim, spacedim>    &mapping,
                        const DoFHandler<dim, spacedim> &dof_handler,
-                       const InputVector &              solution,
-                       Vector<float> &                  derivative_norm,
+                       const InputVector               &solution,
+                       Vector<float>                   &derivative_norm,
                        const unsigned int               component)
   {
     internal::approximate_derivative<internal::Gradient<dim>, dim>(
@@ -1028,8 +1028,8 @@ namespace DerivativeApproximation
   template <int dim, class InputVector, int spacedim>
   void
   approximate_gradient(const DoFHandler<dim, spacedim> &dof_handler,
-                       const InputVector &              solution,
-                       Vector<float> &                  derivative_norm,
+                       const InputVector               &solution,
+                       Vector<float>                   &derivative_norm,
                        const unsigned int               component)
   {
     Assert(!dof_handler.get_triangulation().is_mixed_mesh(),
@@ -1047,10 +1047,10 @@ namespace DerivativeApproximation
 
   template <int dim, class InputVector, int spacedim>
   void
-  approximate_second_derivative(const Mapping<dim, spacedim> &   mapping,
+  approximate_second_derivative(const Mapping<dim, spacedim>    &mapping,
                                 const DoFHandler<dim, spacedim> &dof_handler,
-                                const InputVector &              solution,
-                                Vector<float> &    derivative_norm,
+                                const InputVector               &solution,
+                                Vector<float>     &derivative_norm,
                                 const unsigned int component)
   {
     internal::approximate_derivative<internal::SecondDerivative<dim>, dim>(
@@ -1061,8 +1061,8 @@ namespace DerivativeApproximation
   template <int dim, class InputVector, int spacedim>
   void
   approximate_second_derivative(const DoFHandler<dim, spacedim> &dof_handler,
-                                const InputVector &              solution,
-                                Vector<float> &    derivative_norm,
+                                const InputVector               &solution,
+                                Vector<float>     &derivative_norm,
                                 const unsigned int component)
   {
     Assert(!dof_handler.get_triangulation().is_mixed_mesh(),
@@ -1081,9 +1081,9 @@ namespace DerivativeApproximation
   template <int dim, int spacedim, class InputVector, int order>
   void
   approximate_derivative_tensor(
-    const Mapping<dim, spacedim> &   mapping,
+    const Mapping<dim, spacedim>    &mapping,
     const DoFHandler<dim, spacedim> &dof,
-    const InputVector &              solution,
+    const InputVector               &solution,
 #ifndef _MSC_VER
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
 #else
@@ -1104,7 +1104,7 @@ namespace DerivativeApproximation
   void
   approximate_derivative_tensor(
     const DoFHandler<dim, spacedim> &dof,
-    const InputVector &              solution,
+    const InputVector               &solution,
 #ifndef _MSC_VER
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
 #else

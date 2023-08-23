@@ -31,12 +31,12 @@ namespace internal
     void
     call_stev(const char            jobz,
               const types::blas_int n,
-              Number *              d,
-              Number *              e,
-              Number *              z,
+              Number               *d,
+              Number               *e,
+              Number               *z,
               const types::blas_int ldz,
-              Number *              work,
-              types::blas_int *     info)
+              Number               *work,
+              types::blas_int      *info)
     {
       stev(&jobz, &n, d, e, z, &ldz, work, info);
     }

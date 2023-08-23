@@ -133,7 +133,7 @@ namespace
    */
   template <typename T>
   std::string
-  compress_array(const std::vector<T> &              data,
+  compress_array(const std::vector<T>               &data,
                  const DataOutBase::CompressionLevel compression_level)
   {
 #ifdef DEAL_II_WITH_ZLIB
@@ -209,7 +209,7 @@ namespace
    */
   template <typename T>
   std::string
-  vtu_stringize_array(const std::vector<T> &              data,
+  vtu_stringize_array(const std::vector<T>               &data,
                       const DataOutBase::CompressionLevel compression_level,
                       const int                           precision)
   {
@@ -654,7 +654,7 @@ namespace DataOutBase
 
 
   void
-  DataOutFilter::write_data_set(const std::string &     name,
+  DataOutFilter::write_data_set(const std::string      &name,
                                 const unsigned int      dimension,
                                 const unsigned int      set_num,
                                 const Table<2, double> &data_vectors)
@@ -775,7 +775,7 @@ namespace
   template <int dim, int spacedim>
   inline Point<spacedim>
   get_equispaced_location(
-    const DataOutBase::Patch<dim, spacedim> &  patch,
+    const DataOutBase::Patch<dim, spacedim>   &patch,
     const std::initializer_list<unsigned int> &lattice_location,
     const unsigned int                         n_subdivisions)
   {
@@ -1521,7 +1521,7 @@ namespace
 
 
 
-  TecplotStream::TecplotStream(std::ostream &                   out,
+  TecplotStream::TecplotStream(std::ostream                    &out,
                                const DataOutBase::TecplotFlags &f)
     : StreamBase<DataOutBase::TecplotFlags>(out, f)
   {}
@@ -2718,7 +2718,7 @@ namespace DataOutBase
   template <int dim, int spacedim, typename StreamType>
   void
   write_high_order_cells(const std::vector<Patch<dim, spacedim>> &patches,
-                         StreamType &                             out,
+                         StreamType                              &out,
                          const bool                               legacy_format)
   {
     Assert(dim <= 3 && dim > 1, ExcNotImplemented());
@@ -2831,7 +2831,7 @@ namespace DataOutBase
   write_data(const std::vector<Patch<dim, spacedim>> &patches,
              unsigned int                             n_data_sets,
              const bool                               double_precision,
-             StreamType &                             out)
+             StreamType                              &out)
   {
     Assert(dim <= 3, ExcNotImplemented());
     unsigned int count = 0;
@@ -3175,14 +3175,14 @@ namespace DataOutBase
   void
   write_ucd(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>> &,
     const UcdFlags &flags,
-    std::ostream &  out)
+    std::ostream   &out)
   {
     // Note that while in theory dim==0 should be implemented, this is not
     // tested, therefore currently not allowed.
@@ -3266,14 +3266,14 @@ namespace DataOutBase
   void
   write_dx(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>> &,
     const DXFlags &flags,
-    std::ostream & out)
+    std::ostream  &out)
   {
     // Point output is currently not implemented.
     AssertThrow(dim > 0, ExcNotImplemented());
@@ -3556,14 +3556,14 @@ namespace DataOutBase
   void
   write_gnuplot(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>> &,
     const GnuplotFlags &flags,
-    std::ostream &      out)
+    std::ostream       &out)
   {
     AssertThrow(out.fail() == false, ExcIO());
 
@@ -3963,8 +3963,8 @@ namespace DataOutBase
     void
     do_write_povray(const std::vector<Patch<2, 2>> &patches,
                     const std::vector<std::string> &data_names,
-                    const PovrayFlags &             flags,
-                    std::ostream &                  out)
+                    const PovrayFlags              &flags,
+                    std::ostream                   &out)
     {
       AssertThrow(out.fail() == false, ExcIO());
 
@@ -4293,14 +4293,14 @@ namespace DataOutBase
   void
   write_povray(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>> &,
     const PovrayFlags &flags,
-    std::ostream &     out)
+    std::ostream      &out)
   {
     do_write_povray(patches, data_names, flags, out);
   }
@@ -4336,7 +4336,7 @@ namespace DataOutBase
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>> &,
     const EpsFlags &flags,
-    std::ostream &  out)
+    std::ostream   &out)
   {
     AssertThrow(out.fail() == false, ExcIO());
 
@@ -4647,14 +4647,14 @@ namespace DataOutBase
   void
   write_gmv(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>> &,
     const GmvFlags &flags,
-    std::ostream &  out)
+    std::ostream   &out)
   {
     // The gmv format does not support cells that only consist of a single
     // point. It does support the output of point data using the keyword
@@ -4780,14 +4780,14 @@ namespace DataOutBase
   void
   write_tecplot(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>> &,
     const TecplotFlags &flags,
-    std::ostream &      out)
+    std::ostream       &out)
   {
     AssertThrow(out.fail() == false, ExcIO());
 
@@ -4933,15 +4933,15 @@ namespace DataOutBase
   void
   write_vtk(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &             nonscalar_data_ranges,
+                   &nonscalar_data_ranges,
     const VtkFlags &flags,
-    std::ostream &  out)
+    std::ostream   &out)
   {
     AssertThrow(out.fail() == false, ExcIO());
 
@@ -5229,15 +5229,15 @@ namespace DataOutBase
   void
   write_vtu(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &             nonscalar_data_ranges,
+                   &nonscalar_data_ranges,
     const VtkFlags &flags,
-    std::ostream &  out)
+    std::ostream   &out)
   {
     write_vtu_header(out, flags);
     write_vtu_main(patches, data_names, nonscalar_data_ranges, flags, out);
@@ -5251,15 +5251,15 @@ namespace DataOutBase
   void
   write_vtu_main(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &             nonscalar_data_ranges,
+                   &nonscalar_data_ranges,
     const VtkFlags &flags,
-    std::ostream &  out)
+    std::ostream   &out)
   {
     AssertThrow(out.fail() == false, ExcIO());
 
@@ -5844,7 +5844,7 @@ namespace DataOutBase
        n_data_sets,
        n_nodes,
        output_precision = out.precision()](const Table<2, float> &data_vectors,
-                                           const auto &           range) {
+                                           const auto            &range) {
         std::ostringstream o;
 
         const auto  first_component = std::get<0>(range);
@@ -6103,7 +6103,7 @@ namespace DataOutBase
 
   void
   write_pvtu_record(
-    std::ostream &                  out,
+    std::ostream                   &out,
     const std::vector<std::string> &piece_names,
     const std::vector<std::string> &data_names,
     const std::vector<
@@ -6111,7 +6111,7 @@ namespace DataOutBase
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &             nonscalar_data_ranges,
+                   &nonscalar_data_ranges,
     const VtkFlags &flags)
   {
     AssertThrow(out.fail() == false, ExcIO());
@@ -6256,7 +6256,7 @@ namespace DataOutBase
 
   void
   write_pvd_record(
-    std::ostream &                                     out,
+    std::ostream                                      &out,
     const std::vector<std::pair<double, std::string>> &times_and_names)
   {
     AssertThrow(out.fail() == false, ExcIO());
@@ -6292,7 +6292,7 @@ namespace DataOutBase
 
 
   void
-  write_visit_record(std::ostream &                  out,
+  write_visit_record(std::ostream                   &out,
                      const std::vector<std::string> &piece_names)
   {
     out << "!NBLOCKS " << piece_names.size() << '\n';
@@ -6305,7 +6305,7 @@ namespace DataOutBase
 
 
   void
-  write_visit_record(std::ostream &                               out,
+  write_visit_record(std::ostream                                &out,
                      const std::vector<std::vector<std::string>> &piece_names)
   {
     AssertThrow(out.fail() == false, ExcIO());
@@ -6395,7 +6395,7 @@ namespace DataOutBase
                  DataComponentInterpretation::DataComponentInterpretation>>
       & /*nonscalar_data_ranges*/,
     const SvgFlags &flags,
-    std::ostream &  out)
+    std::ostream   &out)
   {
     const unsigned int height = flags.height;
     unsigned int       width  = flags.width;
@@ -7353,7 +7353,7 @@ namespace DataOutBase
   void
   write_deal_II_intermediate(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
@@ -7401,15 +7401,15 @@ namespace DataOutBase
   void
   write_deal_II_intermediate_in_parallel(
     const std::vector<Patch<dim, spacedim>> &patches,
-    const std::vector<std::string> &         data_names,
+    const std::vector<std::string>          &data_names,
     const std::vector<
       std::tuple<unsigned int,
                  unsigned int,
                  std::string,
                  DataComponentInterpretation::DataComponentInterpretation>>
-      &                              nonscalar_data_ranges,
+                                    &nonscalar_data_ranges,
     const Deal_II_IntermediateFlags &flags,
-    const std::string &              filename,
+    const std::string               &filename,
     const MPI_Comm                   comm,
     const CompressionLevel           compression)
   {
@@ -7766,7 +7766,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   AssertThrowMPI(ierr);
 
   {
-    const auto &                  patches      = get_patches();
+    const auto                   &patches      = get_patches();
     const types::global_dof_index my_n_patches = patches.size();
     const types::global_dof_index global_n_patches =
       Utilities::MPI::sum(my_n_patches, comm);
@@ -7839,7 +7839,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
 template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_pvtu_record(
-  std::ostream &                  out,
+  std::ostream                   &out,
   const std::vector<std::string> &piece_names) const
 {
   DataOutBase::write_pvtu_record(out,
@@ -7949,7 +7949,7 @@ DataOutInterface<dim, spacedim>::write_deal_II_intermediate(
 template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_deal_II_intermediate_in_parallel(
-  const std::string &                 filename,
+  const std::string                  &filename,
   const MPI_Comm                      comm,
   const DataOutBase::CompressionLevel compression) const
 {
@@ -7969,7 +7969,7 @@ template <int dim, int spacedim>
 XDMFEntry
 DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const DataOutBase::DataOutFilter &data_filter,
-  const std::string &               h5_filename,
+  const std::string                &h5_filename,
   const double                      cur_time,
   const MPI_Comm                    comm) const
 {
@@ -7983,8 +7983,8 @@ template <int dim, int spacedim>
 XDMFEntry
 DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const DataOutBase::DataOutFilter &data_filter,
-  const std::string &               h5_mesh_filename,
-  const std::string &               h5_solution_filename,
+  const std::string                &h5_mesh_filename,
+  const std::string                &h5_solution_filename,
   const double                      cur_time,
   const MPI_Comm                    comm) const
 {
@@ -8122,7 +8122,7 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_xdmf_file(
   const std::vector<XDMFEntry> &entries,
-  const std::string &           filename,
+  const std::string            &filename,
   const MPI_Comm                comm) const
 {
 #ifdef DEAL_II_WITH_MPI
@@ -8185,10 +8185,10 @@ namespace
   void
   do_write_hdf5(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
                 const DataOutBase::DataOutFilter &data_filter,
-                const DataOutBase::Hdf5Flags &    flags,
+                const DataOutBase::Hdf5Flags     &flags,
                 const bool                        write_mesh_file,
-                const std::string &               mesh_filename,
-                const std::string &               solution_filename,
+                const std::string                &mesh_filename,
+                const std::string                &solution_filename,
                 const MPI_Comm                    comm)
   {
     hid_t h5_mesh_file_id = -1, h5_solution_file_id, file_plist_id, plist_id;
@@ -8534,13 +8534,13 @@ template <int dim, int spacedim>
 void
 DataOutBase::write_filtered_data(
   const std::vector<Patch<dim, spacedim>> &patches,
-  const std::vector<std::string> &         data_names,
+  const std::vector<std::string>          &data_names,
   const std::vector<
     std::tuple<unsigned int,
                unsigned int,
                std::string,
                DataComponentInterpretation::DataComponentInterpretation>>
-    &                         nonscalar_data_ranges,
+                             &nonscalar_data_ranges,
   DataOutBase::DataOutFilter &filtered_data)
 {
   const unsigned int n_data_sets = data_names.size();
@@ -8657,7 +8657,7 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_hdf5_parallel(
   const DataOutBase::DataOutFilter &data_filter,
-  const std::string &               filename,
+  const std::string                &filename,
   const MPI_Comm                    comm) const
 {
   DataOutBase::write_hdf5_parallel(
@@ -8671,8 +8671,8 @@ void
 DataOutInterface<dim, spacedim>::write_hdf5_parallel(
   const DataOutBase::DataOutFilter &data_filter,
   const bool                        write_mesh_file,
-  const std::string &               mesh_filename,
-  const std::string &               solution_filename,
+  const std::string                &mesh_filename,
+  const std::string                &solution_filename,
   const MPI_Comm                    comm) const
 {
   DataOutBase::write_hdf5_parallel(get_patches(),
@@ -8690,9 +8690,9 @@ template <int dim, int spacedim>
 void
 DataOutBase::write_hdf5_parallel(
   const std::vector<Patch<dim, spacedim>> &patches,
-  const DataOutBase::DataOutFilter &       data_filter,
-  const DataOutBase::Hdf5Flags &           flags,
-  const std::string &                      filename,
+  const DataOutBase::DataOutFilter        &data_filter,
+  const DataOutBase::Hdf5Flags            &flags,
+  const std::string                       &filename,
   const MPI_Comm                           comm)
 {
   write_hdf5_parallel(
@@ -8705,11 +8705,11 @@ template <int dim, int spacedim>
 void
 DataOutBase::write_hdf5_parallel(
   const std::vector<Patch<dim, spacedim>> &patches,
-  const DataOutBase::DataOutFilter &       data_filter,
-  const DataOutBase::Hdf5Flags &           flags,
+  const DataOutBase::DataOutFilter        &data_filter,
+  const DataOutBase::Hdf5Flags            &flags,
   const bool                               write_mesh_file,
-  const std::string &                      mesh_filename,
-  const std::string &                      solution_filename,
+  const std::string                       &mesh_filename,
+  const std::string                       &solution_filename,
   const MPI_Comm                           comm)
 {
   AssertThrow(
@@ -8787,7 +8787,7 @@ DataOutBase::write_hdf5_parallel(
 template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write(
-  std::ostream &                  out,
+  std::ostream                   &out,
   const DataOutBase::OutputFormat output_format_) const
 {
   DataOutBase::OutputFormat output_format = output_format_;
@@ -9398,7 +9398,7 @@ XDMFEntry::XDMFEntry()
 
 
 
-XDMFEntry::XDMFEntry(const std::string & filename,
+XDMFEntry::XDMFEntry(const std::string  &filename,
                      const double        time,
                      const std::uint64_t nodes,
                      const std::uint64_t cells,
@@ -9406,7 +9406,7 @@ XDMFEntry::XDMFEntry(const std::string & filename,
   : XDMFEntry(filename, filename, time, nodes, cells, dim, dim, ReferenceCell())
 {}
 
-XDMFEntry::XDMFEntry(const std::string &  filename,
+XDMFEntry::XDMFEntry(const std::string   &filename,
                      const double         time,
                      const std::uint64_t  nodes,
                      const std::uint64_t  cells,
@@ -9417,8 +9417,8 @@ XDMFEntry::XDMFEntry(const std::string &  filename,
 
 
 
-XDMFEntry::XDMFEntry(const std::string & mesh_filename,
-                     const std::string & solution_filename,
+XDMFEntry::XDMFEntry(const std::string  &mesh_filename,
+                     const std::string  &solution_filename,
                      const double        time,
                      const std::uint64_t nodes,
                      const std::uint64_t cells,
@@ -9435,8 +9435,8 @@ XDMFEntry::XDMFEntry(const std::string & mesh_filename,
 
 
 
-XDMFEntry::XDMFEntry(const std::string &  mesh_filename,
-                     const std::string &  solution_filename,
+XDMFEntry::XDMFEntry(const std::string   &mesh_filename,
+                     const std::string   &solution_filename,
                      const double         time,
                      const std::uint64_t  nodes,
                      const std::uint64_t  cells,
@@ -9454,8 +9454,8 @@ XDMFEntry::XDMFEntry(const std::string &  mesh_filename,
 
 
 
-XDMFEntry::XDMFEntry(const std::string & mesh_filename,
-                     const std::string & solution_filename,
+XDMFEntry::XDMFEntry(const std::string  &mesh_filename,
+                     const std::string  &solution_filename,
                      const double        time,
                      const std::uint64_t nodes,
                      const std::uint64_t cells,
@@ -9506,8 +9506,8 @@ namespace
 
 
 
-XDMFEntry::XDMFEntry(const std::string &  mesh_filename,
-                     const std::string &  solution_filename,
+XDMFEntry::XDMFEntry(const std::string   &mesh_filename,
+                     const std::string   &solution_filename,
                      const double         time,
                      const std::uint64_t  nodes,
                      const std::uint64_t  cells,

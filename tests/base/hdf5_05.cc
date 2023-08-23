@@ -206,7 +206,7 @@ type_to_string()
 // This function tests parallel write and gets the group by reference
 template <typename Number>
 void
-write_test(HDF5::Group &      root_group,
+write_test(HDF5::Group       &root_group,
            MPI_Comm           mpi_communicator,
            ConditionalOStream pcout)
 {

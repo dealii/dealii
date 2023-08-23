@@ -39,7 +39,7 @@ output_double_number(double input, const std::string &text)
 template <class NUMBER>
 void
 output_eigenvalues(const std::vector<NUMBER> &eigenvalues,
-                   const std::string &        text)
+                   const std::string         &text)
 {
   deallog << text;
   for (unsigned int j = 0; j < eigenvalues.size(); ++j)
@@ -55,10 +55,10 @@ template <typename SolverType,
           typename VectorType,
           class PRECONDITION>
 void
-check_solve(SolverType &        solver,
-            const MatrixType &  A,
-            VectorType &        u,
-            VectorType &        f,
+check_solve(SolverType         &solver,
+            const MatrixType   &A,
+            VectorType         &u,
+            VectorType         &f,
             const PRECONDITION &P)
 {
   u = 0.;
@@ -78,10 +78,10 @@ template <typename SolverType,
           typename VectorType,
           class PRECONDITION>
 void
-check_Tsolve(SolverType &        solver,
-             const MatrixType &  A,
-             VectorType &        u,
-             VectorType &        f,
+check_Tsolve(SolverType         &solver,
+             const MatrixType   &A,
+             VectorType         &u,
+             VectorType         &f,
              const PRECONDITION &P)
 {
   u = 0.;

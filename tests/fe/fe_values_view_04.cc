@@ -104,8 +104,8 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
                       AssertThrow(
                         fe_values[vec_components].symmetric_gradient(i, q) ==
-                          decltype(
-                            fe_values[vec_components].symmetric_gradient(i, q))(
+                          decltype(fe_values[vec_components].symmetric_gradient(
+                            i, q))(
                             (fe_values[vec_components].gradient(i, q) +
                              transpose(
                                fe_values[vec_components].gradient(i, q))) /

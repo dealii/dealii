@@ -804,7 +804,7 @@ make_vectorized_array(const typename VectorizedArrayType::value_type &u)
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
-gather(VectorizedArray<Number, width> &   out,
+gather(VectorizedArray<Number, width>    &out,
        const std::array<Number *, width> &ptrs,
        const unsigned int                 offset)
 {
@@ -842,8 +842,8 @@ gather(VectorizedArray<Number, width> &   out,
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int              n_entries,
-                              const Number *                  in,
-                              const unsigned int *            offsets,
+                              const Number                   *in,
+                              const unsigned int             *offsets,
                               VectorizedArray<Number, width> *out)
 {
   for (unsigned int i = 0; i < n_entries; ++i)
@@ -867,7 +867,7 @@ template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int                 n_entries,
                               const std::array<Number *, width> &in,
-                              VectorizedArray<Number, width> *   out)
+                              VectorizedArray<Number, width>    *out)
 {
   for (unsigned int i = 0; i < n_entries; ++i)
     for (unsigned int v = 0; v < VectorizedArray<Number, width>::size(); ++v)
@@ -919,8 +919,8 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                            add_into,
                                const unsigned int                    n_entries,
                                const VectorizedArray<Number, width> *in,
-                               const unsigned int *                  offsets,
-                               Number *                              out)
+                               const unsigned int                   *offsets,
+                               Number                               *out)
 {
   if (add_into)
     for (unsigned int i = 0; i < n_entries; ++i)
@@ -949,7 +949,7 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                            add_into,
                                const unsigned int                    n_entries,
                                const VectorizedArray<Number, width> *in,
-                               std::array<Number *, width> &         out)
+                               std::array<Number *, width>          &out)
 {
   if (add_into)
     for (unsigned int i = 0; i < n_entries; ++i)
@@ -1302,8 +1302,8 @@ private:
 template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int          n_entries,
-                              const double *              in,
-                              const unsigned int *        offsets,
+                              const double               *in,
+                              const unsigned int         *offsets,
                               VectorizedArray<double, 2> *out)
 {
   const unsigned int n_chunks = n_entries / 2;
@@ -1330,7 +1330,7 @@ template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int             n_entries,
                               const std::array<double *, 2> &in,
-                              VectorizedArray<double, 2> *   out)
+                              VectorizedArray<double, 2>    *out)
 {
   // see the comments in the vectorized_load_and_transpose above
 
@@ -1358,8 +1358,8 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 2> *in,
-                               const unsigned int *              offsets,
-                               double *                          out)
+                               const unsigned int               *offsets,
+                               double                           *out)
 {
   const unsigned int n_chunks = n_entries / 2;
   if (add_into)
@@ -1410,7 +1410,7 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 2> *in,
-                               std::array<double *, 2> &         out)
+                               std::array<double *, 2>          &out)
 {
   // see the comments in the vectorized_transpose_and_store above
 
@@ -1771,8 +1771,8 @@ private:
 template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int         n_entries,
-                              const float *              in,
-                              const unsigned int *       offsets,
+                              const float               *in,
+                              const unsigned int        *offsets,
                               VectorizedArray<float, 4> *out)
 {
   const unsigned int n_chunks = n_entries / 4;
@@ -1807,7 +1807,7 @@ template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int            n_entries,
                               const std::array<float *, 4> &in,
-                              VectorizedArray<float, 4> *   out)
+                              VectorizedArray<float, 4>    *out)
 {
   // see the comments in the vectorized_load_and_transpose above
 
@@ -1843,8 +1843,8 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 4> *in,
-                               const unsigned int *             offsets,
-                               float *                          out)
+                               const unsigned int              *offsets,
+                               float                           *out)
 {
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -1906,7 +1906,7 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 4> *in,
-                               std::array<float *, 4> &         out)
+                               std::array<float *, 4>          &out)
 {
   // see the comments in the vectorized_transpose_and_store above
 
@@ -2333,15 +2333,15 @@ private:
 template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int          n_entries,
-                              const double *              in,
-                              const unsigned int *        offsets,
+                              const double               *in,
+                              const unsigned int         *offsets,
                               VectorizedArray<double, 4> *out)
 {
   const unsigned int n_chunks = n_entries / 4;
-  const double *     in0      = in + offsets[0];
-  const double *     in1      = in + offsets[1];
-  const double *     in2      = in + offsets[2];
-  const double *     in3      = in + offsets[3];
+  const double      *in0      = in + offsets[0];
+  const double      *in1      = in + offsets[1];
+  const double      *in2      = in + offsets[2];
+  const double      *in3      = in + offsets[3];
 
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
@@ -2373,15 +2373,15 @@ template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int             n_entries,
                               const std::array<double *, 4> &in,
-                              VectorizedArray<double, 4> *   out)
+                              VectorizedArray<double, 4>    *out)
 {
   // see the comments in the vectorized_load_and_transpose above
 
   const unsigned int n_chunks = n_entries / 4;
-  const double *     in0      = in[0];
-  const double *     in1      = in[1];
-  const double *     in2      = in[2];
-  const double *     in3      = in[3];
+  const double      *in0      = in[0];
+  const double      *in1      = in[1];
+  const double      *in2      = in[2];
+  const double      *in3      = in[3];
 
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
@@ -2413,14 +2413,14 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 4> *in,
-                               const unsigned int *              offsets,
-                               double *                          out)
+                               const unsigned int               *offsets,
+                               double                           *out)
 {
   const unsigned int n_chunks = n_entries / 4;
-  double *           out0     = out + offsets[0];
-  double *           out1     = out + offsets[1];
-  double *           out2     = out + offsets[2];
-  double *           out3     = out + offsets[3];
+  double            *out0     = out + offsets[0];
+  double            *out1     = out + offsets[1];
+  double            *out2     = out + offsets[2];
+  double            *out3     = out + offsets[3];
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
       __m256d u0   = in[4 * i + 0].data;
@@ -2480,15 +2480,15 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 4> *in,
-                               std::array<double *, 4> &         out)
+                               std::array<double *, 4>          &out)
 {
   // see the comments in the vectorized_transpose_and_store above
 
   const unsigned int n_chunks = n_entries / 4;
-  double *           out0     = out[0];
-  double *           out1     = out[1];
-  double *           out2     = out[2];
-  double *           out3     = out[3];
+  double            *out0     = out[0];
+  double            *out1     = out[1];
+  double            *out2     = out[2];
+  double            *out3     = out[3];
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
       __m256d u0   = in[4 * i + 0].data;
@@ -2897,8 +2897,8 @@ private:
 template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int         n_entries,
-                              const float *              in,
-                              const unsigned int *       offsets,
+                              const float               *in,
+                              const unsigned int        *offsets,
                               VectorizedArray<float, 8> *out)
 {
   const unsigned int n_chunks = n_entries / 4;
@@ -2940,7 +2940,7 @@ template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int            n_entries,
                               const std::array<float *, 8> &in,
-                              VectorizedArray<float, 8> *   out)
+                              VectorizedArray<float, 8>    *out)
 {
   // see the comments in the vectorized_load_and_transpose above
 
@@ -2981,8 +2981,8 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 8> *in,
-                               const unsigned int *             offsets,
-                               float *                          out)
+                               const unsigned int              *offsets,
+                               float                           *out)
 {
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -3064,7 +3064,7 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 8> *in,
-                               std::array<float *, 8> &         out)
+                               std::array<float *, 8>          &out)
 {
   // see the comments in the vectorized_transpose_and_store above
 
@@ -3532,8 +3532,8 @@ private:
 template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int          n_entries,
-                              const double *              in,
-                              const unsigned int *        offsets,
+                              const double               *in,
+                              const unsigned int         *offsets,
                               VectorizedArray<double, 8> *out)
 {
   // do not do full transpose because the code is long and will most
@@ -3578,7 +3578,7 @@ template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int             n_entries,
                               const std::array<double *, 8> &in,
-                              VectorizedArray<double, 8> *   out)
+                              VectorizedArray<double, 8>    *out)
 {
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -3618,8 +3618,8 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 8> *in,
-                               const unsigned int *              offsets,
-                               double *                          out)
+                               const unsigned int               *offsets,
+                               double                           *out)
 {
   // as for the load, we split the store operations into 256 bit units to
   // better balance between code size, shuffle instructions, and stores
@@ -3701,7 +3701,7 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 8> *in,
-                               std::array<double *, 8> &         out)
+                               std::array<double *, 8>          &out)
 {
   // see the comments in the vectorized_transpose_and_store above
 
@@ -4147,8 +4147,8 @@ private:
 template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int          n_entries,
-                              const float *               in,
-                              const unsigned int *        offsets,
+                              const float                *in,
+                              const unsigned int         *offsets,
                               VectorizedArray<float, 16> *out)
 {
   // Similar to the double case, we perform the work on smaller entities. In
@@ -4210,7 +4210,7 @@ template <>
 inline DEAL_II_ALWAYS_INLINE void
 vectorized_load_and_transpose(const unsigned int             n_entries,
                               const std::array<float *, 16> &in,
-                              VectorizedArray<float, 16> *   out)
+                              VectorizedArray<float, 16>    *out)
 {
   // see the comments in the vectorized_load_and_transpose above
 
@@ -4263,8 +4263,8 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<float, 16> *in,
-                               const unsigned int *              offsets,
-                               float *                           out)
+                               const unsigned int               *offsets,
+                               float                            *out)
 {
   const unsigned int n_chunks = n_entries / 4;
   for (unsigned int i = 0; i < n_chunks; ++i)
@@ -4377,7 +4377,7 @@ inline DEAL_II_ALWAYS_INLINE void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<float, 16> *in,
-                               std::array<float *, 16> &         out)
+                               std::array<float *, 16>          &out)
 {
   // see the comments in the vectorized_transpose_and_store above
 

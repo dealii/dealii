@@ -64,7 +64,7 @@ test();
 
 template <int dim>
 void
-do_check(const Triangulation<dim> &   triangulation,
+do_check(const Triangulation<dim>    &triangulation,
          const hp::FECollection<dim> &fe)
 {
   DoFHandler<dim> dof_handler(triangulation);

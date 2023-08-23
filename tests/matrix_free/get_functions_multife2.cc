@@ -71,7 +71,7 @@ public:
   void
   operator()(const MatrixFree<dim, Number> &data,
              VectorType &,
-             const VectorType &                           src,
+             const VectorType                            &src,
              const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, 0, 1, 1, Number>                     fe_eval0(data, 0, 0);

@@ -557,7 +557,7 @@ namespace TensorAccessors
       using value_type = return_type;
 
       constexpr DEAL_II_ALWAYS_INLINE return_type &
-                                      operator[](unsigned int j) const
+      operator[](unsigned int j) const
       {
         return s_.apply(j)[i_];
       }

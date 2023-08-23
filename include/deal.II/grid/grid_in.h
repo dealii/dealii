@@ -906,9 +906,9 @@ protected:
    * further ado by the user.
    */
   static void
-  debug_output_grid(const std::vector<CellData<dim>> &  cells,
+  debug_output_grid(const std::vector<CellData<dim>>   &cells,
                     const std::vector<Point<spacedim>> &vertices,
-                    std::ostream &                      out);
+                    std::ostream                       &out);
 
 private:
   /**
@@ -936,14 +936,14 @@ private:
    * function execution..
    */
   static void
-  parse_tecplot_header(std::string &              header,
+  parse_tecplot_header(std::string               &header,
                        std::vector<unsigned int> &tecplot2deal,
-                       unsigned int &             n_vars,
-                       unsigned int &             n_vertices,
-                       unsigned int &             n_cells,
+                       unsigned int              &n_vars,
+                       unsigned int              &n_vertices,
+                       unsigned int              &n_cells,
                        std::vector<unsigned int> &IJK,
-                       bool &                     structured,
-                       bool &                     blocked);
+                       bool                      &structured,
+                       bool                      &blocked);
 
   /**
    * Input format used by read() if no format is given.
@@ -958,20 +958,20 @@ private:
 template <>
 void
 GridIn<2>::debug_output_grid(const std::vector<CellData<2>> &cells,
-                             const std::vector<Point<2>> &   vertices,
-                             std::ostream &                  out);
+                             const std::vector<Point<2>>    &vertices,
+                             std::ostream                   &out);
 
 
 template <>
 void
 GridIn<2, 3>::debug_output_grid(const std::vector<CellData<2>> &cells,
-                                const std::vector<Point<3>> &   vertices,
-                                std::ostream &                  out);
+                                const std::vector<Point<3>>    &vertices,
+                                std::ostream                   &out);
 template <>
 void
 GridIn<3>::debug_output_grid(const std::vector<CellData<3>> &cells,
-                             const std::vector<Point<3>> &   vertices,
-                             std::ostream &                  out);
+                             const std::vector<Point<3>>    &vertices,
+                             std::ostream                   &out);
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE

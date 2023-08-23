@@ -136,8 +136,8 @@ PolynomialsAdini<dim>::PolynomialsAdini()
 template <int dim>
 void
 PolynomialsAdini<dim>::evaluate(
-  const Point<dim> &           unit_point,
-  std::vector<double> &        values,
+  const Point<dim>            &unit_point,
+  std::vector<double>         &values,
   std::vector<Tensor<1, dim>> &grads,
   std::vector<Tensor<2, dim>> &grad_grads,
   std::vector<Tensor<3, dim>> &third_derivatives,
@@ -191,7 +191,7 @@ PolynomialsAdini<dim>::evaluate(
 template <int dim>
 double
 PolynomialsAdini<dim>::compute_value(const unsigned int i,
-                                     const Point<dim> & p) const
+                                     const Point<dim>  &p) const
 {
   const double x = p(0);
   const double y = p(1);
@@ -207,7 +207,7 @@ PolynomialsAdini<dim>::compute_value(const unsigned int i,
 template <int dim>
 Tensor<1, dim>
 PolynomialsAdini<dim>::compute_grad(const unsigned int i,
-                                    const Point<dim> & p) const
+                                    const Point<dim>  &p) const
 {
   const double   x = p(0);
   const double   y = p(1);
@@ -231,7 +231,7 @@ PolynomialsAdini<dim>::compute_grad(const unsigned int i,
 template <int dim>
 Tensor<2, dim>
 PolynomialsAdini<dim>::compute_grad_grad(const unsigned int i,
-                                         const Point<dim> & p) const
+                                         const Point<dim>  &p) const
 {
   const double   x = p(0);
   const double   y = p(1);

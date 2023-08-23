@@ -337,7 +337,7 @@ namespace hp
       const std::set<unsigned int> &fes,
       const std::function<std::vector<std::pair<unsigned int, unsigned int>>(
         const unsigned int,
-        const unsigned int)> &      query_identities)
+        const unsigned int)>       &query_identities)
     {
       // Let's deal with the easy cases first. If the set of fe indices is empty
       // or has only one entry, then there are no identities:

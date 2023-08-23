@@ -63,9 +63,9 @@ namespace internal
       void
       get_dof_sign_change_h_div(
         const typename dealii::Triangulation<2, spacedim>::cell_iterator &cell,
-        const FiniteElement<2, spacedim> &                                fe,
+        const FiniteElement<2, spacedim>                                 &fe,
         const std::vector<MappingKind> &mapping_kind,
-        std::vector<double> &           face_sign)
+        std::vector<double>            &face_sign)
       {
         const unsigned int dim = 2;
         // const unsigned int spacedim = 2;
@@ -143,7 +143,7 @@ namespace internal
         const typename dealii::Triangulation<2, spacedim>::cell_iterator &cell,
         const FiniteElement<2, spacedim> & /*fe*/,
         const std::vector<MappingKind> &mapping_kind,
-        std::vector<double> &           line_dof_sign)
+        std::vector<double>            &line_dof_sign)
       {
         const unsigned int dim = 2;
         // TODO: This fixes only lowest order
@@ -160,7 +160,7 @@ namespace internal
         const typename dealii::Triangulation<3, spacedim>::cell_iterator &cell,
         const FiniteElement<3, spacedim> & /*fe*/,
         const std::vector<MappingKind> &mapping_kind,
-        std::vector<double> &           line_dof_sign)
+        std::vector<double>            &line_dof_sign)
       {
         const unsigned int dim = 3;
         // TODO: This is probably only going to work for those elements for
@@ -178,8 +178,8 @@ namespace internal
 template <int dim, int spacedim>
 FE_PolyTensor<dim, spacedim>::FE_PolyTensor(
   const TensorPolynomialsBase<dim> &polynomials,
-  const FiniteElementData<dim> &    fe_data,
-  const std::vector<bool> &         restriction_is_additive_flags,
+  const FiniteElementData<dim>     &fe_data,
+  const std::vector<bool>          &restriction_is_additive_flags,
   const std::vector<ComponentMask> &nonzero_components)
   : FiniteElement<dim, spacedim>(fe_data,
                                  restriction_is_additive_flags,
@@ -300,7 +300,7 @@ template <int dim, int spacedim>
 double
 FE_PolyTensor<dim, spacedim>::shape_value_component(
   const unsigned int i,
-  const Point<dim> & p,
+  const Point<dim>  &p,
   const unsigned int component) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
@@ -345,7 +345,7 @@ template <int dim, int spacedim>
 Tensor<1, dim>
 FE_PolyTensor<dim, spacedim>::shape_grad_component(
   const unsigned int i,
-  const Point<dim> & p,
+  const Point<dim>  &p,
   const unsigned int component) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
@@ -391,7 +391,7 @@ template <int dim, int spacedim>
 Tensor<2, dim>
 FE_PolyTensor<dim, spacedim>::shape_grad_grad_component(
   const unsigned int i,
-  const Point<dim> & p,
+  const Point<dim>  &p,
   const unsigned int component) const
 {
   AssertIndexRange(i, this->n_dofs_per_cell());
@@ -430,11 +430,11 @@ void
 FE_PolyTensor<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity                            cell_similarity,
-  const Quadrature<dim> &                                     quadrature,
-  const Mapping<dim, spacedim> &                              mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const Quadrature<dim>                                      &quadrature,
+  const Mapping<dim, spacedim>                               &mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    &                                                            mapping_data,
+                                                                &mapping_data,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -1052,11 +1052,11 @@ void
 FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
-  const hp::QCollection<dim - 1> &                            quadrature,
-  const Mapping<dim, spacedim> &                              mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const hp::QCollection<dim - 1>                             &quadrature,
+  const Mapping<dim, spacedim>                               &mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    &                                                            mapping_data,
+                                                                &mapping_data,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>
@@ -1737,11 +1737,11 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
   const unsigned int                                          sub_no,
-  const Quadrature<dim - 1> &                                 quadrature,
-  const Mapping<dim, spacedim> &                              mapping,
-  const typename Mapping<dim, spacedim>::InternalDataBase &   mapping_internal,
+  const Quadrature<dim - 1>                                  &quadrature,
+  const Mapping<dim, spacedim>                               &mapping,
+  const typename Mapping<dim, spacedim>::InternalDataBase    &mapping_internal,
   const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-    &                                                            mapping_data,
+                                                                &mapping_data,
   const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                      spacedim>

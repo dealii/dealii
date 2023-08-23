@@ -60,7 +60,7 @@ x * Cheb2(3,L(ev)) / Cheb2(3,L(aL));
 
  */
 
-//#define EXTRA_OUTPUT
+// #define EXTRA_OUTPUT
 
 
 #include <deal.II/lac/diagonal_matrix.h>

@@ -102,7 +102,7 @@ namespace Step16
   {
   public:
     LaplaceIntegrator();
-    virtual void cell(MeshWorker::DoFInfo<dim> &        dinfo,
+    virtual void cell(MeshWorker::DoFInfo<dim>         &dinfo,
                       MeshWorker::IntegrationInfo<dim> &info) const override;
   };
 
@@ -142,7 +142,7 @@ namespace Step16
   // information into block zero of vector zero.
   template <int dim>
   void
-  LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &        dinfo,
+  LaplaceIntegrator<dim>::cell(MeshWorker::DoFInfo<dim>         &dinfo,
                                MeshWorker::IntegrationInfo<dim> &info) const
   {
     AssertDimension(dinfo.n_matrices(), 1);

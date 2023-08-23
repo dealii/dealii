@@ -46,8 +46,8 @@ template <class PRECONDITIONER,
           class VECTOR,
           class ADDITIONAL_DATA = typename PRECONDITIONER::AdditionalData>
 void
-test_preconditioner(const MATRIX &         A,
-                    const VECTOR &         b,
+test_preconditioner(const MATRIX          &A,
+                    const VECTOR          &b,
                     const ADDITIONAL_DATA &data = ADDITIONAL_DATA())
 {
   // This test might trigger spurious floating point exceptions in Trilinos

@@ -86,7 +86,7 @@ namespace Assembly
 template <int dim, int fe_degree>
 void
 assemble_on_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
-                 Assembly::Scratch::Data<dim, fe_degree> &             data,
+                 Assembly::Scratch::Data<dim, fe_degree>              &data,
                  unsigned int &)
 {
   const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;

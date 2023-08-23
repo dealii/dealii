@@ -59,7 +59,7 @@
 
 void
 evaluate_normal_component(const DoFHandler<2> &dof_handler,
-                          Vector<double> &     solution)
+                          Vector<double>      &solution)
 {
   // This quadrature rule determines the points, where the
   // continuity will be tested.

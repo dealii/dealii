@@ -43,7 +43,7 @@
 
 #include "../tests.h"
 
-//#define DEBUG_OUTPUT_VTK
+// #define DEBUG_OUTPUT_VTK
 
 template <int dim>
 class TestFunction : public Function<dim>
@@ -97,7 +97,7 @@ make_tria()
 template <int dim>
 DoFHandler<dim> *
 make_dof_handler(const parallel::distributed::Triangulation<dim> &tria,
-                 const FiniteElement<dim> &                       fe)
+                 const FiniteElement<dim>                        &fe)
 {
   DoFHandler<dim> *dof_handler = new DoFHandler<dim>(tria);
   dof_handler->distribute_dofs(fe);
@@ -109,8 +109,8 @@ make_dof_handler(const parallel::distributed::Triangulation<dim> &tria,
 // output some indicators for a given vector
 template <unsigned int dim, typename VectorType>
 void
-output_vector(const VectorType &     v,
-              const std::string &    output_name,
+output_vector(const VectorType      &v,
+              const std::string     &output_name,
               const DoFHandler<dim> &dof_handler)
 {
   DataOut<dim> data_out;

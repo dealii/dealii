@@ -43,9 +43,9 @@ namespace internal
   {
     template <int n_rows_1d_templated, std::size_t dim, typename Number>
     void
-    select_vmult(Number *                               dst,
-                 const Number *                         src,
-                 AlignedVector<Number> &                tmp,
+    select_vmult(Number                                *dst,
+                 const Number                          *src,
+                 AlignedVector<Number>                 &tmp,
                  const unsigned int                     n_rows_1d,
                  const std::array<const Number *, dim> &mass_matrix,
                  const std::array<const Number *, dim> &derivative_matrix)
@@ -64,8 +64,8 @@ namespace internal
 
     template <int n_rows_1d_templated, std::size_t dim, typename Number>
     void
-    select_apply_inverse(Number *                               dst,
-                         const Number *                         src,
+    select_apply_inverse(Number                                *dst,
+                         const Number                          *src,
                          const unsigned int                     n_rows_1d,
                          const std::array<const Number *, dim> &eigenvectors,
                          const std::array<const Number *, dim> &eigenvalues,

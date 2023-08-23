@@ -620,8 +620,8 @@ public:
    */
   struct InitializationData
   {
-    const ShapeInfoType *         shape_info;
-    const DoFInfo *               dof_info;
+    const ShapeInfoType          *shape_info;
+    const DoFInfo                *dof_info;
     const MappingInfoStorageType *mapping_data;
     unsigned int                  active_fe_index;
     unsigned int                  active_quad_index;
@@ -647,7 +647,7 @@ protected:
   FEEvaluationData(
     const std::shared_ptr<
       internal::MatrixFreeFunctions::MappingDataOnTheFly<dim, Number>>
-      &                mapping_data,
+                      &mapping_data,
     const unsigned int n_fe_components,
     const unsigned int first_selected_component);
 
@@ -1087,7 +1087,7 @@ template <int dim, typename Number, bool is_face>
 inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   const std::shared_ptr<
     internal::MatrixFreeFunctions::MappingDataOnTheFly<dim, Number>>
-    &                mapped_geometry,
+                    &mapped_geometry,
   const unsigned int n_fe_components,
   const unsigned int first_selected_component)
   : data(nullptr)
@@ -1660,9 +1660,9 @@ namespace internal
             typename FU>
   inline void
   process_cell_or_face_data(const std::array<unsigned int, N> indices,
-                            VectorOfArrayType &               array,
-                            ArrayType &                       out,
-                            const FU &                        fu)
+                            VectorOfArrayType                &array,
+                            ArrayType                        &out,
+                            const FU                         &fu)
   {
     for (unsigned int i = 0; i < N; ++i)
       if (indices[i] != numbers::invalid_unsigned_int)
@@ -1675,8 +1675,8 @@ namespace internal
   template <std::size_t N, typename VectorOfArrayType, typename ArrayType>
   inline void
   set_valid_element_to_array(const std::array<unsigned int, N> indices,
-                             const VectorOfArrayType &         array,
-                             ArrayType &                       out)
+                             const VectorOfArrayType          &array,
+                             ArrayType                        &out)
   {
     AssertDimension(indices.size(), out.size());
     AssertDimension(indices.size(), array[0].size());

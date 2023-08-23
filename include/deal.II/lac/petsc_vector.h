@@ -371,7 +371,7 @@ namespace PETScWrappers
        * distributed across processors.
        */
       void
-      print(std::ostream &     out,
+      print(std::ostream      &out,
             const unsigned int precision  = 3,
             const bool         scientific = true,
             const bool         across     = true) const;
@@ -516,7 +516,7 @@ namespace internal
     public:
       template <typename Matrix>
       static void
-      reinit_range_vector(const Matrix &              matrix,
+      reinit_range_vector(const Matrix               &matrix,
                           PETScWrappers::MPI::Vector &v,
                           bool /*omit_zeroing_entries*/)
       {
@@ -526,7 +526,7 @@ namespace internal
 
       template <typename Matrix>
       static void
-      reinit_domain_vector(const Matrix &              matrix,
+      reinit_domain_vector(const Matrix               &matrix,
                            PETScWrappers::MPI::Vector &v,
                            bool /*omit_zeroing_entries*/)
       {

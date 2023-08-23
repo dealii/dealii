@@ -28,7 +28,7 @@ namespace parallel
   template <int dim, int spacedim>
   CellWeights<dim, spacedim>::CellWeights(
     const DoFHandler<dim, spacedim> &dof_handler,
-    const WeightingFunction &        weighting_function)
+    const WeightingFunction         &weighting_function)
   {
     reinit(dof_handler, weighting_function);
   }
@@ -145,7 +145,7 @@ namespace parallel
 
     return [&dof_handler, tria, weighting_function](
              const typename dealii::Triangulation<dim, spacedim>::cell_iterator
-               &              cell,
+                             &cell,
              const CellStatus status) -> unsigned int {
       return CellWeights<dim, spacedim>::weighting_callback(cell,
                                                             status,
@@ -163,7 +163,7 @@ namespace parallel
   CellWeights<dim, spacedim>::weighting_callback(
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell_,
     const CellStatus                                                    status,
-    const DoFHandler<dim, spacedim> &                 dof_handler,
+    const DoFHandler<dim, spacedim>                  &dof_handler,
     const parallel::TriangulationBase<dim, spacedim> &triangulation,
     const typename CellWeights<dim, spacedim>::WeightingFunction
       &weighting_function)

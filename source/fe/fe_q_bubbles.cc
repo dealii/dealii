@@ -46,7 +46,7 @@ namespace internal
       template <int dim, int spacedim>
       inline void
       compute_embedding_matrices(
-        const dealii::FE_Q_Bubbles<dim, spacedim> &   fe,
+        const dealii::FE_Q_Bubbles<dim, spacedim>    &fe,
         std::vector<std::vector<FullMatrix<double>>> &matrices,
         const bool                                    isotropic_only)
       {
@@ -355,7 +355,7 @@ void
 FE_Q_Bubbles<dim, spacedim>::
   convert_generalized_support_point_values_to_dof_values(
     const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              nodal_values) const
+    std::vector<double>               &nodal_values) const
 {
   Assert(support_point_values.size() == this->unit_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
@@ -384,7 +384,7 @@ template <int dim, int spacedim>
 void
 FE_Q_Bubbles<dim, spacedim>::get_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double>                 &interpolation_matrix) const
 {
   // We don't know how to do this properly, yet.
   // However, for SolutionTransfer to work we need to provide an implementation

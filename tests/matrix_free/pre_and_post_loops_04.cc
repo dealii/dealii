@@ -56,7 +56,7 @@ public:
   {}
 
   void
-  vmult(LinearAlgebra::distributed::Vector<Number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<Number>       &dst,
         const LinearAlgebra::distributed::Vector<Number> &src) const
   {
     dst = 0;
@@ -113,9 +113,9 @@ private:
 
   void
   local_apply(const MatrixFree<dim, Number> &,
-              LinearAlgebra::distributed::Vector<Number> &      dst,
+              LinearAlgebra::distributed::Vector<Number>       &dst,
               const LinearAlgebra::distributed::Vector<Number> &src,
-              const std::pair<unsigned int, unsigned int> &     range) const
+              const std::pair<unsigned int, unsigned int>      &range) const
   {
     helmholtz_operator<dim,
                        fe_degree,

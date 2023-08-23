@@ -47,7 +47,7 @@ public:
    * Constructor. Create an iterator into the matrix <tt>matrix</tt> for the
    * given <tt>row</tt> and the <tt>index</tt> within it.
    */
-  MatrixIterator(MatrixType *    matrix,
+  MatrixIterator(MatrixType     *matrix,
                  const size_type row   = 0,
                  const size_type index = 0);
 
@@ -129,7 +129,7 @@ private:
 //----------------------------------------------------------------------//
 
 template <class ACCESSOR>
-inline MatrixIterator<ACCESSOR>::MatrixIterator(MatrixType *    matrix,
+inline MatrixIterator<ACCESSOR>::MatrixIterator(MatrixType     *matrix,
                                                 const size_type r,
                                                 const size_type i)
   : accessor(matrix, r, i)

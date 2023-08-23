@@ -452,7 +452,7 @@ DerivativeForm<order, dim, spacedim, Number>::memory_consumption()
 template <int spacedim, int dim, typename Number1, typename Number2>
 inline Tensor<1, spacedim, typename ProductType<Number1, Number2>::type>
 apply_transformation(const DerivativeForm<1, dim, spacedim, Number1> &grad_F,
-                     const Tensor<1, dim, Number2> &                  d_x)
+                     const Tensor<1, dim, Number2>                   &d_x)
 {
   Tensor<1, spacedim, typename ProductType<Number1, Number2>::type> dest;
   for (unsigned int i = 0; i < spacedim; ++i)
@@ -477,7 +477,7 @@ inline DerivativeForm<1,
                       dim,
                       typename ProductType<Number1, Number2>::type>
 apply_transformation(const DerivativeForm<1, dim, spacedim, Number1> &grad_F,
-                     const Tensor<2, dim, Number2> &                  D_X)
+                     const Tensor<2, dim, Number2>                   &D_X)
 {
   DerivativeForm<1, spacedim, dim, typename ProductType<Number1, Number2>::type>
     dest;
@@ -503,7 +503,7 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number1> &grad_F,
 template <int dim, typename Number1, typename Number2>
 inline Tensor<2, dim, typename ProductType<Number1, Number2>::type>
 apply_transformation(const DerivativeForm<1, dim, dim, Number1> &grad_F,
-                     const Tensor<2, dim, Number2> &             D_X)
+                     const Tensor<2, dim, Number2>              &D_X)
 {
   Tensor<2, dim, typename ProductType<Number1, Number2>::type> dest;
   for (unsigned int i = 0; i < dim; ++i)
@@ -530,7 +530,7 @@ inline Tensor<1,
               n_components,
               Tensor<1, spacedim, typename ProductType<Number1, Number2>::type>>
 apply_transformation(
-  const DerivativeForm<1, dim, spacedim, Number1> &       grad_F,
+  const DerivativeForm<1, dim, spacedim, Number1>        &grad_F,
   const Tensor<1, n_components, Tensor<1, dim, Number2>> &D_X)
 {
   Tensor<1,

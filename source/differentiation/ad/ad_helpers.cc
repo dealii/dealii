@@ -141,7 +141,7 @@ namespace Differentiation
     void
     HelperBase<ADNumberTypeCode, ScalarType>::mark_independent_variable(
       const unsigned int index,
-      ad_type &          out) const
+      ad_type           &out) const
     {
       Assert(index < n_independent_variables(), ExcInternalError());
       Assert(registered_independent_variable_values[index] == true,
@@ -372,7 +372,7 @@ namespace Differentiation
     void
     HelperBase<ADNumberTypeCode, ScalarType>::print_tape_stats(
       const typename Types<ad_type>::tape_index tape_index,
-      std::ostream &                            stream) const
+      std::ostream                             &stream) const
     {
       if (ADNumberTraits<ad_type>::is_tapeless == true)
         return;
@@ -678,7 +678,7 @@ namespace Differentiation
     void
     HelperBase<ADNumberTypeCode, ScalarType>::register_dependent_variable(
       const unsigned int index,
-      const ad_type &    func)
+      const ad_type     &func)
     {
       Assert(index < n_dependent_variables(), ExcMessage("Index out of range"));
       Assert(registered_marked_dependent_variables[index] == false,
@@ -1568,7 +1568,7 @@ namespace Differentiation
       dim,
       typename ScalarFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type>
     ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
-      extract_hessian_component(const FullMatrix<scalar_type> &   hessian,
+      extract_hessian_component(const FullMatrix<scalar_type>    &hessian,
                                 const FEValuesExtractors::Scalar &extractor_row,
                                 const FEValuesExtractors::Scalar &extractor_col)
     {
@@ -1606,7 +1606,7 @@ namespace Differentiation
       typename ScalarFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type>
     ScalarFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_hessian_component(
-        const FullMatrix<scalar_type> &               hessian,
+        const FullMatrix<scalar_type>                &hessian,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_col)
     {
@@ -1810,7 +1810,7 @@ namespace Differentiation
       typename VectorFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type>
     VectorFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_jacobian_component(
-        const FullMatrix<scalar_type> &   jacobian,
+        const FullMatrix<scalar_type>    &jacobian,
         const FEValuesExtractors::Scalar &extractor_row,
         const FEValuesExtractors::Scalar &extractor_col)
     {
@@ -1848,7 +1848,7 @@ namespace Differentiation
       typename VectorFunction<dim, ADNumberTypeCode, ScalarType>::scalar_type>
     VectorFunction<dim, ADNumberTypeCode, ScalarType>::
       extract_jacobian_component(
-        const FullMatrix<scalar_type> &               jacobian,
+        const FullMatrix<scalar_type>                &jacobian,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_row,
         const FEValuesExtractors::SymmetricTensor<2> &extractor_col)
     {

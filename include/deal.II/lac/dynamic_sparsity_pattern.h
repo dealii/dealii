@@ -441,7 +441,7 @@ public:
               const bool      indices_are_unique_and_sorted = false);
 
   virtual void
-  add_row_entries(const size_type &                 row,
+  add_row_entries(const size_type                  &row,
                   const ArrayView<const size_type> &columns,
                   const bool indices_are_sorted = false) override;
 
@@ -478,7 +478,7 @@ public:
    */
   template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
   void
-  compute_mmult_pattern(const SparsityPatternTypeLeft & left,
+  compute_mmult_pattern(const SparsityPatternTypeLeft  &left,
                         const SparsityPatternTypeRight &right);
 
   /**
@@ -487,7 +487,7 @@ public:
    */
   template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
   void
-  compute_Tmmult_pattern(const SparsityPatternTypeLeft & left,
+  compute_Tmmult_pattern(const SparsityPatternTypeLeft  &left,
                          const SparsityPatternTypeRight &right);
 
   /**

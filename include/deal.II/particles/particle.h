@@ -115,8 +115,8 @@ namespace Particles
      * in the coordinate system of the reference cell.
      * @param[in] id Globally unique ID number of particle.
      */
-    Particle(const Point<spacedim> &     location,
-             const Point<dim> &          reference_location,
+    Particle(const Point<spacedim>      &location,
+             const Point<dim>           &reference_location,
              const types::particle_index id);
 
     /**
@@ -152,7 +152,7 @@ namespace Particles
      * succeed if a property pool is provided as second argument that is able to
      * store the correct number of properties per particle.
      */
-    Particle(const void *&                      begin_data,
+    Particle(const void                       *&begin_data,
              PropertyPool<dim, spacedim> *const property_pool = nullptr);
 
     /**
@@ -469,9 +469,9 @@ namespace Particles
   {
     unsigned int n_properties = 0;
 
-    Point<spacedim>       location;
-    Point<dim>            reference_location;
-    types::particle_index id;
+    Point<spacedim>                       location;
+    Point<dim>                            reference_location;
+    types::particle_index                 id;
     ar &location &reference_location &id &n_properties;
 
     set_location(location);

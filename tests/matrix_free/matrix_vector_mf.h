@@ -31,8 +31,8 @@
 template <int dim, int fe_degree, typename VectorType, int n_q_points_1d>
 void
 helmholtz_operator(const MatrixFree<dim, typename VectorType::value_type> &data,
-                   VectorType &                                            dst,
-                   const VectorType &                                      src,
+                   VectorType                                             &dst,
+                   const VectorType                                       &src,
                    const std::pair<unsigned int, unsigned int> &cell_range)
 {
   using Number = typename VectorType::value_type;
@@ -60,9 +60,9 @@ template <int dim, typename VectorType>
 void
 helmholtz_operator_no_template(
   const MatrixFree<dim, typename VectorType::value_type> &data,
-  VectorType &                                            dst,
-  const VectorType &                                      src,
-  const std::pair<unsigned int, unsigned int> &           cell_range)
+  VectorType                                             &dst,
+  const VectorType                                       &src,
+  const std::pair<unsigned int, unsigned int>            &cell_range)
 {
   using Number = typename VectorType::value_type;
   FEEvaluation<dim, -1, 0, 1, Number> fe_eval(data, cell_range);
@@ -89,9 +89,9 @@ template <int dim, typename VectorType>
 void
 helmholtz_operator_no_template(
   const MatrixFree<dim, typename VectorType::value_type> &data,
-  VectorType &                                            dst,
-  const VectorType &                                      src,
-  const std::pair<unsigned int, unsigned int> &           cell_range,
+  VectorType                                             &dst,
+  const VectorType                                       &src,
+  const std::pair<unsigned int, unsigned int>            &cell_range,
   const unsigned int                                      active_fe_index,
   const unsigned int                                      active_quad_index)
 {

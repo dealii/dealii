@@ -144,7 +144,7 @@ public:
   }
 
   void
-  precondition_Jacobi(BlockVectorType &      dst,
+  precondition_Jacobi(BlockVectorType       &dst,
                       const BlockVectorType &src,
                       const value_type       omega) const
   {
@@ -200,7 +200,7 @@ public:
 
   virtual void
   operator()(const unsigned int                                     level,
-             LinearAlgebra::distributed::BlockVector<Number> &      dst,
+             LinearAlgebra::distributed::BlockVector<Number>       &dst,
              const LinearAlgebra::distributed::BlockVector<Number> &src) const
   {
     ReductionControl solver_control(1e4, 1e-50, 1e-10);
@@ -228,7 +228,8 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
       deallog.push("float");
     }
   else
-    {}
+    {
+    }
 
   for (unsigned int i = 0; i < dof.size(); ++i)
     {

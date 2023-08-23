@@ -108,11 +108,11 @@ namespace Step82
     // <code>face=cell->face(face_no)</code>.
     void assemble_local_matrix(const FEValues<dim> &fe_values_lift,
                                const unsigned int   n_q_points,
-                               FullMatrix<double> & local_matrix);
+                               FullMatrix<double>  &local_matrix);
 
     void compute_discrete_hessians(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      std::vector<std::vector<Tensor<2, dim>>> &            discrete_hessians,
+      std::vector<std::vector<Tensor<2, dim>>>             &discrete_hessians,
       std::vector<std::vector<std::vector<Tensor<2, dim>>>>
         &discrete_hessians_neigh);
 
@@ -155,7 +155,7 @@ namespace Step82
       : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
   };
 
@@ -208,15 +208,15 @@ namespace Step82
       : Function<dim>()
     {}
 
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
 
     virtual Tensor<1, dim>
-    gradient(const Point<dim> & p,
+    gradient(const Point<dim>  &p,
              const unsigned int component = 0) const override;
 
     virtual SymmetricTensor<2, dim>
-    hessian(const Point<dim> & p,
+    hessian(const Point<dim>  &p,
             const unsigned int component = 0) const override;
   };
 
@@ -1110,7 +1110,7 @@ namespace Step82
   void BiLaplacianLDGLift<dim>::assemble_local_matrix(
     const FEValues<dim> &fe_values_lift,
     const unsigned int   n_q_points,
-    FullMatrix<double> & local_matrix)
+    FullMatrix<double>  &local_matrix)
   {
     const FEValuesExtractors::Tensor<2> tau_ext(0);
 
@@ -1168,7 +1168,7 @@ namespace Step82
   template <int dim>
   void BiLaplacianLDGLift<dim>::compute_discrete_hessians(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    std::vector<std::vector<Tensor<2, dim>>> &            discrete_hessians,
+    std::vector<std::vector<Tensor<2, dim>>>             &discrete_hessians,
     std::vector<std::vector<std::vector<Tensor<2, dim>>>>
       &discrete_hessians_neigh)
   {

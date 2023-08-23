@@ -70,16 +70,16 @@ namespace Advection
     setup_system();
 
     void
-    integrate_cell_term(MeshWorker::DoFInfo<dim> &        dinfo,
+    integrate_cell_term(MeshWorker::DoFInfo<dim>         &dinfo,
                         MeshWorker::IntegrationInfo<dim> &info);
 
     void
-    integrate_boundary_term(MeshWorker::DoFInfo<dim> &        dinfo,
+    integrate_boundary_term(MeshWorker::DoFInfo<dim>         &dinfo,
                             MeshWorker::IntegrationInfo<dim> &info);
 
     void
-    integrate_face_term(MeshWorker::DoFInfo<dim> &        dinfo1,
-                        MeshWorker::DoFInfo<dim> &        dinfo2,
+    integrate_face_term(MeshWorker::DoFInfo<dim>         &dinfo1,
+                        MeshWorker::DoFInfo<dim>         &dinfo2,
                         MeshWorker::IntegrationInfo<dim> &info1,
                         MeshWorker::IntegrationInfo<dim> &info2);
 
@@ -281,7 +281,7 @@ namespace Advection
   template <int dim>
   void
   AdvectionProblem<dim>::integrate_cell_term(
-    MeshWorker::DoFInfo<dim> &        dinfo,
+    MeshWorker::DoFInfo<dim>         &dinfo,
     MeshWorker::IntegrationInfo<dim> &info)
   {
     const FEValuesBase<dim> &fe_v = info.fe_values();
@@ -320,7 +320,7 @@ namespace Advection
   template <int dim>
   void
   AdvectionProblem<dim>::integrate_boundary_term(
-    MeshWorker::DoFInfo<dim> &        dinfo,
+    MeshWorker::DoFInfo<dim>         &dinfo,
     MeshWorker::IntegrationInfo<dim> &info)
   {
     const unsigned int boundary_id = dinfo.face->boundary_id();
@@ -354,8 +354,8 @@ namespace Advection
   template <int dim>
   void
   AdvectionProblem<dim>::integrate_face_term(
-    MeshWorker::DoFInfo<dim> &        dinfo1,
-    MeshWorker::DoFInfo<dim> &        dinfo2,
+    MeshWorker::DoFInfo<dim>         &dinfo1,
+    MeshWorker::DoFInfo<dim>         &dinfo2,
     MeshWorker::IntegrationInfo<dim> &info1,
     MeshWorker::IntegrationInfo<dim> &info2)
   {

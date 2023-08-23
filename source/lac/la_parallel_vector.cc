@@ -29,10 +29,10 @@ namespace LinearAlgebra
 {
   namespace distributed
   {
-#define TEMPL_COPY_CONSTRUCTOR(S1, S2)                  \
-  template Vector<S1, ::dealii::MemorySpace::Host>      \
-    &Vector<S1, ::dealii::MemorySpace::Host>::operator= \
-      <S2>(const Vector<S2, ::dealii::MemorySpace::Host> &)
+#define TEMPL_COPY_CONSTRUCTOR(S1, S2)               \
+  template Vector<S1, ::dealii::MemorySpace::Host> & \
+  Vector<S1, ::dealii::MemorySpace::Host>::operator= \
+    <S2>(const Vector<S2, ::dealii::MemorySpace::Host> &)
 
     TEMPL_COPY_CONSTRUCTOR(double, float);
     TEMPL_COPY_CONSTRUCTOR(float, double);

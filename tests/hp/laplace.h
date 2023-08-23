@@ -324,7 +324,7 @@ Laplace<dim>::assemble()
       {
         hp_fe_values.reinit(cell);
         const FEValues<dim> &fe_values = hp_fe_values.get_present_fe_values();
-        const unsigned int & dofs_per_cell = fe_values.dofs_per_cell;
+        const unsigned int  &dofs_per_cell = fe_values.dofs_per_cell;
 
         local_dof_indices.resize(dofs_per_cell);
         cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
@@ -371,7 +371,7 @@ Laplace<dim>::assemble()
 
 
 
-//#define DIRECT
+// #define DIRECT
 
 template <int dim>
 void

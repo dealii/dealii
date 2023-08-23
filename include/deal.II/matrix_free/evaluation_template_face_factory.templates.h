@@ -34,8 +34,8 @@ namespace internal
   FEFaceEvaluationFactory<dim, Number>::evaluate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags evaluation_flag,
-    const Number *                         values_dofs,
-    FEEvaluationData<dim, Number, true> &  fe_eval)
+    const Number                          *values_dofs,
+    FEEvaluationData<dim, Number, true>   &fe_eval)
   {
     instantiation_helper_run<1,
                              FEFaceEvaluationImplEvaluateSelector<dim, Number>>(
@@ -54,8 +54,8 @@ namespace internal
   FEFaceEvaluationFactory<dim, Number>::integrate(
     const unsigned int                     n_components,
     const EvaluationFlags::EvaluationFlags integration_flag,
-    Number *                               values_dofs,
-    FEEvaluationData<dim, Number, true> &  fe_eval)
+    Number                                *values_dofs,
+    FEEvaluationData<dim, Number, true>   &fe_eval)
   {
     instantiation_helper_run<
       1,
@@ -75,8 +75,8 @@ namespace internal
   FEFaceEvaluationGatherFactory<dim, Number, VectorizedArrayType>::evaluate(
     const unsigned int                                n_components,
     const EvaluationFlags::EvaluationFlags            evaluation_flag,
-    const Number *                                    src_ptr,
-    const std::vector<ArrayView<const Number>> *      sm_ptr,
+    const Number                                     *src_ptr,
+    const std::vector<ArrayView<const Number>>       *sm_ptr,
     FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval)
   {
     instantiation_helper_run<
@@ -100,8 +100,8 @@ namespace internal
   FEFaceEvaluationGatherFactory<dim, Number, VectorizedArrayType>::integrate(
     const unsigned int                                n_components,
     const EvaluationFlags::EvaluationFlags            integration_flag,
-    Number *                                          dst_ptr,
-    const std::vector<ArrayView<const Number>> *      sm_ptr,
+    Number                                           *dst_ptr,
+    const std::vector<ArrayView<const Number>>       *sm_ptr,
     FEEvaluationData<dim, VectorizedArrayType, true> &fe_eval)
   {
     instantiation_helper_run<

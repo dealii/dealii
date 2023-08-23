@@ -38,7 +38,7 @@ namespace python
     /**
      * Constructor.
      */
-    TriaAccessorWrapper(void *    tria_accessor,
+    TriaAccessorWrapper(void     *tria_accessor,
                         const int structdim,
                         const int dim,
                         const int spacedim);

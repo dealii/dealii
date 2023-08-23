@@ -65,8 +65,8 @@ namespace LinearAlgebra
       template <typename Number, template <typename> class Binop>
       __global__ void
       masked_vector_bin_op(const unsigned int *mask,
-                           Number *            v1,
-                           const Number *      v2,
+                           Number             *v1,
+                           const Number       *v2,
                            const size_type     N)
       {
         const size_type idx_base =
@@ -193,7 +193,7 @@ namespace LinearAlgebra
 
       template <typename Number, typename Operation>
       __device__ void
-      reduce(Number *         result,
+      reduce(Number          *result,
              volatile Number *result_buffer,
              const size_type  local_idx,
              const size_type /*global_idx*/,
@@ -285,9 +285,9 @@ namespace LinearAlgebra
 
       template <typename Number, typename Operation>
       __global__ void
-      double_vector_reduction(Number *        result,
-                              const Number *  v1,
-                              const Number *  v2,
+      double_vector_reduction(Number         *result,
+                              const Number   *v1,
+                              const Number   *v2,
                               const size_type N)
       {
         __shared__ Number result_buffer[block_size];
@@ -337,9 +337,9 @@ namespace LinearAlgebra
 
       template <typename Number>
       __global__ void
-      add_aV(Number *        val,
+      add_aV(Number         *val,
              const Number    a,
-             const Number *  V_val,
+             const Number   *V_val,
              const size_type N)
       {
         const size_type idx_base =
@@ -356,11 +356,11 @@ namespace LinearAlgebra
 
       template <typename Number>
       __global__ void
-      add_aVbW(Number *        val,
+      add_aVbW(Number         *val,
                const Number    a,
-               const Number *  V_val,
+               const Number   *V_val,
                const Number    b,
-               const Number *  W_val,
+               const Number   *W_val,
                const size_type N)
       {
         const size_type idx_base =
@@ -378,9 +378,9 @@ namespace LinearAlgebra
       template <typename Number>
       __global__ void
       sadd(const Number    s,
-           Number *        val,
+           Number         *val,
            const Number    a,
-           const Number *  V_val,
+           const Number   *V_val,
            const size_type N)
       {
         const size_type idx_base =
@@ -398,11 +398,11 @@ namespace LinearAlgebra
       template <typename Number>
       __global__ void
       sadd(const Number    s,
-           Number *        val,
+           Number         *val,
            const Number    a,
-           const Number *  V_val,
+           const Number   *V_val,
            const Number    b,
-           const Number *  W_val,
+           const Number   *W_val,
            const size_type N)
       {
         const size_type idx_base =
@@ -451,11 +451,11 @@ namespace LinearAlgebra
 
       template <typename Number>
       __global__ void
-      equ(Number *        val,
+      equ(Number         *val,
           const Number    a,
-          const Number *  V_val,
+          const Number   *V_val,
           const Number    b,
-          const Number *  W_val,
+          const Number   *W_val,
           const size_type N)
       {
         const size_type idx_base =
@@ -472,10 +472,10 @@ namespace LinearAlgebra
 
       template <typename Number>
       __global__ void
-      add_and_dot(Number *        res,
-                  Number *        v1,
-                  const Number *  v2,
-                  const Number *  v3,
+      add_and_dot(Number         *res,
+                  Number         *v1,
+                  const Number   *v2,
+                  const Number   *v3,
                   const Number    a,
                   const size_type N)
       {
@@ -531,8 +531,8 @@ namespace LinearAlgebra
       template <typename Number, typename IndexType>
       __global__ void
       set_permutated(const IndexType *indices,
-                     Number *         val,
-                     const Number *   v,
+                     Number          *val,
+                     const Number    *v,
                      const IndexType  N)
       {
         const size_type idx_base =
@@ -549,9 +549,9 @@ namespace LinearAlgebra
 
       template <typename Number, typename IndexType>
       __global__ void
-      gather(Number *         val,
+      gather(Number          *val,
              const IndexType *indices,
-             const Number *   v,
+             const Number    *v,
              const IndexType  N)
       {
         const IndexType idx_base =
@@ -569,8 +569,8 @@ namespace LinearAlgebra
       template <typename Number>
       __global__ void
       add_permutated(const size_type *indices,
-                     Number *         val,
-                     const Number *   v,
+                     Number          *val,
+                     const Number    *v,
                      const size_type  N)
       {
         const size_type idx_base =

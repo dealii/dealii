@@ -67,7 +67,7 @@ VectorBoundaryValues<dim>::VectorBoundaryValues()
 template <int dim>
 inline void
 VectorBoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                        Vector<double> &  values) const
+                                        Vector<double>   &values) const
 {
   Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
 

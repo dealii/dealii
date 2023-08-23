@@ -51,7 +51,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    cell_matrix(FullMatrix<double> &     M,
+    cell_matrix(FullMatrix<double>      &M,
                 const FEValuesBase<dim> &fe,
                 const FEValuesBase<dim> &fetest,
                 double                   factor = 1.)
@@ -90,8 +90,8 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    cell_residual(Vector<number> &                                    result,
-                  const FEValuesBase<dim> &                           fetest,
+    cell_residual(Vector<number>                                     &result,
+                  const FEValuesBase<dim>                            &fetest,
                   const ArrayView<const std::vector<Tensor<1, dim>>> &input,
                   const double factor = 1.)
     {
@@ -123,8 +123,8 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    cell_residual(Vector<number> &                            result,
-                  const FEValuesBase<dim> &                   fetest,
+    cell_residual(Vector<number>                             &result,
+                  const FEValuesBase<dim>                    &fetest,
                   const ArrayView<const std::vector<double>> &input,
                   const double                                factor = 1.)
     {
@@ -154,7 +154,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    gradient_matrix(FullMatrix<double> &     M,
+    gradient_matrix(FullMatrix<double>      &M,
                     const FEValuesBase<dim> &fe,
                     const FEValuesBase<dim> &fetest,
                     double                   factor = 1.)
@@ -194,8 +194,8 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    gradient_residual(Vector<number> &                   result,
-                      const FEValuesBase<dim> &          fetest,
+    gradient_residual(Vector<number>                    &result,
+                      const FEValuesBase<dim>           &fetest,
                       const std::vector<Tensor<1, dim>> &input,
                       const double                       factor = 1.)
     {
@@ -227,8 +227,8 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    gradient_residual(Vector<number> &           result,
-                      const FEValuesBase<dim> &  fetest,
+    gradient_residual(Vector<number>            &result,
+                      const FEValuesBase<dim>   &fetest,
                       const std::vector<double> &input,
                       const double               factor = 1.)
     {
@@ -256,7 +256,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    u_dot_n_matrix(FullMatrix<double> &     M,
+    u_dot_n_matrix(FullMatrix<double>      &M,
                    const FEValuesBase<dim> &fe,
                    const FEValuesBase<dim> &fetest,
                    double                   factor = 1.)
@@ -289,9 +289,9 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    u_dot_n_residual(Vector<number> &                            result,
-                     const FEValuesBase<dim> &                   fe,
-                     const FEValuesBase<dim> &                   fetest,
+    u_dot_n_residual(Vector<number>                             &result,
+                     const FEValuesBase<dim>                    &fe,
+                     const FEValuesBase<dim>                    &fetest,
                      const ArrayView<const std::vector<double>> &data,
                      double                                      factor = 1.)
     {
@@ -321,8 +321,8 @@ namespace LocalIntegrators
      */
     template <int dim, typename number>
     void
-    u_times_n_residual(Vector<number> &           result,
-                       const FEValuesBase<dim> &  fetest,
+    u_times_n_residual(Vector<number>            &result,
+                       const FEValuesBase<dim>   &fetest,
                        const std::vector<double> &data,
                        double                     factor = 1.)
     {
@@ -355,10 +355,10 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    u_dot_n_matrix(FullMatrix<double> &     M11,
-                   FullMatrix<double> &     M12,
-                   FullMatrix<double> &     M21,
-                   FullMatrix<double> &     M22,
+    u_dot_n_matrix(FullMatrix<double>      &M11,
+                   FullMatrix<double>      &M12,
+                   FullMatrix<double>      &M21,
+                   FullMatrix<double>      &M22,
                    const FEValuesBase<dim> &fe1,
                    const FEValuesBase<dim> &fe2,
                    const FEValuesBase<dim> &fetest1,
@@ -414,10 +414,10 @@ namespace LocalIntegrators
      */
     template <int dim>
     void
-    u_dot_n_jump_matrix(FullMatrix<double> &     M11,
-                        FullMatrix<double> &     M12,
-                        FullMatrix<double> &     M21,
-                        FullMatrix<double> &     M22,
+    u_dot_n_jump_matrix(FullMatrix<double>      &M11,
+                        FullMatrix<double>      &M12,
+                        FullMatrix<double>      &M21,
+                        FullMatrix<double>      &M22,
                         const FEValuesBase<dim> &fe1,
                         const FEValuesBase<dim> &fe2,
                         double                   factor = 1.)
@@ -469,7 +469,7 @@ namespace LocalIntegrators
      */
     template <int dim>
     double
-    norm(const FEValuesBase<dim> &                           fe,
+    norm(const FEValuesBase<dim>                            &fe,
          const ArrayView<const std::vector<Tensor<1, dim>>> &Du)
     {
       AssertDimension(fe.get_fe().n_components(), dim);

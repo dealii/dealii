@@ -127,8 +127,8 @@ namespace Functions
     void
     add_outer_product(SymmetricTensor<2, dim> &out,
                       const double             val,
-                      const Tensor<1, dim> &   in1,
-                      const Tensor<1, dim> &   in2)
+                      const Tensor<1, dim>    &in1,
+                      const Tensor<1, dim>    &in2)
     {
       if (val != 0.)
         for (unsigned int i = 0; i < dim; ++i)
@@ -143,7 +143,7 @@ namespace Functions
     void
     add_outer_product(SymmetricTensor<2, dim> &out,
                       const double             val,
-                      const Tensor<1, dim> &   in)
+                      const Tensor<1, dim>    &in)
     {
       if (val != 0.)
         for (unsigned int i = 0; i < dim; ++i)
@@ -155,7 +155,7 @@ namespace Functions
 
 
   template <int dim>
-  Spherical<dim>::Spherical(const Point<dim> & p,
+  Spherical<dim>::Spherical(const Point<dim>  &p,
                             const unsigned int n_components)
     : Function<dim>(n_components)
     , coordinate_system_offset(p)
@@ -167,7 +167,7 @@ namespace Functions
 
   template <int dim>
   double
-  Spherical<dim>::value(const Point<dim> & p_,
+  Spherical<dim>::value(const Point<dim>  &p_,
                         const unsigned int component) const
   {
     const Point<dim>              p = p_ - coordinate_system_offset;

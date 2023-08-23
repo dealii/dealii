@@ -263,9 +263,9 @@ public:
   /**
    * Constructor.
    */
-  SolverGMRES(SolverControl &           cn,
+  SolverGMRES(SolverControl            &cn,
               VectorMemory<VectorType> &mem,
-              const AdditionalData &    data = AdditionalData());
+              const AdditionalData     &data = AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
@@ -283,9 +283,9 @@ public:
    */
   template <typename MatrixType, typename PreconditionerType>
   void
-  solve(const MatrixType &        A,
-        VectorType &              x,
-        const VectorType &        b,
+  solve(const MatrixType         &A,
+        VectorType               &x,
+        const VectorType         &b,
         const PreconditionerType &preconditioner);
 
   /**
@@ -444,7 +444,7 @@ protected:
     const boost::signals2::signal<
       void(const std::vector<std::complex<double>> &)> &eigenvalues_signal,
     const boost::signals2::signal<void(const FullMatrix<double> &)>
-      &                                          hessenberg_signal,
+                                                &hessenberg_signal,
     const boost::signals2::signal<void(double)> &cond_signal);
 
   /**
@@ -530,15 +530,15 @@ public:
   /**
    * Constructor.
    */
-  SolverFGMRES(SolverControl &           cn,
+  SolverFGMRES(SolverControl            &cn,
                VectorMemory<VectorType> &mem,
-               const AdditionalData &    data = AdditionalData());
+               const AdditionalData     &data = AdditionalData());
 
   /**
    * Constructor. Use an object of type GrowingVectorMemory as a default to
    * allocate memory.
    */
-  SolverFGMRES(SolverControl &       cn,
+  SolverFGMRES(SolverControl        &cn,
                const AdditionalData &data = AdditionalData());
 
   /**
@@ -546,9 +546,9 @@ public:
    */
   template <typename MatrixType, typename PreconditionerType>
   void
-  solve(const MatrixType &        A,
-        VectorType &              x,
-        const VectorType &        b,
+  solve(const MatrixType         &A,
+        VectorType               &x,
+        const VectorType         &b,
         const PreconditionerType &preconditioner);
 
 private:
@@ -601,7 +601,7 @@ namespace internal
     template <typename VectorType>
     inline VectorType &
     TmpVectors<VectorType>::operator()(const unsigned int i,
-                                       const VectorType & temp)
+                                       const VectorType  &temp)
     {
       AssertIndexRange(i, data.size());
       if (data[i] == nullptr)
@@ -637,8 +637,8 @@ namespace internal
     inline void
     solve_triangular(const unsigned int        dim,
                      const FullMatrix<double> &H,
-                     const Vector<double> &    rhs,
-                     Vector<double> &          solution)
+                     const Vector<double>     &rhs,
+                     Vector<double>           &solution)
     {
       for (int i = dim - 1; i >= 0; --i)
         {
@@ -677,9 +677,9 @@ inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
 
 
 template <typename VectorType>
-SolverGMRES<VectorType>::SolverGMRES(SolverControl &           cn,
+SolverGMRES<VectorType>::SolverGMRES(SolverControl            &cn,
                                      VectorMemory<VectorType> &mem,
-                                     const AdditionalData &    data)
+                                     const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
   , solver_control(cn)
@@ -688,7 +688,7 @@ SolverGMRES<VectorType>::SolverGMRES(SolverControl &           cn,
 
 
 template <typename VectorType>
-SolverGMRES<VectorType>::SolverGMRES(SolverControl &       cn,
+SolverGMRES<VectorType>::SolverGMRES(SolverControl        &cn,
                                      const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
@@ -833,9 +833,9 @@ namespace internal
                 VectorType> * = nullptr>
     void
     Tvmult_add(const unsigned int dim,
-               const VectorType & vv,
+               const VectorType  &vv,
                const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                 &             orthogonal_vectors,
+                              &orthogonal_vectors,
                Vector<double> &h)
     {
       for (unsigned int i = 0; i < dim; ++i)
@@ -850,9 +850,9 @@ namespace internal
                 VectorType> * = nullptr>
     void
     Tvmult_add(const unsigned int dim,
-               const VectorType & vv,
+               const VectorType  &vv,
                const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-                 &             orthogonal_vectors,
+                              &orthogonal_vectors,
                Vector<double> &h)
     {
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
@@ -925,9 +925,9 @@ namespace internal
     subtract_and_norm(
       const unsigned int dim,
       const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-        &                   orthogonal_vectors,
+                           &orthogonal_vectors,
       const Vector<double> &h,
-      VectorType &          vv)
+      VectorType           &vv)
     {
       Assert(dim > 0, ExcInternalError());
 
@@ -947,9 +947,9 @@ namespace internal
     subtract_and_norm(
       const unsigned int dim,
       const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-        &                   orthogonal_vectors,
+                           &orthogonal_vectors,
       const Vector<double> &h,
-      VectorType &          vv)
+      VectorType           &vv)
     {
       static constexpr unsigned int n_lanes = VectorizedArray<double>::size();
 
@@ -1032,7 +1032,7 @@ namespace internal
                 !is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     double
-    sadd_and_norm(VectorType &      v,
+    sadd_and_norm(VectorType       &v,
                   const double      factor_a,
                   const VectorType &b,
                   const double      factor_b)
@@ -1047,7 +1047,7 @@ namespace internal
                 is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     double
-    sadd_and_norm(VectorType &      v,
+    sadd_and_norm(VectorType       &v,
                   const double      factor_a,
                   const VectorType &w,
                   const double      factor_b)
@@ -1076,11 +1076,11 @@ namespace internal
                 !is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     void
-    add(VectorType &          p,
+    add(VectorType           &p,
         const unsigned int    dim,
         const Vector<double> &h,
         const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-          &        tmp_vectors,
+                  &tmp_vectors,
         const bool zero_out)
     {
       if (zero_out)
@@ -1099,11 +1099,11 @@ namespace internal
                 is_dealii_compatible_distributed_vector<VectorType>::value,
                 VectorType> * = nullptr>
     void
-    add(VectorType &          p,
+    add(VectorType           &p,
         const unsigned int    dim,
         const Vector<double> &h,
         const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-          &        tmp_vectors,
+                  &tmp_vectors,
         const bool zero_out)
     {
       for (unsigned int b = 0; b < n_blocks(p); ++b)
@@ -1134,12 +1134,12 @@ namespace internal
     iterated_gram_schmidt(
       const LinearAlgebra::OrthogonalizationStrategy orthogonalization_strategy,
       const internal::SolverGMRESImplementation::TmpVectors<VectorType>
-        &                                       orthogonal_vectors,
+                                               &orthogonal_vectors,
       const unsigned int                        dim,
       const unsigned int                        accumulated_iterations,
-      VectorType &                              vv,
-      Vector<double> &                          h,
-      bool &                                    reorthogonalize,
+      VectorType                               &vv,
+      Vector<double>                           &h,
+      bool                                     &reorthogonalize,
       const boost::signals2::signal<void(int)> &reorthogonalize_signal =
         boost::signals2::signal<void(int)>())
     {
@@ -1238,7 +1238,7 @@ SolverGMRES<VectorType>::compute_eigs_and_cond(
   const boost::signals2::signal<void(const std::vector<std::complex<double>> &)>
     &eigenvalues_signal,
   const boost::signals2::signal<void(const FullMatrix<double> &)>
-    &                                          hessenberg_signal,
+                                              &hessenberg_signal,
   const boost::signals2::signal<void(double)> &cond_signal)
 {
   // Avoid copying the Hessenberg matrix if it isn't needed.
@@ -1285,9 +1285,9 @@ SolverGMRES<VectorType>::compute_eigs_and_cond(
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
-SolverGMRES<VectorType>::solve(const MatrixType &        A,
-                               VectorType &              x,
-                               const VectorType &        b,
+SolverGMRES<VectorType>::solve(const MatrixType         &A,
+                               VectorType               &x,
+                               const VectorType         &b,
                                const PreconditionerType &preconditioner)
 {
   // TODO:[?] Check, why there are two different start residuals.
@@ -1690,9 +1690,9 @@ SolverGMRES<VectorType>::criterion()
 //----------------------------------------------------------------------//
 
 template <typename VectorType>
-SolverFGMRES<VectorType>::SolverFGMRES(SolverControl &           cn,
+SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
                                        VectorMemory<VectorType> &mem,
-                                       const AdditionalData &    data)
+                                       const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
@@ -1700,7 +1700,7 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl &           cn,
 
 
 template <typename VectorType>
-SolverFGMRES<VectorType>::SolverFGMRES(SolverControl &       cn,
+SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
                                        const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
@@ -1711,9 +1711,9 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl &       cn,
 template <typename VectorType>
 template <typename MatrixType, typename PreconditionerType>
 void
-SolverFGMRES<VectorType>::solve(const MatrixType &        A,
-                                VectorType &              x,
-                                const VectorType &        b,
+SolverFGMRES<VectorType>::solve(const MatrixType         &A,
+                                VectorType               &x,
+                                const VectorType         &b,
                                 const PreconditionerType &preconditioner)
 {
   LogStream::Prefix prefix("FGMRES");

@@ -73,8 +73,8 @@ create_partitioner(const DoFHandler<dim, spacedim> &dof_handler)
 
 template <int dim, int spacedim>
 void
-print(const Mapping<dim, spacedim> &                    mapping,
-      const DoFHandler<dim, spacedim> &                 dof_handler,
+print(const Mapping<dim, spacedim>                     &mapping,
+      const DoFHandler<dim, spacedim>                  &dof_handler,
       const LinearAlgebra::distributed::Vector<double> &result,
       const unsigned int                                counter)
 {

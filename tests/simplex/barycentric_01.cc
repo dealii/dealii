@@ -114,7 +114,7 @@ main()
     const auto tet4 = BarycentricPolynomials<3>::get_fe_p_basis(1);
 
     FE_SimplexP<3> fe(1);
-    const auto &   points = fe.get_unit_support_points();
+    const auto    &points = fe.get_unit_support_points();
     for (unsigned int i = 0; i < 4; ++i)
       {
         Assert(points.size() == 4, ExcInternalError());
@@ -145,7 +145,7 @@ main()
     const auto tet10 = BarycentricPolynomials<3>::get_fe_p_basis(2);
 
     FE_SimplexP<3> fe(2);
-    const auto &   points = fe.get_unit_support_points();
+    const auto    &points = fe.get_unit_support_points();
     for (unsigned int i = 0; i < 10; ++i)
       {
         Assert(points.size() == 10, ExcInternalError());

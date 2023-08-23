@@ -47,10 +47,10 @@
 
 template <int dim>
 inline void
-plot_transformation(Mapping<dim> &                           mapping,
-                    FiniteElement<dim> &                     fe,
+plot_transformation(Mapping<dim>                            &mapping,
+                    FiniteElement<dim>                      &fe,
                     typename DoFHandler<dim>::cell_iterator &cell,
-                    const std::string &                      name)
+                    const std::string                       &name)
 {
   const unsigned int div = 7;
 
@@ -86,10 +86,10 @@ plot_transformation(Mapping<dim> &                           mapping,
 
 template <int dim>
 inline void
-plot_faces(Mapping<dim> &                           mapping,
-           FiniteElement<dim> &                     fe,
+plot_faces(Mapping<dim>                            &mapping,
+           FiniteElement<dim>                      &fe,
            typename DoFHandler<dim>::cell_iterator &cell,
-           const std::string &                      name)
+           const std::string                       &name)
 {
   deallog.push(name);
 
@@ -131,10 +131,10 @@ plot_faces(Mapping<dim> &                           mapping,
 
 template <int dim>
 inline void
-plot_subfaces(Mapping<dim> &                           mapping,
-              FiniteElement<dim> &                     fe,
+plot_subfaces(Mapping<dim>                            &mapping,
+              FiniteElement<dim>                      &fe,
               typename DoFHandler<dim>::cell_iterator &cell,
-              const std::string &                      name)
+              const std::string                       &name)
 {
   deallog.push(name);
 
@@ -198,8 +198,8 @@ plot_subfaces(Mapping<1> &,
 
 template <int dim>
 inline void
-compute_area(Mapping<dim> &                           mapping,
-             FiniteElement<dim> &                     fe,
+compute_area(Mapping<dim>                            &mapping,
+             FiniteElement<dim>                      &fe,
              typename DoFHandler<dim>::cell_iterator &cell)
 {
   QGauss<dim>   gauss4(4);
@@ -250,8 +250,8 @@ create_triangulations(std::vector<Triangulation<1> *> &tria_ptr,
 template <>
 void
 create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
-                      std::vector<Manifold<2> *> &     boundary_ptr,
-                      std::vector<double> &            exact_areas)
+                      std::vector<Manifold<2> *>      &boundary_ptr,
+                      std::vector<double>             &exact_areas)
 {
   Triangulation<2> *tria;
   show.clear();
@@ -265,9 +265,9 @@ create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
       const double right = 4.;
 
       const Point<2>           vertices[4]         = {Point<2>(left, left),
-                                    Point<2>(right, left),
-                                    Point<2>(right, right),
-                                    Point<2>(left, right)};
+                                                      Point<2>(right, left),
+                                                      Point<2>(right, right),
+                                                      Point<2>(left, right)};
       const int                cell_vertices[1][4] = {{1, 2, 0, 3}};
       std::vector<CellData<2>> cells(1, CellData<2>());
       for (unsigned int j = 0; j < 4; ++j)
@@ -364,8 +364,8 @@ create_triangulations(std::vector<Triangulation<2> *> &tria_ptr,
 template <>
 void
 create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
-                      std::vector<Manifold<3> *> &     boundary_ptr,
-                      std::vector<double> &            exact_areas)
+                      std::vector<Manifold<3> *>      &boundary_ptr,
+                      std::vector<double>             &exact_areas)
 {
   Triangulation<3> *tria;
   show.clear();

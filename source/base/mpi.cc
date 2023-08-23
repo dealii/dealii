@@ -221,7 +221,7 @@ namespace Utilities
     create_group(const MPI_Comm   comm,
                  const MPI_Group &group,
                  const int        tag,
-                 MPI_Comm *       new_comm)
+                 MPI_Comm        *new_comm)
     {
       const int ierr = MPI_Comm_create_group(comm, group, tag, new_comm);
       AssertThrowMPI(ierr);
@@ -502,12 +502,12 @@ namespace Utilities
       // custom MIP_Op for calculate_collective_mpi_min_max_avg
       void
       max_reduce(const void *in_lhs_,
-                 void *      inout_rhs_,
-                 int *       len,
+                 void       *inout_rhs_,
+                 int        *len,
                  MPI_Datatype *)
       {
         const MinMaxAvg *in_lhs    = static_cast<const MinMaxAvg *>(in_lhs_);
-        MinMaxAvg *      inout_rhs = static_cast<MinMaxAvg *>(inout_rhs_);
+        MinMaxAvg       *inout_rhs = static_cast<MinMaxAvg *>(inout_rhs_);
 
         for (int i = 0; i < *len; ++i)
           {
@@ -543,7 +543,7 @@ namespace Utilities
 
     void
     min_max_avg(const ArrayView<const double> &my_values,
-                const ArrayView<MinMaxAvg> &   result,
+                const ArrayView<MinMaxAvg>    &result,
                 const MPI_Comm                 mpi_communicator)
     {
       // If MPI was not started, we have a serial computation and cannot run
@@ -710,14 +710,15 @@ namespace Utilities
 
 
 
-    void free_communicator(MPI_Comm /*mpi_communicator*/)
+    void
+    free_communicator(MPI_Comm /*mpi_communicator*/)
     {}
 
 
 
     void
     min_max_avg(const ArrayView<const double> &my_values,
-                const ArrayView<MinMaxAvg> &   result,
+                const ArrayView<MinMaxAvg>    &result,
                 const MPI_Comm)
     {
       AssertDimension(my_values.size(), result.size());
@@ -740,8 +741,8 @@ namespace Utilities
       MPI_InitFinalize::Signals();
 
 
-    MPI_InitFinalize::MPI_InitFinalize(int &              argc,
-                                       char **&           argv,
+    MPI_InitFinalize::MPI_InitFinalize(int               &argc,
+                                       char            **&argv,
                                        const unsigned int max_num_threads)
     {
       static bool constructor_has_already_run = false;

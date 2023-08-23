@@ -23,10 +23,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &space_dh,
       const Particles::ParticleHandler<deal_II_dimension,
                                        deal_II_space_dimension>
-        &                              particle_handler,
-      SparsityPatternBase &            sparsity,
+                                      &particle_handler,
+      SparsityPatternBase             &sparsity,
       const AffineConstraints<scalar> &constraints,
-      const ComponentMask &            space_comps);
+      const ComponentMask             &space_comps);
 #endif
   }
 
@@ -41,9 +41,9 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &space_dh,
       const Particles::ParticleHandler<deal_II_dimension,
                                        deal_II_space_dimension>
-        &                                          particle_handler,
-      Matrix &                                     matrix,
+                                                  &particle_handler,
+      Matrix                                      &matrix,
       const AffineConstraints<Matrix::value_type> &constraints,
-      const ComponentMask &                        space_comps);
+      const ComponentMask                         &space_comps);
 #endif
   }

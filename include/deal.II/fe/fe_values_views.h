@@ -349,7 +349,7 @@ namespace FEValuesViews
      */
     template <typename Number>
     void
-    get_function_values(const ReadVector<Number> &                fe_function,
+    get_function_values(const ReadVector<Number>                 &fe_function,
                         std::vector<solution_value_type<Number>> &values) const;
 
     /**
@@ -413,7 +413,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_gradients(
-      const ReadVector<Number> &                   fe_function,
+      const ReadVector<Number>                    &fe_function,
       std::vector<solution_gradient_type<Number>> &gradients) const;
 
     /**
@@ -449,7 +449,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_hessians(
-      const ReadVector<Number> &                  fe_function,
+      const ReadVector<Number>                   &fe_function,
       std::vector<solution_hessian_type<Number>> &hessians) const;
 
     /**
@@ -487,7 +487,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_laplacians(
-      const ReadVector<Number> &                    fe_function,
+      const ReadVector<Number>                     &fe_function,
       std::vector<solution_laplacian_type<Number>> &laplacians) const;
 
     /**
@@ -525,7 +525,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_third_derivatives(
-      const ReadVector<Number> &                           fe_function,
+      const ReadVector<Number>                            &fe_function,
       std::vector<solution_third_derivative_type<Number>> &third_derivatives)
       const;
 
@@ -958,7 +958,7 @@ namespace FEValuesViews
      */
     template <typename Number>
     void
-    get_function_values(const ReadVector<Number> &                fe_function,
+    get_function_values(const ReadVector<Number>                 &fe_function,
                         std::vector<solution_value_type<Number>> &values) const;
 
     /**
@@ -1022,7 +1022,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_gradients(
-      const ReadVector<Number> &                   fe_function,
+      const ReadVector<Number>                    &fe_function,
       std::vector<solution_gradient_type<Number>> &gradients) const;
 
     /**
@@ -1103,7 +1103,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_divergences(
-      const ReadVector<Number> &                     fe_function,
+      const ReadVector<Number>                      &fe_function,
       std::vector<solution_divergence_type<Number>> &divergences) const;
 
     /**
@@ -1139,7 +1139,7 @@ namespace FEValuesViews
      */
     template <typename Number>
     void
-    get_function_curls(const ReadVector<Number> &               fe_function,
+    get_function_curls(const ReadVector<Number>                &fe_function,
                        std::vector<solution_curl_type<Number>> &curls) const;
 
     /**
@@ -1175,7 +1175,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_hessians(
-      const ReadVector<Number> &                  fe_function,
+      const ReadVector<Number>                   &fe_function,
       std::vector<solution_hessian_type<Number>> &hessians) const;
 
     /**
@@ -1212,7 +1212,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_laplacians(
-      const ReadVector<Number> &                    fe_function,
+      const ReadVector<Number>                     &fe_function,
       std::vector<solution_laplacian_type<Number>> &laplacians) const;
 
     /**
@@ -1249,7 +1249,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_third_derivatives(
-      const ReadVector<Number> &                           fe_function,
+      const ReadVector<Number>                            &fe_function,
       std::vector<solution_third_derivative_type<Number>> &third_derivatives)
       const;
 
@@ -1496,7 +1496,7 @@ namespace FEValuesViews
      */
     template <typename Number>
     void
-    get_function_values(const ReadVector<Number> &                fe_function,
+    get_function_values(const ReadVector<Number>                 &fe_function,
                         std::vector<solution_value_type<Number>> &values) const;
 
     /**
@@ -1564,7 +1564,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_divergences(
-      const ReadVector<Number> &                     fe_function,
+      const ReadVector<Number>                      &fe_function,
       std::vector<solution_divergence_type<Number>> &divergences) const;
 
     /**
@@ -1835,7 +1835,7 @@ namespace FEValuesViews
      */
     template <typename Number>
     void
-    get_function_values(const ReadVector<Number> &                fe_function,
+    get_function_values(const ReadVector<Number>                 &fe_function,
                         std::vector<solution_value_type<Number>> &values) const;
 
     /**
@@ -1903,7 +1903,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_divergences(
-      const ReadVector<Number> &                     fe_function,
+      const ReadVector<Number>                      &fe_function,
       std::vector<solution_divergence_type<Number>> &divergences) const;
 
     /**
@@ -1938,7 +1938,7 @@ namespace FEValuesViews
     template <typename Number>
     void
     get_function_gradients(
-      const ReadVector<Number> &                   fe_function,
+      const ReadVector<Number>                    &fe_function,
       std::vector<solution_gradient_type<Number>> &gradients) const;
 
     /**

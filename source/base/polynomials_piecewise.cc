@@ -81,7 +81,7 @@ namespace Polynomials
   void
   PiecewisePolynomial<number>::value(const number       x,
                                      const unsigned int n_derivatives,
-                                     number *           values) const
+                                     number            *values) const
   {
     if (points.size() > 0)
       {

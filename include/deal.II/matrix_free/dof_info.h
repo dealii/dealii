@@ -206,10 +206,10 @@ namespace internal
         const std::vector<types::global_dof_index> &local_indices_resolved,
         const std::vector<types::global_dof_index> &local_indices,
         const bool                                  cell_has_hanging_nodes,
-        const dealii::AffineConstraints<number> &   constraints,
+        const dealii::AffineConstraints<number>    &constraints,
         const unsigned int                          cell_number,
-        ConstraintValues<double> &                  constraint_values,
-        bool &                                      cell_at_boundary);
+        ConstraintValues<double>                   &constraint_values,
+        bool                                       &cell_at_boundary);
 
       /**
        * For a given cell, determine if it has hanging node constraints. If yes,
@@ -218,11 +218,11 @@ namespace internal
       template <int dim>
       bool
       process_hanging_node_constraints(
-        const HangingNodes<dim> &                     hanging_nodes,
+        const HangingNodes<dim>                      &hanging_nodes,
         const std::vector<std::vector<unsigned int>> &lexicographic_mapping,
         const unsigned int                            cell_number,
         const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
-        std::vector<types::global_dof_index> &                dof_indices);
+        std::vector<types::global_dof_index>                 &dof_indices);
 
       /**
        * This method assigns the correct indices to ghost indices from the
@@ -243,9 +243,9 @@ namespace internal
        * vectorization.
        */
       void
-      reorder_cells(const TaskInfo &                  task_info,
-                    const std::vector<unsigned int> & renumbering,
-                    const std::vector<unsigned int> & constraint_pool_row_index,
+      reorder_cells(const TaskInfo                   &task_info,
+                    const std::vector<unsigned int>  &renumbering,
+                    const std::vector<unsigned int>  &constraint_pool_row_index,
                     const std::vector<unsigned char> &irregular_cells);
 
       /**
@@ -271,7 +271,7 @@ namespace internal
        * fills the structure into a sparsity pattern.
        */
       void
-      make_connectivity_graph(const TaskInfo &                 task_info,
+      make_connectivity_graph(const TaskInfo                  &task_info,
                               const std::vector<unsigned int> &renumbering,
                               DynamicSparsityPattern &connectivity) const;
 
@@ -282,7 +282,7 @@ namespace internal
        */
       void
       compute_tight_partitioners(
-        const Table<2, ShapeInfo<double>> &       shape_info,
+        const Table<2, ShapeInfo<double>>        &shape_info,
         const unsigned int                        n_owned_cells,
         const unsigned int                        n_lanes,
         const std::vector<FaceToCellTopology<1>> &inner_faces,
@@ -327,7 +327,7 @@ namespace internal
       template <int length>
       void
       compute_vector_zero_access_pattern(
-        const TaskInfo &                               task_info,
+        const TaskInfo                                &task_info,
         const std::vector<FaceToCellTopology<length>> &faces);
 
       /**
@@ -342,7 +342,7 @@ namespace internal
        */
       template <typename StreamType>
       void
-      print_memory_consumption(StreamType &    out,
+      print_memory_consumption(StreamType     &out,
                                const TaskInfo &size_info) const;
 
       /**
@@ -351,9 +351,9 @@ namespace internal
        */
       template <typename Number>
       void
-      print(const std::vector<Number> &      constraint_pool_data,
+      print(const std::vector<Number>       &constraint_pool_data,
             const std::vector<unsigned int> &constraint_pool_row_index,
-            std::ostream &                   out) const;
+            std::ostream                    &out) const;
 
       /**
        * Enum for various storage variants of the indices. This storage format

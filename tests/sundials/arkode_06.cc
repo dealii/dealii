@@ -102,7 +102,7 @@ main()
     };
 
   ode.jacobian_times_vector = [&](const VectorType &v,
-                                  VectorType &      Jv,
+                                  VectorType       &Jv,
                                   double            t,
                                   const VectorType &y,
                                   const VectorType &fy) { J.vmult(Jv, v); };
@@ -110,7 +110,7 @@ main()
   ode.solve_linearized_system =
     [&](SUNDIALS::SundialsOperator<VectorType> &op,
         SUNDIALS::SundialsPreconditioner<VectorType> &,
-        VectorType &      x,
+        VectorType       &x,
         const VectorType &b,
         double            tol) {
       ReductionControl     control;

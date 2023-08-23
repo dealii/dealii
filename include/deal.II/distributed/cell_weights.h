@@ -130,7 +130,7 @@ namespace parallel
      *    cell's weight during load balancing.
      */
     CellWeights(const DoFHandler<dim, spacedim> &dof_handler,
-                const WeightingFunction &        weighting_function);
+                const WeightingFunction         &weighting_function);
 
     /**
      * Destructor.
@@ -147,7 +147,7 @@ namespace parallel
      */
     void
     reinit(const DoFHandler<dim, spacedim> &dof_handler,
-           const WeightingFunction &        weighting_function);
+           const WeightingFunction         &weighting_function);
 
     /**
      * Converts a @p weighting_function to a different type that qualifies as
@@ -220,9 +220,9 @@ namespace parallel
     weighting_callback(
       const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
       const CellStatus                                  status,
-      const DoFHandler<dim, spacedim> &                 dof_handler,
+      const DoFHandler<dim, spacedim>                  &dof_handler,
       const parallel::TriangulationBase<dim, spacedim> &triangulation,
-      const WeightingFunction &                         weighting_function);
+      const WeightingFunction                          &weighting_function);
   };
 } // namespace parallel
 

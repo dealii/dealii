@@ -57,7 +57,7 @@ namespace internal
            */
           template <typename number>
           number
-          compute_threshold(const dealii::Vector<number> &   criteria,
+          compute_threshold(const dealii::Vector<number>    &criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const types::global_cell_index   n_target_cells,
                             const MPI_Comm                   mpi_communicator);
@@ -75,7 +75,7 @@ namespace internal
            */
           template <typename number>
           number
-          compute_threshold(const dealii::Vector<number> &   criteria,
+          compute_threshold(const dealii::Vector<number>    &criteria,
                             const std::pair<double, double> &global_min_and_max,
                             const double                     target_error,
                             const MPI_Comm                   mpi_communicator);
@@ -157,7 +157,7 @@ namespace parallel
       void
       refine_and_coarsen_fixed_number(
         dealii::Triangulation<dim, spacedim> &tria,
-        const dealii::Vector<Number> &        criteria,
+        const dealii::Vector<Number>         &criteria,
         const double                          top_fraction_of_cells,
         const double                          bottom_fraction_of_cells,
         const types::global_cell_index        max_n_cells =
@@ -211,7 +211,7 @@ namespace parallel
       void
       refine_and_coarsen_fixed_fraction(
         dealii::Triangulation<dim, spacedim> &tria,
-        const dealii::Vector<Number> &        criteria,
+        const dealii::Vector<Number>         &criteria,
         const double                          top_fraction_of_error,
         const double                          bottom_fraction_of_error,
         const VectorTools::NormType norm_type = VectorTools::NormType::L1_norm);

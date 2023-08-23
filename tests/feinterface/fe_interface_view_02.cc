@@ -67,7 +67,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
                      cell->neighbor(f),
                      cell->neighbor_of_neighbor(f),
                      numbers::invalid_unsigned_int);
-        const auto &       q_points    = fe_iv.get_quadrature_points();
+        const auto        &q_points    = fe_iv.get_quadrature_points();
         const unsigned int n_q_points  = q_points.size();
         const unsigned int n_dofs_face = fe_iv.n_current_interface_dofs();
 

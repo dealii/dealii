@@ -71,9 +71,9 @@ private:
   const MatrixFree<dim, Number> &data;
 
   void
-  local_operation(const MatrixFree<dim, Number> &              data,
-                  VectorType &                                 out,
-                  const VectorType &                           in,
+  local_operation(const MatrixFree<dim, Number>               &data,
+                  VectorType                                  &out,
+                  const VectorType                            &in,
                   const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(data);
@@ -107,7 +107,7 @@ private:
 
 template <int dim, int fe_degree, typename number>
 void
-do_test(const DoFHandler<dim> &          dof,
+do_test(const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints,
         const unsigned int               parallel_option = 0)
 {

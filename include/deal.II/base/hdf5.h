@@ -438,9 +438,9 @@ namespace HDF5
      * Create dataset. This is an internal constructor. The function
      * Group::create_dataset() should be used to create a dataset.
      */
-    DataSet(const std::string &           name,
-            const hid_t &                 parent_group_id,
-            const std::vector<hsize_t> &  dimensions,
+    DataSet(const std::string            &name,
+            const hid_t                  &parent_group_id,
+            const std::vector<hsize_t>   &dimensions,
             const std::shared_ptr<hid_t> &t_type,
             const bool                    mpi);
 
@@ -650,7 +650,7 @@ namespace HDF5
      */
     template <typename Container>
     void
-    write_selection(const Container &           data,
+    write_selection(const Container            &data,
                     const std::vector<hsize_t> &coordinates);
 
     // clang-format off
@@ -682,7 +682,7 @@ namespace HDF5
     // clang-format on
     template <typename Container>
     void
-    write_hyperslab(const Container &           data,
+    write_hyperslab(const Container            &data,
                     const std::vector<hsize_t> &offset,
                     const std::vector<hsize_t> &count);
 
@@ -720,7 +720,7 @@ namespace HDF5
      */
     template <typename Container>
     void
-    write_hyperslab(const Container &           data,
+    write_hyperslab(const Container            &data,
                     const std::vector<hsize_t> &data_dimensions,
                     const std::vector<hsize_t> &offset,
                     const std::vector<hsize_t> &stride,
@@ -999,8 +999,8 @@ namespace HDF5
      * create_group() of the current class should be used to open or create a
      * group.
      */
-    Group(const std::string &   name,
-          const Group &         parent_group,
+    Group(const std::string    &name,
+          const Group          &parent_group,
           const bool            mpi,
           const GroupAccessMode mode);
 
@@ -1042,7 +1042,7 @@ namespace HDF5
      */
     template <typename number>
     DataSet
-    create_dataset(const std::string &         name,
+    create_dataset(const std::string          &name,
                    const std::vector<hsize_t> &dimensions) const;
 
     /**
@@ -1103,7 +1103,7 @@ namespace HDF5
      * defines the processes that participate in this call; `MPI_COMM_WORLD` is
      * a common value for the MPI communicator.
      */
-    File(const std::string &  name,
+    File(const std::string   &name,
          const FileAccessMode mode,
          const MPI_Comm       mpi_communicator);
 
@@ -1115,7 +1115,7 @@ namespace HDF5
      * File(const std::string &, const Mode)
      * should be used to open or create HDF5 files.
      */
-    File(const std::string &  name,
+    File(const std::string   &name,
          const FileAccessMode mode,
          const bool           mpi,
          const MPI_Comm       mpi_communicator);
@@ -1251,10 +1251,10 @@ namespace HDF5
      * been collective.
      */
     inline void
-    release_plist(hid_t &                    plist,
+    release_plist(hid_t                     &plist,
                   H5D_mpio_actual_io_mode_t &io_mode,
-                  std::uint32_t &            local_no_collective_cause,
-                  std::uint32_t &            global_no_collective_cause,
+                  std::uint32_t             &local_no_collective_cause,
+                  std::uint32_t             &global_no_collective_cause,
                   const bool                 mpi,
                   const bool                 query_io_mode);
 
@@ -1495,10 +1495,10 @@ namespace HDF5
 
 
     inline void
-    release_plist(hid_t &                    plist,
+    release_plist(hid_t                     &plist,
                   H5D_mpio_actual_io_mode_t &io_mode,
-                  std::uint32_t &            local_no_collective_cause,
-                  std::uint32_t &            global_no_collective_cause,
+                  std::uint32_t             &local_no_collective_cause,
+                  std::uint32_t             &global_no_collective_cause,
                   const bool                 mpi,
                   const bool                 query_io_mode)
     {
@@ -1632,7 +1632,7 @@ namespace HDF5
     // Todo:
     // - Use H5Dvlen_reclaim instead of free
 
-    char * string_out;
+    char  *string_out;
     hid_t  attr;
     hid_t  type;
     herr_t ret;
@@ -2033,7 +2033,7 @@ namespace HDF5
 
   template <typename Container>
   void
-  DataSet::write_selection(const Container &           data,
+  DataSet::write_selection(const Container            &data,
                            const std::vector<hsize_t> &coordinates)
   {
     AssertDimension(coordinates.size(), data.size() * rank);
@@ -2082,7 +2082,7 @@ namespace HDF5
 
   template <typename Container>
   void
-  DataSet::write_hyperslab(const Container &           data,
+  DataSet::write_hyperslab(const Container            &data,
                            const std::vector<hsize_t> &offset,
                            const std::vector<hsize_t> &count)
   {
@@ -2139,7 +2139,7 @@ namespace HDF5
 
   template <typename Container>
   void
-  DataSet::write_hyperslab(const Container &           data,
+  DataSet::write_hyperslab(const Container            &data,
                            const std::vector<hsize_t> &data_dimensions,
                            const std::vector<hsize_t> &offset,
                            const std::vector<hsize_t> &stride,
@@ -2231,7 +2231,7 @@ namespace HDF5
 
   template <typename number>
   DataSet
-  Group::create_dataset(const std::string &         name,
+  Group::create_dataset(const std::string          &name,
                         const std::vector<hsize_t> &dimensions) const
   {
     std::shared_ptr<hid_t> t_type = internal::get_hdf5_datatype<number>();

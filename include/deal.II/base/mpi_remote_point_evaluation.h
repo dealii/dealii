@@ -93,7 +93,7 @@ namespace Utilities
       void
       reinit(const std::vector<Point<spacedim>> &points,
              const Triangulation<dim, spacedim> &tria,
-             const Mapping<dim, spacedim> &      mapping);
+             const Mapping<dim, spacedim>       &mapping);
 
       /**
        * Set up internal data structures and communication pattern based on
@@ -107,7 +107,7 @@ namespace Utilities
       void
       reinit(const GridTools::internal::
                DistributedComputePointLocationsInternal<dim, spacedim> &data,
-             const Triangulation<dim, spacedim> &                       tria,
+             const Triangulation<dim, spacedim>                        &tria,
              const Mapping<dim, spacedim> &mapping);
 
       /**
@@ -173,7 +173,7 @@ namespace Utilities
       void
       process_and_evaluate(
         const std::vector<T> &input,
-        std::vector<T> &      buffer,
+        std::vector<T>       &buffer,
         const std::function<void(const ArrayView<const T> &, const CellData &)>
           &evaluation_function) const;
 
@@ -492,7 +492,7 @@ namespace Utilities
     void
     RemotePointEvaluation<dim, spacedim>::process_and_evaluate(
       const std::vector<T> &input,
-      std::vector<T> &      buffer,
+      std::vector<T>       &buffer,
       const std::function<void(const ArrayView<const T> &, const CellData &)>
         &evaluation_function) const
     {

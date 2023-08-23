@@ -46,7 +46,7 @@ test()
   tria.execute_coarsening_and_refinement();
 
   // find face index on unrefined cell to neighboring cells
-  const auto & unrefined_cell = tria.begin_active(0);
+  const auto  &unrefined_cell = tria.begin_active(0);
   unsigned int unrefined_f    = numbers::invalid_unsigned_int;
   for (unsigned int f = 0; f < unrefined_cell->n_faces(); ++f)
     if (!unrefined_cell->face(f)->at_boundary())

@@ -66,7 +66,7 @@ test1()
 void
 test2()
 {
-  std::ostream &   logfile = deallog.get_file_stream();
+  std::ostream    &logfile = deallog.get_file_stream();
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria);
 

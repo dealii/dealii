@@ -43,9 +43,9 @@ namespace DoFToolsEx
   template <int dim, class InVector, class OutVector>
   void
   transfer(const DoFHandler<dim> &source_dof,
-           const InVector &       source_vector,
+           const InVector        &source_vector,
            const DoFHandler<dim> &target_dof,
-           OutVector &            target_vector);
+           OutVector             &target_vector);
 } // namespace DoFToolsEx
 
 /**
@@ -58,9 +58,9 @@ namespace DoFToolsEx
 template <int dim, class InVector, class OutVector>
 void
 DoFToolsEx::transfer(const DoFHandler<dim> &source_dof,
-                     const InVector &       source_vector,
+                     const InVector        &source_vector,
                      const DoFHandler<dim> &target_dof,
-                     OutVector &            target_vector)
+                     OutVector             &target_vector)
 {
   // any sanity tests? Trias derived from same coarse grid?
 

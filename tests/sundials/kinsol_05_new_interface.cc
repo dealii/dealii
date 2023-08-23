@@ -114,7 +114,7 @@ main()
 
 
   kinsol.solve_with_jacobian = [&J_inverse](const VectorType &rhs,
-                                            VectorType &      dst,
+                                            VectorType       &dst,
                                             const double /*tolerance*/) {
     deallog << "Solving Jacobian system with rhs=(" << rhs[0] << ',' << rhs[1]
             << ')' << std::endl;

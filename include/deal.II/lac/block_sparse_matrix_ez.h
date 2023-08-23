@@ -213,7 +213,7 @@ public:
    */
   template <typename somenumber>
   void
-  Tvmult(BlockVector<somenumber> &      dst,
+  Tvmult(BlockVector<somenumber>       &dst,
          const BlockVector<somenumber> &src) const;
 
   /**
@@ -222,7 +222,7 @@ public:
    */
   template <typename somenumber>
   void
-  vmult_add(BlockVector<somenumber> &      dst,
+  vmult_add(BlockVector<somenumber>       &dst,
             const BlockVector<somenumber> &src) const;
 
   /**
@@ -232,7 +232,7 @@ public:
    */
   template <typename somenumber>
   void
-  Tvmult_add(BlockVector<somenumber> &      dst,
+  Tvmult_add(BlockVector<somenumber>       &dst,
              const BlockVector<somenumber> &src) const;
 
 
@@ -368,7 +368,7 @@ BlockSparseMatrixEZ<Number>::add(const size_type i,
 template <typename Number>
 template <typename somenumber>
 void
-BlockSparseMatrixEZ<Number>::vmult(BlockVector<somenumber> &      dst,
+BlockSparseMatrixEZ<Number>::vmult(BlockVector<somenumber>       &dst,
                                    const BlockVector<somenumber> &src) const
 {
   Assert(dst.n_blocks() == n_block_rows(),
@@ -388,7 +388,7 @@ BlockSparseMatrixEZ<Number>::vmult(BlockVector<somenumber> &      dst,
 template <typename Number>
 template <typename somenumber>
 void
-BlockSparseMatrixEZ<Number>::vmult_add(BlockVector<somenumber> &      dst,
+BlockSparseMatrixEZ<Number>::vmult_add(BlockVector<somenumber>       &dst,
                                        const BlockVector<somenumber> &src) const
 {
   Assert(dst.n_blocks() == n_block_rows(),
@@ -406,7 +406,7 @@ BlockSparseMatrixEZ<Number>::vmult_add(BlockVector<somenumber> &      dst,
 template <typename Number>
 template <typename somenumber>
 void
-BlockSparseMatrixEZ<Number>::Tvmult(BlockVector<somenumber> &      dst,
+BlockSparseMatrixEZ<Number>::Tvmult(BlockVector<somenumber>       &dst,
                                     const BlockVector<somenumber> &src) const
 {
   Assert(dst.n_blocks() == n_block_cols(),
@@ -427,7 +427,7 @@ template <typename Number>
 template <typename somenumber>
 void
 BlockSparseMatrixEZ<Number>::Tvmult_add(
-  BlockVector<somenumber> &      dst,
+  BlockVector<somenumber>       &dst,
   const BlockVector<somenumber> &src) const
 {
   Assert(dst.n_blocks() == n_block_cols(),

@@ -92,7 +92,7 @@ benchmark(const unsigned int n_global_refinements)
       boost::iostreams::filtering_ostreambuf fosb;
       fosb.push(boost::iostreams::back_inserter(buffer));
       boost::archive::binary_oarchive oa(fosb);
-      oa &                            cell_ids;
+      oa                             &cell_ids;
     }
     {
       TimerOutput::Scope t(computing_timer, "boost binary_archive load");
@@ -100,7 +100,7 @@ benchmark(const unsigned int n_global_refinements)
       boost::iostreams::filtering_istreambuf fisb;
       fisb.push(boost::iostreams::array_source(buffer.data(), buffer.size()));
       boost::archive::binary_iarchive ia(fisb);
-      ia &                            deserialized;
+      ia                             &deserialized;
     }
     AssertThrow(cell_ids == deserialized,
                 ExcMessage("Serialization with boost binary archives failed."));

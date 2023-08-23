@@ -153,8 +153,8 @@ namespace FETools
    */
   template <int dim, int spacedim>
   void
-  compute_component_wise(const FiniteElement<dim, spacedim> &    fe,
-                         std::vector<unsigned int> &             renumbering,
+  compute_component_wise(const FiniteElement<dim, spacedim>     &fe,
+                         std::vector<unsigned int>              &renumbering,
                          std::vector<std::vector<unsigned int>> &start_indices);
 
   /**
@@ -174,7 +174,7 @@ namespace FETools
    */
   template <int dim, int spacedim>
   void
-  compute_block_renumbering(const FiniteElement<dim, spacedim> &  fe,
+  compute_block_renumbering(const FiniteElement<dim, spacedim>   &fe,
                             std::vector<types::global_dof_index> &renumbering,
                             std::vector<types::global_dof_index> &block_data,
                             bool return_start_indices = true);
@@ -239,7 +239,7 @@ namespace FETools
   void
   get_projection_matrix(const FiniteElement<dim, spacedim> &fe1,
                         const FiniteElement<dim, spacedim> &fe2,
-                        FullMatrix<number> &                matrix);
+                        FullMatrix<number>                 &matrix);
 
   /**
    * This is a rather specialized function used during the construction of
@@ -354,7 +354,7 @@ namespace FETools
   template <int dim, typename number, int spacedim>
   void
   compute_embedding_matrices(
-    const FiniteElement<dim, spacedim> &          fe,
+    const FiniteElement<dim, spacedim>           &fe,
     std::vector<std::vector<FullMatrix<number>>> &matrices,
     const bool                                    isotropic_only = false,
     const double                                  threshold      = 1.e-12);
@@ -423,7 +423,7 @@ namespace FETools
   template <int dim, typename number, int spacedim>
   void
   compute_projection_matrices(
-    const FiniteElement<dim, spacedim> &          fe,
+    const FiniteElement<dim, spacedim>           &fe,
     std::vector<std::vector<FullMatrix<number>>> &matrices,
     const bool                                    isotropic_only = false);
 
@@ -516,9 +516,9 @@ namespace FETools
   void
   compute_projection_from_quadrature_points_matrix(
     const FiniteElement<dim, spacedim> &fe,
-    const Quadrature<dim> &             lhs_quadrature,
-    const Quadrature<dim> &             rhs_quadrature,
-    FullMatrix<double> &                X);
+    const Quadrature<dim>              &lhs_quadrature,
+    const Quadrature<dim>              &rhs_quadrature,
+    FullMatrix<double>                 &X);
 
   /**
    * Given a (scalar) local finite element function, compute the matrix that
@@ -531,8 +531,8 @@ namespace FETools
   void
   compute_interpolation_to_quadrature_points_matrix(
     const FiniteElement<dim, spacedim> &fe,
-    const Quadrature<dim> &             quadrature,
-    FullMatrix<double> &                I_q);
+    const Quadrature<dim>              &quadrature,
+    FullMatrix<double>                 &I_q);
 
   /**
    * Compute the projection of tensorial (first-order tensor) data stored at
@@ -550,9 +550,9 @@ namespace FETools
   template <int dim>
   void
   compute_projection_from_quadrature_points(
-    const FullMatrix<double> &         projection_matrix,
+    const FullMatrix<double>          &projection_matrix,
     const std::vector<Tensor<1, dim>> &vector_of_tensors_at_qp,
-    std::vector<Tensor<1, dim>> &      vector_of_tensors_at_nodes);
+    std::vector<Tensor<1, dim>>       &vector_of_tensors_at_nodes);
 
 
 
@@ -562,9 +562,9 @@ namespace FETools
   template <int dim>
   void
   compute_projection_from_quadrature_points(
-    const FullMatrix<double> &                  projection_matrix,
+    const FullMatrix<double>                   &projection_matrix,
     const std::vector<SymmetricTensor<2, dim>> &vector_of_tensors_at_qp,
-    std::vector<SymmetricTensor<2, dim>> &      vector_of_tensors_at_nodes);
+    std::vector<SymmetricTensor<2, dim>>       &vector_of_tensors_at_nodes);
 
 
 
@@ -581,11 +581,11 @@ namespace FETools
   void
   compute_projection_from_face_quadrature_points_matrix(
     const FiniteElement<dim, spacedim> &fe,
-    const Quadrature<dim - 1> &         lhs_quadrature,
-    const Quadrature<dim - 1> &         rhs_quadrature,
+    const Quadrature<dim - 1>          &lhs_quadrature,
+    const Quadrature<dim - 1>          &rhs_quadrature,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face,
-    FullMatrix<double> &                                            X);
+    FullMatrix<double>                                             &X);
 
 
 
@@ -608,8 +608,8 @@ namespace FETools
   void
   convert_generalized_support_point_values_to_dof_values(
     const FiniteElement<dim, spacedim> &finite_element,
-    const std::vector<Vector<number>> & support_point_values,
-    std::vector<number> &               dof_values);
+    const std::vector<Vector<number>>  &support_point_values,
+    std::vector<number>                &dof_values);
 
 
 
@@ -650,9 +650,9 @@ namespace FETools
   template <int dim, int spacedim, class InVector, class OutVector>
   void
   interpolate(const DoFHandler<dim, spacedim> &dof1,
-              const InVector &                 u1,
+              const InVector                  &u1,
               const DoFHandler<dim, spacedim> &dof2,
-              OutVector &                      u2);
+              OutVector                       &u2);
 
   /**
    * Compute the interpolation of a the @p dof1-function @p u1 to a @p
@@ -673,11 +673,11 @@ namespace FETools
   template <int dim, int spacedim, class InVector, class OutVector>
   void
   interpolate(
-    const DoFHandler<dim, spacedim> &                        dof1,
-    const InVector &                                         u1,
-    const DoFHandler<dim, spacedim> &                        dof2,
+    const DoFHandler<dim, spacedim>                         &dof1,
+    const InVector                                          &u1,
+    const DoFHandler<dim, spacedim>                         &dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints,
-    OutVector &                                              u2);
+    OutVector                                               &u2);
 
   /**
    * Compute the interpolation of the @p fe1-function @p u1 to a @p
@@ -694,10 +694,10 @@ namespace FETools
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void
-  back_interpolate(const DoFHandler<dim, spacedim> &   dof1,
-                   const InVector &                    u1,
+  back_interpolate(const DoFHandler<dim, spacedim>    &dof1,
+                   const InVector                     &u1,
                    const FiniteElement<dim, spacedim> &fe2,
-                   OutVector &                         u1_interpolated);
+                   OutVector                          &u1_interpolated);
 
   /**
    * Compute the interpolation of the @p dof1-function @p u1 to a @p
@@ -714,12 +714,12 @@ namespace FETools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   back_interpolate(
-    const DoFHandler<dim, spacedim> &                        dof1,
+    const DoFHandler<dim, spacedim>                         &dof1,
     const AffineConstraints<typename OutVector::value_type> &constraints1,
-    const InVector &                                         u1,
-    const DoFHandler<dim, spacedim> &                        dof2,
+    const InVector                                          &u1,
+    const DoFHandler<dim, spacedim>                         &dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints2,
-    OutVector &                                              u1_interpolated);
+    OutVector                                               &u1_interpolated);
 
   /**
    * Compute $(Id-I_h)z_1$ for a given @p dof1-function $z_1$, where $I_h$ is
@@ -732,10 +732,10 @@ namespace FETools
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void
-  interpolation_difference(const DoFHandler<dim, spacedim> &   dof1,
-                           const InVector &                    z1,
+  interpolation_difference(const DoFHandler<dim, spacedim>    &dof1,
+                           const InVector                     &z1,
                            const FiniteElement<dim, spacedim> &fe2,
-                           OutVector &                         z1_difference);
+                           OutVector                          &z1_difference);
 
   /**
    * Compute $(Id-I_h)z_1$ for a given @p dof1-function $z_1$, where $I_h$ is
@@ -752,12 +752,12 @@ namespace FETools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   interpolation_difference(
-    const DoFHandler<dim, spacedim> &                        dof1,
+    const DoFHandler<dim, spacedim>                         &dof1,
     const AffineConstraints<typename OutVector::value_type> &constraints1,
-    const InVector &                                         z1,
-    const DoFHandler<dim, spacedim> &                        dof2,
+    const InVector                                          &z1,
+    const DoFHandler<dim, spacedim>                         &dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints2,
-    OutVector &                                              z1_difference);
+    OutVector                                               &z1_difference);
 
 
 
@@ -772,9 +772,9 @@ namespace FETools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   project_dg(const DoFHandler<dim, spacedim> &dof1,
-             const InVector &                 u1,
+             const InVector                  &u1,
              const DoFHandler<dim, spacedim> &dof2,
-             OutVector &                      u2);
+             OutVector                       &u2);
 
   /**
    * Compute the patchwise extrapolation of a @p dof1 function @p z1 to a @p
@@ -839,9 +839,9 @@ namespace FETools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   extrapolate(const DoFHandler<dim, spacedim> &dof1,
-              const InVector &                 z1,
+              const InVector                  &z1,
               const DoFHandler<dim, spacedim> &dof2,
-              OutVector &                      z2);
+              OutVector                       &z2);
 
   /**
    * Compute the patchwise extrapolation of a @p dof1 function @p z1 to a @p
@@ -858,11 +858,11 @@ namespace FETools
   template <int dim, class InVector, class OutVector, int spacedim>
   void
   extrapolate(
-    const DoFHandler<dim, spacedim> &                        dof1,
-    const InVector &                                         z1,
-    const DoFHandler<dim, spacedim> &                        dof2,
+    const DoFHandler<dim, spacedim>                         &dof1,
+    const InVector                                          &z1,
+    const DoFHandler<dim, spacedim>                         &dof2,
     const AffineConstraints<typename OutVector::value_type> &constraints,
-    OutVector &                                              z2);
+    OutVector                                               &z2);
 
   /** @} */
   /**
@@ -990,7 +990,7 @@ namespace FETools
     FiniteElementData<dim>
     multiply_dof_numbers(
       const std::vector<const FiniteElement<dim, spacedim> *> &fes,
-      const std::vector<unsigned int> &                        multiplicities,
+      const std::vector<unsigned int>                         &multiplicities,
       const bool do_tensor_product = true);
 
     /**
@@ -1037,7 +1037,7 @@ namespace FETools
     std::vector<bool>
     compute_restriction_is_additive_flags(
       const std::vector<const FiniteElement<dim, spacedim> *> &fes,
-      const std::vector<unsigned int> &                        multiplicities);
+      const std::vector<unsigned int>                         &multiplicities);
 
     /**
      * Same as above for an arbitrary number of parameters of type
@@ -1100,7 +1100,7 @@ namespace FETools
     std::vector<ComponentMask>
     compute_nonzero_components(
       const std::vector<const FiniteElement<dim, spacedim> *> &fes,
-      const std::vector<unsigned int> &                        multiplicities,
+      const std::vector<unsigned int>                         &multiplicities,
       const bool do_tensor_product = true);
 
     /**
@@ -1170,10 +1170,10 @@ namespace FETools
       std::vector<std::pair<std::pair<unsigned int, unsigned int>,
                             unsigned int>> &system_to_base_table,
       std::vector<std::pair<unsigned int, unsigned int>>
-        &                                   system_to_component_table,
+                                           &system_to_component_table,
       std::vector<std::pair<std::pair<unsigned int, unsigned int>,
                             unsigned int>> &component_to_base_table,
-      const FiniteElement<dim, spacedim> &  finite_element,
+      const FiniteElement<dim, spacedim>   &finite_element,
       const bool                            do_tensor_product = true);
 
     /**
@@ -1197,7 +1197,7 @@ namespace FETools
       std::vector<std::pair<std::pair<unsigned int, unsigned int>,
                             unsigned int>> &face_system_to_base_table,
       std::vector<std::pair<unsigned int, unsigned int>>
-        &                                 face_system_to_component_table,
+                                         &face_system_to_component_table,
       const FiniteElement<dim, spacedim> &finite_element,
       const bool                          do_tensor_product = true,
       const unsigned int                  face_no           = 0 /*TODO*/);
@@ -1286,7 +1286,7 @@ namespace FETools
    */
   template <int dim, int spacedim>
   void
-  add_fe_name(const std::string &                 name,
+  add_fe_name(const std::string                  &name,
               const FEFactoryBase<dim, spacedim> *factory);
 
   /**

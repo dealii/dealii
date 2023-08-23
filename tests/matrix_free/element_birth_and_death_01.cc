@@ -109,7 +109,7 @@ test(const unsigned int n_refinements)
       VectorTools::interpolate(dof_handler, Fu<dim>(), src);
 
       const auto cell_operation = [&](const auto &matrix_free,
-                                      auto &      dst,
+                                      auto       &dst,
                                       const auto &src,
                                       const auto  range) {
         FECellIntegrator phi(matrix_free);

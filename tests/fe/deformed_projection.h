@@ -98,7 +98,7 @@ TestMap1<dim>::value(const Point<dim> &, const unsigned int) const
 template <int dim>
 void
 TestMap1<dim>::vector_value(const Point<dim> &p,
-                            Vector<double> &  return_value) const
+                            Vector<double>   &return_value) const
 {
   Assert(return_value.size() == this->n_components,
          ExcDimensionMismatch(return_value.size(), this->n_components));
@@ -189,12 +189,12 @@ EvaluateDerivative(DoFHandler<2> *dof_handler, Vector<double> &solution)
 
 template <int dim>
 void
-create_mass_matrix(const Mapping<dim> &       mapping,
-                   const DoFHandler<dim> &    dof,
-                   const Quadrature<dim> &    q,
-                   SparseMatrix<double> &     matrix,
-                   const Function<dim> &      rhs_function,
-                   Vector<double> &           rhs_vector,
+create_mass_matrix(const Mapping<dim>        &mapping,
+                   const DoFHandler<dim>     &dof,
+                   const Quadrature<dim>     &q,
+                   SparseMatrix<double>      &matrix,
+                   const Function<dim>       &rhs_function,
+                   Vector<double>            &rhs_vector,
                    const Function<dim> *const coefficient = nullptr)
 {
   UpdateFlags update_flags =
@@ -386,11 +386,11 @@ create_mass_matrix(const Mapping<dim> &       mapping,
 
 template <int dim>
 void
-create_right_hand_side(const Mapping<dim> &   mapping,
+create_right_hand_side(const Mapping<dim>    &mapping,
                        const DoFHandler<dim> &dof_handler,
                        const Quadrature<dim> &quadrature,
-                       const Function<dim> &  rhs_function,
-                       Vector<double> &       rhs_vector)
+                       const Function<dim>   &rhs_function,
+                       Vector<double>        &rhs_vector)
 {
   const FiniteElement<dim> &fe = dof_handler.get_fe();
   Assert(fe.n_components() == rhs_function.n_components, ExcInternalError());
@@ -481,15 +481,15 @@ create_right_hand_side(const Mapping<dim> &   mapping,
 
 template <int dim>
 void
-project(const Mapping<dim> &             mapping,
-        const DoFHandler<dim> &          dof,
+project(const Mapping<dim>              &mapping,
+        const DoFHandler<dim>           &dof,
         const AffineConstraints<double> &constraints,
-        const Quadrature<dim> &          quadrature,
-        const Function<dim> &            function,
-        Vector<double> &                 vec,
+        const Quadrature<dim>           &quadrature,
+        const Function<dim>             &function,
+        Vector<double>                  &vec,
         const unsigned int               min_convergence_steps,
         const bool                       enforce_zero_boundary = false,
-        const Quadrature<dim - 1> &          = QGauss<dim - 1>(2),
+        const Quadrature<dim - 1>          & = QGauss<dim - 1>(2),
         const bool project_to_boundary_first = false)
 {
   Assert(dof.get_fe().n_components() == function.n_components,
@@ -548,18 +548,18 @@ project(const Mapping<dim> &             mapping,
   else
     // no homogeneous boundary values
     if (project_to_boundary_first == true)
-    // boundary projection required
-    {
-      //   // set up a list of boundary functions for
-      //   // the different boundary parts. We want the
-      //   // @p{function} to hold on all parts of the
-      //   // boundary
-      //   std::map<types::boundary_id, const Function<dim>*>
-      //   boundary_functions; for (unsigned char c=0; c<255; ++c)
-      //     boundary_functions[c] = &function;
-      //     project_boundary_values (dof,
-      //   boundary_functions, q_boundary, boundary_values);
-    }
+      // boundary projection required
+      {
+        //   // set up a list of boundary functions for
+        //   // the different boundary parts. We want the
+        //   // @p{function} to hold on all parts of the
+        //   // boundary
+        //   std::map<types::boundary_id, const Function<dim>*>
+        //   boundary_functions; for (unsigned char c=0; c<255; ++c)
+        //     boundary_functions[c] = &function;
+        //     project_boundary_values (dof,
+        //   boundary_functions, q_boundary, boundary_values);
+      }
 
 
   // set up mass matrix and right hand side
@@ -718,11 +718,11 @@ main(int /*argc*/, char ** /*argv*/)
 
 
 void
-check(const FiniteElement<2> &           fe,
+check(const FiniteElement<2>            &fe,
       const std::array<unsigned int, 3> &min_convergence_steps)
 {
   Triangulation<2> tria_test;
-  DoFHandler<2> *  dof_handler;
+  DoFHandler<2>   *dof_handler;
 
   deallog << "Dofs/cell " << fe.dofs_per_cell << "Dofs/face "
           << fe.dofs_per_face << std::endl;

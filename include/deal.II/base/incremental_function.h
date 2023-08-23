@@ -92,7 +92,7 @@ namespace Functions
      * this function is called.
      */
     virtual void
-    vector_value(const Point<dim> &       p,
+    vector_value(const Point<dim>        &p,
                  Vector<RangeNumberType> &values) const override;
 
     /**

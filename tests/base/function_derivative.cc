@@ -32,8 +32,8 @@
 template <int dim>
 void
 check_derivative_order(const std::vector<Tensor<1, dim>> &gradients,
-                       FunctionDerivative<dim> &          df,
-                       const Quadrature<dim> &            quadrature,
+                       FunctionDerivative<dim>           &df,
+                       const Quadrature<dim>             &quadrature,
                        const unsigned int                 direction,
                        const double                       order)
 {
@@ -68,9 +68,9 @@ check_derivative_order(const std::vector<Tensor<1, dim>> &gradients,
 template <int dim>
 void
 check_hessian_order(const std::vector<double> &values,
-                    FunctionDerivative<dim> &  df,
-                    const Quadrature<dim> &    quadrature,
-                    const Point<dim> &         k,
+                    FunctionDerivative<dim>   &df,
+                    const Quadrature<dim>     &quadrature,
+                    const Point<dim>          &k,
                     const unsigned int         direction,
                     const double               order)
 {

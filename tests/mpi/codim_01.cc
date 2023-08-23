@@ -36,7 +36,7 @@
 template <int dim, int spacedim>
 void
 write_vtk(const parallel::distributed::Triangulation<dim, spacedim> &tria,
-          const char *                                               filename)
+          const char                                                *filename)
 {
   AssertThrow(tria.are_vertices_communicated_to_p4est(),
               ExcMessage("To use this function the flag "

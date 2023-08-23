@@ -374,7 +374,7 @@ ConsecutiveControl::ConsecutiveControl(const SolverControl &c)
 ConsecutiveControl &
 ConsecutiveControl::operator=(const SolverControl &c)
 {
-  SolverControl::operator  =(c);
+  SolverControl::operator=(c);
   n_consecutive_iterations = 1;
   n_converged_iterations   = 0;
   return *this;

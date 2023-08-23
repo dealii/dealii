@@ -475,7 +475,7 @@ namespace parallel
        */
       void
       prepare_for_coarsening_and_refinement(
-        parallel::distributed::Triangulation<dim> &  tria,
+        parallel::distributed::Triangulation<dim>   &tria,
         CellDataStorage<CellIteratorType, DataType> &data_storage);
 
       /**
@@ -500,7 +500,7 @@ namespace parallel
       std::vector<char>
       pack_function(
         const typename parallel::distributed::Triangulation<dim>::cell_iterator
-          &              cell,
+                        &cell,
         const CellStatus status);
 
       /**
@@ -511,7 +511,7 @@ namespace parallel
       void
       unpack_function(
         const typename parallel::distributed::Triangulation<dim>::cell_iterator
-          &              cell,
+                        &cell,
         const CellStatus status,
         const boost::iterator_range<std::vector<char>::const_iterator>
           &data_range);
@@ -818,9 +818,9 @@ CellDataStorage<CellIteratorType, DataType>::try_get_data(
  */
 template <typename CellIteratorType, typename DataType>
 inline void
-pack_cell_data(const CellIteratorType &                           cell,
+pack_cell_data(const CellIteratorType                            &cell,
                const CellDataStorage<CellIteratorType, DataType> *data_storage,
-               FullMatrix<double> &                               matrix_data)
+               FullMatrix<double>                                &matrix_data)
 {
   static_assert(std::is_base_of_v<TransferableQuadraturePointData, DataType>,
                 "User's DataType class should be derived from QPData");
@@ -855,8 +855,8 @@ pack_cell_data(const CellIteratorType &                           cell,
  */
 template <typename CellIteratorType, typename DataType>
 inline void
-unpack_to_cell_data(const CellIteratorType &                     cell,
-                    const FullMatrix<double> &                   values_at_qp,
+unpack_to_cell_data(const CellIteratorType                      &cell,
+                    const FullMatrix<double>                    &values_at_qp,
                     CellDataStorage<CellIteratorType, DataType> *data_storage)
 {
   static_assert(std::is_base_of_v<TransferableQuadraturePointData, DataType>,
@@ -889,8 +889,8 @@ namespace parallel
     template <int dim, typename DataType>
     inline ContinuousQuadratureDataTransfer<dim, DataType>::
       ContinuousQuadratureDataTransfer(const FiniteElement<dim> &projection_fe_,
-                                       const Quadrature<dim> &   lhs_quadrature,
-                                       const Quadrature<dim> &   rhs_quadrature)
+                                       const Quadrature<dim>    &lhs_quadrature,
+                                       const Quadrature<dim>    &rhs_quadrature)
       : projection_fe(
           std::unique_ptr<const FiniteElement<dim>>(projection_fe_.clone()))
       , data_size_in_bytes(0)
@@ -922,7 +922,7 @@ namespace parallel
     inline void
     ContinuousQuadratureDataTransfer<dim, DataType>::
       prepare_for_coarsening_and_refinement(
-        parallel::distributed::Triangulation<dim> &  tr_,
+        parallel::distributed::Triangulation<dim>   &tr_,
         CellDataStorage<CellIteratorType, DataType> &data_storage_)
     {
       Assert(data_storage == nullptr,
@@ -986,7 +986,7 @@ namespace parallel
     inline void
     ContinuousQuadratureDataTransfer<dim, DataType>::unpack_function(
       const typename parallel::distributed::Triangulation<dim>::cell_iterator
-        &              cell,
+                      &cell,
       const CellStatus status,
       const boost::iterator_range<std::vector<char>::const_iterator>
         &data_range)

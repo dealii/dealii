@@ -50,7 +50,7 @@ test()
   dofh.begin_active()->set_active_fe_index(1);
   dofh.distribute_dofs(fes);
 
-  const auto &       parent = dofh.begin(/*level=*/0);
+  const auto        &parent = dofh.begin(/*level=*/0);
   const unsigned int parent_future_fe =
     internal::hp::DoFHandlerImplementation::dominated_future_fe_on_children<
       dim>(parent);

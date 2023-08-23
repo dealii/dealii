@@ -47,7 +47,7 @@ namespace internal
       const dealii::hp::MappingCollection<dim, spacedim> &mapping,
       const std::vector<
         std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>>
-        &                                           finite_elements,
+                                                   &finite_elements,
       const UpdateFlags                             update_flags,
       const std::vector<std::vector<unsigned int>> &cell_to_patch_index_map)
       : ParallelDataBase<dim, spacedim>(n_datasets,
@@ -94,7 +94,7 @@ DataOut<dim, spacedim>::DataOut()
 template <int dim, int spacedim>
 void
 DataOut<dim, spacedim>::build_one_patch(
-  const std::pair<cell_iterator, unsigned int> *                cell_and_index,
+  const std::pair<cell_iterator, unsigned int>                 *cell_and_index,
   internal::DataOutImplementation::ParallelData<dim, spacedim> &scratch_data,
   const unsigned int                                            n_subdivisions,
   const CurvedCellRegion curved_cell_region)
@@ -1273,7 +1273,7 @@ template <int dim, int spacedim>
 void
 DataOut<dim, spacedim>::set_cell_selection(
   const std::function<cell_iterator(const Triangulation<dim, spacedim> &)>
-    &                                                        first_cell,
+                                                            &first_cell,
   const std::function<cell_iterator(const Triangulation<dim, spacedim> &,
                                     const cell_iterator &)> &next_cell)
 {

@@ -405,7 +405,7 @@ namespace internal
         &pack_callbacks_fixed,
       const std::vector<
         typename internal::CellAttachedData<dim, spacedim>::pack_callback_t>
-        &             pack_callbacks_variable,
+                     &pack_callbacks_variable,
       const MPI_Comm &mpi_communicator);
 
     /**
@@ -458,7 +458,7 @@ namespace internal
     save(const unsigned int global_first_cell,
          const unsigned int global_num_cells,
          const std::string &filename,
-         const MPI_Comm &   mpi_communicator) const;
+         const MPI_Comm    &mpi_communicator) const;
 
     /**
      * Deserialize data from file system.
@@ -485,7 +485,7 @@ namespace internal
          const std::string &filename,
          const unsigned int n_attached_deserialize_fixed,
          const unsigned int n_attached_deserialize_variable,
-         const MPI_Comm &   mpi_communicator);
+         const MPI_Comm    &mpi_communicator);
 
     /**
      * Clears all containers and associated data, and resets member
@@ -2073,8 +2073,8 @@ public:
    */
   virtual void
   create_triangulation(const std::vector<Point<spacedim>> &vertices,
-                       const std::vector<CellData<dim>> &  cells,
-                       const SubCellData &                 subcelldata);
+                       const std::vector<CellData<dim>>   &cells,
+                       const SubCellData                  &subcelldata);
 
   /**
    * Create a triangulation from the provided
@@ -3807,7 +3807,7 @@ public:
   register_data_attach(
     const std::function<std::vector<char>(const cell_iterator &,
                                           const ::dealii::CellStatus)>
-      &        pack_callback,
+              &pack_callback,
     const bool returns_variable_size_data);
 
   /**
@@ -4041,7 +4041,7 @@ protected:
   write_bool_vector(const unsigned int       magic_number1,
                     const std::vector<bool> &v,
                     const unsigned int       magic_number2,
-                    std::ostream &           out);
+                    std::ostream            &out);
 
   /**
    * Re-read a vector of bools previously written by @p write_bool_vector and
@@ -4051,7 +4051,7 @@ protected:
   read_bool_vector(const unsigned int magic_number1,
                    std::vector<bool> &v,
                    const unsigned int magic_number2,
-                   std::istream &     in);
+                   std::istream      &in);
 
   /**
    * Recreate information about periodic neighbors from
@@ -4593,8 +4593,8 @@ namespace internal
     void
     NumberCache<1>::serialize(Archive &ar, const unsigned int)
     {
-      ar &n_levels;
-      ar &n_lines &n_lines_level;
+      ar                 &n_levels;
+      ar &n_lines        &n_lines_level;
       ar &n_active_lines &n_active_lines_level;
     }
 
@@ -4605,7 +4605,7 @@ namespace internal
     {
       this->NumberCache<1>::serialize(ar, version);
 
-      ar &n_quads &n_quads_level;
+      ar &n_quads        &n_quads_level;
       ar &n_active_quads &n_active_quads_level;
     }
 
@@ -4616,7 +4616,7 @@ namespace internal
     {
       this->NumberCache<2>::serialize(ar, version);
 
-      ar &n_hexes &n_hexes_level;
+      ar &n_hexes        &n_hexes_level;
       ar &n_active_hexes &n_active_hexes_level;
     }
 
@@ -4678,7 +4678,7 @@ void Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
   ar &smooth_grid;
 
   unsigned int n_levels = levels.size();
-  ar &         n_levels;
+  ar          &n_levels;
   for (const auto &level : levels)
     ar &level;
 
@@ -4686,7 +4686,7 @@ void Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
   // at least up to 1.65.1. This causes problems with clang-5.
   // Therefore, work around it.
   bool faces_is_nullptr = (faces.get() == nullptr);
-  ar & faces_is_nullptr;
+  ar  &faces_is_nullptr;
   if (!faces_is_nullptr)
     ar &faces;
 
@@ -4720,18 +4720,18 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   ar &smooth_grid;
 
   unsigned int size;
-  ar &         size;
+  ar          &size;
   levels.resize(size);
   for (auto &level_ : levels)
     {
       std::unique_ptr<internal::TriangulationImplementation::TriaLevel> level;
-      ar &                                                              level;
+      ar                                                               &level;
       level_ = std::move(level);
     }
 
   // Workaround for nullptr, see in save().
   bool faces_is_nullptr = true;
-  ar & faces_is_nullptr;
+  ar  &faces_is_nullptr;
   if (!faces_is_nullptr)
     ar &faces;
 
@@ -4759,7 +4759,7 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   reset_policy();
 
   bool my_check_for_distorted_cells;
-  ar & my_check_for_distorted_cells;
+  ar  &my_check_for_distorted_cells;
 
   Assert(my_check_for_distorted_cells == check_for_distorted_cells,
          ExcMessage("The triangulation loaded into here must have the "

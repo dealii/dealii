@@ -28,7 +28,7 @@ void
 test_leak()
 {
   GrowingVectorMemory<VectorType> mem;
-  VectorType *                    v = mem.alloc();
+  VectorType                     *v = mem.alloc();
   v->reinit(5);
 }
 
@@ -38,12 +38,12 @@ void
 test_stat()
 {
   GrowingVectorMemory<VectorType> mem(1, true);
-  VectorType *                    v1 = mem.alloc();
-  VectorType *                    v2 = mem.alloc();
-  VectorType *                    v3 = mem.alloc();
-  VectorType *                    v4 = mem.alloc();
-  VectorType *                    v5 = mem.alloc();
-  VectorType *                    v6 = mem.alloc();
+  VectorType                     *v1 = mem.alloc();
+  VectorType                     *v2 = mem.alloc();
+  VectorType                     *v3 = mem.alloc();
+  VectorType                     *v4 = mem.alloc();
+  VectorType                     *v5 = mem.alloc();
+  VectorType                     *v6 = mem.alloc();
   v1->reinit(5);
   v2->reinit(5);
   v3->reinit(5);

@@ -68,7 +68,7 @@ main(int argc, char **argv)
 
     // Identity preconditioner
     preconditioner_user.vmult =
-      [](PETScWrappers::VectorBase &      dst,
+      [](PETScWrappers::VectorBase       &dst,
          const PETScWrappers::VectorBase &src) -> void { dst = src; };
 
     check_solver_within_range(solver.solve(A, u, f, preconditioner_user),

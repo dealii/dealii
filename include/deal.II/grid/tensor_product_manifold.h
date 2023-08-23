@@ -158,8 +158,8 @@ namespace internal
     template <int dim1, int dim2>
     void
     split_point(const Point<dim1 + dim2> &source,
-                Point<dim1> &             p1,
-                Point<dim2> &             p2)
+                Point<dim1>              &p1,
+                Point<dim2>              &p2)
     {
       for (unsigned int d = 0; d < dim1; ++d)
         p1[d] = source[d];

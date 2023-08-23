@@ -36,10 +36,10 @@ template <typename SolverType,
           typename VectorType,
           class PRECONDITION>
 double
-check_solve(SolverType &        solver,
-            const MatrixType &  A,
-            VectorType &        u,
-            VectorType &        f,
+check_solve(SolverType         &solver,
+            const MatrixType   &A,
+            VectorType         &u,
+            VectorType         &f,
             const PRECONDITION &P)
 {
   double result = 0.;

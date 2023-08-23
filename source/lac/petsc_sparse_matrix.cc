@@ -255,9 +255,9 @@ namespace PETScWrappers
   }
 
   void
-  SparseMatrix::mmult(SparseMatrix &      C,
+  SparseMatrix::mmult(SparseMatrix       &C,
                       const SparseMatrix &B,
-                      const MPI::Vector & V) const
+                      const MPI::Vector  &V) const
   {
     // Simply forward to the protected member function of the base class
     // that takes abstract matrix and vector arguments (to which the compiler
@@ -266,9 +266,9 @@ namespace PETScWrappers
   }
 
   void
-  SparseMatrix::Tmmult(SparseMatrix &      C,
+  SparseMatrix::Tmmult(SparseMatrix       &C,
                        const SparseMatrix &B,
-                       const MPI::Vector & V) const
+                       const MPI::Vector  &V) const
   {
     // Simply forward to the protected member function of the base class
     // that takes abstract matrix and vector arguments (to which the compiler

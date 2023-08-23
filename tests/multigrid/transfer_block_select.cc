@@ -45,8 +45,8 @@
 template <int dim, typename number, int spacedim>
 void
 reinit_vector_by_blocks(
-  const dealii::DoFHandler<dim, spacedim> &          mg_dof,
-  MGLevelObject<dealii::Vector<number>> &            v,
+  const dealii::DoFHandler<dim, spacedim>           &mg_dof,
+  MGLevelObject<dealii::Vector<number>>             &v,
   const unsigned int                                 selected_block,
   std::vector<std::vector<types::global_dof_index>> &ndofs)
 {

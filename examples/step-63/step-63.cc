@@ -361,11 +361,11 @@ namespace Step63
   class RightHandSide : public Function<dim>
   {
   public:
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
 
     virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
+                            std::vector<double>           &values,
                             const unsigned int component = 0) const override;
   };
 
@@ -385,7 +385,7 @@ namespace Step63
 
   template <int dim>
   void RightHandSide<dim>::value_list(const std::vector<Point<dim>> &points,
-                                      std::vector<double> &          values,
+                                      std::vector<double>           &values,
                                       const unsigned int component) const
   {
     AssertDimension(values.size(), points.size());
@@ -402,18 +402,18 @@ namespace Step63
   class BoundaryValues : public Function<dim>
   {
   public:
-    virtual double value(const Point<dim> & p,
+    virtual double value(const Point<dim>  &p,
                          const unsigned int component = 0) const override;
 
     virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
+                            std::vector<double>           &values,
                             const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double BoundaryValues<dim>::value(const Point<dim> & p,
+  double BoundaryValues<dim>::value(const Point<dim>  &p,
                                     const unsigned int component) const
   {
     Assert(component == 0, ExcIndexRange(component, 0, 1));
@@ -435,7 +435,7 @@ namespace Step63
 
   template <int dim>
   void BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
-                                       std::vector<double> &          values,
+                                       std::vector<double>           &values,
                                        const unsigned int component) const
   {
     AssertDimension(values.size(), points.size());
@@ -491,8 +491,8 @@ namespace Step63
 
     template <class IteratorType>
     void assemble_cell(const IteratorType &cell,
-                       ScratchData<dim> &  scratch_data,
-                       CopyData &          copy_data);
+                       ScratchData<dim>   &scratch_data,
+                       CopyData           &copy_data);
     void assemble_system_and_multigrid();
 
     void setup_smoother();
@@ -690,8 +690,8 @@ namespace Step63
   template <int dim>
   template <class IteratorType>
   void AdvectionProblem<dim>::assemble_cell(const IteratorType &cell,
-                                            ScratchData<dim> &  scratch_data,
-                                            CopyData &          copy_data)
+                                            ScratchData<dim>   &scratch_data,
+                                            CopyData           &copy_data)
   {
     copy_data.level = cell->level();
 
@@ -784,8 +784,8 @@ namespace Step63
   {
     const auto cell_worker_active =
       [&](const decltype(dof_handler.begin_active()) &cell,
-          ScratchData<dim> &                          scratch_data,
-          CopyData &                                  copy_data) {
+          ScratchData<dim>                           &scratch_data,
+          CopyData                                   &copy_data) {
         this->assemble_cell(cell, scratch_data, copy_data);
       };
 
@@ -826,8 +826,8 @@ namespace Step63
 
     const auto cell_worker_mg =
       [&](const decltype(dof_handler.begin_mg()) &cell,
-          ScratchData<dim> &                      scratch_data,
-          CopyData &                              copy_data) {
+          ScratchData<dim>                       &scratch_data,
+          CopyData                               &copy_data) {
         this->assemble_cell(cell, scratch_data, copy_data);
       };
 

@@ -275,10 +275,10 @@ namespace
 template <int dim, int spacedim>
 FE_SimplexPoly<dim, spacedim>::FE_SimplexPoly(
   const BarycentricPolynomials<dim>              polynomials,
-  const FiniteElementData<dim> &                 fe_data,
-  const std::vector<Point<dim>> &                unit_support_points,
+  const FiniteElementData<dim>                  &fe_data,
+  const std::vector<Point<dim>>                 &unit_support_points,
   const std::vector<std::vector<Point<dim - 1>>> unit_face_support_points,
-  const FullMatrix<double> &                     interface_constraints)
+  const FullMatrix<double>                      &interface_constraints)
   : dealii::FE_Poly<dim, spacedim>(
       polynomials,
       fe_data,
@@ -393,7 +393,7 @@ template <int dim, int spacedim>
 void
 FE_SimplexPoly<dim, spacedim>::get_face_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
-  FullMatrix<double> &                interpolation_matrix,
+  FullMatrix<double>                 &interpolation_matrix,
   const unsigned int                  face_no) const
 {
   Assert(interpolation_matrix.m() == source_fe.n_dofs_per_face(face_no),
@@ -464,7 +464,7 @@ void
 FE_SimplexPoly<dim, spacedim>::get_subface_interpolation_matrix(
   const FiniteElement<dim, spacedim> &source_fe,
   const unsigned int                  subface,
-  FullMatrix<double> &                interpolation_matrix,
+  FullMatrix<double>                 &interpolation_matrix,
   const unsigned int                  face_no) const
 {
   Assert(interpolation_matrix.m() == source_fe.n_dofs_per_face(face_no),
@@ -546,7 +546,7 @@ void
 FE_SimplexPoly<dim, spacedim>::
   convert_generalized_support_point_values_to_dof_values(
     const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              nodal_values) const
+    std::vector<double>               &nodal_values) const
 {
   AssertDimension(support_point_values.size(),
                   this->get_unit_support_points().size());

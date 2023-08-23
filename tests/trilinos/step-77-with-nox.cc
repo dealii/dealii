@@ -68,7 +68,7 @@ namespace Step77
     setup_system(const bool initial_step);
     void
     solve(const Vector<double> &rhs,
-          Vector<double> &      solution,
+          Vector<double>       &solution,
           const double          tolerance);
     void
     refine_mesh();
@@ -80,7 +80,7 @@ namespace Step77
     compute_and_factorize_jacobian(const Vector<double> &evaluation_point);
     void
     compute_residual(const Vector<double> &evaluation_point,
-                     Vector<double> &      residual);
+                     Vector<double>       &residual);
 
     Triangulation<dim> triangulation;
 
@@ -244,7 +244,7 @@ namespace Step77
   void
   MinimalSurfaceProblem<dim>::compute_residual(
     const Vector<double> &evaluation_point,
-    Vector<double> &      residual)
+    Vector<double>       &residual)
   {
     residual = 0;
 
@@ -309,7 +309,7 @@ namespace Step77
   template <int dim>
   void
   MinimalSurfaceProblem<dim>::solve(const Vector<double> &rhs,
-                                    Vector<double> &      solution,
+                                    Vector<double>       &solution,
                                     const double /*tolerance*/)
   {
     jacobian_matrix_factorization->vmult(solution, rhs);
@@ -431,7 +431,7 @@ namespace Step77
 
           nonlinear_solver.residual =
             [&](const Vector<double> &evaluation_point,
-                Vector<double> &      residual) {
+                Vector<double>       &residual) {
               compute_residual(evaluation_point, residual);
             };
 
@@ -441,7 +441,7 @@ namespace Step77
             };
 
           nonlinear_solver.solve_with_jacobian = [&](const Vector<double> &rhs,
-                                                     Vector<double> &      dst,
+                                                     Vector<double>       &dst,
                                                      const double tolerance) {
             solve(rhs, dst, tolerance);
           };

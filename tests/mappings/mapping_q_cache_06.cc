@@ -60,7 +60,7 @@ template <int dim, typename Fu>
 void
 do_test(const unsigned int degree,
         const unsigned int mapping_degree,
-        const Fu &         fu,
+        const Fu          &fu,
         const bool         is_displacement_function)
 {
   parallel::distributed::Triangulation<dim> tria(

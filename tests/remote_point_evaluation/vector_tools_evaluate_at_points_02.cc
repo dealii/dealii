@@ -79,8 +79,8 @@ create_partitioner(const DoFHandler<dim, spacedim> &dof_handler)
 
 template <int dim>
 void
-print(const Mapping<dim> &                              mapping,
-      const DoFHandler<dim> &                           dof_handler,
+print(const Mapping<dim>                               &mapping,
+      const DoFHandler<dim>                            &dof_handler,
       const LinearAlgebra::distributed::Vector<double> &result,
       const unsigned int                                counter)
 {
@@ -117,9 +117,9 @@ class PoissonProblem
 public:
   PoissonProblem(const Triangulation<dim> &tria,
                  const unsigned int        id,
-                 const Mapping<dim> &      mapping,
+                 const Mapping<dim>       &mapping,
                  const FiniteElement<dim> &fe,
-                 const Quadrature<dim> &   quad)
+                 const Quadrature<dim>    &quad)
     : id(id)
     , mapping(mapping)
     , fe(fe)
@@ -134,9 +134,9 @@ public:
   }
 
   void
-  solve(const DoFHandler<dim> &                           dof_handler_other,
+  solve(const DoFHandler<dim>                            &dof_handler_other,
         const LinearAlgebra::distributed::Vector<double> &solution_other,
-        const Mapping<dim> &                              mapping_other)
+        const Mapping<dim>                               &mapping_other)
   {
     AffineConstraints<double> constraints;
     {
@@ -280,9 +280,9 @@ public:
 
 public:
   const unsigned int                                 id;
-  const Mapping<dim> &                               mapping;
-  const FiniteElement<dim> &                         fe;
-  const Quadrature<dim> &                            quad;
+  const Mapping<dim>                                &mapping;
+  const FiniteElement<dim>                          &fe;
+  const Quadrature<dim>                             &quad;
   DoFHandler<dim>                                    dof_handler;
   std::shared_ptr<const Utilities::MPI::Partitioner> partitioner;
   LinearAlgebra::distributed::Vector<double>         solution;

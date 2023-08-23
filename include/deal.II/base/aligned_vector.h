@@ -575,7 +575,7 @@ private:
      */
     Deleter(AlignedVector<T> *owning_object,
             const bool        is_shmem_root,
-            T *               aligned_shmem_pointer,
+            T                *aligned_shmem_pointer,
             MPI_Comm          shmem_group_communicator,
             MPI_Win           shmem_window);
 #endif
@@ -633,7 +633,7 @@ private:
        * identify the MPI window in which the data resides.
        */
       MPISharedMemDeleterAction(const bool is_shmem_root,
-                                T *        aligned_shmem_pointer,
+                                T         *aligned_shmem_pointer,
                                 MPI_Comm   shmem_group_communicator,
                                 MPI_Win    shmem_window);
 
@@ -651,7 +651,7 @@ private:
        * all ancillary information to destroy this window.
        */
       const bool is_shmem_root;
-      T *        aligned_shmem_pointer;
+      T         *aligned_shmem_pointer;
       MPI_Comm   shmem_group_communicator;
       MPI_Win    shmem_window;
     };
@@ -876,7 +876,7 @@ namespace internal
      * elements, otherwise work in serial.
      */
     AlignedVectorInitialize(const std::size_t size,
-                            const T &         element,
+                            const T          &element,
                             T *const          destination)
       : element_(element)
       , destination_(destination)
@@ -928,7 +928,7 @@ namespace internal
     }
 
   private:
-    const T &  element_;
+    const T   &element_;
     mutable T *destination_;
     bool       trivial_element;
 
@@ -1055,7 +1055,7 @@ inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object)
 template <typename T>
 inline AlignedVector<T>::Deleter::Deleter(AlignedVector<T> *owning_object,
                                           const bool        is_shmem_root,
-                                          T *      aligned_shmem_pointer,
+                                          T       *aligned_shmem_pointer,
                                           MPI_Comm shmem_group_communicator,
                                           MPI_Win  shmem_window)
   : deleter_action_object(
@@ -1110,7 +1110,7 @@ AlignedVector<T>::Deleter::reset_owning_object(
 template <typename T>
 inline AlignedVector<T>::Deleter::MPISharedMemDeleterAction::
   MPISharedMemDeleterAction(const bool is_shmem_root,
-                            T *        aligned_shmem_pointer,
+                            T         *aligned_shmem_pointer,
                             MPI_Comm   shmem_group_communicator,
                             MPI_Win    shmem_window)
   : is_shmem_root(is_shmem_root)
@@ -1125,7 +1125,7 @@ template <typename T>
 inline void
 AlignedVector<T>::Deleter::MPISharedMemDeleterAction::delete_array(
   const AlignedVector<T> *aligned_vector,
-  T *                     ptr)
+  T                      *ptr)
 {
   (void)ptr;
   // It would be nice to assert that aligned_vector->elements.get() equals ptr,
@@ -1260,7 +1260,8 @@ AlignedVector<T>::resize_fast(const size_type new_size)
   if (new_size == 0)
     clear();
   else if (new_size == old_size)
-    {} // nothing to do here
+    {
+    } // nothing to do here
   else if (new_size < old_size)
     {
       // call destructor on fields that are released, if the type requires it.
@@ -1296,7 +1297,8 @@ AlignedVector<T>::resize(const size_type new_size)
   if (new_size == 0)
     clear();
   else if (new_size == old_size)
-    {} // nothing to do here
+    {
+    } // nothing to do here
   else if (new_size < old_size)
     {
       // call destructor on fields that are released, if the type requires it.
@@ -1330,7 +1332,8 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
   if (new_size == 0)
     clear();
   else if (new_size == old_size)
-    {} // nothing to do here
+    {
+    } // nothing to do here
   else if (new_size < old_size)
     {
       // call destructor on fields that are released, if the type requires it.
@@ -1403,7 +1406,8 @@ AlignedVector<T>::reserve(const size_type new_allocated_size)
   else if (new_allocated_size == 0)
     clear();
   else // size_alloc < allocated_size
-    {} // nothing to do here
+    {
+    } // nothing to do here
 }
 
 
@@ -1712,7 +1716,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // know anything about, and so setting this flag is backward compatible also
   // to older MPI versions.
   MPI_Win        shmem_window;
-  void *         base_ptr;
+  void          *base_ptr;
   const MPI_Aint align_by = 64;
   const MPI_Aint alloc_size =
     Utilities::MPI::broadcast(shmem_group_communicator,
@@ -1786,8 +1790,8 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // *think* that the following should do given that we do not use base_ptr and
   // available_space any further after the call to std::align.
   std::size_t available_space       = alloc_size;
-  void *      base_ptr_backup       = base_ptr;
-  T *         aligned_shmem_pointer = static_cast<T *>(
+  void       *base_ptr_backup       = base_ptr;
+  T          *aligned_shmem_pointer = static_cast<T *>(
     std::align(align_by, new_size * sizeof(T), base_ptr, available_space));
   Assert(aligned_shmem_pointer != nullptr, ExcInternalError());
 
@@ -2012,7 +2016,7 @@ inline void
 AlignedVector<T>::save(Archive &ar, const unsigned int) const
 {
   size_type vec_size = size();
-  ar &      vec_size;
+  ar       &vec_size;
   if (vec_size > 0)
     ar &boost::serialization::make_array(elements.get(), vec_size);
 }
@@ -2025,7 +2029,7 @@ inline void
 AlignedVector<T>::load(Archive &ar, const unsigned int)
 {
   size_type vec_size = 0;
-  ar &      vec_size;
+  ar       &vec_size;
 
   if (vec_size > 0)
     {

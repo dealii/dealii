@@ -162,9 +162,9 @@ namespace internal
     template <int dim, typename Number>
     void
     tridiagonalize(const dealii::SymmetricTensor<2, dim, Number> &A,
-                   dealii::Tensor<2, dim, Number> &               Q,
-                   std::array<Number, dim> &                      d,
-                   std::array<Number, dim - 1> &                  e)
+                   dealii::Tensor<2, dim, Number>                &Q,
+                   std::array<Number, dim>                       &d,
+                   std::array<Number, dim - 1>                   &e)
     {
       // Make things work with AD types
       using std::sqrt;

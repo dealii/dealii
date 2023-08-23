@@ -358,7 +358,7 @@ namespace PETScWrappers
 
 
     void
-    Vector::print(std::ostream &     out,
+    Vector::print(std::ostream      &out,
                   const unsigned int precision,
                   const bool         scientific,
                   const bool         across) const

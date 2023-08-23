@@ -33,7 +33,7 @@ public:
 template <int dim>
 void
 BoundaryValues<dim>::vector_value(const Point<dim> &p,
-                                  Vector<double> &  values) const
+                                  Vector<double>   &values) const
 {
   (void)p;
   for (unsigned int i = 0; i < values.size(); ++i)

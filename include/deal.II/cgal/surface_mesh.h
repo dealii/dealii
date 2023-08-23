@@ -66,8 +66,8 @@ namespace CGALWrappers
   void
   dealii_cell_to_cgal_surface_mesh(
     const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
-    const dealii::Mapping<dim, spacedim> &                              mapping,
-    CGAL::Surface_mesh<CGALPointType> &                                 mesh);
+    const dealii::Mapping<dim, spacedim>                               &mapping,
+    CGAL::Surface_mesh<CGALPointType>                                  &mesh);
 
   /**
    * Convert a deal.II triangulation to a CGAL::Surface_mesh. The output depends
@@ -87,7 +87,7 @@ namespace CGALWrappers
   void
   dealii_tria_to_cgal_surface_mesh(
     const dealii::Triangulation<dim, spacedim> &triangulation,
-    CGAL::Surface_mesh<CGALPointType> &         mesh);
+    CGAL::Surface_mesh<CGALPointType>          &mesh);
 } // namespace CGALWrappers
 
 

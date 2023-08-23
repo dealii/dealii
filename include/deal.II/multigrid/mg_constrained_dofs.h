@@ -76,7 +76,7 @@ public:
   template <int dim, int spacedim>
   void
   initialize(const DoFHandler<dim, spacedim> &dof,
-             const MGLevelObject<IndexSet> &  level_relevant_dofs =
+             const MGLevelObject<IndexSet>   &level_relevant_dofs =
                MGLevelObject<IndexSet>());
 
   /**
@@ -92,9 +92,9 @@ public:
   template <int dim, int spacedim>
   void
   make_zero_boundary_constraints(
-    const DoFHandler<dim, spacedim> &   dof,
+    const DoFHandler<dim, spacedim>    &dof,
     const std::set<types::boundary_id> &boundary_ids,
-    const ComponentMask &               component_mask = {});
+    const ComponentMask                &component_mask = {});
 
   /**
    * Add Dirichlet boundary dofs to the internal data structures
@@ -106,7 +106,7 @@ public:
   void
   add_boundary_indices(const DoFHandler<dim, spacedim> &dof,
                        const unsigned int               level,
-                       const IndexSet &                 boundary_indices);
+                       const IndexSet                  &boundary_indices);
 
   /**
    * Add user defined constraints to be used on level @p level.
@@ -275,7 +275,7 @@ template <int dim, int spacedim>
 inline void
 MGConstrainedDoFs::initialize(
   const DoFHandler<dim, spacedim> &dof,
-  const MGLevelObject<IndexSet> &  level_relevant_dofs)
+  const MGLevelObject<IndexSet>   &level_relevant_dofs)
 {
   boundary_indices.clear();
   refinement_edge_indices.clear();
@@ -376,9 +376,9 @@ MGConstrainedDoFs::initialize(
 template <int dim, int spacedim>
 inline void
 MGConstrainedDoFs::make_zero_boundary_constraints(
-  const DoFHandler<dim, spacedim> &   dof,
+  const DoFHandler<dim, spacedim>    &dof,
   const std::set<types::boundary_id> &boundary_ids,
-  const ComponentMask &               component_mask)
+  const ComponentMask                &component_mask)
 {
   // allocate an IndexSet for each global level. Contents will be
   // overwritten inside make_boundary_list.

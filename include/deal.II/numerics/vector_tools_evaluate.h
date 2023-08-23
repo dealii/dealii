@@ -148,14 +148,14 @@ namespace VectorTools
                                dim,
                                spacedim,
                                typename VectorType::value_type>::
-      value_type> point_values(const Mapping<dim> &           mapping,
+      value_type> point_values(const Mapping<dim>            &mapping,
                                const MeshType<dim, spacedim> &mesh,
-                               const VectorType &             vector,
+                               const VectorType              &vector,
                                const std::vector<Point<spacedim>>
                                  &evaluation_points,
                                Utilities::MPI::RemotePointEvaluation<dim,
                                                                      spacedim>
-                                 &                                    cache,
+                                                                     &cache,
                                const EvaluationFlags::EvaluationFlags flags =
                                  EvaluationFlags::avg,
                                const unsigned int first_selected_component = 0);
@@ -191,8 +191,8 @@ namespace VectorTools
                                typename VectorType::value_type>::
       value_type> point_values(const Utilities::MPI::
                                  RemotePointEvaluation<dim, spacedim> &cache,
-                               const MeshType<dim, spacedim> &         mesh,
-                               const VectorType &                      vector,
+                               const MeshType<dim, spacedim>          &mesh,
+                               const VectorType                       &vector,
                                const EvaluationFlags::EvaluationFlags  flags =
                                  EvaluationFlags::avg,
                                const unsigned int first_selected_component = 0);
@@ -224,9 +224,9 @@ namespace VectorTools
                                dim,
                                spacedim,
                                typename VectorType::value_type>::
-      gradient_type> point_gradients(const Mapping<dim> &           mapping,
+      gradient_type> point_gradients(const Mapping<dim>            &mapping,
                                      const MeshType<dim, spacedim> &mesh,
-                                     const VectorType &             vector,
+                                     const VectorType              &vector,
                                      const std::vector<Point<spacedim>>
                                        &evaluation_points,
                                      Utilities::MPI::RemotePointEvaluation<
@@ -267,9 +267,9 @@ namespace VectorTools
                                typename VectorType::value_type>::
       gradient_type> point_gradients(const Utilities::MPI::
                                        RemotePointEvaluation<dim, spacedim>
-                                         &                          cache,
+                                                                   &cache,
                                      const MeshType<dim, spacedim> &mesh,
-                                     const VectorType &             vector,
+                                     const VectorType              &vector,
                                      const EvaluationFlags::EvaluationFlags
                                        flags = EvaluationFlags::avg,
                                      const unsigned int
@@ -295,14 +295,14 @@ namespace VectorTools
                                dim,
                                spacedim,
                                typename VectorType::value_type>::
-      value_type> point_values(const Mapping<dim> &           mapping,
+      value_type> point_values(const Mapping<dim>            &mapping,
                                const MeshType<dim, spacedim> &mesh,
-                               const VectorType &             vector,
+                               const VectorType              &vector,
                                const std::vector<Point<spacedim>>
                                  &evaluation_points,
                                Utilities::MPI::RemotePointEvaluation<dim,
                                                                      spacedim>
-                                 &                                    cache,
+                                                                     &cache,
                                const EvaluationFlags::EvaluationFlags flags,
                                const unsigned int first_selected_component)
   {
@@ -328,9 +328,9 @@ namespace VectorTools
                                dim,
                                spacedim,
                                typename VectorType::value_type>::
-      gradient_type> point_gradients(const Mapping<dim> &           mapping,
+      gradient_type> point_gradients(const Mapping<dim>            &mapping,
                                      const MeshType<dim, spacedim> &mesh,
-                                     const VectorType &             vector,
+                                     const VectorType              &vector,
                                      const std::vector<Point<spacedim>>
                                        &evaluation_points,
                                      Utilities::MPI::RemotePointEvaluation<
@@ -357,7 +357,7 @@ namespace VectorTools
     template <typename T>
     T
     reduce(const EvaluationFlags::EvaluationFlags &flags,
-           const ArrayView<const T> &              values)
+           const ArrayView<const T>               &values)
     {
       switch (flags)
         {
@@ -385,7 +385,7 @@ namespace VectorTools
      */
     template <int rank, int dim, typename Number>
     Tensor<rank, dim, Number>
-    reduce(const EvaluationFlags::EvaluationFlags &          flags,
+    reduce(const EvaluationFlags::EvaluationFlags           &flags,
            const ArrayView<const Tensor<rank, dim, Number>> &values)
     {
       switch (flags)
@@ -453,10 +453,10 @@ namespace VectorTools
       const unsigned int i,
       const typename Utilities::MPI::RemotePointEvaluation<dim,
                                                            spacedim>::CellData
-        &                                                         cell_data,
+                                                                 &cell_data,
       const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-      const DoFHandler<dim, spacedim> &                           dof_handler,
-      const VectorType &                                          vector,
+      const DoFHandler<dim, spacedim>                            &dof_handler,
+      const VectorType                                           &vector,
       const UpdateFlags                                           update_flags,
       const dealii::EvaluationFlags::EvaluationFlags evaluation_flags,
       const unsigned int                             first_selected_component,
@@ -466,7 +466,7 @@ namespace VectorTools
                                            spacedim,
                                            typename VectorType::value_type> &,
                    const unsigned int &)>           process_quadrature_point,
-      const ArrayView<value_type> &                 values,
+      const ArrayView<value_type>                  &values,
       std::vector<typename VectorType::value_type> &solution_values,
       std::vector<
         std::unique_ptr<FEPointEvaluation<n_components,
@@ -521,8 +521,8 @@ namespace VectorTools
     template <int dim, int spacedim, typename Number>
     Number
     get_value(
-      const Triangulation<dim, spacedim> &                               tria,
-      const Vector<Number> &                                             vector,
+      const Triangulation<dim, spacedim>                                &tria,
+      const Vector<Number>                                              &vector,
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
     {
       (void)tria;
@@ -535,8 +535,8 @@ namespace VectorTools
     template <int dim, int spacedim, typename Number>
     Number
     get_value(
-      const Triangulation<dim, spacedim> &                               tria,
-      const LinearAlgebra::distributed::Vector<Number> &                 vector,
+      const Triangulation<dim, spacedim>                                &tria,
+      const LinearAlgebra::distributed::Vector<Number>                  &vector,
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
     {
       const auto distributed_tria =
@@ -596,7 +596,7 @@ namespace VectorTools
         &cell_data,
       const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &,
       const Triangulation<dim, spacedim> &triangulation,
-      const VectorType &                  vector,
+      const VectorType                   &vector,
       const UpdateFlags,
       const dealii::EvaluationFlags::EvaluationFlags evaluation_flags,
       const unsigned int                             first_selected_component,
@@ -649,8 +649,8 @@ namespace VectorTools
         &&concepts::is_triangulation_or_dof_handler<MeshType>)
     inline std::vector<value_type> evaluate_at_points(
       const Utilities::MPI::RemotePointEvaluation<dim, spacedim> &cache,
-      const MeshType &                                            mesh,
-      const VectorType &                                          vector,
+      const MeshType                                             &mesh,
+      const VectorType                                           &vector,
       const EvaluationFlags::EvaluationFlags                      flags,
       const unsigned int                             first_selected_component,
       const UpdateFlags                              update_flags,
@@ -679,7 +679,7 @@ namespace VectorTools
       const auto evaluation_point_results = [&]() {
         // helper function for accessing the global vector and interpolating
         // the results onto the points
-        const auto evaluation_function = [&](auto &      values,
+        const auto evaluation_function = [&](auto       &values,
                                              const auto &cell_data) {
           std::vector<typename VectorType::value_type> solution_values;
 
@@ -762,8 +762,8 @@ namespace VectorTools
                                typename VectorType::value_type>::
       value_type> point_values(const Utilities::MPI::
                                  RemotePointEvaluation<dim, spacedim> &cache,
-                               const MeshType<dim, spacedim> &         mesh,
-                               const VectorType &                      vector,
+                               const MeshType<dim, spacedim>          &mesh,
+                               const VectorType                       &vector,
                                const EvaluationFlags::EvaluationFlags  flags,
                                const unsigned int first_selected_component)
   {
@@ -807,9 +807,9 @@ namespace VectorTools
                                typename VectorType::value_type>::
       gradient_type> point_gradients(const Utilities::MPI::
                                        RemotePointEvaluation<dim, spacedim>
-                                         &                          cache,
+                                                                   &cache,
                                      const MeshType<dim, spacedim> &mesh,
-                                     const VectorType &             vector,
+                                     const VectorType              &vector,
                                      const EvaluationFlags::EvaluationFlags
                                        flags,
                                      const unsigned int

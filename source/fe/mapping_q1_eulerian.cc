@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, typename VectorType, int spacedim>
 MappingQ1Eulerian<dim, VectorType, spacedim>::MappingQ1Eulerian(
   const DoFHandler<dim, spacedim> &shiftmap_dof_handler,
-  const VectorType &               euler_transform_vectors)
+  const VectorType                &euler_transform_vectors)
   : MappingQ<dim, spacedim>(1)
   , euler_transform_vectors(&euler_transform_vectors)
   , shiftmap_dof_handler(&shiftmap_dof_handler)
@@ -132,7 +132,7 @@ CellSimilarity::Similarity
 MappingQ1Eulerian<dim, VectorType, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const CellSimilarity::Similarity,
-  const Quadrature<dim> &                                  quadrature,
+  const Quadrature<dim>                                   &quadrature,
   const typename Mapping<dim, spacedim>::InternalDataBase &internal_data,
   internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
     &output_data) const

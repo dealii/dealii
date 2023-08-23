@@ -875,7 +875,7 @@ namespace Step71
       // the @p constitutive_parameters, are all the fundamental quantities that
       // are required to compute the material response.
       virtual void update_internal_data(const SymmetricTensor<2, dim> &C,
-                                        const Tensor<1, dim> &         H,
+                                        const Tensor<1, dim>          &H,
                                         const DiscreteTime &time) = 0;
 
       // The next few functions provide the interface to probe the material
@@ -1145,7 +1145,7 @@ namespace Step71
       // we'll declare that this class will override all of these base class
       // methods.
       virtual void update_internal_data(const SymmetricTensor<2, dim> &C,
-                                        const Tensor<1, dim> &         H,
+                                        const Tensor<1, dim>          &H,
                                         const DiscreteTime &) override;
 
       virtual double get_psi() const override;
@@ -1231,7 +1231,7 @@ namespace Step71
     void
     Magnetoelastic_Constitutive_Law_AD<dim, ADTypeCode>::update_internal_data(
       const SymmetricTensor<2, dim> &C,
-      const Tensor<1, dim> &         H,
+      const Tensor<1, dim>          &H,
       const DiscreteTime &)
     {
       Assert(determinant(C) > 0, ExcInternalError());
@@ -1442,7 +1442,7 @@ namespace Step71
     {
     public:
       Magnetoviscoelastic_Constitutive_Law_SD(
-        const ConstitutiveParameters &               constitutive_parameters,
+        const ConstitutiveParameters                &constitutive_parameters,
         const Differentiation::SD::OptimizerType     optimizer_type,
         const Differentiation::SD::OptimizationFlags optimization_flags);
 
@@ -1453,7 +1453,7 @@ namespace Step71
       // within the `update_internal_data()` function, and cache the results
       // for layer extraction.
       virtual void update_internal_data(const SymmetricTensor<2, dim> &C,
-                                        const Tensor<1, dim> &         H,
+                                        const Tensor<1, dim>          &H,
                                         const DiscreteTime &time) override;
 
       virtual double get_psi() const override;
@@ -1572,7 +1572,7 @@ namespace Step71
       // The final method of this class will configure the @p optimizer.
       Differentiation::SD::types::substitution_map
       make_substitution_map(const SymmetricTensor<2, dim> &C,
-                            const Tensor<1, dim> &         H,
+                            const Tensor<1, dim>          &H,
                             const double                   delta_t) const;
 
       void initialize_optimizer();
@@ -1590,7 +1590,7 @@ namespace Step71
     template <int dim>
     Magnetoviscoelastic_Constitutive_Law_SD<dim>::
       Magnetoviscoelastic_Constitutive_Law_SD(
-        const ConstitutiveParameters &               constitutive_parameters,
+        const ConstitutiveParameters                &constitutive_parameters,
         const Differentiation::SD::OptimizerType     optimizer_type,
         const Differentiation::SD::OptimizationFlags optimization_flags)
       : Coupled_Magnetomechanical_Constitutive_Law_Base<dim>(
@@ -1632,7 +1632,7 @@ namespace Step71
     Differentiation::SD::types::substitution_map
     Magnetoviscoelastic_Constitutive_Law_SD<dim>::make_substitution_map(
       const SymmetricTensor<2, dim> &C,
-      const Tensor<1, dim> &         H,
+      const Tensor<1, dim>          &H,
       const double                   delta_t) const
     {
       return Differentiation::SD::make_substitution_map(
@@ -1848,8 +1848,8 @@ namespace Step71
     template <int dim>
     void Magnetoviscoelastic_Constitutive_Law_SD<dim>::update_internal_data(
       const SymmetricTensor<2, dim> &C,
-      const Tensor<1, dim> &         H,
-      const DiscreteTime &           time)
+      const Tensor<1, dim>          &H,
+      const DiscreteTime            &time)
     {
       // To update the internal history variable, we first need to compute
       // a few fundamental quantities, which we've seen before.
@@ -2245,7 +2245,7 @@ namespace Step71
         const ConstitutiveParameters &constitutive_parameters);
 
       virtual void update_internal_data(const SymmetricTensor<2, dim> &C,
-                                        const Tensor<1, dim> &         H,
+                                        const Tensor<1, dim>          &H,
                                         const DiscreteTime &) override;
 
       virtual double get_psi() const override;
@@ -2298,7 +2298,7 @@ namespace Step71
     template <int dim>
     void Magnetoelastic_Constitutive_Law<dim>::update_internal_data(
       const SymmetricTensor<2, dim> &C,
-      const Tensor<1, dim> &         H,
+      const Tensor<1, dim>          &H,
       const DiscreteTime &)
     {
       const double                  det_F = std::sqrt(determinant(C));
@@ -2775,7 +2775,7 @@ namespace Step71
         const ConstitutiveParameters &constitutive_parameters);
 
       virtual void update_internal_data(const SymmetricTensor<2, dim> &C,
-                                        const Tensor<1, dim> &         H,
+                                        const Tensor<1, dim>          &H,
                                         const DiscreteTime &time) override;
 
       virtual double get_psi() const override;
@@ -2816,7 +2816,7 @@ namespace Step71
       // internal variables, and will be called before we perform any
       // detailed calculations.
       void set_primary_variables(const SymmetricTensor<2, dim> &C,
-                                 const Tensor<1, dim> &         H) const;
+                                 const Tensor<1, dim>          &H) const;
 
       void update_internal_variable(const DiscreteTime &time);
 
@@ -2925,8 +2925,8 @@ namespace Step71
     template <int dim>
     void Magnetoviscoelastic_Constitutive_Law<dim>::update_internal_data(
       const SymmetricTensor<2, dim> &C,
-      const Tensor<1, dim> &         H,
-      const DiscreteTime &           time)
+      const Tensor<1, dim>          &H,
+      const DiscreteTime            &time)
     {
       // Record the applied deformation state as well as the magnetic load.
       // Thereafter, update internal (viscous) variable based on new deformation
@@ -2968,7 +2968,7 @@ namespace Step71
       // Intermediate quantities. Note that, since we're fetching these values
       // from a cache that has a lifetime that outlasts this function call, we
       // can alias the result rather than copying the value from the cache.
-      const double &                 det_F = get_det_F();
+      const double                  &det_F = get_det_F();
       const SymmetricTensor<2, dim> &C_inv = get_C_inv();
 
       const double &log_det_F         = get_log_det_F();
@@ -3275,7 +3275,7 @@ namespace Step71
     template <int dim>
     void Magnetoviscoelastic_Constitutive_Law<dim>::set_primary_variables(
       const SymmetricTensor<2, dim> &C,
-      const Tensor<1, dim> &         H) const
+      const Tensor<1, dim>          &H) const
     {
       // Set value for $\boldsymbol{\mathbb{H}}$.
       const std::string name_H("H");
@@ -3569,7 +3569,7 @@ namespace Step71
       const std::string name("d2H_dot_C_inv_dot_H_dC_dH");
       if (cache.stores_object_with_name(name) == false)
         {
-          const Tensor<1, dim> &         C_inv_dot_H = get_C_inv_dot_H();
+          const Tensor<1, dim>          &C_inv_dot_H = get_C_inv_dot_H();
           const SymmetricTensor<2, dim> &C_inv       = get_C_inv();
 
           Tensor<3, dim> d2H_dot_C_inv_dot_H_dC_dH;
@@ -3595,7 +3595,7 @@ namespace Step71
       const std::string name("d2H_dot_C_inv_dot_H_dC_dC");
       if (cache.stores_object_with_name(name) == false)
         {
-          const Tensor<1, dim> &         C_inv_dot_H = get_C_inv_dot_H();
+          const Tensor<1, dim>          &C_inv_dot_H = get_C_inv_dot_H();
           const SymmetricTensor<2, dim> &C_inv       = get_C_inv();
 
           SymmetricTensor<4, dim> d2H_dot_C_inv_dot_H_dC_dC;
@@ -3799,8 +3799,8 @@ namespace Step71
       Coupled_Magnetomechanical_Constitutive_Law_Base<dim>
         &material_hand_calculated,
       Coupled_Magnetomechanical_Constitutive_Law_Base<dim>
-        &                material_assisted_computation,
-      TimerOutput &      timer,
+                        &material_assisted_computation,
+      TimerOutput       &timer,
       const std::string &filename)
     {
       // We can take the hand-implemented constitutive law and compare the

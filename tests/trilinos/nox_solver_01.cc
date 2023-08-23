@@ -130,8 +130,8 @@ main(int argc, char **argv)
     {
     public:
       bool
-      computeF(const Epetra_Vector &                      x,
-               Epetra_Vector &                            f,
+      computeF(const Epetra_Vector                       &x,
+               Epetra_Vector                             &f,
                NOX::Epetra::Interface::Required::FillType F) override
       {
         (void)F;

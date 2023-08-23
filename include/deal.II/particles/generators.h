@@ -65,9 +65,9 @@ namespace Particles
     void
     regular_reference_locations(
       const Triangulation<dim, spacedim> &triangulation,
-      const std::vector<Point<dim>> &     particle_reference_locations,
-      ParticleHandler<dim, spacedim> &    particle_handler,
-      const Mapping<dim, spacedim> &      mapping =
+      const std::vector<Point<dim>>      &particle_reference_locations,
+      ParticleHandler<dim, spacedim>     &particle_handler,
+      const Mapping<dim, spacedim>       &mapping =
         (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
            .template get_default_linear_mapping<dim, spacedim>()
@@ -110,7 +110,7 @@ namespace Particles
     random_particle_in_cell(
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
       const types::particle_index                                        id,
-      std::mt19937 &                random_number_generator,
+      std::mt19937                 &random_number_generator,
       const Mapping<dim, spacedim> &mapping =
         (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
@@ -131,9 +131,9 @@ namespace Particles
     random_particle_in_cell_insert(
       const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
       const types::particle_index                                        id,
-      std::mt19937 &                  random_number_generator,
+      std::mt19937                   &random_number_generator,
       ParticleHandler<dim, spacedim> &particle_handler,
-      const Mapping<dim, spacedim> &  mapping =
+      const Mapping<dim, spacedim>   &mapping =
         (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
            .template get_default_linear_mapping<dim, spacedim>()
@@ -190,11 +190,11 @@ namespace Particles
     void
     probabilistic_locations(
       const Triangulation<dim, spacedim> &triangulation,
-      const Function<spacedim> &          probability_density_function,
+      const Function<spacedim>           &probability_density_function,
       const bool                          random_cell_selection,
       const types::particle_index         n_particles_to_create,
-      ParticleHandler<dim, spacedim> &    particle_handler,
-      const Mapping<dim, spacedim> &      mapping =
+      ParticleHandler<dim, spacedim>     &particle_handler,
+      const Mapping<dim, spacedim>       &mapping =
         (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
            .template get_default_linear_mapping<dim, spacedim>()),
@@ -243,16 +243,16 @@ namespace Particles
     dof_support_points(
       const DoFHandler<dim, spacedim> &dof_handler,
       const std::vector<std::vector<BoundingBox<spacedim>>>
-        &                             global_bounding_boxes,
+                                     &global_bounding_boxes,
       ParticleHandler<dim, spacedim> &particle_handler,
-      const Mapping<dim, spacedim> &  mapping =
+      const Mapping<dim, spacedim>   &mapping =
         (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
            .template get_default_linear_mapping<dim, spacedim>()),
 #else
            .ReferenceCell::get_default_linear_mapping<dim, spacedim>()),
 #endif
-      const ComponentMask &                   components = {},
+      const ComponentMask                    &components = {},
       const std::vector<std::vector<double>> &properties = {});
 
     /**
@@ -293,11 +293,11 @@ namespace Particles
     void
     quadrature_points(
       const Triangulation<dim, spacedim> &triangulation,
-      const Quadrature<dim> &             quadrature,
+      const Quadrature<dim>              &quadrature,
       const std::vector<std::vector<BoundingBox<spacedim>>>
-        &                             global_bounding_boxes,
+                                     &global_bounding_boxes,
       ParticleHandler<dim, spacedim> &particle_handler,
-      const Mapping<dim, spacedim> &  mapping =
+      const Mapping<dim, spacedim>   &mapping =
         (ReferenceCells::get_hypercube<dim>()
            .template get_default_linear_mapping<dim, spacedim>()),
       const std::vector<std::vector<double>> &properties = {});

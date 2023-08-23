@@ -112,7 +112,7 @@ struct IncompressibleNeoHookeanPrincipalStretches
     SymmetricTensor<2, dim, NumberType> C_inv;
     for (unsigned int d = 0; d < dim; ++d)
       {
-        const NumberType &                lambda_squared = eig_C[d].first;
+        const NumberType                 &lambda_squared = eig_C[d].first;
         const Tensor<1, dim, NumberType> &N              = eig_C[d].second;
         C_inv +=
           NumberType(1.0 / lambda_squared) * symmetrize(outer_product(N, N));

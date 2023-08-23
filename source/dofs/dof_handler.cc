@@ -310,7 +310,7 @@ namespace internal
       reserve_subentities(DoFHandler<dim, spacedim> &dof_handler,
                           const unsigned int         structdim,
                           const unsigned int         n_raw_entities,
-                          const T &                  cell_process)
+                          const T                   &cell_process)
       {
         if (dof_handler.tria->n_cells() == 0)
           return;
@@ -1338,7 +1338,7 @@ namespace internal
               auto unpack =
                 [&dof_handler](
                   const typename DoFHandler<dim, spacedim>::active_cell_iterator
-                    &                   cell,
+                                       &cell,
                   const types::fe_index active_fe_index) -> void {
                 // we would like to say
                 //   cell->set_active_fe_index(active_fe_index);
@@ -1428,7 +1428,7 @@ namespace internal
               auto unpack =
                 [&dof_handler](
                   const typename DoFHandler<dim, spacedim>::active_cell_iterator
-                    &                   cell,
+                                       &cell,
                   const types::fe_index future_fe_index) -> void {
                 dof_handler
                   .hp_cell_future_fe_indices[cell->level()][cell->index()] =
@@ -1604,7 +1604,7 @@ namespace internal
         static types::fe_index
         determine_fe_from_children(
           const typename Triangulation<dim, spacedim>::cell_iterator &,
-          const std::vector<types::fe_index> &           children_fe_indices,
+          const std::vector<types::fe_index>            &children_fe_indices,
           const dealii::hp::FECollection<dim, spacedim> &fe_collection)
         {
           Assert(!children_fe_indices.empty(), ExcInternalError());

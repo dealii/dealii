@@ -87,12 +87,12 @@ namespace Maxwell
 
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
-                      std::vector<Vector<double>> &  values) const;
+                      std::vector<Vector<double>>   &values) const;
 
 
     void
     curl_value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Vector<double>> &  value_list);
+                    std::vector<Vector<double>>   &value_list);
   };
 
   template <int dim>
@@ -103,7 +103,7 @@ namespace Maxwell
   void
   ExactSolution<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  value_list) const
+    std::vector<Vector<double>>   &value_list) const
   {
     Assert(value_list.size() == points.size(),
            ExcDimensionMismatch(value_list.size(), points.size()));
@@ -123,7 +123,7 @@ namespace Maxwell
   template <int dim>
   void
   ExactSolution<dim>::curl_value_list(const std::vector<Point<dim>> &points,
-                                      std::vector<Vector<double>> &  value_list)
+                                      std::vector<Vector<double>>   &value_list)
   {
     Assert(value_list.size() == points.size(),
            ExcDimensionMismatch(value_list.size(), points.size()));

@@ -100,7 +100,7 @@ public:
 
   virtual void
   vector_value_list(const std::vector<Point<dim>> &points,
-                    std::vector<Vector<double>> &  value_list) const;
+                    std::vector<Vector<double>>   &value_list) const;
 };
 
 
@@ -113,7 +113,7 @@ RightHandSide<dim>::RightHandSide()
 template <int dim>
 inline void
 RightHandSide<dim>::vector_value(const Point<dim> &p,
-                                 Vector<double> &  values) const
+                                 Vector<double>   &values) const
 {
   Assert(values.size() == dim, ExcDimensionMismatch(values.size(), dim));
   Assert(dim >= 2, ExcNotImplemented());
@@ -140,7 +140,7 @@ template <int dim>
 void
 RightHandSide<dim>::vector_value_list(
   const std::vector<Point<dim>> &points,
-  std::vector<Vector<double>> &  value_list) const
+  std::vector<Vector<double>>   &value_list) const
 {
   Assert(value_list.size() == points.size(),
          ExcDimensionMismatch(value_list.size(), points.size()));

@@ -87,7 +87,7 @@ namespace Step12
   public:
     BoundaryValues() = default;
     virtual void value_list(const std::vector<Point<dim>> &points,
-                            std::vector<double> &          values,
+                            std::vector<double>           &values,
                             const unsigned int component = 0) const override;
   };
 
@@ -98,7 +98,7 @@ namespace Step12
   // scheme.
   template <int dim>
   void BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
-                                       std::vector<double> &          values,
+                                       std::vector<double>           &values,
                                        const unsigned int component) const
   {
     (void)component;
@@ -205,8 +205,8 @@ namespace Step12
     // bound.
     static void integrate_cell_term(DoFInfo &dinfo, CellInfo &info);
     static void integrate_boundary_term(DoFInfo &dinfo, CellInfo &info);
-    static void integrate_face_term(DoFInfo & dinfo1,
-                                    DoFInfo & dinfo2,
+    static void integrate_face_term(DoFInfo  &dinfo1,
+                                    DoFInfo  &dinfo2,
                                     CellInfo &info1,
                                     CellInfo &info2);
   };
@@ -331,14 +331,14 @@ namespace Step12
   // just above. They compute the local contributions to the system matrix and
   // right hand side on cells and faces.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_cell_term(DoFInfo & dinfo,
+  void AdvectionProblem<dim>::integrate_cell_term(DoFInfo  &dinfo,
                                                   CellInfo &info)
   {
     // First, let us retrieve some of the objects used here from @p info. Note
     // that these objects can handle much more complex structures, thus the
     // access here looks more complicated than might seem necessary.
-    const FEValuesBase<dim> &  fe_values    = info.fe_values();
-    FullMatrix<double> &       local_matrix = dinfo.matrix(0).matrix;
+    const FEValuesBase<dim>   &fe_values    = info.fe_values();
+    FullMatrix<double>        &local_matrix = dinfo.matrix(0).matrix;
     const std::vector<double> &JxW          = fe_values.get_JxW_values();
 
     // With these objects, we continue local integration like always. First, we
@@ -364,14 +364,14 @@ namespace Step12
   // base class for both FEFaceValues and FESubfaceValues, in order to get
   // access to normal vectors.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_boundary_term(DoFInfo & dinfo,
+  void AdvectionProblem<dim>::integrate_boundary_term(DoFInfo  &dinfo,
                                                       CellInfo &info)
   {
     const FEValuesBase<dim> &fe_face_values = info.fe_values();
-    FullMatrix<double> &     local_matrix   = dinfo.matrix(0).matrix;
-    Vector<double> &         local_vector   = dinfo.vector(0).block(0);
+    FullMatrix<double>      &local_matrix   = dinfo.matrix(0).matrix;
+    Vector<double>          &local_vector   = dinfo.vector(0).block(0);
 
-    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
+    const std::vector<double>         &JxW = fe_face_values.get_JxW_values();
     const std::vector<Tensor<1, dim>> &normals =
       fe_face_values.get_normal_vectors();
 
@@ -405,8 +405,8 @@ namespace Step12
   // two info objects, one for each cell adjacent to the face and we assemble
   // four matrices, one for each cell and two for coupling back and forth.
   template <int dim>
-  void AdvectionProblem<dim>::integrate_face_term(DoFInfo & dinfo1,
-                                                  DoFInfo & dinfo2,
+  void AdvectionProblem<dim>::integrate_face_term(DoFInfo  &dinfo1,
+                                                  DoFInfo  &dinfo2,
                                                   CellInfo &info1,
                                                   CellInfo &info2)
   {
@@ -436,7 +436,7 @@ namespace Step12
     // hand side vectors. Fortunately, the interface terms only involve the
     // solution and the right hand side does not receive any contributions.
 
-    const std::vector<double> &        JxW = fe_face_values.get_JxW_values();
+    const std::vector<double>         &JxW = fe_face_values.get_JxW_values();
     const std::vector<Tensor<1, dim>> &normals =
       fe_face_values.get_normal_vectors();
 

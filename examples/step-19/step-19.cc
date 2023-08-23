@@ -137,7 +137,7 @@ namespace Step19
     void create_particles();
     void move_particles();
     void track_lost_particle(
-      const typename Particles::ParticleIterator<dim> &        particle,
+      const typename Particles::ParticleIterator<dim>         &particle,
       const typename Triangulation<dim>::active_cell_iterator &cell);
 
 
@@ -210,7 +210,7 @@ namespace Step19
     , time(0, 1e-4)
   {
     particle_handler.signals.particle_lost.connect(
-      [this](const typename Particles::ParticleIterator<dim> &        particle,
+      [this](const typename Particles::ParticleIterator<dim>         &particle,
              const typename Triangulation<dim>::active_cell_iterator &cell) {
         this->track_lost_particle(particle, cell);
       });
@@ -753,7 +753,7 @@ namespace Step19
   // the hole and increment a counter.
   template <int dim>
   void CathodeRaySimulator<dim>::track_lost_particle(
-    const typename Particles::ParticleIterator<dim> &        particle,
+    const typename Particles::ParticleIterator<dim>         &particle,
     const typename Triangulation<dim>::active_cell_iterator &cell)
   {
     ++n_recently_lost_particles;

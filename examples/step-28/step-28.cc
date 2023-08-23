@@ -412,7 +412,7 @@ namespace Step28
     // DoF handler member variables private, and do not have to grant external
     // use to it, enhancing encapsulation:
     EnergyGroup(const unsigned int        group,
-                const MaterialData &      material_data,
+                const MaterialData       &material_data,
                 const Triangulation<dim> &coarse_grid,
                 const FiniteElement<dim> &fe);
 
@@ -515,10 +515,10 @@ namespace Step28
     // coarser of the two cells to the finer one:
   private:
     void assemble_cross_group_rhs_recursive(
-      const EnergyGroup<dim> &                       g_prime,
+      const EnergyGroup<dim>                        &g_prime,
       const typename DoFHandler<dim>::cell_iterator &cell_g,
       const typename DoFHandler<dim>::cell_iterator &cell_g_prime,
-      const FullMatrix<double> &                     prolongation_matrix);
+      const FullMatrix<double>                      &prolongation_matrix);
   };
 
 
@@ -531,7 +531,7 @@ namespace Step28
   // members, thereby enabling us to make these data members private.
   template <int dim>
   EnergyGroup<dim>::EnergyGroup(const unsigned int        group,
-                                const MaterialData &      material_data,
+                                const MaterialData       &material_data,
                                 const Triangulation<dim> &coarse_grid,
                                 const FiniteElement<dim> &fe)
     : group(group)
@@ -835,10 +835,10 @@ namespace Step28
   // active. These two cases will be discussed below:
   template <int dim>
   void EnergyGroup<dim>::assemble_cross_group_rhs_recursive(
-    const EnergyGroup<dim> &                       g_prime,
+    const EnergyGroup<dim>                        &g_prime,
     const typename DoFHandler<dim>::cell_iterator &cell_g,
     const typename DoFHandler<dim>::cell_iterator &cell_g_prime,
-    const FullMatrix<double> &                     prolongation_matrix)
+    const FullMatrix<double>                      &prolongation_matrix)
   {
     // The first case is that both cells are no further refined. In that case,
     // we can assemble the relevant terms (see the introduction). This
@@ -1194,7 +1194,7 @@ namespace Step28
     // describing the material parameters for the number of energy groups
     // requested in the input file, and (iii) the finite element to be used by
     // all energy groups:
-    const Parameters & parameters;
+    const Parameters  &parameters;
     const MaterialData material_data;
     FE_Q<dim>          fe;
 

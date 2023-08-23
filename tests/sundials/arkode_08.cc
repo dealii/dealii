@@ -90,16 +90,16 @@ main()
   };
 
   ode.jacobian_times_vector = [&](const VectorType &v,
-                                  VectorType &      Jv,
+                                  VectorType       &Jv,
                                   double            t,
                                   const VectorType &y,
                                   const VectorType &fy) { K.vmult(Jv, v); };
 
   const auto solve_function =
-    [&](SUNDIALS::SundialsOperator<VectorType> &      op,
+    [&](SUNDIALS::SundialsOperator<VectorType>       &op,
         SUNDIALS::SundialsPreconditioner<VectorType> &prec,
-        VectorType &                                  x,
-        const VectorType &                            b,
+        VectorType                                   &x,
+        const VectorType                             &b,
         double                                        tol) {
       ReductionControl     control;
       SolverCG<VectorType> solver_cg(control);
@@ -127,7 +127,7 @@ main()
 
   ode.mass_times_vector = [&](const double      t,
                               const VectorType &v,
-                              VectorType &      Mv) { M.vmult(Mv, v); };
+                              VectorType       &Mv) { M.vmult(Mv, v); };
 
 
   ode.output_step =

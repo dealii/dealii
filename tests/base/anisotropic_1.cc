@@ -30,7 +30,7 @@ using namespace Polynomials;
 
 template <int dim, class PolynomialType1, class PolynomialType2>
 void
-check_poly(const Point<dim> &     x,
+check_poly(const Point<dim>      &x,
            const PolynomialType1 &p,
            const PolynomialType2 &q)
 {

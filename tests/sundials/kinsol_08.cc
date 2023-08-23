@@ -33,8 +33,8 @@ namespace
   void
   kinsol_info_callback(const char *module,
                        const char *function,
-                       char *      msg,
-                       void *      ih_data)
+                       char       *msg,
+                       void       *ih_data)
   {
     (void)ih_data;
     deallog << "KINSOL info: " << module << ":" << function << ": " << msg

@@ -100,7 +100,7 @@ namespace internal
         const unsigned int                                    mg_level,
         const TriaIterator<DoFCellAccessor<dim, dim, false>> &cell,
         const dealii::AffineConstraints<typename Number::value_type>
-          &                                                       constraints,
+                                                                 &constraints,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       /**
@@ -112,7 +112,7 @@ namespace internal
       void
       read_dof_indices(
         const unsigned int                                        cell_no,
-        const std::vector<types::global_dof_index> &              dof_indices,
+        const std::vector<types::global_dof_index>               &dof_indices,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
       void
@@ -120,9 +120,9 @@ namespace internal
 
       template <typename T, typename VectorType>
       void
-      read_write_operation(const T &          operation,
-                           VectorType &       global_vector,
-                           Number *           local_vector,
+      read_write_operation(const T           &operation,
+                           VectorType        &global_vector,
+                           Number            *local_vector,
                            const unsigned int first_cell,
                            const unsigned int n_cells,
                            const unsigned int n_dofs_per_cell,
@@ -314,9 +314,9 @@ namespace internal
     ConstraintInfo<dim, Number>::read_dof_indices(
       const unsigned int                                            cell_no,
       const unsigned int                                            mg_level,
-      const TriaIterator<DoFCellAccessor<dim, dim, false>> &        cell,
+      const TriaIterator<DoFCellAccessor<dim, dim, false>>         &cell,
       const dealii::AffineConstraints<typename Number::value_type> &constraints,
-      const std::shared_ptr<const Utilities::MPI::Partitioner> &    partitioner)
+      const std::shared_ptr<const Utilities::MPI::Partitioner>     &partitioner)
     {
       std::vector<types::global_dof_index> local_dof_indices(
         cell->get_fe().n_dofs_per_cell());
@@ -391,7 +391,7 @@ namespace internal
           // dof is constrained
           if (entries_ptr != nullptr)
             {
-              const auto &                  entries   = *entries_ptr;
+              const auto                   &entries   = *entries_ptr;
               const types::global_dof_index n_entries = entries.size();
               if (n_entries == 1 &&
                   std::abs(entries[0].second - 1.) <
@@ -574,9 +574,9 @@ namespace internal
     template <typename T, typename VectorType>
     inline void
     ConstraintInfo<dim, Number>::read_write_operation(
-      const T &          operation,
-      VectorType &       global_vector,
-      Number *           local_vector,
+      const T           &operation,
+      VectorType        &global_vector,
+      Number            *local_vector,
       const unsigned int first_cell,
       const unsigned int n_cells,
       const unsigned int n_dofs_per_cell,

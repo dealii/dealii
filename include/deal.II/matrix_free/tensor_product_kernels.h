@@ -121,8 +121,8 @@ namespace internal
             typename Number2>
   std::enable_if_t<(variant == evaluate_general), void>
   apply_matrix_vector_product(const Number2 *matrix,
-                              const Number * in,
-                              Number *       out)
+                              const Number  *in,
+                              Number        *out)
   {
     // We can only statically assert that one argument is non-zero because
     // face evaluation might instantiate some functions, so we need to use the
@@ -178,8 +178,8 @@ namespace internal
             typename Number2>
   std::enable_if_t<(variant == evaluate_general), void>
   apply_matrix_vector_product(const Number2 *matrix,
-                              const Number * in,
-                              Number *       out,
+                              const Number  *in,
+                              Number        *out,
                               const int      n_rows,
                               const int      n_columns,
                               const int      stride_in,
@@ -280,8 +280,8 @@ namespace internal
             typename Number2>
   std::enable_if_t<(variant == evaluate_symmetric), void>
   apply_matrix_vector_product(const Number2 *matrix,
-                              const Number * in,
-                              Number *       out)
+                              const Number  *in,
+                              Number        *out)
   {
     // We can only statically assert that one argument is non-zero because
     // face evaluation might instantiate some functions, so we need to use the
@@ -683,8 +683,8 @@ namespace internal
 #endif
     std::enable_if_t<(variant == evaluate_evenodd), void>
     apply_matrix_vector_product(const Number2 *matrix,
-                                const Number * in,
-                                Number *       out,
+                                const Number  *in,
+                                Number        *out,
                                 int            n_rows_runtime     = 0,
                                 int            n_columns_runtime  = 0,
                                 int            stride_in_runtime  = 0,
@@ -865,8 +865,8 @@ namespace internal
             typename Number2>
   std::enable_if_t<(variant == evaluate_evenodd), void>
   apply_matrix_vector_product(const Number2 *matrix,
-                              const Number * in,
-                              Number *       out,
+                              const Number  *in,
+                              Number        *out,
                               int            n_rows,
                               int            n_columns,
                               int            stride_in,
@@ -912,8 +912,8 @@ namespace internal
             typename Number2>
   std::enable_if_t<(variant == evaluate_symmetric_hierarchical), void>
   apply_matrix_vector_product(const Number2 *matrix,
-                              const Number * in,
-                              Number *       out)
+                              const Number  *in,
+                              Number        *out)
   {
     static_assert(n_rows > 0 && n_columns > 0,
                   "Specialization requires n_rows, n_columns > 0");
@@ -1152,9 +1152,9 @@ namespace internal
     /**
      * Constructor, taking the data from ShapeInfo via raw pointers
      */
-    EvaluatorTensorProduct(const Number2 *    shape_values,
-                           const Number2 *    shape_gradients,
-                           const Number2 *    shape_hessians,
+    EvaluatorTensorProduct(const Number2     *shape_values,
+                           const Number2     *shape_gradients,
+                           const Number2     *shape_hessians,
                            const unsigned int dummy1 = 0,
                            const unsigned int dummy2 = 0)
       : shape_values(shape_values)
@@ -1266,8 +1266,8 @@ namespace internal
               EvaluatorQuantity = EvaluatorQuantity::value>
     static void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out);
+          const Number                   *in,
+          Number                         *out);
 
     /**
      * This function applies the tensor product operation to produce face values
@@ -1328,8 +1328,8 @@ namespace internal
   inline void
   EvaluatorTensorProduct<variant, dim, n_rows, n_columns, Number, Number2>::
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out)
+          const Number                   *in,
+          Number                         *out)
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
@@ -1600,9 +1600,9 @@ namespace internal
     /**
      * Constructor, taking the data from ShapeInfo
      */
-    EvaluatorTensorProduct(const Number2 *    shape_values,
-                           const Number2 *    shape_gradients,
-                           const Number2 *    shape_hessians,
+    EvaluatorTensorProduct(const Number2     *shape_values,
+                           const Number2     *shape_gradients,
+                           const Number2     *shape_hessians,
                            const unsigned int n_rows    = 0,
                            const unsigned int n_columns = 0)
       : shape_values(shape_values)
@@ -1685,8 +1685,8 @@ namespace internal
               EvaluatorQuantity quantity = EvaluatorQuantity::value>
     void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out) const;
+          const Number                   *in,
+          Number                         *out) const;
 
     template <int  face_direction,
               bool contract_onto_face,
@@ -1696,9 +1696,9 @@ namespace internal
     apply_face(const Number *DEAL_II_RESTRICT in,
                Number *DEAL_II_RESTRICT       out) const;
 
-    const Number2 *    shape_values;
-    const Number2 *    shape_gradients;
-    const Number2 *    shape_hessians;
+    const Number2     *shape_values;
+    const Number2     *shape_gradients;
+    const Number2     *shape_hessians;
     const unsigned int n_rows;
     const unsigned int n_columns;
   };
@@ -1717,8 +1717,8 @@ namespace internal
   inline void
   EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>::apply(
     const Number2 *DEAL_II_RESTRICT shape_data,
-    const Number *                  in,
-    Number *                        out) const
+    const Number                   *in,
+    Number                         *out) const
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
@@ -2075,8 +2075,8 @@ namespace internal
               bool one_line = false>
     static void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number *                  in,
-          Number *                        out);
+          const Number                   *in,
+          Number                         *out);
 
     template <int  face_direction,
               bool contract_onto_face,
@@ -2108,8 +2108,8 @@ namespace internal
     normal_dir,
     Number,
     Number2>::apply(const Number2 *DEAL_II_RESTRICT shape_data,
-                    const Number *                  in,
-                    Number *                        out)
+                    const Number                   *in,
+                    Number                         *out)
   {
     static_assert(one_line == false || direction == dim - 1,
                   "Single-line evaluation only works for direction=dim-1.");
@@ -2434,9 +2434,9 @@ namespace internal
   template <int dim, typename Number>
   inline void
   compute_values_of_array(
-    dealii::ndarray<Number, 2, dim> *                   shapes,
+    dealii::ndarray<Number, 2, dim>                    *shapes,
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const Point<dim, Number> &                          p,
+    const Point<dim, Number>                           &p,
     const unsigned int                                  derivative = 1)
   {
     const int n_shapes = poly.size();
@@ -2481,11 +2481,11 @@ namespace internal
 #endif
       std::array<typename ProductTypeNoPoint<Number, Number2>::type,
                  2 + n_values>
-      do_interpolate_xy(const Number *                          values,
-                        const std::vector<unsigned int> &       renumber,
+      do_interpolate_xy(const Number                           *values,
+                        const std::vector<unsigned int>        &renumber,
                         const dealii::ndarray<Number2, 2, dim> *shapes,
                         const int n_shapes_runtime,
-                        int &     i)
+                        int      &i)
   {
     static_assert(0 <= dim && dim <= 3, "Only dim=0,1,2,3 implemented");
     static_assert(1 <= n_values && n_values <= 2,
@@ -2571,8 +2571,8 @@ namespace internal
   evaluate_tensor_product_value_and_gradient_shapes(
     const dealii::ndarray<Number2, 2, dim> *shapes,
     const int                               n_shapes,
-    const Number *                          values,
-    const std::vector<unsigned int> &       renumber = {})
+    const Number                           *values,
+    const std::vector<unsigned int>        &renumber = {})
   {
     static_assert(0 <= dim && dim <= 3, "Only dim=0,1,2,3 implemented");
     static_assert(1 <= n_values && n_values <= 2,
@@ -2670,8 +2670,8 @@ namespace internal
                     dim + n_values>
   evaluate_tensor_product_value_and_gradient_linear(
     const unsigned int               n_shapes,
-    const Number *                   values,
-    const Point<dim, Number2> &      p,
+    const Number                    *values,
+    const Point<dim, Number2>       &p,
     const std::vector<unsigned int> &renumber = {})
   {
     static_assert(0 <= dim && dim <= 3, "Only dim=0,1,2,3 implemented");
@@ -2802,10 +2802,10 @@ namespace internal
     Tensor<1, dim, typename ProductTypeNoPoint<Number, Number2>::type>>
   evaluate_tensor_product_value_and_gradient(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number> &                         values,
-    const Point<dim, Number2> &                         p,
+    const std::vector<Number>                          &values,
+    const Point<dim, Number2>                          &p,
     const bool                                          d_linear = false,
-    const std::vector<unsigned int> &                   renumber = {})
+    const std::vector<unsigned int>                    &renumber = {})
   {
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
 
@@ -2842,11 +2842,11 @@ namespace internal
     DEAL_II_ALWAYS_INLINE
 #endif
     typename ProductTypeNoPoint<Number, Number2>::type
-    do_interpolate_xy_value(const Number *                          values,
-                            const std::vector<unsigned int> &       renumber,
+    do_interpolate_xy_value(const Number                           *values,
+                            const std::vector<unsigned int>        &renumber,
                             const dealii::ndarray<Number2, 2, dim> *shapes,
                             const int n_shapes_runtime,
-                            int &     i)
+                            int      &i)
   {
     const int n_shapes = length > 0 ? length : n_shapes_runtime;
     using Number3      = typename ProductTypeNoPoint<Number, Number2>::type;
@@ -2880,8 +2880,8 @@ namespace internal
   evaluate_tensor_product_value_shapes(
     const dealii::ndarray<Number2, 2, dim> *shapes,
     const int                               n_shapes,
-    const Number *                          values,
-    const std::vector<unsigned int> &       renumber = {})
+    const Number                           *values,
+    const std::vector<unsigned int>        &renumber = {})
   {
     static_assert(dim >= 0 && dim <= 3, "Only dim=0,1,2,3 implemented");
 
@@ -2945,8 +2945,8 @@ namespace internal
   inline typename ProductTypeNoPoint<Number, Number2>::type
   evaluate_tensor_product_value_linear(
     const unsigned int               n_shapes,
-    const Number *                   values,
-    const Point<dim, Number2> &      p,
+    const Number                    *values,
+    const Point<dim, Number2>       &p,
     const std::vector<unsigned int> &renumber = {})
   {
     (void)n_shapes;
@@ -3002,10 +3002,10 @@ namespace internal
   inline typename ProductTypeNoPoint<Number, Number2>::type
   evaluate_tensor_product_value(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number> &                         values,
-    const Point<dim, Number2> &                         p,
+    const std::vector<Number>                          &values,
+    const Point<dim, Number2>                          &p,
     const bool                                          d_linear = false,
-    const std::vector<unsigned int> &                   renumber = {})
+    const std::vector<unsigned int>                    &renumber = {})
   {
     typename ProductTypeNoPoint<Number, Number2>::type result;
     if (d_linear)
@@ -3041,9 +3041,9 @@ namespace internal
   inline Tensor<1, 1, typename ProductTypeNoPoint<Number, Number2>::type>
   evaluate_tensor_product_higher_derivatives(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number> &                         values,
-    const Point<1, Number2> &                           p,
-    const std::vector<unsigned int> &                   renumber = {})
+    const std::vector<Number>                          &values,
+    const Point<1, Number2>                            &p,
+    const std::vector<unsigned int>                    &renumber = {})
   {
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
 
@@ -3081,9 +3081,9 @@ namespace internal
                 typename ProductTypeNoPoint<Number, Number2>::type>
   evaluate_tensor_product_higher_derivatives(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number> &                         values,
-    const Point<2, Number2> &                           p,
-    const std::vector<unsigned int> &                   renumber = {})
+    const std::vector<Number>                          &values,
+    const Point<2, Number2>                            &p,
+    const std::vector<unsigned int>                    &renumber = {})
   {
     using Number3     = typename ProductTypeNoPoint<Number, Number2>::type;
     constexpr int dim = 2;
@@ -3133,9 +3133,9 @@ namespace internal
                 typename ProductTypeNoPoint<Number, Number2>::type>
   evaluate_tensor_product_higher_derivatives(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number> &                         values,
-    const Point<3, Number2> &                           p,
-    const std::vector<unsigned int> &                   renumber = {})
+    const std::vector<Number>                          &values,
+    const Point<3, Number2>                            &p,
+    const std::vector<unsigned int>                    &renumber = {})
   {
     using Number3     = typename ProductTypeNoPoint<Number, Number2>::type;
     constexpr int dim = 3;
@@ -3197,9 +3197,9 @@ namespace internal
   SymmetricTensor<2, dim, typename ProductTypeNoPoint<Number, Number2>::type>
   evaluate_tensor_product_hessian(
     const std::vector<Polynomials::Polynomial<double>> &poly,
-    const std::vector<Number> &                         values,
-    const Point<dim, Number2> &                         p,
-    const std::vector<unsigned int> &                   renumber = {})
+    const std::vector<Number>                          &values,
+    const Point<dim, Number2>                          &p,
+    const std::vector<unsigned int>                    &renumber = {})
   {
     static_assert(dim >= 1 && dim <= 3, "Only dim=1,2,3 implemented");
 
@@ -3245,11 +3245,11 @@ namespace internal
 #endif
     void
     do_apply_test_functions_xy(
-      Number2 *                                values,
-      const dealii::ndarray<Number, 2, dim> *  shapes,
+      Number2                                 *values,
+      const dealii::ndarray<Number, 2, dim>   *shapes,
       const std::array<Number2, 2 + n_values> &test_grads_value,
       const int                                n_shapes_runtime,
-      int &                                    i)
+      int                                     &i)
   {
     static_assert(0 <= dim && dim <= 3, "Only dim=0,1,2,3 implemented");
     static_assert(1 <= n_values && n_values <= 2,
@@ -3360,9 +3360,9 @@ namespace internal
   integrate_add_tensor_product_value_and_gradient_shapes(
     const dealii::ndarray<Number, 2, dim> *shapes,
     const int                              n_shapes,
-    const Number2 *                        value,
-    const Tensor<1, dim, Number2> &        gradient,
-    Number2 *                              values)
+    const Number2                         *value,
+    const Tensor<1, dim, Number2>         &gradient,
+    Number2                               *values)
   {
     static_assert(0 <= dim && dim <= 3, "Only dim=0,1,2,3 implemented");
     static_assert(1 <= n_values && n_values <= 2,
@@ -3443,10 +3443,10 @@ namespace internal
   inline void
   integrate_add_tensor_product_value_and_gradient_linear(
     const unsigned int             n_shapes,
-    const Number2 *                value,
+    const Number2                 *value,
     const Tensor<1, dim, Number2> &gradient,
-    Number2 *                      values,
-    const Point<dim, Number> &     p)
+    Number2                       *values,
+    const Point<dim, Number>      &p)
   {
     (void)n_shapes;
     static_assert(0 <= dim && dim <= 3, "Only dim=0,1,2,3 implemented");
@@ -3608,10 +3608,10 @@ namespace internal
   integrate_tensor_product_value_and_gradient(
     const dealii::ndarray<Number, 2, dim> *shapes,
     const unsigned int                     n_shapes,
-    const Number2 *                        value,
-    const Tensor<1, dim, Number2> &        gradient,
-    Number2 *                              values,
-    const Point<dim, Number> &             p,
+    const Number2                         *value,
+    const Tensor<1, dim, Number2>         &gradient,
+    Number2                               *values,
+    const Point<dim, Number>              &p,
     const bool                             is_linear,
     const bool                             do_add)
   {
@@ -3663,11 +3663,11 @@ namespace internal
 #endif
     void
     do_apply_test_functions_xy_value(
-      Number2 *                              values,
+      Number2                               *values,
       const dealii::ndarray<Number, 2, dim> *shapes,
-      const Number2 &                        test_value,
+      const Number2                         &test_value,
       const int                              n_shapes_runtime,
-      int &                                  i)
+      int                                   &i)
   {
     if (length > 0)
       {
@@ -3721,8 +3721,8 @@ namespace internal
   integrate_add_tensor_product_value_shapes(
     const dealii::ndarray<Number, 2, dim> *shapes,
     const int                              n_shapes,
-    const Number2 &                        value,
-    Number2 *                              values)
+    const Number2                         &value,
+    Number2                               *values)
   {
     static_assert(dim >= 0 && dim <= 3, "Only dim=0,1,2,3 implemented");
 
@@ -3776,8 +3776,8 @@ namespace internal
   template <int dim, typename Number, typename Number2, bool add>
   inline void
   integrate_add_tensor_product_value_linear(const unsigned int        n_shapes,
-                                            const Number2 &           value,
-                                            Number2 *                 values,
+                                            const Number2            &value,
+                                            Number2                  *values,
                                             const Point<dim, Number> &p)
   {
     (void)n_shapes;
@@ -3878,8 +3878,8 @@ namespace internal
   inline void
   integrate_tensor_product_value(const dealii::ndarray<Number, 2, dim> *shapes,
                                  const unsigned int        n_shapes,
-                                 const Number2 &           value,
-                                 Number2 *                 values,
+                                 const Number2            &value,
+                                 Number2                  *values,
                                  const Point<dim, Number> &p,
                                  const bool                is_linear,
                                  const bool                do_add)
@@ -3928,10 +3928,10 @@ namespace internal
 
   template <int dim, int n_points_1d_template, typename Number>
   inline void
-  weight_fe_q_dofs_by_entity(const Number *     weights,
+  weight_fe_q_dofs_by_entity(const Number      *weights,
                              const unsigned int n_components,
                              const int          n_points_1d_non_template,
-                             Number *           data)
+                             Number            *data)
   {
     const int n_points_1d = n_points_1d_template != -1 ?
                               n_points_1d_template :
@@ -3966,10 +3966,10 @@ namespace internal
 
   template <int dim, int n_points_1d_template, typename Number>
   inline void
-  weight_fe_q_dofs_by_entity_shifted(const Number *     weights,
+  weight_fe_q_dofs_by_entity_shifted(const Number      *weights,
                                      const unsigned int n_components,
                                      const int n_points_1d_non_template,
-                                     Number *  data)
+                                     Number   *data)
   {
     const int n_points_1d = n_points_1d_template != -1 ?
                               n_points_1d_template :
@@ -4013,10 +4013,10 @@ namespace internal
 
   template <int dim, int n_points_1d_template, typename Number>
   inline bool
-  compute_weights_fe_q_dofs_by_entity(const Number *     data,
+  compute_weights_fe_q_dofs_by_entity(const Number      *data,
                                       const unsigned int n_components,
                                       const int n_points_1d_non_template,
-                                      Number *  weights)
+                                      Number   *weights)
   {
     const int n_points_1d = n_points_1d_template != -1 ?
                               n_points_1d_template :
@@ -4075,10 +4075,10 @@ namespace internal
   template <int dim, int n_points_1d_template, typename Number>
   inline bool
   compute_weights_fe_q_dofs_by_entity_shifted(
-    const Number *     data,
+    const Number      *data,
     const unsigned int n_components,
     const int          n_points_1d_non_template,
-    Number *           weights)
+    Number            *weights)
   {
     const int n_points_1d = n_points_1d_template != -1 ?
                               n_points_1d_template :

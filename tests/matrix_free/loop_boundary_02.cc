@@ -76,8 +76,8 @@ do_test(const unsigned int n_refine)
                      LinearAlgebra::distributed::Vector<double> &,
                      const LinearAlgebra::distributed::Vector<double> &,
                      const std::pair<unsigned int, unsigned int> &)>
-    cell_func = [](const MatrixFree<dim> &                           data,
-                   LinearAlgebra::distributed::Vector<double> &      out,
+    cell_func = [](const MatrixFree<dim>                            &data,
+                   LinearAlgebra::distributed::Vector<double>       &out,
                    const LinearAlgebra::distributed::Vector<double> &in,
                    const std::pair<unsigned int, unsigned int> &range) -> void {
     FEEvaluation<dim, fe_degree> eval(data);
@@ -103,10 +103,10 @@ do_test(const unsigned int n_refine)
                      const LinearAlgebra::distributed::Vector<double> &,
                      const std::pair<unsigned int, unsigned int> &)>
     boundary_func =
-      [](const MatrixFree<dim> &                           data,
-         LinearAlgebra::distributed::Vector<double> &      out,
+      [](const MatrixFree<dim>                            &data,
+         LinearAlgebra::distributed::Vector<double>       &out,
          const LinearAlgebra::distributed::Vector<double> &in,
-         const std::pair<unsigned int, unsigned int> &     range) -> void {
+         const std::pair<unsigned int, unsigned int>      &range) -> void {
     FEFaceEvaluation<dim, fe_degree> eval(data, true);
 
     for (unsigned int face = range.first; face < range.second; ++face)

@@ -98,7 +98,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionJacobi::initialize(const SparseMatrix &  matrix,
+  PreconditionJacobi::initialize(const SparseMatrix   &matrix,
                                  const AdditionalData &additional_data)
   {
     // release memory before reallocation
@@ -151,7 +151,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionSSOR::initialize(const SparseMatrix &  matrix,
+  PreconditionSSOR::initialize(const SparseMatrix   &matrix,
                                const AdditionalData &additional_data)
   {
     preconditioner.reset();
@@ -204,7 +204,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionSOR::initialize(const SparseMatrix &  matrix,
+  PreconditionSOR::initialize(const SparseMatrix   &matrix,
                               const AdditionalData &additional_data)
   {
     preconditioner.reset();
@@ -260,7 +260,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionBlockJacobi::initialize(const SparseMatrix &  matrix,
+  PreconditionBlockJacobi::initialize(const SparseMatrix   &matrix,
                                       const AdditionalData &additional_data)
   {
     // release memory before reallocation
@@ -329,7 +329,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionBlockSSOR::initialize(const SparseMatrix &  matrix,
+  PreconditionBlockSSOR::initialize(const SparseMatrix   &matrix,
                                     const AdditionalData &additional_data)
   {
     preconditioner.reset();
@@ -398,7 +398,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionBlockSOR::initialize(const SparseMatrix &  matrix,
+  PreconditionBlockSOR::initialize(const SparseMatrix   &matrix,
                                    const AdditionalData &additional_data)
   {
     preconditioner.reset();
@@ -462,7 +462,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionIC::initialize(const SparseMatrix &  matrix,
+  PreconditionIC::initialize(const SparseMatrix   &matrix,
                              const AdditionalData &additional_data)
   {
     preconditioner.reset();
@@ -512,7 +512,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionILU::initialize(const SparseMatrix &  matrix,
+  PreconditionILU::initialize(const SparseMatrix   &matrix,
                               const AdditionalData &additional_data)
   {
     preconditioner.reset();
@@ -565,7 +565,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionILUT::initialize(const SparseMatrix &  matrix,
+  PreconditionILUT::initialize(const SparseMatrix   &matrix,
                                const AdditionalData &additional_data)
   {
     preconditioner.reset();
@@ -612,7 +612,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionBlockwiseDirect::initialize(const SparseMatrix &  matrix,
+  PreconditionBlockwiseDirect::initialize(const SparseMatrix   &matrix,
                                           const AdditionalData &additional_data)
   {
     preconditioner.reset();
@@ -664,7 +664,7 @@ namespace TrilinosWrappers
 
 
   void
-  PreconditionChebyshev::initialize(const SparseMatrix &  matrix,
+  PreconditionChebyshev::initialize(const SparseMatrix   &matrix,
                                     const AdditionalData &additional_data)
   {
     preconditioner =
@@ -763,14 +763,14 @@ namespace TrilinosWrappers
   }
 
   void
-  PreconditionIdentity::vmult(dealii::Vector<double> &      dst,
+  PreconditionIdentity::vmult(dealii::Vector<double>       &dst,
                               const dealii::Vector<double> &src) const
   {
     dst = src;
   }
 
   void
-  PreconditionIdentity::Tvmult(dealii::Vector<double> &      dst,
+  PreconditionIdentity::Tvmult(dealii::Vector<double>       &dst,
                                const dealii::Vector<double> &src) const
   {
     dst = src;
@@ -779,7 +779,7 @@ namespace TrilinosWrappers
 #  ifndef DOXYGEN
   void
   PreconditionIdentity::vmult(
-    LinearAlgebra::distributed::Vector<double> &      dst,
+    LinearAlgebra::distributed::Vector<double>       &dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
     dst = src;
@@ -787,7 +787,7 @@ namespace TrilinosWrappers
 
   void
   PreconditionIdentity::Tvmult(
-    LinearAlgebra::distributed::Vector<double> &      dst,
+    LinearAlgebra::distributed::Vector<double>       &dst,
     const LinearAlgebra::distributed::Vector<double> &src) const
   {
     dst = src;

@@ -36,8 +36,8 @@
 template <int dim>
 void
 test(const FiniteElement<dim> &fe,
-     const Quadrature<1> &     quad,
-     const std::string &       quadrature_name)
+     const Quadrature<1>      &quad,
+     const std::string        &quadrature_name)
 {
   internal::MatrixFreeFunctions::ShapeInfo<double> shape_info;
   shape_info.reinit(quad, fe, 0);

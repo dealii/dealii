@@ -30,7 +30,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_dgp.h>
-//#include <deal.II/fe/fe_q.h>
+// #include <deal.II/fe/fe_q.h>
 #include <deal.II/base/smartpointer.h>
 
 #include <deal.II/fe/fe_tools.h>
@@ -72,9 +72,9 @@ public:
 
   void
   compute_SD_integral_on_cell(
-    std::vector<double> &                                    dst,
+    std::vector<double>                                     &dst,
     typename DoFHandler<dim, dim + 1>::active_cell_iterator &cell,
-    const Point<dim + 1> &                                   point);
+    const Point<dim + 1>                                    &point);
 
 private:
   double
@@ -82,7 +82,7 @@ private:
          const Tensor<1, 3> &a1,
          const Tensor<1, 3> &a2,
          const Tensor<1, 3> &n,
-         const double &      rn_c);
+         const double       &rn_c);
 
   double
   term_D(const Tensor<1, 3> &r, const Tensor<1, 3> &a1, const Tensor<1, 3> &a2);
@@ -118,9 +118,9 @@ LaplaceKernelIntegration<dim>::~LaplaceKernelIntegration()
 template <>
 void
 LaplaceKernelIntegration<2>::compute_SD_integral_on_cell(
-  std::vector<double> &                   dst,
+  std::vector<double>                    &dst,
   DoFHandler<2, 3>::active_cell_iterator &cell,
-  const Point<3> &                        point)
+  const Point<3>                         &point)
 {
   Assert(dst.size() == 2, ExcDimensionMismatch(dst.size(), 2));
   fe_values->reinit(cell);
@@ -153,7 +153,7 @@ LaplaceKernelIntegration<dim>::term_S(const Tensor<1, 3> &r,
                                       const Tensor<1, 3> &a1,
                                       const Tensor<1, 3> &a2,
                                       const Tensor<1, 3> &n,
-                                      const double &      rn_c)
+                                      const double       &rn_c)
 {
   Tensor<1, 3> ra1 = cross_product_3d(r, a1);
   Tensor<1, 3> ra2 = cross_product_3d(r, a2);

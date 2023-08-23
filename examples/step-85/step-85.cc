@@ -232,7 +232,7 @@ namespace Step85
   {
     std::cout << "Initializing matrices" << std::endl;
 
-    const auto face_has_flux_coupling = [&](const auto &       cell,
+    const auto face_has_flux_coupling = [&](const auto        &cell,
                                             const unsigned int face_index) {
       return this->face_has_ghost_penalty(cell, face_index);
     };
@@ -582,14 +582,14 @@ namespace Step85
   class AnalyticalSolution : public Function<dim>
   {
   public:
-    double value(const Point<dim> & point,
+    double value(const Point<dim>  &point,
                  const unsigned int component = 0) const override;
   };
 
 
 
   template <int dim>
-  double AnalyticalSolution<dim>::value(const Point<dim> & point,
+  double AnalyticalSolution<dim>::value(const Point<dim>  &point,
                                         const unsigned int component) const
   {
     AssertIndexRange(component, this->n_components);

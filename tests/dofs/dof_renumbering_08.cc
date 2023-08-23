@@ -43,7 +43,7 @@ template <int dim>
 void
 print_dofs(const DoFHandler<dim> &dof)
 {
-  const FiniteElement<dim> &           fe = dof.get_fe();
+  const FiniteElement<dim>            &fe = dof.get_fe();
   std::vector<types::global_dof_index> v(fe.dofs_per_cell);
   std::shared_ptr<FEValues<dim>>       fevalues;
 

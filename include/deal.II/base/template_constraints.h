@@ -694,8 +694,8 @@ namespace concepts
    * example, on class Triangulation.
    */
   template <int dim, int spacedim>
-  concept is_valid_dim_spacedim = (dim >= 1 && spacedim <= 3 &&
-                                   dim <= spacedim);
+  concept is_valid_dim_spacedim =
+    (dim >= 1 && spacedim <= 3 && dim <= spacedim);
 
   namespace internal
   {
@@ -849,9 +849,8 @@ namespace concepts
    * not.
    */
   template <typename VectorType>
-  concept is_writable_dealii_vector_type = is_dealii_vector_type<VectorType> &&
-                                           (std::is_const_v<VectorType> ==
-                                            false);
+  concept is_writable_dealii_vector_type =
+    is_dealii_vector_type<VectorType> && (std::is_const_v<VectorType> == false);
 
   /**
    * A concept that tests whether a given template argument is a deal.II
@@ -963,8 +962,7 @@ namespace concepts
                                             VectorType                      W,
                                             typename VectorType::value_type a,
                                             typename VectorType::value_type b,
-                                            typename VectorType::value_type s)
-  {
+                                            typename VectorType::value_type s) {
     // Check local type requirements:
     typename VectorType::value_type;
     typename VectorType::size_type;
@@ -998,45 +996,37 @@ namespace concepts
     // Norms and similar stuff:
     {
       U.mean_value()
-    }
-    ->std::convertible_to<typename VectorType::value_type>;
+    } -> std::convertible_to<typename VectorType::value_type>;
 
     {
       U.l1_norm()
-    }
-    ->std::convertible_to<typename VectorType::real_type>;
+    } -> std::convertible_to<typename VectorType::real_type>;
 
     {
       U.l2_norm()
-    }
-    ->std::convertible_to<typename VectorType::real_type>;
+    } -> std::convertible_to<typename VectorType::real_type>;
 
     {
       U.linfty_norm()
-    }
-    ->std::convertible_to<typename VectorType::real_type>;
+    } -> std::convertible_to<typename VectorType::real_type>;
 
     // Dot products:
     {
       U *V
-    }
-    ->std::convertible_to<typename VectorType::value_type>;
+    } -> std::convertible_to<typename VectorType::value_type>;
 
     {
       U.add_and_dot(a, V, W)
-    }
-    ->std::convertible_to<typename VectorType::value_type>;
+    } -> std::convertible_to<typename VectorType::value_type>;
 
     // Some queries:
     {
       U.size()
-    }
-    ->std::convertible_to<typename VectorType::size_type>;
+    } -> std::convertible_to<typename VectorType::size_type>;
 
     {
       U.all_zero()
-    }
-    ->std::same_as<bool>;
+    } -> std::same_as<bool>;
   };
 
 #endif

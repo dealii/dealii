@@ -96,7 +96,7 @@ namespace Utilities
       void
       export_to_ghosted_array(
         const ArrayView<const Number> &locally_owned_array,
-        const ArrayView<Number> &      ghost_array) const;
+        const ArrayView<Number>       &ghost_array) const;
 
       /**
        * Same as above but with an interface similar to
@@ -117,9 +117,9 @@ namespace Utilities
       export_to_ghosted_array(
         const unsigned int             communication_channel,
         const ArrayView<const Number> &locally_owned_array,
-        const ArrayView<Number> &      temporary_storage,
-        const ArrayView<Number> &      ghost_array,
-        std::vector<MPI_Request> &     requests) const;
+        const ArrayView<Number>       &temporary_storage,
+        const ArrayView<Number>       &ghost_array,
+        std::vector<MPI_Request>      &requests) const;
 
       /**
        * Start update: Data is packed, non-blocking send and receives
@@ -142,8 +142,8 @@ namespace Utilities
       export_to_ghosted_array_start(
         const unsigned int             communication_channel,
         const ArrayView<const Number> &locally_owned_array,
-        const ArrayView<Number> &      temporary_storage,
-        std::vector<MPI_Request> &     requests) const;
+        const ArrayView<Number>       &temporary_storage,
+        std::vector<MPI_Request>      &requests) const;
 
       /**
        * Finish update. The method waits until all data has been sent and
@@ -163,8 +163,8 @@ namespace Utilities
       void
       export_to_ghosted_array_finish(
         const ArrayView<const Number> &temporary_storage,
-        const ArrayView<Number> &      ghost_array,
-        std::vector<MPI_Request> &     requests) const;
+        const ArrayView<Number>       &ghost_array,
+        std::vector<MPI_Request>      &requests) const;
 
       /**
        * Similar to the above functions but for importing vector entries
@@ -178,8 +178,8 @@ namespace Utilities
       void
       import_from_ghosted_array(
         const VectorOperation::values vector_operation,
-        const ArrayView<Number> &     ghost_array,
-        const ArrayView<Number> &     locally_owned_storage) const;
+        const ArrayView<Number>      &ghost_array,
+        const ArrayView<Number>      &locally_owned_storage) const;
 
       /**
        * Similar to the above function with the difference that
@@ -191,9 +191,9 @@ namespace Utilities
       void
       import_from_ghosted_array(const VectorOperation::values vector_operation,
                                 const unsigned int        communication_channel,
-                                const ArrayView<Number> & ghost_array,
-                                const ArrayView<Number> & temporary_storage,
-                                const ArrayView<Number> & locally_owned_storage,
+                                const ArrayView<Number>  &ghost_array,
+                                const ArrayView<Number>  &temporary_storage,
+                                const ArrayView<Number>  &locally_owned_storage,
                                 std::vector<MPI_Request> &requests) const;
 
       /**
@@ -205,9 +205,9 @@ namespace Utilities
       import_from_ghosted_array_start(
         const VectorOperation::values vector_operation,
         const unsigned int            communication_channel,
-        const ArrayView<Number> &     ghost_array,
-        const ArrayView<Number> &     temporary_storage,
-        std::vector<MPI_Request> &    requests) const;
+        const ArrayView<Number>      &ghost_array,
+        const ArrayView<Number>      &temporary_storage,
+        std::vector<MPI_Request>     &requests) const;
 
       /**
        * Finish update for importing values. The method waits until all data has
@@ -220,8 +220,8 @@ namespace Utilities
       import_from_ghosted_array_finish(
         const VectorOperation::values  vector_operation,
         const ArrayView<const Number> &temporary_storage,
-        const ArrayView<Number> &      locally_owned_storage,
-        std::vector<MPI_Request> &     requests) const;
+        const ArrayView<Number>       &locally_owned_storage,
+        std::vector<MPI_Request>      &requests) const;
 
       /**
        * Returns the number of processes this process sends data to and the

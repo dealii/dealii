@@ -24,9 +24,9 @@
 #include "../tests.h"
 
 void
-log_entry(const ParameterHandler &       prm,
+log_entry(const ParameterHandler        &prm,
           const std::vector<std::string> path,
-          const std::string &            entry)
+          const std::string             &entry)
 {
   for (unsigned int i = 0; i < path.size(); ++i)
     {

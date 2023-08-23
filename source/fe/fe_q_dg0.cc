@@ -180,7 +180,7 @@ template <int dim, int spacedim>
 void
 FE_Q_DG0<dim, spacedim>::convert_generalized_support_point_values_to_dof_values(
   const std::vector<Vector<double>> &support_point_values,
-  std::vector<double> &              nodal_dofs) const
+  std::vector<double>               &nodal_dofs) const
 {
   Assert(support_point_values.size() == this->unit_support_points.size(),
          ExcDimensionMismatch(support_point_values.size(),
@@ -208,7 +208,7 @@ template <int dim, int spacedim>
 void
 FE_Q_DG0<dim, spacedim>::get_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
-  FullMatrix<double> &                interpolation_matrix) const
+  FullMatrix<double>                 &interpolation_matrix) const
 {
   // this is only implemented, if the source FE is also a Q_DG0 element
   using FEQDG0 = FE_Q_DG0<dim, spacedim>;

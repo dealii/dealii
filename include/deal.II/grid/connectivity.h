@@ -1000,23 +1000,23 @@ namespace internal
     build_face_entities_templated(
       const unsigned int                                face_dimensionality,
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-      const std::vector<ReferenceCell> &                cell_types_index,
-      const CRS<unsigned int> &                         crs,
-      CRS<unsigned int> &                               crs_d,        // result
-      CRS<unsigned int> &                               crs_0,        // result
-      TriaObjectsOrientations &                         orientations, // result
-      const FU &                                        second_key_function)
+      const std::vector<ReferenceCell>                 &cell_types_index,
+      const CRS<unsigned int>                          &crs,
+      CRS<unsigned int>                                &crs_d,        // result
+      CRS<unsigned int>                                &crs_0,        // result
+      TriaObjectsOrientations                          &orientations, // result
+      const FU                                         &second_key_function)
     {
       const bool compatibility_mode = true;
 
-      const std::vector<std::size_t> & cell_ptr      = crs.ptr;
+      const std::vector<std::size_t>  &cell_ptr      = crs.ptr;
       const std::vector<unsigned int> &cell_vertices = crs.col;
-      std::vector<std::size_t> &       ptr_d         = crs_d.ptr;
-      std::vector<unsigned int> &      col_d         = crs_d.col;
+      std::vector<std::size_t>        &ptr_d         = crs_d.ptr;
+      std::vector<unsigned int>       &col_d         = crs_d.col;
 
       // note: we do not pre-allocate memory for these arrays because it turned
       // out that counting unique entities is more expensive than push_back().
-      std::vector<std::size_t> & ptr_0 = crs_0.ptr;
+      std::vector<std::size_t>  &ptr_0 = crs_0.ptr;
       std::vector<unsigned int> &col_0 = crs_0.col;
 
       // clear
@@ -1191,12 +1191,12 @@ namespace internal
     build_face_entities(
       const unsigned int                                face_dimensionality,
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-      const std::vector<ReferenceCell> &                cell_types_index,
-      const CRS<unsigned int> &                         crs,
-      CRS<unsigned int> &                               crs_d,
-      CRS<unsigned int> &                               crs_0,
-      TriaObjectsOrientations &                         orientations,
-      const FU &                                        second_key_function)
+      const std::vector<ReferenceCell>                 &cell_types_index,
+      const CRS<unsigned int>                          &crs,
+      CRS<unsigned int>                                &crs_d,
+      CRS<unsigned int>                                &crs_0,
+      TriaObjectsOrientations                          &orientations,
+      const FU                                         &second_key_function)
     {
       std::size_t max_n_vertices = 0;
 
@@ -1255,16 +1255,16 @@ namespace internal
     inline void
     build_intersection(
       const std::vector<std::shared_ptr<CellTypeBase>> &cell_types,
-      const std::vector<ReferenceCell> &                cell_types_index,
-      const CRS<unsigned int> &                         con_cv,
-      const CRS<unsigned int> &                         con_cl,
-      const CRS<unsigned int> &                         con_lv,
-      const CRS<unsigned int> &                         con_cq,
-      const CRS<unsigned int> &                         con_qv,
-      const TriaObjectsOrientations &                   ori_cq,
-      CRS<unsigned int> &                               con_ql,   // result
-      TriaObjectsOrientations &                         ori_ql,   // result
-      std::vector<ReferenceCell> &                      quad_t_id // result
+      const std::vector<ReferenceCell>                 &cell_types_index,
+      const CRS<unsigned int>                          &con_cv,
+      const CRS<unsigned int>                          &con_cl,
+      const CRS<unsigned int>                          &con_lv,
+      const CRS<unsigned int>                          &con_cq,
+      const CRS<unsigned int>                          &con_qv,
+      const TriaObjectsOrientations                    &ori_cq,
+      CRS<unsigned int>                                &con_ql,   // result
+      TriaObjectsOrientations                          &ori_ql,   // result
+      std::vector<ReferenceCell>                       &quad_t_id // result
     )
     {
       // reset output
@@ -1374,7 +1374,7 @@ namespace internal
     build_connectivity(const unsigned int                                dim,
                        const std::vector<std::shared_ptr<CellTypeBase>> &cell_t,
                        const std::vector<ReferenceCell> &cell_t_id,
-                       const CRS<T> &                    con_cv)
+                       const CRS<T>                     &con_cv)
     {
       Connectivity<T> connectivity(dim, cell_t_id);
 

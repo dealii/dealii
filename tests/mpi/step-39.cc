@@ -72,14 +72,14 @@ namespace Step39
   {
   public:
     void
-    cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+    cell(MeshWorker::DoFInfo<dim>                  &dinfo,
          typename MeshWorker::IntegrationInfo<dim> &info) const;
     void
-    boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+    boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
              typename MeshWorker::IntegrationInfo<dim> &info) const;
     void
-    face(MeshWorker::DoFInfo<dim> &                 dinfo1,
-         MeshWorker::DoFInfo<dim> &                 dinfo2,
+    face(MeshWorker::DoFInfo<dim>                  &dinfo1,
+         MeshWorker::DoFInfo<dim>                  &dinfo2,
          typename MeshWorker::IntegrationInfo<dim> &info1,
          typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
@@ -88,7 +88,7 @@ namespace Step39
   template <int dim>
   void
   MatrixIntegrator<dim>::cell(
-    MeshWorker::DoFInfo<dim> &                 dinfo,
+    MeshWorker::DoFInfo<dim>                  &dinfo,
     typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
@@ -99,7 +99,7 @@ namespace Step39
   template <int dim>
   void
   MatrixIntegrator<dim>::boundary(
-    MeshWorker::DoFInfo<dim> &                 dinfo,
+    MeshWorker::DoFInfo<dim>                  &dinfo,
     typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
@@ -112,8 +112,8 @@ namespace Step39
   template <int dim>
   void
   MatrixIntegrator<dim>::face(
-    MeshWorker::DoFInfo<dim> &                 dinfo1,
-    MeshWorker::DoFInfo<dim> &                 dinfo2,
+    MeshWorker::DoFInfo<dim>                  &dinfo1,
+    MeshWorker::DoFInfo<dim>                  &dinfo2,
     typename MeshWorker::IntegrationInfo<dim> &info1,
     typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
@@ -133,14 +133,14 @@ namespace Step39
   {
   public:
     void
-    cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+    cell(MeshWorker::DoFInfo<dim>                  &dinfo,
          typename MeshWorker::IntegrationInfo<dim> &info) const;
     void
-    boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+    boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
              typename MeshWorker::IntegrationInfo<dim> &info) const;
     void
-    face(MeshWorker::DoFInfo<dim> &                 dinfo1,
-         MeshWorker::DoFInfo<dim> &                 dinfo2,
+    face(MeshWorker::DoFInfo<dim>                  &dinfo1,
+         MeshWorker::DoFInfo<dim>                  &dinfo2,
          typename MeshWorker::IntegrationInfo<dim> &info1,
          typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
@@ -156,11 +156,11 @@ namespace Step39
   template <int dim>
   void
   RHSIntegrator<dim>::boundary(
-    MeshWorker::DoFInfo<dim> &                 dinfo,
+    MeshWorker::DoFInfo<dim>                  &dinfo,
     typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe           = info.fe_values();
-    Vector<double> &         local_vector = dinfo.vector(0).block(0);
+    Vector<double>          &local_vector = dinfo.vector(0).block(0);
 
     std::vector<double> boundary_values(fe.n_quadrature_points);
     exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
@@ -192,14 +192,14 @@ namespace Step39
   {
   public:
     void
-    cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+    cell(MeshWorker::DoFInfo<dim>                  &dinfo,
          typename MeshWorker::IntegrationInfo<dim> &info) const;
     void
-    boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+    boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
              typename MeshWorker::IntegrationInfo<dim> &info) const;
     void
-    face(MeshWorker::DoFInfo<dim> &                 dinfo1,
-         MeshWorker::DoFInfo<dim> &                 dinfo2,
+    face(MeshWorker::DoFInfo<dim>                  &dinfo1,
+         MeshWorker::DoFInfo<dim>                  &dinfo2,
          typename MeshWorker::IntegrationInfo<dim> &info1,
          typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
@@ -207,7 +207,7 @@ namespace Step39
 
   template <int dim>
   void
-  Estimator<dim>::cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+  Estimator<dim>::cell(MeshWorker::DoFInfo<dim>                  &dinfo,
                        typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
@@ -224,7 +224,7 @@ namespace Step39
   template <int dim>
   void
   Estimator<dim>::boundary(
-    MeshWorker::DoFInfo<dim> &                 dinfo,
+    MeshWorker::DoFInfo<dim>                  &dinfo,
     typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
@@ -247,14 +247,14 @@ namespace Step39
 
   template <int dim>
   void
-  Estimator<dim>::face(MeshWorker::DoFInfo<dim> &                 dinfo1,
-                       MeshWorker::DoFInfo<dim> &                 dinfo2,
+  Estimator<dim>::face(MeshWorker::DoFInfo<dim>                  &dinfo1,
+                       MeshWorker::DoFInfo<dim>                  &dinfo2,
                        typename MeshWorker::IntegrationInfo<dim> &info1,
                        typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
-    const FEValuesBase<dim> &          fe   = info1.fe_values();
-    const std::vector<double> &        uh1  = info1.values[0][0];
-    const std::vector<double> &        uh2  = info2.values[0][0];
+    const FEValuesBase<dim>           &fe   = info1.fe_values();
+    const std::vector<double>         &uh1  = info1.values[0][0];
+    const std::vector<double>         &uh2  = info2.values[0][0];
     const std::vector<Tensor<1, dim>> &Duh1 = info1.gradients[0][0];
     const std::vector<Tensor<1, dim>> &Duh2 = info2.gradients[0][0];
 
@@ -290,14 +290,14 @@ namespace Step39
   {
   public:
     void
-    cell(MeshWorker::DoFInfo<dim> &                 dinfo,
+    cell(MeshWorker::DoFInfo<dim>                  &dinfo,
          typename MeshWorker::IntegrationInfo<dim> &info) const;
     void
-    boundary(MeshWorker::DoFInfo<dim> &                 dinfo,
+    boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
              typename MeshWorker::IntegrationInfo<dim> &info) const;
     void
-    face(MeshWorker::DoFInfo<dim> &                 dinfo1,
-         MeshWorker::DoFInfo<dim> &                 dinfo2,
+    face(MeshWorker::DoFInfo<dim>                  &dinfo1,
+         MeshWorker::DoFInfo<dim>                  &dinfo2,
          typename MeshWorker::IntegrationInfo<dim> &info1,
          typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
@@ -306,10 +306,10 @@ namespace Step39
   template <int dim>
   void
   ErrorIntegrator<dim>::cell(
-    MeshWorker::DoFInfo<dim> &                 dinfo,
+    MeshWorker::DoFInfo<dim>                  &dinfo,
     typename MeshWorker::IntegrationInfo<dim> &info) const
   {
-    const FEValuesBase<dim> &   fe = info.fe_values();
+    const FEValuesBase<dim>    &fe = info.fe_values();
     std::vector<Tensor<1, dim>> exact_gradients(fe.n_quadrature_points);
     std::vector<double>         exact_values(fe.n_quadrature_points);
 
@@ -317,7 +317,7 @@ namespace Step39
     exact_solution.value_list(fe.get_quadrature_points(), exact_values);
 
     const std::vector<Tensor<1, dim>> &Duh = info.gradients[0][0];
-    const std::vector<double> &        uh  = info.values[0][0];
+    const std::vector<double>         &uh  = info.values[0][0];
 
     for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
       {
@@ -339,7 +339,7 @@ namespace Step39
   template <int dim>
   void
   ErrorIntegrator<dim>::boundary(
-    MeshWorker::DoFInfo<dim> &                 dinfo,
+    MeshWorker::DoFInfo<dim>                  &dinfo,
     typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
@@ -365,12 +365,12 @@ namespace Step39
   template <int dim>
   void
   ErrorIntegrator<dim>::face(
-    MeshWorker::DoFInfo<dim> &                 dinfo1,
-    MeshWorker::DoFInfo<dim> &                 dinfo2,
+    MeshWorker::DoFInfo<dim>                  &dinfo1,
+    MeshWorker::DoFInfo<dim>                  &dinfo2,
     typename MeshWorker::IntegrationInfo<dim> &info1,
     typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
-    const FEValuesBase<dim> &  fe  = info1.fe_values();
+    const FEValuesBase<dim>   &fe  = info1.fe_values();
     const std::vector<double> &uh1 = info1.values[0][0];
     const std::vector<double> &uh2 = info2.values[0][0];
 
@@ -423,7 +423,7 @@ namespace Step39
 
     parallel::distributed::Triangulation<dim> triangulation;
     const MappingQ<dim>                       mapping;
-    const FiniteElement<dim> &                fe;
+    const FiniteElement<dim>                 &fe;
     DoFHandler<dim>                           dof_handler;
 
     IndexSet locally_relevant_set;

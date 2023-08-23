@@ -71,9 +71,9 @@ public:
   using FECellIntegrator = FEEvaluation<dim, -1, 0, 1, number>;
 
   void
-  reinit(const Mapping<dim> &             mapping,
-         const DoFHandler<dim> &          dof_handler,
-         const Quadrature<dim> &          quad,
+  reinit(const Mapping<dim>              &mapping,
+         const DoFHandler<dim>           &dof_handler,
+         const Quadrature<dim>           &quad,
          const AffineConstraints<number> &constraints,
          const unsigned int mg_level = numbers::invalid_unsigned_int)
   {
@@ -219,7 +219,7 @@ private:
 
   void
   do_cell_integral_global(FECellIntegrator &integrator,
-                          VectorType &      dst,
+                          VectorType       &dst,
                           const VectorType &src) const
   {
     integrator.gather_evaluate(src, EvaluationFlags::gradients);
@@ -232,9 +232,9 @@ private:
 
   void
   do_cell_integral_range(
-    const MatrixFree<dim, number> &              matrix_free,
-    VectorType &                                 dst,
-    const VectorType &                           src,
+    const MatrixFree<dim, number>               &matrix_free,
+    VectorType                                  &dst,
+    const VectorType                            &src,
     const std::pair<unsigned int, unsigned int> &range) const
   {
     FECellIntegrator integrator(matrix_free, range);
@@ -289,14 +289,14 @@ template <typename VectorType,
           typename LevelMatrixType,
           typename MGTransferType>
 static void
-mg_solve(SolverControl &                       solver_control,
-         VectorType &                          dst,
-         const VectorType &                    src,
-         const GMGParameters &                 mg_data,
-         const DoFHandler<dim> &               dof,
-         const SystemMatrixType &              fine_matrix,
+mg_solve(SolverControl                        &solver_control,
+         VectorType                           &dst,
+         const VectorType                     &src,
+         const GMGParameters                  &mg_data,
+         const DoFHandler<dim>                &dof,
+         const SystemMatrixType               &fine_matrix,
          const MGLevelObject<LevelMatrixType> &mg_matrices,
-         const MGTransferType &                mg_transfer)
+         const MGTransferType                 &mg_transfer)
 {
   AssertThrow(mg_data.smoother.type == "chebyshev", ExcNotImplemented());
 

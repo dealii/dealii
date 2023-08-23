@@ -245,7 +245,7 @@ namespace Step77
   void
   MinimalSurfaceProblem<dim>::compute_residual(
     const VectorType &evaluation_point,
-    VectorType &      residual)
+    VectorType       &residual)
   {
     deallog << "  Computing residual vector " << std::endl;
     const QGauss<dim> quadrature_formula(fe.degree + 1);
@@ -526,7 +526,7 @@ namespace Step77
           // Here we inform the nonlinear_solver about how to sample the
           // residual of our nonlinear equations.
           nonlinear_solver.residual = [&](const VectorType &evaluation_point,
-                                          VectorType &      residual) {
+                                          VectorType       &residual) {
             compute_residual(evaluation_point, residual);
             return 0;
           };

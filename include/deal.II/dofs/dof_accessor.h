@@ -266,7 +266,7 @@ public:
   DoFAccessor(const Triangulation<dim, spacedim> *tria,
               const int                           level,
               const int                           index,
-              const DoFHandler<dim, spacedim> *   dof_handler);
+              const DoFHandler<dim, spacedim>    *dof_handler);
 
   /**
    * Copy constructor.
@@ -816,10 +816,10 @@ public:
    * This iterator can only be called for one-dimensional triangulations.
    */
   DoFAccessor(
-    const Triangulation<1, spacedim> *                      tria,
+    const Triangulation<1, spacedim>                       *tria,
     const typename TriaAccessor<0, 1, spacedim>::VertexKind vertex_kind,
     const unsigned int                                      vertex_index,
-    const DoFHandler<1, spacedim> *                         dof_handler);
+    const DoFHandler<1, spacedim>                          *dof_handler);
 
   /**
    * Constructor. This constructor exists in order to maintain interface
@@ -1260,7 +1260,7 @@ public:
    * semantic sense, and we generate an exception when such an object is
    * actually generated.
    */
-  DoFInvalidAccessor(const void *        parent     = nullptr,
+  DoFInvalidAccessor(const void         *parent     = nullptr,
                      const int           level      = -1,
                      const int           index      = -1,
                      const AccessorData *local_data = nullptr);
@@ -1621,7 +1621,7 @@ public:
   void
   get_dof_values(
     const AffineConstraints<typename InputVector::value_type> &constraints,
-    const InputVector &                                        values,
+    const InputVector                                         &values,
     ForwardIterator local_values_begin,
     ForwardIterator local_values_end) const;
 
@@ -1652,7 +1652,7 @@ public:
   template <class OutputVector, typename number>
   void
   set_dof_values(const Vector<number> &local_values,
-                 OutputVector &        values) const;
+                 OutputVector         &values) const;
 
   /**
    * Return the interpolation of the given finite element function to the
@@ -1689,7 +1689,7 @@ public:
   void
   get_interpolated_dof_values(
     const ReadVector<Number> &values,
-    Vector<Number> &          interpolated_values,
+    Vector<Number>           &interpolated_values,
     const types::fe_index     fe_index = numbers::invalid_fe_index) const;
 
   /**
@@ -1757,7 +1757,7 @@ public:
   void
   set_dof_values_by_interpolation(
     const Vector<number> &local_values,
-    OutputVector &        values,
+    OutputVector         &values,
     const types::fe_index fe_index      = numbers::invalid_fe_index,
     const bool            perform_check = false) const;
 
@@ -1774,7 +1774,7 @@ public:
   void
   distribute_local_to_global_by_interpolation(
     const Vector<number> &local_values,
-    OutputVector &        values,
+    OutputVector         &values,
     const types::fe_index fe_index = numbers::invalid_fe_index) const;
 
   /**
@@ -1794,7 +1794,7 @@ public:
   template <typename number, typename OutputVector>
   void
   distribute_local_to_global(const Vector<number> &local_source,
-                             OutputVector &        global_destination) const;
+                             OutputVector         &global_destination) const;
 
   /**
    * Distribute a local (cell based) vector in iterator format to a global one
@@ -1814,7 +1814,7 @@ public:
   void
   distribute_local_to_global(ForwardIterator local_source_begin,
                              ForwardIterator local_source_end,
-                             OutputVector &  global_destination) const;
+                             OutputVector   &global_destination) const;
 
   /**
    * Distribute a local (cell based) vector in iterator format to a global one
@@ -1835,7 +1835,7 @@ public:
     const AffineConstraints<typename OutputVector::value_type> &constraints,
     ForwardIterator local_source_begin,
     ForwardIterator local_source_end,
-    OutputVector &  global_destination) const;
+    OutputVector   &global_destination) const;
 
   /**
    * This function does much the same as the
@@ -1855,9 +1855,9 @@ public:
   template <typename number, typename OutputMatrix, typename OutputVector>
   void
   distribute_local_to_global(const FullMatrix<number> &local_matrix,
-                             const Vector<number> &    local_vector,
-                             OutputMatrix &            global_matrix,
-                             OutputVector &            global_vector) const;
+                             const Vector<number>     &local_vector,
+                             OutputMatrix             &global_matrix,
+                             OutputVector             &global_vector) const;
 
   /**
    * @}

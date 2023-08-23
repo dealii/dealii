@@ -77,7 +77,7 @@ void
 test()
 {
   {
-    C *                 p = new C();
+    C                  *p = new C();
     std::pair<C *, C *> pair_1(p, p);
     std::pair<C *, C *> pair_2;
 

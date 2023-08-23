@@ -85,7 +85,7 @@ namespace dealii
     template <int dim, int spacedim, typename VectorType>
     void
     get_position_vector(const DoFHandler<dim, spacedim> &dof_handler_dim,
-                        VectorType &                  euler_coordinates_vector,
+                        VectorType                   &euler_coordinates_vector,
                         const Mapping<dim, spacedim> &mapping)
     {
       FEValues<dim, spacedim> fe_eval(
@@ -125,9 +125,9 @@ namespace dealii
 
 template <int dim, int spacedim, typename VectorType>
 void
-compute_normal(const Mapping<dim, spacedim> &   mapping,
+compute_normal(const Mapping<dim, spacedim>    &mapping,
                const DoFHandler<dim, spacedim> &dof_handler_dim,
-               VectorType &                     normal_vector)
+               VectorType                      &normal_vector)
 {
   FEValues<dim, spacedim> fe_eval_dim(
     mapping,
@@ -167,12 +167,12 @@ compute_normal(const Mapping<dim, spacedim> &   mapping,
 
 template <int dim, int spacedim, typename VectorType>
 void
-compute_curvature(const Mapping<dim, spacedim> &   mapping,
+compute_curvature(const Mapping<dim, spacedim>    &mapping,
                   const DoFHandler<dim, spacedim> &dof_handler_dim,
                   const DoFHandler<dim, spacedim> &dof_handler,
                   const Quadrature<dim>            quadrature,
-                  const VectorType &               normal_vector,
-                  VectorType &                     curvature_vector)
+                  const VectorType                &normal_vector,
+                  VectorType                      &curvature_vector)
 {
   FEValues<dim, spacedim> fe_eval(mapping,
                                   dof_handler.get_fe(),
@@ -256,16 +256,16 @@ print(std::tuple<
 template <int dim, int spacedim, typename VectorType>
 void
 compute_force_vector_sharp_interface(
-  const Mapping<dim, spacedim> &   surface_mapping,
+  const Mapping<dim, spacedim>    &surface_mapping,
   const DoFHandler<dim, spacedim> &surface_dofhandler,
   const DoFHandler<dim, spacedim> &surface_dofhandler_dim,
-  const Quadrature<dim> &          surface_quadrature,
-  const Mapping<spacedim> &        mapping,
-  const DoFHandler<spacedim> &     dof_handler,
+  const Quadrature<dim>           &surface_quadrature,
+  const Mapping<spacedim>         &mapping,
+  const DoFHandler<spacedim>      &dof_handler,
   const double                     surface_tension,
-  const VectorType &               normal_vector,
-  const VectorType &               curvature_vector,
-  VectorType &                     force_vector)
+  const VectorType                &normal_vector,
+  const VectorType                &curvature_vector,
+  VectorType                      &force_vector)
 {
   using T = Tensor<1, spacedim, double>;
 

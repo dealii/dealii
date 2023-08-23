@@ -96,7 +96,7 @@ public:
    */
   virtual void
   smooth(const unsigned int         level,
-         BlockVector<number> &      u,
+         BlockVector<number>       &u,
          const BlockVector<number> &rhs) const;
 
   /**
@@ -165,7 +165,7 @@ template <typename MatrixType, typename RelaxationType, typename number>
 template <typename MGMatrixType, typename MGRelaxationType>
 inline void
 MGSmootherBlock<MatrixType, RelaxationType, number>::initialize(
-  const MGMatrixType &    m,
+  const MGMatrixType     &m,
   const MGRelaxationType &s)
 {
   const unsigned int min = m.min_level();
@@ -209,7 +209,7 @@ template <typename MatrixType, typename RelaxationType, typename number>
 inline void
 MGSmootherBlock<MatrixType, RelaxationType, number>::smooth(
   const unsigned int         level,
-  BlockVector<number> &      u,
+  BlockVector<number>       &u,
   const BlockVector<number> &rhs) const
 {
   LogStream::Prefix prefix("Smooth");

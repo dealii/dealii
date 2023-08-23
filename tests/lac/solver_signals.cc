@@ -49,7 +49,7 @@ output_coefficients(double alpha, double beta)
 template <class NUMBER>
 void
 output_eigenvalues(const std::vector<NUMBER> &eigenvalues,
-                   const std::string &        text)
+                   const std::string         &text)
 {
   deallog << text;
   for (unsigned int j = 0; j < eigenvalues.size(); ++j)
@@ -76,7 +76,7 @@ template <class NUMBER>
 void
 output_arnoldi_vectors_norms(
   const internal::SolverGMRESImplementation::TmpVectors<Vector<NUMBER>>
-    &                tmp_vector,
+                    &tmp_vector,
   const std::string &text)
 {
   deallog << text << std::endl;
@@ -89,10 +89,10 @@ template <typename SolverType,
           typename VectorType,
           class PRECONDITION>
 void
-check_solve(SolverType &        solver,
-            const MatrixType &  A,
-            VectorType &        u,
-            VectorType &        f,
+check_solve(SolverType         &solver,
+            const MatrixType   &A,
+            VectorType         &u,
+            VectorType         &f,
             const PRECONDITION &P)
 {
   u = 0.;

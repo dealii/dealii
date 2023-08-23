@@ -99,9 +99,9 @@ public:
 
 private:
   void
-  local_apply(const MatrixFree<dim, number> &              data,
-              VectorType &                                 dst,
-              const VectorType &                           src,
+  local_apply(const MatrixFree<dim, number>               &data,
+              VectorType                                  &dst,
+              const VectorType                            &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const
   {
     FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> phi(
@@ -128,9 +128,9 @@ private:
 
   void
   local_apply_face(
-    const MatrixFree<dim, number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
+    const MatrixFree<dim, number>               &data,
+    VectorType                                  &dst,
+    const VectorType                            &src,
     const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number> phi_m(
@@ -187,9 +187,9 @@ private:
 
   void
   local_apply_boundary_face(
-    const MatrixFree<dim, number> &              data,
-    VectorType &                                 dst,
-    const VectorType &                           src,
+    const MatrixFree<dim, number>               &data,
+    VectorType                                  &dst,
+    const VectorType                            &src,
     const std::pair<unsigned int, unsigned int> &face_range) const
   {
     FEFaceEvaluation<dim, fe_degree, n_q_points_1d, n_components, number>
@@ -232,7 +232,7 @@ private:
       }
   }
 
-  const MatrixFree<dim, number> &         data;
+  const MatrixFree<dim, number>          &data;
   const bool                              zero_within_loop;
   const unsigned int                      start_vector_component;
   Tensor<1, dim, VectorizedArray<number>> advection;

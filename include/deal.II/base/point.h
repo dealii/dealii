@@ -193,7 +193,7 @@ public:
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE Number &
-                      operator()(const unsigned int index);
+  operator()(const unsigned int index);
 
   /**
    * Assignment operator from Tensor<1, dim, Number> with different underlying

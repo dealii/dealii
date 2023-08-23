@@ -21,7 +21,7 @@ namespace internal
 {
   template <int dim>
   Point<dim + 1>
-  create_higher_dim_point(const Point<dim> & point,
+  create_higher_dim_point(const Point<dim>  &point,
                           const unsigned int component_in_dim_plus_1,
                           const double       coordinate_value)
   {
@@ -61,7 +61,7 @@ namespace Functions
 
   template <int dim>
   double
-  CoordinateRestriction<dim>::value(const Point<dim> & point,
+  CoordinateRestriction<dim>::value(const Point<dim>  &point,
                                     const unsigned int component) const
   {
     const Point<dim + 1> full_point =
@@ -76,7 +76,7 @@ namespace Functions
 
   template <int dim>
   Tensor<1, dim>
-  CoordinateRestriction<dim>::gradient(const Point<dim> & point,
+  CoordinateRestriction<dim>::gradient(const Point<dim>  &point,
                                        const unsigned int component) const
   {
     const Point<dim + 1> full_point =
@@ -104,7 +104,7 @@ namespace Functions
 
   template <int dim>
   SymmetricTensor<2, dim>
-  CoordinateRestriction<dim>::hessian(const Point<dim> & point,
+  CoordinateRestriction<dim>::hessian(const Point<dim>  &point,
                                       const unsigned int component) const
   {
     const Point<dim + 1> full_point =
@@ -139,7 +139,7 @@ namespace Functions
   template <int dim>
   PointRestriction<dim>::PointRestriction(const Function<dim + 1> &function,
                                           const unsigned int open_direction,
-                                          const Point<dim> & point)
+                                          const Point<dim>  &point)
     : function(&function)
     , open_direction(open_direction)
     , point(point)
@@ -151,7 +151,7 @@ namespace Functions
 
   template <int dim>
   double
-  PointRestriction<dim>::value(const Point<1> &   point_1D,
+  PointRestriction<dim>::value(const Point<1>    &point_1D,
                                const unsigned int component) const
   {
     const Point<dim + 1> full_point =
@@ -163,7 +163,7 @@ namespace Functions
 
   template <int dim>
   Tensor<1, 1>
-  PointRestriction<dim>::gradient(const Point<1> &   point_1D,
+  PointRestriction<dim>::gradient(const Point<1>    &point_1D,
                                   const unsigned int component) const
   {
     const Point<dim + 1> full_point =
@@ -182,7 +182,7 @@ namespace Functions
 
   template <int dim>
   SymmetricTensor<2, 1>
-  PointRestriction<dim>::hessian(const Point<1> &   point_1D,
+  PointRestriction<dim>::hessian(const Point<1>    &point_1D,
                                  const unsigned int component) const
   {
     const Point<dim + 1> full_point =

@@ -39,7 +39,7 @@
 template <typename Number>
 void
 check(const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
-        &                                vector,
+                                        &vector,
       const Utilities::MPI::Partitioner &reference_partitioner)
 {
   Assert(vector.get_partitioner()->locally_owned_range() ==
@@ -54,7 +54,7 @@ check(const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
 template <typename Number>
 void
 check(const LinearAlgebra::CUDAWrappers::Vector<Number> &vector,
-      const Utilities::MPI::Partitioner &                reference_partitioner)
+      const Utilities::MPI::Partitioner                 &reference_partitioner)
 {
   AssertDimension(vector.size(), reference_partitioner.size());
 }

@@ -112,7 +112,7 @@ test(const unsigned int degree)
       Vector<double>            solution(dof_handler.n_dofs());
       Solution<dim>             function;
       AffineConstraints<double> dummy;
-      const auto &              mapping =
+      const auto               &mapping =
         reference_cell.template get_default_linear_mapping<dim>();
       dummy.close();
 

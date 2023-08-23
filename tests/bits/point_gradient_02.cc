@@ -70,7 +70,7 @@ public:
   }
 
   virtual void
-  vector_gradient(const Point<dim> &           p,
+  vector_gradient(const Point<dim>            &p,
                   std::vector<Tensor<1, dim>> &gradients) const
   {
     gradients[0] = gradient(p, 0);
@@ -105,7 +105,7 @@ public:
   }
 
   virtual void
-  vector_gradient(const Point<dim> &           p,
+  vector_gradient(const Point<dim>            &p,
                   std::vector<Tensor<1, dim>> &gradients) const
   {
     gradients(0) = gradient(p, 0);

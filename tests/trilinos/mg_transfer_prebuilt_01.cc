@@ -43,7 +43,7 @@
 
 template <int dim, int spacedim>
 void
-reinit_vector(const dealii::DoFHandler<dim, spacedim> &     mg_dof,
+reinit_vector(const dealii::DoFHandler<dim, spacedim>      &mg_dof,
               MGLevelObject<TrilinosWrappers::MPI::Vector> &v)
 {
   const dealii::parallel::distributed::Triangulation<dim, spacedim> *tria =

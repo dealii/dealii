@@ -78,7 +78,7 @@ namespace LinearAlgebra
     template <typename Number>
     BlockVector<Number>::BlockVector(
       const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-        &             partitioners,
+                     &partitioners,
       const MPI_Comm &comm_sm)
     {
       reinit(partitioners, comm_sm);
@@ -203,7 +203,7 @@ namespace LinearAlgebra
     void
     BlockVector<Number>::reinit(
       const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
-        &             partitioners,
+                     &partitioners,
       const MPI_Comm &comm_sm)
     {
       // update the number of blocks
@@ -312,7 +312,7 @@ namespace LinearAlgebra
       void
       copy_petsc_vector(const PETSC_Number *petsc_start_ptr,
                         const PETSC_Number *petsc_end_ptr,
-                        Number *            ptr)
+                        Number             *ptr)
       {
         std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
       }
@@ -321,7 +321,7 @@ namespace LinearAlgebra
       void
       copy_petsc_vector(const std::complex<PETSC_Number> *petsc_start_ptr,
                         const std::complex<PETSC_Number> *petsc_end_ptr,
-                        std::complex<Number> *            ptr)
+                        std::complex<Number>             *ptr)
       {
         std::copy(petsc_start_ptr, petsc_end_ptr, ptr);
       }
@@ -636,7 +636,7 @@ namespace LinearAlgebra
     template <typename Number>
     template <typename OtherNumber>
     void
-    BlockVector<Number>::add(const std::vector<size_type> &       indices,
+    BlockVector<Number>::add(const std::vector<size_type>        &indices,
                              const ::dealii::Vector<OtherNumber> &values)
     {
       for (size_type i = 0; i < indices.size(); ++i)
@@ -648,7 +648,7 @@ namespace LinearAlgebra
     template <typename Number>
     void
     BlockVector<Number>::add(const std::vector<size_type> &indices,
-                             const std::vector<Number> &   values)
+                             const std::vector<Number>    &values)
     {
       for (size_type i = 0; i < indices.size(); ++i)
         (*this)(indices[i]) += values[i];
@@ -888,7 +888,7 @@ namespace LinearAlgebra
 
     template <typename Number>
     void
-    BlockVector<Number>::print(std::ostream &     out,
+    BlockVector<Number>::print(std::ostream      &out,
                                const unsigned int precision,
                                const bool         scientific,
                                const bool         across) const
@@ -983,7 +983,7 @@ namespace LinearAlgebra
     template <typename FullMatrixType>
     Number
     BlockVector<Number>::multivector_inner_product_with_metric(
-      const FullMatrixType &     matrix,
+      const FullMatrixType      &matrix,
       const BlockVector<Number> &V,
       const bool                 symmetric) const
     {
@@ -1031,7 +1031,7 @@ namespace LinearAlgebra
     template <typename Number>
     template <typename FullMatrixType>
     void
-    BlockVector<Number>::mmult(BlockVector<Number> & V,
+    BlockVector<Number>::mmult(BlockVector<Number>  &V,
                                const FullMatrixType &matrix,
                                const Number          s,
                                const Number          b) const

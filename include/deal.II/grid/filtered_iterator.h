@@ -903,7 +903,7 @@ private:
 template <typename BaseIterator, typename Predicate>
 DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
 FilteredIterator<BaseIterator> make_filtered_iterator(const BaseIterator &i,
-                                                      const Predicate &   p)
+                                                      const Predicate    &p)
 {
   FilteredIterator<BaseIterator> fi(p);
   fi.set_to_next_positive(i);
@@ -997,7 +997,7 @@ template <typename BaseIterator, typename Predicate>
 DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
 inline IteratorRange<FilteredIterator<BaseIterator>> filter_iterators(
   IteratorRange<BaseIterator> i,
-  const Predicate &           p)
+  const Predicate            &p)
 {
   FilteredIterator<BaseIterator> fi(p, *(i.begin()));
   FilteredIterator<BaseIterator> fi_end(p, *(i.end()));
@@ -1070,7 +1070,7 @@ IteratorRange<
   typename internal::FilteredIteratorImplementation::
     NestFilteredIterators<BaseIterator, std::tuple<Predicate, Targs...>>::
       type> filter_iterators(IteratorRange<BaseIterator> i,
-                             const Predicate &           p,
+                             const Predicate            &p,
                              const Targs... args)
 {
   // Recursively create filtered iterators, one predicate at a time
@@ -1198,8 +1198,8 @@ FilteredIterator<BaseIterator>::operator=(const FilteredIterator &fi)
   // BaseIterator but try to go through constructing a new Accessor from fi
   // which fails. Hence, we just use an explicit upcast and call the above-
   // mentioned method.
-  const BaseIterator &bi      = fi;
-  return              operator=(bi);
+  const BaseIterator &bi = fi;
+  return operator=(bi);
 }
 
 

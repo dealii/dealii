@@ -69,7 +69,7 @@ namespace Evaluation
 
     virtual void
     operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const = 0;
+               const Vector<double>  &solution) const = 0;
 
   protected:
     unsigned int refinement_cycle;
@@ -98,7 +98,7 @@ namespace Evaluation
 
     virtual void
     operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const;
+               const Vector<double>  &solution) const;
 
     DeclException1(ExcEvaluationPointNotFound,
                    Point<dim>,
@@ -121,7 +121,7 @@ namespace Evaluation
   template <int dim>
   void
   PointValueEvaluation<dim>::operator()(const DoFHandler<dim> &dof_handler,
-                                        const Vector<double> & solution) const
+                                        const Vector<double>  &solution) const
   {
     double point_value = 1e20;
 
@@ -156,7 +156,7 @@ namespace Evaluation
 
     virtual void
     operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const;
+               const Vector<double>  &solution) const;
 
     DeclException1(ExcEvaluationPointNotFound,
                    Point<dim>,
@@ -179,7 +179,7 @@ namespace Evaluation
   void
   PointXDerivativeEvaluation<dim>::operator()(
     const DoFHandler<dim> &dof_handler,
-    const Vector<double> & solution) const
+    const Vector<double>  &solution) const
   {
     double point_derivative = 0;
 
@@ -229,7 +229,7 @@ namespace Evaluation
 
     virtual void
     operator()(const DoFHandler<dim> &dof_handler,
-               const Vector<double> & solution) const;
+               const Vector<double>  &solution) const;
 
   private:
     const std::string output_name_base;
@@ -319,11 +319,11 @@ namespace LaplaceSolver
   class Solver : public virtual Base<dim>
   {
   public:
-    Solver(Triangulation<dim> &       triangulation,
-           const FiniteElement<dim> & fe,
-           const Quadrature<dim> &    quadrature,
+    Solver(Triangulation<dim>        &triangulation,
+           const FiniteElement<dim>  &fe,
+           const Quadrature<dim>     &quadrature,
            const Quadrature<dim - 1> &face_quadrature,
-           const Function<dim> &      boundary_values);
+           const Function<dim>       &boundary_values);
     virtual ~Solver();
 
     virtual void
@@ -365,20 +365,20 @@ namespace LaplaceSolver
 
     void
     assemble_matrix(
-      LinearSystem &                                        linear_system,
+      LinearSystem                                         &linear_system,
       const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
       const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-      Threads::Mutex &                                      mutex) const;
+      Threads::Mutex                                       &mutex) const;
   };
 
 
 
   template <int dim>
-  Solver<dim>::Solver(Triangulation<dim> &       triangulation,
-                      const FiniteElement<dim> & fe,
-                      const Quadrature<dim> &    quadrature,
+  Solver<dim>::Solver(Triangulation<dim>        &triangulation,
+                      const FiniteElement<dim>  &fe,
+                      const Quadrature<dim>     &quadrature,
                       const Quadrature<dim - 1> &face_quadrature,
-                      const Function<dim> &      boundary_values)
+                      const Function<dim>       &boundary_values)
     : Base<dim>(triangulation)
     , fe(&fe)
     , quadrature(&quadrature)
@@ -470,10 +470,10 @@ namespace LaplaceSolver
   template <int dim>
   void
   Solver<dim>::assemble_matrix(
-    LinearSystem &                                        linear_system,
+    LinearSystem                                         &linear_system,
     const typename DoFHandler<dim>::active_cell_iterator &begin_cell,
     const typename DoFHandler<dim>::active_cell_iterator &end_cell,
-    Threads::Mutex &                                      mutex) const
+    Threads::Mutex                                       &mutex) const
   {
     FEValues<dim> fe_values(*fe,
                             *quadrature,
@@ -562,12 +562,12 @@ namespace LaplaceSolver
   class PrimalSolver : public Solver<dim>
   {
   public:
-    PrimalSolver(Triangulation<dim> &       triangulation,
-                 const FiniteElement<dim> & fe,
-                 const Quadrature<dim> &    quadrature,
+    PrimalSolver(Triangulation<dim>        &triangulation,
+                 const FiniteElement<dim>  &fe,
+                 const Quadrature<dim>     &quadrature,
                  const Quadrature<dim - 1> &face_quadrature,
-                 const Function<dim> &      rhs_function,
-                 const Function<dim> &      boundary_values);
+                 const Function<dim>       &rhs_function,
+                 const Function<dim>       &boundary_values);
 
     virtual void
     solve_problem();
@@ -591,12 +591,12 @@ namespace LaplaceSolver
 
 
   template <int dim>
-  PrimalSolver<dim>::PrimalSolver(Triangulation<dim> &       triangulation,
-                                  const FiniteElement<dim> & fe,
-                                  const Quadrature<dim> &    quadrature,
+  PrimalSolver<dim>::PrimalSolver(Triangulation<dim>        &triangulation,
+                                  const FiniteElement<dim>  &fe,
+                                  const Quadrature<dim>     &quadrature,
                                   const Quadrature<dim - 1> &face_quadrature,
-                                  const Function<dim> &      rhs_function,
-                                  const Function<dim> &      boundary_values)
+                                  const Function<dim>       &rhs_function,
+                                  const Function<dim>       &boundary_values)
     : Base<dim>(triangulation)
     , Solver<dim>(triangulation,
                   fe,
@@ -695,12 +695,12 @@ namespace LaplaceSolver
   class RefinementGlobal : public PrimalSolver<dim>
   {
   public:
-    RefinementGlobal(Triangulation<dim> &       coarse_grid,
-                     const FiniteElement<dim> & fe,
-                     const Quadrature<dim> &    quadrature,
+    RefinementGlobal(Triangulation<dim>        &coarse_grid,
+                     const FiniteElement<dim>  &fe,
+                     const Quadrature<dim>     &quadrature,
                      const Quadrature<dim - 1> &face_quadrature,
-                     const Function<dim> &      rhs_function,
-                     const Function<dim> &      boundary_values);
+                     const Function<dim>       &rhs_function,
+                     const Function<dim>       &boundary_values);
 
     virtual void
     refine_grid();
@@ -710,12 +710,12 @@ namespace LaplaceSolver
 
   template <int dim>
   RefinementGlobal<dim>::RefinementGlobal(
-    Triangulation<dim> &       coarse_grid,
-    const FiniteElement<dim> & fe,
-    const Quadrature<dim> &    quadrature,
+    Triangulation<dim>        &coarse_grid,
+    const FiniteElement<dim>  &fe,
+    const Quadrature<dim>     &quadrature,
     const Quadrature<dim - 1> &face_quadrature,
-    const Function<dim> &      rhs_function,
-    const Function<dim> &      boundary_values)
+    const Function<dim>       &rhs_function,
+    const Function<dim>       &boundary_values)
     : Base<dim>(coarse_grid)
     , PrimalSolver<dim>(coarse_grid,
                         fe,
@@ -740,12 +740,12 @@ namespace LaplaceSolver
   class RefinementKelly : public PrimalSolver<dim>
   {
   public:
-    RefinementKelly(Triangulation<dim> &       coarse_grid,
-                    const FiniteElement<dim> & fe,
-                    const Quadrature<dim> &    quadrature,
+    RefinementKelly(Triangulation<dim>        &coarse_grid,
+                    const FiniteElement<dim>  &fe,
+                    const Quadrature<dim>     &quadrature,
                     const Quadrature<dim - 1> &face_quadrature,
-                    const Function<dim> &      rhs_function,
-                    const Function<dim> &      boundary_values);
+                    const Function<dim>       &rhs_function,
+                    const Function<dim>       &boundary_values);
 
     virtual void
     refine_grid();
@@ -755,12 +755,12 @@ namespace LaplaceSolver
 
   template <int dim>
   RefinementKelly<dim>::RefinementKelly(
-    Triangulation<dim> &       coarse_grid,
-    const FiniteElement<dim> & fe,
-    const Quadrature<dim> &    quadrature,
+    Triangulation<dim>        &coarse_grid,
+    const FiniteElement<dim>  &fe,
+    const Quadrature<dim>     &quadrature,
     const Quadrature<dim - 1> &face_quadrature,
-    const Function<dim> &      rhs_function,
-    const Function<dim> &      boundary_values)
+    const Function<dim>       &rhs_function,
+    const Function<dim>       &boundary_values)
     : Base<dim>(coarse_grid)
     , PrimalSolver<dim>(coarse_grid,
                         fe,
@@ -797,13 +797,13 @@ namespace LaplaceSolver
   class RefinementWeightedKelly : public PrimalSolver<dim>
   {
   public:
-    RefinementWeightedKelly(Triangulation<dim> &       coarse_grid,
-                            const FiniteElement<dim> & fe,
-                            const Quadrature<dim> &    quadrature,
+    RefinementWeightedKelly(Triangulation<dim>        &coarse_grid,
+                            const FiniteElement<dim>  &fe,
+                            const Quadrature<dim>     &quadrature,
                             const Quadrature<dim - 1> &face_quadrature,
-                            const Function<dim> &      rhs_function,
-                            const Function<dim> &      boundary_values,
-                            const Function<dim> &      weighting_function);
+                            const Function<dim>       &rhs_function,
+                            const Function<dim>       &boundary_values,
+                            const Function<dim>       &weighting_function);
 
     virtual void
     refine_grid();
@@ -816,13 +816,13 @@ namespace LaplaceSolver
 
   template <int dim>
   RefinementWeightedKelly<dim>::RefinementWeightedKelly(
-    Triangulation<dim> &       coarse_grid,
-    const FiniteElement<dim> & fe,
-    const Quadrature<dim> &    quadrature,
+    Triangulation<dim>        &coarse_grid,
+    const FiniteElement<dim>  &fe,
+    const Quadrature<dim>     &quadrature,
     const Quadrature<dim - 1> &face_quadrature,
-    const Function<dim> &      rhs_function,
-    const Function<dim> &      boundary_values,
-    const Function<dim> &      weighting_function)
+    const Function<dim>       &rhs_function,
+    const Function<dim>       &boundary_values,
+    const Function<dim>       &weighting_function)
     : Base<dim>(coarse_grid)
     , PrimalSolver<dim>(coarse_grid,
                         fe,
@@ -1101,7 +1101,7 @@ namespace DualFunctional
   public:
     virtual void
     assemble_rhs(const DoFHandler<dim> &dof_handler,
-                 Vector<double> &       rhs) const = 0;
+                 Vector<double>        &rhs) const = 0;
   };
 
 
@@ -1135,7 +1135,7 @@ namespace DualFunctional
   template <int dim>
   void
   PointValueEvaluation<dim>::assemble_rhs(const DoFHandler<dim> &dof_handler,
-                                          Vector<double> &       rhs) const
+                                          Vector<double>        &rhs) const
   {
     rhs.reinit(dof_handler.n_dofs());
 
@@ -1186,7 +1186,7 @@ namespace DualFunctional
   void
   PointXDerivativeEvaluation<dim>::assemble_rhs(
     const DoFHandler<dim> &dof_handler,
-    Vector<double> &       rhs) const
+    Vector<double>        &rhs) const
   {
     rhs.reinit(dof_handler.n_dofs());
 
@@ -1239,10 +1239,10 @@ namespace LaplaceSolver
   class DualSolver : public Solver<dim>
   {
   public:
-    DualSolver(Triangulation<dim> &                           triangulation,
-               const FiniteElement<dim> &                     fe,
-               const Quadrature<dim> &                        quadrature,
-               const Quadrature<dim - 1> &                    face_quadrature,
+    DualSolver(Triangulation<dim>                            &triangulation,
+               const FiniteElement<dim>                      &fe,
+               const Quadrature<dim>                         &quadrature,
+               const Quadrature<dim - 1>                     &face_quadrature,
                const DualFunctional::DualFunctionalBase<dim> &dual_functional);
 
     virtual void
@@ -1270,10 +1270,10 @@ namespace LaplaceSolver
 
   template <int dim>
   DualSolver<dim>::DualSolver(
-    Triangulation<dim> &                           triangulation,
-    const FiniteElement<dim> &                     fe,
-    const Quadrature<dim> &                        quadrature,
-    const Quadrature<dim - 1> &                    face_quadrature,
+    Triangulation<dim>                            &triangulation,
+    const FiniteElement<dim>                      &fe,
+    const Quadrature<dim>                         &quadrature,
+    const Quadrature<dim - 1>                     &face_quadrature,
     const DualFunctional::DualFunctionalBase<dim> &dual_functional)
     : Base<dim>(triangulation)
     , Solver<dim>(triangulation,
@@ -1326,13 +1326,13 @@ namespace LaplaceSolver
   {
   public:
     WeightedResidual(
-      Triangulation<dim> &                           coarse_grid,
-      const FiniteElement<dim> &                     primal_fe,
-      const FiniteElement<dim> &                     dual_fe,
-      const Quadrature<dim> &                        quadrature,
-      const Quadrature<dim - 1> &                    face_quadrature,
-      const Function<dim> &                          rhs_function,
-      const Function<dim> &                          boundary_values,
+      Triangulation<dim>                            &coarse_grid,
+      const FiniteElement<dim>                      &primal_fe,
+      const FiniteElement<dim>                      &dual_fe,
+      const Quadrature<dim>                         &quadrature,
+      const Quadrature<dim - 1>                     &face_quadrature,
+      const Function<dim>                           &rhs_function,
+      const Function<dim>                           &boundary_values,
       const DualFunctional::DualFunctionalBase<dim> &dual_functional);
 
     virtual void
@@ -1371,8 +1371,8 @@ namespace LaplaceSolver
       std::vector<double>                  dual_weights;
       typename std::vector<Tensor<2, dim>> cell_grad_grads;
       CellData(const FiniteElement<dim> &fe,
-               const Quadrature<dim> &   quadrature,
-               const Function<dim> &     right_hand_side);
+               const Quadrature<dim>    &quadrature,
+               const Function<dim>      &right_hand_side);
     };
 
     struct FaceData
@@ -1385,7 +1385,7 @@ namespace LaplaceSolver
       std::vector<double>                  dual_weights;
       typename std::vector<Tensor<1, dim>> cell_grads;
       typename std::vector<Tensor<1, dim>> neighbor_grads;
-      FaceData(const FiniteElement<dim> & fe,
+      FaceData(const FiniteElement<dim>  &fe,
                const Quadrature<dim - 1> &face_quadrature);
     };
 
@@ -1399,30 +1399,30 @@ namespace LaplaceSolver
                   const Vector<double> &dual_weights,
                   const unsigned int    n_threads,
                   const unsigned int    this_thread,
-                  Vector<float> &       error_indicators,
-                  FaceIntegrals &       face_integrals) const;
+                  Vector<float>        &error_indicators,
+                  FaceIntegrals        &face_integrals) const;
 
     void
     integrate_over_cell(const active_cell_iterator &cell,
                         const unsigned int          cell_index,
-                        const Vector<double> &      primal_solution,
-                        const Vector<double> &      dual_weights,
-                        CellData &                  cell_data,
-                        Vector<float> &             error_indicators) const;
+                        const Vector<double>       &primal_solution,
+                        const Vector<double>       &dual_weights,
+                        CellData                   &cell_data,
+                        Vector<float>              &error_indicators) const;
 
     void
     integrate_over_regular_face(const active_cell_iterator &cell,
                                 const unsigned int          face_no,
-                                const Vector<double> &      primal_solution,
-                                const Vector<double> &      dual_weights,
-                                FaceData &                  face_data,
+                                const Vector<double>       &primal_solution,
+                                const Vector<double>       &dual_weights,
+                                FaceData                   &face_data,
                                 FaceIntegrals &face_integrals) const;
     void
     integrate_over_irregular_face(const active_cell_iterator &cell,
                                   const unsigned int          face_no,
-                                  const Vector<double> &      primal_solution,
-                                  const Vector<double> &      dual_weights,
-                                  FaceData &                  face_data,
+                                  const Vector<double>       &primal_solution,
+                                  const Vector<double>       &dual_weights,
+                                  FaceData                   &face_data,
                                   FaceIntegrals &face_integrals) const;
   };
 
@@ -1431,8 +1431,8 @@ namespace LaplaceSolver
   template <int dim>
   WeightedResidual<dim>::CellData::CellData(
     const FiniteElement<dim> &fe,
-    const Quadrature<dim> &   quadrature,
-    const Function<dim> &     right_hand_side)
+    const Quadrature<dim>    &quadrature,
+    const Function<dim>      &right_hand_side)
     : fe_values(fe,
                 quadrature,
                 update_values | update_hessians | update_quadrature_points |
@@ -1451,7 +1451,7 @@ namespace LaplaceSolver
 
   template <int dim>
   WeightedResidual<dim>::FaceData::FaceData(
-    const FiniteElement<dim> & fe,
+    const FiniteElement<dim>  &fe,
     const Quadrature<dim - 1> &face_quadrature)
     : fe_face_values_cell(fe,
                           face_quadrature,
@@ -1475,13 +1475,13 @@ namespace LaplaceSolver
 
   template <int dim>
   WeightedResidual<dim>::WeightedResidual(
-    Triangulation<dim> &                           coarse_grid,
-    const FiniteElement<dim> &                     primal_fe,
-    const FiniteElement<dim> &                     dual_fe,
-    const Quadrature<dim> &                        quadrature,
-    const Quadrature<dim - 1> &                    face_quadrature,
-    const Function<dim> &                          rhs_function,
-    const Function<dim> &                          bv,
+    Triangulation<dim>                            &coarse_grid,
+    const FiniteElement<dim>                      &primal_fe,
+    const FiniteElement<dim>                      &dual_fe,
+    const Quadrature<dim>                         &quadrature,
+    const Quadrature<dim - 1>                     &face_quadrature,
+    const Function<dim>                           &rhs_function,
+    const Function<dim>                           &bv,
     const DualFunctional::DualFunctionalBase<dim> &dual_functional)
     : Base<dim>(coarse_grid)
     , PrimalSolver<dim>(coarse_grid,
@@ -1565,7 +1565,7 @@ namespace LaplaceSolver
   WeightedResidual<dim>::output_solution() const
   {
     const PrimalSolver<dim> &primal_solver = *this;
-    const DualSolver<dim> &  dual_solver   = *this;
+    const DualSolver<dim>   &dual_solver   = *this;
 
     AffineConstraints<double> primal_hanging_node_constraints;
     DoFTools::make_hanging_node_constraints(primal_solver.dof_handler,
@@ -1599,7 +1599,7 @@ namespace LaplaceSolver
   WeightedResidual<dim>::estimate_error(Vector<float> &error_indicators) const
   {
     const PrimalSolver<dim> &primal_solver = *this;
-    const DualSolver<dim> &  dual_solver   = *this;
+    const DualSolver<dim>   &dual_solver   = *this;
 
     AffineConstraints<double> dual_hanging_node_constraints;
     DoFTools::make_hanging_node_constraints(dual_solver.dof_handler,
@@ -1673,11 +1673,11 @@ namespace LaplaceSolver
                                        const Vector<double> &dual_weights,
                                        const unsigned int    n_threads,
                                        const unsigned int    this_thread,
-                                       Vector<float> &       error_indicators,
+                                       Vector<float>        &error_indicators,
                                        FaceIntegrals &face_integrals) const
   {
     const PrimalSolver<dim> &primal_solver = *this;
-    const DualSolver<dim> &  dual_solver   = *this;
+    const DualSolver<dim>   &dual_solver   = *this;
 
     CellData cell_data(*dual_solver.fe,
                        *dual_solver.quadrature,
@@ -1688,7 +1688,8 @@ namespace LaplaceSolver
     for (unsigned int t = 0;
          (t < this_thread) && (cell != dual_solver.dof_handler.end());
          ++t, ++cell)
-      {}
+      {
+      }
 
 
     if (cell == dual_solver.dof_handler.end())
@@ -1740,7 +1741,8 @@ namespace LaplaceSolver
         for (unsigned int t = 0;
              ((t < n_threads) && (cell != dual_solver.dof_handler.end()));
              ++t, ++cell, ++cell_index)
-          {}
+          {
+          }
 
         if (cell == dual_solver.dof_handler.end())
           break;
@@ -1754,10 +1756,10 @@ namespace LaplaceSolver
   WeightedResidual<dim>::integrate_over_cell(
     const active_cell_iterator &cell,
     const unsigned int          cell_index,
-    const Vector<double> &      primal_solution,
-    const Vector<double> &      dual_weights,
-    CellData &                  cell_data,
-    Vector<float> &             error_indicators) const
+    const Vector<double>       &primal_solution,
+    const Vector<double>       &dual_weights,
+    CellData                   &cell_data,
+    Vector<float>              &error_indicators) const
   {
     cell_data.fe_values.reinit(cell);
     cell_data.right_hand_side->value_list(
@@ -1782,10 +1784,10 @@ namespace LaplaceSolver
   WeightedResidual<dim>::integrate_over_regular_face(
     const active_cell_iterator &cell,
     const unsigned int          face_no,
-    const Vector<double> &      primal_solution,
-    const Vector<double> &      dual_weights,
-    FaceData &                  face_data,
-    FaceIntegrals &             face_integrals) const
+    const Vector<double>       &primal_solution,
+    const Vector<double>       &dual_weights,
+    FaceData                   &face_data,
+    FaceIntegrals              &face_integrals) const
   {
     const unsigned int n_q_points =
       face_data.fe_face_values_cell.n_quadrature_points;
@@ -1829,10 +1831,10 @@ namespace LaplaceSolver
   WeightedResidual<dim>::integrate_over_irregular_face(
     const active_cell_iterator &cell,
     const unsigned int          face_no,
-    const Vector<double> &      primal_solution,
-    const Vector<double> &      dual_weights,
-    FaceData &                  face_data,
-    FaceIntegrals &             face_integrals) const
+    const Vector<double>       &primal_solution,
+    const Vector<double>       &dual_weights,
+    FaceData                   &face_data,
+    FaceIntegrals              &face_integrals) const
   {
     const unsigned int n_q_points =
       face_data.fe_face_values_cell.n_quadrature_points;

@@ -168,8 +168,8 @@ namespace internal
        * information.
        */
       virtual void
-      initialize(const std::string &                  vars,
-                 const std::vector<std::string> &     expressions,
+      initialize(const std::string                   &vars,
+                 const std::vector<std::string>      &expressions,
                  const std::map<std::string, double> &constants,
                  const bool                           time_dependent = false);
 
@@ -192,7 +192,7 @@ namespace internal
        * Compute the values of all components.
        */
       void
-      do_all_values(const Point<dim> & p,
+      do_all_values(const Point<dim>  &p,
                     const double       time,
                     ArrayView<Number> &values) const;
 

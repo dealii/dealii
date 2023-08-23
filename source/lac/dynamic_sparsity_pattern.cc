@@ -345,7 +345,7 @@ DynamicSparsityPattern::max_entries_per_row() const
 
 void
 DynamicSparsityPattern::add_row_entries(
-  const size_type &                 row,
+  const size_type                  &row,
   const ArrayView<const size_type> &columns,
   const bool                        indices_are_sorted)
 {
@@ -454,7 +454,7 @@ DynamicSparsityPattern::get_view(const IndexSet &rows) const
 template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
 void
 DynamicSparsityPattern::compute_Tmmult_pattern(
-  const SparsityPatternTypeLeft & sp_A,
+  const SparsityPatternTypeLeft  &sp_A,
   const SparsityPatternTypeRight &sp_B)
 {
   Assert(sp_A.n_rows() == sp_B.n_rows(),
@@ -477,7 +477,7 @@ DynamicSparsityPattern::compute_Tmmult_pattern(
       new_cols.resize(sp_B.row_length(i));
       {
         const auto last_il = sp_B.end(i);
-        auto *     col_ptr = new_cols.data();
+        auto      *col_ptr = new_cols.data();
         for (auto il = sp_B.begin(i); il != last_il; ++il)
           *col_ptr++ = il->column();
       }
@@ -495,7 +495,7 @@ DynamicSparsityPattern::compute_Tmmult_pattern(
 template <typename SparsityPatternTypeLeft, typename SparsityPatternTypeRight>
 void
 DynamicSparsityPattern::compute_mmult_pattern(
-  const SparsityPatternTypeLeft & left,
+  const SparsityPatternTypeLeft  &left,
   const SparsityPatternTypeRight &right)
 {
   Assert(left.n_cols() == right.n_rows(),

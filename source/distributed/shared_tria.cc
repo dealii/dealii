@@ -429,8 +429,8 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::create_triangulation(
       const std::vector<Point<spacedim>> &vertices,
-      const std::vector<CellData<dim>> &  cells,
-      const SubCellData &                 subcelldata)
+      const std::vector<CellData<dim>>   &cells,
+      const SubCellData                  &subcelldata)
     {
       try
         {

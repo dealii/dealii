@@ -636,7 +636,7 @@ public:
    */
   virtual double
   shape_value_component(const unsigned int i,
-                        const Point<dim> & p,
+                        const Point<dim>  &p,
                         const unsigned int component) const override;
 
   /**
@@ -666,7 +666,7 @@ public:
    */
   virtual Tensor<1, dim>
   shape_grad_component(const unsigned int i,
-                       const Point<dim> & p,
+                       const Point<dim>  &p,
                        const unsigned int component) const override;
 
   /**
@@ -696,7 +696,7 @@ public:
    */
   virtual Tensor<2, dim>
   shape_grad_grad_component(const unsigned int i,
-                            const Point<dim> & p,
+                            const Point<dim>  &p,
                             const unsigned int component) const override;
 
   /**
@@ -715,7 +715,7 @@ public:
    */
   virtual Tensor<3, dim>
   shape_3rd_derivative(const unsigned int i,
-                       const Point<dim> & p) const override;
+                       const Point<dim>  &p) const override;
 
   /**
    * Return the third derivatives of the @p componentth vector component of
@@ -727,7 +727,7 @@ public:
    */
   virtual Tensor<3, dim>
   shape_3rd_derivative_component(const unsigned int i,
-                                 const Point<dim> & p,
+                                 const Point<dim>  &p,
                                  const unsigned int component) const override;
 
   /**
@@ -746,7 +746,7 @@ public:
    */
   virtual Tensor<4, dim>
   shape_4th_derivative(const unsigned int i,
-                       const Point<dim> & p) const override;
+                       const Point<dim>  &p) const override;
 
   /**
    * Return the fourth derivatives of the @p componentth vector component of
@@ -758,7 +758,7 @@ public:
    */
   virtual Tensor<4, dim>
   shape_4th_derivative_component(const unsigned int i,
-                                 const Point<dim> & p,
+                                 const Point<dim>  &p,
                                  const unsigned int component) const override;
 
   /**
@@ -952,7 +952,7 @@ public:
    */
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
-                                FullMatrix<double> &                matrix,
+                                FullMatrix<double>                 &matrix,
                                 const unsigned int face_no = 0) const override;
 
 
@@ -972,7 +972,7 @@ public:
   get_subface_interpolation_matrix(
     const FiniteElement<dim, spacedim> &source,
     const unsigned int                  subface,
-    FullMatrix<double> &                matrix,
+    FullMatrix<double>                 &matrix,
     const unsigned int                  face_no = 0) const override;
 
   /**
@@ -1036,7 +1036,7 @@ public:
   virtual void
   convert_generalized_support_point_values_to_dof_values(
     const std::vector<Vector<double>> &support_point_values,
-    std::vector<double> &              dof_values) const override;
+    std::vector<double>               &dof_values) const override;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this
@@ -1088,7 +1088,7 @@ protected:
   get_data(
     const UpdateFlags             update_flags,
     const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim> &       quadrature,
+    const Quadrature<dim>        &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
       &output_data) const override;
@@ -1099,7 +1099,7 @@ protected:
     typename FiniteElement<dim, spacedim>::InternalDataBase>
   get_face_data(
     const UpdateFlags               update_flags,
-    const Mapping<dim, spacedim> &  mapping,
+    const Mapping<dim, spacedim>   &mapping,
     const hp::QCollection<dim - 1> &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -1110,7 +1110,7 @@ protected:
   get_subface_data(
     const UpdateFlags             update_flags,
     const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim - 1> &   quadrature,
+    const Quadrature<dim - 1>    &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
       &output_data) const override;
@@ -1119,11 +1119,11 @@ protected:
   fill_fe_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellSimilarity::Similarity                            cell_similarity,
-    const Quadrature<dim> &                                     quadrature,
-    const Mapping<dim, spacedim> &                              mapping,
+    const Quadrature<dim>                                      &quadrature,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                                                            mapping_data,
+                                                                  &mapping_data,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -1135,11 +1135,11 @@ protected:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const hp::QCollection<dim - 1> &                            quadrature,
-    const Mapping<dim, spacedim> &                              mapping,
+    const hp::QCollection<dim - 1>                             &quadrature,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                                                            mapping_data,
+                                                                  &mapping_data,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -1150,11 +1150,11 @@ protected:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
-    const Quadrature<dim - 1> &                                 quadrature,
-    const Mapping<dim, spacedim> &                              mapping,
+    const Quadrature<dim - 1>                                  &quadrature,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                                                            mapping_data,
+                                                                  &mapping_data,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -1173,11 +1173,11 @@ protected:
   template <class Q_or_QC>
   void
   compute_fill(
-    const Mapping<dim, spacedim> &                              mapping,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
-    const Q_or_QC &                                             quadrature,
+    const Q_or_QC                                              &quadrature,
     const CellSimilarity::Similarity                            cell_similarity,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_data,
@@ -1377,9 +1377,9 @@ namespace internal
     auto
     promote_to_fe_pair(std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
                                  unsigned int> &&p)
-      -> decltype(
-        std::forward<std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-                               unsigned int>>(p))
+      -> decltype(std::forward<
+                  std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
+                            unsigned int>>(p))
     {
       return std::forward<
         std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>(

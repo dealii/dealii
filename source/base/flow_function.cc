@@ -49,7 +49,7 @@ namespace Functions
   void
   FlowFunction<dim>::vector_value_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+    std::vector<Vector<double>>   &values) const
   {
     const unsigned int n_points = points.size();
     Assert(values.size() == n_points,
@@ -76,7 +76,7 @@ namespace Functions
   template <int dim>
   void
   FlowFunction<dim>::vector_value(const Point<dim> &point,
-                                  Vector<double> &  value) const
+                                  Vector<double>   &value) const
   {
     Assert(value.size() == dim + 1,
            ExcDimensionMismatch(value.size(), dim + 1));
@@ -100,7 +100,7 @@ namespace Functions
 
   template <int dim>
   double
-  FlowFunction<dim>::value(const Point<dim> & point,
+  FlowFunction<dim>::value(const Point<dim>  &point,
                            const unsigned int comp) const
   {
     AssertIndexRange(comp, dim + 1);
@@ -123,7 +123,7 @@ namespace Functions
   template <int dim>
   void
   FlowFunction<dim>::vector_gradient_list(
-    const std::vector<Point<dim>> &           points,
+    const std::vector<Point<dim>>            &points,
     std::vector<std::vector<Tensor<1, dim>>> &values) const
   {
     const unsigned int n_points = points.size();
@@ -152,7 +152,7 @@ namespace Functions
   void
   FlowFunction<dim>::vector_laplacian_list(
     const std::vector<Point<dim>> &points,
-    std::vector<Vector<double>> &  values) const
+    std::vector<Vector<double>>   &values) const
   {
     const unsigned int n_points = points.size();
     Assert(values.size() == n_points,
@@ -200,7 +200,7 @@ namespace Functions
   template <int dim>
   void
   PoisseuilleFlow<dim>::vector_values(
-    const std::vector<Point<dim>> &   points,
+    const std::vector<Point<dim>>    &points,
     std::vector<std::vector<double>> &values) const
   {
     const unsigned int n = points.size();
@@ -236,7 +236,7 @@ namespace Functions
   template <int dim>
   void
   PoisseuilleFlow<dim>::vector_gradients(
-    const std::vector<Point<dim>> &           points,
+    const std::vector<Point<dim>>            &points,
     std::vector<std::vector<Tensor<1, dim>>> &values) const
   {
     const unsigned int n = points.size();
@@ -268,7 +268,7 @@ namespace Functions
   template <int dim>
   void
   PoisseuilleFlow<dim>::vector_laplacians(
-    const std::vector<Point<dim>> &   points,
+    const std::vector<Point<dim>>    &points,
     std::vector<std::vector<double>> &values) const
   {
     const unsigned int n = points.size();
@@ -304,7 +304,7 @@ namespace Functions
   template <int dim>
   void
   StokesCosine<dim>::vector_values(
-    const std::vector<Point<dim>> &   points,
+    const std::vector<Point<dim>>    &points,
     std::vector<std::vector<double>> &values) const
   {
     unsigned int n = points.size();
@@ -353,7 +353,7 @@ namespace Functions
   template <int dim>
   void
   StokesCosine<dim>::vector_gradients(
-    const std::vector<Point<dim>> &           points,
+    const std::vector<Point<dim>>            &points,
     std::vector<std::vector<Tensor<1, dim>>> &values) const
   {
     unsigned int n = points.size();
@@ -419,7 +419,7 @@ namespace Functions
   template <int dim>
   void
   StokesCosine<dim>::vector_laplacians(
-    const std::vector<Point<dim>> &   points,
+    const std::vector<Point<dim>>    &points,
     std::vector<std::vector<double>> &values) const
   {
     unsigned int n = points.size();
@@ -544,7 +544,7 @@ namespace Functions
 
   void
   StokesLSingularity::vector_values(
-    const std::vector<Point<2>> &     points,
+    const std::vector<Point<2>>      &points,
     std::vector<std::vector<double>> &values) const
   {
     unsigned int n = points.size();
@@ -584,7 +584,7 @@ namespace Functions
 
   void
   StokesLSingularity::vector_gradients(
-    const std::vector<Point<2>> &           points,
+    const std::vector<Point<2>>            &points,
     std::vector<std::vector<Tensor<1, 2>>> &values) const
   {
     unsigned int n = points.size();
@@ -644,7 +644,7 @@ namespace Functions
 
   void
   StokesLSingularity::vector_laplacians(
-    const std::vector<Point<2>> &     points,
+    const std::vector<Point<2>>      &points,
     std::vector<std::vector<double>> &values) const
   {
     unsigned int n = points.size();
@@ -677,7 +677,7 @@ namespace Functions
 
 
   void
-  Kovasznay::vector_values(const std::vector<Point<2>> &     points,
+  Kovasznay::vector_values(const std::vector<Point<2>>      &points,
                            std::vector<std::vector<double>> &values) const
   {
     unsigned int n = points.size();
@@ -702,7 +702,7 @@ namespace Functions
 
   void
   Kovasznay::vector_gradients(
-    const std::vector<Point<2>> &           points,
+    const std::vector<Point<2>>            &points,
     std::vector<std::vector<Tensor<1, 2>>> &gradients) const
   {
     unsigned int n = points.size();
@@ -734,7 +734,7 @@ namespace Functions
 
 
   void
-  Kovasznay::vector_laplacians(const std::vector<Point<2>> &     points,
+  Kovasznay::vector_laplacians(const std::vector<Point<2>>      &points,
                                std::vector<std::vector<double>> &values) const
   {
     unsigned int n = points.size();

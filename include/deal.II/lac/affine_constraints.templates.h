@@ -87,7 +87,7 @@ template <typename number>
 bool
 AffineConstraints<number>::is_consistent_in_parallel(
   const std::vector<IndexSet> &locally_owned_dofs,
-  const IndexSet &             locally_active_dofs,
+  const IndexSet              &locally_active_dofs,
   const MPI_Comm               mpi_communicator,
   const bool                   verbose) const
 {
@@ -178,8 +178,8 @@ namespace internal
   std::vector<typename dealii::AffineConstraints<number>::ConstraintLine>
   compute_locally_relevant_constraints(
     const dealii::AffineConstraints<number> &constraints_in,
-    const IndexSet &                         locally_owned_dofs,
-    const IndexSet &                         locally_relevant_dofs,
+    const IndexSet                          &locally_owned_dofs,
+    const IndexSet                          &locally_relevant_dofs,
     const MPI_Comm                           mpi_communicator)
   {
     // The result vector filled step by step.
@@ -603,7 +603,7 @@ template <typename number>
 void
 AffineConstraints<number>::add_selected_constraints(
   const AffineConstraints &constraints,
-  const IndexSet &         filter)
+  const IndexSet          &filter)
 {
   if (constraints.n_constraints() == 0)
     return;
@@ -1698,7 +1698,7 @@ template <typename number>
 template <typename VectorType>
 void
 AffineConstraints<number>::condense(const VectorType &vec_ghosted,
-                                    VectorType &      vec) const
+                                    VectorType       &vec) const
 {
   Assert(sorted == true, ExcMatrixNotClosed());
 
@@ -1753,7 +1753,7 @@ template <typename number>
 template <typename VectorType>
 void
 AffineConstraints<number>::condense(SparseMatrix<number> &uncondensed,
-                                    VectorType &          vec) const
+                                    VectorType           &vec) const
 {
   // check whether we work on real vectors or we just used a dummy when
   // calling the other function above.
@@ -1926,7 +1926,7 @@ template <typename number>
 template <typename BlockVectorType>
 void
 AffineConstraints<number>::condense(BlockSparseMatrix<number> &uncondensed,
-                                    BlockVectorType &          vec) const
+                                    BlockVectorType           &vec) const
 {
   // check whether we work on real vectors or we just used a dummy when
   // calling the other function above.
@@ -2122,7 +2122,7 @@ namespace internal
     template <typename VectorType>
     void
     set_zero_parallel(const std::vector<size_type> &cm,
-                      VectorType &                  vec,
+                      VectorType                   &vec,
                       size_type                     shift = 0)
     {
       Assert(!vec.has_ghost_elements(), ExcInternalError());
@@ -2144,7 +2144,7 @@ namespace internal
 
     template <typename number>
     void
-    set_zero_parallel(const std::vector<size_type> &              cm,
+    set_zero_parallel(const std::vector<size_type>               &cm,
                       LinearAlgebra::distributed::Vector<number> &vec,
                       size_type                                   shift = 0)
     {
@@ -2167,7 +2167,7 @@ namespace internal
     template <typename number>
     void
     set_zero_parallel(
-      const std::vector<size_type> &                                    cm,
+      const std::vector<size_type>                                     &cm,
       LinearAlgebra::distributed::Vector<number, MemorySpace::Default> &vec,
       size_type shift = 0)
     {
@@ -2195,7 +2195,7 @@ namespace internal
       using ExecutionSpace =
         MemorySpace::Default::kokkos_space::execution_space;
       ExecutionSpace exec;
-      auto *         local_values = vec.get_values();
+      auto          *local_values = vec.get_values();
       Kokkos::parallel_for(
         "dealii::set_zero_parallel",
         Kokkos::RangePolicy<ExecutionSpace>(exec, 0, n_constraints),
@@ -2209,7 +2209,7 @@ namespace internal
     template <typename VectorType>
     void
     set_zero_in_parallel(const std::vector<size_type> &cm,
-                         VectorType &                  vec,
+                         VectorType                   &vec,
                          std::integral_constant<bool, false>)
     {
       set_zero_parallel(cm, vec, 0);
@@ -2219,7 +2219,7 @@ namespace internal
     template <typename VectorType>
     void
     set_zero_in_parallel(const std::vector<size_type> &cm,
-                         VectorType &                  vec,
+                         VectorType                   &vec,
                          std::integral_constant<bool, true>)
     {
       size_type start_shift = 0;
@@ -2269,10 +2269,10 @@ template <typename number>
 template <typename VectorType>
 void
 AffineConstraints<number>::distribute_local_to_global(
-  const Vector<number> &        local_vector,
+  const Vector<number>         &local_vector,
   const std::vector<size_type> &local_dof_indices,
-  VectorType &                  global_vector,
-  const FullMatrix<number> &    local_matrix) const
+  VectorType                   &global_vector,
+  const FullMatrix<number>     &local_matrix) const
 {
   distribute_local_to_global(local_vector,
                              local_dof_indices,
@@ -2286,11 +2286,11 @@ template <typename number>
 template <typename VectorType>
 void
 AffineConstraints<number>::distribute_local_to_global(
-  const Vector<number> &        local_vector,
+  const Vector<number>         &local_vector,
   const std::vector<size_type> &local_dof_indices_row,
   const std::vector<size_type> &local_dof_indices_col,
-  VectorType &                  global_vector,
-  const FullMatrix<number> &    local_matrix,
+  VectorType                   &global_vector,
+  const FullMatrix<number>     &local_matrix,
   bool                          diagonal) const
 {
   Assert(sorted == true, ExcMatrixNotClosed());
@@ -2400,7 +2400,7 @@ namespace internal
   import_vector_with_ghost_elements(
     const TrilinosWrappers::MPI::Vector &vec,
     const IndexSet & /*locally_owned_elements*/,
-    const IndexSet &               needed_elements,
+    const IndexSet                &needed_elements,
     TrilinosWrappers::MPI::Vector &output,
     const std::integral_constant<bool, false> /*is_block_vector*/)
   {
@@ -2422,9 +2422,9 @@ namespace internal
   inline void
   import_vector_with_ghost_elements(
     const PETScWrappers::MPI::Vector &vec,
-    const IndexSet &                  locally_owned_elements,
-    const IndexSet &                  needed_elements,
-    PETScWrappers::MPI::Vector &      output,
+    const IndexSet                   &locally_owned_elements,
+    const IndexSet                   &needed_elements,
+    PETScWrappers::MPI::Vector       &output,
     const std::integral_constant<bool, false> /*is_block_vector*/)
   {
     output.reinit(locally_owned_elements,
@@ -2438,9 +2438,9 @@ namespace internal
   void
   import_vector_with_ghost_elements(
     const LinearAlgebra::distributed::Vector<number> &vec,
-    const IndexSet &                                  locally_owned_elements,
-    const IndexSet &                                  needed_elements,
-    LinearAlgebra::distributed::Vector<number> &      output,
+    const IndexSet                                   &locally_owned_elements,
+    const IndexSet                                   &needed_elements,
+    LinearAlgebra::distributed::Vector<number>       &output,
     const std::integral_constant<bool, false> /*is_block_vector*/)
   {
     // TODO: the in vector might already have all elements. need to find a
@@ -2473,9 +2473,9 @@ namespace internal
   void
   import_vector_with_ghost_elements(
     const VectorType &vec,
-    const IndexSet &  locally_owned_elements,
-    const IndexSet &  needed_elements,
-    VectorType &      output,
+    const IndexSet   &locally_owned_elements,
+    const IndexSet   &needed_elements,
+    VectorType       &output,
     const std::integral_constant<bool, true> /*is_block_vector*/)
   {
     output.reinit(vec.n_blocks());
@@ -3077,9 +3077,9 @@ namespace internal
     // on.
     template <typename number, typename BlockType>
     inline void
-    make_block_starts(const BlockType &            block_object,
+    make_block_starts(const BlockType             &block_object,
                       GlobalRowsFromLocal<number> &global_rows,
-                      std::vector<size_type> &     block_starts)
+                      std::vector<size_type>      &block_starts)
     {
       AssertDimension(block_starts.size(), block_object.n_block_rows() + 1);
 
@@ -3114,7 +3114,7 @@ namespace internal
     // GlobalRowsFromLocal. Used in functions for sparsity patterns.
     template <typename BlockType>
     inline void
-    make_block_starts(const BlockType &       block_object,
+    make_block_starts(const BlockType        &block_object,
                       std::vector<size_type> &row_indices,
                       std::vector<size_type> &block_starts)
     {
@@ -3155,7 +3155,7 @@ namespace internal
                          const size_type                    i,
                          const size_type                    j,
                          const size_type                    loc_row,
-                         const FullMatrix<number> &         local_matrix)
+                         const FullMatrix<number>          &local_matrix)
     {
       const size_type loc_col = global_cols.local_row(j);
       number          col_val;
@@ -3206,9 +3206,9 @@ namespace internal
                        const size_type                    i,
                        const size_type                    column_start,
                        const size_type                    column_end,
-                       const FullMatrix<number> &         local_matrix,
-                       size_type *&                       col_ptr,
-                       number *&                          val_ptr)
+                       const FullMatrix<number>          &local_matrix,
+                       size_type                        *&col_ptr,
+                       number                           *&val_ptr)
     {
       if (column_end == column_start)
         return;
@@ -3303,8 +3303,8 @@ namespace internal
                        const size_type                    i,
                        const size_type                    column_start,
                        const size_type                    column_end,
-                       const FullMatrix<number> &         local_matrix,
-                       SparseMatrix<number> *             sparse_matrix)
+                       const FullMatrix<number>          &local_matrix,
+                       SparseMatrix<number>              *sparse_matrix)
     {
       if (column_end == column_start)
         return;
@@ -3454,8 +3454,8 @@ namespace internal
                        const size_type                    i,
                        const size_type                    column_start,
                        const size_type                    column_end,
-                       const Table<2, bool> &             dof_mask,
-                       std::vector<size_type>::iterator & col_ptr)
+                       const Table<2, bool>              &dof_mask,
+                       std::vector<size_type>::iterator  &col_ptr)
     {
       if (column_end == column_start)
         return;
@@ -3546,12 +3546,12 @@ namespace internal
     inline void
     set_matrix_diagonals(
       const internal::AffineConstraints::GlobalRowsFromLocal<number>
-        &                                      global_rows,
-      const std::vector<size_type> &           local_dof_indices,
-      const FullMatrix<number> &               local_matrix,
+                                              &global_rows,
+      const std::vector<size_type>            &local_dof_indices,
+      const FullMatrix<number>                &local_matrix,
       const dealii::AffineConstraints<number> &constraints,
-      MatrixType &                             global_matrix,
-      VectorType &                             global_vector,
+      MatrixType                              &global_matrix,
+      VectorType                              &global_vector,
       bool                                     use_inhomogeneities_for_rhs)
     {
       if (global_rows.n_constraints() > 0)
@@ -3615,12 +3615,12 @@ namespace internal
     inline void
     set_sparsity_diagonals(
       const internal::AffineConstraints::GlobalRowsFromLocal<number>
-        &                           global_rows,
+                                   &global_rows,
       const std::vector<size_type> &local_dof_indices,
-      const Table<2, bool> &        dof_mask,
+      const Table<2, bool>         &dof_mask,
       const bool                    keep_constrained_entries,
-      ScratchData<number> &         scratch_data,
-      SparsityPatternBase &         sparsity_pattern)
+      ScratchData<number>          &scratch_data,
+      SparsityPatternBase          &sparsity_pattern)
     {
       // if we got constraints, need to add the diagonal element and, if the
       // user requested so, also the rest of the entries in rows and columns
@@ -3669,7 +3669,7 @@ namespace internal
 template <typename number>
 void
 AffineConstraints<number>::make_sorted_row_list(
-  const std::vector<size_type> &                            local_dof_indices,
+  const std::vector<size_type>                             &local_dof_indices,
   internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows) const
 {
   const size_type n_local_dofs = local_dof_indices.size();
@@ -3736,7 +3736,7 @@ template <typename number>
 inline void
 AffineConstraints<number>::make_sorted_row_list(
   const std::vector<size_type> &local_dof_indices,
-  std::vector<size_type> &      active_dofs) const
+  std::vector<size_type>       &active_dofs) const
 {
   const size_type n_local_dofs = local_dof_indices.size();
   size_type       added_rows   = 0;
@@ -3796,8 +3796,8 @@ inline typename ProductType<VectorScalar, MatrixScalar>::type
 AffineConstraints<number>::resolve_vector_entry(
   const size_type                                                 i,
   const internal::AffineConstraints::GlobalRowsFromLocal<number> &global_rows,
-  const Vector<VectorScalar> &                                    local_vector,
-  const std::vector<size_type> &  local_dof_indices,
+  const Vector<VectorScalar>                                     &local_vector,
+  const std::vector<size_type>   &local_dof_indices,
   const FullMatrix<MatrixScalar> &local_matrix) const
 {
   const size_type loc_row              = global_rows.local_row(i);
@@ -3841,11 +3841,11 @@ template <typename number>
 template <typename MatrixType, typename VectorType>
 void
 AffineConstraints<number>::distribute_local_to_global(
-  const FullMatrix<number> &    local_matrix,
-  const Vector<number> &        local_vector,
+  const FullMatrix<number>     &local_matrix,
+  const Vector<number>         &local_vector,
   const std::vector<size_type> &local_dof_indices,
-  MatrixType &                  global_matrix,
-  VectorType &                  global_vector,
+  MatrixType                   &global_matrix,
+  VectorType                   &global_vector,
   const bool                    use_inhomogeneities_for_rhs,
   const std::integral_constant<bool, false>) const
 {
@@ -3887,7 +3887,7 @@ AffineConstraints<number>::distribute_local_to_global(
   // the AffineConstraints class (unless we do cast). This involves a little
   // bit of logic to determine the type of the matrix value.
   std::vector<size_type> &cols = scratch_data->columns;
-  std::vector<number> &   vals = scratch_data->values;
+  std::vector<number>    &vals = scratch_data->values;
   // create arrays for writing into the vector as well
   std::vector<size_type> &vector_indices = scratch_data->vector_indices;
   std::vector<typename VectorType::value_type> &vector_values =
@@ -4002,11 +4002,11 @@ template <typename number>
 template <typename MatrixType, typename VectorType>
 void
 AffineConstraints<number>::distribute_local_to_global(
-  const FullMatrix<number> &    local_matrix,
-  const Vector<number> &        local_vector,
+  const FullMatrix<number>     &local_matrix,
+  const Vector<number>         &local_vector,
   const std::vector<size_type> &local_dof_indices,
-  MatrixType &                  global_matrix,
-  VectorType &                  global_vector,
+  MatrixType                   &global_matrix,
+  VectorType                   &global_vector,
   const bool                    use_inhomogeneities_for_rhs,
   const std::integral_constant<bool, true>) const
 {
@@ -4055,7 +4055,7 @@ AffineConstraints<number>::distribute_local_to_global(
                                                  block_starts);
 
   std::vector<size_type> &cols = scratch_data->columns;
-  std::vector<number> &   vals = scratch_data->values;
+  std::vector<number>    &vals = scratch_data->values;
   if (use_dealii_matrix == false)
     {
       cols.resize(n_actual_dofs);
@@ -4079,7 +4079,7 @@ AffineConstraints<number>::distribute_local_to_global(
               if (use_dealii_matrix == false)
                 {
                   size_type *col_ptr = cols.data();
-                  number *   val_ptr = vals.data();
+                  number    *val_ptr = vals.data();
                   internal::AffineConstraints::resolve_matrix_row(global_rows,
                                                                   global_rows,
                                                                   i,
@@ -4138,10 +4138,10 @@ template <typename number>
 template <typename MatrixType>
 void
 AffineConstraints<number>::distribute_local_to_global(
-  const FullMatrix<number> &    local_matrix,
+  const FullMatrix<number>     &local_matrix,
   const std::vector<size_type> &row_indices,
   const std::vector<size_type> &col_indices,
-  MatrixType &                  global_matrix) const
+  MatrixType                   &global_matrix) const
 {
   distribute_local_to_global(
     local_matrix, row_indices, *this, col_indices, global_matrix);
@@ -4153,11 +4153,11 @@ template <typename number>
 template <typename MatrixType>
 void
 AffineConstraints<number>::distribute_local_to_global(
-  const FullMatrix<number> &       local_matrix,
-  const std::vector<size_type> &   row_indices,
+  const FullMatrix<number>        &local_matrix,
+  const std::vector<size_type>    &row_indices,
   const AffineConstraints<number> &col_constraint_matrix,
-  const std::vector<size_type> &   col_indices,
-  MatrixType &                     global_matrix) const
+  const std::vector<size_type>    &col_indices,
+  MatrixType                      &global_matrix) const
 {
   AssertDimension(local_matrix.m(), row_indices.size());
   AssertDimension(local_matrix.n(), col_indices.size());
@@ -4186,7 +4186,7 @@ AffineConstraints<number>::distribute_local_to_global(
   // create arrays for the column data (indices and values) that will then be
   // written into the matrix. Shortcut for deal.II sparse matrix
   std::vector<size_type> &cols = scratch_data->columns;
-  std::vector<number> &   vals = scratch_data->values;
+  std::vector<number>    &vals = scratch_data->values;
   cols.resize(n_actual_col_dofs);
   vals.resize(n_actual_col_dofs);
 
@@ -4197,7 +4197,7 @@ AffineConstraints<number>::distribute_local_to_global(
 
       // calculate all the data that will be written into the matrix row.
       size_type *col_ptr = cols.data();
-      number *   val_ptr = vals.data();
+      number    *val_ptr = vals.data();
       internal::AffineConstraints::resolve_matrix_row(global_rows,
                                                       global_cols,
                                                       i,
@@ -4218,9 +4218,9 @@ template <typename number>
 void
 AffineConstraints<number>::add_entries_local_to_global(
   const std::vector<size_type> &local_dof_indices,
-  SparsityPatternBase &         sparsity_pattern,
+  SparsityPatternBase          &sparsity_pattern,
   const bool                    keep_constrained_entries,
-  const Table<2, bool> &        dof_mask) const
+  const Table<2, bool>         &dof_mask) const
 {
   Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
          ExcNotQuadratic());
@@ -4321,12 +4321,12 @@ AffineConstraints<number>::add_entries_local_to_global(
 template <typename number>
 void
 AffineConstraints<number>::add_entries_local_to_global(
-  const std::vector<size_type> &   row_indices,
+  const std::vector<size_type>    &row_indices,
   const AffineConstraints<number> &col_constraints,
-  const std::vector<size_type> &   col_indices,
-  SparsityPatternBase &            sparsity_pattern,
+  const std::vector<size_type>    &col_indices,
+  SparsityPatternBase             &sparsity_pattern,
   const bool                       keep_constrained_entries,
-  const Table<2, bool> &           dof_mask) const
+  const Table<2, bool>            &dof_mask) const
 {
   const size_type n_local_rows = row_indices.size();
   const size_type n_local_cols = col_indices.size();
@@ -4395,9 +4395,9 @@ void
 AffineConstraints<number>::add_entries_local_to_global(
   const std::vector<size_type> &row_indices,
   const std::vector<size_type> &col_indices,
-  SparsityPatternBase &         sparsity_pattern,
+  SparsityPatternBase          &sparsity_pattern,
   const bool                    keep_constrained_entries,
-  const Table<2, bool> &        dof_mask) const
+  const Table<2, bool>         &dof_mask) const
 {
   // Call the function with the same name that takes a column constraint as well
   add_entries_local_to_global(row_indices,

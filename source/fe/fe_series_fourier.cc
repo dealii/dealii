@@ -66,8 +66,8 @@ namespace
   template <int dim, int spacedim>
   std::complex<double>
   integrate(const FiniteElement<dim, spacedim> &fe,
-            const Quadrature<dim> &             quadrature,
-            const Tensor<1, dim> &              k_vector,
+            const Quadrature<dim>              &quadrature,
+            const Tensor<1, dim>               &k_vector,
             const unsigned int                  j,
             const unsigned int                  component)
   {
@@ -91,10 +91,10 @@ namespace
   template <int spacedim>
   void
   ensure_existence(
-    const std::vector<unsigned int> &              n_coefficients_per_direction,
-    const hp::FECollection<1, spacedim> &          fe_collection,
-    const hp::QCollection<1> &                     q_collection,
-    const Table<1, Tensor<1, 1>> &                 k_vectors,
+    const std::vector<unsigned int>               &n_coefficients_per_direction,
+    const hp::FECollection<1, spacedim>           &fe_collection,
+    const hp::QCollection<1>                      &q_collection,
+    const Table<1, Tensor<1, 1>>                  &k_vectors,
     const unsigned int                             fe,
     const unsigned int                             component,
     std::vector<FullMatrix<std::complex<double>>> &fourier_transform_matrices)
@@ -117,10 +117,10 @@ namespace
   template <int spacedim>
   void
   ensure_existence(
-    const std::vector<unsigned int> &              n_coefficients_per_direction,
-    const hp::FECollection<2, spacedim> &          fe_collection,
-    const hp::QCollection<2> &                     q_collection,
-    const Table<2, Tensor<1, 2>> &                 k_vectors,
+    const std::vector<unsigned int>               &n_coefficients_per_direction,
+    const hp::FECollection<2, spacedim>           &fe_collection,
+    const hp::QCollection<2>                      &q_collection,
+    const Table<2, Tensor<1, 2>>                  &k_vectors,
     const unsigned int                             fe,
     const unsigned int                             component,
     std::vector<FullMatrix<std::complex<double>>> &fourier_transform_matrices)
@@ -151,10 +151,10 @@ namespace
   template <int spacedim>
   void
   ensure_existence(
-    const std::vector<unsigned int> &              n_coefficients_per_direction,
-    const hp::FECollection<3, spacedim> &          fe_collection,
-    const hp::QCollection<3> &                     q_collection,
-    const Table<3, Tensor<1, 3>> &                 k_vectors,
+    const std::vector<unsigned int>               &n_coefficients_per_direction,
+    const hp::FECollection<3, spacedim>           &fe_collection,
+    const hp::QCollection<3>                      &q_collection,
+    const Table<3, Tensor<1, 3>>                  &k_vectors,
     const unsigned int                             fe,
     const unsigned int                             component,
     std::vector<FullMatrix<std::complex<double>>> &fourier_transform_matrices)
@@ -190,9 +190,9 @@ namespace FESeries
 {
   template <int dim, int spacedim>
   Fourier<dim, spacedim>::Fourier(
-    const std::vector<unsigned int> &      n_coefficients_per_direction,
+    const std::vector<unsigned int>       &n_coefficients_per_direction,
     const hp::FECollection<dim, spacedim> &fe_collection,
-    const hp::QCollection<dim> &           q_collection,
+    const hp::QCollection<dim>            &q_collection,
     const unsigned int                     component_)
     : n_coefficients_per_direction(n_coefficients_per_direction)
     , fe_collection(&fe_collection)
@@ -276,7 +276,7 @@ namespace FESeries
   template <typename Number>
   void
   Fourier<dim, spacedim>::calculate(
-    const Vector<Number> &       local_dof_values,
+    const Vector<Number>        &local_dof_values,
     const unsigned int           cell_active_fe_index,
     Table<dim, CoefficientType> &fourier_coefficients)
   {

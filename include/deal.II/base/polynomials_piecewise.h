@@ -133,7 +133,7 @@ namespace Polynomials
     void
     value(const number       x,
           const unsigned int n_derivatives,
-          number *           values) const;
+          number            *values) const;
 
     /**
      * Degree of the polynomial. This is the degree of the underlying base

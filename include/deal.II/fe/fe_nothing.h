@@ -193,11 +193,11 @@ public:
   fill_fe_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const CellSimilarity::Similarity                            cell_similarity,
-    const Quadrature<dim> &                                     quadrature,
-    const Mapping<dim, spacedim> &                              mapping,
+    const Quadrature<dim>                                      &quadrature,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                                                            mapping_data,
+                                                                  &mapping_data,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -209,11 +209,11 @@ public:
   fill_fe_face_values(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
-    const hp::QCollection<dim - 1> &                            quadrature,
-    const Mapping<dim, spacedim> &                              mapping,
+    const hp::QCollection<dim - 1>                             &quadrature,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                                                            mapping_data,
+                                                                  &mapping_data,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -224,11 +224,11 @@ public:
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          face_no,
     const unsigned int                                          sub_no,
-    const Quadrature<dim - 1> &                                 quadrature,
-    const Mapping<dim, spacedim> &                              mapping,
+    const Quadrature<dim - 1>                                  &quadrature,
+    const Mapping<dim, spacedim>                               &mapping,
     const typename Mapping<dim, spacedim>::InternalDataBase &mapping_internal,
     const internal::FEValuesImplementation::MappingRelatedData<dim, spacedim>
-      &                                                            mapping_data,
+                                                                  &mapping_data,
     const typename FiniteElement<dim, spacedim>::InternalDataBase &fe_internal,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
@@ -248,7 +248,7 @@ public:
   get_data(
     const UpdateFlags             update_flags,
     const Mapping<dim, spacedim> &mapping,
-    const Quadrature<dim> &       quadrature,
+    const Quadrature<dim>        &quadrature,
     dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim,
                                                                        spacedim>
       &output_data) const override;
@@ -292,7 +292,7 @@ public:
   virtual void
   get_interpolation_matrix(
     const FiniteElement<dim, spacedim> &source_fe,
-    FullMatrix<double> &                interpolation_matrix) const override;
+    FullMatrix<double>                 &interpolation_matrix) const override;
 
   /**
    * Return the matrix interpolating from a face of one element to the face
@@ -322,7 +322,7 @@ public:
   get_subface_interpolation_matrix(
     const FiniteElement<dim, spacedim> &source_fe,
     const unsigned int                  index,
-    FullMatrix<double> &                interpolation_matrix,
+    FullMatrix<double>                 &interpolation_matrix,
     const unsigned int                  face_no = 0) const override;
 
   /**

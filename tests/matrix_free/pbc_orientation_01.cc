@@ -58,17 +58,17 @@ void
 generate_grid(Triangulation<3> &triangulation, int orientation)
 {
   Point<3>              vertices_1[] = {Point<3>(-0., -0., -0.),
-                           Point<3>(+1., -0., -0.),
-                           Point<3>(-0., +1., -0.),
-                           Point<3>(+1., +1., -0.),
-                           Point<3>(-0., -0., +0.5),
-                           Point<3>(+1., -0., +0.5),
-                           Point<3>(-0., +1., +0.5),
-                           Point<3>(+1., +1., +0.5),
-                           Point<3>(-0., -0., +1.),
-                           Point<3>(+1., -0., +1.),
-                           Point<3>(-0., +1., +1.),
-                           Point<3>(+1., +1., +1.)};
+                                        Point<3>(+1., -0., -0.),
+                                        Point<3>(-0., +1., -0.),
+                                        Point<3>(+1., +1., -0.),
+                                        Point<3>(-0., -0., +0.5),
+                                        Point<3>(+1., -0., +0.5),
+                                        Point<3>(-0., +1., +0.5),
+                                        Point<3>(+1., +1., +0.5),
+                                        Point<3>(-0., -0., +1.),
+                                        Point<3>(+1., -0., +1.),
+                                        Point<3>(-0., +1., +1.),
+                                        Point<3>(+1., +1., +1.)};
   std::vector<Point<3>> vertices(&vertices_1[0], &vertices_1[12]);
 
   std::vector<CellData<3>> cells(2, CellData<3>());

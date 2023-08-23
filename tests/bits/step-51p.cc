@@ -161,7 +161,7 @@ namespace Step51
   template <int dim>
   void
   SolutionAndGradient<dim>::vector_value(const Point<dim> &p,
-                                         Vector<double> &  v) const
+                                         Vector<double>   &v) const
   {
     AssertDimension(v.size(), dim + 1);
     Solution<dim>  solution;
@@ -282,8 +282,8 @@ namespace Step51
     void
     assemble_system_one_cell(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      ScratchData &                                         scratch,
-      PerTaskData &                                         task_data);
+      ScratchData                                          &scratch,
+      PerTaskData                                          &task_data);
 
     void
     copy_local_to_global(const PerTaskData &data);
@@ -291,8 +291,8 @@ namespace Step51
     void
     postprocess_one_cell(
       const typename DoFHandler<dim>::active_cell_iterator &cell,
-      PostProcessScratchData &                              scratch,
-      unsigned int &                                        empty_data);
+      PostProcessScratchData                               &scratch,
+      unsigned int                                         &empty_data);
 
 
     Triangulation<dim> triangulation;
@@ -415,8 +415,8 @@ namespace Step51
 
     ScratchData(const FiniteElement<dim> &fe,
                 const FiniteElement<dim> &fe_local,
-                const QGauss<dim> &       quadrature_formula,
-                const QGauss<dim - 1> &   face_quadrature_formula,
+                const QGauss<dim>        &quadrature_formula,
+                const QGauss<dim - 1>    &face_quadrature_formula,
                 const UpdateFlags         local_flags,
                 const UpdateFlags         local_face_flags,
                 const UpdateFlags         flags)
@@ -503,7 +503,7 @@ namespace Step51
 
     PostProcessScratchData(const FiniteElement<dim> &fe,
                            const FiniteElement<dim> &fe_local,
-                           const QGauss<dim> &       quadrature_formula,
+                           const QGauss<dim>        &quadrature_formula,
                            const UpdateFlags         local_flags,
                            const UpdateFlags         flags)
       : fe_values_local(fe_local, quadrature_formula, local_flags)
@@ -571,8 +571,8 @@ namespace Step51
   void
   HDG<dim>::assemble_system_one_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    ScratchData &                                         scratch,
-    PerTaskData &                                         task_data)
+    ScratchData                                          &scratch,
+    PerTaskData                                          &task_data)
   {
     const auto loc_cell = cell->as_dof_handler_iterator(dof_handler_local);
 
@@ -882,7 +882,7 @@ namespace Step51
   void
   HDG<dim>::postprocess_one_cell(
     const typename DoFHandler<dim>::active_cell_iterator &cell,
-    PostProcessScratchData &                              scratch,
+    PostProcessScratchData                               &scratch,
     unsigned int &)
   {
     const auto loc_cell = cell->as_dof_handler_iterator(dof_handler_local);

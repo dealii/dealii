@@ -115,9 +115,9 @@ template <int dim>
 void
 check_qph(parallel::distributed::Triangulation<dim> &tr,
           const CellDataStorage<typename Triangulation<dim, dim>::cell_iterator,
-                                MyDataBase> &        manager,
-          const Quadrature<dim> &                    rhs_quadrature,
-          const MyFunction<dim> &                    func)
+                                MyDataBase>         &manager,
+          const Quadrature<dim>                     &rhs_quadrature,
+          const MyFunction<dim>                     &func)
 {
   DoFHandler<dim> dof_handler(tr);
   FE_Q<dim>       dummy_fe(1);

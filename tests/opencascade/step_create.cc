@@ -48,7 +48,8 @@ main()
       counter++;
       if ((counter == 4) || (counter == 5) || (counter == 6) ||
           (counter == 18) || (counter == 19))
-        {}
+        {
+        }
       else
         out << line << std::endl;
     }

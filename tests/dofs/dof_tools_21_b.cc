@@ -169,21 +169,21 @@ void
 generate_grid(Triangulation<3> &triangulation, int orientation)
 {
   Point<3>              vertices_1[] = {Point<3>(-1., -1., -3.),
-                           Point<3>(+1., -1., -3.),
-                           Point<3>(-1., +1., -3.),
-                           Point<3>(+1., +1., -3.),
-                           Point<3>(-1., -1., -1.),
-                           Point<3>(+1., -1., -1.),
-                           Point<3>(-1., +1., -1.),
-                           Point<3>(+1., +1., -1.),
-                           Point<3>(-1., -1., +1.),
-                           Point<3>(+1., -1., +1.),
-                           Point<3>(-1., +1., +1.),
-                           Point<3>(+1., +1., +1.),
-                           Point<3>(-1., -1., +3.),
-                           Point<3>(+1., -1., +3.),
-                           Point<3>(-1., +1., +3.),
-                           Point<3>(+1., +1., +3.)};
+                                        Point<3>(+1., -1., -3.),
+                                        Point<3>(-1., +1., -3.),
+                                        Point<3>(+1., +1., -3.),
+                                        Point<3>(-1., -1., -1.),
+                                        Point<3>(+1., -1., -1.),
+                                        Point<3>(-1., +1., -1.),
+                                        Point<3>(+1., +1., -1.),
+                                        Point<3>(-1., -1., +1.),
+                                        Point<3>(+1., -1., +1.),
+                                        Point<3>(-1., +1., +1.),
+                                        Point<3>(+1., +1., +1.),
+                                        Point<3>(-1., -1., +3.),
+                                        Point<3>(+1., -1., +3.),
+                                        Point<3>(-1., +1., +3.),
+                                        Point<3>(+1., +1., +3.)};
   std::vector<Point<3>> vertices(&vertices_1[0], &vertices_1[16]);
 
   std::vector<CellData<3>> cells(2, CellData<3>());

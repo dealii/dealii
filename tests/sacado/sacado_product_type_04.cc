@@ -59,7 +59,7 @@ main()
       t2[i] = 3. * b - i;
     }
   const Tensor<1, 2, SSdouble> t3 = t2;
-  t1 *                         t2;
+  t1                          *t2;
 
   t2 += a * t1;
 

@@ -1024,7 +1024,7 @@ public:
    * value does not satisfy its pattern is ignored.
    */
   virtual void
-  parse_input(std::istream &     input,
+  parse_input(std::istream      &input,
               const std::string &filename       = "input file",
               const std::string &last_line      = "",
               const bool         skip_undefined = false);
@@ -1122,10 +1122,10 @@ public:
    * error, for example to override an earlier default value.
    */
   void
-  declare_entry(const std::string &          entry,
-                const std::string &          default_value,
+  declare_entry(const std::string           &entry,
+                const std::string           &default_value,
                 const Patterns::PatternBase &pattern = Patterns::Anything(),
-                const std::string &          documentation = "",
+                const std::string           &documentation = "",
                 const bool                   has_to_be_set = false);
 
   /**
@@ -1176,7 +1176,7 @@ public:
    *  ParameterHandler::parse_input() for more information.
    */
   void
-  add_action(const std::string &                                  entry,
+  add_action(const std::string                                   &entry,
              const std::function<void(const std::string &value)> &action,
              const bool execute_action = true);
 
@@ -1197,9 +1197,9 @@ public:
    */
   template <typename ParameterType>
   void
-  add_parameter(const std::string &          entry,
-                ParameterType &              parameter,
-                const std::string &          documentation = "",
+  add_parameter(const std::string           &entry,
+                ParameterType               &parameter,
+                const std::string           &documentation = "",
                 const Patterns::PatternBase &pattern =
                   *Patterns::Tools::Convert<ParameterType>::to_pattern(),
                 const bool has_to_be_set = false);
@@ -1292,7 +1292,7 @@ public:
    */
   std::string
   get(const std::vector<std::string> &entry_subsection_path,
-      const std::string &             entry_string) const;
+      const std::string              &entry_string) const;
 
   /**
    * Return value of entry @p entry_string as <code>long int</code>. (A long
@@ -1312,7 +1312,7 @@ public:
    */
   long int
   get_integer(const std::vector<std::string> &entry_subsection_path,
-              const std::string &             entry_string) const;
+              const std::string              &entry_string) const;
 
   /**
    * Return value of entry @p entry_name as @p double.
@@ -1328,7 +1328,7 @@ public:
    */
   double
   get_double(const std::vector<std::string> &entry_subsection_path,
-             const std::string &             entry_string) const;
+             const std::string              &entry_string) const;
   /**
    * Return value of entry @p entry_name as @p bool. The entry may
    * be "true" or "yes" for @p true, "false" or "no" for @p false
@@ -1347,7 +1347,7 @@ public:
    */
   bool
   get_bool(const std::vector<std::string> &entry_subsection_path,
-           const std::string &             entry_string) const;
+           const std::string              &entry_string) const;
 
   /**
    * Change the value presently stored for <tt>entry_name</tt> to the one
@@ -1551,7 +1551,7 @@ public:
    * it called recursively by the previous function.
    */
   void
-  log_parameters_section(LogStream &       out,
+  log_parameters_section(LogStream        &out,
                          const OutputStyle style = DefaultStyle);
 
   /**
@@ -1809,7 +1809,7 @@ private:
    */
   std::string
   get_current_full_path(const std::vector<std::string> &sub_path,
-                        const std::string &             name) const;
+                        const std::string              &name) const;
 
   /**
    * Scan one line of input. <tt>input_filename</tt> and
@@ -1848,11 +1848,11 @@ private:
    */
   void
   recursively_print_parameters(
-    const boost::property_tree::ptree & tree,
-    const std::vector<std::string> &    target_subsection_path,
+    const boost::property_tree::ptree  &tree,
+    const std::vector<std::string>     &target_subsection_path,
     const ParameterHandler::OutputStyle style,
     const unsigned int                  indent_level,
-    std::ostream &                      out) const;
+    std::ostream                       &out) const;
 
   friend class MultipleParameterLoop;
 };
@@ -2150,7 +2150,7 @@ public:
    * just reformat their inputs and then call this version.
    */
   virtual void
-  parse_input(std::istream &     input,
+  parse_input(std::istream      &input,
               const std::string &filename       = "input file",
               const std::string &last_line      = "",
               const bool         skip_undefined = false) override;
@@ -2214,8 +2214,8 @@ private:
      * <tt>split_different_values</tt>.
      */
     Entry(const std::vector<std::string> &Path,
-          const std::string &             Name,
-          const std::string &             Value);
+          const std::string              &Name,
+          const std::string              &Value);
 
     /**
      * Split the entry value into the different branches.
@@ -2323,7 +2323,7 @@ ParameterHandler::load(Archive &ar, const unsigned int)
   ar &*entries.get();
 
   std::vector<std::string> descriptions;
-  ar &                     descriptions;
+  ar                      &descriptions;
 
   patterns.clear();
   for (const auto &description : descriptions)
@@ -2333,9 +2333,9 @@ ParameterHandler::load(Archive &ar, const unsigned int)
 
 template <typename ParameterType>
 void
-ParameterHandler::add_parameter(const std::string &          entry,
-                                ParameterType &              parameter,
-                                const std::string &          documentation,
+ParameterHandler::add_parameter(const std::string           &entry,
+                                ParameterType               &parameter,
+                                const std::string           &documentation,
                                 const Patterns::PatternBase &pattern,
                                 const bool                   has_to_be_set)
 {

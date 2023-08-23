@@ -136,7 +136,7 @@ namespace Step50
 
     virtual void
     value_list(const std::vector<Point<dim>> &points,
-               std::vector<double> &          values,
+               std::vector<double>           &values,
                const unsigned int             component = 0) const;
   };
 
@@ -157,7 +157,7 @@ namespace Step50
   template <int dim>
   void
   Coefficient<dim>::value_list(const std::vector<Point<dim>> &points,
-                               std::vector<double> &          values,
+                               std::vector<double>           &values,
                                const unsigned int             component) const
   {
     (void)component;
@@ -414,7 +414,8 @@ namespace Step50
                          local_dof_indices[j]) // ( boundary(i) && boundary(j)
                                                // && i==j )
                    ))
-                {}
+                {
+                }
               else
                 {
                   cell_matrix(i, j) = 0;

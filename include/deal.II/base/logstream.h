@@ -152,7 +152,7 @@ public:
    * @param[in] flags Format flags to set on the output stream @p o.
    */
   void
-  attach(std::ostream &                o,
+  attach(std::ostream                 &o,
          const bool                    print_job_id = true,
          const std::ios_base::fmtflags flags        = std::ios::showpoint |
                                                std::ios::left);
