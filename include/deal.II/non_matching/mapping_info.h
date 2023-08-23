@@ -230,10 +230,10 @@ namespace NonMatching
       bool use_global_weights;
 
       /**
-       * During the reinit() function calls, cells are passed as
+       * During the reinit_cells() function call, cells are passed as
        * argument. In the default case, the cell is not stored,
        * since all relevant mapping related information is precomputed.
-       * Hoever, this flag enables that the cells are stored so that
+       * However, this flag enables that the cells are stored so that
        * they can be accessed later on.
        */
       bool store_cells;
@@ -940,6 +940,8 @@ namespace NonMatching
       ExcMessage(
         "There is no known use-case for AdditionalData::use_global_weights=true and reinit_surface()"));
 
+    Assert(additional_data.store_cells == false, ExcNotImplemented());
+
     do_cell_index_compression =
       n_unfiltered_cells != numbers::invalid_unsigned_int;
 
@@ -1039,6 +1041,8 @@ namespace NonMatching
     const unsigned int                                   n_unfiltered_cells)
   {
     clear();
+
+    Assert(additional_data.store_cells == false, ExcNotImplemented());
 
     do_cell_index_compression =
       n_unfiltered_cells != numbers::invalid_unsigned_int;
