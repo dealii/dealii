@@ -289,112 +289,15 @@ namespace internal
           // 'direction' distinguishes between normal and tangential direction
           for (unsigned int direction = 0; direction < 2; ++direction)
             {
-              UnivariateShapeData<Number> &univariate_shape_data =
-                (direction == 0) ? data.front() : data.back();
-
-              univariate_shape_data.element_type  = tensor_raviart_thomas;
-              univariate_shape_data.quadrature    = quad;
-              univariate_shape_data.n_q_points_1d = n_q_points_1d;
-              univariate_shape_data.fe_degree     = fe.degree - direction;
-
-              // grant write access to common univariate shape data
-              auto &shape_values    = univariate_shape_data.shape_values;
-              auto &shape_gradients = univariate_shape_data.shape_gradients;
-              auto &shape_hessians  = univariate_shape_data.shape_hessians;
-
-              auto &values_within_subface =
-                univariate_shape_data.values_within_subface;
-              auto &gradients_within_subface =
-                univariate_shape_data.gradients_within_subface;
-              auto &hessians_within_subface =
-                univariate_shape_data.hessians_within_subface;
-
-              auto &shape_data_on_face =
-                univariate_shape_data.shape_data_on_face;
-
-              const unsigned int n_dofs_1d  = fe.degree + 1 - direction;
-              const unsigned int array_size = n_dofs_1d * n_q_points_1d;
-
-              shape_gradients.resize_fast(array_size);
-              shape_values.resize_fast(array_size);
-              shape_hessians.resize_fast(array_size);
-
-              values_within_subface[0].resize(array_size);
-              values_within_subface[1].resize(array_size);
-              gradients_within_subface[0].resize(array_size);
-              gradients_within_subface[1].resize(array_size);
-              hessians_within_subface[0].resize(array_size);
-              hessians_within_subface[1].resize(array_size);
-
-              shape_data_on_face[0].resize(3 * n_dofs_1d);
-              shape_data_on_face[1].resize(3 * n_dofs_1d);
-
-              Point<dim> unit_point;
-              for (unsigned int i = 0; i < n_dofs_1d; ++i)
-                {
-                  // need to reorder from hierarchical to lexicographic to get
-                  // the DoFs correct
-                  const unsigned int my_i =
-                    (direction == 0) ? lex_normal[i] : lex_tangent[i];
-                  for (unsigned int q = 0; q < n_q_points_1d; ++q)
-                    {
-                      Point<dim> q_point = unit_point;
-                      q_point[direction] = quad.get_points()[q][0];
-
-                      shape_values[i * n_q_points_1d + q] =
-                        fe.shape_value_component(my_i, q_point, 0);
-                      shape_gradients[i * n_q_points_1d + q] =
-                        fe.shape_grad_component(my_i, q_point, 0)[direction];
-                      shape_hessians[i * n_q_points_1d + q] =
-                        fe.shape_grad_grad_component(my_i,
-                                                     q_point,
-                                                     0)[direction][direction];
-
-                      // evaluate basis functions on the two 1d subfaces (i.e.,
-                      // at the positions divided by one half and shifted by one
-                      // half, respectively) for hanging nodes
-                      q_point[direction] *= 0.5;
-                      values_within_subface[0][i * n_q_points_1d + q] =
-                        fe.shape_value_component(my_i, q_point, 0);
-                      gradients_within_subface[0][i * n_q_points_1d + q] =
-                        fe.shape_grad_component(my_i, q_point, 0)[direction];
-                      hessians_within_subface[0][i * n_q_points_1d + q] =
-                        fe.shape_grad_grad_component(my_i,
-                                                     q_point,
-                                                     0)[direction][direction];
-                      q_point[direction] += 0.5;
-                      values_within_subface[1][i * n_q_points_1d + q] =
-                        fe.shape_value_component(my_i, q_point, 0);
-                      gradients_within_subface[1][i * n_q_points_1d + q] =
-                        fe.shape_grad_component(my_i, q_point, 0)[direction];
-                      hessians_within_subface[1][i * n_q_points_1d + q] =
-                        fe.shape_grad_grad_component(my_i,
-                                                     q_point,
-                                                     0)[direction][direction];
-                    }
-                  // evaluate basis functions on the 1d faces, i.e., in zero and
-                  // one
-                  Point<dim> q_point = unit_point;
-                  q_point[direction] = 0;
-                  shape_data_on_face[0][i] =
-                    fe.shape_value_component(my_i, q_point, 0);
-                  shape_data_on_face[0][i + n_dofs_1d] =
-                    fe.shape_grad_component(my_i, q_point, 0)[direction];
-                  shape_data_on_face[0][i + 2 * n_dofs_1d] =
-                    fe.shape_grad_grad_component(my_i,
-                                                 q_point,
-                                                 0)[direction][direction];
-                  q_point[direction] = 1;
-                  shape_data_on_face[1][i] =
-                    fe.shape_value_component(my_i, q_point, 0);
-                  shape_data_on_face[1][i + n_dofs_1d] =
-                    fe.shape_grad_component(my_i, q_point, 0)[direction];
-                  shape_data_on_face[1][i + 2 * n_dofs_1d] =
-                    fe.shape_grad_grad_component(my_i,
-                                                 q_point,
-                                                 0)[direction][direction];
-                }
+              data[direction].element_type  = tensor_raviart_thomas;
+              data[direction].quadrature    = quad;
+              data[direction].n_q_points_1d = n_q_points_1d;
+              data[direction].fe_degree     = fe.degree - direction;
             }
+
+          data[0].evaluate_shape_functions(fe, quad, lex_normal, 0);
+          data[1].evaluate_shape_functions(fe, quad, lex_tangent, 1);
+
           return;
         }
       else if (quad_in.is_tensor_product() == false ||
@@ -609,19 +512,6 @@ namespace internal
       if ((fe.n_dofs_per_cell() == 0) || (quad.empty()))
         return;
 
-      // grant write access to common univariate shape data
-      auto &shape_values          = univariate_shape_data.shape_values;
-      auto &shape_gradients       = univariate_shape_data.shape_gradients;
-      auto &shape_hessians        = univariate_shape_data.shape_hessians;
-      auto &shape_data_on_face    = univariate_shape_data.shape_data_on_face;
-      auto &values_within_subface = univariate_shape_data.values_within_subface;
-      auto &gradients_within_subface =
-        univariate_shape_data.gradients_within_subface;
-      auto &hessians_within_subface =
-        univariate_shape_data.hessians_within_subface;
-      auto &nodal_at_cell_boundaries =
-        univariate_shape_data.nodal_at_cell_boundaries;
-
       const unsigned int fe_degree     = fe.degree;
       const unsigned int n_q_points_1d = quad.size();
       const unsigned int n_dofs_1d =
@@ -631,31 +521,14 @@ namespace internal
       // vertex DoFs come first, which is incompatible with the lexicographic
       // ordering necessary to apply tensor products efficiently)
       std::vector<unsigned int> scalar_lexicographic;
-      Point<dim>                unit_point;
-      {
-        // find numbering to lexicographic
-        Assert(fe.n_components() == 1, ExcMessage("Expected a scalar element"));
+      Assert(fe.n_components() == 1, ExcMessage("Expected a scalar element"));
 
-        get_element_type_specific_information(fe_in,
-                                              fe,
-                                              base_element_number,
-                                              element_type,
-                                              scalar_lexicographic,
-                                              lexicographic_numbering);
-
-        // to evaluate 1d polynomials, evaluate along the line with the first
-        // unit support point, assuming that fe.shape_value(0,unit_point) ==
-        // 1. otherwise, need other entry point (e.g. generating a 1d element
-        // by reading the name, as done before r29356)
-        if (fe.has_support_points())
-          unit_point = fe.get_unit_support_points()[scalar_lexicographic[0]];
-        Assert(fe.n_dofs_per_cell() == 0 ||
-                 std::abs(fe.shape_value(scalar_lexicographic[0], unit_point) -
-                          1) < 1e-13,
-               ExcInternalError("Could not decode 1d shape functions for the "
-                                "element " +
-                                fe.get_name()));
-      }
+      get_element_type_specific_information(fe_in,
+                                            fe,
+                                            base_element_number,
+                                            element_type,
+                                            scalar_lexicographic,
+                                            lexicographic_numbering);
 
       n_q_points = Utilities::fixed_power<dim>(n_q_points_1d);
       n_q_points_face =
@@ -664,71 +537,10 @@ namespace internal
       dofs_per_component_on_face =
         (dim > 1 ? Utilities::fixed_power<dim - 1>(fe_degree + 1) : 1);
 
-      const unsigned int array_size = n_dofs_1d * n_q_points_1d;
-      shape_gradients.resize_fast(array_size);
-      shape_values.resize_fast(array_size);
-      shape_hessians.resize_fast(array_size);
-
-      shape_data_on_face[0].resize(3 * n_dofs_1d);
-      shape_data_on_face[1].resize(3 * n_dofs_1d);
-      values_within_subface[0].resize(array_size);
-      values_within_subface[1].resize(array_size);
-      gradients_within_subface[0].resize(array_size);
-      gradients_within_subface[1].resize(array_size);
-      hessians_within_subface[0].resize(array_size);
-      hessians_within_subface[1].resize(array_size);
-
-      for (unsigned int i = 0; i < n_dofs_1d; ++i)
-        {
-          // need to reorder from hierarchical to lexicographic to get the
-          // DoFs correct
-          const unsigned int my_i = scalar_lexicographic[i];
-          for (unsigned int q = 0; q < n_q_points_1d; ++q)
-            {
-              Point<dim> q_point = unit_point;
-              q_point[0]         = quad.get_points()[q][0];
-
-              shape_values[i * n_q_points_1d + q] =
-                fe.shape_value(my_i, q_point);
-              shape_gradients[i * n_q_points_1d + q] =
-                fe.shape_grad(my_i, q_point)[0];
-              shape_hessians[i * n_q_points_1d + q] =
-                fe.shape_grad_grad(my_i, q_point)[0][0];
-
-              // evaluate basis functions on the two 1d subfaces (i.e., at the
-              // positions divided by one half and shifted by one half,
-              // respectively)
-              q_point[0] *= 0.5;
-              values_within_subface[0][i * n_q_points_1d + q] =
-                fe.shape_value(my_i, q_point);
-              gradients_within_subface[0][i * n_q_points_1d + q] =
-                fe.shape_grad(my_i, q_point)[0];
-              hessians_within_subface[0][i * n_q_points_1d + q] =
-                fe.shape_grad_grad(my_i, q_point)[0][0];
-              q_point[0] += 0.5;
-              values_within_subface[1][i * n_q_points_1d + q] =
-                fe.shape_value(my_i, q_point);
-              gradients_within_subface[1][i * n_q_points_1d + q] =
-                fe.shape_grad(my_i, q_point)[0];
-              hessians_within_subface[1][i * n_q_points_1d + q] =
-                fe.shape_grad_grad(my_i, q_point)[0][0];
-            }
-
-          // evaluate basis functions on the 1d faces, i.e., in zero and one
-          Point<dim> q_point       = unit_point;
-          q_point[0]               = 0;
-          shape_data_on_face[0][i] = fe.shape_value(my_i, q_point);
-          shape_data_on_face[0][i + n_dofs_1d] =
-            fe.shape_grad(my_i, q_point)[0];
-          shape_data_on_face[0][i + 2 * n_dofs_1d] =
-            fe.shape_grad_grad(my_i, q_point)[0][0];
-          q_point[0]               = 1;
-          shape_data_on_face[1][i] = fe.shape_value(my_i, q_point);
-          shape_data_on_face[1][i + n_dofs_1d] =
-            fe.shape_grad(my_i, q_point)[0];
-          shape_data_on_face[1][i + 2 * n_dofs_1d] =
-            fe.shape_grad_grad(my_i, q_point)[0][0];
-        }
+      univariate_shape_data.evaluate_shape_functions(fe,
+                                                     quad,
+                                                     scalar_lexicographic,
+                                                     0);
 
       if (dim > 1 && (dynamic_cast<const FE_Q<dim> *>(&fe) ||
                       dynamic_cast<const FE_Q_iso_Q1<dim> *>(&fe)))
@@ -784,6 +596,8 @@ namespace internal
                                                        quad,
                                                        scalar_lexicographic);
 
+      const auto &shape_data_on_face = univariate_shape_data.shape_data_on_face;
+
       if (element_type == tensor_general &&
           univariate_shape_data.check_and_set_shapes_symmetric())
         {
@@ -812,15 +626,15 @@ namespace internal
       else if (element_type == tensor_symmetric_plus_dg0)
         univariate_shape_data.check_and_set_shapes_symmetric();
 
-      nodal_at_cell_boundaries = true;
+      univariate_shape_data.nodal_at_cell_boundaries = true;
       for (unsigned int i = 1; i < n_dofs_1d; ++i)
         if (std::abs(get_first_array_element(shape_data_on_face[0][i])) >
               1e-13 ||
             std::abs(get_first_array_element(shape_data_on_face[1][i - 1])) >
               1e-13)
-          nodal_at_cell_boundaries = false;
+          univariate_shape_data.nodal_at_cell_boundaries = false;
 
-      if (nodal_at_cell_boundaries == true)
+      if (univariate_shape_data.nodal_at_cell_boundaries == true)
         {
           face_to_cell_index_nodal.reinit(GeometryInfo<dim>::faces_per_cell,
                                           dofs_per_component_on_face);
@@ -911,6 +725,121 @@ namespace internal
 
 
 
+    template <int dim, int spacedim>
+    Point<dim>
+    get_unit_point(const FiniteElement<dim, spacedim> &fe,
+                   const std::vector<unsigned int> &   lexicographic)
+    {
+      Point<dim> unit_point;
+      // to evaluate 1d polynomials, evaluate along the line with the first
+      // unit support point, assuming that fe.shape_value(0,unit_point) ==
+      // 1. otherwise, need other entry point (e.g. generating a 1d element
+      // by reading the name, as done before r29356)
+      if (fe.has_support_points())
+        unit_point = fe.get_unit_support_points()[lexicographic[0]];
+      Assert(fe.n_dofs_per_cell() == 0 ||
+               std::abs(
+                 fe.shape_value_component(lexicographic[0], unit_point, 0) -
+                 1) < 1e-13,
+             ExcInternalError("Could not decode 1d shape functions for the "
+                              "element " +
+                              fe.get_name()));
+      return unit_point;
+    }
+
+
+
+    template <typename Number>
+    template <int dim, int spacedim>
+    void
+    UnivariateShapeData<Number>::evaluate_shape_functions(
+      const FiniteElement<dim, spacedim> &fe,
+      const Quadrature<1> &               quad,
+      const std::vector<unsigned int> &   lexicographic,
+      const unsigned int                  direction)
+    {
+      const unsigned int n_dofs_1d =
+        std::min(fe.n_dofs_per_cell(), fe_degree + 1);
+
+      const unsigned int array_size = n_dofs_1d * n_q_points_1d;
+      shape_gradients.resize_fast(array_size);
+      shape_values.resize_fast(array_size);
+      shape_hessians.resize_fast(array_size);
+
+      shape_data_on_face[0].resize(3 * n_dofs_1d);
+      shape_data_on_face[1].resize(3 * n_dofs_1d);
+      values_within_subface[0].resize(array_size);
+      values_within_subface[1].resize(array_size);
+      gradients_within_subface[0].resize(array_size);
+      gradients_within_subface[1].resize(array_size);
+      hessians_within_subface[0].resize(array_size);
+      hessians_within_subface[1].resize(array_size);
+
+      for (unsigned int i = 0; i < n_dofs_1d; ++i)
+        {
+          // need to reorder from hierarchical to lexicographic to get the
+          // DoFs correct
+          const unsigned int my_i = lexicographic[i];
+          for (unsigned int q = 0; q < n_q_points_1d; ++q)
+            {
+              Point<dim> q_point = get_unit_point(fe, lexicographic);
+              q_point[direction] = quad.get_points()[q][0];
+
+              shape_values[i * n_q_points_1d + q] =
+                fe.shape_value_component(my_i, q_point, 0);
+              shape_gradients[i * n_q_points_1d + q] =
+                fe.shape_grad_component(my_i, q_point, 0)[direction];
+              shape_hessians[i * n_q_points_1d + q] =
+                fe.shape_grad_grad_component(my_i,
+                                             q_point,
+                                             0)[direction][direction];
+
+              // evaluate basis functions on the two 1d subfaces (i.e., at the
+              // positions divided by one half and shifted by one half,
+              // respectively)
+              q_point[direction] *= 0.5;
+              values_within_subface[0][i * n_q_points_1d + q] =
+                fe.shape_value_component(my_i, q_point, 0);
+              gradients_within_subface[0][i * n_q_points_1d + q] =
+                fe.shape_grad_component(my_i, q_point, 0)[direction];
+              hessians_within_subface[0][i * n_q_points_1d + q] =
+                fe.shape_grad_grad_component(my_i,
+                                             q_point,
+                                             0)[direction][direction];
+              q_point[direction] += 0.5;
+              values_within_subface[1][i * n_q_points_1d + q] =
+                fe.shape_value_component(my_i, q_point, 0);
+              gradients_within_subface[1][i * n_q_points_1d + q] =
+                fe.shape_grad_component(my_i, q_point, 0)[direction];
+              hessians_within_subface[1][i * n_q_points_1d + q] =
+                fe.shape_grad_grad_component(my_i,
+                                             q_point,
+                                             0)[direction][direction];
+            }
+
+          // evaluate basis functions on the 1d faces, i.e., in zero and one
+          Point<dim> q_point       = get_unit_point(fe, lexicographic);
+          q_point[direction]       = 0;
+          shape_data_on_face[0][i] = fe.shape_value_component(my_i, q_point, 0);
+          shape_data_on_face[0][i + n_dofs_1d] =
+            fe.shape_grad_component(my_i, q_point, 0)[direction];
+          shape_data_on_face[0][i + 2 * n_dofs_1d] =
+            fe.shape_grad_grad_component(my_i,
+                                         q_point,
+                                         0)[direction][direction];
+          q_point[direction]       = 1;
+          shape_data_on_face[1][i] = fe.shape_value_component(my_i, q_point, 0);
+          shape_data_on_face[1][i + n_dofs_1d] =
+            fe.shape_grad_component(my_i, q_point, 0)[direction];
+          shape_data_on_face[1][i + 2 * n_dofs_1d] =
+            fe.shape_grad_grad_component(my_i,
+                                         q_point,
+                                         0)[direction][direction];
+        }
+    }
+
+
+
     template <typename Number>
     template <int dim, int spacedim>
     void
@@ -919,7 +848,6 @@ namespace internal
       const Quadrature<1> &               quad,
       const std::vector<unsigned int> &   lexicographic)
     {
-      const unsigned int n_q_points_1d = quad.size();
       const unsigned int n_dofs_1d =
         std::min(fe.n_dofs_per_cell(), fe_degree + 1);
 
@@ -1026,8 +954,8 @@ namespace internal
           for (unsigned int i = 0; i < n_dofs_1d; ++i)
             for (unsigned int j = 0; j < n_dofs_1d; ++j)
               {
-                Point<dim> q_point;
-                q_point[0] = quad_project.point(i)[0];
+                Point<dim> q_point = get_unit_point(fe, lexicographic);
+                q_point[0]         = quad_project.point(i)[0];
 
                 transform_from_gauss(i, j) =
                   fe.shape_value(lexicographic[j], q_point);

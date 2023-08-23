@@ -145,6 +145,22 @@ namespace internal
       memory_consumption() const;
 
       /**
+       * Evaluate the finite element shape functions at the points of the
+       * given quadrature formula, filling the fields
+       * shape_[values,gradients,hessians] and related information.
+       *
+       * The two last arguments 'lexicographic' and 'direction' are used to
+       * describe the unknowns along a single dimension, and the respective
+       * direction of derivatives.
+       */
+      template <int dim, int spacedim>
+      void
+      evaluate_shape_functions(const FiniteElement<dim, spacedim> &fe,
+                               const Quadrature<1> &               quad,
+                               const std::vector<unsigned int> &lexicographic,
+                               const unsigned int               direction);
+
+      /**
        * Evaluate the auxiliary polynomial space associated with the Lagrange
        * polynomials in points of the given quadrature formula, filling the
        * fields shape_[gradients,hessians]_collocation and related
