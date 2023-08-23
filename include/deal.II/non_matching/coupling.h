@@ -97,8 +97,8 @@ namespace NonMatching
     const DoFHandler<dim1, spacedim> &immersed_dh,
     const Quadrature<dim1> &          quad,
     SparsityPatternBase &             sparsity,
-    const AffineConstraints<number> & constraints = AffineConstraints<number>(),
-    const ComponentMask &             space_comps = {},
+    const AffineConstraints<number> & constraints    = {},
+    const ComponentMask &             space_comps    = {},
     const ComponentMask &             immersed_comps = {},
     const Mapping<dim0, spacedim> &   space_mapping =
       StaticMappingQ1<dim0, spacedim>::mapping,
@@ -121,10 +121,10 @@ namespace NonMatching
     const DoFHandler<dim1, spacedim> &      immersed_dh,
     const Quadrature<dim1> &                quad,
     SparsityPatternBase &                   sparsity,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
-    const ComponentMask &            space_comps = {},
-    const ComponentMask &            immersed_comps = {},
-    const Mapping<dim1, spacedim> &  immersed_mapping =
+    const AffineConstraints<number> &       constraints    = {},
+    const ComponentMask &                   space_comps    = {},
+    const ComponentMask &                   immersed_comps = {},
+    const Mapping<dim1, spacedim> &         immersed_mapping =
       StaticMappingQ1<dim1, spacedim>::mapping,
     const AffineConstraints<number> &immersed_constraints =
       AffineConstraints<number>());

@@ -88,12 +88,11 @@ namespace MGTools
    */
   template <int dim, int spacedim, typename number = double>
   void
-  make_sparsity_pattern(
-    const DoFHandler<dim, spacedim> &dof_handler,
-    SparsityPatternBase &            sparsity,
-    const unsigned int               level,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
-    const bool                       keep_constrained_dofs = true);
+  make_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
+                        SparsityPatternBase &            sparsity,
+                        const unsigned int               level,
+                        const AffineConstraints<number> &constraints = {},
+                        const bool keep_constrained_dofs             = true);
 
   /**
    * Make a sparsity pattern including fluxes of discontinuous Galerkin
@@ -105,12 +104,11 @@ namespace MGTools
    */
   template <int dim, int spacedim, typename number = double>
   void
-  make_flux_sparsity_pattern(
-    const DoFHandler<dim, spacedim> &dof_handler,
-    SparsityPatternBase &            sparsity,
-    const unsigned int               level,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
-    const bool                       keep_constrained_dofs = true);
+  make_flux_sparsity_pattern(const DoFHandler<dim, spacedim> &dof_handler,
+                             SparsityPatternBase &            sparsity,
+                             const unsigned int               level,
+                             const AffineConstraints<number> &constraints = {},
+                             const bool keep_constrained_dofs = true);
 
 
   /**

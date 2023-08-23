@@ -424,7 +424,7 @@ namespace DoFTools
   make_sparsity_pattern(
     const DoFHandler<dim, spacedim> &dof_handler,
     SparsityPatternBase &            sparsity_pattern,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
+    const AffineConstraints<number> &constraints           = {},
     const bool                       keep_constrained_dofs = true,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
 
@@ -499,7 +499,7 @@ namespace DoFTools
     const DoFHandler<dim, spacedim> &dof_handler,
     const Table<2, Coupling> &       coupling,
     SparsityPatternBase &            sparsity_pattern,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>(),
+    const AffineConstraints<number> &constraints           = {},
     const bool                       keep_constrained_dofs = true,
     const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
 
@@ -1378,7 +1378,7 @@ namespace DoFTools
     const std::function<
       bool(const typename DoFHandler<dim, spacedim>::active_cell_iterator &)>
       &                              predicate,
-    const AffineConstraints<number> &constraints = AffineConstraints<number>());
+    const AffineConstraints<number> &constraints = {});
 
   /**
    * Extract a vector that represents the constant modes of the DoFHandler for
