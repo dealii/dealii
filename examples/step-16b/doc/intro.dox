@@ -4,11 +4,22 @@
 <h1>Introduction</h1>
 
 This is a variant of step-16 with the only change that we are using the
-MeshWorker framework with the pre-made LocalIntegrator helper classes instead
+MeshWorker framework with the pre-made LocalIntegrators helper classes instead
 of manually assembling the matrices.
 
 The details of this framework on how it is used in practice will be explained
 as part of this tutorial program.
+
+
+@note The entire LocalIntegrators namespace has been deprecated. It
+  represents an effort at making integration simpler by providing a
+  library of terms that appear frequently in equations. But this only
+  made the simple case simple -- everything that exceeded the simplest
+  case still needed to be done by hand, and using these pre-built
+  integrators did not help teaching how to do that. As a consequence,
+  these pre-built integrators will be removed in a future version of
+  the library.
+
 
 <h3>The testcase</h3>
 
