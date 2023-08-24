@@ -27,8 +27,6 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
-#include <deal.II/matrix_free/fe_point_evaluation.h>
-
 #include <deal.II/non_matching/fe_values.h>
 
 DEAL_II_NAMESPACE_OPEN
