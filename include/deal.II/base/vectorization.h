@@ -69,7 +69,9 @@
 #    undef vector
 #    undef pixel
 #    undef bool
-#  else
+#  elif defined(__ARM_NEON)
+#    include <arm_neon.h>
+#  elif defined(__x86_64__)
 #    include <x86intrin.h>
 #  endif
 
@@ -966,6 +968,565 @@ vectorized_transpose_and_store(const bool                            add_into,
 
 #ifndef DOXYGEN
 
+#  if defined(DEAL_II_HAVE_ARM_NEON) && defined(__ARM_NEON)
+
+/**
+ * Specialization for double and ARM Neon.
+ */
+template <>
+class VectorizedArray<double, 2>
+  : public VectorizedArrayBase<VectorizedArray<double, 2>, 2>
+{
+public:
+  /**
+   * This gives the type of the array elements.
+   */
+  using value_type = double;
+
+  /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes.
+   */
+  VectorizedArray(const double scalar)
+  {
+    this->operator=(scalar);
+  }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<double, 2>, 2>(list)
+  {}
+
+  /**
+   * This function can be used to set all data fields to a given scalar.
+   */
+  VectorizedArray &
+  operator=(const double x) &
+  {
+    data = vdupq_n_f64(x);
+    return *this;
+  }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const double scalar) && = delete;
+
+  /**
+   * Access operator.
+   */
+  double &
+  operator[](const unsigned int comp)
+  {
+    return *(reinterpret_cast<double *>(&data) + comp);
+  }
+
+  /**
+   * Constant access operator.
+   */
+  const double &
+  operator[](const unsigned int comp) const
+  {
+    return *(reinterpret_cast<const double *>(&data) + comp);
+  }
+
+  /**
+   * Addition.
+   */
+  VectorizedArray &
+  operator+=(const VectorizedArray &vec)
+  {
+    data = vaddq_f64(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Subtraction.
+   */
+  VectorizedArray &
+  operator-=(const VectorizedArray &vec)
+  {
+    data = vsubq_f64(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Multiplication.
+   */
+  VectorizedArray &
+  operator*=(const VectorizedArray &vec)
+  {
+    data = vmulq_f64(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Division.
+   */
+  VectorizedArray &
+  operator/=(const VectorizedArray &vec)
+  {
+    data = vdivq_f64(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Load @p size() from memory into the calling class, starting at
+   * the given address. The memory need not be aligned by 16 bytes, as opposed
+   * to casting a double address to VectorizedArray<double>*.
+   */
+  void
+  load(const double *ptr)
+  {
+    data = vld1q_f64(ptr);
+  }
+
+  DEAL_II_ALWAYS_INLINE
+  void
+  load(const float *ptr)
+  {
+    DEAL_II_OPENMP_SIMD_PRAGMA
+    for (unsigned int i = 0; i < 2; ++i)
+      data[i] = ptr[i];
+  }
+
+  /**
+   * Write the content of the calling class into memory in form of @p
+   * size() to the given address. The memory need not be aligned by
+   * 16 bytes, as opposed to casting a double address to
+   * VectorizedArray<double>*.
+   */
+  void
+  store(double *ptr) const
+  {
+    vst1q_f64(ptr, data);
+  }
+
+  DEAL_II_ALWAYS_INLINE
+  void
+  store(float *ptr) const
+  {
+    DEAL_II_OPENMP_SIMD_PRAGMA
+    for (unsigned int i = 0; i < 2; ++i)
+      ptr[i] = data[i];
+  }
+
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
+   * @note Memory must be aligned by 16 bytes.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  streaming_store(double *ptr) const
+  {
+    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
+           ExcMessage("Memory not aligned"));
+    vst1q_f64(ptr, data);
+  }
+
+  /**
+   * Load @p size() from memory into the calling class, starting at
+   * the given address and with given offsets, each entry from the offset
+   * providing one element of the vectorized array.
+   *
+   * This operation corresponds to the following code (but uses a more
+   * efficient implementation in case the hardware allows for that):
+   * @code
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
+   *   this->operator[](v) = base_ptr[offsets[v]];
+   * @endcode
+   */
+  void
+  gather(const double *base_ptr, const unsigned int *offsets)
+  {
+    for (unsigned int i = 0; i < 2; ++i)
+      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+  }
+
+  /**
+   * Write the content of the calling class into memory in form of @p
+   * size() to the given address and the given offsets, filling the
+   * elements of the vectorized array into each offset.
+   *
+   * This operation corresponds to the following code (but uses a more
+   * efficient implementation in case the hardware allows for that):
+   * @code
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
+   *   base_ptr[offsets[v]] = this->operator[](v);
+   * @endcode
+   */
+  void
+  scatter(const unsigned int *offsets, double *base_ptr) const
+  {
+    for (unsigned int i = 0; i < 2; ++i)
+      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+  }
+
+  /**
+   * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
+   * this->data[i]$.
+   */
+  double
+  sum() const
+  {
+    return vaddvq_f64(data);
+  }
+
+  /**
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
+   */
+  mutable float64x2_t data;
+
+private:
+  /**
+   * Return the square root of this field. Not for use in user code. Use
+   * sqrt(x) instead.
+   */
+  VectorizedArray
+  get_sqrt() const
+  {
+    VectorizedArray res;
+    res.data = vsqrtq_f64(data);
+    return res;
+  }
+
+  /**
+   * Return the absolute value of this field. Not for use in user code. Use
+   * abs(x) instead.
+   */
+  VectorizedArray
+  get_abs() const
+  {
+    VectorizedArray res;
+    res.data = vabsq_f64(data);
+    return res;
+  }
+
+  /**
+   * Return the component-wise maximum of this field and another one. Not for
+   * use in user code. Use max(x,y) instead.
+   */
+  VectorizedArray
+  get_max(const VectorizedArray &other) const
+  {
+    VectorizedArray res;
+    res.data = vmaxq_f64(data, other.data);
+    return res;
+  }
+
+  /**
+   * Return the component-wise minimum of this field and another one. Not for
+   * use in user code. Use min(x,y) instead.
+   */
+  VectorizedArray
+  get_min(const VectorizedArray &other) const
+  {
+    VectorizedArray res;
+    res.data = vminq_f64(data, other.data);
+    return res;
+  }
+
+  // Make a few functions friends.
+  template <typename Number2, std::size_t width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, std::size_t width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, std::size_t width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, std::size_t width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+};
+
+/**
+ * Specialization for float and ARM Neon.
+ */
+template <>
+class VectorizedArray<float, 4>
+  : public VectorizedArrayBase<VectorizedArray<float, 4>, 4>
+{
+public:
+  /**
+   * This gives the type of the array elements.
+   */
+  using value_type = float;
+
+  /**
+   * Default empty constructor, leaving the data in an uninitialized state
+   * similar to float/double.
+   */
+  VectorizedArray() = default;
+
+  /**
+   * Construct an array with the given scalar broadcast to all lanes.
+   */
+  VectorizedArray(const float scalar)
+  {
+    this->operator=(scalar);
+  }
+
+  /**
+   * Construct an array with the given initializer list.
+   */
+  template <typename U>
+  VectorizedArray(const std::initializer_list<U> &list)
+    : VectorizedArrayBase<VectorizedArray<float, 4>, 4>(list)
+  {}
+
+  /**
+   * This function can be used to set all data fields to a given scalar.
+   */
+  VectorizedArray &
+  operator=(const float x) &
+  {
+    data = vdupq_n_f32(x);
+    return *this;
+  }
+
+  /**
+   * Assign a scalar to the current object. This overload is used for
+   * rvalue references; because it does not make sense to assign
+   * something to a temporary, the function is deleted.
+   */
+  VectorizedArray &
+  operator=(const float scalar) && = delete;
+
+  /**
+   * Access operator.
+   */
+  value_type &
+  operator[](const unsigned int comp)
+  {
+    return *(reinterpret_cast<float *>(&data) + comp);
+  }
+
+  /**
+   * Constant access operator.
+   */
+  const value_type &
+  operator[](const unsigned int comp) const
+  {
+    return *(reinterpret_cast<const float *>(&data) + comp);
+  }
+
+  /**
+   * Addition.
+   */
+  VectorizedArray &
+  operator+=(const VectorizedArray &vec)
+  {
+    data = vaddq_f32(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Subtraction.
+   */
+  VectorizedArray &
+  operator-=(const VectorizedArray &vec)
+  {
+    data = vsubq_f32(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Multiplication.
+   */
+  VectorizedArray &
+  operator*=(const VectorizedArray &vec)
+  {
+    data = vmulq_f32(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Division.
+   */
+  VectorizedArray &
+  operator/=(const VectorizedArray &vec)
+  {
+    data = vdivq_f32(data, vec.data);
+    return *this;
+  }
+
+  /**
+   * Load @p size() from memory into the calling class, starting at
+   * the given address. The memory need not be aligned by 16 bytes, as opposed
+   * to casting a float address to VectorizedArray<float>*.
+   */
+  void
+  load(const float *ptr)
+  {
+    data = vld1q_f32(ptr);
+  }
+
+  /**
+   * Write the content of the calling class into memory in form of @p
+   * size() to the given address. The memory need not be aligned by
+   * 16 bytes, as opposed to casting a float address to
+   * VectorizedArray<float>*.
+   */
+  void
+  store(float *ptr) const
+  {
+    vst1q_f32(ptr, data);
+  }
+
+  /**
+   * @copydoc VectorizedArray<Number>::streaming_store()
+   * @note Memory must be aligned by 16 bytes.
+   */
+  DEAL_II_ALWAYS_INLINE
+  void
+  streaming_store(float *ptr) const
+  {
+    Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
+           ExcMessage("Memory not aligned"));
+    vst1q_f32(ptr, data);
+  }
+
+  /**
+   * Load @p size() from memory into the calling class, starting at
+   * the given address and with given offsets, each entry from the offset
+   * providing one element of the vectorized array.
+   *
+   * This operation corresponds to the following code (but uses a more
+   * efficient implementation in case the hardware allows for that):
+   * @code
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
+   *   this->operator[](v) = base_ptr[offsets[v]];
+   * @endcode
+   */
+  void
+  gather(const float *base_ptr, const unsigned int *offsets)
+  {
+    for (unsigned int i = 0; i < 4; ++i)
+      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+  }
+
+  /**
+   * Write the content of the calling class into memory in form of @p
+   * size() to the given address and the given offsets, filling the
+   * elements of the vectorized array into each offset.
+   *
+   * This operation corresponds to the following code (but uses a more
+   * efficient implementation in case the hardware allows for that):
+   * @code
+   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
+   *   base_ptr[offsets[v]] = this->operator[](v);
+   * @endcode
+   */
+  void
+  scatter(const unsigned int *offsets, float *base_ptr) const
+  {
+    for (unsigned int i = 0; i < 4; ++i)
+      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+  }
+
+  /**
+   * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
+   * this->data[i]$.
+   */
+  float
+  sum() const
+  {
+    return vaddvq_f32(data);
+  }
+
+  /**
+   * Actual data field. To be consistent with the standard layout type and to
+   * enable interaction with external SIMD functionality, this member is
+   * declared public.
+   */
+  mutable float32x4_t data;
+
+private:
+  /**
+   * Return the square root of this field. Not for use in user code. Use
+   * sqrt(x) instead.
+   */
+  VectorizedArray
+  get_sqrt() const
+  {
+    VectorizedArray res;
+    res.data = vsqrtq_f32(data);
+    return res;
+  }
+
+  /**
+   * Return the absolute value of this field. Not for use in user code. Use
+   * abs(x) instead.
+   */
+  VectorizedArray
+  get_abs() const
+  {
+    VectorizedArray res;
+    res.data = vabsq_f32(data);
+    return res;
+  }
+
+  /**
+   * Return the component-wise maximum of this field and another one. Not for
+   * use in user code. Use max(x,y) instead.
+   */
+  VectorizedArray
+  get_max(const VectorizedArray &other) const
+  {
+    VectorizedArray res;
+    res.data = vmaxq_f32(data, other.data);
+    return res;
+  }
+
+  /**
+   * Return the component-wise minimum of this field and another one. Not for
+   * use in user code. Use min(x,y) instead.
+   */
+  VectorizedArray
+  get_min(const VectorizedArray &other) const
+  {
+    VectorizedArray res;
+    res.data = vminq_f32(data, other.data);
+    return res;
+  }
+
+  // Make a few functions friends.
+  template <typename Number2, std::size_t width2>
+  friend VectorizedArray<Number2, width2>
+  std::sqrt(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, std::size_t width2>
+  friend VectorizedArray<Number2, width2>
+  std::abs(const VectorizedArray<Number2, width2> &);
+  template <typename Number2, std::size_t width2>
+  friend VectorizedArray<Number2, width2>
+  std::max(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+  template <typename Number2, std::size_t width2>
+  friend VectorizedArray<Number2, width2>
+  std::min(const VectorizedArray<Number2, width2> &,
+           const VectorizedArray<Number2, width2> &);
+};
+
+
+#  endif
+
 #  if DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
 
 /**
@@ -1467,10 +2028,6 @@ public:
   using value_type = float;
 
   /**
-   * This function can be used to set all data fields to a given scalar.
-   */
-
-  /**
    * Default empty constructor, leaving the data in an uninitialized state
    * similar to float/double.
    */
@@ -1492,6 +2049,9 @@ public:
     : VectorizedArrayBase<VectorizedArray<float, 4>, 4>(list)
   {}
 
+  /**
+   * This function can be used to set all data fields to a given scalar.
+   */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
   operator=(const float x) &
@@ -5652,6 +6212,89 @@ compare_and_apply_mask(const VectorizedArray<double, 2> &left,
   VectorizedArray<double, 2> result;
   result.data = _mm_or_pd(_mm_and_pd(mask, true_values.data),
                           _mm_andnot_pd(mask, false_values.data));
+
+  return result;
+}
+
+#  endif
+
+#  if defined(DEAL_II_HAVE_ARM_NEON) && defined(__ARM_NEON)
+
+template <SIMDComparison predicate>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, 4>
+compare_and_apply_mask(const VectorizedArray<float, 4> &left,
+                       const VectorizedArray<float, 4> &right,
+                       const VectorizedArray<float, 4> &true_values,
+                       const VectorizedArray<float, 4> &false_values)
+{
+  uint32x4_t mask;
+  switch (predicate)
+    {
+      case SIMDComparison::equal:
+        mask = vceqq_f32(left.data, right.data);
+        break;
+      case SIMDComparison::not_equal:
+        mask = vmvnq_u32(vceqq_f32(left.data, right.data));
+        break;
+      case SIMDComparison::less_than:
+        mask = vcltq_f32(left.data, right.data);
+        break;
+      case SIMDComparison::less_than_or_equal:
+        mask = vcleq_f32(left.data, right.data);
+        break;
+      case SIMDComparison::greater_than:
+        mask = vcgtq_f32(left.data, right.data);
+        break;
+      case SIMDComparison::greater_than_or_equal:
+        mask = vcgeq_f32(left.data, right.data);
+        break;
+    }
+
+  VectorizedArray<float, 4> result;
+  result.data = vreinterpretq_f32_u32(vorrq_u32(
+    vandq_u32(mask, vreinterpretq_u32_f32(true_values.data)),
+    vandq_u32(vmvnq_u32(mask), vreinterpretq_u32_f32(false_values.data))));
+
+  return result;
+}
+
+
+template <SIMDComparison predicate>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<double, 2>
+compare_and_apply_mask(const VectorizedArray<double, 2> &left,
+                       const VectorizedArray<double, 2> &right,
+                       const VectorizedArray<double, 2> &true_values,
+                       const VectorizedArray<double, 2> &false_values)
+{
+  uint64x2_t mask;
+  switch (predicate)
+    {
+      case SIMDComparison::equal:
+        mask = vceqq_f64(left.data, right.data);
+        break;
+      case SIMDComparison::not_equal:
+        mask = vreinterpretq_u64_u32(
+          vmvnq_u32(vreinterpretq_u32_u64(vceqq_f64(left.data, right.data))));
+        break;
+      case SIMDComparison::less_than:
+        mask = vcltq_f64(left.data, right.data);
+        break;
+      case SIMDComparison::less_than_or_equal:
+        mask = vcleq_f64(left.data, right.data);
+        break;
+      case SIMDComparison::greater_than:
+        mask = vcgtq_f64(left.data, right.data);
+        break;
+      case SIMDComparison::greater_than_or_equal:
+        mask = vcgeq_f64(left.data, right.data);
+        break;
+    }
+
+  VectorizedArray<double, 2> result;
+  result.data = vreinterpretq_f64_u64(vorrq_u64(
+    vandq_u64(mask, vreinterpretq_u64_f64(true_values.data)),
+    vandq_u64(vreinterpretq_u64_u32(vmvnq_u32(vreinterpretq_u32_u64(mask))),
+              vreinterpretq_u64_f64(false_values.data))));
 
   return result;
 }

@@ -130,6 +130,8 @@ namespace internal
       8;
 #elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__SSE2__)
       4;
+#elif DEAL_II_VECTORIZATION_WIDTH_IN_BITS >= 128 && defined(__ARM_NEON)
+      4;
 #else
       1;
 #endif
