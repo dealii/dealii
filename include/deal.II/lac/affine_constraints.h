@@ -567,8 +567,8 @@ public:
   AffineConstraints();
 
   /**
-   * Constructor. The supplied IndexSet defines which indices might be
-   * constrained inside this AffineConstraints container. In a calculation
+   * Constructor. The supplied IndexSet defines for which indices
+   * this object will store constraints. In a calculation
    * with a DoFHandler object based on parallel::distributed::Triangulation
    * or parallel::shared::Triangulation, one should use the set of locally
    * relevant DoFs (see
@@ -576,9 +576,53 @@ public:
    *
    * The given IndexSet allows the AffineConstraints container to save
    * memory by just not caring about degrees of freedom that are not of
-   * importance to the current processor.
+   * importance to the current processor. In contrast, in parallel
+   * computations, if you do not provide such an index set (here, or
+   * using the reinit() function that takes such an argument), the
+   * current object will allocate memory proportional to the *total*
+   * number of degrees of freedom (accumulated over all processes),
+   * which is clearly wasteful and not efficient -- and should be considered
+   * a bug.
+   *
+   * @note This constructor is equivalent to calling the following one with
+   *   both of its arguments equal to the index set provided here. This
+   *   is not wrong, but inefficient. Use the following constructor instead.
    */
-  explicit AffineConstraints(const IndexSet &local_constraints);
+  explicit AffineConstraints(const IndexSet &locally_stored_constraints);
+
+  /**
+   * Constructor. The supplied IndexSet objects define which of the indices
+   * the object may encounter are locally owned, and for which indices
+   * this object will store constraints. In a calculation
+   * with a DoFHandler object based on parallel::distributed::Triangulation
+   * or parallel::shared::Triangulation, the first of these arguments
+   * should be the set of locally owned indices (see
+   * @ref GlossLocallyOwnedDof)
+   * and the second argument should use the set of locally
+   * relevant DoFs (see
+   * @ref GlossLocallyRelevantDof).
+   *
+   * The @p locally_owned_dofs argument indicates which elements of
+   * vectors that will be passed to the member functions of this
+   * object are locally owned (which is generally equal to the set of
+   * locally owned degrees of freedom -- thus the name of the
+   * argument). Knowledge of this set makes it possible to up front,
+   * in close(), determine which vector elements need to be imported
+   * when you later call the distribute() or related functions.
+   *
+   * The @p locally_stored_constraints IndexSet allows the AffineConstraints
+   * container to save memory by just not caring about degrees of freedom
+   * that are not of importance to the current processor. In contrast,
+   * in parallel computations, if you do not provide such an index set
+   * (here, or using the reinit() function that takes such an argument), the
+   * current object will allocate memory proportional to the *total*
+   * number of degrees of freedom (accumulated over all processes),
+   * which is clearly wasteful and not efficient -- and should be considered
+   * a bug. As mentioned above, one typically wants to provide the set of
+   * locally relevant degrees of freedom for this argument.
+   */
+  AffineConstraints(const IndexSet &locally_owned_dofs,
+                    const IndexSet &locally_stored_constraints);
 
   /**
    * Copy constructor
@@ -621,13 +665,36 @@ public:
   copy_from(const AffineConstraints<other_number> &other);
 
   /**
-   * clear() the AffineConstraints object and supply an IndexSet with lines
-   * that may be constrained. This function is only relevant in the
-   * distributed case to supply a different IndexSet. Otherwise this routine
-   * is equivalent to calling clear(). See the constructor for details.
+   * Reset the AffineConstraints object. This results in an object that
+   * is as if it had been default-constructed. See the discussion in the
+   * documentation of the various constructors of this class for whether
+   * this is what you want -- in particular, for parallel computations,
+   * you do not want to call this function, but rather one of the other
+   * reinit() functions that take index sets.
    */
   void
-  reinit(const IndexSet &local_constraints = IndexSet());
+  reinit();
+
+  /**
+   * clear() the AffineConstraints object and supply an IndexSet that describes
+   * for which degrees of freedom this object can store constraints. See
+   * the discussion in the documentation of the constructor of this class
+   * that takes a single index set as argument.
+   */
+  void
+  reinit(const IndexSet &locally_stored_constraints);
+
+  /**
+   * clear() the AffineConstraints object and supply both an IndexSet
+   * object that describes which degrees of freedom the current process
+   * owns, and an IndexSet that describes
+   * for which degrees of freedom this object can store constraints. See
+   * the discussion in the documentation of the constructor of this class
+   * that takes two index sets as argument for more information.
+   */
+  void
+  reinit(const IndexSet &locally_owned_dofs,
+         const IndexSet &locally_stored_constraints);
 
   /**
    * Determines if we can store a constraint for the given @p line_n. This
@@ -1948,6 +2015,14 @@ private:
   std::vector<size_type> lines_cache;
 
   /**
+   * This IndexSet denotes the set of locally owned DoFs (or, more correctly,
+   * the locally owned vector elements when operating on parallel vectors)
+   * and is used in the distribute() function when determining for which
+   * degrees of freedom to import dependent DoFs.
+   */
+  IndexSet locally_owned_dofs;
+
+  /**
    * This IndexSet is used to limit the lines to save in the AffineConstraints
    * to a subset. This is necessary, because the lines_cache vector would
    * become too big in a distributed calculation.
@@ -2048,23 +2123,38 @@ private:
 
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints()
-  : AffineConstraints<number>(IndexSet())
+  : AffineConstraints<number>(IndexSet(), IndexSet())
 {}
 
 
 
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints(
-  const IndexSet &local_constraints)
+  const IndexSet &locally_owned_dofs,
+  const IndexSet &locally_stored_constraints)
   : lines()
-  , local_lines(local_constraints)
+  , locally_owned_dofs(locally_owned_dofs)
+  , local_lines(locally_stored_constraints)
   , sorted(false)
 {
+  Assert(locally_owned_dofs.is_subset_of(locally_stored_constraints),
+         ExcMessage("The set of locally stored constraints needs to be a "
+                    "superset of the locally owned DoFs."));
+
   // make sure the IndexSet is compressed. Otherwise this can lead to crashes
   // that are hard to find (only happen in release mode).
   // see tests/mpi/affine_constraints_crash_01
   local_lines.compress();
 }
+
+
+
+template <typename number>
+inline AffineConstraints<number>::AffineConstraints(
+  const IndexSet &locally_stored_constraints)
+  : AffineConstraints<number>(locally_stored_constraints,
+                              locally_stored_constraints)
+{}
 
 
 

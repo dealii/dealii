@@ -995,29 +995,31 @@ AffineConstraints<number>::close()
 
   // Now also compute which indices we need in distribute().
   //
-  // This processor owns only part of the vector. one may think that
-  // every processor should be able to simply communicate those elements
-  // it owns and for which it knows that they act as sources to constrained
-  // DoFs to the owner of these DoFs. This would lead to a scheme where all
-  // we need to do is to add some local elements to (possibly non-local)
-  // ones and then call compress().
+  // This processor owns only part of the vectors we will work on. One may think
+  // that every processor should be able to simply communicate those elements it
+  // owns and for which it knows that they act as sources to constrained DoFs to
+  // the owner of these DoFs. This would lead to a scheme where all we need to
+  // do is to add some local elements to (possibly non-local) ones and then call
+  // compress().
   //
-  // Alas, this scheme does not work as evidenced by the disaster of bug
-  // #51, see http://code.google.com/p/dealii/issues/detail?id=51 and the
-  // reversion of one attempt that implements this in r29662. Rather, we
-  // need to get a vector that has all the *sources* or constraints we
-  // own locally, possibly as ghost vector elements, then read from them,
-  // and finally throw away the ghosted vector. Implement this in the
-  // following.
-  needed_elements_for_distribute = local_lines;
+  // Alas, this scheme does not work as evidenced by the disaster of
+  // bug #51 (originally stored in the Google Code repository, but now
+  // unfortunately no longer available because that platform has gone
+  // away) and reversion of one attempt that implements this in svn
+  // r29662. Rather, we need to get a vector that has all the
+  // *sources* or constraints we own locally, possibly as ghost vector
+  // elements, then read from them, and finally throw away the ghosted
+  // vector. Implement this in the following.
+  needed_elements_for_distribute = locally_owned_dofs;
 
-  if (needed_elements_for_distribute != complete_index_set(local_lines.size()))
+  if (needed_elements_for_distribute !=
+      complete_index_set(locally_owned_dofs.size()))
     {
       std::vector<types::global_dof_index> additional_elements;
       for (const ConstraintLine &line : lines)
-        if (local_lines.is_element(line.index))
+        if (locally_owned_dofs.is_element(line.index))
           for (const std::pair<size_type, number> &entry : line.entries)
-            if (!local_lines.is_element(entry.first))
+            if (!locally_owned_dofs.is_element(entry.first))
               additional_elements.emplace_back(entry.first);
       std::sort(additional_elements.begin(), additional_elements.end());
       needed_elements_for_distribute.add_indices(additional_elements.begin(),
@@ -1094,6 +1096,9 @@ AffineConstraints<number>::clear()
     lines_cache.swap(tmp);
   }
 
+  locally_owned_dofs             = {};
+  needed_elements_for_distribute = {};
+
   sorted = false;
 }
 
@@ -1101,16 +1106,43 @@ AffineConstraints<number>::clear()
 
 template <typename number>
 void
-AffineConstraints<number>::reinit(const IndexSet &local_constraints)
+AffineConstraints<number>::reinit()
 {
-  local_lines = local_constraints;
+  reinit(IndexSet(), IndexSet());
+}
+
+
+
+template <typename number>
+void
+AffineConstraints<number>::reinit(const IndexSet &locally_stored_constraints)
+{
+  reinit(locally_stored_constraints, locally_stored_constraints);
+}
+
+
+
+template <typename number>
+void
+AffineConstraints<number>::reinit(const IndexSet &locally_owned_dofs,
+                                  const IndexSet &locally_stored_constraints)
+{
+  // First clear previous content
+  clear();
+
+  // Then set the objects that describe the index sets of DoFs we care about:
+  Assert(locally_owned_dofs.is_subset_of(locally_stored_constraints),
+         ExcMessage("The set of locally stored constraints needs to be a "
+                    "superset of the locally owned DoFs."));
+
+  this->locally_owned_dofs = locally_owned_dofs;
+  this->local_lines        = locally_stored_constraints;
 
   // make sure the IndexSet is compressed. Otherwise this can lead to crashes
   // that are hard to find (only happen in release mode).
   // see tests/mpi/affine_constraints_crash_01
-  local_lines.compress();
-
-  clear();
+  this->locally_owned_dofs.compress();
+  this->local_lines.compress();
 }
 
 
@@ -2567,9 +2599,10 @@ AffineConstraints<number>::distribute(VectorType &vec) const
       // of the locally-owned indices. But you never know what people
       // pass as arguments...
 #ifdef DEBUG
-      for (const auto i : vec_owned_elements)
-        Assert(needed_elements_for_distribute.is_element(i),
-               ExcInternalError());
+      if (needed_elements_for_distribute != IndexSet())
+        for (const auto i : vec_owned_elements)
+          Assert(needed_elements_for_distribute.is_element(i),
+                 ExcInternalError());
 #endif
 
       VectorType ghosted_vector;
