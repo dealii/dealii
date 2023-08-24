@@ -241,7 +241,7 @@ delete_empty_entries(const std::list<std::string> &list)
 // determine whether a given substring at position #pos and length #length
 // in the string #text is a real token, i.e. not just part of another word
 bool
-is_real_token(const std::string &          text,
+is_real_token(const std::string           &text,
               const std::string::size_type pos,
               const std::string::size_type length)
 {
@@ -362,7 +362,7 @@ read_expansion_lists(const std::string &filename)
 // produce all combinations of substitutions of the tokens given in the
 // #substitutions list in #text and output it to std::cout
 void
-substitute(const std::string &                                   text,
+substitute(const std::string                                    &text,
            const std::list<std::pair<std::string, std::string>> &substitutions)
 {
   // do things recursively: if the list of substitutions has a single
