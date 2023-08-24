@@ -4738,6 +4738,14 @@ namespace internal
 } // namespace internal
 
 
+
+template <int dim, typename Number>
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  MGTwoLevelTransferNonNested(const AdditionalData &data)
+  : additional_data(data)
+  , rpe(data.tolerance, false, data.rtree_level, {})
+{}
+
 template <int dim, typename Number>
 void
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
@@ -4809,6 +4817,12 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   // hand points over to RPE
   rpe.reinit(points, dof_handler_coarse.get_triangulation(), mapping_coarse);
+
+  AssertThrow(
+    !additional_data.enforce_all_points_found || rpe.all_points_found(),
+    ExcMessage(
+      "You requested that all points should be found, but this didn'thappen."
+      " You can change this option through the AdditionaData struct in the constructor."));
 
   // set up MappingInfo for easier data access
   mapping_info = internal::fill_mapping_info<dim, Number>(rpe);

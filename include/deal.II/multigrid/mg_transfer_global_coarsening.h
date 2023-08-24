@@ -707,6 +707,56 @@ private:
 
 public:
   /**
+   * AdditionalData structure that can be used to tweak parameters
+   * related to the search procedure (used internally by RemotePointEvaluation)
+   * or, in the future, transfer operators needed by the non-nested multigrid
+   * algorithm.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Constructor. By default, the @p tolerance and @p rtree_level parameters
+     * are set to the default values used in the constructor of
+     * RemotePointEvaluation, i.e. 1e-6 and 0, respectively. The last Boolean
+     * parameter @p enforce_all_points_found is true by default and checks
+     * that all points submitted internally to RemotePointEvaluation::reinit()
+     * have been found.
+     *
+     */
+    AdditionalData(const double       tolerance                = 1e-6,
+                   const unsigned int rtree_level              = 0,
+                   const bool         enforce_all_points_found = true)
+      : tolerance(tolerance)
+      , rtree_level(rtree_level)
+      , enforce_all_points_found(enforce_all_points_found)
+    {}
+
+    /**
+     * Tolerance parameter. See the constructor of RemotePointEvaluation for
+     * more details.
+     */
+    double tolerance;
+
+    /**
+     * RTree level parameter. See the constructor of RemotePointEvaluation for
+     * more details.
+     *
+     */
+    unsigned int rtree_level;
+
+    /**
+     * If set to true, it checks if RemotePointEvaluation::all_points_found()
+     * evaluates to true internally during the each call to reinit() from one
+     * level to the next one, ensuring that all submitted points have been found
+     * inside the domain.
+     *
+     */
+    bool enforce_all_points_found;
+  };
+
+  MGTwoLevelTransferNonNested(const AdditionalData &data = AdditionalData());
+
+  /**
    * Set up transfer operator between the given DoFHandler objects (
    * @p dof_handler_fine and @p dof_handler_coarse).
    */
@@ -749,6 +799,7 @@ public:
   memory_consumption() const override;
 
 protected:
+  AdditionalData additional_data;
   /**
    * Perform prolongation.
    */

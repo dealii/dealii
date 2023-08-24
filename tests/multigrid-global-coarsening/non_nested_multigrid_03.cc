@@ -77,10 +77,12 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
     }
 
   // set up transfer operator
+  typename MGTwoLevelTransferNonNested<dim, VectorType>::AdditionalData data;
+  data.enforce_all_points_found = false;
   for (unsigned int l = min_level; l < max_level; ++l)
     {
       transfers[l + 1] =
-        std::make_shared<MGTwoLevelTransferNonNested<dim, VectorType>>();
+        std::make_shared<MGTwoLevelTransferNonNested<dim, VectorType>>(data);
       transfers[l + 1]->reinit(dof_handlers[l + 1],
                                dof_handlers[l],
                                mappings[l + 1],
