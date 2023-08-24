@@ -30,7 +30,6 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/matrix_free/shape_info.h>
-#include <deal.II/matrix_free/tensor_product_kernels.h>
 
 #include <array>
 #include <cmath>
