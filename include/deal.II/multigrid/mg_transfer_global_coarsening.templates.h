@@ -31,6 +31,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
@@ -4399,9 +4400,12 @@ namespace internal
                                           unit_points.end());
         }
 
+      typename NonMatching::MappingInfo<dim, dim, Number>::AdditionalData ad;
+      ad.store_cells = true;
+
       auto mapping_info =
         std::make_shared<NonMatching::MappingInfo<dim, dim, Number>>(
-          rpe.get_mapping(), update_values);
+          rpe.get_mapping(), update_values, ad);
       mapping_info->reinit_cells(cell_iterators, unit_points_vector);
 
       return mapping_info;
@@ -4436,18 +4440,26 @@ namespace internal
       Assert((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
                 &dof_handler.get_fe().base_element(0)) != nullptr) ||
                (dynamic_cast<const FE_Q<dim, spacedim> *>(
+                  &dof_handler.get_fe().base_element(0)) != nullptr) ||
+               (dynamic_cast<const FE_SimplexP<dim, spacedim> *>(
+                  &dof_handler.get_fe().base_element(0)) != nullptr) ||
+               (dynamic_cast<const FE_SimplexDGP<dim, spacedim> *>(
                   &dof_handler.get_fe().base_element(0)) != nullptr),
-             ExcMessage(
-               "Function expects FE_DGQ of FE_Q elements in dof_handler."));
+             ExcMessage("Function expects FE_DGQ, FE_Q, FE_SimplexP, or "
+                        "FE_SimplexDGP in dof_handler."));
 
-      Assert(
-        (dynamic_cast<const FE_Q<dim, spacedim> *>(
-           &dof_handler_support_points.get_fe()) != nullptr) ||
-          ((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
-              &dof_handler_support_points.get_fe()) != nullptr) &&
-           dof_handler_support_points.get_fe().degree == 0),
-        ExcMessage(
-          "Function expects FE_DGQ&&degree==0 or FE_Q in dof_handler_support_points."));
+      Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(
+                &dof_handler_support_points.get_fe()) != nullptr ||
+              dynamic_cast<const FE_SimplexP<dim, spacedim> *>(
+                &dof_handler_support_points.get_fe()) != nullptr) ||
+               ((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
+                   &dof_handler_support_points.get_fe()) != nullptr ||
+                 dynamic_cast<const FE_SimplexDGP<dim, spacedim> *>(
+                   &dof_handler_support_points.get_fe()) != nullptr) &&
+                dof_handler_support_points.get_fe().degree == 0),
+             ExcMessage(
+               "Function expects (FE_DGQ||FE_SimplexDGP)&&degree==0 or "
+               "(FE_Q||FE_SimplexP) in dof_handler_support_points."));
 
       Assert(
         dof_handler_support_points.get_fe().n_components() == 1,
@@ -4858,6 +4870,10 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
     fe_coarse = std::make_unique<FESystem<dim>>(FE_DGQ<dim>(fe->get_degree()),
                                                 n_components);
   else if (const auto fe = dynamic_cast<const FE_DGQ<dim> *>(&fe_base))
+    fe_coarse = fe->clone();
+  else if (const auto fe = dynamic_cast<const FE_SimplexP<dim> *>(&fe_base))
+    fe_coarse = fe->clone();
+  else if (const auto fe = dynamic_cast<const FE_SimplexDGP<dim> *>(&fe_base))
     fe_coarse = fe->clone();
   else
     AssertThrow(false, ExcMessage(dof_handler_coarse.get_fe().get_name()));

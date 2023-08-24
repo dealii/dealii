@@ -11,3 +11,9 @@ DEAL:0::2 1 4 quad 3
 DEAL:0::2 2 4 quad 3
 DEAL:0::2 3 4 quad 3
 DEAL:0::2 4 4 quad 3
+DEAL:0::2 1 2 tri  3
+DEAL:0::2 2 2 tri  3
+DEAL:0::2 1 3 tri  3
+DEAL:0::2 2 3 tri  3
+DEAL:0::2 1 4 tri  3
+DEAL:0::2 2 4 tri  3
