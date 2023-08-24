@@ -1,0 +1,3 @@
+New: The function IndexSet::is_subset_of() does as its name suggests.
+<br>
+(Wolfgang Bangerth, 2023/08/24)
