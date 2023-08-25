@@ -90,11 +90,11 @@ public:
   LaplaceOperator();
 
   void
-  vmult(LinearAlgebra::distributed::Vector<number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<number>       &dst,
         const LinearAlgebra::distributed::Vector<number> &src) const;
 
   void
-  vmult(LinearAlgebra::distributed::Vector<number> &      dst,
+  vmult(LinearAlgebra::distributed::Vector<number>       &dst,
         const LinearAlgebra::distributed::Vector<number> &src,
         const std::function<void(const unsigned int, const unsigned int)>
           &operation_before_loop,
@@ -107,20 +107,20 @@ public:
 private:
   virtual void
   apply_add(
-    LinearAlgebra::distributed::Vector<number> &      dst,
+    LinearAlgebra::distributed::Vector<number>       &dst,
     const LinearAlgebra::distributed::Vector<number> &src) const override;
 
   void
-  local_apply(const MatrixFree<dim, number> &                   data,
-              LinearAlgebra::distributed::Vector<number> &      dst,
+  local_apply(const MatrixFree<dim, number>                    &data,
+              LinearAlgebra::distributed::Vector<number>       &dst,
               const LinearAlgebra::distributed::Vector<number> &src,
               const std::pair<unsigned int, unsigned int> &cell_range) const;
 
   void
   local_compute_diagonal(
-    const MatrixFree<dim, number> &              data,
-    LinearAlgebra::distributed::Vector<number> & dst,
-    const unsigned int &                         dummy,
+    const MatrixFree<dim, number>               &data,
+    LinearAlgebra::distributed::Vector<number>  &dst,
+    const unsigned int                          &dummy,
     const std::pair<unsigned int, unsigned int> &cell_range) const;
 };
 
@@ -136,10 +136,10 @@ LaplaceOperator<dim, fe_degree, number>::LaplaceOperator()
 template <int dim, int fe_degree, typename number>
 void
 LaplaceOperator<dim, fe_degree, number>::local_apply(
-  const MatrixFree<dim, number> &                   data,
-  LinearAlgebra::distributed::Vector<number> &      dst,
+  const MatrixFree<dim, number>                    &data,
+  LinearAlgebra::distributed::Vector<number>       &dst,
   const LinearAlgebra::distributed::Vector<number> &src,
-  const std::pair<unsigned int, unsigned int> &     cell_range) const
+  const std::pair<unsigned int, unsigned int>      &cell_range) const
 {
   FEEvaluation<dim, fe_degree, fe_degree + 1, 1, number> phi(data);
 
@@ -158,7 +158,7 @@ LaplaceOperator<dim, fe_degree, number>::local_apply(
 template <int dim, int fe_degree, typename number>
 void
 LaplaceOperator<dim, fe_degree, number>::apply_add(
-  LinearAlgebra::distributed::Vector<number> &      dst,
+  LinearAlgebra::distributed::Vector<number>       &dst,
   const LinearAlgebra::distributed::Vector<number> &src) const
 {
   this->data->cell_loop(&LaplaceOperator::local_apply, this, dst, src);
@@ -169,7 +169,7 @@ LaplaceOperator<dim, fe_degree, number>::apply_add(
 template <int dim, int fe_degree, typename number>
 void
 LaplaceOperator<dim, fe_degree, number>::vmult(
-  LinearAlgebra::distributed::Vector<number> &      dst,
+  LinearAlgebra::distributed::Vector<number>       &dst,
   const LinearAlgebra::distributed::Vector<number> &src) const
 {
   this->data->cell_loop(&LaplaceOperator::local_apply, this, dst, src, true);
@@ -182,7 +182,7 @@ LaplaceOperator<dim, fe_degree, number>::vmult(
 template <int dim, int fe_degree, typename number>
 void
 LaplaceOperator<dim, fe_degree, number>::vmult(
-  LinearAlgebra::distributed::Vector<number> &      dst,
+  LinearAlgebra::distributed::Vector<number>       &dst,
   const LinearAlgebra::distributed::Vector<number> &src,
   const std::function<void(const unsigned int, const unsigned int)>
     &operation_before_loop,
@@ -233,7 +233,7 @@ LaplaceOperator<dim, fe_degree, number>::compute_diagonal()
 template <int dim, int fe_degree, typename number>
 void
 LaplaceOperator<dim, fe_degree, number>::local_compute_diagonal(
-  const MatrixFree<dim, number> &             data,
+  const MatrixFree<dim, number>              &data,
   LinearAlgebra::distributed::Vector<number> &dst,
   const unsigned int &,
   const std::pair<unsigned int, unsigned int> &cell_range) const
