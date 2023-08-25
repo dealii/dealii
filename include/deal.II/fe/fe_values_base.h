@@ -222,6 +222,12 @@ public:
    */
   virtual ~FEValuesBase() override;
 
+  /**
+   * Explicitly allow to check for cell similarity. By default, this is only
+   * enabled when the number of threads is 1.
+   */
+  void
+  allow_check_for_cell_similarity(bool allow);
 
   /// @name Access to shape function values
   ///
@@ -1740,6 +1746,11 @@ private:
    * A cache for all possible FEValuesViews objects.
    */
   dealii::internal::FEValuesViews::Cache<dim, spacedim> fe_values_views_cache;
+
+  /**
+   * Whether checking for cell similarity is allowed.
+   */
+  bool check_for_cell_similarity_allowed;
 
   // Make the view classes friends of this class, since they access internal
   // data.

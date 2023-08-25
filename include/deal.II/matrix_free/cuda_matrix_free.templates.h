@@ -118,6 +118,7 @@ namespace CUDAWrappers
     {
       local_dof_indices.resize(data->dofs_per_cell);
       lexicographic_dof_indices.resize(dofs_per_cell);
+      fe_values.allow_check_for_cell_similarity(true);
     }
 
 
