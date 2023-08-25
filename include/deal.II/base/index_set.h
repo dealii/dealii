@@ -445,6 +445,16 @@ public:
   fill_binary_vector(VectorType &vector) const;
 
   /**
+   * Determine whether the current object represents a set of indices
+   * that is a subset of the set represented by the argument. This
+   * function returns `true` if the two sets are the same, that is, it
+   * considers the "subset" comparison typically used in set theory,
+   * rather than the "strict subset" comparison.
+   */
+  bool
+  is_subset_of(const IndexSet &other) const;
+
+  /**
    * Output a text representation of this IndexSet to the given stream. Used
    * for testing.
    */

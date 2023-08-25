@@ -497,6 +497,23 @@ IndexSet::add_indices(const IndexSet &other, const size_type offset)
 
 
 
+bool
+IndexSet::is_subset_of(const IndexSet &other) const
+{
+  // See whether there are indices in the current set that are not in 'other'.
+  // If so, then this is clearly not a subset of 'other'.
+  IndexSet A_minus_B = *this;
+  A_minus_B.subtract_set(other);
+  if (A_minus_B.n_elements() > 0)
+    return false;
+  else
+    // Else, every index in 'this' is also in 'other', since we ended up
+    // with an empty set upon subtraction. This means that we have a subset:
+    return true;
+}
+
+
+
 void
 IndexSet::write(std::ostream &out) const
 {
