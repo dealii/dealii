@@ -318,25 +318,25 @@ namespace internal
     evaluate_tensor_product(
       const unsigned int n_derivatives,
       const boost::container::small_vector<dealii::ndarray<double, 5, dim>, 10>
-        &                values_1d,
+                        &values_1d,
       const unsigned int size_x,
       const boost::container::small_vector<std::array<unsigned int, dim1>, 64>
-        &                              indices,
+                                      &indices,
       const std::vector<unsigned int> &index_map,
-      std::vector<double> &            values,
-      std::vector<Tensor<1, dim>> &    grads,
-      std::vector<Tensor<2, dim>> &    grad_grads,
-      std::vector<Tensor<3, dim>> &    third_derivatives,
-      std::vector<Tensor<4, dim>> &    fourth_derivatives)
+      std::vector<double>             &values,
+      std::vector<Tensor<1, dim>>     &grads,
+      std::vector<Tensor<2, dim>>     &grad_grads,
+      std::vector<Tensor<3, dim>>     &third_derivatives,
+      std::vector<Tensor<4, dim>>     &fourth_derivatives)
     {
       const bool update_values = (values.size() == indices.size() * size_x);
       const bool update_grads  = (grads.size() == indices.size() * size_x);
       const bool update_grad_grads =
-                   (grad_grads.size() == indices.size() * size_x);
+        (grad_grads.size() == indices.size() * size_x);
       const bool update_3rd_derivatives =
-                   (third_derivatives.size() == indices.size() * size_x);
+        (third_derivatives.size() == indices.size() * size_x);
       const bool update_4th_derivatives =
-                   (fourth_derivatives.size() == indices.size() * size_x);
+        (fourth_derivatives.size() == indices.size() * size_x);
 
       // For values, 1st and 2nd derivatives use a more lengthy code that
       // minimizes the number of arithmetic operations and memory accesses
@@ -492,8 +492,8 @@ namespace internal
 template <int dim, typename PolynomialType>
 void
 TensorProductPolynomials<dim, PolynomialType>::evaluate(
-  const Point<dim> &           p,
-  std::vector<double> &        values,
+  const Point<dim>            &p,
+  std::vector<double>         &values,
   std::vector<Tensor<1, dim>> &grads,
   std::vector<Tensor<2, dim>> &grad_grads,
   std::vector<Tensor<3, dim>> &third_derivatives,
