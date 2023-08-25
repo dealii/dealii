@@ -329,13 +329,13 @@ namespace internal
       std::vector<Tensor<3, dim>> &    third_derivatives,
       std::vector<Tensor<4, dim>> &    fourth_derivatives)
     {
-      const bool update_values = (values.size() == indices.size() * size_x),
-                 update_grads  = (grads.size() == indices.size() * size_x),
-                 update_grad_grads =
-                   (grad_grads.size() == indices.size() * size_x),
-                 update_3rd_derivatives =
-                   (third_derivatives.size() == indices.size() * size_x),
-                 update_4th_derivatives =
+      const bool update_values = (values.size() == indices.size() * size_x);
+      const bool update_grads  = (grads.size() == indices.size() * size_x);
+      const bool update_grad_grads =
+                   (grad_grads.size() == indices.size() * size_x);
+      const bool update_3rd_derivatives =
+                   (third_derivatives.size() == indices.size() * size_x);
+      const bool update_4th_derivatives =
                    (fourth_derivatives.size() == indices.size() * size_x);
 
       // For values, 1st and 2nd derivatives use a more lengthy code that
