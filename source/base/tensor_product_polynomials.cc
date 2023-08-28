@@ -344,8 +344,9 @@ namespace internal
         for (unsigned int i = 0, i1 = 0; i1 < indices.size(); ++i1)
           {
             double value_outer = 1.;
-            for (unsigned int d = 1; d < dim; ++d)
-              value_outer *= values_1d[indices[i1][d - 1]][0][d];
+            if constexpr (dim > 1)
+              for (unsigned int d = 1; d < dim; ++d)
+                value_outer *= values_1d[indices[i1][d - 1]][0][d];
             if (index_map.empty())
               for (unsigned int ix = 0; ix < size_x; ++ix, ++i)
                 values[i] = value_outer * values_1d[ix][0][0];
@@ -359,31 +360,34 @@ namespace internal
             // prepare parts of products in y (and z) directions
             std::array<double, dim + (dim * (dim - 1)) / 2> value_outer;
             value_outer[0] = 1.;
-            for (unsigned int x = 1; x < dim; ++x)
-              value_outer[0] *= values_1d[indices[i1][x - 1]][0][x];
-            for (unsigned int d = 1; d < dim; ++d)
+            if constexpr (dim > 1)
               {
-                value_outer[d] = values_1d[indices[i1][d - 1]][1][d];
                 for (unsigned int x = 1; x < dim; ++x)
-                  if (x != d)
-                    value_outer[d] *= values_1d[indices[i1][x - 1]][0][x];
-              }
-            for (unsigned int d1 = 1, count = dim; d1 < dim; ++d1)
-              for (unsigned int d2 = d1; d2 < dim; ++d2, ++count)
-                {
-                  value_outer[count] = 1.;
-                  for (unsigned int x = 1; x < dim; ++x)
+                  value_outer[0] *= values_1d[indices[i1][x - 1]][0][x];
+                for (unsigned int d = 1; d < dim; ++d)
+                  {
+                    value_outer[d] = values_1d[indices[i1][d - 1]][1][d];
+                    for (unsigned int x = 1; x < dim; ++x)
+                      if (x != d)
+                        value_outer[d] *= values_1d[indices[i1][x - 1]][0][x];
+                  }
+                for (unsigned int d1 = 1, count = dim; d1 < dim; ++d1)
+                  for (unsigned int d2 = d1; d2 < dim; ++d2, ++count)
                     {
-                      unsigned int derivative = 0;
-                      if (d1 == x)
-                        ++derivative;
-                      if (d2 == x)
-                        ++derivative;
+                      value_outer[count] = 1.;
+                      for (unsigned int x = 1; x < dim; ++x)
+                        {
+                          unsigned int derivative = 0;
+                          if (d1 == x)
+                            ++derivative;
+                          if (d2 == x)
+                            ++derivative;
 
-                      value_outer[count] *=
-                        values_1d[indices[i1][x - 1]][derivative][x];
+                          value_outer[count] *=
+                            values_1d[indices[i1][x - 1]][derivative][x];
+                        }
                     }
-                }
+              }
 
             // now run the loop over x and multiply by the values/derivatives
             // in x direction
@@ -426,8 +430,9 @@ namespace internal
                     (index_map.empty() ? i : index_map[i]);
                   std::array<unsigned int, dim> my_indices;
                   my_indices[0] = ix;
-                  for (unsigned int d = 1; d < dim; ++d)
-                    my_indices[d] = indices[i1][d - 1];
+                  if constexpr (dim > 1)
+                    for (unsigned int d = 1; d < dim; ++d)
+                      my_indices[d] = indices[i1][d - 1];
                   for (unsigned int d1 = 0; d1 < dim; ++d1)
                     for (unsigned int d2 = 0; d2 < dim; ++d2)
                       for (unsigned int d3 = 0; d3 < dim; ++d3)
@@ -456,8 +461,9 @@ namespace internal
                     (index_map.empty() ? i : index_map[i]);
                   std::array<unsigned int, dim> my_indices;
                   my_indices[0] = ix;
-                  for (unsigned int d = 1; d < dim; ++d)
-                    my_indices[d] = indices[i1][d - 1];
+                  if constexpr (dim > 1)
+                    for (unsigned int d = 1; d < dim; ++d)
+                      my_indices[d] = indices[i1][d - 1];
                   for (unsigned int d1 = 0; d1 < dim; ++d1)
                     for (unsigned int d2 = 0; d2 < dim; ++d2)
                       for (unsigned int d3 = 0; d3 < dim; ++d3)
@@ -531,7 +537,8 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   boost::container::small_vector<ndarray<double, 5, dim>, 10> values_1d(
     n_polynomials);
   if constexpr (std::is_same<PolynomialType,
-                             dealii::Polynomials::Polynomial<double>>::value)
+                             dealii::Polynomials::Polynomial<double>>::value &&
+                dim > 0)
     {
       std::array<double, dim> point_array;
       for (unsigned int d = 0; d < dim; ++d)
@@ -555,17 +562,18 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   // arbitrary dimension
   constexpr unsigned int dim1 = dim > 1 ? dim - 1 : 1;
   boost::container::small_vector<std::array<unsigned int, dim1>, 64> indices(1);
-  for (unsigned int d = 1; d < dim; ++d)
-    {
-      const unsigned int size = indices.size();
-      for (unsigned int i = 1; i < n_polynomials; ++i)
-        for (unsigned int j = 0; j < size; ++j)
-          {
-            std::array<unsigned int, dim1> next_index = indices[j];
-            next_index[d - 1]                         = i;
-            indices.push_back(next_index);
-          }
-    }
+  if constexpr (dim > 1)
+    for (unsigned int d = 1; d < dim; ++d)
+      {
+        const unsigned int size = indices.size();
+        for (unsigned int i = 1; i < n_polynomials; ++i)
+          for (unsigned int j = 0; j < size; ++j)
+            {
+              std::array<unsigned int, dim1> next_index = indices[j];
+              next_index[d - 1]                         = i;
+              indices.push_back(next_index);
+            }
+      }
   AssertDimension(indices.size(), Utilities::pow(n_polynomials, dim - 1));
 
   internal::TensorProductPolynomials::evaluate_tensor_product<dim>(
