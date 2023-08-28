@@ -195,7 +195,7 @@ public:
       compute_diagonal<dim, -1, 0, 1, number, VectorizedArray<number>>(
         data, inverse_diagonal_entries->get_vector(), [](auto &eval) {
           eval.evaluate(EvaluationFlags::gradients);
-          for (unsigned int q = 0; q < eval.n_q_points; ++q)
+          for (const unsigned int q : eval.quadrature_point_indices())
             eval.submit_gradient(eval.get_gradient(q), q);
           eval.integrate(EvaluationFlags::gradients);
         });
@@ -232,7 +232,7 @@ private:
       {
         eval.reinit(cell);
         eval.gather_evaluate(src, EvaluationFlags::gradients);
-        for (unsigned int q = 0; q < eval.n_q_points; ++q)
+        for (const unsigned int q : eval.quadrature_point_indices())
           eval.submit_gradient(eval.get_gradient(q), q);
         eval.integrate_scatter(EvaluationFlags::gradients, dst);
       }
@@ -462,8 +462,8 @@ LaplaceProblem<dim>::create_coarse_triangulations()
 {
   coarse_triangulations =
     MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(
-      triangulation/*,
-                     RepartitioningPolicyTools::MinimalGranularityPolicy<dim>(16)*/);
+      triangulation,
+      RepartitioningPolicyTools::MinimalGranularityPolicy<dim>(16));
 }
 
 
@@ -662,7 +662,7 @@ LaplaceProblem<dim>::compute_rhs()
           eval.reinit(cell);
           dg_eval.reinit(cell);
           dg_eval.gather_evaluate(dg_rhs, EvaluationFlags::values);
-          for (unsigned int q = 0; q < eval.n_q_points; ++q)
+          for (const unsigned int q : eval.quadrature_point_indices())
             eval.submit_value(dg_eval.get_value(q), q);
           eval.integrate_scatter(EvaluationFlags::values, rhs);
         }

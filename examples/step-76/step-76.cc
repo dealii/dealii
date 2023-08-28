@@ -709,7 +709,7 @@ namespace Euler_DG
             // Apply the cell integral at the cell quadrature points. See also
             // the function <code>EulerOperator::local_apply_cell()</code> from
             // step-67:
-            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+            for (const unsigned int q : phi.quadrature_point_indices())
               {
                 const auto w_q = phi.get_value(q);
                 phi.submit_gradient(euler_flux<dim>(w_q), q);
@@ -807,7 +807,8 @@ namespace Euler_DG
                     phi_p.reinit(cell, face);
                     phi_p.gather_evaluate(src, EvaluationFlags::values);
 
-                    for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+                    for (const unsigned int q :
+                         phi_m.quadrature_point_indices())
                       {
                         const auto numerical_flux =
                           euler_numerical_flux<dim>(phi_m.get_value(q),
@@ -822,7 +823,8 @@ namespace Euler_DG
                     // are a copy of the function
                     // <code>EulerDG::EulerOperator::local_apply_boundary_face</code>
                     // from step-67:
-                    for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+                    for (const unsigned int q :
+                         phi_m.quadrature_point_indices())
                       {
                         const auto w_m    = phi_m.get_value(q);
                         const auto normal = phi_m.normal_vector(q);
@@ -1057,7 +1059,7 @@ namespace Euler_DG
     for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
       {
         phi.reinit(cell);
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           phi.submit_dof_value(evaluate_function(function,
                                                  phi.quadrature_point(q)),
                                q);
@@ -1085,7 +1087,7 @@ namespace Euler_DG
         phi.reinit(cell);
         phi.gather_evaluate(solution, EvaluationFlags::values);
         VectorizedArrayType local_errors_squared[3] = {};
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             const auto error =
               evaluate_function(function, phi.quadrature_point(q)) -
@@ -1128,7 +1130,7 @@ namespace Euler_DG
         phi.reinit(cell);
         phi.gather_evaluate(solution, EvaluationFlags::values);
         VectorizedArrayType local_max = 0.;
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             const auto solution = phi.get_value(q);
             const auto velocity = euler_velocity<dim>(solution);

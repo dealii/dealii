@@ -249,8 +249,7 @@ Coefficient<dim>::make_coefficient_table(
 
   FEEvaluation<dim, -1, 0, 1, number> fe_eval(mf_storage);
 
-  const unsigned int n_cells    = mf_storage.n_cell_batches();
-  const unsigned int n_q_points = fe_eval.n_q_points;
+  const unsigned int n_cells = mf_storage.n_cell_batches();
 
   coefficient_table->reinit(n_cells, 1);
 
@@ -259,9 +258,9 @@ Coefficient<dim>::make_coefficient_table(
       fe_eval.reinit(cell);
 
       VectorizedArray<number> average_value = 0.;
-      for (unsigned int q = 0; q < n_q_points; ++q)
+      for (const unsigned int q : fe_eval.quadrature_point_indices())
         average_value += value(fe_eval.quadrature_point(q));
-      average_value /= n_q_points;
+      average_value /= fe_eval.n_q_points;
 
       (*coefficient_table)(cell, 0) = average_value;
     }
@@ -948,7 +947,7 @@ void LaplaceProblem<dim, degree>::assemble_rhs()
       phi.read_dof_values_plain(solution_copy);
       phi.evaluate(EvaluationFlags::gradients);
 
-      for (unsigned int q = 0; q < phi.n_q_points; ++q)
+      for (const unsigned int q : phi.quadrature_point_indices())
         {
           phi.submit_gradient(-1.0 *
                                 (coefficient(cell, 0) * phi.get_gradient(q)),

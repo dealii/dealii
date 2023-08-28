@@ -208,7 +208,7 @@ namespace Step66
         phi.read_dof_values_plain(newton_step);
         phi.evaluate(EvaluationFlags::values);
 
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             nonlinear_values(cell, q) = std::exp(phi.get_value(q));
           }
@@ -250,7 +250,7 @@ namespace Step66
                             EvaluationFlags::values |
                               EvaluationFlags::gradients);
 
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             phi.submit_value(-nonlinear_values(cell, q) * phi.get_value(q), q);
             phi.submit_gradient(phi.get_gradient(q), q);
@@ -295,7 +295,7 @@ namespace Step66
 
     phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
-    for (unsigned int q = 0; q < phi.n_q_points; ++q)
+    for (const unsigned int q : phi.quadrature_point_indices())
       {
         phi.submit_value(-nonlinear_values(cell, q) * phi.get_value(q), q);
         phi.submit_gradient(phi.get_gradient(q), q);
@@ -687,7 +687,7 @@ namespace Step66
         phi.read_dof_values_plain(src);
         phi.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             phi.submit_value(-std::exp(phi.get_value(q)), q);
             phi.submit_gradient(phi.get_gradient(q), q);

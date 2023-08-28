@@ -490,7 +490,7 @@ namespace Step75
   {
     integrator.evaluate(EvaluationFlags::gradients);
 
-    for (unsigned int q = 0; q < integrator.n_q_points; ++q)
+    for (const unsigned int q : integrator.quadrature_point_indices())
       integrator.submit_gradient(integrator.get_gradient(q), q);
 
     integrator.integrate(EvaluationFlags::gradients);
@@ -507,7 +507,7 @@ namespace Step75
   {
     integrator.gather_evaluate(src, EvaluationFlags::gradients);
 
-    for (unsigned int q = 0; q < integrator.n_q_points; ++q)
+    for (const unsigned int q : integrator.quadrature_point_indices())
       integrator.submit_gradient(integrator.get_gradient(q), q);
 
     integrator.integrate_scatter(EvaluationFlags::gradients, dst);

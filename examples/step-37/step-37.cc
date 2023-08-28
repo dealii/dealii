@@ -289,7 +289,7 @@ namespace Step37
     for (unsigned int cell = 0; cell < n_cells; ++cell)
       {
         phi.reinit(cell);
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           coefficient(cell, q) =
             coefficient_function.value(phi.quadrature_point(q));
       }
@@ -405,7 +405,7 @@ namespace Step37
         phi.reinit(cell);
         phi.read_dof_values(src);
         phi.evaluate(EvaluationFlags::gradients);
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q), q);
         phi.integrate(EvaluationFlags::gradients);
         phi.distribute_local_to_global(dst);
@@ -633,7 +633,7 @@ namespace Step37
             phi.submit_dof_value(make_vectorized_array<number>(1.), i);
 
             phi.evaluate(EvaluationFlags::gradients);
-            for (unsigned int q = 0; q < phi.n_q_points; ++q)
+            for (const unsigned int q : phi.quadrature_point_indices())
               phi.submit_gradient(coefficient(cell, q) * phi.get_gradient(q),
                                   q);
             phi.integrate(EvaluationFlags::gradients);
@@ -907,7 +907,7 @@ namespace Step37
          ++cell)
       {
         phi.reinit(cell);
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           phi.submit_value(make_vectorized_array<double>(1.0), q);
         phi.integrate(EvaluationFlags::values);
         phi.distribute_local_to_global(system_rhs);
