@@ -161,45 +161,16 @@ public:
     Vector<Number> dst_dummy;
     data.cell_loop(&MatrixFreeTest::operator(), this, dst_dummy, src);
 
-    // for doubles, use a stricter condition than
-    // for floats for the relative error size
-    if (std::is_same_v<Number, double> == true)
-      {
-        deallog << "Error function values: " << errors[0] / total[0]
-                << std::endl;
-        deallog << "Error function gradients: " << errors[1] / total[1]
-                << std::endl;
+    deallog << "Error function values: " << errors[0] / total[0] << std::endl;
+    deallog << "Error function gradients: " << errors[1] / total[1]
+            << std::endl;
 
-        // need to set quite a loose tolerance because
-        // FEValues approximates Hessians with finite
-        // differences, which are not so
-        // accurate. moreover, Hessians are quite
-        // large since we chose random numbers. for
-        // some elements, it might also be zero
-        // (linear elements on quadrilaterals), so
-        // need to check for division by 0, too.
-        const double output2 = total[2] == 0 ? 0. : errors[2] / total[2];
-        deallog << "Error function Laplacians: " << output2 << std::endl;
-        const double output3 = total[3] == 0 ? 0. : errors[3] / total[3];
-        deallog << "Error function diagonal of Hessian: " << output3
-                << std::endl;
-        const double output4 = total[4] == 0 ? 0. : errors[4] / total[4];
-        deallog << "Error function Hessians: " << output4 << std::endl;
-      }
-    else if (std::is_same_v<Number, float> == true)
-      {
-        deallog << "Error function values: " << errors[0] / total[0]
-                << std::endl;
-        deallog << "Error function gradients: " << errors[1] / total[1]
-                << std::endl;
-        const double output2 = total[2] == 0 ? 0. : errors[2] / total[2];
-        deallog << "Error function Laplacians: " << output2 << std::endl;
-        const double output3 = total[3] == 0 ? 0. : errors[3] / total[3];
-        deallog << "Error function diagonal of Hessian: " << output3
-                << std::endl;
-        const double output4 = total[4] == 0 ? 0. : errors[4] / total[4];
-        deallog << "Error function Hessians: " << output4 << std::endl;
-      }
+    const double output2 = total[2] == 0 ? 0. : errors[2] / total[2];
+    deallog << "Error function Laplacians: " << output2 << std::endl;
+    const double output3 = total[3] == 0 ? 0. : errors[3] / total[3];
+    deallog << "Error function diagonal of Hessian: " << output3 << std::endl;
+    const double output4 = total[4] == 0 ? 0. : errors[4] / total[4];
+    deallog << "Error function Hessians: " << output4 << std::endl;
     deallog << std::endl;
   };
 
