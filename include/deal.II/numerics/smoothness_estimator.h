@@ -21,7 +21,7 @@
 
 #include <deal.II/fe/component_mask.h>
 
-#include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/vector_tools_common.h>
 
 #include <functional>
 #include <vector>
