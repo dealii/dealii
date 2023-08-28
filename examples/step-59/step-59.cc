@@ -484,7 +484,7 @@ namespace Step59
       {
         phi.reinit(cell);
         phi.gather_evaluate(src, EvaluationFlags::gradients);
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           phi.submit_gradient(phi.get_gradient(q), q);
         phi.integrate_scatter(EvaluationFlags::gradients, dst);
       }
@@ -600,7 +600,7 @@ namespace Step59
         // accordance with its relation to the primal consistency term that
         // gets the factor of one half due to the average in the test function
         // slot.
-        for (unsigned int q = 0; q < phi_inner.n_q_points; ++q)
+        for (const unsigned int q : phi_inner.quadrature_point_indices())
           {
             const VectorizedArray<number> solution_jump =
               (phi_inner.get_value(q) - phi_outer.get_value(q));
@@ -687,7 +687,7 @@ namespace Step59
 
         const bool is_dirichlet = (data.get_boundary_id(face) == 0);
 
-        for (unsigned int q = 0; q < phi_inner.n_q_points; ++q)
+        for (const unsigned int q : phi_inner.quadrature_point_indices())
           {
             const VectorizedArray<number> u_inner = phi_inner.get_value(q);
             const VectorizedArray<number> u_outer =
@@ -1085,7 +1085,7 @@ namespace Step59
     for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
       {
         phi.reinit(cell);
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             VectorizedArray<double> rhs_val = VectorizedArray<double>();
             Point<dim, VectorizedArray<double>> point_batch =
@@ -1138,7 +1138,7 @@ namespace Step59
         const VectorizedArray<double> sigma =
           inverse_length_normal_to_face * system_matrix.get_penalty_factor();
 
-        for (unsigned int q = 0; q < phi_face.n_q_points; ++q)
+        for (const unsigned int q : phi_face.quadrature_point_indices())
           {
             VectorizedArray<double> test_value = VectorizedArray<double>(),
                                     test_normal_derivative =

@@ -147,7 +147,7 @@ LaplaceOperator<dim, fe_degree, number>::local_apply(
     {
       phi.reinit(cell);
       phi.gather_evaluate(src, EvaluationFlags::gradients);
-      for (unsigned int q = 0; q < phi.n_q_points; ++q)
+      for (const unsigned int q : phi.quadrature_point_indices())
         phi.submit_gradient(phi.get_gradient(q), q);
       phi.integrate_scatter(EvaluationFlags::gradients, dst);
     }
@@ -252,7 +252,7 @@ LaplaceOperator<dim, fe_degree, number>::local_compute_diagonal(
           phi.submit_dof_value(make_vectorized_array<number>(1.), i);
 
           phi.evaluate(EvaluationFlags::gradients);
-          for (unsigned int q = 0; q < phi.n_q_points; ++q)
+          for (const unsigned int q : phi.quadrature_point_indices())
             phi.submit_gradient(phi.get_gradient(q), q);
           phi.integrate(EvaluationFlags::gradients);
           diagonal[i] = phi.get_dof_value(i);

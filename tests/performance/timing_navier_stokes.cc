@@ -723,7 +723,7 @@ namespace NavierStokes_DG
         for (unsigned int i = 0; i < phi.static_n_q_points * (dim + 2); ++i)
           buffer[i] = phi.begin_values()[i];
 
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             const auto w_q      = phi.get_value(q);
             const auto grad_w_q = phi.get_gradient(q);
@@ -854,7 +854,7 @@ namespace NavierStokes_DG
                              phi_p.inverse_jacobian(0))[dim - 1])) *
                   Number(viscosity * (degree + 1) * (degree + 1));
 
-                for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+                for (const unsigned int q : phi_m.quadrature_point_indices())
                   {
                     const auto w_m    = phi_m.get_value(q);
                     const auto w_p    = phi_p.get_value(q);
@@ -889,7 +889,7 @@ namespace NavierStokes_DG
                             phi_m.inverse_jacobian(0))[dim - 1]) *
                   Number(2. * viscosity * (degree + 1) * (degree + 1));
 
-                for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+                for (const unsigned int q : phi_m.quadrature_point_indices())
                   {
                     const auto w_m      = phi_m.get_value(q);
                     const auto normal   = phi_m.normal_vector(q);
@@ -1163,7 +1163,7 @@ namespace NavierStokes_DG
                             EvaluationFlags::values |
                               EvaluationFlags::gradients);
 
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : quadrature_point_indices())
           {
             const auto w_q      = phi.get_value(q);
             const auto grad_w_q = phi.get_gradient(q);
@@ -1234,7 +1234,7 @@ namespace NavierStokes_DG
                                        phi_p.inverse_jacobian(0))[dim - 1])) *
                             Number(viscosity * (degree + 1) * (degree + 1));
 
-        for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+        for (const unsigned int q : phi_m.quadrature_point_indices())
           {
             const auto w_m      = phi_m.get_value(q);
             const auto w_p      = phi_p.get_value(q);
@@ -1302,7 +1302,7 @@ namespace NavierStokes_DG
 
         const auto boundary_id = data.get_boundary_id(face);
 
-        for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
+        for (const unsigned int q : phi_m.quadrature_point_indices())
           {
             const auto w_m      = phi_m.get_value(q);
             const auto normal   = phi_m.normal_vector(q);
@@ -1507,7 +1507,7 @@ namespace NavierStokes_DG
     for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
       {
         phi.reinit(cell);
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           phi.submit_dof_value(evaluate_function(function,
                                                  phi.quadrature_point(q)),
                                q);
@@ -1535,7 +1535,7 @@ namespace NavierStokes_DG
         phi.reinit(cell);
         phi.gather_evaluate(solution, EvaluationFlags::values);
         VectorizedArrayType local_errors_squared[3] = {};
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             const auto error =
               evaluate_function(function, phi.quadrature_point(q)) -
@@ -1580,7 +1580,7 @@ namespace NavierStokes_DG
                             EvaluationFlags::values |
                               EvaluationFlags::gradients);
         VectorizedArrayType local_squared[2] = {};
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             const auto JxW      = phi.JxW(q);
             const auto w_q      = phi.get_value(q);
@@ -1622,7 +1622,7 @@ namespace NavierStokes_DG
         phi.reinit(cell);
         phi.gather_evaluate(solution, EvaluationFlags::values);
         VectorizedArrayType local_max = 0.;
-        for (unsigned int q = 0; q < phi.n_q_points; ++q)
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             const auto solution = phi.get_value(q);
             const auto velocity = fluid_velocity<dim>(solution);
