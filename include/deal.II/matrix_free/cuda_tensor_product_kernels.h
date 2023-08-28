@@ -573,38 +573,24 @@ namespace CUDAWrappers
                            n_q_points_1d,
                            Number>::value_at_quad_pts(ViewType u)
     {
-      switch (dim)
+      if constexpr (dim == 1)
+        values<0, true, false, true>(u, u);
+      else if constexpr (dim == 2)
         {
-          case 1:
-            {
-              values<0, true, false, true>(u, u);
-
-              break;
-            }
-          case 2:
-            {
-              values<0, true, false, true>(u, u);
-              team_member.team_barrier();
-              values<1, true, false, true>(u, u);
-
-              break;
-            }
-          case 3:
-            {
-              values<0, true, false, true>(u, u);
-              team_member.team_barrier();
-              values<1, true, false, true>(u, u);
-              team_member.team_barrier();
-              values<2, true, false, true>(u, u);
-
-              break;
-            }
-          default:
-            {
-              // Do nothing. We should throw but we can't from a __device__
-              // function.
-            }
+          values<0, true, false, true>(u, u);
+          team_member.team_barrier();
+          values<1, true, false, true>(u, u);
         }
+      else if constexpr (dim == 3)
+        {
+          values<0, true, false, true>(u, u);
+          team_member.team_barrier();
+          values<1, true, false, true>(u, u);
+          team_member.team_barrier();
+          values<2, true, false, true>(u, u);
+        }
+      else
+        Kokkos::abort("dim must not exceed 3!");
     }
 
 
@@ -618,38 +604,24 @@ namespace CUDAWrappers
                            n_q_points_1d,
                            Number>::integrate_value(ViewType u)
     {
-      switch (dim)
+      if constexpr (dim == 1)
+        values<0, false, false, true>(u, u);
+      else if constexpr (dim == 2)
         {
-          case 1:
-            {
-              values<0, false, false, true>(u, u);
-
-              break;
-            }
-          case 2:
-            {
-              values<0, false, false, true>(u, u);
-              team_member.team_barrier();
-              values<1, false, false, true>(u, u);
-
-              break;
-            }
-          case 3:
-            {
-              values<0, false, false, true>(u, u);
-              team_member.team_barrier();
-              values<1, false, false, true>(u, u);
-              team_member.team_barrier();
-              values<2, false, false, true>(u, u);
-
-              break;
-            }
-          default:
-            {
-              // Do nothing. We should throw but we can't from a __device__
-              // function.
-            }
+          values<0, false, false, true>(u, u);
+          team_member.team_barrier();
+          values<1, false, false, true>(u, u);
         }
+      else if constexpr (dim == 3)
+        {
+          values<0, false, false, true>(u, u);
+          team_member.team_barrier();
+          values<1, false, false, true>(u, u);
+          team_member.team_barrier();
+          values<2, false, false, true>(u, u);
+        }
+      else
+        Kokkos::abort("dim must not exceed 3!");
     }
 
 
@@ -664,74 +636,57 @@ namespace CUDAWrappers
                            Number>::gradient_at_quad_pts(const ViewTypeIn u,
                                                          ViewTypeOut grad_u)
     {
-      switch (dim)
+      if constexpr (dim == 1)
         {
-          case 1:
-            {
-              gradients<0, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
-
-              break;
-            }
-          case 2:
-            {
-              gradients<0, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              values<0, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
-
-              team_member.team_barrier();
-
-              values<1, true, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0),
-                Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              gradients<1, true, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1),
-                Kokkos::subview(grad_u, Kokkos::ALL, 1));
-
-              break;
-            }
-          case 3:
-            {
-              gradients<0, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              values<0, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
-              values<0, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 2));
-
-              team_member.team_barrier();
-
-              values<1, true, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0),
-                Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              gradients<1, true, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1),
-                Kokkos::subview(grad_u, Kokkos::ALL, 1));
-              values<1, true, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 2),
-                Kokkos::subview(grad_u, Kokkos::ALL, 2));
-
-              team_member.team_barrier();
-
-              values<2, true, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0),
-                Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              values<2, true, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1),
-                Kokkos::subview(grad_u, Kokkos::ALL, 1));
-              gradients<2, true, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 2),
-                Kokkos::subview(grad_u, Kokkos::ALL, 2));
-
-              break;
-            }
-          default:
-            {
-              // Do nothing. We should throw but we can't from a __device__
-              // function.
-            }
+          gradients<0, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
         }
+      else if constexpr (dim == 2)
+        {
+          gradients<0, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
+          values<0, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
+
+          team_member.team_barrier();
+
+          values<1, true, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                                       Kokkos::subview(grad_u, Kokkos::ALL, 0));
+          gradients<1, true, false, true>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 1),
+            Kokkos::subview(grad_u, Kokkos::ALL, 1));
+        }
+      else if constexpr (dim == 3)
+        {
+          gradients<0, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
+          values<0, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
+          values<0, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 2));
+
+          team_member.team_barrier();
+
+          values<1, true, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                                       Kokkos::subview(grad_u, Kokkos::ALL, 0));
+          gradients<1, true, false, true>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 1),
+            Kokkos::subview(grad_u, Kokkos::ALL, 1));
+          values<1, true, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 2),
+                                       Kokkos::subview(grad_u, Kokkos::ALL, 2));
+
+          team_member.team_barrier();
+
+          values<2, true, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                                       Kokkos::subview(grad_u, Kokkos::ALL, 0));
+          values<2, true, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                                       Kokkos::subview(grad_u, Kokkos::ALL, 1));
+          gradients<2, true, false, true>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 2),
+            Kokkos::subview(grad_u, Kokkos::ALL, 2));
+        }
+      else
+        Kokkos::abort("dim must not exceed 3!");
     }
 
 
@@ -747,56 +702,44 @@ namespace CUDAWrappers
                                                                    ViewType2
                                                                      grad_u)
     {
-      switch (dim)
+      if constexpr (dim == 1)
         {
-          case 1:
-            {
-              values<0, true, false, true>(u, u);
-              team_member.team_barrier();
+          values<0, true, false, true>(u, u);
+          team_member.team_barrier();
 
-              co_gradients<0, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
-
-              break;
-            }
-          case 2:
-            {
-              values<0, true, false, true>(u, u);
-              team_member.team_barrier();
-              values<1, true, false, true>(u, u);
-              team_member.team_barrier();
-
-              co_gradients<0, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              co_gradients<1, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
-
-              break;
-            }
-          case 3:
-            {
-              values<0, true, false, true>(u, u);
-              team_member.team_barrier();
-              values<1, true, false, true>(u, u);
-              team_member.team_barrier();
-              values<2, true, false, true>(u, u);
-              team_member.team_barrier();
-
-              co_gradients<0, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              co_gradients<1, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
-              co_gradients<2, true, false, false>(
-                u, Kokkos::subview(grad_u, Kokkos::ALL, 2));
-
-              break;
-            }
-          default:
-            {
-              // Do nothing. We should throw but we can't from a __device__
-              // function.
-            }
+          co_gradients<0, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
         }
+      else if constexpr (dim == 2)
+        {
+          values<0, true, false, true>(u, u);
+          team_member.team_barrier();
+          values<1, true, false, true>(u, u);
+          team_member.team_barrier();
+
+          co_gradients<0, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
+          co_gradients<1, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
+        }
+      else if constexpr (dim == 3)
+        {
+          values<0, true, false, true>(u, u);
+          team_member.team_barrier();
+          values<1, true, false, true>(u, u);
+          team_member.team_barrier();
+          values<2, true, false, true>(u, u);
+          team_member.team_barrier();
+
+          co_gradients<0, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 0));
+          co_gradients<1, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 1));
+          co_gradients<2, true, false, false>(
+            u, Kokkos::subview(grad_u, Kokkos::ALL, 2));
+        }
+      else
+        Kokkos::abort("dim must not exceed 3!");
     }
 
 
@@ -811,77 +754,70 @@ namespace CUDAWrappers
                            Number>::integrate_gradient(ViewType1 u,
                                                        ViewType2 grad_u)
     {
-      switch (dim)
+      if constexpr (dim == 1)
         {
-          case 1:
-            {
-              gradients<0, false, add, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, dim), u);
-
-              break;
-            }
-          case 2:
-            {
-              gradients<0, false, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0),
-                Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              values<0, false, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1),
-                Kokkos::subview(grad_u, Kokkos::ALL, 1));
-
-              team_member.team_barrier();
-
-              values<1, false, add, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              team_member.team_barrier();
-              gradients<1, false, true, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
-
-              break;
-            }
-          case 3:
-            {
-              gradients<0, false, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0),
-                Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              values<0, false, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1),
-                Kokkos::subview(grad_u, Kokkos::ALL, 1));
-              values<0, false, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 2),
-                Kokkos::subview(grad_u, Kokkos::ALL, 2));
-
-              team_member.team_barrier();
-
-              values<1, false, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0),
-                Kokkos::subview(grad_u, Kokkos::ALL, 0));
-              gradients<1, false, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1),
-                Kokkos::subview(grad_u, Kokkos::ALL, 1));
-              values<1, false, false, true>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 2),
-                Kokkos::subview(grad_u, Kokkos::ALL, 2));
-
-              team_member.team_barrier();
-
-              values<2, false, add, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              team_member.team_barrier();
-              values<2, false, true, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
-              team_member.team_barrier();
-              gradients<2, false, true, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
-
-              break;
-            }
-          default:
-            {
-              // Do nothing. We should throw but we can't from a __device__
-              // function.
-            }
+          gradients<0, false, add, false>(
+            Kokkos::subview(grad_u, Kokkos::ALL, dim), u);
         }
+      else if constexpr (dim == 2)
+        {
+          gradients<0, false, false, true>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 0),
+            Kokkos::subview(grad_u, Kokkos::ALL, 0));
+          values<0, false, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                                        Kokkos::subview(grad_u,
+                                                        Kokkos::ALL,
+                                                        1));
+
+          team_member.team_barrier();
+
+          values<1, false, add, false>(Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                                       u);
+          team_member.team_barrier();
+          gradients<1, false, true, false>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
+        }
+      else if constexpr (dim == 3)
+        {
+          gradients<0, false, false, true>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 0),
+            Kokkos::subview(grad_u, Kokkos::ALL, 0));
+          values<0, false, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                                        Kokkos::subview(grad_u,
+                                                        Kokkos::ALL,
+                                                        1));
+          values<0, false, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 2),
+                                        Kokkos::subview(grad_u,
+                                                        Kokkos::ALL,
+                                                        2));
+
+          team_member.team_barrier();
+
+          values<1, false, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                                        Kokkos::subview(grad_u,
+                                                        Kokkos::ALL,
+                                                        0));
+          gradients<1, false, false, true>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 1),
+            Kokkos::subview(grad_u, Kokkos::ALL, 1));
+          values<1, false, false, true>(Kokkos::subview(grad_u, Kokkos::ALL, 2),
+                                        Kokkos::subview(grad_u,
+                                                        Kokkos::ALL,
+                                                        2));
+
+          team_member.team_barrier();
+
+          values<2, false, add, false>(Kokkos::subview(grad_u, Kokkos::ALL, 0),
+                                       u);
+          team_member.team_barrier();
+          values<2, false, true, false>(Kokkos::subview(grad_u, Kokkos::ALL, 1),
+                                        u);
+          team_member.team_barrier();
+          gradients<2, false, true, false>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
+        }
+      else
+        Kokkos::abort("dim must not exceed 3!");
     }
 
 
@@ -897,61 +833,49 @@ namespace CUDAWrappers
                                                                  ViewType2
                                                                    grad_u)
     {
-      switch (dim)
+      if constexpr (dim == 1)
         {
-          case 1:
-            {
-              co_gradients<0, false, true, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              team_member.team_barrier();
+          co_gradients<0, false, true, false>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
+          team_member.team_barrier();
 
-              values<0, false, false, true>(u, u);
-
-              break;
-            }
-          case 2:
-            {
-              co_gradients<1, false, true, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
-              team_member.team_barrier();
-              co_gradients<0, false, true, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              team_member.team_barrier();
-
-              values<1, false, false, true>(u, u);
-              team_member.team_barrier();
-              values<0, false, false, true>(u, u);
-              team_member.team_barrier();
-
-              break;
-            }
-          case 3:
-            {
-              co_gradients<2, false, true, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
-              team_member.team_barrier();
-              co_gradients<1, false, true, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
-              team_member.team_barrier();
-              co_gradients<0, false, true, false>(
-                Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
-              team_member.team_barrier();
-
-              values<2, false, false, true>(u, u);
-              team_member.team_barrier();
-              values<1, false, false, true>(u, u);
-              team_member.team_barrier();
-              values<0, false, false, true>(u, u);
-              team_member.team_barrier();
-
-              break;
-            }
-          default:
-            {
-              // Do nothing. We should throw but we can't from a __device__
-              // function.
-            }
+          values<0, false, false, true>(u, u);
         }
+      else if constexpr (dim == 2)
+        {
+          co_gradients<1, false, true, false>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
+          team_member.team_barrier();
+          co_gradients<0, false, true, false>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
+          team_member.team_barrier();
+
+          values<1, false, false, true>(u, u);
+          team_member.team_barrier();
+          values<0, false, false, true>(u, u);
+          team_member.team_barrier();
+        }
+      else if constexpr (dim == 3)
+        {
+          co_gradients<2, false, true, false>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
+          team_member.team_barrier();
+          co_gradients<1, false, true, false>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 1), u);
+          team_member.team_barrier();
+          co_gradients<0, false, true, false>(
+            Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
+          team_member.team_barrier();
+
+          values<2, false, false, true>(u, u);
+          team_member.team_barrier();
+          values<1, false, false, true>(u, u);
+          team_member.team_barrier();
+          values<0, false, false, true>(u, u);
+          team_member.team_barrier();
+        }
+      else
+        Kokkos::abort("dim must not exceed 3!");
     }
   } // namespace internal
 } // namespace CUDAWrappers
