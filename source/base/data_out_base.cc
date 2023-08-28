@@ -7498,7 +7498,7 @@ namespace DataOutBase
     AssertThrowMPI(ierr);
 
     MPI_Info info;
-    MPI_Info_create(&info);
+    ierr = MPI_Info_create(&info);
     AssertThrowMPI(ierr);
     MPI_File fh;
     ierr = MPI_File_open(
