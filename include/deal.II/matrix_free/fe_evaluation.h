@@ -7848,7 +7848,7 @@ FEEvaluation<dim,
       (this->cell_type > internal::MatrixFreeFunctions::affine))
     evaluation_flag_actual |= EvaluationFlags::values;
 
-  if (fe_degree > -1)
+  if constexpr (fe_degree > -1)
     {
       SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::
         evaluate(n_components, evaluation_flag_actual, values_array, *this);
@@ -8077,7 +8077,7 @@ FEEvaluation<dim,
         }
     }
 
-  if (fe_degree > -1)
+  if constexpr (fe_degree > -1)
     {
       SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::
         integrate(n_components,
@@ -8540,7 +8540,7 @@ FEFaceEvaluation<dim,
       (this->cell_type > internal::MatrixFreeFunctions::affine))
     evaluation_flag_actual |= EvaluationFlags::values;
 
-  if (fe_degree > -1)
+  if constexpr (fe_degree > -1)
     internal::FEFaceEvaluationImplEvaluateSelector<dim, VectorizedArrayType>::
       template run<fe_degree, n_q_points_1d>(n_components,
                                              evaluation_flag_actual,
@@ -8646,7 +8646,7 @@ FEFaceEvaluation<dim,
         }
     }
 
-  if (fe_degree > -1)
+  if constexpr (fe_degree > -1)
     internal::FEFaceEvaluationImplIntegrateSelector<dim, VectorizedArrayType>::
       template run<fe_degree, n_q_points_1d>(n_components,
                                              integration_flag_actual,
@@ -8703,7 +8703,7 @@ FEFaceEvaluation<dim,
                  this->dof_info->index_storage_variants[this->dof_access_index]
                                                        [this->cell]))
     {
-      if (fe_degree > -1)
+      if constexpr (fe_degree > -1)
         {
           internal::FEFaceEvaluationImplGatherEvaluateSelector<
             dim,
@@ -8820,7 +8820,7 @@ FEFaceEvaluation<dim,
                  this->dof_info->index_storage_variants[this->dof_access_index]
                                                        [this->cell]))
     {
-      if (fe_degree > -1)
+      if constexpr (fe_degree > -1)
         {
           internal::FEFaceEvaluationImplIntegrateScatterSelector<
             dim,
