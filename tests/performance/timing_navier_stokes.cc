@@ -1163,7 +1163,7 @@ namespace NavierStokes_DG
                             EvaluationFlags::values |
                               EvaluationFlags::gradients);
 
-        for (const unsigned int q : quadrature_point_indices())
+        for (const unsigned int q : phi.quadrature_point_indices())
           {
             const auto w_q      = phi.get_value(q);
             const auto grad_w_q = phi.get_gradient(q);
