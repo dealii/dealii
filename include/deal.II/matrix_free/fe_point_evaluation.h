@@ -1712,7 +1712,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::do_reinit()
       for (unsigned int qb = 0; qb < n_batches; ++qb)
         if (use_face_path)
           {
-            if (dim > 1)
+            if constexpr (dim > 1)
               {
                 shapes_faces.resize_fast(n_batches * n_shapes);
                 internal::compute_values_of_array(
@@ -1854,28 +1854,28 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
           if (current_face_number / 2 == 0)
             {
               gradient[0] = interpolated_value[dim];
-              if (dim > 1)
+              if constexpr (dim > 1)
                 gradient[1] = interpolated_value[0];
-              if (dim > 2)
+              if constexpr (dim > 2)
                 gradient[2] = interpolated_value[1];
             }
           else if (current_face_number / 2 == 1)
             {
-              if (dim > 1)
+              if constexpr (dim > 1)
                 gradient[1] = interpolated_value[dim];
-              if (dim == 3)
+              if constexpr (dim == 3)
                 {
                   gradient[0] = interpolated_value[1];
                   gradient[2] = interpolated_value[0];
                 }
-              else if (dim == 2)
+              else if constexpr (dim == 2)
                 gradient[0] = interpolated_value[0];
               else
                 Assert(false, ExcInternalError());
             }
           else if (current_face_number / 2 == 2)
             {
-              if (dim > 2)
+              if constexpr (dim > 2)
                 {
                   gradient[0] = interpolated_value[0];
                   gradient[1] = interpolated_value[1];
@@ -1922,9 +1922,9 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_evaluate_fast(
                        n_shapes,
                        solution_renumbered.data());
           gradient[0] = result[0];
-          if (dim > 1)
+          if constexpr (dim > 1)
             gradient[1] = result[1];
-          if (dim > 2)
+          if constexpr (dim > 2)
             gradient[2] = result[2];
           value = result[dim];
         }
@@ -2124,28 +2124,28 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::compute_integrate_fast(
           if (current_face_number / 2 == 0)
             {
               value_face[1] = gradient[0];
-              if (dim > 1)
+              if constexpr (dim > 1)
                 gradient_in_face[0] = gradient[1];
-              if (dim > 2)
+              if constexpr (dim > 2)
                 gradient_in_face[1] = gradient[2];
             }
           else if (current_face_number / 2 == 1)
             {
-              if (dim > 1)
+              if constexpr (dim > 1)
                 value_face[1] = gradient[1];
-              if (dim == 3)
+              if constexpr (dim == 3)
                 {
                   gradient_in_face[0] = gradient[2];
                   gradient_in_face[1] = gradient[0];
                 }
-              else if (dim == 2)
+              else if constexpr (dim == 2)
                 gradient_in_face[0] = gradient[0];
               else
                 Assert(false, ExcInternalError());
             }
           else if (current_face_number / 2 == 2)
             {
-              if (dim > 2)
+              if constexpr (dim > 2)
                 {
                   value_face[1]       = gradient[2];
                   gradient_in_face[0] = gradient[0];

@@ -197,7 +197,7 @@ namespace internal
       const unsigned int points = given_degree + 1;
       const unsigned int n_dofs = shape_info.dofs_per_component_on_cell;
 
-      if (dim == 2)
+      if constexpr (dim == 2)
         {
           dealii::ndarray<Number, 2>    mask_weights = {};
           dealii::ndarray<Number, 2, 2> mask_write   = {};
@@ -259,7 +259,7 @@ namespace internal
                                                values + c * n_dofs);
           }
         }
-      else if (dim == 3)
+      else if constexpr (dim == 3)
         {
           const unsigned int p0 = 0;
           const unsigned int p1 = points - 1;
@@ -1560,7 +1560,7 @@ namespace internal
                                                          constraint_mask_sorted,
                                                          v);
 
-              if (dim == 2) // 2d: only faces
+              if constexpr (dim == 2) // 2d: only faces
                 {
                   const bool subcell_x = (mask >> 0) & 1;
                   const bool subcell_y = (mask >> 1) & 1;
@@ -1603,7 +1603,7 @@ namespace internal
                                                      values); // face 1
                     }
                 }
-              else if (dim == 3) // 3d faces and edges
+              else if constexpr (dim == 3) // 3d faces and edges
                 {
                   const bool type_x = (mask >> 0) & 1;
                   const bool type_y = (mask >> 1) & 1;

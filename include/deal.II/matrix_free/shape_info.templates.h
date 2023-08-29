@@ -678,7 +678,7 @@ namespace internal
 
           // face orientation for faces in 3d
           // (similar to MappingInfoStorage::QuadratureDescriptor::initialize)
-          if (dim == 3)
+          if constexpr (dim == 3)
             {
               face_orientations_dofs = compute_orientation_table(fe_degree + 1);
               face_orientations_quad = compute_orientation_table(n_q_points_1d);

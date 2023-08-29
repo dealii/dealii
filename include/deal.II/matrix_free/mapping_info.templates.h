@@ -1549,17 +1549,17 @@ namespace internal
             return index;
           }
 
-        if (dim == 3)
+        if constexpr (dim == 3)
           {
             unsigned int table[3][3] = {{1, 2, 0}, {2, 0, 1}, {0, 1, 2}};
             return table[face_no / 2][index];
           }
-        else if (dim == 2)
+        else if constexpr (dim == 2)
           {
             unsigned int table[2][2] = {{1, 0}, {0, 1}};
             return table[face_no / 2][index];
           }
-        else if (dim == 1)
+        else if constexpr (dim == 1)
           return 0;
         else
           Assert(false,
@@ -2293,11 +2293,11 @@ namespace internal
                                         [interior_face_no][d][f];
 
                   Tensor<1, dim, VectorizedDouble> boundary_form;
-                  if (dim == 1)
+                  if constexpr (dim == 1)
                     boundary_form[0] = interior_face_no == 0 ? -1. : 1.;
-                  else if (dim == 2)
+                  else if constexpr (dim == 2)
                     boundary_form = cross_product_2d(tangential_vectors[0]);
-                  else if (dim == 3)
+                  else if constexpr (dim == 3)
                     boundary_form = cross_product_3d(tangential_vectors[0],
                                                      tangential_vectors[1]);
                   else

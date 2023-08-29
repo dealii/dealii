@@ -1478,7 +1478,7 @@ namespace internal
                   // faces 2 and 3 in 3d use local coordinate system zx, which
                   // is the other way around compared to the tensor
                   // product. Need to take that into account.
-                  if (dim == 3)
+                  if constexpr (dim == 3)
                     {
                       if (contract_onto_face)
                         out += n_rows - 1;
@@ -1867,7 +1867,7 @@ namespace internal
                   // faces 2 and 3 in 3d use local coordinate system zx, which
                   // is the other way around compared to the tensor
                   // product. Need to take that into account.
-                  if (dim == 3)
+                  if constexpr (dim == 3)
                     {
                       if (contract_onto_face)
                         out += n_rows - 1;
@@ -2327,7 +2327,7 @@ namespace internal
                   // faces 2 and 3 in 3d use local coordinate system zx, which
                   // is the other way around compared to the tensor
                   // product. Need to take that into account.
-                  if (dim == 3)
+                  if constexpr (dim == 3)
                     {
                       if (normal_dir == 0)
                         {
@@ -2531,7 +2531,7 @@ namespace internal
                 inner_result[2] += shapes[i0][0][0] * values_2[i];
             }
 
-        if (dim > 1)
+        if constexpr (dim > 1)
           {
             // Interpolation + derivative in y direction
             // gradient
@@ -2581,7 +2581,7 @@ namespace internal
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
 
     std::array<Number3, dim + n_values> result = {};
-    if (dim == 0)
+    if constexpr (dim == 0)
       {
         // We only need the interpolation of the value and normal derivatives on
         // faces of a 1d element. As the interpolation is the value at the
@@ -2623,7 +2623,7 @@ namespace internal
           inner_result =
             do_interpolate_xy<dim, -1, Number2, Number, n_values, do_renumber>(
               values, renumber, shapes, n_shapes, i);
-        if (dim == 3)
+        if constexpr (dim == 3)
           {
             // derivative + interpolation in z direction
             // gradient
@@ -2635,7 +2635,7 @@ namespace internal
             if (n_values > 1)
               result[4] += inner_result[3] * shapes[i2][0][2];
           }
-        else if (dim == 2)
+        else if constexpr (dim == 2)
           {
             // gradient
             result[0] = inner_result[0];
@@ -2691,14 +2691,14 @@ namespace internal
       AssertDimension(renumber[i], i);
 
     std::array<Number3, dim + n_values> result;
-    if (dim == 0)
+    if constexpr (dim == 0)
       {
         // we only need the value on faces of a 1d element
         result[0] = values[0];
         if (n_values > 1)
           result[1] = values_2[0];
       }
-    else if (dim == 1)
+    else if constexpr (dim == 1)
       {
         // gradient
         result[0] = Number3(values[1] - values[0]);
@@ -2707,7 +2707,7 @@ namespace internal
         if (n_values > 1)
           result[2] = Number3(values_2[0]) + p[0] * (values_2[1] - values_2[0]);
       }
-    else if (dim == 2)
+    else if constexpr (dim == 2)
       {
         const Number3 val10 = Number3(values[1] - values[0]);
         const Number3 val32 = Number3(values[3] - values[2]);
@@ -2730,8 +2730,12 @@ namespace internal
             result[3] = tmp0_2 + p[1] * (tmp1_2 - tmp0_2);
           }
       }
-    else if (dim == 3)
+    else if constexpr (dim == 3)
       {
+        // avoid an unused variable warning since values_2 isn't used in this
+        // branch. This spurious warning is fixed in GCC-13.
+        (void)values_2;
+
         const Number3 val10 = Number3(values[1] - values[0]);
         const Number3 val32 = Number3(values[3] - values[2]);
         const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
@@ -2865,7 +2869,7 @@ namespace internal
           for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
             value += shapes[i0][0][0] * values[i];
 
-        if (dim > 1)
+        if constexpr (dim > 1)
           result += value * shapes[i1][0][1];
         else
           result = value;
@@ -2886,7 +2890,7 @@ namespace internal
     static_assert(dim >= 0 && dim <= 3, "Only dim=0,1,2,3 implemented");
 
     // we only need the value on faces of a 1d element
-    if (dim == 0)
+    if constexpr (dim == 0)
       {
         return values[0];
       }
@@ -2925,7 +2929,7 @@ namespace internal
           inner_result =
             do_interpolate_xy_value<dim, -1, Number2, Number, do_renumber>(
               values, renumber, shapes, n_shapes, i);
-        if (dim == 3)
+        if constexpr (dim == 3)
           {
             // Interpolation + derivative in z direction
             result += inner_result * shapes[i2][0][2];
@@ -2958,16 +2962,16 @@ namespace internal
     for (unsigned int i = 0; i < renumber.size(); ++i)
       AssertDimension(renumber[i], i);
 
-    if (dim == 0)
+    if constexpr (dim == 0)
       {
         // we only need the value on faces of a 1d element
         return values[0];
       }
-    else if (dim == 1)
+    else if constexpr (dim == 1)
       {
         return Number3(values[0]) + p[0] * Number3(values[1] - values[0]);
       }
-    else if (dim == 2)
+    else if constexpr (dim == 2)
       {
         const Number3 val10 = Number3(values[1] - values[0]);
         const Number3 val32 = Number3(values[3] - values[2]);
@@ -2975,7 +2979,7 @@ namespace internal
         const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
         return tmp0 + p[1] * (tmp1 - tmp0);
       }
-    else if (dim == 3)
+    else if constexpr (dim == 3)
       {
         const Number3 val10 = Number3(values[1] - values[0]);
         const Number3 val32 = Number3(values[3] - values[2]);
@@ -3208,16 +3212,16 @@ namespace internal
 
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
     SymmetricTensor<2, dim, Number3> result;
-    if (dim == 1)
+    if constexpr (dim == 1)
       result[0][0] = hessian[0];
-    else if (dim >= 2)
+    else if constexpr (dim >= 2)
       {
         // derivatives in Hessian are xx, xy, yy, xz, yz, zz, so must re-order
         // them for 3D
         for (unsigned int d = 0, c = 0; d < 2; ++d)
           for (unsigned int e = d; e < 2; ++e, ++c)
             result[d][e] = hessian[c];
-        if (dim == 3)
+        if constexpr (dim == 3)
           {
             for (unsigned int d = 0; d < 2; ++d)
               result[d][2] = hessian[3 + d];
@@ -3370,7 +3374,7 @@ namespace internal
 
     // Note that 'add' is a template argument, so the compiler will remove
     // these checks
-    if (dim == 0)
+    if constexpr (dim == 0)
       {
         if (add)
           values[0] += value[0];
@@ -3457,7 +3461,7 @@ namespace internal
 
     // Note that 'add' is a template argument, so the compiler will remove
     // these checks
-    if (dim == 0)
+    if constexpr (dim == 0)
       {
         if (add)
           values[0] += value[0];
@@ -3471,7 +3475,7 @@ namespace internal
               values[1] = value[1];
           }
       }
-    else if (dim == 1)
+    else if constexpr (dim == 1)
       {
         const Number2 difference = value[0] * p[0] + gradient[0];
         if (add)
@@ -3499,7 +3503,7 @@ namespace internal
               }
           }
       }
-    else if (dim == 2)
+    else if constexpr (dim == 2)
       {
         const Number2 test_value_y1 = value[0] * p[1] + gradient[1];
         const Number2 test_value_y0 = value[0] - test_value_y1;
@@ -3546,7 +3550,7 @@ namespace internal
               }
           }
       }
-    else if (dim == 3)
+    else if constexpr (dim == 3)
       {
         Assert(n_values == 1, ExcNotImplemented());
 
@@ -3728,7 +3732,7 @@ namespace internal
 
     // as in evaluate, use `int` type to produce better code in this context
 
-    if (dim == 0)
+    if constexpr (dim == 0)
       {
         if (add)
           values[0] += value;
@@ -3785,14 +3789,14 @@ namespace internal
 
     AssertDimension(n_shapes, 2);
 
-    if (dim == 0)
+    if constexpr (dim == 0)
       {
         if (add)
           values[0] += value;
         else
           values[0] = value;
       }
-    else if (dim == 1)
+    else if constexpr (dim == 1)
       {
         const auto x0 = 1. - p[0], x1 = p[0];
 
@@ -3807,7 +3811,7 @@ namespace internal
             values[1] = value * x1;
           }
       }
-    else if (dim == 2)
+    else if constexpr (dim == 2)
       {
         const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1];
 
@@ -3829,7 +3833,7 @@ namespace internal
             values[3] = x1 * test_value_y1;
           }
       }
-    else if (dim == 3)
+    else if constexpr (dim == 3)
       {
         const auto x0 = 1. - p[0], x1 = p[0], y0 = 1. - p[1], y1 = p[1],
                    z0 = 1. - p[2], z1 = p[2];

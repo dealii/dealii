@@ -1011,7 +1011,7 @@ namespace internal
       fe_eval,
       add_into_values_array,
       std::integral_constant<bool, integrate>());
-    if (dim == 3)
+    if constexpr (dim == 3)
       {
         // Third component
         evaluate_tensor_product_per_component<2>(
@@ -1559,7 +1559,7 @@ namespace internal
               eval_val.template values<0, true, false>(values_in, values_out);
               eval_val.template values<1, true, false>(values_out, values_out);
             }
-          else if (dim == 1)
+          else if constexpr (dim == 1)
             eval_val.template values<dim - 1, true, false>(values_in,
                                                            values_out);
           else
@@ -1690,7 +1690,7 @@ namespace internal
                     eval_val.template hessians<0, false, true>(values_in,
                                                                values_out);
                 }
-              else if (dim == 1)
+              else if constexpr (dim == 1)
                 {
                   if (quantity == EvaluatorQuantity::value)
                     eval_val.template values<0, false, false>(values_in,
@@ -1929,10 +1929,10 @@ namespace internal
          (EvaluationFlags::gradients | EvaluationFlags::hessians)) != 0u)
       {
         eval.template gradients<0, true, false>(values_dofs, gradients_quad);
-        if (dim > 1)
+        if constexpr (dim > 1)
           eval.template gradients<1, true, false>(values_dofs,
                                                   gradients_quad + n_points);
-        if (dim > 2)
+        if constexpr (dim > 2)
           eval.template gradients<2, true, false>(values_dofs,
                                                   gradients_quad +
                                                     2 * n_points);
@@ -1940,7 +1940,7 @@ namespace internal
     if (evaluation_flag & EvaluationFlags::hessians)
       {
         eval.template hessians<0, true, false>(values_dofs, hessians_quad);
-        if (dim > 1)
+        if constexpr (dim > 1)
           {
             eval.template gradients<1, true, false>(gradients_quad,
                                                     hessians_quad +
@@ -1948,7 +1948,7 @@ namespace internal
             eval.template hessians<1, true, false>(values_dofs,
                                                    hessians_quad + n_points);
           }
-        if (dim > 2)
+        if constexpr (dim > 2)
           {
             eval.template gradients<2, true, false>(gradients_quad,
                                                     hessians_quad +
@@ -2030,15 +2030,15 @@ namespace internal
         else
           eval.template hessians<0, false, false>(hessians_quad, values_dofs);
         // grad yy
-        if (dim > 1)
+        if constexpr (dim > 1)
           eval.template hessians<1, false, true>(hessians_quad + n_points,
                                                  values_dofs);
         // grad zz
-        if (dim > 2)
+        if constexpr (dim > 2)
           eval.template hessians<2, false, true>(hessians_quad + 2 * n_points,
                                                  values_dofs);
         // off-diagonal
-        if (dim == 2)
+        if constexpr (dim == 2)
           {
             // grad xy, queue into gradient
             if (integration_flag & EvaluationFlags::gradients)
@@ -2050,7 +2050,7 @@ namespace internal
                                                          2 * n_points,
                                                        gradients_quad);
           }
-        if (dim == 3)
+        if constexpr (dim == 3)
           {
             // grad xy, queue into gradient
             if (integration_flag & EvaluationFlags::gradients)
@@ -2092,10 +2092,10 @@ namespace internal
           eval.template gradients<0, false, true>(gradients_quad, values_dofs);
         else
           eval.template gradients<0, false, false>(gradients_quad, values_dofs);
-        if (dim > 1)
+        if constexpr (dim > 1)
           eval.template gradients<1, false, true>(gradients_quad + n_points,
                                                   values_dofs);
-        if (dim > 2)
+        if constexpr (dim > 2)
           eval.template gradients<2, false, true>(gradients_quad + 2 * n_points,
                                                   values_dofs);
       }
@@ -3013,7 +3013,7 @@ namespace internal
                                 subface_index,
                                 std::integral_constant<bool, integrate>());
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         evaluate_in_face_apply<1>(values_dofs,
                                   fe_eval,
                                   scratch_data,
@@ -3638,7 +3638,7 @@ namespace internal
       const unsigned int                             face_no,
       const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info)
     {
-      if (dim == 1)
+      if constexpr (dim == 1)
         {
           // This should never happen since the FE_RaviartThomasNodal is not
           // defined for dim = 1. It prevents compiler warnings of infinite
@@ -3766,11 +3766,6 @@ namespace internal
                                                   shape_info.data[0] :
                                                   shape_info.data[1],
                                                 face_no);
-      Evalf2 evalf2 =
-        create_evaluator_tensor_product<Evalf2>((face_direction == 2) ?
-                                                  shape_info.data[0] :
-                                                  shape_info.data[1],
-                                                face_no);
 
       const unsigned int dofs_per_component_on_cell =
         shape_info.dofs_per_component_on_cell;
@@ -3807,8 +3802,13 @@ namespace internal
                                  add_into_output,
                                  max_derivative>(input, output);
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         {
+          auto evalf2 =
+            create_evaluator_tensor_product<Evalf2>((face_direction == 2) ?
+                                                      shape_info.data[0] :
+                                                      shape_info.data[1],
+                                                    face_no);
           // stride to next component
           input += (face_direction == 1) ? in_stride_after_normal : in_stride;
           output +=
@@ -5580,9 +5580,9 @@ namespace internal
           // Need to select 'apply' method with hessian slot because values
           // assume symmetries that do not exist in the inverse shapes
           evaluator.template hessians<0, true, false>(in, out);
-          if (dim > 1)
+          if constexpr (dim > 1)
             evaluator.template hessians<1, true, false>(out, out);
-          if (dim > 2)
+          if constexpr (dim > 2)
             evaluator.template hessians<2, true, false>(out, out);
         }
       for (unsigned int q = 0; q < dofs_per_component; ++q)
@@ -5594,9 +5594,9 @@ namespace internal
       for (unsigned int d = 0; d < n_components; ++d)
         {
           Number *out = out_array + d * dofs_per_component;
-          if (dim > 2)
+          if constexpr (dim > 2)
             evaluator.template hessians<2, false, false>(out, out);
-          if (dim > 1)
+          if constexpr (dim > 1)
             evaluator.template hessians<1, false, false>(out, out);
           evaluator.template hessians<0, false, false>(out, out);
         }
@@ -5688,9 +5688,9 @@ namespace internal
               const Number *in_  = in + di * dofs_per_component;
               Number       *out_ = out + di * dofs_per_component;
               evaluator.template hessians<0, true, false>(in_, out_);
-              if (dim > 1)
+              if constexpr (dim > 1)
                 evaluator.template hessians<1, true, false>(out_, out_);
-              if (dim > 2)
+              if constexpr (dim > 2)
                 evaluator.template hessians<2, true, false>(out_, out_);
             }
           if (dyadic_coefficients)
@@ -5722,9 +5722,9 @@ namespace internal
           for (unsigned int di = 0; di < n_comp_inner; ++di)
             {
               Number *out_ = out + di * dofs_per_component;
-              if (dim > 2)
+              if constexpr (dim > 2)
                 evaluator.template hessians<2, false, false>(out_, out_);
-              if (dim > 1)
+              if constexpr (dim > 1)
                 evaluator.template hessians<1, false, false>(out_, out_);
               evaluator.template hessians<0, false, false>(out_, out_);
             }
@@ -5826,23 +5826,29 @@ namespace internal
           Number       *out = out_array + d * dofs_per_component;
 
           auto *temp_1 = do_inplace ? out : fe_eval.get_scratch_data().begin();
-          auto *temp_2 = do_inplace ?
-                           out :
-                           (temp_1 + std::max(n_q_points, dofs_per_component));
 
-          if (dim == 3)
+          if constexpr (dim == 3)
             {
+              auto *temp_2 =
+                do_inplace ?
+                  out :
+                  (temp_1 + std::max(n_q_points, dofs_per_component));
               evaluator.template hessians<2, false, false>(in, temp_1);
               evaluator.template hessians<1, false, false>(temp_1, temp_2);
               evaluator.template hessians<0, false, false>(temp_2, out);
             }
-          if (dim == 2)
+          if constexpr (dim == 2)
             {
               evaluator.template hessians<1, false, false>(in, temp_1);
               evaluator.template hessians<0, false, false>(temp_1, out);
             }
-          if (dim == 1)
-            evaluator.template hessians<0, false, false>(in, out);
+          if constexpr (dim == 1)
+            {
+              // avoid an unused variable warning since temp_1 isn't used in
+              // this branch. This spurious warning is fixed in GCC-13.
+              (void)temp_1;
+              evaluator.template hessians<0, false, false>(in, out);
+            }
         }
       return false;
     }

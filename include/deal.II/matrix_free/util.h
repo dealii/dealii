@@ -59,7 +59,7 @@ namespace internal
                         QWitherdenVincentSimplex<dim - 1>(i))};
         }
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         for (unsigned int i = 1; i <= 3; ++i)
           if (quad == QGaussWedge<dim>(i))
             {
@@ -71,7 +71,7 @@ namespace internal
                 dealii::hp::QCollection<dim - 1>(tri, tri, quad, quad, quad)};
             }
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         for (unsigned int i = 1; i <= 2; ++i)
           if (quad == QGaussPyramid<dim>(i))
             {
@@ -122,7 +122,7 @@ namespace internal
           for (unsigned int i = 1; i <= 4; ++i)
             if (quad == QGaussSimplex<dim>(i))
               {
-                if (dim == 2)
+                if constexpr (dim == 2)
                   return {QGaussSimplex<dim - 1>(i), // line!
                           Quadrature<dim - 1>()};
                 else
@@ -132,7 +132,7 @@ namespace internal
           for (unsigned int i = 1; i <= 5; ++i)
             if (quad == QWitherdenVincentSimplex<dim>(i))
               {
-                if (dim == 2)
+                if constexpr (dim == 2)
                   return {QWitherdenVincentSimplex<dim - 1>(i), // line!
                           Quadrature<dim - 1>()};
                 else
@@ -141,12 +141,12 @@ namespace internal
               }
         }
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         for (unsigned int i = 1; i <= 3; ++i)
           if (quad == QGaussWedge<dim>(i))
             return {QGauss<dim - 1>(i), QGaussSimplex<dim - 1>(i)};
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         for (unsigned int i = 1; i <= 2; ++i)
           if (quad == QGaussPyramid<dim>(i))
             return {QGauss<dim - 1>(i), QGaussSimplex<dim - 1>(i)};

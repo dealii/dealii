@@ -565,7 +565,7 @@ namespace internal
           face |= 1 << direction;
         }
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         for (unsigned int direction = 0; direction < dim; ++direction)
           if (face == 0 || face == (1 << direction))
             {
@@ -667,23 +667,27 @@ namespace internal
         const auto side      = face_no % 2;
         const auto offset    = (side == 1) ? (n_dofs_1d - 1) : 0;
 
-        if (dim == 2)
-          return (direction == 0) ? (n_dofs_1d * i + offset) :
-                                    (n_dofs_1d * offset + i);
-        else if (dim == 3)
-          switch (direction)
-            {
-              case 0:
-                return n_dofs_1d * n_dofs_1d * i + n_dofs_1d * j + offset;
-              case 1:
-                return n_dofs_1d * n_dofs_1d * j + n_dofs_1d * offset + i;
-              case 2:
-                return n_dofs_1d * n_dofs_1d * offset + n_dofs_1d * i + j;
-              default:
-                Assert(false, ExcNotImplemented());
-            }
-
-        Assert(false, ExcNotImplemented());
+        switch (dim)
+          {
+            case 2:
+              return (direction == 0) ? (n_dofs_1d * i + offset) :
+                                        (n_dofs_1d * offset + i);
+            case 3:
+              switch (direction)
+                {
+                  case 0:
+                    return n_dofs_1d * n_dofs_1d * i + n_dofs_1d * j + offset;
+                  case 1:
+                    return n_dofs_1d * n_dofs_1d * j + n_dofs_1d * offset + i;
+                  case 2:
+                    return n_dofs_1d * n_dofs_1d * offset + n_dofs_1d * i + j;
+                  default:
+                    Assert(false, ExcNotImplemented());
+                }
+              break;
+            default:
+              Assert(false, ExcNotImplemented());
+          }
 
         return 0;
       };
@@ -696,6 +700,12 @@ namespace internal
       const std::uint16_t subcell_z = (subcell >> 2) & 1;
       const std::uint16_t face      = (kind >> 3) & 7;
       const std::uint16_t edge      = (kind >> 6) & 7;
+
+      // avoid unused variable warnings since subcell_x etc. aren't used in
+      // all branch. This spurious warning is fixed in GCC-13.
+      (void)subcell_x;
+      (void)subcell_y;
+      (void)subcell_z;
 
       for (unsigned int direction = 0; direction < dim; ++direction)
         if ((face >> direction) & 1U)
@@ -744,14 +754,14 @@ namespace internal
                       [component_to_system_index_face_array[comp][i]];
 
                   // fix DoFs depending on orientation, flip, and rotation
-                  if (dim == 2)
+                  if constexpr (dim == 2)
                     {
                       // TODO: for mixed meshes we need to take care of
                       // orientation here
                       Assert(cell->face_orientation(face_no),
                              ExcNotImplemented());
                     }
-                  else if (dim == 3)
+                  else if constexpr (dim == 3)
                     {
                       int rotate = 0;                   // TODO
                       if (cell->face_rotation(face_no)) //
@@ -779,7 +789,7 @@ namespace internal
                 }
           }
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         for (unsigned int direction = 0; direction < dim; ++direction)
           if ((edge >> direction) & 1U)
             {
