@@ -223,8 +223,14 @@ public:
   virtual ~FEValuesBase() override;
 
   /**
-   * Explicitly allow to check for cell similarity. By default, this is only
-   * enabled when the number of threads is 1.
+   * Explicitly allow to check for cell similarity.
+   * The detection of simple geometries with CellSimilarity is sensitive to the
+   * first cell detected. When using multiple threads, each thread might get a
+   * thread local copy of the FEValues object that is initialized to the first
+   * cell the thread sees. As this cell might be differ between runs and number
+   * of threads used, this slight deviation leads to difference in roundoff
+   * errors that propagate through the program. Therefore, the CellSimilarity
+   * check is disabled by default in case more than one thread is used.
    */
   void
   allow_check_for_cell_similarity(bool allow);
