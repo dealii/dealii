@@ -49,9 +49,9 @@ namespace internal
     std::string,
     << "You are requesting information from an FEEvaluation/FEFaceEvaluation "
     << "object for which this kind of information has not been computed. What "
-    << "information these objects compute is determined by the update_* flags you "
-    << "pass to MatrixFree::reinit() via MatrixFree::AdditionalData. Here, "
-    << "the operation you are attempting requires the <" << arg1
+    << "information these objects compute is determined by the update_* flags "
+    << "you pass to MatrixFree::reinit() via MatrixFree::AdditionalData. "
+    << "Here, the operation you are attempting requires the <" << arg1
     << "> flag to be set, but it was apparently not specified "
     << "upon initialization.");
 } // namespace internal
@@ -1205,7 +1205,9 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
     (n_components * ((dim * (dim + 1)) / 2 + 2 * dim + 2) *
      n_quadrature_points);
 
-  const unsigned int allocated_size = size_scratch_data + size_data_arrays;
+  // include 12 extra fields to insert some padding between values, gradients
+  // and hessians, which helps to reduce the probability of cache conflicts
+  const unsigned int allocated_size = size_scratch_data + size_data_arrays + 12;
 #  ifdef DEBUG
   scratch_data_array->clear();
   scratch_data_array->resize(allocated_size,
@@ -1213,23 +1215,24 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
 #  else
   scratch_data_array->resize_fast(allocated_size);
 #  endif
-  scratch_data.reinit(scratch_data_array->begin() + size_data_arrays,
+  scratch_data.reinit(scratch_data_array->begin() + size_data_arrays + 12,
                       size_scratch_data);
 
   // set the pointers to the correct position in the data array
   values_dofs = scratch_data_array->begin();
-  values_quad = scratch_data_array->begin() + n_components * dofs_per_component;
+  values_quad =
+    scratch_data_array->begin() + 4 + n_components * dofs_per_component;
   values_from_gradients_quad =
-    scratch_data_array->begin() +
+    scratch_data_array->begin() + 6 +
     n_components * (dofs_per_component + n_quadrature_points);
   gradients_quad =
-    scratch_data_array->begin() +
+    scratch_data_array->begin() + 8 +
     n_components * (dofs_per_component + 2 * n_quadrature_points);
   gradients_from_hessians_quad =
-    scratch_data_array->begin() +
+    scratch_data_array->begin() + 12 +
     n_components * (dofs_per_component + (dim + 2) * n_quadrature_points);
   hessians_quad =
-    scratch_data_array->begin() +
+    scratch_data_array->begin() + 12 +
     n_components * (dofs_per_component + (2 * dim + 2) * n_quadrature_points);
 }
 
