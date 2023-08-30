@@ -1130,13 +1130,8 @@ namespace internal
         }
       else
         {
-          // We can enter this function either for the apply() path that has
-          // n_rows * n_columns entries or for the apply_face() path that only
-          // has n_rows * 3 entries in the array. Since we cannot decide about
-          // the use we must allow for both here.
           Assert(shape_values.empty() ||
-                   shape_values.size() == n_rows * n_columns ||
-                   shape_values.size() == 3 * n_rows,
+                   shape_values.size() == n_rows * n_columns,
                  ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
           Assert(shape_gradients.empty() ||
                    shape_gradients.size() == n_rows * n_columns,
@@ -1268,43 +1263,6 @@ namespace internal
           const Number                   *in,
           Number                         *out);
 
-    /**
-     * This function applies the tensor product operation to produce face values
-     * from cell values. As opposed to the apply method, this method assumes
-     * that the directions orthogonal to the face have n_rows degrees of
-     * freedom per direction and not n_columns for those directions lower than
-     * the one currently applied. In other words, apply_face() must be called
-     * before calling any interpolation within the face.
-     *
-     * @tparam face_direction Direction of the normal vector (0=x, 1=y, etc)
-     * @tparam contract_onto_face If true, the input vector is of size n_rows^dim
-     *                            and interpolation into n_rows^(dim-1) points
-     *                            is performed. This is a typical scenario in
-     *                            FEFaceEvaluation::evaluate() calls. If false,
-     *                            data from n_rows^(dim-1) points is expanded
-     *                            into the n_rows^dim points of the higher-
-     *                            dimensional data array. Derivatives in the
-     *                            case contract_onto_face==false are summed
-     *                            together
-     * @tparam add If true, the result is added to the output vector, else
-     *             the computed values overwrite the content in the output
-     * @tparam max_derivative Sets the number of derivatives that should be
-     *             computed. 0 means only values, 1 means values and first
-     *             derivatives, 2 second derivates. Note that all the
-     *             derivatives access the data in @p shape_values passed to
-     *             the constructor of the class
-     *
-     * @param in address of the input data vector
-     * @param out address of the output data vector
-     */
-    template <int  face_direction,
-              bool contract_onto_face,
-              bool add,
-              int  max_derivative>
-    void
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT       out) const;
-
   private:
     const Number2 *shape_values;
     const Number2 *shape_gradients;
@@ -1380,6 +1338,296 @@ namespace internal
 
 
 
+  /**
+   * Internal evaluator for shape function using the tensor product form
+   * of the basis functions. The same as the other templated class but
+   * without making use of template arguments and variable loop bounds
+   * instead.
+   *
+   * @tparam dim Space dimension in which this class is applied
+   * @tparam Number Abstract number type for input and output arrays
+   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
+   *                 same type as the input/output arrays); must implement
+   *                 operator* with Number and produce Number as an output to
+   *                 be a valid type
+   */
+  template <EvaluatorVariant variant,
+            int              dim,
+            typename Number,
+            typename Number2>
+  struct EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>
+  {
+    static constexpr unsigned int n_rows_of_product =
+      numbers::invalid_unsigned_int;
+    static constexpr unsigned int n_columns_of_product =
+      numbers::invalid_unsigned_int;
+
+    /**
+     * Empty constructor. Does nothing. Be careful when using 'values' and
+     * related methods because they need to be filled with the other constructor
+     */
+    EvaluatorTensorProduct()
+      : shape_values(nullptr)
+      , shape_gradients(nullptr)
+      , shape_hessians(nullptr)
+      , n_rows(numbers::invalid_unsigned_int)
+      , n_columns(numbers::invalid_unsigned_int)
+    {}
+
+    /**
+     * Constructor, taking the data from ShapeInfo
+     */
+    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
+                           const AlignedVector<Number2> &shape_gradients,
+                           const AlignedVector<Number2> &shape_hessians,
+                           const unsigned int            n_rows    = 0,
+                           const unsigned int            n_columns = 0)
+      : shape_values(shape_values.begin())
+      , shape_gradients(shape_gradients.begin())
+      , shape_hessians(shape_hessians.begin())
+      , n_rows(n_rows)
+      , n_columns(n_columns)
+    {
+      if (variant == evaluate_evenodd)
+        {
+          if (!shape_values.empty())
+            AssertDimension(shape_values.size(),
+                            n_rows * ((n_columns + 1) / 2));
+          if (!shape_gradients.empty())
+            AssertDimension(shape_gradients.size(),
+                            n_rows * ((n_columns + 1) / 2));
+          if (!shape_hessians.empty())
+            AssertDimension(shape_hessians.size(),
+                            n_rows * ((n_columns + 1) / 2));
+        }
+      else
+        {
+          Assert(shape_values.empty() ||
+                   shape_values.size() == n_rows * n_columns,
+                 ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
+          Assert(shape_gradients.empty() ||
+                   shape_gradients.size() == n_rows * n_columns,
+                 ExcDimensionMismatch(shape_gradients.size(),
+                                      n_rows * n_columns));
+          Assert(shape_hessians.empty() ||
+                   shape_hessians.size() == n_rows * n_columns,
+                 ExcDimensionMismatch(shape_hessians.size(),
+                                      n_rows * n_columns));
+        }
+    }
+
+    /**
+     * Constructor, taking the data from ShapeInfo
+     */
+    EvaluatorTensorProduct(const Number2     *shape_values,
+                           const Number2     *shape_gradients,
+                           const Number2     *shape_hessians,
+                           const unsigned int n_rows    = 0,
+                           const unsigned int n_columns = 0)
+      : shape_values(shape_values)
+      , shape_gradients(shape_gradients)
+      , shape_hessians(shape_hessians)
+      , n_rows(n_rows)
+      , n_columns(n_columns)
+    {}
+
+    template <int direction, bool contract_over_rows, bool add, int stride = 1>
+    void
+    values(const Number *in, Number *out) const
+    {
+      constexpr EvaluatorQuantity value_type = EvaluatorQuantity::value;
+      apply<direction, contract_over_rows, add, false, value_type, stride>(
+        shape_values, in, out);
+    }
+
+    template <int direction, bool contract_over_rows, bool add, int stride = 1>
+    void
+    gradients(const Number *in, Number *out) const
+    {
+      constexpr EvaluatorQuantity gradient_type =
+        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::gradient);
+      apply<direction, contract_over_rows, add, false, gradient_type, stride>(
+        shape_gradients, in, out);
+    }
+
+    template <int direction, bool contract_over_rows, bool add>
+    void
+    hessians(const Number *in, Number *out) const
+    {
+      constexpr EvaluatorQuantity hessian_type =
+        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::hessian);
+      apply<direction, contract_over_rows, add, false, hessian_type>(
+        shape_hessians, in, out);
+    }
+
+    template <int direction, bool contract_over_rows, bool add>
+    void
+    values_one_line(const Number in[], Number out[]) const
+    {
+      Assert(shape_values != nullptr, ExcNotInitialized());
+      apply<direction, contract_over_rows, add, true, EvaluatorQuantity::value>(
+        shape_values, in, out);
+    }
+
+    template <int direction, bool contract_over_rows, bool add>
+    void
+    gradients_one_line(const Number in[], Number out[]) const
+    {
+      Assert(shape_gradients != nullptr, ExcNotInitialized());
+      constexpr EvaluatorQuantity gradient_type =
+        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::gradient);
+      apply<direction, contract_over_rows, add, true, gradient_type>(
+        shape_gradients, in, out);
+    }
+
+    template <int direction, bool contract_over_rows, bool add>
+    void
+    hessians_one_line(const Number in[], Number out[]) const
+    {
+      Assert(shape_hessians != nullptr, ExcNotInitialized());
+      constexpr EvaluatorQuantity hessian_type =
+        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
+                                       EvaluatorQuantity::hessian);
+      apply<direction, contract_over_rows, add, true, hessian_type>(
+        shape_hessians, in, out);
+    }
+
+    template <int               direction,
+              bool              contract_over_rows,
+              bool              add,
+              bool              one_line     = false,
+              EvaluatorQuantity quantity     = EvaluatorQuantity::value,
+              int               extra_stride = 1>
+    void
+    apply(const Number2 *DEAL_II_RESTRICT shape_data,
+          const Number                   *in,
+          Number                         *out) const;
+
+    const Number2     *shape_values;
+    const Number2     *shape_gradients;
+    const Number2     *shape_hessians;
+    const unsigned int n_rows;
+    const unsigned int n_columns;
+  };
+
+
+
+  template <EvaluatorVariant variant,
+            int              dim,
+            typename Number,
+            typename Number2>
+  template <int               direction,
+            bool              contract_over_rows,
+            bool              add,
+            bool              one_line,
+            EvaluatorQuantity quantity,
+            int               extra_stride>
+  inline void
+  EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>::apply(
+    const Number2 *DEAL_II_RESTRICT shape_data,
+    const Number                   *in,
+    Number                         *out) const
+  {
+    static_assert(one_line == false || direction == dim - 1,
+                  "Single-line evaluation only works for direction=dim-1.");
+    Assert(shape_data != nullptr,
+           ExcMessage(
+             "The given array shape_data must not be the null pointer!"));
+    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
+             in != out,
+           ExcMessage("In-place operation only supported for "
+                      "n_rows==n_columns or single-line interpolation"));
+    AssertIndexRange(direction, dim);
+    const int mm = contract_over_rows ? n_rows : n_columns,
+              nn = contract_over_rows ? n_columns : n_rows;
+
+    const int stride =
+      direction == 0 ? 1 : Utilities::fixed_power<direction>(n_columns);
+    const int n_blocks1 = one_line ? 1 : stride;
+    const int n_blocks2 = direction >= dim - 1 ?
+                            1 :
+                            Utilities::fixed_power<dim - direction - 1>(n_rows);
+    Assert(n_rows <= 128, ExcNotImplemented());
+
+    constexpr int stride_in  = !contract_over_rows ? extra_stride : 1;
+    constexpr int stride_out = contract_over_rows ? extra_stride : 1;
+    for (int i2 = 0; i2 < n_blocks2; ++i2)
+      {
+        for (int i1 = 0; i1 < n_blocks1; ++i1)
+          {
+            // the empty template case can only run the general evaluator or
+            // evenodd
+            constexpr EvaluatorVariant restricted_variant =
+              variant == evaluate_evenodd ? evaluate_evenodd : evaluate_general;
+            apply_matrix_vector_product<restricted_variant,
+                                        quantity,
+                                        contract_over_rows,
+                                        add>(shape_data,
+                                             in,
+                                             out,
+                                             n_rows,
+                                             n_columns,
+                                             stride * stride_in,
+                                             stride * stride_out);
+
+            if (one_line == false)
+              {
+                in += stride_in;
+                out += stride_out;
+              }
+          }
+        if (one_line == false)
+          {
+            in += stride * (mm - 1) * stride_in;
+            out += stride * (nn - 1) * stride_out;
+          }
+      }
+  }
+
+
+
+  /**
+   * This function applies the tensor product operation to produce face
+   * values from cell values. The algorithm involved here can be interpreted
+   * the first sweep in sum factorization, reducing the dimensionality of
+   * the data set from dim-dimensional cell values to (dim-1)-dimensional
+   * face values. This step is always done before we evaluate within the
+   * face, as it reduces the dimensionality.
+   *
+   * @tparam n_rows_template The number of entries within the interpolation,
+   *             typically equal to the polynomial degree plus one, if known
+   *             at compile time, otherwise n_rows_runtime is used
+   * @tparam stride_template The stride between successive entries in the
+   *             one-dimensional operation of sum factorization, if known at
+   *             compile time, otherwise stride_runtime is used
+   * @tparam contract_onto_face If true, the input vector is of size n_rows^dim
+   *                            and interpolation into n_rows^(dim-1) points
+   *                            is performed. This is a typical scenario in
+   *                            FEFaceEvaluation::evaluate() calls. If false,
+   *                            data from n_rows^(dim-1) points is expanded
+   *                            into the n_rows^dim points of the higher-
+   *                            dimensional data array. Derivatives in the
+   *                            case contract_onto_face==false are summed
+   *                            together
+   * @tparam add If true, the result is added to the output vector, else
+   *             the computed values overwrite the content in the output
+   * @tparam max_derivative Sets the number of derivatives that should be
+   *             computed. 0 means only values, 1 means values and first
+   *             derivatives, 2 second derivates. Note that all the
+   *             derivatives access the data in @p shape_values passed to
+   *             the constructor of the class
+   *
+   * @param shape_values address of the interpolation matrix
+   * @param n_blocks Number of interpolation layer used along the two other
+   *             dimensions tangential to the interpolation direction
+   * @param steps Increments in the input array from one step to the next,
+   *             varied in conjunction with the @p stride variable.
+   * @param input Address of the input data vector
+   * @param output Address of the output data vector
+   */
   template <int  n_rows_template,
             int  stride_template,
             bool contract_onto_face,
@@ -1500,357 +1748,6 @@ namespace internal
           input2 += n_blocks[0];
         output += steps[1];
       }
-  }
-
-
-
-  template <EvaluatorVariant variant,
-            int              dim,
-            int              n_rows,
-            int              n_columns,
-            typename Number,
-            typename Number2>
-  template <int  face_direction,
-            bool contract_to_face,
-            bool add,
-            int  max_derivative>
-  inline void
-  EvaluatorTensorProduct<variant, dim, n_rows, n_columns, Number, Number2>::
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT       out) const
-  {
-    Assert(dim > 0, ExcMessage("Only dim=1,2,3 supported"));
-    static_assert(max_derivative >= 0 && max_derivative < 3,
-                  "Only derivative orders 0-2 implemented");
-    Assert(shape_values != nullptr,
-           ExcMessage(
-             "The given array shape_values must not be the null pointer."));
-
-    constexpr int      stride = Utilities::pow(n_rows, face_direction);
-    std::array<int, 2> steps;
-    if constexpr (face_direction == 0)
-      steps = {{n_rows, 0}};
-    else if constexpr (face_direction == 1 && dim == 2)
-      steps = {{1, 0}};
-    else if constexpr (face_direction == 1)
-      // in 3d, the coordinate system is zx, not xz -> switch indices
-      steps = {{n_rows * n_rows, -n_rows * n_rows * n_rows + 1}};
-    else if constexpr (face_direction == 2)
-      steps = {{1, 0}};
-
-    interpolate_to_face<n_rows, stride, contract_to_face, add, max_derivative>(
-      this->shape_values,
-      {{(dim > 1 ? n_rows : 1), (dim > 2 ? n_rows : 1)}},
-      steps,
-      in,
-      out);
-  }
-
-
-
-  /**
-   * Internal evaluator for shape function using the tensor product form
-   * of the basis functions. The same as the other templated class but
-   * without making use of template arguments and variable loop bounds
-   * instead.
-   *
-   * @tparam dim Space dimension in which this class is applied
-   * @tparam Number Abstract number type for input and output arrays
-   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
-   *                 same type as the input/output arrays); must implement
-   *                 operator* with Number and produce Number as an output to
-   *                 be a valid type
-   */
-  template <EvaluatorVariant variant,
-            int              dim,
-            typename Number,
-            typename Number2>
-  struct EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>
-  {
-    static constexpr unsigned int n_rows_of_product =
-      numbers::invalid_unsigned_int;
-    static constexpr unsigned int n_columns_of_product =
-      numbers::invalid_unsigned_int;
-
-    /**
-     * Empty constructor. Does nothing. Be careful when using 'values' and
-     * related methods because they need to be filled with the other constructor
-     */
-    EvaluatorTensorProduct()
-      : shape_values(nullptr)
-      , shape_gradients(nullptr)
-      , shape_hessians(nullptr)
-      , n_rows(numbers::invalid_unsigned_int)
-      , n_columns(numbers::invalid_unsigned_int)
-    {}
-
-    /**
-     * Constructor, taking the data from ShapeInfo
-     */
-    EvaluatorTensorProduct(const AlignedVector<Number2> &shape_values,
-                           const AlignedVector<Number2> &shape_gradients,
-                           const AlignedVector<Number2> &shape_hessians,
-                           const unsigned int            n_rows    = 0,
-                           const unsigned int            n_columns = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
-      , n_rows(n_rows)
-      , n_columns(n_columns)
-    {
-      if (variant == evaluate_evenodd)
-        {
-          if (!shape_values.empty())
-            AssertDimension(shape_values.size(),
-                            n_rows * ((n_columns + 1) / 2));
-          if (!shape_gradients.empty())
-            AssertDimension(shape_gradients.size(),
-                            n_rows * ((n_columns + 1) / 2));
-          if (!shape_hessians.empty())
-            AssertDimension(shape_hessians.size(),
-                            n_rows * ((n_columns + 1) / 2));
-        }
-      else
-        {
-          // We can enter this function either for the apply() path that has
-          // n_rows * n_columns entries or for the apply_face() path that only
-          // has n_rows * 3 entries in the array. Since we cannot decide about
-          // the use we must allow for both here.
-          Assert(shape_values.empty() ||
-                   shape_values.size() == n_rows * n_columns ||
-                   shape_values.size() == n_rows * 3,
-                 ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-          Assert(shape_gradients.empty() ||
-                   shape_gradients.size() == n_rows * n_columns,
-                 ExcDimensionMismatch(shape_gradients.size(),
-                                      n_rows * n_columns));
-          Assert(shape_hessians.empty() ||
-                   shape_hessians.size() == n_rows * n_columns,
-                 ExcDimensionMismatch(shape_hessians.size(),
-                                      n_rows * n_columns));
-        }
-    }
-
-    /**
-     * Constructor, taking the data from ShapeInfo
-     */
-    EvaluatorTensorProduct(const Number2     *shape_values,
-                           const Number2     *shape_gradients,
-                           const Number2     *shape_hessians,
-                           const unsigned int n_rows    = 0,
-                           const unsigned int n_columns = 0)
-      : shape_values(shape_values)
-      , shape_gradients(shape_gradients)
-      , shape_hessians(shape_hessians)
-      , n_rows(n_rows)
-      , n_columns(n_columns)
-    {}
-
-    template <int direction, bool contract_over_rows, bool add, int stride = 1>
-    void
-    values(const Number *in, Number *out) const
-    {
-      constexpr EvaluatorQuantity value_type = EvaluatorQuantity::value;
-      apply<direction, contract_over_rows, add, false, value_type, stride>(
-        shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add, int stride = 1>
-    void
-    gradients(const Number *in, Number *out) const
-    {
-      constexpr EvaluatorQuantity gradient_type =
-        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
-                                       EvaluatorQuantity::gradient);
-      apply<direction, contract_over_rows, add, false, gradient_type, stride>(
-        shape_gradients, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians(const Number *in, Number *out) const
-    {
-      constexpr EvaluatorQuantity hessian_type =
-        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
-                                       EvaluatorQuantity::hessian);
-      apply<direction, contract_over_rows, add, false, hessian_type>(
-        shape_hessians, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_values != nullptr, ExcNotInitialized());
-      apply<direction, contract_over_rows, add, true, EvaluatorQuantity::value>(
-        shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_gradients != nullptr, ExcNotInitialized());
-      constexpr EvaluatorQuantity gradient_type =
-        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
-                                       EvaluatorQuantity::gradient);
-      apply<direction, contract_over_rows, add, true, gradient_type>(
-        shape_gradients, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians_one_line(const Number in[], Number out[]) const
-    {
-      Assert(shape_hessians != nullptr, ExcNotInitialized());
-      constexpr EvaluatorQuantity hessian_type =
-        (variant != evaluate_evenodd ? EvaluatorQuantity::value :
-                                       EvaluatorQuantity::hessian);
-      apply<direction, contract_over_rows, add, true, hessian_type>(
-        shape_hessians, in, out);
-    }
-
-    template <int               direction,
-              bool              contract_over_rows,
-              bool              add,
-              bool              one_line     = false,
-              EvaluatorQuantity quantity     = EvaluatorQuantity::value,
-              int               extra_stride = 1>
-    void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number                   *in,
-          Number                         *out) const;
-
-    template <int  face_direction,
-              bool contract_onto_face,
-              bool add,
-              int  max_derivative>
-    void
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT       out) const;
-
-    const Number2     *shape_values;
-    const Number2     *shape_gradients;
-    const Number2     *shape_hessians;
-    const unsigned int n_rows;
-    const unsigned int n_columns;
-  };
-
-
-
-  template <EvaluatorVariant variant,
-            int              dim,
-            typename Number,
-            typename Number2>
-  template <int               direction,
-            bool              contract_over_rows,
-            bool              add,
-            bool              one_line,
-            EvaluatorQuantity quantity,
-            int               extra_stride>
-  inline void
-  EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>::apply(
-    const Number2 *DEAL_II_RESTRICT shape_data,
-    const Number                   *in,
-    Number                         *out) const
-  {
-    static_assert(one_line == false || direction == dim - 1,
-                  "Single-line evaluation only works for direction=dim-1.");
-    Assert(shape_data != nullptr,
-           ExcMessage(
-             "The given array shape_data must not be the null pointer!"));
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
-    AssertIndexRange(direction, dim);
-    const int mm = contract_over_rows ? n_rows : n_columns,
-              nn = contract_over_rows ? n_columns : n_rows;
-
-    const int stride =
-      direction == 0 ? 1 : Utilities::fixed_power<direction>(n_columns);
-    const int n_blocks1 = one_line ? 1 : stride;
-    const int n_blocks2 = direction >= dim - 1 ?
-                            1 :
-                            Utilities::fixed_power<dim - direction - 1>(n_rows);
-    Assert(n_rows <= 128, ExcNotImplemented());
-
-    constexpr int stride_in  = !contract_over_rows ? extra_stride : 1;
-    constexpr int stride_out = contract_over_rows ? extra_stride : 1;
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            // the empty template case can only run the general evaluator or
-            // evenodd
-            constexpr EvaluatorVariant restricted_variant =
-              variant == evaluate_evenodd ? evaluate_evenodd : evaluate_general;
-            apply_matrix_vector_product<restricted_variant,
-                                        quantity,
-                                        contract_over_rows,
-                                        add>(shape_data,
-                                             in,
-                                             out,
-                                             n_rows,
-                                             n_columns,
-                                             stride * stride_in,
-                                             stride * stride_out);
-
-            if (one_line == false)
-              {
-                in += stride_in;
-                out += stride_out;
-              }
-          }
-        if (one_line == false)
-          {
-            in += stride * (mm - 1) * stride_in;
-            out += stride * (nn - 1) * stride_out;
-          }
-      }
-  }
-
-
-
-  template <EvaluatorVariant variant,
-            int              dim,
-            typename Number,
-            typename Number2>
-  template <int  face_direction,
-            bool contract_to_face,
-            bool add,
-            int  max_derivative>
-  inline void
-  EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>::apply_face(
-    const Number *DEAL_II_RESTRICT in,
-    Number *DEAL_II_RESTRICT       out) const
-  {
-    Assert(shape_values != nullptr,
-           ExcMessage(
-             "The given array shape_data must not be the null pointer!"));
-    static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
-
-    const int          stride = Utilities::pow(n_rows, face_direction);
-    const int          n_rows = this->n_rows;
-    std::array<int, 2> steps;
-    if constexpr (face_direction == 0)
-      steps = {{n_rows, 0}};
-    else if constexpr (face_direction == 1 && dim == 2)
-      steps = {{1, 0}};
-    else if constexpr (face_direction == 1)
-      // in 3d, the coordinate system is zx, not xz -> switch indices
-      steps = {{n_rows * n_rows, -n_rows * n_rows * n_rows + 1}};
-    else if constexpr (face_direction == 2)
-      steps = {{1, 0}};
-
-    interpolate_to_face<0, 0, contract_to_face, add, max_derivative>(
-      this->shape_values,
-      {{(dim > 1 ? n_rows : 1), (dim > 2 ? n_rows : 1)}},
-      steps,
-      in,
-      out,
-      n_rows,
-      stride);
   }
 
 
