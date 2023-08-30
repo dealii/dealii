@@ -3586,11 +3586,134 @@ namespace internal
 
       if (face_direction == face_no / 2 && !increase_max_der)
         {
-          interpolate_generic_raviart_thomas_apply_face<do_evaluate,
-                                                        add_into_output,
-                                                        face_direction,
-                                                        max_derivative>(
-            shape_info, face_no, input, output);
+          constexpr int stride1 = Utilities::pow(fe_degree + 1, face_direction);
+          constexpr int stride0 = Utilities::pow(fe_degree, face_direction);
+          constexpr int stride2 = fe_degree * (fe_degree + 1);
+
+          const int degree =
+            fe_degree != -1 ? fe_degree : shape_info.data[0].fe_degree;
+          const int n_rows_n = degree + 1;
+          const int n_rows_t = degree;
+
+          std::array<int, 3> strides{{1, 1, 1}};
+          if (face_direction > 0)
+            {
+              strides[0] =
+                n_rows_n * Utilities::pow(n_rows_t, face_direction - 1);
+              strides[1] = n_rows_t * (face_direction == 3 ? n_rows_n : 1);
+              strides[2] = Utilities::pow(n_rows_t, face_direction);
+            }
+          const dealii::ndarray<int, 3, 3> dofs_per_direction{
+            {{{n_rows_n, n_rows_t, n_rows_t}},
+             {{n_rows_t, n_rows_n, n_rows_t}},
+             {{n_rows_t, n_rows_t, n_rows_n}}}};
+
+          std::array<int, 2> steps, n_blocks;
+
+          if constexpr (face_direction == 0)
+            steps = {{degree + (face_direction == 0), 0}};
+          else if constexpr (face_direction == 1 && dim == 2)
+            steps = {{1, 0}};
+          else if constexpr (face_direction == 1)
+            // in 3d, the coordinate system is zx, not xz -> switch indices
+            steps = {
+              {n_rows_n * n_rows_t, -n_rows_n * n_rows_t * n_rows_t + 1}};
+          else if constexpr (face_direction == 2)
+            steps = {{1, 0}};
+
+          n_blocks[0] = dofs_per_direction[0][(face_direction + 1) % dim];
+          n_blocks[1] =
+            dim > 2 ? dofs_per_direction[0][(face_direction + 2) % dim] : 1;
+
+          interpolate_to_face<
+            (fe_degree != -1 ? (fe_degree + (face_direction == 0)) : 0),
+            ((face_direction < 2) ? stride1 : stride2),
+            do_evaluate,
+            add_into_output,
+            max_derivative>(shape_info.data[face_direction != 0]
+                              .shape_data_on_face[face_no % 2]
+                              .begin(),
+                            n_blocks,
+                            steps,
+                            input,
+                            output,
+                            degree + (face_direction == 0),
+                            strides[0]);
+
+          if (do_evaluate)
+            {
+              input += n_rows_n * Utilities::pow(n_rows_t, dim - 1);
+              output += 3 * n_blocks[0] * n_blocks[1];
+            }
+          else
+            {
+              output += n_rows_n * Utilities::pow(n_rows_t, dim - 1);
+              input += 3 * n_blocks[0] * n_blocks[1];
+            }
+
+          // must only change steps only for face direction 0
+          if constexpr (face_direction == 0)
+            steps = {{degree, 0}};
+
+          n_blocks[0] = dofs_per_direction[1][(face_direction + 1) % dim];
+          n_blocks[1] =
+            dim > 2 ? dofs_per_direction[1][(face_direction + 2) % dim] : 1;
+
+          interpolate_to_face<
+            (fe_degree != -1 ? (fe_degree + (face_direction == 1)) : 0),
+            ((face_direction < 2) ? stride0 : stride2),
+            do_evaluate,
+            add_into_output,
+            max_derivative>(shape_info.data[face_direction != 1]
+                              .shape_data_on_face[face_no % 2]
+                              .begin(),
+                            n_blocks,
+                            steps,
+                            input,
+                            output,
+                            degree + (face_direction == 1),
+                            strides[1]);
+
+          if constexpr (dim > 2)
+            {
+              if (do_evaluate)
+                {
+                  input += n_rows_n * Utilities::pow(n_rows_t, dim - 1);
+                  output += 3 * n_blocks[0] * n_blocks[1];
+                }
+              else
+                {
+                  output += n_rows_n * Utilities::pow(n_rows_t, dim - 1);
+                  input += 3 * n_blocks[0] * n_blocks[1];
+                }
+
+              if constexpr (face_direction == 0)
+                steps = {{degree, 0}};
+              else if constexpr (face_direction == 1)
+                // in 3d, the coordinate system is zx, not xz -> switch indices
+                steps = {
+                  {n_rows_t * n_rows_t, -n_rows_n * n_rows_t * n_rows_t + 1}};
+              else if constexpr (face_direction == 2)
+                steps = {{1, 0}};
+
+              n_blocks[0] = dofs_per_direction[2][(face_direction + 1) % dim];
+              n_blocks[1] = dofs_per_direction[2][(face_direction + 2) % dim];
+
+              interpolate_to_face<
+                (fe_degree != -1 ? (fe_degree + (face_direction == 2)) : 0),
+                stride0,
+                do_evaluate,
+                add_into_output,
+                max_derivative>(shape_info.data[face_direction != 2]
+                                  .shape_data_on_face[face_no % 2]
+                                  .begin(),
+                                n_blocks,
+                                steps,
+                                input,
+                                output,
+                                degree + (face_direction == 2),
+                                strides[2]);
+            }
         }
       else if (face_direction == face_no / 2)
         {
@@ -3621,135 +3744,6 @@ namespace internal
                                                  max_derivative>(
                 n_components, input, output, flag, face_no, shape_info);
             }
-        }
-    }
-
-    /* Help function for interpolate_generic_raviart_thomas */
-    template <bool do_evaluate,
-              bool add_into_output,
-              int  face_direction,
-              int  max_derivative>
-    static inline void
-    interpolate_generic_raviart_thomas_apply_face(
-      const MatrixFreeFunctions::ShapeInfo<Number2> &shape_info,
-      const unsigned int                             face_no,
-      const Number                                  *input,
-      Number                                        *output)
-    {
-      // These types are evaluators in either normal or tangential direction
-      // depending on the face direction, with different normal directions for
-      // the different components.
-      using Evalf0 = typename std::conditional<
-        face_direction == 0,
-        EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
-                                          dim,
-                                          (fe_degree == -1) ? 1 : fe_degree + 1,
-                                          0,
-                                          0,
-                                          Number,
-                                          Number2>,
-        EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
-                                          dim,
-                                          (fe_degree == -1) ? 1 : fe_degree,
-                                          0,
-                                          0,
-                                          Number,
-                                          Number2>>::type;
-      using Evalf1 = typename std::conditional<
-        face_direction == 1,
-        EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
-                                          dim,
-                                          (fe_degree == -1) ? 1 : fe_degree + 1,
-                                          0,
-                                          1,
-                                          Number,
-                                          Number2>,
-        EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
-                                          dim,
-                                          (fe_degree == -1) ? 1 : fe_degree,
-                                          0,
-                                          1,
-                                          Number,
-                                          Number2>>::type;
-      using Evalf2 = typename std::conditional<
-        face_direction == 2,
-        EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
-                                          dim,
-                                          (fe_degree == -1) ? 1 : fe_degree + 1,
-                                          0,
-                                          2,
-                                          Number,
-                                          Number2>,
-        EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
-                                          dim,
-                                          (fe_degree == -1) ? 1 : fe_degree,
-                                          0,
-                                          2,
-                                          Number,
-                                          Number2>>::type;
-
-      Evalf0 evalf0 =
-        create_evaluator_tensor_product<Evalf0>((face_direction == 0) ?
-                                                  shape_info.data[0] :
-                                                  shape_info.data[1],
-                                                face_no);
-      Evalf1 evalf1 =
-        create_evaluator_tensor_product<Evalf1>((face_direction == 1) ?
-                                                  shape_info.data[0] :
-                                                  shape_info.data[1],
-                                                face_no);
-      Evalf2 evalf2 =
-        create_evaluator_tensor_product<Evalf2>((face_direction == 2) ?
-                                                  shape_info.data[0] :
-                                                  shape_info.data[1],
-                                                face_no);
-
-      const unsigned int dofs_per_component_on_cell =
-        shape_info.dofs_per_component_on_cell;
-      const unsigned int dofs_per_component_on_face =
-        3 * shape_info.dofs_per_component_on_face;
-
-      // NOTE! dofs_per_component_on_face is in the tangent direction,
-      // i.e (fe.degree+1)*fe.degree. Normal faces are only
-      // fe.degree*fe.degree
-      const unsigned int in_stride =
-        do_evaluate ? dofs_per_component_on_cell : dofs_per_component_on_face;
-      const unsigned int out_stride =
-        do_evaluate ? dofs_per_component_on_face : dofs_per_component_on_cell;
-
-      const unsigned int in_stride_after_normal =
-        do_evaluate ?
-          dofs_per_component_on_cell :
-          dofs_per_component_on_face - 3 * Utilities::pow(fe_degree, dim - 2);
-      const unsigned int out_stride_after_normal =
-        do_evaluate ?
-          dofs_per_component_on_face - 3 * Utilities::pow(fe_degree, dim - 2) :
-          dofs_per_component_on_cell;
-
-      evalf0.template apply_face<face_direction,
-                                 do_evaluate,
-                                 add_into_output,
-                                 max_derivative>(input, output);
-      // stride to next component
-      input += (face_direction == 0) ? in_stride_after_normal : in_stride;
-      output += (face_direction == 0) ? out_stride_after_normal : out_stride;
-
-      evalf1.template apply_face<face_direction,
-                                 do_evaluate,
-                                 add_into_output,
-                                 max_derivative>(input, output);
-
-      if (dim == 3)
-        {
-          // stride to next component
-          input += (face_direction == 1) ? in_stride_after_normal : in_stride;
-          output +=
-            (face_direction == 1) ? out_stride_after_normal : out_stride;
-
-          evalf2.template apply_face<face_direction,
-                                     do_evaluate,
-                                     add_into_output,
-                                     max_derivative>(input, output);
         }
     }
   };
