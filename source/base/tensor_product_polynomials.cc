@@ -405,20 +405,25 @@ namespace internal
                 if (update_grads)
                   {
                     grads[index][0] = value_outer[0] * val_x[1];
-                    for (unsigned int d = 1; d < dim; ++d)
-                      grads[index][d] = value_outer[d] * val_x[0];
+                    if constexpr (dim > 1)
+                      for (unsigned int d = 1; d < dim; ++d)
+                        grads[index][d] = value_outer[d] * val_x[0];
                   }
 
                 if (update_grad_grads)
                   {
                     grad_grads[index][0][0] = value_outer[0] * val_x[2];
-                    for (unsigned int d = 1; d < dim; ++d)
-                      grad_grads[index][0][d] = grad_grads[index][d][0] =
-                        value_outer[d] * val_x[1];
-                    for (unsigned int d1 = 1, count = dim; d1 < dim; ++d1)
-                      for (unsigned int d2 = d1; d2 < dim; ++d2, ++count)
-                        grad_grads[index][d1][d2] = grad_grads[index][d2][d1] =
-                          value_outer[count] * val_x[0];
+                    if constexpr (dim > 1)
+                      {
+                        for (unsigned int d = 1; d < dim; ++d)
+                          grad_grads[index][0][d] = grad_grads[index][d][0] =
+                            value_outer[d] * val_x[1];
+                        for (unsigned int d1 = 1, count = dim; d1 < dim; ++d1)
+                          for (unsigned int d2 = d1; d2 < dim; ++d2, ++count)
+                            grad_grads[index][d1][d2] =
+                              grad_grads[index][d2][d1] =
+                                value_outer[count] * val_x[0];
+                      }
                   }
               }
 
@@ -505,6 +510,9 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
+  if constexpr (dim == 0)
+    return;
+
   Assert(dim <= 3, ExcNotImplemented());
   Assert(values.size() == this->n() || values.empty(),
          ExcDimensionMismatch2(values.size(), this->n(), 0));
@@ -530,15 +538,14 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   if (fourth_derivatives.size() == this->n())
     n_derivatives = 4;
 
-  // Compute the values (and derivatives, if necessary) of all 1d polynomials
-  // at this evaluation point. We can use the more optimized values_of_array
-  // function to compute 'dim' polynomials at once
+  // Compute the values (and derivatives, if necessary) of all 1d
+  // polynomials at this evaluation point. We can use the more optimized
+  // values_of_array function to compute 'dim' polynomials at once
   const unsigned int n_polynomials = polynomials.size();
   boost::container::small_vector<ndarray<double, 5, dim>, 10> values_1d(
     n_polynomials);
   if constexpr (std::is_same<PolynomialType,
-                             dealii::Polynomials::Polynomial<double>>::value &&
-                dim > 0)
+                             dealii::Polynomials::Polynomial<double>>::value)
     {
       std::array<double, dim> point_array;
       for (unsigned int d = 0; d < dim; ++d)
