@@ -3526,8 +3526,8 @@ outer_product(const SymmetricTensor<2, dim, Number> &t1,
  * original_tensor given as the input argument, \f[ \mathrm{original\_tensor} =
  * \sum_i \lambda_i \, \boldsymbol{n}_i \otimes \boldsymbol{n}_i, \f] where
  * $\lambda_i$ is the eigenvalue, and $\boldsymbol{n}_i$ is the corresponding
- * eigenvector. The output is a pair of 2nd-order symmetric tensors
- * @a positive_negative_tensors. The first term in the pair is the positive
+ * eigenvector. The output is a pair of 2nd-order symmetric tensors.
+ * The first term in the pair is the positive
  * part of the input tensor, and the second term in the pair is the negative
  * part of the input tensor, that is,
  * \f[
@@ -3543,9 +3543,6 @@ outer_product(const SymmetricTensor<2, dim, Number> &t1,
  *
  * @param[in] original_tensor The 2nd-order symmetric tensor to be split into
  * the positive and negative parts
- * @param[out] positive_negative_tensors A pair of 2nd-order symmetric tensors,
- * the first term of which is the positive part of the input tensor, and
- * the second term of which is the negative part of the input tensor
  *
  * @relatesalso SymmetricTensor
  */
@@ -3609,11 +3606,6 @@ positive_negative_split(const SymmetricTensor<2, dim, Number> &original_tensor)
  *
  * @param[in] original_tensor The 2nd-order symmetric tensor to be split into
  * the positive and negative parts
- * @param[out] positive_negative_tensors_projectors A tuple contains the
- * positive part of the tensor as the first term, the negative part of the
- * tensor as the second term, the derivative of the positive tensor with respect
- * to the original tensor as the third them, and the derivative of the negative
- * tensor with respect to the original tensor as the fourth term
  *
  * @relatesalso SymmetricTensor
  */
