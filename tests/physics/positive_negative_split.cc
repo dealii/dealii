@@ -45,11 +45,9 @@ positive_negative_split_test()
         if (j != i)
           random_tensor[j][i] = random_tensor[i][j];
       }
-  SymmetricTensor<2, dim> positive_part_tensor, negative_part_tensor;
 
-  positive_negative_split(random_tensor,
-                          positive_part_tensor,
-                          negative_part_tensor);
+  const auto &[positive_part_tensor, negative_part_tensor] =
+    positive_negative_split(random_tensor);
 
   bool positive_negative_split_success = true;
 
@@ -61,29 +59,28 @@ positive_negative_split_test()
   if (!positive_negative_split_success)
     Assert(false, ExcMessage("Positive-negative split failed!"));
 
-  SymmetricTensor<4, dim> positive_projector, negative_projector;
-  positive_negative_projectors(random_tensor,
-                               positive_part_tensor,
-                               negative_part_tensor,
-                               positive_projector,
-                               negative_projector);
+  const auto &[positive_part_tensor_1,
+               negative_part_tensor_1,
+               positive_projector,
+               negative_projector] =
+    positive_negative_projectors(random_tensor);
 
   bool                    positive_projector_success = true;
   SymmetricTensor<2, dim> projected_positive_tensor;
   projected_positive_tensor = positive_projector * random_tensor;
 
   // test: (P^+) : A = (A^+)
-  if ((projected_positive_tensor - positive_part_tensor).norm() >
+  if ((projected_positive_tensor - positive_part_tensor_1).norm() >
       1.0e-12 * random_tensor.norm())
     positive_projector_success = false;
 
   // test: (P^+) : (A^+) = (A^+)
-  if ((positive_projector * projected_positive_tensor - positive_part_tensor)
+  if ((positive_projector * projected_positive_tensor - positive_part_tensor_1)
         .norm() > 1.0e-12 * random_tensor.norm())
     positive_projector_success = false;
 
   // test: (P^+) : (A^-) = 0
-  if ((positive_projector * negative_part_tensor).norm() >
+  if ((positive_projector * negative_part_tensor_1).norm() >
       1.0e-12 * random_tensor.norm())
     positive_projector_success = false;
 
@@ -92,17 +89,17 @@ positive_negative_split_test()
   projected_negative_tensor = negative_projector * random_tensor;
 
   // test: (P^-) : A = (A^-)
-  if ((projected_negative_tensor - negative_part_tensor).norm() >
+  if ((projected_negative_tensor - negative_part_tensor_1).norm() >
       1.0e-12 * random_tensor.norm())
     negative_projector_success = false;
 
   // test: (P^-) : (A^-) = (A^-)
-  if ((negative_projector * projected_negative_tensor - negative_part_tensor)
+  if ((negative_projector * projected_negative_tensor - negative_part_tensor_1)
         .norm() > 1.0e-12 * random_tensor.norm())
     negative_projector_success = false;
 
   // test: (P^-) : (A^+) = 0
-  if ((negative_projector * positive_part_tensor).norm() >
+  if ((negative_projector * positive_part_tensor_1).norm() >
       1.0e-12 * random_tensor.norm())
     negative_projector_success = false;
 
