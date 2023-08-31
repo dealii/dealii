@@ -1,0 +1,99 @@
+
+DEAL:2d::Testing FE_RaviartThomasNodal<2>(0)
+DEAL:2d::Error cell   values:     0.77942 0.31754 
+DEAL:2d::Error cell   gradients:  2.7000 1.1000 
+DEAL:2d::Error cell   divergence: 2.2204e-16 
+DEAL:2d::Error face-  values:     1.0647 0.43377 
+DEAL:2d::Error face-  gradients:  2.7000 1.1000 
+DEAL:2d::Error face-  divergence: 2.2204e-16 
+DEAL:2d::Error face+  values:     1.0647 0.43377 
+DEAL:2d::Error face+  gradients:  2.7000 1.1000 
+DEAL:2d::Error face+  divergence: 2.2204e-16 
+DEAL:2d::Error face b values:     1.0647 0.43377 
+DEAL:2d::Error face b gradients:  2.7000 1.1000 
+DEAL:2d::Error face b divergence: 2.2204e-16 
+DEAL:2d::
+DEAL:2d::Testing FE_RaviartThomasNodal<2>(1)
+DEAL:2d::Error cell   values:     7.8641e-17 1.7193e-16 
+DEAL:2d::Error cell   gradients:  3.6391e-16 3.5774e-16 
+DEAL:2d::Error cell   divergence: 3.3923e-16 
+DEAL:2d::Error face-  values:     3.2382e-17 8.7893e-17 
+DEAL:2d::Error face-  gradients:  2.2204e-16 4.6259e-16 
+DEAL:2d::Error face-  divergence: 4.4409e-16 
+DEAL:2d::Error face+  values:     3.2382e-17 8.7893e-17 
+DEAL:2d::Error face+  gradients:  4.6259e-16 3.1456e-16 
+DEAL:2d::Error face+  divergence: 4.6259e-16 
+DEAL:2d::Error face b values:     1.0640e-16 7.8641e-17 
+DEAL:2d::Error face b gradients:  5.8287e-16 5.3661e-16 
+DEAL:2d::Error face b divergence: 6.9389e-16 
+DEAL:2d::
+DEAL:2d::Testing FE_RaviartThomasNodal<2>(2)
+DEAL:2d::Error cell   values:     2.6498e-16 1.9418e-16 
+DEAL:2d::Error cell   gradients:  1.9949e-15 1.3982e-15 
+DEAL:2d::Error cell   divergence: 1.9186e-15 
+DEAL:2d::Error face-  values:     1.8757e-16 1.8388e-16 
+DEAL:2d::Error face-  gradients:  3.2058e-15 1.3323e-15 
+DEAL:2d::Error face-  divergence: 3.3445e-15 
+DEAL:2d::Error face+  values:     9.9096e-17 1.2750e-16 
+DEAL:2d::Error face+  gradients:  2.2482e-15 2.3870e-15 
+DEAL:2d::Error face+  divergence: 3.4417e-15 
+DEAL:2d::Error face b values:     3.0358e-16 3.7643e-16 
+DEAL:2d::Error face b gradients:  4.0870e-15 2.9213e-15 
+DEAL:2d::Error face b divergence: 5.1972e-15 
+DEAL:2d::
+DEAL:2d::Testing FE_RaviartThomasNodal<2>(3)
+DEAL:2d::Error cell   values:     2.5709e-16 2.3020e-16 
+DEAL:2d::Error cell   gradients:  3.3573e-15 3.1575e-15 
+DEAL:2d::Error cell   divergence: 2.8955e-15 
+DEAL:2d::Error face-  values:     1.7764e-16 2.3315e-16 
+DEAL:2d::Error face-  gradients:  2.7867e-15 3.4972e-15 
+DEAL:2d::Error face-  divergence: 2.2982e-15 
+DEAL:2d::Error face+  values:     1.4502e-16 1.7902e-16 
+DEAL:2d::Error face+  gradients:  3.9191e-15 3.1086e-15 
+DEAL:2d::Error face+  divergence: 2.8533e-15 
+DEAL:2d::Error face b values:     4.0662e-16 2.8276e-16 
+DEAL:2d::Error face b gradients:  6.0452e-15 6.1173e-15 
+DEAL:2d::Error face b divergence: 5.0460e-15 
+DEAL:2d::
+DEAL:3d::Testing FE_RaviartThomasNodal<3>(0)
+DEAL:3d::Error cell   values:     1.5588 1.4434 0.66395 
+DEAL:3d::Error cell   gradients:  8.1000 6.1000 3.3000 
+DEAL:3d::Error cell   divergence: 4.4409e-16 
+DEAL:3d::Error face-  values:     1.9392 1.7956 0.82597 
+DEAL:3d::Error face-  gradients:  8.1000 6.1000 3.3000 
+DEAL:3d::Error face-  divergence: 3.7007e-16 
+DEAL:3d::Error face+  values:     1.9392 1.7956 0.82597 
+DEAL:3d::Error face+  gradients:  8.1000 6.1000 3.3000 
+DEAL:3d::Error face+  divergence: 4.4409e-16 
+DEAL:3d::Error face b values:     1.9392 1.7956 0.82597 
+DEAL:3d::Error face b gradients:  8.1000 6.1000 3.3000 
+DEAL:3d::Error face b divergence: 4.0708e-16 
+DEAL:3d::
+DEAL:3d::Testing FE_RaviartThomasNodal<3>(1)
+DEAL:3d::Error cell   values:     2.9323e-16 3.6905e-16 2.5109e-16 
+DEAL:3d::Error cell   gradients:  1.0465e-15 1.0043e-15 1.2002e-15 
+DEAL:3d::Error cell   divergence: 1.1801e-15 
+DEAL:3d::Error face-  values:     1.8478e-16 2.6355e-16 1.8799e-16 
+DEAL:3d::Error face-  gradients:  7.1342e-16 7.8744e-16 1.0352e-15 
+DEAL:3d::Error face-  divergence: 1.0938e-15 
+DEAL:3d::Error face+  values:     1.8478e-16 2.6355e-16 1.8799e-16 
+DEAL:3d::Error face+  gradients:  9.7864e-16 7.4015e-16 1.1164e-15 
+DEAL:3d::Error face+  divergence: 1.3158e-15 
+DEAL:3d::Error face b values:     2.9555e-16 3.3975e-16 2.6985e-16 
+DEAL:3d::Error face b gradients:  1.1472e-15 1.1030e-15 1.4006e-15 
+DEAL:3d::Error face b divergence: 1.6324e-15 
+DEAL:3d::
+DEAL:3d::Testing FE_RaviartThomasNodal<3>(2)
+DEAL:3d::Error cell   values:     8.0941e-16 8.5099e-16 8.2424e-16 
+DEAL:3d::Error cell   gradients:  5.5828e-15 5.0810e-15 4.6376e-15 
+DEAL:3d::Error cell   divergence: 5.7940e-15 
+DEAL:3d::Error face-  values:     8.3182e-16 7.5558e-16 7.5558e-16 
+DEAL:3d::Error face-  gradients:  6.7793e-15 5.4089e-15 4.6999e-15 
+DEAL:3d::Error face-  divergence: 7.8224e-15 
+DEAL:3d::Error face+  values:     5.1581e-16 4.8728e-16 6.1290e-16 
+DEAL:3d::Error face+  gradients:  5.9964e-15 5.3950e-15 5.5135e-15 
+DEAL:3d::Error face+  divergence: 9.3305e-15 
+DEAL:3d::Error face b values:     1.1222e-15 1.2358e-15 1.0999e-15 
+DEAL:3d::Error face b gradients:  8.5892e-15 7.4477e-15 6.4367e-15 
+DEAL:3d::Error face b divergence: 1.1618e-14 
+DEAL:3d::
