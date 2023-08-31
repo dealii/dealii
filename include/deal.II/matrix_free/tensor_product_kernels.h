@@ -64,11 +64,7 @@ namespace internal
      * coefficient arrays. See the documentation of the EvaluatorTensorProduct
      * specialization for more information.
      */
-    evaluate_symmetric_hierarchical,
-    /**
-     * Raviart-Thomas elements with anisotropic polynomials.
-     */
-    evaluate_raviart_thomas
+    evaluate_symmetric_hierarchical
   };
 
 
@@ -1599,10 +1595,10 @@ namespace internal
    *
    * @tparam n_rows_template The number of entries within the interpolation,
    *             typically equal to the polynomial degree plus one, if known
-   *             at compile time, otherwise n_rows_runtime is used
+   *             at compile time, otherwise n_rows_runtime is used.
    * @tparam stride_template The stride between successive entries in the
    *             one-dimensional operation of sum factorization, if known at
-   *             compile time, otherwise stride_runtime is used
+   *             compile time, otherwise stride_runtime is used.
    * @tparam contract_onto_face If true, the input vector is of size n_rows^dim
    *                            and interpolation into n_rows^(dim-1) points
    *                            is performed. This is a typical scenario in
@@ -1611,22 +1607,26 @@ namespace internal
    *                            into the n_rows^dim points of the higher-
    *                            dimensional data array. Derivatives in the
    *                            case contract_onto_face==false are summed
-   *                            together
+   *                            together.
    * @tparam add If true, the result is added to the output vector, else
-   *             the computed values overwrite the content in the output
+   *             the computed values overwrite the content in the output.
    * @tparam max_derivative Sets the number of derivatives that should be
    *             computed. 0 means only values, 1 means values and first
    *             derivatives, 2 second derivates. Note that all the
    *             derivatives access the data in @p shape_values passed to
-   *             the constructor of the class
+   *             the constructor of the class.
    *
    * @param shape_values address of the interpolation matrix
    * @param n_blocks Number of interpolation layer used along the two other
    *             dimensions tangential to the interpolation direction
    * @param steps Increments in the input array from one step to the next,
    *             varied in conjunction with the @p stride variable.
-   * @param input Address of the input data vector
-   * @param output Address of the output data vector
+   * @param input Address of the input data vector.
+   * @param output Address of the output data vector.
+   * @param n_rows_runtime Alternative number of rows to be used if the
+   *             variable @p n_rows_template is 0, enabling a run-time path.
+   * @param stride_runtime Alternative number for the stride to be used if the
+   *             variable @p n_rows_template is 0.
    */
   template <int  n_rows_template,
             int  stride_template,
@@ -1747,264 +1747,6 @@ namespace internal
         if (max_derivative > 1)
           input2 += n_blocks[0];
         output += steps[1];
-      }
-  }
-
-
-
-  /**
-   * Generic evaluator framework that valuates the given shape data in general
-   * dimensions using the tensor product form. Depending on the particular
-   * layout in the matrix entries, this corresponds to a usual matrix-matrix
-   * product or a matrix-matrix product including some symmetries. The actual
-   * work is implemented by functions of type apply_matrix_vector_product
-   * working on a single dimension, controlled by suitable strides, using the
-   * kernel specified via variant.
-   *
-   * @tparam variant Variant of evaluation used for creating template
-   *                 specializations
-   * @tparam dim Dimension of the function
-   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
-   *                to the number of 1d shape functions in the usual tensor
-   *                contraction setting
-   * @tparam n_columns Number of columns in the transformation matrix, which
-   *                   corresponds to the number of 1d shape functions in the
-   *                   usual tensor contraction setting
-   * @tparam Number Abstract number type for input and output arrays
-   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
-   *                 same type as the input/output arrays); must implement
-   *                 operator* with Number to be valid
-   * @tparam normal_dir Indicates the direction of the continuous component for the
-   *                    Raviart-Thomas space in terms of the normal onto the
-   * face, e.g 0 if the  is in x-direction, 1 if in y-direction, and 2 if in
-   * z-direction.
-   */
-  template <EvaluatorVariant variant,
-            int              dim,
-            int              n_rows,
-            int              n_columns,
-            int              normal_dir,
-            typename Number,
-            typename Number2 = Number>
-  struct EvaluatorTensorProductAnisotropic
-  {};
-
-
-
-  /**
-   * Internal evaluator for shape function in 2d and 3d using the
-   * tensor product form of the anisotropic basis functions of the
-   * raviart-thomas element, with degree k+1 in normal direction and
-   * k in tangential direction.
-   *
-   * @tparam dim Space dimension in which this class is applied
-   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
-   *                to the number of 1d shape functions in the usual tensor
-   *                contraction setting
-   * @tparam n_columns Number of columns in the transformation matrix, which
-   *                   corresponds to the number of 1d shape functions in the
-   *                   usual tensor contraction setting
-   * @tparam Number Abstract number type for input and output arrays
-   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
-   *                 same type as the input/output arrays); must implement
-   *                 operator* with Number and produce Number as an output to
-   *                 be a valid type
-   */
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            int normal_dir,
-            typename Number,
-            typename Number2>
-  struct EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
-                                           dim,
-                                           n_rows,
-                                           n_columns,
-                                           normal_dir,
-                                           Number,
-                                           Number2>
-  {
-    static constexpr unsigned int n_rows_of_product =
-      numbers::invalid_unsigned_int;
-    static constexpr unsigned int n_columns_of_product =
-      numbers::invalid_unsigned_int;
-
-    /**
-     * Empty constructor. Does nothing. Be careful when using 'values' and
-     * related methods because they need to be filled with the other pointer
-     */
-    EvaluatorTensorProductAnisotropic()
-      : shape_values(nullptr)
-      , shape_gradients(nullptr)
-      , shape_hessians(nullptr)
-    {}
-
-    /**
-     * Constructor, taking the data from ShapeInfo
-     */
-    EvaluatorTensorProductAnisotropic(
-      const AlignedVector<Number2> &shape_values,
-      const AlignedVector<Number2> &shape_gradients,
-      const AlignedVector<Number2> &shape_hessians,
-      const unsigned int            dummy1 = 0,
-      const unsigned int            dummy2 = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
-    {
-      // We can enter this function either for the apply() path that has
-      // n_rows * n_columns entries or for the apply_face() path that only has
-      // n_rows * 3 entries in the array. Since we cannot decide about the use
-      // we must allow for both here.
-      Assert(shape_values.empty() ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == 3 * n_rows,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.empty() ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.empty() ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
-      (void)dummy1;
-      (void)dummy2;
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values(const Number in[], Number out[]) const
-    {
-      apply<direction, contract_over_rows, add>(shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients(const Number in[], Number out[]) const
-    {
-      apply<direction, contract_over_rows, add>(shape_gradients, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians(const Number in[], Number out[]) const
-    {
-      apply<direction, contract_over_rows, add>(shape_hessians, in, out);
-    }
-
-    /**
-     * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1d stripes, along the given @p direction of the tensor
-     * data in the input array. This function allows the @p in and @p out
-     * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
-     * perform the contraction in place where @p in and @p out point to the
-     * same address. For the case n_rows != n_columns, the output is only
-     * correct if @p one_line is set to true.
-     *
-     * @tparam direction Direction that is evaluated
-     * @tparam contract_over_rows If true, the tensor contraction sums
-     *                            over the rows in the given @p shape_data
-     *                            array, otherwise it sums over the columns
-     * @tparam add If true, the result is added to the output vector, else
-     *             the computed values overwrite the content in the output
-     * @tparam normal_dir Indicates the direction of the continuous component of the
-     *                    RT space in terms of the normal onto the face, e.g
-     *                    0 if the  is in x-direction, 1 if in y-direction
-     *                    etc.
-     * @tparam one_line If true, the kernel is only applied along a single 1d
-     *                  stripe within a dim-dimensional tensor, not the full
-     *                  n_rows^dim points as in the @p false case.
-     *
-     * @param shape_data Transformation matrix with @p n_rows rows and
-     *                   @p n_columns columns, stored in row-major format
-     * @param in Pointer to the start of the input data vector
-     * @param out Pointer to the start of the output data vector
-     */
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              bool one_line = false>
-    static void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number                   *in,
-          Number                         *out);
-
-  private:
-    const Number2 *shape_values;
-    const Number2 *shape_gradients;
-    const Number2 *shape_hessians;
-  };
-
-
-
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            int normal_dir,
-            typename Number,
-            typename Number2>
-  template <int direction, bool contract_over_rows, bool add, bool one_line>
-  inline void
-  EvaluatorTensorProductAnisotropic<
-    evaluate_raviart_thomas,
-    dim,
-    n_rows,
-    n_columns,
-    normal_dir,
-    Number,
-    Number2>::apply(const Number2 *DEAL_II_RESTRICT shape_data,
-                    const Number                   *in,
-                    Number                         *out)
-  {
-    static_assert(one_line == false || direction == dim - 1,
-                  "Single-line evaluation only works for direction=dim-1.");
-    Assert(shape_data != nullptr,
-           ExcMessage(
-             "The given array shape_data must not be the null pointer!"));
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
-    AssertIndexRange(direction, dim);
-    constexpr int mm = contract_over_rows ? n_rows : n_columns,
-                  nn = contract_over_rows ? n_columns : n_rows;
-
-    constexpr int stride    = Utilities::pow(n_columns, direction);
-    constexpr int n_blocks1 = one_line ? 1 : stride;
-
-    // The number of blocks depend on both direction and dimension.
-    constexpr int n_blocks2 =
-      (dim - direction - 1 == 0) ?
-        1 :
-        ((direction == normal_dir) ?
-           Utilities::pow((n_rows - 1),
-                          (direction >= dim) ? 0 : dim - direction - 1) :
-           (((direction < normal_dir) ? (n_rows + 1) : n_rows) *
-            ((dim - direction == 3) ? n_rows : 1)));
-
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            apply_matrix_vector_product<evaluate_general,
-                                        EvaluatorQuantity::value,
-                                        n_rows,
-                                        n_columns,
-                                        stride,
-                                        stride,
-                                        contract_over_rows,
-                                        add>(shape_data, in, out);
-
-            if (one_line == false)
-              {
-                ++in;
-                ++out;
-              }
-          }
-        if (one_line == false)
-          {
-            in += stride * (mm - 1);
-            out += stride * (nn - 1);
-          }
       }
   }
 
