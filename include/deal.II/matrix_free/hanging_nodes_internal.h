@@ -474,6 +474,8 @@ namespace internal
                   const unsigned int child_line_idx =
                     child->line_index(neighbor_line);
 
+                  Assert(child->is_active(), ExcInternalError());
+
                   // Now add all active cells
                   for (const auto &cl : line_to_cells[line_idx])
                     line_to_cells[child_line_idx].push_back(cl);
