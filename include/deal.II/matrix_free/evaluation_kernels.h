@@ -2896,6 +2896,8 @@ namespace internal
         {{{n_rows_n, n_rows_t, n_rows_t}},
          {{n_rows_t, n_rows_n, n_rows_t}},
          {{n_rows_t, n_rows_t, n_rows_n}}}};
+
+      (void)scratch_data;
       (void)subface_index;
       // TODO: This is currently not implemented, but the test
       // matrix_vector_rt_face_03 apparently works without it -> check
