@@ -5847,11 +5847,11 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_value(
           // J * u * det(J^-1)
           for (unsigned int comp = 0; comp < n_components; ++comp)
             {
-              value_out[comp] =
-                this->values_quad[q_point] * jac[comp][0] * inv_det;
+              value_out[comp] = this->values_quad[q_point] * jac[comp][0];
               for (unsigned int e = 1; e < dim; ++e)
                 value_out[comp] +=
-                  this->values_quad[e * nqp + q_point] * jac[comp][e] * inv_det;
+                  this->values_quad[e * nqp + q_point] * jac[comp][e];
+              value_out[comp] *= inv_det;
             }
         }
       return value_out;
@@ -5862,6 +5862,8 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_value(
       return BaseClass::get_value(q_point);
     }
 }
+
+
 
 template <int dim, typename Number, bool is_face, typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, VectorizedArrayType>
@@ -5901,7 +5903,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
             for (unsigned int comp = 0; comp < n_components; ++comp)
               grad_out[comp][d] =
                 this->gradients_quad[(comp * dim + d) * nqp + q_point] *
-                inv_t_jac[d][d] * jac[comp][comp] * inv_det;
+                inv_t_jac[d][d] * (jac[comp][comp] * inv_det);
         }
       else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
@@ -5924,10 +5926,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                 tmp = 0;
                 for (unsigned int f = 0; f < dim; ++f)
                   for (unsigned int e = 0; e < dim; ++e)
-                    tmp += jac[comp][f] * inv_t_jac[d][e] * inv_det *
+                    tmp += jac[comp][f] * inv_t_jac[d][e] *
                            this->gradients_quad[(f * dim + e) * nqp + q_point];
 
-                grad_out[comp][d] = tmp;
+                grad_out[comp][d] = tmp * inv_det;
               }
         }
       else
@@ -6067,10 +6069,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                            this->jacobian[0][2][2];
 
           // div * det(J^-1)
-          divergence = this->gradients_quad[q_point] * inv_det;
+          divergence = this->gradients_quad[q_point];
           for (unsigned int d = 1; d < dim; ++d)
-            divergence +=
-              this->gradients_quad[(dim * d + d) * nqp + q_point] * inv_det;
+            divergence += this->gradients_quad[(dim * d + d) * nqp + q_point];
+          divergence *= inv_det;
         }
       else
         {
@@ -6085,10 +6087,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
             Number((is_face && dim == 2 && this->get_face_no() < 2) ? -1 : 1);
 
           // div * det(J^-1)
-          divergence = this->gradients_quad[q_point] * inv_det;
+          divergence = this->gradients_quad[q_point];
           for (unsigned int d = 1; d < dim; ++d)
-            divergence +=
-              this->gradients_quad[(dim * d + d) * nqp + q_point] * inv_det;
+            divergence += this->gradients_quad[(dim * d + d) * nqp + q_point];
+          divergence *= inv_det;
         }
     }
   else
@@ -6247,11 +6249,11 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       else
         {
           // Affine or general cell
-          const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
+          const Tensor<2, dim, VectorizedArrayType> inv_t_jac =
             (this->cell_type > internal::MatrixFreeFunctions::affine) ?
               this->jacobian[q_point] :
               this->jacobian[0];
-          const Tensor<2, dim, VectorizedArrayType> &jac =
+          const Tensor<2, dim, VectorizedArrayType> jac =
             (this->cell_type > internal::MatrixFreeFunctions::affine) ?
               transpose(invert(inv_t_jac)) :
               this->jacobian[1];
@@ -6272,10 +6274,11 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
           for (unsigned int comp = 0; comp < n_components; ++comp)
             {
               this->values_quad[comp * nqp + q_point] =
-                val_in[0] * jac[0][comp] * fac;
+                val_in[0] * jac[0][comp];
               for (unsigned int e = 1; e < dim; ++e)
                 this->values_quad[comp * nqp + q_point] +=
-                  val_in[e] * jac[e][comp] * fac;
+                  val_in[e] * jac[e][comp];
+              this->values_quad[comp * nqp + q_point] *= fac;
             }
         }
     }
