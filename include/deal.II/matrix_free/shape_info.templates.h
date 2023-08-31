@@ -1004,9 +1004,6 @@ namespace internal
     bool
     UnivariateShapeData<Number>::check_and_set_shapes_symmetric()
     {
-      if (fe_degree == 0)
-        return false;
-
       const double zero_tol =
         std::is_same_v<Number, double> == true ? 1e-12 : 1e-7;
       // symmetry for values
