@@ -500,6 +500,7 @@ namespace internal
 } // namespace internal
 
 
+
 template <int dim, typename PolynomialType>
 void
 TensorProductPolynomials<dim, PolynomialType>::evaluate(
@@ -510,9 +511,6 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  if constexpr (dim == 0)
-    return;
-
   Assert(dim <= 3, ExcNotImplemented());
   Assert(values.size() == this->n() || values.empty(),
          ExcDimensionMismatch2(values.size(), this->n(), 0));
@@ -594,6 +592,22 @@ TensorProductPolynomials<dim, PolynomialType>::evaluate(
     grad_grads,
     third_derivatives,
     fourth_derivatives);
+}
+
+
+
+template <>
+void
+TensorProductPolynomials<0, Polynomials::Polynomial<double>>::evaluate(
+  const Point<0> &,
+  std::vector<double> &,
+  std::vector<Tensor<1, 0>> &,
+  std::vector<Tensor<2, 0>> &,
+  std::vector<Tensor<3, 0>> &,
+  std::vector<Tensor<4, 0>> &) const
+{
+  constexpr int dim = 0;
+  AssertThrow(dim > 0, ExcNotImplemented());
 }
 
 
