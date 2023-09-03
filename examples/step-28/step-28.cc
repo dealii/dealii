@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Author: Yaqi Wang, Texas A&M University, 2009, 2010
  */

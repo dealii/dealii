@@ -12,12 +12,11 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Thomas C. Clevenger, Clemson University
- *         Timo Heister, Clemson University
- *         Guido Kanschat, Heidelberg University
- *         Martin Kronbichler, Technical University of Munich
+ * Authors: Thomas C. Clevenger, Clemson University
+ *          Timo Heister, Clemson University
+ *          Guido Kanschat, Heidelberg University
+ *          Martin Kronbichler, Technical University of Munich
  */
 
 

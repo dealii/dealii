@@ -12,10 +12,9 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Wolfgang Bangerth, University of Texas at Austin, 2000, 2004, 2005,
- * Timo Heister, 2013
+ * Authors: Wolfgang Bangerth, University of Texas at Austin, 2000, 2004, 2005,
+ *          Timo Heister, 2013
  */
 
 

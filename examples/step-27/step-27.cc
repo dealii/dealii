@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Wolfgang Bangerth, Texas A&M University, 2006, 2007;
  *          Denis Davydov, University of Erlangen-Nuremberg, 2016;

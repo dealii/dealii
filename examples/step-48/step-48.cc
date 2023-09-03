@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Katharina Kormann, Martin Kronbichler, Uppsala University, 2011-2012
+ * Authors: Katharina Kormann, Martin Kronbichler, Uppsala University, 2011-2012
  */
 
 

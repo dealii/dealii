@@ -12,10 +12,9 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Wolfgang Bangerth, Texas A&M University, 2009, 2010
- *         Timo Heister, University of Goettingen, 2009, 2010
+ * Authors: Wolfgang Bangerth, Texas A&M University, 2009, 2010
+ *          Timo Heister, University of Goettingen, 2009, 2010
  */
 
 

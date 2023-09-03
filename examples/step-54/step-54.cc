@@ -12,6 +12,7 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
+ *
  *  Authors: Andrea Mola, Luca Heltai, 2014
  */
 

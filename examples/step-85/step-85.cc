@@ -12,6 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
+ *
+ * Author: Simon Sticko, Uppsala University, 2021
  */
 
 // @sect3{Include files}

@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Author: Wolfgang Bangerth, University of Texas at Austin, 2000, 2004
  *         Wolfgang Bangerth, Texas A&M University, 2016

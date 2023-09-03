@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Joerg Frohne, Texas A&M University and
  *                        University of Siegen, 2011, 2012

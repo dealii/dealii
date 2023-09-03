@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Chih-Che Chueh, University of Victoria, 2010
  *          Wolfgang Bangerth, Texas A&M University, 2010

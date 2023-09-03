@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Martin Kronbichler, Uppsala University,
  *          Wolfgang Bangerth, Texas A&M University,

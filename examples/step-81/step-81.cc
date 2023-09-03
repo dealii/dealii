@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Manaswinee Bezbaruah, Matthias Maier, Texas A&M University, 2021.
+ * Authors: Manaswinee Bezbaruah, Matthias Maier, Texas A&M University, 2021.
  */
 
 // @sect3{Include files}

@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Bruno Blais, Toni El Geitani Nehme, Rene Gassmoeller, Peter Munch
  */

@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Yan Li, Wolfgang Bangerth, Texas A&M University, 2006
  */

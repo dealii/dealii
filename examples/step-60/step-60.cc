@@ -13,8 +13,8 @@
  *
  * ---------------------------------------------------------------------
  *
- * Authors: Luca Heltai, Giovanni Alzetta,
- * International School for Advanced Studies, Trieste, 2018
+ * Authors: Luca Heltai, Giovanni Alzetta, International School for
+ *            Advanced Studies, Trieste, 2018
  */
 
 // @sect3{Include files}

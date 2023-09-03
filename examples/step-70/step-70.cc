@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Luca Heltai, Bruno Blais, Rene Gassmoeller, 2020
  */

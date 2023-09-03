@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Toby D. Young, Polish Academy of Sciences,
  *          Wolfgang Bangerth, Texas A&M University
