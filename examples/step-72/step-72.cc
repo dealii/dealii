@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Jean-Paul Pelteret,
  *          Wolfgang Bangerth, Colorado State University, 2021.

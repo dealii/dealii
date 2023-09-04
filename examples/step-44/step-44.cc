@@ -13,7 +13,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Jean-Paul Pelteret, University of Cape Town,
  *          Andrew McBride, University of Erlangen-Nuremberg, 2010

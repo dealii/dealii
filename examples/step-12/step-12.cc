@@ -12,10 +12,9 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Guido Kanschat, Texas A&M University, 2009
- *         Timo Heister, Clemson University, 2019
+ * Authors: Guido Kanschat, Texas A&M University, 2009
+ *          Timo Heister, Clemson University, 2019
  */
 
 

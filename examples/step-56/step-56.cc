@@ -13,8 +13,8 @@
  *
  * ---------------------------------------------------------------------
 
- * Author: Ryan Grove, Clemson University
- *         Timo Heister, Clemson University
+ * Authors: Ryan Grove, Clemson University
+ *          Timo Heister, Clemson University
  */
 
 // @sect3{Include files}

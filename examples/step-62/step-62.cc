@@ -12,7 +12,6 @@
  * the top level of the deal.II distribution.
  *
  * ---------------------------------------------------------------------
-
  *
  * Author: Daniel Garcia-Sanchez, CNRS, 2019
  */

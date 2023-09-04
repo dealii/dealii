@@ -12,12 +12,11 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Marc Fehling, Colorado State University, 2021
- *         Peter Munch, Technical University of Munich and Helmholtz-Zentrum
- *                      hereon, 2021
- *         Wolfgang Bangerth, Colorado State University, 2021
+ * Authors: Marc Fehling, Colorado State University, 2021
+ *          Peter Munch, Technical University of Munich and Helmholtz-Zentrum
+ *                       hereon, 2021
+ *          Wolfgang Bangerth, Colorado State University, 2021
  */
 
 

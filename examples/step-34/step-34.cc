@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Luca Heltai, Cataldo Manigrasso, 2009
+ * Authors: Luca Heltai, Cataldo Manigrasso, 2009
  */
 
 

@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Matthias Maier, Texas A&M University;
  *          Ignacio Tomas, Texas A&M University, Sandia National Laboratories

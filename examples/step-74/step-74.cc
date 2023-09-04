@@ -12,9 +12,8 @@
  * the top level of the deal.II distribution.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Timo Heister and Jiaqi Zhang, Clemson University, 2020
+ * Authors: Timo Heister and Jiaqi Zhang, Clemson University, 2020
  */
 
 // The first few files have already been covered in previous examples and will

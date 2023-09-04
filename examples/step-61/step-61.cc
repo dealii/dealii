@@ -12,8 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
- *      Author: Zhuoran Wang, Colorado State University, 2018
+ *
+ * Author: Zhuoran Wang, Colorado State University, 2018
  */
 
 // @sect3{Include files}

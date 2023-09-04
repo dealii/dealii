@@ -13,8 +13,8 @@
  *
  * ---------------------------------------------------------------------
  *
- * Author: Wolfgang Bangerth, Colorado State University
- *         Yong-Yong Cai, Beijing Computational Science Research Center
+ * Authors: Wolfgang Bangerth, Colorado State University
+ *          Yong-Yong Cai, Beijing Computational Science Research Center
  */
 
 // @sect3{Include files}

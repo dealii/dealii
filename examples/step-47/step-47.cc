@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Natasha Sharma, University of Texas at El Paso,
  *          Guido Kanschat, University of Heidelberg

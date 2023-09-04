@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Ivan Christov, Wolfgang Bangerth, Texas A&M University, 2006
+ * Authors: Ivan Christov, Wolfgang Bangerth, Texas A&M University, 2006
  */
 
 

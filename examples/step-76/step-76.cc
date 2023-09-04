@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Martin Kronbichler, Peter Munch, David Schneider, 2020
+ * Authors: Martin Kronbichler, Peter Munch, David Schneider, 2020
  */
 
 // @sect3{Parameters and utility functions}

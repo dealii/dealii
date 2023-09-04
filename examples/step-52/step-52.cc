@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Damien Lebrun-Grandie, Bruno Turcksin, 2014
  */

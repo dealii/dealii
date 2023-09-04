@@ -15,7 +15,7 @@
 ## ---------------------------------------------------------------------
 
 #
-# Author: Ivan Christov, Wolfgang Bangerth, Texas A&M University, 2006
+# Authors: Ivan Christov, Wolfgang Bangerth, Texas A&M University, 2006
 #
 
 dim=1

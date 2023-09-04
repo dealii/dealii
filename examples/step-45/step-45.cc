@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Daniel Arndt, Matthias Maier, 2015
+ * Authors: Daniel Arndt, Matthias Maier, 2015
  *
  * Based on step-22 by Wolfgang Bangerth and Martin Kronbichler
  */

@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Katharina Kormann, Martin Kronbichler, Uppsala University,
  * 2009-2012, updated to MPI version with parallel vectors in 2016
