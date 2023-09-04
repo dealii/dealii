@@ -22,6 +22,7 @@
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/discrete_time.h>
+#include <deal.II/base/function_lib.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/parameter_acceptor.h>
 #include <deal.II/base/timer.h>
@@ -166,49 +167,6 @@ namespace Step68
 
 
 
-  // @sect3{Velocity profile}
-
-  // The velocity profile is provided as a Function object.
-  // This function is hard-coded within
-  // the example.
-  template <int dim>
-  class Vortex : public Function<dim>
-  {
-  public:
-    Vortex()
-      : Function<dim>(dim)
-    {}
-
-
-    virtual void vector_value(const Point<dim> &point,
-                              Vector<double>   &values) const override;
-  };
-
-
-  // The velocity profile for the Rayleigh-Kothe vertex is time-dependent.
-  // Consequently, the current time in the
-  // simulation (t) must be gathered from the Function object.
-  template <int dim>
-  void Vortex<dim>::vector_value(const Point<dim> &point,
-                                 Vector<double>   &values) const
-  {
-    const double T = 4;
-    const double t = this->get_time();
-
-    const double px = numbers::PI * point(0);
-    const double py = numbers::PI * point(1);
-    const double pt = numbers::PI / T * t;
-
-    values[0] = -2 * cos(pt) * pow(sin(px), 2) * sin(py) * cos(py);
-    values[1] = 2 * cos(pt) * pow(sin(py), 2) * sin(px) * cos(px);
-    if (dim == 3)
-      {
-        values[2] = 0;
-      }
-  }
-
-
-
   // @sect3{The <code>ParticleTracking</code> class declaration}
 
   // We are now ready to introduce the main class of our tutorial program.
@@ -278,7 +236,7 @@ namespace Step68
     MappingQ1<dim>                             mapping;
     LinearAlgebra::distributed::Vector<double> velocity_field;
 
-    Vortex<dim> velocity;
+    Functions::RayleighKotheVortex<dim> velocity;
 
     ConditionalOStream pcout;
 
@@ -305,6 +263,7 @@ namespace Step68
     , background_triangulation(mpi_communicator)
     , fluid_dh(background_triangulation)
     , fluid_fe(FE_Q<dim>(par.velocity_degree) ^ dim)
+    , velocity(4.0)
     , pcout(std::cout, Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
     , interpolated_velocity(interpolated_velocity)
 

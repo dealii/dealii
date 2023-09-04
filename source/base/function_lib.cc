@@ -2947,6 +2947,32 @@ namespace Functions
            sizeof(coefficients);
   }
 
+  template <int dim>
+  RayleighKotheVortex<dim>::RayleighKotheVortex(const double T)
+    : Function<dim>(dim)
+    , T(T)
+  {
+    AssertThrow(dim > 1, ExcNotImplemented());
+  }
+
+
+  template <int dim>
+  void
+  RayleighKotheVortex<dim>::vector_value(const Point<dim> &point,
+                                         Vector<double>   &values) const
+  {
+    const double pi_x = numbers::PI * point(0);
+    const double pi_y = numbers::PI * point(1);
+    const double pi_t = numbers::PI / T * this->get_time();
+
+    values[0] = -2 * std::cos(pi_t) * std::pow(std::sin(pi_x), 2) *
+                std::sin(pi_y) * std::cos(pi_y);
+    values[1] = +2 * std::cos(pi_t) * std::pow(std::sin(pi_y), 2) *
+                std::sin(pi_x) * std::cos(pi_x);
+
+    if (dim == 3)
+      values[2] = 0;
+  }
 
 
   // explicit instantiations
@@ -3003,6 +3029,9 @@ namespace Functions
   template class Polynomial<1>;
   template class Polynomial<2>;
   template class Polynomial<3>;
+  template class RayleighKotheVortex<1>;
+  template class RayleighKotheVortex<2>;
+  template class RayleighKotheVortex<3>;
 } // namespace Functions
 
 DEAL_II_NAMESPACE_CLOSE
