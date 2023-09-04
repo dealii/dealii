@@ -218,17 +218,8 @@ namespace GridTools
             local_volume += fe_values.JxW(q);
         }
 
-    double global_volume = 0;
-
-#ifdef DEAL_II_WITH_MPI
-    if (const parallel::TriangulationBase<dim, spacedim> *p_tria =
-          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-            &triangulation))
-      global_volume =
-        Utilities::MPI::sum(local_volume, p_tria->get_communicator());
-    else
-#endif
-      global_volume = local_volume;
+    const double global_volume =
+      Utilities::MPI::sum(local_volume, triangulation.get_communicator());
 
     return global_volume;
   }
@@ -4461,18 +4452,8 @@ namespace GridTools
       if (!cell->is_artificial())
         min_diameter = std::min(min_diameter, cell->diameter(mapping));
 
-    double global_min_diameter = 0;
-
-#ifdef DEAL_II_WITH_MPI
-    if (const parallel::TriangulationBase<dim, spacedim> *p_tria =
-          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-            &triangulation))
-      global_min_diameter =
-        Utilities::MPI::min(min_diameter, p_tria->get_communicator());
-    else
-#endif
-      global_min_diameter = min_diameter;
-
+    const double global_min_diameter =
+      Utilities::MPI::min(min_diameter, triangulation.get_communicator());
     return global_min_diameter;
   }
 
@@ -4488,18 +4469,8 @@ namespace GridTools
       if (!cell->is_artificial())
         max_diameter = std::max(max_diameter, cell->diameter(mapping));
 
-    double global_max_diameter = 0;
-
-#ifdef DEAL_II_WITH_MPI
-    if (const parallel::TriangulationBase<dim, spacedim> *p_tria =
-          dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-            &triangulation))
-      global_max_diameter =
-        Utilities::MPI::max(max_diameter, p_tria->get_communicator());
-    else
-#endif
-      global_max_diameter = max_diameter;
-
+    const double global_max_diameter =
+      Utilities::MPI::max(max_diameter, triangulation.get_communicator());
     return global_max_diameter;
   }
 
