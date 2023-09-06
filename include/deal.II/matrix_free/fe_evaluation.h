@@ -4994,7 +4994,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   this->gradients_quad_submitted = true;
 #  endif
 
-  const std::size_t nqp = this->n_quadrature_points;
+  const std::size_t    nqp_d     = this->n_quadrature_points * dim;
+  VectorizedArrayType *gradients = this->gradients_quad + q_point * dim;
+
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArrayType JxW =
@@ -5006,8 +5008,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           const VectorizedArrayType factor = jac[d] * JxW;
           for (unsigned int comp = 0; comp < n_components; ++comp)
-            this->gradients_quad[(comp * nqp + q_point) * dim + d] =
-              grad_in[comp][d] * factor;
+            gradients[comp * nqp_d + d] = grad_in[comp][d] * factor;
         }
     }
   else
@@ -5026,8 +5027,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             VectorizedArrayType new_val = jac[0][d] * grad_in[comp][0];
             for (unsigned int e = 1; e < dim; ++e)
               new_val += (jac[e][d] * grad_in[comp][e]);
-            this->gradients_quad[(comp * nqp + q_point) * dim + d] =
-              new_val * JxW;
+            gradients[comp * nqp_d + d] = new_val * JxW;
           }
     }
 }
@@ -5053,7 +5053,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   this->gradients_quad_submitted = true;
 #  endif
 
-  const std::size_t nqp = this->n_quadrature_points;
+  const std::size_t    nqp_d     = this->n_quadrature_points * dim;
+  VectorizedArrayType *gradients = this->gradients_quad + q_point * dim;
+
   if (this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArrayType JxW_jac = this->J_value[0] *
@@ -5062,10 +5064,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           for (unsigned int d = 0; d < dim - 1; ++d)
-            this->gradients_quad[(comp * nqp + q_point) * dim + d] =
-              VectorizedArrayType();
-          this->gradients_quad[(comp * nqp + q_point) * dim + dim - 1] =
-            grad_in[comp] * JxW_jac;
+            gradients[comp * nqp_d + d] = VectorizedArrayType();
+          gradients[comp * nqp_d + dim - 1] = grad_in[comp] * JxW_jac;
         }
     }
   else
@@ -5081,8 +5081,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           for (unsigned int d = 0; d < dim; ++d)
-            this->gradients_quad[(comp * nqp + q_point) * dim + d] =
-              (grad_in[comp] * JxW) * jac[d];
+            gradients[comp * nqp_d + d] = (grad_in[comp] * JxW) * jac[d];
         }
     }
 }
@@ -5884,8 +5883,12 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       Assert(this->jacobian != nullptr,
              internal::ExcMatrixFreeAccessToUninitializedMappingField(
                "update_gradients"));
-      const std::size_t nqp = this->n_quadrature_points;
+      const std::size_t nqp   = this->n_quadrature_points;
+      const std::size_t nqp_d = nqp * dim;
       Tensor<1, dim, Tensor<1, dim, VectorizedArrayType>> grad_out;
+      const VectorizedArrayType                          *gradients =
+        this->gradients_quad + q_point * dim;
+
 
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -5902,9 +5905,8 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
           // J * grad_quad * J^-1 * det(J^-1)
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int comp = 0; comp < n_components; ++comp)
-              grad_out[comp][d] =
-                this->gradients_quad[(comp * nqp + q_point) * dim + d] *
-                inv_t_jac[d][d] * (jac[comp][comp] * inv_det);
+              grad_out[comp][d] = gradients[comp * nqp_d + d] *
+                                  inv_t_jac[d][d] * (jac[comp][comp] * inv_det);
         }
       else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
@@ -5919,18 +5921,23 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
               -determinant(inv_t_jac) :
               determinant(inv_t_jac);
 
-          VectorizedArrayType tmp;
+          VectorizedArrayType tmp[dim][dim];
           // J * grad_quad * J^-1 * det(J^-1)
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int e = 0; e < dim; ++e)
+              {
+                tmp[d][e] = inv_t_jac[d][0] * gradients[e * nqp_d + 0];
+                for (unsigned int f = 1; f < dim; ++f)
+                  tmp[d][e] += inv_t_jac[d][f] * gradients[e * nqp_d + f];
+              }
           for (unsigned int comp = 0; comp < n_components; ++comp)
             for (unsigned int d = 0; d < dim; ++d)
               {
-                tmp = 0;
-                for (unsigned int f = 0; f < dim; ++f)
-                  for (unsigned int e = 0; e < dim; ++e)
-                    tmp += jac[comp][f] * inv_t_jac[d][e] *
-                           this->gradients_quad[(f * nqp + q_point) * dim + e];
+                VectorizedArrayType res = jac[comp][0] * tmp[d][0];
+                for (unsigned int f = 1; f < dim; ++f)
+                  res += jac[comp][f] * tmp[d][f];
 
-                grad_out[comp][d] = tmp * inv_det;
+                grad_out[comp][d] = res * inv_det;
               }
         }
       else
@@ -5956,79 +5963,82 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
               -determinant(inv_t_jac) :
               determinant(inv_t_jac);
 
-          VectorizedArrayType tmp;
           // J * grad_quad * J^-1 * det(J^-1)
+          VectorizedArrayType tmp[dim][dim];
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int e = 0; e < dim; ++e)
+              {
+                tmp[d][e] = inv_t_jac[d][0] * gradients[e * nqp_d + 0];
+                for (unsigned int f = 1; f < dim; ++f)
+                  tmp[d][e] += inv_t_jac[d][f] * gradients[e * nqp_d + f];
+              }
           for (unsigned int comp = 0; comp < n_components; ++comp)
             for (unsigned int d = 0; d < dim; ++d)
               {
-                tmp = 0;
-                for (unsigned int f = 0; f < dim; ++f)
-                  for (unsigned int e = 0; e < dim; ++e)
-                    tmp += t_jac[f][comp] * inv_t_jac[d][e] *
-                           this->gradients_quad[(f * nqp + q_point) * dim + e];
+                VectorizedArrayType res = t_jac[0][comp] * tmp[d][0];
+                for (unsigned int f = 1; f < dim; ++f)
+                  res += t_jac[f][comp] * tmp[d][f];
 
-                grad_out[comp][d] = tmp * inv_det;
+                grad_out[comp][d] = res;
               }
 
-          // Contribution from values
-          {
-            // Diagonal part of jac_grad
+          // Add jac_grad * J^{-1} * values * det(J^{-1})
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              for (unsigned int f = 0; f < dim; ++f)
+                tmp[f][d] =
+                  jac_grad[f][d] * this->values_quad[f * nqp + q_point];
+              for (unsigned int f = 0, r = dim; f < dim; ++f)
+                for (unsigned int k = f + 1; k < dim; ++k, ++r)
+                  {
+                    tmp[k][d] +=
+                      jac_grad[r][d] * this->values_quad[f * nqp + q_point];
+                    tmp[f][d] +=
+                      jac_grad[r][d] * this->values_quad[k * nqp + q_point];
+                  }
+            }
+          for (unsigned int i = 0; i < dim; ++i)
+            for (unsigned int j = 0; j < dim; ++j)
+              for (unsigned int f = 0; f < dim; ++f)
+                grad_out[i][j] += tmp[f][i] * inv_t_jac[j][f];
 
-            // Add jac_grad * J^{-1} * values * det(J^{-1})
-            // -(J^{-T} * jac_grad * J^{-1} * J * values * det(J^{-1}))
-            for (unsigned int i = 0; i < dim; ++i)
-              for (unsigned int j = 0; j < dim; ++j)
+          // Add -(J^{-T} * jac_grad * J^{-1} * J * values * det(J^{-1})),
+          // which can be expressed as a rank-1 form tmp2[i] * tmp[j], where
+          // tmp2 = J * values and tmp4 = (J^{-T} * jac_grad * J^{-1})
+          VectorizedArrayType tmp2[dim];
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              tmp2[d] = t_jac[0][d] * this->values_quad[q_point];
+              for (unsigned e = 1; e < dim; ++e)
+                tmp2[d] += t_jac[e][d] * this->values_quad[e * nqp + q_point];
+            }
+          VectorizedArrayType tmp3[dim], tmp4[dim];
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              tmp3[d] = inv_t_jac[0][d] * jac_grad[d][0];
+              for (unsigned int e = 1; e < dim; ++e)
+                tmp3[d] += inv_t_jac[e][d] * jac_grad[d][e];
+            }
+          for (unsigned int r = 0, f = dim; r < dim; ++r)
+            for (unsigned int k = r + 1; k < dim; ++k, ++f)
+              for (unsigned int e = 0; e < dim; ++e)
                 {
-                  tmp = jac_grad[0][i] * inv_t_jac[j][0] *
-                        this->values_quad[q_point];
-                  for (unsigned int f = 1; f < dim; ++f)
-                    tmp += jac_grad[f][i] * inv_t_jac[j][f] *
-                           this->values_quad[f * nqp + q_point];
-
-                  grad_out[i][j] += tmp * inv_det;
+                  tmp3[r] += inv_t_jac[e][k] * jac_grad[f][e];
+                  tmp3[k] += inv_t_jac[e][r] * jac_grad[f][e];
                 }
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              tmp4[d] = tmp3[0] * inv_t_jac[d][0];
+              for (unsigned int f = 1; f < dim; ++f)
+                tmp4[d] += tmp3[f] * inv_t_jac[d][f];
+            }
 
-            for (unsigned int i = 0; i < dim; ++i)
-              for (unsigned int j = 0; j < dim; ++j)
-                {
-                  tmp = 0;
-                  for (unsigned int f = 0; f < dim; ++f)
-                    for (unsigned int n = 0; n < dim; ++n)
-                      for (unsigned int m = 0; m < dim; ++m)
-                        tmp += inv_t_jac[m][f] * jac_grad[f][m] *
-                               inv_t_jac[j][f] * t_jac[n][i] *
-                               this->values_quad[n * nqp + q_point];
-                  grad_out[i][j] -= tmp * inv_det;
-                }
-          }
-
-          {
-            // Off-diagonal part of jac_grad
-
-            // Add jac_grad * J^{-1} * values * det(J^{-1})
-            // -(J^{-T} * jac_grad * J^{-1} * J * values * det(J^{-1}))
-            for (unsigned int i = 0; i < dim; ++i)
-              for (unsigned int j = 0; j < dim; ++j)
-                {
-                  tmp = 0;
-                  for (unsigned int r = 0, f = dim; r < dim; ++r)
-                    for (unsigned int k = r + 1; k < dim; ++k, ++f)
-                      {
-                        tmp += jac_grad[f][i] *
-                               (inv_t_jac[j][k] *
-                                  this->values_quad[r * nqp + q_point] +
-                                inv_t_jac[j][r] *
-                                  this->values_quad[k * nqp + q_point]);
-                        for (unsigned int n = 0; n < dim; ++n)
-                          for (unsigned int m = 0; m < dim; ++m)
-                            tmp -= jac_grad[f][m] * t_jac[n][i] *
-                                   this->values_quad[n * nqp + q_point] *
-                                   (inv_t_jac[m][k] * inv_t_jac[j][r] +
-                                    inv_t_jac[m][r] * inv_t_jac[j][k]);
-                      }
-                  grad_out[i][j] += tmp * inv_det;
-                }
-          }
+          for (unsigned int i = 0; i < dim; ++i)
+            for (unsigned int j = 0; j < dim; ++j)
+              {
+                grad_out[i][j] -= tmp4[j] * tmp2[i];
+                grad_out[i][j] *= inv_det;
+              }
         }
       return grad_out;
     }
@@ -6060,39 +6070,27 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
-      if (!is_face &&
-          this->cell_type == internal::MatrixFreeFunctions::cartesian)
-        {
-          // Cartesian cell
-          const VectorizedArrayType inv_det =
-            (dim == 2) ? this->jacobian[0][0][0] * this->jacobian[0][1][1] :
-                         this->jacobian[0][0][0] * this->jacobian[0][1][1] *
-                           this->jacobian[0][2][2];
+      VectorizedArrayType inv_det =
+        (!is_face &&
+         this->cell_type == internal::MatrixFreeFunctions::cartesian) ?
+          this->jacobian[0][0][0] *
+            ((dim == 2) ? this->jacobian[0][1][1] :
+                          this->jacobian[0][1][1] * this->jacobian[0][2][2]) :
+          determinant(this->jacobian[this->cell_type >
+                                         internal::MatrixFreeFunctions::affine ?
+                                       q_point :
+                                       0]);
 
-          // div * det(J^-1)
-          divergence = this->gradients_quad[q_point * dim];
-          for (unsigned int d = 1; d < dim; ++d)
-            divergence += this->gradients_quad[(d * nqp + q_point) * dim + d];
-          divergence *= inv_det;
-        }
-      else
-        {
-          // General cell
-          // Derivatives are reordered for faces. Need to take this into account
-          const VectorizedArrayType inv_det =
-            determinant(
-              this->jacobian[this->cell_type >
-                                 internal::MatrixFreeFunctions::affine ?
-                               q_point :
-                               0]) *
-            Number((is_face && dim == 2 && this->get_face_no() < 2) ? -1 : 1);
+      // on faces in 2d, the determinant has the wrong sign due to ordering of
+      // derivatives
+      if (is_face && dim == 2 && this->get_face_no() < 2)
+        inv_det = -inv_det;
 
-          // div * det(J^-1)
-          divergence = this->gradients_quad[q_point * dim];
-          for (unsigned int d = 1; d < dim; ++d)
-            divergence += this->gradients_quad[(d * nqp + q_point) * dim + d];
-          divergence *= inv_det;
-        }
+      // div * det(J^-1)
+      divergence = this->gradients_quad[q_point * dim];
+      for (unsigned int d = 1; d < dim; ++d)
+        divergence += this->gradients_quad[(d * nqp + q_point) * dim + d];
+      divergence *= inv_det;
     }
   else
     {
@@ -6237,7 +6235,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       this->values_quad_submitted = true;
 #  endif
 
-      const std::size_t nqp = this->n_quadrature_points;
+      VectorizedArrayType *values = this->values_quad + q_point;
+      const std::size_t    nqp    = this->n_quadrature_points;
+
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
@@ -6245,8 +6245,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
           const VectorizedArrayType weight = this->quadrature_weights[q_point];
 
           for (unsigned int comp = 0; comp < n_components; ++comp)
-            this->values_quad[comp * nqp + q_point] =
-              val_in[comp] * weight * jac[comp][comp];
+            values[comp * nqp] = val_in[comp] * weight * jac[comp][comp];
         }
       else
         {
@@ -6275,12 +6274,10 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
           // J^T * u * factor
           for (unsigned int comp = 0; comp < n_components; ++comp)
             {
-              this->values_quad[comp * nqp + q_point] =
-                val_in[0] * jac[0][comp];
+              values[comp * nqp] = val_in[0] * jac[0][comp];
               for (unsigned int e = 1; e < dim; ++e)
-                this->values_quad[comp * nqp + q_point] +=
-                  val_in[e] * jac[e][comp];
-              this->values_quad[comp * nqp + q_point] *= fac;
+                values[comp * nqp] += val_in[e] * jac[e][comp];
+              values[comp * nqp] *= fac;
             }
         }
     }
@@ -6316,7 +6313,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       this->gradients_quad_submitted = true;
 #  endif
 
-      const std::size_t nqp = this->n_quadrature_points;
+      VectorizedArrayType *gradients = this->gradients_quad + q_point * dim;
+      const std::size_t    nqp_d     = this->n_quadrature_points * dim;
+
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
@@ -6327,8 +6326,8 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
           const VectorizedArrayType weight = this->quadrature_weights[q_point];
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int comp = 0; comp < n_components; ++comp)
-              this->gradients_quad[(comp * nqp + q_point) * dim + d] =
-                grad_in[comp][d] * inv_t_jac[d][d] * jac[comp][comp] * weight;
+              gradients[comp * nqp_d + d] =
+                grad_in[comp][d] * inv_t_jac[d][d] * (jac[comp][comp] * weight);
         }
       else if (this->cell_type <= internal::MatrixFreeFunctions::affine)
         {
@@ -6347,16 +6346,22 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                               determinant(inv_t_jac));
 
           // J_{j,i} * J^{-1}_{k,m} * grad_in_{j,m} * factor
+          VectorizedArrayType tmp[dim][dim];
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int e = 0; e < dim; ++e)
+              {
+                tmp[d][e] = inv_t_jac[0][d] * grad_in[e][0];
+                for (unsigned int f = 1; f < dim; ++f)
+                  tmp[d][e] += inv_t_jac[f][d] * grad_in[e][f];
+              }
           for (unsigned int comp = 0; comp < n_components; ++comp)
             for (unsigned int d = 0; d < dim; ++d)
               {
-                VectorizedArrayType tmp = 0;
-                for (unsigned int f = 0; f < dim; ++f)
-                  for (unsigned int e = 0; e < dim; ++e)
-                    tmp += jac[f][comp] * inv_t_jac[e][d] * grad_in[f][e];
+                VectorizedArrayType res = jac[0][comp] * tmp[d][0];
+                for (unsigned int f = 1; f < dim; ++f)
+                  res += jac[f][comp] * tmp[d][f];
 
-                this->gradients_quad[(comp * nqp + q_point) * dim + d] =
-                  tmp * fac;
+                gradients[comp * nqp_d + d] = res * fac;
               }
         }
       else
@@ -6377,85 +6382,89 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                                           -determinant(inv_t_jac) :
                                           determinant(inv_t_jac));
 
-          VectorizedArrayType tmp;
+          // Start evaluation for values part below to enable the compiler to
+          // possibly re-use the same computation in get_gradient() without
+          // interfering with stores to 'gradients'
+          VectorizedArrayType tmp3[dim], tmp4[dim];
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              tmp3[d] = inv_t_jac[0][d] * jac_grad[d][0];
+              for (unsigned int e = 1; e < dim; ++e)
+                tmp3[d] += inv_t_jac[e][d] * jac_grad[d][e];
+            }
+          for (unsigned int r = 0, f = dim; r < dim; ++r)
+            for (unsigned int k = r + 1; k < dim; ++k, ++f)
+              for (unsigned int e = 0; e < dim; ++e)
+                {
+                  tmp3[r] += inv_t_jac[e][k] * jac_grad[f][e];
+                  tmp3[k] += inv_t_jac[e][r] * jac_grad[f][e];
+                }
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              tmp4[d] = tmp3[0] * inv_t_jac[d][0];
+              for (unsigned int f = 1; f < dim; ++f)
+                tmp4[d] += tmp3[f] * inv_t_jac[d][f];
+            }
+
           // J_{j,i} * J^{-1}_{k,m} * grad_in_{j,m} * factor
+          VectorizedArrayType tmp[dim][dim];
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int e = 0; e < dim; ++e)
+              {
+                tmp[d][e] = inv_t_jac[0][d] * grad_in[e][0];
+                for (unsigned int f = 1; f < dim; ++f)
+                  tmp[d][e] += inv_t_jac[f][d] * grad_in[e][f];
+              }
           for (unsigned int comp = 0; comp < n_components; ++comp)
             for (unsigned int d = 0; d < dim; ++d)
               {
-                tmp = 0;
-                for (unsigned int f = 0; f < dim; ++f)
-                  for (unsigned int e = 0; e < dim; ++e)
-                    tmp += t_jac[comp][f] * inv_t_jac[e][d] * grad_in[f][e];
+                VectorizedArrayType res = t_jac[comp][0] * tmp[d][0];
+                for (unsigned int f = 1; f < dim; ++f)
+                  res += t_jac[comp][f] * tmp[d][f];
 
-                this->gradients_quad[(comp * nqp + q_point) * dim + d] =
-                  tmp * fac;
+                gradients[comp * nqp_d + d] = res * fac;
               }
 
-          // Contribution from values
-          {
-            // Diagonal part of jac_grad
+          const std::size_t nqp = this->n_quadrature_points;
 
-            // Add jac_grad * J^{-1} * values * factor
-            // -(J^{-T} * jac_grad * J^{-1} * J * values * factor)
-            for (unsigned int f = 0; f < dim; ++f)
+          VectorizedArrayType value[dim];
+          // Add jac_grad * J^{-1} * values * factor
+          for (unsigned int i = 0; i < dim; ++i)
+            for (unsigned int j = 0; j < dim; ++j)
               {
-                tmp = 0;
-                for (unsigned int i = 0; i < dim; ++i)
-                  for (unsigned int j = 0; j < dim; ++j)
-                    {
-                      tmp += inv_t_jac[j][f] * jac_grad[f][i] * grad_in[i][j];
-                      for (unsigned int m = 0; m < dim; ++m)
-                        for (unsigned int k = 0; k < dim; ++k)
-                          tmp -= inv_t_jac[m][k] * jac_grad[k][m] *
-                                 inv_t_jac[j][k] * t_jac[f][i] * grad_in[i][j];
-                    }
-                this->values_from_gradients_quad[f * nqp + q_point] = tmp * fac;
+                tmp[i][j] = inv_t_jac[0][j] * grad_in[i][0];
+                for (unsigned int f = 1; f < dim; ++f)
+                  tmp[i][j] += inv_t_jac[f][j] * grad_in[i][f];
               }
-          }
-
-          {
-            // Off-diagonal part of jac_grad
-
-            // Add jac_grad * J^{-1} * values * factor
-            for (unsigned int r = 0, f = dim; r < dim; ++r)
-              for (unsigned int k = r + 1; k < dim; ++k, ++f)
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              value[d] = tmp[0][d] * jac_grad[d][0];
+              for (unsigned int e = 1; e < dim; ++e)
+                value[d] += tmp[e][d] * jac_grad[d][e];
+            }
+          for (unsigned int f = 0, r = dim; f < dim; ++f)
+            for (unsigned int k = f + 1; k < dim; ++k, ++r)
+              for (unsigned int d = 0; d < dim; ++d)
                 {
-                  tmp = jac_grad[f][0] * inv_t_jac[0][k] * grad_in[0][0];
-                  for (unsigned int j = 1; j < dim; ++j)
-                    tmp += jac_grad[f][0] * inv_t_jac[j][k] * grad_in[0][j];
-                  for (unsigned int i = 1; i < dim; ++i)
-                    for (unsigned int j = 0; j < dim; ++j)
-                      tmp += jac_grad[f][i] * inv_t_jac[j][k] * grad_in[i][j];
-                  this->values_from_gradients_quad[r * nqp + q_point] +=
-                    tmp * fac;
-
-                  tmp = jac_grad[f][0] * inv_t_jac[0][r] * grad_in[0][0];
-                  for (unsigned int j = 1; j < dim; ++j)
-                    tmp += jac_grad[f][0] * inv_t_jac[j][r] * grad_in[0][j];
-                  for (unsigned int i = 1; i < dim; ++i)
-                    for (unsigned int j = 0; j < dim; ++j)
-                      tmp += jac_grad[f][i] * inv_t_jac[j][r] * grad_in[i][j];
-                  this->values_from_gradients_quad[k * nqp + q_point] +=
-                    tmp * fac;
+                  value[f] += tmp[d][k] * jac_grad[r][d];
+                  value[k] += tmp[d][f] * jac_grad[r][d];
                 }
 
-            // -(J^{-T} * jac_grad * J^{-1} * J * values * factor)
-            for (unsigned int n = 0; n < dim; ++n)
-              {
-                tmp = 0;
-                for (unsigned int r = 0, f = dim; r < dim; ++r)
-                  for (unsigned int k = r + 1; k < dim; ++k, ++f)
-                    for (unsigned int i = 0; i < dim; ++i)
-                      for (unsigned int j = 0; j < dim; ++j)
-                        for (unsigned int m = 0; m < dim; ++m)
-                          tmp += jac_grad[f][m] * t_jac[n][i] * grad_in[i][j] *
-                                 (inv_t_jac[m][k] * inv_t_jac[j][r] +
-                                  inv_t_jac[m][r] * inv_t_jac[j][k]);
+          //   -(J^{-T} * jac_grad * J^{-1} * J * values * factor)
+          // = -( \------- tmp4 ---------/  * J * values * factor)
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              tmp3[d] = grad_in[d][0] * tmp4[0];
+              for (unsigned int e = 1; e < dim; ++e)
+                tmp3[d] += grad_in[d][e] * tmp4[e];
+            }
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int e = 0; e < dim; ++e)
+              value[d] -= t_jac[d][e] * tmp3[e];
 
-                this->values_from_gradients_quad[n * nqp + q_point] -=
-                  tmp * fac;
-              }
-          }
+          for (unsigned int d = 0; d < dim; ++d)
+            this->values_from_gradients_quad[d * nqp + q_point] =
+              fac * value[d];
         }
     }
   else
@@ -6477,7 +6486,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
       // Piola transform is required
-      const Tensor<2, dim, VectorizedArrayType> &grad = grad_in;
+      const Tensor<2, dim, VectorizedArrayType> grad = grad_in;
       FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
         submit_gradient(grad, q_point);
     }
@@ -6509,7 +6518,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   this->gradients_quad_submitted = true;
 #  endif
 
-  const std::size_t nqp = this->n_quadrature_points;
+  const std::size_t    nqp_d     = this->n_quadrature_points * dim;
+  VectorizedArrayType *gradients = this->gradients_quad + q_point * dim;
+
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas)
     {
@@ -6533,14 +6544,8 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
 
       for (unsigned int d = 0; d < dim; ++d)
         {
-          this->gradients_quad[(d * nqp + q_point) * dim + d] = fac;
-          for (unsigned int e = d + 1; e < dim; ++e)
-            {
-              this->gradients_quad[(d * nqp + q_point) * dim + e] =
-                VectorizedArrayType();
-              this->gradients_quad[(e * nqp + q_point) * dim + d] =
-                VectorizedArrayType();
-            }
+          for (unsigned int e = 0; e < dim; ++e)
+            gradients[d * nqp_d + e] = (d == e) ? fac : 0.;
         }
       this->divergence_is_requested = true;
     }
@@ -6553,15 +6558,9 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
             this->J_value[0] * this->quadrature_weights[q_point] * div_in;
           for (unsigned int d = 0; d < dim; ++d)
             {
-              this->gradients_quad[(d * nqp + q_point) * dim + d] =
-                (fac * this->jacobian[0][d][d]);
-              for (unsigned int e = d + 1; e < dim; ++e)
-                {
-                  this->gradients_quad[(d * nqp + q_point) * dim + e] =
-                    VectorizedArrayType();
-                  this->gradients_quad[(e * nqp + q_point) * dim + d] =
-                    VectorizedArrayType();
-                }
+              const VectorizedArrayType jac_dd = this->jacobian[0][d][d];
+              for (unsigned int e = 0; e < dim; ++e)
+                gradients[d * nqp_d + e] = (d == e) ? fac * jac_dd : 0.;
             }
         }
       else
@@ -6578,8 +6577,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
           for (unsigned int d = 0; d < dim; ++d)
             {
               for (unsigned int e = 0; e < dim; ++e)
-                this->gradients_quad[(d * nqp + q_point) * dim + e] =
-                  jac[d][e] * fac;
+                gradients[d * nqp_d + e] = jac[d][e] * fac;
             }
         }
     }
@@ -6616,23 +6614,23 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
   this->gradients_quad_submitted = true;
 #  endif
 
-  const std::size_t nqp = this->n_quadrature_points;
+  const std::size_t    nqp_d     = this->n_quadrature_points * dim;
+  VectorizedArrayType *gradients = this->gradients_quad + dim * q_point;
   if (!is_face && this->cell_type == internal::MatrixFreeFunctions::cartesian)
     {
       const VectorizedArrayType JxW =
         this->J_value[0] * this->quadrature_weights[q_point];
+      const Tensor<2, dim, VectorizedArrayType> jac = this->jacobian[0];
       for (unsigned int d = 0; d < dim; ++d)
-        this->gradients_quad[(d * nqp + q_point) * dim + d] =
-          (sym_grad.access_raw_entry(d) * JxW * this->jacobian[0][d][d]);
+        gradients[d * nqp_d + d] =
+          (sym_grad.access_raw_entry(d) * JxW * jac[d][d]);
       for (unsigned int e = 0, counter = dim; e < dim; ++e)
         for (unsigned int d = e + 1; d < dim; ++d, ++counter)
           {
             const VectorizedArrayType value =
               sym_grad.access_raw_entry(counter) * JxW;
-            this->gradients_quad[(e * nqp + q_point) * dim + d] =
-              value * this->jacobian[0][d][d];
-            this->gradients_quad[(d * nqp + q_point) * dim + e] =
-              value * this->jacobian[0][e][e];
+            gradients[e * nqp_d + d] = value * jac[d][d];
+            gradients[d * nqp_d + e] = value * jac[e][e];
           }
     }
   // general/affine cell type
@@ -6663,7 +6661,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
             VectorizedArrayType new_val = jac[0][d] * weighted[comp][0];
             for (unsigned int e = 1; e < dim; ++e)
               new_val += jac[e][d] * weighted[comp][e];
-            this->gradients_quad[(comp * nqp + q_point) * dim + d] = new_val;
+            gradients[comp * nqp_d + d] = new_val;
           }
     }
 }
