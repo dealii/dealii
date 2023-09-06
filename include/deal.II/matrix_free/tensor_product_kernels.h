@@ -1225,13 +1225,13 @@ namespace internal
     }
 
     /**
-     * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1d stripes, along the given @p direction of the tensor
-     * data in the input array. This function allows the @p in and @p out
-     * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
-     * perform the contraction in place where @p in and @p out point to the
-     * same address. For the case n_rows != n_columns, the output is in general
-     * not correct.
+     * This function applies the tensor product kernel with sum factorization,
+     * corresponding to a matrix-vector multiplication of 1d stripes, along
+     * the given @p direction of the tensor data in the input array. This
+     * function allows the @p in and @p out arrays to alias for the case
+     * n_rows == n_columns, i.e., it is safe to perform the contraction in
+     * place where @p in and @p out point to the same address. For the case
+     * `n_rows != n_columns`, the output is in general not correct.
      *
      * @tparam direction Direction that is evaluated
      * @tparam contract_over_rows If true, the tensor contraction sums
@@ -1242,18 +1242,29 @@ namespace internal
      * @tparam one_line If true, the kernel is only applied along a single 1d
      *                  stripe within a dim-dimensional tensor, not the full
      *                  n_rows^dim points as in the @p false case.
+     * @tparam quantity Specify whether values, gradients or Hessians should
+     *                  be interpolated, allowing specialized algorithms
+     *                  for some class template parameters of `variant` to
+     *                  find the right path.
+     * @tparam extra_stride This parameter enables to place the result of the
+     *                      tensor product evaluation in the output array (if
+     *                      `contract_over_rows == true`) or input array (if
+     *                      `contract_over_rows == false`), which is used to
+     *                      group all components of a gradient adjacent in
+     *                      memory. If the stride is one, the data will form a
+     *                      contiguous range in memory.
      *
      * @param shape_data Transformation matrix with @p n_rows rows and
      *                   @p n_columns columns, stored in row-major format
      * @param in Pointer to the start of the input data vector
      * @param out Pointer to the start of the output data vector
      */
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              bool one_line     = false,
-              EvaluatorQuantity = EvaluatorQuantity::value,
-              int extra_stride  = 1>
+    template <int               direction,
+              bool              contract_over_rows,
+              bool              add,
+              bool              one_line     = false,
+              EvaluatorQuantity quantity     = EvaluatorQuantity::value,
+              int               extra_stride = 1>
     static void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
           const Number                   *in,
@@ -1586,12 +1597,12 @@ namespace internal
 
 
   /**
-   * This function applies the tensor product operation to produce face
-   * values from cell values. The algorithm involved here can be interpreted
-   * the first sweep in sum factorization, reducing the dimensionality of
-   * the data set from dim-dimensional cell values to (dim-1)-dimensional
-   * face values. This step is always done before we evaluate within the
-   * face, as it reduces the dimensionality.
+   * This function applies the tensor product operation to produce face values
+   * from cell values. The algorithm involved here can be interpreted as the
+   * first sweep in sum factorization, reducing the dimensionality of the data
+   * set from dim-dimensional cell values to (dim-1)-dimensional face
+   * values. This step is always done before we evaluate within the face, as
+   * it reduces the length of the loops for the successive steps.
    *
    * @tparam n_rows_template The number of entries within the interpolation,
    *             typically equal to the polynomial degree plus one, if known
@@ -1612,13 +1623,13 @@ namespace internal
    *             the computed values overwrite the content in the output.
    * @tparam max_derivative Sets the number of derivatives that should be
    *             computed. 0 means only values, 1 means values and first
-   *             derivatives, 2 second derivates. Note that all the
+   *             derivatives, 2 up to second derivates. Note that all the
    *             derivatives access the data in @p shape_values passed to
    *             the constructor of the class.
    *
-   * @param shape_values address of the interpolation matrix
+   * @param shape_values Address of the interpolation matrix.
    * @param n_blocks Number of interpolation layer used along the two other
-   *             dimensions tangential to the interpolation direction
+   *             dimensions tangential to the interpolation direction.
    * @param steps Increments in the input array from one step to the next,
    *             varied in conjunction with the @p stride variable.
    * @param input Address of the input data vector.
@@ -1696,6 +1707,11 @@ namespace internal
 
 
 
+  /**
+   * This function performs the opposite operation to the interpolate_to_face
+   * function, done as the last step in sum factorization to embed face values
+   * and gradients back to values on all degrees of freedom of the cell.
+   */
   template <int  n_rows_template,
             int  stride_template,
             bool contract_onto_face,

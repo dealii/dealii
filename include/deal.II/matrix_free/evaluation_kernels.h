@@ -88,13 +88,13 @@ namespace internal
 
 
   /**
-   * This struct performs the evaluation of function values, gradients and
-   * Hessians for tensor-product finite elements. The operation is used for
-   * both the symmetric and non-symmetric case, which use different apply
-   * functions 'values', 'gradients' in the individual coordinate
-   * directions. The apply functions for values are provided through one of
-   * the template classes EvaluatorTensorProduct which in turn are selected
-   * from the MatrixFreeFunctions::ElementType template argument.
+   * This struct performs the evaluation of function values and gradients for
+   * tensor-product finite elements. The operation is used for both the
+   * symmetric and non-symmetric case, which use different apply functions
+   * 'values', 'gradients' in the individual coordinate directions. The apply
+   * functions for values are provided through one of the template classes
+   * EvaluatorTensorProduct which in turn are selected from the
+   * MatrixFreeFunctions::ElementType template argument.
    *
    * There are two specialized implementation classes
    * FEEvaluationImplCollocation (for Gauss-Lobatto elements where the nodal
@@ -102,6 +102,11 @@ namespace internal
    * identity) and FEEvaluationImplTransformToCollocation (which can be
    * transformed to a collocation space and can then use the identity in these
    * spaces), which both allow for shorter code.
+   *
+   * @note Hessians of the solution are handled in the general
+   * FEEvaluationImplSelector struct below, because they can be implemented
+   * with the only two code paths for all supported cases, including the
+   * specialized cases below.
    */
   template <MatrixFreeFunctions::ElementType type,
             int                              dim,
@@ -792,13 +797,13 @@ namespace internal
      * @param values_out   The array of size basis_size_2^dim where the results
      *                     of the transformation are stored. It may alias with
      *                     the values_in array.
-     * @param basis_size_1_variable In case the template argument basis_size_1
-     * is zero, the size of the first basis can alternatively be passed in as a
-     * run time argument. The template argument takes precedence in case it is
-     * nonzero for efficiency reasons.
-     * @param basis_size_2_variable In case the template argument basis_size_1
-     * is zero, the size of the second basis can alternatively be passed in as a
-     * run time argument.
+     * @param basis_size_1_variable In case the template argument
+     * @p basis_size_1 is zero, the size of the first basis can alternatively
+     * be passed in as a run time argument. The template argument takes
+     * precedence in case it is nonzero for efficiency reasons.
+     * @param basis_size_2_variable In case the template argument
+     * @p basis_size_1 is zero, the size of the second basis can alternatively
+     * be passed in as a run time argument.
      */
     template <typename Number, typename Number2>
 #ifndef DEBUG
@@ -824,11 +829,10 @@ namespace internal
       // basis_size_1==basis_size_2. The latter optimization increases
       // optimization possibilities for the compiler but does only work for
       // aliased pointers if the sizes are equal.
-      constexpr int next_dim =
-        (dim > 2 ||
-         ((basis_size_1 == 0 || basis_size_2 > basis_size_1) && dim > 1)) ?
-          dim - 1 :
-          dim;
+      constexpr int next_dim = (dim == 1 || (dim == 2 && basis_size_1 > 0 &&
+                                             basis_size_1 == basis_size_2)) ?
+                                 dim :
+                                 dim - 1;
 
       EvaluatorTensorProduct<variant,
                              dim,
@@ -914,13 +918,13 @@ namespace internal
      * @param values_out   The array of size basis_size_1^dim where the results
      *                     of the transformation are stored. It may alias with
      *                     the @p values_in array.
-     * @param basis_size_1_variable In case the template argument basis_size_1
-     * is zero, the size of the first basis can alternatively be passed in as a
-     * run time argument. The template argument takes precedence in case it is
-     * nonzero for efficiency reasons.
-     * @param basis_size_2_variable In case the template argument basis_size_1
-     * is zero, the size of the second basis can alternatively be passed in as a
-     * run time argument.
+     * @param basis_size_1_variable In case the template argument
+     * @p basis_size_1 is zero, the size of the first basis can alternatively
+     * be passed in as a run time argument. The template argument takes
+     * precedence in case it is nonzero for efficiency reasons.
+     * @param basis_size_2_variable In case the template argument
+     * @p basis_size_1 is zero, the size of the second basis can alternatively
+     * be passed in as a run time argument.
      */
     template <typename Number, typename Number2>
 #ifndef DEBUG
@@ -1622,12 +1626,12 @@ namespace internal
 
 
   /**
-   * This struct performs the evaluation of function values, gradients and
-   * Hessians for tensor-product finite elements. This a specialization for
-   * elements where the nodal points coincide with the quadrature points like
-   * FE_Q shape functions on Gauss-Lobatto elements integrated with
-   * Gauss-Lobatto quadrature. The assumption of this class is that the shape
-   * 'values' operation is identity, which allows us to write shorter code.
+   * This struct performs the evaluation of function values and gradients for
+   * tensor-product finite elements. This is a specialization for elements
+   * where the nodal points coincide with the quadrature points like FE_Q
+   * shape functions on Gauss-Lobatto elements integrated with Gauss-Lobatto
+   * quadrature. The assumption of this class is that the shape 'values'
+   * operation is identity, which allows us to write shorter code.
    *
    * In literature, this form of evaluation is often called spectral
    * evaluation, spectral collocation or simply collocation, meaning the same
@@ -1705,14 +1709,14 @@ namespace internal
 
 
   /**
-   * This struct performs the evaluation of function values, gradients and
-   * Hessians for tensor-product finite elements. This a specialization for
-   * symmetric basis functions about the mid point 0.5 of the unit interval
-   * with the same number of quadrature points as degrees of freedom. In that
-   * case, we can first transform the basis to one that has the nodal points
-   * in the quadrature points (i.e., the collocation space) and then perform
-   * the evaluation of the first and second derivatives in this transformed
-   * space, using the identity operation for the shape values.
+   * This struct performs the evaluation of function values and gradients for
+   * tensor-product finite elements. This is a specialization for symmetric
+   * basis functions about the mid point 0.5 of the unit interval with the
+   * same number of quadrature points as degrees of freedom. In that case, we
+   * can first transform the basis to one that has the nodal points in the
+   * quadrature points (i.e., the collocation space) and then perform the
+   * evaluation of the first and second derivatives in this transformed space,
+   * using the identity operation for the shape values.
    */
   template <int dim, int fe_degree, int n_q_points_1d, typename Number>
   struct FEEvaluationImplTransformToCollocation
