@@ -101,8 +101,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_index(
   const unsigned int,
   std::array<unsigned int, 0> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 }
 
 
@@ -130,8 +129,7 @@ void
 TensorProductPolynomials<0, Polynomials::Polynomial<double>>::output_indices(
   std::ostream &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 }
 
 
@@ -156,8 +154,7 @@ void
 TensorProductPolynomials<0, Polynomials::Polynomial<double>>::set_numbering(
   const std::vector<unsigned int> &)
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 }
 
 
@@ -188,8 +185,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_value(
   const unsigned int,
   const Point<0> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 
   return {};
 }
@@ -239,8 +235,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::compute_grad(
   const unsigned int,
   const Point<0> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 
   return {};
 }
@@ -606,8 +601,7 @@ TensorProductPolynomials<0, Polynomials::Polynomial<double>>::evaluate(
   std::vector<Tensor<3, 0>> &,
   std::vector<Tensor<4, 0>> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 }
 
 
@@ -698,8 +692,7 @@ void
 AnisotropicPolynomials<0>::compute_index(const unsigned int,
                                          std::array<unsigned int, 0> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 }
 
 
@@ -726,8 +719,7 @@ double
 AnisotropicPolynomials<0>::compute_value(const unsigned int,
                                          const Point<0> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 
   return {};
 }
@@ -768,8 +760,7 @@ Tensor<1, 0>
 AnisotropicPolynomials<0>::compute_grad(const unsigned int,
                                         const Point<0> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 
   return {};
 }
@@ -817,8 +808,7 @@ Tensor<2, 0>
 AnisotropicPolynomials<0>::compute_grad_grad(const unsigned int,
                                              const Point<0> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 
   return {};
 }
@@ -924,8 +914,7 @@ AnisotropicPolynomials<0>::evaluate(const Point<0> &,
                                     std::vector<Tensor<3, 0>> &,
                                     std::vector<Tensor<4, 0>> &) const
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 }
 
 
@@ -948,8 +937,7 @@ unsigned int
 AnisotropicPolynomials<0>::get_n_tensor_pols(
   const std::vector<std::vector<Polynomials::Polynomial<double>>> &)
 {
-  constexpr int dim = 0;
-  AssertThrow(dim > 0, ExcNotImplemented());
+  AssertThrow(false, ExcNotImplemented("This function does not work in 0-d!"));
 
   return {};
 }
