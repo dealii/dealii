@@ -130,9 +130,9 @@ test()
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
-  const unsigned int               frequency   = 2;
-  const double                     deformation = 0.05;
-  static DeformedCubeManifold<dim> manifold(0.0, 1.0, deformation, frequency);
+  const unsigned int        frequency   = 2;
+  const double              deformation = 0.05;
+  DeformedCubeManifold<dim> manifold(0.0, 1.0, deformation, frequency);
   tria.set_all_manifold_ids(1);
   tria.set_manifold(1, manifold);
 
