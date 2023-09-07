@@ -114,8 +114,8 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
 
   const MPI_Comm mpi_communicator   = triangulation.get_communicator();
   const IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
-  IndexSet       locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);
