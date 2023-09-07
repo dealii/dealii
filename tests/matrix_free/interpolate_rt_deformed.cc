@@ -17,10 +17,10 @@
 
 // this function tests the correctness of the implementation of matrix-free
 // operations in getting the function values, the function gradients, and the
-// function Laplacians on a cartesian mesh (hyper cube) with deformed
-// elements. This tests whether non-affine geometries with more complicated
-// terms for the Jacobian are treated correctly. The test case is without any
-// constraints
+// function Laplacians on a structured mesh (hyper cube) with deformed
+// elements inside of the domain. This tests whether non-affine geometries
+// with more complicated terms for the Jacobian are treated correctly. The
+// test case is without any constraints.
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
