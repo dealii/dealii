@@ -270,6 +270,13 @@ namespace VectorTools
    * at some points on the boundary is an artifact of the way it is created,
    * it is not constrained to be zero at these points.
    *
+   *
+   * <h4>Further reading</h4>
+   *
+   * A description of some of the techniques used in this function,
+   * along with a discussion of difficulties encountered with this
+   * kind of boundary conditions can be found in @cite Engelman1982 .
+   *
    * @ingroup constraints
    *
    * @see
@@ -390,6 +397,13 @@ namespace VectorTools
    * components that are left unconstrained by
    * VectorTools::compute_no_normal_flux_constraints(), and leaves the one
    * component unconstrained that is constrained by that function.
+   *
+   *
+   * <h4>Further reading</h4>
+   *
+   * A description of some of the techniques used in this function,
+   * along with a discussion of difficulties encountered with this
+   * kind of boundary conditions can be found in @cite Engelman1982 .
    *
    * @ingroup constraints
    *
