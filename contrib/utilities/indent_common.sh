@@ -43,7 +43,7 @@ checks() {
   export PATH="${CLANG_FORMAT_PATH}:${PATH}"
 
   if ! [ -x "$(command -v "${DEAL_II_CLANG_FORMAT}")" ]; then
-    echo "***   No clang-format program found."
+    echo "***   No clang-format program found, or found with the wrong version."
     echo "***"
     echo "***   You can run the './contrib/utilities/download_clang_format'"
     echo "***   script, or the './contrib/utilities/compile_clang_format' script "
