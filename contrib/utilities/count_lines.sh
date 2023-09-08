@@ -29,7 +29,8 @@
 # commit, averaged over the lifetime of the deal.II project. At the time
 # when this script was written, the repository had about 41,000 commits,
 # so counting lines for every 20th commit takes approximately 400 seconds,
-# or 6m30s.
+# or 6m30s. This can be very substantially accelerated by cloning the
+# repository in a directory such as /tmp.
 #
 # NOTE: The script has existed in this repository only for a finite time.
 #       So, if you go back in history, as this script does, it will
@@ -37,6 +38,9 @@
 #       in its current place -- copy it to the top level of the working
 #       copy you are working in, where it will be an untracked file that
 #       git leaves alone as it cycles through repository commits.
+#
+#       You will then want to run the script using a command such as
+#         ./count_lines.sh | tee ../line-count.dat
 #
 # NOTE: Separately, since the script requires git to check out many
 #       different versions, all of which have files that may not exist
@@ -56,7 +60,7 @@
 #
 #  set xdata time
 #  set timefmt "%Y-%m-%d"
-#  set xrange ["1997-11-01":"2021-12-31"]
+#  set xrange ["1997-11-01":"2023-12-31"]
 #  set yrange [0:1000000]
 #  set format x "%Y"
 #  set style data lines
@@ -64,6 +68,12 @@
 #  
 #  unset arrow
 #  unset label
+#  
+#  set arrow from "2023-07-07",500000 to "2023-07-07",800000 head
+#  set label "9.5" at "2023-07-07",475000
+#  
+#  set arrow from "2022-06-24",450000 to "2022-06-24",750000 head
+#  set label "9.4" at "2022-06-24",425000
 #  
 #  set arrow from "2021-06-18",400000 to "2021-06-18",700000 head
 #  set label "9.3" at "2021-06-18",375000
@@ -89,7 +99,7 @@
 #      
 #  plot "< cat line-count.dat | sort" using 1:2 title "Lines of code in source files", \
 #       "" using 1:3 title "Lines of code in tests", \
-#       "< echo 2018-01-01 700000 ; echo 2022-01-01 900000" using 1:2 title "50,000 lines per year"
+#       "< echo 2018-01-01 700000 ; echo 2023-12-31 1000000" using 1:2 title "50,000 lines per year"
 #
 #
 
