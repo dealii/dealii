@@ -2590,7 +2590,7 @@ AffineConstraints<number>::distribute(VectorType &vec) const
   // the last else is for the simple case (sequential vector)
   const IndexSet vec_owned_elements = vec.locally_owned_elements();
 
-  if (dealii::is_serial_vector<VectorType>::value == false)
+  if constexpr (dealii::is_serial_vector<VectorType>::value == false)
     {
       // Check that the set of indices we will import is a superset of
       // the locally-owned ones. This *should* be the case if, as one
@@ -2606,12 +2606,46 @@ AffineConstraints<number>::distribute(VectorType &vec) const
 #endif
 
       VectorType ghosted_vector;
-      internal::import_vector_with_ghost_elements(
-        vec,
-        vec_owned_elements,
-        needed_elements_for_distribute,
-        ghosted_vector,
-        std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+
+      // It is possible that the user is using a parallel vector type,
+      // but is running a non-parallel program (for example, step-31
+      // does this). In this case, it is (perhaps?) not a bug to not
+      // set an IndexSet for the local_lines and the
+      // locally_owned_lines -- they are simply both empty sets in
+      // that case. If that is so, we could just assign
+      // 'ghosted_vector=vec;'. But this is dangerous. Not having set
+      // index sets could also have been a bug, and we would get
+      // downstream errors about accessing elements that are not
+      // locally available. Rather, if no index sets were provided,
+      // simply import the *entire* vector.
+      if (local_lines != IndexSet())
+        {
+          Assert(needed_elements_for_distribute != IndexSet(),
+                 ExcInternalError());
+          internal::import_vector_with_ghost_elements(
+            vec,
+            vec_owned_elements,
+            needed_elements_for_distribute,
+            ghosted_vector,
+            std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+        }
+      else
+        {
+          Assert(needed_elements_for_distribute == IndexSet(),
+                 ExcInternalError());
+
+          // TODO: We should really consider it a bug if this parallel
+          // truly is distributed (and not just a parallel vector type
+          // used for a sequential program). Assert that we are really
+          // working in a sequential context.
+
+          internal::import_vector_with_ghost_elements(
+            vec,
+            vec_owned_elements,
+            complete_index_set(vec_owned_elements.size()),
+            ghosted_vector,
+            std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+        }
 
       for (const ConstraintLine &line : lines)
         if (vec_owned_elements.is_element(line.index))
