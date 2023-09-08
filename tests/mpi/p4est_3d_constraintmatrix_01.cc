@@ -71,8 +71,7 @@ test()
   static const FE_Q<dim> fe(1);
   dofh.distribute_dofs(fe);
 
-  IndexSet dof_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, dof_set);
+  const IndexSet dof_set = DoFTools::extract_locally_relevant_dofs(dofh);
 
   AffineConstraints<double> cm;
   DoFTools::make_hanging_node_constraints(dofh, cm);

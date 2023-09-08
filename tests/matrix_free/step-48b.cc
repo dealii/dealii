@@ -261,7 +261,8 @@ namespace Step48
             << std::endl;
 
 
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
     constraints.close();
 
     QGaussLobatto<1>                         quadrature(fe_degree + 1);

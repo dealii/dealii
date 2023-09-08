@@ -502,8 +502,7 @@ LaplaceProblem<dim>::setup_dofs()
       else
         dof_h.distribute_dofs(*fes[level + 1 - coarse_triangulations.size()]);
 
-      IndexSet relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof_h, relevant_dofs);
+      IndexSet relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_h);
       AffineConstraints<float> &constraints = level_constraints[level];
       constraints.reinit(relevant_dofs);
       DoFTools::make_hanging_node_constraints(dof_h, constraints);
@@ -517,7 +516,7 @@ LaplaceProblem<dim>::setup_dofs()
                                                 additional_data);
 
       // now create the final constraints object
-      DoFTools::extract_locally_relevant_dofs(dof_h, relevant_dofs);
+      relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_h);
       constraints.clear();
       constraints.reinit(relevant_dofs);
       DoFTools::make_hanging_node_constraints(dof_h, constraints);

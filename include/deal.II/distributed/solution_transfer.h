@@ -89,9 +89,9 @@ namespace parallel
      * process):
      * @code
      * // Create initial indexsets pertaining to the grid before refinement
-     * const IndexSet locally_owned_dofs    = dof_handler.locally_owned_dofs();
-     * const IndexSet locally_relevant_dofs =
-     * DoFTools::extract_locally_relevant_dofs(dof_handler);
+     * const IndexSet &locally_owned_dofs    = dof_handler.locally_owned_dofs();
+     * const IndexSet  locally_relevant_dofs =
+     *   DoFTools::extract_locally_relevant_dofs(dof_handler);
      *
      * // The solution vector only knows about locally owned DoFs
      * TrilinosWrappers::MPI::Vector solution;

@@ -85,8 +85,7 @@ test()
 
   // Integrate the difference in the first component, if everything went
   // well, this should be zero.
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
+  const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
   x_rel = x;
   Vector<double>               error(tr.n_active_cells());

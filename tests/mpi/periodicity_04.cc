@@ -185,9 +185,9 @@ check(const unsigned int orientation, bool reverse)
 
   AffineConstraints<double> constraints;
 
-  IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   constraints.reinit(locally_relevant_dofs);
   {
@@ -209,8 +209,8 @@ check(const unsigned int orientation, bool reverse)
   const std::vector<IndexSet> locally_owned_dofs_vector =
     Utilities::MPI::all_gather(MPI_COMM_WORLD,
                                dof_handler.locally_owned_dofs());
-  IndexSet locally_active_dofs;
-  DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+  const IndexSet locally_active_dofs =
+    DoFTools::extract_locally_active_dofs(dof_handler);
   AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs_vector,
                                                     locally_active_dofs,
                                                     MPI_COMM_WORLD,

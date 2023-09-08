@@ -53,12 +53,11 @@ run(const dealii::Triangulation<dim> &triangulation)
   const dealii::FESystem<dim> fe_system_coarse(fe_q_coarse, dim);
   dof_handler_coarse.distribute_dofs(fe_system_coarse);
 
-  Vector           solution_coarse;
-  dealii::IndexSet locally_owned_dofs_coarse =
+  Vector                 solution_coarse;
+  const dealii::IndexSet locally_owned_dofs_coarse =
     dof_handler_coarse.locally_owned_dofs();
-  dealii::IndexSet ghost_dofs_coarse;
-  dealii::DoFTools::extract_locally_relevant_dofs(dof_handler_coarse,
-                                                  ghost_dofs_coarse);
+  dealii::IndexSet ghost_dofs_coarse =
+    dealii::DoFTools::extract_locally_relevant_dofs(dof_handler_coarse);
   dealii::IndexSet locally_relevant_dofs_coarse = ghost_dofs_coarse;
   ghost_dofs_coarse.subtract_set(locally_owned_dofs_coarse);
 
@@ -91,12 +90,11 @@ run(const dealii::Triangulation<dim> &triangulation)
   const dealii::FESystem<dim> fe_system_fine(fe_q_fine, dim);
   dof_handler_fine.distribute_dofs(fe_system_fine);
 
-  Vector           solution_fine;
-  dealii::IndexSet locally_owned_dofs_fine =
+  Vector                 solution_fine;
+  const dealii::IndexSet locally_owned_dofs_fine =
     dof_handler_fine.locally_owned_dofs();
-  dealii::IndexSet ghost_dofs_fine;
-  dealii::DoFTools::extract_locally_relevant_dofs(dof_handler_fine,
-                                                  ghost_dofs_fine);
+  dealii::IndexSet ghost_dofs_fine =
+    dealii::DoFTools::extract_locally_relevant_dofs(dof_handler_fine);
   dealii::IndexSet locally_relevant_dofs_fine = ghost_dofs_fine;
   ghost_dofs_fine.subtract_set(locally_owned_dofs_fine);
 

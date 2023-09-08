@@ -369,8 +369,8 @@ LaplaceProblem<dim>::setup_dofs()
 
   debug_output << "Number of DoFs: " << dof_handler.n_dofs() << std::endl;
 
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   constraints.clear();
   constraints.reinit(locally_relevant_dofs);
@@ -391,10 +391,8 @@ LaplaceProblem<dim>::setup_dofs()
 
   for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
     {
-      IndexSet relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                    level,
-                                                    relevant_dofs);
+      const IndexSet relevant_dofs =
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
       AffineConstraints<double> level_constraints;
       level_constraints.reinit(relevant_dofs);
       level_constraints.add_lines(
@@ -442,10 +440,8 @@ LaplaceProblem<dim>::setup_matrix_free()
 
   for (unsigned int level = 0; level < nlevels; ++level)
     {
-      IndexSet relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                    level,
-                                                    relevant_dofs);
+      const IndexSet relevant_dofs =
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
       AffineConstraints<double> level_constraints;
       level_constraints.reinit(relevant_dofs);
       level_constraints.add_lines(

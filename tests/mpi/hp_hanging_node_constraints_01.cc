@@ -74,8 +74,8 @@ test()
   dh.distribute_dofs(fes);
 
   // make constraints
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dh);
 
   AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);

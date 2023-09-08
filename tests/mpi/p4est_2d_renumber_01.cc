@@ -61,8 +61,7 @@ test()
     dofh.distribute_dofs(fe);
 
     {
-      IndexSet dof_set;
-      DoFTools::extract_locally_active_dofs(dofh, dof_set);
+      const IndexSet dof_set = DoFTools::extract_locally_active_dofs(dofh);
       if (myid == 0)
         dof_set.print(deallog);
     }
@@ -76,8 +75,7 @@ test()
     // correct. This was a bug at some point.
     Assert(n_dofs == dofh.n_dofs(), ExcInternalError());
     {
-      IndexSet dof_set;
-      DoFTools::extract_locally_active_dofs(dofh, dof_set);
+      const IndexSet dof_set = DoFTools::extract_locally_active_dofs(dofh);
 
       if (myid == 0)
         dof_set.print(deallog);

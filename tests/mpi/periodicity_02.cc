@@ -332,9 +332,8 @@ namespace Step22
       owned_partitioning.push_back(locally_owned_dofs.get_view(n_u, n_u + n_p));
 
       relevant_partitioning.clear();
-      IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                              locally_relevant_dofs);
+      const IndexSet locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
       relevant_partitioning.push_back(locally_relevant_dofs.get_view(0, n_u));
       relevant_partitioning.push_back(
         locally_relevant_dofs.get_view(n_u, n_u + n_p));
@@ -394,8 +393,8 @@ namespace Step22
     const std::vector<IndexSet> &locally_owned_dofs =
       Utilities::MPI::all_gather(MPI_COMM_WORLD,
                                  dof_handler.locally_owned_dofs());
-    IndexSet locally_active_dofs;
-    DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+    const IndexSet locally_active_dofs =
+      DoFTools::extract_locally_active_dofs(dof_handler);
     AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,
                                                       locally_active_dofs,
                                                       mpi_communicator,

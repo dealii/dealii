@@ -115,7 +115,7 @@ namespace Step39
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs();
 
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_set);
+    locally_relevant_set = DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     DynamicSparsityPattern c_sparsity(dof_handler.n_dofs(),
                                       dof_handler.n_dofs());

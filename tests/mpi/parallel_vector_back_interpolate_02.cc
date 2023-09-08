@@ -64,9 +64,9 @@ test()
   DoFRenumbering::component_wise(dof1);
   DoFRenumbering::component_wise(dof2);
 
-  IndexSet locally_owned_dofs1 = dof1.locally_owned_dofs();
-  IndexSet locally_relevant_dofs1;
-  DoFTools::extract_locally_relevant_dofs(dof1, locally_relevant_dofs1);
+  const IndexSet locally_owned_dofs1 = dof1.locally_owned_dofs();
+  const IndexSet locally_relevant_dofs1 =
+    DoFTools::extract_locally_relevant_dofs(dof1);
 
   std::vector<IndexSet> owned_partitioning1;
   std::vector<IndexSet> relevant_partitioning1;

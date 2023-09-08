@@ -463,7 +463,7 @@ namespace Step39
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs();
 
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_set);
+    locally_relevant_set = DoFTools::extract_locally_relevant_dofs(dof_handler);
     solution.reinit(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     right_hand_side.reinit(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 

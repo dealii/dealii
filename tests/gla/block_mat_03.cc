@@ -82,8 +82,8 @@ test()
   std::vector<IndexSet> locally_relevant_partitioning;
   std::vector<IndexSet> locally_owned_partitioning;
 
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
   locally_relevant_partitioning.push_back(
     locally_relevant_dofs.get_view(0, dofs_per_block[0]));
   locally_relevant_partitioning.push_back(
@@ -187,8 +187,8 @@ test_alt()
   std::vector<IndexSet> locally_relevant_partitioning;
   std::vector<IndexSet> locally_owned_partitioning;
 
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
   locally_relevant_partitioning.push_back(
     locally_relevant_dofs.get_view(0, dofs_per_block[0]));
   locally_relevant_partitioning.push_back(

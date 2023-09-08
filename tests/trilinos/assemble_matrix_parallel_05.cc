@@ -285,8 +285,8 @@ LaplaceProblem<dim>::setup_system()
     reference_rhs.reinit(locally_owned, MPI_COMM_WORLD);
   }
   {
-    IndexSet relevant_set;
-    DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_set);
+    const IndexSet relevant_set =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
     DynamicSparsityPattern csp(dof_handler.n_dofs(),
                                dof_handler.n_dofs(),
                                relevant_set);

@@ -81,9 +81,8 @@ test()
 
   // ----- prepare solution -----
   dh.distribute_dofs(fe_collection);
-  IndexSet locally_owned_dofs = dh.locally_owned_dofs();
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+  IndexSet locally_owned_dofs    = dh.locally_owned_dofs();
+  IndexSet locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dh);
 
   TrilinosWrappers::MPI::Vector solution;
   solution.reinit(locally_owned_dofs, MPI_COMM_WORLD);
@@ -106,8 +105,8 @@ test()
   tria.execute_coarsening_and_refinement();
 
   dh.distribute_dofs(fe_collection);
-  locally_owned_dofs = dh.locally_owned_dofs();
-  DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+  locally_owned_dofs    = dh.locally_owned_dofs();
+  locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dh);
 
   TrilinosWrappers::MPI::Vector new_solution;
   new_solution.reinit(locally_owned_dofs, MPI_COMM_WORLD);

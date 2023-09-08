@@ -163,8 +163,8 @@ test()
   hanging_node_constraints.distribute(interpolated);
 
   // extract a vector that has ghost elements
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_set);
+  const IndexSet relevant_set =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
   x_rel = interpolated;
 

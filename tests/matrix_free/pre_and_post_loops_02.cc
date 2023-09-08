@@ -141,8 +141,7 @@ test()
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
   AffineConstraints<double> constraints;
-  IndexSet                  relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof, relevant_dofs);
+  const IndexSet relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof);
   constraints.reinit(relevant_dofs);
   VectorTools::interpolate_boundary_values(dof,
                                            0,

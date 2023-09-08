@@ -66,8 +66,7 @@ test()
     deallog << "Total dofs=" << dofh.n_dofs() << std::endl;
 
   {
-    IndexSet dof_set;
-    DoFTools::extract_locally_active_dofs(dofh, dof_set);
+    const IndexSet dof_set = DoFTools::extract_locally_active_dofs(dofh);
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       dof_set.print(deallog);
   }
@@ -77,8 +76,7 @@ test()
 
   DoFRenumbering::component_wise(dofh);
   {
-    IndexSet dof_set;
-    DoFTools::extract_locally_active_dofs(dofh, dof_set);
+    const IndexSet dof_set = DoFTools::extract_locally_active_dofs(dofh);
 
     const std::vector<IndexSet> owned_dofs =
       Utilities::MPI::all_gather(MPI_COMM_WORLD, dofh.locally_owned_dofs());

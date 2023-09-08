@@ -72,8 +72,8 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  IndexSet locally_relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, locally_relevant_set);
+  const IndexSet locally_relevant_set =
+    DoFTools::extract_locally_relevant_dofs(dofh);
 
   // create a vector representing a function that is independent of the number
   // of processors involved

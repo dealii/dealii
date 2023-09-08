@@ -35,11 +35,11 @@ initialize_dof_vector(LinearAlgebra::distributed::Vector<Number> &vec,
 {
   IndexSet locally_relevant_dofs;
   if (level == numbers::invalid_unsigned_int)
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
   else
-    DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                  level,
-                                                  locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
 
 
   const parallel::TriangulationBase<MeshType::dimension> *dist_tria =

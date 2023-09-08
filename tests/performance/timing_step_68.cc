@@ -263,8 +263,8 @@ namespace Step68
   ParticleTracking<dim>::setup_background_dofs()
   {
     fluid_dh.distribute_dofs(fluid_fe);
-    const IndexSet locally_owned_dofs = fluid_dh.locally_owned_dofs();
-    const IndexSet locally_relevant_dofs =
+    const IndexSet &locally_owned_dofs = fluid_dh.locally_owned_dofs();
+    const IndexSet  locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(fluid_dh);
 
     velocity_field.reinit(locally_owned_dofs,

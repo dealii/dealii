@@ -462,7 +462,7 @@ namespace Step39
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs();
 
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_set);
+    locally_relevant_set = DoFTools::extract_locally_relevant_dofs(dof_handler);
     solution.reinit(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     right_hand_side.reinit(dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
@@ -665,10 +665,8 @@ namespace Step39
         smoother_data[l].relaxation = 0.7;
         smoother_data[l].inversion  = PreconditionBlockBase<double>::svd;
         TrilinosWrappers::MPI::Vector *ghost = &(temp_vectors[l]);
-        IndexSet                       relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      l,
-                                                      relevant_dofs);
+        const IndexSet                 relevant_dofs =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, l);
         ghost->reinit(dof_handler.locally_owned_mg_dofs(l),
                       relevant_dofs,
                       MPI_COMM_WORLD);

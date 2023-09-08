@@ -55,12 +55,10 @@ test()
   dofh.distribute_dofs(fe);
   dofh.distribute_mg_dofs();
 
-  IndexSet locally_level_active;
   for (unsigned int level = 0; level < tr.n_levels(); ++level)
     {
-      DoFTools::extract_locally_active_level_dofs(dofh,
-                                                  locally_level_active,
-                                                  level);
+      const IndexSet locally_level_active =
+        DoFTools::extract_locally_active_level_dofs(dofh, level);
 
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         {

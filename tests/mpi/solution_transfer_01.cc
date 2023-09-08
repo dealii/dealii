@@ -66,10 +66,8 @@ test()
 
   dh.distribute_dofs(fe);
 
-  IndexSet locally_owned_dofs = dh.locally_owned_dofs();
-  IndexSet locally_relevant_dofs;
-
-  DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+  IndexSet locally_owned_dofs    = dh.locally_owned_dofs();
+  IndexSet locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dh);
 
   PETScWrappers::MPI::Vector solution(locally_owned_dofs,
                                       locally_relevant_dofs,
@@ -87,8 +85,8 @@ test()
   tria.execute_coarsening_and_refinement();
 
   dh.distribute_dofs(fe);
-  locally_owned_dofs = dh.locally_owned_dofs();
-  DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+  locally_owned_dofs    = dh.locally_owned_dofs();
+  locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dh);
 
   PETScWrappers::MPI::Vector tmp(locally_owned_dofs, MPI_COMM_WORLD);
 

@@ -95,8 +95,8 @@ test(const unsigned int flag)
   FE_Q<dim> fe(2);
   dh.distribute_dofs(fe);
 
-  IndexSet locally_relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_set);
+  const IndexSet locally_relevant_set =
+    DoFTools::extract_locally_relevant_dofs(dh);
 
   AffineConstraints<double> cm;
   cm.reinit(locally_relevant_set);

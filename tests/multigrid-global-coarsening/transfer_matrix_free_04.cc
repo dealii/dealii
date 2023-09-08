@@ -87,10 +87,8 @@ check(const unsigned int fe_degree)
           LinearAlgebra::distributed::Vector<Number> v1, v2;
           LinearAlgebra::distributed::Vector<double> v1_cpy, v2_cpy, v3;
           v1.reinit(mgdof.locally_owned_mg_dofs(level - 1), MPI_COMM_WORLD);
-          IndexSet relevant_set;
-          DoFTools::extract_locally_relevant_level_dofs(mgdof,
-                                                        level,
-                                                        relevant_set);
+          const IndexSet relevant_set =
+            DoFTools::extract_locally_relevant_level_dofs(mgdof, level);
           v2.reinit(mgdof.locally_owned_mg_dofs(level),
                     relevant_set,
                     MPI_COMM_WORLD);

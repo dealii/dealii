@@ -241,7 +241,7 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
 
   std::vector<IndexSet> locally_relevant_dofs(dof.size());
   for (unsigned int i = 0; i < dof.size(); ++i)
-    DoFTools::extract_locally_relevant_dofs(*dof[i], locally_relevant_dofs[i]);
+    locally_relevant_dofs[i] = DoFTools::extract_locally_relevant_dofs(*dof[i]);
 
   // Dirichlet BC
   Functions::ZeroFunction<dim>                        zero_function;
@@ -349,10 +349,8 @@ do_test(const std::vector<const DoFHandler<dim> *> &dof)
         dof.size());
       for (unsigned int i = 0; i < dof.size(); ++i)
         {
-          IndexSet relevant_dofs;
-          DoFTools::extract_locally_relevant_level_dofs(*dof[i],
-                                                        level,
-                                                        relevant_dofs);
+          const IndexSet relevant_dofs =
+            DoFTools::extract_locally_relevant_level_dofs(*dof[i], level);
           level_constraints[i].reinit(relevant_dofs);
           level_constraints[i].add_lines(
             mg_constrained_dofs[i].get_boundary_indices(level));

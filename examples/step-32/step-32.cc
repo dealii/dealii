@@ -3195,9 +3195,8 @@ namespace Step32
 
     joint_solution.compress(VectorOperation::insert);
 
-    IndexSet locally_relevant_joint_dofs(joint_dof_handler.n_dofs());
-    DoFTools::extract_locally_relevant_dofs(joint_dof_handler,
-                                            locally_relevant_joint_dofs);
+    const IndexSet locally_relevant_joint_dofs =
+      DoFTools::extract_locally_relevant_dofs(joint_dof_handler);
     TrilinosWrappers::MPI::Vector locally_relevant_joint_solution;
     locally_relevant_joint_solution.reinit(locally_relevant_joint_dofs,
                                            MPI_COMM_WORLD);

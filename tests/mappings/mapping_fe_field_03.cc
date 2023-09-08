@@ -65,8 +65,8 @@ test()
   // Create a Mapping
   LinearAlgebra::distributed::Vector<double> map_vector;
 
-  IndexSet locally_relevant_euler;
-  DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_euler);
+  const IndexSet locally_relevant_euler =
+    DoFTools::extract_locally_relevant_dofs(dh);
   map_vector.reinit(dh.locally_owned_dofs(),
                     locally_relevant_euler,
                     MPI_COMM_WORLD);

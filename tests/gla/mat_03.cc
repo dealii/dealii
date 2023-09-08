@@ -70,9 +70,9 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(temperature_fe);
 
-  IndexSet owned = dof_handler.locally_owned_dofs();
-  IndexSet relevant;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, relevant);
+  const IndexSet &owned = dof_handler.locally_owned_dofs();
+  const IndexSet  relevant =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   // this causes a crash in PETSc, but is ignored in Trilinos:
   // DynamicSparsityPattern sp (owned);

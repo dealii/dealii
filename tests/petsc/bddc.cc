@@ -69,16 +69,13 @@ main(int argc, char *argv[])
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(3);
 
-
-  IndexSet locally_owned_dofs;
-  IndexSet locally_relevant_dofs;
-  IndexSet locally_active_dofs;
-
   dof_handler.distribute_dofs(fe);
 
-  locally_owned_dofs    = dof_handler.locally_owned_dofs();
-  locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_handler);
-  locally_active_dofs   = DoFTools::extract_locally_active_dofs(dof_handler);
+  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
+  const IndexSet locally_active_dofs =
+    DoFTools::extract_locally_active_dofs(dof_handler);
 
   DynamicSparsityPattern dsp(locally_relevant_dofs);
 

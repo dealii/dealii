@@ -201,8 +201,8 @@ namespace Step50
     mg_dof_handler.distribute_dofs(fe);
     mg_dof_handler.distribute_mg_dofs();
 
-    DoFTools::extract_locally_relevant_dofs(mg_dof_handler,
-                                            locally_relevant_set);
+    locally_relevant_set =
+      DoFTools::extract_locally_relevant_dofs(mg_dof_handler);
 
     solution.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
@@ -348,10 +348,8 @@ namespace Step50
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {
-        IndexSet dofset;
-        DoFTools::extract_locally_relevant_level_dofs(mg_dof_handler,
-                                                      level,
-                                                      dofset);
+        const IndexSet dofset =
+          DoFTools::extract_locally_relevant_level_dofs(mg_dof_handler, level);
         boundary_constraints[level].reinit(dofset);
         boundary_constraints[level].add_lines(
           mg_constrained_dofs.get_refinement_edge_indices(level));

@@ -281,13 +281,14 @@ LaplaceProblem<dim>::setup_system()
                        std::placeholders::_1)));
 
   TrilinosWrappers::BlockSparsityPattern csp(2, 2);
-  std::vector<IndexSet>                  locally_owned(2), relevant_set(2);
-  IndexSet locally_owned_total = dof_handler.locally_owned_dofs(),
-           relevant_total;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_total);
+  const IndexSet &locally_owned_total = dof_handler.locally_owned_dofs();
+  const IndexSet  relevant_total =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   const std::vector<types::global_dof_index> dofs_per_block =
     DoFTools::count_dofs_per_fe_block(dof_handler, blocks);
+
+  std::vector<IndexSet> locally_owned(2), relevant_set(2);
   locally_owned[0] = locally_owned_total.get_view(0, dofs_per_block[0]);
   locally_owned[1] =
     locally_owned_total.get_view(dofs_per_block[0], dof_handler.n_dofs());

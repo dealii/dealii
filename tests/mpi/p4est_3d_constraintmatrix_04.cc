@@ -67,8 +67,8 @@ test()
   dof.distribute_dofs(fe);
 
   // build constraint matrix
-  IndexSet locally_relevant(dof.n_dofs());
-  DoFTools::extract_locally_relevant_dofs(dof, locally_relevant);
+  const IndexSet locally_relevant =
+    DoFTools::extract_locally_relevant_dofs(dof);
   AffineConstraints<double> constraints(locally_relevant);
   DoFTools::make_hanging_node_constraints(dof, constraints);
   constraints.close();
@@ -78,9 +78,8 @@ test()
   const unsigned int myid    = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
   const unsigned int numproc = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
 
-  IndexSet locally_active(dof.n_dofs());
-  DoFTools::extract_locally_active_dofs(dof, locally_active);
-  std::ofstream file(
+  const IndexSet locally_active = DoFTools::extract_locally_active_dofs(dof);
+  std::ofstream  file(
     (std::string("dat.") + Utilities::int_to_string(myid)).c_str());
   file << "**** proc " << myid << ": \n\n";
   file << "Constraints:\n";

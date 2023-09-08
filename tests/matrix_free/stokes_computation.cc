@@ -1035,9 +1035,8 @@ namespace StokesClass
     dof_handler_p.clear();
     dof_handler_p.distribute_dofs(fe_p);
 
-    IndexSet locally_relevant_dofs_u;
-    DoFTools::extract_locally_relevant_dofs(dof_handler_u,
-                                            locally_relevant_dofs_u);
+    const IndexSet locally_relevant_dofs_u =
+      DoFTools::extract_locally_relevant_dofs(dof_handler_u);
     constraints_u.reinit(locally_relevant_dofs_u);
     DoFTools::make_hanging_node_constraints(dof_handler_u, constraints_u);
 
@@ -1045,9 +1044,8 @@ namespace StokesClass
       dof_handler_u, 0, ExactSolution_BoundaryValues_u<dim>(), constraints_u);
     constraints_u.close();
 
-    IndexSet locally_relevant_dofs_p;
-    DoFTools::extract_locally_relevant_dofs(dof_handler_p,
-                                            locally_relevant_dofs_p);
+    const IndexSet locally_relevant_dofs_p =
+      DoFTools::extract_locally_relevant_dofs(dof_handler_p);
     constraints_p.reinit(locally_relevant_dofs_p);
     DoFTools::make_hanging_node_constraints(dof_handler_p, constraints_p);
     constraints_p.close();
@@ -1112,10 +1110,8 @@ namespace StokesClass
 
     for (unsigned int level = 0; level < n_levels; ++level)
       {
-        IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler_u,
-                                                      level,
-                                                      relevant_dofs);
+        const IndexSet relevant_dofs =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler_u, level);
         AffineConstraints<double> level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(
@@ -1173,9 +1169,8 @@ namespace StokesClass
 
     // Create constraints with no Dirchlet info
     AffineConstraints<double> constraints_u_no_dirchlet;
-    IndexSet                  locally_relevant_dofs_u;
-    DoFTools::extract_locally_relevant_dofs(dof_handler_u,
-                                            locally_relevant_dofs_u);
+    const IndexSet            locally_relevant_dofs_u =
+      DoFTools::extract_locally_relevant_dofs(dof_handler_u);
     constraints_u_no_dirchlet.reinit(locally_relevant_dofs_u);
     DoFTools::make_hanging_node_constraints(dof_handler_u,
                                             constraints_u_no_dirchlet);
