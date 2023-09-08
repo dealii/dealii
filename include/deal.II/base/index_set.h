@@ -317,17 +317,35 @@ public:
   compress() const;
 
   /**
-   * Comparison for equality of index sets. This operation is only allowed if
-   * the size of the two sets is the same (though of course they do not have
-   * to have the same number of indices).
+   * Comparison for equality of index sets.
+   *
+   * This operation is only allowed if the size of the two sets is the
+   * same (though of course they do not have to have the same number
+   * of indices), or if one of the two objects being compared is empty.
+   * The comparison between two objects of different sizes would of course,
+   * intuitively, result in a `false` outcome, but it is often a sign of
+   * a programming mistake to compare index sets of different sizes
+   * against each other, and the comparison is consequently not allowed.
+   * On the other hand, the comparison against an empty object makes
+   * sense to ensure, for example, that an IndexSet object has been
+   * initialized.
    */
   bool
   operator==(const IndexSet &is) const;
 
   /**
-   * Comparison for inequality of index sets. This operation is only allowed
-   * if the size of the two sets is the same (though of course they do not
-   * have to have the same number of indices).
+   * Comparison for inequality of index sets.
+   *
+   * This operation is only allowed if the size of the two sets is the
+   * same (though of course they do not have to have the same number
+   * of indices), or if one of the two objects being compared is empty.
+   * The comparison between two objects of different sizes would of course,
+   * intuitively, result in a `false` outcome, but it is often a sign of
+   * a programming mistake to compare index sets of different sizes
+   * against each other, and the comparison is consequently not allowed.
+   * On the other hand, the comparison against an empty object makes
+   * sense to ensure, for example, that an IndexSet object has been
+   * initialized.
    */
   bool
   operator!=(const IndexSet &is) const;
@@ -1928,12 +1946,20 @@ IndexSet::index_within_set(const size_type n) const
 inline bool
 IndexSet::operator==(const IndexSet &is) const
 {
+  // If one of the two index sets has size zero, the other one has to
+  // have size zero as well:
+  if (size() == 0)
+    return (is.size() == 0);
+  if (is.size() == 0)
+    return (size() == 0);
+
+  // Otherwise, they must have the same size (see the documentation):
   Assert(size() == is.size(), ExcDimensionMismatch(size(), is.size()));
 
   compress();
   is.compress();
 
-  return ranges == is.ranges;
+  return (ranges == is.ranges);
 }
 
 
@@ -1941,12 +1967,20 @@ IndexSet::operator==(const IndexSet &is) const
 inline bool
 IndexSet::operator!=(const IndexSet &is) const
 {
+  // If one of the two index sets has size zero, the other one has to
+  // have a non-zero size for inequality:
+  if (size() == 0)
+    return (is.size() != 0);
+  if (is.size() == 0)
+    return (size() != 0);
+
+  // Otherwise, they must have the same size (see the documentation):
   Assert(size() == is.size(), ExcDimensionMismatch(size(), is.size()));
 
   compress();
   is.compress();
 
-  return ranges != is.ranges;
+  return (ranges != is.ranges);
 }
 
 
