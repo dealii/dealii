@@ -415,17 +415,16 @@ namespace DoFRenumbering
     const IndexSet &locally_owned_dofs = [&]() -> const IndexSet & {
       if (reorder_level_dofs == false)
         {
-          DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                                  locally_relevant_dofs);
+          locally_relevant_dofs =
+            DoFTools::extract_locally_relevant_dofs(dof_handler);
           return dof_handler.locally_owned_dofs();
         }
       else
         {
           Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
                  ExcDoFHandlerNotInitialized());
-          DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                        level,
-                                                        locally_relevant_dofs);
+          locally_relevant_dofs =
+            DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
           return dof_handler.locally_owned_mg_dofs(level);
         }
     }();
@@ -476,14 +475,13 @@ namespace DoFRenumbering
         IndexSet locally_active_dofs;
         if (reorder_level_dofs == false)
           {
-            DoFTools::extract_locally_active_dofs(dof_handler,
-                                                  locally_active_dofs);
+            locally_active_dofs =
+              DoFTools::extract_locally_active_dofs(dof_handler);
           }
         else
           {
-            DoFTools::extract_locally_active_level_dofs(dof_handler,
-                                                        locally_active_dofs,
-                                                        level);
+            locally_active_dofs =
+              DoFTools::extract_locally_active_level_dofs(dof_handler, level);
           }
 
         bool needs_locally_active = false;

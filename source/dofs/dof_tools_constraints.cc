@@ -2894,10 +2894,9 @@ namespace DoFTools
               }
 
 
-            IndexSet locally_relevant_dofs;
-            DoFTools::extract_locally_relevant_dofs(
-              coarse_to_fine_grid_map.get_destination_grid(),
-              locally_relevant_dofs);
+            const IndexSet locally_relevant_dofs =
+              DoFTools::extract_locally_relevant_dofs(
+                coarse_to_fine_grid_map.get_destination_grid());
 
             copy_data.global_parameter_representation[i].reinit(
               coarse_to_fine_grid_map.get_destination_grid()
