@@ -382,8 +382,8 @@ namespace FETools
       // vector u2 with based on the sets of locally owned and relevant
       // dofs of dof2
       const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-      IndexSet        dof2_locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof2, dof2_locally_relevant_dofs);
+      const IndexSet  dof2_locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof2);
 
       PETScWrappers::MPI::Vector u2_out(dof2_locally_owned_dofs,
                                         u1.get_mpi_communicator());
@@ -431,8 +431,8 @@ namespace FETools
       // vector u2 with based on the sets of locally owned and relevant
       // dofs of dof2
       const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-      IndexSet        dof2_locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof2, dof2_locally_relevant_dofs);
+      const IndexSet  dof2_locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof2);
 
       TrilinosWrappers::MPI::Vector u2_out(dof2_locally_owned_dofs,
                                            u1.get_mpi_communicator());
@@ -462,8 +462,8 @@ namespace FETools
         return;
       const MPI_Comm  mpi_communicator = u1.block(0).get_mpi_communicator();
       const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-      IndexSet        dof2_locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof2, dof2_locally_relevant_dofs);
+      const IndexSet  dof2_locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof2);
 
       TrilinosWrappers::MPI::Vector u2_out(dof2_locally_owned_dofs,
                                            mpi_communicator);
@@ -524,8 +524,8 @@ namespace FETools
       LinearAlgebra::distributed::Vector<Number>       &u1_interpolated)
     {
       const IndexSet &dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-      IndexSet        dof2_locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof2, dof2_locally_relevant_dofs);
+      const IndexSet  dof2_locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof2);
 
       LinearAlgebra::distributed::Vector<Number> u2(dof2_locally_owned_dofs,
                                                     dof2_locally_relevant_dofs,
