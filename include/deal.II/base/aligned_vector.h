@@ -201,6 +201,12 @@ public:
   reserve(const size_type new_allocated_size);
 
   /**
+   * Releases the memory allocated but not used.
+   */
+  void
+  shrink_to_fit();
+
+  /**
    * Releases all previously allocated memory and leaves the vector in a state
    * equivalent to the state after the default constructor has been called.
    */
@@ -464,6 +470,15 @@ public:
 #endif
 
 private:
+  /**
+   * Allocates a new vector and moves the data from the old vector to the new
+   * vector. Deletes the old vector and releases the memory.
+   */
+  void
+  allocate_and_move(const size_t old_size,
+                    const size_t new_size,
+                    const size_t new_allocated_size);
+
   /**
    * A class that is used as the "deleter" for a `std::unique_ptr` object that
    * AlignedVector uses to store the memory used for the elements.
@@ -1360,6 +1375,48 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
 
 template <class T>
 inline void
+AlignedVector<T>::allocate_and_move(const size_t old_size,
+                                    const size_t new_size,
+                                    const size_t new_allocated_size)
+{
+  // allocate and align along 64-byte boundaries (this is enough for all
+  // levels of vectorization currently supported by deal.II)
+  T *new_data_ptr;
+  Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_data_ptr),
+                                    64,
+                                    new_size * sizeof(T));
+
+  // Now create a deleter that encodes what should happen when the object is
+  // released: We need to destroy the objects that are currently alive (in
+  // reverse order, and then release the memory. Note that we catch the
+  // 'this' pointer because the number of elements currently alive might
+  // change over time.
+  Deleter deleter(this);
+
+  // copy whatever elements we need to retain
+  if (new_allocated_size > 0)
+    dealii::internal::AlignedVectorMoveConstruct<T>(elements.get(),
+                                                    elements.get() + old_size,
+                                                    new_data_ptr);
+
+  // Now reset all the member variables of the current object
+  // based on the allocation above. Assigning to a std::unique_ptr
+  // object also releases the previously pointed to memory.
+  //
+  // Note that at the time of releasing the old memory, 'used_elements_end'
+  // still points to its previous value, and this is important for the
+  // deleter object of the previously allocated array (see how it loops over
+  // the to-be-destroyed elements at the Deleter::DefaultDeleterAction
+  // class).
+  elements               = decltype(elements)(new_data_ptr, std::move(deleter));
+  used_elements_end      = elements.get() + old_size;
+  allocated_elements_end = elements.get() + new_size;
+}
+
+
+
+template <class T>
+inline void
 AlignedVector<T>::reserve(const size_type new_allocated_size)
 {
   const size_type old_size           = used_elements_end - elements.get();
@@ -1372,42 +1429,25 @@ AlignedVector<T>::reserve(const size_type new_allocated_size)
       const size_type new_size =
         std::max(new_allocated_size, 2 * old_allocated_size);
 
-      // allocate and align along 64-byte boundaries (this is enough for all
-      // levels of vectorization currently supported by deal.II)
-      T *new_data_ptr;
-      Utilities::System::posix_memalign(
-        reinterpret_cast<void **>(&new_data_ptr), 64, new_size * sizeof(T));
-
-      // Now create a deleter that encodes what should happen when the object is
-      // released: We need to destroy the objects that are currently alive (in
-      // reverse order, and then release the memory. Note that we catch the
-      // 'this' pointer because the number of elements currently alive might
-      // change over time.
-      Deleter deleter(this);
-
-      // copy whatever elements we need to retain
-      if (new_allocated_size > 0)
-        dealii::internal::AlignedVectorMoveConstruct<T>(
-          elements.get(), elements.get() + old_size, new_data_ptr);
-
-      // Now reset all of the member variables of the current object
-      // based on the allocation above. Assigning to a std::unique_ptr
-      // object also releases the previously pointed to memory.
-      //
-      // Note that at the time of releasing the old memory, 'used_elements_end'
-      // still points to its previous value, and this is important for the
-      // deleter object of the previously allocated array (see how it loops over
-      // the to-be-destroyed elements a the Deleter::DefaultDeleterAction
-      // class).
-      elements          = decltype(elements)(new_data_ptr, std::move(deleter));
-      used_elements_end = elements.get() + old_size;
-      allocated_elements_end = elements.get() + new_size;
+      allocate_and_move(old_size, new_size, new_allocated_size);
     }
   else if (new_allocated_size == 0)
     clear();
   else // size_alloc < allocated_size
     {
     } // nothing to do here
+}
+
+
+
+template <class T>
+inline void
+AlignedVector<T>::shrink_to_fit()
+{
+  const size_type used_size      = used_elements_end - elements.get();
+  const size_type allocated_size = allocated_elements_end - elements.get();
+  if (allocated_size > used_size)
+    allocate_and_move(used_size, used_size, used_size);
 }
 
 
