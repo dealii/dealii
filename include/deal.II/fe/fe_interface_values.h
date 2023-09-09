@@ -2698,7 +2698,10 @@ template <int dim, int spacedim>
 UpdateFlags
 FEInterfaceValues<dim, spacedim>::get_update_flags() const
 {
-  return internal_fe_face_values->get_update_flags();
+  if (has_hp_capabilities())
+    return internal_hp_fe_face_values->get_update_flags();
+  else
+    return internal_fe_face_values->get_update_flags();
 }
 
 
