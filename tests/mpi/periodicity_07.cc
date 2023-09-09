@@ -132,11 +132,10 @@ test(const unsigned numRefinementLevels = 2)
   data_out.write_vtu_in_parallel(std::string("mesh.vtu").c_str(),
                                  mpi_communicator);
 
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
-
-  IndexSet locally_active_dofs;
-  DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
+  const IndexSet locally_active_dofs =
+    DoFTools::extract_locally_active_dofs(dof_handler);
 
   const std::vector<IndexSet> locally_owned_dofs =
     Utilities::MPI::all_gather(MPI_COMM_WORLD,

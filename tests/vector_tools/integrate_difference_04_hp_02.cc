@@ -105,8 +105,7 @@ test(VectorTools::NormType norm, double value, double exp = 2.0)
 
   VectorTools::interpolate(dofh, Ref<dim>(), interpolated);
 
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
+  const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
   TrilinosWrappers::MPI::Vector solution(relevant_set, MPI_COMM_WORLD);
   solution = interpolated;
 

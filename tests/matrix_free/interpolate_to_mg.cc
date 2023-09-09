@@ -126,9 +126,11 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
   dof_handler.distribute_dofs(fe);
   dof_handler.distribute_mg_dofs();
 
-  IndexSet locally_owned_dofs, locally_relevant_dofs;
-  locally_owned_dofs = dof_handler.locally_owned_dofs();
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
+
+
 
   // constraints:
   AffineConstraints<double> constraints;
@@ -191,8 +193,8 @@ test(const unsigned int n_glob_ref = 2, const unsigned int n_ref = 0)
     level_projection(min_level, max_level);
   for (unsigned int level = min_level; level <= max_level; ++level)
     {
-      IndexSet set;
-      DoFTools::extract_locally_relevant_level_dofs(dof_handler, level, set);
+      const IndexSet set =
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
       level_projection[level].reinit(dof_handler.locally_owned_mg_dofs(level),
                                      set,
                                      mpi_communicator);

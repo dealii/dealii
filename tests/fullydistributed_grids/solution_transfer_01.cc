@@ -58,8 +58,8 @@ test(TriangulationType &triangulation)
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(FE_Q<dim>(2));
 
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   using VectorType = LinearAlgebra::distributed::Vector<double>;
 

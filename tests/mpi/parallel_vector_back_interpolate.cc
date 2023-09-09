@@ -62,8 +62,8 @@ test()
   DoFTools::make_hanging_node_constraints(dof2, c2);
   c2.close();
 
-  IndexSet locally_relevant_dofs2;
-  DoFTools::extract_locally_relevant_dofs(dof2, locally_relevant_dofs2);
+  const IndexSet locally_relevant_dofs2 =
+    DoFTools::extract_locally_relevant_dofs(dof2);
 
   LinearAlgebra::distributed::Vector<double> v2(dof2.locally_owned_dofs(),
                                                 locally_relevant_dofs2,

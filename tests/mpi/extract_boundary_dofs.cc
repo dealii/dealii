@@ -50,8 +50,7 @@ test()
 
   // the result of extract_boundary_dofs is supposed to be a subset of the
   // locally relevant dofs, so test this
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
+  const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
   boundary_dofs.subtract_set(relevant_set);
   AssertThrow(boundary_dofs.n_elements() == 0, ExcInternalError());
 }

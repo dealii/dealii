@@ -82,14 +82,14 @@ test()
 
   FE_Q<dim>                 fe(2);
   DoFHandler<dim>           mg_dof_handler(tria);
-  IndexSet                  locally_relevant_set;
   AffineConstraints<double> constraints;
   MGConstrainedDoFs         mg_constrained_dofs;
 
   mg_dof_handler.distribute_dofs(fe);
   mg_dof_handler.distribute_mg_dofs();
 
-  DoFTools::extract_locally_relevant_dofs(mg_dof_handler, locally_relevant_set);
+  const IndexSet locally_relevant_set =
+    DoFTools::extract_locally_relevant_dofs(mg_dof_handler);
 
   constraints.reinit(locally_relevant_set);
   DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);

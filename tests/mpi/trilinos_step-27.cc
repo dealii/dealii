@@ -211,7 +211,8 @@ namespace Step27
     dof_handler.distribute_dofs(fe_collection);
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     solution.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
@@ -232,8 +233,8 @@ namespace Step27
       Utilities::MPI::all_gather(dof_handler.get_communicator(),
                                  dof_handler.locally_owned_dofs());
 
-    IndexSet locally_active_dofs;
-    DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+    const IndexSet locally_active_dofs =
+      DoFTools::extract_locally_active_dofs(dof_handler);
 
     AssertThrow(
       constraints.is_consistent_in_parallel(locally_owned_dofs_per_processor,

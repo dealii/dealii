@@ -139,7 +139,8 @@ namespace Step40
     dof_handler.distribute_dofs(fe);
 
     locally_owned_dofs = dof_handler.locally_owned_dofs();
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
     locally_relevant_solution.reinit(locally_owned_dofs,
                                      locally_relevant_dofs,
                                      mpi_communicator);
@@ -168,8 +169,8 @@ namespace Step40
     const std::vector<IndexSet> &locally_owned_dofs =
       Utilities::MPI::all_gather(MPI_COMM_WORLD,
                                  dof_handler.locally_owned_dofs());
-    IndexSet locally_active_dofs;
-    DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
+    const IndexSet locally_active_dofs =
+      DoFTools::extract_locally_active_dofs(dof_handler);
     AssertThrow(constraints.is_consistent_in_parallel(locally_owned_dofs,
                                                       locally_active_dofs,
                                                       mpi_communicator,

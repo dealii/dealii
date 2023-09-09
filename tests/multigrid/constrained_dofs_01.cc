@@ -147,8 +147,8 @@ check_fe(FiniteElement<dim> &fe)
       deallog << "get_boundary_indices:" << std::endl;
       bi.print(deallog);
 
-      IndexSet relevant;
-      DoFTools::extract_locally_relevant_level_dofs(dofh, level, relevant);
+      const IndexSet relevant =
+        DoFTools::extract_locally_relevant_level_dofs(dofh, level);
       deallog << "relevant:" << std::endl;
       relevant.print(deallog);
 
@@ -184,8 +184,8 @@ check_fe(FiniteElement<dim> &fe)
       {
         deallog << "Level " << level << ':' << std::endl;
 
-        IndexSet relevant;
-        DoFTools::extract_locally_relevant_level_dofs(dofh, level, relevant);
+        const IndexSet relevant =
+          DoFTools::extract_locally_relevant_level_dofs(dofh, level);
         mg_boundary_constraints[level].reinit(relevant);
         mg_boundary_constraints[level].add_lines(boundary_indices[level]);
 
@@ -229,8 +229,8 @@ check_fe(FiniteElement<dim> &fe)
                                                    level_boundary_indices);
         const auto &bi = mg_constrained_dofs_1.get_boundary_indices(level);
 
-        IndexSet relevant;
-        DoFTools::extract_locally_relevant_level_dofs(dofh, level, relevant);
+        const IndexSet relevant =
+          DoFTools::extract_locally_relevant_level_dofs(dofh, level);
 
         deallog << ((bi ==
                      (relevant &

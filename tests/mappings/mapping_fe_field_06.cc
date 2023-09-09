@@ -75,8 +75,8 @@ test()
                                 update_quadrature_points);
   for (unsigned int level = 0; level < tria.n_global_levels(); ++level)
     {
-      IndexSet relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(dh, level, relevant_dofs);
+      const IndexSet relevant_dofs =
+        DoFTools::extract_locally_relevant_level_dofs(dh, level);
       level_vectors[level].reinit(dh.locally_owned_mg_dofs(level),
                                   relevant_dofs,
                                   tria.get_communicator());

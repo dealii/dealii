@@ -285,8 +285,8 @@ LaplaceProblem<dim>::setup_system()
   }
   {
     TrilinosWrappers::SparsityPattern csp;
-    IndexSet                          relevant_set;
-    DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_set);
+    const IndexSet                    relevant_set =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
     // TODO: currently no Trilinos version is capable of doing this...
     // #if DEAL_II_TRILINOS_VERSION_GTE(11,14,0)
     // Cannot pre-build sparsity pattern, Trilinos must provide it...

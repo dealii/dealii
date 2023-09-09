@@ -102,13 +102,12 @@ test()
   // IndexSets and constraints
   const IndexSet &locally_owned_dofs_euler =
     dof_handler_euler.locally_owned_dofs();
-  IndexSet locally_relevant_dofs_euler;
-  DoFTools::extract_locally_relevant_dofs(dof_handler_euler,
-                                          locally_relevant_dofs_euler);
+  const IndexSet locally_relevant_dofs_euler =
+    DoFTools::extract_locally_relevant_dofs(dof_handler_euler);
 
   const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-  IndexSet        locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet  locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   // constraints:
   AffineConstraints<double> constraints_euler;

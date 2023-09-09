@@ -66,8 +66,7 @@ setup(DoFHandler<dim> &dh,
 {
   dh.distribute_dofs(fe);
   vec.reinit(dh.locally_owned_dofs(), MPI_COMM_WORLD);
-  IndexSet locally_relevant;
-  DoFTools::extract_locally_relevant_dofs(dh, locally_relevant);
+  const IndexSet locally_relevant = DoFTools::extract_locally_relevant_dofs(dh);
   lr_vec.reinit(locally_relevant, MPI_COMM_WORLD);
 }
 

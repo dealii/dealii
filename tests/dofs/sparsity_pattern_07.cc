@@ -79,12 +79,10 @@ main(int argc, char **argv)
   dof_handler_0.distribute_dofs(fe_0);
   dof_handler_1.distribute_dofs(fe_1);
 
-  IndexSet locally_relevant_dofs_0;
-  IndexSet locally_relevant_dofs_1;
-  DoFTools::extract_locally_relevant_dofs(dof_handler_0,
-                                          locally_relevant_dofs_0);
-  DoFTools::extract_locally_relevant_dofs(dof_handler_1,
-                                          locally_relevant_dofs_1);
+  const IndexSet locally_relevant_dofs_0 =
+    DoFTools::extract_locally_relevant_dofs(dof_handler_0);
+  const IndexSet locally_relevant_dofs_1 =
+    DoFTools::extract_locally_relevant_dofs(dof_handler_1);
   deallog << "locally owned dofs 0: ";
   dof_handler_0.locally_owned_dofs().print(deallog);
   deallog << std::endl;

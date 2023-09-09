@@ -77,8 +77,8 @@ test()
   AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_set);
+  const IndexSet relevant_set =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
   deallog << "relevant set:" << std::endl;
   relevant_set.print(deallog.get_file_stream());
   deallog << "constraints:" << std::endl;

@@ -201,14 +201,14 @@ test(const unsigned int fe_degree)
     MatrixFree<dim, number>::AdditionalData::none;
 
   {
-    DoFTools::extract_locally_relevant_dofs(dof, relevant_set);
+    relevant_set = DoFTools::extract_locally_relevant_dofs(dof);
     constraints.close();
 
     DoFRenumbering::matrix_free_data_locality(dof, constraints, addit_data);
   }
 
   constraints.clear();
-  DoFTools::extract_locally_relevant_dofs(dof, relevant_set);
+  relevant_set = DoFTools::extract_locally_relevant_dofs(dof);
   constraints.close();
 
   const QGauss<1>         quadrature(dof.get_fe().degree + 1);

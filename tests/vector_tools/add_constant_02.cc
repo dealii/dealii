@@ -101,8 +101,8 @@ test()
   QIterated<dim> quadrature(QTrapezoid<1>(), 5);
 
   const dealii::Function<dim, double> *w = nullptr;
-  IndexSet                             relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dofhandler, relevant_dofs);
+  const IndexSet                       relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dofhandler);
   VectorType ghosted(dofhandler.locally_owned_dofs(),
                      relevant_dofs,
                      MPI_COMM_WORLD);
@@ -150,8 +150,8 @@ test_simplex()
   const dealii::Function<dim, double> *w = nullptr;
   MappingFE<dim>                       mapping(FE_SimplexP<dim>(1));
 
-  IndexSet relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dofhandler, relevant_dofs);
+  const IndexSet relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dofhandler);
   VectorType ghosted(dofhandler.locally_owned_dofs(),
                      relevant_dofs,
                      MPI_COMM_WORLD);

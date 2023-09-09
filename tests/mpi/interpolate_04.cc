@@ -65,12 +65,13 @@ test()
   AffineConstraints<PetscScalar> cm2;
   cm2.close();
 
-  IndexSet dof1_locally_owned_dofs = dofh1.locally_owned_dofs();
-  IndexSet dof2_locally_owned_dofs = dofh2.locally_owned_dofs();
-  IndexSet dof1_locally_relevant_dofs;
-  IndexSet dof2_locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dofh2, dof2_locally_relevant_dofs);
-  DoFTools::extract_locally_relevant_dofs(dofh1, dof1_locally_relevant_dofs);
+  const IndexSet &dof1_locally_owned_dofs = dofh1.locally_owned_dofs();
+  const IndexSet &dof2_locally_owned_dofs = dofh2.locally_owned_dofs();
+  const IndexSet  dof1_locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dofh1);
+  const IndexSet dof2_locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dofh2);
+
 
   PETScWrappers::MPI::Vector u1(dof1_locally_owned_dofs,
                                 dof1_locally_relevant_dofs,

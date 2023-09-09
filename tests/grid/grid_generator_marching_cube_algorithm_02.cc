@@ -86,10 +86,9 @@ create_mca_tria(const unsigned int   n_subdivisions,
   background_dof_handler.reinit(triangulation);
   background_dof_handler.distribute_dofs(fe);
 
-  VectorType ls_vector;
-  IndexSet   locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(background_dof_handler,
-                                          locally_relevant_dofs);
+  VectorType     ls_vector;
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(background_dof_handler);
 
 
   ls_vector.reinit(background_dof_handler.locally_owned_dofs(),

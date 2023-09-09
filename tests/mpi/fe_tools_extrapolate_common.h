@@ -200,12 +200,12 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   DoFTools::make_hanging_node_constraints(*dof2, cm2);
   cm2.close();
 
-  IndexSet locally_owned_dofs1 = dof1->locally_owned_dofs();
-  IndexSet locally_relevant_dofs1;
-  DoFTools::extract_locally_relevant_dofs(*dof1, locally_relevant_dofs1);
-  IndexSet locally_owned_dofs2 = dof2->locally_owned_dofs();
-  IndexSet locally_relevant_dofs2;
-  DoFTools::extract_locally_relevant_dofs(*dof2, locally_relevant_dofs2);
+  const IndexSet &locally_owned_dofs1 = dof1->locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs1 =
+    DoFTools::extract_locally_relevant_dofs(*dof1);
+  const IndexSet &locally_owned_dofs2 = dof2->locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs2 =
+    DoFTools::extract_locally_relevant_dofs(*dof2);
 
   VectorType in_ghosted =
     build_ghosted<VectorType>(locally_owned_dofs1, locally_relevant_dofs1);
@@ -331,12 +331,12 @@ check_this_dealii(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   DoFTools::make_hanging_node_constraints(*dof2, cm2);
   cm2.close();
 
-  IndexSet locally_owned_dofs1 = dof1->locally_owned_dofs();
-  IndexSet locally_relevant_dofs1;
-  DoFTools::extract_locally_relevant_dofs(*dof1, locally_relevant_dofs1);
-  IndexSet locally_owned_dofs2 = dof2->locally_owned_dofs();
-  IndexSet locally_relevant_dofs2;
-  DoFTools::extract_locally_relevant_dofs(*dof2, locally_relevant_dofs2);
+  const IndexSet &locally_owned_dofs1 = dof1->locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs1 =
+    DoFTools::extract_locally_relevant_dofs(*dof1);
+  const IndexSet &locally_owned_dofs2 = dof2->locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs2 =
+    DoFTools::extract_locally_relevant_dofs(*dof2);
 
   VectorType in_ghosted =
     build_ghosted<VectorType>(locally_owned_dofs1, locally_relevant_dofs1);

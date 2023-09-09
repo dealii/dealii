@@ -67,8 +67,8 @@ test()
   dof_handler.distribute_dofs(fe);
 
   AffineConstraints<Number> constraints;
-  IndexSet                  locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet            locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   constraints.reinit(locally_relevant_dofs);
 

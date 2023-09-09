@@ -124,8 +124,8 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
       dof_handlers[i]->distribute_dofs(*fes[i]);
       deallog << "n_dofs=" << dof_handlers[i]->n_dofs() << std::endl;
 
-      DoFTools::extract_locally_relevant_dofs(*dof_handlers[i],
-                                              locally_relevant_dofs[i]);
+      locally_relevant_dofs[i] =
+        DoFTools::extract_locally_relevant_dofs(*dof_handlers[i]);
 
       constraints[i].reinit(locally_relevant_dofs[i]);
       DoFTools::make_hanging_node_constraints(*dof_handlers[i], constraints[i]);

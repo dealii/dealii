@@ -78,8 +78,8 @@ public:
     AffineConstraints<double> constraints;
     if (level == numbers::invalid_unsigned_int)
       {
-        IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_dofs);
+        const IndexSet relevant_dofs =
+          DoFTools::extract_locally_relevant_dofs(dof_handler);
         constraints.reinit(relevant_dofs);
         DoFTools::make_hanging_node_constraints(dof_handler, constraints);
         VectorTools::interpolate_boundary_values(dof_handler,
@@ -88,10 +88,8 @@ public:
       }
     else
       {
-        IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      level,
-                                                      relevant_dofs);
+        const IndexSet relevant_dofs =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         constraints.reinit(relevant_dofs);
         constraints.add_lines(mg_constrained_dofs.get_boundary_indices(level));
 
@@ -479,8 +477,8 @@ do_test(const DoFHandler<dim> &dof)
   deallog << "Number of degrees of freedom: " << dof.n_dofs() << std::endl;
 
   AffineConstraints<double> hanging_node_constraints;
-  IndexSet                  locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof, locally_relevant_dofs);
+  const IndexSet            locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof);
   hanging_node_constraints.reinit(locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof, hanging_node_constraints);
   hanging_node_constraints.close();

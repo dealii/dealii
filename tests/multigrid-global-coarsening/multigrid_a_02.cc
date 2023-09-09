@@ -67,10 +67,8 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
       auto &op         = operators[l];
 
       // set up constraints
-      IndexSet relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                    l,
-                                                    relevant_dofs);
+      const IndexSet relevant_dofs =
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, l);
       constraint.reinit(relevant_dofs);
       constraint.add_lines(mg_constrained_dofs.get_boundary_indices(l));
       constraint.close();

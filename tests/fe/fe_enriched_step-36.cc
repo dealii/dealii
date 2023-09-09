@@ -287,8 +287,8 @@ namespace Step36
     std::vector<IndexSet> locally_owned_dofs_per_processor =
       DoFTools::locally_owned_dofs_per_subdomain(dof_handler);
     locally_owned_dofs = locally_owned_dofs_per_processor[this_mpi_process];
-    locally_relevant_dofs.clear();
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);

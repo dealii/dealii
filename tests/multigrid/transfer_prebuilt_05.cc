@@ -47,8 +47,8 @@ check()
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(mgdof);
 
-  IndexSet relevant_dofs;
-  DoFTools::extract_locally_relevant_level_dofs(mgdof, 0, relevant_dofs);
+  const IndexSet relevant_dofs =
+    DoFTools::extract_locally_relevant_level_dofs(mgdof, 0);
   AffineConstraints<double> user_constraints;
   user_constraints.reinit(relevant_dofs);
 
