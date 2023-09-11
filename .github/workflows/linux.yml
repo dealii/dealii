@@ -41,7 +41,7 @@ jobs:
       options: --user root
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: info
       run: |
         python --version
@@ -95,7 +95,7 @@ jobs:
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: info
       run: |
         mpicc -v
@@ -159,7 +159,7 @@ jobs:
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: setup apt repo
       run: |
         # oneapi-ci/scripts/setup_apt_repo_linux.sh
@@ -250,7 +250,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
@@ -271,7 +271,7 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         repository: kokkos/kokkos
         ref: 3.7.00
@@ -341,7 +341,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
@@ -363,7 +363,7 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         repository: kokkos/kokkos
         ref: 3.7.00
