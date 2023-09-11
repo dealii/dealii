@@ -1156,6 +1156,31 @@ namespace internal
       (void)dummy2;
     }
 
+    /**
+     * This interpolates values with sum factorization, according to the
+     * following parameters:
+     *
+     * @tparam direction The direction along which the one-dimensional
+     * operations should be performed, using 0 as the fastest running
+     * direction x, 1 for y, and so on.
+     * @tparam contract_over_rows Describes whether the interpolation is over
+     * the rows or the columns in the underlying interpolation matrix. With
+     * the chosen convention in the data fields, `contract_over_rows==true`
+     * means interpolation from DoF values to quadrature points, whereas using
+     * the argument `false` will perform summation over quadrature points to
+     * produce integrals for each test function.
+     * @tparam add Specify whether to add into the output array or overwrite
+     * the previous content.
+     * @tparam stride This parameter can specify an additional stride in the
+     * array associated with quadrature points (`in` for `dof_to_quad==false`,
+     * otherwise `out`) from consecutive points in the x-direction. This is
+     * used to place results from different interpolation steps next to each
+     * other in memory.
+     *
+     * @param in Input array for the operation, needs to be backed up by a
+     * sufficiently large memory region.
+     * @param out Array holding the result of the sum factorization operation.
+     */
     template <int direction, bool contract_over_rows, bool add, int stride = 1>
     void
     values(const Number in[], Number out[]) const
@@ -1165,6 +1190,11 @@ namespace internal
         shape_values, in, out);
     }
 
+    /**
+     * This interpolates gradients with sum factorization, based on the second
+     * argument given to the constructor of this class. For the documentation
+     * of the template and function parameters, see the values function.
+     */
     template <int direction, bool contract_over_rows, bool add, int stride = 1>
     void
     gradients(const Number in[], Number out[]) const
@@ -1176,6 +1206,11 @@ namespace internal
         shape_gradients, in, out);
     }
 
+    /**
+     * This interpolates hessians with sum factorization, based on the third
+     * argument given to the constructor of this class. For the documentation
+     * of the template and function parameters, see the values function.
+     */
     template <int direction, bool contract_over_rows, bool add>
     void
     hessians(const Number in[], Number out[]) const
@@ -1189,6 +1224,13 @@ namespace internal
         shape_hessians, in, out);
     }
 
+    /**
+     * A variant of interpolation with sum factorization that only applies the
+     * operation to a single 1d line, leaving all other entries untouched,
+     * rather than expanding the loop over all other directions of a tensor
+     * product mesh. For the documentation of the template and function
+     * parameters, see the other values function.
+     */
     template <int direction, bool contract_over_rows, bool add>
     void
     values_one_line(const Number in[], Number out[]) const
@@ -1198,6 +1240,13 @@ namespace internal
         shape_values, in, out);
     }
 
+    /**
+     * A variant of interpolation with sum factorization that only applies the
+     * gradient operation to a single 1d line, leaving all other entries
+     * untouched, rather than expanding the loop over all other directions of
+     * a tensor product mesh. For the documentation of the template and
+     * function parameters, see the values function.
+     */
     template <int direction, bool contract_over_rows, bool add>
     void
     gradients_one_line(const Number in[], Number out[]) const
@@ -1210,6 +1259,13 @@ namespace internal
         shape_gradients, in, out);
     }
 
+    /**
+     * A variant of interpolation with sum factorization that only applies the
+     * Hessian operation to a single 1d line, leaving all other entries
+     * untouched, rather than expanding the loop over all other directions of
+     * a tensor product mesh. For the documentation of the template and
+     * function parameters, see the values function.
+     */
     template <int direction, bool contract_over_rows, bool add>
     void
     hessians_one_line(const Number in[], Number out[]) const
@@ -1246,25 +1302,26 @@ namespace internal
      *                  be interpolated, allowing specialized algorithms
      *                  for some class template parameters of `variant` to
      *                  find the right path.
-     * @tparam extra_stride This parameter enables to place the result of the
-     *                      tensor product evaluation in the output array (if
-     *                      `contract_over_rows == true`) or input array (if
-     *                      `contract_over_rows == false`), which is used to
-     *                      group all components of a gradient adjacent in
-     *                      memory. If the stride is one, the data will form a
-     *                      contiguous range in memory.
+     * @tparam stride This parameter enables to place the result of the
+     *                tensor product evaluation in the output array (if
+     *                `contract_over_rows == true`) or input array (if
+     *                `contract_over_rows == false`) with additional strides
+     *                between adjacent points in x direction, which is used
+     *                to group all components of a gradient adjacent in
+     *                memory. If the stride is one, the data will form a
+     *                contiguous range in memory.
      *
      * @param shape_data Transformation matrix with @p n_rows rows and
-     *                   @p n_columns columns, stored in row-major format
-     * @param in Pointer to the start of the input data vector
-     * @param out Pointer to the start of the output data vector
+     *                   @p n_columns columns, stored in row-major format.
+     * @param in Pointer to the start of the input data vector.
+     * @param out Pointer to the start of the output data vector.
      */
     template <int               direction,
               bool              contract_over_rows,
               bool              add,
-              bool              one_line     = false,
-              EvaluatorQuantity quantity     = EvaluatorQuantity::value,
-              int               extra_stride = 1>
+              bool              one_line = false,
+              EvaluatorQuantity quantity = EvaluatorQuantity::value,
+              int               stride   = 1>
     static void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
           const Number                   *in,
@@ -1289,7 +1346,7 @@ namespace internal
             bool              add,
             bool              one_line,
             EvaluatorQuantity quantity,
-            int               extra_stride>
+            int               stride>
   inline void
   EvaluatorTensorProduct<variant, dim, n_rows, n_columns, Number, Number2>::
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
@@ -1309,13 +1366,13 @@ namespace internal
     constexpr int mm = contract_over_rows ? n_rows : n_columns,
                   nn = contract_over_rows ? n_columns : n_rows;
 
-    constexpr int stride    = Utilities::pow(n_columns, direction);
-    constexpr int n_blocks1 = one_line ? 1 : stride;
+    constexpr int stride_operation = Utilities::pow(n_columns, direction);
+    constexpr int n_blocks1        = one_line ? 1 : stride_operation;
     constexpr int n_blocks2 =
       Utilities::pow(n_rows, (direction >= dim) ? 0 : (dim - direction - 1));
 
-    constexpr int stride_in  = !contract_over_rows ? extra_stride : 1;
-    constexpr int stride_out = contract_over_rows ? extra_stride : 1;
+    constexpr int stride_in  = !contract_over_rows ? stride : 1;
+    constexpr int stride_out = contract_over_rows ? stride : 1;
     for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
         for (int i1 = 0; i1 < n_blocks1; ++i1)
@@ -1324,8 +1381,8 @@ namespace internal
                                         quantity,
                                         n_rows,
                                         n_columns,
-                                        stride * stride_in,
-                                        stride * stride_out,
+                                        stride_operation * stride_in,
+                                        stride_operation * stride_out,
                                         contract_over_rows,
                                         add>(shape_data, in, out);
 
@@ -1337,8 +1394,8 @@ namespace internal
           }
         if (one_line == false)
           {
-            in += stride * (mm - 1) * stride_in;
-            out += stride * (nn - 1) * stride_out;
+            in += stride_operation * (mm - 1) * stride_in;
+            out += stride_operation * (nn - 1) * stride_out;
           }
       }
   }
@@ -1505,9 +1562,9 @@ namespace internal
     template <int               direction,
               bool              contract_over_rows,
               bool              add,
-              bool              one_line     = false,
-              EvaluatorQuantity quantity     = EvaluatorQuantity::value,
-              int               extra_stride = 1>
+              bool              one_line = false,
+              EvaluatorQuantity quantity = EvaluatorQuantity::value,
+              int               stride   = 1>
     void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
           const Number                   *in,
@@ -1531,7 +1588,7 @@ namespace internal
             bool              add,
             bool              one_line,
             EvaluatorQuantity quantity,
-            int               extra_stride>
+            int               stride>
   inline void
   EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>::apply(
     const Number2 *DEAL_II_RESTRICT shape_data,
@@ -1551,16 +1608,16 @@ namespace internal
     const int mm = contract_over_rows ? n_rows : n_columns,
               nn = contract_over_rows ? n_columns : n_rows;
 
-    const int stride =
+    const int stride_operation =
       direction == 0 ? 1 : Utilities::fixed_power<direction>(n_columns);
-    const int n_blocks1 = one_line ? 1 : stride;
+    const int n_blocks1 = one_line ? 1 : stride_operation;
     const int n_blocks2 = direction >= dim - 1 ?
                             1 :
                             Utilities::fixed_power<dim - direction - 1>(n_rows);
     Assert(n_rows <= 128, ExcNotImplemented());
 
-    constexpr int stride_in  = !contract_over_rows ? extra_stride : 1;
-    constexpr int stride_out = contract_over_rows ? extra_stride : 1;
+    constexpr int stride_in  = !contract_over_rows ? stride : 1;
+    constexpr int stride_out = contract_over_rows ? stride : 1;
     for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
         for (int i1 = 0; i1 < n_blocks1; ++i1)
@@ -1577,8 +1634,8 @@ namespace internal
                                              out,
                                              n_rows,
                                              n_columns,
-                                             stride * stride_in,
-                                             stride * stride_out);
+                                             stride_operation * stride_in,
+                                             stride_operation * stride_out);
 
             if (one_line == false)
               {
@@ -1588,8 +1645,8 @@ namespace internal
           }
         if (one_line == false)
           {
-            in += stride * (mm - 1) * stride_in;
-            out += stride * (nn - 1) * stride_out;
+            in += stride_operation * (mm - 1) * stride_in;
+            out += stride_operation * (nn - 1) * stride_out;
           }
       }
   }
@@ -1628,10 +1685,13 @@ namespace internal
    *             the constructor of the class.
    *
    * @param shape_values Address of the interpolation matrix.
-   * @param n_blocks Number of interpolation layer used along the two other
+   * @param n_blocks Number of interpolation layers used along the up to two
    *             dimensions tangential to the interpolation direction.
    * @param steps Increments in the input array from one step to the next,
-   *             varied in conjunction with the @p stride variable.
+   *             varied in conjunction with the @p stride_template variable: We
+   *             increment by @p stride_template along the 1d interpolation,
+   *             and then increment by @p steps when passing from one line
+   *             to the next.
    * @param input Address of the input data vector.
    * @param output Address of the output data vector.
    * @param n_rows_runtime Alternative number of rows to be used if the
