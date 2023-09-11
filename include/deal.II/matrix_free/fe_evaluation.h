@@ -5830,11 +5830,11 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::get_value(
       else
         {
           // Affine or general cell
-          const Tensor<2, dim, VectorizedArrayType> &inv_t_jac =
+          const Tensor<2, dim, VectorizedArrayType> inv_t_jac =
             (this->cell_type > internal::MatrixFreeFunctions::affine) ?
               this->jacobian[q_point] :
               this->jacobian[0];
-          const Tensor<2, dim, VectorizedArrayType> &jac =
+          const Tensor<2, dim, VectorizedArrayType> jac =
             (this->cell_type > internal::MatrixFreeFunctions::affine) ?
               transpose(invert(inv_t_jac)) :
               this->jacobian[1];
@@ -5989,6 +5989,8 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                       jac_grad[r][d] * this->values_quad[k * nqp + q_point];
                   }
             }
+
+          // Apply J^{-1} appearing in both terms outside braces above
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
               {
@@ -5999,15 +6001,8 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
               }
 
           // Add -(J^{-T} * jac_grad * J^{-1} * J * values * det(J^{-1})),
-          // which can be expressed as a rank-1 form tmp2[i] * tmp[j], where
-          // tmp2 = J * values and tmp4 = (J^{-T} * jac_grad * J^{-1})
-          VectorizedArrayType tmp2[dim];
-          for (unsigned int d = 0; d < dim; ++d)
-            {
-              tmp2[d] = t_jac[0][d] * this->values_quad[q_point];
-              for (unsigned e = 1; e < dim; ++e)
-                tmp2[d] += t_jac[e][d] * this->values_quad[e * nqp + q_point];
-            }
+          // which can be expressed as a rank-1 update tmp[d] * tmp4[e], where
+          // tmp = J * values and tmp4 = (J^{-T} * jac_grad * J^{-1})
           VectorizedArrayType tmp3[dim], tmp4[dim];
           for (unsigned int d = 0; d < dim; ++d)
             {
@@ -6029,10 +6024,21 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                 tmp4[d] += tmp3[e] * inv_t_jac[d][e];
             }
 
+          VectorizedArrayType tmp2[dim];
+          for (unsigned int d = 0; d < dim; ++d)
+            {
+              tmp2[d] = t_jac[0][d] * this->values_quad[q_point];
+              for (unsigned e = 1; e < dim; ++e)
+                tmp2[d] += t_jac[e][d] * this->values_quad[e * nqp + q_point];
+            }
+
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
               {
                 grad_out[d][e] -= tmp4[e] * tmp2[d];
+
+                // finally multiply by det(J^{-1}) necessary in all
+                // contributions above
                 grad_out[d][e] *= inv_det;
               }
         }
@@ -6313,7 +6319,8 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
 
       VectorizedArrayType *gradients = this->gradients_quad + q_point * dim;
       VectorizedArrayType *values = this->values_from_gradients_quad + q_point;
-      const std::size_t    nqp_d  = this->n_quadrature_points * dim;
+      const std::size_t    nqp    = this->n_quadrature_points;
+      const std::size_t    nqp_d  = nqp * dim;
 
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
@@ -6405,15 +6412,20 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                 tmp4[d] += tmp3[e] * inv_t_jac[d][e];
             }
 
-          // J_{j,i} * J^{-1}_{k,m} * grad_in_{j,m} * factor
+          const Tensor<2, dim, VectorizedArrayType> grad_in_scaled =
+            fac * grad_in;
+
           VectorizedArrayType tmp[dim][dim];
+
+          // J * (J^{-1} * (grad_in * factor))
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
               {
-                tmp[d][e] = inv_t_jac[0][d] * grad_in[e][0];
+                tmp[d][e] = inv_t_jac[0][d] * grad_in_scaled[e][0];
                 for (unsigned int f = 1; f < dim; ++f)
-                  tmp[d][e] += inv_t_jac[f][d] * grad_in[e][f];
+                  tmp[d][e] += inv_t_jac[f][d] * grad_in_scaled[e][f];
               }
+
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = 0; e < dim; ++e)
               {
@@ -6421,13 +6433,12 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                 for (unsigned int f = 1; f < dim; ++f)
                   res += t_jac[d][f] * tmp[e][f];
 
-                gradients[d * nqp_d + e] = res * fac;
+                gradients[d * nqp_d + e] = res;
               }
 
-          const std::size_t nqp = this->n_quadrature_points;
-
+          // jac_grad * (J^{-1} * (grad_in * factor)), re-use part in braces
+          // as 'tmp' from above
           VectorizedArrayType value[dim];
-          // Add jac_grad * J^{-1} * values * factor
           for (unsigned int d = 0; d < dim; ++d)
             {
               value[d] = tmp[d][0] * jac_grad[d][0];
@@ -6442,20 +6453,19 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
                   value[f] += tmp[e][d] * jac_grad[k][d];
                 }
 
-          //   -(J^{-T} * jac_grad * J^{-1} * J * values * factor)
-          // = -( \------- tmp4 ---------/  * J * values * factor)
+          //   -(grad_in * factor) * J * (J^{-T} * jac_grad * J^{-1})
+          // = -(grad_in * factor) * J * ( \------- tmp4 ---------/ )
           for (unsigned int d = 0; d < dim; ++d)
             {
-              tmp3[d] = grad_in[d][0] * tmp4[0];
+              VectorizedArrayType tmp2 = grad_in_scaled[d][0] * tmp4[0];
               for (unsigned int e = 1; e < dim; ++e)
-                tmp3[d] += grad_in[d][e] * tmp4[e];
+                tmp2 += grad_in_scaled[d][e] * tmp4[e];
+              for (unsigned int e = 0; e < dim; ++e)
+                value[e] -= t_jac[e][d] * tmp2;
             }
-          for (unsigned int d = 0; d < dim; ++d)
-            for (unsigned int e = 0; e < dim; ++e)
-              value[d] -= t_jac[d][e] * tmp3[e];
 
           for (unsigned int d = 0; d < dim; ++d)
-            values[d * nqp] = fac * value[d];
+            values[d * nqp] = value[d];
         }
     }
   else
