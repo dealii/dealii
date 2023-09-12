@@ -469,6 +469,16 @@ public:
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif
 
+  /**
+   * Exception message for changing the vector after a call to
+   * replicate_across_communicator().
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(ExcAlignedVectorChangeAfterReplication,
+                   "Changing the vector after a call to "
+                   "replicate_across_communicator() is not allowed.");
+
 private:
   /**
    * Allocates a new vector and moves the data from the old vector to the new
@@ -699,6 +709,11 @@ private:
    * Pointer to the end of the allocated memory.
    */
   T *allocated_elements_end;
+
+  /**
+   * Flag indicating if replicate_across_communicator() has been called.
+   */
+  bool replicated_across_communicator;
 };
 
 
@@ -1172,6 +1187,9 @@ inline AlignedVector<T>::AlignedVector()
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
+#  ifdef DEBUG
+  , replicated_across_communicator(false)
+#  endif
 {}
 
 
@@ -1181,6 +1199,9 @@ inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
+#  ifdef DEBUG
+  , replicated_across_communicator(false)
+#  endif
 {
   if (size > 0)
     resize(size, init);
@@ -1193,6 +1214,9 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
+#  ifdef DEBUG
+  , replicated_across_communicator(false)
+#  endif
 {
   // copy the data from vec
   reserve(vec.size());
@@ -1444,6 +1468,10 @@ template <class T>
 inline void
 AlignedVector<T>::shrink_to_fit()
 {
+#  ifdef DEBUG
+  Assert(replicated_across_communicator == false,
+         ExcAlignedVectorChangeAfterReplication());
+#  endif
   const size_type used_size      = used_elements_end - elements.get();
   const size_type allocated_size = allocated_elements_end - elements.get();
   if (allocated_size > used_size)
@@ -1917,6 +1945,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // At this point, each process should have a copy of the data.
   // Verify this in some sort of round-about way
 #    ifdef DEBUG
+  replicated_across_communicator      = true;
   const std::vector<char> packed_data = Utilities::pack(*this);
   const int               hash =
     std::accumulate(packed_data.begin(), packed_data.end(), int(0));
