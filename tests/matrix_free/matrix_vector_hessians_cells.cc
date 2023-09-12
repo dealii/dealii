@@ -218,13 +218,13 @@ test_hessians(const dealii::FE_Poly<dim>                    &fe,
 
   // compare solutions of matrix vector product
   {
-    dst2 -= dst;
+    dst -= dst2;
 
     double error = 0.;
-    if (dst.l2_norm() > 0)
-      error = dst2.l2_norm() / dst.l2_norm();
+    if (dst2.l2_norm() > 0)
+      error = dst.l2_norm() / dst2.l2_norm();
     else
-      error = dst2.l2_norm();
+      error = dst.l2_norm();
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       deallog << "FEValues verification: " << error << std::endl << std::endl;

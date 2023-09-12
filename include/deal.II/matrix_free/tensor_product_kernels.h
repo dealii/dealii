@@ -64,11 +64,7 @@ namespace internal
      * coefficient arrays. See the documentation of the EvaluatorTensorProduct
      * specialization for more information.
      */
-    evaluate_symmetric_hierarchical,
-    /**
-     * Raviart-Thomas elements with anisotropic polynomials.
-     */
-    evaluate_raviart_thomas
+    evaluate_symmetric_hierarchical
   };
 
 
@@ -682,13 +678,13 @@ namespace internal
   inline DEAL_II_ALWAYS_INLINE
 #endif
     std::enable_if_t<(variant == evaluate_evenodd), void>
-    apply_matrix_vector_product(const Number2 *matrix,
-                                const Number  *in,
-                                Number        *out,
-                                int            n_rows_runtime     = 0,
-                                int            n_columns_runtime  = 0,
-                                int            stride_in_runtime  = 0,
-                                int            stride_out_runtime = 0)
+    apply_matrix_vector_product(const Number2 *DEAL_II_RESTRICT matrix,
+                                const Number                   *in,
+                                Number                         *out,
+                                int n_rows_runtime     = 0,
+                                int n_columns_runtime  = 0,
+                                int stride_in_runtime  = 0,
+                                int stride_out_runtime = 0)
   {
     const int n_rows = n_rows_static == 0 ? n_rows_runtime : n_rows_static;
     const int n_columns =
@@ -1130,13 +1126,8 @@ namespace internal
         }
       else
         {
-          // We can enter this function either for the apply() path that has
-          // n_rows * n_columns entries or for the apply_face() path that only
-          // has n_rows * 3 entries in the array. Since we cannot decide about
-          // the use we must allow for both here.
           Assert(shape_values.empty() ||
-                   shape_values.size() == n_rows * n_columns ||
-                   shape_values.size() == 3 * n_rows,
+                   shape_values.size() == n_rows * n_columns,
                  ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
           Assert(shape_gradients.empty() ||
                    shape_gradients.size() == n_rows * n_columns,
@@ -1165,28 +1156,61 @@ namespace internal
       (void)dummy2;
     }
 
-    template <int direction, bool contract_over_rows, bool add>
+    /**
+     * This interpolates values with sum factorization, according to the
+     * following parameters:
+     *
+     * @tparam direction The direction along which the one-dimensional
+     * operations should be performed, using 0 as the fastest running
+     * direction x, 1 for y, and so on.
+     * @tparam contract_over_rows Describes whether the interpolation is over
+     * the rows or the columns in the underlying interpolation matrix. With
+     * the chosen convention in the data fields, `contract_over_rows==true`
+     * means interpolation from DoF values to quadrature points, whereas using
+     * the argument `false` will perform summation over quadrature points to
+     * produce integrals for each test function.
+     * @tparam add Specify whether to add into the output array or overwrite
+     * the previous content.
+     * @tparam stride This parameter can specify an additional stride in the
+     * array associated with quadrature points (`in` for `dof_to_quad==false`,
+     * otherwise `out`) from consecutive points in the x-direction. This is
+     * used to place results from different interpolation steps next to each
+     * other in memory.
+     *
+     * @param in Input array for the operation, needs to be backed up by a
+     * sufficiently large memory region.
+     * @param out Array holding the result of the sum factorization operation.
+     */
+    template <int direction, bool contract_over_rows, bool add, int stride = 1>
     void
     values(const Number in[], Number out[]) const
     {
-      apply<direction,
-            contract_over_rows,
-            add,
-            false,
-            EvaluatorQuantity::value>(shape_values, in, out);
+      constexpr EvaluatorQuantity value_type = EvaluatorQuantity::value;
+      apply<direction, contract_over_rows, add, false, value_type, stride>(
+        shape_values, in, out);
     }
 
-    template <int direction, bool contract_over_rows, bool add>
+    /**
+     * This interpolates gradients with sum factorization, based on the second
+     * argument given to the constructor of this class. For the documentation
+     * of the template and function parameters, see the values function.
+     */
+    template <int direction, bool contract_over_rows, bool add, int stride = 1>
     void
     gradients(const Number in[], Number out[]) const
     {
       constexpr EvaluatorQuantity gradient_type =
         (variant == evaluate_general ? EvaluatorQuantity::value :
                                        EvaluatorQuantity::gradient);
-      apply<direction, contract_over_rows, add, false, gradient_type>(
+      apply<direction, contract_over_rows, add, false, gradient_type, stride>(
         shape_gradients, in, out);
     }
 
+    /**
+     * This interpolates hessians with sum factorization, based on the third
+     * argument given to the constructor of this class. For the documentation
+     * of the template and function parameters, see the values function.
+     */
     template <int direction, bool contract_over_rows, bool add>
     void
     hessians(const Number in[], Number out[]) const
@@ -1200,6 +1224,13 @@ namespace internal
         shape_hessians, in, out);
     }
 
+    /**
+     * A variant of interpolation with sum factorization that only applies the
+     * operation to a single 1d line, leaving all other entries untouched,
+     * rather than expanding the loop over all other directions of a tensor
+     * product mesh. For the documentation of the template and function
+     * parameters, see the other values function.
+     */
     template <int direction, bool contract_over_rows, bool add>
     void
     values_one_line(const Number in[], Number out[]) const
@@ -1209,6 +1240,13 @@ namespace internal
         shape_values, in, out);
     }
 
+    /**
+     * A variant of interpolation with sum factorization that only applies the
+     * gradient operation to a single 1d line, leaving all other entries
+     * untouched, rather than expanding the loop over all other directions of
+     * a tensor product mesh. For the documentation of the template and
+     * function parameters, see the values function.
+     */
     template <int direction, bool contract_over_rows, bool add>
     void
     gradients_one_line(const Number in[], Number out[]) const
@@ -1221,6 +1259,13 @@ namespace internal
         shape_gradients, in, out);
     }
 
+    /**
+     * A variant of interpolation with sum factorization that only applies the
+     * Hessian operation to a single 1d line, leaving all other entries
+     * untouched, rather than expanding the loop over all other directions of
+     * a tensor product mesh. For the documentation of the template and
+     * function parameters, see the values function.
+     */
     template <int direction, bool contract_over_rows, bool add>
     void
     hessians_one_line(const Number in[], Number out[]) const
@@ -1236,13 +1281,13 @@ namespace internal
     }
 
     /**
-     * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1d stripes, along the given @p direction of the tensor
-     * data in the input array. This function allows the @p in and @p out
-     * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
-     * perform the contraction in place where @p in and @p out point to the
-     * same address. For the case n_rows != n_columns, the output is in general
-     * not correct.
+     * This function applies the tensor product kernel with sum factorization,
+     * corresponding to a matrix-vector multiplication of 1d stripes, along
+     * the given @p direction of the tensor data in the input array. This
+     * function allows the @p in and @p out arrays to alias for the case
+     * n_rows == n_columns, i.e., it is safe to perform the contraction in
+     * place where @p in and @p out point to the same address. For the case
+     * `n_rows != n_columns`, the output is in general not correct.
      *
      * @tparam direction Direction that is evaluated
      * @tparam contract_over_rows If true, the tensor contraction sums
@@ -1253,58 +1298,34 @@ namespace internal
      * @tparam one_line If true, the kernel is only applied along a single 1d
      *                  stripe within a dim-dimensional tensor, not the full
      *                  n_rows^dim points as in the @p false case.
+     * @tparam quantity Specify whether values, gradients or Hessians should
+     *                  be interpolated, allowing specialized algorithms
+     *                  for some class template parameters of `variant` to
+     *                  find the right path.
+     * @tparam stride This parameter enables to place the result of the
+     *                tensor product evaluation in the output array (if
+     *                `contract_over_rows == true`) or input array (if
+     *                `contract_over_rows == false`) with additional strides
+     *                between adjacent points in x direction, which is used
+     *                to group all components of a gradient adjacent in
+     *                memory. If the stride is one, the data will form a
+     *                contiguous range in memory.
      *
      * @param shape_data Transformation matrix with @p n_rows rows and
-     *                   @p n_columns columns, stored in row-major format
-     * @param in Pointer to the start of the input data vector
-     * @param out Pointer to the start of the output data vector
+     *                   @p n_columns columns, stored in row-major format.
+     * @param in Pointer to the start of the input data vector.
+     * @param out Pointer to the start of the output data vector.
      */
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              bool one_line     = false,
-              EvaluatorQuantity = EvaluatorQuantity::value>
+    template <int               direction,
+              bool              contract_over_rows,
+              bool              add,
+              bool              one_line = false,
+              EvaluatorQuantity quantity = EvaluatorQuantity::value,
+              int               stride   = 1>
     static void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
           const Number                   *in,
           Number                         *out);
-
-    /**
-     * This function applies the tensor product operation to produce face values
-     * from cell values. As opposed to the apply method, this method assumes
-     * that the directions orthogonal to the face have n_rows degrees of
-     * freedom per direction and not n_columns for those directions lower than
-     * the one currently applied. In other words, apply_face() must be called
-     * before calling any interpolation within the face.
-     *
-     * @tparam face_direction Direction of the normal vector (0=x, 1=y, etc)
-     * @tparam contract_onto_face If true, the input vector is of size n_rows^dim
-     *                            and interpolation into n_rows^(dim-1) points
-     *                            is performed. This is a typical scenario in
-     *                            FEFaceEvaluation::evaluate() calls. If false,
-     *                            data from n_rows^(dim-1) points is expanded
-     *                            into the n_rows^dim points of the higher-
-     *                            dimensional data array. Derivatives in the
-     *                            case contract_onto_face==false are summed
-     *                            together
-     * @tparam add If true, the result is added to the output vector, else
-     *             the computed values overwrite the content in the output
-     * @tparam max_derivative Sets the number of derivatives that should be
-     *             computed. 0 means only values, 1 means values and first
-     *             derivatives, 2 second derivates. Note that all the
-     *             derivatives access the data in @p shape_values passed to
-     *             the constructor of the class
-     *
-     * @param in address of the input data vector
-     * @param out address of the output data vector
-     */
-    template <int  face_direction,
-              bool contract_onto_face,
-              bool add,
-              int  max_derivative>
-    void
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT       out) const;
 
   private:
     const Number2 *shape_values;
@@ -1324,7 +1345,8 @@ namespace internal
             bool              contract_over_rows,
             bool              add,
             bool              one_line,
-            EvaluatorQuantity quantity>
+            EvaluatorQuantity quantity,
+            int               stride>
   inline void
   EvaluatorTensorProduct<variant, dim, n_rows, n_columns, Number, Number2>::
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
@@ -1344,11 +1366,13 @@ namespace internal
     constexpr int mm = contract_over_rows ? n_rows : n_columns,
                   nn = contract_over_rows ? n_columns : n_rows;
 
-    constexpr int stride    = Utilities::pow(n_columns, direction);
-    constexpr int n_blocks1 = one_line ? 1 : stride;
+    constexpr int stride_operation = Utilities::pow(n_columns, direction);
+    constexpr int n_blocks1        = one_line ? 1 : stride_operation;
     constexpr int n_blocks2 =
       Utilities::pow(n_rows, (direction >= dim) ? 0 : (dim - direction - 1));
 
+    constexpr int stride_in  = !contract_over_rows ? stride : 1;
+    constexpr int stride_out = contract_over_rows ? stride : 1;
     for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
         for (int i1 = 0; i1 < n_blocks1; ++i1)
@@ -1357,157 +1381,21 @@ namespace internal
                                         quantity,
                                         n_rows,
                                         n_columns,
-                                        stride,
-                                        stride,
+                                        stride_operation * stride_in,
+                                        stride_operation * stride_out,
                                         contract_over_rows,
                                         add>(shape_data, in, out);
 
             if (one_line == false)
               {
-                ++in;
-                ++out;
+                in += stride_in;
+                out += stride_out;
               }
           }
         if (one_line == false)
           {
-            in += stride * (mm - 1);
-            out += stride * (nn - 1);
-          }
-      }
-  }
-
-
-
-  template <EvaluatorVariant variant,
-            int              dim,
-            int              n_rows,
-            int              n_columns,
-            typename Number,
-            typename Number2>
-  template <int  face_direction,
-            bool contract_onto_face,
-            bool add,
-            int  max_derivative>
-  inline void
-  EvaluatorTensorProduct<variant, dim, n_rows, n_columns, Number, Number2>::
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT       out) const
-  {
-    Assert(dim > 0, ExcMessage("Only dim=1,2,3 supported"));
-    static_assert(max_derivative >= 0 && max_derivative < 3,
-                  "Only derivative orders 0-2 implemented");
-    Assert(shape_values != nullptr,
-           ExcMessage(
-             "The given array shape_values must not be the null pointer."));
-
-    constexpr int n_blocks1 = (dim > 1 ? n_rows : 1);
-    constexpr int n_blocks2 = (dim > 2 ? n_rows : 1);
-
-    AssertIndexRange(face_direction, dim);
-    constexpr int in_stride  = Utilities::pow(n_rows, face_direction);
-    constexpr int out_stride = Utilities::pow(n_rows, dim - 1);
-    const Number2 *DEAL_II_RESTRICT shape_values = this->shape_values;
-
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            if (contract_onto_face == true)
-              {
-                Number res0 = shape_values[0] * in[0];
-                Number res1, res2;
-                if (max_derivative > 0)
-                  res1 = shape_values[n_rows] * in[0];
-                if (max_derivative > 1)
-                  res2 = shape_values[2 * n_rows] * in[0];
-                for (int ind = 1; ind < n_rows; ++ind)
-                  {
-                    res0 += shape_values[ind] * in[in_stride * ind];
-                    if (max_derivative > 0)
-                      res1 += shape_values[ind + n_rows] * in[in_stride * ind];
-                    if (max_derivative > 1)
-                      res2 +=
-                        shape_values[ind + 2 * n_rows] * in[in_stride * ind];
-                  }
-                if (add)
-                  {
-                    out[0] += res0;
-                    if (max_derivative > 0)
-                      out[out_stride] += res1;
-                    if (max_derivative > 1)
-                      out[2 * out_stride] += res2;
-                  }
-                else
-                  {
-                    out[0] = res0;
-                    if (max_derivative > 0)
-                      out[out_stride] = res1;
-                    if (max_derivative > 1)
-                      out[2 * out_stride] = res2;
-                  }
-              }
-            else
-              {
-                for (int col = 0; col < n_rows; ++col)
-                  {
-                    if (add)
-                      out[col * in_stride] += shape_values[col] * in[0];
-                    else
-                      out[col * in_stride] = shape_values[col] * in[0];
-                    if (max_derivative > 0)
-                      out[col * in_stride] +=
-                        shape_values[col + n_rows] * in[out_stride];
-                    if (max_derivative > 1)
-                      out[col * in_stride] +=
-                        shape_values[col + 2 * n_rows] * in[2 * out_stride];
-                  }
-              }
-
-            // increment: in regular case, just go to the next point in
-            // x-direction. If we are at the end of one chunk in x-dir, need
-            // to jump over to the next layer in z-direction
-            switch (face_direction)
-              {
-                case 0:
-                  in += contract_onto_face ? n_rows : 1;
-                  out += contract_onto_face ? 1 : n_rows;
-                  break;
-                case 1:
-                  ++in;
-                  ++out;
-                  // faces 2 and 3 in 3d use local coordinate system zx, which
-                  // is the other way around compared to the tensor
-                  // product. Need to take that into account.
-                  if (dim == 3)
-                    {
-                      if (contract_onto_face)
-                        out += n_rows - 1;
-                      else
-                        in += n_rows - 1;
-                    }
-                  break;
-                case 2:
-                  ++in;
-                  ++out;
-                  break;
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
-          }
-
-        // adjust for local coordinate system zx
-        if (face_direction == 1 && dim == 3)
-          {
-            if (contract_onto_face)
-              {
-                in += n_rows * (n_rows - 1);
-                out -= n_rows * n_rows - 1;
-              }
-            else
-              {
-                out += n_rows * (n_rows - 1);
-                in -= n_rows * n_rows - 1;
-              }
+            in += stride_operation * (mm - 1) * stride_in;
+            out += stride_operation * (nn - 1) * stride_out;
           }
       }
   }
@@ -1578,13 +1466,8 @@ namespace internal
         }
       else
         {
-          // We can enter this function either for the apply() path that has
-          // n_rows * n_columns entries or for the apply_face() path that only
-          // has n_rows * 3 entries in the array. Since we cannot decide about
-          // the use we must allow for both here.
           Assert(shape_values.empty() ||
-                   shape_values.size() == n_rows * n_columns ||
-                   shape_values.size() == n_rows * 3,
+                   shape_values.size() == n_rows * n_columns,
                  ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
           Assert(shape_gradients.empty() ||
                    shape_gradients.size() == n_rows * n_columns,
@@ -1612,25 +1495,23 @@ namespace internal
       , n_columns(n_columns)
     {}
 
-    template <int direction, bool contract_over_rows, bool add>
+    template <int direction, bool contract_over_rows, bool add, int stride = 1>
     void
     values(const Number *in, Number *out) const
     {
-      apply<direction,
-            contract_over_rows,
-            add,
-            false,
-            EvaluatorQuantity::value>(shape_values, in, out);
+      constexpr EvaluatorQuantity value_type = EvaluatorQuantity::value;
+      apply<direction, contract_over_rows, add, false, value_type, stride>(
+        shape_values, in, out);
     }
 
-    template <int direction, bool contract_over_rows, bool add>
+    template <int direction, bool contract_over_rows, bool add, int stride = 1>
     void
     gradients(const Number *in, Number *out) const
     {
       constexpr EvaluatorQuantity gradient_type =
         (variant != evaluate_evenodd ? EvaluatorQuantity::value :
                                        EvaluatorQuantity::gradient);
-      apply<direction, contract_over_rows, add, false, gradient_type>(
+      apply<direction, contract_over_rows, add, false, gradient_type, stride>(
         shape_gradients, in, out);
     }
 
@@ -1682,19 +1563,12 @@ namespace internal
               bool              contract_over_rows,
               bool              add,
               bool              one_line = false,
-              EvaluatorQuantity quantity = EvaluatorQuantity::value>
+              EvaluatorQuantity quantity = EvaluatorQuantity::value,
+              int               stride   = 1>
     void
     apply(const Number2 *DEAL_II_RESTRICT shape_data,
           const Number                   *in,
           Number                         *out) const;
-
-    template <int  face_direction,
-              bool contract_onto_face,
-              bool add,
-              int  max_derivative>
-    void
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT       out) const;
 
     const Number2     *shape_values;
     const Number2     *shape_gradients;
@@ -1713,7 +1587,8 @@ namespace internal
             bool              contract_over_rows,
             bool              add,
             bool              one_line,
-            EvaluatorQuantity quantity>
+            EvaluatorQuantity quantity,
+            int               stride>
   inline void
   EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>::apply(
     const Number2 *DEAL_II_RESTRICT shape_data,
@@ -1733,14 +1608,16 @@ namespace internal
     const int mm = contract_over_rows ? n_rows : n_columns,
               nn = contract_over_rows ? n_columns : n_rows;
 
-    const int stride =
+    const int stride_operation =
       direction == 0 ? 1 : Utilities::fixed_power<direction>(n_columns);
-    const int n_blocks1 = one_line ? 1 : stride;
+    const int n_blocks1 = one_line ? 1 : stride_operation;
     const int n_blocks2 = direction >= dim - 1 ?
                             1 :
                             Utilities::fixed_power<dim - direction - 1>(n_rows);
     Assert(n_rows <= 128, ExcNotImplemented());
 
+    constexpr int stride_in  = !contract_over_rows ? stride : 1;
+    constexpr int stride_out = contract_over_rows ? stride : 1;
     for (int i2 = 0; i2 < n_blocks2; ++i2)
       {
         for (int i1 = 0; i1 < n_blocks1; ++i1)
@@ -1752,150 +1629,24 @@ namespace internal
             apply_matrix_vector_product<restricted_variant,
                                         quantity,
                                         contract_over_rows,
-                                        add>(
-              shape_data, in, out, n_rows, n_columns, stride, stride);
+                                        add>(shape_data,
+                                             in,
+                                             out,
+                                             n_rows,
+                                             n_columns,
+                                             stride_operation * stride_in,
+                                             stride_operation * stride_out);
 
             if (one_line == false)
               {
-                ++in;
-                ++out;
+                in += stride_in;
+                out += stride_out;
               }
           }
         if (one_line == false)
           {
-            in += stride * (mm - 1);
-            out += stride * (nn - 1);
-          }
-      }
-  }
-
-
-
-  template <EvaluatorVariant variant,
-            int              dim,
-            typename Number,
-            typename Number2>
-  template <int  face_direction,
-            bool contract_onto_face,
-            bool add,
-            int  max_derivative>
-  inline void
-  EvaluatorTensorProduct<variant, dim, 0, 0, Number, Number2>::apply_face(
-    const Number *DEAL_II_RESTRICT in,
-    Number *DEAL_II_RESTRICT       out) const
-  {
-    Assert(shape_values != nullptr,
-           ExcMessage(
-             "The given array shape_data must not be the null pointer!"));
-    static_assert(dim > 0 && dim < 4, "Only dim=1,2,3 supported");
-    const int n_blocks1 = dim > 1 ? n_rows : 1;
-    const int n_blocks2 = dim > 2 ? n_rows : 1;
-
-    AssertIndexRange(face_direction, dim);
-    const int in_stride =
-      face_direction > 0 ? Utilities::fixed_power<face_direction>(n_rows) : 1;
-    const int out_stride =
-      dim > 1 ? Utilities::fixed_power<dim - 1>(n_rows) : 1;
-
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            if (contract_onto_face == true)
-              {
-                Number res0 = shape_values[0] * in[0];
-                Number res1, res2;
-                if (max_derivative > 0)
-                  res1 = shape_values[n_rows] * in[0];
-                if (max_derivative > 1)
-                  res2 = shape_values[2 * n_rows] * in[0];
-                for (unsigned int ind = 1; ind < n_rows; ++ind)
-                  {
-                    res0 += shape_values[ind] * in[in_stride * ind];
-                    if (max_derivative > 0)
-                      res1 += shape_values[ind + n_rows] * in[in_stride * ind];
-                    if (max_derivative > 1)
-                      res2 +=
-                        shape_values[ind + 2 * n_rows] * in[in_stride * ind];
-                  }
-                if (add)
-                  {
-                    out[0] += res0;
-                    if (max_derivative > 0)
-                      out[out_stride] += res1;
-                    if (max_derivative > 1)
-                      out[2 * out_stride] += res2;
-                  }
-                else
-                  {
-                    out[0] = res0;
-                    if (max_derivative > 0)
-                      out[out_stride] = res1;
-                    if (max_derivative > 1)
-                      out[2 * out_stride] = res2;
-                  }
-              }
-            else
-              {
-                for (unsigned int col = 0; col < n_rows; ++col)
-                  {
-                    if (add)
-                      out[col * in_stride] += shape_values[col] * in[0];
-                    else
-                      out[col * in_stride] = shape_values[col] * in[0];
-                    if (max_derivative > 0)
-                      out[col * in_stride] +=
-                        shape_values[col + n_rows] * in[out_stride];
-                    if (max_derivative > 1)
-                      out[col * in_stride] +=
-                        shape_values[col + 2 * n_rows] * in[2 * out_stride];
-                  }
-              }
-
-            // increment: in regular case, just go to the next point in
-            // x-direction. If we are at the end of one chunk in x-dir, need
-            // to jump over to the next layer in z-direction
-            switch (face_direction)
-              {
-                case 0:
-                  in += contract_onto_face ? n_rows : 1;
-                  out += contract_onto_face ? 1 : n_rows;
-                  break;
-                case 1:
-                  ++in;
-                  ++out;
-                  // faces 2 and 3 in 3d use local coordinate system zx, which
-                  // is the other way around compared to the tensor
-                  // product. Need to take that into account.
-                  if (dim == 3)
-                    {
-                      if (contract_onto_face)
-                        out += n_rows - 1;
-                      else
-                        in += n_rows - 1;
-                    }
-                  break;
-                case 2:
-                  ++in;
-                  ++out;
-                  break;
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
-          }
-        if (face_direction == 1 && dim == 3)
-          {
-            // adjust for local coordinate system zx
-            if (contract_onto_face)
-              {
-                in += n_rows * (n_rows - 1);
-                out -= n_rows * n_rows - 1;
-              }
-            else
-              {
-                out += n_rows * (n_rows - 1);
-                in -= n_rows * n_rows - 1;
-              }
+            in += stride_operation * (mm - 1) * stride_in;
+            out += stride_operation * (nn - 1) * stride_out;
           }
       }
   }
@@ -1903,505 +1654,175 @@ namespace internal
 
 
   /**
-   * Generic evaluator framework that valuates the given shape data in general
-   * dimensions using the tensor product form. Depending on the particular
-   * layout in the matrix entries, this corresponds to a usual matrix-matrix
-   * product or a matrix-matrix product including some symmetries. The actual
-   * work is implemented by functions of type apply_matrix_vector_product
-   * working on a single dimension, controlled by suitable strides, using the
-   * kernel specified via variant.
+   * This function applies the tensor product operation to produce face values
+   * from cell values. The algorithm involved here can be interpreted as the
+   * first sweep in sum factorization, reducing the dimensionality of the data
+   * set from dim-dimensional cell values to (dim-1)-dimensional face
+   * values. This step is always done before we evaluate within the face, as
+   * it reduces the length of the loops for the successive steps.
    *
-   * @tparam variant Variant of evaluation used for creating template
-   *                 specializations
-   * @tparam dim Dimension of the function
-   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
-   *                to the number of 1d shape functions in the usual tensor
-   *                contraction setting
-   * @tparam n_columns Number of columns in the transformation matrix, which
-   *                   corresponds to the number of 1d shape functions in the
-   *                   usual tensor contraction setting
-   * @tparam Number Abstract number type for input and output arrays
-   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
-   *                 same type as the input/output arrays); must implement
-   *                 operator* with Number to be valid
-   * @tparam normal_dir Indicates the direction of the continuous component for the
-   *                    Raviart-Thomas space in terms of the normal onto the
-   * face, e.g 0 if the  is in x-direction, 1 if in y-direction, and 2 if in
-   * z-direction.
+   * @tparam n_rows_template The number of entries within the interpolation,
+   *             typically equal to the polynomial degree plus one, if known
+   *             at compile time, otherwise n_rows_runtime is used.
+   * @tparam stride_template The stride between successive entries in the
+   *             one-dimensional operation of sum factorization, if known at
+   *             compile time, otherwise stride_runtime is used.
+   * @tparam contract_onto_face If true, the input vector is of size n_rows^dim
+   *                            and interpolation into n_rows^(dim-1) points
+   *                            is performed. This is a typical scenario in
+   *                            FEFaceEvaluation::evaluate() calls. If false,
+   *                            data from n_rows^(dim-1) points is expanded
+   *                            into the n_rows^dim points of the higher-
+   *                            dimensional data array. Derivatives in the
+   *                            case contract_onto_face==false are summed
+   *                            together.
+   * @tparam add If true, the result is added to the output vector, else
+   *             the computed values overwrite the content in the output.
+   * @tparam max_derivative Sets the number of derivatives that should be
+   *             computed. 0 means only values, 1 means values and first
+   *             derivatives, 2 up to second derivates. Note that all the
+   *             derivatives access the data in @p shape_values passed to
+   *             the constructor of the class.
+   *
+   * @param shape_values Address of the interpolation matrix.
+   * @param n_blocks Number of interpolation layers used along the up to two
+   *             dimensions tangential to the interpolation direction.
+   * @param steps Increments in the input array from one step to the next,
+   *             varied in conjunction with the @p stride_template variable: We
+   *             increment by @p stride_template along the 1d interpolation,
+   *             and then increment by @p steps when passing from one line
+   *             to the next.
+   * @param input Address of the input data vector.
+   * @param output Address of the output data vector.
+   * @param n_rows_runtime Alternative number of rows to be used if the
+   *             variable @p n_rows_template is 0, enabling a run-time path.
+   * @param stride_runtime Alternative number for the stride to be used if the
+   *             variable @p n_rows_template is 0.
    */
-  template <EvaluatorVariant variant,
-            int              dim,
-            int              n_rows,
-            int              n_columns,
-            int              normal_dir,
+  template <int  n_rows_template,
+            int  stride_template,
+            bool contract_onto_face,
+            bool add,
+            int  max_derivative,
             typename Number,
-            typename Number2 = Number>
-  struct EvaluatorTensorProductAnisotropic
-  {};
+            typename Number2>
+  inline std::enable_if_t<contract_onto_face, void>
+  interpolate_to_face(const Number2            *shape_values,
+                      const std::array<int, 2> &n_blocks,
+                      const std::array<int, 2> &steps,
+                      const Number             *input,
+                      Number *DEAL_II_RESTRICT  output,
+                      const int                 n_rows_runtime = 0,
+                      const int                 stride_runtime = 1)
+  {
+    const int n_rows = n_rows_template > 0 ? n_rows_template : n_rows_runtime;
+    const int stride = n_rows_template > 0 ? stride_template : stride_runtime;
+
+    Number *output1 = output + n_blocks[0] * n_blocks[1];
+    Number *output2 = output1 + n_blocks[0] * n_blocks[1];
+    for (int i2 = 0; i2 < n_blocks[1]; ++i2)
+      {
+        for (int i1 = 0; i1 < n_blocks[0]; ++i1)
+          {
+            Number res0 = shape_values[0] * input[0];
+            Number res1, res2;
+            if (max_derivative > 0)
+              res1 = shape_values[n_rows] * input[0];
+            if (max_derivative > 1)
+              res2 = shape_values[2 * n_rows] * input[0];
+            for (int ind = 1; ind < n_rows; ++ind)
+              {
+                res0 += shape_values[ind] * input[stride * ind];
+                if (max_derivative > 0)
+                  res1 += shape_values[ind + n_rows] * input[stride * ind];
+                if (max_derivative > 1)
+                  res2 += shape_values[ind + 2 * n_rows] * input[stride * ind];
+              }
+            if (add)
+              {
+                output[i1] += res0;
+                if (max_derivative > 0)
+                  output1[i1] += res1;
+                if (max_derivative > 1)
+                  output2[i2] += res2;
+              }
+            else
+              {
+                output[i1] = res0;
+                if (max_derivative > 0)
+                  output1[i1] = res1;
+                if (max_derivative > 1)
+                  output2[i1] = res2;
+              }
+            input += steps[0];
+          }
+        output += n_blocks[0];
+        if (max_derivative > 0)
+          output1 += n_blocks[0];
+        if (max_derivative > 1)
+          output2 += n_blocks[0];
+        input += steps[1];
+      }
+  }
 
 
 
   /**
-   * Internal evaluator for shape function in 2d and 3d using the
-   * tensor product form of the anisotropic basis functions of the
-   * raviart-thomas element, with degree k+1 in normal direction and
-   * k in tangential direction.
-   *
-   * @tparam dim Space dimension in which this class is applied
-   * @tparam n_rows Number of rows in the transformation matrix, which corresponds
-   *                to the number of 1d shape functions in the usual tensor
-   *                contraction setting
-   * @tparam n_columns Number of columns in the transformation matrix, which
-   *                   corresponds to the number of 1d shape functions in the
-   *                   usual tensor contraction setting
-   * @tparam Number Abstract number type for input and output arrays
-   * @tparam Number2 Abstract number type for coefficient arrays (defaults to
-   *                 same type as the input/output arrays); must implement
-   *                 operator* with Number and produce Number as an output to
-   *                 be a valid type
+   * This function performs the opposite operation to the interpolate_to_face
+   * function, done as the last step in sum factorization to embed face values
+   * and gradients back to values on all degrees of freedom of the cell.
    */
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            int normal_dir,
-            typename Number,
-            typename Number2>
-  struct EvaluatorTensorProductAnisotropic<evaluate_raviart_thomas,
-                                           dim,
-                                           n_rows,
-                                           n_columns,
-                                           normal_dir,
-                                           Number,
-                                           Number2>
-  {
-    static constexpr unsigned int n_rows_of_product =
-      numbers::invalid_unsigned_int;
-    static constexpr unsigned int n_columns_of_product =
-      numbers::invalid_unsigned_int;
-
-    /**
-     * Empty constructor. Does nothing. Be careful when using 'values' and
-     * related methods because they need to be filled with the other pointer
-     */
-    EvaluatorTensorProductAnisotropic()
-      : shape_values(nullptr)
-      , shape_gradients(nullptr)
-      , shape_hessians(nullptr)
-    {}
-
-    /**
-     * Constructor, taking the data from ShapeInfo
-     */
-    EvaluatorTensorProductAnisotropic(
-      const AlignedVector<Number2> &shape_values,
-      const AlignedVector<Number2> &shape_gradients,
-      const AlignedVector<Number2> &shape_hessians,
-      const unsigned int            dummy1 = 0,
-      const unsigned int            dummy2 = 0)
-      : shape_values(shape_values.begin())
-      , shape_gradients(shape_gradients.begin())
-      , shape_hessians(shape_hessians.begin())
-    {
-      // We can enter this function either for the apply() path that has
-      // n_rows * n_columns entries or for the apply_face() path that only has
-      // n_rows * 3 entries in the array. Since we cannot decide about the use
-      // we must allow for both here.
-      Assert(shape_values.empty() ||
-               shape_values.size() == n_rows * n_columns ||
-               shape_values.size() == 3 * n_rows,
-             ExcDimensionMismatch(shape_values.size(), n_rows * n_columns));
-      Assert(shape_gradients.empty() ||
-               shape_gradients.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_gradients.size(), n_rows * n_columns));
-      Assert(shape_hessians.empty() ||
-               shape_hessians.size() == n_rows * n_columns,
-             ExcDimensionMismatch(shape_hessians.size(), n_rows * n_columns));
-      (void)dummy1;
-      (void)dummy2;
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    values(const Number in[], Number out[]) const
-    {
-      apply<direction, contract_over_rows, add>(shape_values, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    gradients(const Number in[], Number out[]) const
-    {
-      apply<direction, contract_over_rows, add>(shape_gradients, in, out);
-    }
-
-    template <int direction, bool contract_over_rows, bool add>
-    void
-    hessians(const Number in[], Number out[]) const
-    {
-      apply<direction, contract_over_rows, add>(shape_hessians, in, out);
-    }
-
-    /**
-     * This function applies the tensor product kernel, corresponding to a
-     * multiplication of 1d stripes, along the given @p direction of the tensor
-     * data in the input array. This function allows the @p in and @p out
-     * arrays to alias for the case n_rows == n_columns, i.e., it is safe to
-     * perform the contraction in place where @p in and @p out point to the
-     * same address. For the case n_rows != n_columns, the output is only
-     * correct if @p one_line is set to true.
-     *
-     * @tparam direction Direction that is evaluated
-     * @tparam contract_over_rows If true, the tensor contraction sums
-     *                            over the rows in the given @p shape_data
-     *                            array, otherwise it sums over the columns
-     * @tparam add If true, the result is added to the output vector, else
-     *             the computed values overwrite the content in the output
-     * @tparam normal_dir Indicates the direction of the continuous component of the
-     *                    RT space in terms of the normal onto the face, e.g
-     *                    0 if the  is in x-direction, 1 if in y-direction
-     *                    etc.
-     * @tparam one_line If true, the kernel is only applied along a single 1d
-     *                  stripe within a dim-dimensional tensor, not the full
-     *                  n_rows^dim points as in the @p false case.
-     *
-     * @param shape_data Transformation matrix with @p n_rows rows and
-     *                   @p n_columns columns, stored in row-major format
-     * @param in Pointer to the start of the input data vector
-     * @param out Pointer to the start of the output data vector
-     */
-    template <int  direction,
-              bool contract_over_rows,
-              bool add,
-              bool one_line = false>
-    static void
-    apply(const Number2 *DEAL_II_RESTRICT shape_data,
-          const Number                   *in,
-          Number                         *out);
-
-    template <int  face_direction,
-              bool contract_onto_face,
-              bool add,
-              int  max_derivative>
-    void
-    apply_face(const Number *DEAL_II_RESTRICT in,
-               Number *DEAL_II_RESTRICT       out) const;
-
-  private:
-    const Number2 *shape_values;
-    const Number2 *shape_gradients;
-    const Number2 *shape_hessians;
-  };
-
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            int normal_dir,
-            typename Number,
-            typename Number2>
-  template <int direction, bool contract_over_rows, bool add, bool one_line>
-  inline void
-  EvaluatorTensorProductAnisotropic<
-    evaluate_raviart_thomas,
-    dim,
-    n_rows,
-    n_columns,
-    normal_dir,
-    Number,
-    Number2>::apply(const Number2 *DEAL_II_RESTRICT shape_data,
-                    const Number                   *in,
-                    Number                         *out)
-  {
-    static_assert(one_line == false || direction == dim - 1,
-                  "Single-line evaluation only works for direction=dim-1.");
-    Assert(shape_data != nullptr,
-           ExcMessage(
-             "The given array shape_data must not be the null pointer!"));
-    Assert(dim == direction + 1 || one_line == true || n_rows == n_columns ||
-             in != out,
-           ExcMessage("In-place operation only supported for "
-                      "n_rows==n_columns or single-line interpolation"));
-    AssertIndexRange(direction, dim);
-    constexpr int mm = contract_over_rows ? n_rows : n_columns,
-                  nn = contract_over_rows ? n_columns : n_rows;
-
-    constexpr int stride    = Utilities::pow(n_columns, direction);
-    constexpr int n_blocks1 = one_line ? 1 : stride;
-
-    // The number of blocks depend on both direction and dimension.
-    constexpr int n_blocks2 =
-      (dim - direction - 1 == 0) ?
-        1 :
-        ((direction == normal_dir) ?
-           Utilities::pow((n_rows - 1),
-                          (direction >= dim) ? 0 : dim - direction - 1) :
-           (((direction < normal_dir) ? (n_rows + 1) : n_rows) *
-            ((dim - direction == 3) ? n_rows : 1)));
-
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
-      {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
-          {
-            Number x[mm];
-            for (int i = 0; i < mm; ++i)
-              x[i] = in[stride * i];
-
-            for (int col = 0; col < nn; ++col)
-              {
-                Number2 val0;
-
-                if (contract_over_rows)
-                  val0 = shape_data[col];
-                else
-                  val0 = shape_data[col * n_columns];
-
-                Number res0 = val0 * x[0];
-                for (int i = 1; i < mm; ++i)
-                  {
-                    if (contract_over_rows)
-                      val0 = shape_data[i * n_columns + col];
-                    else
-                      val0 = shape_data[col * n_columns + i];
-
-                    res0 += val0 * x[i];
-                  }
-                if (add)
-                  out[stride * col] += res0;
-
-                else
-                  out[stride * col] = res0;
-              }
-
-            if (one_line == false)
-              {
-                ++in;
-                ++out;
-              }
-          }
-        if (one_line == false)
-          {
-            in += stride * (mm - 1);
-            out += stride * (nn - 1);
-          }
-      }
-  }
-
-  template <int dim,
-            int n_rows,
-            int n_columns,
-            int normal_dir,
-            typename Number,
-            typename Number2>
-  template <int  face_direction,
+  template <int  n_rows_template,
+            int  stride_template,
             bool contract_onto_face,
             bool add,
-            int  max_derivative>
-  inline void
-  EvaluatorTensorProductAnisotropic<
-    evaluate_raviart_thomas,
-    dim,
-    n_rows,
-    n_columns,
-    normal_dir,
-    Number,
-    Number2>::apply_face(const Number *DEAL_II_RESTRICT in,
-                         Number *DEAL_II_RESTRICT       out) const
+            int  max_derivative,
+            typename Number,
+            typename Number2>
+  inline std::enable_if_t<!contract_onto_face, void>
+  interpolate_to_face(const Number2            *shape_values,
+                      const std::array<int, 2> &n_blocks,
+                      const std::array<int, 2> &steps,
+                      const Number             *input,
+                      Number *DEAL_II_RESTRICT  output,
+                      const int                 n_rows_runtime = 0,
+                      const int                 stride_runtime = 1)
   {
-    Assert(dim > 1 && dim < 4, ExcMessage("Only dim=2,3 supported"));
-    static_assert(max_derivative >= 0 && max_derivative < 3,
-                  "Only derivative orders 0-2 implemented");
-    Assert(shape_values != nullptr,
-           ExcMessage(
-             "The given array shape_values must not be the null pointer."));
+    const int n_rows = n_rows_template > 0 ? n_rows_template : n_rows_runtime;
+    const int stride = n_rows_template > 0 ? stride_template : stride_runtime;
 
-    // Determine the number of blocks depending on the face and normaldirection,
-    // as well as dimension.
-    constexpr int n_blocks1 = (face_direction == normal_dir) ? (n_rows - 1) :
-                              ((face_direction == 0 && normal_dir == 2) ||
-                               (face_direction == 1 && normal_dir == 2) ||
-                               (face_direction == 2 && normal_dir == 1)) ?
-                                                               n_rows :
-                                                               (n_rows + 1);
-    constexpr int n_blocks2 = (dim == 2) ?
-                                1 :
-                                ((face_direction == normal_dir) ?
-                                   (n_rows - 1) :
-                                   (((face_direction == 0 && normal_dir == 1) ||
-                                     (face_direction == 1 && normal_dir == 0) ||
-                                     (face_direction == 2 && normal_dir == 0)) ?
-                                      n_rows :
-                                      (n_rows + 1)));
-
-    AssertIndexRange(face_direction, dim);
-
-    constexpr int in_stride =
-      (face_direction == normal_dir) ?
-        Utilities::pow(n_rows - 1, face_direction) :
-        ((face_direction == 0) ?
-           1 :
-           ((face_direction == 2) ?
-              n_rows * (n_rows + 1) :
-              ((face_direction == 1 && normal_dir == 0) ? (n_rows + 1) :
-                                                          n_rows)));
-    constexpr int out_stride = n_blocks1 * n_blocks2;
-
-    const Number2 *DEAL_II_RESTRICT shape_values = this->shape_values;
-
-    for (int i2 = 0; i2 < n_blocks2; ++i2)
+    const Number *input1 = input + n_blocks[0] * n_blocks[1];
+    const Number *input2 = input1 + n_blocks[0] * n_blocks[1];
+    for (int i2 = 0; i2 < n_blocks[1]; ++i2)
       {
-        for (int i1 = 0; i1 < n_blocks1; ++i1)
+        for (int i1 = 0; i1 < n_blocks[0]; ++i1)
           {
-            if (contract_onto_face == true)
+            const Number in = input[i1];
+            Number       in1, in2;
+            if (max_derivative > 0)
+              in1 = input1[i1];
+            if (max_derivative > 1)
+              in2 = input2[i1];
+            for (int col = 0; col < n_rows; ++col)
               {
-                Number res0 = shape_values[0] * in[0];
-                Number res1, res2;
-
+                Number result =
+                  add ? (output[col * stride] + shape_values[col] * in) :
+                        (shape_values[col] * in);
                 if (max_derivative > 0)
-                  res1 = shape_values[n_rows] * in[0];
-
+                  result += shape_values[col + n_rows] * in1;
                 if (max_derivative > 1)
-                  res2 = shape_values[2 * n_rows] * in[0];
+                  result += shape_values[col + 2 * n_rows] * in2;
 
-                for (int ind = 1; ind < n_rows; ++ind)
-                  {
-                    res0 += shape_values[ind] * in[in_stride * ind];
-                    if (max_derivative > 0)
-                      res1 += shape_values[ind + n_rows] * in[in_stride * ind];
-
-                    if (max_derivative > 1)
-                      res2 +=
-                        shape_values[ind + 2 * n_rows] * in[in_stride * ind];
-                  }
-                if (add)
-                  {
-                    out[0] += res0;
-
-                    if (max_derivative > 0)
-                      out[out_stride] += res1;
-
-                    if (max_derivative > 1)
-                      out[2 * out_stride] += res2;
-                  }
-                else
-                  {
-                    out[0] = res0;
-
-                    if (max_derivative > 0)
-                      out[out_stride] = res1;
-
-                    if (max_derivative > 1)
-                      out[2 * out_stride] = res2;
-                  }
+                output[col * stride] = result;
               }
-            else
-              {
-                for (int col = 0; col < n_rows; ++col)
-                  {
-                    if (add)
-                      out[col * in_stride] += shape_values[col] * in[0];
-                    else
-                      out[col * in_stride] = shape_values[col] * in[0];
-
-                    if (max_derivative > 0)
-                      out[col * in_stride] +=
-                        shape_values[col + n_rows] * in[out_stride];
-
-                    if (max_derivative > 1)
-                      out[col * in_stride] +=
-                        shape_values[col + 2 * n_rows] * in[2 * out_stride];
-                  }
-              }
-
-            // increment: in regular case, just go to the next point in
-            // x-direction. If we are at the end of one chunk in x-dir, need
-            // to jump over to the next layer in z-direction
-            switch (face_direction)
-              {
-                case 0:
-                  in += contract_onto_face ? n_rows : 1;
-                  out += contract_onto_face ? 1 : n_rows;
-                  break;
-
-                case 1:
-                  ++in;
-                  ++out;
-                  // faces 2 and 3 in 3d use local coordinate system zx, which
-                  // is the other way around compared to the tensor
-                  // product. Need to take that into account.
-                  if (dim == 3)
-                    {
-                      if (normal_dir == 0)
-                        {
-                          if (contract_onto_face)
-                            out += n_rows - 1;
-                          else
-                            in += n_rows - 1;
-                        }
-                      if (normal_dir == 1)
-                        {
-                          if (contract_onto_face)
-                            out += n_rows - 2;
-                          else
-                            in += n_rows - 2;
-                        }
-                      if (normal_dir == 2)
-                        {
-                          if (contract_onto_face)
-                            out += n_rows;
-                          else
-                            in += n_rows;
-                        }
-                    }
-                  break;
-
-                case 2:
-                  ++in;
-                  ++out;
-                  break;
-
-                default:
-                  Assert(false, ExcNotImplemented());
-              }
+            output += steps[0];
           }
-        if (face_direction == 1 && dim == 3)
-          {
-            // adjust for local coordinate system zx
-            if (contract_onto_face)
-              {
-                if (normal_dir == 0)
-                  {
-                    in += (n_rows + 1) * (n_rows - 1);
-                    out -= n_rows * (n_rows + 1) - 1;
-                  }
-                if (normal_dir == 1)
-                  {
-                    in += (n_rows - 1) * (n_rows - 1);
-                    out -= (n_rows - 1) * (n_rows - 1) - 1;
-                  }
-                if (normal_dir == 2)
-                  {
-                    in += (n_rows - 1) * (n_rows);
-                    out -= (n_rows) * (n_rows + 1) - 1;
-                  }
-              }
-            else
-              {
-                if (normal_dir == 0)
-                  {
-                    out += (n_rows + 1) * (n_rows - 1);
-                    in -= n_rows * (n_rows + 1) - 1;
-                  }
-                if (normal_dir == 1)
-                  {
-                    out += (n_rows - 1) * (n_rows - 1);
-                    in -= (n_rows - 1) * (n_rows - 1) - 1;
-                  }
-                if (normal_dir == 2)
-                  {
-                    out += (n_rows - 1) * (n_rows);
-                    in -= (n_rows) * (n_rows + 1) - 1;
-                  }
-              }
-          }
+        input += n_blocks[0];
+        if (max_derivative > 0)
+          input1 += n_blocks[0];
+        if (max_derivative > 1)
+          input2 += n_blocks[0];
+        output += steps[1];
       }
   }
 

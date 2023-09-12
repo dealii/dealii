@@ -757,17 +757,17 @@ namespace NavierStokes_DG
           for (unsigned int c = 0; c < dim + 2; ++c)
             {
               if (dim >= 1 && body_force.get() == nullptr)
-                eval.template gradients<0, false, false>(
-                  gradient_ptr + phi.static_n_q_points * 0, values_ptr);
+                eval.template gradients<0, false, false, dim>(gradient_ptr + 0,
+                                                              values_ptr);
               else if (dim >= 1)
-                eval.template gradients<0, false, true>(
-                  gradient_ptr + phi.static_n_q_points * 0, values_ptr);
+                eval.template gradients<0, false, true, dim>(gradient_ptr + 0,
+                                                             values_ptr);
               if (dim >= 2)
-                eval.template gradients<1, false, true>(
-                  gradient_ptr + phi.static_n_q_points * 1, values_ptr);
+                eval.template gradients<1, false, true, dim>(gradient_ptr + 1,
+                                                             values_ptr);
               if (dim >= 3)
-                eval.template gradients<2, false, true>(
-                  gradient_ptr + phi.static_n_q_points * 2, values_ptr);
+                eval.template gradients<2, false, true, dim>(gradient_ptr + 2,
+                                                             values_ptr);
 
               values_ptr += phi.static_n_q_points;
               gradient_ptr += phi.static_n_q_points * dim;
@@ -790,53 +790,77 @@ namespace NavierStokes_DG
 
             phi_m.reinit(cell, face);
 
-            internal::EvaluatorTensorProduct<
-              internal::EvaluatorVariant::evaluate_general,
-              dim,
-              n_points_1d,
-              0,
-              VectorizedArrayType>
-              evalf(data.get_shape_info()
-                      .data.front()
-                      .quadrature_data_on_face[face % 2],
-                    {},
-                    {},
-                    n_points_1d,
-                    0);
+            const AlignedVector<VectorizedArrayType> &shape_data =
+              data.get_shape_info().data.front().quadrature_data_on_face[face %
+                                                                         2];
+            const std::array<int, 2> n_blocks{
+              {(dim > 1 ? n_q_points_1d : 1), (dim > 2 ? n_q_points_1d : 1)}};
+
+            std::array<int, 2> steps;
+            if (face / 2 == 0)
+              steps = {{n_q_points_1d, 0}};
+            else if (dim == 2 && face / 2 == 1)
+              steps = {{1, 0}};
+            else if (face / 2 == 1)
+              // in 3d, the coordinate system is zx, not xz -> switch indices
+              steps = {{n_q_points_1d * n_q_points_1d,
+                        -static_cast<int>(n_q_points_1d * n_q_points_1d *
+                                          n_q_points_1d) +
+                          1}};
+            else
+              steps = {{1, 0}};
 
             for (unsigned int d = 0; d < dim + 2; ++d)
               {
                 const unsigned int n_q_points_face = phi_m.static_n_q_points;
                 if (face / 2 == 0)
-                  evalf.template apply_face<0, true, false, 1>(
-                    buffer.data() + d * phi.static_n_q_points,
-                    buffer_face.data());
+                  internal::
+                    interpolate_to_face<n_q_points_1d, 1, true, false, 1>(
+                      shape_data.begin(),
+                      n_blocks,
+                      steps,
+                      buffer.data() + d * phi.static_n_q_points,
+                      buffer_face.data());
                 else if (face / 2 == 1)
-                  evalf.template apply_face<1, true, false, 1>(
-                    buffer.data() + d * phi.static_n_q_points,
-                    buffer_face.data());
+                  internal::interpolate_to_face<n_q_points_1d,
+                                                n_q_points_1d,
+                                                true,
+                                                false,
+                                                1>(shape_data.begin(),
+                                                   n_blocks,
+                                                   steps,
+                                                   buffer.data() +
+                                                     d * phi.static_n_q_points,
+                                                   buffer_face.data());
                 else if (face / 2 == 2)
-                  evalf.template apply_face<2, true, false, 1>(
-                    buffer.data() + d * phi.static_n_q_points,
-                    buffer_face.data());
+                  internal::interpolate_to_face<n_q_points_1d,
+                                                n_q_points_1d * n_q_points_1d,
+                                                true,
+                                                false,
+                                                1>(shape_data.begin(),
+                                                   n_blocks,
+                                                   steps,
+                                                   buffer.data() +
+                                                     d * phi.static_n_q_points,
+                                                   buffer_face.data());
 
                 if (dim > 1)
-                  eval_face.template gradients<0, true, false>(
+                  eval_face.template gradients<0, true, false, dim>(
                     buffer_face.data(),
                     phi_m.begin_gradients() + (d * dim) * n_q_points_face);
                 if (dim > 2)
-                  eval_face.template gradients<1, true, false>(
+                  eval_face.template gradients<1, true, false, dim>(
                     buffer_face.data(),
-                    phi_m.begin_gradients() + (d * dim + 1) * n_q_points_face);
+                    phi_m.begin_gradients() + (d * dim) * n_q_points_face + 1);
 
                 for (unsigned int i = 0; i < n_q_points_face; ++i)
                   {
                     phi_m.begin_values()[d * n_q_points_face + i] =
                       buffer_face[i];
 
-                    phi_m
-                      .begin_gradients()[(d * dim + dim - 1) * n_q_points_face +
-                                         i] = buffer_face[n_q_points_face + i];
+                    phi_m.begin_gradients()[(d * dim) * n_q_points_face +
+                                            i * dim + dim - 1] =
+                      buffer_face[n_q_points_face + i];
                   }
               }
 
@@ -975,32 +999,49 @@ namespace NavierStokes_DG
                     buffer_face[i] =
                       phi_m.begin_values()[d * n_q_points_face + i];
                     buffer_face[n_q_points_face + i] =
-                      phi_m.begin_gradients()[(d * dim + dim - 1) *
-                                                n_q_points_face +
-                                              i];
+                      phi_m.begin_gradients()[d * dim * n_q_points_face +
+                                              i * dim + dim - 1];
                   }
 
                 if (dim > 2)
-                  eval_face.template gradients<1, false, true>(
-                    phi_m.begin_gradients() + (d * dim + 1) * n_q_points_face,
+                  eval_face.template gradients<1, false, true, dim>(
+                    phi_m.begin_gradients() + d * dim * n_q_points_face + 1,
                     buffer_face.data());
                 if (dim > 1)
-                  eval_face.template gradients<0, false, true>(
-                    phi_m.begin_gradients() + (d * dim) * n_q_points_face,
+                  eval_face.template gradients<0, false, true, dim>(
+                    phi_m.begin_gradients() + d * dim * n_q_points_face,
                     buffer_face.data());
 
                 if (face / 2 == 0)
-                  evalf.template apply_face<0, false, true, 1>(
-                    buffer_face.data(),
-                    phi.begin_values() + d * phi.static_n_q_points);
+                  internal::
+                    interpolate_to_face<n_q_points_1d, 1, false, true, 1>(
+                      shape_data.begin(),
+                      n_blocks,
+                      steps,
+                      buffer_face.data(),
+                      phi.begin_values() + d * phi.static_n_q_points);
                 else if (face / 2 == 1)
-                  evalf.template apply_face<1, false, true, 1>(
-                    buffer_face.data(),
-                    phi.begin_values() + d * phi.static_n_q_points);
+                  internal::interpolate_to_face<n_q_points_1d,
+                                                n_q_points_1d,
+                                                false,
+                                                true,
+                                                1>(shape_data.begin(),
+                                                   n_blocks,
+                                                   steps,
+                                                   buffer_face.data(),
+                                                   phi.begin_values() +
+                                                     d * phi.static_n_q_points);
                 else if (face / 2 == 2)
-                  evalf.template apply_face<2, false, true, 1>(
-                    buffer_face.data(),
-                    phi.begin_values() + d * phi.static_n_q_points);
+                  internal::interpolate_to_face<n_q_points_1d,
+                                                n_q_points_1d * n_q_points_1d,
+                                                false,
+                                                true,
+                                                1>(shape_data.begin(),
+                                                   n_blocks,
+                                                   steps,
+                                                   buffer_face.data(),
+                                                   phi.begin_values() +
+                                                     d * phi.static_n_q_points);
               }
           }
 
