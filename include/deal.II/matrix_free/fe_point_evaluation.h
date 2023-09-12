@@ -29,7 +29,7 @@
 #include <deal.II/fe/mapping.h>
 
 #include <deal.II/matrix_free/evaluation_flags.h>
-#include <deal.II/matrix_free/evaluation_kernels.h>
+#include <deal.II/matrix_free/evaluation_kernels_face.h>
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_kernels.h>
 
