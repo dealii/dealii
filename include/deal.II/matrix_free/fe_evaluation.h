@@ -31,7 +31,6 @@
 
 #include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/evaluation_kernels.h>
-#include <deal.II/matrix_free/evaluation_selector.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/fe_evaluation_data.h>
 #include <deal.II/matrix_free/hanging_nodes_internal.h>
@@ -7855,8 +7854,11 @@ FEEvaluation<dim,
 
   if constexpr (fe_degree > -1)
     {
-      SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::
-        evaluate(n_components, evaluation_flag_actual, values_array, *this);
+      internal::FEEvaluationImplSelector<dim, VectorizedArrayType, false>::
+        template run<fe_degree, n_q_points_1d>(n_components,
+                                               evaluation_flag_actual,
+                                               values_array,
+                                               *this);
     }
   else
     {
@@ -8084,12 +8086,12 @@ FEEvaluation<dim,
 
   if constexpr (fe_degree > -1)
     {
-      SelectEvaluator<dim, fe_degree, n_q_points_1d, VectorizedArrayType>::
-        integrate(n_components,
-                  integration_flag_actual,
-                  values_array,
-                  *this,
-                  sum_into_values_array);
+      internal::FEEvaluationImplSelector<dim, VectorizedArrayType, true>::
+        template run<fe_degree, n_q_points_1d>(n_components,
+                                               integration_flag_actual,
+                                               values_array,
+                                               *this,
+                                               sum_into_values_array);
     }
   else
     {
