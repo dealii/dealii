@@ -20,8 +20,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/matrix_free/evaluation_kernels.h>
-#include <deal.II/matrix_free/evaluation_selector.h>
+#include <deal.II/matrix_free/evaluation_kernels_face.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>
 #include <deal.II/matrix_free/evaluation_template_factory_internal.h>
 

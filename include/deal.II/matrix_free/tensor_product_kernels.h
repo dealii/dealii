@@ -24,6 +24,8 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/matrix_free/shape_info.h>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1653,6 +1655,173 @@ namespace internal
 
 
 
+  template <int  dim,
+            int  fe_degree,
+            int  n_q_points_1d,
+            bool contract_over_rows,
+            bool symmetric_evaluate = true>
+  struct EvaluatorTensorProductAnisotropic
+  {
+    template <int direction,
+              int stride       = 1,
+              typename Number  = double,
+              typename Number2 = double>
+    static void
+    normal(const MatrixFreeFunctions::UnivariateShapeData<Number2> &data,
+           const Number                                            *in,
+           Number                                                  *out,
+           const bool add_into_result  = false,
+           const int  subface_index_1d = 0)
+    {
+      AssertIndexRange(direction, dim);
+      AssertDimension(fe_degree, data.fe_degree);
+      AssertDimension(n_q_points_1d, data.n_q_points_1d);
+      constexpr int  n_rows    = fe_degree + 1;
+      constexpr int  n_columns = n_q_points_1d;
+      constexpr int  mm        = contract_over_rows ? n_rows : n_columns;
+      constexpr int  nn        = contract_over_rows ? n_columns : n_rows;
+      const Number2 *shape_data =
+        symmetric_evaluate ?
+          data.shape_values_eo.data() :
+          data.values_within_subface[subface_index_1d].data();
+      Assert(shape_data != nullptr, ExcNotInitialized());
+      Assert(contract_over_rows == false || !add_into_result,
+             ExcMessage("Cannot add into result if contract_over_rows = true"));
+
+      constexpr int n_blocks1  = Utilities::pow(fe_degree, direction);
+      constexpr int n_blocks2  = Utilities::pow(fe_degree, dim - direction - 1);
+      constexpr int stride_in  = contract_over_rows ? 1 : stride;
+      constexpr int stride_out = contract_over_rows ? stride : 1;
+      constexpr EvaluatorVariant variant =
+        symmetric_evaluate ? evaluate_evenodd : evaluate_general;
+
+      for (int i2 = 0; i2 < n_blocks2; ++i2)
+        {
+          for (int i1 = 0; i1 < n_blocks1; ++i1)
+            {
+              if (contract_over_rows == false && add_into_result)
+                apply_matrix_vector_product<variant,
+                                            EvaluatorQuantity::value,
+                                            n_rows,
+                                            n_columns,
+                                            n_blocks1 * stride_in,
+                                            n_blocks1 * stride_out,
+                                            contract_over_rows,
+                                            true>(shape_data, in, out);
+              else
+                apply_matrix_vector_product<variant,
+                                            EvaluatorQuantity::value,
+                                            n_rows,
+                                            n_columns,
+                                            n_blocks1 * stride_in,
+                                            n_blocks1 * stride_out,
+                                            contract_over_rows,
+                                            false>(shape_data, in, out);
+
+              in += stride_in;
+              out += stride_out;
+            }
+          in += n_blocks1 * (mm - 1) * stride_in;
+          out += n_blocks1 * (nn - 1) * stride_out;
+        }
+    }
+
+    template <int direction,
+              int normal_direction,
+              int stride       = 1,
+              typename Number  = double,
+              typename Number2 = double>
+    static void
+    tangential(const MatrixFreeFunctions::UnivariateShapeData<Number2> &data,
+               const Number                                            *in,
+               Number                                                  *out,
+               const int subface_index_1d = 0)
+    {
+      AssertIndexRange(direction, dim);
+      AssertDimension(fe_degree - 1, data.fe_degree);
+      AssertDimension(n_q_points_1d, data.n_q_points_1d);
+      static_assert(direction != normal_direction,
+                    "Cannot interpolate tangentially in normal direction");
+
+      constexpr int  n_rows    = fe_degree;
+      constexpr int  n_columns = n_q_points_1d;
+      const Number2 *shape_data =
+        symmetric_evaluate ?
+          data.shape_values_eo.data() :
+          data.values_within_subface[subface_index_1d].data();
+      Assert(shape_data != nullptr, ExcNotInitialized());
+
+      constexpr int n_blocks1 =
+        (direction > normal_direction) ?
+          Utilities::pow(n_q_points_1d, direction) :
+          (direction > 0 ?
+             (Utilities::pow(fe_degree, direction - 1) * n_q_points_1d) :
+             1);
+      constexpr int n_blocks2 =
+        (direction > normal_direction) ?
+          Utilities::pow(fe_degree, dim - 1 - direction) :
+          ((direction + 1 < dim) ?
+             (Utilities::pow(fe_degree, dim - 2 - direction) * n_q_points_1d) :
+             1);
+
+      constexpr EvaluatorVariant variant =
+        symmetric_evaluate ? evaluate_evenodd : evaluate_general;
+
+      // Since we may perform an in-place interpolation, we must run the step
+      // expanding the size of the basis backward ('contract_over_rows' aka
+      // 'evaluate' case), so shift the pointers and decrement during the loop
+      if (contract_over_rows)
+        {
+          in += (n_blocks2 - 1) * n_blocks1 * n_rows + n_blocks1 - 1;
+          out +=
+            stride * ((n_blocks2 - 1) * n_blocks1 * n_columns + n_blocks1 - 1);
+          for (int i2 = 0; i2 < n_blocks2; ++i2)
+            {
+              for (int i1 = 0; i1 < n_blocks1; ++i1)
+                {
+                  apply_matrix_vector_product<variant,
+                                              EvaluatorQuantity::value,
+                                              n_rows,
+                                              n_columns,
+                                              n_blocks1,
+                                              n_blocks1 * stride,
+                                              true,
+                                              false>(shape_data, in, out);
+
+                  --in;
+                  out -= stride;
+                }
+              in -= n_blocks1 * (n_rows - 1);
+              out -= n_blocks1 * (n_columns - 1) * stride;
+            }
+        }
+      else
+        {
+          for (int i2 = 0; i2 < n_blocks2; ++i2)
+            {
+              for (int i1 = 0; i1 < n_blocks1; ++i1)
+                {
+                  apply_matrix_vector_product<variant,
+                                              EvaluatorQuantity::value,
+                                              n_rows,
+                                              n_columns,
+                                              n_blocks1 * stride,
+                                              n_blocks1,
+                                              false,
+                                              false>(shape_data, in, out);
+
+                  in += stride;
+                  ++out;
+                }
+              in += n_blocks1 * (n_columns - 1) * stride;
+              out += n_blocks1 * (n_rows - 1);
+            }
+        }
+    }
+  };
+
+
+
   /**
    * This function applies the tensor product operation to produce face values
    * from cell values. The algorithm involved here can be interpreted as the
@@ -1763,6 +1932,23 @@ namespace internal
           output2 += n_blocks[0];
         input += steps[1];
       }
+  }
+
+
+
+  /**
+   * Helper function to specify whether a transformation to collocation should
+   * be used: It should give correct results (first condition), we need to be
+   * able to initialize the fields in shape_info.templates.h from the
+   * polynomials (second condition), and it should be the most efficient
+   * choice in terms of operation counts (third condition).
+   */
+  constexpr bool
+  use_collocation_evaluation(const unsigned int fe_degree,
+                             const unsigned int n_q_points_1d)
+  {
+    return (n_q_points_1d > fe_degree) && (n_q_points_1d < 200) &&
+           (n_q_points_1d <= 3 * fe_degree / 2 + 1);
   }
 
 
