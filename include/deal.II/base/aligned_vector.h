@@ -481,8 +481,8 @@ public:
 
 private:
   /**
-   * Allocates a new vector and moves the data from the old vector to the new
-   * vector. Deletes the old vector and releases the memory.
+   * Make a new allocation, move the data from the old memory region to the new
+   * region, and release the old memory.
    */
   void
   allocate_and_move(const size_t old_size,
