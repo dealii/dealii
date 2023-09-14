@@ -227,6 +227,7 @@ FEValuesBase<dim, spacedim>::FEValuesBase(
   , fe(&fe, typeid(*this).name())
   , cell_similarity(CellSimilarity::Similarity::none)
   , fe_values_views_cache(*this)
+  , check_for_cell_similarity_allowed(MultithreadInfo::n_threads() == 1)
 {
   Assert(n_q_points > 0,
          ExcMessage("There is nothing useful you can do with an FEValues "
@@ -242,6 +243,16 @@ FEValuesBase<dim, spacedim>::~FEValuesBase()
 {
   tria_listener_refinement.disconnect();
   tria_listener_mesh_transform.disconnect();
+}
+
+
+
+template <int dim, int spacedim>
+void
+FEValuesBase<dim, spacedim>::always_allow_check_for_cell_similarity(
+  const bool allow)
+{
+  check_for_cell_similarity_allowed = allow;
 }
 
 
@@ -1406,22 +1417,7 @@ inline void
 FEValuesBase<dim, spacedim>::check_cell_similarity(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell)
 {
-  // Unfortunately, the detection of simple geometries with CellSimilarity is
-  // sensitive to the first cell detected. When doing this with multiple
-  // threads, each thread will get its own scratch data object with an
-  // FEValues object in the implementation framework from late 2013, which is
-  // initialized to the first cell the thread sees. As this number might
-  // different between different runs (after all, the tasks are scheduled
-  // dynamically onto threads), this slight deviation leads to difference in
-  // roundoff errors that propagate through the program. Therefore, we need to
-  // disable CellSimilarity in case there is more than one thread in the
-  // problem. This will likely not affect many MPI test cases as there
-  // multithreading is disabled on default, but in many other situations
-  // because we rarely explicitly set the number of threads.
-  //
-  // TODO: Is it reasonable to introduce a flag "unsafe" in the constructor of
-  // FEValues to re-enable this feature?
-  if (MultithreadInfo::n_threads() > 1)
+  if (check_for_cell_similarity_allowed == false)
     {
       cell_similarity = CellSimilarity::none;
       return;
