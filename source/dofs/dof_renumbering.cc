@@ -411,23 +411,17 @@ namespace DoFRenumbering
     //
     // note that if constraints are not requested, then the 'constraints'
     // object will be empty and using it has no effect
-    IndexSet        locally_relevant_dofs;
-    const IndexSet &locally_owned_dofs = [&]() -> const IndexSet & {
-      if (reorder_level_dofs == false)
-        {
-          locally_relevant_dofs =
-            DoFTools::extract_locally_relevant_dofs(dof_handler);
-          return dof_handler.locally_owned_dofs();
-        }
-      else
-        {
-          Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
-                 ExcDoFHandlerNotInitialized());
-          locally_relevant_dofs =
-            DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-          return dof_handler.locally_owned_mg_dofs(level);
-        }
-    }();
+    if (reorder_level_dofs == true)
+      Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
+             ExcDoFHandlerNotInitialized());
+
+    const IndexSet locally_relevant_dofs =
+      (reorder_level_dofs == false ?
+         DoFTools::extract_locally_relevant_dofs(dof_handler) :
+         DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
+    const IndexSet &locally_owned_dofs =
+      (reorder_level_dofs == false ? dof_handler.locally_owned_dofs() :
+                                     dof_handler.locally_owned_mg_dofs(level));
 
     AffineConstraints<double> constraints;
     if (use_constraints)
@@ -472,17 +466,10 @@ namespace DoFRenumbering
         // indices that are locally owned, or that are only locally
         // relevant. in the process, also check that all indices
         // really belong to at least the locally relevant ones
-        IndexSet locally_active_dofs;
-        if (reorder_level_dofs == false)
-          {
-            locally_active_dofs =
-              DoFTools::extract_locally_active_dofs(dof_handler);
-          }
-        else
-          {
-            locally_active_dofs =
-              DoFTools::extract_locally_active_level_dofs(dof_handler, level);
-          }
+        const IndexSet locally_active_dofs =
+          (reorder_level_dofs == false ?
+             DoFTools::extract_locally_active_dofs(dof_handler) :
+             DoFTools::extract_locally_active_level_dofs(dof_handler, level));
 
         bool needs_locally_active = false;
         for (const auto starting_index : starting_indices)
