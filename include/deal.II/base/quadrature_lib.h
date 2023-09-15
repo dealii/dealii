@@ -47,6 +47,72 @@ public:
   QGauss(const unsigned int n);
 };
 
+/**
+ * The Gauss-Radau family of quadrature rules for numerical integration.
+ *
+ * This modification of the Gauss quadrature uses one of the two interval end
+ * points as well. Being exact for polynomials of degree $2n-2$, this
+ * formula is suboptimal by one degree.
+ *
+ * This formula is often used in the context of discontinuous Galerkin
+ * discretizations of ODEs and the temporal part of PDEs.
+ *
+ * The quadrature points are the left interval end point plus the $n-1$
+ * roots of the polynomial
+ * \f[
+ *   \frac{P_{n-1}(x)+P_n(x)}{1+x}
+ * \f]
+ * where $P_{n-1}$ and $P_n$ are Legendre polynomials.
+ * The quadrature weights are
+ * \f[
+ *   w_0=\frac{2}{n^2}\quad\text{and}
+ *   \quad w_i=\frac{1-x_i}{n^2(P_{n-1}(x_i))^2}\text{ for }i>0
+ * \f]
+ *
+ * For the right Gauss-Radau formula the quadrature points are
+ * $\tilde{x}_i=1-x_{n-i-1}$ and the weights are $\tilde{w}_i=w_{n-i-1}$,
+ * with $(x_i,w_i)$ as quadrature points
+ * and weights of the left Gauss-Radau formula.
+ *
+ * @see https://mathworld.wolfram.com/RadauQuadrature.html
+ */
+template <int dim>
+class QGaussRadau : public Quadrature<dim>
+{
+public:
+  /**
+   * EndPoint is used to specify which of the two endpoints of the unit interval
+   * is used also as quadrature point.
+   */
+  enum class EndPoint
+  {
+    /**
+     * Left end point.
+     */
+    left,
+    /**
+     * Right end point.
+     */
+    right
+  };
+  /**
+   * Generate a formula with <tt>n</tt> quadrature points (in each space
+   * direction).
+   * <tt>ep</tt> defines whether the left/lower/front endpoint(s) (default)
+   * or the right/upper/back endpoint(s) are part of the quadrature points.
+   */
+  QGaussRadau(const unsigned int n,
+              const EndPoint     end_point = QGaussRadau::EndPoint::left);
+
+  /**
+   * Move constructor.
+   */
+  QGaussRadau(QGaussRadau<dim> &&) noexcept = default;
+
+private:
+  const EndPoint end_point;
+};
+
 
 /**
  * The Gauss-Lobatto family of quadrature rules for numerical integration.
@@ -942,6 +1008,9 @@ public:
 #ifndef DOXYGEN
 template <>
 QGauss<1>::QGauss(const unsigned int n);
+template <>
+QGaussRadau<1>::QGaussRadau(const unsigned int             n,
+                            const QGaussRadau<1>::EndPoint end_poin);
 template <>
 QGaussLobatto<1>::QGaussLobatto(const unsigned int n);
 
