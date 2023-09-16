@@ -241,7 +241,7 @@ macro(feature_trilinos_find_external var)
       add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
 
       if(DEAL_II_WITH_64BIT_INDICES)
-        set(_global_index_type "std::int64_t")
+        set(_global_index_type "long long")
       else()
         set(_global_index_type "int")
       endif()
@@ -272,9 +272,45 @@ macro(feature_trilinos_find_external var)
       else()
         message(
           STATUS
-          "Tpetra was found but is not usable! Disabling Tpetra support."
+          "Tpetra was found but is not usable! Disabling Tpetra support and searching for common errors."
           )
         set(TRILINOS_WITH_TPETRA OFF)
+
+        check_cxx_symbol_exists(HAVE_TPETRA_INT_LONG_LONG "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INT_LONG_LONG)
+        check_cxx_symbol_exists(HAVE_TPETRA_INT_INT "TpetraCore_config.h" DEAL_II_HAVE_TPETRA_INT_INT)
+
+        if(DEAL_II_HAVE_TPETRA_INT_INT AND DEAL_II_WITH_64BIT_INDICES)
+          message(
+            STATUS 
+            "  Tpetra is installed with 32 bit global indices but you want to build deal.II with 64. "
+          )
+          message(
+            STATUS 
+            "  Either rebuild Trilinos with -DTPETRA_INST_INT_INT=OFF and -DTPETRA_INST_LONG_LONG=ON "
+          )
+          message(
+            STATUS 
+            "  or clean and reconfigure deal.II with -DDEAL_II_WITH_64_BIT_INDICES=OFF."
+          )
+        elseif(DEAL_II_HAVE_TPETRA_INT_LONG_LONG AND NOT DEAL_II_WITH_64BIT_INDICES)
+          message(
+            STATUS 
+            "  Tpetra is installed with 64 bit global indices but you want to build deal.II with 32. "
+          )
+          message(
+            STATUS
+            "  Either rebuild Trilinos with -DTPETRA_INST_INT_INT=ON and -DTPETRA_INST_LONG_LONG=OFF "
+          )
+          message(
+            STATUS
+            "  or clean and reconfigure deal.II with -DDEAL_II_WITH_64_BIT_INDICES=ON."
+          )
+        else()
+          message(
+            STATUS 
+            "  No supported global index configuration of Trilions found."
+          )
+        endif()
       endif()
       reset_cmake_required()
     endif()
