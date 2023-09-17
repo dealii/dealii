@@ -162,6 +162,16 @@ namespace Utilities
           &evaluation_function) const;
 
       /**
+       * Same as above but with the result provided as return value and
+       * without external allocation of a user-provided buffer.
+       */
+      template <typename T>
+      std::vector<T>
+      evaluate_and_process(
+        const std::function<void(const ArrayView<T> &, const CellData &)>
+          &evaluation_function) const;
+
+      /**
        * This method is the inverse of the method evaluate_and_process(). It
        * makes the data at the points, provided by @p input, available in the
        * function @p evaluation_function.
@@ -174,6 +184,17 @@ namespace Utilities
       process_and_evaluate(
         const std::vector<T> &input,
         std::vector<T>       &buffer,
+        const std::function<void(const ArrayView<const T> &, const CellData &)>
+          &evaluation_function) const;
+
+      /**
+       * Same as above but without external allocation of a user-provided
+       * buffer.
+       */
+      template <typename T>
+      void
+      process_and_evaluate(
+        const std::vector<T> &input,
         const std::function<void(const ArrayView<const T> &, const CellData &)>
           &evaluation_function) const;
 
@@ -489,6 +510,23 @@ namespace Utilities
 
     template <int dim, int spacedim>
     template <typename T>
+    std::vector<T>
+    RemotePointEvaluation<dim, spacedim>::evaluate_and_process(
+      const std::function<void(const ArrayView<T> &, const CellData &)>
+        &evaluation_function) const
+    {
+      std::vector<T> output;
+      std::vector<T> buffer;
+
+      this->evaluate_and_process(output, buffer, evaluation_function);
+
+      return output;
+    }
+
+
+
+    template <int dim, int spacedim>
+    template <typename T>
     void
     RemotePointEvaluation<dim, spacedim>::process_and_evaluate(
       const std::vector<T> &input,
@@ -658,6 +696,20 @@ namespace Utilities
       // evaluate function at points
       evaluation_function(buffer_eval, cell_data);
 #endif
+    }
+
+
+
+    template <int dim, int spacedim>
+    template <typename T>
+    void
+    RemotePointEvaluation<dim, spacedim>::process_and_evaluate(
+      const std::vector<T> &input,
+      const std::function<void(const ArrayView<const T> &, const CellData &)>
+        &evaluation_function) const
+    {
+      std::vector<T> buffer;
+      this->process_and_evaluate(input, buffer, evaluation_function);
     }
 
   } // end of namespace MPI
