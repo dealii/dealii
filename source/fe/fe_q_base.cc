@@ -26,6 +26,7 @@
 
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_hermite.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q_base.h>
@@ -751,6 +752,15 @@ FE_Q_Base<dim, spacedim>::hp_vertex_dof_identities(
     {
       // there should be exactly one single DoF of each FE at a vertex, and they
       // should have identical value
+      return {{0U, 0U}};
+    }
+  else if (dynamic_cast<const FE_Hermite<dim, spacedim> *>(&fe_other) !=
+           nullptr)
+    {
+      // FE_Hermite will usually have several degrees of freedom on
+      // each vertex, however only the first one will actually
+      // correspond to the shape value at the vertex, meaning it's
+      // the only one of interest for FE_Q_Base
       return {{0U, 0U}};
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
