@@ -111,17 +111,74 @@ namespace Utilities
              const Mapping<dim, spacedim> &mapping);
 
       /**
-       * Data of points positioned in a cell.
+       * Helper class to store and to access data of points positioned in
+       * processed cells.
        */
-      struct CellData
+      class CellData
       {
+      public:
         /**
-         * Level and index of cells.
+         * Constructor.
+         *
+         * @param triangulation Triangulation of the domain.
+         */
+        CellData(const Triangulation<dim, spacedim> &triangulation);
+
+        /**
+         * Return an object that can be thought of as an array containing all
+         * indices from zero (inclusive) to the total number of cells
+         * where points reside given by `cells.size()` (exclusive). This allows
+         * one to write code using range-based `for` loops of the following
+         * kind:
+         *
+         * @code
+         * for (const auto cell : cell_data.cell_indices())
+         *   {
+         *     const auto cell_dofs =
+         *       cell_data.get_active_cell_iterator(cell)->as_dof_handler_iterator(
+         *         dof_handler);
+         *
+         *     const auto unit_points = cell_data.get_unit_points(cell);
+         *     const auto local_value = cell_data.get_data_view(cell, values);
+         *
+         *     // user code: not shown
+         *   }
+         * @endcode
+         *
+         * Here, we are looping over all cells where points reside and
+         * use the index to call the functions get_active_cell_iterator(),
+         * get_unit_points(), and get_data_view().
+         */
+        std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+        cell_indices() const;
+
+        /**
+         * Return active cell iterator of the processed cell @p cell.
+         */
+        typename Triangulation<dim, spacedim>::active_cell_iterator
+        get_active_cell_iterator(const unsigned int cell) const;
+
+        /**
+         * Return unit points of the processed cell @p cell.
+         */
+        ArrayView<const Point<dim>>
+        get_unit_points(const unsigned int cell) const;
+
+        /**
+         * Return local view of the processed cell @p cell for the vector @p values.
+         */
+        template <typename T>
+        ArrayView<T>
+        get_data_view(const unsigned int  cell,
+                      const ArrayView<T> &values) const;
+
+        /**
+         * Level and index of processed cells.
          */
         std::vector<std::pair<int, int>> cells;
 
         /**
-         * Pointers to beginning and ending of the (reference) points
+         * Pointers to the start and end of the (reference) points
          * associated to the cell.
          */
         std::vector<unsigned int> reference_point_ptrs;
@@ -130,6 +187,13 @@ namespace Utilities
          * Reference points in the interval [0,1]^dim.
          */
         std::vector<Point<dim>> reference_point_values;
+
+      private:
+        /**
+         * Reference to the underlying triangulation needed for
+         * get_active_cell_iterator().
+         */
+        const Triangulation<dim, spacedim> &triangulation;
       };
 
       /**
@@ -327,9 +391,9 @@ namespace Utilities
 
       /**
        * Point data sorted according to cells so that evaluation (incl. reading
-       * of degrees of freedoms) needs to performed only once per cell.
+       * of degrees of freedoms) needs to be performed only once per cell.
        */
-      CellData cell_data;
+      std::unique_ptr<CellData> cell_data;
 
       /**
        * Permutation index within a send buffer.
@@ -347,6 +411,21 @@ namespace Utilities
        */
       std::vector<unsigned int> send_ptrs;
     };
+
+
+
+    template <int dim, int spacedim>
+    template <typename T>
+    ArrayView<T>
+    RemotePointEvaluation<dim, spacedim>::CellData::get_data_view(
+      const unsigned int  cell,
+      const ArrayView<T> &values) const
+    {
+      AssertIndexRange(cell, cells.size());
+      return {values.data() + reference_point_ptrs[cell],
+              reference_point_ptrs[cell + 1] - reference_point_ptrs[cell]};
+    }
+
 
 
     template <int dim, int spacedim>
@@ -383,7 +462,7 @@ namespace Utilities
                                send_permutation.size());
 
       // evaluate functions at points
-      evaluation_function(buffer_eval, cell_data);
+      evaluation_function(buffer_eval, *cell_data);
 
       // sort for communication
       unsigned int my_rank_local_recv = numbers::invalid_unsigned_int;
@@ -694,7 +773,7 @@ namespace Utilities
         }
 
       // evaluate function at points
-      evaluation_function(buffer_eval, cell_data);
+      evaluation_function(buffer_eval, *cell_data);
 #endif
     }
 
