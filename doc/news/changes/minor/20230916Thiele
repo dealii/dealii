@@ -1,0 +1,4 @@
+Changed: The interface to QGaussRadauChebyshev<dim> 
+now matches that of the new quadrature QGaussRadau<dim>.
+<br>
+(Jan Philipp Thiele, 2023/09/16)

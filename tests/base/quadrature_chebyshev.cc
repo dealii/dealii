@@ -134,7 +134,8 @@ check_GRC_right(double *exact_monomials)
 {
   for (unsigned int n = 1; n < 18; ++n)
     {
-      QGaussRadauChebyshev<1> quadrature(n, QGaussRadauChebyshev<1>::right);
+      QGaussRadauChebyshev<1> quadrature(
+        n, QGaussRadauChebyshev<1>::EndPoint::right);
       const std::vector<Point<1>> &points  = quadrature.get_points();
       const std::vector<double>   &weights = quadrature.get_weights();
 
