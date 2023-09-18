@@ -3403,6 +3403,16 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             ->component_dof_indices_offset[this->active_fe_index]
                                           [this->first_selected_component] *
           n_lanes;
+
+      std::array<typename VectorType::value_type *, n_components> src_ptrs;
+      if (n_components == 1 || this->n_fe_components == 1)
+        for (unsigned int comp = 0; comp < n_components; ++comp)
+          src_ptrs[comp] =
+            const_cast<typename VectorType::value_type *>(src[comp]->begin());
+      else
+        src_ptrs[0] =
+          const_cast<typename VectorType::value_type *>(src[0]->begin());
+
       if (n_components == 1 || this->n_fe_components == 1)
         for (unsigned int i = 0; i < dofs_per_component;
              ++i, dof_indices += n_lanes)
@@ -3410,14 +3420,19 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             operation.process_dof_gather(dof_indices,
                                          *src[comp],
                                          0,
+                                         src_ptrs[comp],
                                          values_dofs[comp][i],
                                          vector_selector);
       else
         for (unsigned int comp = 0; comp < n_components; ++comp)
           for (unsigned int i = 0; i < dofs_per_component;
                ++i, dof_indices += n_lanes)
-            operation.process_dof_gather(
-              dof_indices, *src[0], 0, values_dofs[comp][i], vector_selector);
+            operation.process_dof_gather(dof_indices,
+                                         *src[0],
+                                         0,
+                                         src_ptrs[0],
+                                         values_dofs[comp][i],
+                                         vector_selector);
       return;
     }
 
@@ -3962,6 +3977,15 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                  interleaved_contiguous_strided)
         {
+          std::array<typename VectorType::value_type *, n_components> src_ptrs;
+          if (n_components == 1 || this->n_fe_components == 1)
+            for (unsigned int comp = 0; comp < n_components; ++comp)
+              src_ptrs[comp] = const_cast<typename VectorType::value_type *>(
+                src[comp]->begin());
+          else
+            src_ptrs[0] =
+              const_cast<typename VectorType::value_type *>(src[0]->begin());
+
           if (n_components == 1 || this->n_fe_components == 1)
             for (unsigned int i = 0; i < dofs_per_component; ++i)
               {
@@ -3969,6 +3993,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                   operation.process_dof_gather(dof_indices.data(),
                                                *src[comp],
                                                i * n_lanes,
+                                               src_ptrs[comp] + i * n_lanes,
                                                values_dofs[comp][i],
                                                vector_selector);
               }
@@ -3976,12 +4001,13 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             for (unsigned int comp = 0; comp < n_components; ++comp)
               for (unsigned int i = 0; i < dofs_per_component; ++i)
                 {
-                  operation.process_dof_gather(dof_indices.data(),
-                                               *src[0],
-                                               (comp * dofs_per_component + i) *
-                                                 n_lanes,
-                                               values_dofs[comp][i],
-                                               vector_selector);
+                  operation.process_dof_gather(
+                    dof_indices.data(),
+                    *src[0],
+                    (comp * dofs_per_component + i) * n_lanes,
+                    src_ptrs[0] + (comp * dofs_per_component + i) * n_lanes,
+                    values_dofs[comp][i],
+                    vector_selector);
                 }
         }
       else
@@ -3990,6 +4016,15 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                    internal::MatrixFreeFunctions::DoFInfo::
                      IndexStorageVariants::interleaved_contiguous_mixed_strides,
                  ExcNotImplemented());
+          std::array<typename VectorType::value_type *, n_components> src_ptrs;
+          if (n_components == 1 || this->n_fe_components == 1)
+            for (unsigned int comp = 0; comp < n_components; ++comp)
+              src_ptrs[comp] = const_cast<typename VectorType::value_type *>(
+                src[comp]->begin());
+          else
+            src_ptrs[0] =
+              const_cast<typename VectorType::value_type *>(src[0]->begin());
+
           const unsigned int *offsets =
             &dof_info.dof_indices_interleave_strides[ind][n_lanes * this->cell];
           if (n_components == 1 || this->n_fe_components == 1)
@@ -3999,6 +4034,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                   operation.process_dof_gather(dof_indices.data(),
                                                *src[comp],
                                                0,
+                                               src_ptrs[comp],
                                                values_dofs[comp][i],
                                                vector_selector);
                 DEAL_II_OPENMP_SIMD_PRAGMA
@@ -4012,6 +4048,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                   operation.process_dof_gather(dof_indices.data(),
                                                *src[0],
                                                0,
+                                               src_ptrs[0],
                                                values_dofs[comp][i],
                                                vector_selector);
                   DEAL_II_OPENMP_SIMD_PRAGMA

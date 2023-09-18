@@ -439,22 +439,28 @@ namespace internal
     // gather
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int  *indices,
-                       VectorType          &vec,
-                       const unsigned int   constant_offset,
-                       VectorizedArrayType &res,
+    process_dof_gather(const unsigned int              *indices,
+                       VectorType                      &vec,
+                       const unsigned int               constant_offset,
+                       typename VectorType::value_type *vec_ptr,
+                       VectorizedArrayType             &res,
                        std::integral_constant<bool, true>) const
     {
+      (void)constant_offset;
+      (void)vec;
+
 #ifdef DEBUG
       // in debug mode, run non-vectorized version because this path
       // has additional checks (e.g., regarding ghosting)
+      Assert(vec_ptr == vec.begin() + constant_offset, ExcInternalError());
       process_dof_gather(indices,
                          vec,
                          constant_offset,
+                         vec_ptr,
                          res,
                          std::integral_constant<bool, false>());
 #else
-      res.gather(vec.begin() + constant_offset, indices);
+      res.gather(vec_ptr, indices);
 #endif
     }
 
@@ -464,9 +470,10 @@ namespace internal
     // manually load the data
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int  *indices,
-                       const VectorType    &vec,
-                       const unsigned int   constant_offset,
+    process_dof_gather(const unsigned int *indices,
+                       const VectorType   &vec,
+                       const unsigned int  constant_offset,
+                       typename VectorType::value_type *,
                        VectorizedArrayType &res,
                        std::integral_constant<bool, false>) const
     {
@@ -683,21 +690,26 @@ namespace internal
     // scatter
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int  *indices,
-                       VectorType          &vec,
-                       const unsigned int   constant_offset,
-                       VectorizedArrayType &res,
+    process_dof_gather(const unsigned int              *indices,
+                       VectorType                      &vec,
+                       const unsigned int               constant_offset,
+                       typename VectorType::value_type *vec_ptr,
+                       VectorizedArrayType             &res,
                        std::integral_constant<bool, true>) const
     {
+      (void)constant_offset;
+      (void)vec_ptr;
+      (void)vec;
+
 #if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         vector_access(vec, indices[v] + constant_offset) += res[v];
 #else
       // only use gather in case there is also scatter.
       VectorizedArrayType tmp;
-      tmp.gather(vec.begin() + constant_offset, indices);
+      tmp.gather(vec_ptr, indices);
       tmp += res;
-      tmp.scatter(indices, vec.begin() + constant_offset);
+      tmp.scatter(indices, vec_ptr);
 #endif
     }
 
@@ -707,9 +719,10 @@ namespace internal
     // manually append all data
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int  *indices,
-                       VectorType          &vec,
-                       const unsigned int   constant_offset,
+    process_dof_gather(const unsigned int *indices,
+                       VectorType         &vec,
+                       const unsigned int  constant_offset,
+                       typename VectorType::value_type *,
                        VectorizedArrayType &res,
                        std::integral_constant<bool, false>) const
     {
@@ -913,22 +926,28 @@ namespace internal
 
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int  *indices,
-                       VectorType          &vec,
-                       const unsigned int   constant_offset,
-                       VectorizedArrayType &res,
+    process_dof_gather(const unsigned int              *indices,
+                       VectorType                      &vec,
+                       const unsigned int               constant_offset,
+                       typename VectorType::value_type *vec_ptr,
+                       VectorizedArrayType             &res,
                        std::integral_constant<bool, true>) const
     {
-      res.scatter(indices, vec.begin() + constant_offset);
+      (void)vec_ptr;
+      (void)constant_offset;
+      (void)vec;
+      Assert(vec_ptr == vec.begin() + constant_offset, ExcInternalError());
+      res.scatter(indices, vec_ptr);
     }
 
 
 
     template <typename VectorType>
     void
-    process_dof_gather(const unsigned int  *indices,
-                       VectorType          &vec,
-                       const unsigned int   constant_offset,
+    process_dof_gather(const unsigned int *indices,
+                       VectorType         &vec,
+                       const unsigned int  constant_offset,
+                       typename VectorType::value_type *,
                        VectorizedArrayType &res,
                        std::integral_constant<bool, false>) const
     {
