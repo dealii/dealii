@@ -27,7 +27,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image of master focal
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./contrib/docker/
           cache-from: type=registry,ref=dealii/dependencies:focal
@@ -39,7 +39,7 @@ jobs:
           tags: dealii/dealii:master-focal
 
       - name: Build and push Docker image of master jammy
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./contrib/docker/
           cache-from: type=registry,ref=dealii/dependencies:jammy
