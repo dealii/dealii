@@ -203,9 +203,11 @@ namespace internal
   hermite_face_lexicographic_to_hierarchic_numbering(
     const unsigned int regularity)
   {
-    return (dim > 1) ? hermite_lexicographic_to_hierarchic_numbering<dim - 1>(
-                         regularity) :
-                       std::vector<unsigned int>();
+    (void)regularity;
+    if constexpr (dim > 1)
+      return hermite_lexicographic_to_hierarchic_numbering<dim - 1>(regularity);
+    else
+      return std::vector<unsigned int>();
   }
 
 
@@ -491,7 +493,7 @@ FE_Hermite<dim, spacedim>::FE_Hermite(const unsigned int fe_degree)
                         false),
       std::vector<ComponentMask>(Utilities::pow(std::max(2U, fe_degree + 1),
                                                 dim),
-                                 std::vector<bool>(1, true)))
+                                 ComponentMask(1, true)))
   , regularity(internal::get_regularity_from_degree(fe_degree))
 {
   Assert((fe_degree % 2 == 1),
