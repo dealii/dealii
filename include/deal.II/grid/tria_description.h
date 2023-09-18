@@ -326,6 +326,11 @@ namespace TriangulationDescription
   struct CellData
   {
     /**
+     * Constructor
+     */
+    CellData();
+
+    /**
      * Read or write the data of this object to or from a stream for the
      * purpose of serialization using the [BOOST serialization
      * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
@@ -387,9 +392,14 @@ namespace TriangulationDescription
   /**
    * Data used in Triangulation::create_triangulation().
    */
-  template <int dim, int spacedim>
+  template <int dim, int spacedim = dim>
   struct Description
   {
+    /**
+     * Constructor.
+     */
+    Description();
+
     /**
      * Read or write the data of this object to or from a stream for the
      * purpose of serialization using the [BOOST serialization
@@ -655,6 +665,23 @@ namespace TriangulationDescription
 
 
   template <int dim>
+  CellData<dim>::CellData()
+    : subdomain_id(numbers::invalid_subdomain_id)
+    , level_subdomain_id(numbers::invalid_subdomain_id)
+    , manifold_id(numbers::flat_manifold_id)
+  {
+    std::fill(id.begin(), id.end(), numbers::invalid_unsigned_int);
+    std::fill(manifold_line_ids.begin(),
+              manifold_line_ids.end(),
+              numbers::flat_manifold_id);
+    std::fill(manifold_quad_ids.begin(),
+              manifold_quad_ids.end(),
+              numbers::flat_manifold_id);
+  }
+
+
+
+  template <int dim>
   template <class Archive>
   void
   CellData<dim>::serialize(Archive &ar, const unsigned int /*version*/)
@@ -669,6 +696,16 @@ namespace TriangulationDescription
       ar &manifold_quad_ids;
     ar &boundary_ids;
   }
+
+
+
+  template <int dim, int spacedim>
+  Description<dim, spacedim>::Description()
+    : comm(MPI_COMM_NULL)
+    , settings(Settings::default_setting)
+    , smoothing(Triangulation<dim, spacedim>::MeshSmoothing::none)
+  {}
+
 
 
   template <int dim, int spacedim>
