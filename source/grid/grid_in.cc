@@ -1369,7 +1369,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   // of fields of which I have no
   // clue what they mean. skip them
   // all and leave the interpretation
-  // to other implementors...
+  // to other implementers...
   while (getline(in, line), ((line.find("End") == std::string::npos) && (in)))
     ;
   // ok, so we are not at the end of

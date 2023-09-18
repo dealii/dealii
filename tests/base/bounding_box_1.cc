@@ -105,7 +105,7 @@ test_bounding_box()
   }
   deallog << std::endl;
 
-  // Initalize box with point
+  // Initialize box with point
   {
     Point<spacedim> p;
     for (unsigned int i = 0; i < spacedim; ++i)
@@ -118,7 +118,7 @@ test_bounding_box()
   }
   deallog << std::endl;
 
-  // Initalize box with box
+  // Initialize box with box
   {
     BoundingBox<spacedim> bb(b);
     deallog << "Boundary points: " << std::endl;
@@ -127,7 +127,7 @@ test_bounding_box()
   }
   deallog << std::endl;
 
-  // Initalize box with box
+  // Initialize box with box
   {
     BoundingBox<spacedim> bb;
     bb = b;

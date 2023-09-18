@@ -171,7 +171,7 @@ public:
               << ')' << std::endl;
     };
 
-    // This callback is invoked after a successfull stage.
+    // This callback is invoked after a successful stage.
     // Here we only print that the callback is invoked.
     time_stepper.distribute = [&](const real_type t, VectorType &) -> void {
       deallog << "Distribute at time " << t << std::endl;

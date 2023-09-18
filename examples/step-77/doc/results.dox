@@ -269,7 +269,7 @@ Mesh refinement step 0
 By default, PETSc uses a Newton solver with cubic backtracking,
 resampling the Jacobian matrix at each Newton step.  That is, we
 compute and factorize the matrix once per Newton step, and then sample
-the residual to check for a successul line-search.
+the residual to check for a successful line-search.
 
 The attentive reader should have noticed that in this case we are
 computing one more extra residual per Newton step.  This is because

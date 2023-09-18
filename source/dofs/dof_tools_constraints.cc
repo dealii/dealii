@@ -2725,7 +2725,7 @@ namespace DoFTools
         // when on cell 1, we compute the weights of dof 'x' to be 1/2 from
         // parameter dofs 0 and 1, respectively. however, when later we are on
         // cell 2, we again compute the prolongation of shape function 1
-        // restricted to cell 2 to the globla grid and find that the weight of
+        // restricted to cell 2 to the global grid and find that the weight of
         // global dof 'x' now is zero. however, we should not overwrite the old
         // value.
         //

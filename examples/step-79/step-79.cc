@@ -1687,7 +1687,7 @@ namespace SAND
       }
 
     // Then compute the residual and take the $l_1$ norms of the
-    // components that correspond to Lagrange mulipliers. We add
+    // components that correspond to Lagrange multipliers. We add
     // those to the objective function computed above, and return
     // the sum at the bottom:
     const BlockVector<double> test_rhs = calculate_test_rhs(test_solution);

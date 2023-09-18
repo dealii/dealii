@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Compute intersection of two 3D cells. This additional test is added becase
+// Compute intersection of two 3D cells. This additional test is added because
 // intersections are not found with inexact kernels.
 
 #include <deal.II/fe/mapping_q1.h>

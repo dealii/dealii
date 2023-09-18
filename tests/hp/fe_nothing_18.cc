@@ -242,7 +242,7 @@ ElasticProblem<dim>::ElasticProblem()
   , degree(1)
   , dofs_per_block(n_blocks)
   , dof_handler(triangulation)
-  , /*assotiate dof_handler to the triangulation */
+  , /*associate dof_handler to the triangulation */
   elasticity_fe(
     FE_Q<dim>(degree),
     dim, // use dim FE_Q of a given degree to represent displacements
