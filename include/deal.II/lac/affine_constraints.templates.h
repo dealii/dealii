@@ -993,6 +993,39 @@ AffineConstraints<number>::close()
          ExcMessage("The constraints represented by this object have a cycle. "
                     "This is not allowed."));
 
+  // Now also compute which indices we need in distribute().
+  //
+  // This processor owns only part of the vectors we will work on. One may think
+  // that every processor should be able to simply communicate those elements it
+  // owns and for which it knows that they act as sources to constrained DoFs to
+  // the owner of these DoFs. This would lead to a scheme where all we need to
+  // do is to add some local elements to (possibly non-local) ones and then call
+  // compress().
+  //
+  // Alas, this scheme does not work as evidenced by the disaster of
+  // bug #51 (originally stored in the Google Code repository, but now
+  // unfortunately no longer available because that platform has gone
+  // away) and reversion of one attempt that implements this in svn
+  // r29662. Rather, we need to get a vector that has all the
+  // *sources* or constraints we own locally, possibly as ghost vector
+  // elements, then read from them, and finally throw away the ghosted
+  // vector. Implement this in the following.
+  needed_elements_for_distribute = locally_owned_dofs;
+
+  if (needed_elements_for_distribute !=
+      complete_index_set(locally_owned_dofs.size()))
+    {
+      std::vector<types::global_dof_index> additional_elements;
+      for (const ConstraintLine &line : lines)
+        if (locally_owned_dofs.is_element(line.index))
+          for (const std::pair<size_type, number> &entry : line.entries)
+            if (!locally_owned_dofs.is_element(entry.first))
+              additional_elements.emplace_back(entry.first);
+      std::sort(additional_elements.begin(), additional_elements.end());
+      needed_elements_for_distribute.add_indices(additional_elements.begin(),
+                                                 additional_elements.end());
+    }
+
   sorted = true;
 }
 
@@ -1063,6 +1096,9 @@ AffineConstraints<number>::clear()
     lines_cache.swap(tmp);
   }
 
+  locally_owned_dofs             = {};
+  needed_elements_for_distribute = {};
+
   sorted = false;
 }
 
@@ -1070,16 +1106,43 @@ AffineConstraints<number>::clear()
 
 template <typename number>
 void
-AffineConstraints<number>::reinit(const IndexSet &local_constraints)
+AffineConstraints<number>::reinit()
 {
-  local_lines = local_constraints;
+  reinit(IndexSet(), IndexSet());
+}
+
+
+
+template <typename number>
+void
+AffineConstraints<number>::reinit(const IndexSet &locally_stored_constraints)
+{
+  reinit(locally_stored_constraints, locally_stored_constraints);
+}
+
+
+
+template <typename number>
+void
+AffineConstraints<number>::reinit(const IndexSet &locally_owned_dofs,
+                                  const IndexSet &locally_stored_constraints)
+{
+  // First clear previous content
+  clear();
+
+  // Then set the objects that describe the index sets of DoFs we care about:
+  Assert(locally_owned_dofs.is_subset_of(locally_stored_constraints),
+         ExcMessage("The set of locally stored constraints needs to be a "
+                    "superset of the locally owned DoFs."));
+
+  this->locally_owned_dofs = locally_owned_dofs;
+  this->local_lines        = locally_stored_constraints;
 
   // make sure the IndexSet is compressed. Otherwise this can lead to crashes
   // that are hard to find (only happen in release mode).
   // see tests/mpi/affine_constraints_crash_01
-  local_lines.compress();
-
-  clear();
+  this->locally_owned_dofs.compress();
+  this->local_lines.compress();
 }
 
 
@@ -2265,6 +2328,8 @@ namespace internal
   } // namespace AffineConstraintsImplementation
 } // namespace internal
 
+
+
 template <typename number>
 template <typename VectorType>
 void
@@ -2281,6 +2346,8 @@ AffineConstraints<number>::distribute_local_to_global(
                              local_matrix,
                              true);
 }
+
+
 
 template <typename number>
 template <typename VectorType>
@@ -2434,6 +2501,8 @@ namespace internal
   }
 #endif
 
+
+
   template <typename number>
   void
   import_vector_with_ghost_elements(
@@ -2453,6 +2522,8 @@ namespace internal
     output = vec;
     output.update_ghost_values();
   }
+
+
 
   // all other vector non-block vector types are sequential and we should
   // not have this function called at all -- so throw an exception
@@ -2498,6 +2569,8 @@ namespace internal
   }
 } // namespace internal
 
+
+
 template <typename number>
 template <typename VectorType>
 void
@@ -2517,41 +2590,62 @@ AffineConstraints<number>::distribute(VectorType &vec) const
   // the last else is for the simple case (sequential vector)
   const IndexSet vec_owned_elements = vec.locally_owned_elements();
 
-  if (dealii::is_serial_vector<VectorType>::value == false)
+  if constexpr (dealii::is_serial_vector<VectorType>::value == false)
     {
-      // This processor owns only part of the vector. one may think that
-      // every processor should be able to simply communicate those elements
-      // it owns and for which it knows that they act as sources to constrained
-      // DoFs to the owner of these DoFs. This would lead to a scheme where all
-      // we need to do is to add some local elements to (possibly non-local)
-      // ones and then call compress().
-      //
-      // Alas, this scheme does not work as evidenced by the disaster of bug
-      // #51, see http://code.google.com/p/dealii/issues/detail?id=51 and the
-      // reversion of one attempt that implements this in r29662. Rather, we
-      // need to get a vector that has all the *sources* or constraints we
-      // own locally, possibly as ghost vector elements, then read from them,
-      // and finally throw away the ghosted vector. Implement this in the
-      // following.
-      IndexSet needed_elements = vec_owned_elements;
-
-      std::vector<types::global_dof_index> additional_elements;
-      for (const ConstraintLine &line : lines)
-        if (vec_owned_elements.is_element(line.index))
-          for (const std::pair<size_type, number> &entry : line.entries)
-            if (!vec_owned_elements.is_element(entry.first))
-              additional_elements.emplace_back(entry.first);
-      std::sort(additional_elements.begin(), additional_elements.end());
-      needed_elements.add_indices(additional_elements.begin(),
-                                  additional_elements.end());
+      // Check that the set of indices we will import is a superset of
+      // the locally-owned ones. This *should* be the case if, as one
+      // would expect, the AffineConstraint object was initialized
+      // with a locally-relevant index set that is indeed a superset
+      // of the locally-owned indices. But you never know what people
+      // pass as arguments...
+#ifdef DEBUG
+      if (needed_elements_for_distribute != IndexSet())
+        for (const auto i : vec_owned_elements)
+          Assert(needed_elements_for_distribute.is_element(i),
+                 ExcInternalError());
+#endif
 
       VectorType ghosted_vector;
-      internal::import_vector_with_ghost_elements(
-        vec,
-        vec_owned_elements,
-        needed_elements,
-        ghosted_vector,
-        std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+
+      // It is possible that the user is using a parallel vector type,
+      // but is running a non-parallel program (for example, step-31
+      // does this). In this case, it is (perhaps?) not a bug to not
+      // set an IndexSet for the local_lines and the
+      // locally_owned_lines -- they are simply both empty sets in
+      // that case. If that is so, we could just assign
+      // 'ghosted_vector=vec;'. But this is dangerous. Not having set
+      // index sets could also have been a bug, and we would get
+      // downstream errors about accessing elements that are not
+      // locally available. Rather, if no index sets were provided,
+      // simply import the *entire* vector.
+      if (local_lines != IndexSet())
+        {
+          Assert(needed_elements_for_distribute != IndexSet(),
+                 ExcInternalError());
+          internal::import_vector_with_ghost_elements(
+            vec,
+            vec_owned_elements,
+            needed_elements_for_distribute,
+            ghosted_vector,
+            std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+        }
+      else
+        {
+          Assert(needed_elements_for_distribute == IndexSet(),
+                 ExcInternalError());
+
+          // TODO: We should really consider it a bug if this parallel
+          // truly is distributed (and not just a parallel vector type
+          // used for a sequential program). Assert that we are really
+          // working in a sequential context.
+
+          internal::import_vector_with_ghost_elements(
+            vec,
+            vec_owned_elements,
+            complete_index_set(vec_owned_elements.size()),
+            ghosted_vector,
+            std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+        }
 
       for (const ConstraintLine &line : lines)
         if (vec_owned_elements.is_element(line.index))
