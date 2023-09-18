@@ -49,7 +49,7 @@ test_distributed_cpt(unsigned int ref_cube)
           << std::endl;
   deallog << "Cube refinements: " << ref_cube << std::endl;
 
-  // Creeating the cube on which to run distributed cpt loc
+  // Creating the cube on which to run distributed cpt loc
   parallel::distributed::Triangulation<dim> cube_d(mpi_communicator);
   GridGenerator::hyper_cube(cube_d);
   cube_d.refine_global(ref_cube);

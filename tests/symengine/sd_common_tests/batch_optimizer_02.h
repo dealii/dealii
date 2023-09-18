@@ -17,7 +17,7 @@
 // Check that the wrapper for symengine numbers can be integrated into the
 // tensor class and works as expected.
 // This test is the same as symengine_wrapper_03.cc, except that we invoke the
-// batch optimzer  before symbolic evaluation takes place.
+// batch optimizer before symbolic evaluation takes place.
 
 #include <deal.II/base/timer.h>
 

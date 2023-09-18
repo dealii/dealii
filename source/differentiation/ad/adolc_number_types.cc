@@ -36,7 +36,7 @@ namespace numbers
     namespace
     {
       // Apply some comparator and extract the boolean result of the operation,
-      // instead of the "adub" return type tpyically returned by ADOL-C for
+      // instead of the "adub" return type typically returned by ADOL-C for
       // such a comparison. This is implemented as a general function so that
       // the list of implemented comparative operations can be easily extended.
       bool

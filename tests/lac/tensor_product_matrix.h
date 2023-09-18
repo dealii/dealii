@@ -65,7 +65,7 @@ namespace dealii
     }
 
     // Compute harmonic extent of each locally owned cell including of each
-    // of its neighbors. If there is no neigbor, its extent is zero.
+    // of its neighbors. If there is no neighbor, its extent is zero.
     template <int dim>
     std::vector<dealii::ndarray<double, dim, 3>>
     compute_harmonic_patch_extent(const Mapping<dim>        &mapping,
@@ -79,7 +79,7 @@ namespace dealii
                                                 quadrature);
 
       // 2) accumulate for each face the normal extent for the
-      // neigboring cell(s); here we also consider periodicies
+      // neighboring cell(s); here we also consider periodicies
       std::vector<double> face_extent(triangulation.n_faces(), 0.0);
 
       for (const auto &cell : triangulation.active_cell_iterators())

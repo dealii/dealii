@@ -46,7 +46,7 @@
 #   targets), respectively.
 #
 # The default name, i.e., interface_<feature>(|_debug|_release) can be
-# overriden by the optional second argument. For example,
+# overridden by the optional second argument. For example,
 #   define_interface_target(DEAL_II base_configuration)
 # will define interface_base_configuration* targets but query all
 # information from DEAL_II_* variables.

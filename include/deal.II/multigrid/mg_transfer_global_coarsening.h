@@ -1013,7 +1013,7 @@ public:
   /** @} */
 
   /**
-   * @name Tranfer functions.
+   * @name Transfer functions.
    */
   /** @{ */
 
@@ -1349,7 +1349,7 @@ MGTransferMF<dim, Number>::initialize_dof_vector(
       partitioner = external_partitioners[level - transfer.min_level()];
     }
 
-  // check if vectors are already correctly initalized
+  // check if vectors are already correctly initialized
 
   // yes: same partitioners are used
   if (vec.get_partitioner().get() == partitioner.get())

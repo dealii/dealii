@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Check that SymEngine can do some optimsation on diffentiated expressions
+// Check that SymEngine can do some optimsation on differentiated expressions
 // using lambda functions
 // This is an extension of basic_04.cc
 

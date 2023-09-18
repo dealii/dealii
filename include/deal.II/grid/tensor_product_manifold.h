@@ -54,10 +54,10 @@ DEAL_II_NAMESPACE_OPEN
  * @tparam dim Dimension of cells (needs to match first template argument of
  * the Triangulation to be attached to.
  * @tparam dim_A Dimension of ChartManifold A.
- * @tparam spacedim_A Spacial dimension of ChartManifold A.
+ * @tparam spacedim_A Spatial dimension of ChartManifold A.
  * @tparam chartdim_A Chart dimension of ChartManifold A.
  * @tparam dim_B Dimension of ChartManifold B.
- * @tparam spacedim_B Spacial dimension of ChartManifold B.
+ * @tparam spacedim_B Spatial dimension of ChartManifold B.
  * @tparam chartdim_B Chart dimension of ChartManifold B.
  */
 template <int dim,

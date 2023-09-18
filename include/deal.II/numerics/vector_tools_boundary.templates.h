@@ -2272,7 +2272,7 @@ namespace VectorTools
       std::vector<number>                        &dof_values,
       std::vector<types::global_dof_index>       &projected_dofs)
     {
-      // Compute the intergral over the product of the normal components of
+      // Compute the integral over the product of the normal components of
       // the boundary function times the normal components of the shape
       // functions supported on the boundary.
       const FEValuesExtractors::Vector vec(first_vector_component);

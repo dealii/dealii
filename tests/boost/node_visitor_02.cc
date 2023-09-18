@@ -13,7 +13,7 @@
 //
 // ---------------------------------------------------------------------
 
-// Use information from NodeVisitor to print show explicitely the boxes
+// Use information from NodeVisitor to print show explicitly the boxes
 // associated to each parent node on the previous level
 
 #include <deal.II/base/bounding_box.h>

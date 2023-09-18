@@ -199,7 +199,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
 
   #
   # We have to ensure that we emit floating-point instructions in debug
-  # mode that preserve the occurence of floating-point exceptions and don't
+  # mode that preserve the occurrence of floating-point exceptions and don't
   # introduce new ones. gcc plays nicely in this regard by enabling
   # `-ftrapping-math` per default, at least for the level of optimization
   # we have in debug mode. clang however is more aggressive and assumes

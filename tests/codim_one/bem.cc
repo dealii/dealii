@@ -122,7 +122,7 @@ BEM<spacedim>::run()
       SphericalManifold<spacedim - 1, spacedim> boundary(p);
       tria.set_manifold(1, boundary);
 
-      // works up to cycle<9, but for testin purpose, we stop at 4
+      // works up to cycle<9, but for testing purpose, we stop at 4
       for (unsigned int cycle = 0; cycle < 4; ++cycle)
         {
           tria.set_manifold(1, boundary);

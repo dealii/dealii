@@ -308,7 +308,7 @@ namespace hp
       //     that apply to all or none of the cells at once. However here, we
       //     do not know which threshold would suffice for this task because the
       //     user could provide any comparison function. Thus if necessary, we
-      //     overwrite the user's choice with suitable functions simplying
+      //     overwrite the user's choice with suitable functions simply
       //     returning 'true' and 'false' for any cell with reference wrappers.
       //     Thus, no function object copies are stored.
       //

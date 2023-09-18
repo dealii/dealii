@@ -51,7 +51,7 @@ const double eps = 1e-10;
 // move nodes randomly
 // and compare FEEnriched to FESystem with explicit treatment of
 // the product rule for
-// valus, gradients, hessians on
+// values, gradients, hessians on
 // elements and faces.
 // The comparison is straight forward because local dofs are enumerated
 // in the same way for FE_System and FEEnriched.

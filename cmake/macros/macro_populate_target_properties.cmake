@@ -65,7 +65,7 @@ function(populate_target_properties _target _build)
 
   #
   # Do not add bundled include directories to bundled_ targets. First of
-  # all this is unnecessary, secondly, this severly trips up ICC-19 that
+  # all this is unnecessary, secondly, this severely trips up ICC-19 that
   # cannot handle the additional -isystem include properly...
   #
   if(NOT "${_target}" MATCHES "^bundled_")

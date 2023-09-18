@@ -216,7 +216,7 @@ namespace LineMinimization
    *     // Ensure that the Dirichlet constraints are correctly applied,
    *     // irrespective of the step size
    *     constraints.distribute(newton_update_trial);
-   *     // Now add the constribution from the previously accepted solution
+   *     // Now add the contribution from the previously accepted solution
    *     // history.
    *     const Vector<double> solution_total_trial =
    *       get_solution_total(newton_update_trial);

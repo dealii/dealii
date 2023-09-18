@@ -18,7 +18,7 @@
 // This test is similar to parallel_multigrid_adaptive_06 but we also test
 // for different polynomial degree in different blocks.
 // We expect to have the same iteration numbers as in
-// parallel_multigrid_adaptive_06 with repsect to the highest polynomial
+// parallel_multigrid_adaptive_06 with respect to the highest polynomial
 // degree used.
 
 

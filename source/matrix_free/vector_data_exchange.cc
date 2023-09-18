@@ -389,7 +389,7 @@ namespace internal
         const auto &ghost_indices_within_larger_ghost_set =
           partitioner->ghost_indices_within_larger_ghost_set();
 
-        // temporal data strucutures
+        // temporal data structures
         std::vector<unsigned int> n_ghost_indices_in_larger_set_by_remote_rank;
 
         std::vector<std::array<unsigned int, 3>> ghost_targets_data;
