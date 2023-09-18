@@ -84,7 +84,7 @@ public:
    * EndPoint is used to specify which of the two endpoints of the unit interval
    * is used also as quadrature point.
    */
-  enum class EndPoint
+  enum EndPoint
   {
     /**
      * Left end point.
@@ -582,8 +582,9 @@ template <int dim>
 class QGaussRadauChebyshev : public Quadrature<dim>
 {
 public:
-  /* EndPoint is used to specify which of the two endpoints of the unit interval
-   * is used also as quadrature point
+  /**
+   * EndPoint is used to specify which of the two endpoints of the unit interval
+   * is used also as quadrature point.
    */
   enum EndPoint
   {
@@ -597,17 +598,17 @@ public:
     right
   };
   /// Generate a formula with <tt>n</tt> quadrature points
-  QGaussRadauChebyshev(const unsigned int n,
-                       EndPoint           ep = QGaussRadauChebyshev::left);
+  QGaussRadauChebyshev(
+    const unsigned int n,
+    const EndPoint     end_point = QGaussRadauChebyshev::EndPoint::left);
 
   /**
-   * Move constructor. We cannot rely on the move constructor for `Quadrature`,
-   * since it does not know about the additional member `ep` of this class.
+   * Move constructor.
    */
   QGaussRadauChebyshev(QGaussRadauChebyshev<dim> &&) noexcept = default;
 
 private:
-  const EndPoint ep;
+  const EndPoint end_point;
 };
 
 /**
@@ -1010,7 +1011,7 @@ template <>
 QGauss<1>::QGauss(const unsigned int n);
 template <>
 QGaussRadau<1>::QGaussRadau(const unsigned int             n,
-                            const QGaussRadau<1>::EndPoint end_poin);
+                            const QGaussRadau<1>::EndPoint end_point);
 template <>
 QGaussLobatto<1>::QGaussLobatto(const unsigned int n);
 

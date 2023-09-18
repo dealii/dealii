@@ -1274,8 +1274,9 @@ namespace internal
   {
     // Computes the points of the quadrature formula.
     std::vector<double>
-    get_quadrature_points(const unsigned int                          n,
-                          ::dealii::QGaussRadauChebyshev<1>::EndPoint ep)
+    get_quadrature_points(
+      const unsigned int                                n,
+      const ::dealii::QGaussRadauChebyshev<1>::EndPoint end_point)
     {
       std::vector<double> points(n);
       // n point quadrature: index from 0 to n-1
@@ -1283,9 +1284,9 @@ namespace internal
         // would be -cos(2i Pi/(2N+1))
         // put + Pi so we start from the smallest point
         // then map from [-1,1] to [0,1]
-        switch (ep)
+        switch (end_point)
           {
-            case ::dealii::QGaussRadauChebyshev<1>::left:
+            case ::dealii::QGaussRadauChebyshev<1>::EndPoint::left:
               {
                 points[i] =
                   1. / 2. *
@@ -1295,7 +1296,7 @@ namespace internal
                 break;
               }
 
-            case ::dealii::QGaussRadauChebyshev<1>::right:
+            case ::dealii::QGaussRadauChebyshev<1>::EndPoint::right:
               {
                 points[i] =
                   1. / 2. *
@@ -1309,8 +1310,8 @@ namespace internal
                 false,
                 ExcMessage(
                   "This constructor can only be called with either "
-                  "QGaussRadauChebyshev::left or QGaussRadauChebyshev::right as "
-                  "second argument."));
+                  "QGaussRadauChebyshev::EndPoint::left or "
+                  "QGaussRadauChebyshev::EndPoint:right as second argument."));
           }
 
       return points;
@@ -1320,8 +1321,9 @@ namespace internal
 
     // Computes the weights of the quadrature formula.
     std::vector<double>
-    get_quadrature_weights(const unsigned int                          n,
-                           ::dealii::QGaussRadauChebyshev<1>::EndPoint ep)
+    get_quadrature_weights(
+      const unsigned int                                n,
+      const ::dealii::QGaussRadauChebyshev<1>::EndPoint end_point)
     {
       std::vector<double> weights(n);
 
@@ -1329,9 +1331,11 @@ namespace internal
         {
           // same weights as on [-1,1]
           weights[i] = 2. * numbers::PI / double(2 * (n - 1) + 1.);
-          if (ep == ::dealii::QGaussRadauChebyshev<1>::left && i == 0)
+          if (end_point == ::dealii::QGaussRadauChebyshev<1>::EndPoint::left &&
+              i == 0)
             weights[i] /= 2.;
-          else if (ep == ::dealii::QGaussRadauChebyshev<1>::right &&
+          else if (end_point ==
+                     ::dealii::QGaussRadauChebyshev<1>::EndPoint::right &&
                    i == (n - 1))
             weights[i] /= 2.;
         }
@@ -1343,31 +1347,32 @@ namespace internal
 
 
 template <>
-QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n, EndPoint ep)
+QGaussRadauChebyshev<1>::QGaussRadauChebyshev(const unsigned int n,
+                                              const EndPoint     end_point)
   : Quadrature<1>(n)
-  , ep(ep)
+  , end_point(end_point)
 {
-  Assert(n > 0, ExcMessage("Need at least one point for quadrature rules"));
-  std::vector<double> p =
-    internal::QGaussRadauChebyshev::get_quadrature_points(n, ep);
-  std::vector<double> w =
-    internal::QGaussRadauChebyshev::get_quadrature_weights(n, ep);
+  Assert(n > 0, ExcMessage("Need at least one point for quadrature rules."));
+  std::vector<double> points =
+    internal::QGaussRadauChebyshev::get_quadrature_points(n, end_point);
+  std::vector<double> weights =
+    internal::QGaussRadauChebyshev::get_quadrature_weights(n, end_point);
 
   for (unsigned int i = 0; i < this->size(); ++i)
     {
-      this->quadrature_points[i] = Point<1>(p[i]);
-      this->weights[i]           = w[i];
+      this->quadrature_points[i] = Point<1>(points[i]);
+      this->weights[i]           = weights[i];
     }
 }
 
 
 template <int dim>
 QGaussRadauChebyshev<dim>::QGaussRadauChebyshev(const unsigned int n,
-                                                EndPoint           ep)
+                                                EndPoint           end_point)
   : Quadrature<dim>(QGaussRadauChebyshev<1>(
       n,
-      static_cast<QGaussRadauChebyshev<1>::EndPoint>(ep)))
-  , ep(ep)
+      static_cast<QGaussRadauChebyshev<1>::EndPoint>(end_point)))
+  , end_point(end_point)
 {}
 
 
