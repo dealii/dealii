@@ -203,9 +203,11 @@ namespace internal
   hermite_face_lexicographic_to_hierarchic_numbering(
     const unsigned int regularity)
   {
-    return (dim > 1) ? hermite_lexicographic_to_hierarchic_numbering<
-                         std::max(dim - 1, 1)>(regularity) :
-                       std::vector<unsigned int>();
+    (void)regularity;
+    if constexpr (dim > 1)
+      return hermite_lexicographic_to_hierarchic_numbering<dim - 1>(regularity);
+    else
+      return std::vector<unsigned int>();
   }
 
 
