@@ -734,7 +734,7 @@ namespace internal
     template <typename VectorType>
     struct is_dealii_compatible_distributed_vector<
       VectorType,
-      typename std::enable_if<!internal::is_block_vector<VectorType>>::type>
+      std::enable_if_t<!internal::is_block_vector<VectorType>>>
     {
       static constexpr bool value = std::is_same_v<
         VectorType,
@@ -747,7 +747,7 @@ namespace internal
     template <typename VectorType>
     struct is_dealii_compatible_distributed_vector<
       VectorType,
-      typename std::enable_if<internal::is_block_vector<VectorType>>::type>
+      std::enable_if_t<internal::is_block_vector<VectorType>>>
     {
       static constexpr bool value = std::is_same_v<
         typename VectorType::BlockType,
