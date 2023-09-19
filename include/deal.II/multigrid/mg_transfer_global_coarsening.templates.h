@@ -4942,6 +4942,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   std::vector<value_type> buffer;
 
   const auto evaluation_function = [&](auto &values, const auto &cell_data) {
+    this->signals_non_nested.evaluation_prolongation(true);
     std::vector<Number> solution_values;
 
     FEPointEvaluation<n_components, dim, dim, Number> evaluator(*mapping_info,
@@ -4971,11 +4972,14 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
           values[q + cell_data.reference_point_ptrs[cell]] =
             evaluator.get_value(q);
       }
+    this->signals_non_nested.evaluation_prolongation(false);
   };
 
+  this->signals_non_nested.evaluate_and_process(true);
   rpe.template evaluate_and_process<value_type>(evaluation_point_results,
                                                 buffer,
                                                 evaluation_function);
+  this->signals_non_nested.evaluate_and_process(false);
 
   // Weight operator in case some points are owned by multiple cells.
   if (rpe.is_map_unique() == false)
@@ -5117,6 +5121,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 
   const auto evaluation_function = [&](const auto &values,
                                        const auto &cell_data) {
+    this->signals_non_nested.evaluation_restriction(true);
     std::vector<Number>                               solution_values;
     FEPointEvaluation<n_components, dim, dim, Number> evaluator(*mapping_info,
                                                                 *fe_coarse);
@@ -5146,11 +5151,14 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
           solution_values.size(),
           true);
       }
+    this->signals_non_nested.evaluation_restriction(false);
   };
 
+  this->signals_non_nested.process_and_evaluate(true);
   rpe.template process_and_evaluate<value_type>(evaluation_point_results,
                                                 buffer,
                                                 evaluation_function);
+  this->signals_non_nested.process_and_evaluate(false);
 }
 
 
@@ -5216,6 +5224,46 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   // TODO: add consumption for rpe, mapping_info and constraint_info.
 
   return size;
+}
+
+
+
+template <int dim, typename Number>
+boost::signals2::connection
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  connect_evaluation_prolongation(const std::function<void(const bool)> &slot)
+{
+  return signals_non_nested.evaluation_prolongation.connect(slot);
+}
+
+
+
+template <int dim, typename Number>
+boost::signals2::connection
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  connect_evaluation_restriction(const std::function<void(const bool)> &slot)
+{
+  return signals_non_nested.evaluation_restriction.connect(slot);
+}
+
+
+
+template <int dim, typename Number>
+boost::signals2::connection
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  connect_evaluate_and_process(const std::function<void(const bool)> &slot)
+{
+  return signals_non_nested.evaluate_and_process.connect(slot);
+}
+
+
+
+template <int dim, typename Number>
+boost::signals2::connection
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  connect_process_and_evaluate(const std::function<void(const bool)> &slot)
+{
+  return signals_non_nested.process_and_evaluate.connect(slot);
 }
 
 

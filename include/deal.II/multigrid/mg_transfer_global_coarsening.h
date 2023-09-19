@@ -52,6 +52,49 @@ namespace RepartitioningPolicyTools
 #endif
 
 
+namespace mg
+{
+  /**
+   * A structure with boost::signal objects for optional processing in a
+   * non-nested multigrid solver.
+   *
+   * Similarly to mg::Signals, each signal is called twice: once before and once
+   * after the action is performed. The two calls only differ in the boolean argument @p before, which is true the first time and false the second.
+   *
+   */
+  struct SignalsNonNested
+  {
+    /**
+     * This signal is triggered before and after the call to actual evaluation
+     * function inside RemotePointEvaluation::evaluate_and_process() during
+     * prolongation.
+     */
+    boost::signals2::signal<void(const bool before)> evaluation_prolongation;
+
+    /**
+     * This signal is triggered before and after the call to actual evaluation
+     * function inside RemotePointEvaluation::process_and_evaluate() during
+     * restriction.
+     */
+    boost::signals2::signal<void(const bool before)> evaluation_restriction;
+
+    /**
+     * This signal is triggered before and after the call to
+     * RemotePointEvaluation::evaluate_and_process() used in
+     * MGTwoLevelTransferNonNested::prolongate_and_add(). The difference with the @p evaluation
+     * signal is that also the communication phase is included.
+     */
+    boost::signals2::signal<void(const bool before)> evaluate_and_process;
+
+    /**
+     * This signal is triggered before and after the call to
+     * RemotePointEvaluation::process_and_evaluate() used in
+     * MGTwoLevelTransferNonNested::restrict_and_add(). Similarly to the @p evaluate_and_process signal,
+     * also the communication phase is included.
+     */
+    boost::signals2::signal<void(const bool before)> process_and_evaluate;
+  };
+} // namespace mg
 
 /**
  * Global coarsening utility functions.
@@ -705,6 +748,8 @@ class MGTwoLevelTransferNonNested<dim,
 private:
   using VectorizedArrayType = VectorizedArray<Number, 1>;
 
+  mg::SignalsNonNested signals_non_nested;
+
 public:
   /**
    * AdditionalData structure that can be used to tweak parameters
@@ -797,6 +842,34 @@ public:
    */
   std::size_t
   memory_consumption() const override;
+
+  /**
+   * Connect a function to mg::SignalsNonNested::evaluation_restriction.
+   *
+   */
+  boost::signals2::connection
+  connect_evaluation_prolongation(const std::function<void(const bool)> &slot);
+
+  /**
+   * Connect a function to mg::SignalsNonNested::evaluation_restriction.
+   *
+   */
+  boost::signals2::connection
+  connect_evaluation_restriction(const std::function<void(const bool)> &slot);
+
+  /**
+   * Connect a function to mg::SignalsNonNested::evaluate_and_process.
+   *
+   */
+  boost::signals2::connection
+  connect_evaluate_and_process(const std::function<void(const bool)> &slot);
+
+  /**
+   * Connect a function to mg::SignalsNonNested::process_and_evaluate.
+   *
+   */
+  boost::signals2::connection
+  connect_process_and_evaluate(const std::function<void(const bool)> &slot);
 
 protected:
   AdditionalData additional_data;
