@@ -195,6 +195,9 @@ namespace Step37
 
     // Apply hanging node constraints on that vector
     constraints_euler.clear();
+    constraints_euler.reinit(dof_euler.locally_owned_dofs(),
+                             DoFTools::extract_locally_relevant_dofs(
+                               dof_euler));
     DoFTools::make_hanging_node_constraints(dof_euler, constraints_euler);
     constraints_euler.close();
     constraints_euler.distribute(euler_positions);

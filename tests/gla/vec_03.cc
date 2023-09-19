@@ -80,7 +80,8 @@ test()
          ExcInternalError());
 
   using scalar_type = typename LA::MPI::BlockVector::value_type;
-  AffineConstraints<scalar_type> cm;
+  AffineConstraints<scalar_type> cm(local_active,
+                                    complete_index_set(local_active.size()));
   cm.add_line(1);
   cm.add_entry(1, 2, 3.0);
   cm.close();

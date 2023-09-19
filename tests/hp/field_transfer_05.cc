@@ -148,7 +148,9 @@ main(int argc, char *argv[])
   LinearAlgebra::distributed::Vector<double> new_solution(
     dof_handler.locally_owned_dofs(), locally_relevant_dofs, MPI_COMM_WORLD);
 
-  AffineConstraints<double> affine_constraints;
+  AffineConstraints<double> affine_constraints(
+    dof_handler.locally_owned_dofs(),
+    DoFTools::extract_locally_relevant_dofs(dof_handler));
   DoFTools::make_hanging_node_constraints(dof_handler, affine_constraints);
   affine_constraints.close();
 

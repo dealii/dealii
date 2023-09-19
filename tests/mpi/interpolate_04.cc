@@ -60,17 +60,19 @@ test()
   dofh1.distribute_dofs(fe);
   dofh2.distribute_dofs(fe);
 
-  AffineConstraints<PetscScalar> cm1;
-  cm1.close();
-  AffineConstraints<PetscScalar> cm2;
-  cm2.close();
-
   const IndexSet &dof1_locally_owned_dofs = dofh1.locally_owned_dofs();
   const IndexSet &dof2_locally_owned_dofs = dofh2.locally_owned_dofs();
   const IndexSet  dof1_locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dofh1);
   const IndexSet dof2_locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dofh2);
+
+  AffineConstraints<PetscScalar> cm1(dof1_locally_owned_dofs,
+                                     dof1_locally_relevant_dofs);
+  cm1.close();
+  AffineConstraints<PetscScalar> cm2(dof2_locally_owned_dofs,
+                                     dof2_locally_relevant_dofs);
+  cm2.close();
 
 
   PETScWrappers::MPI::Vector u1(dof1_locally_owned_dofs,
