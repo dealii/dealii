@@ -188,7 +188,6 @@ Step4<dim>::setup_system()
   constraints.clear();
   constraints.reinit(dof_handler.locally_owned_dofs(),
                      DoFTools::extract_locally_relevant_dofs(dof_handler));
-  std::map<unsigned int, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
                                            BoundaryValues<dim>(),
