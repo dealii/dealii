@@ -20,6 +20,7 @@
 
 #include <deal.II/base/config.h>
 
+#include "deal.II/base/floating_point_comparator.h"
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/vectorization.h>
@@ -30,6 +31,8 @@
 #include <deal.II/fe/mapping_cartesian.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/fe/mapping_related_data.h>
+
+#include <deal.II/matrix_free/mapping_info_storage.h>
 
 #include <memory>
 
@@ -179,6 +182,49 @@ namespace NonMatching
           }
       }
     };
+
+    template <int dim, int spacedim = dim>
+    dealii::internal::MatrixFreeFunctions::GeometryType
+    compute_geometry_type(
+      const double diameter,
+      const std::vector<DerivativeForm<1, dim, spacedim, double>>
+        &inverse_jacobians)
+    {
+      const auto   jac_0 = inverse_jacobians[0];
+      const double zero_tolerance_double =
+        1. / diameter * std::numeric_limits<double>::epsilon() * 1024.;
+      bool jacobian_constant = true;
+      for (unsigned int q = 1; q < inverse_jacobians.size(); ++q)
+        {
+          const DerivativeForm<1, dim, spacedim> &jac = inverse_jacobians[q];
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int e = 0; e < spacedim; ++e)
+              if (std::fabs(jac_0[d][e] - jac[d][e]) > zero_tolerance_double)
+                jacobian_constant = false;
+          if (!jacobian_constant)
+            break;
+        }
+
+      // check whether the Jacobian is diagonal to machine
+      // accuracy
+      bool cell_cartesian = jacobian_constant;
+      for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int e = 0; e < dim; ++e)
+          if (d != e)
+            if (std::fabs(jac_0[d][e]) > zero_tolerance_double)
+              {
+                cell_cartesian = false;
+                break;
+              }
+
+      // return cell type
+      if (cell_cartesian)
+        return dealii::internal::MatrixFreeFunctions::GeometryType::cartesian;
+      else if (jacobian_constant)
+        return dealii::internal::MatrixFreeFunctions::GeometryType::affine;
+      else
+        return dealii::internal::MatrixFreeFunctions::GeometryType::general;
+    }
   } // namespace internal
 
   /**
@@ -413,25 +459,43 @@ namespace NonMatching
     connect_is_reinitialized(const std::function<void()> &set_is_reinitialized);
 
     /**
+     * Compute the geometry index offset of the current cell/face.
+     */
+    template <bool is_face>
+    unsigned int
+    compute_geometry_index_offset(const unsigned int cell_index,
+                                  const unsigned int face_number) const;
+
+    /**
      * Compute the unit points index offset for the current cell/face.
      */
     unsigned int
-    compute_unit_point_index_offset(const unsigned int cell_index,
-                                    const unsigned int face_number) const;
+    compute_unit_point_index_offset(const unsigned int geometry_index) const;
 
     /**
      * Compute the data index offset for the current cell/face.
      */
     unsigned int
-    compute_data_index_offset(const unsigned int cell_index,
-                              const unsigned int face_number) const;
+    compute_data_index_offset(const unsigned int geometry_index) const;
+
+    /**
+     * Compute the data index offset for the current cell/face.
+     */
+    unsigned int
+    compute_compressed_data_index_offset(
+      const unsigned int geometry_index) const;
 
     /**
      * Get number of unvectorized quadrature points.
      */
     unsigned int
-    get_n_q_points_unvectorized(const unsigned int cell_index,
-                                const unsigned int face_number) const;
+    get_n_q_points_unvectorized(const unsigned int geometry_index) const;
+
+    /**
+     * Get cell geometry type.
+     */
+    dealii::internal::MatrixFreeFunctions::GeometryType
+    get_cell_type(const unsigned int geometry_index) const;
 
     /**
      * Return cell iterator.
@@ -503,7 +567,9 @@ namespace NonMatching
                        const unsigned int         n_q_points,
                        const unsigned int         n_q_points_unvectorized,
                        const MappingData         &mapping_data,
-                       const std::vector<double> &weights);
+                       const std::vector<double> &weights,
+                       const unsigned int compressed_unit_point_index_offset,
+                       const bool         affine_cell);
 
     /**
      * Compute the compressed cell index.
@@ -512,11 +578,18 @@ namespace NonMatching
     compute_compressed_cell_index(const unsigned int cell_index) const;
 
     /**
-     * Compute the geometry index offset of the current cell/face.
+     * Compute the mapping information for cells/surface.
      */
-    unsigned int
-    compute_geometry_index_offset(const unsigned int cell_index,
-                                  const unsigned int face_number) const;
+    template <typename ContainerType, typename QuadratureType>
+    void
+    do_reinit_cells(
+      const ContainerType               &cell_iterator_range,
+      const std::vector<QuadratureType> &quadrature_vector,
+      const unsigned int                 n_unfiltered_cells,
+      const std::function<
+        void(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+             const QuadratureType &quadrature,
+             MappingData          &mapping_data)> &compute_mapping_data);
 
     /**
      * Enum class for reinitialized states.
@@ -552,7 +625,7 @@ namespace NonMatching
     /**
      * Offset to point to the first unit point of a cell/face.
      */
-    AlignedVector<unsigned int> unit_points_index;
+    std::vector<unsigned int> unit_points_index;
 
     /**
      * A pointer to the internal data of the underlying mapping.
@@ -581,10 +654,22 @@ namespace NonMatching
     const AdditionalData additional_data;
 
     /**
-     * Stores the index offset into the arrays @p JxW_values, @p jacobians,
-     * @p inverse_jacobians and @p normal_vectors.
+     * Stores whether a cell is Cartesian (cell type 0), has constant
+     * transform data (Jacobians) (cell type 1), or is general (cell type
+     * 3). Type 2 is only used for faces and no cells are assigned this
+     * value.
      */
-    AlignedVector<unsigned int> data_index_offsets;
+    std::vector<dealii::internal::MatrixFreeFunctions::GeometryType> cell_type;
+
+    /**
+     * Stores the index offset into the arrays @p JxW_values and @p normal_vectors.
+     */
+    std::vector<unsigned int> data_index_offsets;
+
+    /**
+     * Stores the index offset into the arrays @p jacobians and @p inverse_jacobians.
+     */
+    std::vector<unsigned int> compressed_data_index_offsets;
 
     /**
      * The storage of the Jacobian determinant times the quadrature weight on
@@ -605,7 +690,7 @@ namespace NonMatching
      * The storage of contravariant transformation on quadrature points, i.e.,
      * the Jacobians of the transformation from the unit to the real cell.
      *
-     * Indexed by @p data_index_offsets.
+     * Indexed by @p compressed_data_index_offsets.
      */
     AlignedVector<DerivativeForm<1, dim, spacedim, Number>> jacobians;
 
@@ -614,7 +699,7 @@ namespace NonMatching
      * the inverse Jacobians of the transformation from the
      * unit to the real cell.
      *
-     * Indexed by @p data_index_offsets.
+     * Indexed by @p compressed_data_index_offsets.
      */
     AlignedVector<DerivativeForm<1, spacedim, dim, Number>> inverse_jacobians;
 
@@ -718,6 +803,8 @@ namespace NonMatching
     n_q_points_unvectorized.clear();
     unit_points_index.clear();
     data_index_offsets.clear();
+    compressed_data_index_offsets.clear();
+    cell_type.clear();
   }
 
 
@@ -783,12 +870,32 @@ namespace NonMatching
                                           internal_mapping_data,
                                           mapping_data);
 
+    // check for cartesian/affine cell
+    if (!quadrature.empty() &&
+        update_flags_mapping & UpdateFlags::update_inverse_jacobians)
+      {
+        cell_type.push_back(
+          internal::compute_geometry_type(cell->diameter(),
+                                          mapping_data.inverse_jacobians));
+      }
+    else
+      cell_type.push_back(
+        dealii::internal::MatrixFreeFunctions::GeometryType::general);
+
     // store mapping data
-    store_mapping_data(0,
-                       n_q_points_data,
-                       n_q_points_unvectorized[0],
-                       mapping_data,
-                       quadrature.get_weights());
+    store_mapping_data(
+      0,
+      n_q_points_data,
+      n_q_points_unvectorized[0],
+      mapping_data,
+      quadrature.get_weights(),
+      0,
+      cell_type.back() <=
+        dealii::internal::MatrixFreeFunctions::GeometryType::affine);
+
+    unit_points_index.push_back(0);
+    data_index_offsets.push_back(0);
+    compressed_data_index_offsets.push_back(0);
 
     state = State::single_cell;
     is_reinitialized();
@@ -820,12 +927,16 @@ namespace NonMatching
 
 
   template <int dim, int spacedim, typename Number>
-  template <typename ContainerType>
+  template <typename ContainerType, typename QuadratureType>
   void
-  MappingInfo<dim, spacedim, Number>::reinit_cells(
-    const ContainerType                &cell_iterator_range,
-    const std::vector<Quadrature<dim>> &quadrature_vector,
-    const unsigned int                  n_unfiltered_cells)
+  MappingInfo<dim, spacedim, Number>::do_reinit_cells(
+    const ContainerType               &cell_iterator_range,
+    const std::vector<QuadratureType> &quadrature_vector,
+    const unsigned int                 n_unfiltered_cells,
+    const std::function<
+      void(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+           const QuadratureType &quadrature,
+           MappingData          &mapping_data)> &compute_mapping_data)
   {
     clear();
 
@@ -838,6 +949,8 @@ namespace NonMatching
                                   cell_iterator_range.end()));
 
     n_q_points_unvectorized.reserve(n_cells);
+
+    cell_type.reserve(n_cells);
 
     if (additional_data.store_cells)
       cell_level_and_indices.resize(n_cells);
@@ -873,9 +986,8 @@ namespace NonMatching
       cell_index_to_compressed_cell_index.resize(n_unfiltered_cells,
                                                  numbers::invalid_unsigned_int);
 
-    MappingData                mapping_data;
-    CellSimilarity::Similarity cell_similarity =
-      CellSimilarity::Similarity::none;
+    MappingData  mapping_data;
+    MappingData  mapping_data_last_cell;
     unsigned int cell_index = 0;
     for (const auto &cell : cell_iterator_range)
       {
@@ -885,32 +997,97 @@ namespace NonMatching
             cell_level_and_indices[cell_index] = {cell->level(), cell->index()};
           }
 
+        const auto &quadrature = quadrature_vector[cell_index];
+        const bool  empty      = quadrature.empty();
+
         // store unit points
         const unsigned int n_q_points = compute_n_q_points<VectorizedArrayType>(
           n_q_points_unvectorized[cell_index]);
         store_unit_points(unit_points_index[cell_index],
                           n_q_points,
                           n_q_points_unvectorized[cell_index],
-                          quadrature_vector[cell_index].get_points());
+                          quadrature.get_points());
 
         // compute mapping data
-        internal::ComputeMappingDataHelper<dim, spacedim>::
-          compute_mapping_data_for_quadrature(mapping,
-                                              update_flags_mapping,
-                                              cell,
-                                              cell_similarity,
-                                              quadrature_vector[cell_index],
-                                              internal_mapping_data,
-                                              mapping_data);
+        compute_mapping_data(cell, quadrature, mapping_data);
 
         // store mapping data
         const unsigned int n_q_points_data =
           compute_n_q_points<Number>(n_q_points_unvectorized[cell_index]);
+
+        // check for cartesian/affine cell
+        if (!empty &&
+            update_flags_mapping & UpdateFlags::update_inverse_jacobians)
+          {
+            cell_type.push_back(
+              internal::compute_geometry_type(cell->diameter(),
+                                              mapping_data.inverse_jacobians));
+          }
+        else
+          cell_type.push_back(
+            dealii::internal::MatrixFreeFunctions::GeometryType::general);
+
+        if (cell_index > 0)
+          {
+            // check if current and last cell are affine
+            const bool affine_cells =
+              cell_type[cell_index] <=
+                dealii::internal::MatrixFreeFunctions::affine &&
+              cell_type[cell_index - 1] <=
+                dealii::internal::MatrixFreeFunctions::affine;
+
+            // create a comparator to compare inverse Jacobian of current
+            // and last cell
+            FloatingPointComparator<double> comparator(
+              1e4 / cell->diameter() * std::numeric_limits<double>::epsilon() *
+              1024.);
+
+            // we can only compare if current and last cell have at least
+            // one quadrature point and both cells are at least affine
+            const auto comparison_result =
+              (!affine_cells || mapping_data.inverse_jacobians.empty() ||
+               mapping_data_last_cell.inverse_jacobians.empty()) ?
+                FloatingPointComparator<double>::ComparisonResult::less :
+                comparator.compare(mapping_data.inverse_jacobians[0],
+                                   mapping_data_last_cell.inverse_jacobians[0]);
+
+            // we can compress the Jacobians and inverse Jacobians if
+            // inverse Jacobians are equal and cells are affine
+            if (affine_cells &&
+                comparison_result ==
+                  FloatingPointComparator<double>::ComparisonResult::equal)
+              {
+                compressed_data_index_offsets.push_back(
+                  compressed_data_index_offsets.back());
+              }
+            else
+              {
+                const unsigned int n_compressed_data_last_cell =
+                  cell_type[cell_index - 1] <=
+                      dealii::internal::MatrixFreeFunctions::affine ?
+                    1 :
+                    compute_n_q_points<Number>(
+                      n_q_points_unvectorized[cell_index - 1]);
+
+                compressed_data_index_offsets.push_back(
+                  compressed_data_index_offsets.back() +
+                  n_compressed_data_last_cell);
+              }
+          }
+        else
+          compressed_data_index_offsets.push_back(0);
+
+        // cache mapping_data from last cell
+        mapping_data_last_cell = mapping_data;
+
         store_mapping_data(data_index_offsets[cell_index],
                            n_q_points_data,
                            n_q_points_unvectorized[cell_index],
                            mapping_data,
-                           quadrature_vector[cell_index].get_weights());
+                           quadrature.get_weights(),
+                           compressed_data_index_offsets[cell_index],
+                           cell_type[cell_index] <=
+                             dealii::internal::MatrixFreeFunctions::affine);
 
         if (do_cell_index_compression)
           cell_index_to_compressed_cell_index[cell->active_cell_index()] =
@@ -919,8 +1096,43 @@ namespace NonMatching
         ++cell_index;
       }
 
+    // TODO: release allocated memory from compressed data vectors
+
     state = State::cell_vector;
     is_reinitialized();
+  }
+
+
+
+  template <int dim, int spacedim, typename Number>
+  template <typename ContainerType>
+  void
+  MappingInfo<dim, spacedim, Number>::reinit_cells(
+    const ContainerType                &cell_iterator_range,
+    const std::vector<Quadrature<dim>> &quadrature_vector,
+    const unsigned int                  n_unfiltered_cells)
+  {
+    auto compute_mapping_data_for_cells =
+      [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+          const Quadrature<dim> &quadrature,
+          MappingData           &mapping_data) {
+        CellSimilarity::Similarity cell_similarity =
+          CellSimilarity::Similarity::none;
+        internal::ComputeMappingDataHelper<dim, spacedim>::
+          compute_mapping_data_for_quadrature(mapping,
+                                              update_flags_mapping,
+                                              cell,
+                                              cell_similarity,
+                                              quadrature,
+                                              internal_mapping_data,
+                                              mapping_data);
+      };
+
+    do_reinit_cells<ContainerType, Quadrature<dim>>(
+      cell_iterator_range,
+      quadrature_vector,
+      n_unfiltered_cells,
+      compute_mapping_data_for_cells);
   }
 
 
@@ -933,8 +1145,6 @@ namespace NonMatching
     const std::vector<ImmersedSurfaceQuadrature<dim>> &quadrature_vector,
     const unsigned int                                 n_unfiltered_cells)
   {
-    clear();
-
     Assert(
       additional_data.use_global_weights == false,
       ExcMessage(
@@ -942,65 +1152,13 @@ namespace NonMatching
 
     Assert(additional_data.store_cells == false, ExcNotImplemented());
 
-    do_cell_index_compression =
-      n_unfiltered_cells != numbers::invalid_unsigned_int;
-
     if (update_flags_mapping & (update_JxW_values | update_normal_vectors))
       update_flags_mapping |= update_covariant_transformation;
 
-    const unsigned int n_cells = quadrature_vector.size();
-    AssertDimension(n_cells,
-                    std::distance(cell_iterator_range.begin(),
-                                  cell_iterator_range.end()));
-
-    n_q_points_unvectorized.reserve(n_cells);
-
-    // fill unit points index offset vector
-    unit_points_index.reserve(n_cells + 1);
-    unit_points_index.push_back(0);
-    data_index_offsets.reserve(n_cells + 1);
-    data_index_offsets.push_back(0);
-    for (const auto &quadrature : quadrature_vector)
-      {
-        const unsigned int n_points = quadrature.size();
-        n_q_points_unvectorized.push_back(n_points);
-
-        const unsigned int n_q_points =
-          compute_n_q_points<VectorizedArrayType>(n_points);
-        unit_points_index.push_back(unit_points_index.back() + n_q_points);
-
-        const unsigned int n_q_points_data =
-          compute_n_q_points<Number>(n_points);
-        data_index_offsets.push_back(data_index_offsets.back() +
-                                     n_q_points_data);
-      }
-
-    const unsigned int n_unit_points = unit_points_index.back();
-    const unsigned int n_data_points = data_index_offsets.back();
-
-    // resize data vectors
-    resize_unit_points(n_unit_points);
-    resize_data_fields(n_data_points);
-
-    if (do_cell_index_compression)
-      cell_index_to_compressed_cell_index.resize(n_unfiltered_cells,
-                                                 numbers::invalid_unsigned_int);
-
-    MappingData  mapping_data;
-    unsigned int cell_index = 0;
-    for (const auto &cell : cell_iterator_range)
-      {
-        const auto &quadrature = quadrature_vector[cell_index];
-
-        // store unit points
-        const unsigned int n_q_points = compute_n_q_points<VectorizedArrayType>(
-          n_q_points_unvectorized[cell_index]);
-        store_unit_points(unit_points_index[cell_index],
-                          n_q_points,
-                          n_q_points_unvectorized[cell_index],
-                          quadrature_vector[cell_index].get_points());
-
-        // compute mapping data
+    auto compute_mapping_data_for_surface =
+      [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+          const ImmersedSurfaceQuadrature<dim> &quadrature,
+          MappingData                          &mapping_data) {
         internal::ComputeMappingDataHelper<dim, spacedim>::
           compute_mapping_data_for_immersed_surface_quadrature(
             mapping,
@@ -1009,25 +1167,13 @@ namespace NonMatching
             quadrature,
             internal_mapping_data,
             mapping_data);
+      };
 
-        // store mapping data
-        const unsigned int n_q_points_data =
-          compute_n_q_points<Number>(n_q_points_unvectorized[cell_index]);
-        store_mapping_data(data_index_offsets[cell_index],
-                           n_q_points_data,
-                           n_q_points_unvectorized[cell_index],
-                           mapping_data,
-                           quadrature_vector[cell_index].get_weights());
-
-        if (do_cell_index_compression)
-          cell_index_to_compressed_cell_index[cell->active_cell_index()] =
-            cell_index;
-
-        ++cell_index;
-      }
-
-    state = State::cell_vector;
-    is_reinitialized();
+    do_reinit_cells<IteratorRange<Iterator>, ImmersedSurfaceQuadrature<dim>>(
+      cell_iterator_range,
+      quadrature_vector,
+      n_unfiltered_cells,
+      compute_mapping_data_for_surface);
   }
 
 
@@ -1064,6 +1210,8 @@ namespace NonMatching
       }
 
     n_q_points_unvectorized.reserve(n_faces);
+
+    cell_type.reserve(n_faces);
 
     // fill unit points index offset vector
     unit_points_index.resize(n_faces + 1);
@@ -1156,13 +1304,21 @@ namespace NonMatching
                                                        internal_mapping_data,
                                                        mapping_data);
 
+            cell_type.push_back(
+              dealii::internal::MatrixFreeFunctions::GeometryType::general);
+
+            compressed_data_index_offsets.push_back(
+              data_index_offsets[current_face_index]);
+
             const unsigned int n_q_points_data = compute_n_q_points<Number>(
               n_q_points_unvectorized[current_face_index]);
             store_mapping_data(data_index_offsets[current_face_index],
                                n_q_points_data,
                                n_q_points_unvectorized[current_face_index],
                                mapping_data,
-                               quadrature_on_face.get_weights());
+                               quadrature_on_face.get_weights(),
+                               data_index_offsets[current_face_index],
+                               false);
           }
         if (do_cell_index_compression)
           cell_index_to_compressed_cell_index[cell->active_cell_index()] =
@@ -1189,22 +1345,18 @@ namespace NonMatching
   template <int dim, int spacedim, typename Number>
   unsigned int
   MappingInfo<dim, spacedim, Number>::get_n_q_points_unvectorized(
-    const unsigned int cell_index,
-    const unsigned int face_number) const
+    const unsigned int geometry_index) const
   {
-    if (cell_index == numbers::invalid_unsigned_int &&
-        face_number == numbers::invalid_unsigned_int)
-      {
-        Assert(state == State::single_cell,
-               ExcMessage(
-                 "This mapping info is not reinitialized for a single cell!"));
-        return n_q_points_unvectorized[0];
-      }
-    else
-      {
-        return n_q_points_unvectorized[compute_geometry_index_offset(
-          cell_index, face_number)];
-      }
+    return n_q_points_unvectorized[geometry_index];
+  }
+
+
+  template <int dim, int spacedim, typename Number>
+  dealii::internal::MatrixFreeFunctions::GeometryType
+  MappingInfo<dim, spacedim, Number>::get_cell_type(
+    const unsigned int geometry_index) const
+  {
+    return cell_type[geometry_index];
   }
 
 
@@ -1244,14 +1396,18 @@ namespace NonMatching
 
 
   template <int dim, int spacedim, typename Number>
+  template <bool is_face>
   unsigned int
   MappingInfo<dim, spacedim, Number>::compute_geometry_index_offset(
     const unsigned int cell_index,
     const unsigned int face_number) const
   {
+    if (cell_index == numbers::invalid_unsigned_int)
+      return 0;
+
     const unsigned int compressed_cell_index =
       compute_compressed_cell_index(cell_index);
-    if (face_number == numbers::invalid_unsigned_int)
+    if (!is_face)
       {
         Assert(state == State::cell_vector,
                ExcMessage(
@@ -1347,7 +1503,9 @@ namespace NonMatching
     const unsigned int              n_q_points,
     const unsigned int              n_q_points_unvectorized,
     const MappingInfo::MappingData &mapping_data,
-    const std::vector<double>      &weights)
+    const std::vector<double>      &weights,
+    const unsigned int              compressed_unit_point_index_offset,
+    const bool                      affine_cell)
   {
     const unsigned int n_lanes =
       dealii::internal::VectorizedArrayTrait<Number>::width();
@@ -1355,22 +1513,28 @@ namespace NonMatching
     for (unsigned int q = 0; q < n_q_points; ++q)
       {
         const unsigned int offset = unit_points_index_offset + q;
+        const unsigned int compressed_offset =
+          compressed_unit_point_index_offset + q;
         for (unsigned int v = 0;
              v < n_lanes && q * n_lanes + v < n_q_points_unvectorized;
              ++v)
           {
-            if (update_flags_mapping & UpdateFlags::update_jacobians)
-              for (unsigned int d = 0; d < dim; ++d)
-                for (unsigned int s = 0; s < spacedim; ++s)
-                  dealii::internal::VectorizedArrayTrait<Number>::get(
-                    jacobians[offset][d][s], v) =
-                    mapping_data.jacobians[q * n_lanes + v][d][s];
-            if (update_flags_mapping & UpdateFlags::update_inverse_jacobians)
-              for (unsigned int d = 0; d < dim; ++d)
-                for (unsigned int s = 0; s < spacedim; ++s)
-                  dealii::internal::VectorizedArrayTrait<Number>::get(
-                    inverse_jacobians[offset][s][d], v) =
-                    mapping_data.inverse_jacobians[q * n_lanes + v][s][d];
+            if (q == 0 || !affine_cell)
+              {
+                if (update_flags_mapping & UpdateFlags::update_jacobians)
+                  for (unsigned int d = 0; d < dim; ++d)
+                    for (unsigned int s = 0; s < spacedim; ++s)
+                      dealii::internal::VectorizedArrayTrait<Number>::get(
+                        jacobians[compressed_offset][d][s], v) =
+                        mapping_data.jacobians[q * n_lanes + v][d][s];
+                if (update_flags_mapping &
+                    UpdateFlags::update_inverse_jacobians)
+                  for (unsigned int d = 0; d < dim; ++d)
+                    for (unsigned int s = 0; s < spacedim; ++s)
+                      dealii::internal::VectorizedArrayTrait<Number>::get(
+                        inverse_jacobians[compressed_offset][s][d], v) =
+                        mapping_data.inverse_jacobians[q * n_lanes + v][s][d];
+              }
             if (update_flags_mapping & UpdateFlags::update_JxW_values)
               {
                 if (additional_data.use_global_weights)
@@ -1447,7 +1611,7 @@ namespace NonMatching
   MappingInfo<dim, spacedim, Number>::get_unit_point(
     const unsigned int offset) const
   {
-    return &unit_points[offset];
+    return unit_points.data() + offset;
   }
 
 
@@ -1459,7 +1623,7 @@ namespace NonMatching
   MappingInfo<dim, spacedim, Number>::get_unit_point_faces(
     const unsigned int offset) const
   {
-    return &unit_points_faces[offset];
+    return unit_points_faces.data() + offset;
   }
 
 
@@ -1469,7 +1633,7 @@ namespace NonMatching
   MappingInfo<dim, spacedim, Number>::get_real_point(
     const unsigned int offset) const
   {
-    return &real_points[offset];
+    return real_points.data() + offset;
   }
 
 
@@ -1477,23 +1641,9 @@ namespace NonMatching
   template <int dim, int spacedim, typename Number>
   unsigned int
   MappingInfo<dim, spacedim, Number>::compute_unit_point_index_offset(
-    const unsigned int cell_index,
-    const unsigned int face_number) const
+    const unsigned int geometry_index) const
   {
-    if (cell_index == numbers::invalid_unsigned_int &&
-        face_number == numbers::invalid_unsigned_int)
-      {
-        Assert(state == State::single_cell,
-               ExcMessage(
-                 "This mapping info is not reinitialized for a single cell!"));
-        return 0;
-      }
-    else
-      {
-        const unsigned int offset =
-          compute_geometry_index_offset(cell_index, face_number);
-        return unit_points_index[offset];
-      }
+    return unit_points_index[geometry_index];
   }
 
 
@@ -1501,23 +1651,18 @@ namespace NonMatching
   template <int dim, int spacedim, typename Number>
   unsigned int
   MappingInfo<dim, spacedim, Number>::compute_data_index_offset(
-    const unsigned int cell_index,
-    const unsigned int face_number) const
+    const unsigned int geometry_index) const
   {
-    if (cell_index == numbers::invalid_unsigned_int &&
-        face_number == numbers::invalid_unsigned_int)
-      {
-        Assert(state == State::single_cell,
-               ExcMessage(
-                 "This mapping info is not reinitialized for a single cell!"));
-        return 0;
-      }
-    else
-      {
-        const unsigned int offset =
-          compute_geometry_index_offset(cell_index, face_number);
-        return data_index_offsets[offset];
-      }
+    return data_index_offsets[geometry_index];
+  }
+
+
+  template <int dim, int spacedim, typename Number>
+  unsigned int
+  MappingInfo<dim, spacedim, Number>::compute_compressed_data_index_offset(
+    const unsigned int geometry_index) const
+  {
+    return compressed_data_index_offsets[geometry_index];
   }
 
 
@@ -1527,7 +1672,7 @@ namespace NonMatching
   MappingInfo<dim, spacedim, Number>::get_jacobian(
     const unsigned int offset) const
   {
-    return &jacobians[offset];
+    return jacobians.data() + offset;
   }
 
 
@@ -1537,7 +1682,7 @@ namespace NonMatching
   MappingInfo<dim, spacedim, Number>::get_inverse_jacobian(
     const unsigned int offset) const
   {
-    return &inverse_jacobians[offset];
+    return inverse_jacobians.data() + offset;
   }
 
 
@@ -1546,7 +1691,7 @@ namespace NonMatching
   MappingInfo<dim, spacedim, Number>::get_normal_vector(
     const unsigned int offset) const
   {
-    return &normal_vectors[offset];
+    return normal_vectors.data() + offset;
   }
 
 
@@ -1555,7 +1700,7 @@ namespace NonMatching
   inline const Number *
   MappingInfo<dim, spacedim, Number>::get_JxW(const unsigned int offset) const
   {
-    return &JxW_values[offset];
+    return JxW_values.data() + offset;
   }
 
 

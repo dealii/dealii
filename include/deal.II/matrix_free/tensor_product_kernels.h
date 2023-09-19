@@ -2272,14 +2272,16 @@ namespace internal
    * Specializes @p evaluate_tensor_product_value_and_gradient() for linear
    * polynomials which massively reduces the necessary instructions.
    */
-  template <int dim, typename Number, typename Number2, int n_values = 1>
+  template <int dim,
+            typename Number,
+            typename Number2,
+            int n_values = 1,
+            int stride   = 1>
   inline std::array<typename ProductTypeNoPoint<Number, Number2>::type,
                     dim + n_values>
   evaluate_tensor_product_value_and_gradient_linear(
-    const unsigned int               n_shapes,
-    const Number                    *values,
-    const Point<dim, Number2>       &p,
-    const std::vector<unsigned int> &renumber = {})
+    const Number              *values,
+    const Point<dim, Number2> &p)
   {
     static_assert(0 <= dim && dim <= 3, "Only dim=0,1,2,3 implemented");
     static_assert(1 <= n_values && n_values <= 2,
@@ -2287,15 +2289,12 @@ namespace internal
 
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
 
+    static_assert(
+      n_values == 1 || stride == 1,
+      "Either n_values or stride has to be one for correct data access!");
     // If n_values > 1, we want to interpolate from a second array,
     // placed in the same array immediately after the main data. This
     // is used to interpolate normal derivatives onto faces.
-    const Number *values_2 =
-      n_values > 1 ? values + Utilities::fixed_power<dim>(n_shapes) : nullptr;
-
-    AssertDimension(n_shapes, 2);
-    for (unsigned int i = 0; i < renumber.size(); ++i)
-      AssertDimension(renumber[i], i);
 
     std::array<Number3, dim + n_values> result;
     if (dim == 0)
@@ -2303,23 +2302,23 @@ namespace internal
         // we only need the value on faces of a 1d element
         result[0] = values[0];
         if (n_values > 1)
-          result[1] = values_2[0];
+          result[1] = values[1];
       }
     else if (dim == 1)
       {
         // gradient
-        result[0] = Number3(values[1] - values[0]);
+        result[0] = Number3(values[stride] - values[0]);
         // values
         result[1] = Number3(values[0]) + p[0] * result[0];
         if (n_values > 1)
-          result[2] = Number3(values_2[0]) + p[0] * (values_2[1] - values_2[0]);
+          result[2] = Number3(values[2]) + p[0] * (values[3] - values[2]);
       }
     else if (dim == 2)
       {
-        const Number3 val10 = Number3(values[1] - values[0]);
-        const Number3 val32 = Number3(values[3] - values[2]);
+        const Number3 val10 = Number3(values[stride] - values[0]);
+        const Number3 val32 = Number3(values[3 * stride] - values[2 * stride]);
         const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
-        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        const Number3 tmp1  = Number3(values[2 * stride]) + p[0] * val32;
 
         // gradient
         result[0] = val10 + p[1] * (val32 - val10);
@@ -2331,25 +2330,25 @@ namespace internal
         if (n_values > 1)
           {
             const Number3 tmp0_2 =
-              Number3(values_2[0]) + p[0] * (values_2[1] - values_2[0]);
+              Number3(values[4]) + p[0] * (values[5] - values[4]);
             const Number3 tmp1_2 =
-              Number3(values_2[2]) + p[0] * (values_2[3] - values_2[0]);
+              Number3(values[6]) + p[0] * (values[7] - values[6]);
             result[3] = tmp0_2 + p[1] * (tmp1_2 - tmp0_2);
           }
       }
     else if (dim == 3)
       {
-        const Number3 val10 = Number3(values[1] - values[0]);
-        const Number3 val32 = Number3(values[3] - values[2]);
+        const Number3 val10 = Number3(values[stride] - values[0]);
+        const Number3 val32 = Number3(values[3 * stride] - values[2 * stride]);
         const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
-        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        const Number3 tmp1  = Number3(values[2 * stride]) + p[0] * val32;
         const Number3 tmp10 = tmp1 - tmp0;
         const Number3 tmpy0 = tmp0 + p[1] * tmp10;
 
-        const Number3 val54 = Number3(values[5] - values[4]);
-        const Number3 val76 = Number3(values[7] - values[6]);
-        const Number3 tmp2  = Number3(values[4]) + p[0] * val54;
-        const Number3 tmp3  = Number3(values[6]) + p[0] * val76;
+        const Number3 val54 = Number3(values[5 * stride] - values[4 * stride]);
+        const Number3 val76 = Number3(values[7 * stride] - values[6 * stride]);
+        const Number3 tmp2  = Number3(values[4 * stride]) + p[0] * val54;
+        const Number3 tmp3  = Number3(values[6 * stride]) + p[0] * val76;
         const Number3 tmp32 = tmp3 - tmp2;
         const Number3 tmpy1 = tmp2 + p[1] * tmp32;
 
@@ -2419,8 +2418,8 @@ namespace internal
     std::array<Number3, dim + 1> result;
     if (d_linear)
       {
-        result = evaluate_tensor_product_value_and_gradient_linear(
-          poly.size(), values.data(), p, renumber);
+        result =
+          evaluate_tensor_product_value_and_gradient_linear(values.data(), p);
       }
     else
       {
@@ -2548,22 +2547,14 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename Number2>
+  template <int dim, typename Number, typename Number2, int stride = 1>
   inline typename ProductTypeNoPoint<Number, Number2>::type
-  evaluate_tensor_product_value_linear(
-    const unsigned int               n_shapes,
-    const Number                    *values,
-    const Point<dim, Number2>       &p,
-    const std::vector<unsigned int> &renumber = {})
+  evaluate_tensor_product_value_linear(const Number              *values,
+                                       const Point<dim, Number2> &p)
   {
-    (void)n_shapes;
     static_assert(dim >= 0 && dim <= 3, "Only dim=0,1,2,3 implemented");
 
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
-
-    AssertDimension(n_shapes, 2);
-    for (unsigned int i = 0; i < renumber.size(); ++i)
-      AssertDimension(renumber[i], i);
 
     if (dim == 0)
       {
@@ -2572,28 +2563,28 @@ namespace internal
       }
     else if (dim == 1)
       {
-        return Number3(values[0]) + p[0] * Number3(values[1] - values[0]);
+        return Number3(values[0]) + p[0] * Number3(values[stride] - values[0]);
       }
     else if (dim == 2)
       {
-        const Number3 val10 = Number3(values[1] - values[0]);
-        const Number3 val32 = Number3(values[3] - values[2]);
+        const Number3 val10 = Number3(values[stride] - values[0]);
+        const Number3 val32 = Number3(values[3 * stride] - values[2 * stride]);
         const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
-        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        const Number3 tmp1  = Number3(values[2 * stride]) + p[0] * val32;
         return tmp0 + p[1] * (tmp1 - tmp0);
       }
     else if (dim == 3)
       {
-        const Number3 val10 = Number3(values[1] - values[0]);
-        const Number3 val32 = Number3(values[3] - values[2]);
+        const Number3 val10 = Number3(values[stride] - values[0]);
+        const Number3 val32 = Number3(values[3 * stride] - values[2 * stride]);
         const Number3 tmp0  = Number3(values[0]) + p[0] * val10;
-        const Number3 tmp1  = Number3(values[2]) + p[0] * val32;
+        const Number3 tmp1  = Number3(values[2 * stride]) + p[0] * val32;
         const Number3 tmpy0 = tmp0 + p[1] * (tmp1 - tmp0);
 
-        const Number3 val54 = Number3(values[5] - values[4]);
-        const Number3 val76 = Number3(values[7] - values[6]);
-        const Number3 tmp2  = Number3(values[4]) + p[0] * val54;
-        const Number3 tmp3  = Number3(values[6]) + p[0] * val76;
+        const Number3 val54 = Number3(values[5 * stride] - values[4 * stride]);
+        const Number3 val76 = Number3(values[7 * stride] - values[6 * stride]);
+        const Number3 tmp2  = Number3(values[4 * stride]) + p[0] * val54;
+        const Number3 tmp3  = Number3(values[6 * stride]) + p[0] * val76;
         const Number3 tmpy1 = tmp2 + p[1] * (tmp3 - tmp2);
 
         return tmpy0 + p[2] * (tmpy1 - tmpy0);
@@ -2617,10 +2608,7 @@ namespace internal
     typename ProductTypeNoPoint<Number, Number2>::type result;
     if (d_linear)
       {
-        result = evaluate_tensor_product_value_linear(poly.size(),
-                                                      values.data(),
-                                                      p,
-                                                      renumber);
+        result = evaluate_tensor_product_value_linear(values.data(), p);
       }
     else
       {
@@ -3049,18 +3037,14 @@ namespace internal
             int  n_values = 1>
   inline void
   integrate_add_tensor_product_value_and_gradient_linear(
-    const unsigned int             n_shapes,
     const Number2                 *value,
     const Tensor<1, dim, Number2> &gradient,
     Number2                       *values,
     const Point<dim, Number>      &p)
   {
-    (void)n_shapes;
     static_assert(0 <= dim && dim <= 3, "Only dim=0,1,2,3 implemented");
     static_assert(1 <= n_values && n_values <= 2,
                   "Only n_values=1,2 implemented");
-
-    AssertDimension(n_shapes, 2);
 
     // Note that 'add' is a template argument, so the compiler will remove
     // these checks
@@ -3210,7 +3194,11 @@ namespace internal
    * function depending on if values should be added to or set and if
    * polynomials are linear.
    */
-  template <int dim, typename Number, typename Number2, int n_values = 1>
+  template <bool is_linear,
+            int  dim,
+            typename Number,
+            typename Number2,
+            int n_values = 1>
   inline void
   integrate_tensor_product_value_and_gradient(
     const dealii::ndarray<Number, 2, dim> *shapes,
@@ -3219,7 +3207,6 @@ namespace internal
     const Tensor<1, dim, Number2>         &gradient,
     Number2                               *values,
     const Point<dim, Number>              &p,
-    const bool                             is_linear,
     const bool                             do_add)
   {
     if (do_add)
@@ -3230,7 +3217,7 @@ namespace internal
             Number,
             Number2,
             true,
-            n_values>(n_shapes, value, gradient, values, p);
+            n_values>(value, gradient, values, p);
         else
           internal::integrate_add_tensor_product_value_and_gradient_shapes<
             dim,
@@ -3247,7 +3234,7 @@ namespace internal
             Number,
             Number2,
             false,
-            n_values>(n_shapes, value, gradient, values, p);
+            n_values>(value, gradient, values, p);
         else
           internal::integrate_add_tensor_product_value_and_gradient_shapes<
             dim,
@@ -3382,15 +3369,11 @@ namespace internal
    */
   template <int dim, typename Number, typename Number2, bool add>
   inline void
-  integrate_add_tensor_product_value_linear(const unsigned int        n_shapes,
-                                            const Number2            &value,
+  integrate_add_tensor_product_value_linear(const Number2            &value,
                                             Number2                  *values,
                                             const Point<dim, Number> &p)
   {
-    (void)n_shapes;
     static_assert(dim >= 0 && dim <= 3, "Only dim=0,1,2,3 implemented");
-
-    AssertDimension(n_shapes, 2);
 
     if (dim == 0)
       {
@@ -3481,14 +3464,13 @@ namespace internal
    * function depending on if values should be added to or set and if
    * polynomials are linear.
    */
-  template <int dim, typename Number, typename Number2>
+  template <bool is_linear, int dim, typename Number, typename Number2>
   inline void
   integrate_tensor_product_value(const dealii::ndarray<Number, 2, dim> *shapes,
                                  const unsigned int        n_shapes,
                                  const Number2            &value,
                                  Number2                  *values,
                                  const Point<dim, Number> &p,
-                                 const bool                is_linear,
                                  const bool                do_add)
   {
     if (do_add)
@@ -3497,8 +3479,7 @@ namespace internal
           internal::integrate_add_tensor_product_value_linear<dim,
                                                               Number,
                                                               Number2,
-                                                              true>(n_shapes,
-                                                                    value,
+                                                              true>(value,
                                                                     values,
                                                                     p);
         else
@@ -3516,8 +3497,7 @@ namespace internal
           internal::integrate_add_tensor_product_value_linear<dim,
                                                               Number,
                                                               Number2,
-                                                              false>(n_shapes,
-                                                                     value,
+                                                              false>(value,
                                                                      values,
                                                                      p);
         else

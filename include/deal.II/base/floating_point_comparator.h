@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/derivative_form.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/vectorization.h>
@@ -104,6 +105,14 @@ struct FloatingPointComparator
   template <int rank, int dim, typename T>
   ComparisonResult
   compare(const Tensor<rank, dim, T> &t1, const Tensor<rank, dim, T> &t2) const;
+
+  /**
+   * Compare two derivative forms.
+   */
+  template <int rank, int dim, int spacedim, typename T>
+  ComparisonResult
+  compare(const DerivativeForm<rank, dim, spacedim, T> &t1,
+          const DerivativeForm<rank, dim, spacedim, T> &t2) const;
 
   /**
    * Compare two tables.
@@ -205,6 +214,24 @@ template <int rank, int dim, typename T>
 typename FloatingPointComparator<Number>::ComparisonResult
 FloatingPointComparator<Number>::compare(const Tensor<rank, dim, T> &t1,
                                          const Tensor<rank, dim, T> &t2) const
+{
+  for (unsigned int i = 0; i < dim; ++i)
+    {
+      const ComparisonResult result = compare(t1[i], t2[i]);
+      if (result != ComparisonResult::equal)
+        return result;
+    }
+  return ComparisonResult::equal;
+}
+
+
+
+template <typename Number>
+template <int rank, int dim, int spacedim, typename T>
+typename FloatingPointComparator<Number>::ComparisonResult
+FloatingPointComparator<Number>::compare(
+  const DerivativeForm<rank, dim, spacedim, T> &t1,
+  const DerivativeForm<rank, dim, spacedim, T> &t2) const
 {
   for (unsigned int i = 0; i < dim; ++i)
     {
