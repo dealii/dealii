@@ -31,21 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  PreconditionBase::PreconditionBase()
-    : communicator(MPI_COMM_SELF)
-  {}
-
-
-
-  PreconditionBase::PreconditionBase(const PreconditionBase &base)
-    : Subscriptor()
-    , preconditioner(base.preconditioner)
-    , communicator(base.communicator)
-    , vector_distributor(new Epetra_Map(*base.vector_distributor))
-  {}
-
-
-
   void
   PreconditionBase::clear()
   {
