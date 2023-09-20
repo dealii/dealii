@@ -3077,7 +3077,7 @@ protected:
 
 
 //----------------------------------------------------------------------//
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 inline std::pair<unsigned int, unsigned int>
@@ -3332,7 +3332,7 @@ FiniteElement<dim, spacedim>::get_associated_geometry_primitive(
     return GeometryPrimitive::hex;
 }
 
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 

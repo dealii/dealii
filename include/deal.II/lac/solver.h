@@ -473,7 +473,7 @@ protected:
 
 
 /*-------------------------------- Inline functions ------------------------*/
-
+#ifndef DOXYGEN
 
 template <typename VectorType>
 inline SolverControl::State
@@ -559,7 +559,7 @@ SolverBase<VectorType>::connect(
   return iteration_status.connect(slot);
 }
 
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
