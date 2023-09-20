@@ -36,22 +36,11 @@ namespace TrilinosWrappers
   {}
 
 
-
-  PreconditionBase::PreconditionBase(const PreconditionBase &base)
-    : Subscriptor()
-    , preconditioner(base.preconditioner)
-    , communicator(base.communicator)
-    , vector_distributor(new Epetra_Map(*base.vector_distributor))
-  {}
-
-
-
   void
   PreconditionBase::clear()
   {
     preconditioner.reset();
     communicator = MPI_COMM_SELF;
-    vector_distributor.reset();
   }
 
 
