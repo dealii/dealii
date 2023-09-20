@@ -624,31 +624,38 @@ namespace SparsityTools
     for (const auto &last_round_dof : last_round_dofs)
       new_indices[last_round_dof] = next_free_number++;
 
+    // store the indices of the dofs to be renumbered in the next round
+    std::vector<DynamicSparsityPattern::size_type> next_round_dofs;
+
+    // store for each coordination number the dofs with these coordination
+    // number
+    std::vector<std::pair<unsigned int, DynamicSparsityPattern::size_type>>
+      dofs_by_coordination;
+
     // now do as many steps as needed to renumber all dofs
     while (true)
       {
-        // store the indices of the dofs to be renumbered in the next round
-        std::vector<DynamicSparsityPattern::size_type> next_round_dofs;
+        next_round_dofs.clear();
 
         // find all neighbors of the dofs numbered in the last round
         for (const auto dof : last_round_dofs)
-          for (DynamicSparsityPattern::iterator j = sparsity.begin(dof);
-               j < sparsity.end(dof);
-               ++j)
-            next_round_dofs.push_back(j->column());
+          {
+            const unsigned int row_length = sparsity.row_length(dof);
+            for (unsigned int i = 0; i < row_length; ++i)
+              {
+                // skip dofs which are already numbered
+                const auto column = sparsity.column_number(dof, i);
+                if (new_indices[column] == numbers::invalid_size_type)
+                  {
+                    next_round_dofs.push_back(column);
 
-        // sort dof numbers
-        std::sort(next_round_dofs.begin(), next_round_dofs.end());
-
-        // delete multiple entries
-        next_round_dofs.erase(std::unique(next_round_dofs.begin(),
-                                          next_round_dofs.end()),
-                              next_round_dofs.end());
-
-        // eliminate dofs which are already numbered
-        for (int s = next_round_dofs.size() - 1; s >= 0; --s)
-          if (new_indices[next_round_dofs[s]] != numbers::invalid_size_type)
-            next_round_dofs.erase(next_round_dofs.begin() + s);
+                    // assign a dummy value to 'new_indices' to avoid adding
+                    // the same index again; those will get the right number
+                    // at the end of the outer 'while' loop
+                    new_indices[column] = 0;
+                  }
+              }
+          }
 
         // check whether there are any new dofs in the list. if there are
         // none, then we have completely numbered the current component of the
@@ -680,32 +687,19 @@ namespace SparsityTools
           }
 
 
-
-        // store for each coordination number the dofs with these coordination
-        // number
-        std::multimap<DynamicSparsityPattern::size_type, int>
-          dofs_by_coordination;
-
         // find coordination number for each of these dofs
+        dofs_by_coordination.clear();
         for (const types::global_dof_index next_round_dof : next_round_dofs)
-          {
-            const DynamicSparsityPattern::size_type coordination =
-              sparsity.row_length(next_round_dof);
-
-            // insert this dof at its coordination number
-            const std::pair<const DynamicSparsityPattern::size_type, int>
-              new_entry(coordination, next_round_dof);
-            dofs_by_coordination.insert(new_entry);
-          }
+          dofs_by_coordination.emplace_back(sparsity.row_length(next_round_dof),
+                                            next_round_dof);
+        std::sort(dofs_by_coordination.begin(), dofs_by_coordination.end());
 
         // assign new DoF numbers to the elements of the present front:
-        std::multimap<DynamicSparsityPattern::size_type, int>::iterator i;
-        for (i = dofs_by_coordination.begin(); i != dofs_by_coordination.end();
-             ++i)
-          new_indices[i->second] = next_free_number++;
+        for (const auto &i : dofs_by_coordination)
+          new_indices[i.second] = next_free_number++;
 
-        // after that: copy this round's dofs for the next round
-        last_round_dofs = next_round_dofs;
+        // after that: use this round's dofs for the next round
+        last_round_dofs.swap(next_round_dofs);
       }
 
     // test for all indices numbered. this mostly tests whether the
