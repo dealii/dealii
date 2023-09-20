@@ -1,0 +1,11 @@
+
+DEAL:can_create_vector_host:OK
+DEAL:can_create_vector_host_const:OK
+DEAL:can_create_vector_default:OK
+DEAL:can_create_vector_with_executor:OK
+DEAL:can_create_csr:OK
+DEAL:can_create_csr_with_index_type:OK
+DEAL:can_create_csr_with_value_index_type:OK
+DEAL:can_create_linop_host:OK
+DEAL:can_create_linop_default:OK
+DEAL:can_create_inverse_linop:OK
