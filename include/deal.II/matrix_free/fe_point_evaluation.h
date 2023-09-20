@@ -2495,7 +2495,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
              is_linear ? (is_face_path ? 2 * Utilities::pow(2, dim - 1) :
                                          Utilities::pow(2, dim)) :
                          0>
-    solution_values_vectorized_linear;
+    solution_values_vectorized_linear = {};
 
   // loop over quadrature batches qb
   const unsigned int n_shapes = is_linear ? 2 : poly.size();
