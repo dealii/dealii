@@ -12,7 +12,14 @@ permissions:
 
 jobs:
   build-master-docker:
+    name: build master docker ${{ matrix.ubuntu_version }}
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: ["focal", "jammy"]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,26 +33,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image of master focal
+      - name: Build and push Docker image of master ${{ matrix.ubuntu_version }}
         uses: docker/build-push-action@v5
         with:
           context: ./contrib/docker/
-          cache-from: type=registry,ref=dealii/dependencies:focal
+          cache-from: type=registry,ref=dealii/dependencies:${{ matrix.ubuntu_version }}
           cache-to: type=inline
           build-args: |
             VER=master
-            IMG=focal
+            IMG=${{ matrix.ubuntu_version }}
           push: ${{github.ref_name == 'master'}}
-          tags: dealii/dealii:master-focal
-
-      - name: Build and push Docker image of master jammy
-        uses: docker/build-push-action@v5
-        with:
-          context: ./contrib/docker/
-          cache-from: type=registry,ref=dealii/dependencies:jammy
-          cache-to: type=inline
-          build-args: |
-            VER=master
-            IMG=jammy
-          push: ${{github.ref_name == 'master'}}
-          tags: dealii/dealii:master-jammy
+          tags: dealii/dealii:master-${{ matrix.ubuntu_version }}
