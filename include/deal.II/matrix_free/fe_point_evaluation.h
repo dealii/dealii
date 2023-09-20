@@ -2544,10 +2544,11 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::integrate_fast(
     }
 
   // add between the lanes and write into the result
-  finish_integrate_fast<is_face_path, is_linear>(
-    solution_values,
-    integration_flags,
-    solution_values_vectorized_linear.data());
+  if (n_q_batches > 0)
+    finish_integrate_fast<is_face_path, is_linear>(
+      solution_values,
+      integration_flags,
+      solution_values_vectorized_linear.data());
 }
 
 
