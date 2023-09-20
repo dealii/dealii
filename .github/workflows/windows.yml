@@ -62,14 +62,14 @@ jobs:
         cmake --build build --parallel 2 --target test
     - name: archive library
       # run only if a PR is merged into master
-      if: ${{ github.ref == 'refs/heads/master' }}
+      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}
       shell: bash
       run: |
         cd c:/project
         7z a dealii-windows.zip *
     - name: upload library
       # run only if a PR is merged into master
-      if: ${{ github.ref == 'refs/heads/master' }}
+      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}
       uses: actions/upload-artifact@v3
       with:
         name: dealii-windows.zip
