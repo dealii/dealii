@@ -9560,7 +9560,7 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
   // We now store the type of cell in the XDMFEntry:
   (void)reference_cell;
   Assert(cell_type == reference_cell,
-         ExcMessage("Incorrect ReferenceCell type passed in."));
+         internal::ExcNonMatchingReferenceCellTypes(cell_type, reference_cell));
   return get_xdmf_content(indent_level);
 }
 

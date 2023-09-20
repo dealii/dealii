@@ -2687,6 +2687,25 @@ namespace internal
      */
     const ArrayView<const T> vertices_1;
   };
+
+  /**
+   * This exception is raised whenever the types of two reference cell objects
+   * were assumed to be equal, but were not.
+   *
+   * Parameters to the constructor are the first and second reference cells,
+   * both of type <tt>ReferenceCell</tt>.
+   */
+  DeclException2(
+    ExcNonMatchingReferenceCellTypes,
+    ReferenceCell,
+    ReferenceCell,
+    << "The reference-cell type used on this cell (" << arg1.to_string()
+    << ") does not match the reference-cell type of the finite element "
+    << "associated with this cell (" << arg2.to_string() << "). "
+    << "Did you accidentally use simplex elements on hypercube meshes "
+    << "(or the other way around), or are you using a mixed mesh and "
+    << "assigned a simplex element to a hypercube cell (or the other "
+    << "way around) via the active_fe_index?");
 } // namespace internal
 
 
