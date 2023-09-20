@@ -56,27 +56,32 @@ jobs:
       shell: bash
       run: |
         cmake --build build --parallel 2 --target install
-        cd c:/project
-        7z a dealii-windows.zip *
     - name: test library
       shell: bash
       run: |
         cmake --build build --parallel 2 --target test
     - name: archive library
       # run only if a PR is merged into master
-      if: github.ref == 'refs/heads/master'
+      if: ${{ github.ref == 'refs/heads/master' }}
+      shell: bash
+      run: |
+        cd c:/project
+        7z a dealii-windows.zip *
+    - name: upload library
+      # run only if a PR is merged into master
+      if: ${{ github.ref == 'refs/heads/master' }}
       uses: actions/upload-artifact@v3
       with:
         name: dealii-windows.zip
         path: c:/project/dealii-windows.zip
-    - name: archive error 1
+    - name: upload CMakeOutput
       uses: actions/upload-artifact@v3
       if: always()
       continue-on-error: true
       with:
         name: windows-serial-CMakeOutput.log
         path: build/CMakeFiles/CMakeOutput.log
-    - name: archive error 2
+    - name: upload CMakeError
       uses: actions/upload-artifact@v3
       if: always()
       continue-on-error: true
