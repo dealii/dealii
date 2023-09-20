@@ -45,7 +45,11 @@ test()
     deallog << a[i] << ' ';
   deallog << std::endl;
 
+  deallog << "Memory Shrinking: ";
+  deallog << a.memory_consumption() << " to ";
   a.resize(4);
+  a.shrink_to_fit();
+  deallog << a.memory_consumption() << std::endl;
   deallog << "Shrinking: ";
   for (unsigned int i = 0; i < a.size(); ++i)
     deallog << a[i] << ' ';
