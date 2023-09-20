@@ -77,7 +77,8 @@ test()
 
 
   using scalar_type = typename LA::MPI::BlockVector::value_type;
-  AffineConstraints<scalar_type> cm;
+  AffineConstraints<scalar_type> cm(complete_index_set(v.size()),
+                                    complete_index_set(v.size()));
   cm.add_line(0);
   cm.add_entry(0, 1, 3.0);
   cm.close();

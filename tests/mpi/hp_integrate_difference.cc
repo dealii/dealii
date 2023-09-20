@@ -156,15 +156,16 @@ test()
   VectorTools::interpolate(dof_handler, CheckFunction<dim>(), interpolated);
 
   // then also apply constraints
-  AffineConstraints<double> hanging_node_constraints;
+  const IndexSet relevant_set =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
+  AffineConstraints<double> hanging_node_constraints(
+    dof_handler.locally_owned_dofs(), relevant_set);
   DoFTools::make_hanging_node_constraints(dof_handler,
                                           hanging_node_constraints);
   hanging_node_constraints.close();
   hanging_node_constraints.distribute(interpolated);
 
   // extract a vector that has ghost elements
-  const IndexSet relevant_set =
-    DoFTools::extract_locally_relevant_dofs(dof_handler);
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
   x_rel = interpolated;
 

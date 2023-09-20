@@ -76,7 +76,9 @@ test_transfer_operator(
   const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
   const unsigned int mg_level_coarse = numbers::invalid_unsigned_int)
 {
-  AffineConstraints<Number> constraint_fine;
+  AffineConstraints<Number> constraint_fine(
+    dof_handler_fine.locally_owned_dofs(),
+    DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
   DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
   constraint_fine.close();
 
@@ -186,7 +188,9 @@ test_non_nested_transfer(
   const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
   const unsigned int mg_level_coarse = numbers::invalid_unsigned_int)
 {
-  AffineConstraints<Number> constraint_fine;
+  AffineConstraints<Number> constraint_fine(
+    dof_handler_fine.locally_owned_dofs(),
+    DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
   DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
   constraint_fine.close();
 

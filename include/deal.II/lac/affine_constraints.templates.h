@@ -2570,6 +2570,33 @@ namespace internal
 } // namespace internal
 
 
+namespace internal
+{
+  namespace AffineConstraints
+  {
+    template <typename VectorType,
+              std::enable_if_t<internal::is_block_vector<VectorType> == false>
+                * = nullptr>
+    MPI_Comm
+    get_mpi_communicator(const VectorType &vec)
+    {
+      return vec.get_mpi_communicator();
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<internal::is_block_vector<VectorType> == true>
+                * = nullptr>
+    MPI_Comm
+    get_mpi_communicator(const VectorType &vec)
+    {
+      Assert(vec.n_blocks() > 0, ExcInternalError());
+      return vec.block(0).get_mpi_communicator();
+    }
+  } // namespace AffineConstraints
+} // namespace internal
+
 
 template <typename number>
 template <typename VectorType>
@@ -2592,83 +2619,115 @@ AffineConstraints<number>::distribute(VectorType &vec) const
 
   if constexpr (dealii::is_serial_vector<VectorType>::value == false)
     {
-      // Check that the set of indices we will import is a superset of
-      // the locally-owned ones. This *should* be the case if, as one
-      // would expect, the AffineConstraint object was initialized
-      // with a locally-relevant index set that is indeed a superset
-      // of the locally-owned indices. But you never know what people
-      // pass as arguments...
+      // First check whether there are any constraints at all. If
+      // there aren't, then there is nothing we need to do and we can
+      // save the considerable effort below to communicate information
+      // -- this is for sure the case on the first (not yet adaptively
+      // refined) level of computations, for example:
+      if (Utilities::MPI::sum(lines.size(),
+                              internal::AffineConstraints::get_mpi_communicator(
+                                vec)) > 0)
+        {
+          // We are looking at parallel vectors here. Of course, they could be
+          // used in sequential contexts, but at least if we know that we are
+          // in a parallel context with more than one process, we should check
+          // that the user of this class provided index sets to the constructor
+          // or the reinit() functions:
+          if (Utilities::MPI::n_mpi_processes(
+                internal::AffineConstraints::get_mpi_communicator(vec)) > 1)
+            Assert(local_lines != IndexSet(),
+                   ExcMessage(
+                     "You are using the AffineConstraints class in a "
+                     "program that is running in parallel. In this case, "
+                     "it is inefficient to store all constraints: This class "
+                     "should really only store constraints for those degrees "
+                     "of freedom that are locally relevant. It is considered "
+                     "a bug not to do that. Please call either the "
+                     "constructor of this class, or one of its reinit() "
+                     "functions that provide this class with index sets "
+                     "of the locally owned and the locally relevant "
+                     "degrees of freedom."));
+
+            // Check that the set of indices we will import is a superset of
+            // the locally-owned ones. This *should* be the case if, as one
+            // would expect, the AffineConstraint object was initialized
+            // with a locally-relevant index set that is indeed a superset
+            // of the locally-owned indices. But you never know what people
+            // pass as arguments...
 #ifdef DEBUG
-      if (needed_elements_for_distribute != IndexSet())
-        for (const auto i : vec_owned_elements)
-          Assert(needed_elements_for_distribute.is_element(i),
-                 ExcInternalError());
+          if (needed_elements_for_distribute != IndexSet())
+            for (const auto i : vec_owned_elements)
+              Assert(needed_elements_for_distribute.is_element(i),
+                     ExcInternalError());
 #endif
 
-      VectorType ghosted_vector;
+          VectorType ghosted_vector;
 
-      // It is possible that the user is using a parallel vector type,
-      // but is running a non-parallel program (for example, step-31
-      // does this). In this case, it is (perhaps?) not a bug to not
-      // set an IndexSet for the local_lines and the
-      // locally_owned_lines -- they are simply both empty sets in
-      // that case. If that is so, we could just assign
-      // 'ghosted_vector=vec;'. But this is dangerous. Not having set
-      // index sets could also have been a bug, and we would get
-      // downstream errors about accessing elements that are not
-      // locally available. Rather, if no index sets were provided,
-      // simply import the *entire* vector.
-      if (local_lines != IndexSet())
-        {
-          Assert(needed_elements_for_distribute != IndexSet(),
-                 ExcInternalError());
-          internal::import_vector_with_ghost_elements(
-            vec,
-            vec_owned_elements,
-            needed_elements_for_distribute,
-            ghosted_vector,
-            std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+          // It is possible that the user is using a parallel vector type,
+          // but is running a non-parallel program (for example, step-31
+          // does this). In this case, it is (perhaps?) not a bug to not
+          // set an IndexSet for the local_lines and the
+          // locally_owned_lines -- they are simply both empty sets in
+          // that case. If that is so, we could just assign
+          // 'ghosted_vector=vec;'. But this is dangerous. Not having set
+          // index sets could also have been a bug, and we would get
+          // downstream errors about accessing elements that are not
+          // locally available. Rather, if no index sets were provided,
+          // simply import the *entire* vector.
+          if (local_lines != IndexSet())
+            {
+              Assert(needed_elements_for_distribute != IndexSet(),
+                     ExcInternalError());
+              internal::import_vector_with_ghost_elements(
+                vec,
+                vec_owned_elements,
+                needed_elements_for_distribute,
+                ghosted_vector,
+                std::integral_constant<bool,
+                                       IsBlockVector<VectorType>::value>());
+            }
+          else
+            {
+              Assert(needed_elements_for_distribute == IndexSet(),
+                     ExcInternalError());
+
+              // TODO: We should really consider it a bug if this parallel
+              // truly is distributed (and not just a parallel vector type
+              // used for a sequential program). Assert that we are really
+              // working in a sequential context.
+
+              internal::import_vector_with_ghost_elements(
+                vec,
+                vec_owned_elements,
+                complete_index_set(vec_owned_elements.size()),
+                ghosted_vector,
+                std::integral_constant<bool,
+                                       IsBlockVector<VectorType>::value>());
+            }
+
+          for (const ConstraintLine &line : lines)
+            if (vec_owned_elements.is_element(line.index))
+              {
+                typename VectorType::value_type new_value = line.inhomogeneity;
+                for (const std::pair<size_type, number> &entry : line.entries)
+                  new_value +=
+                    (static_cast<typename VectorType::value_type>(
+                       internal::ElementAccess<VectorType>::get(ghosted_vector,
+                                                                entry.first)) *
+                     entry.second);
+                AssertIsFinite(new_value);
+                internal::ElementAccess<VectorType>::set(new_value,
+                                                         line.index,
+                                                         vec);
+              }
+
+          // now compress to communicate the entries that we added to
+          // and that weren't to local processors to the owner
+          //
+          // this shouldn't be strictly necessary but it probably doesn't
+          // hurt either
+          vec.compress(VectorOperation::insert);
         }
-      else
-        {
-          Assert(needed_elements_for_distribute == IndexSet(),
-                 ExcInternalError());
-
-          // TODO: We should really consider it a bug if this parallel
-          // truly is distributed (and not just a parallel vector type
-          // used for a sequential program). Assert that we are really
-          // working in a sequential context.
-
-          internal::import_vector_with_ghost_elements(
-            vec,
-            vec_owned_elements,
-            complete_index_set(vec_owned_elements.size()),
-            ghosted_vector,
-            std::integral_constant<bool, IsBlockVector<VectorType>::value>());
-        }
-
-      for (const ConstraintLine &line : lines)
-        if (vec_owned_elements.is_element(line.index))
-          {
-            typename VectorType::value_type new_value = line.inhomogeneity;
-            for (const std::pair<size_type, number> &entry : line.entries)
-              new_value +=
-                (static_cast<typename VectorType::value_type>(
-                   internal::ElementAccess<VectorType>::get(ghosted_vector,
-                                                            entry.first)) *
-                 entry.second);
-            AssertIsFinite(new_value);
-            internal::ElementAccess<VectorType>::set(new_value,
-                                                     line.index,
-                                                     vec);
-          }
-
-      // now compress to communicate the entries that we added to
-      // and that weren't to local processors to the owner
-      //
-      // this shouldn't be strictly necessary but it probably doesn't
-      // hurt either
-      vec.compress(VectorOperation::insert);
     }
   else
     // purely sequential vector (either because the type doesn't

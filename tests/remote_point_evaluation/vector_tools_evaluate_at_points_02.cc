@@ -137,7 +137,9 @@ public:
         const LinearAlgebra::distributed::Vector<double> &solution_other,
         const Mapping<dim>                               &mapping_other)
   {
-    AffineConstraints<double> constraints;
+    AffineConstraints<double> constraints(
+      dof_handler.locally_owned_dofs(),
+      DoFTools::extract_locally_relevant_dofs(dof_handler));
     {
       std::map<types::global_dof_index, Point<dim>> support_points;
 

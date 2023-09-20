@@ -864,7 +864,9 @@ namespace Euler_DG
     const DoFHandler<dim> &dof_handler)
   {
     const std::vector<const DoFHandler<dim> *> dof_handlers = {&dof_handler};
-    const AffineConstraints<double>            dummy;
+    const AffineConstraints<double>            dummy(
+      dof_handler.locally_owned_dofs(),
+      DoFTools::extract_locally_relevant_dofs(dof_handler));
     const std::vector<const AffineConstraints<double> *> constraints = {&dummy};
 #ifdef HEX
     const std::vector<Quadrature<1>> quadratures = {QGauss<1>(n_q_points_1d),
@@ -2320,7 +2322,9 @@ namespace Euler_DG
           euler_operator.project(ExactSolution<dim>(time), reference);
 #else
 
-          AffineConstraints<double> dummy;
+          AffineConstraints<double> dummy(
+            dof_handler.locally_owned_dofs(),
+            DoFTools::extract_locally_relevant_dofs(dof_handler));
           dummy.close();
           VectorTools::project(mapping,
                                dof_handler,
@@ -2414,7 +2418,9 @@ namespace Euler_DG
 #ifdef HEX
     euler_operator.project(ExactSolution<dim>(time), solution);
 #else
-    AffineConstraints<double> dummy;
+    AffineConstraints<double> dummy(dof_handler.locally_owned_dofs(),
+                                    DoFTools::extract_locally_relevant_dofs(
+                                      dof_handler));
     dummy.close();
     VectorTools::project(mapping,
                          dof_handler,
