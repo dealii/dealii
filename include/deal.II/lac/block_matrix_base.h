@@ -1939,8 +1939,9 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
         if (col_indices[i] <= before)
           Assert(false,
                  ExcMessage("Flag col_indices_are_sorted is set, but "
-                            "indices appear to not be sorted.")) else before =
-            col_indices[i];
+                            "indices appear to not be sorted."));
+        else
+          before = col_indices[i];
 #  endif
       const std::pair<unsigned int, size_type> row_index =
         this->row_block_indices.global_to_local(row);

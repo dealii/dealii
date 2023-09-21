@@ -13174,7 +13174,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcNotImplemented())
+        Assert(false, ExcNotImplemented());
       }
   }
 } // namespace
@@ -13214,7 +13214,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcNotImplemented())
+        Assert(false, ExcNotImplemented());
       }
   }
 } // namespace
@@ -13254,7 +13254,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcNotImplemented())
+        Assert(false, ExcNotImplemented());
       }
   }
 } // namespace

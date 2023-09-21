@@ -30,7 +30,7 @@ template <int dim>
 void
 test(const unsigned int)
 {
-  AssertThrow(false, ExcNotImplemented())
+  AssertThrow(false, ExcNotImplemented());
 }
 
 template <>

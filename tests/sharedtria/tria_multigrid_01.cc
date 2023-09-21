@@ -63,7 +63,7 @@ compare_meshes(parallel::shared::Triangulation<dim>      &shared_tria,
     {
       AssertThrow(shared_map[it->first] == it->second,
                   ExcMessage(
-                    "Not all CellIds map to correct level subdomain_ids."))
+                    "Not all CellIds map to correct level subdomain_ids."));
     }
 
 
@@ -88,14 +88,14 @@ compare_meshes(parallel::shared::Triangulation<dim>      &shared_tria,
     {
       if (cell1->level_subdomain_id() != numbers::artificial_subdomain_id)
         Assert(p4est_known_cells.find(cell1->id()) != p4est_known_cells.end(),
-               ExcMessage("Cell not known by processor."))
+               ExcMessage("Cell not known by processor."));
     }
   cell2 = p4est_tria.begin(), endc2 = p4est_tria.end();
   for (; cell2 != endc2; ++cell2)
     {
       if (cell2->level_subdomain_id() != numbers::artificial_subdomain_id)
         Assert(shared_known_cells.find(cell2->id()) != shared_known_cells.end(),
-               ExcMessage("Cell not known by processor."))
+               ExcMessage("Cell not known by processor."));
     }
 }
 

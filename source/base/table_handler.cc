@@ -73,7 +73,7 @@ namespace internal
       {
         Assert(false,
                ExcMessage("The number stored by this element of the "
-                          "table is not a number."))
+                          "table is not a number."));
       }
 
     return 0;

@@ -105,12 +105,13 @@ test()
         {
           AssertThrow(p->row() == 0, ExcInternalError());
           if (p->column() == 0)
-            AssertThrow(p->value() == 0.1,
-                        ExcInternalError()) else if (p->column() == 2)
-              AssertThrow(p->value() == 0.2, ExcInternalError()) else
-              // well, we didn't write here, so the only thing that
-              // should be in there is a zero
-              AssertThrow(p->value() == 0.0, ExcInternalError());
+            AssertThrow(p->value() == 0.1, ExcInternalError());
+          else if (p->column() == 2)
+            AssertThrow(p->value() == 0.2, ExcInternalError());
+          else
+            // well, we didn't write here, so the only thing that
+            // should be in there is a zero
+            AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
   else
@@ -121,10 +122,11 @@ test()
         {
           AssertThrow(p->row() == 2, ExcInternalError());
           if (p->column() == 3)
-            AssertThrow(p->value() == 0.3, ExcInternalError()) else
-              // well, we didn't write here, so the only thing that
-              // should be in there is a zero
-              AssertThrow(p->value() == 0.0, ExcInternalError());
+            AssertThrow(p->value() == 0.3, ExcInternalError());
+          else
+            // well, we didn't write here, so the only thing that
+            // should be in there is a zero
+            AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
 
@@ -141,12 +143,13 @@ test()
         {
           AssertThrow(p->row() == 0, ExcInternalError());
           if (p->column() == 0)
-            AssertThrow(p->value() == 0.1,
-                        ExcInternalError()) else if (p->column() == 2)
-              AssertThrow(p->value() == 0.2, ExcInternalError()) else
-              // well, we didn't write here, so the only thing that
-              // should be in there is a zero
-              AssertThrow(p->value() == 0.0, ExcInternalError());
+            AssertThrow(p->value() == 0.1, ExcInternalError());
+          else if (p->column() == 2)
+            AssertThrow(p->value() == 0.2, ExcInternalError());
+          else
+            // well, we didn't write here, so the only thing that
+            // should be in there is a zero
+            AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
   else
@@ -158,10 +161,11 @@ test()
         {
           AssertThrow(p->row() == 2, ExcInternalError());
           if (p->column() == 3)
-            AssertThrow(p->value() == 0.3, ExcInternalError()) else
-              // well, we didn't write here, so the only thing that
-              // should be in there is a zero
-              AssertThrow(p->value() == 0.0, ExcInternalError());
+            AssertThrow(p->value() == 0.3, ExcInternalError());
+          else
+            // well, we didn't write here, so the only thing that
+            // should be in there is a zero
+            AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
 
@@ -175,12 +179,13 @@ test()
         {
           AssertThrow(p->row() == 0, ExcInternalError());
           if (p->column() == 0)
-            AssertThrow(p->value() == 108,
-                        ExcInternalError()) else if (p->column() == 2)
-              AssertThrow(p->value() == 0.2, ExcInternalError()) else
-              // well, we didn't write here, so the only thing that
-              // should be in there is a zero
-              AssertThrow(p->value() == 0.0, ExcInternalError());
+            AssertThrow(p->value() == 108, ExcInternalError());
+          else if (p->column() == 2)
+            AssertThrow(p->value() == 0.2, ExcInternalError());
+          else
+            // well, we didn't write here, so the only thing that
+            // should be in there is a zero
+            AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
   else
@@ -191,10 +196,11 @@ test()
         {
           AssertThrow(p->row() == 2, ExcInternalError());
           if (p->column() == 3)
-            AssertThrow(p->value() == 42, ExcInternalError()) else
-              // well, we didn't write here, so the only thing that
-              // should be in there is a zero
-              AssertThrow(p->value() == 0.0, ExcInternalError());
+            AssertThrow(p->value() == 42, ExcInternalError());
+          else
+            // well, we didn't write here, so the only thing that
+            // should be in there is a zero
+            AssertThrow(p->value() == 0.0, ExcInternalError());
         }
     }
 

@@ -679,11 +679,10 @@ namespace SparsityTools
                               "component, but as stated in the documentation "
                               "we only want to reorder such graphs if no "
                               "starting indices are given. The function was "
-                              "called with starting indices, however."))
+                              "called with starting indices, however."));
 
-              next_round_dofs.push_back(
-                internal::find_unnumbered_starting_index(sparsity,
-                                                         new_indices));
+            next_round_dofs.push_back(
+              internal::find_unnumbered_starting_index(sparsity, new_indices));
           }
 
 

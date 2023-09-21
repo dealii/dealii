@@ -1614,7 +1614,8 @@ FullMatrix<number>::left_invert(const FullMatrix<number2> &A)
   A_t.Tadd(A, 1);
   A_t.mmult(A_t_times_A, A);
   if (number(A_t_times_A.determinant()) == number(0))
-    Assert(false, ExcSingular()) else
+    Assert(false, ExcSingular());
+  else
     {
       A_t_times_A_inv.invert(A_t_times_A);
       A_t_times_A_inv.mmult(left_inv, A_t);
@@ -1652,7 +1653,8 @@ FullMatrix<number>::right_invert(const FullMatrix<number2> &A)
   A_t.Tadd(A, 1);
   A.mmult(A_times_A_t, A_t);
   if (number(A_times_A_t.determinant()) == number(0))
-    Assert(false, ExcSingular()) else
+    Assert(false, ExcSingular());
+  else
     {
       A_times_A_t_inv.invert(A_times_A_t);
       A_t.mmult(right_inv, A_times_A_t_inv);

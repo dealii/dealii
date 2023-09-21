@@ -37,10 +37,9 @@ check()
   const double d  = p1.distance(p2);
   const double d2 = p1.distance_square(p2);
 
-  AssertThrow(std::abs(d - std::sqrt(d2)) < 1e-10, ExcInternalError())
+  AssertThrow(std::abs(d - std::sqrt(d2)) < 1e-10, ExcInternalError());
 
-      deallog
-    << "Ok" << std::endl;
+  deallog << "Ok" << std::endl;
 }
 
 int

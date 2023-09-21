@@ -248,7 +248,9 @@ namespace StokesClass
                     "did not converge to a tolerance of " +
                     Utilities::to_string(solver_control.tolerance()) +
                     ". It reported the following error:\n\n") +
-                  exc.what())) else throw QuietException();
+                  exc.what()));
+            else
+              throw QuietException();
           }
         dst.block(1) *= -1.0;
       }
