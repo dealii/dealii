@@ -505,6 +505,12 @@ namespace NonMatching
     typename Triangulation<dim, spacedim>::cell_iterator
     get_cell_iterator(const unsigned int cell_index) const;
 
+    /**
+     * Return the memory consumption of this class in bytes.
+     */
+    std::size_t
+    memory_consumption() const;
+
   private:
     using MappingData =
       dealii::internal::FEValuesImplementation::MappingRelatedData<dim,
@@ -988,7 +994,8 @@ namespace NonMatching
 
     MappingData  mapping_data;
     MappingData  mapping_data_last_cell;
-    unsigned int cell_index = 0;
+    unsigned int size_compressed_data = 0;
+    unsigned int cell_index           = 0;
     for (const auto &cell : cell_iterator_range)
       {
         if (additional_data.store_cells)
@@ -1089,6 +1096,16 @@ namespace NonMatching
                            cell_type[cell_index] <=
                              dealii::internal::MatrixFreeFunctions::affine);
 
+        // update size of compressed data depending on cell type and handle
+        // empty quadratures
+        if (cell_type[cell_index] <=
+            dealii::internal::MatrixFreeFunctions::affine)
+          size_compressed_data = compressed_data_index_offsets.back() + 1;
+        else
+          size_compressed_data =
+            std::max(size_compressed_data,
+                     compressed_data_index_offsets.back() + n_q_points_data);
+
         if (do_cell_index_compression)
           cell_index_to_compressed_cell_index[cell->active_cell_index()] =
             cell_index;
@@ -1096,7 +1113,16 @@ namespace NonMatching
         ++cell_index;
       }
 
-    // TODO: release allocated memory from compressed data vectors
+    if (update_flags_mapping & UpdateFlags::update_jacobians)
+      {
+        jacobians.resize(size_compressed_data);
+        jacobians.shrink_to_fit();
+      }
+    if (update_flags_mapping & UpdateFlags::update_inverse_jacobians)
+      {
+        inverse_jacobians.resize(size_compressed_data);
+        inverse_jacobians.shrink_to_fit();
+      }
 
     state = State::cell_vector;
     is_reinitialized();
@@ -1738,6 +1764,34 @@ namespace NonMatching
     const std::function<void()> &set_is_reinitialized)
   {
     return is_reinitialized.connect(set_is_reinitialized);
+  }
+
+
+
+  template <int dim, int spacedim, typename Number>
+  std::size_t
+  MappingInfo<dim, spacedim, Number>::memory_consumption() const
+  {
+    std::size_t memory = MemoryConsumption::memory_consumption(unit_points);
+    memory += MemoryConsumption::memory_consumption(unit_points_faces);
+    memory += MemoryConsumption::memory_consumption(unit_points_index);
+    memory += cell_type.capacity() *
+              sizeof(dealii::internal::MatrixFreeFunctions::GeometryType);
+    memory += MemoryConsumption::memory_consumption(data_index_offsets);
+    memory +=
+      MemoryConsumption::memory_consumption(compressed_data_index_offsets);
+    memory += MemoryConsumption::memory_consumption(JxW_values);
+    memory += MemoryConsumption::memory_consumption(normal_vectors);
+    memory += MemoryConsumption::memory_consumption(jacobians);
+    memory += MemoryConsumption::memory_consumption(inverse_jacobians);
+    memory += MemoryConsumption::memory_consumption(real_points);
+    memory += MemoryConsumption::memory_consumption(n_q_points_unvectorized);
+    memory += MemoryConsumption::memory_consumption(cell_index_offset);
+    memory += MemoryConsumption::memory_consumption(
+      cell_index_to_compressed_cell_index);
+    memory += MemoryConsumption::memory_consumption(cell_level_and_indices);
+    memory += sizeof(*this);
+    return memory;
   }
 } // namespace NonMatching
 
