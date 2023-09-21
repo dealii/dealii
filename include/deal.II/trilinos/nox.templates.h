@@ -961,6 +961,7 @@ namespace TrilinosWrappers
     n_jacobian_applications  = 0;
     n_nonlinear_iterations   = 0;
     n_last_linear_iterations = 0;
+    pending_exception        = nullptr;
   }
 
 
