@@ -151,6 +151,7 @@ namespace internal
 } // namespace internal
 
 /*------------------------------- FEValues -------------------------------*/
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 const unsigned int FEValues<dim, spacedim>::integral_dimension;
@@ -369,9 +370,9 @@ FEValues<dim, spacedim>::memory_consumption() const
           MemoryConsumption::memory_consumption(quadrature));
 }
 
-
+#endif
 /*------------------------------- FEFaceValuesBase --------------------------*/
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 FEFaceValuesBase<dim, spacedim>::FEFaceValuesBase(
@@ -430,9 +431,11 @@ FEFaceValuesBase<dim, spacedim>::memory_consumption() const
   return (FEValuesBase<dim, spacedim>::memory_consumption() +
           MemoryConsumption::memory_consumption(quadrature));
 }
-
+#endif
 
 /*------------------------------- FEFaceValues -------------------------------*/
+
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 const unsigned int FEFaceValues<dim, spacedim>::dimension;
@@ -991,7 +994,7 @@ FESubfaceValues<dim, spacedim>::do_reinit(const unsigned int face_no,
                                         *this->fe_data,
                                         this->finite_element_output);
 }
-
+#endif
 
 /*------------------------- Explicit Instantiations --------------------------*/
 

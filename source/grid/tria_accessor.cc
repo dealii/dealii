@@ -1463,6 +1463,7 @@ namespace
 
 
 /*-------------------- Static variables: TriaAccessorBase -------------------*/
+#ifndef DOXYGEN
 
 template <int structdim, int dim, int spacedim>
 const unsigned int TriaAccessorBase<structdim, dim, spacedim>::dimension;
@@ -1474,8 +1475,9 @@ template <int structdim, int dim, int spacedim>
 const unsigned int
   TriaAccessorBase<structdim, dim, spacedim>::structure_dimension;
 
-
+#endif
 /*------------------------ Functions: TriaAccessor ---------------------------*/
+#ifndef DOXYGEN
 
 template <int structdim, int dim, int spacedim>
 void
@@ -1570,7 +1572,7 @@ TriaAccessor<structdim, dim, spacedim>::extent_in_direction(
   return std::numeric_limits<double>::signaling_NaN();
 }
 
-
+#endif
 
 template <>
 double

@@ -174,6 +174,7 @@ namespace internal
   }   // namespace FE_PolyTensor
 } // namespace internal
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 FE_PolyTensor<dim, spacedim>::FE_PolyTensor(
@@ -2504,7 +2505,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
   return out;
 }
 
-
+#endif
 // explicit instantiations
 #include "fe_poly_tensor.inst"
 

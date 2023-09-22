@@ -26,9 +26,10 @@ namespace numbers
   template <typename number>
   constexpr bool NumberTraits<number>::is_complex;
 
+#ifndef DOXYGEN
   template <typename number>
   constexpr bool NumberTraits<std::complex<number>>::is_complex;
-
+#endif
   // explicit instantiations
   template struct NumberTraits<double>;
   template struct NumberTraits<float>;
