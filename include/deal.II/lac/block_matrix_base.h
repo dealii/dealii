@@ -1937,9 +1937,11 @@ BlockMatrixBase<MatrixType>::add(const size_type  row,
       size_type before = col_indices[0];
       for (size_type i = 1; i < n_cols; ++i)
         if (col_indices[i] <= before)
-          Assert(false,
-                 ExcMessage("Flag col_indices_are_sorted is set, but "
-                            "indices appear to not be sorted."));
+          {
+            Assert(false,
+                   ExcMessage("Flag col_indices_are_sorted is set, but "
+                              "indices appear to not be sorted."));
+          }
         else
           before = col_indices[i];
 #  endif

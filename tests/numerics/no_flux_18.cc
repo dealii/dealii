@@ -241,15 +241,17 @@ namespace StokesClass
           {
             if (Utilities::MPI::this_mpi_process(
                   src.block(0).get_mpi_communicator()) == 0)
-              AssertThrow(
-                false,
-                ExcMessage(
-                  std::string(
-                    "The iterative (bottom right) solver in BlockSchurPreconditioner::vmult "
-                    "did not converge to a tolerance of " +
-                    Utilities::to_string(solver_control.tolerance()) +
-                    ". It reported the following error:\n\n") +
-                  exc.what()));
+              {
+                AssertThrow(
+                  false,
+                  ExcMessage(
+                    std::string(
+                      "The iterative (bottom right) solver in BlockSchurPreconditioner::vmult "
+                      "did not converge to a tolerance of " +
+                      Utilities::to_string(solver_control.tolerance()) +
+                      ". It reported the following error:\n\n") +
+                    exc.what()));
+              }
             else
               throw QuietException();
           }
