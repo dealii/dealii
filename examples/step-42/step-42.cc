@@ -979,7 +979,8 @@ namespace Step42
     /* setup hanging nodes and Dirichlet constraints */
     {
       TimerOutput::Scope t(computing_timer, "Setup: constraints");
-      constraints_hanging_nodes.reinit(locally_relevant_dofs);
+      constraints_hanging_nodes.reinit(locally_owned_dofs,
+                                       locally_relevant_dofs);
       DoFTools::make_hanging_node_constraints(dof_handler,
                                               constraints_hanging_nodes);
       constraints_hanging_nodes.close();
@@ -1059,7 +1060,8 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::compute_dirichlet_constraints()
   {
-    constraints_dirichlet_and_hanging_nodes.reinit(locally_relevant_dofs);
+    constraints_dirichlet_and_hanging_nodes.reinit(locally_owned_dofs,
+                                                   locally_relevant_dofs);
     constraints_dirichlet_and_hanging_nodes.merge(constraints_hanging_nodes);
 
     if (base_mesh == "box")
@@ -1197,7 +1199,7 @@ namespace Step42
     diag_mass_matrix_vector_relevant = diag_mass_matrix_vector;
 
 
-    all_constraints.reinit(locally_relevant_dofs);
+    all_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     active_set.clear();
 
     // The second part is a loop over all cells in which we look at each

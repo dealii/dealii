@@ -490,7 +490,7 @@ void LaplaceProblem<dim, degree>::setup_system()
 
   solution.reinit(locally_owned_dofs, mpi_communicator);
   right_hand_side.reinit(locally_owned_dofs, mpi_communicator);
-  constraints.reinit(locally_relevant_dofs);
+  constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   VectorTools::interpolate_boundary_values(
@@ -592,11 +592,10 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
 
           for (unsigned int level = 0; level < n_levels; ++level)
             {
-              const IndexSet relevant_dofs =
+              AffineConstraints<double> level_constraints(
+                dof_handler.locally_owned_mg_dofs(level),
                 DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                              level);
-              AffineConstraints<double> level_constraints;
-              level_constraints.reinit(relevant_dofs);
+                                                              level));
               level_constraints.add_lines(
                 mg_constrained_dofs.get_boundary_indices(level));
               level_constraints.close();
@@ -824,9 +823,9 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
     triangulation.n_global_levels());
   for (unsigned int level = 0; level < triangulation.n_global_levels(); ++level)
     {
-      const IndexSet dof_set =
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-      boundary_constraints[level].reinit(dof_set);
+      boundary_constraints[level].reinit(
+        dof_handler.locally_owned_mg_dofs(level),
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
       boundary_constraints[level].add_lines(
         mg_constrained_dofs.get_refinement_edge_indices(level));
       boundary_constraints[level].add_lines(

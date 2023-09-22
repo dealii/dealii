@@ -1250,7 +1250,7 @@ namespace Step70
     fluid_relevant_dofs[1] = locally_relevant_dofs.get_view(n_u, n_u + n_p);
 
     {
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(fluid_dh.locally_owned_dofs(), locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(fluid_dh, constraints);
@@ -1263,7 +1263,7 @@ namespace Step70
       constraints.close();
     }
 
-    auto locally_owned_dofs_per_processor =
+    const auto locally_owned_dofs_per_processor =
       Utilities::MPI::all_gather(mpi_communicator,
                                  fluid_dh.locally_owned_dofs());
     {

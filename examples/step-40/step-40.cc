@@ -282,15 +282,23 @@ namespace Step40
     // expect any information to store. In our case, as explained in the
     // @ref distributed module, the degrees of freedom we need to care about on
     // each processor are the locally relevant ones, so we pass this to the
-    // AffineConstraints::reinit function. As a side note, if you forget to
-    // pass this argument, the AffineConstraints class will allocate an array
+    // AffineConstraints::reinit() function as a second argument. A further
+    // optimization, AffineConstraint can avoid certain operations if you also
+    // provide it with the set of locally owned degrees of freedom -- the
+    // first argument to AffineConstraints::reinit().
+    //
+    // (What would happen if we didn't pass this information to
+    // AffineConstraints, for example if we called the argument-less version of
+    // AffineConstraints::reinit() typically used in non-parallel codes? In that
+    // case, the AffineConstraints class will allocate an array
     // with length equal to the largest DoF index it has seen so far. For
-    // processors with high MPI process number, this may be very large --
+    // processors with large numbers of MPI processes, this may be very large --
     // maybe on the order of billions. The program would then allocate more
     // memory than for likely all other operations combined for this single
-    // array.
+    // array. Fortunately, recent versions of deal.II would trigger an assertion
+    // that tells you that this is considered a bug.)
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,

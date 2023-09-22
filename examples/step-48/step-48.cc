@@ -399,9 +399,9 @@ namespace Step48
 
     // We generate hanging node constraints for ensuring continuity of the
     // solution. As in step-40, we need to equip the constraint matrix with
-    // the IndexSet of locally relevant degrees of freedom to avoid it to
-    // consume too much memory for big problems. Next, the <code> MatrixFree
-    // </code> object for the problem is set up. Note that we specify a
+    // the IndexSet of locally active and locally relevant degrees of freedom
+    // to avoid it consuming too much memory for big problems. Next, the
+    // MatrixFree object for the problem is set up. Note that we specify a
     // particular scheme for shared-memory parallelization (hence one would
     // use multithreading for intra-node parallelism and not MPI; we here
     // choose the standard option &mdash; if we wanted to disable shared
@@ -418,7 +418,7 @@ namespace Step48
     locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     constraints.close();
 
