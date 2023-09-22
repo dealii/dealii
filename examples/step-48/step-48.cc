@@ -375,18 +375,13 @@ namespace Step48
     GridGenerator::hyper_cube(triangulation, -15, 15);
     triangulation.refine_global(n_global_refinements);
     {
-      typename Triangulation<dim>::active_cell_iterator
-        cell     = triangulation.begin_active(),
-        end_cell = triangulation.end();
-      for (; cell != end_cell; ++cell)
+      for (const auto &cell : triangulation.active_cell_iterators())
         if (cell->is_locally_owned())
           if (cell->center().norm() < 11)
             cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
 
-      cell     = triangulation.begin_active();
-      end_cell = triangulation.end();
-      for (; cell != end_cell; ++cell)
+      for (const auto &cell : triangulation.active_cell_iterators())
         if (cell->is_locally_owned())
           if (cell->center().norm() < 6)
             cell->set_refine_flag();
@@ -394,12 +389,7 @@ namespace Step48
     }
 
     pcout << "   Number of global active cells: "
-#ifdef DEAL_II_WITH_P4EST
-          << triangulation.n_global_active_cells()
-#else
-          << triangulation.n_active_cells()
-#endif
-          << std::endl;
+          << triangulation.n_global_active_cells() << std::endl;
 
     dof_handler.distribute_dofs(fe);
 
