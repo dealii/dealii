@@ -201,12 +201,12 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
   const IndexSet  locally_relevant_dofs2 =
     DoFTools::extract_locally_relevant_dofs(*dof2);
 
-  AffineConstraints<PetscScalar> cm1(locally_owned_dofs1,
-                                     locally_relevant_dofs1);
+  AffineConstraints<typename VectorType::value_type> cm1(
+    locally_owned_dofs1, locally_relevant_dofs1);
   DoFTools::make_hanging_node_constraints(*dof1, cm1);
   cm1.close();
-  AffineConstraints<PetscScalar> cm2(locally_owned_dofs2,
-                                     locally_relevant_dofs2);
+  AffineConstraints<typename VectorType::value_type> cm2(
+    locally_owned_dofs2, locally_relevant_dofs2);
   DoFTools::make_hanging_node_constraints(*dof2, cm2);
   cm2.close();
 
