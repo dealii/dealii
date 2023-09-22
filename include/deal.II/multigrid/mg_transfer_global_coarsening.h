@@ -68,35 +68,35 @@ namespace mg
   {
     /**
      * This signal is triggered before and after the call to the actual
-     * evaluationfunction inside RemotePointEvaluation::evaluate_and_process()
+     * evaluation function inside RemotePointEvaluation::evaluate_and_process()
      * during prolongation.
      */
-    boost::signals2::signal<void(const bool before)> evaluation_prolongation;
+    boost::signals2::signal<void(const bool before)> prolongation_cell_loop;
 
     /**
      * This signal is triggered before and after the call to the actual
      * evaluation function inside RemotePointEvaluation::process_and_evaluate()
      * during restriction.
      */
-    boost::signals2::signal<void(const bool before)> evaluation_restriction;
+    boost::signals2::signal<void(const bool before)> restriction_cell_loop;
 
     /**
      * This signal is triggered before and after the call to
      * RemotePointEvaluation::evaluate_and_process() used in
      * MGTwoLevelTransferNonNested::prolongate_and_add(). The difference
-     * with the @p evaluation_prolongation signal is that also the
+     * with the @p prolongation_cell_loop signal is that also the
      * communication phase is included.
      */
-    boost::signals2::signal<void(const bool before)> evaluate_and_process;
+    boost::signals2::signal<void(const bool before)> prolongation;
 
     /**
      * This signal is triggered before and after the call to
      * RemotePointEvaluation::process_and_evaluate() used in
      * MGTwoLevelTransferNonNested::restrict_and_add(). Similarly to
-     * the @p evaluation_restriction signal, also the communication phase is
+     * the @p restriction_cell_loop signal, also the communication phase is
      * included.
      */
-    boost::signals2::signal<void(const bool before)> process_and_evaluate;
+    boost::signals2::signal<void(const bool before)> restriction;
   };
 } // namespace mg
 
@@ -848,28 +848,28 @@ public:
   memory_consumption() const override;
 
   /**
-   * Connect a function to mg::SignalsNonNested::evaluation_restriction.
+   * Connect a function to mg::SignalsNonNested::prolongation_cell_loop.
    */
   boost::signals2::connection
-  connect_evaluation_prolongation(const std::function<void(const bool)> &slot);
+  connect_prolongation_cell_loop(const std::function<void(const bool)> &slot);
 
   /**
-   * Connect a function to mg::SignalsNonNested::evaluation_restriction.
+   * Connect a function to mg::SignalsNonNested::restriction_cell_loop.
    */
   boost::signals2::connection
-  connect_evaluation_restriction(const std::function<void(const bool)> &slot);
+  connect_restriction_cell_loop(const std::function<void(const bool)> &slot);
 
   /**
-   * Connect a function to mg::SignalsNonNested::evaluate_and_process.
+   * Connect a function to mg::SignalsNonNested::prolongation.
    */
   boost::signals2::connection
-  connect_evaluate_and_process(const std::function<void(const bool)> &slot);
+  connect_prolongation(const std::function<void(const bool)> &slot);
 
   /**
-   * Connect a function to mg::SignalsNonNested::process_and_evaluate.
+   * Connect a function to mg::SignalsNonNested::restriction.
    */
   boost::signals2::connection
-  connect_process_and_evaluate(const std::function<void(const bool)> &slot);
+  connect_restriction(const std::function<void(const bool)> &slot);
 
 protected:
   AdditionalData additional_data;

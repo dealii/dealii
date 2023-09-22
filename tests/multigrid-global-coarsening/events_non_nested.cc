@@ -104,8 +104,7 @@ test(const unsigned int n_refinements,
     {
       transfers[l + 1] =
         std::make_shared<MGTwoLevelTransferNonNested<dim, VectorType>>();
-      transfers[l + 1]->connect_evaluate_and_process(
-        print_evaluate_and_process);
+      transfers[l + 1]->connect_prolongation(print_evaluate_and_process);
       transfers[l + 1]->reinit(dof_handlers[l + 1],
                                dof_handlers[l],
                                *mappings[l + 1],
