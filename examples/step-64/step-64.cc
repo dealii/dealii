@@ -415,7 +415,7 @@ namespace Step64
     system_rhs_dev.reinit(locally_owned_dofs, mpi_communicator);
 
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,

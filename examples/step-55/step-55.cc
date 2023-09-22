@@ -382,10 +382,10 @@ namespace Step55
     // We split up the IndexSet for locally owned and locally relevant DoFs
     // into two IndexSets based on how we want to create the block matrices
     // and vectors.
+    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
     owned_partitioning.resize(2);
-    owned_partitioning[0] = dof_handler.locally_owned_dofs().get_view(0, n_u);
-    owned_partitioning[1] =
-      dof_handler.locally_owned_dofs().get_view(n_u, n_u + n_p);
+    owned_partitioning[0] = locally_owned_dofs.get_view(0, n_u);
+    owned_partitioning[1] = locally_owned_dofs.get_view(n_u, n_u + n_p);
 
     const IndexSet locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
@@ -399,7 +399,7 @@ namespace Step55
     // to put this function call in, in case adaptive refinement gets
     // introduced later.
     {
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
       DoFTools::make_hanging_node_constraints(dof_handler, constraints);

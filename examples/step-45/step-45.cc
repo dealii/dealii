@@ -366,7 +366,7 @@ namespace Step45
 
     {
       owned_partitioning.clear();
-      IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
+      const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
       owned_partitioning.push_back(locally_owned_dofs.get_view(0, n_u));
       owned_partitioning.push_back(locally_owned_dofs.get_view(n_u, n_u + n_p));
 
@@ -378,7 +378,7 @@ namespace Step45
         locally_relevant_dofs.get_view(n_u, n_u + n_p));
 
       constraints.clear();
-      constraints.reinit(locally_relevant_dofs);
+      constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
 

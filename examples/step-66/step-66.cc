@@ -544,11 +544,9 @@ namespace Step66
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs();
 
-    const IndexSet locally_relevant_dofs =
-      DoFTools::extract_locally_relevant_dofs(dof_handler);
-
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(dof_handler.locally_owned_dofs(),
+                       DoFTools::extract_locally_relevant_dofs(dof_handler));
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
@@ -592,11 +590,9 @@ namespace Step66
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
-        const IndexSet relevant_dofs =
-          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-
-        AffineConstraints<double> level_constraints;
-        level_constraints.reinit(relevant_dofs);
+        AffineConstraints<double> level_constraints(
+          dof_handler.locally_owned_mg_dofs(level),
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
         level_constraints.add_lines(
           mg_constrained_dofs.get_boundary_indices(level));
         level_constraints.close();

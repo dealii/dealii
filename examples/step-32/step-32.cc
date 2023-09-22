@@ -1852,26 +1852,28 @@ namespace Step32
     // of each matrix or vector will be stored where, then call the functions
     // that actually set up the matrices, and at the end also resize the
     // various vectors we keep around in this program.
-    std::vector<IndexSet> stokes_partitioning, stokes_relevant_partitioning;
-    IndexSet              temperature_partitioning(n_T),
-      temperature_relevant_partitioning(n_T);
-    IndexSet stokes_relevant_set;
-    {
-      IndexSet stokes_index_set = stokes_dof_handler.locally_owned_dofs();
-      stokes_partitioning.push_back(stokes_index_set.get_view(0, n_u));
-      stokes_partitioning.push_back(stokes_index_set.get_view(n_u, n_u + n_p));
 
-      stokes_relevant_set =
-        DoFTools::extract_locally_relevant_dofs(stokes_dof_handler);
-      stokes_relevant_partitioning.push_back(
-        stokes_relevant_set.get_view(0, n_u));
-      stokes_relevant_partitioning.push_back(
-        stokes_relevant_set.get_view(n_u, n_u + n_p));
+    const IndexSet &stokes_locally_owned_index_set =
+      stokes_dof_handler.locally_owned_dofs();
+    const IndexSet stokes_locally_relevant_set =
+      DoFTools::extract_locally_relevant_dofs(stokes_dof_handler);
 
-      temperature_partitioning = temperature_dof_handler.locally_owned_dofs();
-      temperature_relevant_partitioning =
-        DoFTools::extract_locally_relevant_dofs(temperature_dof_handler);
-    }
+    std::vector<IndexSet> stokes_partitioning;
+    stokes_partitioning.push_back(
+      stokes_locally_owned_index_set.get_view(0, n_u));
+    stokes_partitioning.push_back(
+      stokes_locally_owned_index_set.get_view(n_u, n_u + n_p));
+
+    std::vector<IndexSet> stokes_relevant_partitioning;
+    stokes_relevant_partitioning.push_back(
+      stokes_locally_relevant_set.get_view(0, n_u));
+    stokes_relevant_partitioning.push_back(
+      stokes_locally_relevant_set.get_view(n_u, n_u + n_p));
+
+    const IndexSet temperature_partitioning =
+      temperature_dof_handler.locally_owned_dofs();
+    const IndexSet temperature_relevant_partitioning =
+      DoFTools::extract_locally_relevant_dofs(temperature_dof_handler);
 
     // Following this, we can compute constraints for the solution vectors,
     // including hanging node constraints and homogeneous and inhomogeneous
@@ -1886,7 +1888,8 @@ namespace Step32
     // objects.
     {
       stokes_constraints.clear();
-      stokes_constraints.reinit(stokes_relevant_set);
+      stokes_constraints.reinit(stokes_locally_owned_index_set,
+                                stokes_locally_relevant_set);
 
       DoFTools::make_hanging_node_constraints(stokes_dof_handler,
                                               stokes_constraints);
@@ -1910,7 +1913,8 @@ namespace Step32
     }
     {
       temperature_constraints.clear();
-      temperature_constraints.reinit(temperature_relevant_partitioning);
+      temperature_constraints.reinit(temperature_partitioning,
+                                     temperature_relevant_partitioning);
 
       DoFTools::make_hanging_node_constraints(temperature_dof_handler,
                                               temperature_constraints);

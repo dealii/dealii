@@ -780,51 +780,50 @@ namespace Step37
   {
     Timer time;
     setup_time = 0;
+    {
+      system_matrix.clear();
+      mg_matrices.clear_elements();
 
-    system_matrix.clear();
-    mg_matrices.clear_elements();
+      dof_handler.distribute_dofs(fe);
+      dof_handler.distribute_mg_dofs();
 
-    dof_handler.distribute_dofs(fe);
-    dof_handler.distribute_mg_dofs();
+      pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
+            << std::endl;
 
-    pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
-          << std::endl;
-
-    const IndexSet locally_relevant_dofs =
-      DoFTools::extract_locally_relevant_dofs(dof_handler);
-
-    constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
-    VectorTools::interpolate_boundary_values(
-      mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
-    constraints.close();
+      constraints.clear();
+      constraints.reinit(dof_handler.locally_owned_dofs(),
+                         DoFTools::extract_locally_relevant_dofs(dof_handler));
+      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      VectorTools::interpolate_boundary_values(
+        mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
+      constraints.close();
+    }
     setup_time += time.wall_time();
     time_details << "Distribute DoFs & B.C.     (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << 's' << std::endl;
     time.restart();
-
     {
-      typename MatrixFree<dim, double>::AdditionalData additional_data;
-      additional_data.tasks_parallel_scheme =
-        MatrixFree<dim, double>::AdditionalData::none;
-      additional_data.mapping_update_flags =
-        (update_gradients | update_JxW_values | update_quadrature_points);
-      std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
-        new MatrixFree<dim, double>());
-      system_mf_storage->reinit(mapping,
-                                dof_handler,
-                                constraints,
-                                QGauss<1>(fe.degree + 1),
-                                additional_data);
-      system_matrix.initialize(system_mf_storage);
+      {
+        typename MatrixFree<dim, double>::AdditionalData additional_data;
+        additional_data.tasks_parallel_scheme =
+          MatrixFree<dim, double>::AdditionalData::none;
+        additional_data.mapping_update_flags =
+          (update_gradients | update_JxW_values | update_quadrature_points);
+        std::shared_ptr<MatrixFree<dim, double>> system_mf_storage(
+          new MatrixFree<dim, double>());
+        system_mf_storage->reinit(mapping,
+                                  dof_handler,
+                                  constraints,
+                                  QGauss<1>(fe.degree + 1),
+                                  additional_data);
+        system_matrix.initialize(system_mf_storage);
+      }
+
+      system_matrix.evaluate_coefficient(Coefficient<dim>());
+
+      system_matrix.initialize_dof_vector(solution);
+      system_matrix.initialize_dof_vector(system_rhs);
     }
-
-    system_matrix.evaluate_coefficient(Coefficient<dim>());
-
-    system_matrix.initialize_dof_vector(solution);
-    system_matrix.initialize_dof_vector(system_rhs);
-
     setup_time += time.wall_time();
     time_details << "Setup matrix-free system   (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << 's' << std::endl;
@@ -839,43 +838,44 @@ namespace Step37
     // closely the construction of the system matrix on the original mesh,
     // except the slight difference in naming when accessing information on
     // the levels rather than the active cells.
-    const unsigned int nlevels = triangulation.n_global_levels();
-    mg_matrices.resize(0, nlevels - 1);
+    {
+      const unsigned int nlevels = triangulation.n_global_levels();
+      mg_matrices.resize(0, nlevels - 1);
 
-    const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
-    mg_constrained_dofs.initialize(dof_handler);
-    mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
-                                                       dirichlet_boundary_ids);
+      const std::set<types::boundary_id> dirichlet_boundary_ids = {0};
+      mg_constrained_dofs.initialize(dof_handler);
+      mg_constrained_dofs.make_zero_boundary_constraints(
+        dof_handler, dirichlet_boundary_ids);
 
-    for (unsigned int level = 0; level < nlevels; ++level)
-      {
-        const IndexSet relevant_dofs =
-          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
-        AffineConstraints<double> level_constraints;
-        level_constraints.reinit(relevant_dofs);
-        level_constraints.add_lines(
-          mg_constrained_dofs.get_boundary_indices(level));
-        level_constraints.close();
+      for (unsigned int level = 0; level < nlevels; ++level)
+        {
+          AffineConstraints<double> level_constraints(
+            dof_handler.locally_owned_mg_dofs(level),
+            DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
+          level_constraints.add_lines(
+            mg_constrained_dofs.get_boundary_indices(level));
+          level_constraints.close();
 
-        typename MatrixFree<dim, float>::AdditionalData additional_data;
-        additional_data.tasks_parallel_scheme =
-          MatrixFree<dim, float>::AdditionalData::none;
-        additional_data.mapping_update_flags =
-          (update_gradients | update_JxW_values | update_quadrature_points);
-        additional_data.mg_level = level;
-        std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
-          new MatrixFree<dim, float>());
-        mg_mf_storage_level->reinit(mapping,
-                                    dof_handler,
-                                    level_constraints,
-                                    QGauss<1>(fe.degree + 1),
-                                    additional_data);
+          typename MatrixFree<dim, float>::AdditionalData additional_data;
+          additional_data.tasks_parallel_scheme =
+            MatrixFree<dim, float>::AdditionalData::none;
+          additional_data.mapping_update_flags =
+            (update_gradients | update_JxW_values | update_quadrature_points);
+          additional_data.mg_level = level;
+          std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
+            new MatrixFree<dim, float>());
+          mg_mf_storage_level->reinit(mapping,
+                                      dof_handler,
+                                      level_constraints,
+                                      QGauss<1>(fe.degree + 1),
+                                      additional_data);
 
-        mg_matrices[level].initialize(mg_mf_storage_level,
-                                      mg_constrained_dofs,
-                                      level);
-        mg_matrices[level].evaluate_coefficient(Coefficient<dim>());
-      }
+          mg_matrices[level].initialize(mg_mf_storage_level,
+                                        mg_constrained_dofs,
+                                        level);
+          mg_matrices[level].evaluate_coefficient(Coefficient<dim>());
+        }
+    }
     setup_time += time.wall_time();
     time_details << "Setup matrix-free levels   (CPU/wall) " << time.cpu_time()
                  << "s/" << time.wall_time() << 's' << std::endl;
