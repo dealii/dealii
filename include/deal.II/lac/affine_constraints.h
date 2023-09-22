@@ -705,6 +705,17 @@ public:
   can_store_line(const size_type line_n) const;
 
   /**
+   * Return the index set describing which part of the degrees of freedom to
+   * which this object stores constraints are "locally owned". Typically,
+   * these would be the
+   * @ref GlossLocallyOwnedDof "locally owned degrees of freedom".
+   * This function returns the corresponding index set provided to either
+   * the constructor or the reinit() function of this class.
+   */
+  const IndexSet &
+  get_locally_owned_indices() const;
+
+  /**
    * Return the index set describing locally relevant lines if any are
    * present. Note that if no local lines were given, this represents an empty
    * IndexSet, whereas otherwise it contains the global problem size and the
@@ -2378,6 +2389,8 @@ AffineConstraints<number>::calculate_line_index(const size_type line_n) const
   return local_lines.index_within_set(line_n);
 }
 
+
+
 template <typename number>
 inline bool
 AffineConstraints<number>::can_store_line(size_type line_n) const
@@ -2385,12 +2398,25 @@ AffineConstraints<number>::can_store_line(size_type line_n) const
   return local_lines.size() == 0 || local_lines.is_element(line_n);
 }
 
+
+
+template <typename number>
+inline const IndexSet &
+AffineConstraints<number>::get_locally_owned_indices() const
+{
+  return locally_owned_dofs;
+}
+
+
+
 template <typename number>
 inline const IndexSet &
 AffineConstraints<number>::get_local_lines() const
 {
   return local_lines;
 }
+
+
 
 template <typename number>
 template <typename VectorType>
