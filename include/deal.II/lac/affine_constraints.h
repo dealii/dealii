@@ -583,10 +583,11 @@ public:
    * which is clearly wasteful and not efficient -- and should be considered
    * a bug.
    *
-   * @note This constructor is equivalent to calling the following one with
+   * @deprecated This constructor is equivalent to calling the following one with
    *   both of its arguments equal to the index set provided here. This
    *   is not wrong, but inefficient. Use the following constructor instead.
    */
+  DEAL_II_DEPRECATED_EARLY
   explicit AffineConstraints(const IndexSet &locally_stored_constraints);
 
   /**
@@ -679,7 +680,10 @@ public:
    * for which degrees of freedom this object can store constraints. See
    * the discussion in the documentation of the constructor of this class
    * that takes a single index set as argument.
+   *
+   * @deprecated Use the reinit() function with two index set arguments instead.
    */
+  DEAL_II_DEPRECATED_EARLY
   void
   reinit(const IndexSet &locally_stored_constraints);
 
@@ -698,8 +702,10 @@ public:
   /**
    * Determines if we can store a constraint for the given @p line_n. This
    * routine only matters in the distributed case and checks if the IndexSet
-   * allows storage of this line. Always returns true if not in the
-   * distributed case.
+   * provided to the constructor or reinit() function that determines
+   * which constraints to store, allows storage of the line provides
+   * as argument to this function. As a consequence, it will always return
+   * true if not in the distributed case.
    */
   bool
   can_store_line(const size_type line_n) const;
@@ -2140,6 +2146,15 @@ inline AffineConstraints<number>::AffineConstraints()
 
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints(
+  const IndexSet &locally_stored_constraints)
+  : AffineConstraints<number>(locally_stored_constraints,
+                              locally_stored_constraints)
+{}
+
+
+
+template <typename number>
+inline AffineConstraints<number>::AffineConstraints(
   const IndexSet &locally_owned_dofs,
   const IndexSet &locally_stored_constraints)
   : lines()
@@ -2156,15 +2171,6 @@ inline AffineConstraints<number>::AffineConstraints(
   // see tests/mpi/affine_constraints_crash_01
   local_lines.compress();
 }
-
-
-
-template <typename number>
-inline AffineConstraints<number>::AffineConstraints(
-  const IndexSet &locally_stored_constraints)
-  : AffineConstraints<number>(locally_stored_constraints,
-                              locally_stored_constraints)
-{}
 
 
 
