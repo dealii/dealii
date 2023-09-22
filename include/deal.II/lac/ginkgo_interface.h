@@ -24,6 +24,9 @@
 
 #  include <deal.II/base/array_view.h>
 
+#  include <deal.II/lac/la_parallel_vector.h>
+#  include <deal.II/lac/linear_operator.h>
+#  include <deal.II/lac/read_vector.h>
 #  include <deal.II/lac/sparse_matrix.h>
 
 #  include <ginkgo/core/matrix/csr.hpp>
@@ -231,6 +234,131 @@ namespace GinkgoWrappers
     return create_csr_matrix<DealValueType, IndexType>(std::move(exec),
                                                        deal_csr,
                                                        strategy);
+  }
+
+
+  namespace detail
+  {
+    class GinkgoPayload
+      : public dealii::internal::LinearOperatorImplementation::EmptyPayload
+    {};
+
+    template <typename ValueType, typename MemorySpace>
+    ArrayView<ValueType, MemorySpace>
+    create_array_view(
+      LinearAlgebra::distributed::Vector<ValueType, MemorySpace> &v)
+    {
+      Assert(v.locally_owned_size() == v.size(),
+             ExcMessage(" truly distributed vectors are not yet supported "));
+      return {v.begin(), v.locally_owned_size()};
+    }
+
+    template <typename ValueType, typename MemorySpace>
+    ArrayView<const ValueType, MemorySpace>
+    create_array_view(
+      const LinearAlgebra::distributed::Vector<ValueType, MemorySpace> &v)
+    {
+      Assert(v.locally_owned_size() == v.size(),
+             ExcMessage(" truly distributed vectors are not yet supported "));
+      return {v.begin(), v.locally_owned_size()};
+    }
+
+  } // namespace detail
+
+  template <typename DomainValueType   = double,
+            typename RangeValueType    = double,
+            typename DomainMemorySpace = MemorySpace::Host,
+            typename RangeMemorySpace  = MemorySpace::Host>
+  dealii::LinearOperator<
+    dealii::LinearAlgebra::distributed::Vector<DomainValueType,
+                                               DomainMemorySpace>,
+    dealii::LinearAlgebra::distributed::Vector<RangeValueType,
+                                               RangeMemorySpace>,
+    detail::GinkgoPayload>
+  linear_operator(const std::shared_ptr<gko::LinOp> &gko_op)
+  {
+    using Domain =
+      dealii::LinearAlgebra::distributed::Vector<DomainValueType,
+                                                 DomainMemorySpace>;
+    using Range = dealii::LinearAlgebra::distributed::Vector<RangeValueType,
+                                                             RangeMemorySpace>;
+    using domain_value_type = DomainValueType;
+    using range_value_type  = RangeValueType;
+    using value_type = std::common_type_t<domain_value_type, range_value_type>;
+
+    using LinearOperator =
+      dealii::LinearOperator<Domain, Range, detail::GinkgoPayload>;
+    LinearOperator return_op{detail::GinkgoPayload{}};
+
+    auto exec = gko_op->get_executor();
+
+    auto one =
+      gko::share(gko::initialize<gko::matrix::Dense<value_type>>({1.0}, exec));
+
+    return_op.reinit_domain_vector = [gko_op](Domain &v,
+                                              bool    omit_zeroing_entries) {
+      v.reinit(gko_op->get_size()[1], omit_zeroing_entries);
+    };
+
+    return_op.reinit_range_vector = [gko_op](Range &v,
+                                             bool   omit_zeroing_entries) {
+      v.reinit(gko_op->get_size()[0], omit_zeroing_entries);
+    };
+
+    return_op.vmult = [gko_op](Range &v, const Domain &u) {
+      auto gko_u = create_vector(detail::create_array_view(u));
+      auto gko_v = create_vector(detail::create_array_view(v));
+
+      gko_op->apply(gko_u, gko_v);
+    };
+
+    return_op.vmult_add = [gko_op, one](Range &v, const Domain &u) {
+      auto gko_u = create_vector(detail::create_array_view(u));
+      auto gko_v = create_vector(detail::create_array_view(v));
+
+      gko_op->apply(one, gko_u, one, gko_v);
+    };
+
+    return_op.Tvmult = [gko_op](Range &v, const Domain &u) {
+      auto gko_u = create_vector(detail::create_array_view(u));
+      auto gko_v = create_vector(detail::create_array_view(v));
+
+      // @todo: this creates a temporary transposed matrix
+      gko::as<gko::Transposable>(gko_op)->transpose()->apply(gko_u, gko_v);
+    };
+
+    return_op.Tvmult_add = [gko_op, one](Range &v, const Domain &u) {
+      auto gko_u = create_vector(detail::create_array_view(u));
+      auto gko_v = create_vector(detail::create_array_view(v));
+
+      // @todo: this creates a temporary transposed matrix
+      gko::as<gko::Transposable>(gko_op)->transpose()->apply(one,
+                                                             gko_u,
+                                                             one,
+                                                             gko_v);
+    };
+
+    return return_op;
+  }
+
+  template <typename DomainValueType   = double,
+            typename RangeValueType    = double,
+            typename DomainMemorySpace = MemorySpace::Host,
+            typename RangeMemorySpace  = MemorySpace::Host>
+  dealii::LinearOperator<
+    dealii::LinearAlgebra::distributed::Vector<DomainValueType,
+                                               DomainMemorySpace>,
+    dealii::LinearAlgebra::distributed::Vector<RangeValueType,
+                                               RangeMemorySpace>,
+    detail::GinkgoPayload>
+  inverse_operator(const std::shared_ptr<gko::LinOp>        &gko_op,
+                   const std::shared_ptr<gko::LinOpFactory> &solver)
+  {
+    auto solver_op = solver->generate(gko_op);
+    return linear_operator<RangeValueType,
+                           DomainValueType,
+                           RangeMemorySpace,
+                           DomainMemorySpace>(std::move(solver_op));
   }
 
 
