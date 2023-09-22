@@ -587,7 +587,8 @@ public:
    *   both of its arguments equal to the index set provided here. This
    *   is not wrong, but inefficient. Use the following constructor instead.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the constructor with two index set arguments.")
   explicit AffineConstraints(const IndexSet &locally_stored_constraints);
 
   /**
@@ -683,7 +684,8 @@ public:
    *
    * @deprecated Use the reinit() function with two index set arguments instead.
    */
-  DEAL_II_DEPRECATED_EARLY
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the reinit() function with two index set arguments.")
   void
   reinit(const IndexSet &locally_stored_constraints);
 
