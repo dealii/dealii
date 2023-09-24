@@ -2619,6 +2619,9 @@ AffineConstraints<number>::copy_from(
   lines_cache = other.lines_cache;
   local_lines = other.local_lines;
   sorted      = other.sorted;
+
+  locally_owned_dofs             = other.locally_owned_dofs;
+  needed_elements_for_distribute = other.needed_elements_for_distribute;
 }
 
 
