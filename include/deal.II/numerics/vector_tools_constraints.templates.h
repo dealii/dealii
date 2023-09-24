@@ -1314,7 +1314,7 @@ namespace VectorTools
     const Mapping<dim, spacedim> &mapping)
   {
     AffineConstraints<double> no_normal_flux_constraints(
-      constraints.get_local_lines());
+      constraints.get_locally_owned_indices(), constraints.get_local_lines());
     compute_nonzero_normal_flux_constraints(dof_handler,
                                             first_vector_component,
                                             boundary_ids,

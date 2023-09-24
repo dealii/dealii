@@ -298,13 +298,15 @@ MGConstrainedDoFs::initialize(
     {
       if (user_level_dofs)
         {
-          level_constraints[l].reinit(level_relevant_dofs[l]);
+          level_constraints[l].reinit(dof.locally_owned_mg_dofs(l),
+                                      level_relevant_dofs[l]);
         }
       else
         {
           const IndexSet relevant_dofs =
             DoFTools::extract_locally_relevant_level_dofs(dof, l);
-          level_constraints[l].reinit(relevant_dofs);
+          level_constraints[l].reinit(dof.locally_owned_mg_dofs(l),
+                                      relevant_dofs);
         }
 
       // Loop through relevant cells and faces finding those which are periodic
@@ -478,7 +480,9 @@ MGConstrainedDoFs::add_user_constraints(
   // Get the relevant DoFs from level_constraints if
   // the user constraint matrix has not been initialized
   if (user_constraints[level].get_local_lines().size() == 0)
-    user_constraints[level].reinit(level_constraints[level].get_local_lines());
+    user_constraints[level].reinit(
+      level_constraints[level].get_locally_owned_indices(),
+      level_constraints[level].get_local_lines());
 
   user_constraints[level].merge(
     constraints_on_level,
@@ -613,7 +617,7 @@ MGConstrainedDoFs::merge_constraints(AffineConstraints<Number> &constraints,
     index_set.add_indices(
       this->get_user_constraint_matrix(level).get_local_lines());
 
-  constraints.reinit(index_set);
+  constraints.reinit(constraints.get_locally_owned_indices(), index_set);
 
   // merge constraints
   if (add_boundary_indices && this->have_boundary_indices())
