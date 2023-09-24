@@ -2174,7 +2174,10 @@ inline AffineConstraints<number>::AffineConstraints(
   : Subscriptor()
   , lines(affine_constraints.lines)
   , lines_cache(affine_constraints.lines_cache)
+  , locally_owned_dofs(affine_constraints.locally_owned_dofs)
   , local_lines(affine_constraints.local_lines)
+  , needed_elements_for_distribute(
+      affine_constraints.needed_elements_for_distribute)
   , sorted(affine_constraints.sorted)
 {}
 
