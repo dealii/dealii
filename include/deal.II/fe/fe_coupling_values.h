@@ -471,7 +471,7 @@ enum class QuadratureCouplingType
    * integration. This is equivalent to rewriting double integrals as a single
    * sum over unrolled indices, and it is useful, for example, when performing
    * integration of singular kernels, which require special quadrature rules
-   * both on the inside and on the outside integral. An assertion is thrown if
+   * both on the inside and on the outside integral. An exception is thrown if
    * the two FEValuesBase objects do not provide the same number of quadrature
    * points, but otherwise the two sets of points and weights can be arbitrary.
    */
@@ -685,8 +685,8 @@ enum class DoFCouplingType
  *
  * ...
  *
- * for (const unsigned int q : cfv.quadrature_point_indices()) { const auto
- *   &[x_q,y_q] = cfv.quadrature_point(q);
+ * for (const unsigned int q : cfv.quadrature_point_indices()) {
+ *   const auto &[x_q,y_q] = cfv.quadrature_point(q);
  *
  *   for (const unsigned int i : cfv.left_dof_indices())
  *     {
@@ -716,7 +716,7 @@ enum class DoFCouplingType
  * and weights.
  *
  * According to the DoFCouplingType and QuadratureCouplingType argument passed
- * to the constructor, the class behaves differently w.r.t. to how the dof
+ * to the constructor, the class behaves differently w.r.t. how the dof
  * indices and the quadrature points of the two different FEValuesBase objects
  * are grouped together.
  *

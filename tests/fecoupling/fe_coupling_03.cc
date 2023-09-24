@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Test QuadratureCouplingType::matchiing integration in FECouplingValues
+// Test QuadratureCouplingType::matching integration in FECouplingValues
 // with DoFCouplingType::contiguous. Typical for DG interfaces.
 
 #include <deal.II/base/quadrature_lib.h>
