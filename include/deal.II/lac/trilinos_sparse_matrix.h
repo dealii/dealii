@@ -177,12 +177,12 @@ namespace TrilinosWrappers
        * performance, we keep a shared pointer to these entries so that more
        * than one accessor can access this data if necessary.
        */
-      std::shared_ptr<std::vector<size_type>> colnum_cache;
+      Teuchos::RCP<std::vector<size_type>> colnum_cache;
 
       /**
        * Cache for the values of this row.
        */
-      std::shared_ptr<std::vector<TrilinosScalar>> value_cache;
+      Teuchos::RCP<std::vector<TrilinosScalar>> value_cache;
     };
 
     /**
@@ -565,6 +565,26 @@ namespace TrilinosWrappers
                    << " of a non-contiguous locally owned row set."
                    << " The row " << arg1
                    << " is not stored locally and can't be accessed.");
+
+    /**
+     * Declare an alias in analogy to all the other container classes.
+     */
+    using value_type = TrilinosScalar;
+
+    /**
+     * Typedef for Tpetra::CrsMatrix
+     */
+    using MatrixType = Tpetra::CrsMatrix<TrilinosScalar, int, dealii::types::signed_global_dof_index>;
+
+    /**
+     * Typedef for Tpetra::Map
+     */
+    using MapType    = Tpetra::Map<int, dealii::types::signed_global_dof_index>;
+
+    /**
+     * Typedef for Tpetra::CrsGraph
+     */
+    using GraphType  = Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>;
 
     /**
      * A structure that describes some of the traits of this class in terms of
@@ -1937,26 +1957,26 @@ namespace TrilinosWrappers
      * Pointer to the user-supplied Tpetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
      */
-    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> column_space_map;
+    Teuchos::RCP<MapType> column_space_map;
 
     /**
      * A sparse matrix object in Trilinos to be used for finite element based
      * problems which allows for assembling into non-local elements.  The
      * actual type, a sparse matrix, is set in the constructor.
      */
-    std::unique_ptr<Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>> matrix;
+    Teuchos::RCP<MatrixType> matrix;
 
     /**
      * A sparse matrix object in Trilinos to be used for collecting the non-
      * local elements if the matrix was constructed from a Trilinos sparsity
      * pattern with the respective option.
      */
-    std::unique_ptr<Tpetra::CrsMatrix<double, int, dealii::types::signed_global_dof_index>> nonlocal_matrix;
+    Teuchos::RCP<MatrixType> nonlocal_matrix;
 
     /**
      * An export object used to communicate the nonlocal matrix.
      */
-    std::unique_ptr<Tpetra::Export<int, dealii::types::signed_global_dof_index>> nonlocal_matrix_exporter;
+    Teuchos::RCP<Tpetra::Export<int, dealii::types::signed_global_dof_index>> nonlocal_matrix_exporter;
 
     /**
      * Trilinos doesn't allow to mix additions to matrix entries and

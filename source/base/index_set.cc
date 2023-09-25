@@ -782,16 +782,17 @@ IndexSet::make_tpetra_map(const MPI_Comm communicator,
   const bool linear =
     overlapping ? false : is_ascending_and_one_to_one(communicator);
   if (linear)
-    return new Tpetra::Map<int, types::signed_global_dof_index>(
-      size(),
-      n_elements(),
-      0,
+    return Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index>>(
+      new Tpetra::Map<int, types::signed_global_dof_index>(
+        size(),
+        n_elements(),
+        0,
 #    ifdef DEAL_II_WITH_MPI
-      Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
+        Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
 #    else
-      Teuchos::rcp(new Teuchos::Comm<int>())
+        Teuchos::rcp(new Teuchos::Comm<int>())
 #    endif
-    );
+    ));
   else
     {
       const std::vector<size_type>                indices = get_index_vector();
@@ -799,16 +800,17 @@ IndexSet::make_tpetra_map(const MPI_Comm communicator,
       std::copy(indices.begin(), indices.end(), int_indices.begin());
       const Teuchos::ArrayView<types::signed_global_dof_index> arr_view(
         int_indices);
-      return new Tpetra::Map<int, types::signed_global_dof_index>(
-        size(),
-        arr_view,
-        0,
+      return Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index>>(
+        new Tpetra::Map<int, types::signed_global_dof_index>(
+          size(),
+          arr_view,
+          0,
 #    ifdef DEAL_II_WITH_MPI
-        Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
+          Teuchos::rcp(new Teuchos::MpiComm<int>(communicator))
 #    else
-        Teuchos::rcp(new Teuchos::Comm<int>())
+          Teuchos::rcp(new Teuchos::Comm<int>())
 #    endif
-      );
+      ));
     }
 }
 #  endif

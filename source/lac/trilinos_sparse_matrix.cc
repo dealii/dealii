@@ -211,13 +211,18 @@ value_cache_view,
   // MPI will still get a parallel
   // interface.
   SparseMatrix::SparseMatrix()
-    : column_space_map(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(0, 0, Utilities::Trilinos::tpetra_comm_self()))
-    , matrix(
-        new Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>(Teuchos::rcp(new Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>(column_space_map, column_space_map, 0))))
+    : column_space_map(new MapType(0, 0, Utilities::Trilinos::tpetra_comm_self()))
+    , matrix()
     , last_action(Tpetra::ZERO)
     , compressed(true)
   {
-    matrix->fillComplete();
+   // Prepare the graph
+    Teuchos::RCP<GraphType> graph(
+      new GraphType(column_space_map, column_space_map, 0));
+    graph->fillComplete();
+
+    // Create the matrix from the graph
+    matrix = Teuchos::rcp(new Tpetra::CrsMatrix<dealii::TrilinosScalar, int, dealii::types::signed_global_dof_index>( graph ) );
   }
 
 
@@ -226,9 +231,9 @@ value_cache_view,
                              const size_type    n,
                              const unsigned int n_max_entries_per_row)
     : column_space_map(
-        new Tpetra::Map<int, dealii::types::signed_global_dof_index>(static_cast<TrilinosWrappers::types::int_type>(n),
-                       0,
-                       Utilities::Trilinos::tpetra_comm_self()))
+        new MapType(static_cast<TrilinosWrappers::types::int_type>(n),
+                    0,
+                    Utilities::Trilinos::tpetra_comm_self()))
     ,
 
     // on one processor only, we know how the
@@ -239,14 +244,13 @@ value_cache_view,
     // can't do so in parallel, where the
     // information from columns is only
     // available when entries have been added
-    matrix(new Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>(
-      Copy,
-      Tpetra::Map<int, dealii::types::signed_global_dof_index>(static_cast<TrilinosWrappers::types::int_type>(m),
-                 0,
-                 Utilities::Trilinos::tpetra_comm_self()),
-      *column_space_map,
-      n_max_entries_per_row,
-      false))
+    matrix(new MatrixType(
+      Teuchos::RCP<MapType>(new MapType(static_cast<TrilinosWrappers::types::int_type>(m),
+                            0,
+                            Utilities::Trilinos::tpetra_comm_self())),
+      column_space_map,
+      n_max_entries_per_row
+      ))
     , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
@@ -256,19 +260,16 @@ value_cache_view,
   SparseMatrix::SparseMatrix(const size_type                  m,
                              const size_type                  n,
                              const std::vector<unsigned int> &n_entries_per_row)
-    : column_space_map(
-        new Tpetra::Map<int, dealii::types::signed_global_dof_index>(static_cast<TrilinosWrappers::types::int_type>(n),
+    : column_space_map(new MapType(static_cast<TrilinosWrappers::types::int_type>(n),
                        0,
                        Utilities::Trilinos::tpetra_comm_self()))
-    , matrix(new Tpetra::FECrsMatrix<>(
-        Copy,
-        Tpetra::Map<int, dealii::types::signed_global_dof_index>(static_cast<TrilinosWrappers::types::int_type>(m),
-                   0,
-                   Utilities::Trilinos::tpetra_comm_self()),
-        *column_space_map,
-        reinterpret_cast<int *>(
-          const_cast<unsigned int *>(n_entries_per_row.data())),
-        false))
+    , matrix(new MatrixType(
+      Teuchos::RCP<MapType>(new MapType(static_cast<TrilinosWrappers::types::int_type>(m),
+                                        0,
+                                        Utilities::Trilinos::tpetra_comm_self())),
+      column_space_map,
+      Teuchos::ArrayView<const long unsigned int>(std::vector<long unsigned int>(*n_entries_per_row.data()))
+    ))
     , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
@@ -278,12 +279,9 @@ value_cache_view,
   SparseMatrix::SparseMatrix(const IndexSet &   parallel_partitioning,
                              const MPI_Comm     communicator,
                              const unsigned int n_max_entries_per_row)
-    : column_space_map(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(
-        parallel_partitioning.make_trilinos_map(communicator, false)))
-    , matrix(new Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>(Copy,
-                                    *column_space_map,
-                                    n_max_entries_per_row,
-                                    false))
+    : column_space_map(new MapType(
+        *parallel_partitioning.make_tpetra_map(communicator, false)))
+    , matrix(new MatrixType(column_space_map, n_max_entries_per_row))
     , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
@@ -293,14 +291,11 @@ value_cache_view,
   SparseMatrix::SparseMatrix(const IndexSet &parallel_partitioning,
                              const MPI_Comm  communicator,
                              const std::vector<unsigned int> &n_entries_per_row)
-    : column_space_map(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(
-        parallel_partitioning.make_trilinos_map(communicator, false)))
-    , matrix(new Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>(Copy,
-                                    *column_space_map,
-                                    reinterpret_cast<int *>(
-                                      const_cast<unsigned int *>(
-                                        n_entries_per_row.data())),
-                                    false))
+    : column_space_map(new MapType(
+      *parallel_partitioning.make_tpetra_map(communicator, false)))
+    , matrix(new MatrixType(
+        column_space_map,
+        Teuchos::ArrayView<const long unsigned int>(std::vector<long unsigned int>(*n_entries_per_row.data()))))
     , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
@@ -311,13 +306,11 @@ value_cache_view,
                              const IndexSet &col_parallel_partitioning,
                              const MPI_Comm  communicator,
                              const size_type n_max_entries_per_row)
-    : column_space_map(new Tpetra::Map<int, dealii::types::signed_global_dof_index>(
-        col_parallel_partitioning.make_trilinos_map(communicator, false)))
-    , matrix(new Tpetra::FECrsMatrix<double, int, dealii::types::signed_global_dof_index>(
-        Copy,
-        row_parallel_partitioning.make_trilinos_map(communicator, false),
-        n_max_entries_per_row,
-        false))
+    : column_space_map(new MapType(
+        *col_parallel_partitioning.make_tpetra_map(communicator, false)))
+    , matrix(new MatrixType(
+      row_parallel_partitioning.make_tpetra_map(communicator, false),
+      n_max_entries_per_row))
     , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
@@ -328,14 +321,11 @@ value_cache_view,
                              const IndexSet &col_parallel_partitioning,
                              const MPI_Comm  communicator,
                              const std::vector<unsigned int> &n_entries_per_row)
-    : column_space_map(new Tpetra::Map(
-        col_parallel_partitioning.make_trilinos_map(communicator, false)))
-    , matrix(new Tpetra::FECrsMatrix(
-        Copy,
-        row_parallel_partitioning.make_trilinos_map(communicator, false),
-        reinterpret_cast<int *>(
-          const_cast<unsigned int *>(n_entries_per_row.data())),
-        false))
+    : column_space_map(new MapType(
+      *col_parallel_partitioning.make_tpetra_map(communicator, false)))
+    , matrix(new MatrixType(
+        row_parallel_partitioning.make_tpetra_map(communicator, false),
+        Teuchos::ArrayView<const long unsigned int>(std::vector<long unsigned int>(*n_entries_per_row.data()))))
     , last_action(Tpetra::ZERO)
     , compressed(false)
   {}
