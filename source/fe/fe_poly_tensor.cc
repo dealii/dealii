@@ -1040,7 +1040,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
             (mapping_kind == mapping_raviart_thomas) ||
             (mapping_kind == mapping_nedelec))))
         {
-          Assert(false, ExcNotImplemented())
+          Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -1724,7 +1724,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
       // third derivatives are not implemented
       if (fe_data.update_each & update_3rd_derivatives)
         {
-          Assert(false, ExcNotImplemented())
+          Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -2397,7 +2397,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
       // third derivatives are not implemented
       if (fe_data.update_each & update_3rd_derivatives)
         {
-          Assert(false, ExcNotImplemented())
+          Assert(false, ExcNotImplemented());
         }
     }
 }

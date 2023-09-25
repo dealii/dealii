@@ -1403,7 +1403,7 @@ namespace GridTools
               (std::lower_bound(edge_list.begin(), edge_list.end(), e) -
                edge_list.begin());
             Assert(edge_indices[l] < edge_list.size(), ExcInternalError());
-            Assert(edge_list[edge_indices[l]] == e, ExcInternalError())
+            Assert(edge_list[edge_indices[l]] == e, ExcInternalError());
           }
       }
 

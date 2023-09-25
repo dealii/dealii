@@ -407,11 +407,11 @@ namespace Functions
     (void)points;
     AssertIndexRange(component, this->n_components);
     Assert(return_values.size() == points.size(),
-           ExcDimensionMismatch(return_values.size(), points.size()))
+           ExcDimensionMismatch(return_values.size(), points.size()));
 
-      std::fill(return_values.begin(),
-                return_values.end(),
-                function_value_vector[component]);
+    std::fill(return_values.begin(),
+              return_values.end(),
+              function_value_vector[component]);
   }
 
 

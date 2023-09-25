@@ -783,7 +783,8 @@ namespace PETScWrappers
     {
       Assert(false,
              ExcMessage("You can't ask a complex value "
-                        "whether it is non-negative.")) return true;
+                        "whether it is non-negative."));
+      return true;
     }
   } // namespace internal
 

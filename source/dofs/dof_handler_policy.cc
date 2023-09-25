@@ -3271,7 +3271,7 @@ namespace internal
             Assert(Utilities::MPI::this_mpi_process(tr->get_communicator()) ==
                      this->dof_handler->get_triangulation()
                        .locally_owned_subdomain(),
-                   ExcInternalError())
+                   ExcInternalError());
 
             // gather new numbers among processors into one vector
             {

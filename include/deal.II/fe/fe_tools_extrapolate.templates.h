@@ -66,7 +66,7 @@ namespace FETools
                            const DoFHandler<dim, spacedim> & /*dof2*/,
                            OutVector & /*u2*/)
       {
-        Assert(false, ExcNotImplemented())
+        Assert(false, ExcNotImplemented());
       }
     };
 
@@ -373,7 +373,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
 
       template <class InVector>
@@ -390,7 +390,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
 
       template <class InVector>
@@ -407,7 +407,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
 
       template <class InVector>

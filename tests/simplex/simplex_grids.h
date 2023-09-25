@@ -123,7 +123,7 @@ namespace dealii
         }
       else
         {
-          AssertThrow(false, ExcNotImplemented())
+          AssertThrow(false, ExcNotImplemented());
         }
     }
 
@@ -269,7 +269,7 @@ namespace dealii
         }
       else
         {
-          AssertThrow(false, ExcNotImplemented())
+          AssertThrow(false, ExcNotImplemented());
         }
     }
 
@@ -373,7 +373,7 @@ namespace dealii
         }
       else
         {
-          AssertThrow(false, ExcNotImplemented())
+          AssertThrow(false, ExcNotImplemented());
         }
     }
 

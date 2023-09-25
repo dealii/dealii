@@ -336,7 +336,7 @@ DataOutFaces<dim, spacedim>::build_patches(const unsigned int n_subdivisions)
     Assert(false,
            ExcMessage("The DataOutFaces class can currently not be "
                       "used on meshes that do not have the same cell type "
-                      "throughout."))
+                      "throughout."));
 }
 
 

@@ -308,8 +308,9 @@ namespace internal
                   AssertThrow(
                     false,
                     ExcMessage(
-                      "No convergence in iterative QL eigenvector algorithm.")) return std::
-                    array<std::pair<Number, Tensor<1, dim, Number>>, dim>();
+                      "No convergence in iterative QL eigenvector algorithm."));
+                  return std::array<std::pair<Number, Tensor<1, dim, Number>>,
+                                    dim>();
                 }
 
               // Calculate the shift..
@@ -445,8 +446,9 @@ namespace internal
               AssertThrow(
                 false,
                 ExcMessage(
-                  "No convergence in iterative Jacobi eigenvector algorithm.")) return std::
-                array<std::pair<Number, Tensor<1, dim, Number>>, dim>();
+                  "No convergence in iterative Jacobi eigenvector algorithm."));
+              return std::array<std::pair<Number, Tensor<1, dim, Number>>,
+                                dim>();
             }
 
           // Compute threshold value which dictates whether or
