@@ -54,7 +54,7 @@ print
   <li> <a href=\"#Intro\" class=bold>Introduction</a>
 ";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc", "$cmake_source_dir/examples/$step/doc/intro.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc.pl", "$cmake_source_dir/examples/$step/doc/intro.dox";
 
 print "  <li> <a href=\"#CommProg\" class=bold>The commented program</a>\n";
 
@@ -65,7 +65,7 @@ print
   <li value=\"3\"> <a href=\"#Results\" class=bold>Results</a>
 ";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc", "$cmake_source_dir/examples/$step/doc/results.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc.pl", "$cmake_source_dir/examples/$step/doc/results.dox";
 
 print
 "  <li> <a href=\"#PlainProg\" class=bold>The plain program</a>
@@ -73,7 +73,7 @@ print
 \@endhtmlonly
 ";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_source_dir/examples/$step/doc/intro.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_source_dir/examples/$step/doc/intro.dox";
 
 
 # Start the commented program by writing two empty lines. We have had
@@ -92,7 +92,7 @@ print " * <h1> The commented program</h1>\n";
 
 system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen.pl", "$cmake_source_dir/examples/$step/$step.cc";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_source_dir/examples/$step/doc/results.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_source_dir/examples/$step/doc/results.dox";
 
 
 # Move to the stripped, plain program. The same principle as above
