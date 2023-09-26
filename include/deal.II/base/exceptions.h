@@ -1561,7 +1561,7 @@ namespace deal_II_exceptions
                 Kokkos::abort(#cond);                                          \
             }))                                                                \
           }                                                                    \
-        while (0)
+        while (false)
 #    else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #      define Assert(cond, exc)                                                \
         do                                                                     \
@@ -1583,7 +1583,7 @@ namespace deal_II_exceptions
                 Kokkos::abort(#cond);                                          \
             }))                                                                \
           }                                                                    \
-        while (0)
+        while (false)
 #    endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #  else    /*if KOKKOS_VERSION >= 30600*/
 #    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
@@ -1602,7 +1602,7 @@ namespace deal_II_exceptions
                   #exc,                                                        \
                   exc);                                                        \
             }                                                                  \
-          while (0)
+          while (false)
 #      else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #        define Assert(cond, exc)                                              \
           do                                                                   \
@@ -1618,7 +1618,7 @@ namespace deal_II_exceptions
                   #exc,                                                        \
                   exc);                                                        \
             }                                                                  \
-          while (0)
+          while (false)
 #      endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #    else    /*#ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #      define Assert(cond, exc)     \
@@ -1627,7 +1627,7 @@ namespace deal_II_exceptions
             if (!(cond))            \
               Kokkos::abort(#cond); \
           }                         \
-        while (0)
+        while (false)
 #    endif /*ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #  endif   /*KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #else      /*ifdef DEBUG*/
@@ -1635,7 +1635,7 @@ namespace deal_II_exceptions
     do                      \
       {                     \
       }                     \
-    while (0)
+    while (false)
 #endif /*ifdef DEBUG*/
 
 
@@ -1675,7 +1675,7 @@ namespace deal_II_exceptions
             ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
               __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
         }                                                                 \
-      while (0)
+      while (false)
 #  else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #    define AssertNothrow(cond, exc)                                      \
       do                                                                  \
@@ -1684,14 +1684,14 @@ namespace deal_II_exceptions
             ::dealii::deal_II_exceptions::internals::issue_error_nothrow( \
               __FILE__, __LINE__, __PRETTY_FUNCTION__, #cond, #exc, exc); \
         }                                                                 \
-      while (0)
+      while (false)
 #  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #else
 #  define AssertNothrow(cond, exc) \
     do                             \
       {                            \
       }                            \
-    while (0)
+    while (false)
 #endif
 
 /**
@@ -1736,7 +1736,7 @@ namespace deal_II_exceptions
             #exc,                                                        \
             exc);                                                        \
       }                                                                  \
-    while (0)
+    while (false)
 #else /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #  define AssertThrow(cond, exc)                                         \
     do                                                                   \
@@ -1752,7 +1752,7 @@ namespace deal_II_exceptions
             #exc,                                                        \
             exc);                                                        \
       }                                                                  \
-    while (0)
+    while (false)
 #endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 
 
@@ -1944,7 +1944,7 @@ namespace internal
     do                               \
       {                              \
       }                              \
-    while (0)
+    while (false)
 #endif // DEAL_II_WITH_MPI
 
 #ifdef DEAL_II_WITH_CUDA
@@ -1975,7 +1975,7 @@ namespace internal
         {                          \
           (void)(error_code);      \
         }                          \
-      while (0)
+      while (false)
 #  endif
 
 /**
@@ -2004,7 +2004,7 @@ namespace internal
         {                                 \
           (void)(error_code);             \
         }                                 \
-      while (0)
+      while (false)
 #  endif
 
 /**
@@ -2033,13 +2033,13 @@ namespace internal
           local_error_code = cudaDeviceSynchronize();           \
           AssertCuda(local_error_code);                         \
         }                                                       \
-      while (0)
+      while (false)
 #  else
 #    define AssertCudaKernel() \
       do                       \
         {                      \
         }                      \
-      while (0)
+      while (false)
 #  endif
 
 /**
@@ -2072,7 +2072,7 @@ namespace internal
         {                              \
           (void)(error_code);          \
         }                              \
-      while (0)
+      while (false)
 #  endif
 
 /**
@@ -2104,7 +2104,7 @@ namespace internal
         {                                     \
           (void)(error_code);                 \
         }                                     \
-      while (0)
+      while (false)
 #  endif
 
 /**
@@ -2137,7 +2137,7 @@ namespace internal
         {                              \
           (void)(error_code);          \
         }                              \
-      while (0)
+      while (false)
 #  endif
 
 #endif
