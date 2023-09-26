@@ -442,7 +442,7 @@ namespace FEValuesViews
  *
  * where $T_1$ and $T_2$ are two arbitrary sets (cells, faces, edges, or any
  * combination thereof), and $K$ is a (possibly singular) coupling kernel, one
- * need to combine quadrature formulas from two different FEValuesBase objects.
+ * needs to combine quadrature formulas from two different FEValuesBase objects.
  *
  * This enum class provides a way to specify how the quadrature points and
  * weights should be combined. In general, the two FEValuesBase objects provide
@@ -531,7 +531,7 @@ enum class QuadratureCouplingType
  * 1. the two FEValuesBase objects refer to different DoFHandlers
  * 2. the two FEValuesBase objects refer to the same DoFHandler
  *
- * In the first case, one usually treat the two sets of degrees of freedom as
+ * In the first case, one usually treats the two sets of degrees of freedom as
  * independent of each other, and the resulting matrix is generally rectangular.
  *
  * In the second case, one may choose to treat the two sets of degrees of
@@ -544,7 +544,7 @@ enum class QuadratureCouplingType
  * \phi_{l,i}(x) = \begin{cases} v_i(x) & \text{ if } i \in [0,n_l) \\
  * 0 & \text{ if ) i \in [n_l, n_l+n_r] \end{cases},\quad \phi_{l,i}(x) =
  * \begin{cases} 0(x) & \text{ if } i \in [0,n_l) \\
- * w_{i-n_l} & \text{ if ) i \in [n_l, n_l+n_r] \end{cases},
+ * w_{i-n_l}(x) & \text{ if ) i \in [n_l, n_l+n_r] \end{cases},
  * \f]
  *
  * where $phi_{l,i}$ is the left basis function with index $i$ and $n_{l,r}$ are
@@ -618,7 +618,7 @@ enum class DoFCouplingType
  * This, however is not the only way to proceed. In fact, such an integral can
  * be rewritten as a single loop over two vectors of points with the same length
  * that can be thought of as a single quadrature rule on the set $T_1\times
- * T_2$. For singular Kernels, for example, this is often the only way to
+ * T_2$. For singular kernels, for example, this is often the only way to
  * proceed, since the quadrature formula on $T_1\times T_2$ is usually not
  * written as a tensor product quadrature formula, and one needs to build a
  * custom quadrature formula for this purpose.
@@ -639,7 +639,7 @@ enum class DoFCouplingType
  * different topological dimensions), $\phi^1_i$ and $\phi^2_j$ are basis
  * functions defined on $T_1$ and $T_2$, respectively.
  *
- * The case of the dirac Distribution is when $T_1$ and $T_2$
+ * The case of the Dirac distribution is when $T_1$ and $T_2$
  * correspond to the common face of two neighboring cells. In this case, this
  * class provides a functionality which is similar to the FEInterfaceValues
  * class, and provides a way to access values of basis functions on the
@@ -668,7 +668,7 @@ enum class DoFCouplingType
  *
  * fe_values_1.reinit(cell_1); fe_values_2.reinit(cell_2);
  *
- * CouplingFEValues<dim> cfv(fe_values1, fe_values2,
+ * CouplingFEValues<dim, dim, spacedim> cfv(fe_values1, fe_values2,
  *                           DoFCouplingType::independent,
  *                           QuadratureCouplingType::tensor_product);
  *
@@ -846,7 +846,7 @@ public:
   right(const Extractor &extractor) const;
 
   /**
-   * Return the value of JxW in the given quadrature point.
+   * Return the value of JxW at the given quadrature point.
    *
    * @dealiiRequiresUpdateFlags{update_JxW_values}
    */
@@ -854,7 +854,7 @@ public:
   JxW(const unsigned int quadrature_point) const;
 
   /**
-   * Return the two quadrature points in in real space at the given quadrature
+   * Return the two quadrature points in real space at the given quadrature
    * point index, corresponding to a quadrature point in the set $T_1\times
    * T_2$.
    *
