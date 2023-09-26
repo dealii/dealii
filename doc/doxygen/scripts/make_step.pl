@@ -58,7 +58,7 @@ system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc", "$cmake_source_di
 
 print "  <li> <a href=\"#CommProg\" class=bold>The commented program</a>\n";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2toc", "$cmake_source_dir/examples/$step/$step.cc";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2toc.pl", "$cmake_source_dir/examples/$step/$step.cc";
 
 print
 "</ol></td><td width=\"50%\" valign=\"top\"><ol>
@@ -90,7 +90,7 @@ print " *\n";
 print " * <a name=\"CommProg\"></a>\n";
 print " * <h1> The commented program</h1>\n";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen", "$cmake_source_dir/examples/$step/$step.cc";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen.pl", "$cmake_source_dir/examples/$step/$step.cc";
 
 system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_source_dir/examples/$step/doc/results.dox";
 
