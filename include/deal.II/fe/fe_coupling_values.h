@@ -669,8 +669,8 @@ enum class DoFCouplingType
  * fe_values_1.reinit(cell_1); fe_values_2.reinit(cell_2);
  *
  * CouplingFEValues<dim, dim, spacedim> cfv(fe_values1, fe_values2,
- *                           DoFCouplingType::independent,
- *                           QuadratureCouplingType::tensor_product);
+ *                                          DoFCouplingType::independent,
+ *                                          QuadratureCouplingType::tensor_product);
  *
  * FullMatrix<double> local_matrix(fe_values1.dofs_per_cell,
  *                                 fe_values2.dofs_per_cell);
@@ -890,9 +890,16 @@ public:
   right_dof_indices() const;
 
   /**
-   * Return an object that can be thought of as an array containing all
-   * indices from zero (inclusive) to `n_coupling_dof_indices()` (exclusive).
-   * This allows one to write code using range-based `for` loops.
+   * Return an object that can be thought of as an array containing all indices
+   * from zero (inclusive) to `n_coupling_dof_indices()` (exclusive). This
+   * allows one to write code using range-based `for` loops.
+   *
+   * This function only makes sense when the dof coupling type is
+   * DoFCouplingType::contiguous, and, in this case, n_coupling_dof_indices() is
+   * the  sum of n_left_dofs() and n_right_dofs(). If
+   * DoFCouplingType::independent is used, you should call left_dof_indices() or
+   * right_dof_indices() instead, and calling this function will throw an
+   * exception.
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
   coupling_dof_indices() const;
@@ -953,6 +960,34 @@ public:
    * @}
    */
 
+  /**
+   * Return the number of coupling DoF indices. If DoFCouplingType::independent
+   * is used, this function returns numbers::invalid_unsigned_int, otherwise it
+   * returns the sum of n_left_dofs() and n_right_dofs().
+   */
+  unsigned int
+  n_coupling_dofs() const;
+
+  /**
+   * Return the number of left DoF indices. This generally coincides with
+   * n_dofs_per_cell of the left FEValuesBase object.
+   */
+  unsigned int
+  n_left_dofs() const;
+
+  /**
+   * Return the number of right DoF indices. This generally coincides with
+   * n_dofs_per_cell of the right FEValuesBase object.
+   */
+  unsigned int
+  n_right_dofs() const;
+
+  /**
+   * Return the number of quadrature points.
+   */
+  unsigned int
+  n_quadrature_points() const;
+
 private:
   /**
    * The dof coupling type used by this object.
@@ -995,35 +1030,6 @@ private:
    * n_right_dofs() in the the case of DoFCouplingType::contiguous.
    */
   unsigned int n_coupling_dofs_;
-
-public:
-  /**
-   * Return the number of coupling DoF indices. If DoFCouplingType::independent
-   * is used, this function returns numbers::invalid_unsigned_int, otherwise it
-   * returns the sum of n_left_dofs() and n_right_dofs().
-   */
-  unsigned int
-  n_coupling_dofs() const;
-
-  /**
-   * Return the number of left DoF indices. This generally coincides with
-   * n_dofs_per_cell of the left FEValuesBase object.
-   */
-  unsigned int
-  n_left_dofs() const;
-
-  /**
-   * Return the number of right DoF indices. This generally coincides with
-   * n_dofs_per_cell of the right FEValuesBase object.
-   */
-  unsigned int
-  n_right_dofs() const;
-
-  /**
-   * Return the number of quadrature points.
-   */
-  unsigned int
-  n_quadrature_points() const;
 };
 
 
