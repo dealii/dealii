@@ -129,7 +129,7 @@ if (EXISTS ${DEAL_II_CODE_GALLERY_DIRECTORY}/README.md)
         ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS
         ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_gallery.pl
-        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
+        ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen.pl
         ${_src_files}
       )
 
