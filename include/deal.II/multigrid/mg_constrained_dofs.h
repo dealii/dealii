@@ -617,7 +617,8 @@ MGConstrainedDoFs::merge_constraints(AffineConstraints<Number> &constraints,
     index_set.add_indices(
       this->get_user_constraint_matrix(level).get_local_lines());
 
-  constraints.reinit(constraints.get_locally_owned_indices(), index_set);
+  constraints.reinit(level_constraints[level].get_locally_owned_indices(),
+                     index_set);
 
   // merge constraints
   if (add_boundary_indices && this->have_boundary_indices())
