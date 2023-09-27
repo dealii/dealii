@@ -266,6 +266,11 @@ public:
   using VectorType = LinearAlgebra::distributed::Vector<Number>;
 
   /**
+   * Default constructor.
+   */
+  MGTwoLevelTransferBase();
+
+  /**
    * Perform prolongation.
    */
   void
@@ -355,6 +360,7 @@ protected:
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
     const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine,
+    bool &vec_fine_needs_ghost_update,
     internal::MatrixFreeFunctions::ConstraintInfo<
       dim,
       VectorizedArray<Number, width>> &constraint_info_coarse,
@@ -380,6 +386,11 @@ public:
 
 protected:
   /**
+   * Internal vector on that the actual prolongation/restriction is performed.
+   */
+  mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
+
+  /**
    * Internal vector needed for collecting all degrees of freedom of the fine
    * cells. It is only initialized if the fine-level DoF indices touch DoFs
    * other than the locally active ones (which we always assume can be
@@ -389,9 +400,9 @@ protected:
   mutable LinearAlgebra::distributed::Vector<Number> vec_fine;
 
   /**
-   * Internal vector on that the actual prolongation/restriction is performed.
+   * Bool indicating whether fine vector has relevant ghost values.
    */
-  mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
+  bool vec_fine_needs_ghost_update;
 
   /**
    * Embedded partitioner for efficient communication if locally relevant DoFs

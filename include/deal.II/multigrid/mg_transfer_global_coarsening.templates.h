@@ -3178,6 +3178,14 @@ namespace MGTransferGlobalCoarseningTools
 
 
 template <typename Number>
+MGTwoLevelTransferBase<
+  LinearAlgebra::distributed::Vector<Number>>::MGTwoLevelTransferBase()
+  : vec_fine_needs_ghost_update(true)
+{}
+
+
+
+template <typename Number>
 void
 MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
   prolongate_and_add(
@@ -3208,7 +3216,7 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
 
   this->prolongate_and_add_internal(*vec_fine_ptr, *vec_coarse_ptr);
 
-  if (fine_element_is_continuous || use_dst_inplace == false)
+  if (this->vec_fine_needs_ghost_update || use_dst_inplace == false)
     this->compress(*vec_fine_ptr, VectorOperation::add);
 
   if (use_dst_inplace == false)
@@ -3371,7 +3379,7 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     this->vec_fine.copy_locally_owned_data_from(src);
 
   if ((use_src_inplace == false) ||
-      (fine_element_is_continuous && (src_ghosts_have_been_set == false)))
+      (vec_fine_needs_ghost_update && (src_ghosts_have_been_set == false)))
     this->update_ghost_values(*vec_fine_ptr);
 
   if (use_dst_inplace == false)
@@ -3384,11 +3392,11 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
   this->restrict_and_add_internal(*vec_coarse_ptr, *vec_fine_ptr);
 
   // clean up related to update_ghost_values()
-  if (fine_element_is_continuous == false && use_src_inplace == false)
+  if (vec_fine_needs_ghost_update == false && use_src_inplace == false)
     this->zero_out_ghost_values(*vec_fine_ptr); // internal vector (DG)
-  else if (fine_element_is_continuous && use_src_inplace == false)
+  else if (vec_fine_needs_ghost_update && use_src_inplace == false)
     vec_fine_ptr->set_ghost_state(false); // internal vector (CG)
-  else if (fine_element_is_continuous && (src_ghosts_have_been_set == false))
+  else if (vec_fine_needs_ghost_update && (src_ghosts_have_been_set == false))
     this->zero_out_ghost_values(*vec_fine_ptr); // external vector
 
   this->compress(*vec_coarse_ptr, VectorOperation::add);
@@ -3552,8 +3560,8 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   if (use_src_inplace == false)
     this->vec_fine.copy_locally_owned_data_from(src);
 
-  if ((use_src_inplace == false) ||
-      (this->fine_element_is_continuous && (src_ghosts_have_been_set == false)))
+  if ((use_src_inplace == false) || (this->vec_fine_needs_ghost_update &&
+                                     (src_ghosts_have_been_set == false)))
     this->update_ghost_values(*vec_fine_ptr);
 
   *vec_coarse_ptr = 0.0;
@@ -3716,7 +3724,8 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &external_partitioner_coarse,
     const std::shared_ptr<const Utilities::MPI::Partitioner>
-      &external_partitioner_fine,
+         &external_partitioner_fine,
+    bool &vec_fine_needs_ghost_update,
     internal::MatrixFreeFunctions::ConstraintInfo<
       dim,
       VectorizedArray<Number, width>> &constraint_info_coarse,
@@ -3747,6 +3756,10 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
 
       this->partitioner_coarse = external_partitioner_coarse;
     }
+
+  vec_fine_needs_ghost_update =
+    Utilities::MPI::max(this->partitioner_fine->ghost_indices().n_elements(),
+                        this->partitioner_fine->get_mpi_communicator()) != 0;
 
   if (this->partitioner_fine->is_globally_compatible(
         *external_partitioner_fine))
@@ -3783,6 +3796,7 @@ MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>::
   this->internal_enable_inplace_operations_if_possible(
     external_partitioner_coarse,
     external_partitioner_fine,
+    this->vec_fine_needs_ghost_update,
     constraint_info_coarse,
     constraint_info_fine.dof_indices);
 }
@@ -5205,6 +5219,7 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   this->internal_enable_inplace_operations_if_possible(
     external_partitioner_coarse,
     external_partitioner_fine,
+    this->vec_fine_needs_ghost_update,
     constraint_info,
     this->level_dof_indices_fine);
 }
