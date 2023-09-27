@@ -30,11 +30,9 @@
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
-#  include <Epetra_ConfigDefs.h>
-#  include <Epetra_FEVector.h>
-#  include <Epetra_LocalMap.h>
-#  include <Epetra_Map.h>
-#  include <Epetra_MpiComm.h>
+#include <Tpetra_Core.hpp>
+#include <Tpetra_Vector.hpp>
+#include <Tpetra_MultiVector.hpp>
 
 #  include <memory>
 #  include <utility>
@@ -46,11 +44,10 @@ DEAL_II_NAMESPACE_OPEN
 #  ifndef DOXYGEN
 namespace LinearAlgebra
 {
-  // Forward declaration
   template <typename Number>
   class ReadWriteVector;
 } // namespace LinearAlgebra
-#  endif
+#  endif // DOXYGEN
 
 /**
  * @addtogroup TrilinosWrappers
@@ -409,6 +406,11 @@ namespace TrilinosWrappers
       using const_iterator  = const value_type *;
       using reference       = internal::VectorReference;
       using const_reference = const internal::VectorReference;
+
+      using MapType         = Tpetra::Map<int, dealii::types::signed_global_dof_index>;
+      using VectorType      = Tpetra::Vector<TrilinosScalar, int, dealii::types::signed_global_dof_index>;
+      using MultiVectorType = Tpetra::MultiVector<TrilinosScalar, int, dealii::types::signed_global_dof_index>;
+
 
       /**
        * @name 1: Basic Object-handling
@@ -1244,9 +1246,9 @@ namespace TrilinosWrappers
 
       /**
        * Return a (modifiable) reference to the underlying Trilinos
-       * Epetra_FEVector class.
+       * Tpetra::Vector class.
        */
-      Epetra_FEVector &
+      Teuchos::RCP<Tpetra::Vector<TrilinosScalar, int, types::signed_global_dof_index>>
       trilinos_vector();
 
       /**
@@ -1349,7 +1351,7 @@ namespace TrilinosWrappers
        * so we simply use their model, which stores whether the last operation
        * was an addition or an insertion.
        */
-      Epetra_CombineMode last_action;
+      Tpetra::CombineMode last_action;
 
       /**
        * A boolean variable to hold information on whether the vector is
@@ -1364,18 +1366,18 @@ namespace TrilinosWrappers
       bool has_ghosts;
 
       /**
-       * Pointer to the actual Epetra vector object. This may represent a vector
+       * Pointer to the actual Tpetra vector object. This may represent a vector
        * that is in fact distributed among multiple processors. The object
-       * requires an existing Epetra_Map for storing data when setting it up.
+       * requires an existing Tpetra_Map for storing data when setting it up.
        */
-      std::unique_ptr<Epetra_FEVector> vector;
+      Teuchos::RCP<Tpetra::Vector<TrilinosScalar, int, types::signed_global_dof_index>> vector;
 
       /**
        * A vector object in Trilinos to be used for collecting the non-local
        * elements if the vector was constructed with an additional IndexSet
        * describing ghost elements.
        */
-      std::unique_ptr<Epetra_MultiVector> nonlocal_vector;
+      Teuchos::RCP<Tpetra::MultiVector<dealii::TrilinosScalar, int, types::signed_global_dof_index >> nonlocal_vector;
 
       /**
        * An IndexSet storing the indices this vector owns exclusively.
@@ -1723,13 +1725,13 @@ namespace TrilinosWrappers
               const int ierr = vector->GlobalAssemble(Insert);
               AssertThrow(ierr == 0, ExcTrilinosError(ierr));
             }
-          last_action = Add;
+          last_action = Tpetra::ADD;
         }
 
       for (size_type i = 0; i < n_elements; ++i)
         {
           const size_type                         row       = indices[i];
-          const TrilinosWrappers::types::int_type local_row = vector->Map().LID(
+          const TrilinosWrappers::types::int_type local_row = vector->getMap().LID(
             static_cast<TrilinosWrappers::types::int_type>(row));
           if (local_row != -1)
             (*vector)[0][local_row] += values[i];
@@ -1748,7 +1750,7 @@ namespace TrilinosWrappers
               // use pre-allocated vector for non-local entries if it exists for
               // addition operation
               const TrilinosWrappers::types::int_type my_row =
-                nonlocal_vector->Map().LID(
+                nonlocal_vector->getMap().LID(
                   static_cast<TrilinosWrappers::types::int_type>(row));
               Assert(my_row != -1,
                      ExcMessage(
@@ -1769,7 +1771,7 @@ namespace TrilinosWrappers
 #    ifndef DEAL_II_WITH_64BIT_INDICES
       return vector->Map().MaxAllGID() + 1 - vector->Map().MinAllGID();
 #    else
-      return vector->Map().MaxAllGID64() + 1 - vector->Map().MinAllGID64();
+      return vector->getMap()->MaxAllGID64() + 1 - vector->getMap()->MinAllGID64();
 #    endif
     }
 
@@ -1778,7 +1780,7 @@ namespace TrilinosWrappers
     inline Vector::size_type
     Vector::local_size() const
     {
-      return vector->Map().NumMyElements();
+      return vector->getMap()->NumMyElements();
     }
 
 
@@ -1800,9 +1802,9 @@ namespace TrilinosWrappers
         vector->Map().MaxMyGID() + 1;
 #    else
       const TrilinosWrappers::types::int_type begin =
-        vector->Map().MinMyGID64();
+        vector->getMap()->MinMyGID64();
       const TrilinosWrappers::types::int_type end =
-        vector->Map().MaxMyGID64() + 1;
+        vector->getMap()->MaxMyGID64() + 1;
 #    endif
 
       Assert(
