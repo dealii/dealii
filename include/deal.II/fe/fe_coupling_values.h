@@ -483,7 +483,7 @@ enum class QuadratureCouplingType
    * the sense that the quadrature formulas are used as is, but both objects are
    * assumed to return the same quadrature points and weights. This is useful
    * when integrating over faces of neighboring cells, and when the reordering
-   * of the quadrature points is known to match a priori. An assertion is thrown
+   * of the quadrature points is known to match a priori. An exception is thrown
    * if the quadrature points and weights of the two FEValuesBase objects do not
    * match one-to-one.
    */
@@ -493,7 +493,7 @@ enum class QuadratureCouplingType
    * The FEValuesBase objects provide the same quadrature rule over the same
    * set, but with possibly different orientations. The quadrature points are
    * reordered internally, so that the resulting quadrature points and weights
-   * are the same as in the matching case. An assertion is thrown if the
+   * are the same as in the matching case. An exception is thrown if the
    * quadrature points and weights of the two FEValuesBase cannot be reordered
    * to match one-to-one.
    */
@@ -506,7 +506,7 @@ enum class QuadratureCouplingType
    * resulting quadrature points and weights are only the ones that match
    * between the two objects. If no overlapping points and weights can be found,
    * an empty set is used to integrate, and the resulting integral is zero. No
-   * assertion is thrown in this case.
+   * exception is thrown in this case.
    */
   overlapping,
 };
@@ -523,7 +523,7 @@ enum class QuadratureCouplingType
  * where $T_1$ and $T_2$ are two arbitrary sets (cells, faces, edges, or any
  * combination thereof), and $K$ is a (possibly singular) coupling kernel, one
  * may want to combine degrees from two different FEValuesBase objects (i.e.,
- * basis functions $v_i$ and $w_j$ in the examples above)
+ * basis functions $v_i$ and $w_j$ in the examples above).
  *
  * This enum class provides a way to specify how the degrees of freedom should
  * be combined. There are two cases of interest:
