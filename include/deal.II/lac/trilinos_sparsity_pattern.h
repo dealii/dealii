@@ -31,7 +31,7 @@
 #  include <Epetra_Map.h>
 #  include <Epetra_MpiComm.h>
 
-#  include <Tpetra_FECrsGraph.hpp>
+#  include <Tpetra_CrsGraph.hpp>
 
 #  include <cmath>
 #  include <memory>
@@ -150,7 +150,7 @@ namespace TrilinosWrappers
        * performance, we keep a shared pointer to these entries so that more
        * than one accessor can access this data if necessary.
        */
-      std::shared_ptr<std::vector<dealii::types::signed_global_dof_index>> colnum_cache;
+      Teuchos::RCP<std::vector<dealii::types::signed_global_dof_index>> colnum_cache;
 
       /**
        * Discard the old row caches (they may still be used by other
@@ -175,7 +175,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      using size_type = dealii::types::signed_global_dof_index;
+      using size_type = unsigned long int;//dealii::types::signed_global_dof_index;
 
       /**
        * Constructor. Create an iterator into the matrix @p matrix for the
@@ -285,6 +285,21 @@ namespace TrilinosWrappers
      * Declare an alias for the iterator class.
      */
     using const_iterator = SparsityPatternIterators::Iterator;
+
+    /**
+     * Typedef for Tpetra::CrsMatrix
+     */
+    using MatrixType     = Tpetra::CrsMatrix<TrilinosScalar, int, dealii::types::signed_global_dof_index>;
+
+    /**
+     * Typedef for Tpetra::Map
+     */
+    using MapType        = Tpetra::Map<int, dealii::types::signed_global_dof_index>;
+
+    /**
+     * Typedef for Tpetra:Graph
+     */
+    using GraphType      = Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>;
 
     /**
      * @name Basic constructors and initialization
@@ -792,31 +807,33 @@ namespace TrilinosWrappers
      * Return a const reference to the underlying Trilinos Epetra_CrsGraph
      * data that stores the sparsity pattern.
      */
-    const Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index> &
+    Teuchos::RCP<GraphType>
     trilinos_sparsity_pattern() const;
 
+    // TODO: return RCP
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
      * sets the parallel partitioning of the domain space of this sparsity
      * pattern, i.e., the partitioning of the vectors matrices based on this
      * sparsity pattern are multiplied with.
      */
-    const Tpetra::Map<int, dealii::types::signed_global_dof_index> &
+    const MapType &
     domain_partitioner() const;
 
+    // TODO: return RCP
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
      * sets the partitioning of the range space of this sparsity pattern,
      * i.e., the partitioning of the vectors that are result from matrix-
      * vector products.
      */
-    const Tpetra::Map<int, dealii::types::signed_global_dof_index> &
+    const MapType &
     range_partitioner() const;
 
     /**
      * Return the underlying MPI communicator.
      */
-    MPI_Comm
+    Teuchos::RCP<const Teuchos::Comm<int>>
     get_mpi_communicator() const;
 
     /** @} */
@@ -976,14 +993,14 @@ namespace TrilinosWrappers
      * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
      * columns that assigns parts of the matrix to the individual processes.
      */
-    Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> column_space_map;
+    Teuchos::RCP<MapType> column_space_map;
 
     /**
      * A sparsity pattern object in Trilinos to be used for finite element
      * based problems which allows for adding non-local elements to the
      * pattern.
      */
-    Teuchos::RCP<Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index>> graph;
+    Teuchos::RCP<GraphType> graph;
 
     /**
      * A sparsity pattern object for the non-local part of the sparsity
@@ -991,7 +1008,7 @@ namespace TrilinosWrappers
      * when the particular constructor or reinit method with writable_rows
      * argument is set
      */
-    Teuchos::RCP<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>> nonlocal_graph;
+    Teuchos::RCP<GraphType> nonlocal_graph;
 
     friend class TrilinosWrappers::SparseMatrix;
     friend class SparsityPatternIterators::Accessor;
@@ -1276,22 +1293,21 @@ namespace TrilinosWrappers
                           "that has not be specified as being writable upon "
                           "initialization"));
         nonlocal_graph->insertGlobalIndices(trilinos_row_index,
-                                                   n_cols,
-                                                   col_index_ptr);
+                                            n_cols,
+                                            col_index_ptr);
       }
     else
-      graph->insertGlobalIndices(
-                                        trilinos_row_index,
-                                        n_cols,
-                                        col_index_ptr);
+      graph->insertGlobalIndices(trilinos_row_index,
+                                 n_cols,
+                                 col_index_ptr);
   }
 
 
 
-  inline const Tpetra::FECrsGraph<int, dealii::types::signed_global_dof_index> &
+  inline Teuchos::RCP<Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>>
   SparsityPattern::trilinos_sparsity_pattern() const
   {
-    return *graph;
+    return graph;
   }
 
 
