@@ -34,11 +34,10 @@
 #    include <deal.II/lac/vector_memory.h>
 #    include <deal.II/lac/vector_operation.h>
 
-#    include <Tpetra_Core.hpp>
+#include <Tpetra_Core.hpp>
 #include <Tpetra_CrsMatrix.hpp>
 //#    include <Tpetra_CrsGraph.h>
 //#    include <Tpetra_Export.h>
-#    include <Tpetra_FECrsMatrix.hpp>
 //#    include <Tpetra_Map.h>
 //#    include <Tpetra_MpiComm.h>
 //#    include <Tpetra_MultiVector.h>
@@ -71,9 +70,9 @@ namespace TrilinosWrappers
   {
     template <bool Constness>
     class Iterator;
-  }
+  } // namespace SparseMatrixIterators
 } // namespace TrilinosWrappers
-#    endif
+#    endif // DOXYGEN
 
 namespace TrilinosWrappers
 {
@@ -557,6 +556,26 @@ namespace TrilinosWrappers
     using size_type = dealii::types::global_dof_index;
 
     /**
+       * Typedef for the Tpetra::Map
+     */
+    using MapType = Tpetra::Map<int, types::signed_global_dof_index>;
+
+    /**
+        * Typedef for the Tpetra::Vector
+     */
+    using VectorType = Tpetra::Vector<TrilinosScalar, int, types::signed_global_dof_index>;
+
+    /**
+        * Typedef for the Tpetra::CRSMatrix
+     */
+    using MatrixType = Tpetra::CrsMatrix<TrilinosScalar, int, types::signed_global_dof_index>;
+
+    /**
+        * Typedef for the Tpetra::CRSMatrix
+     */
+    using GraphType = Tpetra::CrsGraph<int, types::signed_global_dof_index>;
+
+    /**
      * Exception
      */
     DeclException1(ExcAccessToNonlocalRow,
@@ -565,26 +584,6 @@ namespace TrilinosWrappers
                    << " of a non-contiguous locally owned row set."
                    << " The row " << arg1
                    << " is not stored locally and can't be accessed.");
-
-    /**
-     * Declare an alias in analogy to all the other container classes.
-     */
-    using value_type = TrilinosScalar;
-
-    /**
-     * Typedef for Tpetra::CrsMatrix
-     */
-    using MatrixType = Tpetra::CrsMatrix<TrilinosScalar, int, dealii::types::signed_global_dof_index>;
-
-    /**
-     * Typedef for Tpetra::Map
-     */
-    using MapType    = Tpetra::Map<int, dealii::types::signed_global_dof_index>;
-
-    /**
-     * Typedef for Tpetra::CrsGraph
-     */
-    using GraphType  = Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>;
 
     /**
      * A structure that describes some of the traits of this class in terms of
@@ -1682,6 +1681,7 @@ namespace TrilinosWrappers
      */
     /** @{ */
 
+    // TODO: This function should only return a Teuchos::RCP Poiner, Trilinos matricies and vectors should be never handeled directly
     /**
      * Return a const reference to the underlying Trilinos Tpetra_CrsMatrix
      * data.
@@ -2010,9 +2010,9 @@ namespace TrilinosWrappers
   namespace internal
   {
     inline void
-    check_vector_map_equality(const Tpetra::CrsMatrix<double, int, dealii::types::signed_global_dof_index> &  mtrx,
-                              const Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index> &src,
-                              const Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index> &dst,
+    check_vector_map_equality(const Tpetra::CrsMatrix<TrilinosScalar, int, dealii::types::signed_global_dof_index> &  mtrx,
+                              const Tpetra::MultiVector<TrilinosScalar, int, dealii::types::signed_global_dof_index> &src,
+                              const Tpetra::MultiVector<TrilinosScalar, int, dealii::types::signed_global_dof_index> &dst,
                               const bool                transpose)
     {
       if (transpose == false)
@@ -2037,9 +2037,9 @@ namespace TrilinosWrappers
     }
 
     inline void
-    check_vector_map_equality(const Tpetra::Operator<double, int, dealii::types::signed_global_dof_index> &   op,
-                              const Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index> &src,
-                              const Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index> &dst,
+    check_vector_map_equality(const Tpetra::Operator<TrilinosScalar, int, dealii::types::signed_global_dof_index> &   op,
+                              const Tpetra::MultiVector<TrilinosScalar, int, dealii::types::signed_global_dof_index> &src,
+                              const Tpetra::MultiVector<TrilinosScalar, int, dealii::types::signed_global_dof_index> &dst,
                               const bool                transpose)
     {
       if (transpose == false)
@@ -2086,13 +2086,13 @@ namespace TrilinosWrappers
        *
        * @ingroup TrilinosWrappers
        */
-      class TrilinosPayload : public Tpetra::Operator<double, int, dealii::types::signed_global_dof_index>
+      class TrilinosPayload : public Tpetra::Operator<TrilinosScalar, int, dealii::types::signed_global_dof_index>
       {
       public:
         /**
          * Definition for the internally supported vector type.
          */
-        using VectorType = Tpetra::MultiVector<double, int, dealii::types::signed_global_dof_index>;
+        using VectorType = Tpetra::MultiVector<TrilinosScalar, int, dealii::types::signed_global_dof_index>;
 
         /**
          * Definition for the vector type for the domain space of the operator.
@@ -2103,6 +2103,8 @@ namespace TrilinosWrappers
          * Definition for the vector type for the range space of the operator.
          */
         using Domain = VectorType;
+
+        using MapType = Tpetra::Map<int, dealii::types::signed_global_dof_index>;
 
         /**
          * @name Constructors / destructor
@@ -2376,7 +2378,7 @@ namespace TrilinosWrappers
          * This overloads the same function from the Trilinos class
          * Tpetra_Operator.
          */
-        virtual Teuchos::RCP<const Tpetra::Map<int, dealii::types::signed_global_dof_index>>
+        virtual Teuchos::RCP<const MapType>
         getDomainMap() const override;
 
         /**
@@ -2387,7 +2389,7 @@ namespace TrilinosWrappers
          * This overloads the same function from the Trilinos class
          * Tpetra_Operator.
          */
-        virtual Teuchos::RCP<const Tpetra::Map<int, dealii::types::signed_global_dof_index>>
+        virtual Teuchos::RCP<const MapType>
         getRangeMap() const override;
         /** @} */
 
@@ -2425,13 +2427,13 @@ namespace TrilinosWrappers
          * Tpetra_Map that sets the partitioning of the domain space of
          * this operator.
          */
-        Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> domain_map;
+        Teuchos::RCP<MapType> domain_map;
 
         /**
          * Tpetra_Map that sets the partitioning of the range space of
          * this operator.
          */
-        Teuchos::RCP<Tpetra::Map<int, dealii::types::signed_global_dof_index>> range_map;
+        Teuchos::RCP<MapType> range_map;
       };
 
       /**
@@ -3024,7 +3026,7 @@ namespace TrilinosWrappers
   inline IndexSet
   SparseMatrix::locally_owned_domain_indices() const
   {
-    return IndexSet(*matrix->getDomainMap());
+    return IndexSet(*(matrix->getDomainMap()));
   }
 
 
@@ -3032,7 +3034,7 @@ namespace TrilinosWrappers
   inline IndexSet
   SparseMatrix::locally_owned_range_indices() const
   {
-    return IndexSet(*matrix->getRangeMap());
+    return IndexSet(*(matrix->getRangeMap()));
   }
 
 
@@ -3253,7 +3255,6 @@ DEAL_II_NAMESPACE_CLOSE
 #  endif // DEAL_II_WITH_TRILINOS
 
 
-/*-----------------------   trilinos_sparse_matrix.h     --------------------*/
 
 #endif
 /*-----------------------   trilinos_sparse_matrix.h     --------------------*/
