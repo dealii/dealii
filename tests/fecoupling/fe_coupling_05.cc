@@ -98,17 +98,17 @@ main()
   FullMatrix<double> matrix(fcv.n_coupling_dofs(), fcv.n_coupling_dofs());
   FEValuesExtractors::Scalar scalar(0);
 
-  const auto bulk    = fcv.left(scalar);
-  const auto surface = fcv.right(scalar);
+  const auto bulk    = fcv.first(scalar);
+  const auto surface = fcv.second(scalar);
 
   deallog << "Renumbering vectors: " << std::endl;
 
   for (const auto i : fcv.coupling_dof_indices())
     {
-      auto id_left  = fcv.coupling_dof_to_dof_indices(i)[0];
-      auto id_right = fcv.coupling_dof_to_dof_indices(i)[1];
-      deallog << "i: " << i << " bulk: " << (int)id_left
-              << " surface: " << (int)id_right << std::endl;
+      auto id_first  = fcv.coupling_dof_to_dof_indices(i)[0];
+      auto id_second = fcv.coupling_dof_to_dof_indices(i)[1];
+      deallog << "i: " << i << " bulk: " << (int)id_first
+              << " surface: " << (int)id_second << std::endl;
     }
 
   // We need to loop over all the coupling quadrature points

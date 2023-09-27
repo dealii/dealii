@@ -100,21 +100,21 @@ main()
           << "n_q_points_per_cell = " << fv2.n_quadrature_points << std::endl
           << "n_q_points = " << fcv.n_quadrature_points() << std::endl;
 
-  FullMatrix<double> matrix(fcv.n_left_dofs(), fcv.n_right_dofs());
+  FullMatrix<double> matrix(fcv.n_first_dofs(), fcv.n_second_dofs());
 
-  const auto left  = fcv.left(FEValuesExtractors::Scalar(0));
-  const auto right = fcv.right(FEValuesExtractors::Scalar(0));
+  const auto first  = fcv.first(FEValuesExtractors::Scalar(0));
+  const auto second = fcv.second(FEValuesExtractors::Scalar(0));
 
   // We need to loop over all the coupling quadrature points
   for (const auto q : fcv.quadrature_point_indices())
     {
       const auto &[x, y] = fcv.quadrature_point(q);
-      for (const auto i : fcv.left_dof_indices())
+      for (const auto i : fcv.first_dof_indices())
         {
-          const auto &vi = fcv[left].value(i, q);
-          for (const auto j : fcv.right_dof_indices())
+          const auto &vi = fcv[first].value(i, q);
+          for (const auto j : fcv.second_dof_indices())
             {
-              const auto &vj = fcv[right].value(j, q);
+              const auto &vj = fcv[second].value(j, q);
 
               deallog << std::left                                           //
                       << "vi[" << i << "]: " << std::setw(10) << vi          //

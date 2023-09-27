@@ -547,8 +547,8 @@ enum class QuadratureCouplingType
  * w_{i-n_l}(x) & \text{ if ) i \in [n_l, n_l+n_r] \end{cases},
  * \f]
  *
- * where $phi_{l,i}$ is the left basis function with index $i$ and $n_{l,r}$ are
- * the number of local dofs on the left and right FEValuesBase objects.
+ * where $phi_{l,i}$ is the first basis function with index $i$ and $n_{l,r}$
+ * are the number of local dofs on the first and second FEValuesBase objects.
  *
  * This enum is used in the constructor of FECouplingValues to specify how to
  * interpret and manipulate the local dof indices of the two FEValuesBase
@@ -568,13 +568,13 @@ enum class DoFCouplingType
    * The FEValuesBase objects may have different dof indices, but they both
    * index the same DoFHandler objects, and we are interested in assembling them
    * all together in a single matrix. In this coupling type, the DoF indices are
-   * grouped together, one after the other, first the left dof indices, and then
-   * the right dof indices. This is useful when one wants to assemble four
+   * grouped together, one after the other, first the first dof indices, and
+   * then the second dof indices. This is useful when one wants to assemble four
    * matrices at the same time, corresponding to the four possible combinations
-   * of the two FEValuesBase objects, (i.e., left coupled with left, left
-   * coupled with right, right coupled with left, and right coupled with right)
-   * and then sum them together to obtain the final system. This is similar to
-   * what is done in the FEInterfaceValues class.
+   * of the two FEValuesBase objects, (i.e., first coupled with first, first
+   * coupled with second, second coupled with first, and second coupled with
+   * second) and then sum them together to obtain the final system. This is
+   * similar to what is done in the FEInterfaceValues class.
    */
   contiguous,
 };
@@ -675,25 +675,25 @@ enum class DoFCouplingType
  * FullMatrix<double> local_matrix(fe_values1.dofs_per_cell,
  *                                 fe_values2.dofs_per_cell);
  *
- * // Extractor on left cell
- * const auto v1 = cfv.left(FEValuesExtractor::Scalar(0));
- * const auto p1 = cfv.left(FEValuesExtractor::Scalar(1));
+ * // Extractor on first cell
+ * const auto v1 = cfv.first(FEValuesExtractor::Scalar(0));
+ * const auto p1 = cfv.first(FEValuesExtractor::Scalar(1));
  *
- * // Extractor on right cell
- * const auto u2 = cfv.right(FEValuesExtractor::Scalar(0));
- * const auto q2 = cfv.right(FEValuesExtractor::Scalar(1));
+ * // Extractor on second cell
+ * const auto u2 = cfv.second(FEValuesExtractor::Scalar(0));
+ * const auto q2 = cfv.second(FEValuesExtractor::Scalar(1));
  *
  * ...
  *
  * for (const unsigned int q : cfv.quadrature_point_indices()) {
  *   const auto &[x_q,y_q] = cfv.quadrature_point(q);
  *
- *   for (const unsigned int i : cfv.left_dof_indices())
+ *   for (const unsigned int i : cfv.first_dof_indices())
  *     {
  *       const auto &v_i = cfv[v1].value(i, q);
  *       const auto &p_i = cfv[p1].value(i, q);
  *
- *       for (const unsigned int j : cfv.right_dof_indices())
+ *       for (const unsigned int j : cfv.second_dof_indices())
  *         {
  *           const auto &u_j = cfv[u2].value(j, q);
  *           const auto &q_j = cfv[q2].value(j, q);
@@ -727,7 +727,7 @@ enum class DoFCouplingType
  * provides a unified way to access the values of the two basis, using the
  * concept of FEValuesExtractors. Unlike the FEValuesBase class, though, we need
  * to specify which FEValuesBase object we are referring to, and this is done by
- * calling the left() or right() functions, which are used to *inform* the
+ * calling the first() or second() functions, which are used to *inform* the
  * extractors about what FEValuesBase object the extractor refers to.
  *
  * This is achieved, in user codes, by the following snippet:
@@ -739,16 +739,17 @@ enum class DoFCouplingType
  *
  * FECouplingValues<dim> fe_coupling(fev1, fev1);
  *
- * // Extractors for the two FEValuesBase objects are returned by the left() and
- * // right() methods
+ * // Extractors for the two FEValuesBase objects are returned by the first()
+ * and
+ * // second() methods
  *
- * const auto left = fe_coupling.left(scalar);
- * const auto right = fe_coupling.right(scalar);
+ * const auto first = fe_coupling.first(scalar);
+ * const auto second = fe_coupling.second(scalar);
  *
  * // Now we can use the augmented extractors to access the values of the two
  * // FEValuesBase objects
- * const auto & left_vi = fe_coupling[left].value(i, q);
- * const auto & right_vi = fe_coupling[right].value(i, q);
+ * const auto & first_vi = fe_coupling[first].value(i, q);
+ * const auto & second_vi = fe_coupling[second].value(i, q);
  * @endcode
  */
 template <int dim1, int dim2 = dim1, int spacedim = dim1>
@@ -767,8 +768,8 @@ public:
    * construction time are initialized and ready to use (i.e., that you have
    * called the reinit() function on them before calling this constructor).
    *
-   * @param fe_values_1 The left FEValuesBase object.
-   * @param fe_values_2 The right FEValuesBase object.
+   * @param fe_values_1 The first FEValuesBase object.
+   * @param fe_values_2 The second FEValuesBase object.
    * @param dof_coupling_type The type of dof coupling to use.
    * @param quadrature_coupling_type The type of quadrature to use for the coupling.
    */
@@ -784,8 +785,8 @@ public:
    * The FEValuesBase objects must be initialized and ready to use, i.e., you
    * must have called the reinit() function on them before calling this method.
    *
-   * @param fe_values_1 The left FEValuesBase object.
-   * @param fe_values_2 The right FEValuesBase object.
+   * @param fe_values_1 The first FEValuesBase object.
+   * @param fe_values_2 The second FEValuesBase object.
    * @param dof_coupling_type The type of dof coupling to use.
    * @param quadrature_coupling_type The type of quadrature to use for the coupling.
    */
@@ -798,12 +799,12 @@ public:
       QuadratureCouplingType::tensor_product);
 
   /**
-   * Helper struct to associate an extractor to the left FEValuesBase object.
+   * Helper struct to associate an extractor to the first FEValuesBase object.
    */
   template <typename Extractor>
-  struct LeftCoupling
+  struct FirstCoupling
   {
-    LeftCoupling(const Extractor &extractor)
+    FirstCoupling(const Extractor &extractor)
       : extractor(extractor)
     {}
 
@@ -814,12 +815,12 @@ public:
   };
 
   /**
-   * Helper struct to associate an extractor to the right FEValuesBase object.
+   * Helper struct to associate an extractor to the second FEValuesBase object.
    */
   template <typename Extractor>
-  struct RightCoupling
+  struct SecondCoupling
   {
-    RightCoupling(const Extractor &extractor)
+    SecondCoupling(const Extractor &extractor)
       : extractor(extractor)
     {}
 
@@ -830,20 +831,20 @@ public:
   };
 
   /**
-   * Return a LeftCoupling object that can be used to extract values from the
+   * Return a FirstCoupling object that can be used to extract values from the
    * first FEValuesBase object.
    */
   template <typename Extractor>
-  const LeftCoupling<Extractor>
-  left(const Extractor &extractor) const;
+  const FirstCoupling<Extractor>
+  first(const Extractor &extractor) const;
 
   /**
-   * Return a RightCoupling object that can be used to extract values from the
+   * Return a SecondCoupling object that can be used to extract values from the
    * second FEValuesBase object.
    */
   template <typename Extractor>
-  const RightCoupling<Extractor>
-  right(const Extractor &extractor) const;
+  const SecondCoupling<Extractor>
+  second(const Extractor &extractor) const;
 
   /**
    * Return the value of JxW at the given quadrature point.
@@ -875,19 +876,19 @@ public:
 
   /**
    * Return an object that can be thought of as an array containing all
-   * indices from zero (inclusive) to `n_left_dofs()` (exclusive).
+   * indices from zero (inclusive) to `n_first_dofs()` (exclusive).
    * This allows one to write code using range-based `for` loops.
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-  left_dof_indices() const;
+  first_dof_indices() const;
 
   /**
    * Return an object that can be thought of as an array containing all
-   * indices from zero (inclusive) to `n_right_dofs()` (exclusive).
+   * indices from zero (inclusive) to `n_second_dofs()` (exclusive).
    * This allows one to write code using range-based `for` loops.
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-  right_dof_indices() const;
+  second_dof_indices() const;
 
   /**
    * Return an object that can be thought of as an array containing all indices
@@ -896,9 +897,9 @@ public:
    *
    * This function only makes sense when the dof coupling type is
    * DoFCouplingType::contiguous, and, in this case, n_coupling_dof_indices() is
-   * the  sum of n_left_dofs() and n_right_dofs(). If
-   * DoFCouplingType::independent is used, you should call left_dof_indices() or
-   * right_dof_indices() instead, and calling this function will throw an
+   * the  sum of n_first_dofs() and n_second_dofs(). If
+   * DoFCouplingType::independent is used, you should call first_dof_indices()
+   * or second_dof_indices() instead, and calling this function will throw an
    * exception.
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
@@ -937,24 +938,24 @@ public:
    */
 
   /**
-   * Create a combined view of the left FECouplingValues object that represents
+   * Create a combined view of the first FECouplingValues object that represents
    * a view of the possibly vector-valued finite element. The concept of views
    * is explained in the documentation of the namespace FEValuesViews.
    */
   template <typename Extractor>
   const FEValuesViews::RenumberedView<
     typename FEValuesViews::View<dim1, spacedim, Extractor>>
-  operator[](const LeftCoupling<Extractor> &extractor) const;
+  operator[](const FirstCoupling<Extractor> &extractor) const;
 
   /**
-   * Create a combined view of the right FECouplingValues object that represents
-   * a view of the possibly vector-valued finite element. The concept of views
-   * is explained in the documentation of the namespace FEValuesViews.
+   * Create a combined view of the second FECouplingValues object that
+   * represents a view of the possibly vector-valued finite element. The concept
+   * of views is explained in the documentation of the namespace FEValuesViews.
    */
   template <typename Extractor>
   const FEValuesViews::RenumberedView<
     typename FEValuesViews::View<dim2, spacedim, Extractor>>
-  operator[](const RightCoupling<Extractor> &extractor) const;
+  operator[](const SecondCoupling<Extractor> &extractor) const;
 
   /**
    * @}
@@ -963,24 +964,24 @@ public:
   /**
    * Return the number of coupling DoF indices. If DoFCouplingType::independent
    * is used, this function returns numbers::invalid_unsigned_int, otherwise it
-   * returns the sum of n_left_dofs() and n_right_dofs().
+   * returns the sum of n_first_dofs() and n_second_dofs().
    */
   unsigned int
   n_coupling_dofs() const;
 
   /**
-   * Return the number of left DoF indices. This generally coincides with
-   * n_dofs_per_cell of the left FEValuesBase object.
+   * Return the number of first DoF indices. This generally coincides with
+   * n_dofs_per_cell of the first FEValuesBase object.
    */
   unsigned int
-  n_left_dofs() const;
+  n_first_dofs() const;
 
   /**
-   * Return the number of right DoF indices. This generally coincides with
-   * n_dofs_per_cell of the right FEValuesBase object.
+   * Return the number of second DoF indices. This generally coincides with
+   * n_dofs_per_cell of the second FEValuesBase object.
    */
   unsigned int
-  n_right_dofs() const;
+  n_second_dofs() const;
 
   /**
    * Return the number of quadrature points.
@@ -1000,24 +1001,24 @@ private:
   QuadratureCouplingType quadrature_coupling_type;
 
   /**
-   * Pointer to left FEValuesBase object.
+   * Pointer to first FEValuesBase object.
    */
-  SmartPointer<const FEValuesBase<dim1, spacedim>> left_fe_values;
+  SmartPointer<const FEValuesBase<dim1, spacedim>> first_fe_values;
 
   /**
-   * Pointer to right FEValuesBase object.
+   * Pointer to second FEValuesBase object.
    */
-  SmartPointer<const FEValuesBase<dim2, spacedim>> right_fe_values;
+  SmartPointer<const FEValuesBase<dim2, spacedim>> second_fe_values;
 
   /**
-   * Renumbering data for the left FEValuesBase object.
+   * Renumbering data for the first FEValuesBase object.
    */
-  FEValuesViews::RenumberingData left_renumbering_data;
+  FEValuesViews::RenumberingData first_renumbering_data;
 
   /**
-   * Renumbering data for the right FEValuesBase object.
+   * Renumbering data for the second FEValuesBase object.
    */
-  FEValuesViews::RenumberingData right_renumbering_data;
+  FEValuesViews::RenumberingData second_renumbering_data;
 
   /**
    * Number of quadrature points.
@@ -1026,8 +1027,8 @@ private:
 
   /**
    * Number of coupling DoF indices. If DoFCouplingType::independent is used,
-   * this is numbers::invalid_unsigned_int, while it is n_left_dofs() +
-   * n_right_dofs() in the the case of DoFCouplingType::contiguous.
+   * this is numbers::invalid_unsigned_int, while it is n_first_dofs() +
+   * n_second_dofs() in the the case of DoFCouplingType::contiguous.
    */
   unsigned int n_coupling_dofs_;
 };
@@ -1266,8 +1267,8 @@ FECouplingValues<dim1, dim2, spacedim>::get_coupling_dof_indices(
   const int                                   dofs_offset_1,
   const int                                   dofs_offset_2) const
 {
-  AssertDimension(dof_indices_1.size(), left_fe_values->dofs_per_cell);
-  AssertDimension(dof_indices_2.size(), right_fe_values->dofs_per_cell);
+  AssertDimension(dof_indices_1.size(), first_fe_values->dofs_per_cell);
+  AssertDimension(dof_indices_2.size(), second_fe_values->dofs_per_cell);
 
   std::vector<types::global_dof_index> coupling_dof_indices(
     dof_indices_1.size() + dof_indices_2.size());
@@ -1283,8 +1284,8 @@ FECouplingValues<dim1, dim2, spacedim>::get_coupling_dof_indices(
 
 template <int dim1, int dim2, int spacedim>
 FECouplingValues<dim1, dim2, spacedim>::FECouplingValues()
-  : left_fe_values(nullptr)
-  , right_fe_values(nullptr)
+  : first_fe_values(nullptr)
+  , second_fe_values(nullptr)
   , quadrature_coupling_type(QuadratureCouplingType::unrolled)
   , n_quadrature_points_(0)
   , n_coupling_dofs_(numbers::invalid_unsigned_int)
@@ -1312,23 +1313,23 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
   const DoFCouplingType              &dof_coupling_type,
   const QuadratureCouplingType       &quadrature_coupling_type)
 {
-  left_fe_values                 = &fe_values_1;
-  right_fe_values                = &fe_values_2;
+  first_fe_values                = &fe_values_1;
+  second_fe_values               = &fe_values_2;
   this->dof_coupling_type        = dof_coupling_type;
   this->quadrature_coupling_type = quadrature_coupling_type;
 
   // Store the number of inner dofs and quadrature points
-  left_renumbering_data.n_inner_dofs  = left_fe_values->dofs_per_cell;
-  right_renumbering_data.n_inner_dofs = right_fe_values->dofs_per_cell;
+  first_renumbering_data.n_inner_dofs  = first_fe_values->dofs_per_cell;
+  second_renumbering_data.n_inner_dofs = second_fe_values->dofs_per_cell;
 
-  left_renumbering_data.n_inner_quadrature_points =
-    left_fe_values->n_quadrature_points;
-  right_renumbering_data.n_inner_quadrature_points =
-    right_fe_values->n_quadrature_points;
+  first_renumbering_data.n_inner_quadrature_points =
+    first_fe_values->n_quadrature_points;
+  second_renumbering_data.n_inner_quadrature_points =
+    second_fe_values->n_quadrature_points;
 
   // Compute the dof renumbering
-  auto &dofs_map_0 = left_renumbering_data.dof_renumbering;
-  auto &dofs_map_1 = right_renumbering_data.dof_renumbering;
+  auto &dofs_map_0 = first_renumbering_data.dof_renumbering;
+  auto &dofs_map_1 = second_renumbering_data.dof_renumbering;
 
   switch (dof_coupling_type)
     {
@@ -1337,8 +1338,8 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
           n_coupling_dofs_ = numbers::invalid_unsigned_int;
           dofs_map_0.clear();
           dofs_map_1.clear();
-          left_renumbering_data.n_dofs  = left_fe_values->dofs_per_cell;
-          right_renumbering_data.n_dofs = right_fe_values->dofs_per_cell;
+          first_renumbering_data.n_dofs  = first_fe_values->dofs_per_cell;
+          second_renumbering_data.n_dofs = second_fe_values->dofs_per_cell;
           break;
         }
       case DoFCouplingType::contiguous:
@@ -1346,8 +1347,8 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
           n_coupling_dofs_ =
             fe_values_1.dofs_per_cell + fe_values_2.dofs_per_cell;
 
-          left_renumbering_data.n_dofs  = n_coupling_dofs_;
-          right_renumbering_data.n_dofs = n_coupling_dofs_;
+          first_renumbering_data.n_dofs  = n_coupling_dofs_;
+          second_renumbering_data.n_dofs = n_coupling_dofs_;
 
           dofs_map_0.resize(n_coupling_dofs_);
           dofs_map_1.resize(n_coupling_dofs_);
@@ -1363,7 +1364,7 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
               dofs_map_0[idx]   = numbers::invalid_unsigned_int;
               dofs_map_1[idx++] = i;
             }
-          // Make sure we have the right number of dofs
+          // Make sure we have the second number of dofs
           AssertDimension(idx, n_coupling_dofs_);
           break;
         }
@@ -1371,8 +1372,8 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
         AssertThrow(false, ExcNotImplemented());
     }
   // Compute the quadrature map
-  auto &quad_map_0 = left_renumbering_data.quadrature_renumbering;
-  auto &quad_map_1 = right_renumbering_data.quadrature_renumbering;
+  auto &quad_map_0 = first_renumbering_data.quadrature_renumbering;
+  auto &quad_map_1 = second_renumbering_data.quadrature_renumbering;
   switch (quadrature_coupling_type)
     {
       case QuadratureCouplingType::tensor_product:
@@ -1383,8 +1384,8 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
           n_quadrature_points_ =
             quadrature_points_1.size() * quadrature_points_2.size();
 
-          left_renumbering_data.n_quadrature_points  = n_quadrature_points_;
-          right_renumbering_data.n_quadrature_points = n_quadrature_points_;
+          first_renumbering_data.n_quadrature_points  = n_quadrature_points_;
+          second_renumbering_data.n_quadrature_points = n_quadrature_points_;
 
           quad_map_0.resize(n_quadrature_points_);
           quad_map_1.resize(n_quadrature_points_);
@@ -1408,8 +1409,8 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
 
           n_quadrature_points_ = fe_values_1.get_quadrature_points().size();
 
-          left_renumbering_data.n_quadrature_points  = n_quadrature_points_;
-          right_renumbering_data.n_quadrature_points = n_quadrature_points_;
+          first_renumbering_data.n_quadrature_points  = n_quadrature_points_;
+          second_renumbering_data.n_quadrature_points = n_quadrature_points_;
 
           quad_map_0.clear();
           quad_map_1.clear();
@@ -1436,8 +1437,8 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
 
           n_quadrature_points_ = fe_values_1.get_quadrature_points().size();
 
-          left_renumbering_data.n_quadrature_points  = n_quadrature_points_;
-          right_renumbering_data.n_quadrature_points = n_quadrature_points_;
+          first_renumbering_data.n_quadrature_points  = n_quadrature_points_;
+          second_renumbering_data.n_quadrature_points = n_quadrature_points_;
 
           quad_map_0.clear();
           quad_map_1.clear();
@@ -1455,8 +1456,8 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
 
           n_quadrature_points_ = fe_values_1.get_quadrature_points().size();
 
-          left_renumbering_data.n_quadrature_points  = n_quadrature_points_;
-          right_renumbering_data.n_quadrature_points = n_quadrature_points_;
+          first_renumbering_data.n_quadrature_points  = n_quadrature_points_;
+          second_renumbering_data.n_quadrature_points = n_quadrature_points_;
 
           // The first is the id. The second is renumbered.
           quad_map_0.clear();
@@ -1502,8 +1503,8 @@ FECouplingValues<dim1, dim2, spacedim>::reinit(
             }
           n_quadrature_points_ = quad_map_0.size();
 
-          left_renumbering_data.n_quadrature_points  = n_quadrature_points_;
-          right_renumbering_data.n_quadrature_points = n_quadrature_points_;
+          first_renumbering_data.n_quadrature_points  = n_quadrature_points_;
+          second_renumbering_data.n_quadrature_points = n_quadrature_points_;
           break;
         }
       default:
@@ -1518,18 +1519,18 @@ FECouplingValues<dim1, dim2, spacedim>::JxW(const unsigned int q) const
 {
   AssertIndexRange(q, n_quadrature_points_);
 
-  const auto left_q  = left_renumbering_data.quadrature_renumbering.empty() ?
-                         q :
-                         left_renumbering_data.quadrature_renumbering[q];
-  const auto right_q = right_renumbering_data.quadrature_renumbering.empty() ?
-                         q :
-                         right_renumbering_data.quadrature_renumbering[q];
+  const auto first_q  = first_renumbering_data.quadrature_renumbering.empty() ?
+                          q :
+                          first_renumbering_data.quadrature_renumbering[q];
+  const auto second_q = second_renumbering_data.quadrature_renumbering.empty() ?
+                          q :
+                          second_renumbering_data.quadrature_renumbering[q];
 
   if (quadrature_coupling_type == QuadratureCouplingType::tensor_product ||
       quadrature_coupling_type == QuadratureCouplingType::unrolled)
-    return left_fe_values->JxW(left_q) * right_fe_values->JxW(right_q);
+    return first_fe_values->JxW(first_q) * second_fe_values->JxW(second_q);
   else
-    return left_fe_values->JxW(left_q);
+    return first_fe_values->JxW(first_q);
 }
 
 
@@ -1557,18 +1558,18 @@ FECouplingValues<dim1, dim2, spacedim>::coupling_dof_indices() const
 
 template <int dim1, int dim2, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-FECouplingValues<dim1, dim2, spacedim>::left_dof_indices() const
+FECouplingValues<dim1, dim2, spacedim>::first_dof_indices() const
 {
-  return {0U, n_left_dofs()};
+  return {0U, n_first_dofs()};
 }
 
 
 
 template <int dim1, int dim2, int spacedim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-FECouplingValues<dim1, dim2, spacedim>::right_dof_indices() const
+FECouplingValues<dim1, dim2, spacedim>::second_dof_indices() const
 {
-  return {0U, n_right_dofs()};
+  return {0U, n_second_dofs()};
 }
 
 
@@ -1587,18 +1588,18 @@ FECouplingValues<dim1, dim2, spacedim>::n_coupling_dofs() const
 
 template <int dim1, int dim2, int spacedim>
 inline unsigned int
-FECouplingValues<dim1, dim2, spacedim>::n_left_dofs() const
+FECouplingValues<dim1, dim2, spacedim>::n_first_dofs() const
 {
-  return left_renumbering_data.n_dofs;
+  return first_renumbering_data.n_dofs;
 }
 
 
 
 template <int dim1, int dim2, int spacedim>
 inline unsigned int
-FECouplingValues<dim1, dim2, spacedim>::n_right_dofs() const
+FECouplingValues<dim1, dim2, spacedim>::n_second_dofs() const
 {
-  return right_renumbering_data.n_dofs;
+  return second_renumbering_data.n_dofs;
 }
 
 
@@ -1618,17 +1619,17 @@ FECouplingValues<dim1, dim2, spacedim>::quadrature_point(
   const unsigned int quadrature_point) const
 {
   AssertIndexRange(quadrature_point, n_quadrature_points_);
-  auto left_q = left_fe_values->quadrature_point(
-    left_renumbering_data.quadrature_renumbering.empty() ?
+  auto first_q = first_fe_values->quadrature_point(
+    first_renumbering_data.quadrature_renumbering.empty() ?
       quadrature_point :
-      left_renumbering_data.quadrature_renumbering[quadrature_point]);
+      first_renumbering_data.quadrature_renumbering[quadrature_point]);
 
-  auto right_q = right_fe_values->quadrature_point(
-    right_renumbering_data.quadrature_renumbering.empty() ?
+  auto second_q = second_fe_values->quadrature_point(
+    second_renumbering_data.quadrature_renumbering.empty() ?
       quadrature_point :
-      right_renumbering_data.quadrature_renumbering[quadrature_point]);
+      second_renumbering_data.quadrature_renumbering[quadrature_point]);
 
-  return {left_q, right_q};
+  return {first_q, second_q};
 }
 
 
@@ -1640,16 +1641,16 @@ FECouplingValues<dim1, dim2, spacedim>::
     const unsigned int quadrature_point) const
 {
   AssertIndexRange(quadrature_point, n_quadrature_points_);
-  const auto left_id =
-    left_renumbering_data.quadrature_renumbering.empty() ?
+  const auto first_id =
+    first_renumbering_data.quadrature_renumbering.empty() ?
       quadrature_point :
-      left_renumbering_data.quadrature_renumbering[quadrature_point];
+      first_renumbering_data.quadrature_renumbering[quadrature_point];
 
-  const auto right_id =
-    right_renumbering_data.quadrature_renumbering.empty() ?
+  const auto second_id =
+    second_renumbering_data.quadrature_renumbering.empty() ?
       quadrature_point :
-      right_renumbering_data.quadrature_renumbering[quadrature_point];
-  return {left_id, right_id};
+      second_renumbering_data.quadrature_renumbering[quadrature_point];
+  return {first_id, second_id};
 }
 
 
@@ -1660,16 +1661,16 @@ FECouplingValues<dim1, dim2, spacedim>::coupling_dof_to_dof_indices(
   const unsigned int coupling_dof_index) const
 {
   AssertIndexRange(coupling_dof_index, n_coupling_dofs_);
-  const auto left_id =
-    left_renumbering_data.dof_renumbering.empty() ?
+  const auto first_id =
+    first_renumbering_data.dof_renumbering.empty() ?
       coupling_dof_index :
-      left_renumbering_data.dof_renumbering[coupling_dof_index];
+      first_renumbering_data.dof_renumbering[coupling_dof_index];
 
-  const auto right_id =
-    right_renumbering_data.dof_renumbering.empty() ?
+  const auto second_id =
+    second_renumbering_data.dof_renumbering.empty() ?
       coupling_dof_index :
-      right_renumbering_data.dof_renumbering[coupling_dof_index];
-  return {left_id, right_id};
+      second_renumbering_data.dof_renumbering[coupling_dof_index];
+  return {first_id, second_id};
 }
 
 
@@ -1677,22 +1678,23 @@ FECouplingValues<dim1, dim2, spacedim>::coupling_dof_to_dof_indices(
 template <int dim1, int dim2, int spacedim>
 template <typename Extractor>
 inline const typename FECouplingValues<dim1, dim2, spacedim>::
-  template LeftCoupling<Extractor>
-  FECouplingValues<dim1, dim2, spacedim>::left(const Extractor &extractor) const
-{
-  return LeftCoupling<Extractor>(extractor);
-}
-
-
-
-template <int dim1, int dim2, int spacedim>
-template <typename Extractor>
-inline const typename FECouplingValues<dim1, dim2, spacedim>::
-  template RightCoupling<Extractor>
-  FECouplingValues<dim1, dim2, spacedim>::right(
+  template FirstCoupling<Extractor>
+  FECouplingValues<dim1, dim2, spacedim>::first(
     const Extractor &extractor) const
 {
-  return RightCoupling<Extractor>(extractor);
+  return FirstCoupling<Extractor>(extractor);
+}
+
+
+
+template <int dim1, int dim2, int spacedim>
+template <typename Extractor>
+inline const typename FECouplingValues<dim1, dim2, spacedim>::
+  template SecondCoupling<Extractor>
+  FECouplingValues<dim1, dim2, spacedim>::second(
+    const Extractor &extractor) const
+{
+  return SecondCoupling<Extractor>(extractor);
 }
 
 
@@ -1702,11 +1704,11 @@ template <typename Extractor>
 inline const FEValuesViews::RenumberedView<
   typename FEValuesViews::View<dim1, spacedim, Extractor>>
 FECouplingValues<dim1, dim2, spacedim>::operator[](
-  const LeftCoupling<Extractor> &extractor) const
+  const FirstCoupling<Extractor> &extractor) const
 {
   return FEValuesViews::RenumberedView<
     typename FEValuesViews::View<dim1, spacedim, Extractor>>(
-    (*left_fe_values)[extractor.extractor], left_renumbering_data);
+    (*first_fe_values)[extractor.extractor], first_renumbering_data);
 }
 
 
@@ -1716,11 +1718,11 @@ template <typename Extractor>
 inline const FEValuesViews::RenumberedView<
   typename FEValuesViews::View<dim2, spacedim, Extractor>>
 FECouplingValues<dim1, dim2, spacedim>::operator[](
-  const RightCoupling<Extractor> &extractor) const
+  const SecondCoupling<Extractor> &extractor) const
 {
   return FEValuesViews::RenumberedView<
     typename FEValuesViews::View<dim2, spacedim, Extractor>>(
-    (*right_fe_values)[extractor.extractor], right_renumbering_data);
+    (*second_fe_values)[extractor.extractor], second_renumbering_data);
 }
 
 #endif // DOXYGEN

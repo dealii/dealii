@@ -118,8 +118,8 @@ main()
   FullMatrix<double> matrix(fcv.n_coupling_dofs(), fcv.n_coupling_dofs());
   FEValuesExtractors::Scalar scalar(0);
 
-  const auto left  = fcv.left(scalar);
-  const auto right = fcv.right(scalar);
+  const auto first  = fcv.first(scalar);
+  const auto second = fcv.second(scalar);
 
   // We need to loop over all the coupling quadrature points
   for (const auto q : fcv.quadrature_point_indices())
@@ -127,16 +127,16 @@ main()
       const auto &[x, y] = fcv.quadrature_point(q);
       for (const auto i : fcv.coupling_dof_indices())
         {
-          const auto &lvi       = fcv[left].value(i, q);
-          const auto &rvi       = fcv[right].value(i, q);
+          const auto &lvi       = fcv[first].value(i, q);
+          const auto &rvi       = fcv[second].value(i, q);
           const auto  jump_i    = lvi - rvi;
           const auto &jump_ifiv = fiv[scalar].jump_in_values(i, q);
 
 
           for (const auto j : fcv.coupling_dof_indices())
             {
-              const auto &lvj = fcv[left].value(j, q);
-              const auto &rvj = fcv[right].value(j, q);
+              const auto &lvj = fcv[first].value(j, q);
+              const auto &rvj = fcv[second].value(j, q);
 
               const auto  jump_j    = lvj - rvj;
               const auto &jump_jfiv = fiv[scalar].jump_in_values(j, q);
