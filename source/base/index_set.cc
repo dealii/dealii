@@ -520,6 +520,13 @@ IndexSet::add_indices(const IndexSet &other, const size_type offset)
 bool
 IndexSet::is_subset_of(const IndexSet &other) const
 {
+  Assert(size() == other.size(),
+         ExcMessage("One index set can only be a subset of another if they "
+                    "describe index spaces of the same size. The ones in "
+                    "question here have sizes " +
+                    std::to_string(size()) + " and " +
+                    std::to_string(other.size()) + "."));
+
   // See whether there are indices in the current set that are not in 'other'.
   // If so, then this is clearly not a subset of 'other'.
   IndexSet A_minus_B = *this;
