@@ -26,7 +26,7 @@ author.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="900-901-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -41,13 +41,13 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="900-901-general"></a>
 <h3>General</h3>
 
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="900-901-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>

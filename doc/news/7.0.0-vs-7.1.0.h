@@ -22,7 +22,7 @@ All entries are signed with the names of the author.
 </p>
 
 
-<a name="incompatible"></a>
+<a name="700-710-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -113,7 +113,7 @@ changed to use std_cxx1x::_1, std_cxx1x::_2, etc from now on.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="700-710-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -342,7 +342,7 @@ and DoF handlers embedded in higher dimensional space have been added.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="700-710-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>

@@ -20,7 +20,7 @@ and the p4est library installed. The installation of deal.II together with
 these additional libraries is described in the <a href="../../readme.html"
 target="body">README</a> file.
 
-<a name="Intro"></a>
+<a name="step-55-Intro"></a>
 <h1>Introduction</h1>
 
 Building on step-40, this tutorial shows how to solve linear PDEs with several

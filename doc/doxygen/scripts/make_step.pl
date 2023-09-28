@@ -51,29 +51,29 @@ print
 <tr><th colspan=\"2\"><b><small>Table of contents</small></b></th></tr>
 <tr><td width=\"50%\" valign=\"top\">
 <ol>
-  <li> <a href=\"#Intro\" class=bold>Introduction</a>
+  <li> <a href=\"#$step-Intro\" class=bold>Introduction</a>
 ";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc.pl", "$cmake_source_dir/examples/$step/doc/intro.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc.pl", "$cmake_source_dir/examples/$step/doc/intro.dox" , "--prefix=$step";
 
-print "  <li> <a href=\"#CommProg\" class=bold>The commented program</a>\n";
+print "  <li> <a href=\"#$step-CommProg\" class=bold>The commented program</a>\n";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2toc.pl", "$cmake_source_dir/examples/$step/$step.cc";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2toc.pl", "$cmake_source_dir/examples/$step/$step.cc" , "--prefix=$step";
 
 print
 "</ol></td><td width=\"50%\" valign=\"top\"><ol>
-  <li value=\"3\"> <a href=\"#Results\" class=bold>Results</a>
+  <li value=\"3\"> <a href=\"#$step-Results\" class=bold>Results</a>
 ";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc.pl", "$cmake_source_dir/examples/$step/doc/results.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc.pl", "$cmake_source_dir/examples/$step/doc/results.dox" , "--prefix=$step";
 
 print
-"  <li> <a href=\"#PlainProg\" class=bold>The plain program</a>
+"  <li> <a href=\"#$step-PlainProg\" class=bold>The plain program</a>
 </ol> </td> </tr> </table>
 \@endhtmlonly
 ";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_source_dir/examples/$step/doc/intro.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_source_dir/examples/$step/doc/intro.dox" , "--prefix=$step";
 
 
 # Start the commented program by writing two empty lines. We have had
@@ -87,12 +87,12 @@ system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_s
 # solves the problem -- so a second newline character.
 print " *\n";
 print " *\n";
-print " * <a name=\"CommProg\"></a>\n";
+print " * <a name=\"$step-CommProg\"></a>\n";
 print " * <h1> The commented program</h1>\n";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen.pl", "$cmake_source_dir/examples/$step/$step.cc";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen.pl", "$cmake_source_dir/examples/$step/$step.cc" , "--prefix=$step";
 
-system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_source_dir/examples/$step/doc/results.dox";
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_source_dir/examples/$step/doc/results.dox" , "--prefix=$step";
 
 
 # Move to the stripped, plain program. The same principle as above
@@ -100,7 +100,7 @@ system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors.pl", "$cmake_s
 print " *\n";
 print " *\n";
 print
-"<a name=\"PlainProg\"></a>
+"<a name=\"$step-PlainProg\"></a>
 <h1> The plain program</h1>
 \@include \"$step.cc\"
 */

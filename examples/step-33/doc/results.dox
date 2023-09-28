@@ -1,4 +1,4 @@
-<a name="Results"></a>
+<a name="step-33-Results"></a>
 <h1>Results</h1>
 
 We run the problem with the mesh <code>slide.inp</code> (this file is in the
@@ -219,7 +219,7 @@ refinement scheme discussed above.
 
 
 
-<a name="extensions"></a>
+<a name="step-33-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 <h4>Stabilization</h4>

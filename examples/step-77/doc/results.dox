@@ -177,7 +177,7 @@ The key takeaway messages of this program are the following:
   that determine when we need to rebuild this information.
 
 
-<a name="extensions"></a>
+<a name="step-77-extensions"></a>
 <h3> Possibilities for extensions </h3>
 
 <h4> Better linear solvers </h4>

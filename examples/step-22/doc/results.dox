@@ -1,4 +1,4 @@
-<a name="Results"></a>
+<a name="step-22-Results"></a>
 <h1>Results</h1>
 
 <h3>Output of the program and graphical visualization</h3>
@@ -280,7 +280,7 @@ is not a good choice in 3D - a full decomposition needs many new entries that
 
 <h3>Possibilities for extensions</h3>
 
-<a name="improved-solver">
+<a name="step-22-improved-solver">
 <h4>Improved linear solver in 3D</h4>
 </a>
 
@@ -318,7 +318,7 @@ size. Either way, we will introduce below a number of improvements to the
 linear solver, a discussion that we will re-consider again with additional
 options in the step-31 program.
 
-<a name="improved-ilu">
+<a name="step-22-improved-ilu">
 <h5>Better ILU decomposition by smart reordering</h5>
 </a>
 A first attempt to improve the speed of the linear solution process is to choose
@@ -346,7 +346,7 @@ mesh-independent number of iterations, say 10 to 30. We have seen such a
 candidate in step-16: multigrid.
 
 <h5>Block Schur complement preconditioner</h5>
-<a name="block-schur"></a>
+<a name="step-22-block-schur"></a>
 Even with a good preconditioner for $A$, we still
 need to solve of the same linear system repeatedly (with different
 right hand sides, though) in order to make the Schur complement solve

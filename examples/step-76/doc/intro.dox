@@ -19,7 +19,7 @@ element implementations with hybrid parallelization and improved data locality"
 within the KONWIHR program.
 </i>
 
-<a name="Intro"></a>
+<a name="step-76-Intro"></a>
 <h1>Introduction</h1>
 
 This tutorial program solves the Euler equations of fluid dynamics, using an

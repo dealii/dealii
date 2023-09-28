@@ -5,10 +5,10 @@ This program grew out of a student project by Abner Salgado at Texas A&M
 University. Most of the work for this program is by him.
 </i>
 
-<a name="Intro"></a>
+<a name="step-35-Intro"></a>
 <h1> Introduction </h1>
 
-<a name="Motivation"></a>
+<a name="step-35-Motivation"></a>
 <h3> Motivation </h3>
 The purpose of this program is to show how to effectively solve the incompressible time-dependent
 Navier-Stokes equations. These equations describe the flow of a viscous incompressible fluid and read
@@ -52,7 +52,7 @@ Schur complement is proportional to $\tau^{-2}$. This makes the system very
 difficult to solve, and means that for the Navier-Stokes equations, this is
 not a useful avenue to the solution.
 
-<a name="Projection"></a>
+<a name="step-35-Projection"></a>
 <h3> Projection methods </h3>
 
 Rather, we need to come up with a different approach to solve the time-dependent Navier-Stokes

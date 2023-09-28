@@ -25,7 +25,7 @@ All entries are signed with the names of the authors.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="730-800-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -80,7 +80,7 @@ this function.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="730-800-general"></a>
 <h3>General</h3>
 
 
@@ -173,7 +173,7 @@ this function.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="730-800-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>

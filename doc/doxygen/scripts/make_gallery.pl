@@ -163,7 +163,7 @@ foreach my $file (@src_files)
         print "<a name=\"ann-$file\"></a>\n";
         print "<h1>Annotated version of $file</h1>\n";
 
-        system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen.pl", "$gallery_dir/$file";
+        system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen.pl", "$gallery_dir/$file" , "--prefix=$file";
 
         print "\n\n";
     }

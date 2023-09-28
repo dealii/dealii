@@ -97,7 +97,7 @@ it appears to break up and reassemble, rather than just oscillate.
 <img src="https://www.dealii.org/images/steps/developer/step-25.2d-pseudobreather.gif" alt="Animation of a 2D pseudobreather.">
 
 
-<a name="extensions"></a>
+<a name="step-25-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 It is instructive to change the initial conditions. Most choices will not lead

@@ -23,7 +23,7 @@ author.
 </p>
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="933-940-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -452,7 +452,7 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="933-940-general"></a>
 <h3>General</h3>
 <ol>
 
@@ -612,7 +612,7 @@ inconvenience this causes.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="933-940-specific"></a>
 <h3>Specific improvements</h3>
 <ol>
 

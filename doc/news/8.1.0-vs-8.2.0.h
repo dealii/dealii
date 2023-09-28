@@ -26,7 +26,7 @@ authors.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="810-820-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -114,7 +114,7 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="810-820-general"></a>
 <h3>General</h3>
 
 
@@ -336,7 +336,7 @@ inconvenience this causes.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="810-820-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>

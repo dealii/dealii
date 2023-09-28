@@ -13,7 +13,7 @@ California Institute of Technology.
 
 
 
-<a name="Intro"></a>
+<a name="step-22-Intro"></a>
 <h1>Introduction</h1>
 
 This program deals with the Stokes system of equations which reads as
@@ -823,7 +823,7 @@ MatrixTools::apply_boundary_values for implementing Dirichlet boundary
 conditions.
 
 
-<a name="constraint-matrix">
+<a name="step-22-constraint-matrix">
 <h4>Using AffineConstraints for increasing performance</h4>
 </a>
 

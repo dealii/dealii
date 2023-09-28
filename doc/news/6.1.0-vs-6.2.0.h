@@ -31,7 +31,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 </p>
 
 
-<a name="incompatible"></a>
+<a name="610-620-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -178,7 +178,7 @@ inconvenience this causes.
 </ol>
 
 
-<a name="general"></a>
+<a name="610-620-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -453,7 +453,7 @@ inconvenience this causes.
 
 
 
-<a name="base"></a>
+<a name="610-620-base"></a>
 <h3>base</h3>
 
 <ol>
@@ -637,7 +637,7 @@ inconvenience this causes.
 
 
 
-<a name="lac"></a>
+<a name="610-620-lac"></a>
 <h3>lac</h3>
 
 <ol>
@@ -853,7 +853,7 @@ inconvenience this causes.
 
 
 
-<a name="deal.II"></a>
+<a name="610-620-deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>

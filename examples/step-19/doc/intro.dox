@@ -13,7 +13,7 @@ awards DMS-1821210, EAR-1550901, and OAC-1835673.
   the publication @cite GLHPW2018 if you use particle functionality in your
   own work.
 
-<a name="Intro"></a>
+<a name="step-19-Intro"></a>
 <h1>Introduction</h1>
 
 The finite element method in general, and deal.II in particular, were invented

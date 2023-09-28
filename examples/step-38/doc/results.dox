@@ -53,7 +53,7 @@ as the curve moves from one quadrant of the domain into the adjacent one):
 <img src="https://www.dealii.org/images/steps/developer/step-38.solution-2d.png" alt="">
 
 
-<a name="extensions"></a>
+<a name="step-38-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 Computing on surfaces only becomes interesting if the surface is more

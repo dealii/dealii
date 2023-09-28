@@ -18,6 +18,9 @@
 # license information, if the file is a step-xx.cc tutorial. Here, xx
 # is either a number like step-32 or a number plus a letter like step-12b.
 # Don't skip for other files such as code-gallery files
+use Getopt::Long;
+GetOptions("prefix:s" => \$prefix);
+
 if ($ARGV[0] =~ /step-\d+[a-z]?.cc/)
 {
   $_ = <>;
@@ -101,7 +104,7 @@ do {
            # everything except for letters, numbers, and underscores
            $sect_name =~ s/[^a-zA-Z0-9_]//g;
 
-           $_ = "\n * <a name=\"$sect_name\"></a> \n * $_";
+           $_ = "\n * <a name=\"$prefix-$sect_name\"></a> \n * $_";
         }
 
         # finally print this line

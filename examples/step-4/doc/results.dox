@@ -100,7 +100,7 @@ wants to see, but no more.
 
 
 
-<a name="postprocessing"></a>
+<a name="step-4-postprocessing"></a>
 <h3> Postprocessing: What to do with the solution? </h3>
 
 This tutorial -- like most of the other programs -- principally only shows how
@@ -308,7 +308,7 @@ should expect (and obtain!) a negative value.
 
 
 
-<a name="extensions"></a>
+<a name="step-4-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 There are many ways with which one can play with this program. The simpler
