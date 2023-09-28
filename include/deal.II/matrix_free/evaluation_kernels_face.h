@@ -562,7 +562,7 @@ namespace internal
 
       using Eval = EvaluatorTensorProduct<evaluate_evenodd,
                                           dim - 1,
-                                          fe_degree,
+                                          (fe_degree > 0 ? fe_degree : 0),
                                           n_q_points_1d,
                                           Number,
                                           Number2>;
