@@ -50,7 +50,7 @@ RUN cd /usr/src && \
     -DDEAL_II_WITH_VTK=ON \
     -DDEAL_II_WITH_ZLIB=ON \
     .. \
-    && ninja -j 2 install \
+    && ninja -j 1 install \
     && cd ../ && rm -rf .git build
 
 USER $USER
