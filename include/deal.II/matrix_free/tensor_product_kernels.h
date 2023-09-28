@@ -688,6 +688,9 @@ namespace internal
                                 int stride_in_runtime  = 0,
                                 int stride_out_runtime = 0)
   {
+    static_assert(n_rows_static >= 0 && n_columns_static >= 0,
+                  "Negative loop ranges are not allowed!");
+
     const int n_rows = n_rows_static == 0 ? n_rows_runtime : n_rows_static;
     const int n_columns =
       n_rows_static == 0 ? n_columns_runtime : n_columns_static;
@@ -703,19 +706,20 @@ namespace internal
 
     const int mm     = transpose_matrix ? n_rows : n_columns,
               nn     = transpose_matrix ? n_columns : n_rows;
-    const int n_cols = nn / 2;
-    const int mid    = mm / 2;
+    const int n_half = nn / 2;
+    const int m_half = mm / 2;
 
-    constexpr int max_mid = 16; // for non-templated execution
-    constexpr int static_mid =
-      n_rows_static == 0 ? 1 : (transpose_matrix ? n_rows : n_columns) / 2;
+    constexpr int array_length =
+      (n_rows_static == 0) ?
+        16 // for non-templated execution
+        :
+        (1 + (transpose_matrix ? n_rows_static : n_columns_static) / 2);
     const int offset = (n_columns + 1) / 2;
 
-    Assert((n_rows_static != 0 && n_columns_static != 0) || mid <= max_mid,
-           ExcNotImplemented());
+    Assert(m_half <= array_length, ExcNotImplemented());
 
-    std::array<Number, (n_rows_static != 0 ? static_mid : max_mid)> xp, xm;
-    for (int i = 0; i < mid; ++i)
+    std::array<Number, array_length> xp, xm;
+    for (int i = 0; i < m_half; ++i)
       {
         if (transpose_matrix == true && quantity == EvaluatorQuantity::gradient)
           {
@@ -728,11 +732,11 @@ namespace internal
             xm[i] = in[stride_in * i] - in[stride_in * (mm - 1 - i)];
           }
       }
-    Number xmid = in[stride_in * mid];
-    for (int col = 0; col < n_cols; ++col)
+    Number xmid = in[stride_in * m_half];
+    for (int col = 0; col < n_half; ++col)
       {
         Number r0, r1;
-        if (mid > 0)
+        if (m_half > 0)
           {
             if (transpose_matrix == true)
               {
@@ -744,7 +748,7 @@ namespace internal
                 r0 = matrix[col * offset] * xp[0];
                 r1 = matrix[(n_rows - 1 - col) * offset] * xm[0];
               }
-            for (int ind = 1; ind < mid; ++ind)
+            for (int ind = 1; ind < m_half; ++ind)
               {
                 if (transpose_matrix == true)
                   {
@@ -763,14 +767,14 @@ namespace internal
         if (mm % 2 == 1 && transpose_matrix == true)
           {
             if (quantity == EvaluatorQuantity::gradient)
-              r1 += matrix[mid * offset + col] * xmid;
+              r1 += matrix[m_half * offset + col] * xmid;
             else
-              r0 += matrix[mid * offset + col] * xmid;
+              r0 += matrix[m_half * offset + col] * xmid;
           }
         else if (mm % 2 == 1 &&
                  (nn % 2 == 0 || quantity != EvaluatorQuantity::value ||
                   mm == 3))
-          r0 += matrix[col * offset + mid] * xmid;
+          r0 += matrix[col * offset + m_half] * xmid;
 
         if (add)
           {
@@ -795,57 +799,57 @@ namespace internal
         nn % 2 == 1 && mm % 2 == 1 && mm > 3)
       {
         if (add)
-          out[stride_out * n_cols] += matrix[mid * offset + n_cols] * xmid;
+          out[stride_out * n_half] += matrix[m_half * offset + n_half] * xmid;
         else
-          out[stride_out * n_cols] = matrix[mid * offset + n_cols] * xmid;
+          out[stride_out * n_half] = matrix[m_half * offset + n_half] * xmid;
       }
     else if (transpose_matrix == true && nn % 2 == 1)
       {
         Number r0;
-        if (mid > 0)
+        if (m_half > 0)
           {
-            r0 = matrix[n_cols] * xp[0];
-            for (int ind = 1; ind < mid; ++ind)
-              r0 += matrix[ind * offset + n_cols] * xp[ind];
+            r0 = matrix[n_half] * xp[0];
+            for (int ind = 1; ind < m_half; ++ind)
+              r0 += matrix[ind * offset + n_half] * xp[ind];
           }
         else
           r0 = Number();
         if (quantity != EvaluatorQuantity::gradient && mm % 2 == 1)
-          r0 += matrix[mid * offset + n_cols] * xmid;
+          r0 += matrix[m_half * offset + n_half] * xmid;
 
         if (add)
-          out[stride_out * n_cols] += r0;
+          out[stride_out * n_half] += r0;
         else
-          out[stride_out * n_cols] = r0;
+          out[stride_out * n_half] = r0;
       }
     else if (transpose_matrix == false && nn % 2 == 1)
       {
         Number r0;
-        if (mid > 0)
+        if (m_half > 0)
           {
             if (quantity == EvaluatorQuantity::gradient)
               {
-                r0 = matrix[n_cols * offset] * xm[0];
-                for (int ind = 1; ind < mid; ++ind)
-                  r0 += matrix[n_cols * offset + ind] * xm[ind];
+                r0 = matrix[n_half * offset] * xm[0];
+                for (int ind = 1; ind < m_half; ++ind)
+                  r0 += matrix[n_half * offset + ind] * xm[ind];
               }
             else
               {
-                r0 = matrix[n_cols * offset] * xp[0];
-                for (int ind = 1; ind < mid; ++ind)
-                  r0 += matrix[n_cols * offset + ind] * xp[ind];
+                r0 = matrix[n_half * offset] * xp[0];
+                for (int ind = 1; ind < m_half; ++ind)
+                  r0 += matrix[n_half * offset + ind] * xp[ind];
               }
           }
         else
           r0 = Number();
 
         if (quantity != EvaluatorQuantity::gradient && mm % 2 == 1)
-          r0 += matrix[n_cols * offset + mid] * xmid;
+          r0 += matrix[n_half * offset + m_half] * xmid;
 
         if (add)
-          out[stride_out * n_cols] += r0;
+          out[stride_out * n_half] += r0;
         else
-          out[stride_out * n_cols] = r0;
+          out[stride_out * n_half] = r0;
       }
   }
 
@@ -921,22 +925,22 @@ namespace internal
 
     constexpr int mm     = transpose_matrix ? n_rows : n_columns,
                   nn     = transpose_matrix ? n_columns : n_rows;
-    constexpr int n_cols = nn / 2;
-    constexpr int mid    = mm / 2;
+    constexpr int n_half = nn / 2;
+    constexpr int m_half = mm / 2;
 
     if (transpose_matrix)
       {
         std::array<Number, mm> x;
         for (unsigned int i = 0; i < mm; ++i)
           x[i] = in[stride_in * i];
-        for (unsigned int col = 0; col < n_cols; ++col)
+        for (unsigned int col = 0; col < n_half; ++col)
           {
             Number r0, r1;
-            if (mid > 0)
+            if (m_half > 0)
               {
                 r0 = matrix[col] * x[0];
                 r1 = matrix[col + n_columns] * x[1];
-                for (unsigned int ind = 1; ind < mid; ++ind)
+                for (unsigned int ind = 1; ind < m_half; ++ind)
                   {
                     r0 += matrix[col + 2 * ind * n_columns] * x[2 * ind];
                     r1 +=
@@ -968,27 +972,27 @@ namespace internal
           {
             Number             r0;
             const unsigned int shift = evaluate_antisymmetric ? 1 : 0;
-            if (mid > 0)
+            if (m_half > 0)
               {
-                r0 = matrix[n_cols + shift * n_columns] * x[shift];
-                for (unsigned int ind = 1; ind < mid; ++ind)
-                  r0 += matrix[n_cols + (2 * ind + shift) * n_columns] *
+                r0 = matrix[n_half + shift * n_columns] * x[shift];
+                for (unsigned int ind = 1; ind < m_half; ++ind)
+                  r0 += matrix[n_half + (2 * ind + shift) * n_columns] *
                         x[2 * ind + shift];
               }
             else
               r0 = 0;
             if (!evaluate_antisymmetric && mm % 2 == 1)
-              r0 += matrix[n_cols + (mm - 1) * n_columns] * x[mm - 1];
+              r0 += matrix[n_half + (mm - 1) * n_columns] * x[mm - 1];
             if (add)
-              out[stride_out * n_cols] += r0;
+              out[stride_out * n_half] += r0;
             else
-              out[stride_out * n_cols] = r0;
+              out[stride_out * n_half] = r0;
           }
       }
     else
       {
-        std::array<Number, mid + 1> xp, xm;
-        for (int i = 0; i < mid; ++i)
+        std::array<Number, m_half + 1> xp, xm;
+        for (int i = 0; i < m_half; ++i)
           if (!evaluate_antisymmetric)
             {
               xp[i] = in[stride_in * i] + in[stride_in * (mm - 1 - i)];
@@ -1000,15 +1004,15 @@ namespace internal
               xm[i] = in[stride_in * i] + in[stride_in * (mm - 1 - i)];
             }
         if (mm % 2 == 1)
-          xp[mid] = in[stride_in * mid];
-        for (unsigned int col = 0; col < n_cols; ++col)
+          xp[m_half] = in[stride_in * m_half];
+        for (unsigned int col = 0; col < n_half; ++col)
           {
             Number r0, r1;
-            if (mid > 0)
+            if (m_half > 0)
               {
                 r0 = matrix[2 * col * n_columns] * xp[0];
                 r1 = matrix[(2 * col + 1) * n_columns] * xm[0];
-                for (unsigned int ind = 1; ind < mid; ++ind)
+                for (unsigned int ind = 1; ind < m_half; ++ind)
                   {
                     r0 += matrix[2 * col * n_columns + ind] * xp[ind];
                     r1 += matrix[(2 * col + 1) * n_columns + ind] * xm[ind];
@@ -1019,9 +1023,9 @@ namespace internal
             if (mm % 2 == 1)
               {
                 if (evaluate_antisymmetric)
-                  r1 += matrix[(2 * col + 1) * n_columns + mid] * xp[mid];
+                  r1 += matrix[(2 * col + 1) * n_columns + m_half] * xp[m_half];
                 else
-                  r0 += matrix[2 * col * n_columns + mid] * xp[mid];
+                  r0 += matrix[2 * col * n_columns + m_half] * xp[m_half];
               }
             if (add)
               {
@@ -1037,16 +1041,16 @@ namespace internal
         if (nn % 2 == 1)
           {
             Number r0;
-            if (mid > 0)
+            if (m_half > 0)
               {
                 r0 = matrix[(nn - 1) * n_columns] * xp[0];
-                for (unsigned int ind = 1; ind < mid; ++ind)
+                for (unsigned int ind = 1; ind < m_half; ++ind)
                   r0 += matrix[(nn - 1) * n_columns + ind] * xp[ind];
               }
             else
               r0 = Number();
             if (mm % 2 == 1 && !evaluate_antisymmetric)
-              r0 += matrix[(nn - 1) * n_columns + mid] * xp[mid];
+              r0 += matrix[(nn - 1) * n_columns + m_half] * xp[m_half];
             if (add)
               out[stride_out * (nn - 1)] += r0;
             else
@@ -1743,7 +1747,7 @@ namespace internal
       static_assert(direction != normal_direction,
                     "Cannot interpolate tangentially in normal direction");
 
-      constexpr int  n_rows    = fe_degree;
+      constexpr int  n_rows    = std::max(fe_degree, 0);
       constexpr int  n_columns = n_q_points_1d;
       const Number2 *shape_data =
         symmetric_evaluate ?
