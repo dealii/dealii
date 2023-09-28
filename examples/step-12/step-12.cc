@@ -45,12 +45,12 @@
 // This header is needed for FEInterfaceValues to compute integrals on
 // interfaces:
 #include <deal.II/fe/fe_interface_values.h>
-// We are going to use the simplest possible solver, called Richardson
-// iteration, that represents a simple defect correction. This, in combination
-// with a block SSOR preconditioner (defined in precondition_block.h), that
-// uses the special block matrix structure of system matrices arising from DG
-// discretizations.
-#include <deal.II/lac/solver_richardson.h>
+// We are going to use a standard solver, called Generalized minimal residual
+// method (GMRES). It is a iterative solver which is applicable to arbitrary
+// invertible matrices. This, in combination with a block SSOR preconditioner
+// (defined in precondition_block.h), that uses the special block matrix
+// structure of system matrices arising from DG discretizations.
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition_block.h>
 // We are going to use gradients as refinement indicator.
 #include <deal.II/numerics/derivative_approximation.h>
