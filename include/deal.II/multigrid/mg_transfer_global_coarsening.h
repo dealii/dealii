@@ -49,6 +49,9 @@ namespace RepartitioningPolicyTools
   template <int dim, int spacedim>
   class Base;
 }
+
+template <int dim, typename Number>
+class MGTransferMF;
 #endif
 
 
@@ -706,7 +709,19 @@ private:
    */
   unsigned int n_components;
 
+  /**
+   * Pointer to the DoFHandler object used during initialization.
+   */
+  SmartPointer<const DoFHandler<dim>> dof_handler_fine;
+
+  /**
+   * Muligird level used during initialization.
+   */
+  unsigned int mg_level_fine;
+
   friend class internal::MGTwoLevelTransferImplementation;
+
+  friend class MGTransferMF<dim, Number>;
 };
 
 
@@ -920,6 +935,16 @@ private:
     const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
+   * Pointer to the DoFHandler object used during initialization.
+   */
+  SmartPointer<const DoFHandler<dim>> dof_handler_fine;
+
+  /**
+   * Multigrid level used during initialization.
+   */
+  unsigned int mg_level_fine;
+
+  /**
    * Object to evaluate shape functions on one mesh on visited support points of
    * the other mesh.
    */
@@ -954,6 +979,8 @@ private:
    * point.
    */
   std::vector<unsigned int> level_dof_indices_fine_ptrs;
+
+  friend class MGTransferMF<dim, Number>;
 };
 
 
@@ -1001,7 +1028,7 @@ public:
    *
    * @note See also MGTransferMatrixFree.
    */
-  MGTransferMF() = default;
+  MGTransferMF();
 
   /**
    * @name Global coarsening.
@@ -1073,10 +1100,20 @@ public:
   void
   initialize_constraints(const MGConstrainedDoFs &mg_constrained_dofs);
 
+  /** @} */
+
+  /**
+   * @name Global coarsening and local smoothing.
+   */
+  /** @{ */
+
   /**
    * Actually build the information for the prolongation for each level.
    *
-   * @note See also MGTransferMatrixFree.
+   * @note In the case of global coarsening, you can pass into this function
+   * a @p dof_handler with different DoF numbering as the one used within the
+   * provided two-level transfer objects. In this case, vector entries are
+   * permuted during copy_to_mg(), copy_from_mg(), and interpolate_to_mg().
    */
   void
   build(const DoFHandler<dim> &dof_handler,
@@ -1087,7 +1124,10 @@ public:
    * Same as above but taking a lambda for initializing vector instead of
    * partitioners.
    *
-   * @note See also MGTransferMatrixFree.
+   * @note In the case of global coarsening, you can pass into this function
+   * a @p dof_handler with different DoF numbering as the one used within the
+   * provided two-level transfer objects. In this case, vector entries are
+   * permuted during copy_to_mg(), copy_from_mg(), and interpolate_to_mg().
    */
   void
   build(const DoFHandler<dim> &dof_handler,
@@ -1163,19 +1203,17 @@ public:
    */
   template <class InVector>
   void
-  interpolate_to_mg(MGLevelObject<VectorType> &dst, const InVector &src) const;
-
-  /**
-   * Like the above function but with a user-provided DoFHandler as
-   * additional argument. However, this DoFHandler is not used internally, but
-   * is required to be able to use MGTransferMF and
-   * MGTransferMatrixFree as template argument.
-   */
-  template <class InVector>
-  void
   interpolate_to_mg(const DoFHandler<dim>     &dof_handler,
                     MGLevelObject<VectorType> &dst,
                     const InVector            &src) const;
+
+  /**
+   * Interpolate fine-mesh field @p src to each multigrid level in
+   * @p dof_handler and store the result in @p dst.
+   */
+  template <class InVector>
+  void
+  interpolate_to_mg(MGLevelObject<VectorType> &dst, const InVector &src) const;
 
   /** @} */
 
@@ -1226,6 +1264,21 @@ private:
     const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs);
 
   /**
+   * Retreave finest DoFHandler from two-level transfer objects.
+   */
+  std::pair<const DoFHandler<dim> *, unsigned int>
+  get_dof_handler_fine() const;
+
+  /**
+   * Initialize copy indices for MGTransferMF::copy_to_mg(),
+   * MGTransferMF::copy_to_mg(), and MGTransferMF::interpolate_to_mg()
+   * in the case of global coarsening.
+   */
+  void
+  fill_and_communicate_copy_indices_global_coarsening(
+    const DoFHandler<dim> &dof_handler);
+
+  /**
    * Set references to two-level transfer operators to be used.
    */
   template <typename MGTwoLevelTransferObject>
@@ -1242,6 +1295,14 @@ private:
                         VectorType        &vector,
                         const InVector    &vector_reference,
                         const bool         omit_zeroing_entries) const;
+
+  /**
+   * Check that the internal DoFHandler is compatible with the external one
+   * provided by copy_to_mg(), copy_from_mg() and interpolate_to_mg()
+   * used, e.g., by PreconditionMG.
+   */
+  void
+  assert_dof_handler(const DoFHandler<dim> &dof_handler_out) const;
 
   /**
    * Internal transfer operator.
@@ -1374,6 +1435,9 @@ MGTransferMF<dim, Number>::MGTransferMF(
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
 {
+  this->transfer.clear();
+  this->internal_transfer.clear();
+
   this->initialize_transfer_references(transfer);
   this->build(initialize_dof_vector);
 }
@@ -1465,7 +1529,7 @@ MGTransferMF<dim, Number>::copy_to_mg(const DoFHandler<dim>     &dof_handler,
                                       MGLevelObject<VectorType> &dst,
                                       const InVector            &src) const
 {
-  (void)dof_handler;
+  assert_dof_handler(dof_handler);
 
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
     {
@@ -1524,7 +1588,7 @@ MGTransferMF<dim, Number>::copy_from_mg(
   OutVector                       &dst,
   const MGLevelObject<VectorType> &src) const
 {
-  (void)dof_handler;
+  assert_dof_handler(dof_handler);
 
   if (this->perform_plain_copy)
     {
@@ -1576,6 +1640,22 @@ void
 MGTransferMF<dim, Number>::interpolate_to_mg(MGLevelObject<VectorType> &dst,
                                              const InVector &src) const
 {
+  DoFHandler<dim> dof_handler_dummy;
+
+  this->interpolate_to_mg(dof_handler_dummy, dst, src);
+}
+
+
+
+template <int dim, typename Number>
+template <class InVector>
+void
+MGTransferMF<dim, Number>::interpolate_to_mg(const DoFHandler<dim> &dof_handler,
+                                             MGLevelObject<VectorType> &dst,
+                                             const InVector &src) const
+{
+  assert_dof_handler(dof_handler);
+
   const unsigned int min_level = transfer.min_level();
   const unsigned int max_level = transfer.max_level();
 
@@ -1634,20 +1714,6 @@ MGTransferMF<dim, Number>::interpolate_to_mg(MGLevelObject<VectorType> &dst,
             this->transfer[l]->interpolate(dst[l - 1], dst[l]);
         }
     }
-}
-
-
-
-template <int dim, typename Number>
-template <class InVector>
-void
-MGTransferMF<dim, Number>::interpolate_to_mg(const DoFHandler<dim> &dof_handler,
-                                             MGLevelObject<VectorType> &dst,
-                                             const InVector &src) const
-{
-  (void)dof_handler;
-
-  this->interpolate_to_mg(dst, src);
 }
 
 #endif
