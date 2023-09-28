@@ -66,7 +66,16 @@ namespace
   class CellTransferFactory
   {
   public:
-    static const unsigned int max_degree = 9;
+    // Maximum degree to precompile. If no value is given by the user during
+    // compilation, we choose its value as FE_EVAL_FACTORY_DEGREE_MAX (default
+    // value 6).
+    static const unsigned int max_degree =
+#ifndef FE_EVAL_FACTORY_DEGREE_MAX
+      6
+#else
+      FE_EVAL_FACTORY_DEGREE_MAX
+#endif
+      ;
 
     CellTransferFactory(const unsigned int degree_fine,
                         const unsigned int degree_coarse)
@@ -827,7 +836,7 @@ namespace internal
               const auto cell_fine_raw =
                 dof_handler_fine.get_triangulation().create_cell_iterator(
                   cell_id);
-              return cell_fine_raw->as_dof_handler_iterator(dof_handler_fine)
+              cell_fine_raw->as_dof_handler_iterator(dof_handler_fine)
                 ->get_dof_indices(dof_indices);
             }
           else
@@ -1777,6 +1786,8 @@ namespace internal
       transfer.dof_handler_fine = &dof_handler_fine;
       transfer.mg_level_fine    = mg_level_fine;
 
+      auto temp_time = std::chrono::system_clock::now();
+
       std::unique_ptr<FineDoFHandlerViewBase<dim>> dof_handler_fine_view;
 
       if (internal::h_transfer_uses_first_child_policy(dof_handler_fine,
@@ -1853,6 +1864,13 @@ namespace internal
 
       const auto reference_cell = dof_handler_fine.get_fe(0).reference_cell();
 
+      const auto time0 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
+
       // create partitioners and vectors for internal purposes
       {
         // ... for fine mesh
@@ -1874,6 +1892,14 @@ namespace internal
           transfer.vec_coarse.reinit(transfer.partitioner_coarse);
         }
       }
+
+
+      const auto time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
 
       // helper function: to process the fine level cells; function @p fu_non_refined is
       // performed on cells that are not refined and @fu_refined is performed on
@@ -1989,6 +2015,13 @@ namespace internal
           n_dof_indices_fine[i + 1] += n_dof_indices_fine[i];
           n_dof_indices_coarse[i + 1] += n_dof_indices_coarse[i];
         }
+
+      const auto time2 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
 
       // indices
       {
@@ -2123,6 +2156,13 @@ namespace internal
         transfer.constraint_info_fine.finalize();
       }
 
+      const auto time3 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
+
 
       // ------------- prolongation matrix (0) -> identity matrix --------------
 
@@ -2233,6 +2273,13 @@ namespace internal
           }
       }
 
+      const auto time4 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
+
 
       // ------------------------------- weights -------------------------------
       if (transfer.fine_element_is_continuous)
@@ -2284,6 +2331,15 @@ namespace internal
           if (is_feq)
             compress_weights(transfer);
         }
+
+      const auto time5 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      if (false)
+        std::cout << time0 << " " << time1 << " " << time2 << " " << time3
+                  << " " << time4 << " " << time5 << std::endl;
     }
 
 
@@ -5544,6 +5600,18 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 {
   return signals_non_nested.restriction.connect(slot);
 }
+
+
+
+template <int dim, typename Number>
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  AdditionalData::AdditionalData(const double       tolerance,
+                                 const unsigned int rtree_level,
+                                 const bool         enforce_all_points_found)
+  : tolerance(tolerance)
+  , rtree_level(rtree_level)
+  , enforce_all_points_found(enforce_all_points_found)
+{}
 
 
 DEAL_II_NAMESPACE_CLOSE

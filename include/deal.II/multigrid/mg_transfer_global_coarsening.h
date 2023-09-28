@@ -103,6 +103,8 @@ namespace mg
   };
 } // namespace mg
 
+
+
 /**
  * Global coarsening utility functions.
  */
@@ -111,7 +113,7 @@ namespace MGTransferGlobalCoarseningTools
   /**
    * Common polynomial coarsening sequences.
    *
-   * @note These polynomial coarsening sequences up to a degree of 9 are
+   * @note These polynomial coarsening sequences up to a degree of 6 are
    *   precompiled in MGTwoLevelTransfer. See also:
    *   MGTwoLevelTransfer::fast_polynomial_transfer_supported()
    */
@@ -438,7 +440,7 @@ protected:
 /**
  * Class for transfer between two multigrid levels for p- or global coarsening.
  *
- * The implementation of this class is explained in detail in @cite munch2022gc.
+ * @note For more details, see the template specializations.
  */
 template <int dim, typename VectorType>
 class MGTwoLevelTransfer : public MGTwoLevelTransferBase<VectorType>
@@ -487,7 +489,8 @@ public:
  * Class for transfer between two multigrid levels for p- or global coarsening.
  * Specialization for LinearAlgebra::distributed::Vector.
  *
- * The implementation of this class is explained in detail in @cite munch2022gc.
+ * The implementation of this class is explained in detail in @cite munch2022gc
+ * and in step-75.
  */
 template <int dim, typename Number>
 class MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
@@ -498,8 +501,7 @@ class MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
 public:
   /**
    * Set up global coarsening between the given DoFHandler objects (
-   * @p dof_handler_fine and @p dof_handler_coarse). The transfer
-   * can be only performed on active levels.
+   * @p dof_handler_fine and @p dof_handler_coarse).
    */
   void
   reinit_geometric_transfer(
@@ -519,7 +521,8 @@ public:
    * or on coarse-grid levels, i.e., levels without hanging nodes.
    *
    * @note The function polynomial_transfer_supported() can be used to
-   *   check if the given polynomial coarsening strategy is supported.
+   *   check whether fast evaluation of the given polynomial coarsening
+   *   strategy is supported.
    */
   void
   reinit_polynomial_transfer(
@@ -538,8 +541,8 @@ public:
    * underlying Triangulation objects polynomial or geometrical global
    * coarsening is performed.
    *
-   * @note While geometric transfer can be only performed on active levels
-   *   (`numbers::invalid_unsigned_int`), polynomial transfers can also be
+   * @note While geometric transfer can be performed on active levels
+   *   and any multigrid level, polynomial transfers can only be
    *   performed on coarse-grid levels, i.e., levels without hanging nodes.
    *
    * @note The function polynomial_transfer_supported() can be used to
@@ -561,7 +564,7 @@ public:
    *
    * @note Currently, the polynomial coarsening strategies: 1) go-to-one,
    *   2) bisect, and 3) decrease-by-one are precompiled with templates for
-   *   degrees up to 9.
+   *   degrees up to 6.
    */
   static bool
   fast_polynomial_transfer_supported(const unsigned int fe_degree_fine,
@@ -666,13 +669,6 @@ private:
      * 1d restriction matrix for tensor-product elements.
      */
     AlignedVector<VectorizedArrayType> restriction_matrix_1d;
-
-    /**
-     * ShapeInfo description of the coarse cell. Needed during the
-     * fast application of hanging-node constraints.
-     */
-    internal::MatrixFreeFunctions::ShapeInfo<VectorizedArrayType>
-      shape_info_coarse;
   };
 
   /**
@@ -800,11 +796,7 @@ public:
      */
     AdditionalData(const double       tolerance                = 1e-6,
                    const unsigned int rtree_level              = 0,
-                   const bool         enforce_all_points_found = true)
-      : tolerance(tolerance)
-      , rtree_level(rtree_level)
-      , enforce_all_points_found(enforce_all_points_found)
-    {}
+                   const bool         enforce_all_points_found = true);
 
     /**
      * Tolerance parameter. See the constructor of RemotePointEvaluation for
@@ -1011,7 +1003,8 @@ private:
  * for systems involving multiple components of one of these elements. Other
  * elements are currently not implemented.
  *
- * The implementation of this class is explained in detail in @cite munch2022gc.
+ * The implementation of this class is explained in detail in @cite munch2022gc
+ * and in step-75.
  */
 template <int dim, typename Number>
 class MGTransferMF : public dealii::MGLevelGlobalTransfer<
@@ -1031,7 +1024,7 @@ public:
   MGTransferMF();
 
   /**
-   * @name Global coarsening.
+   * @name Global coarsening
    */
   /** @{ */
 
@@ -1080,7 +1073,7 @@ public:
   /** @} */
 
   /**
-   * @name Local smoothing.
+   * @name Local smoothing
    */
   /** @{ */
 
@@ -1138,7 +1131,7 @@ public:
   /** @} */
 
   /**
-   * @name Transfer functions.
+   * @name Transfer functions
    */
   /** @{ */
 
@@ -1235,7 +1228,7 @@ public:
   /** @} */
 
   /**
-   * @name Utility functions.
+   * @name Utility functions
    */
   /** @{ */
 

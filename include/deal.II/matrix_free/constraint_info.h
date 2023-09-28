@@ -176,6 +176,11 @@ namespace internal
 
       inline const typename Number::value_type *
       constraint_pool_end(const unsigned int row) const;
+
+      // TODO
+      std::vector<types::global_dof_index> local_dof_indices;
+      std::vector<types::global_dof_index> local_dof_indices_lex;
+      std::vector<ConstraintKinds>         mask;
     };
 
 
@@ -318,10 +323,8 @@ namespace internal
       const dealii::AffineConstraints<typename Number::value_type> &constraints,
       const std::shared_ptr<const Utilities::MPI::Partitioner>     &partitioner)
     {
-      std::vector<types::global_dof_index> local_dof_indices(
-        cell->get_fe().n_dofs_per_cell());
-      std::vector<types::global_dof_index> local_dof_indices_lex(
-        cell->get_fe().n_dofs_per_cell());
+      local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+      local_dof_indices_lex.resize(cell->get_fe().n_dofs_per_cell());
 
       if (mg_level == numbers::invalid_unsigned_int)
         cell->get_dof_indices(local_dof_indices);
@@ -375,7 +378,7 @@ namespace internal
           AssertIndexRange(cell_no, this->hanging_node_constraint_masks.size());
           AssertIndexRange(cell_no, this->active_fe_indices.size());
 
-          std::vector<ConstraintKinds> mask(cell->get_fe().n_components());
+          mask.resize(cell->get_fe().n_components());
           hanging_nodes->setup_constraints(
             cell, {}, lexicographic_numbering, local_dof_indices_lex, mask);
 
