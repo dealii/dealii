@@ -16,7 +16,6 @@ be able to proceed this way one has to assume that the model can be
 periodically extended to the other boxes; this requires the solution to
 have a periodic structure.
 
-<a name="step-45-Procedure"></a>
 <h1>Procedure</h1>
 
 deal.II provides a number of high level entry points to impose periodic
