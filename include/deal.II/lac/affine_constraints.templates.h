@@ -2635,18 +2635,32 @@ AffineConstraints<number>::distribute(VectorType &vec) const
           // or the reinit() functions:
           if (Utilities::MPI::n_mpi_processes(
                 internal::AffineConstraints::get_mpi_communicator(vec)) > 1)
-            Assert(local_lines != IndexSet(),
-                   ExcMessage(
-                     "You are using the AffineConstraints class in a "
-                     "program that is running in parallel. In this case, "
-                     "it is inefficient to store all constraints: This class "
-                     "should really only store constraints for those degrees "
-                     "of freedom that are locally relevant. It is considered "
-                     "a bug not to do that. Please call either the "
-                     "constructor of this class, or one of its reinit() "
-                     "functions that provide this class with index sets "
-                     "of the locally owned and the locally relevant "
-                     "degrees of freedom."));
+            {
+              Assert(local_lines != IndexSet(),
+                     ExcMessage(
+                       "You are using the AffineConstraints class in a "
+                       "program that is running in parallel. In this case, "
+                       "it is inefficient to store all constraints: This class "
+                       "should really only store constraints for those degrees "
+                       "of freedom that are locally relevant. It is considered "
+                       "a bug not to do that. Please call either the "
+                       "constructor of this class, or one of its reinit() "
+                       "functions that provide this class with index sets "
+                       "of the locally owned and the locally relevant "
+                       "degrees of freedom."));
+
+              Assert(vec_owned_elements.size() == locally_owned_dofs.size(),
+                     ExcMessage("You have previously initialized this "
+                                "AffineConstraints object with an index set "
+                                "that stated that vectors have size " +
+                                std::to_string(locally_owned_dofs.size()) +
+                                " entries, but you are now calling "
+                                "AffineConstraints::distribute() with a vector "
+                                "of size " +
+                                std::to_string(vec_owned_elements.size()) +
+                                "."));
+            }
+
 
             // Check that the set of indices we will import is a superset of
             // the locally-owned ones. This *should* be the case if, as one
@@ -2676,6 +2690,10 @@ AffineConstraints<number>::distribute(VectorType &vec) const
           // simply import the *entire* vector.
           if (local_lines != IndexSet())
             {
+              Assert(vec_owned_elements.size() ==
+                       needed_elements_for_distribute.size(),
+                     ExcInternalError());
+
               Assert(needed_elements_for_distribute != IndexSet(),
                      ExcInternalError());
               internal::import_vector_with_ghost_elements(
