@@ -46,7 +46,7 @@
 // interfaces:
 #include <deal.II/fe/fe_interface_values.h>
 // We are going to use a standard solver, called Generalized minimal residual
-// method (GMRES). It is a iterative solver which is applicable to arbitrary
+// method (GMRES). It is an iterative solver which is applicable to arbitrary
 // invertible matrices. This, in combination with a block SSOR preconditioner
 // (defined in precondition_block.h), that uses the special block matrix
 // structure of system matrices arising from DG discretizations.
@@ -459,7 +459,7 @@ namespace Step12
   // @sect3{All the rest}
   //
   // For this simple problem we use a standard iterative solver, called GMRES,
-  // that creates approximate solutions minimising the residual in each
+  // that creates approximate solutions minimizing the residual in each
   // iterations by adding a new basis vector to the Krylov subspace. This, in
   // combination with a block SSOR preconditioner, that uses the special block
   // matrix structure of system matrices arising from DG discretizations. The
@@ -476,7 +476,7 @@ namespace Step12
     // maximum number of basis vectors of the Krylov subspace. When this number
     // is reached the GMRES algorithm is restarted using the solution of the
     // previous iteration as the starting approximation. The choice of the
-    // number of basis vectors is a trade- off between memory consumption and
+    // number of basis vectors is a trade-off between memory consumption and
     // convergence speed, since a longer basis means minimization over a larger
     // space.
     SolverGMRES<Vector<double>>::AdditionalData additional_data;
