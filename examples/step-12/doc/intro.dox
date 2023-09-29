@@ -5,7 +5,7 @@ MeshWorker and LocalIntegrators instead of assembling matrices using
 FEInterfaceValues as is done in this tutorial.
 </i>
 
-<a name="Intro"></a>
+<a name="step-12-Intro"></a>
 <h1>An example of an advection problem using the Discountinuous Galerkin method</h1>
 
 <h3>Overview</h3>

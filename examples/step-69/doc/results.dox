@@ -1,4 +1,4 @@
-<a name="Results"></a>
+<a name="step-69-Results"></a>
 <h1>Results</h1>
 
 Running the program with default parameters in release mode takes about 1
@@ -155,7 +155,7 @@ the code for roughly 2 hours on 16 cores.
 
 
 
-<a name="extensions"></a>
+<a name="step-69-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 The program showcased here is really only first-order accurate, as

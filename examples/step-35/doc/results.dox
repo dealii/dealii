@@ -1,7 +1,7 @@
-<a name="results"></a>
+<a name="step-35-results"></a>
 <h1>Results</h1>
 
-<a name="Re100"></a>
+<a name="step-35-Re100"></a>
 <h3> Re = 100 </h3>
 
 We run the code with the following <code>parameter-file.prm</code>, which can be found in the
@@ -89,7 +89,7 @@ behind the obstacles, with the sign of the vorticity indicating
 whether this is a left or right turning vortex.
 
 
-<a name="Re500"></a>
+<a name="step-35-Re500"></a>
 <h3> Re = 500 </h3>
 
 We can change the Reynolds number, $Re$, in the parameter file to a
@@ -130,7 +130,7 @@ one should take measures to obtain a robust scheme in the limit of coarse
 resolutions, as described below.
 
 
-<a name="extensions"></a>
+<a name="step-35-extensions"></a>
 <h3> Possibilities for extensions </h3>
 
 This program can be extended in the following directions:

@@ -6,7 +6,7 @@
 the UMFPACK sparse direct solver. Refer to the <a
 href="../../readme.html#umfpack">ReadMe</a> for instructions how to do this.
 
-<a name="Intro"></a>
+<a name="step-52-Intro"></a>
 <h1>Introduction</h1>
 
 This program shows how to use Runge-Kutta methods to solve a time-dependent

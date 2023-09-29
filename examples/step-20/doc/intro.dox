@@ -1,4 +1,4 @@
-<a name="Intro"></a>
+<a name="step-20-Intro"></a>
 <h1>Introduction</h1>
 
 @dealiiVideoLecture{19,20,21}
@@ -800,5 +800,5 @@ hand side equals $f=0$, and as boundary values we have to choose
 $g=p|_{\partial\Omega}$.
 
 For the computations in this program, we choose $\alpha=0.3,\beta=1$. You can
-find the resulting solution in the <a name="#Results">results section
+find the resulting solution in the <a name="step-20-#Results">results section
 below</a>, after the commented program.

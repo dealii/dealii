@@ -15,7 +15,8 @@
 
 
 # If we find a heading in a .dox file, create an HTML anchor for it.
-
+use Getopt::Long;
+GetOptions("prefix:s" => \$prefix);
 while (<>) {
     if ( /<h.>(.*)<\/h.>\s*/ ) {
 	$reftext = $1;
@@ -24,7 +25,7 @@ while (<>) {
 	# everything except for letters, numbers, and underscores
 	$reftext =~ s/[^a-zA-Z0-9_]//g;
 
-	print "<a name=\"$reftext\"></a>$_\n";
+	print "<a name=\"$prefix-$reftext\"></a>$_\n";
     } else {
         print;
     }

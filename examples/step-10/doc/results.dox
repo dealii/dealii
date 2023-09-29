@@ -230,7 +230,7 @@ eigenfunctions of the Laplace-Beltrami operator", submitted, 2018.)
 
 
 <h3>Possibilities for extensions</h3>
-<a name="extensions"></a>
+<a name="step-10-extensions"></a>
 
 As the table of numbers copied from the output of the program shows above,
 it is not very difficult to compute the value of $\pi$ to 13 or 15 digits. But,

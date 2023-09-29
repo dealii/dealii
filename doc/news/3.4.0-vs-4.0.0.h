@@ -24,7 +24,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 </p>
 
 
-<a name="general"></a>
+<a name="340-400-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -312,7 +312,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 
 
-<a name="base"></a>
+<a name="340-400-base"></a>
 <h3>base</h3>
 
 <ol>
@@ -603,7 +603,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 
 
-<a name="lac"></a>
+<a name="340-400-lac"></a>
 <h3>lac</h3>
 
 <ol>
@@ -843,7 +843,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
 
 
-<a name="deal.II"></a>
+<a name="340-400-deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>

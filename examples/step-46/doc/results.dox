@@ -1,4 +1,4 @@
-<a name="Results"></a>
+<a name="step-46-Results"></a>
 <h1>Results</h1>
 
 <h3>2d results</h3>
@@ -130,7 +130,7 @@ of error indicators in the two subdomains is important if one wanted
 to go on doing more 3d computations.
 
 
-<a name="extensions"></a>
+<a name="step-46-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 <h4>Linear solvers and preconditioners</h4>

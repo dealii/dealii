@@ -1,7 +1,7 @@
 <i>This program was contributed by Timo Heister. Parts of the results section
 were contributed by Yuhan Zhou, Wolfgang Bangerth, David Wells, and Sean Ingimarson.</i>
 
-<a name="Intro"></a>
+<a name="step-49-Intro"></a>
 <h1> Introduction </h1>
 This tutorial is an extension to step-1 and demonstrates several ways to
 obtain more involved meshes than the ones shown there.

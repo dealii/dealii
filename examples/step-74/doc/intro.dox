@@ -11,7 +11,7 @@ EAR-0949446 and EAR-1550901 and The University of California -- Davis.
 
 @dealiiTutorialDOI{10.5281/zenodo.5812174,https://zenodo.org/badge/DOI/10.5281/zenodo.5812174.svg}
 
-<a name="Intro"></a>
+<a name="step-74-Intro"></a>
 <h1><em>Symmetric interior penalty Galerkin</em> (SIPG) method for Poisson's equation</h1>
 
 <h3>Overview</h3>

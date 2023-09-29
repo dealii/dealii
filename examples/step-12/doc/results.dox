@@ -53,7 +53,7 @@ And finally we show a plot of a 3d computation.
 <img src="https://www.dealii.org/images/steps/developer/step-12.sol-5-3d.png" alt="">
 
 
-<a name="dg-vs-cg"></a>
+<a name="step-12-dg-vs-cg"></a>
 <h3>Why use discontinuous elements</h3>
 
 In this program we have used discontinuous elements. It is a legitimate
@@ -131,7 +131,7 @@ take a look at step-31.
 
 
 
-<a name="extensions"></a>
+<a name="step-12-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 Given that the exact solution is known in this case, one interesting
