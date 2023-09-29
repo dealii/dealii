@@ -131,11 +131,20 @@ public:
   operator=(IndexSet &&is) noexcept;
 
 #ifdef DEAL_II_WITH_TRILINOS
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  /**
+   * Constructor from a Trilinos Teuchos::RCP<Tpetra::Map>.
+   */
+  explicit IndexSet(
+    Teuchos::RCP<const Tpetra::Map<int, types::signed_global_dof_index>> map);
+#  endif // DEAL_II_TRILINOS_WITH_TPETRA
+
   /**
    * Constructor from a Trilinos Epetra_BlockMap.
    */
   explicit IndexSet(const Epetra_BlockMap &map);
-#endif
+#endif // DEAL_II_WITH_TRILINOS
 
   /**
    * Remove all indices from this index set. The index set retains its size,
@@ -596,6 +605,10 @@ public:
   Tpetra::Map<int, types::signed_global_dof_index>
   make_tpetra_map(const MPI_Comm communicator = MPI_COMM_WORLD,
                   const bool     overlapping  = false) const;
+
+  Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index>>
+  make_tpetra_map_rcp(const MPI_Comm communicator = MPI_COMM_WORLD,
+                      const bool     overlapping  = false) const;
 #  endif
 #endif
 

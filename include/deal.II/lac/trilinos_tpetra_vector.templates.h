@@ -72,8 +72,7 @@ namespace LinearAlgebra
                            const MPI_Comm  communicator)
       : Subscriptor()
       , vector(new Tpetra::Vector<Number, int, types::signed_global_dof_index>(
-          Teuchos::rcp(new Tpetra::Map<int, types::signed_global_dof_index>(
-            parallel_partitioner.make_tpetra_map(communicator, false)))))
+          parallel_partitioner.make_tpetra_map_rcp(communicator, false)))
     {}
 
 
@@ -84,13 +83,12 @@ namespace LinearAlgebra
                            const MPI_Comm  communicator,
                            const bool      omit_zeroing_entries)
     {
-      Tpetra::Map<int, types::signed_global_dof_index> input_map =
-        parallel_partitioner.make_tpetra_map(communicator, false);
-      if (vector->getMap()->isSameAs(input_map) == false)
+      Teuchos::RCP<Tpetra::Map<int, types::signed_global_dof_index>> input_map =
+        parallel_partitioner.make_tpetra_map_rcp(communicator, false);
+      if (vector->getMap()->isSameAs(*input_map) == false)
         vector = std::make_unique<
           Tpetra::Vector<Number, int, types::signed_global_dof_index>>(
-          Teuchos::rcp(
-            new Tpetra::Map<int, types::signed_global_dof_index>(input_map)));
+          input_map);
       else if (omit_zeroing_entries == false)
         {
           vector->putScalar(0.);

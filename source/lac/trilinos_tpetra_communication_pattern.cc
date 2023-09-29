@@ -52,11 +52,9 @@ namespace LinearAlgebra
       comm = std::make_shared<const MPI_Comm>(communicator);
 
       auto vector_space_vector_map =
-        Teuchos::rcp(new Tpetra::Map<int, types::signed_global_dof_index>(
-          locally_owned_indices.make_tpetra_map(*comm, false)));
+        locally_owned_indices.make_tpetra_map_rcp(*comm, false);
       auto read_write_vector_map =
-        Teuchos::rcp(new Tpetra::Map<int, types::signed_global_dof_index>(
-          ghost_indices.make_tpetra_map(*comm, true)));
+        ghost_indices.make_tpetra_map_rcp(*comm, true);
 
       // Target map is read_write_vector_map
       // Source map is vector_space_vector_map. This map must have uniquely
