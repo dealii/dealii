@@ -271,6 +271,7 @@ private:
 };
 
 
+
 template <int dim, int spacedim>
 inline void
 MGConstrainedDoFs::initialize(
@@ -287,8 +288,8 @@ MGConstrainedDoFs::initialize(
   const unsigned int max_level = (level_relevant_dofs.max_level() == 0) ?
                                    nlevels - 1 :
                                    level_relevant_dofs.max_level();
-  const bool         user_level_dofs =
-    (level_relevant_dofs.max_level() == 0) ? false : true;
+  const bool         use_provided_level_relevant_dofs =
+    (level_relevant_dofs.max_level() > 0);
 
   // At this point level_constraint and refinement_edge_indices are empty.
   refinement_edge_indices.resize(nlevels);
@@ -296,7 +297,7 @@ MGConstrainedDoFs::initialize(
   user_constraints.resize(nlevels);
   for (unsigned int l = min_level; l <= max_level; ++l)
     {
-      if (user_level_dofs)
+      if (use_provided_level_relevant_dofs)
         {
           level_constraints[l].reinit(dof.locally_owned_mg_dofs(l),
                                       level_relevant_dofs[l]);
@@ -311,60 +312,54 @@ MGConstrainedDoFs::initialize(
 
       // Loop through relevant cells and faces finding those which are periodic
       // neighbors.
-      typename DoFHandler<dim, spacedim>::cell_iterator cell = dof.begin(l),
-                                                        endc = dof.end(l);
-      for (; cell != endc; ++cell)
-        if (cell->level_subdomain_id() != numbers::artificial_subdomain_id)
-          {
-            for (auto f : cell->face_indices())
-              if (cell->has_periodic_neighbor(f) &&
-                  cell->periodic_neighbor(f)->level() == cell->level())
-                {
-                  if (cell->is_locally_owned_on_level())
-                    {
-                      Assert(
-                        cell->periodic_neighbor(f)->level_subdomain_id() !=
-                          numbers::artificial_subdomain_id,
-                        ExcMessage(
-                          "Periodic neighbor of a locally owned cell must either be owned or ghost."));
-                    }
-                  // Cell is a level-ghost and its neighbor is a
-                  // level-artificial cell nothing to do here
-                  else if (cell->periodic_neighbor(f)->level_subdomain_id() ==
-                           numbers::artificial_subdomain_id)
-                    {
-                      Assert(cell->is_locally_owned_on_level() == false,
-                             ExcInternalError());
-                      continue;
-                    }
+      for (const auto &cell : dof.cell_iterators_on_level(l))
+        if (cell->is_artificial_on_level() == false)
+          for (auto f : cell->face_indices())
+            if (cell->has_periodic_neighbor(f) &&
+                cell->periodic_neighbor(f)->level() == cell->level())
+              {
+                if (cell->is_locally_owned_on_level())
+                  {
+                    Assert(
+                      cell->periodic_neighbor(f)->level_subdomain_id() !=
+                        numbers::artificial_subdomain_id,
+                      ExcMessage(
+                        "Periodic neighbor of a locally owned cell must either be owned or ghost."));
+                  }
+                // Cell is a level-ghost and its neighbor is a
+                // level-artificial cell nothing to do here
+                else if (cell->periodic_neighbor(f)->level_subdomain_id() ==
+                         numbers::artificial_subdomain_id)
+                  {
+                    Assert(cell->is_locally_owned_on_level() == false,
+                           ExcInternalError());
+                    continue;
+                  }
 
-                  const unsigned int dofs_per_face =
-                    dof.get_fe(0).n_dofs_per_face(f);
-                  std::vector<types::global_dof_index> dofs_1(dofs_per_face);
-                  std::vector<types::global_dof_index> dofs_2(dofs_per_face);
+                const unsigned int dofs_per_face =
+                  dof.get_fe(0).n_dofs_per_face(f);
+                std::vector<types::global_dof_index> dofs_1(dofs_per_face);
+                std::vector<types::global_dof_index> dofs_2(dofs_per_face);
 
-                  cell->periodic_neighbor(f)
-                    ->face(cell->periodic_neighbor_face_no(f))
-                    ->get_mg_dof_indices(l, dofs_1, 0);
-                  cell->face(f)->get_mg_dof_indices(l, dofs_2, 0);
-                  // Store periodicity information in the level
-                  // AffineConstraints object. Skip DoFs for which we've
-                  // previously entered periodicity constraints already; this
-                  // can happen, for example, for a vertex dof at a periodic
-                  // boundary that we visit from more than one cell
-                  for (unsigned int i = 0; i < dofs_per_face; ++i)
-                    if (level_constraints[l].can_store_line(dofs_2[i]) &&
-                        level_constraints[l].can_store_line(dofs_1[i]) &&
-                        !level_constraints[l].is_constrained(dofs_2[i]) &&
-                        !level_constraints[l].is_constrained(dofs_1[i]))
-                      {
-                        level_constraints[l].add_line(dofs_2[i]);
-                        level_constraints[l].add_entry(dofs_2[i],
-                                                       dofs_1[i],
-                                                       1.);
-                      }
-                }
-          }
+                cell->periodic_neighbor(f)
+                  ->face(cell->periodic_neighbor_face_no(f))
+                  ->get_mg_dof_indices(l, dofs_1, 0);
+                cell->face(f)->get_mg_dof_indices(l, dofs_2, 0);
+                // Store periodicity information in the level
+                // AffineConstraints object. Skip DoFs for which we've
+                // previously entered periodicity constraints already; this
+                // can happen, for example, for a vertex dof at a periodic
+                // boundary that we visit from more than one cell
+                for (unsigned int i = 0; i < dofs_per_face; ++i)
+                  if (level_constraints[l].can_store_line(dofs_2[i]) &&
+                      level_constraints[l].can_store_line(dofs_1[i]) &&
+                      !level_constraints[l].is_constrained(dofs_2[i]) &&
+                      !level_constraints[l].is_constrained(dofs_1[i]))
+                    {
+                      level_constraints[l].add_line(dofs_2[i]);
+                      level_constraints[l].add_entry(dofs_2[i], dofs_1[i], 1.);
+                    }
+              }
       level_constraints[l].close();
 
       // Initialize with empty IndexSet of correct size
@@ -373,6 +368,7 @@ MGConstrainedDoFs::initialize(
 
   MGTools::extract_inner_interface_dofs(dof, refinement_edge_indices);
 }
+
 
 
 template <int dim, int spacedim>
@@ -470,6 +466,7 @@ MGConstrainedDoFs::make_no_normal_flux_constraints(
 }
 
 
+
 inline void
 MGConstrainedDoFs::add_user_constraints(
   const unsigned int               level,
@@ -521,6 +518,8 @@ MGConstrainedDoFs::is_boundary_index(const unsigned int            level,
   return boundary_indices[level].is_element(index);
 }
 
+
+
 inline bool
 MGConstrainedDoFs::at_refinement_edge(const unsigned int            level,
                                       const types::global_dof_index index) const
@@ -529,6 +528,8 @@ MGConstrainedDoFs::at_refinement_edge(const unsigned int            level,
 
   return refinement_edge_indices[level].is_element(index);
 }
+
+
 
 inline bool
 MGConstrainedDoFs::is_interface_matrix_entry(
@@ -588,6 +589,7 @@ MGConstrainedDoFs::get_user_constraint_matrix(const unsigned int level) const
   AssertIndexRange(level, user_constraints.size());
   return user_constraints[level];
 }
+
 
 
 template <typename Number>
