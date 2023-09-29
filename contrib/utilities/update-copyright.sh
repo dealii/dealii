@@ -31,7 +31,7 @@ files="
          contrib/python-bindings/*/*.{h,cc,py} \
          contrib/utilities/{update-copyright,indent} \
          doc/doxygen/*/*.{h,h.in} \
-         doc/doxygen/scripts/{create_anchors,filter,intro2toc,program*,*.pl} \
+         doc/doxygen/scripts/*.pl \
          doc/screen.css)
   $(find include/ source/ examples/ | egrep '\.(h|in|cc|cu)$')
   $(find cmake/ | egrep '\.(cmake|in|cc)$')
