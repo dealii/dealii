@@ -468,19 +468,20 @@ namespace Step12
   // field. If the DoFs are renumbered in the downstream direction of the flow,
   // then a block Gauss-Seidel preconditioner (see the PreconditionBlockSOR
   // class with relaxation=1) does a much better job.
+
+  // We create an additional data object for the GMRES solver to increase the
+  // maximum number of basis vectors of the Krylov subspace. When this number
+  // is reached the GMRES algorithm is restarted using the solution of the
+  // previous iteration as the starting approximation. The choice of the
+  // number of basis vectors is a trade-off between memory consumption and
+  // convergence speed, since a longer basis means minimization over a larger
+  // space.
   template <int dim>
   void AdvectionProblem<dim>::solve()
   {
-    SolverControl solver_control(1000, 1e-12);
-    // We create an additional data object for the GMRES solver to increase the
-    // maximum number of basis vectors of the Krylov subspace. When this number
-    // is reached the GMRES algorithm is restarted using the solution of the
-    // previous iteration as the starting approximation. The choice of the
-    // number of basis vectors is a trade-off between memory consumption and
-    // convergence speed, since a longer basis means minimization over a larger
-    // space.
+    SolverControl solver_control(1000, 1e-6 * right_hand_side.l2_norm());
     SolverGMRES<Vector<double>>::AdditionalData additional_data;
-    additional_data.max_n_tmp_vectors = 100;
+    additional_data.max_n_tmp_vectors = 85;
     SolverGMRES<Vector<double>> solver(solver_control, additional_data);
 
     // Here we create the preconditioner,
