@@ -1,8 +1,9 @@
 ARG IMG=focal    # Ubuntu image that contains all corresponding dependencies.
-ARG NJOBS=0      # Jobs used for building. Default: Use all available jobs.
-ARG VER=master   # deal.II branch that gets checked out.
 
 FROM dealii/dependencies:$IMG
+
+ARG NJOBS=0      # Jobs used for building. Default: Use all available jobs.
+ARG VER=master   # deal.II branch that gets checked out.
 
 LABEL maintainer="luca.heltai@gmail.com"
 
