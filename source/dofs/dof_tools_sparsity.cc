@@ -802,10 +802,10 @@ namespace DoFTools
               neighbor->get_fe().has_support_on_face(j, neighbor_face_no);
           }
 
-        // For the parallel setting, must include also the off-diagonal
-        // coupling, otherwise we will include those on the other cell
-        for (unsigned int f = 0; f < (neighbor->is_locally_owned() ? 1 : 2);
-             ++f)
+        // For the parallel setting, must include also the diagonal
+        // neighbor-neighbor coupling, otherwise those get included on the
+        // other cell
+        for (int f = 0; f < (neighbor->is_locally_owned() ? 1 : 2); ++f)
           {
             const auto &fe = (f == 0) ? cell->get_fe() : neighbor->get_fe();
             const auto &dofs_i =
