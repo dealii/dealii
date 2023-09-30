@@ -18,7 +18,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: ["focal", "jammy"]
+        ubuntu_version: [focal, jammy]
+        # Use 2 jobs to build, but only 1 for the focal image
+        # as it starves the github machine for memory.
+        include:
+          - n_jobs: 2
+          - n_jobs: 1
+            ubuntu_version: focal
 
     steps:
       - name: Checkout code
@@ -40,7 +46,8 @@ jobs:
           cache-from: type=registry,ref=dealii/dependencies:${{ matrix.ubuntu_version }}
           cache-to: type=inline
           build-args: |
-            VER=master
             IMG=${{ matrix.ubuntu_version }}
-          push: ${{github.ref_name == 'master'}}
+            NJOBS=${{ matrix.n_jobs }}
+            VER=master
+          push: ${{ github.ref_name == 'master' }}
           tags: dealii/dealii:master-${{ matrix.ubuntu_version }}
