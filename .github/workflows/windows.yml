@@ -74,17 +74,10 @@ jobs:
       with:
         name: dealii-windows.zip
         path: c:/project/dealii-windows.zip
-    - name: upload CMakeOutput
+    - name: upload CMakeConfigureLog
       uses: actions/upload-artifact@v3
       if: always()
       continue-on-error: true
       with:
-        name: windows-serial-CMakeOutput.log
-        path: build/CMakeFiles/CMakeOutput.log
-    - name: upload CMakeError
-      uses: actions/upload-artifact@v3
-      if: always()
-      continue-on-error: true
-      with:
-        name: windows-serial-CMakeError.log
-        path: build/CMakeFiles/CMakeError.log
+        name: windows-serial-CMakeConfigureLog.yaml
+        path: build/CMakeFiles/CMakeConfigureLog.yaml
