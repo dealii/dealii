@@ -188,7 +188,7 @@ namespace Utilities
       Assert(enforce_unique_mapping == false || unique_mapping,
              ExcInternalError());
 
-      cell_data        = {};
+      cell_data        = std::make_unique<CellData>(tria);
       send_permutation = {};
 
       std::pair<int, int> dummy{-1, -1};
@@ -197,19 +197,59 @@ namespace Utilities
           if (dummy != std::get<0>(i))
             {
               dummy = std::get<0>(i);
-              cell_data.cells.emplace_back(dummy);
-              cell_data.reference_point_ptrs.emplace_back(
-                cell_data.reference_point_values.size());
+              cell_data->cells.emplace_back(dummy);
+              cell_data->reference_point_ptrs.emplace_back(
+                cell_data->reference_point_values.size());
             }
 
-          cell_data.reference_point_values.emplace_back(std::get<3>(i));
+          cell_data->reference_point_values.emplace_back(std::get<3>(i));
           send_permutation.emplace_back(std::get<5>(i));
         }
 
-      cell_data.reference_point_ptrs.emplace_back(
-        cell_data.reference_point_values.size());
+      cell_data->reference_point_ptrs.emplace_back(
+        cell_data->reference_point_values.size());
 
       this->ready_flag = true;
+    }
+
+
+
+    template <int dim, int spacedim>
+    RemotePointEvaluation<dim, spacedim>::CellData::CellData(
+      const Triangulation<dim, spacedim> &triangulation)
+      : triangulation(triangulation)
+    {}
+
+
+
+    template <int dim, int spacedim>
+    std_cxx20::ranges::iota_view<unsigned int, unsigned int>
+    RemotePointEvaluation<dim, spacedim>::CellData::cell_indices() const
+    {
+      return {0, static_cast<unsigned int>(cells.size())};
+    }
+
+
+
+    template <int dim, int spacedim>
+    typename Triangulation<dim, spacedim>::active_cell_iterator
+    RemotePointEvaluation<dim, spacedim>::CellData::get_active_cell_iterator(
+      const unsigned int cell) const
+    {
+      AssertIndexRange(cell, cells.size());
+      return {&triangulation, cells[cell].first, cells[cell].second};
+    }
+
+
+
+    template <int dim, int spacedim>
+    ArrayView<const Point<dim>>
+    RemotePointEvaluation<dim, spacedim>::CellData::get_unit_points(
+      const unsigned int cell) const
+    {
+      AssertIndexRange(cell, cells.size());
+      return {reference_point_values.data() + reference_point_ptrs[cell],
+              reference_point_ptrs[cell + 1] - reference_point_ptrs[cell]};
     }
 
 
@@ -218,7 +258,7 @@ namespace Utilities
     const typename RemotePointEvaluation<dim, spacedim>::CellData &
     RemotePointEvaluation<dim, spacedim>::get_cell_data() const
     {
-      return cell_data;
+      return *cell_data;
     }
 
 
