@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - 'docker*'
-      - 'master'
+  schedule:
+  - cron: '0 */12 * * *'
 
 permissions:
   contents: read
@@ -12,6 +13,8 @@ permissions:
 
 jobs:
   build-master-docker:
+    if: (github.event_name == 'schedule' && github.repository == 'dealii/dealii') || github.event_name != 'schedule'
+
     name: build master docker ${{ matrix.ubuntu_version }}
     runs-on: ubuntu-latest
 
@@ -49,5 +52,5 @@ jobs:
             IMG=${{ matrix.ubuntu_version }}
             NJOBS=${{ matrix.n_jobs }}
             VER=master
-          push: ${{ github.ref_name == 'master' }}
+          push: ${{ github.event_name == 'schedule' }}
           tags: dealii/dealii:master-${{ matrix.ubuntu_version }}
