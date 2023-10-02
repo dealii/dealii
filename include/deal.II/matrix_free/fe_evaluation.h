@@ -7573,19 +7573,24 @@ FEEvaluation<dim,
 
   if (this->cell_type <= internal::MatrixFreeFunctions::GeometryType::affine)
     {
-      if (this->mapping_data->jacobians[0].size() > 0)
+      if (this_jacobian_data.size() != 2)
         this_jacobian_data.resize_fast(2);
 
-      if (this->mapping_data->JxW_values.size() > 0)
+      if (this_J_value_data.size() != 1)
         this_J_value_data.resize_fast(1);
 
-      if (this->mapping_data->jacobian_gradients[0].size() > 0)
-        this_jacobian_gradients_data.resize_fast(1);
+      const auto &update_flags_cells =
+        this->matrix_free->get_mapping_info().update_flags_cells;
 
-      if (this->mapping_data->jacobian_gradients_non_inverse[0].size() > 0)
-        this_jacobian_gradients_non_inverse_data.resize_fast(1);
+      if (update_flags_cells & update_jacobian_grads &&
+          this_jacobian_gradients_data.size() != 1)
+        {
+          this_jacobian_gradients_data.resize_fast(1);
+          this_jacobian_gradients_non_inverse_data.resize_fast(1);
+        }
 
-      if (this->mapping_data->quadrature_points.size() > 0)
+      if (update_flags_cells & update_quadrature_points &&
+          this_quadrature_points_data.size() != 1)
         this_quadrature_points_data.resize_fast(1);
     }
   else
@@ -7632,35 +7637,37 @@ FEEvaluation<dim,
           internal::MatrixFreeFunctions::GeometryType::affine)
         {
           // case that all cells are Cartesian or affine
+          for (unsigned int q = 0; q < 2; ++q)
+            for (unsigned int i = 0; i < dim; ++i)
+              for (unsigned int j = 0; j < dim; ++j)
+                this_jacobian_data[q][i][j][v] =
+                  this->mapping_data->jacobians[0][offsets + q][i][j][lane];
+
           const unsigned int q = 0;
 
-          if (this->mapping_data->JxW_values.size() > 0)
-            this_J_value_data[q][v] =
-              this->mapping_data->JxW_values[offsets + q][lane];
+          this_J_value_data[q][v] =
+            this->mapping_data->JxW_values[offsets + q][lane];
 
-          if (this->mapping_data->jacobians[0].size() > 0)
-            for (unsigned int q = 0; q < 2; ++q)
-              for (unsigned int i = 0; i < dim; ++i)
+          const auto &update_flags_cells =
+            this->matrix_free->get_mapping_info().update_flags_cells;
+
+          if (update_flags_cells & update_jacobian_grads)
+            {
+              for (unsigned int i = 0; i < dim * (dim + 1) / 2; ++i)
                 for (unsigned int j = 0; j < dim; ++j)
-                  this_jacobian_data[q][i][j][v] =
-                    this->mapping_data->jacobians[0][offsets + q][i][j][lane];
+                  this_jacobian_gradients_data[q][i][j][v] =
+                    this->mapping_data
+                      ->jacobian_gradients[0][offsets + q][i][j][lane];
 
-          if (this->mapping_data->jacobian_gradients[0].size() > 0)
-            for (unsigned int i = 0; i < dim * (dim + 1) / 2; ++i)
-              for (unsigned int j = 0; j < dim; ++j)
-                this_jacobian_gradients_data[q][i][j][v] =
-                  this->mapping_data
-                    ->jacobian_gradients[0][offsets + q][i][j][lane];
+              for (unsigned int i = 0; i < dim * (dim + 1) / 2; ++i)
+                for (unsigned int j = 0; j < dim; ++j)
+                  this_jacobian_gradients_non_inverse_data[q][i][j][v] =
+                    this->mapping_data
+                      ->jacobian_gradients_non_inverse[0][offsets + q][i][j]
+                                                      [lane];
+            }
 
-          if (this->mapping_data->jacobian_gradients_non_inverse[0].size() > 0)
-            for (unsigned int i = 0; i < dim * (dim + 1) / 2; ++i)
-              for (unsigned int j = 0; j < dim; ++j)
-                this_jacobian_gradients_non_inverse_data[q][i][j][v] =
-                  this->mapping_data
-                    ->jacobian_gradients_non_inverse[0][offsets + q][i][j]
-                                                    [lane];
-
-          if (this->mapping_data->quadrature_points.size() > 0)
+          if (update_flags_cells & update_quadrature_points)
             for (unsigned int i = 0; i < dim; ++i)
               this_quadrature_points_data[q][i][v] =
                 this->mapping_data->quadrature_points
