@@ -192,7 +192,7 @@ namespace NonMatching
     {
       const auto   jac_0 = inverse_jacobians[0];
       const double zero_tolerance_double =
-        1. / diameter * std::numeric_limits<double>::epsilon() * 1024.;
+        1e4 / diameter * std::numeric_limits<double>::epsilon() * 1024.;
       bool jacobian_constant = true;
       for (unsigned int q = 1; q < inverse_jacobians.size(); ++q)
         {
