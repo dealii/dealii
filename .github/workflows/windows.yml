@@ -79,5 +79,5 @@ jobs:
       if: always()
       continue-on-error: true
       with:
-        name: windows-serial-CMakeConfigureLog.yaml
+        name: ${{ matrix.os }}-serial-CMakeConfigureLog.yaml
         path: build/CMakeFiles/CMakeConfigureLog.yaml
