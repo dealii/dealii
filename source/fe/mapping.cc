@@ -31,7 +31,7 @@
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 boost::container::small_vector<Point<spacedim>,
@@ -192,7 +192,7 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
 
 
 
-#ifndef DOXYGEN
+#  ifndef DOXYGEN
 template <int dim, int spacedim>
 void
 Mapping<dim, spacedim>::fill_fe_face_values(
@@ -258,7 +258,7 @@ Mapping<dim, spacedim>::get_face_data(
 
   return std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>();
 }
-#endif
+#  endif
 
 /* ---------------------------- InternalDataBase --------------------------- */
 
@@ -276,7 +276,7 @@ Mapping<dim, spacedim>::InternalDataBase::memory_consumption() const
 {
   return sizeof(*this);
 }
-
+#endif
 
 /* ------------------------------ Global functions ------------------------- */
 

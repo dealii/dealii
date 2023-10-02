@@ -361,7 +361,7 @@ namespace PETScWrappers
     import_from_ghosted_array_finish(op, src, dst);
   }
 
-
+#  ifndef DOXYGEN
 
   // Partitioner
 
@@ -510,7 +510,7 @@ namespace PETScWrappers
     import_from_ghosted_array_start(op, src, dst);
     import_from_ghosted_array_finish(op, src, dst);
   }
-
+#  endif
 } // namespace PETScWrappers
 
 // Explicit instantiations

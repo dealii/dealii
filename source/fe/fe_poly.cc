@@ -28,6 +28,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 FE_Poly<dim, spacedim>::FE_Poly(const FE_Poly &fe)
@@ -35,7 +36,7 @@ FE_Poly<dim, spacedim>::FE_Poly(const FE_Poly &fe)
   , poly_space(fe.poly_space->clone())
 {}
 
-
+#endif
 
 #include "fe_poly.inst"
 

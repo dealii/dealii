@@ -34,6 +34,8 @@
 DEAL_II_NAMESPACE_OPEN
 
 /* -------------------------- Manifold --------------------- */
+#ifndef DOXYGEN
+
 template <int dim, int spacedim>
 Point<spacedim>
 Manifold<dim, spacedim>::project_to_manifold(
@@ -522,7 +524,7 @@ Manifold<dim, spacedim>::get_tangent_vector(const Point<spacedim> &x1,
                   make_array_view(weights.begin(), weights.end()));
   return (neighbor_point - x1) / epsilon;
 }
-
+#endif
 /* -------------------------- FlatManifold --------------------- */
 
 namespace internal
@@ -550,6 +552,8 @@ namespace internal
 
   } // namespace
 } // namespace internal
+
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 FlatManifold<dim, spacedim>::FlatManifold(
@@ -1004,7 +1008,7 @@ FlatManifold<dim, spacedim>::normal_vector(
   // vectors given by grad_F
   return internal::normalized_alternating_product(grad_F);
 }
-
+#endif
 
 /* -------------------------- ChartManifold --------------------- */
 template <int dim, int spacedim, int chartdim>

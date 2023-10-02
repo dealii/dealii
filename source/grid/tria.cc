@@ -12083,7 +12083,7 @@ namespace internal
   } // namespace TriangulationImplementation
 } // namespace internal
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -12221,7 +12221,6 @@ void Triangulation<dim, spacedim>::clear()
   cell_attached_data = {0, 0, {}, {}};
   data_serializer.clear();
 }
-
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -12462,8 +12461,10 @@ std::vector<types::manifold_id> Triangulation<dim, spacedim>::get_manifold_ids()
   return {m_ids.begin(), m_ids.end()};
 }
 
+#endif
 /*-----------------------------------------------------------------*/
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -12929,9 +12930,10 @@ void Triangulation<dim, spacedim>::coarsen_global(const unsigned int times)
 }
 
 
+#endif
 /*-------------------- refine/coarsen flags -------------------------*/
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -13077,6 +13079,7 @@ bool Triangulation<dim, spacedim>::get_anisotropic_refinement_flag() const
 }
 
 
+#endif
 
 namespace internal
 {
@@ -13140,6 +13143,7 @@ namespace
   }
 } // namespace
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -13446,6 +13450,7 @@ void Triangulation<dim, spacedim>::load_user_flags_line(
   Assert(i == v.end(), ExcInternalError());
 }
 
+#endif
 
 namespace
 {
@@ -13504,6 +13509,7 @@ namespace
   }
 } // namespace
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -13735,6 +13741,7 @@ void Triangulation<dim, spacedim>::load(const std::string &filename)
   load(ia, 0);
 }
 
+#endif
 namespace
 {
   template <typename Iterator>
@@ -13776,6 +13783,7 @@ namespace
   }
 } // namespace
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -13874,6 +13882,7 @@ void Triangulation<dim, spacedim>::load_user_indices_hex(
     }
 }
 
+#endif
 
 
 //---------------- user pointers ----------------------------------------//
@@ -13920,6 +13929,7 @@ namespace
   }
 } // namespace
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -14089,10 +14099,11 @@ void Triangulation<dim, spacedim>::load_user_pointers_hex(
     }
 }
 
-
+#endif
 
 /*------------------------ Cell iterator functions ------------------------*/
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -14404,10 +14415,11 @@ IteratorRange<typename Triangulation<dim, spacedim>::
     typename Triangulation<dim, spacedim>::active_cell_iterator>(
     begin_active(level), end_active(level));
 }
-
+#endif
 
 /*------------------------ Face iterator functions ------------------------*/
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -14528,11 +14540,12 @@ typename Triangulation<dim, spacedim>::vertex_iterator
                              numbers::invalid_unsigned_int);
 }
 
+#endif
 
 
 /*------------------------ Line iterator functions ------------------------*/
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -14620,10 +14633,11 @@ typename Triangulation<dim, spacedim>::line_iterator
                            -1);
 }
 
-
+#endif
 
 /*------------------------ Quad iterator functions ------------------------*/
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -14725,9 +14739,11 @@ typename Triangulation<dim, spacedim>::quad_iterator
                            -1);
 }
 
+#endif
 
 /*------------------------ Hex iterator functions ------------------------*/
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -14820,7 +14836,7 @@ typename Triangulation<dim, spacedim>::hex_iterator
                           -1);
 }
 
-
+#endif
 
 // -------------------------------- number of cells etc ---------------
 
@@ -14875,7 +14891,7 @@ namespace internal
   } // namespace TriangulationImplementation
 } // namespace internal
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -15116,7 +15132,7 @@ unsigned int Triangulation<dim, spacedim>::n_active_lines(
 
   return number_cache.n_active_lines_level[level];
 }
-
+#endif
 
 template <>
 unsigned int
@@ -15262,7 +15278,7 @@ Triangulation<1, 3>::n_active_quads() const
   return 0;
 }
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -15282,7 +15298,7 @@ unsigned int Triangulation<dim, spacedim>::n_quads(
   return number_cache.n_quads_level[level];
 }
 
-
+#endif
 
 template <>
 unsigned int
@@ -15311,7 +15327,7 @@ Triangulation<3, 3>::n_raw_quads(const unsigned int) const
   return 0;
 }
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -15321,7 +15337,7 @@ unsigned int Triangulation<dim, spacedim>::n_raw_quads() const
   return 0;
 }
 
-
+#endif
 
 template <>
 unsigned int
@@ -15330,7 +15346,7 @@ Triangulation<3, 3>::n_raw_quads() const
   return faces->quads.n_objects();
 }
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -15395,6 +15411,7 @@ unsigned int Triangulation<dim, spacedim>::n_active_hexs(
   return 0;
 }
 
+#endif
 
 template <>
 unsigned int
@@ -15443,7 +15460,7 @@ Triangulation<3, 3>::n_active_hexs(const unsigned int level) const
   return number_cache.n_active_hexes_level[level];
 }
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -15461,7 +15478,7 @@ const std::vector<bool> &Triangulation<dim, spacedim>::get_used_vertices() const
   return vertices_used;
 }
 
-
+#endif
 
 template <>
 unsigned int
@@ -15487,6 +15504,7 @@ Triangulation<1, 3>::max_adjacent_cells() const
   return 2;
 }
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -15627,7 +15645,7 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
 
   update_periodic_face_map();
 
-#ifdef DEBUG
+#  ifdef DEBUG
 
   // In debug mode, we want to check for some consistency of the
   // result of this function. Because there are multiple exit
@@ -15670,7 +15688,7 @@ void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
                 }
             }
     }
-#endif
+#  endif
 }
 
 
@@ -16117,7 +16135,7 @@ typename Triangulation<dim, spacedim>::DistortedCellList
   internal::TriangulationImplementation::Implementation::compute_number_cache(
     *this, levels.size(), number_cache);
 
-#ifdef DEBUG
+#  ifdef DEBUG
   for (const auto &level : levels)
     monitor_memory(level->cells, dim);
 
@@ -16127,7 +16145,7 @@ typename Triangulation<dim, spacedim>::DistortedCellList
   // since the cell-accessors should have caught this)
   for (const auto &cell : this->cell_iterators())
     Assert(!cell->refine_flag_set(), ExcInternalError());
-#endif
+#  endif
 
   return cells_with_distorted_children;
 }
@@ -16378,7 +16396,7 @@ void Triangulation<dim, spacedim>::fix_coarsen_flags()
   while (continue_iterating == true);
 }
 
-
+#endif
 
 // TODO: merge the following 3 functions since they are the same
 template <>
@@ -16619,7 +16637,7 @@ namespace
   }
 } // namespace
 
-
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
@@ -17733,6 +17751,7 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 Triangulation<dim, spacedim>::DistortedCellList::~DistortedCellList() noexcept =
   default;
 
+#endif
 
 // explicit instantiations
 #include "tria.inst"

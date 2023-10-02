@@ -42,10 +42,11 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 const types::fe_index DoFHandler<dim, spacedim>::default_fe_index;
-
+#endif
 
 namespace internal
 {
@@ -1714,7 +1715,7 @@ namespace internal
   }   // namespace hp
 } // namespace internal
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -1799,10 +1800,9 @@ void DoFHandler<dim, spacedim>::reinit(const Triangulation<dim, spacedim> &tria)
   this->create_active_fe_table();
 }
 
-
-
+#endif
 /*------------------------ Cell iterator functions ------------------------*/
-
+#ifndef DOXYGEN
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 typename DoFHandler<dim, spacedim>::cell_iterator
@@ -2168,7 +2168,7 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
          ExcMessage("The given hp::FECollection contains more finite elements "
                     "than the DoFHandler can cover with active FE indices."));
 
-#ifdef DEBUG
+#  ifdef DEBUG
   // make sure that the provided FE collection is large enough to
   // cover all FE indices presently in use on the mesh
   if ((hp_cell_active_fe_indices.size() > 0) &&
@@ -2185,7 +2185,7 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
                  ExcInvalidFEIndex(cell->future_fe_index(), ff.size()));
         }
     }
-#endif
+#  endif
 
   //
   // register the new finite element collection
@@ -2410,7 +2410,7 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
 
       AssertDimension(new_numbers.size(), this->n_locally_owned_dofs());
 
-#ifdef DEBUG
+#  ifdef DEBUG
       // assert that the new indices are consecutively numbered if we are
       // working on a single processor. this doesn't need to
       // hold in the case of a parallel mesh since we map the interval
@@ -2429,7 +2429,7 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
           Assert(new_number < this->n_dofs(),
                  ExcMessage(
                    "New DoF index is not less than the total number of dofs."));
-#endif
+#  endif
 
       // uncompress the internal storage scheme of dofs on cells so that
       // we can access dofs in turns. uncompress in parallel, starting
@@ -2464,7 +2464,7 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
              ExcMessage(
                "You need to distribute DoFs before you can renumber them."));
 
-#ifdef DEBUG
+#  ifdef DEBUG
       if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
             &*this->tria) != nullptr)
         {
@@ -2501,7 +2501,7 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
           Assert(new_number < this->n_dofs(),
                  ExcMessage(
                    "New DoF index is not less than the total number of dofs."));
-#endif
+#  endif
 
       this->number_cache = this->policy->renumber_dofs(new_numbers);
     }
@@ -2525,7 +2525,7 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
   AssertDimension(new_numbers.size(),
                   this->locally_owned_mg_dofs(level).n_elements());
 
-#ifdef DEBUG
+#  ifdef DEBUG
   // assert that the new indices are consecutively numbered if we are working
   // on a single processor. this doesn't need to hold in the case of a
   // parallel mesh since we map the interval [0...n_dofs(level)) into itself
@@ -2544,7 +2544,7 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
       Assert(new_number < this->n_dofs(level),
              ExcMessage(
                "New DoF index is not less than the total number of dofs."));
-#endif
+#  endif
 
   this->mg_number_cache[level] =
     this->policy->renumber_mg_dofs(level, new_numbers);
@@ -2904,13 +2904,13 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
 {
-#ifndef DEAL_II_WITH_P4EST
+#  ifndef DEAL_II_WITH_P4EST
   Assert(false,
          ExcMessage(
            "You are attempting to use a functionality that is only available "
            "if deal.II was configured to use p4est, but cmake did not find a "
            "valid p4est library."));
-#else
+#  else
   // the implementation below requires a p:d:T currently
   Assert(
     (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
@@ -2962,7 +2962,7 @@ void DoFHandler<dim, spacedim>::pre_distributed_transfer_action()
   active_fe_index_transfer->cell_data_transfer
     ->prepare_for_coarsening_and_refinement(
       active_fe_index_transfer->active_fe_indices);
-#endif
+#  endif
 }
 
 
@@ -2994,9 +2994,9 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::post_distributed_transfer_action()
 {
-#ifndef DEAL_II_WITH_P4EST
+#  ifndef DEAL_II_WITH_P4EST
   Assert(false, ExcInternalError());
-#else
+#  else
   update_active_fe_table();
 
   Assert(this->active_fe_index_transfer != nullptr, ExcInternalError());
@@ -3017,7 +3017,7 @@ void DoFHandler<dim, spacedim>::post_distributed_transfer_action()
 
   // Free memory.
   this->active_fe_index_transfer.reset();
-#endif
+#  endif
 }
 
 
@@ -3026,13 +3026,13 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
 {
-#ifndef DEAL_II_WITH_P4EST
+#  ifndef DEAL_II_WITH_P4EST
   Assert(false,
          ExcMessage(
            "You are attempting to use a functionality that is only available "
            "if deal.II was configured to use p4est, but cmake did not find a "
            "valid p4est library."));
-#else
+#  else
   // the implementation below requires a p:d:T currently
   Assert(
     (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
@@ -3075,7 +3075,7 @@ void DoFHandler<dim, spacedim>::prepare_for_serialization_of_active_fe_indices()
   // Attach to transfer object
   active_fe_index_transfer->cell_data_transfer->prepare_for_serialization(
     active_fe_index_transfer->active_fe_indices);
-#endif
+#  endif
 }
 
 
@@ -3084,13 +3084,13 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::deserialize_active_fe_indices()
 {
-#ifndef DEAL_II_WITH_P4EST
+#  ifndef DEAL_II_WITH_P4EST
   Assert(false,
          ExcMessage(
            "You are attempting to use a functionality that is only available "
            "if deal.II was configured to use p4est, but cmake did not find a "
            "valid p4est library."));
-#else
+#  else
   // the implementation below requires a p:d:T currently
   Assert(
     (dynamic_cast<const parallel::distributed::Triangulation<dim, spacedim> *>(
@@ -3139,7 +3139,7 @@ void DoFHandler<dim, spacedim>::deserialize_active_fe_indices()
 
   // Free memory.
   active_fe_index_transfer.reset();
-#endif
+#  endif
 }
 
 
@@ -3194,7 +3194,7 @@ unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_finest_level() const
 {
   return finest_level;
 }
-
+#endif
 /*-------------- Explicit Instantiations -------------------------------*/
 #include "dof_handler.inst"
 

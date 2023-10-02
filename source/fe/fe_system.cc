@@ -232,6 +232,7 @@ namespace internal
 } // namespace internal
 
 /* ----------------------- FESystem::InternalData ------------------- */
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 FESystem<dim, spacedim>::InternalData::InternalData(
@@ -1978,7 +1979,7 @@ FESystem<dim, spacedim>::initialize(
           }
       }
 
-#ifdef DEBUG
+#  ifdef DEBUG
     // check generalized_support_points_index_table for consistency
     for (unsigned int i = 0; i < base_elements.size(); ++i)
       {
@@ -1994,7 +1995,7 @@ FESystem<dim, spacedim>::initialize(
                    ExcInternalError());
           }
       }
-#endif /* DEBUG */
+#  endif /* DEBUG */
   });
 
   // initialize quad dof index permutation in 3d and higher
@@ -2760,7 +2761,7 @@ FESystem<dim, spacedim>::memory_consumption() const
   return mem;
 }
 
-
+#endif
 
 // explicit instantiations
 #include "fe_system.inst"
