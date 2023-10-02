@@ -376,6 +376,30 @@ public:
   get_view(const size_type begin, const size_type end) const;
 
   /**
+   * This command takes a "mask", i.e., a second index set of same size as the
+   * current one and returns the intersection of the current index set the mask,
+   * shifted to the index of an entry within the given mask. For example,
+   * if the current object is a an IndexSet object representing an index space
+   * `[0,100)` containing indices `[20,40)`, and if the mask represents
+   * an index space of the same size but containing all 50 *odd* indices in this
+   * range, then the result will be an index set for a space of size 50 that
+   * contains those indices that correspond to the question "the how many'th
+   * entry in the mask are the indices `[20,40)`. This will result in an index
+   * set of size 50 that contains the indices `{11,12,13,14,15,16,17,18,19,20}`
+   * (because, for example, the index 20 in the original set is not in the mask,
+   * but 21 is and corresponds to the 11th entry of the mask -- the mask
+   * contains the elements `{1,3,5,7,9,11,13,15,17,19,21,...}`).
+   *
+   * In other words, the result of this operation is the intersection of the
+   * set represented by the current object and the mask, as seen
+   * <i>within the mask</i>. This corresponds to the notion of a <i>view</i>:
+   * The mask is a <i>window</i> through which we see the set represented by the
+   * current object.
+   */
+  IndexSet
+  get_view(const IndexSet &mask) const;
+
+  /**
    * Split the set indices represented by this object into blocks given by the
    * @p n_indices_per_block structure. The sum of its entries must match the
    * global size of the current object.
