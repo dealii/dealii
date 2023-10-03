@@ -209,6 +209,10 @@ namespace numbers
    * integer. This value is widely used throughout the library as a marker for
    * an invalid unsigned integer value, such as an invalid array index, an
    * invalid array size, and the like.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
   static const unsigned int invalid_unsigned_int =
     static_cast<unsigned int>(-1);
@@ -218,17 +222,29 @@ namespace numbers
    * This value is used throughout the library as a marker for an invalid
    * size_type value, such as an invalid array index, an invalid array size,
    * and the like. Invalid_size_type is equivalent to invalid_dof_index.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
   const types::global_dof_index invalid_size_type =
     static_cast<types::global_dof_index>(-1);
 
   /**
    * An invalid value for active and future fe indices.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
   const types::fe_index invalid_fe_index = static_cast<types::fe_index>(-1);
 
   /**
    * An invalid value for indices of degrees of freedom.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
   const types::global_dof_index invalid_dof_index =
     static_cast<types::global_dof_index>(-1);
@@ -238,22 +254,34 @@ namespace numbers
    * entry on
    * @ref GlossCoarseCellId "coarse cell IDs"
    * for more information.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
   const types::coarse_cell_id invalid_coarse_cell_id =
     static_cast<types::coarse_cell_id>(-1);
 
   /**
    * Invalid material_id which we need in several places as a default value.
-   * We assume that all material_ids lie in the range [0,
-   * invalid_material_id).
+   * We assume that all material_ids lie in the range `[0,
+   * invalid_material_id)`.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
   const types::material_id invalid_material_id =
     static_cast<types::material_id>(-1);
 
   /**
    * Invalid boundary_id which we need in several places as a default value.
-   * We assume that all valid boundary_ids lie in the range [0,
-   * invalid_boundary_id).
+   * We assume that all valid boundary_ids lie in the range `[0,
+   * invalid_boundary_id)`.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -263,13 +291,17 @@ namespace numbers
 
   /**
    * A boundary indicator number that we reserve for internal faces.  We
-   * assume that all valid boundary_ids lie in the range [0,
-   * internal_face_boundary_id).
+   * assume that all valid boundary_ids lie in the range `[0,
+   * internal_face_boundary_id)`.
    *
    * This is an indicator that is used internally (by the library) to
    * differentiate between faces that lie at the boundary of the domain and
    * faces that lie in the interior of the domain. You should never try to
    * assign this boundary indicator to anything in user code.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    *
    * @see
    * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
@@ -279,6 +311,10 @@ namespace numbers
 
   /**
    * A manifold_id we reserve for the default flat Cartesian manifold.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    *
    * @see
    * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
@@ -290,6 +326,10 @@ namespace numbers
    * A special id for an invalid subdomain id. This value may not be used as a
    * valid id but is used, for example, for default arguments to indicate a
    * subdomain id that is not to be used.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    *
    * See the
    * @ref GlossSubdomainId "glossary"
@@ -311,6 +351,10 @@ namespace numbers
    * as well as the
    * @ref distributed
    * module for more information.
+   *
+   * This value is an example of an
+   * @ref GlossInvalidValue "invalid value".
+   * See there for more information.
    */
   const types::subdomain_id artificial_subdomain_id =
     static_cast<types::subdomain_id>(-2);

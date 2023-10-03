@@ -279,7 +279,7 @@ public:
    * Return the how-manyth element of this set (counted in ascending order) @p
    * global_index is. @p global_index needs to be less than the size(). This
    * function returns numbers::invalid_dof_index if the index @p global_index is not actually
-   * a member of this index set, i.e. if is_element(global_index) is false.
+   * a member of this index set, i.e. if `is_element(global_index)` is false.
    */
   size_type
   index_within_set(const size_type global_index) const;
