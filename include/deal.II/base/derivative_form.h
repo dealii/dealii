@@ -429,6 +429,30 @@ DerivativeForm<order, dim, spacedim, Number>::memory_consumption()
 
 
 /**
+ * Output operator for DerivativeForm. Print the elements consecutively, with a
+ * space in between, two spaces between rank 1 subtensors, three between rank 2
+ * and so on.
+ *
+ * @relatesalso DerivativeForm
+ */
+template <int order, int dim, int spacedim, typename Number>
+inline std::ostream &
+operator<<(std::ostream                                       &out,
+           const DerivativeForm<order, dim, spacedim, Number> &df)
+{
+  for (unsigned int i = 0; i < spacedim; ++i)
+    {
+      out << df[i];
+      if (i != spacedim - 1)
+        out << ' ';
+    }
+
+  return out;
+}
+
+
+
+/**
  * One of the uses of DerivativeForm is to apply it as a linear transformation.
  * This function returns $\nabla \mathbf F(\mathbf x) \Delta \mathbf x$, which
  * approximates the change in $\mathbf F(\mathbf x)$ when $\mathbf x$ is changed
