@@ -4072,7 +4072,7 @@ MGTransferMF<dim, Number>::initialize_constraints(
 
 template <int dim, typename Number>
 void
-MGTransferMF<dim, Number>::intitialize_internal_transfer(
+MGTransferMF<dim, Number>::initialize_internal_transfer(
   const DoFHandler<dim>                       &dof_handler,
   const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs)
 {
@@ -4183,8 +4183,8 @@ MGTransferMF<dim, Number>::build(
   const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     &external_partitioners)
 {
-  this->intitialize_internal_transfer(dof_handler, this->mg_constrained_dofs);
-  this->intitialize_transfer_references(internal_transfer);
+  this->initialize_internal_transfer(dof_handler, this->mg_constrained_dofs);
+  this->initialize_transfer_references(internal_transfer);
   this->build(external_partitioners);
   this->fill_and_communicate_copy_indices(dof_handler);
 }
@@ -4198,8 +4198,8 @@ MGTransferMF<dim, Number>::build(
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
 {
-  this->intitialize_internal_transfer(dof_handler, this->mg_constrained_dofs);
-  this->intitialize_transfer_references(internal_transfer);
+  this->initialize_internal_transfer(dof_handler, this->mg_constrained_dofs);
+  this->initialize_transfer_references(internal_transfer);
   this->build(initialize_dof_vector);
   this->fill_and_communicate_copy_indices(dof_handler);
 }

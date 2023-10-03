@@ -965,7 +965,7 @@ private:
  * sequence of functions calls for setup is:
  * @code
  * MGTransferGlobalCoarsening mg_transfer;
- * mg_transfer.intitialize_two_level_transfers(two_level_transfers);
+ * mg_transfer.initialize_two_level_transfers(two_level_transfers);
  * mg_transfer.build(partitioners);
  * @endcode
  *
@@ -1027,7 +1027,7 @@ public:
    */
   template <typename MGTwoLevelTransferObject>
   void
-  intitialize_two_level_transfers(
+  initialize_two_level_transfers(
     const MGLevelObject<MGTwoLevelTransferObject> &transfer);
 
   /**
@@ -1221,7 +1221,7 @@ private:
    * @note See also MGTransferMatrixFree.
    */
   void
-  intitialize_internal_transfer(
+  initialize_internal_transfer(
     const DoFHandler<dim>                       &dof_handler,
     const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs);
 
@@ -1230,7 +1230,7 @@ private:
    */
   template <typename MGTwoLevelTransferObject>
   void
-  intitialize_transfer_references(
+  initialize_transfer_references(
     const MGLevelObject<MGTwoLevelTransferObject> &transfer);
 
   /**
@@ -1374,7 +1374,7 @@ MGTransferMF<dim, Number>::MGTransferMF(
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
 {
-  this->intitialize_transfer_references(transfer);
+  this->initialize_transfer_references(transfer);
   this->build(initialize_dof_vector);
 }
 
@@ -1383,10 +1383,10 @@ MGTransferMF<dim, Number>::MGTransferMF(
 template <int dim, typename Number>
 template <typename MGTwoLevelTransferObject>
 void
-MGTransferMF<dim, Number>::intitialize_two_level_transfers(
+MGTransferMF<dim, Number>::initialize_two_level_transfers(
   const MGLevelObject<MGTwoLevelTransferObject> &transfer)
 {
-  this->intitialize_transfer_references(transfer);
+  this->initialize_transfer_references(transfer);
 }
 
 
@@ -1394,7 +1394,7 @@ MGTransferMF<dim, Number>::intitialize_two_level_transfers(
 template <int dim, typename Number>
 template <typename MGTwoLevelTransferObject>
 void
-MGTransferMF<dim, Number>::intitialize_transfer_references(
+MGTransferMF<dim, Number>::initialize_transfer_references(
   const MGLevelObject<MGTwoLevelTransferObject> &transfer)
 {
   const unsigned int min_level = transfer.min_level();
