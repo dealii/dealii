@@ -1929,7 +1929,8 @@ operator<<(std::ostream &out, const Tensor<rank_, dim, Number> &p)
     {
       out << p[i];
       if (i != dim - 1)
-        out << ' ';
+        for (unsigned int j = 0; j < rank_; ++j)
+          out << ' ';
     }
 
   return out;
