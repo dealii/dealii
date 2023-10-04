@@ -4143,7 +4143,9 @@ void
 MGTransferMF<dim, Number>::fill_and_communicate_copy_indices_global_coarsening(
   const DoFHandler<dim> &dof_handler_out)
 {
-  const auto [dof_handler_in, level_in] = get_dof_handler_fine();
+  const auto dof_handler_and_level_in = get_dof_handler_fine();
+  const auto dof_handler_in           = dof_handler_and_level_in.first;
+  const auto level_in                 = dof_handler_and_level_in.second;
 
   if ((dof_handler_in == nullptr) || (dof_handler_in == &dof_handler_out))
     return; // nothing to do
@@ -4407,7 +4409,9 @@ MGTransferMF<dim, Number>::assert_dof_handler(
   (void)dof_handler_out;
 #else
 
-  const auto [dof_handler_in, level_in] = get_dof_handler_fine();
+  const auto dof_handler_and_level_in = get_dof_handler_fine();
+  const auto dof_handler_in           = dof_handler_and_level_in.first;
+  const auto level_in                 = dof_handler_and_level_in.second;
 
   if ((dof_handler_out.n_dofs() == 0) ||  // dummy DoFHandler
       (dof_handler_in == nullptr) ||      // single level
