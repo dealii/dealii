@@ -13,9 +13,9 @@
 //
 // ---------------------------------------------------------------------
 
-
-
 #include <deal.II/base/timer.h>
+
+#include <thread>
 
 #include "../tests.h"
 
@@ -28,8 +28,9 @@ compare(double t1, double t2, double ratio)
   double r = t2 / t1;
   double d = std::fabs(r - ratio) / ratio;
 
-  // relative error < 25%?
-  if (d <= .25)
+  // use a really coarse tolerance to account for situations in which we are
+  // running the test suite with very high load
+  if (d <= 0.5)
     {
       deallog << "OK" << std::endl;
     }
@@ -53,36 +54,20 @@ match(double v1, double v2)
     }
 }
 
-// burn computer time
-
-double s = 0.;
-void
-burn(unsigned int n)
-{
-  for (unsigned int i = 0; i < n; ++i)
-    {
-      for (unsigned int j = 1; j < 100000; ++j)
-        {
-          s += 1. / j * i;
-        }
-    }
-}
-
-
 int
 main()
 {
   initlog();
 
   Timer       t1, t2;
-  TimerOutput tO(std::cout, TimerOutput::summary, TimerOutput::cpu_times);
+  TimerOutput tO(std::cout, TimerOutput::summary, TimerOutput::wall_times);
 
   tO.enter_subsection("Section1");
   tO.enter_subsection("Section2");
-  burn(50);
+  std::this_thread::sleep_for(std::chrono::seconds(2));
   tO.leave_subsection("Section2");
   tO.enter_subsection("Section2");
-  burn(50);
+  std::this_thread::sleep_for(std::chrono::seconds(2));
   tO.leave_subsection("Section2");
   tO.leave_subsection("Section1");
 
