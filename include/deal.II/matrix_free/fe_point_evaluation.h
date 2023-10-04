@@ -1816,7 +1816,7 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::do_reinit()
   if (update_flags_mapping & UpdateFlags::update_inverse_jacobians)
     inverse_jacobian_ptr =
       mapping_info->get_inverse_jacobian(compressed_data_offset);
-  if (is_face && update_flags_mapping & UpdateFlags::update_normal_vectors)
+  if (update_flags_mapping & UpdateFlags::update_normal_vectors)
     normal_ptr = mapping_info->get_normal_vector(data_offset);
   if (update_flags_mapping & UpdateFlags::update_JxW_values)
     JxW_ptr = mapping_info->get_JxW(data_offset);
