@@ -697,6 +697,11 @@
  *       <br/> Keywords: FERemoteEvaluation
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-90</td>
+ *       <td> Solving the Laplace-Beltrami equation on a surface using the trace finite element method.
+ *       <br/> Keywords: MeshWorker::mesh_loop(), NonMatching::FEImmersedSurfaceValues
+ *       </td></tr>
  * </table>
  *
  *
