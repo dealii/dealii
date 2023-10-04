@@ -4111,8 +4111,8 @@ template <int dim, typename Number>
 std::pair<const DoFHandler<dim> *, unsigned int>
 MGTransferMF<dim, Number>::get_dof_handler_fine() const
 {
-  if (this->transfer.n_levels() <=
-      1) // single level: the information cannot be retreaved
+  if (this->transfer.n_levels() <= 1)
+    // single level: the information cannot be retrieved
     return {nullptr, numbers::invalid_unsigned_int};
 
   if (const auto t = dynamic_cast<

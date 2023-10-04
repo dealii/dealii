@@ -1110,10 +1110,11 @@ public:
   /**
    * Actually build the information for the prolongation for each level.
    *
-   * @note In the case of global coarsening, you can pass into this function
-   * a @p dof_handler with different DoF numbering as the one used within the
-   * provided two-level transfer objects. In this case, vector entries are
-   * permuted during copy_to_mg(), copy_from_mg(), and interpolate_to_mg().
+   * @note In the case of global coarsening, you can pass a @p dof_handler
+   * with different DoF numbering as the one used within the provided
+   * two-level transfer objects  into this function. In this case, vector
+   * entries are permuted during copy_to_mg(), copy_from_mg(), and
+   * interpolate_to_mg().
    */
   void
   build(const DoFHandler<dim> &dof_handler,
@@ -1166,10 +1167,13 @@ public:
                    const VectorType  &src) const override;
 
   /**
-   * Initialize internal vectors and copy @p src vector to the finest
-   * multigrid level.
+   * Initialize internal vectors and copy @p src vector
+   * (associated to @p dof_handler) to the finest multigrid level.
    *
-   * @note DoFHandler is not needed here, but is required by the interface.
+   * @note The @dof_handler object needs to be the same as the DoFHandler passed
+   * directly to the function build() or indirectly to the function
+   * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
+   * need to be same.
    */
   template <class InVector>
   void
@@ -1178,10 +1182,13 @@ public:
              const InVector            &src) const;
 
   /**
-   * Initialize internal vectors and copy the values on the finest
-   * multigrid level to @p dst vector.
+   * Copy the values on the finest multigrid level to @p dst
+   * vector (associated to @p dof_handler).
    *
-   * @note DoFHandler is not needed here, but is required by the interface.
+   * @note The @dof_handler object needs to be the same as the DoFHandler passed
+   * directly to the function build() or indirectly to the function
+   * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
+   * need to be same.
    */
   template <class OutVector>
   void
@@ -1190,16 +1197,22 @@ public:
                const MGLevelObject<VectorType> &src) const;
 
   /**
-   * Interpolate fine-mesh field @p src to each multigrid level in
-   * @p dof_handler and store the result in @p dst. This function is different
-   * from restriction, where a weighted residual is
-   * transferred to a coarser level (transposition of prolongation matrix).
+   * Interpolate fine-mesh field @p src (associated to @p dof_handler)
+   * to each multigrid level and
+   * store the result in @p dst. This function is different from
+   * restriction, where a weighted residual is transferred to a coarser
+   * level (transposition of prolongation matrix).
    *
    * The argument @p dst has to be initialized with the correct size according
    * to the number of levels of the triangulation.
    *
    * If an inner vector of @p dst is empty or has incorrect locally owned size,
    * it will be resized to locally relevant degrees of freedom on each level.
+   *
+   * @note The @dof_handler object needs to be the same as the DoFHandler passed
+   * directly to the function build() or indirectly to the function
+   * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
+   * need to be same.
    */
   template <class InVector>
   void
@@ -1208,8 +1221,12 @@ public:
                     const InVector            &src) const;
 
   /**
-   * Interpolate fine-mesh field @p src to each multigrid level in
-   * @p dof_handler and store the result in @p dst.
+   * Interpolate fine-mesh field @p src to each multigrid level and
+   * store the result in @p dst.
+   *
+   * @note In contrast to the last function, no @dof_handler object needs passed.
+   * This function used the DoFHandler passed directly to the function build()
+   * or indirectly to the function initialize_two_level_transfers().
    */
   template <class InVector>
   void
@@ -1264,7 +1281,7 @@ private:
     const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs);
 
   /**
-   * Retreave finest DoFHandler from two-level transfer objects.
+   * Retrieve finest DoFHandler from two-level transfer objects.
    */
   std::pair<const DoFHandler<dim> *, unsigned int>
   get_dof_handler_fine() const;
