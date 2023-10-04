@@ -1170,7 +1170,7 @@ public:
    * Initialize internal vectors and copy @p src vector
    * (associated to @p dof_handler) to the finest multigrid level.
    *
-   * @note The @dof_handler object needs to be the same as the DoFHandler passed
+   * @note The @p dof_handler object needs to be the same as the DoFHandler passed
    * directly to the function build() or indirectly to the function
    * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
    * need to be same.
@@ -1185,7 +1185,7 @@ public:
    * Copy the values on the finest multigrid level to @p dst
    * vector (associated to @p dof_handler).
    *
-   * @note The @dof_handler object needs to be the same as the DoFHandler passed
+   * @note The @p dof_handler object needs to be the same as the DoFHandler passed
    * directly to the function build() or indirectly to the function
    * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
    * need to be same.
@@ -1209,7 +1209,7 @@ public:
    * If an inner vector of @p dst is empty or has incorrect locally owned size,
    * it will be resized to locally relevant degrees of freedom on each level.
    *
-   * @note The @dof_handler object needs to be the same as the DoFHandler passed
+   * @note The @p dof_handler object needs to be the same as the DoFHandler passed
    * directly to the function build() or indirectly to the function
    * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
    * need to be same.
@@ -1224,7 +1224,7 @@ public:
    * Interpolate fine-mesh field @p src to each multigrid level and
    * store the result in @p dst.
    *
-   * @note In contrast to the last function, no @dof_handler object needs passed.
+   * @note In contrast to the last function, no @p dof_handler object needs passed.
    * This function used the DoFHandler passed directly to the function build()
    * or indirectly to the function initialize_two_level_transfers().
    */
