@@ -24,8 +24,6 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 

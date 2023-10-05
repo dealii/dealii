@@ -36,8 +36,6 @@
 
 #include <deal.II/lac/trilinos_vector.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 template <int dim>

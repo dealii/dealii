@@ -22,8 +22,6 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/petsc_vector.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 

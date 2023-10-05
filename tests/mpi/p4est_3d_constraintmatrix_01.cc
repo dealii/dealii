@@ -35,8 +35,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 template <int dim>
