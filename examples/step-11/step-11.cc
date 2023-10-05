@@ -151,16 +151,17 @@ namespace Step11
 
     // Then generate a constraints object with just this one constraint. First
     // clear all previous content (which might reside there from the previous
-    // computation on a once coarser grid), then add this one line
+    // computation on a once coarser grid), then add this one constraint,
     // constraining the <code>first_boundary_dof</code> to the sum of other
     // boundary DoFs each with weight -1. Finally, close the constraints
     // object, i.e. do some internal bookkeeping on it for faster processing
     // of what is to come later:
     mean_value_constraints.clear();
-    mean_value_constraints.add_line(first_boundary_dof);
+    std::vector<std::pair<types::global_dof_index, double>> rhs;
     for (const types::global_dof_index i : boundary_dofs)
       if (i != first_boundary_dof)
-        mean_value_constraints.add_entry(first_boundary_dof, i, -1);
+        rhs.emplace_back(i, -1.);
+    mean_value_constraints.add_constraint(first_boundary_dof, rhs);
     mean_value_constraints.close();
 
     // Next task is to generate a sparsity pattern. This is indeed a tricky
