@@ -1097,6 +1097,7 @@ AffineConstraints<number>::clear()
   }
 
   locally_owned_dofs             = {};
+  local_lines                    = {};
   needed_elements_for_distribute = {};
 
   sorted = false;
