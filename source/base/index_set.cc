@@ -257,6 +257,144 @@ IndexSet::get_view(const size_type begin, const size_type end) const
   return result;
 }
 
+
+
+IndexSet
+IndexSet::get_view(const IndexSet &mask) const
+{
+  Assert(size() == mask.size(),
+         ExcMessage("The mask must have the same size index space "
+                    "as the index set it is applied to."));
+
+  // If 'other' is an empty set, then the view is also empty:
+  if (mask == IndexSet())
+    return {};
+
+  // For everything, it is more efficient to work on compressed sets:
+  compress();
+  mask.compress();
+
+  // If 'other' has a single range, then we can just defer to the
+  // previous function
+  if (mask.ranges.size() == 1)
+    return get_view(mask.ranges[0].begin, mask.ranges[0].end);
+
+  // For the general case where the mask is an arbitrary set,
+  // the situation is slightly more complicated. We need to walk
+  // the ranges of the two index sets in parallel and search for
+  // overlaps, and then appropriately shift
+
+  // we save all new ranges to our IndexSet in an temporary vector and
+  // add all of them in one go at the end.
+  std::vector<Range> new_ranges;
+
+  std::vector<Range>::iterator own_it  = ranges.begin();
+  std::vector<Range>::iterator mask_it = mask.ranges.begin();
+
+  while ((own_it != ranges.end()) && (mask_it != mask.ranges.end()))
+    {
+      // If our own range lies completely ahead of the current
+      // range in the mask, move forward and start the loop body
+      // anew. If this was the last range, the 'while' loop above
+      // will terminate, so we don't have to check for end iterators
+      if (own_it->end <= mask_it->begin)
+        {
+          ++own_it;
+          continue;
+        }
+
+      // Do the same if the current mask range lies completely ahead of
+      // the current range of the this object:
+      if (mask_it->end <= own_it->begin)
+        {
+          ++mask_it;
+          continue;
+        }
+
+      // Now own_it and other_it overlap. Check that that is true by
+      // enumerating the cases that can happen. This is
+      // surprisingly tricky because the two intervals can intersect in
+      // a number of different ways, but there really are only the four
+      // following possibilities:
+
+      // Case 1: our interval overlaps the left end of the other interval
+      //
+      // So we need to add the elements from the first element of the mask's
+      // interval to the end of our own interval. But we need to shift the
+      // indices so that they correspond to the how many'th element within the
+      // mask this is; fortunately (because we compressed the mask), this
+      // is recorded in the mask's ranges.
+      if ((own_it->begin <= mask_it->begin) && (own_it->end <= mask_it->end))
+        {
+          new_ranges.emplace_back(mask_it->begin - mask_it->nth_index_in_set,
+                                  own_it->end - mask_it->nth_index_in_set);
+        }
+      else
+        // Case 2:our interval overlaps the tail end of the other interval
+        if ((mask_it->begin <= own_it->begin) && (mask_it->end <= own_it->end))
+          {
+            const size_type offset_within_mask_interval =
+              own_it->begin - mask_it->begin;
+            new_ranges.emplace_back(mask_it->nth_index_in_set +
+                                      offset_within_mask_interval,
+                                    mask_it->nth_index_in_set +
+                                      (mask_it->end - mask_it->begin));
+          }
+        else
+          // Case 3: Our own interval completely encloses the other interval
+          if ((own_it->begin <= mask_it->begin) &&
+              (own_it->end >= mask_it->end))
+            {
+              new_ranges.emplace_back(mask_it->begin -
+                                        mask_it->nth_index_in_set,
+                                      mask_it->end - mask_it->nth_index_in_set);
+            }
+          else
+            // Case 3: The other interval completely encloses our own interval
+            if ((mask_it->begin <= own_it->begin) &&
+                (mask_it->end >= own_it->end))
+              {
+                const size_type offset_within_mask_interval =
+                  own_it->begin - mask_it->begin;
+                new_ranges.emplace_back(mask_it->nth_index_in_set +
+                                          offset_within_mask_interval,
+                                        mask_it->nth_index_in_set +
+                                          offset_within_mask_interval +
+                                          (own_it->end - own_it->begin));
+              }
+            else
+              Assert(false, ExcInternalError());
+
+      // We considered the overlap of these two intervals. It may of course
+      // be that one of them overlaps with another one, but that can only
+      // be the case for the interval that extends further to the right. So
+      // we can safely move on from the interval that terminates earlier:
+      if (own_it->end < mask_it->end)
+        ++own_it;
+      else if (mask_it->end < own_it->end)
+        ++mask_it;
+      else
+        {
+          // The intervals ended at the same point. We can move on from both.
+          // (The algorithm would also work if we only moved on from one,
+          // but we can micro-optimize here without too much effort.)
+          ++own_it;
+          ++mask_it;
+        }
+    }
+
+  // Now turn the ranges of overlap we have accumulated into an IndexSet in
+  // its own right:
+  IndexSet result(mask.n_elements());
+  for (const auto &range : new_ranges)
+    result.add_range(range.begin, range.end);
+  result.compress();
+
+  return result;
+}
+
+
+
 std::vector<IndexSet>
 IndexSet::split_by_block(
   const std::vector<types::global_dof_index> &n_indices_per_block) const
@@ -283,6 +421,8 @@ IndexSet::split_by_block(
 
   return partitioned;
 }
+
+
 
 void
 IndexSet::subtract_set(const IndexSet &other)
