@@ -1063,13 +1063,13 @@ namespace VectorTools
                         constraints.can_store_line(
                           same_dof_range[0]->first.dof_indices[i]))
                       {
-                        const types::global_dof_index line =
-                          dof_indices.dof_indices[i];
-                        constraints.add_line(line);
-                        if (std::fabs(b_values[i]) >
-                            std::numeric_limits<double>::epsilon())
-                          constraints.set_inhomogeneity(line, b_values[i]);
-                        // no add_entries here
+                        constraints.add_constraint(
+                          dof_indices.dof_indices[i],
+                          {},
+                          (std::fabs(b_values[i]) >
+                               std::numeric_limits<double>::epsilon() ?
+                             b_values[i] :
+                             0));
                       }
 
                   break;
@@ -1459,10 +1459,7 @@ namespace VectorTools
               {
                 const Vector<double> b_value = dof_vector_to_b_values[dofs];
                 for (unsigned int d = 0; d < dim; ++d)
-                  {
-                    constraints.add_line(dofs[d]);
-                    constraints.set_inhomogeneity(dofs[d], b_value(d));
-                  }
+                  constraints.add_constraint(dofs[d], {}, b_value(d));
                 continue;
               }
 
@@ -1502,12 +1499,15 @@ namespace VectorTools
                 const unsigned int new_index = dofs[d];
                 if (!constraints.is_constrained(new_index))
                   {
-                    constraints.add_line(new_index);
                     if (std::abs(normal[d]) > 1e-13)
-                      constraints.add_entry(new_index,
-                                            dofs[constrained_index],
-                                            -normal[d]);
-                    constraints.set_inhomogeneity(new_index, boundary_value[d]);
+                      constraints.add_constraint(new_index,
+                                                 {{dofs[constrained_index],
+                                                   -normal[d]}},
+                                                 boundary_value[d]);
+                    else
+                      constraints.add_constraint(new_index,
+                                                 {},
+                                                 boundary_value[d]);
                   }
               }
           }
