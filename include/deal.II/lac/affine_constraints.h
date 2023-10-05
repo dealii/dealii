@@ -943,6 +943,57 @@ public:
   shift(const size_type offset);
 
   /**
+   * This function provides a "view" into a constraint
+   * object. Specifically, given a "mask" index set that describes
+   * which constraints we are interested in, it returns an
+   * AffineConstraints object that contains only those constraints
+   * that correspond to degrees of freedom that are listed in the
+   * mask, with indices shifted so that they correspond to the
+   * position within the mask. This process is the same as how
+   * IndexSet::get_view() computes the shifted indices. The function
+   * is typically used to extract from an AffineConstraints object
+   * corresponding to a DoFHandler only those constraints that
+   * correspond to a specific variable (say, to the velocity in a
+   * Stokes system) so that the resulting AffineConstraints object can
+   * be applied to a single block of a block vector of solutions; in
+   * this case, the mask would be the index set of velocity degrees of
+   * freedom, as a subset of all degrees of freedom.
+   *
+   * This function can only work if the degrees of freedom selected by
+   * the mask are constrained only against other degrees of freedom
+   * that are listed in the mask. In the example above, this means
+   * that constraints for the selected velocity degrees of freedom are
+   * only against other velocity degrees of freedom, but not against
+   * any pressure degrees of freedom. If that is not so, an assertion
+   * will be triggered.
+   *
+   * A typical case where this function is useful is as follows. Say,
+   * you have a block linear system in which you have blocks
+   * corresponding to variables $(u,p,T,c)$ (which you can think of as
+   * velocity, pressure, temperature, and chemical composition -- or
+   * whatever other kind of problem you are currently considering in
+   * your own work). Let's assume we have developed a linear solver or
+   * preconditioner that first solves the coupled $u$-$T$ system, and
+   * once that is done, solves the $p$-$c$ system. In this case, it is
+   * often useful to set up block vectors with only two components
+   * corresponding to the $u$ and $T$ components, and later for only
+   * the $p$-$c$ components of the solution. As part of this, you will
+   * want to apply constraints (using the distribute() function of this
+   * class) to only the 2-block vector, but for this you need to obtain
+   * an AffineConstraints object that represents only those constraints
+   * that correspond to the variables in question, and in the order
+   * in which they appear in the 2-block vector rather than in global
+   * 4-block vectors. This function allows you to extract such an
+   * object corresponding to a subset of constraints by applying a mask
+   * to the global constraints object that corresponds to the
+   * variables we're currently interested in. For the $u$-$T$ system,
+   * we need a mask that contains all indices of $u$ degrees of
+   * freedom as well as all indices of $T$ degrees of freedom.
+   */
+  AffineConstraints
+  get_view(const IndexSet &mask) const;
+
+  /**
    * Clear all entries of this matrix. Reset the flag determining whether new
    * entries are accepted or not.
    *

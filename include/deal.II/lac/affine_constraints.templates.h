@@ -1083,6 +1083,68 @@ AffineConstraints<number>::shift(const size_type offset)
 
 
 template <typename number>
+AffineConstraints<number>
+AffineConstraints<number>::get_view(const IndexSet &mask) const
+{
+  Assert(sorted == true, ExcMatrixNotClosed());
+
+  AffineConstraints<number> view;
+
+  // If index sets were associated with the current object, take views
+  // of those as well:
+  if (locally_owned_dofs != IndexSet())
+    {
+      Assert(locally_owned_dofs.size() == mask.size(),
+             ExcMessage("This operation only makes sense if the index "
+                        "space described by the mask is the same as "
+                        "the index space associated with the "
+                        "AffineConstraints object into which you take "
+                        "a view."));
+      Assert(local_lines.size() == mask.size(),
+             ExcMessage("This operation only makes sense if the index "
+                        "space described by the mask is the same as "
+                        "the index space associated with the "
+                        "AffineConstraints object into which you take "
+                        "a view."));
+
+      view.reinit(locally_owned_dofs.get_view(mask),
+                  local_lines.get_view(mask));
+    }
+
+  for (const ConstraintLine &line : lines)
+    if (mask.is_element(line.index))
+      {
+        const size_type row = mask.index_within_set(line.index);
+        view.add_line(row);
+        for (const std::pair<size_type, number> &entry : line.entries)
+          {
+            Assert(
+              mask.is_element(entry.first),
+              ExcMessage(
+                "In creating a view of an AffineConstraints "
+                "object, the constraint on degree of freedom " +
+                std::to_string(line.index) + " (which corresponds to the " +
+                std::to_string(row) +
+                "th degree of freedom selected in the mask) "
+                "is constrained against degree of freedom " +
+                std::to_string(entry.first) +
+                ", but this degree of freedom is not listed in the mask and "
+                "consequently cannot be transcribed into the index space "
+                "of the output object."));
+            view.add_entry(row,
+                           mask.index_within_set(entry.first),
+                           entry.second);
+          }
+        view.set_inhomogeneity(row, line.inhomogeneity);
+      }
+
+  view.close();
+  return view;
+}
+
+
+
+template <typename number>
 void
 AffineConstraints<number>::clear()
 {
