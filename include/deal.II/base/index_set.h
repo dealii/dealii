@@ -371,6 +371,9 @@ public:
    * <tt>begin</tt>. This corresponds to the notion of a <i>view</i>: The
    * interval <tt>[begin, end)</tt> is a <i>window</i> through which we see
    * the set represented by the current object.
+   *
+   * A more general function of the same name, taking a mask instead
+   * of just an interval to define the view, is below.
    */
   IndexSet
   get_view(const size_type begin, const size_type end) const;
@@ -395,6 +398,30 @@ public:
    * <i>within the mask</i>. This corresponds to the notion of a <i>view</i>:
    * The mask is a <i>window</i> through which we see the set represented by the
    * current object.
+   *
+   * A typical case where this function is useful is as follows. Say,
+   * you have a block linear system in which you have blocks
+   * corresponding to variables $(u,p,T,c)$ (which you can think of as
+   * velocity, pressure, temperature, and chemical composition -- or
+   * whatever other kind of problem you are currently considering in
+   * your own work). We solve this in parallel, so every MPI process
+   * has its own `locally_owned_dofs` index set that describes which
+   * among all $N_\text{dofs}$ degrees of freedom this process
+   * owns. Let's assume we have developed a linear solver or
+   * preconditioner that first solves the coupled $u$-$T$ system, and
+   * once that is done, solves the $p$-$c$ system. In this case, it is
+   * often useful to set up block vectors with only two components
+   * corresponding to the $u$ and $T$ components, and later for only
+   * the $p$-$c$ components of the solution. The question is which of
+   * the components of these 2-block vectors are locally owned? The
+   * answer is that we need to get a view of the `locally_owned_dofs`
+   * index set in which we apply a mask that corresponds to the
+   * variables we're currently interested in. For the $u$-$T$ system,
+   * we need a mask (corresponding to an index set of size
+   * $N_\text{dofs}$ that contains all indices of $u$ degrees of
+   * freedom as well as all indices of $T$ degrees of freedom. The
+   * resulting view is an index set of size $N_u+N_T$ that contains
+   * the indices of the locally owned $u$ and $T$ degrees of freedom.
    */
   IndexSet
   get_view(const IndexSet &mask) const;
