@@ -1882,9 +1882,9 @@ public:
   DeclExceptionMsg(
     ExcMatrixIsClosed,
     "You are attempting an operation on an AffineConstraints object "
-    "that requires the object to be 'closed', i.e., for which you "
-    "needed to call the close() member function. But the object "
-    "is not currently closed, and so the operation can not be "
+    "that requires the object to not be 'closed', i.e., for which you "
+    "must not already have called the close() member function. But the "
+    "object is already closed, and so the operation can not be "
     "performed.");
   /**
    * Exception
@@ -1894,9 +1894,9 @@ public:
   DeclExceptionMsg(
     ExcMatrixNotClosed,
     "You are attempting an operation on an AffineConstraints object "
-    "that requires the object to not be 'closed', i.e., for which you "
-    "must not already have called the close() member function. But the "
-    "object is already closed, and so the operation can not be "
+    "that requires the object to be 'closed', i.e., for which you "
+    "needed to call the close() member function. But the object "
+    "is not currently closed, and so the operation can not be "
     "performed.");
   /**
    * Exception
