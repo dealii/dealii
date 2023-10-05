@@ -684,6 +684,13 @@
  *       <br/> Keywords: FEInterfaceValues, NonMatching::FEImmersedSurfaceValues
  *       </td></tr>
  *
+ *   <tr valign="top">
+ *       <td>step-87</td>
+ *       <td> Evaluation of finite element solutions at arbitrary points within a distributed
+ *       mesh with application to two-phase flow.
+ *       <br/> Keywords: Utilities::MPI::RemotePointEvaluation, VectorTools::point_values()
+ *       </td></tr>
+ *
  * </table>
  *
  *
@@ -1027,7 +1034,8 @@
  *     <td>
  *       step-60,
  *       step-70,
- *       step-85
+ *       step-85,
+ *       step-87
  *     </td>
  *   </tr>
  *
