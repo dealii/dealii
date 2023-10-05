@@ -444,7 +444,8 @@ operator<<(std::ostream                                       &out,
     {
       out << df[i];
       if (i != spacedim - 1)
-        out << ' ';
+        for (unsigned int j = 0; j < order + 1; ++j)
+          out << ' ';
     }
 
   return out;
