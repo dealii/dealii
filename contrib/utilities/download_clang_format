@@ -41,11 +41,11 @@ case "${OSTYPE}" in
     CHECKSUM_CMD="shasum"
     ARCH=$(uname -m)
     if [[ "$ARCH" == "arm64" ]]; then
-	FILENAME="clang-format-${VERSION}-darwin-arm.tar.gz"
-	CHECKSUM="8b1733414dec5a91e15060f482bebeb0723ac8e8f3115241c1ea595302758b46  $FILENAME"
+        FILENAME="clang-format-${VERSION}-darwin-arm.tar.gz"
+        CHECKSUM="8b1733414dec5a91e15060f482bebeb0723ac8e8f3115241c1ea595302758b46  $FILENAME"
     else
-	FILENAME="clang-format-${VERSION}-darwin-intel.tar.gz"
-	CHECKSUM="edff4341fb3b9e25c670902227538be6348d3b91ff88aa676ff8e7bb589b2ae5  $FILENAME"
+        FILENAME="clang-format-${VERSION}-darwin-intel.tar.gz"
+        CHECKSUM="edff4341fb3b9e25c670902227538be6348d3b91ff88aa676ff8e7bb589b2ae5  $FILENAME"
     fi
     ;;
   *)
