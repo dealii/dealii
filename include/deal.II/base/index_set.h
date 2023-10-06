@@ -418,7 +418,7 @@ public:
    * index set in which we apply a mask that corresponds to the
    * variables we're currently interested in. For the $u$-$T$ system,
    * we need a mask (corresponding to an index set of size
-   * $N_\text{dofs}$ that contains all indices of $u$ degrees of
+   * $N_\text{dofs}$) that contains all indices of $u$ degrees of
    * freedom as well as all indices of $T$ degrees of freedom. The
    * resulting view is an index set of size $N_u+N_T$ that contains
    * the indices of the locally owned $u$ and $T$ degrees of freedom.

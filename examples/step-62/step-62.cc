@@ -1186,8 +1186,8 @@ namespace step62
           ((unsigned int)std::log10(parameters.nb_frequency_points)) + 1;
         frequency_idx_stream << std::setw(nb_number_positions)
                              << std::setfill('0') << frequency_idx;
-        std::string filename = (parameters.simulation_name + "_" +
-                                frequency_idx_stream.str() + ".vtu");
+        const std::string filename = (parameters.simulation_name + "_" +
+                                      frequency_idx_stream.str() + ".vtu");
         data_out.write_vtu_in_parallel(filename, mpi_communicator);
       }
   }

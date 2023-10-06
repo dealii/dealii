@@ -123,7 +123,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
   for (unsigned int owner = 0; owner < nproc; ++owner)
     {
       // find all lines to send to @p owner
-      IndexSet indices_to_send = non_owned & locally_owned_dofs[owner];
+      const IndexSet indices_to_send = non_owned & locally_owned_dofs[owner];
       for (const auto row_idx : indices_to_send)
         {
           to_send[owner].emplace_back(get_line(row_idx));
