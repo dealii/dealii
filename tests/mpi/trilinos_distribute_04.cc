@@ -53,8 +53,6 @@ constraint?
 
 #include <deal.II/numerics/vector_tools.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 

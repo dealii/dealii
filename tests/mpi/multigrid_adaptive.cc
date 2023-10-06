@@ -61,8 +61,6 @@
 
 #include "../tests.h"
 
-// This is C++:
-#include <sstream>
 
 namespace Step50
 {

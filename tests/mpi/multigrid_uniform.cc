@@ -61,9 +61,6 @@
 
 #include "../tests.h"
 
-// This is C++:
-#include <sstream>
-
 namespace Step50
 {
   template <int dim>
