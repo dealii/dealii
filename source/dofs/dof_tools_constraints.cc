@@ -571,9 +571,9 @@ namespace DoFTools
                 if (std::fabs(face_constraints(row, i)) >= 1e-14 * abs_sum)
                   entries.emplace_back(primary_dofs[i],
                                        face_constraints(row, i));
-              constraints.add_line(dependent_dofs[row]);
-              constraints.add_entries(dependent_dofs[row], entries);
-              constraints.set_inhomogeneity(dependent_dofs[row], 0.);
+              constraints.add_constraint(dependent_dofs[row],
+                                         entries,
+                                         /* inhomogeneity= */ 0.);
             }
       }
 

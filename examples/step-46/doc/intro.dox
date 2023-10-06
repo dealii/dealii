@@ -494,21 +494,16 @@ for (const auto &cell: dof_handler.active_cell_iterators())
              cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
              for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
              if (stokes_fe.face_system_to_component_index(i).first < dim)
-               constraints.add_line (local_face_dof_indices[i]);
+               constraints.add_constraint (local_face_dof_indices[i], {}, 0.);
            }
         }
 @endcode
 
-The call <code>constraints.add_line(t)</code> tells the
-AffineConstraints to start a new constraint for degree of freedom
-<code>t</code> of the form $x_t=\sum_{l=0}^{N-1} c_{tl} x_l +
-b_t$. Typically, one would then proceed to set individual coefficients
-$c_{tl}$ to nonzero values (using AffineConstraints::add_entry) or set
-$b_t$ to something nonzero (using
-AffineConstraints::set_inhomogeneity); doing nothing as above, funny as
-it looks, simply leaves the constraint to be $x_t=0$, which is exactly
+The last line calls
+AffineConstraints::add_constraint() and adds the constraint
+<i>x<sub>local_face_dof_indices[i]</sub>=0</i>, which is exactly
 what we need in the current context. The call to
-FiniteElement::face_system_to_component_index makes sure that we only set
+FiniteElement::face_system_to_component_index() makes sure that we only set
 boundary values to zero for velocity but not pressure components.
 
 Note that there are cases where this may yield incorrect results:

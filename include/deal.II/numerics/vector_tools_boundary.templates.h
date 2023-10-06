@@ -519,11 +519,9 @@ namespace VectorTools
       {
         if (constraints.can_store_line(boundary_value.first) &&
             !constraints.is_constrained(boundary_value.first))
-          {
-            constraints.add_line(boundary_value.first);
-            constraints.set_inhomogeneity(boundary_value.first,
-                                          boundary_value.second);
-          }
+          constraints.add_constraint(boundary_value.first,
+                                     {},
+                                     boundary_value.second);
       }
   }
 
@@ -564,11 +562,9 @@ namespace VectorTools
       {
         if (constraints.can_store_line(boundary_value.first) &&
             !constraints.is_constrained(boundary_value.first))
-          {
-            constraints.add_line(boundary_value.first);
-            constraints.set_inhomogeneity(boundary_value.first,
-                                          boundary_value.second);
-          }
+          constraints.add_constraint(boundary_value.first,
+                                     {},
+                                     boundary_value.second);
       }
   }
 
@@ -955,16 +951,13 @@ namespace VectorTools
     std::map<types::global_dof_index, number> boundary_values;
     project_boundary_values(
       mapping, dof, boundary_functions, q, boundary_values, component_mapping);
-    typename std::map<types::global_dof_index, number>::const_iterator
-      boundary_value = boundary_values.begin();
-    for (; boundary_value != boundary_values.end(); ++boundary_value)
+
+    for (const auto &boundary_value : boundary_values)
       {
-        if (!constraints.is_constrained(boundary_value->first))
-          {
-            constraints.add_line(boundary_value->first);
-            constraints.set_inhomogeneity(boundary_value->first,
-                                          boundary_value->second);
-          }
+        if (!constraints.is_constrained(boundary_value.first))
+          constraints.add_constraint(boundary_value.first,
+                                     {},
+                                     boundary_value.second);
       }
   }
 
@@ -1934,16 +1927,12 @@ namespace VectorTools
                                         face_dof_indices[dof]) &&
                                       !(constraints.is_constrained(
                                         face_dof_indices[dof])))
-                                    {
-                                      constraints.add_line(
-                                        face_dof_indices[dof]);
-                                      if (std::abs(dof_values[dof]) > 1e-13)
-                                        {
-                                          constraints.set_inhomogeneity(
-                                            face_dof_indices[dof],
-                                            dof_values[dof]);
-                                        }
-                                    }
+                                    constraints.add_constraint(
+                                      face_dof_indices[dof],
+                                      {},
+                                      (std::abs(dof_values[dof]) > 1e-13 ?
+                                         dof_values[dof] :
+                                         0));
                                 }
                             }
                         }
@@ -2078,17 +2067,12 @@ namespace VectorTools
                                         face_dof_indices[dof]) &&
                                       !(constraints.is_constrained(
                                         face_dof_indices[dof])))
-                                    {
-                                      constraints.add_line(
-                                        face_dof_indices[dof]);
-
-                                      if (std::abs(dof_values[dof]) > 1e-13)
-                                        {
-                                          constraints.set_inhomogeneity(
-                                            face_dof_indices[dof],
-                                            dof_values[dof]);
-                                        }
-                                    }
+                                    constraints.add_constraint(
+                                      face_dof_indices[dof],
+                                      {},
+                                      (std::abs(dof_values[dof]) > 1e-13 ?
+                                         dof_values[dof] :
+                                         0));
                                 }
                             }
                         }
@@ -2232,12 +2216,11 @@ namespace VectorTools
               cell->face_orientation(face),
               cell->face_flip(face),
               cell->face_rotation(face)))[first_vector_component])
-          {
-            constraints.add_line(face_dof_indices[i]);
-
-            if (std::abs(dof_values(i)) > 1e-14)
-              constraints.set_inhomogeneity(face_dof_indices[i], dof_values(i));
-          }
+          constraints.add_constraint(face_dof_indices[i],
+                                     {},
+                                     (std::abs(dof_values[i]) > 1e-14 ?
+                                        dof_values[i] :
+                                        0));
     }
 
     // dummy implementation of above function for all other dimensions
@@ -2529,12 +2512,11 @@ namespace VectorTools
             for (unsigned int dof = 0; dof < n_dofs; ++dof)
               if ((projected_dofs[dof] != 0) &&
                   !(constraints.is_constrained(dof)))
-                {
-                  constraints.add_line(dof);
-
-                  if (std::abs(dof_values[dof]) > 1e-14)
-                    constraints.set_inhomogeneity(dof, dof_values[dof]);
-                }
+                constraints.add_constraint(dof,
+                                           {},
+                                           (std::abs(dof_values[dof]) > 1e-14 ?
+                                              dof_values[dof] :
+                                              0));
 
             break;
           }
@@ -2688,12 +2670,11 @@ namespace VectorTools
             for (unsigned int dof = 0; dof < n_dofs; ++dof)
               if ((projected_dofs[dof] != 0) &&
                   !(constraints.is_constrained(dof)))
-                {
-                  constraints.add_line(dof);
-
-                  if (std::abs(dof_values[dof]) > 1e-14)
-                    constraints.set_inhomogeneity(dof, dof_values[dof]);
-                }
+                constraints.add_constraint(dof,
+                                           {},
+                                           (std::abs(dof_values[dof]) > 1e-14 ?
+                                              dof_values[dof] :
+                                              0));
 
             break;
           }

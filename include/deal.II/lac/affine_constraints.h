@@ -246,9 +246,10 @@ namespace internal
                        const size_type index_in_constraint) const;
 
       /**
-       * Return whether there is one row with indirect contributions (i.e.,
-       * there has been at least one constraint with non-trivial
-       * ConstraintLine).
+       * Return whether this object stores a constraint in which one degree
+       * of freedom is constrained against another degree of freedom (as
+       * opposed to having only constraints of the form $x_i=42$ where
+       * no other degree of freedom appears on the right side).
        */
       bool
       have_indirect_rows() const;
@@ -428,14 +429,7 @@ namespace internal
 } // namespace internal
 #endif
 
-// TODO[WB]: We should have a function of the kind
-//   AffineConstraints::add_constraint (const size_type constrained_dof,
-//     const std::vector<std::pair<size_type, number> > &entries,
-//     const number inhomogeneity = 0);
-// rather than building up constraints piecemeal through add_line/add_entry
-// etc. This would also eliminate the possibility of accidentally changing
-// existing constraints into something pointless, see the discussion on the
-// mailing list on "Tiny bug in interpolate_boundary_values" in Sept. 2010.
+
 
 /**
  * This class implements dealing with linear (possibly inhomogeneous)
@@ -759,6 +753,41 @@ public:
    * @name Adding constraints
    * @{
    */
+
+  /**
+   * Add a constraint to this object. This function adds a constraint
+   * of the form
+   * @f[
+   *  x_i = \sum_{j=1}^n w_j x_{k_j} + b
+   * @f]
+   * where $i$ is the number of the degree of freedom to be constrained
+   * and is provided by the @p constrained_dofs argument. The weights
+   * $w_j$ and indices $k_j$ are provided as pairs in the
+   * @p dependencies argument, and the inhomogeneity $b$ is
+   * provided by the last argument.
+   *
+   * As an example, if you want to add the constraint
+   * @f[
+   *   x_{42} = 0.5 x_{12} + 0.5 x_{36} + 27
+   * @f]
+   * you would call this function as follows:
+   * @code
+   *   constraints.add_constraint (42, {{12, 0.5}, {36, 0.5}}, 27.0);
+   * @endcode
+   * On the other hand, if (as one often wants to) you need a constraint
+   * of the kind
+   * @f[
+   *   x_{42} = 27
+   * @f]
+   * you would call this function as follows:
+   * @code
+   *   constraints.add_constraint (42, {}, 27.0);
+   * @endcode
+   */
+  void
+  add_constraint(const size_type constrained_dof,
+                 const std::vector<std::pair<size_type, number>> &dependencies,
+                 const number inhomogeneity = 0);
 
   /**
    * Add a new line to the matrix. If the line already exists, then the
@@ -2251,6 +2280,25 @@ inline AffineConstraints<number>::AffineConstraints(
       affine_constraints.needed_elements_for_distribute)
   , sorted(affine_constraints.sorted)
 {}
+
+
+
+template <typename number>
+inline void
+AffineConstraints<number>::add_constraint(
+  const size_type                                  constrained_dof,
+  const std::vector<std::pair<size_type, number>> &dependencies,
+  const number                                     inhomogeneity)
+{
+  Assert(is_constrained(constrained_dof) == false,
+         ExcMessage("You cannot add a constraint for a degree of freedom "
+                    "that is already constrained."));
+
+  add_line(constrained_dof);
+  for (const auto &dep : dependencies)
+    add_entry(constrained_dof, dep.first, dep.second);
+  set_inhomogeneity(constrained_dof, inhomogeneity);
+}
 
 
 

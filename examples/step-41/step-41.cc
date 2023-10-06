@@ -479,8 +479,7 @@ namespace Step41
               0)
             {
               active_set.add_index(dof_index);
-              constraints.add_line(dof_index);
-              constraints.set_inhomogeneity(dof_index, obstacle_value);
+              constraints.add_constraint(dof_index, {}, obstacle_value);
 
               solution(dof_index) = obstacle_value;
 
