@@ -2671,9 +2671,23 @@ AffineConstraints<number>::distribute(VectorType &vec) const
             // pass as arguments...
 #ifdef DEBUG
           if (needed_elements_for_distribute != IndexSet())
-            for (const auto i : vec_owned_elements)
-              Assert(needed_elements_for_distribute.is_element(i),
-                     ExcInternalError());
+            {
+              Assert(vec_owned_elements.size() ==
+                       needed_elements_for_distribute.size(),
+                     ExcMessage("You have previously initialized this "
+                                "AffineConstraints object with an index set "
+                                "that stated that vectors have size " +
+                                std::to_string(locally_owned_dofs.size()) +
+                                " entries, but you are now calling "
+                                "AffineConstraints::distribute() with a vector "
+                                "of size " +
+                                std::to_string(vec_owned_elements.size()) +
+                                "."));
+
+              for (const auto i : vec_owned_elements)
+                Assert(needed_elements_for_distribute.is_element(i),
+                       ExcInternalError());
+            }
 #endif
 
           VectorType ghosted_vector;
