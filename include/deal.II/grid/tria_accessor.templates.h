@@ -613,14 +613,15 @@ namespace internal
       inline static unsigned int
       line_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
       {
-        const auto pair =
+        const auto [face_index, line_index] =
           accessor.reference_cell().standard_line_to_face_and_line_index(i);
-        const auto quad_index = pair[0];
-        const auto line_index =
+        const auto line_within_face_index =
           accessor.reference_cell().standard_to_real_face_line(
-            pair[1], pair[0], combined_face_orientation(accessor, quad_index));
+            line_index,
+            face_index,
+            combined_face_orientation(accessor, face_index));
 
-        return accessor.quad(quad_index)->line_index(line_index);
+        return accessor.quad(face_index)->line_index(line_within_face_index);
       }
 
 
@@ -842,18 +843,19 @@ namespace internal
 
         // First pick a face on which this line is a part of, and the
         // index of the line within.
-        const auto pair =
+        const auto [face_index, line_index] =
           accessor.reference_cell().standard_line_to_face_and_line_index(line);
-        const auto quad_index = pair[0];
         const auto line_within_face_index =
           accessor.reference_cell().standard_to_real_face_line(
-            pair[1], pair[0], combined_face_orientation(accessor, quad_index));
+            line_index,
+            face_index,
+            combined_face_orientation(accessor, face_index));
 
         // Then query how that line is oriented within that face:
         return accessor.reference_cell().standard_vs_true_line_orientation(
-          pair[1],
-          combined_face_orientation(accessor, quad_index),
-          accessor.quad(quad_index)->line_orientation(line_within_face_index));
+          line_index,
+          combined_face_orientation(accessor, face_index),
+          accessor.quad(face_index)->line_orientation(line_within_face_index));
       }
 
       /**
@@ -957,15 +959,15 @@ namespace internal
       vertex_index(const TriaAccessor<2, dim, spacedim> &accessor,
                    const unsigned int                    corner)
       {
-        const auto pair =
+        const auto [line_index, vertex_index] =
           accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
             corner);
-        const auto line_index = pair[0];
-        const auto vertex_index =
+        const auto vertex_within_line_index =
           accessor.reference_cell().standard_to_real_face_vertex(
-            pair[1], pair[0], accessor.line_orientation(line_index));
+            vertex_index, line_index, accessor.line_orientation(line_index));
 
-        return accessor.line(line_index)->vertex_index(vertex_index);
+        return accessor.line(line_index)
+          ->vertex_index(vertex_within_line_index);
       }
 
 
@@ -974,15 +976,17 @@ namespace internal
       vertex_index(const TriaAccessor<3, 3, 3> &accessor,
                    const unsigned int           corner)
       {
-        const auto pair =
+        const auto [face_index, vertex_index] =
           accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
             corner);
-        const auto face_index = pair[0];
-        const auto vertex_index =
+        const auto vertex_within_face_index =
           accessor.reference_cell().standard_to_real_face_vertex(
-            pair[1], pair[0], combined_face_orientation(accessor, face_index));
+            vertex_index,
+            face_index,
+            combined_face_orientation(accessor, face_index));
 
-        return accessor.quad(face_index)->vertex_index(vertex_index);
+        return accessor.quad(face_index)
+          ->vertex_index(vertex_within_face_index);
       }
 
 
