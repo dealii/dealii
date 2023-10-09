@@ -112,7 +112,7 @@ to set up point-to-point communication patterns.
 <h3>Implementation: Utilities::MPI::RemotePointEvaluation</h3>
 
 The algorithm described above is implemented in
-Utilities::MPI::RemotePointEvaluation (short: ``rpe'') and related
+Utilities::MPI::RemotePointEvaluation (short: "rpe") and related
 classes/functions. In this section, basic functionalities are briefly
 summarized. Their advanced capabilities will be shown subsequently based on
 concrete application cases.
