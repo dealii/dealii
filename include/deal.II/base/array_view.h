@@ -217,6 +217,46 @@ public:
   ArrayView(std::array<std::remove_cv_t<value_type>, N> &vector);
 
   /**
+   * A constructor that creates a view of the array that underlies a
+   * [std::initializer_list](https://en.cppreference.com/w/cpp/utility/initializer_list).
+   * This constructor allows for cases such as where one has a function
+   * that takes an ArrayView object:
+   * @code
+   *   void f(const ArrayView<int> &a);
+   * @endcode
+   * and then to call this function with a list of integers:
+   * @code
+   *   f({1,2,3});
+   * @endcode
+   * This also works with an empty list:
+   * @code
+   *   f({});
+   * @encode
+   *
+   * @note `std::initializer_list` objects are temporary. They are constructed
+   * where the compiler finds a brace-enclosed list, and so they only live
+   * for at most the time it takes to execute the current statement. As a
+   * consequence, creating an ArrayView object of such a `std::initializer_list`
+   * also results in a view object that points to valid memory only for as long
+   * as the current statement is executed. You shouldn't expect that the
+   * resulting ArrayView can be used to point to useful memory content past
+   * that point. In other words, while this code...
+   * @code
+   *   std::vector<int> v(10);
+   *   ArrayView<int> a(v);
+   *   f(a);
+   * @endcode
+   * ...works because the array `v` pointed to exists until after the call to
+   * `f()`, the following code will not likely work as expected:
+   * @code
+   *   ArrayView<int> a({1,2,3});
+   *   f(a);
+   * @endcode
+   */
+  ArrayView(const std::initializer_list<std::remove_cv_t<value_type>>
+              &initializer_list);
+
+  /**
    * Reinitialize a view.
    *
    * @param[in] starting_element A pointer to the first element of the array
@@ -507,6 +547,16 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   std::array<std::remove_cv_t<value_type>, N> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
+{}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  const std::initializer_list<std::remove_cv_t<value_type>> &initializer)
+  : // use delegating constructor
+  ArrayView((initializer.size() > 0 ? initializer.begin() : nullptr),
+            initializer.size())
 {}
 
 
