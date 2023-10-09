@@ -744,7 +744,17 @@ public:
    * certain vector components in a vector-valued problem from a full
    * AffineConstraints, i.e. extracting a diagonal subblock from a larger
    * AffineConstraints. The block is specified by the IndexSet argument.
+   *
+   * @deprecated This function is a combination of the get_view() function
+   *   and merge() in that it selects a subset of constraints from another
+   *   constraints object that is then merged into the current one. But
+   *   the current function does not deal well with index sets. Furthermore,
+   *   it simply discards parts of constraints that constrain one degree
+   *   of freedom against ones that are not selected in the filter -- something
+   *   that should probably be considered a bug. Use get_view() and merge()
+   *   instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use get_view() and merge() instead.")
   void
   add_selected_constraints(const AffineConstraints &constraints_in,
                            const IndexSet          &filter);
@@ -946,8 +956,8 @@ public:
    * This behavior can be altered by setting @p allow_different_local_lines
    * appropriately.
    *
-   * Merging a AffineConstraints that is initialized with an IndexSet
-   * and one that is not initialized with an IndexSet is not yet implemented.
+   * Merging an AffineConstraints that is initialized with an IndexSet
+   * and one that is not initialized with an IndexSet is not implemented.
    */
   template <typename other_number>
   void
