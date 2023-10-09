@@ -110,7 +110,10 @@ public:
    * Constructor.
    *
    * @param[in] starting_element A pointer to the first element of the array
-   * this object should represent.
+   * this object should represent. The value of this argument is only evaluated
+   * if `n_elements` is larger than zero. Otherwise, the value of this
+   * argument is ignored as if the ArrayView object used a `nullptr`
+   * to point to the first element of the array.
    * @param[in] n_elements The length (in elements) of the chunk of memory
    * this object should represent.
    *
@@ -400,7 +403,7 @@ template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   value_type       *starting_element,
   const std::size_t n_elements)
-  : starting_element(starting_element)
+  : starting_element(n_elements > 0 ? starting_element : nullptr)
   , n_elements(n_elements)
 {}
 
@@ -411,8 +414,11 @@ inline void
 ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
                                                 const std::size_t n_elements)
 {
-  this->starting_element = starting_element;
-  this->n_elements       = n_elements;
+  if (n_elements > 0)
+    this->starting_element = starting_element;
+  else
+    this->starting_element = nullptr;
+  this->n_elements = n_elements;
 }
 
 
