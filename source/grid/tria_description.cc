@@ -171,7 +171,7 @@ namespace TriangulationDescription
               std::map<unsigned int, unsigned int>
                 map_old_to_new_local_vertex_index;
 
-              // 1) renumerate vertices in other and insert into maps
+              // 1) re-enumerate vertices in other and insert into maps
               unsigned int counter = coarse_cell_vertices.size();
               for (const auto &p : other.coarse_cell_vertices)
                 if (map_point_to_local_vertex_index.find(p.second) ==
@@ -185,7 +185,7 @@ namespace TriangulationDescription
                   map_old_to_new_local_vertex_index[p.first] =
                     map_point_to_local_vertex_index[p.second];
 
-              // 2) renumerate vertices of cells
+              // 2) re-enumerate vertices of cells
               auto other_coarse_cells_copy = other.coarse_cells;
 
               for (auto &cell : other_coarse_cells_copy)
@@ -283,7 +283,14 @@ namespace TriangulationDescription
                       Assert(a.second.distance(b.second) <=
                                1e-7 *
                                  std::max(a.second.norm(), b.second.norm()),
-                             ExcInternalError());
+                             ExcMessage(
+                               "In the process of merging the vertices of "
+                               "the coarse meshes used on different processes, "
+                               "there were two processes that used the same "
+                               "vertex index for points that are not the same. "
+                               "This suggests that you are using different "
+                               "coarse meshes on different processes. This "
+                               "should not happen."));
                       return true;
                     }
                   return false;
