@@ -671,7 +671,7 @@ public:
    * process and possibly ghost elements that are mirrored from its owning
    * process to other processes. Rather, the elements of the current object are
    * simply copied to the other processes, and it is useful to think of this
-   * operation as creating a set of `const` AlignedVector objects on all
+   * operation as creating a set of `const` TableBase objects on all
    * processes that should not be changed any more after the replication
    * operation, as this is the only way to ensure that the vectors remain the
    * same on all processes. This is particularly true because of the use of

@@ -1482,6 +1482,13 @@ namespace Functions
      * separately. In other words, there is no need to keep the original object
      * from which this object could copy its information, but it might as well
      * take over ("move") the data.
+     *
+     * Moving data also enables using tables that are located in shared memory
+     * between multiple MPI processes, rather than copying the data from
+     * shared memory into local memory whenever one creates an
+     * InterpolatedTensorProductGridData object. See the
+     * TableBase::replicate_across_communicator() function on how to share a
+     * data set between multiple processes.
      */
     InterpolatedTensorProductGridData(
       std::array<std::vector<double>, dim> &&coordinate_values,
@@ -1620,6 +1627,13 @@ namespace Functions
      * separately. In other words, there is no need to keep the original object
      * from which this object could copy its information, but it might as well
      * take over ("move") the data.
+     *
+     * Moving data also enables using tables that are located in shared memory
+     * between multiple MPI processes, rather than copying the data from
+     * shared memory into local memory whenever one creates an
+     * InterpolatedUniformGridData object. See the
+     * TableBase::replicate_across_communicator() function on how to share a
+     * data set between multiple processes.
      */
     InterpolatedUniformGridData(
       std::array<std::pair<double, double>, dim> &&interval_endpoints,
