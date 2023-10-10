@@ -563,8 +563,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   const std::initializer_list<std::remove_cv_t<value_type>> &initializer)
   DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>)
   : // use delegating constructor
-  ArrayView((initializer.size() > 0 ? initializer.begin() : nullptr),
-            initializer.size())
+  ArrayView(initializer.begin(), initializer.size())
 {}
 
 
