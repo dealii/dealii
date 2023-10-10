@@ -222,7 +222,7 @@ public:
    * This constructor allows for cases such as where one has a function
    * that takes an ArrayView object:
    * @code
-   *   void f(const ArrayView<int> &a);
+   *   void f(const ArrayView<const int> &a);
    * @endcode
    * and then to call this function with a list of integers:
    * @code
@@ -232,6 +232,12 @@ public:
    * @code
    *   f({});
    * @encode
+   *
+   * @note This constructor only works if the template type is `const`
+   * qualified. That is, you can initialize an `ArrayView<const int>`
+   * object from a `std::initializer_list<int>`, but not an
+   * `ArrayView<int>` object. This is because the elements of initializer
+   * lists are `const`.
    *
    * @note `std::initializer_list` objects are temporary. They are constructed
    * where the compiler finds a brace-enclosed list, and so they only live
@@ -253,8 +259,9 @@ public:
    *   f(a);
    * @endcode
    */
-  ArrayView(const std::initializer_list<std::remove_cv_t<value_type>>
-              &initializer_list);
+  ArrayView(
+    const std::initializer_list<std::remove_cv_t<value_type>> &initializer_list)
+    DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>);
 
   /**
    * Reinitialize a view.
@@ -554,6 +561,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   const std::initializer_list<std::remove_cv_t<value_type>> &initializer)
+  DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>)
   : // use delegating constructor
   ArrayView((initializer.size() > 0 ? initializer.begin() : nullptr),
             initializer.size())
