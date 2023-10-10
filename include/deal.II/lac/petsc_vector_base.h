@@ -28,6 +28,8 @@
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/vector_operation.h>
 
+#  include <boost/serialization/split_member.hpp>
+
 #  include <petscvec.h>
 
 #  include <utility>
@@ -725,6 +727,41 @@ namespace PETScWrappers
           const bool         across     = true) const;
 
     /**
+     * Write the data of this object to a stream for the purpose of
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     *
+     * @note Each processor only serializes its own locally owned values.
+     */
+    template <class Archive>
+    void
+    save(Archive &ar, const unsigned int version) const;
+
+    /**
+     * Read the data of this object from a stream for the purpose of
+     * serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <class Archive>
+    void
+    load(Archive &ar, const unsigned int version);
+
+#  ifdef DOXYGEN
+    /**
+     * Write and read the data of this object from a stream for the purpose
+     * of serialization using the [BOOST serialization
+     * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
+     */
+    template <class Archive>
+    void
+    serialize(Archive &archive, const unsigned int version);
+#  else
+    // This macro defines the serialize() method that is compatible with
+    // the templated save() and load() method that have been implemented.
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+#  endif
+
+    /**
      * Swap the contents of this vector and the other vector @p v. One could
      * do this operation with a temporary variable and copying over the data
      * elements, but this function is significantly more efficient since it
@@ -1271,6 +1308,65 @@ namespace PETScWrappers
       }
   }
 
+  template <class Archive>
+  inline void
+  VectorBase::save(Archive &ar, const unsigned int) const
+  {
+    // forward to serialization function in the base class.
+    ar &static_cast<const Subscriptor &>(*this);
+    ar &size();
+    ar &local_range();
+
+    const PetscScalar *array = nullptr;
+    int                ierr  = VecGetArrayRead(*this, &array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    boost::serialization::array_wrapper<const double> wrapper(
+      array, locally_owned_size());
+    ar &wrapper;
+
+    ierr = VecRestoreArrayRead(*this, &array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
+
+
+
+  template <class Archive>
+  inline void
+  VectorBase::load(Archive &ar, const unsigned int)
+  {
+    ar &static_cast<Subscriptor &>(*this);
+
+    size_type                       size = 0;
+    std::pair<size_type, size_type> local_range;
+
+    ar &size;
+    Assert(size == this->size(),
+           ExcMessage("The serialized value of size (" + std::to_string(size) +
+                      ") does not match the current size (" +
+                      std::to_string(this->size()) + ")"));
+    (void)size;
+    ar &local_range;
+    Assert(local_range == this->local_range(),
+           ExcMessage("The serialized value of local_range (" +
+                      std::to_string(local_range.first) + ", " +
+                      std::to_string(local_range.second) +
+                      ") does not match the current local_range (" +
+                      std::to_string(this->local_range().first) + ", " +
+                      std::to_string(this->local_range().second) + ")"));
+    (void)local_range;
+
+    PetscScalar *array = nullptr;
+    int          ierr  = VecGetArray(petsc_vector(), &array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    boost::serialization::array_wrapper<double> velocity_wrapper(
+      array, locally_owned_size());
+    ar &velocity_wrapper;
+
+    ierr = VecRestoreArray(petsc_vector(), &array);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
 #  endif // DOXYGEN
 } // namespace PETScWrappers
 
