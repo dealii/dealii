@@ -403,7 +403,12 @@ template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   value_type       *starting_element,
   const std::size_t n_elements)
-  : starting_element(n_elements > 0 ? starting_element : nullptr)
+  :
+#ifdef DEBUG
+  starting_element(n_elements > 0 ? starting_element : nullptr)
+#else
+  starting_element(starting_element)
+#endif
   , n_elements(n_elements)
 {}
 
@@ -414,10 +419,14 @@ inline void
 ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
                                                 const std::size_t n_elements)
 {
+#ifdef DEBUG
   if (n_elements > 0)
     this->starting_element = starting_element;
   else
     this->starting_element = nullptr;
+#else
+  this->starting_element = starting_element;
+#endif
   this->n_elements = n_elements;
 }
 
