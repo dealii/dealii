@@ -522,6 +522,7 @@ public:
    */
   bool
   standard_vs_true_line_orientation(const unsigned int  line,
+                                    const unsigned int  face,
                                     const unsigned char face_orientation,
                                     const bool          line_orientation) const;
 
@@ -2598,6 +2599,7 @@ ReferenceCell::n_face_orientations(const unsigned int face_no) const
 inline bool
 ReferenceCell::standard_vs_true_line_orientation(
   const unsigned int  line,
+  const unsigned int  face,
   const unsigned char combined_face_orientation,
   const bool          line_orientation) const
 {
@@ -2609,6 +2611,26 @@ ReferenceCell::standard_vs_true_line_orientation(
 
       return (line_orientation ==
               bool_table[line / 2][combined_face_orientation]);
+    }
+  else if (*this == ReferenceCells::Tetrahedron)
+    {
+      static constexpr unsigned int X = numbers::invalid_unsigned_int;
+      static constexpr dealii::ndarray<unsigned int, 4, 3> combined_lines{
+        {{{0, 0, 0}}, {{X, 0, 1}}, {{X, 0, X}}, {{X, X, X}}}};
+
+      const auto combined_line = combined_lines[face][line];
+
+      Assert(combined_line != X,
+             ExcMessage(
+               "This function can only be called for following face-line "
+               "combinations: (0,0), (0,1), (0,2), (1,1), (1,2), (2,1),"));
+
+      static constexpr dealii::ndarray<bool, 2, 6> bool_table{
+        {{{false, true, false, true, false, true}},
+         {{true, false, true, false, true, false}}}};
+
+      return (line_orientation ==
+              bool_table[combined_line][combined_face_orientation]);
     }
   else
     // TODO: This might actually be wrong for some of the other
