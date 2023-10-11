@@ -1,0 +1,4 @@
+New: The ArrayView class now has a constructor that allows creation of
+an ArrayView object from a `std::initializer_list`.
+<br>
+(Wolfgang Bangerth, 2023/10/10)
