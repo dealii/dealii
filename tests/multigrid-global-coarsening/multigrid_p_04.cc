@@ -98,7 +98,7 @@ test(const unsigned int n_refinements,
   fine_constraints.close();
 
   // set up operator
-  Operator<dim, Number> fine_operator;
+  Operator<dim, 1, Number> fine_operator;
   fine_operator.reinit(*mapping, fine_dof_handler, *quad, fine_constraints);
 
   ////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ test(const unsigned int n_refinements,
   MGLevelObject<AffineConstraints<Number>> constraints(min_level, max_level);
   MGLevelObject<MGTwoLevelTransfer<dim, VectorType>> transfers(min_level,
                                                                max_level);
-  MGLevelObject<Operator<dim, Number>> operators(min_level, max_level);
+  MGLevelObject<Operator<dim, 1, Number>> operators(min_level, max_level);
 
   std::unique_ptr<Mapping<dim>> mapping_;
 
