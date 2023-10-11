@@ -87,7 +87,8 @@ test()
         for (auto f : cell->face_indices())
           {
             fe_point_eval.reinit(cell->active_cell_index(), f);
-            for (unsigned int q : fe_point_eval.quadrature_point_indices())
+            for (const unsigned int q :
+                 fe_point_eval.quadrature_point_indices())
               deallog << fe_point_eval.JxW(q) << std::endl;
           }
       }
@@ -123,7 +124,7 @@ test()
     for (const auto &cell : tria.active_cell_iterators())
       {
         fe_point_eval.reinit(cell->active_cell_index());
-        for (unsigned int q : fe_point_eval.quadrature_point_indices())
+        for (const unsigned int q : fe_point_eval.quadrature_point_indices())
           deallog << fe_point_eval.JxW(q) << std::endl;
       }
   }

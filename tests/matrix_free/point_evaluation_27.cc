@@ -93,7 +93,7 @@ test(const FiniteElement<dim> &fe)
 
   fe_point_eval.evaluate(buffer, EvaluationFlags::values);
 
-  for (unsigned int q : fe_point_eval.quadrature_point_indices())
+  for (const unsigned int q : fe_point_eval.quadrature_point_indices())
     {
       deallog << "Value at q " << q << ": " << fe_point_eval.get_value(q)
               << std::endl;
