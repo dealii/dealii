@@ -58,7 +58,7 @@
 
 #include "../tests.h"
 
-template <int dim_, typename Number>
+template <int dim_, int n_components = dim_, typename Number = double>
 class Operator : public Subscriptor
 {
 public:
@@ -68,7 +68,7 @@ public:
 
   static const int dim = dim_;
 
-  using FECellIntegrator = FEEvaluation<dim, -1, 0, 1, number>;
+  using FECellIntegrator = FEEvaluation<dim, -1, 0, n_components, Number>;
 
   void
   reinit(const Mapping<dim>              &mapping,
@@ -195,7 +195,24 @@ public:
           {
             phi.reinit(cell);
             for (unsigned int q = 0; q < phi.n_q_points; ++q)
-              phi.submit_value(1.0, q);
+              {
+                if constexpr (n_components == 1)
+                  {
+                    phi.submit_value(1.0, q);
+                  }
+                else
+                  {
+                    Tensor<1, n_components, VectorizedArray<Number>> temp;
+                    for (unsigned int v = 0;
+                         v < VectorizedArray<Number>::size();
+                         ++v)
+                      {
+                        for (unsigned int i = 0; i < n_components; i++)
+                          temp[i][v] = 1.;
+                      }
+                    phi.submit_value(temp, q);
+                  }
+              }
 
             phi.integrate_scatter(EvaluationFlags::values, dst);
           }

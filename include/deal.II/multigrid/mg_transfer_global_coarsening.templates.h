@@ -4721,18 +4721,20 @@ namespace internal
              ExcMessage("Function expects FE_DGQ, FE_Q, FE_SimplexP, or "
                         "FE_SimplexDGP in dof_handler."));
 
-      Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(
-                &dof_handler_support_points.get_fe()) != nullptr ||
-              dynamic_cast<const FE_SimplexP<dim, spacedim> *>(
-                &dof_handler_support_points.get_fe()) != nullptr) ||
-               ((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
-                   &dof_handler_support_points.get_fe()) != nullptr ||
-                 dynamic_cast<const FE_SimplexDGP<dim, spacedim> *>(
-                   &dof_handler_support_points.get_fe()) != nullptr) &&
-                dof_handler_support_points.get_fe().degree == 0),
-             ExcMessage(
-               "Function expects (FE_DGQ||FE_SimplexDGP)&&degree==0 or "
-               "(FE_Q||FE_SimplexP) in dof_handler_support_points."));
+      Assert(
+        (dynamic_cast<const FE_Q<dim, spacedim> *>(
+           &dof_handler_support_points.get_fe().base_element(0)) != nullptr ||
+         dynamic_cast<const FE_SimplexP<dim, spacedim> *>(
+           &dof_handler_support_points.get_fe().base_element(0)) != nullptr) ||
+          ((dynamic_cast<const FE_DGQ<dim, spacedim> *>(
+              &dof_handler_support_points.get_fe().base_element(0)) !=
+              nullptr ||
+            dynamic_cast<const FE_SimplexDGP<dim, spacedim> *>(
+              &dof_handler_support_points.get_fe().base_element(0)) !=
+              nullptr) &&
+           dof_handler_support_points.get_fe().degree == 0),
+        ExcMessage("Function expects (FE_DGQ||FE_SimplexDGP)&&degree==0 or "
+                   "(FE_Q||FE_SimplexP) in dof_handler_support_points."));
 
       Assert(
         dof_handler_support_points.get_fe().n_components() == 1,
@@ -4769,7 +4771,8 @@ namespace internal
         const bool needs_conversion =
           dof_handler.get_fe().conforming_space ==
             FiniteElementData<dim>::Conformity::L2 &&
-          (dof_handler.get_fe().degree > 0);
+          (dof_handler.get_fe().degree > 0) &&
+          dof_handler.get_fe().reference_cell().is_hyper_cube();
         std::vector<unsigned int> lexicographic_to_hierarchic;
         if (needs_conversion)
           lexicographic_to_hierarchic =
@@ -4907,8 +4910,10 @@ namespace internal
       const auto  n_components = fe.n_components();
 
       if (n_components == 1 &&
-          (fe.conforming_space == FiniteElementData<dim>::Conformity::H1 ||
-           degree == 0))
+          ((fe.reference_cell().is_hyper_cube() ||
+            fe.reference_cell().is_simplex()) &&
+           (fe.conforming_space == FiniteElementData<dim>::Conformity::H1 ||
+            degree == 0)))
         {
           // in case a DG space of order 0 is provided, DoFs indices are always
           // uniquely assigned to support points (they are always defined in the
@@ -4927,7 +4932,13 @@ namespace internal
           auto dof_handler_support_points =
             std::make_shared<DoFHandler<dim, spacedim>>(tria);
 
-          if (degree == 0)
+          if (fe.reference_cell().is_simplex() && (degree == 0))
+            dof_handler_support_points->distribute_dofs(
+              FE_SimplexDGP<dim, spacedim>(degree));
+          else if (fe.reference_cell().is_simplex())
+            dof_handler_support_points->distribute_dofs(
+              FE_SimplexP<dim, spacedim>(degree));
+          else if (degree == 0)
             dof_handler_support_points->distribute_dofs(
               FE_DGQ<dim, spacedim>(degree));
           else
@@ -5145,12 +5156,13 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   if (const auto fe = dynamic_cast<const FE_Q<dim> *>(&fe_base))
     fe_coarse = std::make_unique<FESystem<dim>>(FE_DGQ<dim>(fe->get_degree()),
                                                 n_components);
-  else if (const auto fe = dynamic_cast<const FE_DGQ<dim> *>(&fe_base))
-    fe_coarse = fe->clone();
   else if (const auto fe = dynamic_cast<const FE_SimplexP<dim> *>(&fe_base))
-    fe_coarse = fe->clone();
-  else if (const auto fe = dynamic_cast<const FE_SimplexDGP<dim> *>(&fe_base))
-    fe_coarse = fe->clone();
+    fe_coarse =
+      std::make_unique<FESystem<dim>>(FE_SimplexDGP<dim>(fe->get_degree()),
+                                      n_components);
+  else if (dynamic_cast<const FE_DGQ<dim> *>(&fe_base) ||
+           dynamic_cast<const FE_SimplexP<dim> *>(&fe_base))
+    fe_coarse = dof_handler_coarse.get_fe().clone();
   else
     AssertThrow(false, ExcMessage(dof_handler_coarse.get_fe().get_name()));
 }

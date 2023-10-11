@@ -16,14 +16,16 @@
 
 /**
  * Test global-coarsening multigrid for a uniformly refined mesh both for
- * simplex and hypercube mesh.
+ * simplicial elements and multiple components.
  */
+
+#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_tools.h>
 
 #include "multigrid_util.h"
 
-template <int dim, typename Number = double>
+template <int dim, int n_components = 1, typename Number = double>
 void
 test(const unsigned int n_refinements,
      const unsigned int fe_degree_fine,
@@ -37,10 +39,11 @@ test(const unsigned int n_refinements,
   MGLevelObject<Triangulation<dim>>        triangulations(min_level, max_level);
   MGLevelObject<DoFHandler<dim>>           dof_handlers(min_level, max_level);
   MGLevelObject<AffineConstraints<Number>> constraints(min_level, max_level);
-  MGLevelObject<MappingQ1<dim>>            mappings(min_level, max_level);
+  MGLevelObject<std::unique_ptr<Mapping<dim>>> mappings(min_level, max_level);
   MGLevelObject<std::shared_ptr<MGTwoLevelTransferNonNested<dim, VectorType>>>
-                                          transfers(min_level, max_level);
-  MGLevelObject<Operator<dim, 1, Number>> operators(min_level, max_level);
+    transfers(min_level, max_level);
+  MGLevelObject<Operator<dim, n_components, Number>> operators(min_level,
+                                                               max_level);
 
 
   // set up levels
@@ -49,20 +52,24 @@ test(const unsigned int n_refinements,
       auto &tria        = triangulations[l];
       auto &dof_handler = dof_handlers[l];
       auto &constraint  = constraints[l];
-      auto &mapping     = mappings[l];
       auto &op          = operators[l];
 
-      std::unique_ptr<FiniteElement<dim>> fe =
-        std::make_unique<FE_Q<dim>>(fe_degree_fine);
+      std::unique_ptr<FESystem<dim>> fe =
+        std::make_unique<FESystem<dim>>(FE_SimplexP<dim>(fe_degree_fine),
+                                        n_components);
       std::unique_ptr<Quadrature<dim>> quad =
-        std::make_unique<QGauss<dim>>(fe_degree_fine + 1);
+        std::make_unique<QGaussSimplex<dim>>(fe_degree_fine + 1);
       std::unique_ptr<Mapping<dim>> _mapping =
-        std::make_unique<MappingFE<dim>>(FE_Q<dim>(1));
+        std::make_unique<MappingFE<dim>>(FE_SimplexP<dim>(fe_degree_fine));
 
+      mappings[l] = _mapping->clone();
 
       // set up triangulation
-      GridGenerator::subdivided_hyper_cube(tria, 2);
-      tria.refine_global(l);
+      Triangulation<dim> tria_tmp;
+      GridGenerator::hyper_cube(tria_tmp, -1.0, 1.0);
+      tria_tmp.refine_global(l);
+
+      GridGenerator::convert_hypercube_to_simplex_mesh(tria_tmp, tria);
       GridTools::distort_random(factor,
                                 tria,
                                 true,
@@ -73,11 +80,16 @@ test(const unsigned int n_refinements,
       dof_handler.distribute_dofs(*fe);
 
       // set up constraints
-      const IndexSet locally_relevant_dofs =
-        DoFTools::extract_locally_relevant_dofs(dof_handler);
+      IndexSet locally_relevant_dofs;
+      DoFTools::extract_locally_relevant_dofs(dof_handler,
+                                              locally_relevant_dofs);
       constraint.reinit(locally_relevant_dofs);
-      VectorTools::interpolate_boundary_values(
-        *_mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraint);
+      VectorTools::interpolate_boundary_values(*_mapping,
+                                               dof_handler,
+                                               0,
+                                               Functions::ZeroFunction<dim>(
+                                                 n_components),
+                                               constraint);
       constraint.close();
 
       // set up operator
@@ -91,8 +103,8 @@ test(const unsigned int n_refinements,
         std::make_shared<MGTwoLevelTransferNonNested<dim, VectorType>>();
       transfers[l + 1]->reinit(dof_handlers[l + 1],
                                dof_handlers[l],
-                               mappings[l + 1],
-                               mappings[l],
+                               *mappings[l + 1],
+                               *mappings[l],
                                constraints[l + 1],
                                constraints[l]);
     }
@@ -123,7 +135,8 @@ test(const unsigned int n_refinements,
            transfer);
 
   deallog << dim << ' ' << fe_degree_fine << ' ' << n_refinements << ' '
-          << "quad" << ' ' << solver_control.last_step() << std::endl;
+          << n_components << ' ' << "simplex" << ' '
+          << solver_control.last_step() << std::endl;
 }
 
 int
@@ -133,9 +146,15 @@ main(int argc, char **argv)
   MPILogInitAll                    all;
 
   deallog.precision(8);
+  static constexpr unsigned int dim                = 2;
+  static constexpr unsigned int max_simplex_degree = 2;
 
   const double factor = .36;
-  for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
-    for (unsigned int degree = 1; degree <= 4; ++degree)
-      test<2>(n_refinements, degree, factor);
+  for (unsigned int n_refinements = 2; n_refinements <= 3; ++n_refinements)
+    for (unsigned int degree = 1; degree <= max_simplex_degree; ++degree)
+      test<dim, 1>(n_refinements, degree, factor);
+
+  for (unsigned int n_refinements = 2; n_refinements <= 3; ++n_refinements)
+    for (unsigned int degree = 1; degree <= max_simplex_degree; ++degree)
+      test<dim, dim>(n_refinements, degree, factor);
 }

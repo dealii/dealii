@@ -37,7 +37,7 @@ test(const unsigned int n_refinements, const unsigned int fe_degree_fine)
   const unsigned int max_level = n_refinements;
 
   MGLevelObject<AffineConstraints<Number>> constraints(min_level, max_level);
-  MGLevelObject<Operator<dim, Number>>     operators(min_level, max_level);
+  MGLevelObject<Operator<dim, 1, Number>>  operators(min_level, max_level);
 
   std::unique_ptr<FiniteElement<dim>> fe;
   std::unique_ptr<Quadrature<dim>>    quad;
