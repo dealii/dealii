@@ -1774,17 +1774,8 @@ namespace internal
                (mg_level_coarse + 1 == mg_level_fine),
              ExcNotImplemented());
 
-      // if (mg_level_fine != numbers::invalid_unsigned_int)
-      //   AssertIndexRange(mg_level_fine,
-      //                    MGTools::max_level_for_coarse_mesh(
-      //                      dof_handler_fine.get_triangulation()) +
-      //                      1);
-      //
-      // if (mg_level_coarse != numbers::invalid_unsigned_int)
-      //   AssertIndexRange(mg_level_coarse,
-      //                    MGTools::max_level_for_coarse_mesh(
-      //                      dof_handler_coarse.get_triangulation()) +
-      //                      1);
+      transfer.dof_handler_fine = &dof_handler_fine;
+      transfer.mg_level_fine    = mg_level_fine;
 
       std::unique_ptr<FineDoFHandlerViewBase<dim>> dof_handler_fine_view;
 
@@ -2325,6 +2316,9 @@ namespace internal
           "Polynomial transfer is only allowed on the active level "
           "(numbers::invalid_unsigned_int) or on refinement levels without "
           "hanging nodes."));
+
+      transfer.dof_handler_fine = &dof_handler_fine;
+      transfer.mg_level_fine    = mg_level_fine;
 
       std::unique_ptr<FineDoFHandlerViewBase<dim>> dof_handler_fine_view;
 
@@ -4052,9 +4046,20 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
 
 
 template <int dim, typename Number>
+MGTransferMF<dim, Number>::MGTransferMF()
+{
+  this->transfer.clear();
+  this->internal_transfer.clear();
+}
+
+
+
+template <int dim, typename Number>
 MGTransferMF<dim, Number>::MGTransferMF(
   const MGConstrainedDoFs &mg_constrained_dofs)
 {
+  this->transfer.clear();
+  this->internal_transfer.clear();
   this->initialize_constraints(mg_constrained_dofs);
 }
 
@@ -4098,6 +4103,137 @@ MGTransferMF<dim, Number>::initialize_internal_transfer(
   for (unsigned int l = min_level; l < max_level; ++l)
     internal_transfer[l + 1].reinit_geometric_transfer(
       dof_handler, dof_handler, constraints[l + 1], constraints[l], l + 1, l);
+}
+
+
+
+template <int dim, typename Number>
+std::pair<const DoFHandler<dim> *, unsigned int>
+MGTransferMF<dim, Number>::get_dof_handler_fine() const
+{
+  if (this->transfer.n_levels() <= 1)
+    // single level: the information cannot be retrieved
+    return {nullptr, numbers::invalid_unsigned_int};
+
+  if (const auto t = dynamic_cast<
+        const MGTwoLevelTransfer<dim,
+                                 LinearAlgebra::distributed::Vector<Number>> *>(
+        this->transfer[this->transfer.max_level()].get()))
+    {
+      return {t->dof_handler_fine, t->mg_level_fine};
+    }
+  else if (const auto t = dynamic_cast<const MGTwoLevelTransferNonNested<
+             dim,
+             LinearAlgebra::distributed::Vector<Number>> *>(
+             this->transfer[this->transfer.max_level()].get()))
+    {
+      return {t->dof_handler_fine, t->mg_level_fine};
+    }
+  else
+    {
+      Assert(false, ExcNotImplemented());
+      return {nullptr, numbers::invalid_unsigned_int};
+    }
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::fill_and_communicate_copy_indices_global_coarsening(
+  const DoFHandler<dim> &dof_handler_out)
+{
+  const auto dof_handler_and_level_in = get_dof_handler_fine();
+  const auto dof_handler_in           = dof_handler_and_level_in.first;
+  const auto level_in                 = dof_handler_and_level_in.second;
+
+  if ((dof_handler_in == nullptr) || (dof_handler_in == &dof_handler_out))
+    return; // nothing to do
+
+  this->copy_indices.resize(1);
+  this->copy_indices[0].reinit(2, dof_handler_out.n_locally_owned_dofs());
+
+  std::vector<types::global_dof_index> dof_indices_in;
+  std::vector<types::global_dof_index> dof_indices_out;
+
+  this->perform_plain_copy = true;
+
+  const auto &is_out = (level_in == numbers::invalid_unsigned_int) ?
+                         dof_handler_out.locally_owned_dofs() :
+                         dof_handler_out.locally_owned_mg_dofs(level_in);
+
+  const auto &is_in = (level_in == numbers::invalid_unsigned_int) ?
+                        dof_handler_in->locally_owned_dofs() :
+                        dof_handler_in->locally_owned_mg_dofs(level_in);
+
+  internal::loop_over_active_or_level_cells(
+    dof_handler_in->get_triangulation(), level_in, [&](const auto &cell) {
+      const auto cell_id = cell->id();
+
+      Assert(
+        dof_handler_out.get_triangulation().contains_cell(cell_id),
+        ExcMessage(
+          "DoFHandler instances used for set up of MGTransferMF and copy_to_mg(), "
+          "copy_from_mg(), or interpolate_to_mg() are not compatible."));
+
+      if (level_in == numbers::invalid_unsigned_int)
+        {
+          const auto cell_in  = cell->as_dof_handler_iterator(*dof_handler_in);
+          const auto cell_out = dof_handler_out.get_triangulation()
+                                  .create_cell_iterator(cell_id)
+                                  ->as_dof_handler_iterator(dof_handler_out);
+
+          AssertDimension(cell_in->get_fe().n_dofs_per_cell(),
+                          cell_out->get_fe().n_dofs_per_cell());
+
+          dof_indices_in.resize(cell_in->get_fe().n_dofs_per_cell());
+          dof_indices_out.resize(cell_out->get_fe().n_dofs_per_cell());
+
+          cell_in->get_dof_indices(dof_indices_in);
+          cell_out->get_dof_indices(dof_indices_out);
+        }
+      else
+        {
+          const auto cell_in =
+            cell->as_dof_handler_level_iterator(*dof_handler_in);
+          const auto cell_out =
+            dof_handler_out.get_triangulation()
+              .create_cell_iterator(cell_id)
+              ->as_dof_handler_level_iterator(dof_handler_out);
+
+          AssertDimension(cell_in->get_fe().n_dofs_per_cell(),
+                          cell_out->get_fe().n_dofs_per_cell());
+
+          dof_indices_in.resize(cell_in->get_fe().n_dofs_per_cell());
+          dof_indices_out.resize(cell_out->get_fe().n_dofs_per_cell());
+
+          cell_in->get_mg_dof_indices(dof_indices_in);
+          cell_out->get_mg_dof_indices(dof_indices_out);
+        }
+
+      this->perform_plain_copy &= (dof_indices_in == dof_indices_out);
+
+      for (unsigned int i = 0; i < dof_indices_in.size(); ++i)
+        if (is_out.is_element(dof_indices_out[i]))
+          this->copy_indices[0](1,
+                                is_out.index_within_set(dof_indices_out[i])) =
+            is_in.index_within_set(dof_indices_in[i]);
+    });
+
+
+  this->perform_plain_copy =
+    Utilities::MPI::max(this->perform_plain_copy ? 1 : 0,
+                        dof_handler_out.get_communicator()) != 0;
+
+  if (this->perform_plain_copy)
+    {
+      this->copy_indices.clear();
+    }
+  else
+    {
+      this->perform_renumbered_plain_copy = true;
+      this->solution_copy_indices         = this->copy_indices;
+    }
 }
 
 
@@ -4183,10 +4319,22 @@ MGTransferMF<dim, Number>::build(
   const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     &external_partitioners)
 {
-  this->initialize_internal_transfer(dof_handler, this->mg_constrained_dofs);
-  this->initialize_transfer_references(internal_transfer);
+  const bool use_local_smoothing =
+    this->transfer.n_levels() == 0 || this->internal_transfer.n_levels() > 0;
+
+  if (use_local_smoothing)
+    {
+      this->initialize_internal_transfer(dof_handler,
+                                         this->mg_constrained_dofs);
+      this->initialize_transfer_references(internal_transfer);
+    }
+
   this->build(external_partitioners);
-  this->fill_and_communicate_copy_indices(dof_handler);
+
+  if (use_local_smoothing)
+    this->fill_and_communicate_copy_indices(dof_handler);
+  else
+    this->fill_and_communicate_copy_indices_global_coarsening(dof_handler);
 }
 
 
@@ -4198,10 +4346,22 @@ MGTransferMF<dim, Number>::build(
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
 {
-  this->initialize_internal_transfer(dof_handler, this->mg_constrained_dofs);
-  this->initialize_transfer_references(internal_transfer);
+  const bool use_local_smoothing =
+    this->transfer.n_levels() == 0 || this->internal_transfer.n_levels() > 0;
+
+  if (use_local_smoothing)
+    {
+      this->initialize_internal_transfer(dof_handler,
+                                         this->mg_constrained_dofs);
+      this->initialize_transfer_references(internal_transfer);
+    }
+
   this->build(initialize_dof_vector);
-  this->fill_and_communicate_copy_indices(dof_handler);
+
+  if (use_local_smoothing)
+    this->fill_and_communicate_copy_indices(dof_handler);
+  else
+    this->fill_and_communicate_copy_indices_global_coarsening(dof_handler);
 }
 
 
@@ -4236,6 +4396,95 @@ MGTransferMF<dim, Number>::restrict_and_add(const unsigned int from_level,
                                             const VectorType  &src) const
 {
   this->transfer[from_level]->restrict_and_add(dst, src);
+}
+
+
+
+template <int dim, typename Number>
+void
+MGTransferMF<dim, Number>::assert_dof_handler(
+  const DoFHandler<dim> &dof_handler_out) const
+{
+#ifndef DEBUG
+  (void)dof_handler_out;
+#else
+
+  const auto dof_handler_and_level_in = get_dof_handler_fine();
+  const auto dof_handler_in           = dof_handler_and_level_in.first;
+  const auto level_in                 = dof_handler_and_level_in.second;
+
+  if ((dof_handler_out.n_dofs() == 0) ||  // dummy DoFHandler
+      (dof_handler_in == nullptr) ||      // single level
+      (dof_handler_in == &dof_handler_out // same DoFHandler
+       ))
+    return; // nothing to do
+
+  if (this->perform_plain_copy)
+    {
+      // global-coarsening path: compare indices of cells
+
+      std::vector<types::global_dof_index> dof_indices_in;
+      std::vector<types::global_dof_index> dof_indices_out;
+
+      internal::loop_over_active_or_level_cells(
+        dof_handler_in->get_triangulation(), level_in, [&](const auto &cell) {
+          const auto cell_id = cell->id();
+
+          Assert(
+            dof_handler_out.get_triangulation().contains_cell(cell_id),
+            ExcMessage(
+              "DoFHandler instances used for set up of MGTransferMF and copy_to_mg(), "
+              "copy_from_mg(), or interpolate_to_mg() are not compatible."));
+
+          if (level_in == numbers::invalid_unsigned_int)
+            {
+              const auto cell_in =
+                cell->as_dof_handler_iterator(*dof_handler_in);
+              const auto cell_out =
+                dof_handler_out.get_triangulation()
+                  .create_cell_iterator(cell_id)
+                  ->as_dof_handler_iterator(dof_handler_out);
+
+              AssertDimension(cell_in->get_fe().n_dofs_per_cell(),
+                              cell_out->get_fe().n_dofs_per_cell());
+
+              dof_indices_in.resize(cell_in->get_fe().n_dofs_per_cell());
+              dof_indices_out.resize(cell_out->get_fe().n_dofs_per_cell());
+
+              cell_in->get_dof_indices(dof_indices_in);
+              cell_out->get_dof_indices(dof_indices_out);
+            }
+          else
+            {
+              const auto cell_in =
+                cell->as_dof_handler_level_iterator(*dof_handler_in);
+              const auto cell_out =
+                dof_handler_out.get_triangulation()
+                  .create_cell_iterator(cell_id)
+                  ->as_dof_handler_level_iterator(dof_handler_out);
+
+              AssertDimension(cell_in->get_fe().n_dofs_per_cell(),
+                              cell_out->get_fe().n_dofs_per_cell());
+
+              dof_indices_in.resize(cell_in->get_fe().n_dofs_per_cell());
+              dof_indices_out.resize(cell_out->get_fe().n_dofs_per_cell());
+
+              cell_in->get_mg_dof_indices(dof_indices_in);
+              cell_out->get_mg_dof_indices(dof_indices_out);
+            }
+
+          Assert(
+            dof_indices_in == dof_indices_out,
+            ExcMessage(
+              "DoFHandler instances used for set up of MGTransferMF and copy_to_mg(), "
+              "copy_from_mg(), or interpolate_to_mg() are not compatible."));
+        });
+    }
+  else if (this->perform_renumbered_plain_copy)
+    {
+      // nothing to do
+    }
+#endif
 }
 
 
@@ -4797,6 +5046,9 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   Assert(dof_handler_coarse.get_fe().n_components() > 0 &&
            dof_handler_fine.get_fe().n_components() > 0,
          ExcNotImplemented());
+
+  this->dof_handler_fine = &dof_handler_fine;
+  this->mg_level_fine    = numbers::invalid_unsigned_int;
 
   this->fine_element_is_continuous =
     dof_handler_fine.get_fe().n_dofs_per_vertex() > 0;
