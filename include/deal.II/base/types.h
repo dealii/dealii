@@ -79,7 +79,7 @@ namespace types
 #ifdef DEAL_II_WITH_64BIT_INDICES
   using global_dof_index = std::uint64_t;
 #else
-  using global_dof_index  = unsigned int;
+  using global_dof_index        = unsigned int;
 #endif
 
   /**
@@ -87,7 +87,11 @@ namespace types
    * This is useful for interacting with Trilinos' Tpetra that only works well
    * with a signed global ordinal type.
    */
-  using signed_global_dof_index = std::make_signed_t<global_dof_index>;
+#ifdef DEAL_II_WITH_64BIT_INDICES
+  using signed_global_dof_index = long long;
+#else
+  using signed_global_dof_index = int;
+#endif
 
   /**
    * An identifier that denotes the MPI type associated with
@@ -115,7 +119,7 @@ namespace types
 #ifdef DEAL_II_WITH_64BIT_INDICES
   using global_cell_index = std::uint64_t;
 #else
-  using global_cell_index = unsigned int;
+  using global_cell_index       = unsigned int;
 #endif
 
   /**
