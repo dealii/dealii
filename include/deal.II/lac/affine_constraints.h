@@ -2305,8 +2305,7 @@ AffineConstraints<number>::add_constraint(
                     "that is already constrained."));
 
   add_line(constrained_dof);
-  for (const auto &dep : dependencies)
-    add_entry(constrained_dof, dep.first, dep.second);
+  add_entries(constrained_dof, dependencies);
   set_inhomogeneity(constrained_dof, inhomogeneity);
 }
 
