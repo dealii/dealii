@@ -709,9 +709,14 @@
             <dd>
                 <p>
                     <a href="https://faculty.cse.tamu.edu/davis/suitesparse.html">UMFPACK</a>, which is part of SuiteSparse, is a sparse direct solver that we often use in prototype codes where the goal is to simply get a linear system solved robustly.
-                    The interface will be enabled by default, either using a version installed on your system of using a version that comes bundled with
+                    The interface will be enabled by default, either using a version installed on your system, or using the version that comes bundled with
                     <acronym>deal.II</acronym>. It can be disabled explicitly by using the
-                    <code>-DDEAL_II_WITH_UMFPACK=OFF</code> argument. To use a self compiled version, pass the argument
+                    <code>-DDEAL_II_WITH_UMFPACK=OFF</code>
+                    argument. It will also be disabled if no version
+                    installed on the system can be found, and if the
+                    version that comes bundled with deal.II cannot be
+                    compiled, for example because no version of LAPACK
+                    can be found. To use a self compiled version, pass the argument
                     <code>-DUMFPACK_DIR=/path/to/umfpack</code> to the
                     <code>cmake</code> command.
                 </p>
