@@ -1275,9 +1275,9 @@ namespace Step42
                            0) &&
                           !constraints_hanging_nodes.is_constrained(index_z))
                         {
-                          all_constraints.add_line(index_z);
-                          all_constraints.set_inhomogeneity(index_z,
-                                                            undeformed_gap);
+                          all_constraints.add_constraint(index_z,
+                                                         {},
+                                                         undeformed_gap);
                           distributed_solution(index_z) = undeformed_gap;
 
                           active_set.add_index(index_z);

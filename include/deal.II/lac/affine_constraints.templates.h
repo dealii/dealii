@@ -568,18 +568,7 @@ AffineConstraints<number>::make_consistent_in_parallel(
 
   // 3) refill this constraint matrix
   for (const auto &line : temporal_constraint_matrix)
-    {
-      // ... line
-      this->add_line(line.index);
-
-      // ... inhomogeneity
-      if (line.inhomogeneity != number())
-        this->set_inhomogeneity(line.index, line.inhomogeneity);
-
-      // ... entries
-      if (!line.entries.empty())
-        this->add_entries(line.index, line.entries);
-    }
+    this->add_constraint(line.index, line.entries, line.inhomogeneity);
 
 #ifdef DEBUG
   Assert(this->is_consistent_in_parallel(
@@ -1193,8 +1182,7 @@ AffineConstraints<number>::get_view(const IndexSet &mask) const
   for (const ConstraintLine &line : lines)
     if (mask.is_element(line.index))
       {
-        const size_type row = mask.index_within_set(line.index);
-        view.add_line(row);
+#ifdef DEBUG
         for (const std::pair<size_type, number> &entry : line.entries)
           {
             Assert(
@@ -1203,18 +1191,24 @@ AffineConstraints<number>::get_view(const IndexSet &mask) const
                 "In creating a view of an AffineConstraints "
                 "object, the constraint on degree of freedom " +
                 std::to_string(line.index) + " (which corresponds to the " +
-                std::to_string(row) +
+                std::to_string(mask.index_within_set(line.index)) +
                 "th degree of freedom selected in the mask) "
                 "is constrained against degree of freedom " +
                 std::to_string(entry.first) +
                 ", but this degree of freedom is not listed in the mask and "
                 "consequently cannot be transcribed into the index space "
                 "of the output object."));
-            view.add_entry(row,
-                           mask.index_within_set(entry.first),
-                           entry.second);
           }
-        view.set_inhomogeneity(row, line.inhomogeneity);
+#endif
+
+        std::vector<std::pair<size_type, number>> translated_entries =
+          line.entries;
+        for (auto &entry : translated_entries)
+          entry.first = mask.index_within_set(entry.first);
+
+        view.add_constraint(mask.index_within_set(line.index),
+                            translated_entries,
+                            line.inhomogeneity);
       }
 
   view.close();

@@ -170,21 +170,24 @@ namespace VectorTools
                   if (!constraints.is_constrained(dof_indices.dof_indices[0]) &&
                       constraints.can_store_line(dof_indices.dof_indices[0]))
                     {
-                      constraints.add_line(dof_indices.dof_indices[0]);
+                      const double normalized_inhomogeneity =
+                        (std::fabs(inhomogeneity / constraining_vector[0]) >
+                             std::numeric_limits<double>::epsilon() ?
+                           inhomogeneity / constraining_vector[0] :
+                           0);
 
                       if (std::fabs(constraining_vector[1] /
                                     constraining_vector[0]) >
                           std::numeric_limits<double>::epsilon())
-                        constraints.add_entry(dof_indices.dof_indices[0],
-                                              dof_indices.dof_indices[1],
-                                              -constraining_vector[1] /
-                                                constraining_vector[0]);
-
-                      if (std::fabs(inhomogeneity / constraining_vector[0]) >
-                          std::numeric_limits<double>::epsilon())
-                        constraints.set_inhomogeneity(
-                          dof_indices.dof_indices[0],
-                          inhomogeneity / constraining_vector[0]);
+                        constraints.add_constraint(dof_indices.dof_indices[0],
+                                                   {{dof_indices.dof_indices[1],
+                                                     -constraining_vector[1] /
+                                                       constraining_vector[0]}},
+                                                   normalized_inhomogeneity);
+                      else
+                        constraints.add_constraint(dof_indices.dof_indices[0],
+                                                   {},
+                                                   normalized_inhomogeneity);
                     }
                 }
               else
@@ -192,21 +195,24 @@ namespace VectorTools
                   if (!constraints.is_constrained(dof_indices.dof_indices[1]) &&
                       constraints.can_store_line(dof_indices.dof_indices[1]))
                     {
-                      constraints.add_line(dof_indices.dof_indices[1]);
+                      const double normalized_inhomogeneity =
+                        (std::fabs(inhomogeneity / constraining_vector[1]) >
+                             std::numeric_limits<double>::epsilon() ?
+                           inhomogeneity / constraining_vector[1] :
+                           0);
 
                       if (std::fabs(constraining_vector[0] /
                                     constraining_vector[1]) >
                           std::numeric_limits<double>::epsilon())
-                        constraints.add_entry(dof_indices.dof_indices[1],
-                                              dof_indices.dof_indices[0],
-                                              -constraining_vector[0] /
-                                                constraining_vector[1]);
-
-                      if (std::fabs(inhomogeneity / constraining_vector[1]) >
-                          std::numeric_limits<double>::epsilon())
-                        constraints.set_inhomogeneity(
-                          dof_indices.dof_indices[1],
-                          inhomogeneity / constraining_vector[1]);
+                        constraints.add_constraint(dof_indices.dof_indices[1],
+                                                   {{dof_indices.dof_indices[0],
+                                                     -constraining_vector[0] /
+                                                       constraining_vector[1]}},
+                                                   normalized_inhomogeneity);
+                      else
+                        constraints.add_constraint(dof_indices.dof_indices[1],
+                                                   {},
+                                                   normalized_inhomogeneity);
                     }
                 }
               break;
@@ -214,6 +220,16 @@ namespace VectorTools
 
           case 3:
             {
+              // Store constraints. There are at most 2 entries per
+              // constraint, so a boost::container::small_vector with
+              // static size 2 will do just fine.
+              //
+              // TODO: This could use std::inplace_vector once available (in
+              // C++26?)
+              boost::container::
+                small_vector<std::pair<types::global_dof_index, double>, 2>
+                  constraint_entries;
+
               if ((std::fabs(constraining_vector[0]) >=
                    std::fabs(constraining_vector[1]) + 1e-10) &&
                   (std::fabs(constraining_vector[0]) >=
@@ -222,29 +238,29 @@ namespace VectorTools
                   if (!constraints.is_constrained(dof_indices.dof_indices[0]) &&
                       constraints.can_store_line(dof_indices.dof_indices[0]))
                     {
-                      constraints.add_line(dof_indices.dof_indices[0]);
-
                       if (std::fabs(constraining_vector[1] /
                                     constraining_vector[0]) >
                           std::numeric_limits<double>::epsilon())
-                        constraints.add_entry(dof_indices.dof_indices[0],
-                                              dof_indices.dof_indices[1],
-                                              -constraining_vector[1] /
-                                                constraining_vector[0]);
+                        constraint_entries.emplace_back(
+                          dof_indices.dof_indices[1],
+                          -constraining_vector[1] / constraining_vector[0]);
 
                       if (std::fabs(constraining_vector[2] /
                                     constraining_vector[0]) >
                           std::numeric_limits<double>::epsilon())
-                        constraints.add_entry(dof_indices.dof_indices[0],
-                                              dof_indices.dof_indices[2],
-                                              -constraining_vector[2] /
-                                                constraining_vector[0]);
+                        constraint_entries.emplace_back(
+                          dof_indices.dof_indices[2],
+                          -constraining_vector[2] / constraining_vector[0]);
 
-                      if (std::fabs(inhomogeneity / constraining_vector[0]) >
-                          std::numeric_limits<double>::epsilon())
-                        constraints.set_inhomogeneity(
-                          dof_indices.dof_indices[0],
-                          inhomogeneity / constraining_vector[0]);
+                      const double normalized_inhomogeneity =
+                        (std::fabs(inhomogeneity / constraining_vector[0]) >
+                             std::numeric_limits<double>::epsilon() ?
+                           inhomogeneity / constraining_vector[0] :
+                           0);
+
+                      constraints.add_constraint(dof_indices.dof_indices[0],
+                                                 constraint_entries,
+                                                 normalized_inhomogeneity);
                     }
                 }
               else if ((std::fabs(constraining_vector[1]) + 1e-10 >=
@@ -255,29 +271,29 @@ namespace VectorTools
                   if (!constraints.is_constrained(dof_indices.dof_indices[1]) &&
                       constraints.can_store_line(dof_indices.dof_indices[1]))
                     {
-                      constraints.add_line(dof_indices.dof_indices[1]);
-
                       if (std::fabs(constraining_vector[0] /
                                     constraining_vector[1]) >
                           std::numeric_limits<double>::epsilon())
-                        constraints.add_entry(dof_indices.dof_indices[1],
-                                              dof_indices.dof_indices[0],
-                                              -constraining_vector[0] /
-                                                constraining_vector[1]);
+                        constraint_entries.emplace_back(
+                          dof_indices.dof_indices[0],
+                          -constraining_vector[0] / constraining_vector[1]);
 
                       if (std::fabs(constraining_vector[2] /
                                     constraining_vector[1]) >
                           std::numeric_limits<double>::epsilon())
-                        constraints.add_entry(dof_indices.dof_indices[1],
-                                              dof_indices.dof_indices[2],
-                                              -constraining_vector[2] /
-                                                constraining_vector[1]);
+                        constraint_entries.emplace_back(
+                          dof_indices.dof_indices[2],
+                          -constraining_vector[2] / constraining_vector[1]);
 
-                      if (std::fabs(inhomogeneity / constraining_vector[1]) >
-                          std::numeric_limits<double>::epsilon())
-                        constraints.set_inhomogeneity(
-                          dof_indices.dof_indices[1],
-                          inhomogeneity / constraining_vector[1]);
+                      const double normalized_inhomogeneity =
+                        (std::fabs(inhomogeneity / constraining_vector[1]) >
+                             std::numeric_limits<double>::epsilon() ?
+                           inhomogeneity / constraining_vector[1] :
+                           0);
+
+                      constraints.add_constraint(dof_indices.dof_indices[1],
+                                                 constraint_entries,
+                                                 normalized_inhomogeneity);
                     }
                 }
               else
@@ -285,29 +301,29 @@ namespace VectorTools
                   if (!constraints.is_constrained(dof_indices.dof_indices[2]) &&
                       constraints.can_store_line(dof_indices.dof_indices[2]))
                     {
-                      constraints.add_line(dof_indices.dof_indices[2]);
-
                       if (std::fabs(constraining_vector[0] /
                                     constraining_vector[2]) >
                           std::numeric_limits<double>::epsilon())
-                        constraints.add_entry(dof_indices.dof_indices[2],
-                                              dof_indices.dof_indices[0],
-                                              -constraining_vector[0] /
-                                                constraining_vector[2]);
+                        constraint_entries.emplace_back(
+                          dof_indices.dof_indices[0],
+                          -constraining_vector[0] / constraining_vector[2]);
 
                       if (std::fabs(constraining_vector[1] /
                                     constraining_vector[2]) >
                           std::numeric_limits<double>::epsilon())
-                        constraints.add_entry(dof_indices.dof_indices[2],
-                                              dof_indices.dof_indices[1],
-                                              -constraining_vector[1] /
-                                                constraining_vector[2]);
+                        constraint_entries.emplace_back(
+                          dof_indices.dof_indices[1],
+                          -constraining_vector[1] / constraining_vector[2]);
 
-                      if (std::fabs(inhomogeneity / constraining_vector[2]) >
-                          std::numeric_limits<double>::epsilon())
-                        constraints.set_inhomogeneity(
-                          dof_indices.dof_indices[2],
-                          inhomogeneity / constraining_vector[2]);
+                      const double normalized_inhomogeneity =
+                        (std::fabs(inhomogeneity / constraining_vector[2]) >
+                             std::numeric_limits<double>::epsilon() ?
+                           inhomogeneity / constraining_vector[2] :
+                           0);
+
+                      constraints.add_constraint(dof_indices.dof_indices[2],
+                                                 constraint_entries,
+                                                 normalized_inhomogeneity);
                     }
                 }
 
@@ -363,25 +379,29 @@ namespace VectorTools
           if (!constraints.is_constrained(dof_indices.dof_indices[d]) &&
               constraints.can_store_line(dof_indices.dof_indices[d]))
             {
-              constraints.add_line(dof_indices.dof_indices[d]);
-
-              if (std::fabs(tangent_vector[d] /
-                            tangent_vector[largest_component]) >
-                  std::numeric_limits<double>::epsilon())
-                constraints.add_entry(
-                  dof_indices.dof_indices[d],
-                  dof_indices.dof_indices[largest_component],
-                  tangent_vector[d] / tangent_vector[largest_component]);
-
               const double inhomogeneity =
                 (b_values(d) * tangent_vector[largest_component] -
                  b_values(largest_component) * tangent_vector[d]) /
                 tangent_vector[largest_component];
 
-              if (std::fabs(inhomogeneity) >
+              const double normalized_inhomogeneity =
+                (std::fabs(inhomogeneity) >
+                     std::numeric_limits<double>::epsilon() ?
+                   inhomogeneity :
+                   0);
+
+              if (std::fabs(tangent_vector[d] /
+                            tangent_vector[largest_component]) >
                   std::numeric_limits<double>::epsilon())
-                constraints.set_inhomogeneity(dof_indices.dof_indices[d],
-                                              inhomogeneity);
+                constraints.add_constraint(
+                  dof_indices.dof_indices[d],
+                  {{dof_indices.dof_indices[largest_component],
+                    tangent_vector[d] / tangent_vector[largest_component]}},
+                  normalized_inhomogeneity);
+              else
+                constraints.add_constraint(dof_indices.dof_indices[d],
+                                           {},
+                                           normalized_inhomogeneity);
             }
     }
 

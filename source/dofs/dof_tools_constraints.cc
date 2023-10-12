@@ -509,8 +509,14 @@ namespace DoFTools
           Assert(primary_dofs[col] != numbers::invalid_dof_index,
                  ExcInternalError());
 
-        std::vector<
-          std::pair<typename AffineConstraints<number2>::size_type, number2>>
+        // Build constraints in a vector of pairs that can be
+        // arbitrarily large, but that holds up to 25 elements without
+        // external memory allocation. This is good enough for hanging
+        // node constraints of Q4 elements in 3d, so covers most
+        // common cases.
+        boost::container::small_vector<
+          std::pair<typename AffineConstraints<number2>::size_type, number2>,
+          25>
           entries;
         entries.reserve(n_primary_dofs);
         for (unsigned int row = 0; row != n_dependent_dofs; ++row)
@@ -650,6 +656,16 @@ namespace DoFTools
       std::vector<types::global_dof_index> dofs_on_mother;
       std::vector<types::global_dof_index> dofs_on_children;
 
+      // Build constraints in a vector of pairs that can be
+      // arbitrarily large, but that holds up to 25 elements without
+      // external memory allocation. This is good enough for hanging
+      // node constraints of Q4 elements in 3d, so covers most
+      // common cases.
+      boost::container::small_vector<
+        std::pair<typename AffineConstraints<number>::size_type, number>,
+        25>
+        constraint_entries;
+
       // loop over all lines; only on lines there can be constraints. We do so
       // by looping over all active cells and checking whether any of the faces
       // are refined which can only be from the neighboring cell because this
@@ -658,10 +674,7 @@ namespace DoFTools
       // note that even though we may visit a face twice if the neighboring
       // cells are equally refined, we can only visit each face with hanging
       // nodes once
-      typename DoFHandler<dim_, spacedim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
           // artificial cells can at best neighbor ghost cells, but we're not
           // interested in these interfaces
@@ -760,13 +773,15 @@ namespace DoFTools
                 for (unsigned int row = 0; row != dofs_on_children.size();
                      ++row)
                   {
-                    constraints.add_line(dofs_on_children[row]);
+                    constraint_entries.clear();
+                    constraint_entries.reserve(dofs_on_mother.size());
                     for (unsigned int i = 0; i != dofs_on_mother.size(); ++i)
-                      constraints.add_entry(dofs_on_children[row],
-                                            dofs_on_mother[i],
-                                            fe.constraints()(row, i));
+                      constraint_entries.emplace_back(dofs_on_mother[i],
+                                                      fe.constraints()(row, i));
 
-                    constraints.set_inhomogeneity(dofs_on_children[row], 0.);
+                    constraints.add_constraint(dofs_on_children[row],
+                                               constraint_entries,
+                                               0.);
                   }
               }
             else
@@ -802,6 +817,16 @@ namespace DoFTools
       std::vector<types::global_dof_index> dofs_on_mother;
       std::vector<types::global_dof_index> dofs_on_children;
 
+      // Build constraints in a vector of pairs that can be
+      // arbitrarily large, but that holds up to 25 elements without
+      // external memory allocation. This is good enough for hanging
+      // node constraints of Q4 elements in 3d, so covers most
+      // common cases.
+      boost::container::small_vector<
+        std::pair<typename AffineConstraints<number>::size_type, number>,
+        25>
+        constraint_entries;
+
       // loop over all quads; only on quads there can be constraints. We do so
       // by looping over all active cells and checking whether any of the faces
       // are refined which can only be from the neighboring cell because this
@@ -810,10 +835,7 @@ namespace DoFTools
       // note that even though we may visit a face twice if the neighboring
       // cells are equally refined, we can only visit each face with hanging
       // nodes once
-      typename DoFHandler<dim_, spacedim>::active_cell_iterator
-        cell = dof_handler.begin_active(),
-        endc = dof_handler.end();
-      for (; cell != endc; ++cell)
+      for (const auto &cell : dof_handler.active_cell_iterators())
         {
           // artificial cells can at best neighbor ghost cells, but we're not
           // interested in these interfaces
@@ -1004,13 +1026,15 @@ namespace DoFTools
                 for (unsigned int row = 0; row != dofs_on_children.size();
                      ++row)
                   {
-                    constraints.add_line(dofs_on_children[row]);
+                    constraint_entries.clear();
+                    constraint_entries.reserve(dofs_on_mother.size());
                     for (unsigned int i = 0; i != dofs_on_mother.size(); ++i)
-                      constraints.add_entry(dofs_on_children[row],
-                                            dofs_on_mother[i],
-                                            fe.constraints()(row, i));
+                      constraint_entries.emplace_back(dofs_on_mother[i],
+                                                      fe.constraints()(row, i));
 
-                    constraints.set_inhomogeneity(dofs_on_children[row], 0.);
+                    constraints.add_constraint(dofs_on_children[row],
+                                               constraint_entries,
+                                               0.);
                   }
               }
             else
@@ -1993,11 +2017,20 @@ namespace DoFTools
           cell_to_rotated_face_index[cell_index] = i;
         }
 
+      // Build constraints in a vector of pairs that can be
+      // arbitrarily large, but that holds up to 25 elements without
+      // external memory allocation. This is good enough for hanging
+      // node constraints of Q4 elements in 3d, so covers most
+      // common cases.
+      boost::container::small_vector<
+        std::pair<typename AffineConstraints<number>::size_type, number>,
+        25>
+        constraint_entries;
+
       //
       // Loop over all dofs on face 2 and constrain them against all
       // matching dofs on face 1:
       //
-
       for (unsigned int i = 0; i < dofs_per_face; ++i)
         {
           // Obey the component mask
@@ -2055,8 +2088,8 @@ namespace DoFTools
               if (affine_constraints.is_constrained(dofs_2[i]))
                 continue;
 
-              // Enter the constraint piece by piece:
-              affine_constraints.add_line(dofs_2[i]);
+              constraint_entries.clear();
+              constraint_entries.reserve(dofs_per_face);
 
               for (unsigned int jj = 0; jj < dofs_per_face; ++jj)
                 {
@@ -2067,10 +2100,15 @@ namespace DoFTools
                       jj, 0, face_orientation, face_flip, face_rotation)];
 
                   if (std::abs(transformation(i, jj)) > eps)
-                    affine_constraints.add_entry(dofs_2[i],
-                                                 dofs_1[j],
-                                                 transformation(i, jj));
+                    constraint_entries.emplace_back(dofs_1[j],
+                                                    transformation(i, jj));
                 }
+
+              // Enter the constraint::
+              affine_constraints.add_constraint(dofs_2[i],
+                                                constraint_entries,
+                                                0.);
+
 
               // Continue with next dof.
               continue;
@@ -2149,14 +2187,12 @@ namespace DoFTools
           if (constraints_are_cyclic)
             {
               if (std::abs(cycle_constraint_factor - number(1.)) > eps)
-                affine_constraints.add_line(dof_left);
+                affine_constraints.add_constraint(dof_left, {}, 0.);
             }
           else
             {
-              affine_constraints.add_line(dof_left);
-              affine_constraints.add_entry(dof_left,
-                                           dof_right,
-                                           constraint_factor);
+              affine_constraints.add_constraint(
+                dof_left, {{dof_right, constraint_factor}}, 0.);
               // The number 1e10 in the assert below is arbitrary. If the
               // absolute value of constraint_factor is too large, then probably
               // the absolute value of periodicity_factor is too large or too
@@ -3339,8 +3375,6 @@ namespace DoFTools
 
 
           // otherwise enter all constraints
-          constraints.add_line(global_dof);
-
           constraint_line.clear();
           for (types::global_dof_index row = first_used_row;
                row < n_coarse_dofs;
@@ -3352,7 +3386,7 @@ namespace DoFTools
                 constraint_line.emplace_back(representants[row], j->second);
             }
 
-          constraints.add_entries(global_dof, constraint_line);
+          constraints.add_constraint(global_dof, constraint_line, 0.);
         }
   }
 
@@ -3483,10 +3517,14 @@ namespace DoFTools
     std::vector<types::global_dof_index> cell_dofs;
     cell_dofs.reserve(dof.get_fe_collection().max_dofs_per_cell());
 
-    typename DoFHandler<dim, spacedim>::active_cell_iterator
-      cell = dof.begin_active(),
-      endc = dof.end();
-    for (; cell != endc; ++cell)
+    // In looping over faces, we will encounter some DoFs multiple
+    // times (namely, the ones on vertices and (in 3d) edges shared
+    // between multiple boundary faces. Keep track of which DoFs we
+    // have already encountered, so that we do not have to consider
+    // them a second time.
+    std::set<types::global_dof_index> dofs_already_treated;
+
+    for (const auto &cell : dof.active_cell_iterators())
       if (!cell->is_artificial() && cell->at_boundary())
         {
           const FiniteElement<dim, spacedim> &fe = cell->get_fe();
@@ -3513,30 +3551,38 @@ namespace DoFTools
                   // enter those dofs into the list that match the component
                   // signature.
                   for (const types::global_dof_index face_dof : face_dofs)
-                    {
-                      // Find out if a dof has a contribution in this component,
-                      // and if so, add it to the list
-                      const std::vector<types::global_dof_index>::iterator
-                        it_index_on_cell = std::find(cell_dofs.begin(),
-                                                     cell_dofs.end(),
-                                                     face_dof);
-                      Assert(it_index_on_cell != cell_dofs.end(),
-                             ExcInvalidIterator());
-                      const unsigned int index_on_cell =
-                        std::distance(cell_dofs.begin(), it_index_on_cell);
-                      const ComponentMask &nonzero_component_array =
-                        cell->get_fe().get_nonzero_components(index_on_cell);
-                      bool nonzero = false;
-                      for (unsigned int c = 0; c < n_components; ++c)
-                        if (nonzero_component_array[c] && component_mask[c])
-                          {
-                            nonzero = true;
-                            break;
-                          }
+                    if (dofs_already_treated.find(face_dof) ==
+                        dofs_already_treated.end())
+                      {
+                        // Find out if a dof has a contribution in this
+                        // component, and if so, add it to the list
+                        const std::vector<types::global_dof_index>::iterator
+                          it_index_on_cell = std::find(cell_dofs.begin(),
+                                                       cell_dofs.end(),
+                                                       face_dof);
+                        Assert(it_index_on_cell != cell_dofs.end(),
+                               ExcInvalidIterator());
+                        const unsigned int index_on_cell =
+                          std::distance(cell_dofs.begin(), it_index_on_cell);
+                        const ComponentMask &nonzero_component_array =
+                          cell->get_fe().get_nonzero_components(index_on_cell);
 
-                      if (nonzero)
-                        zero_boundary_constraints.add_line(face_dof);
-                    }
+                        bool nonzero = false;
+                        for (unsigned int c = 0; c < n_components; ++c)
+                          if (nonzero_component_array[c] && component_mask[c])
+                            {
+                              nonzero = true;
+                              break;
+                            }
+
+                        if (nonzero)
+                          zero_boundary_constraints.add_constraint(face_dof,
+                                                                   {},
+                                                                   0.);
+                        // We already dealt with this DoF. Make sure we
+                        // don't touch it again.
+                        dofs_already_treated.insert(face_dof);
+                      }
                 }
             }
         }

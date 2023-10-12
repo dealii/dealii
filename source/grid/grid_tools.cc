@@ -2297,9 +2297,9 @@ namespace GridTools
             if (map_iter != map_end)
               for (unsigned int i = 0; i < dim; ++i)
                 {
-                  constraints[i].add_line(cell->vertex_dof_index(vertex_no, 0));
-                  constraints[i].set_inhomogeneity(
+                  constraints[i].add_constraint(
                     cell->vertex_dof_index(vertex_no, 0),
+                    {},
                     (solve_for_absolute_positions ?
                        map_iter->second(i) :
                        map_iter->second(i) - vertex_point[i]));
