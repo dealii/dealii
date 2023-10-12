@@ -795,9 +795,10 @@ public:
    * @endcode
    */
   void
-  add_constraint(const size_type constrained_dof,
-                 const std::vector<std::pair<size_type, number>> &dependencies,
-                 const number inhomogeneity = 0);
+  add_constraint(
+    const size_type                                      constrained_dof,
+    const ArrayView<const std::pair<size_type, number>> &dependencies,
+    const number                                         inhomogeneity = 0);
 
   /**
    * Add a new line to the matrix. If the line already exists, then the
@@ -2290,24 +2291,6 @@ inline AffineConstraints<number>::AffineConstraints(
       affine_constraints.needed_elements_for_distribute)
   , sorted(affine_constraints.sorted)
 {}
-
-
-
-template <typename number>
-inline void
-AffineConstraints<number>::add_constraint(
-  const size_type                                  constrained_dof,
-  const std::vector<std::pair<size_type, number>> &dependencies,
-  const number                                     inhomogeneity)
-{
-  Assert(is_constrained(constrained_dof) == false,
-         ExcMessage("You cannot add a constraint for a degree of freedom "
-                    "that is already constrained."));
-
-  add_line(constrained_dof);
-  add_entries(constrained_dof, dependencies);
-  set_inhomogeneity(constrained_dof, inhomogeneity);
-}
 
 
 
