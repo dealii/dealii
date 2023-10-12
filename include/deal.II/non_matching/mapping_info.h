@@ -1284,8 +1284,12 @@ namespace NonMatching
     resize_unit_points(n_unit_points);
     resize_data_fields(n_data_points);
 
-    MappingData mapping_data;
-    cell_index = 0;
+    MappingData  mapping_data;
+    MappingData  mapping_data_last_cell;
+    MappingData  mapping_data_first;
+    bool         first_set            = false;
+    unsigned int size_compressed_data = 0;
+    cell_index                        = 0;
     QProjector<dim> q_projector;
     for (const auto &cell : cell_iterator_range)
       {
@@ -1298,6 +1302,7 @@ namespace NonMatching
         for (const auto &f : cell->face_indices())
           {
             const auto &quadrature_on_face = quadratures_on_faces[f];
+            const bool  empty              = quadrature_on_face.empty();
 
             const auto quadrature_on_cell =
               q_projector.project_to_face(cell->reference_cell(),
@@ -1330,11 +1335,87 @@ namespace NonMatching
                                                        internal_mapping_data,
                                                        mapping_data);
 
-            cell_type.push_back(
-              dealii::internal::MatrixFreeFunctions::GeometryType::general);
+            // check for cartesian/affine cell
+            if (!empty &&
+                update_flags_mapping & UpdateFlags::update_inverse_jacobians)
+              {
+                cell_type.push_back(internal::compute_geometry_type(
+                  cell->diameter(), mapping_data.inverse_jacobians));
 
-            compressed_data_index_offsets.push_back(
-              data_index_offsets[current_face_index]);
+                if (!first_set)
+                  {
+                    mapping_data_first = mapping_data;
+                    first_set          = true;
+                  }
+              }
+            else
+              cell_type.push_back(
+                dealii::internal::MatrixFreeFunctions::GeometryType::general);
+
+            if (current_face_index > 0)
+              {
+                // check if current and last cell are affine
+                const bool affine_cells =
+                  cell_type[current_face_index] <=
+                    dealii::internal::MatrixFreeFunctions::affine &&
+                  cell_type[current_face_index - 1] <=
+                    dealii::internal::MatrixFreeFunctions::affine;
+
+                // create a comparator to compare inverse Jacobian of current
+                // and last cell
+                FloatingPointComparator<double> comparator(
+                  1e4 / cell->diameter() *
+                  std::numeric_limits<double>::epsilon() * 1024.);
+
+                // we can only compare if current and last cell have at least
+                // one quadrature point and both cells are at least affine
+                const auto comparison_result =
+                  (!affine_cells || mapping_data.inverse_jacobians.empty() ||
+                   mapping_data_last_cell.inverse_jacobians.empty()) ?
+                    FloatingPointComparator<double>::ComparisonResult::less :
+                    comparator.compare(
+                      mapping_data.inverse_jacobians[0],
+                      mapping_data_last_cell.inverse_jacobians[0]);
+
+                // we can compress the Jacobians and inverse Jacobians if
+                // inverse Jacobians are equal and cells are affine
+                if (affine_cells &&
+                    comparison_result ==
+                      FloatingPointComparator<double>::ComparisonResult::equal)
+                  {
+                    compressed_data_index_offsets.push_back(
+                      compressed_data_index_offsets.back());
+                  }
+                else if (first_set &&
+                         (cell_type[current_face_index] <=
+                          dealii::internal::MatrixFreeFunctions::affine) &&
+                         (comparator.compare(
+                            mapping_data.inverse_jacobians[0],
+                            mapping_data_first.inverse_jacobians[0]) ==
+                          FloatingPointComparator<
+                            double>::ComparisonResult::equal))
+                  {
+                    compressed_data_index_offsets.push_back(0);
+                  }
+                else
+                  {
+                    const unsigned int n_compressed_data_last_cell =
+                      cell_type[current_face_index - 1] <=
+                          dealii::internal::MatrixFreeFunctions::affine ?
+                        1 :
+                        compute_n_q_points<Number>(
+                          n_q_points_unvectorized[current_face_index - 1]);
+
+                    compressed_data_index_offsets.push_back(
+                      compressed_data_index_offsets.back() +
+                      n_compressed_data_last_cell);
+                  }
+              }
+            else
+              compressed_data_index_offsets.push_back(0);
+
+            // cache mapping_data from last cell
+            mapping_data_last_cell = mapping_data;
 
             const unsigned int n_q_points_data = compute_n_q_points<Number>(
               n_q_points_unvectorized[current_face_index]);
@@ -1344,13 +1425,36 @@ namespace NonMatching
                                mapping_data,
                                quadrature_on_face.get_weights(),
                                data_index_offsets[current_face_index],
-                               false);
+                               cell_type[current_face_index] <=
+                                 dealii::internal::MatrixFreeFunctions::affine);
+
+            // update size of compressed data depending on cell type and handle
+            // empty quadratures
+            if (cell_type[current_face_index] <=
+                dealii::internal::MatrixFreeFunctions::affine)
+              size_compressed_data = compressed_data_index_offsets.back() + 1;
+            else
+              size_compressed_data =
+                std::max(size_compressed_data,
+                         compressed_data_index_offsets.back() +
+                           n_q_points_data);
           }
         if (do_cell_index_compression)
           cell_index_to_compressed_cell_index[cell->active_cell_index()] =
             cell_index;
 
         ++cell_index;
+      }
+
+    if (update_flags_mapping & UpdateFlags::update_jacobians)
+      {
+        jacobians.resize(size_compressed_data);
+        jacobians.shrink_to_fit();
+      }
+    if (update_flags_mapping & UpdateFlags::update_inverse_jacobians)
+      {
+        inverse_jacobians.resize(size_compressed_data);
+        inverse_jacobians.shrink_to_fit();
       }
 
     state = State::faces_on_cells_in_vector;
