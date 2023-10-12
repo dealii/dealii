@@ -23,6 +23,8 @@
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <array>
 #include <type_traits>
 #include <vector>
@@ -179,6 +181,44 @@ public:
    *   such as <code>ArrayView@<double@></code>.
    */
   ArrayView(std::vector<std::remove_cv_t<value_type>> &vector);
+
+  /**
+   * A constructor that automatically creates a view from a
+   * boost::container::small_vector object. The view encompasses all elements of
+   * the given vector.
+   *
+   * This implicit conversion constructor is particularly useful when calling
+   * a function that takes an ArrayView object as argument, and passing in
+   * a boost::container::small_vector.
+   *
+   * @note This constructor takes a reference to a @p const vector as argument.
+   *   It can only be used to initialize ArrayView objects that point to
+   *   @p const memory locations, such as <code>ArrayView@<const double@></code>.
+   *   You cannot initialize ArrayView objects to non-@p const memory with
+   *   such arguments, such as <code>ArrayView@<double@></code>.
+   */
+  template <std::size_t N>
+  ArrayView(const boost::container::small_vector<std::remove_cv_t<value_type>,
+                                                 N> &vector);
+
+  /**
+   * A constructor that automatically creates a view from a
+   * boost::container::small_vector object. The view encompasses all elements of
+   * the given vector.
+   *
+   * This implicit conversion constructor is particularly useful when calling
+   * a function that takes an ArrayView object as argument, and passing in
+   * a boost::container::small_vector.
+   *
+   * @note This constructor takes a reference to a non-@p const vector as
+   *   argument. It can be used to initialize ArrayView objects that point to
+   *   either @p const memory locations, such as
+   *   <code>ArrayView@<const double@></code>, or to non-@p const memory,
+   *   such as <code>ArrayView@<double@></code>.
+   */
+  template <std::size_t N>
+  ArrayView(
+    boost::container::small_vector<std::remove_cv_t<value_type>, N> &vector);
 
   /**
    * A constructor that automatically creates a view for a given C-style array.
@@ -523,6 +563,41 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   std::vector<std::remove_cv_t<value_type>> &vector)
+  : // use delegating constructor
+  ArrayView(vector.data(), vector.size())
+{}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+template <std::size_t N>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  const boost::container::small_vector<std::remove_cv_t<value_type>, N> &vector)
+  : // use delegating constructor
+  ArrayView(vector.data(), vector.size())
+{
+  // the following static_assert is not strictly necessary because,
+  // if we got a const boost::container::small_vector reference argument but
+  // ElementType is not itself const, then the call to the forwarding
+  // constructor above will already have failed: vector.data() will have
+  // returned a const pointer, but we need a non-const pointer.
+  //
+  // nevertheless, leave the static_assert in since it provides a
+  // more descriptive error message that will simply come after the first
+  // error produced above
+  static_assert(std::is_const_v<value_type> == true,
+                "This constructor may only be called if the ArrayView "
+                "object has a const value_type. In other words, you can "
+                "only create an ArrayView to const values from a const "
+                "std::vector.");
+}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+template <std::size_t N>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  boost::container::small_vector<std::remove_cv_t<value_type>, N> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
 {}
