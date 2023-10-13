@@ -235,7 +235,13 @@ IndexSet::get_view(const size_type begin, const size_type end) const
 {
   Assert(begin <= end,
          ExcMessage("End index needs to be larger or equal to begin index!"));
-  Assert(end <= size(), ExcMessage("Given range exceeds index set dimension"));
+  Assert(end <= size(),
+         ExcMessage("You are asking for a view into an IndexSet object "
+                    "that would cover the sub-range [" +
+                    std::to_string(begin) + ',' + std::to_string(end) +
+                    "). But this is not a subset of the range "
+                    "of the current object, which is [0," +
+                    std::to_string(size()) + ")."));
 
   IndexSet                           result(end - begin);
   std::vector<Range>::const_iterator r1 = ranges.begin();
