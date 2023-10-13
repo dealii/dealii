@@ -73,7 +73,7 @@ $u^{\text{upwind}}$ is defined to be $u^+$ if $\beta \cdot n>0$ and $u^-$ otherw
 
 As a result, the mesh-dependent weak form reads:
 @f[
-\sum_{T\in \mathbb T_h} -\bigl(\nabla \phi_i,{\mathbf \beta}\cdot \phi_j \bigr)_T +
+\sum_{T\in \mathbb T_h} -\bigl(\nabla \phi_i,{\mathbf \beta} \phi_j \bigr)_T +
 \sum_{F\in\mathbb F_h^i} \bigl< [\phi_i], \phi_j^{upwind} \beta\cdot \mathbf n\bigr>_{F} +
 \bigl<\phi_i, \phi_j \beta\cdot \mathbf n\bigr>_{\Gamma_+}
 = -\bigl<\phi_i, g \beta\cdot\mathbf n\bigr>_{\Gamma_-}.

@@ -45,12 +45,12 @@
 // This header is needed for FEInterfaceValues to compute integrals on
 // interfaces:
 #include <deal.II/fe/fe_interface_values.h>
-// We are going to use the simplest possible solver, called Richardson
-// iteration, that represents a simple defect correction. This, in combination
-// with a block SSOR preconditioner (defined in precondition_block.h), that
-// uses the special block matrix structure of system matrices arising from DG
-// discretizations.
-#include <deal.II/lac/solver_richardson.h>
+// We are going to use a standard solver, called Generalized minimal residual
+// method (GMRES). It is an iterative solver which is applicable to arbitrary
+// invertible matrices. This, in combination with a block SSOR preconditioner
+// (defined in precondition_block.h), that uses the special block matrix
+// structure of system matrices arising from DG discretizations.
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/precondition_block.h>
 // We are going to use gradients as refinement indicator.
 #include <deal.II/numerics/derivative_approximation.h>
@@ -458,8 +458,9 @@ namespace Step12
 
   // @sect3{All the rest}
   //
-  // For this simple problem we use the simplest possible solver, called
-  // Richardson iteration, that represents a simple defect correction. This, in
+  // For this simple problem we use a standard iterative solver, called GMRES,
+  // that creates approximate solutions minimizing the residual in each
+  // iterations by adding a new basis vector to the Krylov subspace. This, in
   // combination with a block SSOR preconditioner, that uses the special block
   // matrix structure of system matrices arising from DG discretizations. The
   // size of these blocks are the number of DoFs per cell. Here, we use a SSOR
@@ -467,11 +468,22 @@ namespace Step12
   // field. If the DoFs are renumbered in the downstream direction of the flow,
   // then a block Gauss-Seidel preconditioner (see the PreconditionBlockSOR
   // class with relaxation=1) does a much better job.
+
+  // We create an additional data object for the GMRES solver to increase the
+  // maximum number of basis vectors of the Krylov subspace. When this number
+  // is reached the GMRES algorithm is restarted using the solution of the
+  // previous iteration as the starting approximation. The choice of the
+  // number of basis vectors is a trade-off between memory consumption and
+  // convergence speed, since a longer basis means minimization over a larger
+  // space.
   template <int dim>
   void AdvectionProblem<dim>::solve()
   {
-    SolverControl                    solver_control(1000, 1e-12);
-    SolverRichardson<Vector<double>> solver(solver_control);
+    SolverControl solver_control(1000, 1e-6 * right_hand_side.l2_norm());
+
+    SolverGMRES<Vector<double>>::AdditionalData additional_data;
+    additional_data.max_n_tmp_vectors = 100;
+    SolverGMRES<Vector<double>> solver(solver_control, additional_data);
 
     // Here we create the preconditioner,
     PreconditionBlockSSOR<SparseMatrix<double>> preconditioner;
