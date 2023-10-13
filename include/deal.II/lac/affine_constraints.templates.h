@@ -954,25 +954,33 @@ AffineConstraints<number>::close()
       for (ConstraintLine &line : boost::iterator_range<
              typename std::vector<ConstraintLine>::iterator>(begin, end))
         {
-          std::sort(line.entries.begin(),
-                    line.entries.end(),
-                    [](const std::pair<unsigned int, number> &a,
-                       const std::pair<unsigned int, number> &b) -> bool {
-                      // Let's use lexicographic ordering with std::abs for
-                      // number type (it might be complex valued).
-                      return (a.first < b.first) ||
-                             (a.first == b.first &&
-                              std::abs(a.second) < std::abs(b.second));
-                    });
+          unsigned int duplicates                   = 0;
+          bool         is_sorted_without_duplicates = true;
+          for (unsigned int i = 1; i < line.entries.size(); ++i)
+            if (!(line.entries[i - 1].first < line.entries[i].first))
+              {
+                is_sorted_without_duplicates = false;
+                break;
+              }
+          if (is_sorted_without_duplicates == false)
+            {
+              std::sort(line.entries.begin(),
+                        line.entries.end(),
+                        [](const std::pair<unsigned int, number> &a,
+                           const std::pair<unsigned int, number> &b) -> bool {
+                          // Just look at the index, ignore the value.
+                          return a.first < b.first;
+                        });
 
-          // loop over the now sorted list and see whether any of the entries
-          // references the same dofs more than once in order to find how many
-          // non-duplicate entries we have. This lets us allocate the correct
-          // amount of memory for the constraint entries.
-          size_type duplicates = 0;
-          for (size_type i = 1; i < line.entries.size(); ++i)
-            if (line.entries[i].first == line.entries[i - 1].first)
-              ++duplicates;
+              // loop over the now sorted list and see whether any of the
+              // entries references the same dofs more than once in order to
+              // find how many non-duplicate entries we have. This lets us
+              // allocate the correct amount of memory for the constraint
+              // entries.
+              for (size_type i = 1; i < line.entries.size(); ++i)
+                if (line.entries[i].first == line.entries[i - 1].first)
+                  ++duplicates;
+            }
 
           if (duplicates > 0 || (line.entries.size() < line.entries.capacity()))
             {
