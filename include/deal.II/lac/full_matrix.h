@@ -498,22 +498,26 @@ public:
    *
    * The parameters allow for a flexible setting of the output format:
    *
-   * @arg <tt>precision</tt> denotes the number of trailing digits.
+   * @param out This specifies the stream to write to.
    *
-   * @arg <tt>scientific</tt> is used to determine the number format, where
-   * <tt>scientific</tt> = <tt>false</tt> means fixed point notation.
+   * @param precision denotes the number of trailing digits.
    *
-   * @arg <tt>width</tt> denotes the with of each column. A zero entry for
-   * <tt>width</tt> makes the function compute a width, but it may be changed
+   * @param scientific is used to determine the number format, where
+   * <code>scientific = false</code> means fixed point notation.
+   *
+   * @param width denotes the with of each column. A zero entry for
+   * @p width makes the function compute a width, but it may be changed
    * to a positive value, if output is crude.
    *
-   * @arg <tt>zero_string</tt> specifies a string printed for zero entries.
+   * @param zero_string specifies a string printed for zero entries.
    *
-   * @arg <tt>denominator</tt> Multiply the whole matrix by this common
+   * @param denominator Multiply the whole matrix by this common
    * denominator to get nicer numbers.
    *
-   * @arg <tt>threshold</tt>: all entries with absolute value smaller than
+   * @param threshold all entries with absolute value smaller than
    * this are considered zero.
+   *
+   * @param separator specifies a string printed to separate row entries.
    */
   void
   print_formatted(std::ostream      &out,
@@ -522,7 +526,8 @@ public:
                   const unsigned int width       = 0,
                   const char        *zero_string = " ",
                   const double       denominator = 1.,
-                  const double       threshold   = 0.) const;
+                  const double       threshold   = 0.,
+                  const char        *separator   = " ") const;
 
   /**
    * Determine an estimate for the memory consumption (in bytes) of this

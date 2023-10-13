@@ -166,23 +166,25 @@ namespace CUDAWrappers
           const bool  diagonal_first = true) const;
 
     /**
-     * Print the matrix in the usual format, i.e. as a matrix and not as a list
+     * Print the matrix in the usual format, i.e., as a matrix and not as a list
      * of nonzero elements. For better readability, elements not in the matrix
      * are displayed as empty space, while matrix elements which are explicitly
      * set to zero are displayed as such.
      *
      * The parameters allow for a flexible setting of the output format:
-     * <tt>precision</tt> and <tt>scientific</tt> are used to determine the
-     * number format, where <tt>scientific = false</tt> means fixed point
-     * notation.  A zero entry for <tt>width</tt> makes the function compute a
-     * width, but it may be changed to a positive value, if output is crude.
+     * @p precision and @p scientific are used to determine the number format,
+     * where <code>scientific = false</code> means fixed point notation. A zero
+     * entry for @p width makes the function compute a width, but it may be
+     * changed to a positive value, if output is crude.
      *
-     * Additionally, a character for an empty value may be specified.
+     * Additionally, a character for an empty value may be specified in
+     * @p zero_string, and a character to separate row entries can be set in
+     * @p separator.
      *
-     * Finally, the whole matrix can be multiplied with a common denominator to
-     * produce more readable output, even integers.
+     * Finally, the whole matrix can be multiplied with a common @p denominator
+     * to produce more readable output, even integers.
      *
-     * @attention This function may produce <b>large</b> amounts of output if
+     * @attention This function may produce @em large amounts of output if
      * applied to a large matrix!
      */
     void
@@ -191,7 +193,8 @@ namespace CUDAWrappers
                     const bool         scientific  = true,
                     const unsigned int width       = 0,
                     const char        *zero_string = " ",
-                    const double       denominator = 1.) const;
+                    const double       denominator = 1.,
+                    const char        *separator   = " ") const;
     /** @} */
 
     /**
@@ -467,7 +470,8 @@ namespace CUDAWrappers
                                         const bool         scientific,
                                         const unsigned int width_,
                                         const char        *zero_string,
-                                        const double       denominator) const
+                                        const double       denominator,
+                                        const char        *separator) const
   {
     Assert(column_index_dev != nullptr, ExcNotInitialized());
     Assert(val_dev != nullptr, ExcNotInitialized());
@@ -505,11 +509,12 @@ namespace CUDAWrappers
           {
             if (k == cols[j])
               {
-                out << std::setw(width) << val[j] * Number(denominator) << ' ';
+                out << std::setw(width) << val[j] * Number(denominator)
+                    << separator;
                 ++j;
               }
             else
-              out << std::setw(width) << zero_string << ' ';
+              out << std::setw(width) << zero_string << separator;
           }
         out << std::endl;
       };

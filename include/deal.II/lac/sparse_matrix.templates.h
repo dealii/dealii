@@ -1912,7 +1912,8 @@ SparseMatrix<number>::print_formatted(std::ostream      &out,
                                       const bool         scientific,
                                       const unsigned int width_,
                                       const char        *zero_string,
-                                      const double       denominator) const
+                                      const double       denominator,
+                                      const char        *separator) const
 {
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());
@@ -1940,9 +1941,9 @@ SparseMatrix<number>::print_formatted(std::ostream      &out,
       for (size_type j = 0; j < n(); ++j)
         if ((*cols)(i, j) != SparsityPattern::invalid_entry)
           out << std::setw(width)
-              << val[cols->operator()(i, j)] * number(denominator) << ' ';
+              << val[cols->operator()(i, j)] * number(denominator) << separator;
         else
-          out << std::setw(width) << zero_string << ' ';
+          out << std::setw(width) << zero_string << separator;
       out << std::endl;
     };
   AssertThrow(out.fail() == false, ExcIO());

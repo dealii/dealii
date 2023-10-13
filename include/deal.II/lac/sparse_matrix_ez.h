@@ -749,24 +749,26 @@ public:
   print(std::ostream &out) const;
 
   /**
-   * Print the matrix in the usual format, i.e. as a matrix and not as a list
+   * Print the matrix in the usual format, i.e., as a matrix and not as a list
    * of nonzero elements. For better readability, elements not in the matrix
    * are displayed as empty space, while matrix elements which are explicitly
    * set to zero are displayed as such.
    *
-   * The parameters allow for a flexible setting of the output format: @p
-   * precision and @p scientific are used to determine the number format,
-   * where @p scientific = @p false means fixed point notation.  A zero entry
-   * for @p width makes the function compute a width, but it may be changed to
-   * a positive value, if output is crude.
+   * The parameters allow for a flexible setting of the output format:
+   * @p precision and @p scientific are used to determine the number format,
+   * where <code>scientific = false</code> means fixed point notation. A zero
+   * entry for @p width makes the function compute a width, but it may be
+   * changed to a positive value, if output is crude.
    *
-   * Additionally, a character for an empty value may be specified.
+   * Additionally, a character for an empty value may be specified in
+   * @p zero_string, and a character to separate row entries can be set in
+   * @p separator.
    *
-   * Finally, the whole matrix can be multiplied with a common denominator to
-   * produce more readable output, even integers.
+   * Finally, the whole matrix can be multiplied with a common @p denominator
+   * to produce more readable output, even integers.
    *
-   * This function may produce @em large amounts of output if applied to a
-   * large matrix!
+   * @attention This function may produce @em large amounts of output if
+   * applied to a large matrix!
    */
   void
   print_formatted(std::ostream      &out,
@@ -774,7 +776,8 @@ public:
                   const bool         scientific  = true,
                   const unsigned int width       = 0,
                   const char        *zero_string = " ",
-                  const double       denominator = 1.) const;
+                  const double       denominator = 1.,
+                  const char        *separator   = " ") const;
 
   /**
    * Write the data of this object in binary mode to a file.
