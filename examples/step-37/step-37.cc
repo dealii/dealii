@@ -862,8 +862,8 @@ namespace Step37
           additional_data.mapping_update_flags =
             (update_gradients | update_JxW_values | update_quadrature_points);
           additional_data.mg_level = level;
-          std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level(
-            new MatrixFree<dim, float>());
+          std::shared_ptr<MatrixFree<dim, float>> mg_mf_storage_level =
+            std::make_shared<MatrixFree<dim, float>>();
           mg_mf_storage_level->reinit(mapping,
                                       dof_handler,
                                       level_constraints,
