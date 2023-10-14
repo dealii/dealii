@@ -1,0 +1,4 @@
+New: The ArrayView class now has a constructor that allows creation of
+an ArrayView object from a `boost::container::small_vector`.
+<br>
+(Wolfgang Bangerth, 2023/10/24)
