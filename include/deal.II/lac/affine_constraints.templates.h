@@ -1030,11 +1030,13 @@ AffineConstraints<number>::close()
           number sum = 0.;
           for (const std::pair<size_type, number> &entry : line.entries)
             sum += entry.second;
-          if (std::abs(sum - number(1.)) < 1.e-13)
+          if (std::abs(sum - number(1.)) < 1.e-13 &&
+              std::abs(sum - number(1.)) > 0.)
             {
+              const number inverse_sum = number(1.) / sum;
               for (std::pair<size_type, number> &entry : line.entries)
-                entry.second /= sum;
-              line.inhomogeneity /= sum;
+                entry.second *= inverse_sum;
+              line.inhomogeneity *= inverse_sum;
             }
         }
     },
