@@ -49,20 +49,34 @@ namespace internal
  * polar change of coordinates).
  *
  * The two template arguments match the meaning of the two template arguments
- * in Triangulation<dim, spacedim>, however this Manifold can be used to
+ * in Triangulation<dim, spacedim>; however, this Manifold can be used to
  * describe both thin and thick objects, and the behavior is identical when
  * dim <= spacedim, i.e., the functionality of PolarManifold<2,3> is
  * identical to PolarManifold<3,3>.
  *
- * This class works by transforming points to polar coordinates (in
- * both two and three dimensions), taking the average in that
- * coordinate system, and then transforming the point back to
- * Cartesian coordinates. In order for this manifold to work
- * correctly, it cannot be attached to cells containing the center of
- * the coordinate system or the north and south poles in three
- * dimensions. These points are singular points of the coordinate
- * transformation, and taking averages around these points does not
- * make any sense.
+ * This class works by transforming points from Cartesian coordinates into Polar
+ * coordinates, doing computations (e.g., averages) in that coordinate system,
+ * and then transforming the results back to Cartesian coordinates. For more
+ * information on this approach see the documentation of the base class
+ * (ChartManifold).
+ *
+ * In order for this manifold to work correctly, it cannot be attached to cells
+ * containing the center of the coordinate system or, in 3d, the north and south
+ * poles. Those points are singular points of the coordinate mapping;
+ * consequently, pull_back() is not defined at those points and taking averages
+ * across them does not make sense. We recommend setting the manifold_id of the
+ * cell containing the center to numbers::flat_manifold_id and blending in one
+ * of two ways:
+ *
+ * 1. Only set PolarManifold manifold ids on the curved boundary (i.e., set the
+ *    manifold id of faces and not cells). deal.II will use a cell-by-cell
+ *    version of transfinite interpolation to compute cell center locations for,
+ *    e.g., mesh refinement.
+ * 2. Set the PolarManifold manifold ids on cells and use
+ *    TransfiniteInterpolationManifold.
+ *
+ * In 3d, we recommend using SphericalManifold to correctly handle the north and
+ * south poles.
  *
  * @ingroup manifold
  */
@@ -71,12 +85,10 @@ class PolarManifold : public ChartManifold<dim, spacedim, spacedim>
 {
 public:
   /**
-   * The Constructor takes the center of the spherical coordinates system.
-   * This class uses the pull_back and push_forward mechanism to transform
-   * from Cartesian to spherical coordinate systems, taking into account the
-   * periodicity of base Manifold in two dimensions, while in three dimensions
-   * it takes the middle point, and project it along the radius using the
-   * average radius of the surrounding points.
+   * Constructor.
+   *
+   * @param[in] center The center of the coordinate system. Defaults to the
+   * origin.
    */
   PolarManifold(const Point<spacedim> center = Point<spacedim>());
 
@@ -88,8 +100,7 @@ public:
 
   /**
    * Pull back the given point from the Euclidean space. Will return the polar
-   * coordinates associated with the point @p space_point. Only used when
-   * spacedim = 2.
+   * coordinates associated with the point @p space_point.
    */
   virtual Point<spacedim>
   pull_back(const Point<spacedim> &space_point) const override;
@@ -97,7 +108,6 @@ public:
   /**
    * Given a point in the spherical coordinate system, this method returns the
    * Euclidean coordinates associated to the polar coordinates @p chart_point.
-   * Only used when spacedim = 3.
    */
   virtual Point<spacedim>
   push_forward(const Point<spacedim> &chart_point) const override;
@@ -223,8 +233,8 @@ private:
  * points across the center, they would travel on spherical
  * coordinates, avoiding the center.
  *
- * The ideal geometry for this Manifold is an HyperShell. If you plan to use
- * this Manifold on a HyperBall, you have to make sure you do not attach this
+ * The ideal geometry for this Manifold is a hyper shell. If you plan to use
+ * this Manifold on a hyper ball, you have to make sure you do not attach this
  * Manifold to the cell containing the center. It is advisable to combine this
  * class with TransfiniteInterpolationManifold to ensure a smooth transition
  * from a curved shape to the straight coordinate system in the center of the
@@ -237,7 +247,10 @@ class SphericalManifold : public Manifold<dim, spacedim>
 {
 public:
   /**
-   * The Constructor takes the center of the spherical coordinates.
+   * Constructor.
+   *
+   * @param[in] center The center of the coordinate system. Defaults to the
+   * origin.
    */
   SphericalManifold(const Point<spacedim> center = Point<spacedim>());
 
