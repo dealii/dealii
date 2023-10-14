@@ -151,6 +151,9 @@ namespace SparseMatrixTools
       (void)comm;
       return {0, value};
 #  else
+      if (comm == MPI_COMM_SELF)
+        return {0, value}; // serial triangulation
+
       T prefix = {};
 
       int ierr =
