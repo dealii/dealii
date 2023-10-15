@@ -31,7 +31,7 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
 
-#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/grid_tools_geometry.h>
 
 #include <deal.II/matrix_free/evaluation_flags.h>
 #include <deal.II/matrix_free/evaluation_template_factory.h>

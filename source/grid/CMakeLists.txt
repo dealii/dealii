@@ -52,9 +52,10 @@ set(_separate_src
   grid_generator_pipe_junction.cc
   grid_in.cc
   grid_out.cc
-  grid_tools_cache.cc
   grid_tools.cc
+  grid_tools_cache.cc
   grid_tools_dof_handlers.cc
+  grid_tools_geometry.cc
   grid_tools_nontemplates.cc
   tria.cc
   )
@@ -78,8 +79,9 @@ set(_inst
   grid_out.inst.in
   grid_refinement.inst.in
   grid_tools.inst.in
-  grid_tools_dof_handlers.inst.in
   grid_tools_cache.inst.in
+  grid_tools_dof_handlers.inst.in
+  grid_tools_geometry.inst.in
   intergrid_map.inst.in
   manifold.inst.in
   manifold_lib.inst.in

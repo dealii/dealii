@@ -255,16 +255,6 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
     GridTools::build_global_description_tree(
       const std::vector<BoundingBox<deal_II_space_dimension>> &,
       const MPI_Comm);
-
-    template Vector<double> GridTools::compute_aspect_ratio_of_cells(
-      const Mapping<deal_II_space_dimension> &,
-      const Triangulation<deal_II_space_dimension> &,
-      const Quadrature<deal_II_space_dimension> &);
-
-    template double GridTools::compute_maximum_aspect_ratio(
-      const Mapping<deal_II_space_dimension> &,
-      const Triangulation<deal_II_space_dimension> &,
-      const Quadrature<deal_II_space_dimension> &);
   }
 
 
@@ -273,27 +263,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #if deal_II_dimension <= deal_II_space_dimension
     namespace GridTools
     \{
-      template double
-      diameter(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
-
-      template double
-      volume(const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
-
-      template double
-      volume(const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
-             const Mapping<deal_II_dimension, deal_II_space_dimension> &);
-
-      template std::pair<
-        DerivativeForm<1, deal_II_dimension, deal_II_space_dimension>,
-        Tensor<1, deal_II_space_dimension>>
-      affine_cell_approximation<deal_II_dimension, deal_II_space_dimension>(
-        const ArrayView<const Point<deal_II_space_dimension>> &);
-
-      template BoundingBox<deal_II_space_dimension>
-      compute_bounding_box(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
-
       template std::tuple<std::vector<Point<deal_II_space_dimension>>,
                           std::vector<CellData<deal_II_dimension>>,
                           SubCellData>
@@ -440,18 +409,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
       template std::vector<bool>
       get_locally_owned_vertices(
         const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
-
-      template double
-      minimal_cell_diameter(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &triangulation,
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &);
-
-      template double
-      maximal_cell_diameter(
-        const Triangulation<deal_II_dimension, deal_II_space_dimension>
-          &triangulation,
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &);
 
       template std::map<unsigned int, Point<deal_II_space_dimension>>
       get_all_vertices_at_boundary(
