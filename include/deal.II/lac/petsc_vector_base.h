@@ -1321,7 +1321,7 @@ namespace PETScWrappers
     int                ierr  = VecGetArrayRead(*this, &array);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    boost::serialization::array_wrapper<const double> wrapper(
+    boost::serialization::array_wrapper<const PetscScalar> wrapper(
       array, locally_owned_size());
     ar &wrapper;
 
@@ -1360,9 +1360,9 @@ namespace PETScWrappers
     int          ierr  = VecGetArray(petsc_vector(), &array);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
-    boost::serialization::array_wrapper<double> velocity_wrapper(
+    boost::serialization::array_wrapper<PetscScalar> wrapper(
       array, locally_owned_size());
-    ar &velocity_wrapper;
+    ar &wrapper;
 
     ierr = VecRestoreArray(petsc_vector(), &array);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
