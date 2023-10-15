@@ -2795,9 +2795,14 @@ namespace GridTools
    * The first argument passed to the current function is typically the
    * exception thrown by the Triangulation::execute_coarsening_and_refinement
    * function.
+   *
+   * @deprecated This function predates deal.II's use of manifolds and use of
+   * cell-local transfinite interpolation to place new points and is no longer
+   * necessary. See Manifolds::get_default_points_and_weights() for more
+   * information.
    */
   template <int dim, int spacedim>
-  typename Triangulation<dim, spacedim>::DistortedCellList
+  DEAL_II_DEPRECATED typename Triangulation<dim, spacedim>::DistortedCellList
   fix_up_distorted_child_cells(
     const typename Triangulation<dim, spacedim>::DistortedCellList
                                  &distorted_cells,
