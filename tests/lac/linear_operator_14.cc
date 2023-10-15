@@ -105,7 +105,7 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
   locally_owned_partitioning.push_back(
     locally_owned_dofs.get_view(dofs_per_block[0],
                                 dofs_per_block[0] + dofs_per_block[1]));
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_handler);
   locally_relevant_partitioning.push_back(
     locally_relevant_dofs.get_view(0, dofs_per_block[0]));
   locally_relevant_partitioning.push_back(

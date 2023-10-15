@@ -66,7 +66,7 @@ namespace FETools
                            const DoFHandler<dim, spacedim> & /*dof2*/,
                            OutVector & /*u2*/)
       {
-        Assert(false, ExcNotImplemented())
+        Assert(false, ExcNotImplemented());
       }
     };
 
@@ -373,7 +373,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
 
       template <class InVector>
@@ -390,7 +390,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
 
       template <class InVector>
@@ -407,7 +407,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
 
       template <class InVector>
@@ -1586,8 +1586,8 @@ namespace FETools
           &dh.get_triangulation());
       Assert(parallel_tria != nullptr, ExcNotImplemented());
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      IndexSet        locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+      const IndexSet  locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dh);
       vector.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
                     parallel_tria->get_communicator());
@@ -1606,8 +1606,8 @@ namespace FETools
           &dh.get_triangulation());
       Assert(parallel_tria != nullptr, ExcNotImplemented());
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      IndexSet        locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+      const IndexSet  locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dh);
       vector.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
                     parallel_tria->get_communicator());
@@ -1625,8 +1625,8 @@ namespace FETools
           &dh.get_triangulation());
       Assert(parallel_tria != nullptr, ExcNotImplemented());
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
-      IndexSet        locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+      const IndexSet  locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dh);
       vector.reinit(locally_owned_dofs,
                     locally_relevant_dofs,
                     parallel_tria->get_communicator());

@@ -51,10 +51,8 @@ check()
 
   for (unsigned int level = 0; level < tr.n_levels(); ++level)
     {
-      IndexSet relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(mgdof,
-                                                    level,
-                                                    relevant_dofs);
+      const IndexSet relevant_dofs =
+        DoFTools::extract_locally_relevant_level_dofs(mgdof, level);
       AffineConstraints<double> level_constraints;
       level_constraints.reinit(relevant_dofs);
 

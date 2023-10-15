@@ -76,9 +76,9 @@ test()
       DoFHandler<dim> dh(tr);
       dh.distribute_dofs(fe);
 
-      IndexSet locally_owned_dofs = dh.locally_owned_dofs();
-      IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+      const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
+      const IndexSet  locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dh);
 
       PETScWrappers::MPI::Vector x(locally_owned_dofs, com_small);
       PETScWrappers::MPI::Vector rel_x(locally_owned_dofs,
@@ -123,10 +123,9 @@ test()
     DoFHandler<dim> dh(tr);
     dh.distribute_dofs(fe);
 
-    IndexSet locally_owned_dofs = dh.locally_owned_dofs();
-    IndexSet locally_relevant_dofs;
-
-    DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_dofs);
+    const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
+    const IndexSet  locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dh);
 
     PETScWrappers::MPI::Vector solution(locally_owned_dofs, com_all);
     solution = PetscScalar();

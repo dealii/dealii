@@ -93,8 +93,8 @@ test()
   coupling[1][1]      = DoFTools::always;
   flux_coupling[1][1] = DoFTools::always;
 
-  IndexSet relevant_partitioning(dh.n_dofs());
-  DoFTools::extract_locally_relevant_dofs(dh, relevant_partitioning);
+  const IndexSet relevant_partitioning =
+    DoFTools::extract_locally_relevant_dofs(dh);
 
   // Generate hanging node constraints
   AffineConstraints<double> constraints;

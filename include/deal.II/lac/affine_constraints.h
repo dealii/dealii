@@ -246,9 +246,10 @@ namespace internal
                        const size_type index_in_constraint) const;
 
       /**
-       * Return whether there is one row with indirect contributions (i.e.,
-       * there has been at least one constraint with non-trivial
-       * ConstraintLine).
+       * Return whether this object stores a constraint in which one degree
+       * of freedom is constrained against another degree of freedom (as
+       * opposed to having only constraints of the form $x_i=42$ where
+       * no other degree of freedom appears on the right side).
        */
       bool
       have_indirect_rows() const;
@@ -428,14 +429,7 @@ namespace internal
 } // namespace internal
 #endif
 
-// TODO[WB]: We should have a function of the kind
-//   AffineConstraints::add_constraint (const size_type constrained_dof,
-//     const std::vector<std::pair<size_type, number> > &entries,
-//     const number inhomogeneity = 0);
-// rather than building up constraints piecemeal through add_line/add_entry
-// etc. This would also eliminate the possibility of accidentally changing
-// existing constraints into something pointless, see the discussion on the
-// mailing list on "Tiny bug in interpolate_boundary_values" in Sept. 2010.
+
 
 /**
  * This class implements dealing with linear (possibly inhomogeneous)
@@ -500,12 +494,11 @@ namespace internal
  *
  * @note Many of the algorithms this class implements are discussed in the
  * @ref hp_paper.
- * The algorithms are also related to those shown in <i>M. S. Shephard: Linear
- * multipoint constraints applied via transformation as part of a direct
- * stiffness assembly process. Int. J. Numer. Meth. Engrg., vol. 20 (1984),
- * pp. 2107-2112.</i>, with the difference that the algorithms shown there
- * completely eliminated constrained degrees of freedom, whereas we usually
- * keep them as part of the linear system.
+ * The algorithms are also related to those shown in @cite Shephard1984 ,
+ * with the difference that the algorithms shown there
+ * completely eliminate constrained degrees of freedom, whereas we usually
+ * keep them as part of the linear system (but zero out the row and column
+ * to decouple this degree of freedom from the rest of the linear system).
  *
  * @ingroup dofs
  * @ingroup constraints
@@ -567,8 +560,8 @@ public:
   AffineConstraints();
 
   /**
-   * Constructor. The supplied IndexSet defines which indices might be
-   * constrained inside this AffineConstraints container. In a calculation
+   * Constructor. The supplied IndexSet defines for which indices
+   * this object will store constraints. In a calculation
    * with a DoFHandler object based on parallel::distributed::Triangulation
    * or parallel::shared::Triangulation, one should use the set of locally
    * relevant DoFs (see
@@ -576,9 +569,55 @@ public:
    *
    * The given IndexSet allows the AffineConstraints container to save
    * memory by just not caring about degrees of freedom that are not of
-   * importance to the current processor.
+   * importance to the current processor. In contrast, in parallel
+   * computations, if you do not provide such an index set (here, or
+   * using the reinit() function that takes such an argument), the
+   * current object will allocate memory proportional to the *total*
+   * number of degrees of freedom (accumulated over all processes),
+   * which is clearly wasteful and not efficient -- and should be considered
+   * a bug.
+   *
+   * @deprecated This constructor is equivalent to calling the following one with
+   *   both of its arguments equal to the index set provided here. This
+   *   is not wrong, but inefficient. Use the following constructor instead.
    */
-  explicit AffineConstraints(const IndexSet &local_constraints);
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the constructor with two index set arguments.")
+  explicit AffineConstraints(const IndexSet &locally_stored_constraints);
+
+  /**
+   * Constructor. The supplied IndexSet objects define which of the indices
+   * the object may encounter are locally owned, and for which indices
+   * this object will store constraints. In a calculation
+   * with a DoFHandler object based on parallel::distributed::Triangulation
+   * or parallel::shared::Triangulation, the first of these arguments
+   * should be the set of locally owned indices (see
+   * @ref GlossLocallyOwnedDof)
+   * and the second argument should use the set of locally
+   * relevant DoFs (see
+   * @ref GlossLocallyRelevantDof).
+   *
+   * The @p locally_owned_dofs argument indicates which elements of
+   * vectors that will be passed to the member functions of this
+   * object are locally owned (which is generally equal to the set of
+   * locally owned degrees of freedom -- thus the name of the
+   * argument). Knowledge of this set makes it possible to up front,
+   * in close(), determine which vector elements need to be imported
+   * when you later call the distribute() or related functions.
+   *
+   * The @p locally_stored_constraints IndexSet allows the AffineConstraints
+   * container to save memory by just not caring about degrees of freedom
+   * that are not of importance to the current processor. In contrast,
+   * in parallel computations, if you do not provide such an index set
+   * (here, or using the reinit() function that takes such an argument), the
+   * current object will allocate memory proportional to the *total*
+   * number of degrees of freedom (accumulated over all processes),
+   * which is clearly wasteful and not efficient -- and should be considered
+   * a bug. As mentioned above, one typically wants to provide the set of
+   * locally relevant degrees of freedom for this argument.
+   */
+  AffineConstraints(const IndexSet &locally_owned_dofs,
+                    const IndexSet &locally_stored_constraints);
 
   /**
    * Copy constructor
@@ -621,22 +660,62 @@ public:
   copy_from(const AffineConstraints<other_number> &other);
 
   /**
-   * clear() the AffineConstraints object and supply an IndexSet with lines
-   * that may be constrained. This function is only relevant in the
-   * distributed case to supply a different IndexSet. Otherwise this routine
-   * is equivalent to calling clear(). See the constructor for details.
+   * Reset the AffineConstraints object. This results in an object that
+   * is as if it had been default-constructed. See the discussion in the
+   * documentation of the various constructors of this class for whether
+   * this is what you want -- in particular, for parallel computations,
+   * you do not want to call this function, but rather one of the other
+   * reinit() functions that take index sets.
    */
   void
-  reinit(const IndexSet &local_constraints = IndexSet());
+  reinit();
+
+  /**
+   * clear() the AffineConstraints object and supply an IndexSet that describes
+   * for which degrees of freedom this object can store constraints. See
+   * the discussion in the documentation of the constructor of this class
+   * that takes a single index set as argument.
+   *
+   * @deprecated Use the reinit() function with two index set arguments instead.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the reinit() function with two index set arguments.")
+  void
+  reinit(const IndexSet &locally_stored_constraints);
+
+  /**
+   * clear() the AffineConstraints object and supply both an IndexSet
+   * object that describes which degrees of freedom the current process
+   * owns, and an IndexSet that describes
+   * for which degrees of freedom this object can store constraints. See
+   * the discussion in the documentation of the constructor of this class
+   * that takes two index sets as argument for more information.
+   */
+  void
+  reinit(const IndexSet &locally_owned_dofs,
+         const IndexSet &locally_stored_constraints);
 
   /**
    * Determines if we can store a constraint for the given @p line_n. This
    * routine only matters in the distributed case and checks if the IndexSet
-   * allows storage of this line. Always returns true if not in the
-   * distributed case.
+   * provided to the constructor or reinit() function that determines
+   * which constraints to store, allows storage of the line provides
+   * as argument to this function. As a consequence, it will always return
+   * true if not in the distributed case.
    */
   bool
   can_store_line(const size_type line_n) const;
+
+  /**
+   * Return the index set describing which part of the degrees of freedom to
+   * which this object stores constraints are "locally owned". Typically,
+   * these would be the
+   * @ref GlossLocallyOwnedDof "locally owned degrees of freedom".
+   * This function returns the corresponding index set provided to either
+   * the constructor or the reinit() function of this class.
+   */
+  const IndexSet &
+  get_locally_owned_indices() const;
 
   /**
    * Return the index set describing locally relevant lines if any are
@@ -665,7 +744,17 @@ public:
    * certain vector components in a vector-valued problem from a full
    * AffineConstraints, i.e. extracting a diagonal subblock from a larger
    * AffineConstraints. The block is specified by the IndexSet argument.
+   *
+   * @deprecated This function is a combination of the get_view() function
+   *   and merge() in that it selects a subset of constraints from another
+   *   constraints object that is then merged into the current one. But
+   *   the current function does not deal well with index sets. Furthermore,
+   *   it simply discards parts of constraints that constrain one degree
+   *   of freedom against ones that are not selected in the filter -- something
+   *   that should probably be considered a bug. Use get_view() and merge()
+   *   instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use get_view() and merge() instead.")
   void
   add_selected_constraints(const AffineConstraints &constraints_in,
                            const IndexSet          &filter);
@@ -674,6 +763,42 @@ public:
    * @name Adding constraints
    * @{
    */
+
+  /**
+   * Add a constraint to this object. This function adds a constraint
+   * of the form
+   * @f[
+   *  x_i = \sum_{j=1}^n w_j x_{k_j} + b
+   * @f]
+   * where $i$ is the number of the degree of freedom to be constrained
+   * and is provided by the @p constrained_dofs argument. The weights
+   * $w_j$ and indices $k_j$ are provided as pairs in the
+   * @p dependencies argument, and the inhomogeneity $b$ is
+   * provided by the last argument.
+   *
+   * As an example, if you want to add the constraint
+   * @f[
+   *   x_{42} = 0.5 x_{12} + 0.5 x_{36} + 27
+   * @f]
+   * you would call this function as follows:
+   * @code
+   *   constraints.add_constraint (42, {{12, 0.5}, {36, 0.5}}, 27.0);
+   * @endcode
+   * On the other hand, if (as one often wants to) you need a constraint
+   * of the kind
+   * @f[
+   *   x_{42} = 27
+   * @f]
+   * you would call this function as follows:
+   * @code
+   *   constraints.add_constraint (42, {}, 27.0);
+   * @endcode
+   */
+  void
+  add_constraint(
+    const size_type                                      constrained_dof,
+    const ArrayView<const std::pair<size_type, number>> &dependencies,
+    const number                                         inhomogeneity = 0);
 
   /**
    * Add a new line to the matrix. If the line already exists, then the
@@ -832,8 +957,8 @@ public:
    * This behavior can be altered by setting @p allow_different_local_lines
    * appropriately.
    *
-   * Merging a AffineConstraints that is initialized with an IndexSet
-   * and one that is not initialized with an IndexSet is not yet implemented.
+   * Merging an AffineConstraints that is initialized with an IndexSet
+   * and one that is not initialized with an IndexSet is not implemented.
    */
   template <typename other_number>
   void
@@ -856,6 +981,57 @@ public:
    */
   void
   shift(const size_type offset);
+
+  /**
+   * This function provides a "view" into a constraint
+   * object. Specifically, given a "mask" index set that describes
+   * which constraints we are interested in, it returns an
+   * AffineConstraints object that contains only those constraints
+   * that correspond to degrees of freedom that are listed in the
+   * mask, with indices shifted so that they correspond to the
+   * position within the mask. This process is the same as how
+   * IndexSet::get_view() computes the shifted indices. The function
+   * is typically used to extract from an AffineConstraints object
+   * corresponding to a DoFHandler only those constraints that
+   * correspond to a specific variable (say, to the velocity in a
+   * Stokes system) so that the resulting AffineConstraints object can
+   * be applied to a single block of a block vector of solutions; in
+   * this case, the mask would be the index set of velocity degrees of
+   * freedom, as a subset of all degrees of freedom.
+   *
+   * This function can only work if the degrees of freedom selected by
+   * the mask are constrained only against other degrees of freedom
+   * that are listed in the mask. In the example above, this means
+   * that constraints for the selected velocity degrees of freedom are
+   * only against other velocity degrees of freedom, but not against
+   * any pressure degrees of freedom. If that is not so, an assertion
+   * will be triggered.
+   *
+   * A typical case where this function is useful is as follows. Say,
+   * you have a block linear system in which you have blocks
+   * corresponding to variables $(u,p,T,c)$ (which you can think of as
+   * velocity, pressure, temperature, and chemical composition -- or
+   * whatever other kind of problem you are currently considering in
+   * your own work). Let's assume we have developed a linear solver or
+   * preconditioner that first solves the coupled $u$-$T$ system, and
+   * once that is done, solves the $p$-$c$ system. In this case, it is
+   * often useful to set up block vectors with only two components
+   * corresponding to the $u$ and $T$ components, and later for only
+   * the $p$-$c$ components of the solution. As part of this, you will
+   * want to apply constraints (using the distribute() function of this
+   * class) to only the 2-block vector, but for this you need to obtain
+   * an AffineConstraints object that represents only those constraints
+   * that correspond to the variables in question, and in the order
+   * in which they appear in the 2-block vector rather than in global
+   * 4-block vectors. This function allows you to extract such an
+   * object corresponding to a subset of constraints by applying a mask
+   * to the global constraints object that corresponds to the
+   * variables we're currently interested in. For the $u$-$T$ system,
+   * we need a mask that contains all indices of $u$ degrees of
+   * freedom as well as all indices of $T$ degrees of freedom.
+   */
+  AffineConstraints
+  get_view(const IndexSet &mask) const;
 
   /**
    * Clear all entries of this matrix. Reset the flag determining whether new
@@ -1794,13 +1970,25 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcMatrixIsClosed);
+  DeclExceptionMsg(
+    ExcMatrixIsClosed,
+    "You are attempting an operation on an AffineConstraints object "
+    "that requires the object to not be 'closed', i.e., for which you "
+    "must not already have called the close() member function. But the "
+    "object is already closed, and so the operation can not be "
+    "performed.");
   /**
    * Exception
    *
    * @ingroup Exceptions
    */
-  DeclException0(ExcMatrixNotClosed);
+  DeclExceptionMsg(
+    ExcMatrixNotClosed,
+    "You are attempting an operation on an AffineConstraints object "
+    "that requires the object to be 'closed', i.e., for which you "
+    "needed to call the close() member function. But the object "
+    "is not currently closed, and so the operation can not be "
+    "performed.");
   /**
    * Exception
    *
@@ -1948,11 +2136,29 @@ private:
   std::vector<size_type> lines_cache;
 
   /**
+   * This IndexSet denotes the set of locally owned DoFs (or, more correctly,
+   * the locally owned vector elements when operating on parallel vectors)
+   * and is used in the distribute() function when determining for which
+   * degrees of freedom to import dependent DoFs.
+   */
+  IndexSet locally_owned_dofs;
+
+  /**
    * This IndexSet is used to limit the lines to save in the AffineConstraints
    * to a subset. This is necessary, because the lines_cache vector would
    * become too big in a distributed calculation.
    */
   IndexSet local_lines;
+
+  /**
+   * The set of elements that are necessary to call distribute(). Because
+   * we need to set locally owned constrained elements of a vector, the
+   * needed elements include all vector entries that these constrained
+   * elements depend on -- which may be owned by other processes.
+   *
+   * This variable is set in close().
+   */
+  IndexSet needed_elements_for_distribute;
 
   /**
    * Store whether the arrays are sorted.  If so, no new entries can be added.
@@ -2038,18 +2244,33 @@ private:
 
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints()
-  : AffineConstraints<number>(IndexSet())
+  : AffineConstraints<number>(IndexSet(), IndexSet())
 {}
 
 
 
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints(
-  const IndexSet &local_constraints)
+  const IndexSet &locally_stored_constraints)
+  : AffineConstraints<number>(locally_stored_constraints,
+                              locally_stored_constraints)
+{}
+
+
+
+template <typename number>
+inline AffineConstraints<number>::AffineConstraints(
+  const IndexSet &locally_owned_dofs,
+  const IndexSet &locally_stored_constraints)
   : lines()
-  , local_lines(local_constraints)
+  , locally_owned_dofs(locally_owned_dofs)
+  , local_lines(locally_stored_constraints)
   , sorted(false)
 {
+  Assert(locally_owned_dofs.is_subset_of(locally_stored_constraints),
+         ExcMessage("The set of locally stored constraints needs to be a "
+                    "superset of the locally owned DoFs."));
+
   // make sure the IndexSet is compressed. Otherwise this can lead to crashes
   // that are hard to find (only happen in release mode).
   // see tests/mpi/affine_constraints_crash_01
@@ -2064,7 +2285,10 @@ inline AffineConstraints<number>::AffineConstraints(
   : Subscriptor()
   , lines(affine_constraints.lines)
   , lines_cache(affine_constraints.lines_cache)
+  , locally_owned_dofs(affine_constraints.locally_owned_dofs)
   , local_lines(affine_constraints.local_lines)
+  , needed_elements_for_distribute(
+      affine_constraints.needed_elements_for_distribute)
   , sorted(affine_constraints.sorted)
 {}
 
@@ -2279,6 +2503,8 @@ AffineConstraints<number>::calculate_line_index(const size_type line_n) const
   return local_lines.index_within_set(line_n);
 }
 
+
+
 template <typename number>
 inline bool
 AffineConstraints<number>::can_store_line(size_type line_n) const
@@ -2286,12 +2512,25 @@ AffineConstraints<number>::can_store_line(size_type line_n) const
   return local_lines.size() == 0 || local_lines.is_element(line_n);
 }
 
+
+
+template <typename number>
+inline const IndexSet &
+AffineConstraints<number>::get_locally_owned_indices() const
+{
+  return locally_owned_dofs;
+}
+
+
+
 template <typename number>
 inline const IndexSet &
 AffineConstraints<number>::get_local_lines() const
 {
   return local_lines;
 }
+
+
 
 template <typename number>
 template <typename VectorType>
@@ -2491,6 +2730,9 @@ AffineConstraints<number>::copy_from(
   lines_cache = other.lines_cache;
   local_lines = other.local_lines;
   sorted      = other.sorted;
+
+  locally_owned_dofs             = other.locally_owned_dofs;
+  needed_elements_for_distribute = other.needed_elements_for_distribute;
 }
 
 

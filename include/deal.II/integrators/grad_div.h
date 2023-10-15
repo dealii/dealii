@@ -180,8 +180,8 @@ namespace LocalIntegrators
                      double factor = 1.)
     {
       const unsigned int n_dofs = fe.dofs_per_cell;
-      AssertDimension(fe.get_fe().n_components(), dim)
-        AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
+      AssertDimension(fe.get_fe().n_components(), dim);
+      AssertVectorVectorDimension(input, dim, fe.n_quadrature_points);
       AssertVectorVectorDimension(Dinput, dim, fe.n_quadrature_points);
       AssertVectorVectorDimension(data, dim, fe.n_quadrature_points);
 

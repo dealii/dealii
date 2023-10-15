@@ -100,12 +100,20 @@
  *
  * <table align="center">
  *   <tr>
- *     <td> @image html distributed_mesh_0.png </td>
- *     <td> @image html distributed_mesh_1.png </td>
- *   </tr>
+ *     <td>
+ *		@image html distributed_mesh_0.png
+ * 	</td>
+ *     <td>
+ * 		@image html distributed_mesh_1.png
+ *	</td>
+ *</tr>
  *   <tr>
- *     <td> @image html distributed_mesh_2.png </td>
- *     <td> @image html distributed_mesh_3.png </td>
+ *     <td>
+ * 		@image html distributed_mesh_2.png
+ * 	</td>
+ *     <td>
+ *		@image html distributed_mesh_3.png
+ *	</td>
  *   </tr>
  * </table>
  *

@@ -37,7 +37,7 @@
 #  include <CGAL/Mesh_complex_3_in_triangulation_3.h>
 #  include <CGAL/Mesh_criteria_3.h>
 #  include <CGAL/Mesh_triangulation_3.h>
-// Disable a warnung that we get with gcc-13 about a potential unitialized
+// Disable a warnung that we get with gcc-13 about a potential uninitialized
 // usage of an <anonymous> lambda function in this external CGAL header.
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <CGAL/Polygon_mesh_processing/corefinement.h>

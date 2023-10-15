@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Wolfgang Bangerth, Rene Gassmoeller, Peter Munch, 2020.
  */

@@ -20,7 +20,7 @@
 
 #include "../tests.h"
 
-// and a _lot_ of stuff to create a linera oprator
+// and a _lot_ of stuff to create a linear operator
 #include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -67,7 +67,7 @@ main()
 
   static const int dim = 2;
 
-  // Create mass marix M, and an iterative inverse MInv:
+  // Create mass matrix M, and an iterative inverse MInv:
 
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation);

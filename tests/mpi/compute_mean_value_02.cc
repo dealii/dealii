@@ -94,8 +94,7 @@ test()
     dofh.distribute_dofs(fe_collection);
   }
 
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
+  const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
   TrilinosWrappers::MPI::Vector x_rel(relevant_set, dofh.get_communicator());
   {
     TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),

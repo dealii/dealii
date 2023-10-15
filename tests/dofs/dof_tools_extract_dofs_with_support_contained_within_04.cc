@@ -98,8 +98,8 @@ test()
   dh.distribute_dofs(fe);
 
   const IndexSet &locally_owned_set = dh.locally_owned_dofs();
-  IndexSet        locally_relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dh, locally_relevant_set);
+  const IndexSet  locally_relevant_set =
+    DoFTools::extract_locally_relevant_dofs(dh);
 
   AffineConstraints<double> cm;
   cm.reinit(locally_relevant_set);

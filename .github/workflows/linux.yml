@@ -41,7 +41,7 @@ jobs:
       options: --user root
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: info
       run: |
         python --version
@@ -95,7 +95,7 @@ jobs:
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: info
       run: |
         mpicc -v
@@ -159,14 +159,14 @@ jobs:
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: setup apt repo
       run: |
-        # oneapi-ci/scripts/setup_apt_repo_linux.sh
-        wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
-        sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
-        echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-        sudo apt-get update -o Dir::Etc::sourcelist="sources.list.d/oneAPI.list" -o APT::Get::List-Cleanup="0"
+        # download the key to system keyring
+        wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+        # add signed entry to apt sources and configure the APT client to use Intel repository:
+        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+        sudo apt-get update
     - name: collect versioned dependencies of apt packages
       run : |
         # oneapi-ci/scripts/apt_depends.sh
@@ -250,7 +250,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
@@ -271,7 +271,7 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         repository: kokkos/kokkos
         ref: 3.7.00
@@ -341,7 +341,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
@@ -363,7 +363,7 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         repository: kokkos/kokkos
         ref: 3.7.00

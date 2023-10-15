@@ -147,7 +147,7 @@ namespace internal
        * Dummy finite element object necessary for initializing the FEValues
        * object.
        */
-      FE_Nothing<dim> fe_dummy;
+      std::unique_ptr<FE_Nothing<dim>> fe_dummy;
 
       /**
        * An underlying FEValues object that performs the (scalar) evaluation.
@@ -174,9 +174,10 @@ namespace internal
       const Mapping<dim>  &mapping,
       const Quadrature<1> &quadrature,
       const UpdateFlags    update_flags)
-      : fe_values(std::make_unique<dealii::FEValues<dim>>(
+      : fe_dummy(std::make_unique<FE_Nothing<dim>>())
+      , fe_values(std::make_unique<dealii::FEValues<dim>>(
           mapping,
-          fe_dummy,
+          *fe_dummy,
           Quadrature<dim>(quadrature),
           MappingInfoStorage<dim, dim, Number>::compute_update_flags(
             update_flags)))

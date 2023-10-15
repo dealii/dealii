@@ -26,7 +26,7 @@ author.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="830-840-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -218,7 +218,7 @@ inconvenience this causes.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="830-840-general"></a>
 <h3>General</h3>
 <ol>
   <li> New: A variant for GridGenerator::subdivided_parallelepiped() was added
@@ -514,7 +514,7 @@ inconvenience this causes.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="830-840-specific"></a>
 <h3>Specific improvements</h3>
 
 

@@ -81,10 +81,14 @@ do_test(const FiniteElement<dim> &fe_fine, const FiniteElement<dim> &fe_coarse)
   dof_handler_coarse.distribute_dofs(fe_coarse);
   dof_handler_coarse.distribute_mg_dofs();
 
-  AffineConstraints<Number> constraint_coarse;
+  AffineConstraints<Number> constraint_coarse(
+    dof_handler_coarse.locally_owned_dofs(),
+    DoFTools::extract_locally_relevant_dofs(dof_handler_coarse));
   constraint_coarse.close();
 
-  AffineConstraints<Number> constraint_fine;
+  AffineConstraints<Number> constraint_fine(
+    dof_handler_fine.locally_owned_dofs(),
+    DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
   constraint_fine.close();
 
   // setup transfer operator

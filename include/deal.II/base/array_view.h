@@ -23,6 +23,8 @@
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <array>
 #include <type_traits>
 #include <vector>
@@ -110,7 +112,10 @@ public:
    * Constructor.
    *
    * @param[in] starting_element A pointer to the first element of the array
-   * this object should represent.
+   * this object should represent. The value of this argument is only evaluated
+   * if `n_elements` is larger than zero. Otherwise, the value of this
+   * argument is ignored as if the ArrayView object used a `nullptr`
+   * to point to the first element of the array.
    * @param[in] n_elements The length (in elements) of the chunk of memory
    * this object should represent.
    *
@@ -178,6 +183,44 @@ public:
   ArrayView(std::vector<std::remove_cv_t<value_type>> &vector);
 
   /**
+   * A constructor that automatically creates a view from a
+   * boost::container::small_vector object. The view encompasses all elements of
+   * the given vector.
+   *
+   * This implicit conversion constructor is particularly useful when calling
+   * a function that takes an ArrayView object as argument, and passing in
+   * a boost::container::small_vector.
+   *
+   * @note This constructor takes a reference to a @p const vector as argument.
+   *   It can only be used to initialize ArrayView objects that point to
+   *   @p const memory locations, such as <code>ArrayView@<const double@></code>.
+   *   You cannot initialize ArrayView objects to non-@p const memory with
+   *   such arguments, such as <code>ArrayView@<double@></code>.
+   */
+  template <std::size_t N>
+  ArrayView(const boost::container::small_vector<std::remove_cv_t<value_type>,
+                                                 N> &vector);
+
+  /**
+   * A constructor that automatically creates a view from a
+   * boost::container::small_vector object. The view encompasses all elements of
+   * the given vector.
+   *
+   * This implicit conversion constructor is particularly useful when calling
+   * a function that takes an ArrayView object as argument, and passing in
+   * a boost::container::small_vector.
+   *
+   * @note This constructor takes a reference to a non-@p const vector as
+   *   argument. It can be used to initialize ArrayView objects that point to
+   *   either @p const memory locations, such as
+   *   <code>ArrayView@<const double@></code>, or to non-@p const memory,
+   *   such as <code>ArrayView@<double@></code>.
+   */
+  template <std::size_t N>
+  ArrayView(
+    boost::container::small_vector<std::remove_cv_t<value_type>, N> &vector);
+
+  /**
    * A constructor that automatically creates a view for a given C-style array.
    * This constructor can be used as follows:
    * @code
@@ -215,6 +258,53 @@ public:
    */
   template <std::size_t N>
   ArrayView(std::array<std::remove_cv_t<value_type>, N> &vector);
+
+  /**
+   * A constructor that creates a view of the array that underlies a
+   * [std::initializer_list](https://en.cppreference.com/w/cpp/utility/initializer_list).
+   * This constructor allows for cases such as where one has a function
+   * that takes an ArrayView object:
+   * @code
+   *   void f(const ArrayView<const int> &a);
+   * @endcode
+   * and then to call this function with a list of integers:
+   * @code
+   *   f({1,2,3});
+   * @endcode
+   * This also works with an empty list:
+   * @code
+   *   f({});
+   * @encode
+   *
+   * @note This constructor only works if the template type is `const`
+   * qualified. That is, you can initialize an `ArrayView<const int>`
+   * object from a `std::initializer_list<int>`, but not an
+   * `ArrayView<int>` object. This is because the elements of initializer
+   * lists are `const`.
+   *
+   * @note `std::initializer_list` objects are temporary. They are constructed
+   * where the compiler finds a brace-enclosed list, and so they only live
+   * for at most the time it takes to execute the current statement. As a
+   * consequence, creating an ArrayView object of such a `std::initializer_list`
+   * also results in a view object that points to valid memory only for as long
+   * as the current statement is executed. You shouldn't expect that the
+   * resulting ArrayView can be used to point to useful memory content past
+   * that point. In other words, while this code...
+   * @code
+   *   std::vector<int> v(10);
+   *   ArrayView<int> a(v);
+   *   f(a);
+   * @endcode
+   * ...works because the array `v` pointed to exists until after the call to
+   * `f()`, the following code will not likely work as expected:
+   * @code
+   *   ArrayView<int> a({1,2,3});
+   *   f(a);
+   * @endcode
+   */
+  ArrayView(
+    const std::initializer_list<std::remove_cv_t<value_type>> &initializer_list)
+    DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>);
 
   /**
    * Reinitialize a view.
@@ -400,7 +490,12 @@ template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   value_type       *starting_element,
   const std::size_t n_elements)
-  : starting_element(starting_element)
+  :
+#ifdef DEBUG
+  starting_element(n_elements > 0 ? starting_element : nullptr)
+#else
+  starting_element(starting_element)
+#endif
   , n_elements(n_elements)
 {}
 
@@ -411,8 +506,15 @@ inline void
 ArrayView<ElementType, MemorySpaceType>::reinit(value_type *starting_element,
                                                 const std::size_t n_elements)
 {
+#ifdef DEBUG
+  if (n_elements > 0)
+    this->starting_element = starting_element;
+  else
+    this->starting_element = nullptr;
+#else
   this->starting_element = starting_element;
-  this->n_elements       = n_elements;
+#endif
+  this->n_elements = n_elements;
 }
 
 
@@ -470,6 +572,41 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 template <typename ElementType, typename MemorySpaceType>
 template <std::size_t N>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  const boost::container::small_vector<std::remove_cv_t<value_type>, N> &vector)
+  : // use delegating constructor
+  ArrayView(vector.data(), vector.size())
+{
+  // the following static_assert is not strictly necessary because,
+  // if we got a const boost::container::small_vector reference argument but
+  // ElementType is not itself const, then the call to the forwarding
+  // constructor above will already have failed: vector.data() will have
+  // returned a const pointer, but we need a non-const pointer.
+  //
+  // nevertheless, leave the static_assert in since it provides a
+  // more descriptive error message that will simply come after the first
+  // error produced above
+  static_assert(std::is_const_v<value_type> == true,
+                "This constructor may only be called if the ArrayView "
+                "object has a const value_type. In other words, you can "
+                "only create an ArrayView to const values from a const "
+                "std::vector.");
+}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+template <std::size_t N>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  boost::container::small_vector<std::remove_cv_t<value_type>, N> &vector)
+  : // use delegating constructor
+  ArrayView(vector.data(), vector.size())
+{}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+template <std::size_t N>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   const std::array<std::remove_cv_t<value_type>, N> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
@@ -507,6 +644,16 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   std::array<std::remove_cv_t<value_type>, N> &vector)
   : // use delegating constructor
   ArrayView(vector.data(), vector.size())
+{}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
+  const std::initializer_list<std::remove_cv_t<value_type>> &initializer)
+  DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>)
+  : // use delegating constructor
+  ArrayView(initializer.begin(), initializer.size())
 {}
 
 
@@ -630,6 +777,143 @@ ArrayView<ElementType, MemorySpaceType>::operator[](const std::size_t i) const
 
   return *(starting_element + i);
 }
+
+
+
+/**
+ * A variation of @p ArrayView which allows strided access into the view.
+ * This is particularly useful when you want to access only one lane of a
+ * VectorizedArray.
+ */
+template <typename ElementType, std::size_t stride = 1>
+class StridedArrayView
+{
+public:
+  /**
+   * An alias that denotes the "value_type" of this container-like class,
+   * i.e., the type of the element it "stores" or points to.
+   */
+  using value_type = ElementType;
+
+  /**
+   * Constructor.
+   *
+   * @param[in] starting_element A pointer to the first element of the array
+   * this object should represent.
+   * @param[in] n_elements The length (in elements) of the chunk of memory
+   * this object should represent.
+   *
+   * @note The object that is constructed from these arguments has no
+   * knowledge how large the object into which it points really is. As a
+   * consequence, whenever you call ArrayView::operator[], the array view can
+   * check that the given index is within the range of the view, but it can't
+   * check that the view is indeed a subset of the valid range of elements of
+   * the underlying object that allocated that range. In other words, you need
+   * to ensure that the range of the view specified by the two arguments to
+   * this constructor is in fact a subset of the elements of the array into
+   * which it points. The appropriate way to do this is to use the
+   * make_array_view() functions.
+   */
+  StridedArrayView(value_type *starting_element, const std::size_t n_elements);
+
+  /**
+   * Return the size (in elements) of the view of memory this object
+   * represents.
+   */
+  std::size_t
+  size() const;
+
+  /**
+   * Return a bool whether the array view is empty.
+   */
+  bool
+  empty() const;
+
+  /**
+   * Return a pointer to the underlying array serving as element storage.
+   * In case the container is empty a nullptr is returned.
+   */
+  value_type *
+  data() const noexcept;
+
+  /**
+   * Return a reference to the $i$th element of the range represented by the
+   * current object.
+   *
+   * This function is marked as @p const because it does not change the
+   * <em>view object</em>. It may however return a reference to a non-@p const
+   * memory location depending on whether the template type of the class is @p
+   * const or not.
+   *
+   * This function is only allowed to be called if the underlying data is indeed
+   * stored in CPU memory.
+   */
+  value_type &
+  operator[](const std::size_t i) const;
+
+protected:
+  /**
+   * A pointer to the first element of the range of locations in memory that
+   * this object represents.
+   */
+  value_type *starting_element;
+
+  /**
+   * The length of the array this object represents.
+   */
+  std::size_t n_elements;
+};
+
+
+
+template <typename ElementType, std::size_t stride>
+typename StridedArrayView<ElementType, stride>::value_type &
+StridedArrayView<ElementType, stride>::operator[](const std::size_t i) const
+{
+  AssertIndexRange(i, this->n_elements);
+
+  return *(this->starting_element + stride * i);
+}
+
+
+
+template <typename ElementType, std::size_t stride>
+typename StridedArrayView<ElementType, stride>::value_type *
+StridedArrayView<ElementType, stride>::data() const noexcept
+{
+  if (this->n_elements == 0)
+    return nullptr;
+  else
+    return this->starting_element;
+}
+
+
+
+template <typename ElementType, std::size_t stride>
+bool
+StridedArrayView<ElementType, stride>::empty() const
+{
+  return this->n_elements == 0;
+}
+
+
+
+template <typename ElementType, std::size_t stride>
+std::size_t
+StridedArrayView<ElementType, stride>::size() const
+{
+  return this->n_elements;
+}
+
+
+
+template <typename ElementType, std::size_t stride>
+StridedArrayView<ElementType, stride>::StridedArrayView(
+  value_type       *starting_element,
+  const std::size_t n_elements)
+  : starting_element(starting_element)
+  , n_elements(n_elements)
+{}
 
 
 

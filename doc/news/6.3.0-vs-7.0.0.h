@@ -31,7 +31,7 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 </p>
 
 
-<a name="incompatible"></a>
+<a name="630-700-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -103,7 +103,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 </ol>
 
 
-<a name="general"></a>
+<a name="630-700-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -297,7 +297,7 @@ through DoFHandler::get_tria() and DoFHandler::get_fe(), respectively.
 
 
 
-<a name="base"></a>
+<a name="630-700-base"></a>
 <h3>base</h3>
 
 
@@ -373,7 +373,7 @@ independent of the dimension.
 </ol>
 
 
-<a name="lac"></a>
+<a name="630-700-lac"></a>
 <h3>lac</h3>
 
 <ol>
@@ -430,7 +430,7 @@ independent of the dimension.
 
 
 
-<a name="deal.II"></a>
+<a name="630-700-deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>

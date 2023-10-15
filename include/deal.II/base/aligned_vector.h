@@ -201,6 +201,12 @@ public:
   reserve(const size_type new_allocated_size);
 
   /**
+   * Releases the memory allocated but not used.
+   */
+  void
+  shrink_to_fit();
+
+  /**
    * Releases all previously allocated memory and leaves the vector in a state
    * equivalent to the state after the default constructor has been called.
    */
@@ -463,7 +469,26 @@ public:
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 #endif
 
+  /**
+   * Exception message for changing the vector after a call to
+   * replicate_across_communicator().
+   *
+   * @ingroup Exceptions
+   */
+  DeclExceptionMsg(ExcAlignedVectorChangeAfterReplication,
+                   "Changing the vector after a call to "
+                   "replicate_across_communicator() is not allowed.");
+
 private:
+  /**
+   * Make a new allocation, move the data from the old memory region to the new
+   * region, and release the old memory.
+   */
+  void
+  allocate_and_move(const size_t old_size,
+                    const size_t new_size,
+                    const size_t new_allocated_size);
+
   /**
    * A class that is used as the "deleter" for a `std::unique_ptr` object that
    * AlignedVector uses to store the memory used for the elements.
@@ -684,6 +709,11 @@ private:
    * Pointer to the end of the allocated memory.
    */
   T *allocated_elements_end;
+
+  /**
+   * Flag indicating if replicate_across_communicator() has been called.
+   */
+  bool replicated_across_communicator;
 };
 
 
@@ -1157,6 +1187,9 @@ inline AlignedVector<T>::AlignedVector()
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
+#  ifdef DEBUG
+  , replicated_across_communicator(false)
+#  endif
 {}
 
 
@@ -1166,6 +1199,9 @@ inline AlignedVector<T>::AlignedVector(const size_type size, const T &init)
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
+#  ifdef DEBUG
+  , replicated_across_communicator(false)
+#  endif
 {
   if (size > 0)
     resize(size, init);
@@ -1178,6 +1214,9 @@ inline AlignedVector<T>::AlignedVector(const AlignedVector<T> &vec)
   : elements(nullptr, Deleter(this))
   , used_elements_end(nullptr)
   , allocated_elements_end(nullptr)
+#  ifdef DEBUG
+  , replicated_across_communicator(false)
+#  endif
 {
   // copy the data from vec
   reserve(vec.size());
@@ -1360,6 +1399,48 @@ AlignedVector<T>::resize(const size_type new_size, const T &init)
 
 template <class T>
 inline void
+AlignedVector<T>::allocate_and_move(const size_t old_size,
+                                    const size_t new_size,
+                                    const size_t new_allocated_size)
+{
+  // allocate and align along 64-byte boundaries (this is enough for all
+  // levels of vectorization currently supported by deal.II)
+  T *new_data_ptr;
+  Utilities::System::posix_memalign(reinterpret_cast<void **>(&new_data_ptr),
+                                    64,
+                                    new_size * sizeof(T));
+
+  // Now create a deleter that encodes what should happen when the object is
+  // released: We need to destroy the objects that are currently alive (in
+  // reverse order, and then release the memory. Note that we catch the
+  // 'this' pointer because the number of elements currently alive might
+  // change over time.
+  Deleter deleter(this);
+
+  // copy whatever elements we need to retain
+  if (new_allocated_size > 0)
+    dealii::internal::AlignedVectorMoveConstruct<T>(elements.get(),
+                                                    elements.get() + old_size,
+                                                    new_data_ptr);
+
+  // Now reset all the member variables of the current object
+  // based on the allocation above. Assigning to a std::unique_ptr
+  // object also releases the previously pointed to memory.
+  //
+  // Note that at the time of releasing the old memory, 'used_elements_end'
+  // still points to its previous value, and this is important for the
+  // deleter object of the previously allocated array (see how it loops over
+  // the to-be-destroyed elements at the Deleter::DefaultDeleterAction
+  // class).
+  elements               = decltype(elements)(new_data_ptr, std::move(deleter));
+  used_elements_end      = elements.get() + old_size;
+  allocated_elements_end = elements.get() + new_size;
+}
+
+
+
+template <class T>
+inline void
 AlignedVector<T>::reserve(const size_type new_allocated_size)
 {
   const size_type old_size           = used_elements_end - elements.get();
@@ -1372,42 +1453,29 @@ AlignedVector<T>::reserve(const size_type new_allocated_size)
       const size_type new_size =
         std::max(new_allocated_size, 2 * old_allocated_size);
 
-      // allocate and align along 64-byte boundaries (this is enough for all
-      // levels of vectorization currently supported by deal.II)
-      T *new_data_ptr;
-      Utilities::System::posix_memalign(
-        reinterpret_cast<void **>(&new_data_ptr), 64, new_size * sizeof(T));
-
-      // Now create a deleter that encodes what should happen when the object is
-      // released: We need to destroy the objects that are currently alive (in
-      // reverse order, and then release the memory. Note that we catch the
-      // 'this' pointer because the number of elements currently alive might
-      // change over time.
-      Deleter deleter(this);
-
-      // copy whatever elements we need to retain
-      if (new_allocated_size > 0)
-        dealii::internal::AlignedVectorMoveConstruct<T>(
-          elements.get(), elements.get() + old_size, new_data_ptr);
-
-      // Now reset all of the member variables of the current object
-      // based on the allocation above. Assigning to a std::unique_ptr
-      // object also releases the previously pointed to memory.
-      //
-      // Note that at the time of releasing the old memory, 'used_elements_end'
-      // still points to its previous value, and this is important for the
-      // deleter object of the previously allocated array (see how it loops over
-      // the to-be-destroyed elements a the Deleter::DefaultDeleterAction
-      // class).
-      elements          = decltype(elements)(new_data_ptr, std::move(deleter));
-      used_elements_end = elements.get() + old_size;
-      allocated_elements_end = elements.get() + new_size;
+      allocate_and_move(old_size, new_size, new_allocated_size);
     }
   else if (new_allocated_size == 0)
     clear();
   else // size_alloc < allocated_size
     {
     } // nothing to do here
+}
+
+
+
+template <class T>
+inline void
+AlignedVector<T>::shrink_to_fit()
+{
+#  ifdef DEBUG
+  Assert(replicated_across_communicator == false,
+         ExcAlignedVectorChangeAfterReplication());
+#  endif
+  const size_type used_size      = used_elements_end - elements.get();
+  const size_type allocated_size = allocated_elements_end - elements.get();
+  if (allocated_size > used_size)
+    allocate_and_move(used_size, used_size, used_size);
 }
 
 
@@ -1877,6 +1945,7 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // At this point, each process should have a copy of the data.
   // Verify this in some sort of round-about way
 #    ifdef DEBUG
+  replicated_across_communicator      = true;
   const std::vector<char> packed_data = Utilities::pack(*this);
   const int               hash =
     std::accumulate(packed_data.begin(), packed_data.end(), int(0));

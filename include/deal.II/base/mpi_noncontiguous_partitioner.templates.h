@@ -279,7 +279,7 @@ namespace Utilities
                       send_ranks[i],
                       tag,
                       communicator,
-                      &requests[i + send_ranks.size()]);
+                      &requests[i]);
           AssertThrowMPI(ierr);
         }
 
@@ -304,7 +304,7 @@ namespace Utilities
                       recv_ranks[i],
                       tag,
                       communicator,
-                      &requests[i]);
+                      &requests[i + send_ranks.size()]);
           AssertThrowMPI(ierr);
         }
 #endif
@@ -343,10 +343,8 @@ namespace Utilities
         {
           int        i;
           MPI_Status status;
-          const auto ierr = MPI_Waitany(recv_ranks.size(),
-                                        requests.data() + send_ranks.size(),
-                                        &i,
-                                        &status);
+          const auto ierr =
+            MPI_Waitany(send_ranks.size(), requests.data(), &i, &status);
           AssertThrowMPI(ierr);
         }
 
@@ -364,8 +362,9 @@ namespace Utilities
         }
 
       // wait that all data packages have been sent
-      const int ierr =
-        MPI_Waitall(send_ranks.size(), requests.data(), MPI_STATUSES_IGNORE);
+      const int ierr = MPI_Waitall(recv_ranks.size(),
+                                   requests.data() + send_ranks.size(),
+                                   MPI_STATUSES_IGNORE);
       AssertThrowMPI(ierr);
 #endif
     }

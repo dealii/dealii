@@ -1165,17 +1165,12 @@ namespace internal
           // We need to reinterpret the data after evaluate has been applied.
           for (unsigned int out_comp = 0; out_comp < n_comp; ++out_comp)
             for (unsigned int point = 0; point < n_q_points; ++point)
-              for (unsigned int j = 0; j < dim; ++j)
-                for (unsigned int in_comp = 0;
-                     in_comp < n_lanes &&
-                     in_comp < spacedim - out_comp * n_lanes;
-                     ++in_comp)
+              for (unsigned int in_comp = 0;
+                   in_comp < n_lanes && in_comp < spacedim - out_comp * n_lanes;
+                   ++in_comp)
+                for (unsigned int j = 0; j < dim; ++j)
                   {
-                    const unsigned int total_number = point * dim + j;
-                    const unsigned int new_comp     = total_number / n_q_points;
-                    const unsigned int new_point    = total_number % n_q_points;
-                    jacobians[new_point][out_comp * n_lanes +
-                                         in_comp][new_comp] =
+                    jacobians[point][out_comp * n_lanes + in_comp][j] =
                       eval.begin_gradients()[(out_comp * n_q_points + point) *
                                                dim +
                                              j][in_comp];

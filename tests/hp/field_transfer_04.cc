@@ -110,7 +110,6 @@ main(int argc, char *argv[])
   AffineConstraints<double> affine_constraints;
   const double              new_value = 2.;
 
-  locally_relevant_dofs.clear();
   locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_handler);
   LinearAlgebra::distributed::Vector<double> new_solution(
     dof_handler.locally_owned_dofs(), locally_relevant_dofs, MPI_COMM_WORLD);

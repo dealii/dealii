@@ -178,8 +178,8 @@ namespace Step77
         dof_handler.distribute_dofs(fe);
       }
 
-    IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
-    IndexSet locally_relevant_dofs =
+    const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+    const IndexSet  locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     // Specifically, we need two types of AffineConstraints.
@@ -496,7 +496,7 @@ namespace Step77
         // reach; but you might want to look into what other members of the
         // PETScWrappers::NonlinearSolverData class has and play with them).
         //
-        // When using the PETSc nonlinear solver, we have two possibilites,
+        // When using the PETSc nonlinear solver, we have two possibilities,
         // both of them are coded below for this example.
         //  - In the case with `user_control` set to true
         //    there is complete control of the linear system solution process

@@ -2650,11 +2650,11 @@ namespace GridGenerator
           epsilon = std::min(epsilon, 0.01 * delta[i][i]);
         Assert(epsilon > 0,
                ExcMessage(
-                 "The distance between corner points must be positive."))
+                 "The distance between corner points must be positive."));
 
-          // actual code is external since
-          // 1-D is different from 2/3d.
-          colorize_subdivided_hyper_rectangle(tria, p1, p2, epsilon);
+        // actual code is external since
+        // 1-D is different from 2/3d.
+        colorize_subdivided_hyper_rectangle(tria, p1, p2, epsilon);
       }
   }
 
@@ -5125,9 +5125,9 @@ namespace GridGenerator
   {
     AssertThrow(n_rotate_middle_square < 4,
                 ExcMessage("The number of rotation by pi/2 of the right square "
-                           "must be in the half-open range [0,4)."))
+                           "must be in the half-open range [0,4)."));
 
-      constexpr unsigned int dim = 2;
+    constexpr unsigned int dim = 2;
 
     const unsigned int         n_cells = 5;
     std::vector<CellData<dim>> cells(n_cells);
@@ -8706,7 +8706,7 @@ namespace GridGenerator
       }
     else
       {
-        AssertThrow(false, ExcNotImplemented())
+        AssertThrow(false, ExcNotImplemented());
       }
   }
 } // namespace GridGenerator

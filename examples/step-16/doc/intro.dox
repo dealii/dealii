@@ -5,7 +5,7 @@ MeshWorker and LocalIntegrators instead of assembling matrices manually as it
 is done in this tutorial.
 </i>
 
-<a name="Intro"></a>
+<a name="step-16-Intro"></a>
 <h1>Introduction</h1>
 
 

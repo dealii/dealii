@@ -429,6 +429,31 @@ DerivativeForm<order, dim, spacedim, Number>::memory_consumption()
 
 
 /**
+ * Output operator for DerivativeForm. Print the elements consecutively, with a
+ * space in between, two spaces between rank 1 subtensors, three between rank 2
+ * and so on.
+ *
+ * @relatesalso DerivativeForm
+ */
+template <int order, int dim, int spacedim, typename Number>
+inline std::ostream &
+operator<<(std::ostream                                       &out,
+           const DerivativeForm<order, dim, spacedim, Number> &df)
+{
+  for (unsigned int i = 0; i < spacedim; ++i)
+    {
+      out << df[i];
+      if (i != spacedim - 1)
+        for (unsigned int j = 0; j < order + 1; ++j)
+          out << ' ';
+    }
+
+  return out;
+}
+
+
+
+/**
  * One of the uses of DerivativeForm is to apply it as a linear transformation.
  * This function returns $\nabla \mathbf F(\mathbf x) \Delta \mathbf x$, which
  * approximates the change in $\mathbf F(\mathbf x)$ when $\mathbf x$ is changed
@@ -588,6 +613,82 @@ transpose(const DerivativeForm<1, dim, spacedim, Number> &DF)
   DerivativeForm<1, spacedim, dim, Number> tt;
   tt = DF.transpose();
   return tt;
+}
+
+
+
+/**
+ * Specialization of apply_transformation() for a diagonal DerivativeForm.
+ *
+ * @relatesalso DerivativeForm
+ */
+template <int spacedim, int dim, typename Number1, typename Number2>
+inline Tensor<1, spacedim, typename ProductType<Number1, Number2>::type>
+apply_diagonal_transformation(
+  const DerivativeForm<1, dim, spacedim, Number1> &grad_F,
+  const Tensor<1, dim, Number2>                   &d_x)
+{
+  Assert(dim == spacedim,
+         ExcMessage("Only dim = spacedim allowed for diagonal transformation"));
+  Tensor<1, spacedim, typename ProductType<Number1, Number2>::type> dest;
+  for (unsigned int i = 0; i < spacedim; ++i)
+    dest[i] = grad_F[i][i] * d_x[i];
+  return dest;
+}
+
+
+/**
+ * Similar to the previous apply_diagonal_transformation(), specialized for the
+ * case `dim == spacedim` where we can return a rank-2 tensor instead of the
+ * more general `DerivativeForm`.
+ * Each row of the result corresponds to one of the rows of @p D_X transformed
+ * by @p grad_F, equivalent to $\mathrm{D\_X} \, \mathrm{grad\_F}^T$ in matrix
+ * notation.
+ *
+ * @relatesalso DerivativeForm
+ */
+template <int dim, typename Number1, typename Number2>
+inline Tensor<2, dim, typename ProductType<Number1, Number2>::type>
+apply_diagonal_transformation(
+  const DerivativeForm<1, dim, dim, Number1> &grad_F,
+  const Tensor<2, dim, Number2>              &D_X)
+{
+  Tensor<2, dim, typename ProductType<Number1, Number2>::type> dest;
+  for (unsigned int i = 0; i < dim; ++i)
+    dest[i] = apply_diagonal_transformation(grad_F, D_X[i]);
+
+  return dest;
+}
+
+
+
+/**
+ * Similar to the previous apply_diagonal_transformation().
+ * Each row of the result corresponds to one of the rows of @p D_X transformed
+ * by @p grad_F.
+ *
+ * @relatesalso DerivativeForm
+ */
+template <int spacedim,
+          int dim,
+          int n_components,
+          typename Number1,
+          typename Number2>
+inline Tensor<1,
+              n_components,
+              Tensor<1, spacedim, typename ProductType<Number1, Number2>::type>>
+apply_diagonal_transformation(
+  const DerivativeForm<1, dim, spacedim, Number1>        &grad_F,
+  const Tensor<1, n_components, Tensor<1, dim, Number2>> &D_X)
+{
+  Tensor<1,
+         n_components,
+         Tensor<1, spacedim, typename ProductType<Number1, Number2>::type>>
+    dest;
+  for (unsigned int i = 0; i < n_components; ++i)
+    dest[i] = apply_diagonal_transformation(grad_F, D_X[i]);
+
+  return dest;
 }
 
 

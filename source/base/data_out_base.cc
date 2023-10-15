@@ -4964,11 +4964,11 @@ namespace DataOutBase
     // check against # of data sets in first patch.
     if (patches[0].points_are_available)
       {
-        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows())
+        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows());
       }
     else
       {
-        AssertDimension(n_data_sets, patches[0].data.n_rows())
+        AssertDimension(n_data_sets, patches[0].data.n_rows());
       }
 
     //---------------------
@@ -5375,11 +5375,11 @@ namespace DataOutBase
     // patches are made in write_gmv_reorder_data_vectors
     if (patches[0].points_are_available)
       {
-        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows())
+        AssertDimension(n_data_sets + spacedim, patches[0].data.n_rows());
       }
     else
       {
-        AssertDimension(n_data_sets, patches[0].data.n_rows())
+        AssertDimension(n_data_sets, patches[0].data.n_rows());
       }
 
     const char *ascii_or_binary =
@@ -9560,7 +9560,7 @@ XDMFEntry::get_xdmf_content(const unsigned int   indent_level,
   // We now store the type of cell in the XDMFEntry:
   (void)reference_cell;
   Assert(cell_type == reference_cell,
-         ExcMessage("Incorrect ReferenceCell type passed in."));
+         internal::ExcNonMatchingReferenceCellTypes(cell_type, reference_cell));
   return get_xdmf_content(indent_level);
 }
 

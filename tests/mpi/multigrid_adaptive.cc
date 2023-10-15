@@ -61,8 +61,6 @@
 
 #include "../tests.h"
 
-// This is C++:
-#include <sstream>
 
 namespace Step50
 {
@@ -189,6 +187,8 @@ namespace Step50
     system_rhs.reinit(mg_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
     constraints.clear();
+    constraints.reinit(mg_dof_handler.locally_owned_dofs(),
+                       DoFTools::extract_locally_relevant_dofs(mg_dof_handler));
     DoFTools::make_hanging_node_constraints(mg_dof_handler, constraints);
 
     std::map<types::boundary_id, const Function<dim> *> dirichlet_boundary;
@@ -489,8 +489,8 @@ namespace Step50
     Vector<float> estimated_error_per_cell(triangulation.n_active_cells());
 
     TrilinosWrappers::MPI::Vector temp_solution;
-    IndexSet                      idx;
-    DoFTools::extract_locally_relevant_dofs(mg_dof_handler, idx);
+    const IndexSet                idx =
+      DoFTools::extract_locally_relevant_dofs(mg_dof_handler);
     temp_solution.reinit(idx, MPI_COMM_WORLD);
     temp_solution = solution;
 

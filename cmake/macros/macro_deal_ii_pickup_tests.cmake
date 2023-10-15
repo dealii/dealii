@@ -163,7 +163,7 @@ macro(deal_ii_pickup_tests)
          "running mpi tests within the testsuite. As a consequence all "
          "tests that require an mpi launcher have been disabled.\n"
          "If you want to run tests with mpi then please configure deal.II "
-         "by either setting the MPIEXEC environemt variable or the CMake "
+         "by either setting the MPIEXEC environment variable or the CMake "
          "variable MPIEXEC_EXECUTABLE to a full path to the MPI launcher "
          "program.\n\n"
          )

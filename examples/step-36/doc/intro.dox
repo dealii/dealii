@@ -3,7 +3,7 @@
 <i>This program was contributed by Toby D. Young and Wolfgang
 Bangerth.  </i>
 
-<a name="Preamble"></a>
+<a name="step-36-Preamble"></a>
 <h1>Preamble</h1>
 
 The problem we want to solve in this example is an eigenspectrum
@@ -48,7 +48,7 @@ library; SLEPc itself builds on the <a
 href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> library
 for linear algebra contents.
 
-<a name="Intro"></a>
+<a name="step-36-Intro"></a>
 <h1>Introduction</h1>
 
 The basic equation of stationary quantum mechanics is the

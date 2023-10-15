@@ -411,24 +411,17 @@ namespace DoFRenumbering
     //
     // note that if constraints are not requested, then the 'constraints'
     // object will be empty and using it has no effect
-    IndexSet        locally_relevant_dofs;
-    const IndexSet &locally_owned_dofs = [&]() -> const IndexSet & {
-      if (reorder_level_dofs == false)
-        {
-          DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                                  locally_relevant_dofs);
-          return dof_handler.locally_owned_dofs();
-        }
-      else
-        {
-          Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
-                 ExcDoFHandlerNotInitialized());
-          DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                        level,
-                                                        locally_relevant_dofs);
-          return dof_handler.locally_owned_mg_dofs(level);
-        }
-    }();
+    if (reorder_level_dofs == true)
+      Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
+             ExcDoFHandlerNotInitialized());
+
+    const IndexSet locally_relevant_dofs =
+      (reorder_level_dofs == false ?
+         DoFTools::extract_locally_relevant_dofs(dof_handler) :
+         DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
+    const IndexSet &locally_owned_dofs =
+      (reorder_level_dofs == false ? dof_handler.locally_owned_dofs() :
+                                     dof_handler.locally_owned_mg_dofs(level));
 
     AffineConstraints<double> constraints;
     if (use_constraints)
@@ -436,7 +429,7 @@ namespace DoFRenumbering
         // reordering with constraints is not yet implemented on a level basis
         Assert(reorder_level_dofs == false, ExcNotImplemented());
 
-        constraints.reinit(locally_relevant_dofs);
+        constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
         DoFTools::make_hanging_node_constraints(dof_handler, constraints);
       }
     constraints.close();
@@ -473,18 +466,10 @@ namespace DoFRenumbering
         // indices that are locally owned, or that are only locally
         // relevant. in the process, also check that all indices
         // really belong to at least the locally relevant ones
-        IndexSet locally_active_dofs;
-        if (reorder_level_dofs == false)
-          {
-            DoFTools::extract_locally_active_dofs(dof_handler,
-                                                  locally_active_dofs);
-          }
-        else
-          {
-            DoFTools::extract_locally_active_level_dofs(dof_handler,
-                                                        locally_active_dofs,
-                                                        level);
-          }
+        const IndexSet locally_active_dofs =
+          (reorder_level_dofs == false ?
+             DoFTools::extract_locally_active_dofs(dof_handler) :
+             DoFTools::extract_locally_active_level_dofs(dof_handler, level));
 
         bool needs_locally_active = false;
         for (const auto starting_index : starting_indices)

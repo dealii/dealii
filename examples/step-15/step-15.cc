@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Author: Sven Wetterauer, University of Heidelberg, 2012
  */

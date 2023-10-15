@@ -613,14 +613,15 @@ namespace internal
       inline static unsigned int
       line_index(const TriaAccessor<3, 3, 3> &accessor, const unsigned int i)
       {
-        const auto pair =
+        const auto [face_index, line_index] =
           accessor.reference_cell().standard_line_to_face_and_line_index(i);
-        const auto quad_index = pair[0];
-        const auto line_index =
+        const auto line_within_face_index =
           accessor.reference_cell().standard_to_real_face_line(
-            pair[1], pair[0], combined_face_orientation(accessor, quad_index));
+            line_index,
+            face_index,
+            combined_face_orientation(accessor, face_index));
 
-        return accessor.quad(quad_index)->line_index(line_index);
+        return accessor.quad(face_index)->line_index(line_within_face_index);
       }
 
 
@@ -842,18 +843,20 @@ namespace internal
 
         // First pick a face on which this line is a part of, and the
         // index of the line within.
-        const auto pair =
+        const auto [face_index, line_index] =
           accessor.reference_cell().standard_line_to_face_and_line_index(line);
-        const auto quad_index = pair[0];
         const auto line_within_face_index =
           accessor.reference_cell().standard_to_real_face_line(
-            pair[1], pair[0], combined_face_orientation(accessor, quad_index));
+            line_index,
+            face_index,
+            combined_face_orientation(accessor, face_index));
 
         // Then query how that line is oriented within that face:
         return accessor.reference_cell().standard_vs_true_line_orientation(
-          pair[1],
-          combined_face_orientation(accessor, quad_index),
-          accessor.quad(quad_index)->line_orientation(line_within_face_index));
+          line_index,
+          face_index,
+          combined_face_orientation(accessor, face_index),
+          accessor.quad(face_index)->line_orientation(line_within_face_index));
       }
 
       /**
@@ -957,15 +960,15 @@ namespace internal
       vertex_index(const TriaAccessor<2, dim, spacedim> &accessor,
                    const unsigned int                    corner)
       {
-        const auto pair =
+        const auto [line_index, vertex_index] =
           accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
             corner);
-        const auto line_index = pair[0];
-        const auto vertex_index =
+        const auto vertex_within_line_index =
           accessor.reference_cell().standard_to_real_face_vertex(
-            pair[1], pair[0], accessor.line_orientation(line_index));
+            vertex_index, line_index, accessor.line_orientation(line_index));
 
-        return accessor.line(line_index)->vertex_index(vertex_index);
+        return accessor.line(line_index)
+          ->vertex_index(vertex_within_line_index);
       }
 
 
@@ -974,15 +977,17 @@ namespace internal
       vertex_index(const TriaAccessor<3, 3, 3> &accessor,
                    const unsigned int           corner)
       {
-        const auto pair =
+        const auto [face_index, vertex_index] =
           accessor.reference_cell().standard_vertex_to_face_and_vertex_index(
             corner);
-        const auto face_index = pair[0];
-        const auto vertex_index =
+        const auto vertex_within_face_index =
           accessor.reference_cell().standard_to_real_face_vertex(
-            pair[1], pair[0], combined_face_orientation(accessor, face_index));
+            vertex_index,
+            face_index,
+            combined_face_orientation(accessor, face_index));
 
-        return accessor.quad(face_index)->vertex_index(vertex_index);
+        return accessor.quad(face_index)
+          ->vertex_index(vertex_within_face_index);
       }
 
 
@@ -1166,13 +1171,16 @@ namespace internal
                 const auto                quad = cell.quad(f);
                 const std::array<bool, 4> my_orientations{
                   {ref_cell.standard_vs_true_line_orientation(
-                     0, orientation, quad->line_orientation(my_indices[0])),
+                     0, f, orientation, quad->line_orientation(my_indices[0])),
                    ref_cell.standard_vs_true_line_orientation(
-                     1, orientation, quad->line_orientation(my_indices[1])),
+                     1, f, orientation, quad->line_orientation(my_indices[1])),
                    ref_cell.standard_vs_true_line_orientation(
-                     2, orientation, quad->line_orientation(my_indices[2])),
+                     2, f, orientation, quad->line_orientation(my_indices[2])),
                    ref_cell.standard_vs_true_line_orientation(
-                     3, orientation, quad->line_orientation(my_indices[3]))}};
+                     3,
+                     f,
+                     orientation,
+                     quad->line_orientation(my_indices[3]))}};
                 for (unsigned int l = 0; l < 4; ++l)
                   line_orientations[4 * (f - 4) + l] = my_orientations[l];
               }
@@ -1189,9 +1197,12 @@ namespace internal
                 const auto                quad = cell.quad(f);
                 const std::array<bool, 2> my_orientations{
                   {ref_cell.standard_vs_true_line_orientation(
-                     0, orientation, quad->line_orientation(my_indices[0])),
+                     0, f, orientation, quad->line_orientation(my_indices[0])),
                    ref_cell.standard_vs_true_line_orientation(
-                     1, orientation, quad->line_orientation(my_indices[1]))}};
+                     1,
+                     f,
+                     orientation,
+                     quad->line_orientation(my_indices[1]))}};
                 line_orientations[8 + f]  = my_orientations[0];
                 line_orientations[10 + f] = my_orientations[1];
               }
@@ -1211,26 +1222,32 @@ namespace internal
                ref_cell.standard_to_real_face_line(1, 2, orientations[2])}};
             line_orientations[0] = ref_cell.standard_vs_true_line_orientation(
               0,
+              0,
               orientations[0],
               cell.quad(0)->line_orientation(my_indices[0]));
             line_orientations[1] = ref_cell.standard_vs_true_line_orientation(
               1,
+              0,
               orientations[0],
               cell.quad(0)->line_orientation(my_indices[1]));
             line_orientations[2] = ref_cell.standard_vs_true_line_orientation(
               2,
+              0,
               orientations[0],
               cell.quad(0)->line_orientation(my_indices[2]));
             line_orientations[3] = ref_cell.standard_vs_true_line_orientation(
+              1,
               1,
               orientations[1],
               cell.quad(1)->line_orientation(my_indices[3]));
             line_orientations[4] = ref_cell.standard_vs_true_line_orientation(
               2,
+              1,
               orientations[1],
               cell.quad(1)->line_orientation(my_indices[4]));
             line_orientations[5] = ref_cell.standard_vs_true_line_orientation(
               1,
+              2,
               orientations[2],
               cell.quad(2)->line_orientation(my_indices[5]));
           }

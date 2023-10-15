@@ -153,7 +153,7 @@ namespace parallel
         }
       else
         {
-          AssertThrow(false, ExcInternalError())
+          AssertThrow(false, ExcInternalError());
         }
 
       // do not partition multigrid levels if user is

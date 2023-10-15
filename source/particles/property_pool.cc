@@ -53,13 +53,13 @@ namespace Particles
         const unsigned int n_open_handles =
           properties.size() / n_properties - currently_available_handles.size();
         (void)n_open_handles;
-        AssertThrow(n_open_handles == 0,
-                    ExcMessage("This property pool currently still holds " +
-                               std::to_string(n_open_handles) +
-                               " open handles to memory that was allocated "
-                               "via allocate_properties_array() but that has "
-                               "not been returned via "
-                               "deregister_particle()."));
+        Assert(n_open_handles == 0,
+               ExcMessage("This property pool currently still holds " +
+                          std::to_string(n_open_handles) +
+                          " open handles to memory that was allocated "
+                          "via allocate_properties_array() but that has "
+                          "not been returned via "
+                          "deregister_particle()."));
       }
 
     // Clear vectors and ensure deallocation of memory

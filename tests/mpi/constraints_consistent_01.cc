@@ -50,13 +50,11 @@ check(parallel::distributed::Triangulation<dim> &tria)
 
   dof_handler.distribute_dofs(fe);
 
-  IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
-  IndexSet locally_active_dofs;
-
-  DoFTools::extract_locally_active_dofs(dof_handler, locally_active_dofs);
-
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+  const IndexSet  locally_active_dofs =
+    DoFTools::extract_locally_active_dofs(dof_handler);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   AffineConstraints<double> constraints;
 

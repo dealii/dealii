@@ -174,6 +174,7 @@ namespace internal
   }   // namespace FE_PolyTensor
 } // namespace internal
 
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 FE_PolyTensor<dim, spacedim>::FE_PolyTensor(
@@ -466,19 +467,19 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
   std::fill(fe_data.dof_sign_change.begin(),
             fe_data.dof_sign_change.end(),
             1.0);
-  internal::FE_PolyTensor::get_dof_sign_change_nedelec(cell,
-                                                       *this,
-                                                       this->mapping_kind,
-                                                       fe_data.dof_sign_change);
+  if (fe_data.update_each & update_values)
+    internal::FE_PolyTensor::get_dof_sign_change_nedelec(
+      cell, *this, this->mapping_kind, fe_data.dof_sign_change);
 
   // TODO: This, similarly to the Nedelec case, is just a legacy function in 2d
   // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1d.
   // Also nothing in 3d since we take care of it by using the
   // adjust_quad_dof_sign_for_face_orientation_table.
-  internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
-                                                     *this,
-                                                     this->mapping_kind,
-                                                     fe_data.dof_sign_change);
+  if (fe_data.update_each & update_values)
+    internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
+                                                       *this,
+                                                       this->mapping_kind,
+                                                       fe_data.dof_sign_change);
 
   // What is the first dof_index on a quad?
   const unsigned int first_quad_index = this->get_first_quad_index();
@@ -1040,7 +1041,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
             (mapping_kind == mapping_raviart_thomas) ||
             (mapping_kind == mapping_nedelec))))
         {
-          Assert(false, ExcNotImplemented())
+          Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -1095,19 +1096,19 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
   std::fill(fe_data.dof_sign_change.begin(),
             fe_data.dof_sign_change.end(),
             1.0);
-  internal::FE_PolyTensor::get_dof_sign_change_nedelec(cell,
-                                                       *this,
-                                                       this->mapping_kind,
-                                                       fe_data.dof_sign_change);
+  if (fe_data.update_each & update_values)
+    internal::FE_PolyTensor::get_dof_sign_change_nedelec(
+      cell, *this, this->mapping_kind, fe_data.dof_sign_change);
 
   // TODO: This, similarly to the Nedelec case, is just a legacy function in 2d
   // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1d.
   // Also nothing in 3d since we take care of it by using the
   // adjust_quad_dof_sign_for_face_orientation_table.
-  internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
-                                                     *this,
-                                                     this->mapping_kind,
-                                                     fe_data.dof_sign_change);
+  if (fe_data.update_each & update_values)
+    internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
+                                                       *this,
+                                                       this->mapping_kind,
+                                                       fe_data.dof_sign_change);
 
   // What is the first dof_index on a quad?
   const unsigned int first_quad_index = this->get_first_quad_index();
@@ -1724,7 +1725,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
       // third derivatives are not implemented
       if (fe_data.update_each & update_3rd_derivatives)
         {
-          Assert(false, ExcNotImplemented())
+          Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -1780,19 +1781,19 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
   std::fill(fe_data.dof_sign_change.begin(),
             fe_data.dof_sign_change.end(),
             1.0);
-  internal::FE_PolyTensor::get_dof_sign_change_nedelec(cell,
-                                                       *this,
-                                                       this->mapping_kind,
-                                                       fe_data.dof_sign_change);
+  if (fe_data.update_each & update_values)
+    internal::FE_PolyTensor::get_dof_sign_change_nedelec(
+      cell, *this, this->mapping_kind, fe_data.dof_sign_change);
 
   // TODO: This, similarly to the Nedelec case, is just a legacy function in 2d
   // and affects only face_dofs of H(div) conformal FEs. It does nothing in 1d.
   // Also nothing in 3d since we take care of it by using the
   // adjust_quad_dof_sign_for_face_orientation_table.
-  internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
-                                                     *this,
-                                                     this->mapping_kind,
-                                                     fe_data.dof_sign_change);
+  if (fe_data.update_each & update_values)
+    internal::FE_PolyTensor::get_dof_sign_change_h_div(cell,
+                                                       *this,
+                                                       this->mapping_kind,
+                                                       fe_data.dof_sign_change);
 
   // What is the first dof_index on a quad?
   const unsigned int first_quad_index = this->get_first_quad_index();
@@ -2397,7 +2398,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
       // third derivatives are not implemented
       if (fe_data.update_each & update_3rd_derivatives)
         {
-          Assert(false, ExcNotImplemented())
+          Assert(false, ExcNotImplemented());
         }
     }
 }
@@ -2504,7 +2505,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
   return out;
 }
 
-
+#endif
 // explicit instantiations
 #include "fe_poly_tensor.inst"
 

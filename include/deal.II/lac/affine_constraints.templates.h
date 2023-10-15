@@ -75,6 +75,75 @@ AffineConstraints<number>::ConstraintLine::memory_consumption() const
 
 
 template <typename number>
+void
+AffineConstraints<number>::add_constraint(
+  const size_type                                      constrained_dof,
+  const ArrayView<const std::pair<size_type, number>> &dependencies,
+  const number                                         inhomogeneity)
+{
+  Assert(sorted == false, ExcMatrixIsClosed());
+  Assert(is_constrained(constrained_dof) == false,
+         ExcMessage("You cannot add a constraint for a degree of freedom "
+                    "that is already constrained."));
+
+  // In debug mode, make sure that columns don't show up more than
+  // once. Do this by sorting an array of the column indices. Try to
+  // avoid memory allocation by using a vector type that allocates up
+  // to 25 entries on the stack -- this is enough for the constraints
+  // of Q4 elements in 3d, and so should cover the vast majority of
+  // cases. If we have a constraint with more dependencies, then
+  // that's just going to require a heap allocation.
+#ifdef DEBUG
+  {
+    boost::container::small_vector<size_type, 25> column_indices;
+    column_indices.reserve(dependencies.size());
+    for (const auto &d : dependencies)
+      column_indices.emplace_back(d.first);
+    std::sort(column_indices.begin(), column_indices.end());
+    Assert(std::adjacent_find(column_indices.begin(), column_indices.end()) ==
+             column_indices.end(),
+           ExcMessage(
+             "You are trying to insert a constraint that lists the same "
+             "degree of freedom more than once on the right hand side. This is "
+             "not allowed."));
+  }
+#endif
+
+
+  // The following can happen when we compute with distributed meshes and dof
+  // handlers and we constrain a degree of freedom whose number we don't have
+  // locally. if we don't abort here the program will try to allocate several
+  // terabytes of memory to resize the various arrays below :-)
+  Assert(constrained_dof != numbers::invalid_size_type, ExcInternalError());
+
+  // if necessary enlarge vector of existing entries for cache
+  const size_type line_index = calculate_line_index(constrained_dof);
+  if (line_index >= lines_cache.size())
+    lines_cache.resize(std::max(2 * static_cast<size_type>(lines_cache.size()),
+                                line_index + 1),
+                       numbers::invalid_size_type);
+
+  // Push a new line to the end of the list and fill it with the
+  // provided information:
+  ConstraintLine &constraint = lines.emplace_back();
+  constraint.index           = constrained_dof;
+  constraint.entries.reserve(dependencies.size());
+  for (const auto &[column, weight] : dependencies)
+    {
+      Assert(column != constrained_dof,
+             ExcMessage("You cannot constrain a degree of freedom against "
+                        "itself."));
+      constraint.entries.emplace_back(column, weight);
+    }
+  constraint.inhomogeneity = inhomogeneity;
+
+  // Record the new constraint in the cache:
+  lines_cache[line_index] = lines.size() - 1;
+}
+
+
+
+template <typename number>
 typename AffineConstraints<number>::LineRange
 AffineConstraints<number>::get_lines() const
 {
@@ -123,7 +192,7 @@ AffineConstraints<number>::is_consistent_in_parallel(
   for (unsigned int owner = 0; owner < nproc; ++owner)
     {
       // find all lines to send to @p owner
-      IndexSet indices_to_send = non_owned & locally_owned_dofs[owner];
+      const IndexSet indices_to_send = non_owned & locally_owned_dofs[owner];
       for (const auto row_idx : indices_to_send)
         {
           to_send[owner].emplace_back(get_line(row_idx));
@@ -885,25 +954,33 @@ AffineConstraints<number>::close()
       for (ConstraintLine &line : boost::iterator_range<
              typename std::vector<ConstraintLine>::iterator>(begin, end))
         {
-          std::sort(line.entries.begin(),
-                    line.entries.end(),
-                    [](const std::pair<unsigned int, number> &a,
-                       const std::pair<unsigned int, number> &b) -> bool {
-                      // Let's use lexicographic ordering with std::abs for
-                      // number type (it might be complex valued).
-                      return (a.first < b.first) ||
-                             (a.first == b.first &&
-                              std::abs(a.second) < std::abs(b.second));
-                    });
+          unsigned int duplicates                   = 0;
+          bool         is_sorted_without_duplicates = true;
+          for (unsigned int i = 1; i < line.entries.size(); ++i)
+            if (!(line.entries[i - 1].first < line.entries[i].first))
+              {
+                is_sorted_without_duplicates = false;
+                break;
+              }
+          if (is_sorted_without_duplicates == false)
+            {
+              std::sort(line.entries.begin(),
+                        line.entries.end(),
+                        [](const std::pair<unsigned int, number> &a,
+                           const std::pair<unsigned int, number> &b) -> bool {
+                          // Just look at the index, ignore the value.
+                          return a.first < b.first;
+                        });
 
-          // loop over the now sorted list and see whether any of the entries
-          // references the same dofs more than once in order to find how many
-          // non-duplicate entries we have. This lets us allocate the correct
-          // amount of memory for the constraint entries.
-          size_type duplicates = 0;
-          for (size_type i = 1; i < line.entries.size(); ++i)
-            if (line.entries[i].first == line.entries[i - 1].first)
-              ++duplicates;
+              // loop over the now sorted list and see whether any of the
+              // entries references the same dofs more than once in order to
+              // find how many non-duplicate entries we have. This lets us
+              // allocate the correct amount of memory for the constraint
+              // entries.
+              for (size_type i = 1; i < line.entries.size(); ++i)
+                if (line.entries[i].first == line.entries[i - 1].first)
+                  ++duplicates;
+            }
 
           if (duplicates > 0 || (line.entries.size() < line.entries.capacity()))
             {
@@ -961,11 +1038,13 @@ AffineConstraints<number>::close()
           number sum = 0.;
           for (const std::pair<size_type, number> &entry : line.entries)
             sum += entry.second;
-          if (std::abs(sum - number(1.)) < 1.e-13)
+          if (std::abs(sum - number(1.)) < 1.e-13 &&
+              std::abs(sum - number(1.)) > 0.)
             {
+              const number inverse_sum = number(1.) / sum;
               for (std::pair<size_type, number> &entry : line.entries)
-                entry.second /= sum;
-              line.inhomogeneity /= sum;
+                entry.second *= inverse_sum;
+              line.inhomogeneity *= inverse_sum;
             }
         }
     },
@@ -992,6 +1071,39 @@ AffineConstraints<number>::close()
                       }),
          ExcMessage("The constraints represented by this object have a cycle. "
                     "This is not allowed."));
+
+  // Now also compute which indices we need in distribute().
+  //
+  // This processor owns only part of the vectors we will work on. One may think
+  // that every processor should be able to simply communicate those elements it
+  // owns and for which it knows that they act as sources to constrained DoFs to
+  // the owner of these DoFs. This would lead to a scheme where all we need to
+  // do is to add some local elements to (possibly non-local) ones and then call
+  // compress().
+  //
+  // Alas, this scheme does not work as evidenced by the disaster of
+  // bug #51 (originally stored in the Google Code repository, but now
+  // unfortunately no longer available because that platform has gone
+  // away) and reversion of one attempt that implements this in svn
+  // r29662. Rather, we need to get a vector that has all the
+  // *sources* or constraints we own locally, possibly as ghost vector
+  // elements, then read from them, and finally throw away the ghosted
+  // vector. Implement this in the following.
+  needed_elements_for_distribute = locally_owned_dofs;
+
+  if (needed_elements_for_distribute !=
+      complete_index_set(locally_owned_dofs.size()))
+    {
+      std::vector<types::global_dof_index> additional_elements;
+      for (const ConstraintLine &line : lines)
+        if (locally_owned_dofs.is_element(line.index))
+          for (const std::pair<size_type, number> &entry : line.entries)
+            if (!locally_owned_dofs.is_element(entry.first))
+              additional_elements.emplace_back(entry.first);
+      std::sort(additional_elements.begin(), additional_elements.end());
+      needed_elements_for_distribute.add_indices(additional_elements.begin(),
+                                                 additional_elements.end());
+    }
 
   sorted = true;
 }
@@ -1050,6 +1162,68 @@ AffineConstraints<number>::shift(const size_type offset)
 
 
 template <typename number>
+AffineConstraints<number>
+AffineConstraints<number>::get_view(const IndexSet &mask) const
+{
+  Assert(sorted == true, ExcMatrixNotClosed());
+
+  AffineConstraints<number> view;
+
+  // If index sets were associated with the current object, take views
+  // of those as well:
+  if (locally_owned_dofs != IndexSet())
+    {
+      Assert(locally_owned_dofs.size() == mask.size(),
+             ExcMessage("This operation only makes sense if the index "
+                        "space described by the mask is the same as "
+                        "the index space associated with the "
+                        "AffineConstraints object into which you take "
+                        "a view."));
+      Assert(local_lines.size() == mask.size(),
+             ExcMessage("This operation only makes sense if the index "
+                        "space described by the mask is the same as "
+                        "the index space associated with the "
+                        "AffineConstraints object into which you take "
+                        "a view."));
+
+      view.reinit(locally_owned_dofs.get_view(mask),
+                  local_lines.get_view(mask));
+    }
+
+  for (const ConstraintLine &line : lines)
+    if (mask.is_element(line.index))
+      {
+        const size_type row = mask.index_within_set(line.index);
+        view.add_line(row);
+        for (const std::pair<size_type, number> &entry : line.entries)
+          {
+            Assert(
+              mask.is_element(entry.first),
+              ExcMessage(
+                "In creating a view of an AffineConstraints "
+                "object, the constraint on degree of freedom " +
+                std::to_string(line.index) + " (which corresponds to the " +
+                std::to_string(row) +
+                "th degree of freedom selected in the mask) "
+                "is constrained against degree of freedom " +
+                std::to_string(entry.first) +
+                ", but this degree of freedom is not listed in the mask and "
+                "consequently cannot be transcribed into the index space "
+                "of the output object."));
+            view.add_entry(row,
+                           mask.index_within_set(entry.first),
+                           entry.second);
+          }
+        view.set_inhomogeneity(row, line.inhomogeneity);
+      }
+
+  view.close();
+  return view;
+}
+
+
+
+template <typename number>
 void
 AffineConstraints<number>::clear()
 {
@@ -1063,6 +1237,10 @@ AffineConstraints<number>::clear()
     lines_cache.swap(tmp);
   }
 
+  locally_owned_dofs             = {};
+  local_lines                    = {};
+  needed_elements_for_distribute = {};
+
   sorted = false;
 }
 
@@ -1070,16 +1248,43 @@ AffineConstraints<number>::clear()
 
 template <typename number>
 void
-AffineConstraints<number>::reinit(const IndexSet &local_constraints)
+AffineConstraints<number>::reinit()
 {
-  local_lines = local_constraints;
+  reinit(IndexSet(), IndexSet());
+}
+
+
+
+template <typename number>
+void
+AffineConstraints<number>::reinit(const IndexSet &locally_stored_constraints)
+{
+  reinit(locally_stored_constraints, locally_stored_constraints);
+}
+
+
+
+template <typename number>
+void
+AffineConstraints<number>::reinit(const IndexSet &locally_owned_dofs,
+                                  const IndexSet &locally_stored_constraints)
+{
+  // First clear previous content
+  clear();
+
+  // Then set the objects that describe the index sets of DoFs we care about:
+  Assert(locally_owned_dofs.is_subset_of(locally_stored_constraints),
+         ExcMessage("The set of locally stored constraints needs to be a "
+                    "superset of the locally owned DoFs."));
+
+  this->locally_owned_dofs = locally_owned_dofs;
+  this->local_lines        = locally_stored_constraints;
 
   // make sure the IndexSet is compressed. Otherwise this can lead to crashes
   // that are hard to find (only happen in release mode).
   // see tests/mpi/affine_constraints_crash_01
-  local_lines.compress();
-
-  clear();
+  this->locally_owned_dofs.compress();
+  this->local_lines.compress();
 }
 
 
@@ -2265,6 +2470,8 @@ namespace internal
   } // namespace AffineConstraintsImplementation
 } // namespace internal
 
+
+
 template <typename number>
 template <typename VectorType>
 void
@@ -2281,6 +2488,8 @@ AffineConstraints<number>::distribute_local_to_global(
                              local_matrix,
                              true);
 }
+
+
 
 template <typename number>
 template <typename VectorType>
@@ -2434,6 +2643,8 @@ namespace internal
   }
 #endif
 
+
+
   template <typename number>
   void
   import_vector_with_ghost_elements(
@@ -2453,6 +2664,8 @@ namespace internal
     output = vec;
     output.update_ghost_values();
   }
+
+
 
   // all other vector non-block vector types are sequential and we should
   // not have this function called at all -- so throw an exception
@@ -2498,6 +2711,35 @@ namespace internal
   }
 } // namespace internal
 
+
+namespace internal
+{
+  namespace AffineConstraints
+  {
+    template <typename VectorType,
+              std::enable_if_t<internal::is_block_vector<VectorType> == false>
+                * = nullptr>
+    MPI_Comm
+    get_mpi_communicator(const VectorType &vec)
+    {
+      return vec.get_mpi_communicator();
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<internal::is_block_vector<VectorType> == true>
+                * = nullptr>
+    MPI_Comm
+    get_mpi_communicator(const VectorType &vec)
+    {
+      Assert(vec.n_blocks() > 0, ExcInternalError());
+      return vec.block(0).get_mpi_communicator();
+    }
+  } // namespace AffineConstraints
+} // namespace internal
+
+
 template <typename number>
 template <typename VectorType>
 void
@@ -2517,64 +2759,149 @@ AffineConstraints<number>::distribute(VectorType &vec) const
   // the last else is for the simple case (sequential vector)
   const IndexSet vec_owned_elements = vec.locally_owned_elements();
 
-  if (dealii::is_serial_vector<VectorType>::value == false)
+  if constexpr (dealii::is_serial_vector<VectorType>::value == false)
     {
-      // This processor owns only part of the vector. one may think that
-      // every processor should be able to simply communicate those elements
-      // it owns and for which it knows that they act as sources to constrained
-      // DoFs to the owner of these DoFs. This would lead to a scheme where all
-      // we need to do is to add some local elements to (possibly non-local)
-      // ones and then call compress().
-      //
-      // Alas, this scheme does not work as evidenced by the disaster of bug
-      // #51, see http://code.google.com/p/dealii/issues/detail?id=51 and the
-      // reversion of one attempt that implements this in r29662. Rather, we
-      // need to get a vector that has all the *sources* or constraints we
-      // own locally, possibly as ghost vector elements, then read from them,
-      // and finally throw away the ghosted vector. Implement this in the
-      // following.
-      IndexSet needed_elements = vec_owned_elements;
+      // First check whether there are any constraints at all. If
+      // there aren't, then there is nothing we need to do and we can
+      // save the considerable effort below to communicate information
+      // -- this is for sure the case on the first (not yet adaptively
+      // refined) level of computations, for example:
+      if (Utilities::MPI::sum(lines.size(),
+                              internal::AffineConstraints::get_mpi_communicator(
+                                vec)) > 0)
+        {
+          // We are looking at parallel vectors here. Of course, they could be
+          // used in sequential contexts, but at least if we know that we are
+          // in a parallel context with more than one process, we should check
+          // that the user of this class provided index sets to the constructor
+          // or the reinit() functions:
+          if (Utilities::MPI::n_mpi_processes(
+                internal::AffineConstraints::get_mpi_communicator(vec)) > 1)
+            {
+              Assert(local_lines != IndexSet(),
+                     ExcMessage(
+                       "You are using the AffineConstraints class in a "
+                       "program that is running in parallel. In this case, "
+                       "it is inefficient to store all constraints: This class "
+                       "should really only store constraints for those degrees "
+                       "of freedom that are locally relevant. It is considered "
+                       "a bug not to do that. Please call either the "
+                       "constructor of this class, or one of its reinit() "
+                       "functions that provide this class with index sets "
+                       "of the locally owned and the locally relevant "
+                       "degrees of freedom."));
 
-      std::vector<types::global_dof_index> additional_elements;
-      for (const ConstraintLine &line : lines)
-        if (vec_owned_elements.is_element(line.index))
-          for (const std::pair<size_type, number> &entry : line.entries)
-            if (!vec_owned_elements.is_element(entry.first))
-              additional_elements.emplace_back(entry.first);
-      std::sort(additional_elements.begin(), additional_elements.end());
-      needed_elements.add_indices(additional_elements.begin(),
-                                  additional_elements.end());
+              Assert(vec_owned_elements.size() == locally_owned_dofs.size(),
+                     ExcMessage("You have previously initialized this "
+                                "AffineConstraints object with an index set "
+                                "that stated that vectors have size " +
+                                std::to_string(locally_owned_dofs.size()) +
+                                " entries, but you are now calling "
+                                "AffineConstraints::distribute() with a vector "
+                                "of size " +
+                                std::to_string(vec_owned_elements.size()) +
+                                "."));
+            }
 
-      VectorType ghosted_vector;
-      internal::import_vector_with_ghost_elements(
-        vec,
-        vec_owned_elements,
-        needed_elements,
-        ghosted_vector,
-        std::integral_constant<bool, IsBlockVector<VectorType>::value>());
 
-      for (const ConstraintLine &line : lines)
-        if (vec_owned_elements.is_element(line.index))
-          {
-            typename VectorType::value_type new_value = line.inhomogeneity;
-            for (const std::pair<size_type, number> &entry : line.entries)
-              new_value +=
-                (static_cast<typename VectorType::value_type>(
-                   internal::ElementAccess<VectorType>::get(ghosted_vector,
-                                                            entry.first)) *
-                 entry.second);
-            AssertIsFinite(new_value);
-            internal::ElementAccess<VectorType>::set(new_value,
-                                                     line.index,
-                                                     vec);
-          }
+            // Check that the set of indices we will import is a superset of
+            // the locally-owned ones. This *should* be the case if, as one
+            // would expect, the AffineConstraint object was initialized
+            // with a locally-relevant index set that is indeed a superset
+            // of the locally-owned indices. But you never know what people
+            // pass as arguments...
+#ifdef DEBUG
+          if (needed_elements_for_distribute != IndexSet())
+            {
+              Assert(vec_owned_elements.size() ==
+                       needed_elements_for_distribute.size(),
+                     ExcMessage("You have previously initialized this "
+                                "AffineConstraints object with an index set "
+                                "that stated that vectors have size " +
+                                std::to_string(locally_owned_dofs.size()) +
+                                " entries, but you are now calling "
+                                "AffineConstraints::distribute() with a vector "
+                                "of size " +
+                                std::to_string(vec_owned_elements.size()) +
+                                "."));
 
-      // now compress to communicate the entries that we added to
-      // and that weren't to local processors to the owner
-      //
-      // this shouldn't be strictly necessary but it probably doesn't
-      // hurt either
-      vec.compress(VectorOperation::insert);
+              for (const auto i : vec_owned_elements)
+                Assert(needed_elements_for_distribute.is_element(i),
+                       ExcInternalError());
+            }
+#endif
+
+          VectorType ghosted_vector;
+
+          // It is possible that the user is using a parallel vector type,
+          // but is running a non-parallel program (for example, step-31
+          // does this). In this case, it is (perhaps?) not a bug to not
+          // set an IndexSet for the local_lines and the
+          // locally_owned_lines -- they are simply both empty sets in
+          // that case. If that is so, we could just assign
+          // 'ghosted_vector=vec;'. But this is dangerous. Not having set
+          // index sets could also have been a bug, and we would get
+          // downstream errors about accessing elements that are not
+          // locally available. Rather, if no index sets were provided,
+          // simply import the *entire* vector.
+          if (local_lines != IndexSet())
+            {
+              Assert(vec_owned_elements.size() ==
+                       needed_elements_for_distribute.size(),
+                     ExcInternalError());
+
+              Assert(needed_elements_for_distribute != IndexSet(),
+                     ExcInternalError());
+              internal::import_vector_with_ghost_elements(
+                vec,
+                vec_owned_elements,
+                needed_elements_for_distribute,
+                ghosted_vector,
+                std::integral_constant<bool,
+                                       IsBlockVector<VectorType>::value>());
+            }
+          else
+            {
+              Assert(needed_elements_for_distribute == IndexSet(),
+                     ExcInternalError());
+
+              // TODO: We should really consider it a bug if this parallel
+              // truly is distributed (and not just a parallel vector type
+              // used for a sequential program). Assert that we are really
+              // working in a sequential context.
+
+              internal::import_vector_with_ghost_elements(
+                vec,
+                vec_owned_elements,
+                complete_index_set(vec_owned_elements.size()),
+                ghosted_vector,
+                std::integral_constant<bool,
+                                       IsBlockVector<VectorType>::value>());
+            }
+
+          for (const ConstraintLine &line : lines)
+            if (vec_owned_elements.is_element(line.index))
+              {
+                typename VectorType::value_type new_value = line.inhomogeneity;
+                for (const std::pair<size_type, number> &entry : line.entries)
+                  new_value +=
+                    (static_cast<typename VectorType::value_type>(
+                       internal::ElementAccess<VectorType>::get(ghosted_vector,
+                                                                entry.first)) *
+                     entry.second);
+                AssertIsFinite(new_value);
+                internal::ElementAccess<VectorType>::set(new_value,
+                                                         line.index,
+                                                         vec);
+              }
+
+          // now compress to communicate the entries that we added to
+          // and that weren't to local processors to the owner
+          //
+          // this shouldn't be strictly necessary but it probably doesn't
+          // hurt either
+          vec.compress(VectorOperation::insert);
+        }
     }
   else
     // purely sequential vector (either because the type doesn't

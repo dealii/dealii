@@ -74,7 +74,7 @@ namespace TrilinosWrappers
         ML_Epetra::SetDefaults("SA", parameter_list);
 
         // uncoupled mode can give a lot of warnings or even fail when there
-        // are too many entries per row and aggreggation gets complicated, but
+        // are too many entries per row and aggregation gets complicated, but
         // MIS does not work if too few elements are located on one
         // processor. work around these warnings by choosing the different
         // strategies in different situations: for low order, always use the

@@ -73,7 +73,7 @@ wave, an artifact of a too-large mesh size that can be reduced by reducing the
 mesh width and the time step.
 
 
-<a name="extensions"></a>
+<a name="step-23-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 If you want to explore a bit, try out some of the following things:

@@ -51,8 +51,7 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  IndexSet locally_active;
-  DoFTools::extract_locally_active_dofs(dofh, locally_active);
+  const IndexSet locally_active = DoFTools::extract_locally_active_dofs(dofh);
 
   Assert(locally_active == DoFTools::dof_indices_with_subdomain_association(
                              dofh, tr.locally_owned_subdomain()),

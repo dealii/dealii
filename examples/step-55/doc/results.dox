@@ -217,7 +217,7 @@ solve (we are using LU by default), a change in number of levels will
 influence the quality of a V-cycle. Therefore, a V-cycle is closer to an exact
 solver for smaller problem sizes.
 
-<a name="extensions"></a>
+<a name="step-55-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 <h4>Investigate Trilinos iterations</h4>

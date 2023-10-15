@@ -51,8 +51,6 @@
 #include <deal.II/numerics/derivative_approximation.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 
@@ -74,8 +72,8 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  IndexSet locally_relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, locally_relevant_set);
+  const IndexSet locally_relevant_set =
+    DoFTools::extract_locally_relevant_dofs(dofh);
 
   TrilinosWrappers::MPI::Vector vec(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   for (unsigned int i = vec.local_range().first; i < vec.local_range().second;

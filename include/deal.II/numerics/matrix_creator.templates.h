@@ -28,6 +28,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_hermite.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
 
@@ -999,7 +1000,9 @@ namespace MatrixCreator
       const unsigned int n_components = fe.n_components();
       const unsigned int n_function_components =
         boundary_functions.begin()->second->n_components;
-      const bool fe_is_system    = (n_components != 1);
+      const bool fe_is_system = (n_components != 1);
+      const bool fe_is_hermite =
+        (dynamic_cast<const FE_Hermite<dim, spacedim> *>(&fe) != nullptr);
       const bool fe_is_primitive = fe.is_primitive();
 
       copy_data.cell          = cell;
@@ -1008,6 +1011,8 @@ namespace MatrixCreator
       UpdateFlags update_flags =
         UpdateFlags(update_values | update_JxW_values | update_normal_vectors |
                     update_quadrature_points);
+      if (fe_is_hermite)
+        update_flags = update_flags | update_mapping;
       FEFaceValues<dim, spacedim> fe_values(mapping, fe, q, update_flags);
 
       // two variables for the coefficient, one for the two cases
@@ -1351,9 +1356,14 @@ namespace MatrixCreator
 
     const FiniteElement<dim, spacedim> &fe           = dof.get_fe();
     const unsigned int                  n_components = fe.n_components();
+    const bool                          fe_is_hermite =
+      (dynamic_cast<const FE_Hermite<dim, spacedim> *>(&fe) != nullptr);
 
-    Assert(matrix.n() == dof.n_boundary_dofs(boundary_functions),
+    Assert(fe_is_hermite ||
+             matrix.n() == dof.n_boundary_dofs(boundary_functions),
            ExcInternalError());
+    (void)fe_is_hermite;
+
     Assert(matrix.n() == matrix.m(), ExcInternalError());
     Assert(matrix.n() == rhs_vector.size(), ExcInternalError());
     Assert(boundary_functions.size() != 0, ExcInternalError());

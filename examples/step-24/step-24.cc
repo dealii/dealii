@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Xing Jin, Wolfgang Bangerth, Texas A&M University, 2006
+ * Authors: Xing Jin, Wolfgang Bangerth, Texas A&M University, 2006
  */
 
 

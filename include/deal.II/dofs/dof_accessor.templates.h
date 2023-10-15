@@ -2636,9 +2636,8 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_fe() const
   const auto &fe = this->dof_handler->get_fe(active_fe_index());
 
   Assert(this->reference_cell() == fe.reference_cell(),
-         ExcMessage(
-           "The reference-cell type of the cell does not match the one of the "
-           "finite element!"));
+         internal::ExcNonMatchingReferenceCellTypes(this->reference_cell(),
+                                                    fe.reference_cell()));
 
   return fe;
 }

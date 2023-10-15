@@ -37,7 +37,7 @@ jobs:
         os: [windows-2019, windows-2022]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: info
       run: |
         cmake --version
@@ -56,30 +56,28 @@ jobs:
       shell: bash
       run: |
         cmake --build build --parallel 2 --target install
-        cd c:/project
-        7z a dealii-windows.zip *
     - name: test library
       shell: bash
       run: |
         cmake --build build --parallel 2 --target test
     - name: archive library
       # run only if a PR is merged into master
-      if: github.ref == 'refs/heads/master'
+      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}
+      shell: bash
+      run: |
+        cd c:/project
+        7z a dealii-windows.zip *
+    - name: upload library
+      # run only if a PR is merged into master
+      if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2022' }}
       uses: actions/upload-artifact@v3
       with:
         name: dealii-windows.zip
         path: c:/project/dealii-windows.zip
-    - name: archive error 1
+    - name: upload CMakeConfigureLog
       uses: actions/upload-artifact@v3
       if: always()
       continue-on-error: true
       with:
-        name: windows-serial-CMakeOutput.log
-        path: build/CMakeFiles/CMakeOutput.log
-    - name: archive error 2
-      uses: actions/upload-artifact@v3
-      if: always()
-      continue-on-error: true
-      with:
-        name: windows-serial-CMakeError.log
-        path: build/CMakeFiles/CMakeError.log
+        name: ${{ matrix.os }}-serial-CMakeConfigureLog.yaml
+        path: build/CMakeFiles/CMakeConfigureLog.yaml

@@ -111,8 +111,8 @@ do_project(const parallel::distributed::Triangulation<dim> &triangulation,
   deallog << "n_cells=" << triangulation.n_global_active_cells() << std::endl;
   deallog << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   AffineConstraints<double> constraints;
   constraints.reinit(locally_relevant_dofs);

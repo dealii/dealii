@@ -46,8 +46,8 @@ test()
   DoFHandler<dim> dh(triangulation);
   dh.distribute_dofs(fe_system);
 
-  IndexSet relevant_partitioning(dh.n_dofs());
-  DoFTools::extract_locally_relevant_dofs(dh, relevant_partitioning);
+  const IndexSet relevant_partitioning =
+    DoFTools::extract_locally_relevant_dofs(dh);
 
   // generate empty constraints
   AffineConstraints<double> constraints;

@@ -108,33 +108,35 @@ test()
 
         fe_val.get_function_values(interpolant, values);
         fe_val_m.get_function_values(interpolant, values_m);
-        Assert(values[0] == values_m[0], ExcInternalError())
+        Assert(values[0] == values_m[0], ExcInternalError());
 
-          for (const unsigned int f : GeometryInfo<dim>::face_indices())
-        {
-          fe_f_val.reinit(cell, f);
-          fe_f_val_m.reinit(cell, f);
+        for (const unsigned int f : GeometryInfo<dim>::face_indices())
+          {
+            fe_f_val.reinit(cell, f);
+            fe_f_val_m.reinit(cell, f);
 
-          fe_f_val.get_function_values(interpolant, values);
-          fe_f_val_m.get_function_values(interpolant, values_m);
-          Assert(values[0] == values_m[0], ExcInternalError())
+            fe_f_val.get_function_values(interpolant, values);
+            fe_f_val_m.get_function_values(interpolant, values_m);
+            Assert(values[0] == values_m[0], ExcInternalError());
 
             // Also check the Jacobian with FESubfaceValues
             if (cell->at_boundary(f) == false &&
                 cell->neighbor(f)->level() < cell->level())
-          {
-            fe_subf_val.reinit(cell->neighbor(f),
-                               cell->neighbor_face_no(f),
-                               cell->neighbor_of_coarser_neighbor(f).second);
-            fe_subf_val_m.reinit(cell->neighbor(f),
-                                 cell->neighbor_face_no(f),
-                                 cell->neighbor_of_coarser_neighbor(f).second);
+              {
+                fe_subf_val.reinit(
+                  cell->neighbor(f),
+                  cell->neighbor_face_no(f),
+                  cell->neighbor_of_coarser_neighbor(f).second);
+                fe_subf_val_m.reinit(
+                  cell->neighbor(f),
+                  cell->neighbor_face_no(f),
+                  cell->neighbor_of_coarser_neighbor(f).second);
 
-            fe_subf_val.get_function_values(interpolant, values);
-            fe_subf_val_m.get_function_values(interpolant, values_m);
-            Assert(values[0] == values_m[0], ExcInternalError())
+                fe_subf_val.get_function_values(interpolant, values);
+                fe_subf_val_m.get_function_values(interpolant, values_m);
+                Assert(values[0] == values_m[0], ExcInternalError());
+              }
           }
-        }
       }
     deallog << "OK" << std::endl;
   }

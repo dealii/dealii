@@ -149,8 +149,8 @@ test(const Triangulation<dim, spacedim> &tria,
 
   const MPI_Comm comm = get_communicator(dof_handler.get_triangulation());
 
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
 
 #ifdef DEAL_II_WITH_TRILINOS

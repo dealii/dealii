@@ -443,10 +443,7 @@
  * @f[
  *   (C^T A C + Id_c) \tilde x = C^T (b - A\,k)
  * @f]
- * instead [1] (M. S. Shephard. Linear multipoint constraints applied via
- * transformation as part of a direct stiffness assembly process.
- * <i>International Journal for Numerical Methods in Engineering</i>
- * 20(11):2107-2112, 1985).
+ * instead (see, for example, @cite Shephard1984).
  *
  * Here, $A$ is a given (unconstrained) system matrix for which we only
  * assume that we can apply it to a vector but can not necessarily access

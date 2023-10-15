@@ -53,8 +53,6 @@ constraint?
 
 #include <deal.II/numerics/vector_tools.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 
@@ -90,8 +88,8 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  IndexSet locally_relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, locally_relevant_set);
+  const IndexSet locally_relevant_set =
+    DoFTools::extract_locally_relevant_dofs(dofh);
 
   AffineConstraints<double> cm;
   cm.reinit(locally_relevant_set);

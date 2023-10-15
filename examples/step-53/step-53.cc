@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Wolfgang Bangerth, Texas A&M University, 2014
  *          Luca Heltai, SISSA, 2014

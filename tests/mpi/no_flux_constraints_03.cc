@@ -40,8 +40,6 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 template <int dim>
@@ -84,8 +82,7 @@ test()
   if (myid == 0)
     deallog << "#dofs = " << dofh.locally_owned_dofs().size() << std::endl;
 
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
+  const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
 
   AffineConstraints<double> constraints;
   constraints.reinit(relevant_set);

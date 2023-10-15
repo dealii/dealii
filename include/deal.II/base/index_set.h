@@ -279,7 +279,7 @@ public:
    * Return the how-manyth element of this set (counted in ascending order) @p
    * global_index is. @p global_index needs to be less than the size(). This
    * function returns numbers::invalid_dof_index if the index @p global_index is not actually
-   * a member of this index set, i.e. if is_element(global_index) is false.
+   * a member of this index set, i.e. if `is_element(global_index)` is false.
    */
   size_type
   index_within_set(const size_type global_index) const;
@@ -317,17 +317,35 @@ public:
   compress() const;
 
   /**
-   * Comparison for equality of index sets. This operation is only allowed if
-   * the size of the two sets is the same (though of course they do not have
-   * to have the same number of indices).
+   * Comparison for equality of index sets.
+   *
+   * This operation is only allowed if the size of the two sets is the
+   * same (though of course they do not have to have the same number
+   * of indices), or if one of the two objects being compared is empty.
+   * The comparison between two objects of different sizes would of course,
+   * intuitively, result in a `false` outcome, but it is often a sign of
+   * a programming mistake to compare index sets of different sizes
+   * against each other, and the comparison is consequently not allowed.
+   * On the other hand, the comparison against an empty object makes
+   * sense to ensure, for example, that an IndexSet object has been
+   * initialized.
    */
   bool
   operator==(const IndexSet &is) const;
 
   /**
-   * Comparison for inequality of index sets. This operation is only allowed
-   * if the size of the two sets is the same (though of course they do not
-   * have to have the same number of indices).
+   * Comparison for inequality of index sets.
+   *
+   * This operation is only allowed if the size of the two sets is the
+   * same (though of course they do not have to have the same number
+   * of indices), or if one of the two objects being compared is empty.
+   * The comparison between two objects of different sizes would of course,
+   * intuitively, result in a `false` outcome, but it is often a sign of
+   * a programming mistake to compare index sets of different sizes
+   * against each other, and the comparison is consequently not allowed.
+   * On the other hand, the comparison against an empty object makes
+   * sense to ensure, for example, that an IndexSet object has been
+   * initialized.
    */
   bool
   operator!=(const IndexSet &is) const;
@@ -353,9 +371,60 @@ public:
    * <tt>begin</tt>. This corresponds to the notion of a <i>view</i>: The
    * interval <tt>[begin, end)</tt> is a <i>window</i> through which we see
    * the set represented by the current object.
+   *
+   * A more general function of the same name, taking a mask instead
+   * of just an interval to define the view, is below.
    */
   IndexSet
   get_view(const size_type begin, const size_type end) const;
+
+  /**
+   * This command takes a "mask", i.e., a second index set of same size as the
+   * current one and returns the intersection of the current index set the mask,
+   * shifted to the index of an entry within the given mask. For example,
+   * if the current object is a an IndexSet object representing an index space
+   * `[0,100)` containing indices `[20,40)`, and if the mask represents
+   * an index space of the same size but containing all 50 *odd* indices in this
+   * range, then the result will be an index set for a space of size 50 that
+   * contains those indices that correspond to the question "the how many'th
+   * entry in the mask are the indices `[20,40)`. This will result in an index
+   * set of size 50 that contains the indices `{11,12,13,14,15,16,17,18,19,20}`
+   * (because, for example, the index 20 in the original set is not in the mask,
+   * but 21 is and corresponds to the 11th entry of the mask -- the mask
+   * contains the elements `{1,3,5,7,9,11,13,15,17,19,21,...}`).
+   *
+   * In other words, the result of this operation is the intersection of the
+   * set represented by the current object and the mask, as seen
+   * <i>within the mask</i>. This corresponds to the notion of a <i>view</i>:
+   * The mask is a <i>window</i> through which we see the set represented by the
+   * current object.
+   *
+   * A typical case where this function is useful is as follows. Say,
+   * you have a block linear system in which you have blocks
+   * corresponding to variables $(u,p,T,c)$ (which you can think of as
+   * velocity, pressure, temperature, and chemical composition -- or
+   * whatever other kind of problem you are currently considering in
+   * your own work). We solve this in parallel, so every MPI process
+   * has its own `locally_owned_dofs` index set that describes which
+   * among all $N_\text{dofs}$ degrees of freedom this process
+   * owns. Let's assume we have developed a linear solver or
+   * preconditioner that first solves the coupled $u$-$T$ system, and
+   * once that is done, solves the $p$-$c$ system. In this case, it is
+   * often useful to set up block vectors with only two components
+   * corresponding to the $u$ and $T$ components, and later for only
+   * the $p$-$c$ components of the solution. The question is which of
+   * the components of these 2-block vectors are locally owned? The
+   * answer is that we need to get a view of the `locally_owned_dofs`
+   * index set in which we apply a mask that corresponds to the
+   * variables we're currently interested in. For the $u$-$T$ system,
+   * we need a mask (corresponding to an index set of size
+   * $N_\text{dofs}$) that contains all indices of $u$ degrees of
+   * freedom as well as all indices of $T$ degrees of freedom. The
+   * resulting view is an index set of size $N_u+N_T$ that contains
+   * the indices of the locally owned $u$ and $T$ degrees of freedom.
+   */
+  IndexSet
+  get_view(const IndexSet &mask) const;
 
   /**
    * Split the set indices represented by this object into blocks given by the
@@ -1928,12 +1997,20 @@ IndexSet::index_within_set(const size_type n) const
 inline bool
 IndexSet::operator==(const IndexSet &is) const
 {
+  // If one of the two index sets has size zero, the other one has to
+  // have size zero as well:
+  if (size() == 0)
+    return (is.size() == 0);
+  if (is.size() == 0)
+    return (size() == 0);
+
+  // Otherwise, they must have the same size (see the documentation):
   Assert(size() == is.size(), ExcDimensionMismatch(size(), is.size()));
 
   compress();
   is.compress();
 
-  return ranges == is.ranges;
+  return (ranges == is.ranges);
 }
 
 
@@ -1941,12 +2018,20 @@ IndexSet::operator==(const IndexSet &is) const
 inline bool
 IndexSet::operator!=(const IndexSet &is) const
 {
+  // If one of the two index sets has size zero, the other one has to
+  // have a non-zero size for inequality:
+  if (size() == 0)
+    return (is.size() != 0);
+  if (is.size() == 0)
+    return (size() != 0);
+
+  // Otherwise, they must have the same size (see the documentation):
   Assert(size() == is.size(), ExcDimensionMismatch(size(), is.size()));
 
   compress();
   is.compress();
 
-  return ranges != is.ranges;
+  return (ranges != is.ranges);
 }
 
 

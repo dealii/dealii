@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Author: David Neckels, Boulder, Colorado, 2007, 2008
  */

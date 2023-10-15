@@ -1,0 +1,7 @@
+New: The new function AffineConstraints::add_constraint() adds an
+entire constraint all at once, rather than splitting the task across
+AffineConstraint::add_line(), multiple calls to
+AffineConstraint::add_entry(), and
+AffineConstraint::set_inhomogeneity().
+<br>
+(Wolfgang Bangerth, 2023/10/05)

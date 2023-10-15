@@ -59,8 +59,8 @@ do_test()
   dof_handler.distribute_mg_dofs();
 
   // Make FE vector
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   using VectorType = LinearAlgebra::distributed::Vector<double>;
   VectorType global_dof_vector;
@@ -73,7 +73,8 @@ do_test()
   FunctionParser<dim> function(dim == 2 ? "y;-x;x*x+y*y" :
                                           "y;-x;0;x*x+y*y+z*z");
 
-  AffineConstraints<double> constraints;
+  AffineConstraints<double> constraints(dof_handler.locally_owned_dofs(),
+                                        locally_relevant_dofs);
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
   VectorTools::project(

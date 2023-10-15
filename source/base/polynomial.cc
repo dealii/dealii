@@ -665,7 +665,7 @@ namespace Polynomials
             break;
           }
         default:
-          Assert(false, ExcInternalError())
+          Assert(false, ExcInternalError());
       }
 
     Assert(x != nullptr, ExcInternalError());

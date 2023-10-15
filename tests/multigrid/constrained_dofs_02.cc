@@ -207,8 +207,8 @@ check_fe(FiniteElement<dim> &fe)
       deallog << "get_boundary_indices:" << std::endl;
       bi.print(deallog);
 
-      IndexSet relevant;
-      DoFTools::extract_locally_relevant_level_dofs(dofh, level, relevant);
+      const IndexSet relevant =
+        DoFTools::extract_locally_relevant_level_dofs(dofh, level);
       deallog << "relevant:" << std::endl;
       relevant.print(deallog);
 

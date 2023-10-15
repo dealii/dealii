@@ -26,6 +26,7 @@
 
 #include <deal.II/fe/fe_dgp.h>
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_hermite.h>
 #include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q_base.h>
@@ -411,7 +412,7 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
   }
 };
 
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 FE_Q_Base<dim, spacedim>::FE_Q_Base(
@@ -569,7 +570,7 @@ FE_Q_Base<dim, spacedim>::get_interpolation_matrix(
           if (std::fabs(interpolation_matrix(i, j)) < eps)
             interpolation_matrix(i, j) = 0.;
 
-#ifdef DEBUG
+#  ifdef DEBUG
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
       for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
@@ -580,7 +581,7 @@ FE_Q_Base<dim, spacedim>::get_interpolation_matrix(
 
           Assert(std::fabs(sum - 1) < eps, ExcInternalError());
         }
-#endif
+#  endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe))
     {
@@ -699,7 +700,7 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
             }
         }
 
-#ifdef DEBUG
+#  ifdef DEBUG
       // make sure that the row sum of each of the matrices is 1 at this
       // point. this must be so since the shape functions sum up to 1
       for (unsigned int j = 0; j < source_fe.n_dofs_per_face(face_no); ++j)
@@ -711,7 +712,7 @@ FE_Q_Base<dim, spacedim>::get_subface_interpolation_matrix(
 
           Assert(std::fabs(sum - 1) < eps, ExcInternalError());
         }
-#endif
+#  endif
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&source_fe) != nullptr)
     {
@@ -751,6 +752,15 @@ FE_Q_Base<dim, spacedim>::hp_vertex_dof_identities(
     {
       // there should be exactly one single DoF of each FE at a vertex, and they
       // should have identical value
+      return {{0U, 0U}};
+    }
+  else if (dynamic_cast<const FE_Hermite<dim, spacedim> *>(&fe_other) !=
+           nullptr)
+    {
+      // FE_Hermite will usually have several degrees of freedom on
+      // each vertex, however only the first one will actually
+      // correspond to the shape value at the vertex, meaning it's
+      // the only one of interest for FE_Q_Base
       return {{0U, 0U}};
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
@@ -1275,7 +1285,7 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
       // evaluations of the Lagrange polynomials are zero or one.
       const double eps = 1e-15 * q_degree * dim;
 
-#ifdef DEBUG
+#  ifdef DEBUG
       // in DEBUG mode, check that the evaluation of support points in the
       // current numbering gives the identity operation
       for (unsigned int i = 0; i < q_dofs_per_cell; ++i)
@@ -1300,7 +1310,7 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
                        "ill-conditioned such that round-off "
                        "prevents the sum to be one."));
         }
-#endif
+#  endif
 
       // to efficiently evaluate the polynomial at the subcell, make use of
       // the tensor product structure of this element and only evaluate 1d
@@ -1411,7 +1421,7 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
 
         // and make sure that the row sum is 1. this must be so since for this
         // element, the shape functions add up to one
-#ifdef DEBUG
+#  ifdef DEBUG
       for (unsigned int row = 0; row < this->n_dofs_per_cell(); ++row)
         {
           double sum = 0;
@@ -1426,7 +1436,7 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
                                   "ill-conditioned such that round-off "
                                   "prevents the sum to be one."));
         }
-#endif
+#  endif
 
       // swap matrices
       prolongate.swap(const_cast<FullMatrix<double> &>(
@@ -1523,9 +1533,9 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
                   }
               unsigned int j_indices[dim];
               internal::FE_Q_Base::zero_indices<dim>(j_indices);
-#ifdef DEBUG
+#  ifdef DEBUG
               double sum_check = 0;
-#endif
+#  endif
               for (unsigned int j = 0; j < q_dofs_per_cell; j += dofs1d)
                 {
                   double val_extra_dim = 1.;
@@ -1545,9 +1555,9 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
                         my_restriction(mother_dof, child_dof) = 1.;
                       else if (std::fabs(val) > eps)
                         my_restriction(mother_dof, child_dof) = val;
-#ifdef DEBUG
+#  ifdef DEBUG
                       sum_check += val;
-#endif
+#  endif
                     }
                   internal::FE_Q_Base::increment_indices<dim>(j_indices,
                                                               dofs1d);
@@ -1704,7 +1714,7 @@ FE_Q_Base<dim, spacedim>::get_constant_modes() const
     constant_modes, std::vector<unsigned int>(1, 0));
 }
 
-
+#endif
 
 // explicit instantiations
 #include "fe_q_base.inst"

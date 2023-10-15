@@ -222,6 +222,28 @@ public:
    */
   virtual ~FEValuesBase() override;
 
+  /**
+   * Explicitly allow to check for cell similarity.
+   * The detection of simple geometries with CellSimilarity is sensitive to the
+   * first cell detected. When using multiple threads, each thread might get a
+   * thread local copy of the FEValues object that is initialized to the first
+   * cell the thread sees. As this cell might be different between runs and
+   * number of threads used, this slight deviation leads to difference in
+   * roundoff errors that propagate through the program. Therefore, deal.II
+   * disables the CellSimilarity check by default in programs that use more than
+   * one thread. This function can be used to disable this behavior: When
+   * called, FEValues objects will always do the similarity check, even in cases
+   * where the program uses multiple threads. This substantially accelerates the
+   * operations of FEValues because many operations can be avoided if a cell is,
+   * for example, just a translation of the previous cell. On the other hand,
+   * you might get results that differ by an amount proportional to round-off
+   * between the case of using or not using cell similarity information, and
+   * because the order of cells assigned to individual threads may differ from
+   * run to run, when you call this function you may end up with results that
+   * differ by round-off between runs of the same program.
+   */
+  void
+  always_allow_check_for_cell_similarity(const bool allow);
 
   /// @name Access to shape function values
   ///
@@ -1740,6 +1762,11 @@ private:
    * A cache for all possible FEValuesViews objects.
    */
   dealii::internal::FEValuesViews::Cache<dim, spacedim> fe_values_views_cache;
+
+  /**
+   * Whether checking for cell similarity is allowed.
+   */
+  bool check_for_cell_similarity_allowed;
 
   // Make the view classes friends of this class, since they access internal
   // data.

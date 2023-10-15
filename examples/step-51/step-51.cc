@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Martin Kronbichler, Technische Universität München,
+ * Author: Martin Kronbichler, Technical University of Munich,
  *         Scott T. Miller, The Pennsylvania State University, 2013
  */
 

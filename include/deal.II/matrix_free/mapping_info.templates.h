@@ -1230,7 +1230,7 @@ namespace internal
                       for (unsigned int e = 0; e < dim; ++e)
                         jac[d][e] =
                           eval
-                            .begin_gradients()[q + (d * dim + e) * n_q_points];
+                            .begin_gradients()[e + (d * n_q_points + q) * dim];
 
                     // eliminate roundoff errors
                     if (cell_type[cell] == cartesian)
@@ -2180,7 +2180,7 @@ namespace internal
                   for (unsigned int e = 0; e < dim; ++e)
                     for (unsigned int d = 0; d < dim; ++d)
                       jacobi[d][e] =
-                        eval.begin_gradients()[(d * dim + e) * n_q_points + q];
+                        eval.begin_gradients()[(d * n_q_points + q) * dim + e];
                   Tensor<2, dim, VectorizedDouble> inv_transp_jac =
                     transpose(invert(jacobi));
                   Tensor<3, dim, VectorizedDouble> jac_grad;
@@ -2250,7 +2250,7 @@ namespace internal
                       for (unsigned int d = 0; d < dim; ++d)
                         jac[d][ee] =
                           eval_int
-                            .begin_gradients()[(d * dim + e) * n_q_points + q];
+                            .begin_gradients()[(d * n_q_points + q) * dim + e];
                     }
                   Tensor<2, dim, VectorizedDouble> inv_jac = invert(jac);
                   for (unsigned int e = 0; e < dim; ++e)
@@ -2365,8 +2365,8 @@ namespace internal
                           for (unsigned int d = 0; d < dim; ++d)
                             jac[d][ee] =
                               eval_ext
-                                .begin_gradients()[(d * dim + e) * n_q_points +
-                                                   q];
+                                .begin_gradients()[(d * n_q_points + q) * dim +
+                                                   e];
                         }
                       Tensor<2, dim, VectorizedDouble> inv_jac = invert(jac);
                       for (unsigned int e = 0; e < dim; ++e)

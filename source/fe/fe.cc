@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
 
 
 /*------------------------------- FiniteElement ----------------------*/
-
+#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 FiniteElement<dim, spacedim>::InternalDataBase::InternalDataBase()
@@ -1175,7 +1175,7 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
   const unsigned int first_selected =
     mask.first_selected_component(n_total_components);
 
-#ifdef DEBUG
+#  ifdef DEBUG
   // check that it is contiguous:
   for (unsigned int c = 0; c < n_total_components; ++c)
     Assert((c < first_selected && (!mask[c])) ||
@@ -1183,7 +1183,7 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
               mask[c]) ||
              (c >= first_selected + n_selected && !mask[c]),
            ExcMessage("Error: the given ComponentMask is not contiguous!"));
-#endif
+#  endif
 
   return get_sub_fe(first_selected, n_selected);
 }
@@ -1275,7 +1275,7 @@ FiniteElement<dim, spacedim>::compute_n_nonzero_components(
 
 /*------------------------------- FiniteElement ----------------------*/
 
-#ifndef DOXYGEN
+#  ifndef DOXYGEN
 template <int dim, int spacedim>
 std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
 FiniteElement<dim, spacedim>::get_face_data(
@@ -1370,7 +1370,7 @@ FiniteElement<dim, spacedim>::fill_fe_face_values(
   (void)fe_internal;
   (void)output_data;
 }
-#endif
+#  endif
 
 
 
@@ -1406,7 +1406,7 @@ FiniteElement<dim, spacedim>::base_element(const unsigned int index) const
 }
 
 
-
+#endif
 /*------------------------------- Explicit Instantiations -------------*/
 #include "fe.inst"
 

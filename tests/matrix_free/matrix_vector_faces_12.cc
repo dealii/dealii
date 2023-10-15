@@ -282,7 +282,7 @@ test()
   triangulation.add_periodicity(periodic_faces);
   triangulation.set_all_manifold_ids(111);
 
-  static PeriodicHillManifold<dim> manifold;
+  PeriodicHillManifold<dim> manifold;
   triangulation.set_manifold(111, manifold);
   triangulation.refine_global(2);
 

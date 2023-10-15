@@ -100,8 +100,7 @@ test()
                   << dofh.n_locally_owned_dofs() << std::endl;
         }
 
-      IndexSet dof_set;
-      DoFTools::extract_locally_active_dofs<>(dofh, dof_set);
+      const IndexSet dof_set = DoFTools::extract_locally_active_dofs<>(dofh);
       std::set<unsigned int> control_dof_set;
 
       typename DoFHandler<dim>::active_cell_iterator cell = dofh.begin_active();

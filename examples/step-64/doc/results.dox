@@ -42,7 +42,7 @@ of the size of the problem. But having such a solver would require
 using a better preconditioner than the identity matrix we have used here.
 
 
-<a name="extensions"></a>
+<a name="step-64-extensions"></a>
 <h3> Possibilities for extensions </h3>
 
 Currently, this program uses no preconditioner at all. This is mainly

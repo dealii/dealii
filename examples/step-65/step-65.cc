@@ -12,8 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
- * This tutorial program was contributed by Martin Kronbichler
+ *
+ * Author: Martin Kronbichler
  */
 
 // @sect3{Include files}

@@ -22,7 +22,7 @@ All entries are signed with the names of the author.
 </p>
 
 
-<a name="general"></a>
+<a name="310-320-general"></a>
 <h3>General</h3>
 
 <ol>
@@ -88,7 +88,7 @@ All entries are signed with the names of the author.
        (GK 2001/03/14)
        </p>
 
-  <li> <a name="new_fe_mapping_design"></a>
+  <li> <a name="310-320-new_fe_mapping_design"></a>
        <i> New Design of <code>FiniteElements</code>
        and <code>Mappings</code></i>
 
@@ -161,7 +161,7 @@ All entries are signed with the names of the author.
 
 
 
-<a name="base"></a>
+<a name="310-320-base"></a>
 <h3>base</h3>
 
 <ol>
@@ -355,7 +355,7 @@ All entries are signed with the names of the author.
 
 
 
-<a name="lac"></a>
+<a name="310-320-lac"></a>
 <h3>lac</h3>
 
 <ol>
@@ -604,7 +604,7 @@ All entries are signed with the names of the author.
 
 
 
-<a name="deal.II"></a>
+<a name="310-320-deal.II"></a>
 <h3>deal.II</h3>
 
 <ol>

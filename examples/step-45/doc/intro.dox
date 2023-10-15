@@ -1,7 +1,7 @@
 <br>
 
 <i>This program was contributed by Daniel Arndt and Matthias Maier.</i>
-<a name="Intro"></a>
+<a name="step-45-Intro"></a>
 <h1>Introduction</h1>
 
 In this example we present how to use periodic boundary conditions in
@@ -16,7 +16,7 @@ be able to proceed this way one has to assume that the model can be
 periodically extended to the other boxes; this requires the solution to
 have a periodic structure.
 
-<a name="Procedure"></a>
+<a name="step-45-Procedure"></a>
 <h1>Procedure</h1>
 
 deal.II provides a number of high level entry points to impose periodic
@@ -143,7 +143,7 @@ The remaining parameters are the same as for the high level interface apart
 from the self-explaining @p component_mask and @p affine_constraints.
 
 
-<a name="problem"></a>
+<a name="step-45-problem"></a>
 <h1>A practical example</h1>
 
 In the following, we show how to use the above functions in a more involved

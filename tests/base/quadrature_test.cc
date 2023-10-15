@@ -46,6 +46,12 @@ fill_vector(std::vector<Quadrature<dim> *> &quadratures)
     {
       quadratures.push_back(new QGaussLobatto<dim>(i));
     }
+  for (unsigned int i = 1; i < 9; ++i)
+    {
+      quadratures.push_back(new QGaussRadau<dim>(i));
+      quadratures.push_back(
+        new QGaussRadau<dim>(i, QGaussRadau<dim>::EndPoint::right));
+    }
 }
 
 template <int dim>

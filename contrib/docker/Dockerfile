@@ -1,12 +1,14 @@
-ARG IMG=focal
+ARG IMG=focal    # Ubuntu image that contains all corresponding dependencies.
 
 FROM dealii/dependencies:$IMG
 
+ARG NJOBS=0      # Jobs used for building. Default: Use all available jobs.
+ARG VER=master   # deal.II branch that gets checked out.
+
 LABEL maintainer="luca.heltai@gmail.com"
 
-ARG VER=master
-
 USER root
+
 RUN cd /usr/src && \
     git clone https://github.com/dealii/dealii dealii-$VER && \
     cd dealii-$VER && \
@@ -49,9 +51,9 @@ RUN cd /usr/src && \
     -DDEAL_II_WITH_UMFPACK=ON \
     -DDEAL_II_WITH_VTK=ON \
     -DDEAL_II_WITH_ZLIB=ON \
-    .. \
-    && ninja -j 2 install \
-    && cd ../ && rm -rf .git build
+    .. && \
+    ninja -j $NJOBS install && \
+    cd ../ && rm -rf .git build
 
 USER $USER
 WORKDIR $HOME

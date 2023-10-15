@@ -211,10 +211,8 @@ MGTransferPrebuilt<VectorType>::build(
       //
       // increment dofs_per_cell since a useless diagonal element will be
       // stored
-      IndexSet level_p1_relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                    level + 1,
-                                                    level_p1_relevant_dofs);
+      const IndexSet level_p1_relevant_dofs =
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, level + 1);
       DynamicSparsityPattern dsp(this->sizes[level + 1],
                                  this->sizes[level],
                                  level_p1_relevant_dofs);

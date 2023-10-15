@@ -1234,9 +1234,179 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossInvalidValue <b>Invalid value</b></dt>
+ * <dd>
+ * A common problem in software design is what to do if a function needs to
+ * return something like "this value does not exist". An example of this
+ * could be the function `IndexSet::index_within_set(i)` that returns the
+ * how many'th element of the set `i` is. Clearly, the return value of this
+ * function should be an unsigned integer type, the result always being
+ * a count (zero or positive). The question is what to do if the index
+ * `i` is not actually in the set. One *could* consider this a bug: You
+ * can't ask an index set for the position of an index that is not in the
+ * set, and so an exception should be thrown: The user should first check
+ * with `IndexSet::is_element(i)` whether `i` is an element of the set,
+ * and only then should they call `IndexSet::index_within_set(i)`.
+ * But sometimes there are situations where one simply wants to
+ * return a regular count if `i` is in the set, and some kind of
+ * "exceptional" value if it is not.
+ *
+ * Similar questions appear when one writes code of the following kind:
+ * @code
+ *   unsigned int value;
+ *   if (some condition)
+ *     value = 13;
+ *   [...] // much code
+ *   if (some other condition)
+ *     value = 42;
+ *
+ *   launch_the_rocket(value); // something important and expensive
+ * @endcode
+ * Here, the programmer may know that either `some condition` or
+ * `some other condition` is true, and that consequently `value` is
+ * always initialized at the end of the block. But there are good
+ * reasons not to trust this. First, programmers make mistakes, and
+ * so it is conceivable that there are situations where the variable
+ * ends up uninitialized, even though that wasn't intended. Second,
+ * code changes over time and while the "either `some condition` or
+ * `some other condition` is true" situation may hold at the time
+ * of development of the software, when code is moved around
+ * or undergoes bug fixes and functionality enhancement, things may
+ * change and the variable may go uninitialized. A better way
+ * to write this code would be like this:
+ * @code
+ *   unsigned int value = some_invalid_value;
+ *   if (some condition)
+ *     value = 13;
+ *   [...] // much code
+ *   if (some other condition)
+ *     value = 42;
+ *
+ *   Assert (value != some_invalid_value, "some error message");
+ *   launch_the_rocket(value); // something important and expensive
+ * @endcode
+ * As before, the issue is what `some_invalid_value` should be.
+ *
+ * This is such a common problem that many, mostly ad-hoc, solutions
+ * are widely used. In some cases, parts of the values of a type can
+ * be used. For example, `sqrt` must necessarily return a
+ * non-negative value because, well, all square roots are non-negative.
+ * As a consequence, this function could return error codes as negative
+ * values. (In truth, though,
+ * [`sqrt`](https://en.cppreference.com/w/cpp/numeric/math/sqrt)
+ * returns `NaN` if one provides
+ * a negative input -- here, `NaN` stands for "not a number" and is,
+ * just like negative numbers, a stand-in for a value that can not
+ * happen as part of the regular operations of this function and can
+ * consequently be used to indicate errors.) Similarly, functions such as
+ * [`printf()`](https://en.cppreference.com/w/c/io/fprintf)
+ * either return the number of characters printed or, in case
+ * of an error in the inputs, a negative value. Finally, the
+ * [`fopen`](https://en.cppreference.com/w/cpp/io/c/fopen)
+ * function returns a pointer to a file descriptor (similar to a
+ * `std::iofstream` object) but if the file cannot be opened,
+ * for example because the file does not exist or the directory in which
+ * it supposedly is does not exist, then the function returns a `nullptr`.
+ *
+ * All of these examples use that the returned object is of a type whose
+ * set of possible values contains values that cannot be legitimate
+ * return values (in mathematical language: they are not part of the
+ * "range" of the function) and that can consequently be used to indicate
+ * errors. This is awkward because the mapping of error codes into the
+ * space of possible return values depends very much on the function and
+ * what it can and cannot return. For example, `sqrt()` could return `-1`
+ * as an error, but `sin()` can not because `-1` is a valid return value.
+ * Also, not all functions allow for this. For example, the
+ * [`strtol`](https://en.cppreference.com/w/c/string/byte/strtol)
+ * ("string to long (integer)") function takes a string as input and
+ * returns a long integer as output. But since clearly every possible
+ * value of the type `long int` can legitimately be returned, errors in
+ * the input (say, if someone provided the string `"nonsense"` as
+ * input) cannot be indicated via the return object, and the function
+ * needs to indicate errors through another mechanism. The C language
+ * does that by letting functions such as `strtol` set the global variable
+ * `errno` to a nonzero value to indicate an error (an approach that
+ * comes with its own set of problems, among which are that people
+ * tend to forget the value of this variable after calling the function).
+ *
+ * The examples listed above date back to the time when C was first
+ * developed, in the late 1960s and 1970s. C++ solves this conundrum
+ * in a more systematic way. First, functions can throw exceptions of
+ * any type, and one can think of a thrown exception as simply another
+ * possible return value of functions that indicates errors without
+ * requiring having a part of the value space of the return type of a
+ * function occupied for error codes. In fact, the type of an exception
+ * is completely decoupled from the usual return type: You can pass as
+ * much information through exceptions you throw, even if the function
+ * in question returns just a meager `int` in regular operation. This
+ * approach is used in a number of deal.II functions: If inputs don't
+ * make sense, the program is either aborted (typically via an
+ * `Assert` statement) if the inputs are believed to be hard-coded --
+ * say, when adding vectors of different length -- or an exception is
+ * thrown via C++'s `throw` statement. The function
+ * Mapping::transform_real_to_unit_cell() is an example of the latter.
+ * Second, in newer C++ standards, one can use the
+ * [`std::expected<T,E>`](https://en.cppreference.com/w/cpp/utility/expected)
+ * class as the return value that can be thought as "this function
+ * returns objects of type `T`, but if an error was detected, then the
+ * function instead returns an object of type `E`". You can then ask
+ * the returned object whether it stores one or the other. In cases of
+ * errors, one would typically store an explanation of the error in `E`,
+ * in much the same way as the function could throw an exception of type
+ * `E`. For example, a perhaps better design for the the `fopen` function
+ * mentioned above could return `std::expected<FILE,std::string>` where
+ * if successful, it returns a `FILE` object that identifies the file
+ * for writing and reading; if it fails, the function would store a textual
+ * description of what went wrong in the second slot of the `std::expected`
+ * object (or perhaps an element of an `enum` that simply provides an
+ * enumeration of possible reasons for failure). Relatedly, if it is not
+ * necessary to provide a reason for the failure, functions could simply
+ * return an object of type
+ * [`std::optional<T>`](https://en.cppreference.com/w/cpp/utility/optional)
+ * that may or may not hold an object of type `T`, and that one can ask
+ * about that. This would be the right approach for the
+ * `IndexSet::index_within_set(i)` function mentioned above: If `i` is
+ * an element of the set, then it returns an object of type
+ * `std::optional<IndexSet::size_type>` that contains the requested value;
+ * if `i` was not in the set, then it returns an empty
+ * `std::optional<IndexSet::size_type>` object.
+ *
+ * A third approach, widely used in deal.II, is to *explicitly* declare
+ * part of the range space as "exceptional". For example, many functions
+ * in deal.II deal with indices of degrees of freedom. These are encoded
+ * as unsigned integers, except that we explicitly declare the value
+ * 4294967295 as an invalid value that indicates an error. (This specific
+ * value happens to be the largest unsigned integer; computations are
+ * unlikely to be so large that they use this specific value in a legitimate
+ * sense.) Many of the data types used in deal.II, such as
+ * types::global_dof_index, types::active_fe_index, types::material_id
+ * explicitly consider one possible value representable by these
+ * types as "invalid" and use it to report errors of uninitialized
+ * variables. These values typically have names such as
+ * numbers::invalid_unsigned_int, numbers::invalid_material_id, etc.
+ *
+ * (As a postscript, the `strtol` function mentioned above uses this sort of
+ * approach as well. If the input to that function is invalid, it not only
+ * sets the global variable `errno`, but *also* returns either `LONG_MAX`
+ * or `LONG_MIN`. These are the largest and smallest long integer values.
+ * In other words, the function's definition *explicitly* marks these values
+ * as "invalid" or "exceptional", even though one could legitimately expect
+ * to provide the function with a string for which the conversion to a long
+ * integer would result in these values. This is at its core the same
+ * approach we use in deal.II with the invalid values mentioned above,
+ * except that deal.II uses variable names that reflect the underlying
+ * use case (such as whether a value reflects an invalid value
+ * for DoF indices or manifold ids), rather than just the type: When
+ * using numbers::invalid_material_id, you don't need to know what
+ * type is actually used to represent material ids.)
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossLagrange <b>Lagrange elements</b></dt>
  * <dd>Finite elements based on Lagrangian interpolation at
- * @ref GlossSupport "support points".
+ * @ref GlossSupport "support points"
+ * are called "Lagrange elements". Their node functionals correspond
+ * to evaluation of shape functions at these support points.
  * </dd>
  *
  *

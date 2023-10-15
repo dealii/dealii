@@ -90,9 +90,8 @@ test()
   stokes_partitioning.push_back(stokes_index_set.get_view(0, n_u));
   stokes_partitioning.push_back(stokes_index_set.get_view(n_u, n_u + n_p));
 
-  IndexSet stokes_relevant_set;
-  DoFTools::extract_locally_relevant_dofs(stokes_dof_handler,
-                                          stokes_relevant_set);
+  const IndexSet stokes_relevant_set =
+    DoFTools::extract_locally_relevant_dofs(stokes_dof_handler);
   stokes_relevant_partitioning.push_back(stokes_relevant_set.get_view(0, n_u));
   stokes_relevant_partitioning.push_back(
     stokes_relevant_set.get_view(n_u, n_u + n_p));
@@ -185,9 +184,8 @@ test_LA_Trilinos()
   stokes_partitioning.push_back(stokes_index_set.get_view(0, n_u));
   stokes_partitioning.push_back(stokes_index_set.get_view(n_u, n_u + n_p));
 
-  IndexSet stokes_relevant_set;
-  DoFTools::extract_locally_relevant_dofs(stokes_dof_handler,
-                                          stokes_relevant_set);
+  const IndexSet stokes_relevant_set =
+    DoFTools::extract_locally_relevant_dofs(stokes_dof_handler);
   stokes_relevant_partitioning.push_back(stokes_relevant_set.get_view(0, n_u));
   stokes_relevant_partitioning.push_back(
     stokes_relevant_set.get_view(n_u, n_u + n_p));

@@ -30,8 +30,6 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 

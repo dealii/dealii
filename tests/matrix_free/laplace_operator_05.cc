@@ -89,9 +89,8 @@ test()
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
 
-  IndexSet owned_set = dof.locally_owned_dofs();
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dof, relevant_set);
+  const IndexSet &owned_set    = dof.locally_owned_dofs();
+  const IndexSet  relevant_set = DoFTools::extract_locally_relevant_dofs(dof);
 
   AffineConstraints<double> constraints(relevant_set);
   DoFTools::make_hanging_node_constraints(dof, constraints);

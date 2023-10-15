@@ -23,7 +23,7 @@
 #
 
 #
-# First, collect some metatadata:
+# First, collect some metadata:
 #
 
 site="${1}"

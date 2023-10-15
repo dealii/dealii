@@ -231,7 +231,7 @@ the right one shows the x-displacement along two cutplanes through the cube.
 
 
 
-<a name="extensions"></a>
+<a name="step-17-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 The program keeps a complete copy of the Triangulation and DoFHandler objects

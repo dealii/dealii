@@ -115,10 +115,10 @@ namespace RepartitioningPolicyTools
     Assert(
       tria_fine.all_reference_cells_are_hyper_cube(),
       ExcMessage(
-        "FirstChildPolicy is only working for pure hex meshes at the moment."))
+        "FirstChildPolicy is only working for pure hex meshes at the moment."));
 
-      const internal::CellIDTranslator<dim>
-        cell_id_translator(n_coarse_cells, n_global_levels);
+    const internal::CellIDTranslator<dim> cell_id_translator(n_coarse_cells,
+                                                             n_global_levels);
     is_level_partitions.set_size(cell_id_translator.size());
 
     for (const auto &cell : tria_fine.active_cell_iterators())

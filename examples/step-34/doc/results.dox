@@ -209,7 +209,7 @@ and then the external contour plot of the potential, with opacity set to 25%:
 <img src="https://www.dealii.org/images/steps/developer/step-34_3d-2.png" alt="">
 
 
-<a name="extensions"></a>
+<a name="step-34-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 This is the first tutorial program that considers solving equations defined on

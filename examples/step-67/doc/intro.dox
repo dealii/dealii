@@ -11,7 +11,7 @@ the project "High-order discontinuous Galerkin for the exa-scale" (ExaDG)
 within the priority program "Software for Exascale Computing" (SPPEXA).
 </i>
 
-<a name="Intro"></a>
+<a name="step-67-Intro"></a>
 <h1>Introduction</h1>
 
 This tutorial program solves the Euler equations of fluid dynamics using an

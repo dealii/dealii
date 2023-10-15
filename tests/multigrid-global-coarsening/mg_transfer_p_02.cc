@@ -126,12 +126,18 @@ do_test()
       dof_handler_fine.distribute_dofs(fe_collection);
       dof_handler_coarse.distribute_dofs(fe_collection);
 
-      AffineConstraints<Number> constraint_coarse;
+      AffineConstraints<Number> constraint_coarse(
+        dof_handler_coarse.locally_owned_dofs(),
+        DoFTools::extract_locally_relevant_dofs(dof_handler_coarse));
+
+      AffineConstraints<Number> constraint_fine(
+        dof_handler_fine.locally_owned_dofs(),
+        DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
+
       DoFTools::make_hanging_node_constraints(dof_handler_coarse,
                                               constraint_coarse);
       constraint_coarse.close();
 
-      AffineConstraints<Number> constraint_fine;
       DoFTools::make_hanging_node_constraints(dof_handler_fine,
                                               constraint_fine);
       constraint_fine.close();

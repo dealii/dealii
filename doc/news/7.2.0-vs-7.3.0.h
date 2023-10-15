@@ -25,7 +25,7 @@ All entries are signed with the names of the author.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="720-730-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -171,7 +171,7 @@ never working correctly and it is not used.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="720-730-general"></a>
 <h3>General</h3>
 
 
@@ -224,7 +224,7 @@ DoFHandler, in particular removal of specializations.
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="720-730-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>

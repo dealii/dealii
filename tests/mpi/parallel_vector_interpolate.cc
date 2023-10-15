@@ -54,9 +54,10 @@ test()
   dof1.distribute_dofs(fe1);
   dof2.distribute_dofs(fe2);
 
-  IndexSet locally_relevant_dofs1, locally_relevant_dofs2;
-  DoFTools::extract_locally_relevant_dofs(dof1, locally_relevant_dofs1);
-  DoFTools::extract_locally_relevant_dofs(dof2, locally_relevant_dofs2);
+  const IndexSet locally_relevant_dofs1 =
+    DoFTools::extract_locally_relevant_dofs(dof1);
+  const IndexSet locally_relevant_dofs2 =
+    DoFTools::extract_locally_relevant_dofs(dof2);
 
   LinearAlgebra::distributed::Vector<double> v1(dof1.locally_owned_dofs(),
                                                 locally_relevant_dofs1,

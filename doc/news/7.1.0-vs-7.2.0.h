@@ -25,7 +25,7 @@ All entries are signed with the names of the author.
 
 <!-- ----------- INCOMPATIBILITIES ----------------- -->
 
-<a name="incompatible"></a>
+<a name="710-720-incompatible"></a>
 <h3 style="color:red">Incompatibilities</h3>
 
 <p style="color:red">
@@ -71,7 +71,7 @@ used to store boundary indicators internally.
 
 <!-- ----------- GENERAL IMPROVEMENTS ----------------- -->
 
-<a name="general"></a>
+<a name="710-720-general"></a>
 <h3>General</h3>
 
 
@@ -320,7 +320,7 @@ enabled due to a missing include file in file
 
 <!-- ----------- SPECIFIC IMPROVEMENTS ----------------- -->
 
-<a name="specific"></a>
+<a name="710-720-specific"></a>
 <h3>Specific improvements</h3>
 
 <ol>

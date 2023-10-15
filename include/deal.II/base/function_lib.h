@@ -1482,6 +1482,13 @@ namespace Functions
      * separately. In other words, there is no need to keep the original object
      * from which this object could copy its information, but it might as well
      * take over ("move") the data.
+     *
+     * Moving data also enables using tables that are located in shared memory
+     * between multiple MPI processes, rather than copying the data from
+     * shared memory into local memory whenever one creates an
+     * InterpolatedTensorProductGridData object. See the
+     * TableBase::replicate_across_communicator() function on how to share a
+     * data set between multiple processes.
      */
     InterpolatedTensorProductGridData(
       std::array<std::vector<double>, dim> &&coordinate_values,
@@ -1620,6 +1627,13 @@ namespace Functions
      * separately. In other words, there is no need to keep the original object
      * from which this object could copy its information, but it might as well
      * take over ("move") the data.
+     *
+     * Moving data also enables using tables that are located in shared memory
+     * between multiple MPI processes, rather than copying the data from
+     * shared memory into local memory whenever one creates an
+     * InterpolatedUniformGridData object. See the
+     * TableBase::replicate_across_communicator() function on how to share a
+     * data set between multiple processes.
      */
     InterpolatedUniformGridData(
       std::array<std::pair<double, double>, dim> &&interval_endpoints,
@@ -1750,6 +1764,72 @@ namespace Functions
      * The set of coefficients.
      */
     const std::vector<double> coefficients;
+  };
+
+
+  /**
+   * A class that represents a time-dependent function object for a
+   * Rayleigh--Kothe vortex vector field. This is generally used as
+   * flow pattern in complex test cases for interface tracking methods
+   * (e.g., volume-of-fluid and level-set approaches) since it leads
+   * to strong rotation and elongation of the fluid @cite Blais2013.
+   *
+   * The stream function $\Psi$ of this Rayleigh-Kothe vortex is defined as:
+@f[
+\Psi = \frac{1}{\pi} \sin^2 (\pi x) \sin^2 (\pi y) \cos \left( \pi \frac{t}{T}
+\right)
+@f]
+   * where $T$ is half the period of the flow. The velocity profile in 2D
+($\textbf{u}=[u,v]^T$) is :
+@f{eqnarray*}{
+   u &=&  - \frac{\partial\Psi}{\partial y} = -2 \sin^2 (\pi x) \sin (\pi y)
+\cos (\pi y)  \cos \left( \pi \frac{t}{T} \right)\\ v &=&
+\frac{\partial\Psi}{\partial x} = 2 \cos(\pi x) \sin(\pi x) \sin^2 (\pi y) \cos
+\left( \pi \frac{t}{T} \right)
+@f}
+   * where $T$ is half the period of the flow.
+   *
+   * The velocity profile is illustrated in the following animation:
+   *
+@htmlonly
+<p align="center">
+  <iframe width="560" height="500"
+src="https://www.youtube.com/embed/m6hQm7etji8" frameborder="0"
+   allow="accelerometer; autoplay; encrypted-media; gyroscope;
+picture-in-picture" allowfullscreen></iframe>
+ </p>
+@endhtmlonly
+   *
+   * It can be seen that this velocity reverses periodically due to the term
+   * $\cos \left( \pi \frac{t}{T} \right)$ and that material will end up at its
+   * starting position after every period of length $t=2T$.
+   *
+   * @note This class is only implemented for 2D and 3D. In 3D, the
+   * third component is set to zero.
+   *
+   * @ingroup functions
+   */
+  template <int dim>
+  class RayleighKotheVortex : public Function<dim>
+  {
+  public:
+    /**
+     * Constructor.
+     */
+    RayleighKotheVortex(const double T = 1.0);
+
+    /**
+     * Return all components of a vector-valued function at a given point.
+     */
+    virtual void
+    vector_value(const Point<dim> &point,
+                 Vector<double>   &values) const override;
+
+  private:
+    /**
+     * Half the period of the flow.
+     */
+    const double T;
   };
 
 #ifndef DOXYGEN

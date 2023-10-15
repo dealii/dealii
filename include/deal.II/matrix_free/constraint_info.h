@@ -78,7 +78,7 @@ namespace internal
 
     /**
      * A helper class to apply constraints in matrix-free loops in
-     * user code. It combines constraint related functionalties from
+     * user code. It combines constraint related functionalities from
      * MatrixFree and FEEvaluation.
      */
     template <int dim, typename Number>

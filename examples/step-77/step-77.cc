@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Author: Wolfgang Bangerth, Colorado State University, 2021.
  * Based on step-15 by Sven Wetterauer, University of Heidelberg, 2012.

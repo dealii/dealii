@@ -14,6 +14,8 @@
 ## ---------------------------------------------------------------------
 
 print "    <ul>\n";
+use Getopt::Long;
+GetOptions("prefix:s" => \$prefix);
 
 $level = 3;
 while (<>) {
@@ -54,7 +56,7 @@ while (<>) {
           # hyperref, so get rid of the percent sign
           $text =~ s!\%!!g;
 
-          print "        <li><a href=\"#$reftext\">$text</a>\n";
+          print "        <li><a href=\"#$prefix-$reftext\">$text</a>\n";
 
           $level = $newlevel;
        }

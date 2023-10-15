@@ -97,8 +97,8 @@ test(const unsigned int n_refinements,
   MGLevelObject<AffineConstraints<Number>> constraints(min_level, max_level);
   MGLevelObject<std::unique_ptr<Mapping<dim>>> mappings(min_level, max_level);
   MGLevelObject<std::shared_ptr<MGTwoLevelTransferNonNested<dim, VectorType>>>
-                                       transfers(min_level, max_level);
-  MGLevelObject<Operator<dim, Number>> operators(min_level, max_level);
+                                          transfers(min_level, max_level);
+  MGLevelObject<Operator<dim, 1, Number>> operators(min_level, max_level);
 
 
   // set up levels
@@ -139,9 +139,8 @@ test(const unsigned int n_refinements,
       dof_handler.distribute_dofs(*fe);
 
       // set up constraints
-      IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_dofs(dof_handler,
-                                              locally_relevant_dofs);
+      const IndexSet locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
       constraint.reinit(locally_relevant_dofs);
       VectorTools::interpolate_boundary_values(
         *mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraint);

@@ -60,8 +60,7 @@ test()
   // supposed to be a map that
   // contains exactly the locally
   // relevant dofs, so test this
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
+  const IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
 
   for (unsigned int i = 0; i < dofh.n_dofs(); ++i)
     {

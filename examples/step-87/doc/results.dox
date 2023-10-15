@@ -1,0 +1,272 @@
+<h1>Results</h1>
+
+<h3>Mini example 0</h3>
+
+We present a part of the terminal output. It shows, for each point, the
+determined cell and reference position. Also, one can see that
+the values evaluated with FEValues, FEPointEvaluation, and
+VectorTools::point_values() are identical, as expected.
+
+@verbatim
+Running: example 0
+ - Found point with real coordinates: 0 0.5
+   - in cell with vertices: (0 0.4) (0.2 0.4) (0 0.6) (0.2 0.6)
+   - with coordinates on the unit cell: (0 0.5)
+ - Values at point:
+  - 0.25002 (w. FEValues)
+  - 0.25002 (w. FEPointEvaluation)
+  - 0.25002 (w. VectorTools::point_value())
+
+ - Found point with real coordinates: 0.05 0.5
+   - in cell with vertices: (0 0.4) (0.2 0.4) (0 0.6) (0.2 0.6)
+   - with coordinates on the unit cell: (0.25 0.5)
+ - Values at point:
+  - 0.20003 (w. FEValues)
+  - 0.20003 (w. FEPointEvaluation)
+  - 0.20003 (w. VectorTools::point_value())
+
+...
+
+ - Found point with real coordinates: 1 0.5
+   - in cell with vertices: (0.8 0.4) (1 0.4) (0.8 0.6) (1 0.6)
+   - with coordinates on the unit cell: (1 0.5)
+ - Values at point:
+  - 0.25002 (w. FEValues)
+  - 0.25002 (w. FEPointEvaluation)
+  - 0.25002 (w. VectorTools::point_value())
+
+ - writing csv file
+@endverbatim
+
+The CSV output is as follows and contains, in the
+first column, the distances with respect to the first point,
+the second and the third column represent the coordinates
+of the points and the fourth column the evaluated solution
+values at those points.
+
+@verbatim
+0.000     0.000     0.500     0.250
+0.050     0.050     0.500     0.200
+0.100     0.100     0.500     0.150
+0.150     0.150     0.500     0.100
+0.200     0.200     0.500     0.050
+0.250     0.250     0.500     0.000
+0.300     0.300     0.500    -0.050
+0.350     0.350     0.500    -0.100
+0.400     0.400     0.500    -0.149
+0.450     0.450     0.500    -0.200
+0.500     0.500     0.500    -0.222
+0.550     0.550     0.500    -0.200
+0.600     0.600     0.500    -0.149
+0.650     0.650     0.500    -0.100
+0.700     0.700     0.500    -0.050
+0.750     0.750     0.500     0.000
+0.800     0.800     0.500     0.050
+0.850     0.850     0.500     0.100
+0.900     0.900     0.500     0.150
+0.950     0.950     0.500     0.200
+1.000     1.000     0.500     0.250
+@endverbatim
+
+<h3>Mini example 1</h3>
+
+We show the terminal output.
+
+@verbatim
+Running: example 1
+ - writing csv file
+@endverbatim
+
+The CSV output is as follows and identical to the results
+of the serial case presented in mini example 0.
+The fifth column shows the
+user quantity evaluated additionally in this mini example.
+
+@verbatim
+0.000     0.000     0.500     0.250     0.000
+0.050     0.050     0.500     0.200     0.050
+0.100     0.100     0.500     0.150     0.100
+0.150     0.150     0.500     0.100     0.150
+0.200     0.200     0.500     0.050     0.200
+0.250     0.250     0.500     0.000     0.250
+0.300     0.300     0.500    -0.050     0.300
+0.350     0.350     0.500    -0.100     0.350
+0.400     0.400     0.500    -0.149     0.400
+0.450     0.450     0.500    -0.200     0.450
+0.500     0.500     0.500    -0.222     0.500
+0.550     0.550     0.500    -0.200     0.550
+0.600     0.600     0.500    -0.149     0.600
+0.650     0.650     0.500    -0.100     0.650
+0.700     0.700     0.500    -0.050     0.700
+0.750     0.750     0.500     0.000     0.750
+0.800     0.800     0.500     0.050     0.800
+0.850     0.850     0.500     0.100     0.850
+0.900     0.900     0.500     0.150     0.900
+0.950     0.950     0.500     0.200     0.950
+1.000     1.000     0.500     0.250     1.000
+@endverbatim
+
+
+<h3>Mini example 2</h3>
+
+We show the terminal output.
+@verbatim
+Running: example 2
+  - create system
+  - determine narrow band
+  - determine closest point iteratively
+    - iteration 0: 7076 -> 7076
+    - iteration 1: 7076 -> 104
+    - iteration 2: 104 -> 0
+  - determine distance in narrow band
+  - perform extrapolation in narrow band
+  - output results
+@endverbatim
+
+The following three plots, representing the performed iterations of the
+closest-point projection, show the current position of the closest
+points exceeding the required tolerance of the discrete interface
+of the circle and still need to
+be corrected.
+It can be seen that the numbers of points to be processed decrease
+from iteration to iteration.
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_p_0.png
+    </td>
+    <td>
+        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_p_1.png
+    </td>
+    <td>
+        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_p_2.png
+    </td>
+  </tr>
+</table>
+
+The output visualized in Paraview looks like the following: On the
+left, the original distance function is shown as the light gray surface.
+In addition, the contour values refer to the distance values determined
+from calculation of the distance to the closest points at the interface
+in the narrow band. It can be seen that the two functions coincide.
+Similarly, on the right, the original solution and the extrapolated
+solution from the interface is shown.
+
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_res_0.png
+    </td>
+    <td>
+        @image html https://www.dealii.org/images/steps/developer/step_87_ex_2_res_1.png
+    </td>
+  </tr>
+</table>
+
+<h3>Mini example 3</h3>
+
+We show a shortened version of the terminal output.
+
+@verbatim
+Running: example 3
+  - creating background mesh
+  - creating immersed mesh
+time: 0
+  - compute to be tested values (immersed mesh)
+  - test values (background mesh)
+  - write data (background mesh)
+  - write mesh (immersed mesh)
+
+time: 0.01
+  - move support points (immersed mesh)
+  - compute to be tested values (immersed mesh)
+  - test values (background mesh)
+
+time: 0.02
+  - move support points (immersed mesh)
+  - compute to be tested values (immersed mesh)
+  - test values (background mesh)
+
+...
+
+time: 2
+  - move support points (immersed mesh)
+  - compute to be tested values (immersed mesh)
+  - test values (background mesh)
+  - write data (background mesh)
+  - write mesh (immersed mesh)
+@endverbatim
+
+The output visualized in Paraview looks like the following: The deformation of
+the immersed mesh by the reversible vortex flow can be seen. Due to
+discretization errors, the shape is not exactly circular at the end, illustrated
+in the right figure. The sharp nature of the surface-tension force vector, shown
+as vector plots, can be seen by its restriction to cells that are intersected by
+the immersed mesh.
+
+<table align="center" class="doxtable">
+  <tr>
+    <td>
+        @image html https://www.dealii.org/images/steps/developer/step_87_ex_3_force.0000.png
+    </td>
+    <td>
+        @image html https://www.dealii.org/images/steps/developer/step_87_ex_3_force.0010.png
+    </td>
+    <td>
+        @image html https://www.dealii.org/images/steps/developer/step_87_ex_3_force.0020.png
+    </td>
+  </tr>
+</table>
+
+<h3>Possibilities for extension</h3>
+
+This program highlights some of the main capabilities
+of the distributed evaluation routines in deal.II. However, there are many
+related topics worth mentioning:
+- Performing a distributed search is an expensive step. That is why we suggest
+to provide hints to Utilities::MPI::RemotePointEvaluation and to reuse
+Utilities::MPI::RemotePointEvaluation
+instances in the case that the communication pattern has not changed.
+Furthermore, there  are instances where no search is needed and the points are
+already sorted into the right cells. This is the case if the points are
+generated on the cell level (see step-85; CutFEM) or the points are
+automatically sorted into the correct (neighboring) cell (see step-68; PIC with
+Particles::ParticleHandler). Having said that, the
+Particles::ParticleHandler::insert_global_particles() function uses
+the described infrastructure to perform the initial sorting of particles into
+cells.
+- We concentrated on parallelization aspects in this tutorial. However, we would
+like to point out the need for fast evaluation on cell level.
+The task for this in deal.II is FEPointEvaluation. It exploits the structure of
+@f[
+\hat{u}(\hat{\boldsymbol{x}}) = \sum_i \hat{N}_i(\hat{\boldsymbol{x}}) \hat{u}_i
+@f]
+to derive fast implementations, e.g., for tensor-product elements
+@f[
+\hat{u}(\hat{x}_0, \hat{x}_1, \hat{x}_2) =
+\sum_k \hat{N}^{\text{1D}}_k(\hat{x}_2)
+\sum_j \hat{N}^{\text{1D}}_j(\hat{x}_1)
+\sum_i \hat{N}^{\text{1D}}_i(\hat{x}_0)
+\hat{u}_{ijk}.
+@f]
+Since only 1D shape functions are queried and are re-used in re-occurring terms,
+this formulation is faster than without exploitation of the structure.
+- Utilities::MPI::RemotePointEvaluation is used in multiple places in deal.II.
+The class DataOutResample allows to output results on a different mesh than
+the computational mesh. This is useful if one wants to output the results
+on a coarser mesh or one does not want to output 3D results but instead 2D
+slices. In addition, MGTwoLevelTransferNonNested allows to prolongate solutions
+and restrict residuals between two independent meshes. By passing a sequence
+of such two-level transfer operators to MGTransferMF and, finally, to Multigrid,
+non-nested multigrid can be computed.
+- Utilities::MPI::RemotePointEvaluation can be used to couple non-matching
+grids via surfaces (example: fluid-structure interaction, independently created
+grids). The evaluation points can come from any side (pointwise interpolation)
+or are defined on intersected meshes (Nitsche-type mortaring
+@cite heinz2022high). Concerning the creation of such intersected meshes and the
+corresponding evaluation points, see
+GridTools::internal::distributed\_compute_intersection_locations().
+- Alternatively to the coupling via Utilities::MPI::RemotePointEvaluation,
+preCICE @cite bungartz2016precice @cite chourdakis2021precice can be used. The
+code-gallery program "Laplace equation coupled to an external simulation
+program" shows how to use this library with deal.II.

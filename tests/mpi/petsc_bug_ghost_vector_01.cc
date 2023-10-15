@@ -222,9 +222,9 @@ test()
     DoFHandler<2> handler(fluid_triangulation);
     handler.distribute_dofs(fe);
 
-    IndexSet locally_owned_dofs    = handler.locally_owned_dofs();
-    IndexSet locally_relevant_dofs = handler.locally_owned_dofs();
-    DoFTools::extract_locally_relevant_dofs(handler, locally_relevant_dofs);
+    const IndexSet &locally_owned_dofs = handler.locally_owned_dofs();
+    const IndexSet  locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(handler);
 
 
     PETScWrappers::MPI::Vector vector;

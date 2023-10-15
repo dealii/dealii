@@ -307,6 +307,9 @@ namespace internal
               data[direction].check_and_set_shapes_symmetric();
             }
 
+          if (dim == 3)
+            face_orientations_quad = compute_orientation_table(n_q_points_1d);
+
           return;
         }
       else if (quad_in.is_tensor_product() == false ||

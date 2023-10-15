@@ -106,9 +106,9 @@ test()
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
 
-  IndexSet locally_owned_dofs = dof_handler.locally_owned_dofs();
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   PETScWrappers::MPI::Vector x(locally_owned_dofs, MPI_COMM_WORLD);
   PETScWrappers::MPI::Vector x_relevant(locally_owned_dofs,

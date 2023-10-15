@@ -193,19 +193,23 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 
   std::unique_ptr<DoFHandler<dim>> dof1(make_dof_handler(*tria, fe1));
   std::unique_ptr<DoFHandler<dim>> dof2(make_dof_handler(*tria, fe2));
-  AffineConstraints<double>        cm1;
+
+  const IndexSet &locally_owned_dofs1 = dof1->locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs1 =
+    DoFTools::extract_locally_relevant_dofs(*dof1);
+  const IndexSet &locally_owned_dofs2 = dof2->locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs2 =
+    DoFTools::extract_locally_relevant_dofs(*dof2);
+
+  AffineConstraints<typename VectorType::value_type> cm1(
+    locally_owned_dofs1, locally_relevant_dofs1);
   DoFTools::make_hanging_node_constraints(*dof1, cm1);
   cm1.close();
-  AffineConstraints<double> cm2;
+  AffineConstraints<typename VectorType::value_type> cm2(
+    locally_owned_dofs2, locally_relevant_dofs2);
   DoFTools::make_hanging_node_constraints(*dof2, cm2);
   cm2.close();
 
-  IndexSet locally_owned_dofs1 = dof1->locally_owned_dofs();
-  IndexSet locally_relevant_dofs1;
-  DoFTools::extract_locally_relevant_dofs(*dof1, locally_relevant_dofs1);
-  IndexSet locally_owned_dofs2 = dof2->locally_owned_dofs();
-  IndexSet locally_relevant_dofs2;
-  DoFTools::extract_locally_relevant_dofs(*dof2, locally_relevant_dofs2);
 
   VectorType in_ghosted =
     build_ghosted<VectorType>(locally_owned_dofs1, locally_relevant_dofs1);
@@ -324,19 +328,20 @@ check_this_dealii(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 
   std::unique_ptr<DoFHandler<dim>> dof1(make_dof_handler(*tria, fe1));
   std::unique_ptr<DoFHandler<dim>> dof2(make_dof_handler(*tria, fe2));
-  AffineConstraints<double>        cm1;
+
+  const IndexSet &locally_owned_dofs1 = dof1->locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs1 =
+    DoFTools::extract_locally_relevant_dofs(*dof1);
+  const IndexSet &locally_owned_dofs2 = dof2->locally_owned_dofs();
+  const IndexSet  locally_relevant_dofs2 =
+    DoFTools::extract_locally_relevant_dofs(*dof2);
+
+  AffineConstraints<double> cm1(locally_owned_dofs1, locally_relevant_dofs1);
   DoFTools::make_hanging_node_constraints(*dof1, cm1);
   cm1.close();
-  AffineConstraints<double> cm2;
+  AffineConstraints<double> cm2(locally_owned_dofs2, locally_relevant_dofs2);
   DoFTools::make_hanging_node_constraints(*dof2, cm2);
   cm2.close();
-
-  IndexSet locally_owned_dofs1 = dof1->locally_owned_dofs();
-  IndexSet locally_relevant_dofs1;
-  DoFTools::extract_locally_relevant_dofs(*dof1, locally_relevant_dofs1);
-  IndexSet locally_owned_dofs2 = dof2->locally_owned_dofs();
-  IndexSet locally_relevant_dofs2;
-  DoFTools::extract_locally_relevant_dofs(*dof2, locally_relevant_dofs2);
 
   VectorType in_ghosted =
     build_ghosted<VectorType>(locally_owned_dofs1, locally_relevant_dofs1);

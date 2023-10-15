@@ -3606,7 +3606,7 @@ public:
 
   /**
    * Save the triangulation into the given file. Internally, this
-   * function calls the save funtion which uses BOOST archives. This
+   * function calls the save function which uses BOOST archives. This
    * is a placeholder implementation that, in the near future, will also
    * attach the data associated with the triangulation
    */

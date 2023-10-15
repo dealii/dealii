@@ -32,7 +32,7 @@ jobs:
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: info
       run: |
         g++ -v
@@ -46,20 +46,13 @@ jobs:
       run: |
         make VERBOSE=1 -j2
         make -j3 test # quicktests
-    - name: archive error 1
+    - name: upload CMakeCongiureLog
       uses: actions/upload-artifact@v3
       if: always()
       continue-on-error: true
       with:
-        name: osx-serial-CMakeOutput.log
-        path: CMakeFiles/CMakeOutput.log
-    - name: archive error 2
-      uses: actions/upload-artifact@v3
-      if: always()
-      continue-on-error: true
-      with:
-        name: osx-serial-CMakeError.log
-        path: CMakeFiles/CMakeError.log
+        name: osx-serial-CMakeConfigureLog.yaml
+        path: CMakeFiles/CMakeConfigureLog.yaml
 
   osx-parallel64:
     # MPI build using apple clang and 64 bit indices
@@ -76,7 +69,7 @@ jobs:
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: setup
       run: |
         brew install openmpi
@@ -97,18 +90,11 @@ jobs:
       run: |
         make VERBOSE=1 -j2
         make -j3 test #quicktests
-    - name: archive error 1
+    - name: upload CMakeConfigureLog
       uses: actions/upload-artifact@v3
       if: always()
       continue-on-error: true
       with:
-        name: osx-parallel64-CMakeOutput.log
-        path: CMakeFiles/CMakeOutput.log
-    - name: archive error 2
-      uses: actions/upload-artifact@v3
-      if: always()
-      continue-on-error: true
-      with:
-        name: osx-parallel64-CMakeError.log
-        path: CMakeFiles/CMakeError.log
+        name: osx-parallel64-CMakeConfigureLog.yaml
+        path: CMakeFiles/CMakeConfigureLog.yaml
 

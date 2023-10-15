@@ -49,9 +49,59 @@ namespace RepartitioningPolicyTools
   template <int dim, int spacedim>
   class Base;
 }
+
+template <int dim, typename Number>
+class MGTransferMF;
 #endif
 
 
+namespace mg
+{
+  /**
+   * A structure with boost::signal objects for optional processing in a
+   * non-nested multigrid solver.
+   *
+   * Similarly to mg::Signals, each signal is called twice: once before and
+   * once after the action is performed. The two calls only differ in the
+   * booleanargument @p before, which is true the first time and false the
+   * second.
+   *
+   */
+  struct SignalsNonNested
+  {
+    /**
+     * This signal is triggered before and after the call to the actual
+     * evaluation function inside RemotePointEvaluation::evaluate_and_process()
+     * during prolongation.
+     */
+    boost::signals2::signal<void(const bool before)> prolongation_cell_loop;
+
+    /**
+     * This signal is triggered before and after the call to the actual
+     * evaluation function inside RemotePointEvaluation::process_and_evaluate()
+     * during restriction.
+     */
+    boost::signals2::signal<void(const bool before)> restriction_cell_loop;
+
+    /**
+     * This signal is triggered before and after the call to
+     * RemotePointEvaluation::evaluate_and_process() used in
+     * MGTwoLevelTransferNonNested::prolongate_and_add(). The difference
+     * with the @p prolongation_cell_loop signal is that also the
+     * communication phase is included.
+     */
+    boost::signals2::signal<void(const bool before)> prolongation;
+
+    /**
+     * This signal is triggered before and after the call to
+     * RemotePointEvaluation::process_and_evaluate() used in
+     * MGTwoLevelTransferNonNested::restrict_and_add(). Similarly to
+     * the @p restriction_cell_loop signal, also the communication phase is
+     * included.
+     */
+    boost::signals2::signal<void(const bool before)> restriction;
+  };
+} // namespace mg
 
 /**
  * Global coarsening utility functions.
@@ -219,6 +269,11 @@ public:
   using VectorType = LinearAlgebra::distributed::Vector<Number>;
 
   /**
+   * Default constructor.
+   */
+  MGTwoLevelTransferBase();
+
+  /**
    * Perform prolongation.
    */
   void
@@ -308,6 +363,7 @@ protected:
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
     const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine,
+    bool &vec_fine_needs_ghost_update,
     internal::MatrixFreeFunctions::ConstraintInfo<
       dim,
       VectorizedArray<Number, width>> &constraint_info_coarse,
@@ -333,6 +389,11 @@ public:
 
 protected:
   /**
+   * Internal vector on that the actual prolongation/restriction is performed.
+   */
+  mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
+
+  /**
    * Internal vector needed for collecting all degrees of freedom of the fine
    * cells. It is only initialized if the fine-level DoF indices touch DoFs
    * other than the locally active ones (which we always assume can be
@@ -342,9 +403,9 @@ protected:
   mutable LinearAlgebra::distributed::Vector<Number> vec_fine;
 
   /**
-   * Internal vector on that the actual prolongation/restriction is performed.
+   * Bool indicating whether fine vector has relevant ghost values.
    */
-  mutable LinearAlgebra::distributed::Vector<Number> vec_coarse;
+  bool vec_fine_needs_ghost_update;
 
   /**
    * Embedded partitioner for efficient communication if locally relevant DoFs
@@ -648,7 +709,19 @@ private:
    */
   unsigned int n_components;
 
+  /**
+   * Pointer to the DoFHandler object used during initialization.
+   */
+  SmartPointer<const DoFHandler<dim>> dof_handler_fine;
+
+  /**
+   * Muligird level used during initialization.
+   */
+  unsigned int mg_level_fine;
+
   friend class internal::MGTwoLevelTransferImplementation;
+
+  friend class MGTransferMF<dim, Number>;
 };
 
 
@@ -704,6 +777,8 @@ class MGTwoLevelTransferNonNested<dim,
 {
 private:
   using VectorizedArrayType = VectorizedArray<Number, 1>;
+
+  mg::SignalsNonNested signals_non_nested;
 
 public:
   /**
@@ -798,6 +873,30 @@ public:
   std::size_t
   memory_consumption() const override;
 
+  /**
+   * Connect a function to mg::SignalsNonNested::prolongation_cell_loop.
+   */
+  boost::signals2::connection
+  connect_prolongation_cell_loop(const std::function<void(const bool)> &slot);
+
+  /**
+   * Connect a function to mg::SignalsNonNested::restriction_cell_loop.
+   */
+  boost::signals2::connection
+  connect_restriction_cell_loop(const std::function<void(const bool)> &slot);
+
+  /**
+   * Connect a function to mg::SignalsNonNested::prolongation.
+   */
+  boost::signals2::connection
+  connect_prolongation(const std::function<void(const bool)> &slot);
+
+  /**
+   * Connect a function to mg::SignalsNonNested::restriction.
+   */
+  boost::signals2::connection
+  connect_restriction(const std::function<void(const bool)> &slot);
+
 protected:
   AdditionalData additional_data;
   /**
@@ -836,6 +935,16 @@ private:
     const LinearAlgebra::distributed::Vector<Number> &src) const;
 
   /**
+   * Pointer to the DoFHandler object used during initialization.
+   */
+  SmartPointer<const DoFHandler<dim>> dof_handler_fine;
+
+  /**
+   * Multigrid level used during initialization.
+   */
+  unsigned int mg_level_fine;
+
+  /**
    * Object to evaluate shape functions on one mesh on visited support points of
    * the other mesh.
    */
@@ -870,6 +979,8 @@ private:
    * point.
    */
   std::vector<unsigned int> level_dof_indices_fine_ptrs;
+
+  friend class MGTransferMF<dim, Number>;
 };
 
 
@@ -881,7 +992,7 @@ private:
  * sequence of functions calls for setup is:
  * @code
  * MGTransferGlobalCoarsening mg_transfer;
- * mg_transfer.intitialize_two_level_transfers(two_level_transfers);
+ * mg_transfer.initialize_two_level_transfers(two_level_transfers);
  * mg_transfer.build(partitioners);
  * @endcode
  *
@@ -917,7 +1028,7 @@ public:
    *
    * @note See also MGTransferMatrixFree.
    */
-  MGTransferMF() = default;
+  MGTransferMF();
 
   /**
    * @name Global coarsening.
@@ -943,7 +1054,7 @@ public:
    */
   template <typename MGTwoLevelTransferObject>
   void
-  intitialize_two_level_transfers(
+  initialize_two_level_transfers(
     const MGLevelObject<MGTwoLevelTransferObject> &transfer);
 
   /**
@@ -989,10 +1100,21 @@ public:
   void
   initialize_constraints(const MGConstrainedDoFs &mg_constrained_dofs);
 
+  /** @} */
+
+  /**
+   * @name Global coarsening and local smoothing.
+   */
+  /** @{ */
+
   /**
    * Actually build the information for the prolongation for each level.
    *
-   * @note See also MGTransferMatrixFree.
+   * @note In the case of global coarsening, you can pass a @p dof_handler
+   * with different DoF numbering as the one used within the provided
+   * two-level transfer objects  into this function. In this case, vector
+   * entries are permuted during copy_to_mg(), copy_from_mg(), and
+   * interpolate_to_mg().
    */
   void
   build(const DoFHandler<dim> &dof_handler,
@@ -1003,7 +1125,10 @@ public:
    * Same as above but taking a lambda for initializing vector instead of
    * partitioners.
    *
-   * @note See also MGTransferMatrixFree.
+   * @note In the case of global coarsening, you can pass into this function
+   * a @p dof_handler with different DoF numbering as the one used within the
+   * provided two-level transfer objects. In this case, vector entries are
+   * permuted during copy_to_mg(), copy_from_mg(), and interpolate_to_mg().
    */
   void
   build(const DoFHandler<dim> &dof_handler,
@@ -1013,7 +1138,7 @@ public:
   /** @} */
 
   /**
-   * @name Tranfer functions.
+   * @name Transfer functions.
    */
   /** @{ */
 
@@ -1042,10 +1167,13 @@ public:
                    const VectorType  &src) const override;
 
   /**
-   * Initialize internal vectors and copy @p src vector to the finest
-   * multigrid level.
+   * Initialize internal vectors and copy @p src vector
+   * (associated to @p dof_handler) to the finest multigrid level.
    *
-   * @note DoFHandler is not needed here, but is required by the interface.
+   * @note The @p dof_handler object needs to be the same as the DoFHandler passed
+   * directly to the function build() or indirectly to the function
+   * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
+   * need to be same.
    */
   template <class InVector>
   void
@@ -1054,10 +1182,13 @@ public:
              const InVector            &src) const;
 
   /**
-   * Initialize internal vectors and copy the values on the finest
-   * multigrid level to @p dst vector.
+   * Copy the values on the finest multigrid level to @p dst
+   * vector (associated to @p dof_handler).
    *
-   * @note DoFHandler is not needed here, but is required by the interface.
+   * @note The @p dof_handler object needs to be the same as the DoFHandler passed
+   * directly to the function build() or indirectly to the function
+   * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
+   * need to be same.
    */
   template <class OutVector>
   void
@@ -1066,32 +1197,40 @@ public:
                const MGLevelObject<VectorType> &src) const;
 
   /**
-   * Interpolate fine-mesh field @p src to each multigrid level in
-   * @p dof_handler and store the result in @p dst. This function is different
-   * from restriction, where a weighted residual is
-   * transferred to a coarser level (transposition of prolongation matrix).
+   * Interpolate fine-mesh field @p src (associated to @p dof_handler)
+   * to each multigrid level and
+   * store the result in @p dst. This function is different from
+   * restriction, where a weighted residual is transferred to a coarser
+   * level (transposition of prolongation matrix).
    *
    * The argument @p dst has to be initialized with the correct size according
    * to the number of levels of the triangulation.
    *
    * If an inner vector of @p dst is empty or has incorrect locally owned size,
    * it will be resized to locally relevant degrees of freedom on each level.
-   */
-  template <class InVector>
-  void
-  interpolate_to_mg(MGLevelObject<VectorType> &dst, const InVector &src) const;
-
-  /**
-   * Like the above function but with a user-provided DoFHandler as
-   * additional argument. However, this DoFHandler is not used internally, but
-   * is required to be able to use MGTransferMF and
-   * MGTransferMatrixFree as template argument.
+   *
+   * @note The @p dof_handler object needs to be the same as the DoFHandler passed
+   * directly to the function build() or indirectly to the function
+   * initialize_two_level_transfers(). Alternatively, the numbering of the DoFs
+   * need to be same.
    */
   template <class InVector>
   void
   interpolate_to_mg(const DoFHandler<dim>     &dof_handler,
                     MGLevelObject<VectorType> &dst,
                     const InVector            &src) const;
+
+  /**
+   * Interpolate fine-mesh field @p src to each multigrid level and
+   * store the result in @p dst.
+   *
+   * @note In contrast to the last function, no @p dof_handler object needs passed.
+   * This function used the DoFHandler passed directly to the function build()
+   * or indirectly to the function initialize_two_level_transfers().
+   */
+  template <class InVector>
+  void
+  interpolate_to_mg(MGLevelObject<VectorType> &dst, const InVector &src) const;
 
   /** @} */
 
@@ -1137,16 +1276,31 @@ private:
    * @note See also MGTransferMatrixFree.
    */
   void
-  intitialize_internal_transfer(
+  initialize_internal_transfer(
     const DoFHandler<dim>                       &dof_handler,
     const SmartPointer<const MGConstrainedDoFs> &mg_constrained_dofs);
+
+  /**
+   * Retrieve finest DoFHandler from two-level transfer objects.
+   */
+  std::pair<const DoFHandler<dim> *, unsigned int>
+  get_dof_handler_fine() const;
+
+  /**
+   * Initialize copy indices for MGTransferMF::copy_to_mg(),
+   * MGTransferMF::copy_to_mg(), and MGTransferMF::interpolate_to_mg()
+   * in the case of global coarsening.
+   */
+  void
+  fill_and_communicate_copy_indices_global_coarsening(
+    const DoFHandler<dim> &dof_handler);
 
   /**
    * Set references to two-level transfer operators to be used.
    */
   template <typename MGTwoLevelTransferObject>
   void
-  intitialize_transfer_references(
+  initialize_transfer_references(
     const MGLevelObject<MGTwoLevelTransferObject> &transfer);
 
   /**
@@ -1158,6 +1312,14 @@ private:
                         VectorType        &vector,
                         const InVector    &vector_reference,
                         const bool         omit_zeroing_entries) const;
+
+  /**
+   * Check that the internal DoFHandler is compatible with the external one
+   * provided by copy_to_mg(), copy_from_mg() and interpolate_to_mg()
+   * used, e.g., by PreconditionMG.
+   */
+  void
+  assert_dof_handler(const DoFHandler<dim> &dof_handler_out) const;
 
   /**
    * Internal transfer operator.
@@ -1290,7 +1452,10 @@ MGTransferMF<dim, Number>::MGTransferMF(
   const std::function<void(const unsigned int, VectorType &)>
     &initialize_dof_vector)
 {
-  this->intitialize_transfer_references(transfer);
+  this->transfer.clear();
+  this->internal_transfer.clear();
+
+  this->initialize_transfer_references(transfer);
   this->build(initialize_dof_vector);
 }
 
@@ -1299,10 +1464,10 @@ MGTransferMF<dim, Number>::MGTransferMF(
 template <int dim, typename Number>
 template <typename MGTwoLevelTransferObject>
 void
-MGTransferMF<dim, Number>::intitialize_two_level_transfers(
+MGTransferMF<dim, Number>::initialize_two_level_transfers(
   const MGLevelObject<MGTwoLevelTransferObject> &transfer)
 {
-  this->intitialize_transfer_references(transfer);
+  this->initialize_transfer_references(transfer);
 }
 
 
@@ -1310,7 +1475,7 @@ MGTransferMF<dim, Number>::intitialize_two_level_transfers(
 template <int dim, typename Number>
 template <typename MGTwoLevelTransferObject>
 void
-MGTransferMF<dim, Number>::intitialize_transfer_references(
+MGTransferMF<dim, Number>::initialize_transfer_references(
   const MGLevelObject<MGTwoLevelTransferObject> &transfer)
 {
   const unsigned int min_level = transfer.min_level();
@@ -1349,7 +1514,7 @@ MGTransferMF<dim, Number>::initialize_dof_vector(
       partitioner = external_partitioners[level - transfer.min_level()];
     }
 
-  // check if vectors are already correctly initalized
+  // check if vectors are already correctly initialized
 
   // yes: same partitioners are used
   if (vec.get_partitioner().get() == partitioner.get())
@@ -1381,7 +1546,7 @@ MGTransferMF<dim, Number>::copy_to_mg(const DoFHandler<dim>     &dof_handler,
                                       MGLevelObject<VectorType> &dst,
                                       const InVector            &src) const
 {
-  (void)dof_handler;
+  assert_dof_handler(dof_handler);
 
   for (unsigned int level = dst.min_level(); level <= dst.max_level(); ++level)
     {
@@ -1440,7 +1605,7 @@ MGTransferMF<dim, Number>::copy_from_mg(
   OutVector                       &dst,
   const MGLevelObject<VectorType> &src) const
 {
-  (void)dof_handler;
+  assert_dof_handler(dof_handler);
 
   if (this->perform_plain_copy)
     {
@@ -1492,6 +1657,22 @@ void
 MGTransferMF<dim, Number>::interpolate_to_mg(MGLevelObject<VectorType> &dst,
                                              const InVector &src) const
 {
+  DoFHandler<dim> dof_handler_dummy;
+
+  this->interpolate_to_mg(dof_handler_dummy, dst, src);
+}
+
+
+
+template <int dim, typename Number>
+template <class InVector>
+void
+MGTransferMF<dim, Number>::interpolate_to_mg(const DoFHandler<dim> &dof_handler,
+                                             MGLevelObject<VectorType> &dst,
+                                             const InVector &src) const
+{
+  assert_dof_handler(dof_handler);
+
   const unsigned int min_level = transfer.min_level();
   const unsigned int max_level = transfer.max_level();
 
@@ -1550,20 +1731,6 @@ MGTransferMF<dim, Number>::interpolate_to_mg(MGLevelObject<VectorType> &dst,
             this->transfer[l]->interpolate(dst[l - 1], dst[l]);
         }
     }
-}
-
-
-
-template <int dim, typename Number>
-template <class InVector>
-void
-MGTransferMF<dim, Number>::interpolate_to_mg(const DoFHandler<dim> &dof_handler,
-                                             MGLevelObject<VectorType> &dst,
-                                             const InVector &src) const
-{
-  (void)dof_handler;
-
-  this->interpolate_to_mg(dst, src);
 }
 
 #endif

@@ -1331,7 +1331,7 @@ namespace Step44
             BlockVector<double> solution_delta_trial(newton_update);
             solution_delta_trial *= ss;
             this->constraints.distribute(solution_delta_trial);
-            // Now add the constribution from the previously accepted solution
+            // Now add the contribution from the previously accepted solution
             // history.
             solution_delta_trial += solution_delta;
 

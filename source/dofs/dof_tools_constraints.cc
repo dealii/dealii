@@ -571,9 +571,9 @@ namespace DoFTools
                 if (std::fabs(face_constraints(row, i)) >= 1e-14 * abs_sum)
                   entries.emplace_back(primary_dofs[i],
                                        face_constraints(row, i));
-              constraints.add_line(dependent_dofs[row]);
-              constraints.add_entries(dependent_dofs[row], entries);
-              constraints.set_inhomogeneity(dependent_dofs[row], 0.);
+              constraints.add_constraint(dependent_dofs[row],
+                                         entries,
+                                         /* inhomogeneity= */ 0.);
             }
       }
 
@@ -2225,10 +2225,9 @@ namespace DoFTools
       // matrix, we assume that for a 0* rotation we would have to build the
       // identity matrix
 
-      Assert(matrix.m() == spacedim, ExcInternalError())
+      Assert(matrix.m() == spacedim, ExcInternalError());
 
-        Quadrature<dim - 1>
-          quadrature(fe.get_unit_face_support_points(face_no));
+      Quadrature<dim - 1> quadrature(fe.get_unit_face_support_points(face_no));
 
       // have an array that stores the location of each vector-dof tuple we want
       // to rotate.
@@ -2725,7 +2724,7 @@ namespace DoFTools
         // when on cell 1, we compute the weights of dof 'x' to be 1/2 from
         // parameter dofs 0 and 1, respectively. however, when later we are on
         // cell 2, we again compute the prolongation of shape function 1
-        // restricted to cell 2 to the globla grid and find that the weight of
+        // restricted to cell 2 to the global grid and find that the weight of
         // global dof 'x' now is zero. however, we should not overwrite the old
         // value.
         //
@@ -2894,10 +2893,9 @@ namespace DoFTools
               }
 
 
-            IndexSet locally_relevant_dofs;
-            DoFTools::extract_locally_relevant_dofs(
-              coarse_to_fine_grid_map.get_destination_grid(),
-              locally_relevant_dofs);
+            const IndexSet locally_relevant_dofs =
+              DoFTools::extract_locally_relevant_dofs(
+                coarse_to_fine_grid_map.get_destination_grid());
 
             copy_data.global_parameter_representation[i].reinit(
               coarse_to_fine_grid_map.get_destination_grid()

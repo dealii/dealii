@@ -14,6 +14,8 @@
 ## ---------------------------------------------------------------------
 
 print "    <ul>\n";
+use Getopt::Long;
+GetOptions("prefix:s" => \$prefix);
 
 $level = 3;
 while (<>) {
@@ -52,7 +54,7 @@ while (<>) {
         # replace double dashes in comments by &mdash;
 	$text =~ s!--!&mdash;!g;
 
-	print "        <li><a href=\"#$reftext\">$text</a>\n";
+	print "        <li><a href=\"#$prefix-$reftext\">$text</a>\n";
 
 	$level = $newlevel;
     } 

@@ -45,8 +45,6 @@
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
 
-#include <sstream>
-
 #include "../tests.h"
 
 const double R0 = 0.5; // 6371000.-2890000.;
@@ -129,13 +127,9 @@ test()
 
   dofh.distribute_dofs(fe);
 
-  IndexSet owned_set = dofh.locally_owned_dofs();
-
-  IndexSet dof_set;
-  DoFTools::extract_locally_active_dofs(dofh, dof_set);
-
-  IndexSet relevant_set;
-  DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
+  IndexSet owned_set    = dofh.locally_owned_dofs();
+  IndexSet dof_set      = DoFTools::extract_locally_active_dofs(dofh);
+  IndexSet relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
 
   TrilinosWrappers::MPI::Vector x;
   x.reinit(owned_set, MPI_COMM_WORLD);
@@ -203,11 +197,9 @@ test()
 
       dofh.distribute_dofs(fe);
 
-      owned_set = dofh.locally_owned_dofs();
-
-      DoFTools::extract_locally_active_dofs(dofh, dof_set);
-
-      DoFTools::extract_locally_relevant_dofs(dofh, relevant_set);
+      owned_set    = dofh.locally_owned_dofs();
+      dof_set      = DoFTools::extract_locally_active_dofs(dofh);
+      relevant_set = DoFTools::extract_locally_relevant_dofs(dofh);
 
       x.reinit(owned_set, MPI_COMM_WORLD);
 

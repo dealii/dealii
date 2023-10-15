@@ -458,7 +458,7 @@ produces the saddle on the right.
   </div>
 </div>
 
-<a name="extensions"></a>
+<a name="step-60-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 <h4> Running with `spacedim` equal to three</h4>

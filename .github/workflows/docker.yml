@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - 'docker*'
-      - 'master'
+  schedule:
+  - cron: '0 */12 * * *'
 
 permissions:
   contents: read
@@ -12,40 +13,44 @@ permissions:
 
 jobs:
   build-master-docker:
+    if: (github.event_name == 'schedule' && github.repository == 'dealii/dealii') || github.event_name != 'schedule'
+
+    name: build master docker ${{ matrix.ubuntu_version }}
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_version: [focal, jammy]
+        # Use 2 jobs to build, but only 1 for the focal image
+        # as it starves the github machine for memory.
+        include:
+          - n_jobs: 2
+          - n_jobs: 1
+            ubuntu_version: focal
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image of master focal
-        uses: docker/build-push-action@v4
+      - name: Build and push Docker image of master ${{ matrix.ubuntu_version }}
+        uses: docker/build-push-action@v5
         with:
           context: ./contrib/docker/
-          cache-from: type=registry,ref=dealii/dependencies:focal
+          cache-from: type=registry,ref=dealii/dependencies:${{ matrix.ubuntu_version }}
           cache-to: type=inline
           build-args: |
+            IMG=${{ matrix.ubuntu_version }}
+            NJOBS=${{ matrix.n_jobs }}
             VER=master
-            IMG=focal
-          push: ${{github.ref_name == 'master'}}
-          tags: dealii/dealii:master-focal
-
-      - name: Build and push Docker image of master jammy
-        uses: docker/build-push-action@v4
-        with:
-          context: ./contrib/docker/
-          cache-from: type=registry,ref=dealii/dependencies:jammy
-          cache-to: type=inline
-          build-args: |
-            VER=master
-            IMG=jammy
-          push: ${{github.ref_name == 'master'}}
-          tags: dealii/dealii:master-jammy
+          push: ${{ github.event_name == 'schedule' }}
+          tags: dealii/dealii:master-${{ matrix.ubuntu_version }}

@@ -1,4 +1,4 @@
-<a name="Results"></a>
+<a name="step-29-Results"></a>
 <h1>Results</h1>
 
 The current program reads its run-time parameters from an input file
@@ -183,7 +183,7 @@ other parts of the program scale very nicely.
 
 
 
-<a name="extensions"></a>
+<a name="step-29-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 An obvious possible extension for this program is to run it in 3d

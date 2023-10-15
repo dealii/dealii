@@ -97,16 +97,6 @@ namespace TrilinosWrappers
     PreconditionBase();
 
     /**
-     * Copy constructor.
-     */
-    PreconditionBase(const PreconditionBase &);
-
-    /**
-     * Destructor.
-     */
-    ~PreconditionBase() override = default;
-
-    /**
      * Destroys the preconditioner, leaving an object like just after having
      * called the constructor.
      */
@@ -237,12 +227,6 @@ namespace TrilinosWrappers
      * from deal.II format.
      */
     Epetra_MpiComm communicator;
-
-    /**
-     * Internal Trilinos map in case the matrix needs to be copied from
-     * deal.II format.
-     */
-    std::shared_ptr<Epetra_Map> vector_distributor;
   };
 
 

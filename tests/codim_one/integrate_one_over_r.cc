@@ -93,7 +93,7 @@ main()
                     deallog << std::endl;
                   else
                     deallog
-                      << ", desing: " << approx_integral_2 - exact_integral
+                      << ", design: " << approx_integral_2 - exact_integral
                       << std::endl;
                 }
             }

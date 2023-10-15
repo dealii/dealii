@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------
 //
-// Copyright (C) 2003 - 2021 by the deal.II authors
+// Copyright (C) 2003 - 2023 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -13,6 +13,8 @@
 //
 // ---------------------------------------------------------------------
 
+#ifndef dealii_tests_shapes_h
+#define dealii_tests_shapes_h
 
 // Show the shape functions implemented.
 
@@ -515,3 +517,5 @@ test_compute_functions(const Mapping<dim>       &mapping,
       check_values_and_derivatives(fe, fe_values, q);
     };
 }
+
+#endif

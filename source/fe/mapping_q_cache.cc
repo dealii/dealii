@@ -311,9 +311,9 @@ MappingQCache<dim, spacedim>::initialize(
   // Step 1: copy global vector so that the ghost values are such that the
   // cache can be set up for all ghost cells
   LinearAlgebra::distributed::Vector<typename VectorType::value_type>
-           vector_ghosted;
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+                 vector_ghosted;
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
   vector_ghosted.reinit(dof_handler.locally_owned_dofs(),
                         locally_relevant_dofs,
                         dof_handler.get_communicator());
@@ -515,10 +515,8 @@ MappingQCache<dim, spacedim>::initialize(
 
   for (unsigned int l = vectors.min_level(); l <= vectors.max_level(); ++l)
     {
-      IndexSet locally_relevant_dofs;
-      DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                    l,
-                                                    locally_relevant_dofs);
+      const IndexSet locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_level_dofs(dof_handler, l);
       vectors_ghosted[l].reinit(dof_handler.locally_owned_mg_dofs(l),
                                 locally_relevant_dofs,
                                 dof_handler.get_communicator());

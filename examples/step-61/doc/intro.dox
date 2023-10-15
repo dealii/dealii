@@ -6,7 +6,7 @@ Some more information about this program, as well as more numerical
 results, are presented in @cite Wang2019 .
 </i>
 
-<a name="Intro"></a>
+<a name="step-61-Intro"></a>
 <h1>Introduction</h1>
 
 This tutorial program presents an implementation of the "weak Galerkin"

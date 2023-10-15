@@ -12,9 +12,8 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
- * Author: Katharina Kormann, Martin Kronbichler, Uppsala University, 2011-2012
+ * Authors: Katharina Kormann, Martin Kronbichler, Uppsala University, 2011-2012
  */
 
 
@@ -376,18 +375,13 @@ namespace Step48
     GridGenerator::hyper_cube(triangulation, -15, 15);
     triangulation.refine_global(n_global_refinements);
     {
-      typename Triangulation<dim>::active_cell_iterator
-        cell     = triangulation.begin_active(),
-        end_cell = triangulation.end();
-      for (; cell != end_cell; ++cell)
+      for (const auto &cell : triangulation.active_cell_iterators())
         if (cell->is_locally_owned())
           if (cell->center().norm() < 11)
             cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
 
-      cell     = triangulation.begin_active();
-      end_cell = triangulation.end();
-      for (; cell != end_cell; ++cell)
+      for (const auto &cell : triangulation.active_cell_iterators())
         if (cell->is_locally_owned())
           if (cell->center().norm() < 6)
             cell->set_refine_flag();
@@ -395,12 +389,7 @@ namespace Step48
     }
 
     pcout << "   Number of global active cells: "
-#ifdef DEAL_II_WITH_P4EST
-          << triangulation.n_global_active_cells()
-#else
-          << triangulation.n_active_cells()
-#endif
-          << std::endl;
+          << triangulation.n_global_active_cells() << std::endl;
 
     dof_handler.distribute_dofs(fe);
 
@@ -410,9 +399,9 @@ namespace Step48
 
     // We generate hanging node constraints for ensuring continuity of the
     // solution. As in step-40, we need to equip the constraint matrix with
-    // the IndexSet of locally relevant degrees of freedom to avoid it to
-    // consume too much memory for big problems. Next, the <code> MatrixFree
-    // </code> object for the problem is set up. Note that we specify a
+    // the IndexSet of locally active and locally relevant degrees of freedom
+    // to avoid it consuming too much memory for big problems. Next, the
+    // MatrixFree object for the problem is set up. Note that we specify a
     // particular scheme for shared-memory parallelization (hence one would
     // use multithreading for intra-node parallelism and not MPI; we here
     // choose the standard option &mdash; if we wanted to disable shared
@@ -429,7 +418,7 @@ namespace Step48
     locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);
     constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
+    constraints.reinit(dof_handler.locally_owned_dofs(), locally_relevant_dofs);
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     constraints.close();
 

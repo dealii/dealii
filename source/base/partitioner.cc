@@ -23,6 +23,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifndef DOXYGEN
 namespace Utilities
 {
   namespace MPI
@@ -79,7 +80,7 @@ namespace Utilities
     {
       types::global_dof_index prefix_sum = 0;
 
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
       const int ierr =
         MPI_Exscan(&local_size,
                    &prefix_sum,
@@ -88,7 +89,7 @@ namespace Utilities
                    MPI_SUM,
                    communicator);
       AssertThrowMPI(ierr);
-#endif
+#  endif
 
       local_range_data = {prefix_sum, prefix_sum + local_size};
 
@@ -216,7 +217,7 @@ namespace Utilities
 
       // find out the end index for each processor and communicate it (this
       // implies the start index for the next processor)
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
       if (n_procs < 2)
         {
           Assert(ghost_indices_data.n_elements() == 0, ExcInternalError());
@@ -339,7 +340,7 @@ namespace Utilities
                                                local_range_data.first);
         }
 
-#  ifdef DEBUG
+#    ifdef DEBUG
 
       // simple check: the number of processors to which we want to send
       // ghosts and the processors to which ghosts reference should be the
@@ -387,9 +388,9 @@ namespace Utilities
       for (unsigned int i = 0; i < ghost_indices.size(); ++i)
         AssertDimension(ghost_indices[i], ghost_indices_ref[i]);
 
-#  endif
+#    endif
 
-#endif // #ifdef DEAL_II_WITH_MPI
+#  endif // #ifdef DEAL_II_WITH_MPI
 
       if (larger_ghost_index_set.size() == 0)
         {
@@ -471,7 +472,7 @@ namespace Utilities
       // processor
       if (&part == this)
         return true;
-#ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
       if (Utilities::MPI::job_supports_mpi())
         {
           int       communicators_same = 0;
@@ -483,7 +484,7 @@ namespace Utilities
                 communicators_same == MPI_CONGRUENT))
             return false;
         }
-#endif
+#  endif
       return (global_size == part.global_size &&
               local_range_data == part.local_range_data &&
               ghost_indices_data == part.ghost_indices_data);
@@ -569,7 +570,7 @@ namespace Utilities
 
 } // end of namespace Utilities
 
-
+#endif
 
 // explicit instantiations from .templates.h file
 #include "partitioner.inst"

@@ -456,7 +456,7 @@ unimportant as far as run time is concerned.
 @endhtmlonly
 
 
-<a name="extensions"></a>
+<a name="step-70-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
 The current tutorial program shows a one-way coupling between the fluid and the

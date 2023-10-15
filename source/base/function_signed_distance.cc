@@ -30,7 +30,7 @@ namespace Functions
       : center(center)
       , radius(radius)
     {
-      Assert(radius > 0, ExcMessage("Radius must be positive."))
+      Assert(radius > 0, ExcMessage("Radius must be positive."));
     }
 
 
@@ -89,7 +89,7 @@ namespace Functions
       : point_in_plane(point)
       , normal(normal)
     {
-      Assert(normal.norm() > 0, ExcMessage("Plane normal must not be 0."))
+      Assert(normal.norm() > 0, ExcMessage("Plane normal must not be 0."));
     }
 
 
@@ -142,7 +142,7 @@ namespace Functions
       , max_iter(max_iter)
     {
       for (unsigned int d = 0; d < dim; ++d)
-        Assert(radii[d] > 0, ExcMessage("All radii must be positive."))
+        Assert(radii[d] > 0, ExcMessage("All radii must be positive."));
     }
 
 

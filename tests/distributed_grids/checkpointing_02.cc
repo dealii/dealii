@@ -107,8 +107,8 @@ void
 LaplaceProblem<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
-  locally_owned_dofs = dof_handler.locally_owned_dofs();
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  locally_owned_dofs    = dof_handler.locally_owned_dofs();
+  locally_relevant_dofs = DoFTools::extract_locally_relevant_dofs(dof_handler);
 }
 
 template <int dim>

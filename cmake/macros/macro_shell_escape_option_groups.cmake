@@ -53,7 +53,7 @@ macro(shell_escape_option_groups _variable)
 
   #
   # In addition try to merge options of the form "-Wl,-flag -Wl,/path". We
-  # do this by detecting all occurences of a flag ("-Wl,-[-]flag") followed
+  # do this by detecting all occurrences of a flag ("-Wl,-[-]flag") followed
   # by an option that doesn't start with a dash ("-Wl,[option]"):
   #
   string(REGEX REPLACE

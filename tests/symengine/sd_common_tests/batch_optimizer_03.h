@@ -20,7 +20,7 @@
 // See tests/symengine/basic_06.cc and tests/symengine/basic_07.cc for
 // a more simple example of differentiation of symbols with
 // explicit/implicit relationships.
-// We invoke the batch optimzer before symbolic evaluation takes place.
+// We invoke the batch optimizer before symbolic evaluation takes place.
 
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>

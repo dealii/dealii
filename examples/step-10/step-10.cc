@@ -12,7 +12,6 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
-
  *
  * Authors: Wolfgang Bangerth, Ralf Hartmann, University of Heidelberg, 2001
  */

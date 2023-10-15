@@ -1,0 +1,3 @@
+New: FE_SimplexP and FE_SimplexDGP now support cubic elements.
+<br>
+(David Wells and Peter Munch, 2023/10/11)

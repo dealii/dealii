@@ -55,8 +55,8 @@ test()
   const auto      mpi_comm   = dof_handler.get_communicator();
   const IndexSet &owned_dofs = dof_handler.locally_owned_dofs();
 
-  IndexSet relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, relevant_dofs);
+  const IndexSet relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   AffineConstraints<typename MatrixType::value_type> constraints;
 

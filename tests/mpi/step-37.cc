@@ -180,9 +180,8 @@ namespace Step37
 
     dof_euler.distribute_dofs(fe_system);
     {
-      IndexSet locally_relevant_euler;
-      DoFTools::extract_locally_relevant_dofs(dof_euler,
-                                              locally_relevant_euler);
+      const IndexSet locally_relevant_euler =
+        DoFTools::extract_locally_relevant_dofs(dof_euler);
       euler_positions.reinit(dof_euler.locally_owned_dofs(),
                              locally_relevant_euler,
                              MPI_COMM_WORLD);
@@ -196,6 +195,9 @@ namespace Step37
 
     // Apply hanging node constraints on that vector
     constraints_euler.clear();
+    constraints_euler.reinit(dof_euler.locally_owned_dofs(),
+                             DoFTools::extract_locally_relevant_dofs(
+                               dof_euler));
     DoFTools::make_hanging_node_constraints(dof_euler, constraints_euler);
     constraints_euler.close();
     constraints_euler.distribute(euler_positions);
@@ -209,7 +211,8 @@ namespace Step37
     pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
           << std::endl;
 
-    DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+    locally_relevant_dofs =
+      DoFTools::extract_locally_relevant_dofs(dof_handler);
 
     constraints.clear();
     constraints.reinit(locally_relevant_dofs);
@@ -251,10 +254,8 @@ namespace Step37
 
     for (unsigned int level = 0; level < nlevels; ++level)
       {
-        IndexSet relevant_dofs;
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler,
-                                                      level,
-                                                      relevant_dofs);
+        const IndexSet relevant_dofs =
+          DoFTools::extract_locally_relevant_level_dofs(dof_handler, level);
         AffineConstraints<double> level_constraints;
         level_constraints.reinit(relevant_dofs);
         level_constraints.add_lines(

@@ -63,8 +63,8 @@ transfer(const MPI_Comm comm)
   DoFHandler<dim> dof_handler(tria);
   dof_handler.begin(0)->child(0)->set_active_fe_index(1);
 
-  IndexSet locally_relevant_dofs;
-  DoFTools::extract_locally_relevant_dofs(dof_handler, locally_relevant_dofs);
+  const IndexSet locally_relevant_dofs =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   LinearAlgebra::distributed::Vector<double> solution(
     dof_handler.locally_owned_dofs(), locally_relevant_dofs, comm);
