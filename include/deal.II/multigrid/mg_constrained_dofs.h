@@ -226,7 +226,7 @@ public:
   get_user_constraint_matrix(const unsigned int level) const;
 
   /**
-   * Merge selected constraints of a specifiedlevel into a given single
+   * Merge selected constraints of a specified @p level into a given single
    * AffineConstraints object.
    *
    * @param constraints AffineConstraints object to be filled.
