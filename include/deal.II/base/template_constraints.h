@@ -685,6 +685,27 @@ namespace concepts
 {
 #if defined(DEAL_II_HAVE_CXX20) || defined(DOXYGEN)
   /**
+   * A concept that identifies whether a template argument `C`
+   * represents a [contiguous
+   * container](https://en.cppreference.com/w/cpp/named_req/ContiguousContainer).
+   * A contiguous container is a container object (such as `std::vector`,
+   * `std::array`, or `boost::container::small_vector` that stores its elements
+   * in one contiguous array in which we access all elements via a pointer to
+   * the first element plus an offset. In contrast, linked lists, maps, and
+   * similar objects are typically not stored as contiguous containers.
+   */
+  template <typename C>
+  concept is_contiguous_container = requires(C &c) {
+    {
+      std::data(c)
+    };
+    {
+      std::size(c)
+    };
+  };
+
+
+  /**
    * A concept that tests that a combination of `dim` and `spacedim`
    * template arguments is valid. Specifically, we must have that
    * - `dim>=1`
