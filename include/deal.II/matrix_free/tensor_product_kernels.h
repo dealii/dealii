@@ -3122,7 +3122,7 @@ namespace internal
           {
             const Number2 test_value_y1_2 = value[1] * p[1];
             const Number2 test_value_y0_2 = value[1] - test_value_y1_2;
-            const Number2 value0_2        = p[0] * test_value_y1_2;
+            const Number2 value0_2        = p[0] * test_value_y0_2;
             const Number2 value1_2        = p[0] * test_value_y1_2;
 
             if (add)
