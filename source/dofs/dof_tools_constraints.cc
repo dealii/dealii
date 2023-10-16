@@ -1022,20 +1022,27 @@ namespace DoFTools
                 Assert(dofs_on_children.size() <= n_dofs_on_children,
                        ExcInternalError());
 
-                // for each row in the AffineConstraints object for this line:
+                // For each row in the AffineConstraints object for
+                // this line, add the constraint. Ignore rows that
+                // have already been added (e.g., in 3d degrees of
+                // freedom on edges with hanging nodes will be visited
+                // more than once).
                 for (unsigned int row = 0; row != dofs_on_children.size();
                      ++row)
-                  {
-                    constraint_entries.clear();
-                    constraint_entries.reserve(dofs_on_mother.size());
-                    for (unsigned int i = 0; i != dofs_on_mother.size(); ++i)
-                      constraint_entries.emplace_back(dofs_on_mother[i],
-                                                      fe.constraints()(row, i));
+                  if (constraints.is_constrained(dofs_on_children[row]) ==
+                      false)
+                    {
+                      constraint_entries.clear();
+                      constraint_entries.reserve(dofs_on_mother.size());
+                      for (unsigned int i = 0; i != dofs_on_mother.size(); ++i)
+                        constraint_entries.emplace_back(dofs_on_mother[i],
+                                                        fe.constraints()(row,
+                                                                         i));
 
-                    constraints.add_constraint(dofs_on_children[row],
-                                               constraint_entries,
-                                               0.);
-                  }
+                      constraints.add_constraint(dofs_on_children[row],
+                                                 constraint_entries,
+                                                 0.);
+                    }
               }
             else
               {
@@ -3576,9 +3583,22 @@ namespace DoFTools
                             }
 
                         if (nonzero)
-                          zero_boundary_constraints.add_constraint(face_dof,
-                                                                   {},
-                                                                   0.);
+                          {
+                            // Check that either (i) the DoF is not
+                            // yet constrained, or (ii) if it is, its
+                            // inhomogeneity is zero:
+                            if (zero_boundary_constraints.is_constrained(
+                                  face_dof) == false)
+                              zero_boundary_constraints.add_constraint(face_dof,
+                                                                       {},
+                                                                       0.);
+                            else
+                              Assert(zero_boundary_constraints
+                                         .is_inhomogeneously_constrained(
+                                           face_dof) == false,
+                                     ExcInternalError());
+                          }
+
                         // We already dealt with this DoF. Make sure we
                         // don't touch it again.
                         dofs_already_treated.insert(face_dof);
