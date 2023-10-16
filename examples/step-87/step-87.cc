@@ -436,7 +436,7 @@ namespace Step87
       }
   }
 
-  // @sect3{Mini example 2: Closest-point evaluation of a distributed mesh}
+  // @sect3{Mini example 2: Closest-point evaluation on a distributed mesh}
   //
   // In this mini example, we perform a closest-point projection for each
   // support point of a mesh within a narrow band by iteratively solving for
