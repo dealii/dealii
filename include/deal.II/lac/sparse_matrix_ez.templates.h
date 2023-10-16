@@ -485,7 +485,8 @@ SparseMatrixEZ<number>::print_formatted(std::ostream      &out,
                                         const bool         scientific,
                                         const unsigned int width_,
                                         const char        *zero_string,
-                                        const double       denominator) const
+                                        const double       denominator,
+                                        const char        *separator) const
 {
   AssertThrow(out.fail() == false, ExcIO());
   Assert(m() != 0, ExcNotInitialized());
@@ -516,9 +517,9 @@ SparseMatrixEZ<number>::print_formatted(std::ostream      &out,
         {
           const Entry *entry = locate(i, j);
           if (entry)
-            out << std::setw(width) << entry->value * denominator << ' ';
+            out << std::setw(width) << entry->value * denominator << separator;
           else
-            out << std::setw(width) << zero_string << ' ';
+            out << std::setw(width) << zero_string << separator;
         }
       out << std::endl;
     };

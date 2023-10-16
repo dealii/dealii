@@ -178,14 +178,20 @@ BlockSparseMatrix<number>::print_formatted(std::ostream      &out,
                                            const bool         scientific,
                                            const unsigned int width,
                                            const char        *zero_string,
-                                           const double       denominator) const
+                                           const double       denominator,
+                                           const char        *separator) const
 {
   for (size_type r = 0; r < this->n_block_rows(); ++r)
     for (size_type c = 0; c < this->n_block_cols(); ++c)
       {
         out << "Component (" << r << ',' << c << ')' << std::endl;
-        this->block(r, c).print_formatted(
-          out, precision, scientific, width, zero_string, denominator);
+        this->block(r, c).print_formatted(out,
+                                          precision,
+                                          scientific,
+                                          width,
+                                          zero_string,
+                                          denominator,
+                                          separator);
       }
 }
 

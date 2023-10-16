@@ -1657,7 +1657,8 @@ FullMatrix<number>::print_formatted(std::ostream      &out,
                                     const unsigned int width_,
                                     const char        *zero_string,
                                     const double       denominator,
-                                    const double       threshold) const
+                                    const double       threshold,
+                                    const char        *separator) const
 {
   unsigned int width = width_;
 
@@ -1688,11 +1689,12 @@ FullMatrix<number>::print_formatted(std::ostream      &out,
         // we might have complex numbers, so use abs also to check for nan
         // since there is no isnan on complex numbers
         if (numbers::is_nan(std::abs((*this)(i, j))))
-          out << std::setw(width) << (*this)(i, j) << ' ';
+          out << std::setw(width) << (*this)(i, j) << separator;
         else if (std::abs((*this)(i, j)) > threshold)
-          out << std::setw(width) << (*this)(i, j) * number(denominator) << ' ';
+          out << std::setw(width) << (*this)(i, j) * number(denominator)
+              << separator;
         else
-          out << std::setw(width) << zero_string << ' ';
+          out << std::setw(width) << zero_string << separator;
       out << std::endl;
     };
 

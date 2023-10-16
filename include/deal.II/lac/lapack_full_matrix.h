@@ -902,6 +902,8 @@ public:
    * @param threshold all entries with absolute value smaller than
    * this are considered zero.
    *
+   * @param separator specifies a string printed to separate row entries.
+   *
    * @note The entries stored resemble a matrix only if the state is either
    * LAPACKSupport::matrix or LAPACK::inverse_matrix. Otherwise, calling this
    * function is not allowed.
@@ -913,7 +915,8 @@ public:
                   const unsigned int width       = 0,
                   const char        *zero_string = " ",
                   const double       denominator = 1.,
-                  const double       threshold   = 0.) const;
+                  const double       threshold   = 0.,
+                  const char        *separator   = " ") const;
 
 private:
   /**
