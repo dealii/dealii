@@ -242,15 +242,17 @@ namespace VectorTools
                                     constraining_vector[0]) >
                           std::numeric_limits<double>::epsilon())
                         constraint_entries.emplace_back(
-                          dof_indices.dof_indices[1],
-                          -constraining_vector[1] / constraining_vector[0]);
+                          std::make_pair(dof_indices.dof_indices[1],
+                                         -constraining_vector[1] /
+                                           constraining_vector[0]));
 
                       if (std::fabs(constraining_vector[2] /
                                     constraining_vector[0]) >
                           std::numeric_limits<double>::epsilon())
                         constraint_entries.emplace_back(
-                          dof_indices.dof_indices[2],
-                          -constraining_vector[2] / constraining_vector[0]);
+                          std::make_pair(dof_indices.dof_indices[2],
+                                         -constraining_vector[2] /
+                                           constraining_vector[0]));
 
                       const double normalized_inhomogeneity =
                         (std::fabs(inhomogeneity / constraining_vector[0]) >
@@ -275,15 +277,17 @@ namespace VectorTools
                                     constraining_vector[1]) >
                           std::numeric_limits<double>::epsilon())
                         constraint_entries.emplace_back(
-                          dof_indices.dof_indices[0],
-                          -constraining_vector[0] / constraining_vector[1]);
+                          std::make_pair(dof_indices.dof_indices[0],
+                                         -constraining_vector[0] /
+                                           constraining_vector[1]));
 
                       if (std::fabs(constraining_vector[2] /
                                     constraining_vector[1]) >
                           std::numeric_limits<double>::epsilon())
                         constraint_entries.emplace_back(
-                          dof_indices.dof_indices[2],
-                          -constraining_vector[2] / constraining_vector[1]);
+                          std::make_pair(dof_indices.dof_indices[2],
+                                         -constraining_vector[2] /
+                                           constraining_vector[1]));
 
                       const double normalized_inhomogeneity =
                         (std::fabs(inhomogeneity / constraining_vector[1]) >
@@ -305,15 +309,17 @@ namespace VectorTools
                                     constraining_vector[2]) >
                           std::numeric_limits<double>::epsilon())
                         constraint_entries.emplace_back(
-                          dof_indices.dof_indices[0],
-                          -constraining_vector[0] / constraining_vector[2]);
+                          std::make_pair(dof_indices.dof_indices[0],
+                                         -constraining_vector[0] /
+                                           constraining_vector[2]));
 
                       if (std::fabs(constraining_vector[1] /
                                     constraining_vector[2]) >
                           std::numeric_limits<double>::epsilon())
                         constraint_entries.emplace_back(
-                          dof_indices.dof_indices[1],
-                          -constraining_vector[1] / constraining_vector[2]);
+                          std::make_pair(dof_indices.dof_indices[1],
+                                         -constraining_vector[1] /
+                                           constraining_vector[2]));
 
                       const double normalized_inhomogeneity =
                         (std::fabs(inhomogeneity / constraining_vector[2]) >
