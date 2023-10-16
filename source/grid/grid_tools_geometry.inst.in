@@ -1,0 +1,73 @@
+// ---------------------------------------------------------------------
+//
+// Copyright (C) 2001 - 2023 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE.md at
+// the top level directory of deal.II.
+//
+// ---------------------------------------------------------------------
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+    namespace GridTools
+    \{
+      template double
+      diameter(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+      template double
+      volume(const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+      template double
+      volume(const Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+             const Mapping<deal_II_dimension, deal_II_space_dimension> &);
+
+      template double
+      minimal_cell_diameter(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension>
+          &triangulation,
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &);
+
+      template double
+      maximal_cell_diameter(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension>
+          &triangulation,
+        const Mapping<deal_II_dimension, deal_II_space_dimension> &);
+
+      template std::pair<
+        DerivativeForm<1, deal_II_dimension, deal_II_space_dimension>,
+        Tensor<1, deal_II_space_dimension>>
+      affine_cell_approximation<deal_II_dimension, deal_II_space_dimension>(
+        const ArrayView<const Point<deal_II_space_dimension>> &);
+
+      template BoundingBox<deal_II_space_dimension>
+      compute_bounding_box(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+    \}
+#endif
+  }
+
+for (deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+    namespace GridTools
+    \{
+      template Vector<double>
+      GridTools::compute_aspect_ratio_of_cells(
+        const Mapping<deal_II_space_dimension> &,
+        const Triangulation<deal_II_space_dimension> &,
+        const Quadrature<deal_II_space_dimension> &);
+
+      template double
+      GridTools::compute_maximum_aspect_ratio(
+        const Mapping<deal_II_space_dimension> &,
+        const Triangulation<deal_II_space_dimension> &,
+        const Quadrature<deal_II_space_dimension> &);
+    \}
+  }
