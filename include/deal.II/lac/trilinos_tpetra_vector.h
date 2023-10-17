@@ -84,14 +84,149 @@ namespace LinearAlgebra
 #  endif
 
   /**
+   * @addtogroup TpetraWrappers
+   * @{
+   */
+
+  /**
    * A namespace for classes that provide wrappers for Trilinos' Tpetra vectors.
    *
    * This namespace provides wrappers for the Tpetra::Vector class from the
    * Tpetra package (https://trilinos.github.io/tpetra.html) that is part of
    * Trilinos.
+   *
+   * @ingroup TpetraWrappers
    */
   namespace TpetraWrappers
   {
+    /**
+     * @cond internal
+     */
+
+    /**
+     * A namespace for internal implementation details of the TrilinosWrapper
+     * members.
+     *
+     * @ingroup TpetraWrappers
+     */
+    namespace internal
+    {
+      /**
+       * Declare type for container size.
+       */
+      using size_type = dealii::types::global_dof_index;
+
+      /**
+       * This class implements a wrapper for accessing the Trilinos Tpetra
+       * vector in the same way as we access deal.II objects: it is initialized
+       * with a vector and an element within it, and has a conversion operator
+       * to extract the scalar value of this element. It also has a variety of
+       * assignment operator for writing to this one element.
+       *
+       * @ingroup TpetraWrappers
+       */
+      template <typename Number>
+      class VectorReference
+      {
+      private:
+        /**
+         * Constructor. It is made private so as to only allow the actual vector
+         * class to create it.
+         */
+        VectorReference(Vector<Number> &vector, const size_type index);
+
+      public:
+        /**
+         * Copy constructor.
+         */
+        VectorReference(const VectorReference &) = default;
+
+        /**
+         * This looks like a copy operator, but does something different than
+         * usual. In particular, it does not copy the member variables of this
+         * reference. Rather, it handles the situation where we have two vectors
+         * @p v and @p w, and assign elements like in <tt>v(i)=w(i)</tt>. Here,
+         * both left and right hand side of the assignment have data type
+         * VectorReference, but what we really mean is to assign the vector
+         * elements represented by the two references. This operator implements
+         * this operation. Note also that this allows us to make the assignment
+         * operator const.
+         */
+        const VectorReference &
+        operator=(const VectorReference &r) const;
+
+        /**
+         * Same as above but for non-const reference objects.
+         */
+        VectorReference &
+        operator=(const VectorReference &r);
+
+        /**
+         * Set the referenced element of the vector to <tt>s</tt>.
+         */
+        const VectorReference &
+        operator=(const Number &s) const;
+
+        /**
+         * Add <tt>s</tt> to the referenced element of the vector->
+         */
+        const VectorReference &
+        operator+=(const Number &s) const;
+
+        /**
+         * Subtract <tt>s</tt> from the referenced element of the vector->
+         */
+        const VectorReference &
+        operator-=(const Number &s) const;
+
+        /**
+         * Multiply the referenced element of the vector by <tt>s</tt>.
+         */
+        const VectorReference &
+        operator*=(const Number &s) const;
+
+        /**
+         * Divide the referenced element of the vector by <tt>s</tt>.
+         */
+        const VectorReference &
+        operator/=(const Number &s) const;
+
+        /**
+         * Convert the reference to an actual value, i.e. return the value of
+         * the referenced element of the vector.
+         */
+        operator Number() const;
+
+        /**
+         * Exception
+         */
+        DeclException1(ExcTrilinosError,
+                       int,
+                       << "An error with error number " << arg1
+                       << " occurred while calling a Trilinos function");
+
+      private:
+        /**
+         * Point to the vector we are referencing.
+         */
+        Vector<Number> &vector;
+
+        /**
+         * Index of the referenced element of the vector.
+         */
+        const size_type index;
+
+        // Make the vector class a friend, so that it can create objects of the
+        // present type.
+        friend class Vector<Number>;
+      }; // class VectorReference
+
+    } // namespace internal
+    /**
+     * @endcond
+     */
+
+
     /**
      * This class implements a wrapper to the Trilinos distributed vector
      * class Tpetra::Vector. This class requires Trilinos to be
@@ -108,19 +243,32 @@ namespace LinearAlgebra
      * actions on the GPU. In particular, there is no need for manually
      * synchronizing memory between host and @ref GlossDevice "device".
      *
-     * @ingroup TrilinosWrappers
+     * @ingroup TpetraWrappers
      * @ingroup Vectors
      */
     template <typename Number>
     class Vector : public ReadVector<Number>, public Subscriptor
     {
     public:
+      /**
+       * Declare some of the standard types used in all containers.
+       */
       using value_type = Number;
       using real_type  = typename numbers::NumberTraits<Number>::real_type;
       using size_type  = types::global_dof_index;
+      using reference  = internal::VectorReference<Number>;
+      using MapType = Tpetra::Map<int, dealii::types::signed_global_dof_index>;
+      using VectorType =
+        Tpetra::Vector<Number, int, dealii::types::signed_global_dof_index>;
 
       /**
-       * Constructor. Create a vector of dimension zero.
+       * @name 1: Basic Object-handling
+       */
+      /** @{ */
+      /**
+       * Default constructor that generates an empty (zero size) vector. The
+       * function <tt>reinit()</tt> will have to give the vector the correct
+       * size and distribution among processes in case of an MPI run.
        */
       Vector();
 
@@ -129,6 +277,11 @@ namespace LinearAlgebra
        * the given vector and copies all elements.
        */
       Vector(const Vector &V);
+
+      /**
+       *  Copy constructor from Teuchos::RCP<Tpetra::Vector>.
+       */
+      Vector(const Teuchos::RCP<VectorType> V);
 
       /**
        * This constructor takes an IndexSet that defines how to distribute the
@@ -149,6 +302,26 @@ namespace LinearAlgebra
       reinit(const IndexSet &parallel_partitioner,
              const MPI_Comm  communicator,
              const bool      omit_zeroing_entries = false);
+
+
+      /**
+       * Reinit functionality. This function destroys the old vector content
+       * and generates a new one based on the input partitioning. In addition
+       * to just specifying one index set as in all the other methods above,
+       * this method allows to supply an additional set of ghost entries.
+       *
+       * Depending on whether the @p locally_relevant_or_ghost_entries argument uniquely
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
+       *
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
+       */
+      void
+      reinit(const IndexSet &locally_owned_entries,
+             const IndexSet &locally_relevant_or_ghost_entries,
+             const MPI_Comm  communicator = MPI_COMM_WORLD);
 
       /**
        * Change the dimension to that of the vector @p V. The elements of @p V are not
@@ -192,8 +365,29 @@ namespace LinearAlgebra
       import_elements(
         const ReadWriteVector<Number> &V,
         VectorOperation::values        operation,
+        const Teuchos::RCP<const Utilities::MPI::CommunicationPatternBase>
+          &communication_pattern);
+
+      /**
+       * @deprecated Use Teuchos::RCP<> instead of std::shared_ptr<>.
+       */
+      DEAL_II_DEPRECATED
+      void
+      import_elements(
+        const ReadWriteVector<Number> &V,
+        VectorOperation::values        operation,
         const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-          &communication_pattern = {});
+          &communication_pattern);
+
+      /*
+       * Imports all the elements present in the vector's IndexSet from the
+       * input vector @p V. VectorOperation::values @p operation is used to decide if
+       * the elements in @p V should be added to the current vector or replace the
+       * current elements.
+       */
+      void
+      import_elements(const ReadWriteVector<Number> &V,
+                      VectorOperation::values        operation);
 
       /**
        * @deprecated Use import_elements() instead.
@@ -207,6 +401,32 @@ namespace LinearAlgebra
       {
         import_elements(V, operation, communication_pattern);
       }
+
+      /** @} */
+
+
+      /**
+       * @name 2: Data-Access
+       */
+      /** @{ */
+
+      /**
+       * Provide access to a given element, both read and write.
+       *
+       * When using a vector distributed with MPI, this operation only makes
+       * sense for elements that are actually present on the calling processor.
+       * Otherwise, an exception is thrown.
+       */
+      reference
+      operator()(const size_type index);
+
+      /** @} */
+
+
+      /**
+       * @name 3: Modification of vectors
+       */
+      /** @{ */
 
       /**
        * Multiply the entire vector by a fixed factor.
@@ -263,11 +483,41 @@ namespace LinearAlgebra
           const Vector<Number> &W);
 
       /**
+       * A collective add operation: This function adds a whole set of values
+       * stored in @p values to the vector components specified by @p indices.
+       */
+      void
+      add(const std::vector<size_type>      &indices,
+          const std::vector<TrilinosScalar> &values);
+
+
+      /**
+       * Take an address where <tt>n_elements</tt> are stored contiguously and
+       * add them into the vector. Handles all cases which are not covered by
+       * the other two <tt>add()</tt> functions above.
+       */
+      void
+      add(const size_type  n_elements,
+          const size_type *indices,
+          const Number    *values);
+
+      /**
        * Scaling and simple addition of a multiple of a vector, i.e. <tt>*this
        * = s*(*this)+a*V</tt>.
        */
       void
       sadd(const Number s, const Number a, const Vector<Number> &V);
+
+      /**
+       * A collective set operation: instead of setting individual elements of a
+       * vector, this function allows to set a whole set of elements at once.
+       * It is assumed that the elements to be set are located in contiguous
+       * memory.
+       */
+      void
+      set(const size_type  n_elements,
+          const size_type *indices,
+          const Number    *values);
 
       /**
        * Scale each element of this vector by the corresponding element in the
@@ -289,6 +539,14 @@ namespace LinearAlgebra
        */
       bool
       all_zero() const;
+
+      /** @} */
+
+
+      /**
+       * @name 4: Scalar products, norms and related operations
+       */
+      /** @{ */
 
       /**
        * Return the mean value of the element of this vector.
@@ -343,6 +601,15 @@ namespace LinearAlgebra
       add_and_dot(const Number          a,
                   const Vector<Number> &V,
                   const Vector<Number> &W);
+
+      /** @} */
+
+
+      /**
+       * @name 5: Scalar products, norms and related operations
+       */
+      /** @{ */
+
       /**
        * This function always returns false and is present only for backward
        * compatibility.
@@ -384,6 +651,13 @@ namespace LinearAlgebra
       ::dealii::IndexSet
       locally_owned_elements() const;
 
+      /** @} */
+
+
+      /**
+       * @name 6: Mixed stuff
+       */
+      /** @{ */
       /**
        * Compress the underlying representation of the Trilinos object, i.e.
        * flush the buffers of the vector object if it has any. This function is
@@ -396,6 +670,7 @@ namespace LinearAlgebra
        */
       void
       compress(const VectorOperation::values operation);
+
       /**
        * Return a const reference to the underlying Trilinos
        * Tpetra::Vector class.
@@ -409,6 +684,21 @@ namespace LinearAlgebra
        */
       Tpetra::Vector<Number, int, types::signed_global_dof_index> &
       trilinos_vector();
+
+      /**
+       * Return a const Teuchos::RCP to the underlying Trilinos
+       * Tpetra::Vector class.
+       */
+      Teuchos::RCP<
+        const Tpetra::Vector<Number, int, types::signed_global_dof_index>>
+      trilinos_rcp() const;
+
+      /**
+       * Return a (modifiable) Teuchos::RCP to the underlying Trilinos
+       * Tpetra::Vector class.
+       */
+      Teuchos::RCP<Tpetra::Vector<Number, int, types::signed_global_dof_index>>
+      trilinos_rcp();
 
       /**
        * Prints the vector to the output stream @p out.
@@ -426,8 +716,19 @@ namespace LinearAlgebra
       memory_consumption() const;
 
       /**
+       * Return the mpi communicator
+       */
+      const MPI_Comm
+      mpi_comm() const;
+
+      /** @} */
+
+
+      /**
        * The vectors have different partitioning, i.e. their IndexSet objects
        * don't represent the same indices.
+       *
+       * @ingroup Exceptions
        */
       DeclException0(ExcDifferentParallelPartitioning);
 
@@ -459,11 +760,9 @@ namespace LinearAlgebra
                                  const MPI_Comm  mpi_comm);
 
       /**
-       * Pointer to the actual Tpetra vector object.
+       * Teuchos::RCP to the actual Tpetra vector object.
        */
-      std::unique_ptr<
-        Tpetra::Vector<Number, int, types::signed_global_dof_index>>
-        vector;
+      Teuchos::RCP<VectorType> vector;
 
       /**
        * IndexSet of the elements of the last imported vector.
@@ -474,10 +773,15 @@ namespace LinearAlgebra
        * CommunicationPattern for the communication between the
        * source_stored_elements IndexSet and the current vector.
        */
-      std::shared_ptr<const TpetraWrappers::CommunicationPattern>
+      Teuchos::RCP<const TpetraWrappers::CommunicationPattern>
         tpetra_comm_pattern;
+
+      // Make the reference class a friend.
+      friend class internal::VectorReference<Number>;
     };
 
+
+    /* ------------------------- Inline functions ---------------------- */
 
     template <typename Number>
     inline bool
@@ -485,9 +789,204 @@ namespace LinearAlgebra
     {
       return false;
     }
-  } // namespace TpetraWrappers
-} // namespace LinearAlgebra
 
+
+
+    template <typename Number>
+    inline void
+    Vector<Number>::add(const std::vector<size_type>      &indices,
+                        const std::vector<TrilinosScalar> &values)
+    {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      AssertDimension(indices.size(), values.size());
+
+      add(indices.size(), indices.data(), values.data());
+    }
+
+
+
+    template <typename Number>
+    inline void
+    Vector<Number>::add(const size_type  n_elements,
+                        const size_type *indices,
+                        const Number    *values)
+    {
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWrite);
+#  else
+      vector->template sync<Kokkos::HostSpace>();
+      auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
+#  endif
+      auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      vector->template modify<Kokkos::HostSpace>();
+#  endif
+
+      for (size_type i = 0; i < n_elements; ++i)
+        {
+          const size_type                         row = indices[i];
+          const TrilinosWrappers::types::int_type local_row =
+            vector->getMap()->getLocalElement(row);
+
+          if (local_row != Teuchos::OrdinalTraits<int>::invalid())
+            vector_1d(local_row) += values[i];
+        }
+
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      vector->template sync<
+        typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
+          device_type::memory_space>();
+#  endif
+    }
+
+
+
+    template <typename Number>
+    inline void
+    Vector<Number>::set(const size_type  n_elements,
+                        const size_type *indices,
+                        const Number    *values)
+    {
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWrite);
+#  else
+      vector->template sync<Kokkos::HostSpace>();
+      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
+#  endif
+      auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      vector->template modify<Kokkos::HostSpace>();
+#  endif
+
+      for (size_type i = 0; i < n_elements; ++i)
+        {
+          const size_type                         row = indices[i];
+          const TrilinosWrappers::types::int_type local_row =
+            vector->getMap()->getLocalElement(row);
+
+          if (local_row != Teuchos::OrdinalTraits<int>::invalid())
+            vector_1d(local_row) = values[i];
+        }
+
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+      vector->template sync<
+        typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
+          device_type::memory_space>();
+#  endif
+    }
+
+
+
+    template <typename Number>
+    inline internal::VectorReference<Number>
+    Vector<Number>::operator()(const size_type index)
+    {
+      return internal::VectorReference(*this, index);
+    }
+
+#  ifndef DOXYGEN
+
+    // VectorReference
+    namespace internal
+    {
+      template <typename Number>
+      inline VectorReference<Number>::VectorReference(Vector<Number> &vector,
+                                                      const size_type index)
+        : vector(vector)
+        , index(index)
+      {}
+
+
+
+      template <typename Number>
+      inline const VectorReference<Number> &
+      VectorReference<Number>::operator=(const VectorReference<Number> &r) const
+      {
+        // as explained in the class
+        // documentation, this is not the copy
+        // operator. so simply pass on to the
+        // "correct" assignment operator
+        *this = static_cast<Number>(r);
+
+        return *this;
+      }
+
+
+
+      template <typename Number>
+      inline VectorReference<Number> &
+      VectorReference<Number>::operator=(const VectorReference<Number> &r)
+      {
+        // as above
+        *this = static_cast<Number>(r);
+
+        return *this;
+      }
+
+
+
+      template <typename Number>
+      inline const VectorReference<Number> &
+      VectorReference<Number>::operator=(const Number &value) const
+      {
+        vector.set(1, &index, &value);
+        return *this;
+      }
+
+
+
+      template <typename Number>
+      inline const VectorReference<Number> &
+      VectorReference<Number>::operator+=(const Number &value) const
+      {
+        vector.add(1, &index, &value);
+        return *this;
+      }
+
+
+
+      template <typename Number>
+      inline const VectorReference<Number> &
+      VectorReference<Number>::operator-=(const Number &value) const
+      {
+        Number new_value = -value;
+        vector.add(1, &index, &new_value);
+        return *this;
+      }
+
+
+
+      template <typename Number>
+      inline const VectorReference<Number> &
+      VectorReference<Number>::operator*=(const Number &value) const
+      {
+        Number new_value = static_cast<Number>(*this) * value;
+        vector.set(1, &index, &new_value);
+        return *this;
+      }
+
+
+
+      template <typename Number>
+      inline const VectorReference<Number> &
+      VectorReference<Number>::operator/=(const Number &value) const
+      {
+        Number new_value = static_cast<Number>(*this) / value;
+        vector.set(1, &index, &new_value);
+        return *this;
+      }
+    } // namespace internal
+
+#  endif /* DOXYGEN */
+
+  } // namespace TpetraWrappers
+
+  /** @} */
+
+} // namespace LinearAlgebra
 
 /**
  * Declare dealii::LinearAlgebra::TpetraWrappers::Vector as distributed vector.

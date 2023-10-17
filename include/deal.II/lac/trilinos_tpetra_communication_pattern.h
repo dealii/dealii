@@ -88,27 +88,39 @@ namespace LinearAlgebra
       get_tpetra_import() const;
 
       /**
+       * Return a Teuchos::RCP to the underlying Tpetra::Import object.
+       */
+      Teuchos::RCP<const Tpetra::Import<int, types::signed_global_dof_index>>
+      get_tpetra_import_rcp() const;
+
+      /**
        * Return the underlying Tpetra::Export object.
        */
       const Tpetra::Export<int, types::signed_global_dof_index> &
       get_tpetra_export() const;
 
+      /**
+       * Return a Teuchos::RCP to the underlying Tpetra::Export object.
+       */
+      Teuchos::RCP<const Tpetra::Export<int, types::signed_global_dof_index>>
+      get_tpetra_export_rcp() const;
+
     private:
       /**
-       * Shared pointer to the MPI communicator used.
+       * Teuchos::RCP to the MPI communicator used.
        */
-      std::shared_ptr<const MPI_Comm> comm;
+      Teuchos::RCP<const MPI_Comm> comm;
 
       /**
-       * Shared pointer to the Tpetra::Import object used.
+       * Teuchos::RCP to the Tpetra::Import object used.
        */
-      std::unique_ptr<Tpetra::Import<int, types::signed_global_dof_index>>
+      Teuchos::RCP<Tpetra::Import<int, types::signed_global_dof_index>>
         tpetra_import;
 
       /**
-       * Shared pointer to the Tpetra::Export object used.
+       * Teuchos::RCP to the Tpetra::Export object used.
        */
-      std::unique_ptr<Tpetra::Export<int, types::signed_global_dof_index>>
+      Teuchos::RCP<Tpetra::Export<int, types::signed_global_dof_index>>
         tpetra_export;
     };
   } // end of namespace TpetraWrappers
