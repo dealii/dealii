@@ -1850,33 +1850,8 @@ namespace DoFTools
 
 
 
-  namespace
+  namespace internal
   {
-    /**
-     * @internal
-     *
-     * Internally used in make_periodicity_constraints.
-     *
-     * enter constraints for periodicity into the given AffineConstraints
-     * object. this function is called when at least one of the two face
-     * iterators corresponds to an active object without further children
-     *
-     * @param transformation A matrix that maps degrees of freedom from one face
-     * to another. If the DoFs on the two faces are supposed to match exactly,
-     * then the matrix so provided will be the identity matrix. if face 2 is
-     * once refined from face 1, then the matrix needs to be the interpolation
-     * matrix from a face to this particular child
-     *
-     * @precondition: face_1 is supposed to be active
-     *
-     * @note We have to be careful not to accidentally create constraint
-     * cycles when adding periodic constraints: For example, as the
-     * corresponding testcase bits/periodicity_05 demonstrates, we can
-     * occasionally get into trouble if we already have the constraint
-     * x1 == x2 and want to insert x2 == x1. We avoid this by skipping
-     * such "identity constraints" if the opposite constraint already
-     * exists.
-     */
     template <typename FaceIterator, typename number>
     void
     set_periodicity_constraints(
@@ -1888,13 +1863,16 @@ namespace DoFTools
       const bool                                      face_orientation,
       const bool                                      face_flip,
       const bool                                      face_rotation,
-      const number                                    periodicity_factor)
+      const number                                    periodicity_factor,
+      const unsigned int                              level)
     {
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
+      const bool use_mg = level != numbers::invalid_unsigned_int;
+
       // we should be in the case where face_1 is active, i.e. has no children:
-      Assert(!face_1->has_children(), ExcInternalError());
+      Assert(use_mg || (!face_1->has_children()), ExcInternalError());
 
       Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
 
@@ -1909,7 +1887,7 @@ namespace DoFTools
       // If face_2 does have children, then we need to iterate over these
       // children and set periodic constraints in the inverse direction:
 
-      if (face_2->has_children())
+      if ((!use_mg) && face_2->has_children())
         {
           Assert(face_2->n_children() ==
                    GeometryInfo<dim>::max_children_per_face,
@@ -1971,8 +1949,15 @@ namespace DoFTools
       std::vector<types::global_dof_index> dofs_1(dofs_per_face);
       std::vector<types::global_dof_index> dofs_2(dofs_per_face);
 
-      face_1->get_dof_indices(dofs_1, face_1_index);
-      face_2->get_dof_indices(dofs_2, face_2_index);
+      if (use_mg)
+        face_1->get_mg_dof_indices(level, dofs_1, face_1_index);
+      else
+        face_1->get_dof_indices(dofs_1, face_1_index);
+
+      if (use_mg)
+        face_2->get_mg_dof_indices(level, dofs_2, face_2_index);
+      else
+        face_2->get_dof_indices(dofs_2, face_2_index);
 
       // If either of the two faces has an invalid dof index, stop. This is
       // so that there is no attempt to match artificial cells of parallel
@@ -2232,9 +2217,11 @@ namespace DoFTools
             }
         } /* for dofs_per_face */
     }
+  } // namespace internal
 
 
-
+  namespace
+  {
     // Internally used in make_periodicity_constraints.
     //
     // Build up a (possibly rotated) interpolation matrix that is used in
@@ -2539,30 +2526,30 @@ namespace DoFTools
             // matrix is the identity matrix.
             if (first_vector_components.empty() && matrix.m() == 0)
               {
-                set_periodicity_constraints(face_2,
-                                            face_1,
-                                            transformation,
-                                            affine_constraints,
-                                            component_mask,
-                                            face_orientation,
-                                            face_flip,
-                                            face_rotation,
-                                            periodicity_factor);
+                internal::set_periodicity_constraints(face_2,
+                                                      face_1,
+                                                      transformation,
+                                                      affine_constraints,
+                                                      component_mask,
+                                                      face_orientation,
+                                                      face_flip,
+                                                      face_rotation,
+                                                      periodicity_factor);
               }
             else
               {
                 FullMatrix<double> inverse(transformation.m());
                 inverse.invert(transformation);
 
-                set_periodicity_constraints(face_2,
-                                            face_1,
-                                            inverse,
-                                            affine_constraints,
-                                            component_mask,
-                                            face_orientation,
-                                            face_flip,
-                                            face_rotation,
-                                            periodicity_factor);
+                internal::set_periodicity_constraints(face_2,
+                                                      face_1,
+                                                      inverse,
+                                                      affine_constraints,
+                                                      component_mask,
+                                                      face_orientation,
+                                                      face_flip,
+                                                      face_rotation,
+                                                      periodicity_factor);
               }
           }
         else
@@ -2575,17 +2562,17 @@ namespace DoFTools
             // the rotation when constraining face_2 to face_1. Therefore
             // face_flip has to be toggled if face_rotation is true: In case of
             // inverted orientation, nothing has to be done.
-            set_periodicity_constraints(face_1,
-                                        face_2,
-                                        transformation,
-                                        affine_constraints,
-                                        component_mask,
-                                        face_orientation,
-                                        face_orientation ?
-                                          face_rotation ^ face_flip :
-                                          face_flip,
-                                        face_rotation,
-                                        periodicity_factor);
+            internal::set_periodicity_constraints(face_1,
+                                                  face_2,
+                                                  transformation,
+                                                  affine_constraints,
+                                                  component_mask,
+                                                  face_orientation,
+                                                  face_orientation ?
+                                                    face_rotation ^ face_flip :
+                                                    face_flip,
+                                                  face_rotation,
+                                                  periodicity_factor);
           }
       }
   }

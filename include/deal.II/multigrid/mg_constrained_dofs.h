@@ -21,6 +21,8 @@
 #include <deal.II/base/mg_level_object.h>
 #include <deal.II/base/subscriptor.h>
 
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/multigrid/mg_tools.h>
@@ -309,58 +311,43 @@ MGConstrainedDoFs::initialize(
           level_constraints[l].reinit(dof.locally_owned_mg_dofs(l),
                                       relevant_dofs);
         }
+    }
 
-      // Loop through relevant cells and faces finding those which are periodic
-      // neighbors.
-      for (const auto &cell : dof.cell_iterators_on_level(l))
-        if (cell->is_artificial_on_level() == false)
-          for (auto f : cell->face_indices())
-            if (cell->has_periodic_neighbor(f) &&
-                cell->periodic_neighbor(f)->level() == cell->level())
-              {
-                if (cell->is_locally_owned_on_level())
-                  {
-                    Assert(
-                      cell->periodic_neighbor(f)->level_subdomain_id() !=
-                        numbers::artificial_subdomain_id,
-                      ExcMessage(
-                        "Periodic neighbor of a locally owned cell must either be owned or ghost."));
-                  }
-                // Cell is a level-ghost and its neighbor is a
-                // level-artificial cell nothing to do here
-                else if (cell->periodic_neighbor(f)->level_subdomain_id() ==
-                         numbers::artificial_subdomain_id)
-                  {
-                    Assert(cell->is_locally_owned_on_level() == false,
-                           ExcInternalError());
-                    continue;
-                  }
+  // TODO: currently we only consider very basic periodic constraints
+  const IdentityMatrix transformation(dof.get_fe().n_dofs_per_face());
+  const ComponentMask  component_mask;
+  const double         periodicity_factor = 1.0;
 
-                const unsigned int dofs_per_face =
-                  dof.get_fe(0).n_dofs_per_face(f);
-                std::vector<types::global_dof_index> dofs_1(dofs_per_face);
-                std::vector<types::global_dof_index> dofs_2(dofs_per_face);
+  for (const auto &[first_cell, second_cell] :
+       dof.get_triangulation().get_periodic_face_map())
+    {
+      // only consider non-artificial cells
+      if (first_cell.first->is_artificial_on_level())
+        continue;
+      if (second_cell.first.first->is_artificial_on_level())
+        continue;
 
-                cell->periodic_neighbor(f)
-                  ->face(cell->periodic_neighbor_face_no(f))
-                  ->get_mg_dof_indices(l, dofs_1, 0);
-                cell->face(f)->get_mg_dof_indices(l, dofs_2, 0);
-                // Store periodicity information in the level
-                // AffineConstraints object. Skip DoFs for which we've
-                // previously entered periodicity constraints already; this
-                // can happen, for example, for a vertex dof at a periodic
-                // boundary that we visit from more than one cell
-                for (unsigned int i = 0; i < dofs_per_face; ++i)
-                  if (level_constraints[l].can_store_line(dofs_2[i]) &&
-                      level_constraints[l].can_store_line(dofs_1[i]) &&
-                      !level_constraints[l].is_constrained(dofs_2[i]) &&
-                      !level_constraints[l].is_constrained(dofs_1[i]))
-                    {
-                      level_constraints[l].add_constraint(dofs_2[i],
-                                                          {{dofs_1[i], 1.}},
-                                                          0.);
-                    }
-              }
+      // consider cell pairs with the same level
+      if (first_cell.first->level() != second_cell.first.first->level())
+        continue;
+
+      DoFTools::internal::set_periodicity_constraints(
+        first_cell.first->as_dof_handler_level_iterator(dof)->face(
+          first_cell.second),
+        second_cell.first.first->as_dof_handler_level_iterator(dof)->face(
+          second_cell.first.second),
+        transformation,
+        level_constraints[first_cell.first->level()],
+        component_mask,
+        second_cell.second[0],
+        second_cell.second[1],
+        second_cell.second[2],
+        periodicity_factor,
+        first_cell.first->level());
+    }
+
+  for (unsigned int l = min_level; l <= max_level; ++l)
+    {
       level_constraints[l].close();
 
       // Initialize with empty IndexSet of correct size
