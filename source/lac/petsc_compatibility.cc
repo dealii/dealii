@@ -35,7 +35,7 @@
         PetscErrorCode ierr = (code);                \
         AssertThrow(ierr == 0, ExcPETScError(ierr)); \
       }                                              \
-    while (0)
+    while (false)
 
 DEAL_II_NAMESPACE_OPEN
 

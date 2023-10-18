@@ -29,7 +29,7 @@ DEAL_II_NAMESPACE_OPEN
         PetscErrorCode ierr = (code);                \
         AssertThrow(ierr == 0, ExcPETScError(ierr)); \
       }                                              \
-    while (0)
+    while (false)
 
 namespace PETScWrappers
 {

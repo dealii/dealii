@@ -1103,7 +1103,7 @@ namespace PETScWrappers
           PetscErrorCode ierr = (code); \
           CHKERRQ(ierr);                \
         }                               \
-      while (0)
+      while (false)
 #  endif
 
   PetscErrorCode
