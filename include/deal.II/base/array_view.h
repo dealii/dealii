@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/tensor.h>
 
 #include <boost/container/small_vector.hpp>
@@ -150,75 +151,112 @@ public:
    */
   explicit ArrayView(value_type &element);
 
+#ifdef DEAL_II_HAVE_CXX20
   /**
-   * A constructor that automatically creates a view from a std::vector object.
-   * The view encompasses all elements of the given vector.
+   * A constructor that automatically creates a view from a container
+   * object that requires a contiguous array of elements (such as
+   * `std::vector`, `std::array`, `boost::container::small_vector`,
+   * and the like). The view encompasses all elements of the given
+   * container.
    *
    * This implicit conversion constructor is particularly useful when calling
    * a function that takes an ArrayView object as argument, and passing in
-   * a std::vector.
+   * a container.
    *
-   * @note This constructor takes a reference to a @p const vector as argument.
+   * @note This constructor takes a reference to a @p const container as argument.
    *   It can only be used to initialize ArrayView objects that point to
    *   @p const memory locations, such as <code>ArrayView@<const double@></code>.
    *   You cannot initialize ArrayView objects to non-@p const memory with
    *   such arguments, such as <code>ArrayView@<double@></code>.
    */
-  ArrayView(const std::vector<std::remove_cv_t<value_type>> &vector);
+  template <typename ContiguousContainer>
+  ArrayView(const ContiguousContainer &container)
+    requires(std::is_same_v<
+               std::remove_cv_t<ElementType>,
+               std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+             std::is_const_v<ElementType> &&
+             concepts::is_contiguous_container<ContiguousContainer>);
 
   /**
-   * A constructor that automatically creates a view from a std::vector object.
-   * The view encompasses all elements of the given vector.
+   * A constructor that automatically creates a view from a container
+   * object that requires a contiguous array of elements (such as
+   * `std::vector`, `std::array`, `boost::container::small_vector`,
+   * and the like). The view encompasses all elements of the given
+   * container.
    *
    * This implicit conversion constructor is particularly useful when calling
    * a function that takes an ArrayView object as argument, and passing in
-   * a std::vector.
+   * a container.
    *
-   * @note This constructor takes a reference to a non-@p const vector as
+   * @note This constructor takes a reference to a non-@p const container as
    *   argument. It can be used to initialize ArrayView objects that point to
    *   either @p const memory locations, such as
    *   <code>ArrayView@<const double@></code>, or to non-@p const memory,
    *   such as <code>ArrayView@<double@></code>.
    */
-  ArrayView(std::vector<std::remove_cv_t<value_type>> &vector);
+  template <typename ContiguousContainer>
+  ArrayView(ContiguousContainer &container)
+    requires(std::is_same_v<
+               std::remove_cv_t<ElementType>,
+               std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+             concepts::is_contiguous_container<ContiguousContainer>);
+
+#else
+
 
   /**
-   * A constructor that automatically creates a view from a
-   * boost::container::small_vector object. The view encompasses all elements of
-   * the given vector.
+   * A constructor that automatically creates a view from a container
+   * object that requires a contiguous array of elements (such as
+   * `std::vector`, `std::array`, `boost::container::small_vector`,
+   * and the like). The view encompasses all elements of the given
+   * container.
    *
    * This implicit conversion constructor is particularly useful when calling
    * a function that takes an ArrayView object as argument, and passing in
-   * a boost::container::small_vector.
+   * a container.
    *
-   * @note This constructor takes a reference to a @p const vector as argument.
+   * @note This constructor takes a reference to a @p const container as argument.
    *   It can only be used to initialize ArrayView objects that point to
    *   @p const memory locations, such as <code>ArrayView@<const double@></code>.
    *   You cannot initialize ArrayView objects to non-@p const memory with
    *   such arguments, such as <code>ArrayView@<double@></code>.
    */
-  template <std::size_t N>
-  ArrayView(const boost::container::small_vector<std::remove_cv_t<value_type>,
-                                                 N> &vector);
+  template <typename ContiguousContainer,
+            typename = decltype(std::data(std::declval<ContiguousContainer>())),
+            typename = decltype(std::size(std::declval<ContiguousContainer>())),
+            typename = std::enable_if_t<
+              std::is_same_v<
+                std::remove_cv_t<ElementType>,
+                std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+              std::is_const_v<ElementType>>>
+  ArrayView(const ContiguousContainer &container);
 
   /**
-   * A constructor that automatically creates a view from a
-   * boost::container::small_vector object. The view encompasses all elements of
-   * the given vector.
+   * A constructor that automatically creates a view from a container
+   * object that requires a contiguous array of elements (such as
+   * `std::vector`, `std::array`, `boost::container::small_vector`,
+   * and the like). The view encompasses all elements of the given
+   * container.
    *
    * This implicit conversion constructor is particularly useful when calling
    * a function that takes an ArrayView object as argument, and passing in
-   * a boost::container::small_vector.
+   * a container.
    *
-   * @note This constructor takes a reference to a non-@p const vector as
+   * @note This constructor takes a reference to a non-@p const container as
    *   argument. It can be used to initialize ArrayView objects that point to
    *   either @p const memory locations, such as
    *   <code>ArrayView@<const double@></code>, or to non-@p const memory,
    *   such as <code>ArrayView@<double@></code>.
    */
-  template <std::size_t N>
-  ArrayView(
-    boost::container::small_vector<std::remove_cv_t<value_type>, N> &vector);
+  template <typename ContiguousContainer,
+            typename = decltype(std::data(std::declval<ContiguousContainer>())),
+            typename = decltype(std::size(std::declval<ContiguousContainer>())),
+            typename = std::enable_if_t<std::is_same_v<
+              std::remove_cv_t<ElementType>,
+              std::remove_cv_t<typename ContiguousContainer::value_type>>>>
+  ArrayView(ContiguousContainer &container);
+
+#endif
 
   /**
    * A constructor that automatically creates a view for a given C-style array.
@@ -236,28 +274,6 @@ public:
    */
   template <std::size_t N>
   ArrayView(value_type (&array)[N]);
-
-  /**
-   * A constructor that automatically creates a view from a std::array object.
-   * The view encompasses all elements of the given vector.
-   *
-   * This implicit conversion constructor is particularly useful when calling
-   * a function that takes an ArrayView object as argument, and passing in
-   * a std::array.
-   */
-  template <std::size_t N>
-  ArrayView(const std::array<std::remove_cv_t<value_type>, N> &vector);
-
-  /**
-   * A constructor that automatically creates a view from a std::array object.
-   * The view encompasses all elements of the given vector.
-   *
-   * This implicit conversion constructor is particularly useful when calling
-   * a function that takes an ArrayView object as argument, and passing in
-   * a std::array.
-   */
-  template <std::size_t N>
-  ArrayView(std::array<std::remove_cv_t<value_type>, N> &vector);
 
   /**
    * A constructor that creates a view of the array that underlies a
@@ -535,97 +551,57 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 {}
 
 
+#ifdef DEAL_II_HAVE_CXX20
 
 template <typename ElementType, typename MemorySpaceType>
+template <typename ContiguousContainer>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const std::vector<std::remove_cv_t<value_type>> &vector)
+  const ContiguousContainer &container)
+  requires(std::is_same_v<
+             std::remove_cv_t<ElementType>,
+             std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+           std::is_const_v<ElementType> &&
+           concepts::is_contiguous_container<ContiguousContainer>)
   : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
-{
-  // the following static_assert is not strictly necessary because,
-  // if we got a const std::vector reference argument but ElementType
-  // is not itself const, then the call to the forwarding constructor
-  // above will already have failed: vector.data() will have returned
-  // a const pointer, but we need a non-const pointer.
-  //
-  // nevertheless, leave the static_assert in since it provides a
-  // more descriptive error message that will simply come after the first
-  // error produced above
-  static_assert(std::is_const_v<value_type> == true,
-                "This constructor may only be called if the ArrayView "
-                "object has a const value_type. In other words, you can "
-                "only create an ArrayView to const values from a const "
-                "std::vector.");
-}
-
-
-
-template <typename ElementType, typename MemorySpaceType>
-inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  std::vector<std::remove_cv_t<value_type>> &vector)
-  : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
+  ArrayView(container.data(), container.size())
 {}
 
 
 
 template <typename ElementType, typename MemorySpaceType>
-template <std::size_t N>
+template <typename ContiguousContainer>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const boost::container::small_vector<std::remove_cv_t<value_type>, N> &vector)
+  ContiguousContainer &container)
+  requires(std::is_same_v<
+             std::remove_cv_t<ElementType>,
+             std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+           concepts::is_contiguous_container<ContiguousContainer>)
   : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
-{
-  // the following static_assert is not strictly necessary because,
-  // if we got a const boost::container::small_vector reference argument but
-  // ElementType is not itself const, then the call to the forwarding
-  // constructor above will already have failed: vector.data() will have
-  // returned a const pointer, but we need a non-const pointer.
-  //
-  // nevertheless, leave the static_assert in since it provides a
-  // more descriptive error message that will simply come after the first
-  // error produced above
-  static_assert(std::is_const_v<value_type> == true,
-                "This constructor may only be called if the ArrayView "
-                "object has a const value_type. In other words, you can "
-                "only create an ArrayView to const values from a const "
-                "std::vector.");
-}
+  ArrayView(std::data(container), std::size(container))
+{}
 
 
+#else
 
 template <typename ElementType, typename MemorySpaceType>
-template <std::size_t N>
+template <typename ContiguousContainer, typename, typename, typename>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  boost::container::small_vector<std::remove_cv_t<value_type>, N> &vector)
+  const ContiguousContainer &container)
   : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
+  ArrayView(container.data(), container.size())
 {}
 
 
 
 template <typename ElementType, typename MemorySpaceType>
-template <std::size_t N>
+template <typename ContiguousContainer, typename, typename, typename>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const std::array<std::remove_cv_t<value_type>, N> &vector)
+  ContiguousContainer &container)
   : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
-{
-  // the following static_assert is not strictly necessary because,
-  // if we got a const std::array reference argument but ElementType
-  // is not itself const, then the call to the forwarding constructor
-  // above will already have failed: vector.data() will have returned
-  // a const pointer, but we need a non-const pointer.
-  //
-  // nevertheless, leave the static_assert in since it provides a
-  // more descriptive error message that will simply come after the first
-  // error produced above
-  static_assert(std::is_const_v<value_type> == true,
-                "This constructor may only be called if the ArrayView "
-                "object has a const value_type. In other words, you can "
-                "only create an ArrayView to const values from a const "
-                "std::array.");
-}
+  ArrayView(std::data(container), std::size(container))
+{}
+
+#endif
 
 
 
@@ -635,17 +611,6 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   ElementType (&array)[N])
   : ArrayView(&array[0], N)
 {}
-
-
-
-template <typename ElementType, typename MemorySpaceType>
-template <std::size_t N>
-inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  std::array<std::remove_cv_t<value_type>, N> &vector)
-  : // use delegating constructor
-  ArrayView(vector.data(), vector.size())
-{}
-
 
 
 template <typename ElementType, typename MemorySpaceType>
