@@ -71,3 +71,18 @@ for (deal_II_space_dimension : SPACE_DIMENSIONS)
         const Quadrature<deal_II_space_dimension> &);
     \}
   }
+
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template std::pair<unsigned int, double>
+      GridTools::get_longest_direction<deal_II_dimension, deal_II_dimension>(
+        Triangulation<deal_II_dimension>::active_cell_iterator);
+
+#if deal_II_dimension < 3
+    template std::pair<unsigned int, double>
+      GridTools::get_longest_direction<deal_II_dimension,
+                                       deal_II_dimension + 1>(
+        Triangulation<deal_II_dimension,
+                      deal_II_dimension + 1>::active_cell_iterator);
+#endif
+  }
