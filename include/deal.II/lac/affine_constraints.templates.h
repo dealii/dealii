@@ -144,6 +144,41 @@ AffineConstraints<number>::add_constraint(
 
 
 template <typename number>
+void
+AffineConstraints<number>::constrain_dof_to_zero(
+  const size_type constrained_dof)
+{
+  Assert(sorted == false, ExcMatrixIsClosed());
+  Assert(is_constrained(constrained_dof) == false,
+         ExcMessage("You cannot add a constraint for a degree of freedom "
+                    "that is already constrained."));
+
+  // The following can happen when we compute with distributed meshes and dof
+  // handlers and we constrain a degree of freedom whose number we don't have
+  // locally. if we don't abort here the program will try to allocate several
+  // terabytes of memory to resize the various arrays below :-)
+  Assert(constrained_dof != numbers::invalid_size_type, ExcInternalError());
+
+  // if necessary enlarge vector of existing entries for cache
+  const size_type line_index = calculate_line_index(constrained_dof);
+  if (line_index >= lines_cache.size())
+    lines_cache.resize(std::max(2 * static_cast<size_type>(lines_cache.size()),
+                                line_index + 1),
+                       numbers::invalid_size_type);
+
+  // Push a new line to the end of the list and fill it with the
+  // provided information:
+  ConstraintLine &constraint = lines.emplace_back();
+  constraint.index           = constrained_dof;
+  constraint.inhomogeneity   = 0.;
+
+  // Record the new constraint in the cache:
+  lines_cache[line_index] = lines.size() - 1;
+}
+
+
+
+template <typename number>
 typename AffineConstraints<number>::LineRange
 AffineConstraints<number>::get_lines() const
 {
