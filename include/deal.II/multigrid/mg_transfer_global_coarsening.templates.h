@@ -707,102 +707,7 @@ namespace internal
       : dof_handler_fine(dof_handler_fine)
       , mg_level_fine(mg_level_fine)
     {
-      std::vector<types::global_dof_index> locally_active_non_local_indices;
-
-      if (this->mg_level_fine == numbers::invalid_unsigned_int)
-        {
-          is_locally_owned_dofs = dof_handler_fine.locally_owned_dofs();
-
-          std::vector<types::global_dof_index> dof_indices_cell;
-
-          loop_over_active_or_level_cells(
-            dof_handler_coarse,
-            numbers::invalid_unsigned_int,
-            [&](const auto &cell_coarse) {
-              // create fine cell in two steps, since the coarse cell and
-              // the fine cell are associated to different Trinagulation
-              // objects
-              const auto cell_id = cell_coarse->id();
-              const auto cell_fine_raw =
-                dof_handler_fine.get_triangulation().create_cell_iterator(
-                  cell_id);
-
-              if (cell_fine_raw->has_children() == false)
-                {
-                  // cell has no children on fine mesh
-
-                  // convert CellAccessor to DoFCellAccessor
-                  const auto cell_fine =
-                    cell_fine_raw->as_dof_handler_iterator(dof_handler_fine);
-
-                  dof_indices_cell.resize(
-                    cell_fine->get_fe().n_dofs_per_cell());
-                  cell_fine->get_dof_indices(dof_indices_cell);
-                  locally_active_non_local_indices.insert(
-                    locally_active_non_local_indices.end(),
-                    dof_indices_cell.begin(),
-                    dof_indices_cell.end());
-                }
-              else
-                {
-                  // cell has children on fine mesh: loop over all children
-                  for (const auto &child_raw : cell_fine_raw->child_iterators())
-                    {
-                      // convert CellAccessor of child to DoFCellAccessor
-                      const auto child =
-                        child_raw->as_dof_handler_iterator(dof_handler_fine);
-
-                      dof_indices_cell.resize(
-                        child->get_fe().n_dofs_per_cell());
-                      child->get_dof_indices(dof_indices_cell);
-
-                      for (const auto i : dof_indices_cell)
-                        if (is_locally_owned_dofs.is_element(i) == false)
-                          locally_active_non_local_indices.push_back(i);
-                    }
-                }
-            });
-        }
-      else
-        {
-          is_locally_owned_dofs =
-            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
-
-          Assert(mg_level_fine > 0, ExcInternalError());
-
-          std::vector<types::global_dof_index> dof_indices_cell;
-
-          loop_over_active_or_level_cells(
-            dof_handler_fine, mg_level_fine - 1, [&](const auto &cell) {
-              if (cell->has_children())
-                {
-                  for (const auto &child : cell->child_iterators())
-                    {
-                      dof_indices_cell.resize(
-                        child->get_fe().n_dofs_per_cell());
-                      child->get_mg_dof_indices(dof_indices_cell);
-
-                      for (const auto i : dof_indices_cell)
-                        if (is_locally_owned_dofs.is_element(i) == false)
-                          locally_active_non_local_indices.push_back(i);
-                    }
-                }
-            });
-        }
-
-      is_locally_active_dofs.set_size(is_locally_owned_dofs.size());
-
-      is_locally_active_dofs.add_indices(is_locally_owned_dofs);
-
-      std::sort(locally_active_non_local_indices.begin(),
-                locally_active_non_local_indices.end());
-      locally_active_non_local_indices.erase(
-        std::unique(locally_active_non_local_indices.begin(),
-                    locally_active_non_local_indices.end()),
-        locally_active_non_local_indices.end());
-      is_locally_active_dofs.add_indices(
-        locally_active_non_local_indices.begin(),
-        locally_active_non_local_indices.end());
+      (void)dof_handler_coarse;
     }
 
     virtual ~FirstChildPolicyFineDoFHandlerView() = default;
@@ -2333,7 +2238,7 @@ namespace internal
                            .count() /
                          1e9;
 
-      if (false)
+      if (true)
         std::cout << time0 << " " << time1 << " " << time2 << " " << time3
                   << " " << time4 << " " << time5 << std::endl;
     }
