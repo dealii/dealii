@@ -664,7 +664,7 @@ namespace internal
       std::sort(locally_relevant_dofs_temp.begin(),
                 locally_relevant_dofs_temp.end());
 
-      IndexSet locally_relevant_dofs;
+      IndexSet locally_relevant_dofs(locally_owned_indices.size());
       locally_relevant_dofs.add_indices(locally_relevant_dofs_temp.begin(),
                                         locally_relevant_dofs_temp.end());
 
