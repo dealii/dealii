@@ -12520,6 +12520,34 @@ void Triangulation<dim, spacedim>::copy_triangulation(
   if (other_tria.policy)
     this->policy = other_tria.policy->clone();
 
+  // periodic faces
+  this->periodic_face_pairs_level_0.reserve(
+    other_tria.periodic_face_pairs_level_0.size());
+
+  for (auto entry : other_tria.periodic_face_pairs_level_0)
+    {
+      entry.cell[0] =
+        cell_iterator(this, entry.cell[0]->level(), entry.cell[0]->index());
+      entry.cell[1] =
+        cell_iterator(this, entry.cell[1]->level(), entry.cell[1]->index());
+      periodic_face_pairs_level_0.emplace_back(entry);
+    }
+
+  for (auto [first_cell_, second_cell_and_orientation] :
+       other_tria.periodic_face_map)
+    {
+      auto first_cell  = first_cell_; // make copy since key is const
+      first_cell.first = cell_iterator(this,
+                                       first_cell.first->level(),
+                                       first_cell.first->index());
+      second_cell_and_orientation.first.first =
+        cell_iterator(this,
+                      second_cell_and_orientation.first.first->level(),
+                      second_cell_and_orientation.first.first->index());
+
+      this->periodic_face_map[first_cell] = second_cell_and_orientation;
+    }
+
   // inform those who are listening on other_tria of the copy operation
   other_tria.signals.copy(*this);
   // also inform all listeners of the current triangulation that the
