@@ -158,6 +158,39 @@ namespace GridTools
 
 
 
+  template <int dim, int spacedim>
+  std::pair<unsigned int, double>
+  get_longest_direction(
+    typename Triangulation<dim, spacedim>::active_cell_iterator cell)
+  {
+    double       max_ratio = 1;
+    unsigned int index     = 0;
+
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = i + 1; j < dim; ++j)
+        {
+          unsigned int ax      = i % dim;
+          unsigned int next_ax = j % dim;
+
+          double ratio =
+            cell->extent_in_direction(ax) / cell->extent_in_direction(next_ax);
+
+          if (ratio > max_ratio)
+            {
+              max_ratio = ratio;
+              index     = ax;
+            }
+          else if (1.0 / ratio > max_ratio)
+            {
+              max_ratio = 1.0 / ratio;
+              index     = next_ax;
+            }
+        }
+    return std::make_pair(index, max_ratio);
+  }
+
+
+
   namespace
   {
     /**

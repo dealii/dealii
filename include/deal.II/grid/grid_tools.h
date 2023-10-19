@@ -2112,22 +2112,6 @@ namespace GridTools
   compute_local_to_global_vertex_index_map(
     const parallel::distributed::Triangulation<dim, spacedim> &triangulation);
 
-  /**
-   * Return the highest value among ratios between extents in each of the
-   * coordinate directions of a @p cell. Moreover, return the dimension
-   * relative to the highest elongation.
-   *
-   * @param[in] cell an iterator pointing to the cell.
-   *
-   * @return  A std::pair<unsigned int, double> such that the @p first value
-   * is the dimension of the highest elongation and the @p second value is the
-   * ratio among the dimensions of the @p cell.
-   */
-  template <int dim, int spacedim>
-  std::pair<unsigned int, double>
-  get_longest_direction(
-    typename Triangulation<dim, spacedim>::active_cell_iterator cell);
-
   /** @} */
   /**
    * @name Partitions and subdomains of triangulations
