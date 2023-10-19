@@ -57,7 +57,11 @@ IndexSet::IndexSet(
               size_type(map->getMaxGlobalIndex() + 1));
   else
     {
+#    if DEAL_II_TRILINOS_VERSION_GTE(13, 4, 0)
       const size_type n_indices = map->getLocalNumElements();
+#    else
+      const size_type n_indices = map->getNodeNumElements();
+#    endif
       const types::signed_global_dof_index *indices =
         map->getMyGlobalIndices().data();
       add_indices(indices, indices + n_indices);
