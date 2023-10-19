@@ -870,6 +870,10 @@ namespace internal
       std::vector<types::global_dof_index>         &dof_indices,
       const ArrayView<ConstraintKinds>             &masks) const
     {
+      // 0) clear flags
+      for (unsigned int c = 0; c < masks.size(); ++c)
+        masks[c] = ConstraintKinds::unconstrained;
+
       // 1) check if finite elements support fast hanging-node algorithm
       const auto supported_components = compute_supported_components(
         cell->get_dof_handler().get_fe_collection());
