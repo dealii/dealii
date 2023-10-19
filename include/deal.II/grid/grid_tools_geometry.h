@@ -35,14 +35,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/**
- * This namespace is a collection of algorithms working on triangulations,
- * such as shifting or rotating triangulations, but also finding a cell that
- * contains a given point. See the descriptions of the individual functions
- * for more information.
- *
- * @ingroup grid
- */
 namespace GridTools
 {
   /**
