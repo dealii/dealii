@@ -57,6 +57,7 @@ set(_separate_src
   grid_tools_dof_handlers.cc
   grid_tools_geometry.cc
   grid_tools_nontemplates.cc
+  grid_tools_topology.cc
   tria.cc
   )
 
@@ -82,6 +83,7 @@ set(_inst
   grid_tools_cache.inst.in
   grid_tools_dof_handlers.inst.in
   grid_tools_geometry.inst.in
+  grid_tools_topology.inst.in
   intergrid_map.inst.in
   manifold.inst.in
   manifold_lib.inst.in
