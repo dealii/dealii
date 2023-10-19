@@ -2199,7 +2199,7 @@ namespace DoFTools
           if (constraints_are_cyclic)
             {
               if (std::abs(cycle_constraint_factor - number(1.)) > eps)
-                affine_constraints.add_constraint(dof_left, {}, 0.);
+                affine_constraints.constrain_dof_to_zero(dof_left);
             }
           else
             {
@@ -3594,9 +3594,8 @@ namespace DoFTools
                             // inhomogeneity is zero:
                             if (zero_boundary_constraints.is_constrained(
                                   face_dof) == false)
-                              zero_boundary_constraints.add_constraint(face_dof,
-                                                                       {},
-                                                                       0.);
+                              zero_boundary_constraints.constrain_dof_to_zero(
+                                face_dof);
                             else
                               Assert(zero_boundary_constraints
                                          .is_inhomogeneously_constrained(

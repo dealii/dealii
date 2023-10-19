@@ -854,7 +854,7 @@ namespace Step37
             DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
           for (const types::global_dof_index dof_index :
                mg_constrained_dofs.get_boundary_indices(level))
-            level_constraints.add_constraint(dof_index, {}, 0.);
+            level_constraints.constrain_dof_to_zero(dof_index);
           level_constraints.close();
 
           typename MatrixFree<dim, float>::AdditionalData additional_data;

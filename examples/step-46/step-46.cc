@@ -385,9 +385,8 @@ namespace Step46
                          ++i)
                       if (stokes_fe.face_system_to_component_index(i).first <
                           dim)
-                        constraints.add_constraint(local_face_dof_indices[i],
-                                                   {},
-                                                   0.);
+                        constraints.constrain_dof_to_zero(
+                          local_face_dof_indices[i]);
                   }
               }
     }

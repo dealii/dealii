@@ -598,7 +598,7 @@ void LaplaceProblem<dim, degree>::setup_multigrid()
                                                               level));
               for (const types::global_dof_index dof_index :
                    mg_constrained_dofs.get_boundary_indices(level))
-                level_constraints.add_constraint(dof_index, {}, 0.);
+                level_constraints.constrain_dof_to_zero(dof_index);
               level_constraints.close();
 
               typename MatrixFree<dim, float>::AdditionalData additional_data;
@@ -830,10 +830,10 @@ void LaplaceProblem<dim, degree>::assemble_multigrid()
 
       for (const types::global_dof_index dof_index :
            mg_constrained_dofs.get_refinement_edge_indices(level))
-        boundary_constraints[level].add_constraint(dof_index, {}, 0.);
+        boundary_constraints[level].constrain_dof_to_zero(dof_index);
       for (const types::global_dof_index dof_index :
            mg_constrained_dofs.get_boundary_indices(level))
-        boundary_constraints[level].add_constraint(dof_index, {}, 0.);
+        boundary_constraints[level].constrain_dof_to_zero(dof_index);
       boundary_constraints[level].close();
     }
 
