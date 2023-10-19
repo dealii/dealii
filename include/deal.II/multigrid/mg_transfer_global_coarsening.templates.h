@@ -4278,6 +4278,8 @@ MGTransferMF<dim, Number>::build(
   const bool use_local_smoothing =
     this->transfer.n_levels() == 0 || this->internal_transfer.n_levels() > 0;
 
+  auto temp_time = std::chrono::system_clock::now();
+
   if (use_local_smoothing)
     {
       this->initialize_internal_transfer(dof_handler,
@@ -4285,12 +4287,34 @@ MGTransferMF<dim, Number>::build(
       this->initialize_transfer_references(internal_transfer);
     }
 
+  const auto time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::system_clock::now() - temp_time)
+                       .count() /
+                     1e9;
+
+  temp_time = std::chrono::system_clock::now();
+
   this->build(external_partitioners);
+
+  const auto time2 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::system_clock::now() - temp_time)
+                       .count() /
+                     1e9;
+
+  temp_time = std::chrono::system_clock::now();
 
   if (use_local_smoothing)
     this->fill_and_communicate_copy_indices(dof_handler);
   else
     this->fill_and_communicate_copy_indices_global_coarsening(dof_handler);
+
+  const auto time3 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::system_clock::now() - temp_time)
+                       .count() /
+                     1e9;
+
+  if (true)
+    std::cout << time1 << " " << time2 << " " << time3 << std::endl;
 }
 
 
