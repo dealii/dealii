@@ -1891,7 +1891,7 @@ namespace internal
           n_dof_indices_coarse[i + 1] += n_dof_indices_coarse[i];
         }
 
-      const auto time2 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      const auto time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
                            std::chrono::system_clock::now() - temp_time)
                            .count() /
                          1e9;
@@ -2029,35 +2029,34 @@ namespace internal
                 cell_no_1++;
               }
           });
-
-        transfer.partitioner_coarse =
-          transfer.constraint_info_coarse
-            .template finalize<types::global_dof_index>(
-              (mg_level_coarse == numbers::invalid_unsigned_int) ?
-                dof_handler_coarse.locally_owned_dofs() :
-                dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
-              dof_handler_coarse.get_communicator());
-        transfer.vec_coarse.reinit(transfer.partitioner_coarse);
-
-        transfer.partitioner_fine =
-          transfer.constraint_info_fine
-            .template finalize<types::global_dof_index>(
-              (mg_level_fine == numbers::invalid_unsigned_int) ?
-                dof_handler_fine.locally_owned_dofs() :
-                dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
-              dof_handler_fine.get_communicator());
-        transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
 
-      const auto time3 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      const auto time2 = std::chrono::duration_cast<std::chrono::nanoseconds>(
                            std::chrono::system_clock::now() - temp_time)
                            .count() /
                          1e9;
 
       temp_time = std::chrono::system_clock::now();
 
+      transfer.partitioner_coarse =
+        transfer.constraint_info_coarse
+          .template finalize<types::global_dof_index>(
+            (mg_level_coarse == numbers::invalid_unsigned_int) ?
+              dof_handler_coarse.locally_owned_dofs() :
+              dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
+            dof_handler_coarse.get_communicator());
+      transfer.vec_coarse.reinit(transfer.partitioner_coarse);
 
-      const auto time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+      transfer.partitioner_fine =
+        transfer.constraint_info_fine
+          .template finalize<types::global_dof_index>(
+            (mg_level_fine == numbers::invalid_unsigned_int) ?
+              dof_handler_fine.locally_owned_dofs() :
+              dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
+            dof_handler_fine.get_communicator());
+      transfer.vec_fine.reinit(transfer.partitioner_fine);
+
+      const auto time3 = std::chrono::duration_cast<std::chrono::nanoseconds>(
                            std::chrono::system_clock::now() - temp_time)
                            .count() /
                          1e9;
