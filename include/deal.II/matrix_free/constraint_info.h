@@ -593,20 +593,39 @@ namespace internal
           this->row_starts_plain_indices.emplace_back(0);
         }
 
-      IndexSet ghost_indices;
+      std::vector<types::global_dof_index> locally_relevant_dofs_temp;
 
-      // TODO
+      for (unsigned int i = 0; i < dof_indices_per_cell.size(); ++i)
+        {
+          for (const auto &j : dof_indices_per_cell[i])
+            if (locally_owned_indices.is_element(j) == false)
+              locally_relevant_dofs_temp.push_back(j);
+
+          if (plain_dof_indices_per_cell.empty() == false)
+            {
+              for (const auto &j : plain_dof_indices_per_cell[i])
+                if (locally_owned_indices.is_element(j) == false)
+                  locally_relevant_dofs_temp.push_back(j);
+            }
+        }
+
+      std::sort(locally_relevant_dofs_temp.begin(),
+                locally_relevant_dofs_temp.end());
+
+      IndexSet locally_relevant_dofs;
+      locally_relevant_dofs.add_indices(locally_relevant_dofs_temp.begin(),
+                                        locally_relevant_dofs_temp.end());
 
       const auto partitioner =
         std::make_shared<Utilities::MPI::Partitioner>(locally_owned_indices,
-                                                      ghost_indices,
+                                                      locally_relevant_dofs,
                                                       comm);
 
       for (unsigned int i = 0; i < dof_indices_per_cell.size(); ++i)
         {
-          this->dof_indices.insert(this->dof_indices.end(),
-                                   dof_indices_per_cell[i].begin(),
-                                   dof_indices_per_cell[i].end());
+          for (const auto &j : dof_indices_per_cell[i])
+            this->dof_indices.push_back(partitioner->global_to_local(j));
+
           this->constraint_indicator.insert(
             this->constraint_indicator.end(),
             constraint_indicator_per_cell[i].begin(),
@@ -617,10 +636,9 @@ namespace internal
 
           if (plain_dof_indices_per_cell.empty() == false)
             {
-              this->plain_dof_indices.insert(
-                this->plain_dof_indices.end(),
-                plain_dof_indices_per_cell[i].begin(),
-                plain_dof_indices_per_cell[i].end());
+              for (const auto &j : plain_dof_indices_per_cell[i])
+                this->plain_dof_indices.push_back(
+                  partitioner->global_to_local(j));
 
               this->row_starts_plain_indices.emplace_back(
                 this->plain_dof_indices.size());
