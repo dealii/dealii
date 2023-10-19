@@ -155,6 +155,10 @@ namespace internal
       ConstraintValues<double>               constraint_values;
       std::vector<std::vector<unsigned int>> dof_indices_per_cell;
       std::vector<std::vector<unsigned int>> plain_dof_indices_per_cell;
+      std::vector<std::vector<types::global_dof_index>>
+        dof_indices_per_cell_long;
+      std::vector<std::vector<types::global_dof_index>>
+        plain_dof_indices_per_cell_long;
       std::vector<std::vector<std::pair<unsigned short, unsigned short>>>
         constraint_indicator_per_cell;
 
@@ -190,6 +194,30 @@ namespace internal
       std::vector<types::global_dof_index> local_dof_indices;
       std::vector<types::global_dof_index> local_dof_indices_lex;
       std::vector<ConstraintKinds>         mask;
+
+      template <typename T>
+      std::vector<std::vector<T>> &
+      get_dof_indices_per_cell()
+      {
+        if constexpr (std::is_same_v<T, unsigned int>)
+          return dof_indices_per_cell;
+        else if constexpr (std::is_same_v<T, types::global_dof_index>)
+          return dof_indices_per_cell_long;
+        else
+          return {};
+      }
+
+      template <typename T>
+      std::vector<std::vector<T>> &
+      get_plain_dof_indices_per_cell()
+      {
+        if constexpr (std::is_same_v<T, unsigned int>)
+          return plain_dof_indices_per_cell;
+        else if constexpr (std::is_same_v<T, types::global_dof_index>)
+          return plain_dof_indices_per_cell_long;
+        else
+          return {};
+      }
     };
 
 
@@ -270,8 +298,8 @@ namespace internal
       const unsigned int     n_cells,
       const bool             use_fast_hanging_node_algorithm)
     {
-      this->dof_indices_per_cell.resize(n_cells);
-      this->plain_dof_indices_per_cell.resize(n_cells);
+      this->template get_dof_indices_per_cell<T>().resize(n_cells);
+      this->template get_plain_dof_indices_per_cell<T>().resize(n_cells);
       this->constraint_indicator_per_cell.resize(n_cells);
 
       // note: has_hanging_nodes() is a global operatrion
@@ -318,8 +346,8 @@ namespace internal
     inline void
     ConstraintInfo<dim, Number>::reinit(const unsigned int n_cells)
     {
-      this->dof_indices_per_cell.resize(n_cells);
-      this->plain_dof_indices_per_cell.resize(0);
+      this->template get_dof_indices_per_cell<T>().resize(n_cells);
+      this->template get_plain_dof_indices_per_cell<T>().resize(0);
       this->constraint_indicator_per_cell.resize(n_cells);
     }
 
@@ -360,17 +388,21 @@ namespace internal
       std::pair<unsigned short, unsigned short> constraint_iterator(0, 0);
 
       AssertIndexRange(cell_no, this->constraint_indicator_per_cell.size());
-      AssertIndexRange(cell_no, this->dof_indices_per_cell.size());
-      AssertIndexRange(cell_no, this->plain_dof_indices_per_cell.size());
-      AssertIndexRange(cell_no, this->plain_dof_indices_per_cell.size());
+      AssertIndexRange(cell_no,
+                       this->template get_dof_indices_per_cell<T>().size());
+      AssertIndexRange(
+        cell_no, this->template get_plain_dof_indices_per_cell<T>().size());
 
       auto &constraint_indicator = this->constraint_indicator_per_cell[cell_no];
-      auto &dof_indices          = this->dof_indices_per_cell[cell_no];
-      auto &plain_dof_indices    = this->plain_dof_indices_per_cell[cell_no];
+      auto &dof_indices = this->template get_dof_indices_per_cell<T>()[cell_no];
+      auto &plain_dof_indices =
+        this->template get_plain_dof_indices_per_cell<T>()[cell_no];
 
       AssertDimension(constraint_indicator_per_cell[cell_no].size(), 0);
-      AssertDimension(dof_indices_per_cell[cell_no].size(), 0);
-      AssertDimension(plain_dof_indices_per_cell[cell_no].size(), 0);
+      AssertDimension(
+        this->template get_dof_indices_per_cell<T>()[cell_no].size(), 0);
+      AssertDimension(
+        this->template get_plain_dof_indices_per_cell<T>()[cell_no].size(), 0);
 
       const auto global_to_local =
         [&](const types::global_dof_index global_index) -> T {
@@ -470,7 +502,7 @@ namespace internal
       std::pair<unsigned short, unsigned short> constraint_iterator(0, 0);
 
       auto &constraint_indicator = this->constraint_indicator_per_cell[cell_no];
-      auto &dof_indices          = this->dof_indices_per_cell[cell_no];
+      auto &dof_indices = this->template get_dof_indices_per_cell<T>()[cell_no];
 
       for (const auto current_dof : local_dof_indices_lex)
         {
@@ -515,17 +547,20 @@ namespace internal
       this->row_starts = {};
       this->row_starts.emplace_back(0, 0);
 
-      if (plain_dof_indices_per_cell.empty() == false)
+      if (this->template get_plain_dof_indices_per_cell<T>().empty() == false)
         {
           this->row_starts_plain_indices = {};
           this->row_starts_plain_indices.emplace_back(0);
         }
 
-      for (unsigned int i = 0; i < dof_indices_per_cell.size(); ++i)
+      for (unsigned int i = 0;
+           i < this->template get_dof_indices_per_cell<T>().size();
+           ++i)
         {
-          this->dof_indices.insert(this->dof_indices.end(),
-                                   dof_indices_per_cell[i].begin(),
-                                   dof_indices_per_cell[i].end());
+          this->dof_indices.insert(
+            this->dof_indices.end(),
+            this->template get_dof_indices_per_cell<T>()[i].begin(),
+            this->template get_dof_indices_per_cell<T>()[i].end());
           this->constraint_indicator.insert(
             this->constraint_indicator.end(),
             constraint_indicator_per_cell[i].begin(),
@@ -534,12 +569,13 @@ namespace internal
           this->row_starts.emplace_back(this->dof_indices.size(),
                                         this->constraint_indicator.size());
 
-          if (plain_dof_indices_per_cell.empty() == false)
+          if (this->template get_plain_dof_indices_per_cell<T>().empty() ==
+              false)
             {
               this->plain_dof_indices.insert(
                 this->plain_dof_indices.end(),
-                plain_dof_indices_per_cell[i].begin(),
-                plain_dof_indices_per_cell[i].end());
+                this->template get_plain_dof_indices_per_cell<T>()[i].begin(),
+                this->template get_plain_dof_indices_per_cell<T>()[i].end());
 
               this->row_starts_plain_indices.emplace_back(
                 this->plain_dof_indices.size());
@@ -573,7 +609,7 @@ namespace internal
 
       AssertDimension(constraint_pool_data.size(), length);
 
-      dof_indices_per_cell.clear();
+      this->template get_dof_indices_per_cell<T>().clear();
       constraint_indicator_per_cell.clear();
 
       if (hanging_nodes &&
@@ -599,7 +635,7 @@ namespace internal
       this->row_starts = {};
       this->row_starts.emplace_back(0, 0);
 
-      if (plain_dof_indices_per_cell.empty() == false)
+      if (this->template get_plain_dof_indices_per_cell<T>().empty() == false)
         {
           this->row_starts_plain_indices = {};
           this->row_starts_plain_indices.emplace_back(0);
@@ -607,15 +643,19 @@ namespace internal
 
       std::vector<types::global_dof_index> locally_relevant_dofs_temp;
 
-      for (unsigned int i = 0; i < dof_indices_per_cell.size(); ++i)
+      for (unsigned int i = 0;
+           i < this->template get_dof_indices_per_cell<T>().size();
+           ++i)
         {
-          for (const auto &j : dof_indices_per_cell[i])
+          for (const auto &j : this->template get_dof_indices_per_cell<T>()[i])
             if (locally_owned_indices.is_element(j) == false)
               locally_relevant_dofs_temp.push_back(j);
 
-          if (plain_dof_indices_per_cell.empty() == false)
+          if (this->template get_plain_dof_indices_per_cell<T>().empty() ==
+              false)
             {
-              for (const auto &j : plain_dof_indices_per_cell[i])
+              for (const auto &j :
+                   this->template get_plain_dof_indices_per_cell<T>()[i])
                 if (locally_owned_indices.is_element(j) == false)
                   locally_relevant_dofs_temp.push_back(j);
             }
@@ -633,9 +673,11 @@ namespace internal
                                                       locally_relevant_dofs,
                                                       comm);
 
-      for (unsigned int i = 0; i < dof_indices_per_cell.size(); ++i)
+      for (unsigned int i = 0;
+           i < this->template get_dof_indices_per_cell<T>().size();
+           ++i)
         {
-          for (const auto &j : dof_indices_per_cell[i])
+          for (const auto &j : this->template get_dof_indices_per_cell<T>()[i])
             this->dof_indices.push_back(partitioner->global_to_local(j));
 
           this->constraint_indicator.insert(
@@ -646,9 +688,11 @@ namespace internal
           this->row_starts.emplace_back(this->dof_indices.size(),
                                         this->constraint_indicator.size());
 
-          if (plain_dof_indices_per_cell.empty() == false)
+          if (this->template get_plain_dof_indices_per_cell<T>().empty() ==
+              false)
             {
-              for (const auto &j : plain_dof_indices_per_cell[i])
+              for (const auto &j :
+                   this->template get_plain_dof_indices_per_cell<T>()[i])
                 this->plain_dof_indices.push_back(
                   partitioner->global_to_local(j));
 
@@ -684,7 +728,7 @@ namespace internal
 
       AssertDimension(constraint_pool_data.size(), length);
 
-      dof_indices_per_cell.clear();
+      this->template get_dof_indices_per_cell<T>().clear();
       constraint_indicator_per_cell.clear();
 
       if (hanging_nodes &&
@@ -871,6 +915,9 @@ namespace internal
       size += MemoryConsumption::memory_consumption(constraint_values);
       size += MemoryConsumption::memory_consumption(dof_indices_per_cell);
       size += MemoryConsumption::memory_consumption(plain_dof_indices_per_cell);
+      size += MemoryConsumption::memory_consumption(dof_indices_per_cell_long);
+      size +=
+        MemoryConsumption::memory_consumption(plain_dof_indices_per_cell_long);
       size +=
         MemoryConsumption::memory_consumption(constraint_indicator_per_cell);
 
