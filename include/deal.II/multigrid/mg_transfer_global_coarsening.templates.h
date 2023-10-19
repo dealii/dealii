@@ -2031,15 +2031,16 @@ namespace internal
         unsigned int cell_no_0 = 0;
         unsigned int cell_no_1 = transfer.schemes[0].n_coarse_cells;
 
-        transfer.constraint_info_coarse.reinit(
-          dof_handler_coarse,
-          transfer.schemes[0].n_coarse_cells +
-            transfer.schemes[1].n_coarse_cells,
-          constraints_coarse.n_constraints() > 0 &&
-            use_fast_hanging_node_algorithm(dof_handler_coarse,
-                                            mg_level_coarse));
+        transfer.constraint_info_coarse
+          .template reinit<types::global_dof_index>(
+            dof_handler_coarse,
+            transfer.schemes[0].n_coarse_cells +
+              transfer.schemes[1].n_coarse_cells,
+            constraints_coarse.n_constraints() > 0 &&
+              use_fast_hanging_node_algorithm(dof_handler_coarse,
+                                              mg_level_coarse));
 
-        transfer.constraint_info_fine.reinit(
+        transfer.constraint_info_fine.template reinit<types::global_dof_index>(
           transfer.schemes[0].n_coarse_cells +
           transfer.schemes[1].n_coarse_cells);
 
@@ -2047,12 +2048,13 @@ namespace internal
           [&](const auto &cell_coarse, const auto &cell_fine) {
             // parent
             {
-              transfer.constraint_info_coarse.read_dof_indices(
-                cell_no_0,
-                mg_level_coarse,
-                cell_coarse,
-                constraints_coarse,
-                transfer.partitioner_coarse);
+              transfer.constraint_info_coarse
+                .template read_dof_indices<types::global_dof_index>(
+                  cell_no_0,
+                  mg_level_coarse,
+                  cell_coarse,
+                  constraints_coarse,
+                  {});
             }
 
             // child
@@ -2064,8 +2066,9 @@ namespace internal
                 level_dof_indices_fine_0[i] =
                   local_dof_indices[lexicographic_numbering_fine[i]];
 
-              transfer.constraint_info_fine.read_dof_indices(
-                cell_no_0, level_dof_indices_fine_0, transfer.partitioner_fine);
+              transfer.constraint_info_fine
+                .template read_dof_indices<types::global_dof_index>(
+                  cell_no_0, level_dof_indices_fine_0, {});
             }
 
             // move pointers
@@ -2077,12 +2080,13 @@ namespace internal
             // parent (only once at the beginning)
             if (c == 0)
               {
-                transfer.constraint_info_coarse.read_dof_indices(
-                  cell_no_1,
-                  mg_level_coarse,
-                  cell_coarse,
-                  constraints_coarse,
-                  transfer.partitioner_coarse);
+                transfer.constraint_info_coarse
+                  .template read_dof_indices<types::global_dof_index>(
+                    cell_no_1,
+                    mg_level_coarse,
+                    cell_coarse,
+                    constraints_coarse,
+                    {});
 
                 level_dof_indices_fine_1.assign(level_dof_indices_fine_1.size(),
                                                 numbers::invalid_dof_index);
@@ -2113,27 +2117,30 @@ namespace internal
             // move pointers (only once at the end)
             if (c + 1 == GeometryInfo<dim>::max_children_per_cell)
               {
-                transfer.constraint_info_fine.read_dof_indices(
-                  cell_no_1,
-                  level_dof_indices_fine_1,
-                  transfer.partitioner_fine);
+                transfer.constraint_info_fine
+                  .template read_dof_indices<types::global_dof_index>(
+                    cell_no_1, level_dof_indices_fine_1, {});
 
                 cell_no_1++;
               }
           });
 
-        transfer.partitioner_coarse = transfer.constraint_info_coarse.finalize(
-          (mg_level_coarse == numbers::invalid_unsigned_int) ?
-            dof_handler_coarse.locally_owned_dofs() :
-            dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
-          dof_handler_coarse.get_communicator());
+        transfer.partitioner_coarse =
+          transfer.constraint_info_coarse
+            .template finalize<types::global_dof_index>(
+              (mg_level_coarse == numbers::invalid_unsigned_int) ?
+                dof_handler_coarse.locally_owned_dofs() :
+                dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
+              dof_handler_coarse.get_communicator());
         transfer.vec_coarse.reinit(transfer.partitioner_coarse);
 
-        transfer.partitioner_fine = transfer.constraint_info_fine.finalize(
-          (mg_level_fine == numbers::invalid_unsigned_int) ?
-            dof_handler_fine.locally_owned_dofs() :
-            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
-          dof_handler_fine.get_communicator());
+        transfer.partitioner_fine =
+          transfer.constraint_info_fine
+            .template finalize<types::global_dof_index>(
+              (mg_level_fine == numbers::invalid_unsigned_int) ?
+                dof_handler_fine.locally_owned_dofs() :
+                dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
+              dof_handler_fine.get_communicator());
         transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
 

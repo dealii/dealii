@@ -89,11 +89,13 @@ namespace internal
        * Version 1: indices are extracted from DoFCellAccessor and
        * constraints are resolved with the help of AffineConstraints.
        */
+      template <typename T = unsigned int>
       void
       reinit(const DoFHandler<dim> &dof_handler,
              const unsigned int     n_cells,
              const bool             use_fast_hanging_node_algorithm = true);
 
+      template <typename T = unsigned int>
       void
       read_dof_indices(
         const unsigned int                                    cell_no,
@@ -106,18 +108,22 @@ namespace internal
       /**
        * Version 2: no constraints, indices are user-provided.
        */
+      template <typename T = unsigned int>
       void
       reinit(const unsigned int n_cells);
 
+      template <typename T = unsigned int>
       void
       read_dof_indices(
         const unsigned int                                        cell_no,
         const std::vector<types::global_dof_index>               &dof_indices,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
+      template <typename T = unsigned int>
       void
       finalize();
 
+      template <typename T = unsigned int>
       std::shared_ptr<const Utilities::MPI::Partitioner>
       finalize(const IndexSet &locally_owned_indices, const MPI_Comm comm);
 
@@ -257,6 +263,7 @@ namespace internal
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::reinit(
       const DoFHandler<dim> &dof_handler,
@@ -307,6 +314,7 @@ namespace internal
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::reinit(const unsigned int n_cells)
     {
@@ -318,6 +326,7 @@ namespace internal
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::read_dof_indices(
       const unsigned int                                            cell_no,
@@ -364,7 +373,7 @@ namespace internal
       AssertDimension(plain_dof_indices_per_cell[cell_no].size(), 0);
 
       const auto global_to_local =
-        [&](const types::global_dof_index global_index) -> unsigned int {
+        [&](const types::global_dof_index global_index) -> T {
         if (partitioner)
           return partitioner->global_to_local(global_index);
         else
@@ -443,6 +452,7 @@ namespace internal
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::read_dof_indices(
       const unsigned int                          cell_no,
@@ -450,7 +460,7 @@ namespace internal
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
     {
       const auto global_to_local =
-        [&](const types::global_dof_index global_index) -> unsigned int {
+        [&](const types::global_dof_index global_index) -> T {
         if (partitioner)
           return partitioner->global_to_local(global_index);
         else
@@ -494,6 +504,7 @@ namespace internal
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::finalize()
     {
@@ -576,6 +587,7 @@ namespace internal
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline std::shared_ptr<const Utilities::MPI::Partitioner>
     ConstraintInfo<dim, Number>::finalize(const IndexSet &locally_owned_indices,
                                           const MPI_Comm  comm)
