@@ -193,9 +193,9 @@ public:
           if (global_ids[i] == numbers::invalid_size_type)
             continue;
 
-          constraints.add_line(global_ids[i]);
-          constraints.set_inhomogeneity(global_ids[i],
-                                        evaluation_point_results[i]);
+          constraints.add_constraint(global_ids[i],
+                                     {},
+                                     evaluation_point_results[i]);
         }
     }
     constraints.close();

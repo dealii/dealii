@@ -41,7 +41,7 @@ test()
 
 
   AffineConstraints<double> cm(owned, relevant);
-  cm.add_line(0);
+  cm.constrain_dof_to_zero(0);
   cm.close();
 
   AffineConstraints<double> cm2(cm);

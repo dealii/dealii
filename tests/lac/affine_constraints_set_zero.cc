@@ -40,8 +40,8 @@ test()
   local_active.add_range(myid * numproc, (myid + 1) * numproc);
 
   AffineConstraints<double> cm;
-  cm.add_line(1);
-  cm.add_line(2);
+  cm.constrain_dof_to_zero(1);
+  cm.constrain_dof_to_zero(2);
   cm.close();
 
   deallog << "CM:" << std::endl;

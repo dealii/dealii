@@ -90,11 +90,11 @@ test(bool use_constraint_matrix)
     {
       AffineConstraints<double> cm;
 
-      cm.add_line(1);
+      cm.constrain_dof_to_zero(1);
       cm.set_inhomogeneity(1, -5.0);
-      cm.add_line(3);
+      cm.constrain_dof_to_zero(3);
       cm.set_inhomogeneity(3, 2.0);
-      cm.add_line(4);
+      cm.constrain_dof_to_zero(4);
       cm.set_inhomogeneity(4, 0.0);
 
       cm.close();

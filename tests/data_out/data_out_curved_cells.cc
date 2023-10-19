@@ -158,7 +158,9 @@ curved_grid(std::ostream &out)
       for (const unsigned int vertex_no : GeometryInfo<2>::vertex_indices())
         {
           for (unsigned int i = 0; i < 2; ++i)
-            m[i].add_line(cell->vertex_dof_index(vertex_no, 0));
+            if (m[i].is_constrained(cell->vertex_dof_index(vertex_no, 0)) ==
+                false)
+              m[i].constrain_dof_to_zero(cell->vertex_dof_index(vertex_no, 0));
         }
 
       if (cell->at_boundary())
@@ -174,7 +176,7 @@ curved_grid(std::ostream &out)
                 if (std::fabs(face->vertex(1).norm() - r_i) < eps)
                   for (unsigned int i = 0; i < 2; ++i)
                     {
-                      m[i].add_line(face->dof_index(0));
+                      m[i].constrain_dof_to_zero(face->dof_index(0));
                       m[i].set_inhomogeneity(face->dof_index(0),
                                              (face->center() *
                                               (r_i / face->center().norm() -
@@ -182,7 +184,7 @@ curved_grid(std::ostream &out)
                     }
                 else if (std::fabs(face->vertex(1).norm() - r_a) < eps)
                   for (unsigned int i = 0; i < 2; ++i)
-                    m[i].add_line(face->dof_index(0));
+                    m[i].constrain_dof_to_zero(face->dof_index(0));
                 else
                   Assert(false, ExcInternalError());
               }

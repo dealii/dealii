@@ -40,7 +40,7 @@ test()
   // local_active_together.compress();
 
   AffineConstraints<double> cm(local_active_together);
-  cm.add_line(1);
+  cm.constrain_dof_to_zero(1);
   cm.close();
   deallog << "OK" << std::endl;
 }

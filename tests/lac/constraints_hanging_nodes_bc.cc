@@ -86,7 +86,7 @@ test()
       {
         if (!correct_constraints.is_constrained(boundary_value->first))
           {
-            correct_constraints.add_line(boundary_value->first);
+            correct_constraints.constrain_dof_to_zero(boundary_value->first);
             correct_constraints.set_inhomogeneity(boundary_value->first,
                                                   boundary_value->second);
           }

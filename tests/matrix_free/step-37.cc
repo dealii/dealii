@@ -448,7 +448,7 @@ namespace Step37
         std::set<types::global_dof_index>::iterator bc_it =
           boundary_indices[level].begin();
         for (; bc_it != boundary_indices[level].end(); ++bc_it)
-          mg_constraints[level].add_line(*bc_it);
+          mg_constraints[level].constrain_dof_to_zero(*bc_it);
 
         mg_constraints[level].close();
         mg_matrices[level].reinit(dof_handler, mg_constraints[level], level);
