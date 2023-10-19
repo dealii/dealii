@@ -356,8 +356,9 @@ MGConstrainedDoFs::initialize(
                       !level_constraints[l].is_constrained(dofs_2[i]) &&
                       !level_constraints[l].is_constrained(dofs_1[i]))
                     {
-                      level_constraints[l].add_line(dofs_2[i]);
-                      level_constraints[l].add_entry(dofs_2[i], dofs_1[i], 1.);
+                      level_constraints[l].add_constraint(dofs_2[i],
+                                                          {{dofs_1[i], 1.}},
+                                                          0.);
                     }
               }
       level_constraints[l].close();
@@ -624,10 +625,12 @@ MGConstrainedDoFs::merge_constraints(AffineConstraints<Number> &constraints,
 
   // merge constraints
   if (add_boundary_indices && this->have_boundary_indices())
-    constraints.add_lines(this->get_boundary_indices(level));
+    for (const auto i : this->get_boundary_indices(level))
+      constraints.add_constraint(i, {}, 0.);
 
   if (add_refinement_edge_indices)
-    constraints.add_lines(this->get_refinement_edge_indices(level));
+    for (const auto i : this->get_refinement_edge_indices(level))
+      constraints.add_constraint(i, {}, 0.);
 
   if (add_level_constraints)
     constraints.merge(this->get_level_constraints(level),

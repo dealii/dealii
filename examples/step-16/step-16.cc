@@ -436,10 +436,13 @@ namespace Step16
         boundary_constraints[level].reinit(
           dof_handler.locally_owned_mg_dofs(level),
           DoFTools::extract_locally_relevant_level_dofs(dof_handler, level));
-        boundary_constraints[level].add_lines(
-          mg_constrained_dofs.get_refinement_edge_indices(level));
-        boundary_constraints[level].add_lines(
-          mg_constrained_dofs.get_boundary_indices(level));
+
+        for (const types::global_dof_index dof_index :
+             mg_constrained_dofs.get_refinement_edge_indices(level))
+          boundary_constraints[level].add_constraint(dof_index, {}, 0.);
+        for (const types::global_dof_index dof_index :
+             mg_constrained_dofs.get_boundary_indices(level))
+          boundary_constraints[level].add_constraint(dof_index, {}, 0.);
         boundary_constraints[level].close();
       }
 

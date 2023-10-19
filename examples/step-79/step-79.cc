@@ -536,13 +536,16 @@ namespace SAND
     types::global_dof_index last_density_dof =
       density_dofs.nth_index_in_set(density_dofs.n_elements() - 1);
     constraints.clear();
-    constraints.add_line(last_density_dof);
-    for (unsigned int i = 0; i < density_dofs.n_elements() - 1; ++i)
-      constraints.add_entry(last_density_dof,
-                            density_dofs.nth_index_in_set(i),
-                            -1);
-    constraints.set_inhomogeneity(last_density_dof, 0);
+    {
+      std::vector<std::pair<types::global_dof_index, double>>
+        constraint_entries;
+      constraint_entries.reserve(density_dofs.n_elements() - 1);
+      for (const types::global_dof_index dof_index : density_dofs)
+        if (dof_index != last_density_dof)
+          constraint_entries.emplace_back(dof_index, -1.);
 
+      constraints.add_constraint(last_density_dof, constraint_entries, 0.);
+    }
     constraints.close();
 
     // We can now finally create the sparsity pattern for the

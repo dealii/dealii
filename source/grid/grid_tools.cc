@@ -1949,11 +1949,13 @@ namespace GridTools
     typename std::map<unsigned int, Point<dim>>::const_iterator map_end =
       new_points.end();
 
-    // fill these maps using the data given by new_points
+    // Fill these maps using the data given by new_points
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
-        // loop over all vertices of the cell and see if it is listed in the map
-        // given as first argument of the function
+        // Loop over all vertices of the cell and see if it is listed in the map
+        // given as first argument of the function. We visit vertices multiple
+        // times, so also check that if we have already added a constraint, we
+        // don't do it a second time again.
         for (const unsigned int vertex_no : cell->vertex_indices())
           {
             const unsigned int vertex_index = cell->vertex_index(vertex_no);
@@ -1964,14 +1966,16 @@ namespace GridTools
 
             if (map_iter != map_end)
               for (unsigned int i = 0; i < dim; ++i)
-                {
-                  constraints[i].add_line(cell->vertex_dof_index(vertex_no, 0));
-                  constraints[i].set_inhomogeneity(
-                    cell->vertex_dof_index(vertex_no, 0),
-                    (solve_for_absolute_positions ?
-                       map_iter->second(i) :
-                       map_iter->second(i) - vertex_point[i]));
-                }
+                if (constraints[i].is_constrained(
+                      cell->vertex_dof_index(vertex_no, 0)) == false)
+                  {
+                    constraints[i].add_constraint(
+                      cell->vertex_dof_index(vertex_no, 0),
+                      {},
+                      (solve_for_absolute_positions ?
+                         map_iter->second(i) :
+                         map_iter->second(i) - vertex_point[i]));
+                  }
           }
       }
 
