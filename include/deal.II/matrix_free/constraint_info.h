@@ -118,6 +118,9 @@ namespace internal
       void
       finalize();
 
+      std::shared_ptr<const Utilities::MPI::Partitioner>
+      finalize(const IndexSet &locally_owned_indices, const MPI_Comm comm);
+
       template <typename T, typename VectorType>
       void
       read_write_operation(const T           &operation,
@@ -569,6 +572,100 @@ namespace internal
                         return i == unconstrained_compressed_constraint_kind;
                       }))
         hanging_node_constraint_masks.clear();
+    }
+
+
+    template <int dim, typename Number>
+    inline std::shared_ptr<const Utilities::MPI::Partitioner>
+    ConstraintInfo<dim, Number>::finalize(const IndexSet &locally_owned_indices,
+                                          const MPI_Comm  comm)
+    {
+      this->dof_indices          = {};
+      this->plain_dof_indices    = {};
+      this->constraint_indicator = {};
+
+      this->row_starts = {};
+      this->row_starts.emplace_back(0, 0);
+
+      if (plain_dof_indices_per_cell.empty() == false)
+        {
+          this->row_starts_plain_indices = {};
+          this->row_starts_plain_indices.emplace_back(0);
+        }
+
+      IndexSet ghost_indices;
+
+      // TODO
+
+      const auto partitioner =
+        std::make_shared<Utilities::MPI::Partitioner>(locally_owned_indices,
+                                                      ghost_indices,
+                                                      comm);
+
+      for (unsigned int i = 0; i < dof_indices_per_cell.size(); ++i)
+        {
+          this->dof_indices.insert(this->dof_indices.end(),
+                                   dof_indices_per_cell[i].begin(),
+                                   dof_indices_per_cell[i].end());
+          this->constraint_indicator.insert(
+            this->constraint_indicator.end(),
+            constraint_indicator_per_cell[i].begin(),
+            constraint_indicator_per_cell[i].end());
+
+          this->row_starts.emplace_back(this->dof_indices.size(),
+                                        this->constraint_indicator.size());
+
+          if (plain_dof_indices_per_cell.empty() == false)
+            {
+              this->plain_dof_indices.insert(
+                this->plain_dof_indices.end(),
+                plain_dof_indices_per_cell[i].begin(),
+                plain_dof_indices_per_cell[i].end());
+
+              this->row_starts_plain_indices.emplace_back(
+                this->plain_dof_indices.size());
+            }
+        }
+
+      std::vector<const std::vector<double> *> constraints(
+        constraint_values.constraints.size());
+      unsigned int length = 0;
+      for (const auto &it : constraint_values.constraints)
+        {
+          AssertIndexRange(it.second, constraints.size());
+          constraints[it.second] = &it.first;
+          length += it.first.size();
+        }
+
+      constraint_pool_data.clear();
+      constraint_pool_data.reserve(length);
+      constraint_pool_row_index.reserve(constraint_values.constraints.size() +
+                                        1);
+      constraint_pool_row_index.resize(1, 0);
+
+      for (const auto &constraint : constraints)
+        {
+          Assert(constraint != nullptr, ExcInternalError());
+          constraint_pool_data.insert(constraint_pool_data.end(),
+                                      constraint->begin(),
+                                      constraint->end());
+          constraint_pool_row_index.push_back(constraint_pool_data.size());
+        }
+
+      AssertDimension(constraint_pool_data.size(), length);
+
+      dof_indices_per_cell.clear();
+      constraint_indicator_per_cell.clear();
+
+      if (hanging_nodes &&
+          std::all_of(hanging_node_constraint_masks.begin(),
+                      hanging_node_constraint_masks.end(),
+                      [](const auto i) {
+                        return i == unconstrained_compressed_constraint_kind;
+                      }))
+        hanging_node_constraint_masks.clear();
+
+      return partitioner;
     }
 
 

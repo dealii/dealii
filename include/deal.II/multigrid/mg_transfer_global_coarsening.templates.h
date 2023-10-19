@@ -1871,36 +1871,6 @@ namespace internal
 
       temp_time = std::chrono::system_clock::now();
 
-      // create partitioners and vectors for internal purposes
-      {
-        // ... for fine mesh
-        {
-          transfer.partitioner_fine =
-            std::make_shared<Utilities::MPI::Partitioner>(
-              dof_handler_fine_view->locally_owned_dofs(),
-              dof_handler_fine_view->locally_active_dofs(),
-              dof_handler_fine.get_communicator());
-          transfer.vec_fine.reinit(transfer.partitioner_fine);
-        }
-
-        // ... coarse mesh (needed since user vector might be const)
-        {
-          transfer.partitioner_coarse =
-            create_coarse_partitioner(dof_handler_coarse,
-                                      constraints_coarse,
-                                      mg_level_coarse);
-          transfer.vec_coarse.reinit(transfer.partitioner_coarse);
-        }
-      }
-
-
-      const auto time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                           std::chrono::system_clock::now() - temp_time)
-                           .count() /
-                         1e9;
-
-      temp_time = std::chrono::system_clock::now();
-
       // helper function: to process the fine level cells; function @p fu_non_refined is
       // performed on cells that are not refined and @fu_refined is performed on
       // children of cells that are refined
@@ -2152,11 +2122,30 @@ namespace internal
               }
           });
 
-        transfer.constraint_info_coarse.finalize();
-        transfer.constraint_info_fine.finalize();
+        transfer.partitioner_coarse = transfer.constraint_info_coarse.finalize(
+          (mg_level_coarse == numbers::invalid_unsigned_int) ?
+            dof_handler_coarse.locally_owned_dofs() :
+            dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
+          dof_handler_coarse.get_communicator());
+        transfer.vec_coarse.reinit(transfer.partitioner_coarse);
+
+        transfer.partitioner_fine = transfer.constraint_info_fine.finalize(
+          (mg_level_fine == numbers::invalid_unsigned_int) ?
+            dof_handler_fine.locally_owned_dofs() :
+            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
+          dof_handler_fine.get_communicator());
+        transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
 
       const auto time3 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
+
+
+      const auto time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
                            std::chrono::system_clock::now() - temp_time)
                            .count() /
                          1e9;
