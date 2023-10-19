@@ -513,10 +513,17 @@ namespace DoFTools
         // arbitrarily large, but that holds up to 25 elements without
         // external memory allocation. This is good enough for hanging
         // node constraints of Q4 elements in 3d, so covers most
-        // common cases.
-        boost::container::small_vector<
-          std::pair<typename AffineConstraints<number2>::size_type, number2>,
-          25>
+        // common cases. Sort the primary dofs to add a sorted list to the
+        // affine constraints, which increases performance there.
+        using size_type = typename AffineConstraints<number2>::size_type;
+        boost::container::small_vector<std::pair<size_type, size_type>, 25>
+          sorted_primary_dofs;
+        sorted_primary_dofs.reserve(n_primary_dofs);
+        for (unsigned int i = 0; i < n_primary_dofs; ++i)
+          sorted_primary_dofs.emplace_back(primary_dofs[i], i);
+        std::sort(sorted_primary_dofs.begin(), sorted_primary_dofs.end());
+
+        boost::container::small_vector<std::pair<size_type, number2>, 25>
           entries;
         entries.reserve(n_primary_dofs);
         for (unsigned int row = 0; row != n_dependent_dofs; ++row)
@@ -558,14 +565,11 @@ namespace DoFTools
                 if (is_trivial_constraint == true)
                   continue;
               }
-              // add up the absolute values of all constraints in this line
-              // to get a measure of their absolute size
-              number1 abs_sum = 0;
-              for (unsigned int i = 0; i < n_primary_dofs; ++i)
-                abs_sum += std::abs(face_constraints(row, i));
 
               // then enter those constraints that are larger than
-              // 1e-14*abs_sum. everything else probably originated from
+              // 1e-14; since numbers are normalized for the subface
+              // interpolation matrices, we do not need to normalize here.
+              // everything else probably originated from
               // inexact inversion of matrices and similar effects. having
               // those constraints in here will only lead to problems because
               // it makes sparsity patterns fuller than necessary without
@@ -573,10 +577,11 @@ namespace DoFTools
               // filling a vector and then adding to the constraints in order
               // to reduce the number of memory allocations.
               entries.clear();
-              for (unsigned int i = 0; i < n_primary_dofs; ++i)
-                if (std::fabs(face_constraints(row, i)) >= 1e-14 * abs_sum)
-                  entries.emplace_back(primary_dofs[i],
-                                       face_constraints(row, i));
+              for (const auto &[dof_index, unsorted_index] :
+                   sorted_primary_dofs)
+                if (std::fabs(face_constraints(row, unsorted_index)) >= 1e-14)
+                  entries.emplace_back(dof_index,
+                                       face_constraints(row, unsorted_index));
               constraints.add_constraint(dependent_dofs[row],
                                          entries,
                                          /* inhomogeneity= */ 0.);
