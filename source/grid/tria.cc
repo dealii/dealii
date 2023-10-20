@@ -12524,8 +12524,9 @@ void Triangulation<dim, spacedim>::copy_triangulation(
   this->periodic_face_pairs_level_0.reserve(
     other_tria.periodic_face_pairs_level_0.size());
 
-  for (auto entry : other_tria.periodic_face_pairs_level_0)
+  for (const auto &other_entry : other_tria.periodic_face_pairs_level_0)
     {
+      auto entry = other_entry;
       entry.cell[0] =
         cell_iterator(this, entry.cell[0]->level(), entry.cell[0]->index());
       entry.cell[1] =
