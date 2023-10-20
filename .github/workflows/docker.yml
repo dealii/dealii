@@ -22,12 +22,10 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu_version: [focal, jammy]
-        # Use 2 jobs to build, but only 1 for the focal image
-        # as it starves the github machine for memory.
+        # Use only 1 job to build, as more jobs
+        # would starve the github machine for memory.
         include:
-          - n_jobs: 2
           - n_jobs: 1
-            ubuntu_version: focal
 
     steps:
       - name: Checkout code
