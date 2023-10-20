@@ -75,7 +75,8 @@ public:
          const DoFHandler<dim>           &dof_handler,
          const Quadrature<dim>           &quad,
          const AffineConstraints<number> &constraints,
-         const unsigned int mg_level = numbers::invalid_unsigned_int)
+         const unsigned int mg_level         = numbers::invalid_unsigned_int,
+         const bool         ones_on_diagonal = false)
   {
     // Clear internal data structures (if operator is reused).
     this->system_matrix.clear();
@@ -92,6 +93,12 @@ public:
     data.mg_level             = mg_level;
 
     matrix_free.reinit(mapping, dof_handler, constraints, quad, data);
+
+    constrained_indices.clear();
+
+    if (ones_on_diagonal)
+      for (auto i : this->matrix_free.get_constrained_dofs())
+        constrained_indices.push_back(i);
   }
 
   virtual types::global_dof_index
@@ -122,6 +129,10 @@ public:
   {
     this->matrix_free.cell_loop(
       &Operator::do_cell_integral_range, this, dst, src, true);
+
+    for (unsigned int i = 0; i < constrained_indices.size(); ++i)
+      dst.local_element(constrained_indices[i]) =
+        src.local_element(constrained_indices[i]);
   }
 
   void
@@ -269,6 +280,8 @@ private:
   AffineConstraints<number> constraints;
 
   mutable TrilinosWrappers::SparseMatrix system_matrix;
+
+  std::vector<unsigned int> constrained_indices;
 };
 
 struct GMGParameters

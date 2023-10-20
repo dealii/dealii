@@ -25,7 +25,8 @@ template <int dim, typename Number = double>
 void
 test(const unsigned int n_refinements,
      const unsigned int fe_degree_fine,
-     const bool         do_simplex_mesh)
+     const bool         do_simplex_mesh,
+     const bool         ones_on_diagonal)
 {
   using VectorType = LinearAlgebra::distributed::Vector<Number>;
 
@@ -89,7 +90,12 @@ test(const unsigned int n_refinements,
       constraint.close();
 
       // set up operator
-      op.reinit(*mapping, dof_handler, *quad, constraint);
+      op.reinit(*mapping,
+                dof_handler,
+                *quad,
+                constraint,
+                numbers::invalid_unsigned_int,
+                ones_on_diagonal);
     }
 
   // set up transfer operator
@@ -161,11 +167,17 @@ main(int argc, char **argv)
 
   deallog.precision(8);
 
-  for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
-    for (unsigned int degree = 1; degree <= 4; ++degree)
-      test<2>(n_refinements, degree, false /*quadrilateral*/);
+  for (const auto ones_on_diagonal : {false, true})
+    {
+      for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
+        for (unsigned int degree = 1; degree <= 4; ++degree)
+          test<2>(n_refinements,
+                  degree,
+                  false /*quadrilateral*/,
+                  ones_on_diagonal);
 
-  for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
-    for (unsigned int degree = 1; degree <= 2; ++degree)
-      test<2>(n_refinements, degree, true /*triangle*/);
+      for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
+        for (unsigned int degree = 1; degree <= 2; ++degree)
+          test<2>(n_refinements, degree, true /*triangle*/, ones_on_diagonal);
+    }
 }

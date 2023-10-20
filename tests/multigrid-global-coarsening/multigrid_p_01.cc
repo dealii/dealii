@@ -26,7 +26,8 @@ void
 test(const unsigned int n_refinements,
      const unsigned int fe_degree_fine,
      const bool         do_simplex_mesh,
-     const unsigned int mesh_type)
+     const unsigned int mesh_type,
+     const bool         ones_on_diagonal)
 {
   using VectorType = LinearAlgebra::distributed::Vector<Number>;
 
@@ -117,7 +118,12 @@ test(const unsigned int n_refinements,
       constraint.close();
 
       // set up operator
-      op.reinit(*mapping, dof_handler, *quad, constraint);
+      op.reinit(*mapping,
+                dof_handler,
+                *quad,
+                constraint,
+                numbers::invalid_unsigned_int,
+                ones_on_diagonal);
     }
 
   // set up transfer operator
@@ -193,14 +199,26 @@ main(int argc, char **argv)
 
   deallog.precision(8);
 
-  for (unsigned int mesh_type = 0; mesh_type < 2; ++mesh_type)
-    {
-      for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
-        for (unsigned int degree = 2; degree <= 4; ++degree)
-          test<2>(n_refinements, degree, false /*quadrilateral*/, mesh_type);
+  for (const auto ones_on_diagonal : {false, true})
+    for (unsigned int mesh_type = 0; mesh_type < 2; ++mesh_type)
+      {
+        for (unsigned int n_refinements = 2; n_refinements <= 4;
+             ++n_refinements)
+          for (unsigned int degree = 2; degree <= 4; ++degree)
+            test<2>(n_refinements,
+                    degree,
+                    false /*quadrilateral*/,
+                    mesh_type,
+                    ones_on_diagonal);
 
-      for (unsigned int n_refinements = 2; n_refinements <= 4; ++n_refinements)
-        for (unsigned int degree = 2; degree <= 2; ++degree)
-          test<2>(n_refinements, degree, true /*triangle*/, mesh_type);
-    }
+
+        for (unsigned int n_refinements = 2; n_refinements <= 4;
+             ++n_refinements)
+          for (unsigned int degree = 2; degree <= 2; ++degree)
+            test<2>(n_refinements,
+                    degree,
+                    true /*triangle*/,
+                    mesh_type,
+                    ones_on_diagonal);
+      }
 }
