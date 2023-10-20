@@ -1163,6 +1163,49 @@ namespace DoFTools
                                const ComponentMask &component_mask     = {},
                                const number         periodicity_factor = 1.);
 
+  namespace internal
+  {
+    /**
+     * This function is internally used in make_periodicity_constraints().
+     * Enter constraints for periodicity into the given AffineConstraints
+     * object.
+     *
+     * This function works both on 1) an active mesh
+     * (`level == numbers::invalid_unsigned_int`) and on 2) multigrid levels.
+     *
+     * In the case of an active mesh, this function is called when at least
+     * one of the two face iterators corresponds to an active object
+     * without further children. Furthermore, @p face_1 is supposed to be active.
+     *
+     * The matrix @p transformation maps degrees of freedom from one face
+     * to another. If the DoFs on the two faces are supposed to match exactly,
+     * then the matrix so provided will be the identity matrix. if face 2 is
+     * once refined from face 1, then the matrix needs to be the interpolation
+     * matrix from a face to this particular child
+     *
+     * @note We have to be careful not to accidentally create constraint
+     * cycles when adding periodic constraints: For example, as the
+     * corresponding testcase bits/periodicity_05 demonstrates, we can
+     * occasionally get into trouble if we already have the constraint
+     * x1 == x2 and want to insert x2 == x1. We avoid this by skipping
+     * such "identity constraints" if the opposite constraint already
+     * exists.
+     */
+    template <typename FaceIterator, typename number>
+    void
+    set_periodicity_constraints(
+      const FaceIterator                             &face_1,
+      const std_cxx20::type_identity_t<FaceIterator> &face_2,
+      const FullMatrix<double>                       &transformation,
+      AffineConstraints<number>                      &affine_constraints,
+      const ComponentMask                            &component_mask,
+      const bool                                      face_orientation,
+      const bool                                      face_flip,
+      const bool                                      face_rotation,
+      const number                                    periodicity_factor,
+      const unsigned int level = numbers::invalid_unsigned_int);
+  } // namespace internal
+
   /**
    * @}
    */
