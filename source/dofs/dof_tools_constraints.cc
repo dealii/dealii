@@ -1869,9 +1869,12 @@ namespace DoFTools
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
-      const bool use_mg = level != numbers::invalid_unsigned_int;
+      const bool use_mg = (level != numbers::invalid_unsigned_int);
 
-      // we should be in the case where face_1 is active, i.e. has no children:
+      // If we don't use multigrid, we should be in the case where face_1 is
+      // active, i.e. has no children. In the case of multigrid, constraints
+      // between cells on the same level are set up.
+
       Assert(use_mg || (!face_1->has_children()), ExcInternalError());
 
       Assert(face_1->n_active_fe_indices() == 1, ExcInternalError());
@@ -1884,8 +1887,11 @@ namespace DoFTools
         face_2->get_fe(face_2->nth_active_fe_index(0)).n_unique_faces(), 1);
       const unsigned int face_no = 0;
 
-      // If face_2 does have children, then we need to iterate over these
-      // children and set periodic constraints in the inverse direction:
+      // If we don't use multigrid and face_2 does have children,
+      // then we need to iterate over these children and set periodic
+      // constraints in the inverse direction. In the case of multigrid,
+      // we don't need to do this, since constraints between cells on
+      // the same level are set up.
 
       if ((!use_mg) && face_2->has_children())
         {

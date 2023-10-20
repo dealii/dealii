@@ -1166,19 +1166,22 @@ namespace DoFTools
   namespace internal
   {
     /**
-     * Internally used in make_periodicity_constraints.
-     *
+     * This function is internally used in make_periodicity_constraints().
      * Enter constraints for periodicity into the given AffineConstraints
-     * object. this function is called when at least one of the two face
-     * iterators corresponds to an active object without further children
+     * object.
+     *
+     * This function works both on 1) an active mesh
+     * (`level == numbers::invalid_unsigned_int`) and on 2) multigrid levels.
+     *
+     * In the case of an active mesh, this function is called when at least
+     * one of the two face iterators corresponds to an active object
+     * without further children. Furthermore, @p face_1 is supposed to be active.
      *
      * The matrix @p transformation maps degrees of freedom from one face
      * to another. If the DoFs on the two faces are supposed to match exactly,
      * then the matrix so provided will be the identity matrix. if face 2 is
      * once refined from face 1, then the matrix needs to be the interpolation
      * matrix from a face to this particular child
-     *
-     * @note: @p face_1 is supposed to be active.
      *
      * @note We have to be careful not to accidentally create constraint
      * cycles when adding periodic constraints: For example, as the
