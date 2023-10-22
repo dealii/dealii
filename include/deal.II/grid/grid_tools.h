@@ -2361,6 +2361,8 @@ namespace GridTools
    *
    * @p face1 and @p face2 are considered equal, if a one to one matching
    * between its vertices can be achieved via an orthogonal equality relation.
+   * If no such relation exists then the returned std::optional object is empty
+   * (i.e., has_value() will return `false`).
    *
    * Here, two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered equal, if
    * $M\cdot v_1 + offset - v_2$ is parallel to the unit vector in unit
@@ -2368,12 +2370,13 @@ namespace GridTools
    * spacedim x spacedim matrix, $M$ is set to @p matrix, otherwise $M$ is the
    * identity matrix.
    *
-   * If the matching was successful, the _relative_ orientation of @p face1
-   * with respect to @p face2 is returned in the bitset @p orientation, where
+   * If the matching was successful, the _relative_ orientation of @p face1 with
+   * respect to @p face2 is returned a std::optional<std::bitset<3>> object
+   * orientation in which
    * @code
-   * orientation[0] -> face_orientation
-   * orientation[1] -> face_flip
-   * orientation[2] -> face_rotation
+   * orientation.value()[0] = face_orientation
+   * orientation.value()[1] = face_flip
+   * orientation.value()[2] = face_rotation
    * @endcode
    *
    * In 2d <tt>face_orientation</tt> is always <tt>true</tt>,
@@ -2420,9 +2423,8 @@ namespace GridTools
    * article.
    */
   template <typename FaceIterator>
-  bool
+  std::optional<std::bitset<3>>
   orthogonal_equality(
-    std::bitset<3>                                               &orientation,
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
     const unsigned int                                            direction,

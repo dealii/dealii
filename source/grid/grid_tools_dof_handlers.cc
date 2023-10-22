@@ -43,6 +43,7 @@
 #include <list>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <set>
 #include <vector>
 
@@ -2142,7 +2143,6 @@ namespace GridTools
     unsigned int n_matches = 0;
 
     // Match with a complexity of O(n^2). This could be improved...
-    std::bitset<3> orientation;
     using PairIterator =
       typename std::set<std::pair<CellIterator, unsigned int>>::const_iterator;
     for (PairIterator it1 = pairs1.begin(); it1 != pairs1.end(); ++it1)
@@ -2153,18 +2153,21 @@ namespace GridTools
             const CellIterator cell2     = it2->first;
             const unsigned int face_idx1 = it1->second;
             const unsigned int face_idx2 = it2->second;
-            if (GridTools::orthogonal_equality(orientation,
-                                               cell1->face(face_idx1),
-                                               cell2->face(face_idx2),
-                                               direction,
-                                               offset,
-                                               matrix))
+            if (const std::optional<std::bitset<3>> orientation =
+                  GridTools::orthogonal_equality(cell1->face(face_idx1),
+                                                 cell2->face(face_idx2),
+                                                 direction,
+                                                 offset,
+                                                 matrix))
               {
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
                 // matching:
                 const PeriodicFacePair<CellIterator> matched_face = {
-                  {cell1, cell2}, {face_idx1, face_idx2}, orientation, matrix};
+                  {cell1, cell2},
+                  {face_idx1, face_idx2},
+                  orientation.value(),
+                  matrix};
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
                 ++n_matches;
@@ -2504,9 +2507,8 @@ namespace GridTools
 
 
   template <typename FaceIterator>
-  inline bool
+  std::optional<std::bitset<3>>
   orthogonal_equality(
-    std::bitset<3>                                               &orientation,
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
     const unsigned int                                            direction,
@@ -2548,15 +2550,10 @@ namespace GridTools
       }
 
     // And finally, a lookup to determine the ordering bitmask:
-    if (face2_vertices.empty())
-      orientation = OrientationLookupTable<dim>::lookup(matching);
-
-    return face2_vertices.empty();
-
+    return face2_vertices.empty() ?
+             std::make_optional(OrientationLookupTable<dim>::lookup(matching)) :
+             std::nullopt;
   }
-
-
-
 } // namespace GridTools
 
 
