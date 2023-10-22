@@ -2430,21 +2430,6 @@ namespace GridTools
       Tensor<1, FaceIterator::AccessorType::space_dimension>(),
     const FullMatrix<double> &matrix = FullMatrix<double>());
 
-
-  /**
-   * Same function as above, but doesn't return the actual orientation
-   */
-  template <typename FaceIterator>
-  bool
-  orthogonal_equality(
-    const FaceIterator                                           &face1,
-    const FaceIterator                                           &face2,
-    const unsigned int                                            direction,
-    const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset =
-      Tensor<1, FaceIterator::AccessorType::space_dimension>(),
-    const FullMatrix<double> &matrix = FullMatrix<double>());
-
-
   /**
    * This function will collect periodic face pairs on the coarsest mesh level
    * of the given @p mesh (a Triangulation or DoFHandler) and add them to the

@@ -267,23 +267,6 @@ for (X : SEQUENTIAL_TRIANGULATION_AND_DOFHANDLER;
         const unsigned int,
         const Tensor<1, deal_II_space_dimension> &,
         const FullMatrix<double> &);
-
-      template bool
-      orthogonal_equality<X::active_face_iterator>(
-        const X::active_face_iterator &,
-        const X::active_face_iterator &,
-        const unsigned int,
-        const Tensor<1, deal_II_space_dimension> &,
-        const FullMatrix<double> &);
-
-      template bool
-      orthogonal_equality<X::face_iterator>(
-        const X::face_iterator &,
-        const X::face_iterator &,
-        const unsigned int,
-        const Tensor<1, deal_II_space_dimension> &,
-        const FullMatrix<double> &);
-
     \}
 #endif
   }

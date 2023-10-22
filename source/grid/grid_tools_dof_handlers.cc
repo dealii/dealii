@@ -2552,22 +2552,7 @@ namespace GridTools
       orientation = OrientationLookupTable<dim>::lookup(matching);
 
     return face2_vertices.empty();
-  }
 
-
-
-  template <typename FaceIterator>
-  inline bool
-  orthogonal_equality(
-    const FaceIterator                                           &face1,
-    const FaceIterator                                           &face2,
-    const unsigned int                                            direction,
-    const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
-    const FullMatrix<double>                                     &matrix)
-  {
-    // Call the function above with a dummy orientation array
-    std::bitset<3> dummy;
-    return orthogonal_equality(dummy, face1, face2, direction, offset, matrix);
   }
 
 
