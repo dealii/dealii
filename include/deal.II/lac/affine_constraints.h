@@ -793,12 +793,41 @@ public:
    * @code
    *   constraints.add_constraint (42, {}, 27.0);
    * @endcode
+   * If you want to constrain a degree of freedom to zero, i.e.,
+   * require that
+   * @f[
+   *   x_{42} = 0
+   * @f]
+   * you would call this function as follows:
+   * @code
+   *   constraints.add_constraint (42, {}, 0.0);
+   * @endcode
+   * That said, this special case can be achieved in a more obvious way by
+   * calling
+   * @code
+   *   constraints.constrain_dof_to_zero (42);
+   * @endcode
+   * instead.
    */
   void
   add_constraint(
     const size_type                                      constrained_dof,
     const ArrayView<const std::pair<size_type, number>> &dependencies,
     const number                                         inhomogeneity = 0);
+
+  /**
+   * Constrain the given degree of freedom to be zero, i.e.,
+   * require a constraint like
+   * @f[
+   *   x_{42} = 0.
+   * @f]
+   * Calling this function is equivalent to, but more readable than, saying
+   * @code
+   *   constraints.add_constraint (42, {}, 0.0);
+   * @endcode
+   */
+  void
+  constrain_dof_to_zero(const size_type constrained_dof);
 
   /**
    * Add a new line to the matrix. If the line already exists, then the

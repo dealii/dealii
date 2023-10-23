@@ -613,11 +613,11 @@ MGConstrainedDoFs::merge_constraints(AffineConstraints<Number> &constraints,
   // merge constraints
   if (add_boundary_indices && this->have_boundary_indices())
     for (const auto i : this->get_boundary_indices(level))
-      constraints.add_constraint(i, {}, 0.);
+      constraints.constrain_dof_to_zero(i);
 
   if (add_refinement_edge_indices)
     for (const auto i : this->get_refinement_edge_indices(level))
-      constraints.add_constraint(i, {}, 0.);
+      constraints.constrain_dof_to_zero(i);
 
   if (add_level_constraints)
     constraints.merge(this->get_level_constraints(level),

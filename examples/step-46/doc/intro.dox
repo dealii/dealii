@@ -494,13 +494,12 @@ for (const auto &cell: dof_handler.active_cell_iterators())
              cell->face(f)->get_dof_indices (local_face_dof_indices, 0);
              for (unsigned int i=0; i<local_face_dof_indices.size(); ++i)
              if (stokes_fe.face_system_to_component_index(i).first < dim)
-               constraints.add_constraint (local_face_dof_indices[i], {}, 0.);
+               constraints.constrain_dof_to_zero (local_face_dof_indices[i]);
            }
         }
 @endcode
 
-The last line calls
-AffineConstraints::add_constraint() and adds the constraint
+The last line adds the constraint
 <i>x<sub>local_face_dof_indices[i]</sub>=0</i>, which is exactly
 what we need in the current context. The call to
 FiniteElement::face_system_to_component_index() makes sure that we only set
