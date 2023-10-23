@@ -1332,9 +1332,11 @@ private:
   };
 
   /**
-   * Mutex for protecting initialization of restriction and embedding matrix.
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
    */
-  mutable std::mutex mutex;
+  mutable std::mutex restriction_matrix_mutex;
+  mutable std::mutex prolongation_matrix_mutex;
 
   friend class FE_Enriched<dim, spacedim>;
 };
