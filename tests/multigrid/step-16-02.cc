@@ -412,17 +412,20 @@ LaplaceProblem<dim>::assemble_multigrid(const bool &use_mw)
         triangulation.n_levels());
       for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
         {
-          boundary_constraints[level].add_lines(
-            mg_constrained_dofs.get_refinement_edge_indices(level));
-          boundary_constraints[level].add_lines(
-            mg_constrained_dofs.get_boundary_indices(level));
-          boundary_constraints[level].close();
+          for (const types::global_dof_index dof_index :
+               mg_constrained_dofs.get_refinement_edge_indices(level))
+            boundary_constraints[level].constrain_dof_to_zero(dof_index);
+          for (const types::global_dof_index dof_index :
+               mg_constrained_dofs.get_boundary_indices(level))
+            boundary_constraints[level].constrain_dof_to_zero(dof_index);
 
-          IndexSet idx =
+          const IndexSet idx =
             mg_constrained_dofs.get_refinement_edge_indices(level) &
             mg_constrained_dofs.get_boundary_indices(level);
 
-          boundary_interface_constraints[level].add_lines(idx);
+          for (const types::global_dof_index idx :
+               mg_constrained_dofs.get_boundary_indices(level))
+            boundary_constraints[level].constrain_dof_to_zero(idx);
           boundary_interface_constraints[level].close();
         }
 

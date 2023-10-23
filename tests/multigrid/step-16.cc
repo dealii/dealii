@@ -298,10 +298,12 @@ LaplaceProblem<dim>::assemble_multigrid()
   AffineConstraints<double> empty_constraints;
   for (unsigned int level = 0; level < triangulation.n_levels(); ++level)
     {
-      boundary_constraints[level].add_lines(
-        mg_constrained_dofs.get_refinement_edge_indices(level));
-      boundary_constraints[level].add_lines(
-        mg_constrained_dofs.get_boundary_indices(level));
+      for (const types::global_dof_index dof_index :
+           mg_constrained_dofs.get_refinement_edge_indices(level))
+        boundary_constraints[level].constrain_dof_to_zero(dof_index);
+      for (const types::global_dof_index dof_index :
+           mg_constrained_dofs.get_boundary_indices(level))
+        boundary_constraints[level].constrain_dof_to_zero(dof_index);
       boundary_constraints[level].close();
     }
 
