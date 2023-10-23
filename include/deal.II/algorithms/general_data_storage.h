@@ -21,10 +21,10 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
 
-#include <boost/any.hpp>
 #include <boost/core/demangle.hpp>
 
 #include <algorithm>
+#include <any>
 #include <map>
 #include <string>
 #include <typeinfo>
@@ -330,14 +330,14 @@ public:
   /** @} */
 
   /**
-   * An entry with this name does not exist in the internal boost::any map.
+   * An entry with this name does not exist in the internal std::any map.
    */
   DeclException1(ExcNameNotFound,
                  std::string,
                  << "No entry with the name " << arg1 << " exists.");
 
   /**
-   * An entry with this name does not exist in the internal boost::any map.
+   * An entry with this name does not exist in the internal std::any map.
    */
   DeclException1(ExcNameHasBeenFound,
                  std::string,
@@ -357,7 +357,7 @@ private:
   /**
    * Arbitrary user data, identified by a string.
    */
-  std::map<std::string, boost::any> any_data;
+  std::map<std::string, std::any> any_data;
 };
 
 
@@ -426,11 +426,11 @@ GeneralDataStorage::get_object_with_name(const std::string &name)
 
   if (any_data[name].type() == typeid(Type *))
     {
-      p = boost::any_cast<Type *>(any_data[name]);
+      p = std::any_cast<Type *>(any_data[name]);
     }
   else if (any_data[name].type() == typeid(Type))
     {
-      p = boost::any_cast<Type>(&any_data[name]);
+      p = std::any_cast<Type>(&any_data[name]);
     }
   else
     {
@@ -454,12 +454,12 @@ GeneralDataStorage::get_object_with_name(const std::string &name) const
 
   if (it->second.type() == typeid(Type *))
     {
-      const Type *p = boost::any_cast<Type *>(it->second);
+      const Type *p = std::any_cast<Type *>(it->second);
       return *p;
     }
   else if (it->second.type() == typeid(Type))
     {
-      const Type *p = boost::any_cast<Type>(&it->second);
+      const Type *p = std::any_cast<Type>(&it->second);
       return *p;
     }
   else
