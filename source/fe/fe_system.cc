@@ -963,8 +963,9 @@ FESystem<dim, spacedim>::get_restriction_matrix(
                   (*base_matrices[base])(base_index_i, base_index_j);
               }
 
-          restriction.swap(const_cast<FullMatrix<double> &>(
-            this->restriction[refinement_case - 1][child]));
+          const_cast<FullMatrix<double> &>(
+            this->restriction[refinement_case - 1][child]) =
+            std::move(restriction);
         }
     }
 
@@ -1030,8 +1031,10 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
                 prolongate(i, j) =
                   (*base_matrices[base])(base_index_i, base_index_j);
               }
-          prolongate.swap(const_cast<FullMatrix<double> &>(
-            this->prolongation[refinement_case - 1][child]));
+
+          const_cast<FullMatrix<double> &>(
+            this->prolongation[refinement_case - 1][child]) =
+            std::move(prolongate);
         }
     }
 
