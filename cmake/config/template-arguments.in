@@ -242,6 +242,8 @@ TRIANGULATIONS := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
                     parallel::distributed::Triangulation<deal_II_dimension, deal_II_space_dimension>;
                     parallel::fullydistributed::Triangulation<deal_II_dimension, deal_II_space_dimension>; }
 
+TRILINOS_SCALARS := { @DEAL_II_EXPAND_TPETRA_TYPES@; }
+
 // all supported logical dimensions
 DIMENSIONS := { 1; 2; 3 }
 
