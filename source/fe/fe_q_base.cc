@@ -1438,9 +1438,9 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
         }
 #  endif
 
-      // swap matrices
-      prolongate.swap(const_cast<FullMatrix<double> &>(
-        this->prolongation[refinement_case - 1][child]));
+      // move result into place
+      const_cast<FullMatrix<double> &>(
+        this->prolongation[refinement_case - 1][child]) = std::move(prolongate);
     }
 
   // finally return the matrix
@@ -1581,10 +1581,10 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
                      RefinementCase<dim>(refinement_case));
         }
 
-      // swap the just computed restriction matrix into the
-      // element of the vector stored in the base class
-      my_restriction.swap(const_cast<FullMatrix<double> &>(
-        this->restriction[refinement_case - 1][child]));
+      // move result into place
+      const_cast<FullMatrix<double> &>(
+        this->restriction[refinement_case - 1][child]) =
+        std::move(my_restriction);
     }
 
   return this->restriction[refinement_case - 1][child];
