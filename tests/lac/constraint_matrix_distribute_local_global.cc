@@ -39,7 +39,7 @@ main()
 
   // set up constraint
   AffineConstraints<double> constraints;
-  constraints.add_line(0);
+  constraints.constrain_dof_to_zero(0);
   constraints.close();
 
   // global matrix and vector

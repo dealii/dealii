@@ -109,7 +109,8 @@ public:
                     {
                       face->get_mg_dof_indices(level, local_dofs);
                       for (unsigned int i = 0; i < fe.dofs_per_face; ++i)
-                        constraints.add_line(local_dofs[i]);
+                        if (constraints.is_constrained(local_dofs[i]) == false)
+                          constraints.constrain_dof_to_zero(local_dofs[i]);
                     }
                 }
           }

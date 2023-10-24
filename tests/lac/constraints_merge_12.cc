@@ -41,11 +41,11 @@ merge_check()
   AffineConstraints<double> c1(local_lines), c2(local_lines);
   for (types::global_dof_index i = 99999800; i < local_lines.size(); ++i)
     if (i % 2 == 1)
-      c1.add_line(i);
+      c1.constrain_dof_to_zero(i);
 
-  c2.add_line(99999800);
-  c2.add_line(99999801);
-  c2.add_line(99999802);
+  c2.constrain_dof_to_zero(99999800);
+  c2.constrain_dof_to_zero(99999801);
+  c2.constrain_dof_to_zero(99999802);
 
   // now merge the two and print the results
   c2.merge(c1, AffineConstraints<double>::right_object_wins);

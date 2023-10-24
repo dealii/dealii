@@ -690,7 +690,7 @@ MeshWorkerAffineConstraintsTest<dim>::createInhomConstraints()
 
           if (std::sqrt(p.square()) < 1e-6)
             {
-              this->constraintsInhom.add_line(dof_index);
+              this->constraintsInhom.constrain_dof_to_zero(dof_index);
               this->constraintsInhom.set_inhomogeneity(dof_index, 2);
             }
         }

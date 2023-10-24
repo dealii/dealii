@@ -226,7 +226,7 @@ LaplaceProblem<dim>::setup_system()
       {
         if (!test_all_constraints.is_constrained(boundary_value->first))
           {
-            test_all_constraints.add_line(boundary_value->first);
+            test_all_constraints.constrain_dof_to_zero(boundary_value->first);
             test_all_constraints.set_inhomogeneity(boundary_value->first,
                                                    boundary_value->second);
           }

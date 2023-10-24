@@ -138,6 +138,8 @@ AffineConstraints<number>::add_constraint(
   constraint.inhomogeneity = inhomogeneity;
 
   // Record the new constraint in the cache:
+  Assert(lines_cache[line_index] == numbers::invalid_size_type,
+         ExcInternalError());
   lines_cache[line_index] = lines.size() - 1;
 }
 
@@ -149,9 +151,6 @@ AffineConstraints<number>::constrain_dof_to_zero(
   const size_type constrained_dof)
 {
   Assert(sorted == false, ExcMatrixIsClosed());
-  Assert(is_constrained(constrained_dof) == false,
-         ExcMessage("You cannot add a constraint for a degree of freedom "
-                    "that is already constrained."));
 
   // The following can happen when we compute with distributed meshes and dof
   // handlers and we constrain a degree of freedom whose number we don't have
@@ -166,14 +165,29 @@ AffineConstraints<number>::constrain_dof_to_zero(
                                 line_index + 1),
                        numbers::invalid_size_type);
 
-  // Push a new line to the end of the list and fill it with the
-  // provided information:
-  ConstraintLine &constraint = lines.emplace_back();
-  constraint.index           = constrained_dof;
-  constraint.inhomogeneity   = 0.;
+  // Let's check whether the DoF is already constrained. This is only allowed
+  // if it had previously been constrained to zero, and only then.
+  if (lines_cache[line_index] != numbers::invalid_size_type)
+    {
+      Assert(lines[lines_cache[line_index]].entries.empty() &&
+               (lines[lines_cache[line_index]].inhomogeneity == number(0.)),
+             ExcMessage("You cannot constrain a degree of freedom "
+                        "to zero that is is already constrained to "
+                        "something else."));
+    }
+  else
+    {
+      // Push a new line to the end of the list and fill it with the
+      // provided information:
+      ConstraintLine &constraint = lines.emplace_back();
+      constraint.index           = constrained_dof;
+      constraint.inhomogeneity   = 0.;
 
-  // Record the new constraint in the cache:
-  lines_cache[line_index] = lines.size() - 1;
+      // Record the new constraint in the cache:
+      Assert(lines_cache[line_index] == numbers::invalid_size_type,
+             ExcInternalError());
+      lines_cache[line_index] = lines.size() - 1;
+    }
 }
 
 

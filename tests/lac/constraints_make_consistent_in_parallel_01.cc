@@ -75,7 +75,8 @@ test(const DoFHandler<dim, spacedim> &dof_handler,
         {
           cell->face(face)->get_dof_indices(dof_indices);
           for (const auto i : dof_indices)
-            constraints.add_line(i);
+            if (constraints.is_constrained(i) == false)
+              constraints.constrain_dof_to_zero(i);
         }
 
   const auto a = collect_lines(constraints, dof_handler.n_dofs());

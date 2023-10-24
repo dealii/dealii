@@ -36,7 +36,7 @@ test()
   AffineConstraints<double> cm;
 
   for (unsigned int i = 0; i < 5; ++i)
-    cm.add_line(i);
+    cm.constrain_dof_to_zero(i);
   cm.close();
 
   // completely fill a 5x5 matrix

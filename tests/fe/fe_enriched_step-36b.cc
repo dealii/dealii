@@ -426,7 +426,10 @@ namespace Step36
                       // if
                       // (fe_collection[1].face_system_to_component_index(i).first
                       // /*component*/ > 0)
-                      constraints.add_line(local_face_dof_indices[i]);
+                      if (constraints.is_constrained(
+                            local_face_dof_indices[i]) == false)
+                        constraints.constrain_dof_to_zero(
+                          local_face_dof_indices[i]);
                 }
             }
   }

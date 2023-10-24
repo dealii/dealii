@@ -22,7 +22,7 @@
 905: An error occurred in line <1898> of file
 </scratch/deal-trunk/deal.II/include/deal.II/lac/affine_constraints.h> in
 function 905:     void
-dealii::AffineConstraints<double>::add_line(dealii::AffineConstraints<double>::size_type)
+dealii::AffineConstraints<double>::constrain_dof_to_zero(dealii::AffineConstraints<double>::size_type)
 905: The violated condition was: 905:     line != numbers::invalid_size_type
 905: The name and call sequence of the exception was: 905: ExcInternalError()
 905: Additional Information: 905: (none) 905:

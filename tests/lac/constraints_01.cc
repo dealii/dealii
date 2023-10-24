@@ -42,7 +42,7 @@ test()
   for (unsigned int i = 0; i < sizeof(inhoms) / sizeof(inhoms[0]); ++i)
     {
       deallog << inhoms[i] << std::endl;
-      cm.add_line(inhoms[i]);
+      cm.constrain_dof_to_zero(inhoms[i]);
       cm.set_inhomogeneity(inhoms[i], 1.0);
     }
 

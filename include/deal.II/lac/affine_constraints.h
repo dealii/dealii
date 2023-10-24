@@ -825,6 +825,12 @@ public:
    * @code
    *   constraints.add_constraint (42, {}, 0.0);
    * @endcode
+   *
+   * It is not an error to call this function more than once on the same
+   * degree of freedom, but it is an error to call this function on a
+   * degree of freedom that has previously been constrained to either
+   * a different value than zero, or to a linear combination of degrees
+   * of freedom via the add_constraint() function.
    */
   void
   constrain_dof_to_zero(const size_type constrained_dof);

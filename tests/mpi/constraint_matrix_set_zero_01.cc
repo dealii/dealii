@@ -59,7 +59,7 @@ test()
   local_active_together.add_range(numproc + myid * 2, numproc + myid * 2 + 2);
 
   AffineConstraints<PetscScalar> cm(local_active_together);
-  cm.add_line(numproc + myid * 2);
+  cm.constrain_dof_to_zero(numproc + myid * 2);
   cm.close();
 
   deallog << "vector before:" << std::endl;

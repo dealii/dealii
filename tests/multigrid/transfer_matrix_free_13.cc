@@ -62,7 +62,7 @@ check()
     {
       if (user_constraints.can_store_line(face_dofs[i]))
         {
-          user_constraints.add_line(face_dofs[i]);
+          user_constraints.constrain_dof_to_zero(face_dofs[i]);
           user_constraints.set_inhomogeneity(face_dofs[i], 5.0);
         }
     }
