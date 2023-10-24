@@ -2000,11 +2000,6 @@ public:
    * as a copy constructor, since it makes it easier to maintain collections
    * of triangulations if you can assign them values later on.
    *
-   * Keep in mind that this function also copies the pointer to the boundary
-   * descriptor previously set by the @p set_manifold function. You must
-   * therefore also guarantee that the Manifold objects describing the boundary
-   * have a lifetime at least as long as the copied triangulation.
-   *
    * This triangulation must be empty beforehand.
    *
    * The function is made @p virtual since some derived classes might want to
