@@ -1285,29 +1285,30 @@ namespace internal
         const unsigned int n_components = dof_info.start_components.back();
         for (unsigned int block = begin; block < end; ++block)
           {
-            scratch.clear();
-            scratch.insert(
-              scratch.end(),
+            scratch.assign(
               dof_info.dof_indices.data() +
                 dof_info.row_starts[block * n_components].first,
               dof_info.dof_indices.data() +
                 dof_info.row_starts[(block + 1) * n_components].first);
             std::sort(scratch.begin(), scratch.end());
-            std::vector<unsigned int>::const_iterator end_unique =
+
+            const std::vector<unsigned int>::const_iterator end_unique =
               std::unique(scratch.begin(), scratch.end());
-            std::vector<unsigned int>::const_iterator it = scratch.begin();
-            while (it != end_unique)
+            for (std::vector<unsigned int>::const_iterator it = scratch.begin();
+                 it != end_unique;
+                 /* update in loop body */)
               {
                 // In this code, the procedure is that we insert all elements
                 // that are within the range of one lock at once
                 const unsigned int next_bucket =
                   (*it / bucket_size_threading + 1) * bucket_size_threading;
+
                 std::lock_guard<std::mutex> lock(
                   mutexes[*it / bucket_size_threading]);
                 for (; it != end_unique && *it < next_bucket; ++it)
                   {
                     AssertIndexRange(*it, row_lengths.size());
-                    row_lengths[*it]++;
+                    ++row_lengths[*it];
                   }
               }
           }
@@ -1325,21 +1326,22 @@ namespace internal
         const unsigned int n_components = dof_info.start_components.back();
         for (unsigned int block = begin; block < end; ++block)
           {
-            scratch.clear();
-            scratch.insert(
-              scratch.end(),
+            scratch.assign(
               dof_info.dof_indices.data() +
                 dof_info.row_starts[block * n_components].first,
               dof_info.dof_indices.data() +
                 dof_info.row_starts[(block + 1) * n_components].first);
             std::sort(scratch.begin(), scratch.end());
-            std::vector<unsigned int>::const_iterator end_unique =
+
+            const std::vector<unsigned int>::const_iterator end_unique =
               std::unique(scratch.begin(), scratch.end());
-            std::vector<unsigned int>::const_iterator it = scratch.begin();
-            while (it != end_unique)
+            for (std::vector<unsigned int>::const_iterator it = scratch.begin();
+                 it != end_unique;
+                 /* update in loop body */)
               {
                 const unsigned int next_bucket =
                   (*it / bucket_size_threading + 1) * bucket_size_threading;
+
                 std::lock_guard<std::mutex> lock(
                   mutexes[*it / bucket_size_threading]);
                 for (; it != end_unique && *it < next_bucket; ++it)
