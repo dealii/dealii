@@ -25,7 +25,6 @@
 #include <cmath>
 #include <limits>
 #include <memory>
-#include <shared_mutex>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -847,18 +846,12 @@ namespace Polynomials
 
   // ------------------ class Hierarchical --------------- //
 
-  // have a lock that guarantees that at most one thread is changing and
-  // accessing the `recursive_coefficients array.
-  namespace
-  {
-    std::shared_mutex coefficients_lock;
-  }
-
   // Reserve space for polynomials up to degree 19. Should be sufficient
   // for the start.
   std::vector<std::unique_ptr<const std::vector<double>>>
     Hierarchical::recursive_coefficients(20);
 
+  std::shared_mutex Hierarchical::coefficients_lock;
 
 
   Hierarchical::Hierarchical(const unsigned int k)

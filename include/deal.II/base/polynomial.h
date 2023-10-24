@@ -27,6 +27,7 @@
 #include <array>
 #include <limits>
 #include <memory>
+#include <shared_mutex>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -572,6 +573,12 @@ namespace Polynomials
      */
     static std::vector<std::unique_ptr<const std::vector<double>>>
       recursive_coefficients;
+
+    /**
+     * The mutex that guards read and write access to the
+     * `recursive_coefficients` array.
+     */
+    static std::shared_mutex coefficients_lock;
   };
 
 
