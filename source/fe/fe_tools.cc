@@ -18,6 +18,19 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+namespace FETools
+{
+  namespace internal
+  {
+    namespace FEToolsAddFENameHelper
+    {
+      std::shared_mutex fe_name_map_lock;
+    }
+  } // namespace internal
+} // namespace FETools
+
+
 /*-------------- Explicit Instantiations -------------------------------*/
 #include "fe_tools.inst"
 

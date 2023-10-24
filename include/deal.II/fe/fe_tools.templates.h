@@ -1220,15 +1220,12 @@ namespace FETools
       }
 
 
-      // have a lock that guarantees that at most one thread is changing
-      // and accessing the fe_name_map variable. make this lock local to
-      // this file.
-      //
-      // This variable is declared static (even though
-      // it belongs to an internal namespace) in order to make icc happy
-      // (which otherwise reports a multiply defined symbol when linking
-      // libraries for more than one space dimension together)
-      static std::shared_mutex fe_name_map_lock;
+      // Have a lock that guarantees that at most one thread is changing
+      // and accessing the fe_name_map variable. The variable
+      // is declared 'extern' here because we are in a .h file, but
+      // it really needs to be defined in a .cc file (and indeed we have
+      // the definition there).
+      extern std::shared_mutex fe_name_map_lock;
 
       // This is the map used by FETools::get_fe_by_name and
       // FETools::add_fe_name. It is only accessed by functions in this
