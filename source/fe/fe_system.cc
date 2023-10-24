@@ -896,77 +896,70 @@ FESystem<dim, spacedim>::get_restriction_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->restriction[refinement_case - 1][child].n() == 0)
-    {
-      std::lock_guard<std::mutex> lock(this->mutex);
+  [[maybe_unused]] static bool once = [&, this]() {
+    // Check if some of the matrices of the base elements are void.
+    bool do_restriction = true;
 
-      // check if updated while waiting for lock
-      if (this->restriction[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
-        return this->restriction[refinement_case - 1][child];
+    // shortcut for accessing local restrictions further down
+    std::vector<const FullMatrix<double> *> base_matrices(
+      this->n_base_elements());
 
-      // Check if some of the matrices of the base elements are void.
-      bool do_restriction = true;
+    for (unsigned int i = 0; i < this->n_base_elements(); ++i)
+      {
+        base_matrices[i] =
+          &base_element(i).get_restriction_matrix(child, refinement_case);
+        if (base_matrices[i]->n() != base_element(i).n_dofs_per_cell())
+          do_restriction = false;
+      }
+    Assert(do_restriction,
+           (typename FiniteElement<dim, spacedim>::ExcProjectionVoid()));
 
-      // shortcut for accessing local restrictions further down
-      std::vector<const FullMatrix<double> *> base_matrices(
-        this->n_base_elements());
+    // if we did not encounter void matrices, initialize the matrix sizes
+    if (do_restriction)
+      {
+        FullMatrix<double> restriction(this->n_dofs_per_cell(),
+                                       this->n_dofs_per_cell());
 
-      for (unsigned int i = 0; i < this->n_base_elements(); ++i)
-        {
-          base_matrices[i] =
-            &base_element(i).get_restriction_matrix(child, refinement_case);
-          if (base_matrices[i]->n() != base_element(i).n_dofs_per_cell())
-            do_restriction = false;
-        }
-      Assert(do_restriction,
-             (typename FiniteElement<dim, spacedim>::ExcProjectionVoid()));
+        // distribute the matrices of the base finite elements to the
+        // matrices of this object. for this, loop over all degrees of
+        // freedom and take the respective entry of the underlying base
+        // element.
+        //
+        // note that we by definition of a base element, they are
+        // independent, i.e. do not couple. only DoFs that belong to the
+        // same instance of a base element may couple
+        for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+          for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
+            {
+              // first find out to which base element indices i and j
+              // belong, and which instance thereof in case the base element
+              // has a multiplicity greater than one. if they should not
+              // happen to belong to the same instance of a base element,
+              // then they cannot couple, so go on with the next index
+              if (this->system_to_base_table[i].first !=
+                  this->system_to_base_table[j].first)
+                continue;
 
-      // if we did not encounter void matrices, initialize the matrix sizes
-      if (do_restriction)
-        {
-          FullMatrix<double> restriction(this->n_dofs_per_cell(),
-                                         this->n_dofs_per_cell());
+              // so get the common base element and the indices therein:
+              const unsigned int base =
+                this->system_to_base_table[i].first.first;
 
-          // distribute the matrices of the base finite elements to the
-          // matrices of this object. for this, loop over all degrees of
-          // freedom and take the respective entry of the underlying base
-          // element.
-          //
-          // note that we by definition of a base element, they are
-          // independent, i.e. do not couple. only DoFs that belong to the
-          // same instance of a base element may couple
-          for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-            for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
-              {
-                // first find out to which base element indices i and j
-                // belong, and which instance thereof in case the base element
-                // has a multiplicity greater than one. if they should not
-                // happen to belong to the same instance of a base element,
-                // then they cannot couple, so go on with the next index
-                if (this->system_to_base_table[i].first !=
-                    this->system_to_base_table[j].first)
-                  continue;
+              const unsigned int base_index_i =
+                                   this->system_to_base_table[i].second,
+                                 base_index_j =
+                                   this->system_to_base_table[j].second;
 
-                // so get the common base element and the indices therein:
-                const unsigned int base =
-                  this->system_to_base_table[i].first.first;
+              // if we are sure that DoFs i and j may couple, then copy
+              // entries of the matrices:
+              restriction(i, j) =
+                (*base_matrices[base])(base_index_i, base_index_j);
+            }
 
-                const unsigned int base_index_i =
-                                     this->system_to_base_table[i].second,
-                                   base_index_j =
-                                     this->system_to_base_table[j].second;
-
-                // if we are sure that DoFs i and j may couple, then copy
-                // entries of the matrices:
-                restriction(i, j) =
-                  (*base_matrices[base])(base_index_i, base_index_j);
-              }
-
-          restriction.swap(const_cast<FullMatrix<double> &>(
-            this->restriction[refinement_case - 1][child]));
-        }
-    }
+        restriction.swap(const_cast<FullMatrix<double> &>(
+          this->restriction[refinement_case - 1][child]));
+      }
+    return true;
+  }();
 
   return this->restriction[refinement_case - 1][child];
 }
@@ -988,52 +981,46 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
 
   // initialization upon first request, construction completely analogous to
   // restriction matrix
-  if (this->prolongation[refinement_case - 1][child].n() == 0)
-    {
-      std::lock_guard<std::mutex> lock(this->mutex);
+  [[maybe_unused]] static bool once = [&, this]() {
+    bool                                    do_prolongation = true;
+    std::vector<const FullMatrix<double> *> base_matrices(
+      this->n_base_elements());
+    for (unsigned int i = 0; i < this->n_base_elements(); ++i)
+      {
+        base_matrices[i] =
+          &base_element(i).get_prolongation_matrix(child, refinement_case);
+        if (base_matrices[i]->n() != base_element(i).n_dofs_per_cell())
+          do_prolongation = false;
+      }
+    Assert(do_prolongation,
+           (typename FiniteElement<dim, spacedim>::ExcEmbeddingVoid()));
 
-      if (this->prolongation[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
-        return this->prolongation[refinement_case - 1][child];
+    if (do_prolongation)
+      {
+        FullMatrix<double> prolongate(this->n_dofs_per_cell(),
+                                      this->n_dofs_per_cell());
 
-      bool                                    do_prolongation = true;
-      std::vector<const FullMatrix<double> *> base_matrices(
-        this->n_base_elements());
-      for (unsigned int i = 0; i < this->n_base_elements(); ++i)
-        {
-          base_matrices[i] =
-            &base_element(i).get_prolongation_matrix(child, refinement_case);
-          if (base_matrices[i]->n() != base_element(i).n_dofs_per_cell())
-            do_prolongation = false;
-        }
-      Assert(do_prolongation,
-             (typename FiniteElement<dim, spacedim>::ExcEmbeddingVoid()));
+        for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+          for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
+            {
+              if (this->system_to_base_table[i].first !=
+                  this->system_to_base_table[j].first)
+                continue;
+              const unsigned int base =
+                this->system_to_base_table[i].first.first;
 
-      if (do_prolongation)
-        {
-          FullMatrix<double> prolongate(this->n_dofs_per_cell(),
-                                        this->n_dofs_per_cell());
-
-          for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-            for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
-              {
-                if (this->system_to_base_table[i].first !=
-                    this->system_to_base_table[j].first)
-                  continue;
-                const unsigned int base =
-                  this->system_to_base_table[i].first.first;
-
-                const unsigned int base_index_i =
-                                     this->system_to_base_table[i].second,
-                                   base_index_j =
-                                     this->system_to_base_table[j].second;
-                prolongate(i, j) =
-                  (*base_matrices[base])(base_index_i, base_index_j);
-              }
-          prolongate.swap(const_cast<FullMatrix<double> &>(
-            this->prolongation[refinement_case - 1][child]));
-        }
-    }
+              const unsigned int base_index_i =
+                                   this->system_to_base_table[i].second,
+                                 base_index_j =
+                                   this->system_to_base_table[j].second;
+              prolongate(i, j) =
+                (*base_matrices[base])(base_index_i, base_index_j);
+            }
+        prolongate.swap(const_cast<FullMatrix<double> &>(
+          this->prolongation[refinement_case - 1][child]));
+      }
+    return true;
+  }();
 
   return this->prolongation[refinement_case - 1][child];
 }

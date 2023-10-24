@@ -3039,40 +3039,32 @@ FE_Nedelec<dim>::get_prolongation_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->prolongation[refinement_case - 1][child].n() == 0)
-    {
-      std::lock_guard<std::mutex> lock(this->mutex);
+  [[maybe_unused]] static bool once = [&]() {
+    // now do the work. need to get a non-const version of data in order to
+    // be able to modify them inside a const function
+    FE_Nedelec<dim> &this_nonconst = const_cast<FE_Nedelec<dim> &>(*this);
 
-      // if matrix got updated while waiting for the lock
-      if (this->prolongation[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
-        return this->prolongation[refinement_case - 1][child];
-
-      // now do the work. need to get a non-const version of data in order to
-      // be able to modify them inside a const function
-      FE_Nedelec<dim> &this_nonconst = const_cast<FE_Nedelec<dim> &>(*this);
-
-      // Reinit the vectors of
-      // restriction and prolongation
-      // matrices to the right sizes.
-      // Restriction only for isotropic
-      // refinement
+    // Reinit the vectors of
+    // restriction and prolongation
+    // matrices to the right sizes.
+    // Restriction only for isotropic
+    // refinement
 #ifdef DEBUG_NEDELEC
-      deallog << "Embedding" << std::endl;
+    deallog << "Embedding" << std::endl;
 #endif
-      this_nonconst.reinit_restriction_and_prolongation_matrices();
-      // Fill prolongation matrices with embedding operators
-      FETools::compute_embedding_matrices(
-        this_nonconst,
-        this_nonconst.prolongation,
-        true,
-        internal::FE_Nedelec::get_embedding_computation_tolerance(
-          this->degree));
+    this_nonconst.reinit_restriction_and_prolongation_matrices();
+    // Fill prolongation matrices with embedding operators
+    FETools::compute_embedding_matrices(
+      this_nonconst,
+      this_nonconst.prolongation,
+      true,
+      internal::FE_Nedelec::get_embedding_computation_tolerance(this->degree));
 #ifdef DEBUG_NEDELEC
-      deallog << "Restriction" << std::endl;
+    deallog << "Restriction" << std::endl;
 #endif
-      this_nonconst.initialize_restriction();
-    }
+    this_nonconst.initialize_restriction();
+    return true;
+  }();
 
   // we use refinement_case-1 here. the -1 takes care of the origin of the
   // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
@@ -3095,40 +3087,32 @@ FE_Nedelec<dim>::get_restriction_matrix(
     child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
 
   // initialization upon first request
-  if (this->restriction[refinement_case - 1][child].n() == 0)
-    {
-      std::lock_guard<std::mutex> lock(this->mutex);
+  [[maybe_unused]] static bool once = [&]() {
+    // now do the work. need to get a non-const version of data in order to
+    // be able to modify them inside a const function
+    FE_Nedelec<dim> &this_nonconst = const_cast<FE_Nedelec<dim> &>(*this);
 
-      // if matrix got updated while waiting for the lock...
-      if (this->restriction[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
-        return this->restriction[refinement_case - 1][child];
-
-      // now do the work. need to get a non-const version of data in order to
-      // be able to modify them inside a const function
-      FE_Nedelec<dim> &this_nonconst = const_cast<FE_Nedelec<dim> &>(*this);
-
-      // Reinit the vectors of
-      // restriction and prolongation
-      // matrices to the right sizes.
-      // Restriction only for isotropic
-      // refinement
+    // Reinit the vectors of
+    // restriction and prolongation
+    // matrices to the right sizes.
+    // Restriction only for isotropic
+    // refinement
 #ifdef DEBUG_NEDELEC
-      deallog << "Embedding" << std::endl;
+    deallog << "Embedding" << std::endl;
 #endif
-      this_nonconst.reinit_restriction_and_prolongation_matrices();
-      // Fill prolongation matrices with embedding operators
-      FETools::compute_embedding_matrices(
-        this_nonconst,
-        this_nonconst.prolongation,
-        true,
-        internal::FE_Nedelec::get_embedding_computation_tolerance(
-          this->degree));
+    this_nonconst.reinit_restriction_and_prolongation_matrices();
+    // Fill prolongation matrices with embedding operators
+    FETools::compute_embedding_matrices(
+      this_nonconst,
+      this_nonconst.prolongation,
+      true,
+      internal::FE_Nedelec::get_embedding_computation_tolerance(this->degree));
 #ifdef DEBUG_NEDELEC
-      deallog << "Restriction" << std::endl;
+    deallog << "Restriction" << std::endl;
 #endif
-      this_nonconst.initialize_restriction();
-    }
+    this_nonconst.initialize_restriction();
+    return true;
+  }();
 
   // we use refinement_case-1 here. the -1 takes care of the origin of the
   // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data

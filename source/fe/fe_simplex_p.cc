@@ -316,30 +316,23 @@ FE_SimplexPoly<dim, spacedim>::get_prolongation_matrix(
   AssertDimension(dim, spacedim);
 
   // initialization upon first request
-  if (this->prolongation[refinement_case - 1][child].n() == 0)
-    {
-      std::lock_guard<std::mutex> lock(this->mutex);
+  [[maybe_unused]] static bool once = [&]() {
+    // now do the work. need to get a non-const version of data in order to
+    // be able to modify them inside a const function
+    auto &this_nonconst = const_cast<FE_SimplexPoly<dim, spacedim> &>(*this);
 
-      // if matrix got updated while waiting for the lock
-      if (this->prolongation[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
-        return this->prolongation[refinement_case - 1][child];
+    std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
+      RefinementCase<dim>::isotropic_refinement);
+    isotropic_matrices.back().resize(
+      GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+      FullMatrix<double>(this->n_dofs_per_cell(), this->n_dofs_per_cell()));
 
-      // now do the work. need to get a non-const version of data in order to
-      // be able to modify them inside a const function
-      auto &this_nonconst = const_cast<FE_SimplexPoly<dim, spacedim> &>(*this);
+    FETools::compute_embedding_matrices(*this, isotropic_matrices, true);
 
-      std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
-        RefinementCase<dim>::isotropic_refinement);
-      isotropic_matrices.back().resize(
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-        FullMatrix<double>(this->n_dofs_per_cell(), this->n_dofs_per_cell()));
-
-      FETools::compute_embedding_matrices(*this, isotropic_matrices, true);
-
-      this_nonconst.prolongation[refinement_case - 1].swap(
-        isotropic_matrices.back());
-    }
+    this_nonconst.prolongation[refinement_case - 1].swap(
+      isotropic_matrices.back());
+    return true;
+  }();
 
   // finally return the matrix
   return this->prolongation[refinement_case - 1][child];
@@ -358,30 +351,23 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
   AssertDimension(dim, spacedim);
 
   // initialization upon first request
-  if (this->restriction[refinement_case - 1][child].n() == 0)
-    {
-      std::lock_guard<std::mutex> lock(this->mutex);
+  [[maybe_unused]] static bool once = [&]() {
+    // now do the work. need to get a non-const version of data in order to
+    // be able to modify them inside a const function
+    auto &this_nonconst = const_cast<FE_SimplexPoly<dim, spacedim> &>(*this);
 
-      // if matrix got updated while waiting for the lock
-      if (this->restriction[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
-        return this->restriction[refinement_case - 1][child];
+    std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
+      RefinementCase<dim>::isotropic_refinement);
+    isotropic_matrices.back().resize(
+      GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+      FullMatrix<double>(this->n_dofs_per_cell(), this->n_dofs_per_cell()));
 
-      // now do the work. need to get a non-const version of data in order to
-      // be able to modify them inside a const function
-      auto &this_nonconst = const_cast<FE_SimplexPoly<dim, spacedim> &>(*this);
+    FETools::compute_projection_matrices(*this, isotropic_matrices, true);
 
-      std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
-        RefinementCase<dim>::isotropic_refinement);
-      isotropic_matrices.back().resize(
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-        FullMatrix<double>(this->n_dofs_per_cell(), this->n_dofs_per_cell()));
-
-      FETools::compute_projection_matrices(*this, isotropic_matrices, true);
-
-      this_nonconst.restriction[refinement_case - 1].swap(
-        isotropic_matrices.back());
-    }
+    this_nonconst.restriction[refinement_case - 1].swap(
+      isotropic_matrices.back());
+    return true;
+  }();
 
   // finally return the matrix
   return this->restriction[refinement_case - 1][child];

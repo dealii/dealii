@@ -681,43 +681,33 @@ FE_RaviartThomasNodal<dim>::get_prolongation_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->prolongation[refinement_case - 1][child].n() == 0)
-    {
-      std::lock_guard<std::mutex> lock(this->mutex);
-
-      // if matrix got updated while waiting for the lock
-      if (this->prolongation[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
-        return this->prolongation[refinement_case - 1][child];
-
-      // now do the work. need to get a non-const version of data in order to
-      // be able to modify them inside a const function
-      FE_RaviartThomasNodal<dim> &this_nonconst =
-        const_cast<FE_RaviartThomasNodal<dim> &>(*this);
-      if (refinement_case == RefinementCase<dim>::isotropic_refinement)
-        {
-          std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
-            RefinementCase<dim>::isotropic_refinement);
-          isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-            FullMatrix<double>(this->n_dofs_per_cell(),
-                               this->n_dofs_per_cell()));
-          FETools::compute_embedding_matrices(*this, isotropic_matrices, true);
-          this_nonconst.prolongation[refinement_case - 1].swap(
-            isotropic_matrices.back());
-        }
-      else
-        {
-          // must compute both restriction and prolongation matrices because
-          // we only check for their size and the reinit call initializes them
-          // all
-          this_nonconst.reinit_restriction_and_prolongation_matrices();
-          FETools::compute_embedding_matrices(*this,
-                                              this_nonconst.prolongation);
-          FETools::compute_projection_matrices(*this,
-                                               this_nonconst.restriction);
-        }
-    }
+  [[maybe_unused]] static bool once = [&]() {
+    // now do the work. need to get a non-const version of data in order to
+    // be able to modify them inside a const function
+    FE_RaviartThomasNodal<dim> &this_nonconst =
+      const_cast<FE_RaviartThomasNodal<dim> &>(*this);
+    if (refinement_case == RefinementCase<dim>::isotropic_refinement)
+      {
+        std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
+          RefinementCase<dim>::isotropic_refinement);
+        isotropic_matrices.back().resize(
+          GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+          FullMatrix<double>(this->n_dofs_per_cell(), this->n_dofs_per_cell()));
+        FETools::compute_embedding_matrices(*this, isotropic_matrices, true);
+        this_nonconst.prolongation[refinement_case - 1].swap(
+          isotropic_matrices.back());
+      }
+    else
+      {
+        // must compute both restriction and prolongation matrices because
+        // we only check for their size and the reinit call initializes them
+        // all
+        this_nonconst.reinit_restriction_and_prolongation_matrices();
+        FETools::compute_embedding_matrices(*this, this_nonconst.prolongation);
+        FETools::compute_projection_matrices(*this, this_nonconst.restriction);
+      }
+    return true;
+  }();
 
   // finally return the matrix
   return this->prolongation[refinement_case - 1][child];
@@ -739,43 +729,33 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
   AssertIndexRange(child, GeometryInfo<dim>::n_children(refinement_case));
 
   // initialization upon first request
-  if (this->restriction[refinement_case - 1][child].n() == 0)
-    {
-      std::lock_guard<std::mutex> lock(this->mutex);
-
-      // if matrix got updated while waiting for the lock...
-      if (this->restriction[refinement_case - 1][child].n() ==
-          this->n_dofs_per_cell())
-        return this->restriction[refinement_case - 1][child];
-
-      // now do the work. need to get a non-const version of data in order to
-      // be able to modify them inside a const function
-      FE_RaviartThomasNodal<dim> &this_nonconst =
-        const_cast<FE_RaviartThomasNodal<dim> &>(*this);
-      if (refinement_case == RefinementCase<dim>::isotropic_refinement)
-        {
-          std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
-            RefinementCase<dim>::isotropic_refinement);
-          isotropic_matrices.back().resize(
-            GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
-            FullMatrix<double>(this->n_dofs_per_cell(),
-                               this->n_dofs_per_cell()));
-          FETools::compute_projection_matrices(*this, isotropic_matrices, true);
-          this_nonconst.restriction[refinement_case - 1].swap(
-            isotropic_matrices.back());
-        }
-      else
-        {
-          // must compute both restriction and prolongation matrices because
-          // we only check for their size and the reinit call initializes them
-          // all
-          this_nonconst.reinit_restriction_and_prolongation_matrices();
-          FETools::compute_embedding_matrices(*this,
-                                              this_nonconst.prolongation);
-          FETools::compute_projection_matrices(*this,
-                                               this_nonconst.restriction);
-        }
-    }
+  [[maybe_unused]] static bool once = [&]() {
+    // now do the work. need to get a non-const version of data in order to
+    // be able to modify them inside a const function
+    FE_RaviartThomasNodal<dim> &this_nonconst =
+      const_cast<FE_RaviartThomasNodal<dim> &>(*this);
+    if (refinement_case == RefinementCase<dim>::isotropic_refinement)
+      {
+        std::vector<std::vector<FullMatrix<double>>> isotropic_matrices(
+          RefinementCase<dim>::isotropic_refinement);
+        isotropic_matrices.back().resize(
+          GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
+          FullMatrix<double>(this->n_dofs_per_cell(), this->n_dofs_per_cell()));
+        FETools::compute_projection_matrices(*this, isotropic_matrices, true);
+        this_nonconst.restriction[refinement_case - 1].swap(
+          isotropic_matrices.back());
+      }
+    else
+      {
+        // must compute both restriction and prolongation matrices because
+        // we only check for their size and the reinit call initializes them
+        // all
+        this_nonconst.reinit_restriction_and_prolongation_matrices();
+        FETools::compute_embedding_matrices(*this, this_nonconst.prolongation);
+        FETools::compute_projection_matrices(*this, this_nonconst.restriction);
+      }
+    return true;
+  }();
 
   // finally return the matrix
   return this->restriction[refinement_case - 1][child];
