@@ -25,6 +25,7 @@
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_iterator.h>
+#include <deal.II/grid/tria_orientation.h>
 
 #include <algorithm>
 #include <functional>
@@ -608,8 +609,9 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
       return (this->reference_cell().face_to_cell_vertices(
                 face,
                 face_vertex,
-                (face_orientation ? 1 : 0) + (face_rotation ? 2 : 0) +
-                  (face_flip ? 4 : 0)) *
+                internal::combined_face_orientation(face_orientation,
+                                                    face_rotation,
+                                                    face_flip)) *
                 this->n_dofs_per_vertex() +
               dof_index_on_vertex);
     }
@@ -624,15 +626,15 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
       const unsigned int face_line         = index / this->n_dofs_per_line();
       const unsigned int dof_index_on_line = index % this->n_dofs_per_line();
 
-      return (
-        this->get_first_line_index() +
-        this->reference_cell().face_to_cell_lines(face,
-                                                  face_line,
-                                                  (face_orientation ? 1 : 0) +
-                                                    (face_rotation ? 2 : 0) +
-                                                    (face_flip ? 4 : 0)) *
-          this->n_dofs_per_line() +
-        dof_index_on_line);
+      return (this->get_first_line_index() +
+              this->reference_cell().face_to_cell_lines(
+                face,
+                face_line,
+                internal::combined_face_orientation(face_orientation,
+                                                    face_rotation,
+                                                    face_flip)) *
+                this->n_dofs_per_line() +
+              dof_index_on_line);
     }
   else
     // DoF is on a quad

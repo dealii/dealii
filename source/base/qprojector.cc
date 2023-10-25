@@ -1323,21 +1323,29 @@ QProjector<dim>::DataSetDescriptor::face(const ReferenceCell &reference_cell,
                                          const bool           face_rotation,
                                          const unsigned int n_quadrature_points)
 {
+  const unsigned char combined_orientation =
+    internal::combined_face_orientation(face_orientation,
+                                        face_rotation,
+                                        face_flip);
+  // TODO: once we move to representing the default orientation as 0 (instead of
+  // 1) we can get rid of the dim = 1 check
+  Assert(dim == 1 ||
+           (combined_orientation < reference_cell.n_face_orientations(face_no)),
+         ExcInternalError());
   if (reference_cell == ReferenceCells::Triangle ||
       reference_cell == ReferenceCells::Tetrahedron)
     {
       if (dim == 2)
-        return {(2 * face_no + (face_orientation ? 1 : 0)) *
+        return {(2 * face_no +
+                 (combined_orientation ==
+                      ReferenceCell::default_combined_face_orientation() ?
+                    1 :
+                    0)) *
                 n_quadrature_points};
       else if (dim == 3)
         {
-          const unsigned char orientation =
-            internal::combined_face_orientation(face_orientation,
-                                                face_rotation,
-                                                face_flip);
-          Assert(orientation < 6, ExcInternalError());
           return {(reference_cell.n_face_orientations(face_no) * face_no +
-                   orientation) *
+                   combined_orientation) *
                   n_quadrature_points};
         }
     }
@@ -1424,6 +1432,13 @@ QProjector<dim>::DataSetDescriptor::face(
     {
       unsigned int offset = 0;
 
+      const unsigned char combined_orientation =
+        internal::combined_face_orientation(face_orientation,
+                                            face_rotation,
+                                            face_flip);
+      Assert(combined_orientation < reference_cell.n_face_orientations(face_no),
+             ExcInternalError());
+
       static const unsigned int X = numbers::invalid_unsigned_int;
       static const std::array<unsigned int, 5> scale_tri   = {{2, 2, 2, X, X}};
       static const std::array<unsigned int, 5> scale_tet   = {{6, 6, 6, 6, X}};
@@ -1447,14 +1462,13 @@ QProjector<dim>::DataSetDescriptor::face(
 
       if (dim == 2)
         return {offset +
-                face_orientation *
+                (combined_orientation ==
+                 ReferenceCell::default_combined_face_orientation()) *
                   quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
       else if (dim == 3)
         {
           return {offset +
-                  internal::combined_face_orientation(face_orientation,
-                                                      face_rotation,
-                                                      face_flip) *
+                  combined_orientation *
                     quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
         }
     }
