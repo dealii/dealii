@@ -19,7 +19,12 @@
 #include <deal.II/base/config.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#include <Kokkos_Core.hpp>
+#include <Kokkos_Macros.hpp>
+#if KOKKOS_VERSION >= 40200
+#  include <Kokkos_Abort.hpp>
+#else
+#  include <Kokkos_Core.hpp>
+#endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <exception>
