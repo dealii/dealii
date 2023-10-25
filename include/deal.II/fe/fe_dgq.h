@@ -367,10 +367,12 @@ private:
   rotate_indices(std::vector<unsigned int> &indices,
                  const char                 direction) const;
 
-  /*
-   * Mutex for protecting initialization of restriction and embedding matrix.
+  /**
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
    */
-  mutable Threads::Mutex mutex;
+  mutable Threads::Mutex restriction_matrix_mutex;
+  mutable Threads::Mutex prolongation_matrix_mutex;
 
   // Allow access from other dimensions.
   template <int dim1, int spacedim1>
