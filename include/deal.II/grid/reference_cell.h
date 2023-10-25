@@ -887,11 +887,11 @@ private:
     quadrilateral_vertex_permutations = {{{{0, 2, 1, 3}},
                                           {{0, 1, 2, 3}},
                                           {{2, 3, 0, 1}},
-                                          {{2, 0, 3, 1}},
+                                          {{1, 3, 0, 2}},
                                           {{3, 1, 2, 0}},
                                           {{3, 2, 1, 0}},
                                           {{1, 0, 3, 2}},
-                                          {{1, 3, 0, 2}}}};
+                                          {{2, 0, 3, 1}}}};
 
   /**
    * A kind of constructor -- not quite private because it can be
@@ -2817,7 +2817,7 @@ ReferenceCell::get_combined_orientation(
 
         // face_orientation=true, face_rotation=true, face_flip=false
         if (v0_equals(
-              {vertices_1[2], vertices_1[0], vertices_1[3], vertices_1[1]}))
+              {vertices_1[1], vertices_1[3], vertices_1[0], vertices_1[2]}))
           return 3;
 
         // face_orientation=true, face_rotation=false, face_flip=true
@@ -2827,7 +2827,7 @@ ReferenceCell::get_combined_orientation(
 
         // face_orientation=true, face_rotation=true, face_flip=true
         if (v0_equals(
-              {vertices_1[1], vertices_1[3], vertices_1[0], vertices_1[2]}))
+              {vertices_1[2], vertices_1[0], vertices_1[3], vertices_1[1]}))
           return 7;
 
         // face_orientation=false, face_rotation=false, face_flip=false
@@ -2936,11 +2936,11 @@ ReferenceCell::permute_by_combined_orientation(
             case 1:
               return {vertices[0], vertices[1], vertices[2], vertices[3]};
             case 3:
-              return {vertices[2], vertices[0], vertices[3], vertices[1]};
+              return {vertices[1], vertices[3], vertices[0], vertices[2]};
             case 5:
               return {vertices[3], vertices[2], vertices[1], vertices[0]};
             case 7:
-              return {vertices[1], vertices[3], vertices[0], vertices[2]};
+              return {vertices[2], vertices[0], vertices[3], vertices[1]};
             case 0:
               return {vertices[0], vertices[2], vertices[1], vertices[3]};
             case 2:
