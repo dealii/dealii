@@ -20,7 +20,7 @@
 
 #include <deal.II/base/utilities.h>
 
-#include <vector>
+#include <tuple>
 
 DEAL_II_NAMESPACE_OPEN
 
