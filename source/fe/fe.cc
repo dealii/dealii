@@ -139,12 +139,12 @@ FiniteElement<dim, spacedim>::FiniteElement(
        RefinementCase<dim>::all_refinement_cases())
     if (ref_case != RefinementCase<dim>::no_refinement)
       {
-        prolongation[ref - 1].resize(GeometryInfo<dim>::n_children(
-                                       RefinementCase<dim>(ref)),
-                                     FullMatrix<double>());
-        restriction[ref - 1].resize(GeometryInfo<dim>::n_children(
-                                      RefinementCase<dim>(ref)),
-                                    FullMatrix<double>());
+        prolongation[ref_case - 1].resize(GeometryInfo<dim>::n_children(
+                                            RefinementCase<dim>(ref_case)),
+                                          FullMatrix<double>());
+        restriction[ref_case - 1].resize(GeometryInfo<dim>::n_children(
+                                           RefinementCase<dim>(ref_case)),
+                                         FullMatrix<double>());
       }
 
 
