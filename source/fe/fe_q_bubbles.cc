@@ -92,10 +92,10 @@ namespace internal
         const unsigned int nq = q_fine->size();
 
         // loop over all possible refinement cases
-        unsigned int ref_case = (isotropic_only) ?
-                                  RefinementCase<dim>::isotropic_refinement :
-                                  RefinementCase<dim>::cut_x;
-        for (; ref_case <= RefinementCase<dim>::isotropic_refinement;
+        for (unsigned int ref_case =
+               (isotropic_only ? RefinementCase<dim>::isotropic_refinement :
+                                 RefinementCase<dim>::cut_x);
+             ref_case <= RefinementCase<dim>::isotropic_refinement;
              ++ref_case)
           {
             const unsigned int nc =

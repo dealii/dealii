@@ -52,27 +52,27 @@ FE_DGPNonparametric<dim, spacedim>::FE_DGPNonparametric(
   , polynomial_space(Polynomials::Legendre::generate_complete_basis(degree))
 {
   const unsigned int n_dofs = this->n_dofs_per_cell();
-  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
-       ref_case < RefinementCase<dim>::isotropic_refinement + 1;
-       ++ref_case)
-    {
-      if (dim != 2 && ref_case != RefinementCase<dim>::isotropic_refinement)
-        // do nothing, as anisotropic
-        // refinement is not
-        // implemented so far
-        continue;
+  for (const unsigned int ref_case :
+       RefinementCase<dim>::all_refinement_cases())
+    if (ref_case != RefinementCase<dim>::no_refinement)
+      {
+        if (dim != 2 && ref_case != RefinementCase<dim>::isotropic_refinement)
+          // do nothing, as anisotropic
+          // refinement is not
+          // implemented so far
+          continue;
 
-      const unsigned int nc =
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-      for (unsigned int i = 0; i < nc; ++i)
-        {
-          this->prolongation[ref_case - 1][i].reinit(n_dofs, n_dofs);
-          // Fill prolongation matrices with
-          // embedding operators
-          for (unsigned int j = 0; j < n_dofs; ++j)
-            this->prolongation[ref_case - 1][i](j, j) = 1.;
-        }
-    }
+        const unsigned int nc =
+          GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+        for (unsigned int i = 0; i < nc; ++i)
+          {
+            this->prolongation[ref_case - 1][i].reinit(n_dofs, n_dofs);
+            // Fill prolongation matrices with
+            // embedding operators
+            for (unsigned int j = 0; j < n_dofs; ++j)
+              this->prolongation[ref_case - 1][i](j, j) = 1.;
+          }
+      }
 
   // restriction can be defined
   // through projection for

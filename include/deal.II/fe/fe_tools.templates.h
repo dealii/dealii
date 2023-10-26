@@ -1865,11 +1865,11 @@ namespace FETools
     Threads::TaskGroup<void> task_group;
 
     // loop over all possible refinement cases
-    unsigned int ref_case = (isotropic_only) ?
-                              RefinementCase<dim>::isotropic_refinement :
-                              RefinementCase<dim>::cut_x;
-
-    for (; ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
+    for (unsigned int ref_case =
+           (isotropic_only ? RefinementCase<dim>::isotropic_refinement :
+                             RefinementCase<dim>::cut_x);
+         ref_case <= RefinementCase<dim>::isotropic_refinement;
+         ++ref_case)
       task_group += Threads::new_task(
         &internal::FEToolsComputeEmbeddingMatricesHelper::
           compute_embedding_matrices_for_refinement_case<dim, number, spacedim>,
@@ -2270,10 +2270,11 @@ namespace FETools
 
     // finally loop over all possible refinement cases
     Threads::TaskGroup<> tasks;
-    unsigned int         ref_case = (isotropic_only) ?
-                                      RefinementCase<dim>::isotropic_refinement :
-                                      RefinementCase<dim>::cut_x;
-    for (; ref_case <= RefinementCase<dim>::isotropic_refinement; ++ref_case)
+    for (unsigned int ref_case =
+           (isotropic_only ? RefinementCase<dim>::isotropic_refinement :
+                             RefinementCase<dim>::cut_x);
+         ref_case <= RefinementCase<dim>::isotropic_refinement;
+         ++ref_case)
       tasks += Threads::new_task([&, ref_case]() {
         compute_one_case(ref_case, mass, matrices[ref_case - 1]);
       });
