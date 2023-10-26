@@ -5,12 +5,12 @@
 [![jenkins/dealii-mpi](https://ci.tjhei.info/job/dealii-mpi/job/master/badge/icon?style=plastic&subject=jenkins-MPI)](https://ci.tjhei.info/job/dealii-mpi/job/master/)
 [![jenkins/dealii-osx](https://ci.tjhei.info/job/dealii-osx/job/master/badge/icon?style=plastic&subject=jenkins-OSX)](https://ci.tjhei.info/job/dealii-osx/job/master/)
 [![jenkins/dealii-ampere](https://ci.tjhei.info/job/dealii-ampere/job/master/badge/icon?style=plastic&subject=jenkins-ampere)](https://ci.tjhei.info/job/dealii-ampere/job/master/)
-[![workflows/github-docker](https://github.com/dealii/dealii/workflows/github-docker/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-docker)
-[![workflows/indent](https://github.com/dealii/dealii/workflows/indent/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Aindent)
-[![workflows/tidy](https://github.com/dealii/dealii/workflows/tidy/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Atidy)
-[![workflows/github-linux](https://github.com/dealii/dealii/workflows/github-linux/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-linux)
-[![workflows/github-OSX](https://github.com/dealii/dealii/workflows/github-OSX/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-OSX)
-[![workflows/github-windows](https://github.com/dealii/dealii/workflows/github-windows/badge.svg)](https://github.com/dealii/dealii/actions?query=workflow%3Agithub-windows)
+[![workflows/github-docker](https://github.com/dealii/dealii/actions/workflows/docker.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/docker.yml?query=branch%3Amaster)
+[![workflows/indent](https://github.com/dealii/dealii/actions/workflows/indent.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/indent.yml?query=branch%3Amaster)
+[![workflows/tidy](https://github.com/dealii/dealii/actions/workflows/tidy.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/tidy.yml?query=branch%3Amaster)
+[![workflows/github-linux](https://github.com/dealii/dealii/actions/workflows/linux.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/linux.yml?query=branch%3Amaster)
+[![workflows/github-OSX](https://github.com/dealii/dealii/actions/workflows/osx.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/osx.yml?query=branch%3Amaster)
+[![workflows/github-windows](https://github.com/dealii/dealii/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/dealii/dealii/actions/workflows/windows.yml?query=branch%3Amaster)
 
 What is deal.II?
 ================
