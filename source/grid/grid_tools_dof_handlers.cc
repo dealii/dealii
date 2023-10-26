@@ -2522,18 +2522,19 @@ namespace GridTools
 
     // Do a full matching of the face vertices:
 
-    std::array<unsigned int, GeometryInfo<dim>::vertices_per_face> matching;
+    std::array<unsigned int, GeometryInfo<dim>::vertices_per_face>
+      face1_vertices, face2_vertices;
 
     AssertDimension(face1->n_vertices(), face2->n_vertices());
 
-    std::set<unsigned int> face2_vertices;
+    std::set<unsigned int> face2_vertices_set;
     for (unsigned int i = 0; i < face1->n_vertices(); ++i)
-      face2_vertices.insert(i);
+      face2_vertices_set.insert(i);
 
     for (unsigned int i = 0; i < face1->n_vertices(); ++i)
       {
-        for (std::set<unsigned int>::iterator it = face2_vertices.begin();
-             it != face2_vertices.end();
+        for (auto it = face2_vertices_set.begin();
+             it != face2_vertices_set.end();
              ++it)
           {
             if (orthogonal_equality(face1->vertex(i),
@@ -2542,17 +2543,71 @@ namespace GridTools
                                     offset,
                                     matrix))
               {
-                matching[i] = *it;
-                face2_vertices.erase(it);
+                face1_vertices[i] = *it;
+                face2_vertices[i] = i;
+                face2_vertices_set.erase(it);
                 break; // jump out of the innermost loop
               }
           }
       }
 
     // And finally, a lookup to determine the ordering bitmask:
-    return face2_vertices.empty() ?
-             std::make_optional(OrientationLookupTable<dim>::lookup(matching)) :
-             std::nullopt;
+    if (face2_vertices_set.empty())
+      {
+        const auto combined_orientation =
+          face1->reference_cell().get_combined_orientation(
+            make_array_view(face1_vertices.cbegin(),
+                            face1_vertices.cbegin() + face1->n_vertices()),
+            make_array_view(face2_vertices.cbegin(),
+                            face2_vertices.cbegin() + face2->n_vertices()));
+        std::bitset<3> orientation;
+        if (dim == 1)
+          {
+            // In 1D things are always well-oriented
+            orientation = ReferenceCell::default_combined_face_orientation();
+          }
+        // The original version of this doesn't use the standardized orientation
+        // value so we have to do an additional translation step
+        else if (dim == 2)
+          {
+            // In 2D, calls in set_periodicity_constraints() ultimately require
+            // calling FiniteElement::face_to_cell_index(), which in turn (for
+            // hypercubes) calls GeometryInfo<2>::child_cell_on_face(). The
+            // final function assumes that orientation in 2D is encoded solely
+            // in face_flip (the second bit) whereas the orientation bit is
+            // ignored. Hence, the backwards orientation is 1 + 2 and the
+            // standard orientation is 1 + 0.
+            constexpr std::array<unsigned int, 2> translation{{3, 1}};
+            AssertIndexRange(combined_orientation, translation.size());
+            orientation =
+              translation[std::min<unsigned int>(combined_orientation, 1u)];
+          }
+        else
+          {
+            Assert(dim == 3, ExcInternalError());
+            // There are two differences between the orientation implementation
+            // used in the periodicity code and that used in ReferenceCell:
+            //
+            // 1. The bitset is unpacked as (orientation, flip, rotation)
+            //    instead of the standard (orientation, rotation, flip).
+            //
+            // 2. The 90 degree rotations are always clockwise, so the third and
+            //    seventh (in the combined orientation) are switched.
+            //
+            // Both translations are encoded in this table. This matches
+            // OrientationLookupTable<3> which was present in previous revisions
+            // of this file.
+            constexpr std::array<unsigned int, 8> translation{
+              {0, 1, 4, 7, 2, 3, 6, 5}};
+            AssertIndexRange(combined_orientation, translation.size());
+            orientation =
+              translation[std::min<unsigned int>(combined_orientation, 7u)];
+          }
+
+        return std::make_optional(orientation);
+      }
+    else
+      return std::nullopt;
   }
 } // namespace GridTools
 
