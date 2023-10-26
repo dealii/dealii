@@ -953,8 +953,9 @@ namespace internal
                     0,
                     (end - begin) * sizeof(T));
       else
-        copy_construct_or_assign(
-          begin, end, std::integral_constant<bool, initialize_memory>());
+        copy_construct_or_assign(begin,
+                                 end,
+                                 std::bool_constant<initialize_memory>());
     }
 
   private:
@@ -966,7 +967,7 @@ namespace internal
     void
     copy_construct_or_assign(const std::size_t begin,
                              const std::size_t end,
-                             std::integral_constant<bool, false>) const
+                             std::bool_constant<false>) const
     {
       for (std::size_t i = begin; i < end; ++i)
         destination_[i] = element_;
@@ -976,7 +977,7 @@ namespace internal
     void
     copy_construct_or_assign(const std::size_t begin,
                              const std::size_t end,
-                             std::integral_constant<bool, true>) const
+                             std::bool_constant<true>) const
     {
       for (std::size_t i = begin; i < end; ++i)
         new (&destination_[i]) T(element_);
@@ -1038,8 +1039,9 @@ namespace internal
                     0,
                     (end - begin) * sizeof(T));
       else
-        default_construct_or_assign(
-          begin, end, std::integral_constant<bool, initialize_memory>());
+        default_construct_or_assign(begin,
+                                    end,
+                                    std::bool_constant<initialize_memory>());
     }
 
   private:
@@ -1049,7 +1051,7 @@ namespace internal
     void
     default_construct_or_assign(const std::size_t begin,
                                 const std::size_t end,
-                                std::integral_constant<bool, false>) const
+                                std::bool_constant<false>) const
     {
       for (std::size_t i = begin; i < end; ++i)
         destination_[i] = std::move(T());
@@ -1059,7 +1061,7 @@ namespace internal
     void
     default_construct_or_assign(const std::size_t begin,
                                 const std::size_t end,
-                                std::integral_constant<bool, true>) const
+                                std::bool_constant<true>) const
     {
       for (std::size_t i = begin; i < end; ++i)
         new (&destination_[i]) T;

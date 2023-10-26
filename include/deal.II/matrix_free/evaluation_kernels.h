@@ -2159,7 +2159,7 @@ namespace internal
       const Number                          *values_dofs,
       FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             sum_into_values_array,
-      std::integral_constant<bool, false>)
+      std::bool_constant<false>)
     {
       (void)sum_into_values_array;
 
@@ -2174,7 +2174,7 @@ namespace internal
       Number                                *values_dofs,
       FEEvaluationData<dim, Number, false>  &fe_eval,
       const bool                             sum_into_values_array,
-      std::integral_constant<bool, true>)
+      std::bool_constant<true>)
     {
       T::integrate(n_components,
                    evaluation_flag,
@@ -2197,7 +2197,7 @@ namespace internal
                                values_dofs,
                                fe_eval,
                                sum_into_values_array,
-                               std::integral_constant<bool, do_integrate>());
+                               std::bool_constant<do_integrate>());
     }
   };
 

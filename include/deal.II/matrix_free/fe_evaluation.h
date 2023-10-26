@@ -3374,8 +3374,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             has_hn_constraints = true;
     }
 
-  std::integral_constant<bool,
-                         internal::is_vectorizable<VectorType, Number>::value>
+  std::bool_constant<internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
   const bool use_vectorized_path =
@@ -3768,8 +3767,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // a vector and puts the data into the local data field or write local data
   // into the vector. Certain operations are no-ops for the given use case.
 
-  std::integral_constant<bool,
-                         internal::is_vectorizable<VectorType, Number>::value>
+  std::bool_constant<internal::is_vectorizable<VectorType, Number>::value>
                                                                vector_selector;
   const internal::MatrixFreeFunctions::DoFInfo::DoFAccessIndex ind =
     is_face ? this->dof_access_index :
