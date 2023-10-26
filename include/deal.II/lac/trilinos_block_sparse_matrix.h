@@ -359,8 +359,8 @@ namespace TrilinosWrappers
     vmult(VectorType1       &dst,
           const VectorType2 &src,
           const bool         transpose,
-          const std::integral_constant<bool, true>,
-          const std::integral_constant<bool, true>) const;
+          const std::bool_constant<true>,
+          const std::bool_constant<true>) const;
 
     /**
      * Internal version of (T)vmult where the source vector is a block vector
@@ -371,8 +371,8 @@ namespace TrilinosWrappers
     vmult(VectorType1       &dst,
           const VectorType2 &src,
           const bool         transpose,
-          const std::integral_constant<bool, false>,
-          const std::integral_constant<bool, true>) const;
+          const std::bool_constant<false>,
+          const std::bool_constant<true>) const;
 
     /**
      * Internal version of (T)vmult where the source vector is a non-block
@@ -383,8 +383,8 @@ namespace TrilinosWrappers
     vmult(VectorType1       &dst,
           const VectorType2 &src,
           const bool         transpose,
-          const std::integral_constant<bool, true>,
-          const std::integral_constant<bool, false>) const;
+          const std::bool_constant<true>,
+          const std::bool_constant<false>) const;
 
     /**
      * Internal version of (T)vmult where both source vector and the
@@ -396,8 +396,8 @@ namespace TrilinosWrappers
     vmult(VectorType1       &dst,
           const VectorType2 &src,
           const bool         transpose,
-          const std::integral_constant<bool, false>,
-          const std::integral_constant<bool, false>) const;
+          const std::bool_constant<false>,
+          const std::bool_constant<false>) const;
   };
 
 
@@ -446,8 +446,8 @@ namespace TrilinosWrappers
     vmult(dst,
           src,
           false,
-          std::integral_constant<bool, IsBlockVector<VectorType1>::value>(),
-          std::integral_constant<bool, IsBlockVector<VectorType2>::value>());
+          std::bool_constant<IsBlockVector<VectorType1>::value>(),
+          std::bool_constant<IsBlockVector<VectorType2>::value>());
   }
 
 
@@ -459,8 +459,8 @@ namespace TrilinosWrappers
     vmult(dst,
           src,
           true,
-          std::integral_constant<bool, IsBlockVector<VectorType1>::value>(),
-          std::integral_constant<bool, IsBlockVector<VectorType2>::value>());
+          std::bool_constant<IsBlockVector<VectorType1>::value>(),
+          std::bool_constant<IsBlockVector<VectorType2>::value>());
   }
 
 
@@ -470,8 +470,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult(VectorType1       &dst,
                            const VectorType2 &src,
                            const bool         transpose,
-                           std::integral_constant<bool, true>,
-                           std::integral_constant<bool, true>) const
+                           std::bool_constant<true>,
+                           std::bool_constant<true>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_block_block(dst, src);
@@ -486,8 +486,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult(VectorType1       &dst,
                            const VectorType2 &src,
                            const bool         transpose,
-                           std::integral_constant<bool, false>,
-                           std::integral_constant<bool, true>) const
+                           std::bool_constant<false>,
+                           std::bool_constant<true>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_nonblock_block(dst, src);
@@ -502,8 +502,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult(VectorType1       &dst,
                            const VectorType2 &src,
                            const bool         transpose,
-                           std::integral_constant<bool, true>,
-                           std::integral_constant<bool, false>) const
+                           std::bool_constant<true>,
+                           std::bool_constant<false>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_block_nonblock(dst, src);
@@ -518,8 +518,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::vmult(VectorType1       &dst,
                            const VectorType2 &src,
                            const bool         transpose,
-                           std::integral_constant<bool, false>,
-                           std::integral_constant<bool, false>) const
+                           std::bool_constant<false>,
+                           std::bool_constant<false>) const
   {
     if (transpose == true)
       BaseClass::Tvmult_nonblock_nonblock(dst, src);

@@ -186,8 +186,7 @@ namespace internal
   // a dummy InVector == unsigned int is provided.
   // Thus we have to treat this case as well.
   template <class T, class IsSerialVectorNotSpecialized = void>
-  using not_parallel_vector_t =
-    std::integral_constant<bool, is_serial_vector<T>::value>;
+  using not_parallel_vector_t = std::bool_constant<is_serial_vector<T>::value>;
 
   /**
    * A predicate stating whether something is a vector type. We test this

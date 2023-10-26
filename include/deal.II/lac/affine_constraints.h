@@ -2223,7 +2223,7 @@ private:
                              MatrixType                   &global_matrix,
                              VectorType                   &global_vector,
                              const bool use_inhomogeneities_for_rhs,
-                             const std::integral_constant<bool, false>) const;
+                             const std::bool_constant<false>) const;
 
   /**
    * This function actually implements the local_to_global function for block
@@ -2237,7 +2237,7 @@ private:
                              MatrixType                   &global_matrix,
                              VectorType                   &global_vector,
                              const bool use_inhomogeneities_for_rhs,
-                             const std::integral_constant<bool, true>) const;
+                             const std::bool_constant<true>) const;
 
   /**
    * Internal helper function for distribute_local_to_global function.

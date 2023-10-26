@@ -108,7 +108,7 @@ for (S : REAL_AND_COMPLEX_SCALARS; M : AFFINE_CONSTRAINTS_MATRIX_TEMPL)
       M<S> &,
       Vector<S> &,
       bool,
-      std::integral_constant<bool, false>) const;
+      std::bool_constant<false>) const;
 
     template void AffineConstraints<S>::distribute_local_to_global<M<S>>(
       const FullMatrix<S> &,
@@ -154,7 +154,7 @@ for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
             DiagonalMatrix<T<S>> &,
             T<S> &,
             bool,
-            std::integral_constant<bool, false>) const;
+            std::bool_constant<false>) const;
 
     template void AffineConstraints<S>::distribute_local_to_global<
       DiagonalMatrix<LinearAlgebra::distributed::T<S>>,
@@ -165,7 +165,7 @@ for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
       DiagonalMatrix<LinearAlgebra::distributed::T<S>> &,
       LinearAlgebra::distributed::T<S> &,
       bool,
-      std::integral_constant<bool, false>) const;
+      std::bool_constant<false>) const;
 
     template void AffineConstraints<S>::distribute_local_to_global<
       DiagonalMatrix<LinearAlgebra::distributed::T<S>>,
@@ -175,7 +175,7 @@ for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
             DiagonalMatrix<LinearAlgebra::distributed::T<S>> &,
             T<S> &,
             bool,
-            std::integral_constant<bool, false>) const;
+            std::bool_constant<false>) const;
   }
 
 // BlockSparseMatrix:
@@ -190,7 +190,7 @@ for (S : REAL_AND_COMPLEX_SCALARS)
                  BlockSparseMatrix<S> &,
                  Vector<S> &,
                  bool,
-                 std::integral_constant<bool, true>) const;
+                 std::bool_constant<true>) const;
 
     template void AffineConstraints<S>::distribute_local_to_global<
       BlockSparseMatrix<S>,
@@ -200,7 +200,7 @@ for (S : REAL_AND_COMPLEX_SCALARS)
                       BlockSparseMatrix<S> &,
                       BlockVector<S> &,
                       bool,
-                      std::integral_constant<bool, true>) const;
+                      std::bool_constant<true>) const;
 
     template void
     AffineConstraints<S>::distribute_local_to_global<BlockSparseMatrix<S>>(

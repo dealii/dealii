@@ -61,7 +61,7 @@ DEAL_II_NAMESPACE_OPEN
       MatrixType &,                                           \
       VectorType &,                                           \
       bool,                                                   \
-      std::integral_constant<bool, false>) const
+      std::bool_constant<false>) const
 
 #define INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(MatrixType, VectorType) \
   template void AffineConstraints<MatrixType::value_type>::         \
@@ -72,7 +72,7 @@ DEAL_II_NAMESPACE_OPEN
       MatrixType &,                                                 \
       VectorType &,                                                 \
       bool,                                                         \
-      std::integral_constant<bool, true>) const
+      std::bool_constant<true>) const
 
 #define INSTANTIATE_DLTG_MATRIX(MatrixType)                              \
   template void                                                          \

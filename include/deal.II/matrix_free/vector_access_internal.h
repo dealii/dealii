@@ -307,16 +307,13 @@ namespace internal
                             const unsigned int   dof_index,
                             VectorType          &vec,
                             VectorizedArrayType *dof_values,
-                            std::integral_constant<bool, true>) const
+                            std::bool_constant<true>) const
     {
 #ifdef DEBUG
       // in debug mode, run non-vectorized version because this path
       // has additional checks (e.g., regarding ghosting)
-      process_dofs_vectorized(dofs_per_cell,
-                              dof_index,
-                              vec,
-                              dof_values,
-                              std::integral_constant<bool, false>());
+      process_dofs_vectorized(
+        dofs_per_cell, dof_index, vec, dof_values, std::bool_constant<false>());
 #else
       const Number *vec_ptr = vec.begin() + dof_index;
       for (unsigned int i = 0; i < dofs_per_cell;
@@ -333,7 +330,7 @@ namespace internal
                             const unsigned int   dof_index,
                             const VectorType    &vec,
                             VectorizedArrayType *dof_values,
-                            std::integral_constant<bool, false>) const
+                            std::bool_constant<false>) const
     {
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -350,7 +347,7 @@ namespace internal
                                       VectorType          &vec,
                                       const unsigned int   constant_offset,
                                       VectorizedArrayType *dof_values,
-                                      std::integral_constant<bool, true>) const
+                                      std::bool_constant<true>) const
     {
       dealii::vectorized_load_and_transpose(dofs_per_cell,
                                             vec.begin() + constant_offset,
@@ -367,7 +364,7 @@ namespace internal
                                       const VectorType    &vec,
                                       const unsigned int   constant_offset,
                                       VectorizedArrayType *dof_values,
-                                      std::integral_constant<bool, false>) const
+                                      std::bool_constant<false>) const
     {
       for (unsigned int d = 0; d < dofs_per_cell; ++d)
         for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -379,12 +376,11 @@ namespace internal
 
     template <typename VectorType>
     void
-    process_dofs_vectorized_transpose(
-      const unsigned int                 dofs_per_cell,
-      const unsigned int                *dof_indices,
-      VectorType                        &vec,
-      VectorizedArrayType               *dof_values,
-      std::integral_constant<bool, true> type) const
+    process_dofs_vectorized_transpose(const unsigned int       dofs_per_cell,
+                                      const unsigned int      *dof_indices,
+                                      VectorType              &vec,
+                                      VectorizedArrayType     *dof_values,
+                                      std::bool_constant<true> type) const
     {
       process_dofs_vectorized_transpose(
         dofs_per_cell, dof_indices, vec, 0, dof_values, type);
@@ -394,12 +390,11 @@ namespace internal
 
     template <typename VectorType>
     void
-    process_dofs_vectorized_transpose(
-      const unsigned int                  dofs_per_cell,
-      const unsigned int                 *dof_indices,
-      const VectorType                   &vec,
-      VectorizedArrayType                *dof_values,
-      std::integral_constant<bool, false> type) const
+    process_dofs_vectorized_transpose(const unsigned int        dofs_per_cell,
+                                      const unsigned int       *dof_indices,
+                                      const VectorType         &vec,
+                                      VectorizedArrayType      *dof_values,
+                                      std::bool_constant<false> type) const
     {
       process_dofs_vectorized_transpose(
         dofs_per_cell, dof_indices, vec, 0, dof_values, type);
@@ -413,7 +408,7 @@ namespace internal
       const unsigned int                                        dofs_per_cell,
       const std::array<Number2 *, VectorizedArrayType::size()> &global_ptr,
       VectorizedArrayType                                      *dof_values,
-      std::integral_constant<bool, true>) const
+      std::bool_constant<true>) const
     {
       dealii::vectorized_load_and_transpose(dofs_per_cell,
                                             global_ptr,
@@ -428,7 +423,7 @@ namespace internal
       const unsigned int,
       const std::array<Number2 *, VectorizedArrayType::size()> &,
       VectorizedArrayType *,
-      std::integral_constant<bool, false>) const
+      std::bool_constant<false>) const
     {
       Assert(false, ExcNotImplemented());
     }
@@ -444,7 +439,7 @@ namespace internal
                        const unsigned int               constant_offset,
                        typename VectorType::value_type *vec_ptr,
                        VectorizedArrayType             &res,
-                       std::integral_constant<bool, true>) const
+                       std::bool_constant<true>) const
     {
       (void)constant_offset;
       (void)vec;
@@ -458,7 +453,7 @@ namespace internal
                          constant_offset,
                          vec_ptr,
                          res,
-                         std::integral_constant<bool, false>());
+                         std::bool_constant<false>());
 #else
       res.gather(vec_ptr, indices);
 #endif
@@ -475,7 +470,7 @@ namespace internal
                        const unsigned int  constant_offset,
                        typename VectorType::value_type *,
                        VectorizedArrayType &res,
-                       std::integral_constant<bool, false>) const
+                       std::bool_constant<false>) const
     {
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         res[v] = vector_access(vec, indices[v] + constant_offset);
@@ -559,7 +554,7 @@ namespace internal
                             const unsigned int   dof_index,
                             VectorType          &vec,
                             VectorizedArrayType *dof_values,
-                            std::integral_constant<bool, true>) const
+                            std::bool_constant<true>) const
     {
       Number *vec_ptr = vec.begin() + dof_index;
       for (unsigned int i = 0; i < dofs_per_cell;
@@ -580,7 +575,7 @@ namespace internal
                             const unsigned int   dof_index,
                             VectorType          &vec,
                             VectorizedArrayType *dof_values,
-                            std::integral_constant<bool, false>) const
+                            std::bool_constant<false>) const
     {
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -598,7 +593,7 @@ namespace internal
                                       VectorType          &vec,
                                       const unsigned int   constant_offset,
                                       VectorizedArrayType *dof_values,
-                                      std::integral_constant<bool, true>) const
+                                      std::bool_constant<true>) const
     {
       vectorized_transpose_and_store(true,
                                      dofs_per_cell,
@@ -616,7 +611,7 @@ namespace internal
                                       VectorType          &vec,
                                       const unsigned int   constant_offset,
                                       VectorizedArrayType *dof_values,
-                                      std::integral_constant<bool, false>) const
+                                      std::bool_constant<false>) const
     {
       for (unsigned int d = 0; d < dofs_per_cell; ++d)
         for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -629,12 +624,11 @@ namespace internal
 
     template <typename VectorType>
     void
-    process_dofs_vectorized_transpose(
-      const unsigned int                 dofs_per_cell,
-      const unsigned int                *dof_indices,
-      VectorType                        &vec,
-      VectorizedArrayType               *dof_values,
-      std::integral_constant<bool, true> type) const
+    process_dofs_vectorized_transpose(const unsigned int       dofs_per_cell,
+                                      const unsigned int      *dof_indices,
+                                      VectorType              &vec,
+                                      VectorizedArrayType     *dof_values,
+                                      std::bool_constant<true> type) const
     {
       process_dofs_vectorized_transpose(
         dofs_per_cell, dof_indices, vec, 0, dof_values, type);
@@ -644,12 +638,11 @@ namespace internal
 
     template <typename VectorType>
     void
-    process_dofs_vectorized_transpose(
-      const unsigned int                  dofs_per_cell,
-      const unsigned int                 *dof_indices,
-      VectorType                         &vec,
-      VectorizedArrayType                *dof_values,
-      std::integral_constant<bool, false> type) const
+    process_dofs_vectorized_transpose(const unsigned int        dofs_per_cell,
+                                      const unsigned int       *dof_indices,
+                                      VectorType               &vec,
+                                      VectorizedArrayType      *dof_values,
+                                      std::bool_constant<false> type) const
     {
       process_dofs_vectorized_transpose(
         dofs_per_cell, dof_indices, vec, 0, dof_values, type);
@@ -663,7 +656,7 @@ namespace internal
       const unsigned int                                  dofs_per_cell,
       std::array<Number2 *, VectorizedArrayType::size()> &global_ptr,
       VectorizedArrayType                                *dof_values,
-      std::integral_constant<bool, true>) const
+      std::bool_constant<true>) const
     {
       vectorized_transpose_and_store(true,
                                      dofs_per_cell,
@@ -679,7 +672,7 @@ namespace internal
       const unsigned int,
       std::array<Number2 *, VectorizedArrayType::size()> &,
       VectorizedArrayType *,
-      std::integral_constant<bool, false>) const
+      std::bool_constant<false>) const
     {
       Assert(false, ExcNotImplemented());
     }
@@ -695,7 +688,7 @@ namespace internal
                        const unsigned int               constant_offset,
                        typename VectorType::value_type *vec_ptr,
                        VectorizedArrayType             &res,
-                       std::integral_constant<bool, true>) const
+                       std::bool_constant<true>) const
     {
       (void)constant_offset;
       (void)vec_ptr;
@@ -724,7 +717,7 @@ namespace internal
                        const unsigned int  constant_offset,
                        typename VectorType::value_type *,
                        VectorizedArrayType &res,
-                       std::integral_constant<bool, false>) const
+                       std::bool_constant<false>) const
     {
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         vector_access_add(vec, indices[v] + constant_offset, res[v]);
@@ -804,7 +797,7 @@ namespace internal
                             const unsigned int   dof_index,
                             VectorType          &vec,
                             VectorizedArrayType *dof_values,
-                            std::integral_constant<bool, true>) const
+                            std::bool_constant<true>) const
     {
       Number *vec_ptr = vec.begin() + dof_index;
       for (unsigned int i = 0; i < dofs_per_cell;
@@ -820,7 +813,7 @@ namespace internal
                             const unsigned int   dof_index,
                             VectorType          &vec,
                             VectorizedArrayType *dof_values,
-                            std::integral_constant<bool, false>) const
+                            std::bool_constant<false>) const
     {
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -837,7 +830,7 @@ namespace internal
                                       VectorType          &vec,
                                       const unsigned int   constant_offset,
                                       VectorizedArrayType *dof_values,
-                                      std::integral_constant<bool, true>) const
+                                      std::bool_constant<true>) const
     {
       vectorized_transpose_and_store(false,
                                      dofs_per_cell,
@@ -855,7 +848,7 @@ namespace internal
                                       VectorType          &vec,
                                       const unsigned int   constant_offset,
                                       VectorizedArrayType *dof_values,
-                                      std::integral_constant<bool, false>) const
+                                      std::bool_constant<false>) const
     {
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
@@ -867,12 +860,11 @@ namespace internal
 
     template <typename VectorType>
     void
-    process_dofs_vectorized_transpose(
-      const unsigned int                 dofs_per_cell,
-      const unsigned int                *dof_indices,
-      VectorType                        &vec,
-      VectorizedArrayType               *dof_values,
-      std::integral_constant<bool, true> type) const
+    process_dofs_vectorized_transpose(const unsigned int       dofs_per_cell,
+                                      const unsigned int      *dof_indices,
+                                      VectorType              &vec,
+                                      VectorizedArrayType     *dof_values,
+                                      std::bool_constant<true> type) const
     {
       process_dofs_vectorized_transpose(
         dofs_per_cell, dof_indices, vec, 0, dof_values, type);
@@ -882,12 +874,11 @@ namespace internal
 
     template <typename VectorType, bool booltype>
     void
-    process_dofs_vectorized_transpose(
-      const unsigned int                  dofs_per_cell,
-      const unsigned int                 *dof_indices,
-      VectorType                         &vec,
-      VectorizedArrayType                *dof_values,
-      std::integral_constant<bool, false> type) const
+    process_dofs_vectorized_transpose(const unsigned int        dofs_per_cell,
+                                      const unsigned int       *dof_indices,
+                                      VectorType               &vec,
+                                      VectorizedArrayType      *dof_values,
+                                      std::bool_constant<false> type) const
     {
       process_dofs_vectorized_transpose(
         dofs_per_cell, dof_indices, vec, 0, dof_values, type);
@@ -901,7 +892,7 @@ namespace internal
       const unsigned int                                  dofs_per_cell,
       std::array<Number2 *, VectorizedArrayType::size()> &global_ptr,
       VectorizedArrayType                                *dof_values,
-      std::integral_constant<bool, true>) const
+      std::bool_constant<true>) const
     {
       vectorized_transpose_and_store(false,
                                      dofs_per_cell,
@@ -917,7 +908,7 @@ namespace internal
       const unsigned int,
       std::array<Number2 *, VectorizedArrayType::size()> &,
       VectorizedArrayType *,
-      std::integral_constant<bool, false>) const
+      std::bool_constant<false>) const
     {
       Assert(false, ExcNotImplemented());
     }
@@ -931,7 +922,7 @@ namespace internal
                        const unsigned int               constant_offset,
                        typename VectorType::value_type *vec_ptr,
                        VectorizedArrayType             &res,
-                       std::integral_constant<bool, true>) const
+                       std::bool_constant<true>) const
     {
       (void)vec_ptr;
       (void)constant_offset;
@@ -949,7 +940,7 @@ namespace internal
                        const unsigned int  constant_offset,
                        typename VectorType::value_type *,
                        VectorizedArrayType &res,
-                       std::integral_constant<bool, false>) const
+                       std::bool_constant<false>) const
     {
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
         vector_access(vec, indices[v] + constant_offset) = res[v];

@@ -2440,7 +2440,7 @@ namespace internal
     void
     set_zero_in_parallel(const std::vector<size_type> &cm,
                          VectorType                   &vec,
-                         std::integral_constant<bool, false>)
+                         std::bool_constant<false>)
     {
       set_zero_parallel(cm, vec, 0);
     }
@@ -2450,7 +2450,7 @@ namespace internal
     void
     set_zero_in_parallel(const std::vector<size_type> &cm,
                          VectorType                   &vec,
-                         std::integral_constant<bool, true>)
+                         std::bool_constant<true>)
     {
       size_type start_shift = 0;
       for (size_type j = 0; j < vec.n_blocks(); ++j)
@@ -2473,9 +2473,7 @@ namespace internal
     set_zero_all(const std::vector<size_type> &cm, VectorType &vec)
     {
       set_zero_in_parallel<VectorType>(
-        cm,
-        vec,
-        std::integral_constant<bool, IsBlockVector<VectorType>::value>());
+        cm, vec, std::bool_constant<IsBlockVector<VectorType>::value>());
       vec.compress(VectorOperation::insert);
     }
 
@@ -2636,7 +2634,7 @@ namespace internal
     const IndexSet & /*locally_owned_elements*/,
     const IndexSet                &needed_elements,
     TrilinosWrappers::MPI::Vector &output,
-    const std::integral_constant<bool, false> /*is_block_vector*/)
+    const std::bool_constant<false> /*is_block_vector*/)
   {
     Assert(!vec.has_ghost_elements(), ExcGhostsPresent());
 #  ifdef DEAL_II_WITH_MPI
@@ -2659,7 +2657,7 @@ namespace internal
     const IndexSet                   &locally_owned_elements,
     const IndexSet                   &needed_elements,
     PETScWrappers::MPI::Vector       &output,
-    const std::integral_constant<bool, false> /*is_block_vector*/)
+    const std::bool_constant<false> /*is_block_vector*/)
   {
     output.reinit(locally_owned_elements,
                   needed_elements,
@@ -2677,7 +2675,7 @@ namespace internal
     const IndexSet                                   &locally_owned_elements,
     const IndexSet                                   &needed_elements,
     LinearAlgebra::distributed::Vector<number>       &output,
-    const std::integral_constant<bool, false> /*is_block_vector*/)
+    const std::bool_constant<false> /*is_block_vector*/)
   {
     // TODO: the in vector might already have all elements. need to find a
     // way to efficiently avoid the copy then
@@ -2701,7 +2699,7 @@ namespace internal
     const IndexSet & /*locally_owned_elements*/,
     const IndexSet & /*needed_elements*/,
     Vector & /*output*/,
-    const std::integral_constant<bool, false> /*is_block_vector*/)
+    const std::bool_constant<false> /*is_block_vector*/)
   {
     Assert(false, ExcMessage("We shouldn't even get here!"));
   }
@@ -2714,7 +2712,7 @@ namespace internal
     const IndexSet   &locally_owned_elements,
     const IndexSet   &needed_elements,
     VectorType       &output,
-    const std::integral_constant<bool, true> /*is_block_vector*/)
+    const std::bool_constant<true> /*is_block_vector*/)
   {
     output.reinit(vec.n_blocks());
 
@@ -2728,7 +2726,7 @@ namespace internal
           needed_elements.get_view(block_start,
                                    block_start + vec.block(b).size()),
           output.block(b),
-          std::integral_constant<bool, false>());
+          std::bool_constant<false>());
         block_start += vec.block(b).size();
       }
 
@@ -2882,8 +2880,7 @@ AffineConstraints<number>::distribute(VectorType &vec) const
                 vec_owned_elements,
                 needed_elements_for_distribute,
                 ghosted_vector,
-                std::integral_constant<bool,
-                                       IsBlockVector<VectorType>::value>());
+                std::bool_constant<IsBlockVector<VectorType>::value>());
             }
           else
             {
@@ -2900,8 +2897,7 @@ AffineConstraints<number>::distribute(VectorType &vec) const
                 vec_owned_elements,
                 complete_index_set(vec_owned_elements.size()),
                 ghosted_vector,
-                std::integral_constant<bool,
-                                       IsBlockVector<VectorType>::value>());
+                std::bool_constant<IsBlockVector<VectorType>::value>());
             }
 
           for (const ConstraintLine &line : lines)
@@ -4199,7 +4195,7 @@ AffineConstraints<number>::distribute_local_to_global(
   MatrixType                   &global_matrix,
   VectorType                   &global_vector,
   const bool                    use_inhomogeneities_for_rhs,
-  const std::integral_constant<bool, false>) const
+  const std::bool_constant<false>) const
 {
   // FIXME: static_assert MatrixType::value_type == number
 
@@ -4360,7 +4356,7 @@ AffineConstraints<number>::distribute_local_to_global(
   MatrixType                   &global_matrix,
   VectorType                   &global_vector,
   const bool                    use_inhomogeneities_for_rhs,
-  const std::integral_constant<bool, true>) const
+  const std::bool_constant<true>) const
 {
   const bool use_vectors =
     (local_vector.size() == 0 && global_vector.size() == 0) ? false : true;

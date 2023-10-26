@@ -3950,8 +3950,7 @@ namespace internal
 
   template <typename VectorStruct>
   unsigned int
-  n_components_block(const VectorStruct &vec,
-                     std::integral_constant<bool, true>)
+  n_components_block(const VectorStruct &vec, const std::bool_constant<true>)
   {
     unsigned int components = 0;
     for (unsigned int bl = 0; bl < vec.n_blocks(); ++bl)
@@ -3961,7 +3960,7 @@ namespace internal
 
   template <typename VectorStruct>
   unsigned int
-  n_components_block(const VectorStruct &, std::integral_constant<bool, false>)
+  n_components_block(const VectorStruct &, const std::bool_constant<false>)
   {
     return 1;
   }
@@ -3971,7 +3970,7 @@ namespace internal
   n_components(const VectorStruct &vec)
   {
     return n_components_block(
-      vec, std::integral_constant<bool, IsBlockVector<VectorStruct>::value>());
+      vec, std::bool_constant<IsBlockVector<VectorStruct>::value>());
   }
 
   template <typename VectorStruct>
@@ -3981,8 +3980,7 @@ namespace internal
     unsigned int components = 0;
     for (unsigned int comp = 0; comp < vec.size(); ++comp)
       components += n_components_block(
-        vec[comp],
-        std::integral_constant<bool, IsBlockVector<VectorStruct>::value>());
+        vec[comp], std::bool_constant<IsBlockVector<VectorStruct>::value>());
     return components;
   }
 
@@ -3993,8 +3991,7 @@ namespace internal
     unsigned int components = 0;
     for (unsigned int comp = 0; comp < vec.size(); ++comp)
       components += n_components_block(
-        *vec[comp],
-        std::integral_constant<bool, IsBlockVector<VectorStruct>::value>());
+        *vec[comp], std::bool_constant<IsBlockVector<VectorStruct>::value>());
     return components;
   }
 

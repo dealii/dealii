@@ -1021,12 +1021,12 @@ namespace internal
           // on the number types we are given. To choose the vectorized
           // version often enough, we need to have all tasks but the last one
           // to be divisible by the vectorization length
-          size_type n_chunks = do_accumulate(
-            op,
-            vec_size,
-            first,
-            outer_results,
-            std::integral_constant<bool, Operation::vectorizes>());
+          size_type n_chunks =
+            do_accumulate(op,
+                          vec_size,
+                          first,
+                          outer_results,
+                          std::bool_constant<Operation::vectorizes>());
 
           AssertIndexRange(n_chunks,
                            vector_accumulation_recursion_threshold + 1);
@@ -1114,7 +1114,7 @@ namespace internal
                   const size_type vec_size,
                   const size_type start_index,
                   ResultType     *outer_results,
-                  std::integral_constant<bool, false>)
+                  std::bool_constant<false>)
     {
       // Create local copy to indicate no aliasing to the compiler
       size_type index = start_index;
@@ -1196,7 +1196,7 @@ namespace internal
                   const size_type vec_size,
                   const size_type start_index,
                   Number         *outer_results,
-                  std::integral_constant<bool, true>)
+                  std::bool_constant<true>)
     {
       // Create local copy to indicate no aliasing to the compiler
       size_type index = start_index;
