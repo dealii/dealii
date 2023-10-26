@@ -448,8 +448,8 @@ FE_DGQ<dim, spacedim>::get_prolongation_matrix(
             FETools::compute_embedding_matrices(FE_DGQ<dim>(this->degree),
                                                 isotropic_matrices,
                                                 true);
-          this_nonconst.prolongation[refinement_case - 1].swap(
-            isotropic_matrices.back());
+          this_nonconst.prolongation[refinement_case - 1] =
+            std::move(isotropic_matrices.back());
         }
       else
         {
@@ -524,8 +524,8 @@ FE_DGQ<dim, spacedim>::get_restriction_matrix(
             FETools::compute_projection_matrices(FE_DGQ<dim>(this->degree),
                                                  isotropic_matrices,
                                                  true);
-          this_nonconst.restriction[refinement_case - 1].swap(
-            isotropic_matrices.back());
+          this_nonconst.restriction[refinement_case - 1] =
+            std::move(isotropic_matrices.back());
         }
       else
         {

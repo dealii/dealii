@@ -385,8 +385,8 @@ FE_SimplexPoly<dim, spacedim>::get_prolongation_matrix(
 
       FETools::compute_embedding_matrices(*this, isotropic_matrices, true);
 
-      this_nonconst.prolongation[refinement_case - 1].swap(
-        isotropic_matrices.back());
+      this_nonconst.prolongation[refinement_case - 1] =
+        std::move(isotropic_matrices.back());
     }
 
   // finally return the matrix
@@ -427,8 +427,8 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
 
       FETools::compute_projection_matrices(*this, isotropic_matrices, true);
 
-      this_nonconst.restriction[refinement_case - 1].swap(
-        isotropic_matrices.back());
+      this_nonconst.restriction[refinement_case - 1] =
+        std::move(isotropic_matrices.back());
     }
 
   // finally return the matrix

@@ -703,8 +703,8 @@ FE_RaviartThomasNodal<dim>::get_prolongation_matrix(
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           FETools::compute_embedding_matrices(*this, isotropic_matrices, true);
-          this_nonconst.prolongation[refinement_case - 1].swap(
-            isotropic_matrices.back());
+          this_nonconst.prolongation[refinement_case - 1] =
+            std::move(isotropic_matrices.back());
         }
       else
         {
@@ -761,8 +761,8 @@ FE_RaviartThomasNodal<dim>::get_restriction_matrix(
             FullMatrix<double>(this->n_dofs_per_cell(),
                                this->n_dofs_per_cell()));
           FETools::compute_projection_matrices(*this, isotropic_matrices, true);
-          this_nonconst.restriction[refinement_case - 1].swap(
-            isotropic_matrices.back());
+          this_nonconst.restriction[refinement_case - 1] =
+            std::move(isotropic_matrices.back());
         }
       else
         {

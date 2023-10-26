@@ -2616,7 +2616,8 @@ FESystem<dim, spacedim>::get_constant_modes() const
           for (unsigned int r = 0; r < comp; ++r)
             for (unsigned int c = 0; c < this->n_dofs_per_cell(); ++c)
               new_constant_modes(r, c) = constant_modes(r, c);
-          constant_modes.swap(new_constant_modes);
+
+          constant_modes = std::move(new_constant_modes);
         }
 
       // next, fill the constant modes from the individual components as well
