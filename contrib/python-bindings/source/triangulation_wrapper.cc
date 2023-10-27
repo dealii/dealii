@@ -812,7 +812,7 @@ namespace python
       else if (format.compare("vtu") == 0)
         {
           output_format = GridOut::OutputFormat::vtu;
-          GridOutFlags::Vtu flags(true);
+          GridOutFlags::Vtu flags(/* serialize_triangulation = */ true);
           mesh_writer.set_flags(flags);
         }
       else
