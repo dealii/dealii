@@ -139,6 +139,14 @@ public:
 
 
   /**
+   * Returns true if the contained object has been initialized, otherwise
+   * false.
+   */
+  bool
+  has_value() const;
+
+
+  /**
    * Return a const reference to the contained object.
    *
    * @pre The object has been initialized with a call to
@@ -327,11 +335,25 @@ Lazy<T>::ensure_initialized(const Callable &creator) const
 
 
 template <typename T>
+inline DEAL_II_ALWAYS_INLINE bool
+Lazy<T>::has_value() const
+{
+  //
+  // In principle it would be sufficient to solely check the atomic<bool>
+  // object_is_initialized because the load() is performed with "acquire"
+  // semantics. But just in case let's check the object.has_value() boolean
+  // as well:
+  //
+  return object_is_initialized && object.has_value();
+}
+
+
+template <typename T>
 inline DEAL_II_ALWAYS_INLINE const T &
 Lazy<T>::value() const
 {
   Assert(
-    object.has_value(),
+    object_is_initialized && object.has_value(),
     dealii::ExcMessage(
       "value() has been called but the contained object has not been "
       "initialized. Did you forget to call 'ensure_initialized()' first?"));
@@ -345,7 +367,7 @@ inline DEAL_II_ALWAYS_INLINE T &
 Lazy<T>::value()
 {
   Assert(
-    object.has_value(),
+    object_is_initialized && object.has_value(),
     dealii::ExcMessage(
       "value() has been called but the contained object has not been "
       "initialized. Did you forget to call 'ensure_initialized()' first?"));

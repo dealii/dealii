@@ -33,11 +33,15 @@ main()
 
   {
     Lazy<int> lazy_integer;
+    deallog << "lazy_integer.has_value() = " << lazy_integer.has_value()
+            << std::endl;
 
     lazy_integer.ensure_initialized([&]() {
       deallog << "[initializing object]" << std::endl;
       return 42;
     });
+    deallog << "lazy_integer.has_value() = " << lazy_integer.has_value()
+            << std::endl;
     deallog << "lazy_integer.value() = " << lazy_integer.value() << std::endl;
 
     lazy_integer.ensure_initialized([&]() {
