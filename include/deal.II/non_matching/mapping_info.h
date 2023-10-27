@@ -360,10 +360,10 @@ namespace NonMatching
      * Compute the mapping information for the incoming vector of cells and
      * corresponding vector of ImmersedSurfaceQuadrature.
      */
-    template <typename Iterator>
+    template <typename ContainerType>
     void
     reinit_surface(
-      const IteratorRange<Iterator>                     &cell_iterator_range,
+      const ContainerType                               &cell_iterator_range,
       const std::vector<ImmersedSurfaceQuadrature<dim>> &quadrature_vector,
       const unsigned int n_unfiltered_cells = numbers::invalid_unsigned_int);
 
@@ -371,10 +371,10 @@ namespace NonMatching
      * Compute the mapping information for all faces of the incoming vector
      * of cells and corresponding vector of quadratures.
      */
-    template <typename Iterator>
+    template <typename ContainerType>
     void
     reinit_faces(
-      const IteratorRange<Iterator>                       &cell_iterator_range,
+      const ContainerType                                 &cell_iterator_range,
       const std::vector<std::vector<Quadrature<dim - 1>>> &quadrature_vector,
       const unsigned int n_unfiltered_cells = numbers::invalid_unsigned_int);
 
@@ -1164,10 +1164,10 @@ namespace NonMatching
 
 
   template <int dim, int spacedim, typename Number>
-  template <typename Iterator>
+  template <typename ContainerType>
   void
   MappingInfo<dim, spacedim, Number>::reinit_surface(
-    const IteratorRange<Iterator>                     &cell_iterator_range,
+    const ContainerType                               &cell_iterator_range,
     const std::vector<ImmersedSurfaceQuadrature<dim>> &quadrature_vector,
     const unsigned int                                 n_unfiltered_cells)
   {
@@ -1195,7 +1195,7 @@ namespace NonMatching
             mapping_data);
       };
 
-    do_reinit_cells<IteratorRange<Iterator>, ImmersedSurfaceQuadrature<dim>>(
+    do_reinit_cells<ContainerType, ImmersedSurfaceQuadrature<dim>>(
       cell_iterator_range,
       quadrature_vector,
       n_unfiltered_cells,
@@ -1205,10 +1205,10 @@ namespace NonMatching
 
 
   template <int dim, int spacedim, typename Number>
-  template <typename Iterator>
+  template <typename ContainerType>
   void
   MappingInfo<dim, spacedim, Number>::reinit_faces(
-    const IteratorRange<Iterator>                       &cell_iterator_range,
+    const ContainerType                                 &cell_iterator_range,
     const std::vector<std::vector<Quadrature<dim - 1>>> &quadrature_vector,
     const unsigned int                                   n_unfiltered_cells)
   {
