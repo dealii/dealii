@@ -28,8 +28,6 @@
 #include <deal.II/grid/tria_orientation.h>
 
 #include <algorithm>
-#include <functional>
-#include <numeric>
 #include <typeinfo>
 
 DEAL_II_NAMESPACE_OPEN
@@ -132,22 +130,22 @@ FiniteElement<dim, spacedim>::FiniteElement(
   // Fill with default value; may be changed by constructor of derived class.
   base_to_block_indices.reinit(1, 1);
 
-  // initialize the restriction and prolongation matrices. the default
-  // constructor of FullMatrix<dim> initializes them with size zero
+  // Initialize the restriction and prolongation matrix vectors to the
+  // appropriate size. Note that the containing Lazy<FullMatrix<double>>
+  // will be initialized on first use wiht a call to
+  // construct_restriction_matrix() and construct_prolongation_matrix().
   prolongation.resize(RefinementCase<dim>::isotropic_refinement);
   restriction.resize(RefinementCase<dim>::isotropic_refinement);
   for (unsigned int ref = RefinementCase<dim>::cut_x;
        ref < RefinementCase<dim>::isotropic_refinement + 1;
        ++ref)
     {
-      prolongation[ref - 1].resize(GeometryInfo<dim>::n_children(
-                                     RefinementCase<dim>(ref)),
-                                   FullMatrix<double>());
-      restriction[ref - 1].resize(GeometryInfo<dim>::n_children(
-                                    RefinementCase<dim>(ref)),
-                                  FullMatrix<double>());
-    }
+      const unsigned int n_children =
+        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref));
 
+      prolongation[ref - 1].resize(n_children);
+      restriction[ref - 1].resize(n_children);
+    }
 
   if (dim == 3)
     {
@@ -295,36 +293,44 @@ FiniteElement<dim, spacedim>::shape_4th_derivative_component(
 }
 
 
+
 template <int dim, int spacedim>
 void
 FiniteElement<dim, spacedim>::reinit_restriction_and_prolongation_matrices(
-  const bool isotropic_restriction_only,
-  const bool isotropic_prolongation_only)
+  const bool,
+  const bool)
 {
-  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
-       ref_case <= RefinementCase<dim>::isotropic_refinement;
-       ++ref_case)
-    {
-      const unsigned int nc =
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-
-      for (unsigned int i = 0; i < nc; ++i)
-        {
-          if (this->restriction[ref_case - 1][i].m() !=
-                this->n_dofs_per_cell() &&
-              (!isotropic_restriction_only ||
-               ref_case == RefinementCase<dim>::isotropic_refinement))
-            this->restriction[ref_case - 1][i].reinit(this->n_dofs_per_cell(),
-                                                      this->n_dofs_per_cell());
-          if (this->prolongation[ref_case - 1][i].m() !=
-                this->n_dofs_per_cell() &&
-              (!isotropic_prolongation_only ||
-               ref_case == RefinementCase<dim>::isotropic_refinement))
-            this->prolongation[ref_case - 1][i].reinit(this->n_dofs_per_cell(),
-                                                       this->n_dofs_per_cell());
-        }
-    }
+  Assert(false, ExcMessage("This function does nothing. Don't call it"));
 }
+
+
+
+template <int dim, int spacedim>
+FullMatrix<double>
+FiniteElement<dim, spacedim>::construct_restriction_matrix(
+  const unsigned int /*child*/,
+  const RefinementCase<dim> & /*refinement_case*/) const
+{
+  // Per default, signal that restriction matrices are not implemented:
+  Assert(false, ExcProjectionVoid());
+
+  return FullMatrix<double>{};
+}
+
+
+
+template <int dim, int spacedim>
+FullMatrix<double>
+FiniteElement<dim, spacedim>::construct_prolongation_matrix(
+  const unsigned int /*child*/,
+  const RefinementCase<dim> & /*refinement_case*/) const
+{
+  // Per default, signal that prolongation matrices are not implemented:
+  Assert(false, ExcEmbeddingVoid());
+
+  return FullMatrix<double>{};
+}
+
 
 
 template <int dim, int spacedim>
@@ -340,12 +346,66 @@ FiniteElement<dim, spacedim>::get_restriction_matrix(
            "Restriction matrices are only available for refined cells!"));
   AssertIndexRange(
     child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
-  // we use refinement_case-1 here. the -1 takes care of the origin of the
-  // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
+
+  // We use refinement_case-1 here. The -1 takes care of the origin of the
+  // vector, as for RefinementCase::no_refinement (= 0) there is no data
   // available and so the vector indices are shifted
-  Assert(restriction[refinement_case - 1][child].n() == this->n_dofs_per_cell(),
-         ExcProjectionVoid());
-  return restriction[refinement_case - 1][child];
+  const auto &restriction_matrix = restriction[refinement_case - 1][child];
+
+  restriction_matrix.ensure_initialized(
+    [&]() { return construct_restriction_matrix(child, refinement_case); });
+
+  Assert(restriction_matrix.has_value(), ExcProjectionVoid());
+  return restriction_matrix.value();
+}
+
+
+
+template <int dim, int spacedim>
+bool
+FiniteElement<dim, spacedim>::restriction_is_implemented() const
+{
+  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
+       ref_case < RefinementCase<dim>::isotropic_refinement + 1;
+       ++ref_case)
+    {
+      const unsigned int n_children =
+        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+
+      for (unsigned int c = 0; c < n_children; ++c)
+        {
+          // Try to initialize the restriction matrix
+          get_restriction_matrix(c, RefinementCase<dim>(ref_case));
+
+          if (!restriction[ref_case - 1][c].has_value())
+            return false;
+        }
+    }
+
+  return true;
+}
+
+
+
+template <int dim, int spacedim>
+bool
+FiniteElement<dim, spacedim>::isotropic_restriction_is_implemented() const
+{
+  const RefinementCase<dim> ref_case =
+    RefinementCase<dim>::isotropic_refinement;
+  const unsigned int n_children =
+    GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+
+  for (unsigned int c = 0; c < n_children; ++c)
+    {
+      // Try to initialize the restriction matrix
+      get_restriction_matrix(c, RefinementCase<dim>(ref_case));
+
+      if (!restriction[ref_case - 1][c].has_value())
+        return false;
+    }
+
+  return true;
 }
 
 
@@ -363,16 +423,63 @@ FiniteElement<dim, spacedim>::get_prolongation_matrix(
            "Prolongation matrices are only available for refined cells!"));
   AssertIndexRange(
     child, GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)));
-  // we use refinement_case-1 here. the -1 takes care
-  // of the origin of the vector, as for
-  // RefinementCase::no_refinement (=0) there is no
-  // data available and so the vector indices
-  // are shifted
-  Assert(prolongation[refinement_case - 1][child].n() ==
-           this->n_dofs_per_cell(),
-         ExcEmbeddingVoid());
-  return prolongation[refinement_case - 1][child];
+
+  // We use refinement_case-1 here. The -1 takes care of the origin of the
+  // vector, as for RefinementCase::no_refinement (= 0) there is no data
+  // available and so the vector indices are shifted
+  const auto &prolongation_matrix = prolongation[refinement_case - 1][child];
+
+  prolongation_matrix.ensure_initialized(
+    [&]() { return construct_prolongation_matrix(child, refinement_case); });
+
+  Assert(prolongation_matrix.has_value(), ExcEmbeddingVoid());
+  return prolongation_matrix.value();
 }
+
+
+
+template <int dim, int spacedim>
+bool
+FiniteElement<dim, spacedim>::prolongation_is_implemented() const
+{
+  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
+       ref_case < RefinementCase<dim>::isotropic_refinement + 1;
+       ++ref_case)
+    for (unsigned int c = 0;
+         c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+         ++c)
+      {
+        // Try to initialize the restriction matrix
+        get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
+
+        if (!prolongation[ref_case - 1][c].has_value())
+          return false;
+      }
+  return true;
+}
+
+
+
+template <int dim, int spacedim>
+bool
+FiniteElement<dim, spacedim>::isotropic_prolongation_is_implemented() const
+{
+  const RefinementCase<dim> ref_case =
+    RefinementCase<dim>::isotropic_refinement;
+
+  for (unsigned int c = 0;
+       c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+       ++c)
+    {
+      // Try to initialize the restriction matrix
+      get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
+
+      if (!prolongation[ref_case - 1][c].has_value())
+        return false;
+    }
+  return true;
+}
+
 
 
 // TODO:[GK] This is probably not the most efficient way of doing this.
@@ -716,118 +823,6 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
     return index;
   else
     return index + adjust_line_dof_index_for_line_orientation_table[index];
-}
-
-
-
-template <int dim, int spacedim>
-bool
-FiniteElement<dim, spacedim>::prolongation_is_implemented() const
-{
-  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
-       ref_case < RefinementCase<dim>::isotropic_refinement + 1;
-       ++ref_case)
-    for (unsigned int c = 0;
-         c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-         ++c)
-      {
-        // make sure also the lazily initialized matrices are created
-        get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
-        Assert((prolongation[ref_case - 1][c].m() == this->n_dofs_per_cell()) ||
-                 (prolongation[ref_case - 1][c].m() == 0),
-               ExcInternalError());
-        Assert((prolongation[ref_case - 1][c].n() == this->n_dofs_per_cell()) ||
-                 (prolongation[ref_case - 1][c].n() == 0),
-               ExcInternalError());
-        if ((prolongation[ref_case - 1][c].m() == 0) ||
-            (prolongation[ref_case - 1][c].n() == 0))
-          return false;
-      }
-  return true;
-}
-
-
-
-template <int dim, int spacedim>
-bool
-FiniteElement<dim, spacedim>::restriction_is_implemented() const
-{
-  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
-       ref_case < RefinementCase<dim>::isotropic_refinement + 1;
-       ++ref_case)
-    for (unsigned int c = 0;
-         c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-         ++c)
-      {
-        // make sure also the lazily initialized matrices are created
-        get_restriction_matrix(c, RefinementCase<dim>(ref_case));
-        Assert((restriction[ref_case - 1][c].m() == this->n_dofs_per_cell()) ||
-                 (restriction[ref_case - 1][c].m() == 0),
-               ExcInternalError());
-        Assert((restriction[ref_case - 1][c].n() == this->n_dofs_per_cell()) ||
-                 (restriction[ref_case - 1][c].n() == 0),
-               ExcInternalError());
-        if ((restriction[ref_case - 1][c].m() == 0) ||
-            (restriction[ref_case - 1][c].n() == 0))
-          return false;
-      }
-  return true;
-}
-
-
-
-template <int dim, int spacedim>
-bool
-FiniteElement<dim, spacedim>::isotropic_prolongation_is_implemented() const
-{
-  const RefinementCase<dim> ref_case =
-    RefinementCase<dim>::isotropic_refinement;
-
-  for (unsigned int c = 0;
-       c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-       ++c)
-    {
-      // make sure also the lazily initialized matrices are created
-      get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
-      Assert((prolongation[ref_case - 1][c].m() == this->n_dofs_per_cell()) ||
-               (prolongation[ref_case - 1][c].m() == 0),
-             ExcInternalError());
-      Assert((prolongation[ref_case - 1][c].n() == this->n_dofs_per_cell()) ||
-               (prolongation[ref_case - 1][c].n() == 0),
-             ExcInternalError());
-      if ((prolongation[ref_case - 1][c].m() == 0) ||
-          (prolongation[ref_case - 1][c].n() == 0))
-        return false;
-    }
-  return true;
-}
-
-
-
-template <int dim, int spacedim>
-bool
-FiniteElement<dim, spacedim>::isotropic_restriction_is_implemented() const
-{
-  const RefinementCase<dim> ref_case =
-    RefinementCase<dim>::isotropic_refinement;
-
-  for (unsigned int c = 0;
-       c < GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
-       ++c)
-    {
-      // make sure also the lazily initialized matrices are created
-      get_restriction_matrix(c, RefinementCase<dim>(ref_case));
-      Assert((restriction[ref_case - 1][c].m() == this->n_dofs_per_cell()) ||
-               (restriction[ref_case - 1][c].m() == 0),
-             ExcInternalError());
-      Assert((restriction[ref_case - 1][c].n() == this->n_dofs_per_cell()) ||
-               (restriction[ref_case - 1][c].n() == 0),
-             ExcInternalError());
-      if ((restriction[ref_case - 1][c].m() == 0) ||
-          (restriction[ref_case - 1][c].n() == 0))
-        return false;
-    }
-  return true;
 }
 
 
