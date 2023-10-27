@@ -108,11 +108,13 @@ public:
     const std::vector<Vector<double>> &support_point_values,
     std::vector<double>               &nodal_values) const override;
 
-protected:
+private:
   /**
-   * Mutex used to guard computation of some internal lookup tables.
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
    */
-  mutable Threads::Mutex mutex;
+  mutable Threads::Mutex restriction_matrix_mutex;
+  mutable Threads::Mutex prolongation_matrix_mutex;
 };
 
 

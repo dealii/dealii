@@ -417,10 +417,12 @@ private:
   void
   initialize_quad_dof_index_permutation_and_sign_change();
 
-  /*
-   * Mutex for protecting initialization of restriction and embedding matrix.
+  /**
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
    */
-  mutable Threads::Mutex mutex;
+  mutable Threads::Mutex restriction_matrix_mutex;
+  mutable Threads::Mutex prolongation_matrix_mutex;
 };
 
 /** @} */

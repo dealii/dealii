@@ -334,9 +334,11 @@ protected:
 
 private:
   /**
-   * Mutex for protecting initialization of restriction and embedding matrix.
+   * Mutex variables used for protecting the initialization of restriction
+   * and embedding matrices.
    */
-  mutable Threads::Mutex mutex;
+  mutable Threads::Mutex restriction_matrix_mutex;
+  mutable Threads::Mutex prolongation_matrix_mutex;
 
   /**
    * The highest polynomial degree of the underlying tensor product space
