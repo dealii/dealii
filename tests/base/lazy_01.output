@@ -1,0 +1,6 @@
+
+DEAL::[initializing object]
+DEAL::lazy_integer.value() = 42
+DEAL::lazy_integer.value() = 42
+DEAL::lazy_integer.value() = ... [initializing object] ... 42
+DEAL::OK!
