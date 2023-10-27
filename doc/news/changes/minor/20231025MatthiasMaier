@@ -1,0 +1,4 @@
+New: A new wrapper class Lazy<T> provides an efficient, thread-safe
+mechanism for lazy initialization of objects.
+<br>
+(Matthias Maier, 2023/10/25)
