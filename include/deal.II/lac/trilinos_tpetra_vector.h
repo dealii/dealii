@@ -817,7 +817,7 @@ namespace LinearAlgebra
         Tpetra::Access::ReadWrite);
 #  else
       vector->template sync<Kokkos::HostSpace>();
-      auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
+      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
 #  endif
       auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 #  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
