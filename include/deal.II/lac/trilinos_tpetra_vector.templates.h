@@ -243,7 +243,7 @@ namespace LinearAlgebra
             const TpetraWrappers::CommunicationPattern>(communication_pattern);
 
           AssertThrow(
-            tpetra_comm_pattern.is_null(),
+            !tpetra_comm_pattern.is_null(),
             ExcMessage(
               std::string("The communication pattern is not of type ") +
               "LinearAlgebra::TpetraWrappers::CommunicationPattern."));
