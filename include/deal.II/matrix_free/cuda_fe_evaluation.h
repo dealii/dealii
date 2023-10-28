@@ -29,6 +29,7 @@
 #include <deal.II/matrix_free/cuda_matrix_free.h>
 #include <deal.II/matrix_free/cuda_matrix_free.templates.h>
 #include <deal.II/matrix_free/cuda_tensor_product_kernels.h>
+#include <deal.II/matrix_free/evaluation_flags.h>
 
 #include <Kokkos_Core.hpp>
 
@@ -143,6 +144,19 @@ namespace CUDAWrappers
      * @p get_value() or @p get_gradient() give useful information.
      */
     DEAL_II_HOST_DEVICE void
+    evaluate(const EvaluationFlags::EvaluationFlags evaluate_flag);
+
+    /**
+     * Evaluate the function values and the gradients of the FE function given
+     * at the DoF values in the input vector at the quadrature points on the
+     * unit cell. The function arguments specify which parts shall actually be
+     * computed. This function needs to be called before the functions
+     * @p get_value() or @p get_gradient() give useful information.
+     */
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the version taking EvaluationFlags.")
+    DEAL_II_HOST_DEVICE
+    void
     evaluate(const bool evaluate_val, const bool evaluate_grad);
 
     /**
@@ -153,6 +167,19 @@ namespace CUDAWrappers
      * of the values or the gradients.
      */
     DEAL_II_HOST_DEVICE void
+    integrate(const EvaluationFlags::EvaluationFlags integration_flag);
+
+    /**
+     * This function takes the values and/or gradients that are stored on
+     * quadrature points, tests them by all the basis functions/gradients on
+     * the cell and performs the cell integration. The two function arguments
+     * @p integrate_val and @p integrate_grad are used to enable/disable some
+     * of the values or the gradients.
+     */
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the version taking EvaluationFlags.")
+    DEAL_II_HOST_DEVICE
+    void
     integrate(const bool integrate_val, const bool integrate_grad);
 
     /**
@@ -312,8 +339,7 @@ namespace CUDAWrappers
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::evaluate(
-    const bool evaluate_val,
-    const bool evaluate_grad)
+    const EvaluationFlags::EvaluationFlags evaluate_flag)
   {
     // First evaluate the gradients because it requires values that will be
     // changed if evaluate_val is true
@@ -327,21 +353,81 @@ namespace CUDAWrappers
                                data->shape_values,
                                data->shape_gradients,
                                data->co_shape_gradients);
-    if (evaluate_val == true && evaluate_grad == true)
+
+    if ((evaluate_flag & EvaluationFlags::values) &&
+        (evaluate_flag & EvaluationFlags::gradients))
       {
         evaluator_tensor_product.value_and_gradient_at_quad_pts(
           shared_data->values, shared_data->gradients);
         shared_data->team_member.team_barrier();
       }
-    else if (evaluate_grad == true)
+    else if (evaluate_flag & EvaluationFlags::gradients)
       {
         evaluator_tensor_product.gradient_at_quad_pts(shared_data->values,
                                                       shared_data->gradients);
         shared_data->team_member.team_barrier();
       }
-    else if (evaluate_val == true)
+    else if (evaluate_flag & EvaluationFlags::values)
       {
         evaluator_tensor_product.value_at_quad_pts(shared_data->values);
+        shared_data->team_member.team_barrier();
+      }
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE void
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::evaluate(
+    const bool evaluate_val,
+    const bool evaluate_grad)
+  {
+    evaluate(
+      (evaluate_val ? EvaluationFlags::values : EvaluationFlags::nothing) |
+      (evaluate_grad ? EvaluationFlags::gradients : EvaluationFlags::nothing));
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE void
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::integrate(
+    const EvaluationFlags::EvaluationFlags integration_flag)
+  {
+    internal::EvaluatorTensorProduct<
+      internal::EvaluatorVariant::evaluate_general,
+      dim,
+      fe_degree,
+      n_q_points_1d,
+      Number>
+      evaluator_tensor_product(shared_data->team_member,
+                               data->shape_values,
+                               data->shape_gradients,
+                               data->co_shape_gradients);
+
+    if ((integration_flag & EvaluationFlags::values) &&
+        (integration_flag & EvaluationFlags::gradients))
+      {
+        evaluator_tensor_product.integrate_value_and_gradient(
+          shared_data->values, shared_data->gradients);
+      }
+    else if (integration_flag & EvaluationFlags::gradients)
+      {
+        evaluator_tensor_product.integrate_value(shared_data->values);
+        shared_data->team_member.team_barrier();
+      }
+    else if (integration_flag & EvaluationFlags::values)
+      {
+        evaluator_tensor_product.template integrate_gradient<false>(
+          shared_data->values, shared_data->gradients);
         shared_data->team_member.team_barrier();
       }
   }
@@ -358,32 +444,9 @@ namespace CUDAWrappers
     const bool integrate_val,
     const bool integrate_grad)
   {
-    internal::EvaluatorTensorProduct<
-      internal::EvaluatorVariant::evaluate_general,
-      dim,
-      fe_degree,
-      n_q_points_1d,
-      Number>
-      evaluator_tensor_product(shared_data->team_member,
-                               data->shape_values,
-                               data->shape_gradients,
-                               data->co_shape_gradients);
-    if (integrate_val == true && integrate_grad == true)
-      {
-        evaluator_tensor_product.integrate_value_and_gradient(
-          shared_data->values, shared_data->gradients);
-      }
-    else if (integrate_val == true)
-      {
-        evaluator_tensor_product.integrate_value(shared_data->values);
-        shared_data->team_member.team_barrier();
-      }
-    else if (integrate_grad == true)
-      {
-        evaluator_tensor_product.template integrate_gradient<false>(
-          shared_data->values, shared_data->gradients);
-        shared_data->team_member.team_barrier();
-      }
+    integrate(
+      (integrate_val ? EvaluationFlags::values : EvaluationFlags::nothing) |
+      (integrate_grad ? EvaluationFlags::gradients : EvaluationFlags::nothing));
   }
 
 

@@ -69,7 +69,7 @@ namespace EvaluationFlags
    *
    * @ref EvaluationFlags
    */
-  inline EvaluationFlags
+  DEAL_II_HOST_DEVICE inline EvaluationFlags
   operator|(const EvaluationFlags f1, const EvaluationFlags f2)
   {
     return static_cast<EvaluationFlags>(static_cast<unsigned int>(f1) |
@@ -84,7 +84,7 @@ namespace EvaluationFlags
    *
    * @ref EvaluationFlags
    */
-  inline EvaluationFlags &
+  DEAL_II_HOST_DEVICE inline EvaluationFlags &
   operator|=(EvaluationFlags &f1, const EvaluationFlags f2)
   {
     f1 = f1 | f2;
@@ -101,7 +101,7 @@ namespace EvaluationFlags
    *
    * @ref EvaluationFlags
    */
-  inline EvaluationFlags
+  DEAL_II_HOST_DEVICE inline EvaluationFlags
   operator&(const EvaluationFlags f1, const EvaluationFlags f2)
   {
     return static_cast<EvaluationFlags>(static_cast<unsigned int>(f1) &
@@ -115,7 +115,7 @@ namespace EvaluationFlags
    *
    * @ref EvaluationFlags
    */
-  inline EvaluationFlags &
+  DEAL_II_HOST_DEVICE inline EvaluationFlags &
   operator&=(EvaluationFlags &f1, const EvaluationFlags f2)
   {
     f1 = f1 & f2;

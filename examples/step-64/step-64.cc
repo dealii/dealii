@@ -221,10 +221,10 @@ namespace Step64
     CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, double>
       fe_eval(gpu_data, shared_data);
     fe_eval.read_dof_values(src);
-    fe_eval.evaluate(true, true);
+    fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.apply_for_each_quad_point(
       HelmholtzOperatorQuad<dim, fe_degree>(gpu_data, coef, cell));
-    fe_eval.integrate(true, true);
+    fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }
 

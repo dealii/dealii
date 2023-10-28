@@ -109,12 +109,12 @@ HelmholtzOperator<dim, fe_degree, Number, n_q_points_1d>::operator()(
   CUDAWrappers::FEEvaluation<dim, fe_degree, n_q_points_1d, 1, Number> fe_eval(
     gpu_data, shared_data);
   fe_eval.read_dof_values(src);
-  fe_eval.evaluate(true, true);
+  fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
   fe_eval.apply_for_each_quad_point(
     HelmholtzOperatorQuad<dim, fe_degree, Number, n_q_points_1d>(gpu_data,
                                                                  coef,
                                                                  cell));
-  fe_eval.integrate(true, true);
+  fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
   fe_eval.distribute_local_to_global(dst);
 }
 

@@ -57,7 +57,7 @@ public:
                                                  n_local_dofs),
                          [&](int i) { fe_eval_ptr->submit_dof_value(1., i); });
     shared_data->team_member.team_barrier();
-    fe_eval.evaluate(/*evaluate_values =*/true, /*evaluate_gradients=*/true);
+    fe_eval.evaluate(EvaluationFlags::values | EvaluationFlags::gradients);
 
 #ifndef __APPLE__
     Kokkos::parallel_for(Kokkos::TeamThreadRange(shared_data->team_member,
@@ -69,8 +69,7 @@ public:
                              assert(fe_eval_ptr->get_gradient(i)[e] == 0.);
                          });
 
-    fe_eval.integrate(/*integrate_values = */ true,
-                      /*integrate_gradients=*/true);
+    fe_eval.integrate(EvaluationFlags::values | EvaluationFlags::gradients);
 
     Kokkos::parallel_for(
       Kokkos::TeamThreadRange(shared_data->team_member, n_local_dofs),
