@@ -1800,6 +1800,9 @@ SymmetricTensor<rank_, dim, Number>::memory_consumption()
 
 namespace internal
 {
+  /**
+   * Perform the double contraction between two rank-2 symmetric tensors.
+   */
   template <int dim, typename Number, typename OtherNumber = Number>
   DEAL_II_HOST DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
     typename SymmetricTensorAccessors::
@@ -1817,14 +1820,17 @@ namespace internal
       {
         case 1:
           return data[0] * sdata[0];
-        default:
-          // Start with the non-diagonal part to avoid some multiplications by
-          // 2.
 
+        default:
+          // Start with the non-diagonal part. These values appear
+          // twice in the matrix, but are only stored once. So we can
+          // get the double-contraction sum for these elements using
+          // only one multiplication each, and at the end multiplying
+          // things by 2.
           result_type sum = data[dim] * sdata[dim];
           for (unsigned int d = dim + 1; d < (dim * (dim + 1) / 2); ++d)
             sum += data[d] * sdata[d];
-          sum += sum; // sum = sum * 2.;
+          sum += sum; // sum *= 2
 
           // Now add the contributions from the diagonal
           for (unsigned int d = 0; d < dim; ++d)
@@ -1835,6 +1841,10 @@ namespace internal
 
 
 
+  /**
+   * Perform the double contraction between a rank-4 and a rank-2
+   * symmetric tensor.
+   */
   template <int dim, typename Number, typename OtherNumber = Number>
   DEAL_II_HOST DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
     typename SymmetricTensorAccessors::
@@ -1861,6 +1871,10 @@ namespace internal
 
 
 
+  /**
+   * Perform the double contraction between a rank-2 and a rank-4
+   * symmetric tensor.
+   */
   template <int dim, typename Number, typename OtherNumber = Number>
   DEAL_II_HOST DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
     typename SymmetricTensorAccessors::StorageType<
@@ -1883,11 +1897,15 @@ namespace internal
     base_tensor_type tmp;
     for (unsigned int i = 0; i < tmp.dimension; ++i)
       {
-        // Start with the non-diagonal part
+        // Start with the non-diagonal part. These values appear
+        // twice in the matrix, but are only stored once. So we can
+        // get the double-contraction sum for these elements using
+        // only one multiplication each, and at the end multiplying
+        // things by 2.
         value_type sum = data[dim] * sdata[dim][i];
         for (unsigned int d = dim + 1; d < (dim * (dim + 1) / 2); ++d)
           sum += data[d] * sdata[d][i];
-        sum += sum; // sum = sum * 2.;
+        sum += sum; // sum *= 2
 
         // Now add the contributions from the diagonal
         for (unsigned int d = 0; d < dim; ++d)
@@ -1899,6 +1917,9 @@ namespace internal
 
 
 
+  /**
+   * Perform the double contraction between two rank-4 symmetric tensors.
+   */
   template <int dim, typename Number, typename OtherNumber = Number>
   DEAL_II_HOST DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
     typename SymmetricTensorAccessors::StorageType<
@@ -1927,7 +1948,7 @@ namespace internal
           // Start with the non-diagonal part
           for (unsigned int d = dim; d < (dim * (dim + 1) / 2); ++d)
             tmp[i][j] += data[i][d] * sdata[d][j];
-          tmp[i][j] += tmp[i][j]; // tmp[i][j] = tmp[i][j] * 2;
+          tmp[i][j] += tmp[i][j]; // tmp[i][j] *= 2;
 
           // Now add the contributions from the diagonal
           for (unsigned int d = 0; d < dim; ++d)
@@ -1948,10 +1969,8 @@ DEAL_II_HOST DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
     SymmetricTensor<rank_, dim, Number>::operator*(
       const SymmetricTensor<2, dim, OtherNumber> &s) const
 {
-  // need to have two different function calls
-  // because a scalar and rank-2 tensor are not
-  // the same data type (see internal function
-  // above)
+  // Dispatch to functions that know the types of the involved
+  // arguments via overloads.
   return internal::perform_double_contraction<dim, Number, OtherNumber>(data,
                                                                         s.data);
 }
