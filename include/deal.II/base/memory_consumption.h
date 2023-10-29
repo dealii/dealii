@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <cstring>
 #include <memory>
+#include <optional>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -221,6 +222,14 @@ namespace MemoryConsumption
   memory_consumption(const std::pair<A, B> &p);
 
   /**
+   * Determine an estimate of the amount of memory in bytes consumed by a
+   * value wrapped in a std::optional.
+   */
+  template <typename A>
+  inline std::size_t
+  memory_consumption(const std::optional<A> &o);
+
+  /**
    * Calculate the memory consumption of a pointer.
    *
    * @note This function is overloaded for C-style strings; see the
@@ -376,6 +385,31 @@ namespace MemoryConsumption
   memory_consumption(const std::pair<A, B> &p)
   {
     return (memory_consumption(p.first) + memory_consumption(p.second));
+  }
+
+
+
+  template <typename A>
+  inline std::size_t
+  memory_consumption(const std::optional<A> &o)
+  {
+    if (o.has_value())
+      {
+        //
+        // If the optional carries a value then we query the contained
+        // value for memory consumption and estimate the size of the
+        // control overhead.
+        //
+        return memory_consumption(o.value()) + sizeof(o) - sizeof(A);
+      }
+    else
+      {
+        //
+        // The optional contains no value, so simply return its plain size
+        // (consisting of space for the value and control overhead):
+        //
+        return sizeof(o);
+      }
   }
 
 
