@@ -641,19 +641,20 @@ namespace PETScWrappers
     AssertPETSc(status);
 
     // Get the number of steps taken.
-    PetscInt nt;
-    AssertPETSc(SNESGetIterationNumber(snes, &nt));
+    PetscInt n_iterations;
+    AssertPETSc(SNESGetIterationNumber(snes, &n_iterations));
 
     // Raise an exception if the solver has not converged
     SNESConvergedReason reason;
     AssertPETSc(SNESGetConvergedReason(snes, &reason));
     AssertThrow(reason > 0,
                 ExcMessage("SNES solver did not converge after " +
-                           std::to_string(nt) + " iterations with reason " +
+                           std::to_string(n_iterations) +
+                           " iterations with reason " +
                            SNESConvergedReasons[reason]));
 
     // Finally return
-    return nt;
+    return n_iterations;
   }
 
 
