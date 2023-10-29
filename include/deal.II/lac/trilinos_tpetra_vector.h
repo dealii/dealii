@@ -718,7 +718,7 @@ namespace LinearAlgebra
       /**
        * Return the mpi communicator
        */
-      const MPI_Comm
+      MPI_Comm
       mpi_comm() const;
 
       /** @} */

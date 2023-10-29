@@ -291,8 +291,7 @@ namespace LinearAlgebra
     Vector<Number>::import_elements(
       const ReadWriteVector<Number> &V,
       VectorOperation::values        operation,
-      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
-        &communication_pattern)
+      const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase> &)
     {
       import_elements(V, operation);
     }
@@ -731,7 +730,7 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    const MPI_Comm
+    MPI_Comm
     Vector<Number>::mpi_comm() const
     {
       MPI_Comm out;
