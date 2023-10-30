@@ -15,6 +15,7 @@
 
 set(_unity_include_src
   mg_base.cc
+  mg_constrained_dofs.cc
   mg_level_global_transfer.cc
   mg_transfer_block.cc
   mg_transfer_component.cc
@@ -40,6 +41,7 @@ setup_source_list("${_unity_include_src}"
 
 set(_inst
   mg_base.inst.in
+  mg_constrained_dofs.inst.in
   mg_level_global_transfer.inst.in
   mg_tools.inst.in
   mg_transfer_block.inst.in

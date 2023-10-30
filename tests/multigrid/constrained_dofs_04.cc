@@ -17,6 +17,8 @@
 // check that we get a reasonable error message when trying to call
 // MGConstrainedDofs::initialize() with distributing level dofs.
 
+#include <deal.II/dofs/dof_handler.h>
+
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>

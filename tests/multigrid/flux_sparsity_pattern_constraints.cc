@@ -38,6 +38,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 
 #include <deal.II/multigrid/mg_constrained_dofs.h>
+#include <deal.II/multigrid/mg_tools.h>
 
 #include "../tests.h"
 

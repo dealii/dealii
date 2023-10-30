@@ -28,6 +28,7 @@
 #include <deal.II/grid/tria_iterator.h>
 
 #include <deal.II/multigrid/mg_constrained_dofs.h>
+#include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
 #include <deal.II/multigrid/multigrid.h>
 
