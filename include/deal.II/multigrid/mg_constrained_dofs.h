@@ -23,6 +23,8 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/grid/manifold.h>
+
 #include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/multigrid/mg_tools.h>
