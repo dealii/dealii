@@ -1124,6 +1124,64 @@ namespace Threads
 
 
   /**
+   * Overload of the new_task function for other kinds of function objects
+   * passed as first argument. This overload applies to cases where the first
+   * argument is a lambda function that takes arguments (whose values are then
+   * provided via subsequent arguments), or other objects that have function
+   * call operators.
+   *
+   * This overload is useful when creating multiple tasks using the same lambda
+   * function, but for different arguments. Say in code such as this:
+   * @code
+   *   std::vector<Triangulation<dim>> triangulations;
+   *   [... initialize triangulations ...]
+   *
+   *   auto something_expensive = [](const Triangulation<dim> &t) {...};
+   *
+   *   // Apply something_expensive() to all elements of the collection of
+   *   // triangulations:
+   *   Threads::TaskGroup<> task_group;
+   *   for (const Triangulation<dim> &t : triangulations)
+   *     task_group += Threads::new_task (something_expensive, t);
+   *   task_group.join_all();
+   * @endcode
+   *
+   * See the other functions of same name for more information.
+   *
+   * @note This overload is disabled if the first argument is a
+   * pointer or reference to a function, as there is another overload
+   * for that case. (Strictly speaking, this overload is disabled if the
+   * first argument is a reference to a function or any kind of pointer.
+   * But since only pointers to functions are invocable like functions,
+   * and since another part of the declaration checks that the first
+   * argument is invocable, testing that the first argument is not a
+   * pointer is sufficient. We use this scheme because there is no type
+   * trait to check whether something is a pointer-to-function: there
+   * is only `std::is_pointer` and `std::is_function`, the latter of
+   * which checks whether a type is a reference-to-function; but there is
+   * no type trait for pointer-to-function.)
+   *
+   * @ingroup threads
+   */
+  template <
+    typename FunctionObject,
+    typename... Args,
+    typename = std::enable_if_t<std::is_invocable_v<FunctionObject, Args...>>,
+    typename = std::enable_if_t<std::is_function_v<FunctionObject> == false>,
+    typename =
+      std::enable_if_t<std::is_member_pointer_v<FunctionObject> == false>,
+    typename = std::enable_if_t<std::is_pointer_v<FunctionObject> == false>>
+  inline Task<std::invoke_result_t<FunctionObject, Args...>>
+  new_task(const FunctionObject &fun, Args &&...args)
+  {
+    using RT   = std::invoke_result_t<FunctionObject, Args...>;
+    auto dummy = std::make_tuple(std::forward<Args>(args)...);
+    return new_task([dummy, fun]() -> RT { return std::apply(fun, dummy); });
+  }
+
+
+
+  /**
    * Overload of the non-const new_task function. See the other functions of
    * same name for more information.
    *
