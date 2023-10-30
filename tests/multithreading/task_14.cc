@@ -37,7 +37,10 @@ main()
 {
   initlog();
 
-  // Create a bunch of tasks, and put them into a TaskGroup
+  // Create a bunch of tasks, and put them into a TaskGroup. The test
+  // also checks that the call to `new_task()` needs to copy the
+  // passed in value for `i` rather than take a reference to it,
+  // because it would otherwise use outdated values.
   Threads::TaskGroup<int> tg;
   for (unsigned int i = 0; i < 10; ++i)
     tg += Threads::new_task(&test, i);
