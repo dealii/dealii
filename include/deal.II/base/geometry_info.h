@@ -862,10 +862,10 @@ public:
   /**
    * Return an array that lists all possible refinement cases possible in
    * the given space dimension. For example, for `dim==1`, it returns an
-   * array that only contains `{ RefinementCase<1>::no_refinement,
-   * RefinementCase<1>::cut_x }`. In `dim==2`, it returns
-   * `{ RefinementCase<1>::no_refinement, RefinementCase<2>::cut_x,
-   * RefinementCase<2>::cut_y, RefinementCase<2>::cut_xy }`.
+   * array that only contains `{ RefinementCase::no_refinement,
+   * RefinementCase::cut_x }`. In `dim==2`, it returns
+   * `{ RefinementCase::no_refinement, RefinementCase::cut_x,
+   * RefinementCase::cut_y, RefinementCase::cut_xy }`.
    */
   static std::array<RefinementCase<dim>, n_refinement_cases>
   all_refinement_cases();
