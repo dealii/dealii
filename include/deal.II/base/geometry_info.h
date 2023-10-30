@@ -790,6 +790,11 @@ class RefinementCase : public RefinementPossibilities<dim>
 {
 public:
   /**
+   * A variable indicating the number of possible refinement cases.
+   */
+  static constexpr unsigned int n_refinement_cases = (1 << dim);
+
+  /**
    * Default constructor. Initialize the refinement case with no_refinement.
    */
   RefinementCase();
@@ -855,6 +860,17 @@ public:
   cut_axis(const unsigned int i);
 
   /**
+   * Return an array that lists all possible refinement cases possible in
+   * the given space dimension. For example, for `dim==1`, it returns an
+   * array that only contains `{ RefinementCase::no_refinement,
+   * RefinementCase::cut_x }`. In `dim==2`, it returns
+   * `{ RefinementCase::no_refinement, RefinementCase::cut_x,
+   * RefinementCase::cut_y, RefinementCase::cut_xy }`.
+   */
+  static std::array<RefinementCase<dim>, n_refinement_cases>
+  all_refinement_cases();
+
+  /**
    * Return the amount of memory occupied by an object of this type.
    */
   static std::size_t
@@ -886,6 +902,7 @@ private:
    */
   std::uint8_t value : (dim > 0 ? dim : 1);
 };
+
 
 
 namespace internal
@@ -2770,6 +2787,44 @@ RefinementCase<3>::cut_axis(const unsigned int i)
                                      RefinementPossibilities<3>::cut_y,
                                      RefinementPossibilities<3>::cut_z};
   return options[i];
+}
+
+
+
+template <>
+inline std::array<RefinementCase<1>, 2>
+RefinementCase<1>::all_refinement_cases()
+{
+  return {{RefinementPossibilities<1>::no_refinement,
+           RefinementPossibilities<1>::cut_x}};
+}
+
+
+
+template <>
+inline std::array<RefinementCase<2>, 4>
+RefinementCase<2>::all_refinement_cases()
+{
+  return {{RefinementPossibilities<2>::no_refinement,
+           RefinementPossibilities<2>::cut_x,
+           RefinementPossibilities<2>::cut_y,
+           RefinementPossibilities<2>::cut_xy}};
+}
+
+
+
+template <>
+inline std::array<RefinementCase<3>, 8>
+RefinementCase<3>::all_refinement_cases()
+{
+  return {{RefinementPossibilities<3>::no_refinement,
+           RefinementPossibilities<3>::cut_x,
+           RefinementPossibilities<3>::cut_y,
+           RefinementPossibilities<3>::cut_xy,
+           RefinementPossibilities<3>::cut_z,
+           RefinementPossibilities<3>::cut_xz,
+           RefinementPossibilities<3>::cut_yz,
+           RefinementPossibilities<3>::cut_xyz}};
 }
 
 

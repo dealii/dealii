@@ -68,16 +68,16 @@ FE_RT_Bubbles<dim>::FE_RT_Bubbles(const unsigned int deg)
 
   // Reinit the vectors of prolongation matrices to the
   // right sizes. There are no restriction matrices implemented
-  for (unsigned int ref_case = RefinementCase<dim>::cut_x;
-       ref_case < RefinementCase<dim>::isotropic_refinement + 1;
-       ++ref_case)
-    {
-      const unsigned int nc =
-        GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
+  for (const unsigned int ref_case :
+       RefinementCase<dim>::all_refinement_cases())
+    if (ref_case != RefinementCase<dim>::no_refinement)
+      {
+        const unsigned int nc =
+          GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case));
 
-      for (unsigned int i = 0; i < nc; ++i)
-        this->prolongation[ref_case - 1][i].reinit(n_dofs, n_dofs);
-    }
+        for (unsigned int i = 0; i < nc; ++i)
+          this->prolongation[ref_case - 1][i].reinit(n_dofs, n_dofs);
+      }
 
   // TODO: the implementation makes the assumption that all faces have the
   // same number of dofs
