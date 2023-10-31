@@ -107,6 +107,11 @@ inline GrowingVectorMemory<VectorType>::GrowingVectorMemory(
   , current_alloc(0)
   , log_statistics(log_statistics)
 {
+  // Constructors generally cannot be called in parallel and so it is not
+  // necessary to guard access to member variables with a mutex -- unless
+  // the member variable being accessed is 'static', which is the case
+  // for the things get_pool() returns, and in that case the mutex itself
+  // must also be 'static' as it is here.
   std::lock_guard<std::mutex> lock(mutex);
   get_pool().initialize(initial_size);
 }
@@ -136,23 +141,23 @@ GrowingVectorMemory<VectorType>::alloc()
 
   ++total_alloc;
   ++current_alloc;
-  // see if there is a free vector
-  // available in our list
-  for (typename std::vector<entry_type>::iterator i = get_pool().data->begin();
-       i != get_pool().data->end();
-       ++i)
+
+  // See if there is a currently unused vector available in our list
+  for (entry_type &i : *get_pool().data)
     {
-      if (i->first == false)
+      if (i.first == false)
         {
-          i->first = true;
-          return i->second.get();
+          i.first = true;
+          return i.second.get();
         }
     }
 
-  // no free vector found, so let's just allocate a new one
-  get_pool().data->emplace_back(true, std::make_unique<VectorType>());
+  // No currently unused vector found, so let's just allocate a new one
+  // and return it:
+  const auto &new_entry =
+    get_pool().data->emplace_back(true, std::make_unique<VectorType>());
 
-  return get_pool().data->back().second.get();
+  return new_entry.second.get();
 }
 
 
@@ -163,17 +168,19 @@ GrowingVectorMemory<VectorType>::free(const VectorType *const v)
 {
   std::lock_guard<std::mutex> lock(mutex);
 
-  for (typename std::vector<entry_type>::iterator i = get_pool().data->begin();
-       i != get_pool().data->end();
-       ++i)
+  // Find the vector to be de-allocated and mark it as now unused:
+  for (entry_type &i : *get_pool().data)
     {
-      if (v == i->second.get())
+      if (v == i.second.get())
         {
-          i->first = false;
+          i.first = false;
           --current_alloc;
           return;
         }
     }
+
+  // If we got here, someone is trying to free a vector that has not
+  // been allocated!
   Assert(false, typename VectorMemory<VectorType>::ExcNotAllocatedHere());
 }
 
@@ -197,14 +204,10 @@ GrowingVectorMemory<VectorType>::memory_consumption() const
 {
   std::lock_guard<std::mutex> lock(mutex);
 
-  std::size_t                                            result = sizeof(*this);
-  const typename std::vector<entry_type>::const_iterator end =
-    get_pool().data->end();
-  for (typename std::vector<entry_type>::const_iterator i =
-         get_pool().data->begin();
-       i != end;
-       ++i)
-    result += sizeof(*i) + MemoryConsumption::memory_consumption(i->second);
+  std::size_t result = sizeof(*this);
+  for (const entry_type &i : *get_pool().data)
+    result +=
+      sizeof(entry_type) + MemoryConsumption::memory_consumption(i.second);
 
   return result;
 }
