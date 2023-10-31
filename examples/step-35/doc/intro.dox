@@ -8,7 +8,6 @@ University. Most of the work for this program is by him.
 <a name="step-35-Intro"></a>
 <h1> Introduction </h1>
 
-<a name="step-35-Motivation"></a>
 <h3> Motivation </h3>
 The purpose of this program is to show how to effectively solve the incompressible time-dependent
 Navier-Stokes equations. These equations describe the flow of a viscous incompressible fluid and read

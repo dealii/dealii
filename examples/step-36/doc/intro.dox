@@ -3,7 +3,6 @@
 <i>This program was contributed by Toby D. Young and Wolfgang
 Bangerth.  </i>
 
-<a name="step-36-Preamble"></a>
 <h1>Preamble</h1>
 
 The problem we want to solve in this example is an eigenspectrum
