@@ -993,7 +993,7 @@ namespace NonMatching
                                                  numbers::invalid_unsigned_int);
 
     MappingData  mapping_data;
-    MappingData  mapping_data_last_cell;
+    MappingData  mapping_data_previous_cell;
     unsigned int size_compressed_data = 0;
     unsigned int cell_index           = 0;
     for (const auto &cell : cell_iterator_range)
@@ -1036,7 +1036,7 @@ namespace NonMatching
 
         if (cell_index > 0)
           {
-            // check if current and last cell are affine
+            // check if current and previous cell are affine
             const bool affine_cells =
               cell_type[cell_index] <=
                 dealii::internal::MatrixFreeFunctions::affine &&
@@ -1044,19 +1044,20 @@ namespace NonMatching
                 dealii::internal::MatrixFreeFunctions::affine;
 
             // create a comparator to compare inverse Jacobian of current
-            // and last cell
+            // and previous cell
             FloatingPointComparator<double> comparator(
               1e4 / cell->diameter() * std::numeric_limits<double>::epsilon() *
               1024.);
 
-            // we can only compare if current and last cell have at least
+            // we can only compare if current and previous cell have at least
             // one quadrature point and both cells are at least affine
             const auto comparison_result =
               (!affine_cells || mapping_data.inverse_jacobians.empty() ||
-               mapping_data_last_cell.inverse_jacobians.empty()) ?
+               mapping_data_previous_cell.inverse_jacobians.empty()) ?
                 FloatingPointComparator<double>::ComparisonResult::less :
-                comparator.compare(mapping_data.inverse_jacobians[0],
-                                   mapping_data_last_cell.inverse_jacobians[0]);
+                comparator.compare(
+                  mapping_data.inverse_jacobians[0],
+                  mapping_data_previous_cell.inverse_jacobians[0]);
 
             // we can compress the Jacobians and inverse Jacobians if
             // inverse Jacobians are equal and cells are affine
@@ -1084,8 +1085,8 @@ namespace NonMatching
         else
           compressed_data_index_offsets.push_back(0);
 
-        // cache mapping_data from last cell
-        mapping_data_last_cell = mapping_data;
+        // cache mapping_data from previous cell
+        mapping_data_previous_cell = mapping_data;
 
         store_mapping_data(data_index_offsets[cell_index],
                            n_q_points_data,
@@ -1285,7 +1286,7 @@ namespace NonMatching
     resize_data_fields(n_data_points);
 
     MappingData  mapping_data;
-    MappingData  mapping_data_last_cell;
+    MappingData  mapping_data_previous_cell;
     MappingData  mapping_data_first;
     bool         first_set            = false;
     unsigned int size_compressed_data = 0;
@@ -1354,7 +1355,7 @@ namespace NonMatching
 
             if (current_face_index > 0)
               {
-                // check if current and last cell are affine
+                // check if current and previous cell are affine
                 const bool affine_cells =
                   cell_type[current_face_index] <=
                     dealii::internal::MatrixFreeFunctions::affine &&
@@ -1362,20 +1363,20 @@ namespace NonMatching
                     dealii::internal::MatrixFreeFunctions::affine;
 
                 // create a comparator to compare inverse Jacobian of current
-                // and last cell
+                // and previous cell
                 FloatingPointComparator<double> comparator(
                   1e4 / cell->diameter() *
                   std::numeric_limits<double>::epsilon() * 1024.);
 
-                // we can only compare if current and last cell have at least
-                // one quadrature point and both cells are at least affine
+                // we can only compare if current and previous cell have at
+                // least one quadrature point and both cells are at least affine
                 const auto comparison_result =
                   (!affine_cells || mapping_data.inverse_jacobians.empty() ||
-                   mapping_data_last_cell.inverse_jacobians.empty()) ?
+                   mapping_data_previous_cell.inverse_jacobians.empty()) ?
                     FloatingPointComparator<double>::ComparisonResult::less :
                     comparator.compare(
                       mapping_data.inverse_jacobians[0],
-                      mapping_data_last_cell.inverse_jacobians[0]);
+                      mapping_data_previous_cell.inverse_jacobians[0]);
 
                 // we can compress the Jacobians and inverse Jacobians if
                 // inverse Jacobians are equal and cells are affine
@@ -1414,8 +1415,8 @@ namespace NonMatching
             else
               compressed_data_index_offsets.push_back(0);
 
-            // cache mapping_data from last cell
-            mapping_data_last_cell = mapping_data;
+            // cache mapping_data from previous cell
+            mapping_data_previous_cell = mapping_data;
 
             const unsigned int n_q_points_data = compute_n_q_points<Number>(
               n_q_points_unvectorized[current_face_index]);
