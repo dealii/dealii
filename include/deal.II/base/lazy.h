@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mutex.h>
 
 #include <atomic>
@@ -193,6 +194,12 @@ public:
   DEAL_II_ALWAYS_INLINE inline T &
   value_or_initialize(const Callable &creator);
 
+
+  /**
+   * Compute the memory consumption of this structure.
+   */
+  std::size_t
+  memory_consumption() const;
 
 private:
   /**
@@ -393,6 +400,15 @@ Lazy<T>::value_or_initialize(const Callable &creator)
 {
   ensure_initialized(creator);
   return object.value();
+}
+
+
+template <typename T>
+std::size_t
+Lazy<T>::memory_consumption() const
+{
+  return MemoryConsumption::memory_consumption(object) + //
+         sizeof(*this) - sizeof(object);
 }
 
 
