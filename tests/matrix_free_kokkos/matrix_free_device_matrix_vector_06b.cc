@@ -14,18 +14,13 @@
 // ---------------------------------------------------------------------
 
 
-
-// this function tests the correctness of the implementation of matrix free
-// matrix-vector products by comparing with the result of deal.II sparse
-// matrix. The mesh uses a mesh consisting of several different cell types
-// according to the create_mesh helper function. Quite large mesh
-// mesh so that the thread parallelization is actually used
+// Same as matrix_free_matrix_vector_06b but uses varying coefficients
 
 #include <deal.II/base/function.h>
 
 #include "../tests.h"
 
-#include "create_mesh.h"
+#include "../matrix_free/create_mesh.h"
 #include "matrix_vector_device_common.h"
 
 template <int dim, int fe_degree, typename Number>
@@ -76,5 +71,5 @@ test()
           fe_degree,
           Number,
           LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>,
-          fe_degree + 1>(dof, constraints, tria.n_active_cells());
+          fe_degree + 1>(dof, constraints, tria.n_active_cells(), false);
 }

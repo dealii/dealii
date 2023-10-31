@@ -14,16 +14,14 @@
 // ---------------------------------------------------------------------
 
 
-
-// same test as matrix_vector_06 (quite large mesh, hanging nodes, different
-// cell types), but tiny domain of size 1e-20 to test correctness of
-// relative scaling in mapping info
+// Same as matrix_free_matrix_vector_06a but uses LA::distributed::Vector
+// instead of CUDAWrappers::Vector
 
 #include <deal.II/base/function.h>
 
 #include "../tests.h"
 
-#include "create_mesh.h"
+#include "../matrix_free/create_mesh.h"
 #include "matrix_vector_device_common.h"
 
 template <int dim, int fe_degree, typename Number>
@@ -32,21 +30,21 @@ test()
 {
   if (fe_degree > 1)
     return;
-
   Triangulation<dim> tria;
-  create_mesh(tria, 1e-20);
+  create_mesh(tria);
   tria.begin_active()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   typename Triangulation<dim>::active_cell_iterator cell, endc;
   cell = tria.begin_active();
   endc = tria.end();
   for (; cell != endc; ++cell)
-    if (cell->center().norm() < 0.5 * 1e-20)
+    if (cell->center().norm() < 0.5)
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
   tria.begin(tria.n_levels() - 1)->set_refine_flag();
   tria.last()->set_refine_flag();
   tria.execute_coarsening_and_refinement();
+  tria.refine_global(1);
   cell = tria.begin_active();
   for (unsigned int i = 0; i < 10 - 3 * dim; ++i)
     {

@@ -30,7 +30,6 @@
 
 #include "../tests.h"
 
-namespace CUDA = LinearAlgebra::CUDAWrappers;
 
 using TeamHandle = Kokkos::TeamPolicy<
   MemorySpace::Default::kokkos_space::execution_space>::member_type;
@@ -217,7 +216,6 @@ main()
   deallog.attach(logfile);
 
   Kokkos::initialize();
-  init_cuda();
 
   deallog.push("values");
   test<4, 4, 0, false>();
