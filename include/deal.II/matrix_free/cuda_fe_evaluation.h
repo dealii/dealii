@@ -419,12 +419,12 @@ namespace CUDAWrappers
         evaluator_tensor_product.integrate_value_and_gradient(
           shared_data->values, shared_data->gradients);
       }
-    else if (integration_flag & EvaluationFlags::gradients)
+    else if (integration_flag & EvaluationFlags::values)
       {
         evaluator_tensor_product.integrate_value(shared_data->values);
         shared_data->team_member.team_barrier();
       }
-    else if (integration_flag & EvaluationFlags::values)
+    else if (integration_flag & EvaluationFlags::gradients)
       {
         evaluator_tensor_product.template integrate_gradient<false>(
           shared_data->values, shared_data->gradients);
