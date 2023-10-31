@@ -145,10 +145,10 @@ public:
     CUDAWrappers::FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number>
       fe_eval(/*cell,*/ gpu_data, shared_data);
     fe_eval.read_dof_values(src);
-    fe_eval.evaluate(false, true);
+    fe_eval.evaluate(EvaluationFlags::gradients);
     fe_eval.apply_for_each_quad_point(
       LaplaceOperatorQuad<dim, fe_degree, Number>());
-    fe_eval.integrate(false, true);
+    fe_eval.integrate(EvaluationFlags::gradients);
     fe_eval.distribute_local_to_global(dst);
   }
   static const unsigned int n_dofs_1d    = fe_degree + 1;
