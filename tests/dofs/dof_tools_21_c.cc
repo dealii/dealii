@@ -323,37 +323,29 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler,
   deallog << std::endl;
 
 
-  std::bitset<3> orientation;
-  if (not GridTools::orthogonal_equality(orientation,
-                                         face_1,
-                                         face_2,
-                                         dim == 2 ? 1 : 2,
-                                         dealii::Tensor<1, spacedim>()))
-    std::cerr << " not match! oh noze!! " << std::endl;
-  deallog << "Orientation: " << orientation[0] << orientation[1]
-          << orientation[2] << std::endl;
+  const auto orientation = GridTools::orthogonal_equality(
+    face_1, face_2, dim == 2 ? 1 : 2, Tensor<1, spacedim>());
+  AssertThrow(orientation, ExcInternalError());
+  const auto o = *orientation;
+  deallog << "Orientation: " << o[0] << o[1] << o[2] << std::endl;
 
-
-  DoFTools::make_periodicity_constraints(face_1,
-                                         face_2,
-                                         constraint_matrix,
-                                         velocity_mask,
-                                         orientation[0],
-                                         orientation[1],
-                                         orientation[2]);
+  DoFTools::make_periodicity_constraints(
+    face_1, face_2, constraint_matrix, velocity_mask, o[0], o[1], o[2]);
   deallog << "Matching:" << std::endl;
   constraint_matrix.print(deallog.get_file_stream());
   constraint_matrix.close();
 
+  const auto reverse_orientation = GridTools::orthogonal_equality(
+    face_2, face_1, dim == 2 ? 1 : 2, Tensor<1, spacedim>());
+  AssertThrow(reverse_orientation, ExcInternalError());
+  const auto ro = *reverse_orientation;
   DoFTools::make_periodicity_constraints(face_2,
                                          face_1,
                                          constraint_matrix_reverse,
                                          velocity_mask,
-                                         orientation[0],
-                                         orientation[0] ?
-                                           orientation[1] ^ orientation[2] :
-                                           orientation[1],
-                                         orientation[2]);
+                                         ro[0],
+                                         ro[1],
+                                         ro[2]);
   deallog << "Reverse Matching:" << std::endl;
   constraint_matrix_reverse.print(deallog.get_file_stream());
   constraint_matrix_reverse.close();

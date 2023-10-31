@@ -2775,14 +2775,20 @@ ReferenceCell::get_combined_orientation(
 
   switch (this->kind)
     {
+      case ReferenceCells::Vertex:
+        // Things are always default-oriented in 1D
+        if (v0_equals({vertices_1[0]}))
+          return default_combined_face_orientation();
+        break;
+
       case ReferenceCells::Line:
         // line_orientation=true
         if (v0_equals({vertices_1[0], vertices_1[1]}))
-          return 1;
+          return default_combined_face_orientation();
 
         // line_orientation=false
         if (v0_equals({vertices_1[1], vertices_1[0]}))
-          return 0;
+          return reversed_combined_line_orientation();
         break;
       case ReferenceCells::Triangle:
         // face_orientation=true, face_rotation=false, face_flip=false

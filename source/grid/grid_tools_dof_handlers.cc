@@ -43,6 +43,7 @@
 #include <list>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <set>
 #include <vector>
 
@@ -2142,7 +2143,6 @@ namespace GridTools
     unsigned int n_matches = 0;
 
     // Match with a complexity of O(n^2). This could be improved...
-    std::bitset<3> orientation;
     using PairIterator =
       typename std::set<std::pair<CellIterator, unsigned int>>::const_iterator;
     for (PairIterator it1 = pairs1.begin(); it1 != pairs1.end(); ++it1)
@@ -2153,18 +2153,21 @@ namespace GridTools
             const CellIterator cell2     = it2->first;
             const unsigned int face_idx1 = it1->second;
             const unsigned int face_idx2 = it2->second;
-            if (GridTools::orthogonal_equality(orientation,
-                                               cell1->face(face_idx1),
-                                               cell2->face(face_idx2),
-                                               direction,
-                                               offset,
-                                               matrix))
+            if (const std::optional<std::bitset<3>> orientation =
+                  GridTools::orthogonal_equality(cell1->face(face_idx1),
+                                                 cell2->face(face_idx2),
+                                                 direction,
+                                                 offset,
+                                                 matrix))
               {
                 // We have a match, so insert the matching pairs and
                 // remove the matched cell in pairs2 to speed up the
                 // matching:
                 const PeriodicFacePair<CellIterator> matched_face = {
-                  {cell1, cell2}, {face_idx1, face_idx2}, orientation, matrix};
+                  {cell1, cell2},
+                  {face_idx1, face_idx2},
+                  orientation.value(),
+                  matrix};
                 matched_pairs.push_back(matched_face);
                 pairs2.erase(it2);
                 ++n_matches;
@@ -2403,110 +2406,10 @@ namespace GridTools
   }
 
 
-  /*
-   * Internally used in orthogonal_equality
-   *
-   * A lookup table to transform vertex matchings to orientation flags of
-   * the form (face_orientation, face_flip, face_rotation)
-   *
-   * See the comment on the next function as well as the detailed
-   * documentation of make_periodicity_constraints and
-   * collect_periodic_faces for details
-   */
-  template <int dim>
-  struct OrientationLookupTable
-  {};
-
-  template <>
-  struct OrientationLookupTable<1>
-  {
-    using MATCH_T =
-      std::array<unsigned int, GeometryInfo<1>::vertices_per_face>;
-    static inline std::bitset<3>
-    lookup(const MATCH_T &)
-    {
-      // The 1d case is trivial
-      return 1; // [true ,false,false]
-    }
-  };
-
-  template <>
-  struct OrientationLookupTable<2>
-  {
-    using MATCH_T =
-      std::array<unsigned int, GeometryInfo<2>::vertices_per_face>;
-    static inline std::bitset<3>
-    lookup(const MATCH_T &matching)
-    {
-      // In 2d matching faces (=lines) results in two cases: Either
-      // they are aligned or flipped. We store this "line_flip"
-      // property somewhat sloppy as "face_flip"
-      // (always: face_orientation = true, face_rotation = false)
-
-      static const MATCH_T m_tff = {{0, 1}};
-      if (matching == m_tff)
-        return 1; // [true ,false,false]
-      static const MATCH_T m_ttf = {{1, 0}};
-      if (matching == m_ttf)
-        return 3; // [true ,true ,false]
-      Assert(false, ExcInternalError());
-      // what follows is dead code, but it avoids warnings about the lack
-      // of a return value
-      return 0;
-    }
-  };
-
-  template <>
-  struct OrientationLookupTable<3>
-  {
-    using MATCH_T =
-      std::array<unsigned int, GeometryInfo<3>::vertices_per_face>;
-
-    static inline std::bitset<3>
-    lookup(const MATCH_T &matching)
-    {
-      // The full fledged 3d case. *Yay*
-      // See the documentation in include/deal.II/base/geometry_info.h
-      // as well as the actual implementation in source/grid/tria.cc
-      // for more details...
-
-      static const MATCH_T m_tff = {{0, 1, 2, 3}};
-      if (matching == m_tff)
-        return 1; // [true ,false,false]
-      static const MATCH_T m_tft = {{1, 3, 0, 2}};
-      if (matching == m_tft)
-        return 5; // [true ,false,true ]
-      static const MATCH_T m_ttf = {{3, 2, 1, 0}};
-      if (matching == m_ttf)
-        return 3; // [true ,true ,false]
-      static const MATCH_T m_ttt = {{2, 0, 3, 1}};
-      if (matching == m_ttt)
-        return 7; // [true ,true ,true ]
-      static const MATCH_T m_fff = {{0, 2, 1, 3}};
-      if (matching == m_fff)
-        return 0; // [false,false,false]
-      static const MATCH_T m_fft = {{2, 3, 0, 1}};
-      if (matching == m_fft)
-        return 4; // [false,false,true ]
-      static const MATCH_T m_ftf = {{3, 1, 2, 0}};
-      if (matching == m_ftf)
-        return 2; // [false,true ,false]
-      static const MATCH_T m_ftt = {{1, 0, 3, 2}};
-      if (matching == m_ftt)
-        return 6; // [false,true ,true ]
-      Assert(false, ExcInternalError());
-      // what follows is dead code, but it avoids warnings about the lack
-      // of a return value
-      return 0;
-    }
-  };
-
-
 
   template <typename FaceIterator>
-  inline bool
+  std::optional<std::bitset<3>>
   orthogonal_equality(
-    std::bitset<3>                                               &orientation,
     const FaceIterator                                           &face1,
     const FaceIterator                                           &face2,
     const unsigned int                                            direction,
@@ -2520,18 +2423,19 @@ namespace GridTools
 
     // Do a full matching of the face vertices:
 
-    std::array<unsigned int, GeometryInfo<dim>::vertices_per_face> matching;
+    std::array<unsigned int, GeometryInfo<dim>::vertices_per_face>
+      face1_vertices, face2_vertices;
 
     AssertDimension(face1->n_vertices(), face2->n_vertices());
 
-    std::set<unsigned int> face2_vertices;
+    std::set<unsigned int> face2_vertices_set;
     for (unsigned int i = 0; i < face1->n_vertices(); ++i)
-      face2_vertices.insert(i);
+      face2_vertices_set.insert(i);
 
     for (unsigned int i = 0; i < face1->n_vertices(); ++i)
       {
-        for (std::set<unsigned int>::iterator it = face2_vertices.begin();
-             it != face2_vertices.end();
+        for (auto it = face2_vertices_set.begin();
+             it != face2_vertices_set.end();
              ++it)
           {
             if (orthogonal_equality(face1->vertex(i),
@@ -2540,38 +2444,72 @@ namespace GridTools
                                     offset,
                                     matrix))
               {
-                matching[i] = *it;
-                face2_vertices.erase(it);
+                face1_vertices[i] = *it;
+                face2_vertices[i] = i;
+                face2_vertices_set.erase(it);
                 break; // jump out of the innermost loop
               }
           }
       }
 
     // And finally, a lookup to determine the ordering bitmask:
-    if (face2_vertices.empty())
-      orientation = OrientationLookupTable<dim>::lookup(matching);
+    if (face2_vertices_set.empty())
+      {
+        const auto combined_orientation =
+          face1->reference_cell().get_combined_orientation(
+            make_array_view(face1_vertices.cbegin(),
+                            face1_vertices.cbegin() + face1->n_vertices()),
+            make_array_view(face2_vertices.cbegin(),
+                            face2_vertices.cbegin() + face2->n_vertices()));
+        std::bitset<3> orientation;
+        if (dim == 1)
+          {
+            // In 1D things are always well-oriented
+            orientation = ReferenceCell::default_combined_face_orientation();
+          }
+        // The original version of this doesn't use the standardized orientation
+        // value so we have to do an additional translation step
+        else if (dim == 2)
+          {
+            // In 2D, calls in set_periodicity_constraints() ultimately require
+            // calling FiniteElement::face_to_cell_index(), which in turn (for
+            // hypercubes) calls GeometryInfo<2>::child_cell_on_face(). The
+            // final function assumes that orientation in 2D is encoded solely
+            // in face_flip (the second bit) whereas the orientation bit is
+            // ignored. Hence, the backwards orientation is 1 + 2 and the
+            // standard orientation is 1 + 0.
+            constexpr std::array<unsigned int, 2> translation{{3, 1}};
+            AssertIndexRange(combined_orientation, translation.size());
+            orientation =
+              translation[std::min<unsigned int>(combined_orientation, 1u)];
+          }
+        else
+          {
+            Assert(dim == 3, ExcInternalError());
+            // There are two differences between the orientation implementation
+            // used in the periodicity code and that used in ReferenceCell:
+            //
+            // 1. The bitset is unpacked as (orientation, flip, rotation)
+            //    instead of the standard (orientation, rotation, flip).
+            //
+            // 2. The 90 degree rotations are always clockwise, so the third and
+            //    seventh (in the combined orientation) are switched.
+            //
+            // Both translations are encoded in this table. This matches
+            // OrientationLookupTable<3> which was present in previous revisions
+            // of this file.
+            constexpr std::array<unsigned int, 8> translation{
+              {0, 1, 4, 7, 2, 3, 6, 5}};
+            AssertIndexRange(combined_orientation, translation.size());
+            orientation =
+              translation[std::min<unsigned int>(combined_orientation, 7u)];
+          }
 
-    return face2_vertices.empty();
+        return std::make_optional(orientation);
+      }
+    else
+      return std::nullopt;
   }
-
-
-
-  template <typename FaceIterator>
-  inline bool
-  orthogonal_equality(
-    const FaceIterator                                           &face1,
-    const FaceIterator                                           &face2,
-    const unsigned int                                            direction,
-    const Tensor<1, FaceIterator::AccessorType::space_dimension> &offset,
-    const FullMatrix<double>                                     &matrix)
-  {
-    // Call the function above with a dummy orientation array
-    std::bitset<3> dummy;
-    return orthogonal_equality(dummy, face1, face2, direction, offset, matrix);
-  }
-
-
-
 } // namespace GridTools
 
 
