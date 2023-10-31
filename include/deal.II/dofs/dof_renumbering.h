@@ -749,12 +749,12 @@ namespace DoFRenumbering
    * Does not perform the renumbering on the DoFHandler dofs but returns the
    * renumbering vector.
    */
-  template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
+  template <int dim, int spacedim, class IteratorType, class EndIteratorType>
   types::global_dof_index
   compute_block_wise(std::vector<types::global_dof_index> &new_dof_indices,
-                     const ITERATOR                       &start,
-                     const ENDITERATOR                    &end,
-                     bool                                  is_level_operation);
+                     const IteratorType                   &start,
+                     const EndIteratorType                &end,
+                     const bool                            is_level_operation);
 
   /**
    * @}
