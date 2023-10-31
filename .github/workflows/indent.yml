@@ -20,10 +20,13 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 100
+    - uses: ssciwr/doxygen-install@v1
+      with:
+        version: "1.9.6"
     - name: setup
       run: |
         ./contrib/utilities/download_clang_format
-        sudo apt update && sudo apt install doxygen graphviz perl texlive-bibtex-extra
+        sudo apt update && sudo apt install graphviz perl texlive-bibtex-extra
         doxygen --version
     - name: indent
       run: |
@@ -39,6 +42,19 @@ jobs:
         # warning: Inheritance graph for 'SmartPointer' not generated, too many nodes (138), threshold is 50. Consider increasing DOT_GRAPH_MAX_NODES.
         # warning: Inheritance graph for 'Subscriptor' not generated, too many nodes (209), threshold is 50. Consider increasing DOT_GRAPH_MAX_NODES.
         sed -i '/Inheritance graph/d' doxygen.log
+        # Suppress:
+        # warning: @copybrief or @copydoc target '<name>' not found
+        # warning: Found recursive @copybrief or @copydoc relation for argument '<arg>'
+        sed -i '/@copybrief or @copydoc/d' doxygen.log 
+        # Suppress:
+        # warning: @copydetails or @copydoc target '<name>' not found
+        # warning: Found recursive @copydetails or @copydoc relation for argument '<arg>'
+        sed -i '/@copydetails or @copydoc/d' doxygen.log 
+        # Suppress:
+        # warning: explicit link request to '<function>' could not be resolved
+        sed -i '/explicit link request to/d' doxygen.log
+        # Remove empty lines
+        sed -i '/^$/d' doxygen.log
         ! [ -s doxygen.log ] || exit 1
         tar -czf doxygen_documentation.tar.gz doc/doxygen
     - name: archive documentation
