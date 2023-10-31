@@ -53,6 +53,13 @@ for (S : REAL_AND_COMPLEX_SCALARS; T : DEAL_II_VEC_TEMPLATES)
         LinearAlgebra::distributed::T<S> & vec) const;
   }
 
+for (T : DEAL_II_VEC_TEMPLATES)
+  {
+    template void
+      AffineConstraints<double>::condense<LinearAlgebra::distributed::T<float>>(
+        LinearAlgebra::distributed::T<float> & vec) const;
+  }
+
 
 // ---------------------------------------------------------------------
 //
