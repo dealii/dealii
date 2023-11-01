@@ -27,39 +27,65 @@
 DEAL_II_NAMESPACE_OPEN
 
 /**
- * Smart pointers avoid using dangling pointers. They can be used just
- * like a pointer (i.e. using the <tt>*</tt> and <tt>-></tt> operators and
+ * The SmartPointer class avoids using dangling pointers. They can be used just
+ * like a pointer (i.e., using the <tt>*</tt> and <tt>-></tt> operators and
  * through casting) but make sure that the object pointed to is not deleted or
  * moved from in the course of use of the pointer by signaling the pointee its
  * use.
  *
- * Objects pointed to, i.e. the class T, should inherit Subscriptor or must
- * implement the same functionality. Null pointers are an exception from this
- * rule and are allowed, too.
+ * Conceptually, SmartPointer fills a gap between `std::unique_ptr` and
+ * `std::shared_ptr`. While the former makes it clear that there is a unique
+ * owner of an object (namely the scope in which the `std::unique_ptr` resides),
+ * it does not allow other places in a code base to point to the object. In
+ * contrast, `std::shared_ptr` allows many places to point to the same object,
+ * but none of them is the "owner" of the object: They all are, and the last
+ * one to stop pointing to the object is responsible for deleting it.
  *
- * The second template argument P only serves a single purpose: if a
- * constructor without a debug string is used, then the name of P is used as
- * the debug string.
+ * SmartPointer utilizes semantics in which one place owns an object and others
+ * can point to it. The owning place is responsible for destroying the object
+ * when it is no longer needed, and this will trigger an error if other places
+ * are still pointing to it via SmartPointer pointers. In other words, one
+ * should consider those places that hold a SmartPointer to an object as
+ * "observers", and an object may only be destroyed without an error if there
+ * are no observers left. With hindsight, perhaps a better name for the class
+ * would have been "ObserverPointer".
  *
- * SmartPointer does NOT implement any memory handling! Especially, deleting a
- * SmartPointer does not delete the object. Writing
- * @code
- * SmartPointer<T,P> dont_do_this = new T;
- * @endcode
- * is a sure way to program a memory leak! The secure version is
- * @code
- * T* p = new T;
- * {
- *   SmartPointer<T,P> t(p);
- *   ...
- * }
- * delete p;
- * @endcode
+ * To make this scheme work, SmartPointers need to increment the "observer
+ * count" when they point to an observed object. This is facilitated by
+ * requiring that the objects pointed to, i.e., the template type `T`, must
+ * inherit from the Subscriptor class.
  *
- * Note that a smart pointer can handle <tt>const</tt>ness of an object, i.e.
- * a <tt>SmartPointer<const ABC></tt> really behaves as if it were a pointer
- * to a constant object (disallowing write access when dereferenced), while
- * <tt>SmartPointer<ABC></tt> is a mutable pointer.
+ * In practice, using this scheme, if you try to destroy an object to which
+ * observers still point via SmartPointer objects, you will get an error that
+ * says that there are still observers of the object and that the object can
+ * consequently not be destroyed without creating "dangling" pointers. This
+ * is often not very helpful in finding where these pointers are. As a
+ * consequence, this class also provides two ways to annotate the observer
+ * count with information about what other places still observe an object.
+ * First, when initializing a SmartPointer object with the address of the
+ * object pointed to, you can also attach a string that describes the
+ * observing location, and this string will then be shown in error messages
+ * listing all remaining observers. Second, if no such string is provided,
+ * the name second template argument `P` is used as the debug string. This
+ * allows to encode the observer information in the type of the SmartPointer.
+ *
+ * @note Unlike `std::unique_ptr` and `std::shared_ptr`, SmartPointer does
+ *   NOT implement any memory handling. In particular, deleting a
+ *   SmartPointer does not delete the object because the semantics
+ *   of this class are that it only *observes* an object, but does not
+ *   take over ownership. As a consequence, this is a sure way of creating
+ *   a memory leak:
+ *   @code
+ *     SmartPointer<T> dont_do_this = new T;
+ *   @endcode
+ *   This is because here, no variable "owns" the object pointed to, and
+ *   the destruction of the `dont_do_this` pointer does not trigger the
+ *   release of the memory pointed to.
+ *
+ * @note This class correctly handles `const`-ness of an object, i.e.,
+ *   a `SmartPointer<const T>` really behaves as if it were a pointer
+ *   to a constant object (disallowing write access when dereferenced), while
+ *   `SmartPointer<T>` is a mutable pointer.
  *
  * @ingroup memory
  */
