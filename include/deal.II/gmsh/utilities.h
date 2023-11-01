@@ -70,12 +70,15 @@ namespace Gmsh
     double characteristic_length = 1.0;
 
     /**
-     * Basename for the output files.
+     * Base name for the output files. The base name may contain a directory
+     * (followed by a slash), and must contain the base of the names of files
+     * to be created.
      *
-     * If this is left empty, then temporary files are used, and removed when
-     * not needed any more.
+     * If this variable is left empty, then a temporary directory will be used,
+     * and both the files written into it as well as the temporary directory
+     * will be removed when not needed any more.
      */
-    std::string output_base_name = "";
+    std::string output_base_name = {};
   };
 
 #  ifdef DEAL_II_WITH_OPENCASCADE
