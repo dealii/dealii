@@ -1048,11 +1048,11 @@ namespace DoFRenumbering
 
 
 
-  template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
+  template <int dim, int spacedim, class IteratorType, class EndIteratorType>
   types::global_dof_index
   compute_block_wise(std::vector<types::global_dof_index> &new_indices,
-                     const ITERATOR                       &start,
-                     const ENDITERATOR                    &end,
+                     const IteratorType                   &start,
+                     const EndIteratorType                &end,
                      const bool                            is_level_operation)
   {
     const hp::FECollection<dim, spacedim> &fe_collection =
@@ -1104,7 +1104,7 @@ namespace DoFRenumbering
     // take care of that
     std::vector<std::vector<types::global_dof_index>> block_to_dof_map(
       fe_collection.n_blocks());
-    for (ITERATOR cell = start; cell != end; ++cell)
+    for (IteratorType cell = start; cell != end; ++cell)
       {
         if (is_level_operation)
           {
