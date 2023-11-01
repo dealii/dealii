@@ -100,10 +100,6 @@ namespace BlockMatrixIterators
      * Block column into which we presently point.
      */
     unsigned int col_block;
-
-    // Let the iterator class be a friend.
-    template <typename>
-    friend class MatrixIterator;
   };
 
 
