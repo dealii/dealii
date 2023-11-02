@@ -73,15 +73,6 @@
  *
  * <dl>
  *
- * <dt class="concepts">@anchor ConceptDoFHandlerType <b>DoFHandlerType</b></dt>
- *
- * <dd>
- * deal.II includes both DoFHandler and hp::DoFHandler as objects which manage
- * degrees of freedom on a mesh. Though the two do not share any sort of
- * inheritance relationship, they are similar enough that many functions just
- * need something which resembles a DoFHandler to work correctly.
- * </dd>
- *
  * <dt class="concepts">@anchor ConceptMatrixType <b>MatrixType</b></dt>
  *
  * <dd>

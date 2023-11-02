@@ -32,7 +32,7 @@
  *
  * In the implementation of the hp-finite element method, each cell might have
  * a different finite element associated with it. To handle this, the
- * hp::DoFHandler must have a whole set of finite element classes associated
+ * DoFHandler must have a whole set of finite element classes associated
  * with it. This concept is represented by the hp::FECollection class: Objects
  * of this type act as containers that hold a whole set of finite element
  * objects. Instead of storing pointers to finite element objects on each
