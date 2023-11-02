@@ -84,9 +84,9 @@ checks() {
   git log --since "2019-01-01" --format="%aN" --no-merges | sort -u | while read name ; do
       words=($name)
       if [ "${#words[@]}" -lt "2" -a "$name" != "dependabot[bot]" ]; then
-	  echo "invalid author '$name' without firstname and lastname"
+	  echo "Invalid author '$name' without firstname and lastname"
 	  echo ""
-	  echo "hint: for possible solutions, consult the webpage:"
+	  echo "For possible solutions, consult the following page:"
 	  echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
 	  exit 2
       fi
