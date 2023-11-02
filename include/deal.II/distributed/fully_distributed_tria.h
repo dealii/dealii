@@ -134,7 +134,7 @@ namespace parallel
       virtual ~Triangulation() = default;
 
       /**
-       * @copydoc dealii::Triangulation::create_triangulation()
+       * @copydoc deal.II/grid/tria.h Triangulation::create_triangulation(const TriangulationDescription::Description<dim, spacedim>&)
        *
        * @note This is the function to be used instead of
        * Triangulation::create_triangulation() for some of the other

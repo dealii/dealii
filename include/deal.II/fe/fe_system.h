@@ -605,7 +605,7 @@ public:
   using FiniteElement<dim, spacedim>::get_sub_fe;
 
   /**
-   * @copydoc FiniteElement<dim,spacedim>::get_sub_fe()
+   * @copydoc FiniteElement::get_sub_fe()
    */
   virtual const FiniteElement<dim, spacedim> &
   get_sub_fe(const unsigned int first_component,

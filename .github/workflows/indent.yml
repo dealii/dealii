@@ -43,14 +43,6 @@ jobs:
         # warning: Inheritance graph for 'Subscriptor' not generated, too many nodes (209), threshold is 50. Consider increasing DOT_GRAPH_MAX_NODES.
         sed -i '/Inheritance graph/d' doxygen.log
         # Suppress:
-        # warning: @copybrief or @copydoc target '<name>' not found
-        # warning: Found recursive @copybrief or @copydoc relation for argument '<arg>'
-        sed -i '/@copybrief or @copydoc/d' doxygen.log 
-        # Suppress:
-        # warning: @copydetails or @copydoc target '<name>' not found
-        # warning: Found recursive @copydetails or @copydoc relation for argument '<arg>'
-        sed -i '/@copydetails or @copydoc/d' doxygen.log 
-        # Suppress:
         # warning: explicit link request to '<function>' could not be resolved
         sed -i '/explicit link request to/d' doxygen.log
         # Remove empty lines

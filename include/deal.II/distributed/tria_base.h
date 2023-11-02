@@ -211,7 +211,7 @@ namespace parallel
       const unsigned int level) const override;
 
     /**
-     * @copydoc dealii::Triangulation::get_boundary_ids()
+     * @copydoc deal.II/grid/tria.h Triangulation::get_boundary_ids()
      *
      * @note This function involves a global communication gathering all current
      *   IDs from all processes.
@@ -220,7 +220,7 @@ namespace parallel
     get_boundary_ids() const override;
 
     /**
-     * @copydoc dealii::Triangulation::get_manifold_ids()
+     * @copydoc deal.II/grid/tria.h Triangulation::get_manifold_ids()
      *
      * @note This function involves a global communication gathering all current
      *   IDs from all processes.
@@ -371,7 +371,7 @@ namespace parallel
     update_number_cache();
 
     /**
-     * @copydoc dealii::Triangulation::update_reference_cells()
+     * @copydoc deal.II/grid/tria.h Triangulation::update_reference_cells()
      */
     void
     update_reference_cells() override;

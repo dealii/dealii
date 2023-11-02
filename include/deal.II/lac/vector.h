@@ -1466,7 +1466,7 @@ operator<<(std::ostream &out, const Vector<number> &v)
 
 
 /**
- * Declare dealii::Vector< Number > as serial vector.
+ * Declare Vector<Number> as serial vector.
  *
  * @relatesalso Vector
  */

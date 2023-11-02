@@ -193,7 +193,7 @@ public:
              const bool vector_describes_relative_displacement);
 
   /**
-   * @copydoc Mapping<dim,spacedim>::get_vertices()
+   * @copydoc Mapping::get_vertices()
    */
   virtual boost::container::small_vector<Point<spacedim>,
                                          GeometryInfo<dim>::vertices_per_cell>
