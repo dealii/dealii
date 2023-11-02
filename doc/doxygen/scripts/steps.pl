@@ -33,8 +33,8 @@ my %colors = (
  "basic"          => 'green',
  "techniques"     => 'orange',
  "fluids"         => 'yellow2',
- "solids"         => 'lightblue',
- "time dependent" => 'dodgerblue1',
+ "solids"         => 'coral',
+ "time dependent" => 'darkolivegreen1',
  "unfinished"     => 'white',
  "code-gallery"   => 'white',
     );
@@ -53,19 +53,20 @@ my %style = (
 print << 'EOT'
 digraph StepsMap
 {
+  bgcolor=transparent;
   overlap=false;
   edge [fontname="FreeSans",
         fontsize="10",
         labelfontname="FreeSans",
         labelfontsize="10",
-        color="black",
+        color="cornflowerblue",
         style="solid"];
   node [fontname="FreeSans",
         fontsize="10",
         shape="rectangle",
         height=0.2,
         width=0.4,
-        color="black",
+        color="cornflowerblue",
         fillcolor="white",
         style="filled"];
 EOT
@@ -298,21 +299,20 @@ while (my $line = <TUTORIAL>)
 print << 'EOT'
 graph StepsDescription
 {
+  bgcolor=transparent;
   overlap=false;
   edge [fontname="FreeSans",
-        fontsize="10",
+        fontsize="12",
         labelfontname="FreeSans",
         labelfontsize="10",
-        color="black",
+        color="cornflowerblue",
         style="solid"];
   node [fontname="FreeSans",
-        fontsize="10",
+        fontsize="11",
         shape="rectangle",
         height=0.2,
         width=0.4,
-        color="black",
-        fillcolor="white",
-        style="filled"];
+        color="cornflowerblue"];
 EOT
     ;
 
@@ -334,9 +334,9 @@ foreach $kind (keys %style)
 {
     my $escaped_kind = $kind;
     $escaped_kind =~ s/[^a-zA-Z]/_/g;
-    printf "  $escaped_kind [label=\"\" $style{$kind}, fillcolor=\"$colors{$kind}\"];\n";
-    printf "  fake_$escaped_kind [label=\"$kind_descriptions{$kind}\", shape=plaintext];\n";
-    printf "  $escaped_kind -- fake_$escaped_kind [style=dotted, arrowhead=odot, arrowsize=1];\n";
+    printf "  $escaped_kind [label=\"\" $style{$kind}, style=\"filled\" fillcolor=\"$colors{$kind}\"];\n";
+    printf "  fake_$escaped_kind [label=\"$kind_descriptions{$kind}\", fontcolor=\"cornflowerblue\" fontsize=12 shape=plaintext];\n";
+    printf "  $escaped_kind -- fake_$escaped_kind [style=\"bold,dotted\", arrowhead=odot, arrowsize=1];\n";
 }
 # now add connections to make sure they appear nicely next to each other
 # in the legend

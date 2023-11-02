@@ -38,8 +38,8 @@
 
   node [fontname="FreeSans",fontsize=15,
         shape=record,height=0.2,width=0.4,
-        color="black", fillcolor="white", style="filled"];
-  edge [color="black", weight=10];
+        color="cornflowerblue", fillcolor="white", style="filled"];
+  edge [color="cornflowerblue", weight=10];
 
   tria       [label="Triangulation",    URL="\ref grid"];
   fe         [label="Finite elements",    URL="\ref feall"];
@@ -52,17 +52,17 @@
   output     [label="Graphical output", URL="\ref output"];
   manifold   [label="Manifold",         URL="\ref manifold"];
 
-  tria -> dh              [color="black",style="solid"];
-  fe -> dh                [color="black",style="solid"];
-  fe -> fevalues          [color="black",style="solid"];
-  mapping -> fevalues     [color="black",style="solid"];
-  quadrature -> fevalues  [color="black",style="solid"];
-  dh -> systems           [color="black",style="solid"];
-  fevalues -> systems     [color="black",style="solid"];
-  systems -> solvers      [color="black",style="solid"];
-  solvers -> output       [color="black",style="solid"];
-  manifold -> tria        [color="black",style="solid"];
-  manifold -> mapping     [color="black",style="solid"];
+  tria -> dh              [style="solid"];
+  fe -> dh                [style="solid"];
+  fe -> fevalues          [style="solid"];
+  mapping -> fevalues     [style="solid"];
+  quadrature -> fevalues  [style="solid"];
+  dh -> systems           [style="solid"];
+  fevalues -> systems     [style="solid"];
+  systems -> solvers      [style="solid"];
+  solvers -> output       [style="solid"];
+  manifold -> tria        [style="solid"];
+  manifold -> mapping     [style="solid"];
 
 
 
