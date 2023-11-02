@@ -49,7 +49,8 @@ namespace VectorTools
 
   /**
    * Compute constraints on the solution that corresponds to the imposition
-   * of Dirichlet boundary conditions.  This function creates a map of
+   * of Dirichlet boundary conditions on parts of the boundary.
+   * This function creates a map of
    * degrees of freedom subject to Dirichlet boundary conditions and the
    * corresponding values to be assigned to them, by interpolation around the
    * boundary. For each degree of freedom at the boundary, its boundary value
@@ -107,8 +108,35 @@ namespace VectorTools
    * corresponding boundary function, to be called separately for every
    * boundary indicator.
    *
+   * @note Mathematically, boundary conditions can only be applied to a
+   *   part of the boundary that has a nonzero $(d-1)$-dimensional measure;
+   *   in other words, it must be the union of *faces* of a mesh, rather than
+   *   a set of edges in 3d, or even just a few vertices. That is because
+   *   applying boundary conditions on individual vertices (rather than
+   *   on the entire face of which this vertex might be a part) would
+   *   correspond to using Dirac delta functions as boundary values, and
+   *   this generally leads to singular solutions that can not adequately
+   *   be resolved with the finite element method. These considerations
+   *   notwithstanding, people often do apply boundary conditions at individual
+   *   vertices -- in particular in solid mechanics, where one would then
+   *   impose constraints on one or all components of the displacement at a
+   *   vertex. This function does not support this operation: It works solely
+   *   by looping over faces, checking whether the boundary indicator of the
+   *   face is one of the ones of interest, and then considers all of the
+   *   degrees of freedom on the face; it does not consider vertices (or,
+   *   in 3d, edges) separately from the faces they are part of. But you can
+   *   impose constraints on individual vertices by looping over all cells,
+   *   over all vertices of each cell, and identifying whether this is the
+   *   vertex you care about; then you use DoFAccessor::vertex_dof_index()
+   *   to obtain the indices of the DoFs located on it. You can then
+   *   entries for these degrees of freedom by hand to the `std::map`
+   *   or AffineConstraints object you typically use to represent
+   *   boundary value constraints.
+   *
    * @note When solving a partial differential equation with boundary
-   *   conditions $u|_{\partial\Omega}=g$ (or on *parts* of the boundary),
+   *   conditions $u|_{\partial\Omega}=g$ (on the entire boundary
+   *   $\partial\Omega$, or perhaps only on parts $\Gamma\subset\partial\Omega$
+   *   of the boundary),
    *   then this boundary condition is in general not satisfiable exactly
    *   using finite elements in the form $u_h|_{\partial\Omega}=g$. That is
    *   because the function $g$ is generally not a polynomial, whereas
