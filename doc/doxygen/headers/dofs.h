@@ -22,12 +22,10 @@
  * DoFHandler class: it is built on top of a triangulation and a
  * finite element class and allocated degrees of freedom on each cell
  * of the triangulation as required for the finite element space
- * described by the finite element object. There are other variants of
- * the DoFHandler class such as hp::DoFHandler that do similar
- * things for more special cases.
+ * described by the finite element object.
  *
  * DoFHandler objects are used together with objects of type FiniteElement
- * (or hp::FECollection in the case of hp::DoFHandler) to enumerate all the
+ * (or hp::FECollection) to enumerate all the
  * degrees of freedom that exist in a triangulation for this particular
  * finite element. As such, the combination of mesh, finite element, and
  * DoF handler object can be thought of as providing a <i>basis</i> of

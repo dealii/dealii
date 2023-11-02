@@ -18,8 +18,8 @@
  @{
 
 deal.II has several classes which are understood conceptually as
-meshes. Apart from the obvious Triangulation, these are, for example,
-DoFHandler and hp::DoFHandler. All of those define a set
+meshes. Apart from the obvious Triangulation, there is, for example,
+the DoFHandler. All of those define a set
 of iterators, allowing the user to traverse the whole mesh, i.e. the
 set of cells, faces, edges, etc that comprise the mesh, or portions of
 it. These iterators are all in a sense derived from the TriaIterator
@@ -255,8 +255,7 @@ of accessor classes:
   request iterators pointing to neighbors of a cell.
 
 - The DoFAccessor class lets you access information related to degrees
-  of freedom associated with cells, faces, etc; it does so for both
-  DoFHandler and hp::DoFHandler objects. Note that the DoFAccessor
+  of freedom associated with cells, faces, etc. Note that the DoFAccessor
   class is derived from either TriaAccessor or CellAccessor (depending
   on whether the DoFAccessor points to an object of full dimension or
   not) and so is able to provide a superset of information over its
@@ -269,7 +268,7 @@ of accessor classes:
 
 Except to look up member documentation, you will not usually have to deal with
 the actual class names listed above. Rather, one uses the typedefs provided by
-the mesh classes Triangulation, DoFHandler and hp::DoFHandler, as well
+the mesh classes Triangulation and DoFHandler, as well
 as the function that generate such objects:
 
 <table border=1>
@@ -287,11 +286,6 @@ as the function that generate such objects:
     <th>DoFHandler</th>
     <td>typename DoFHandler::cell_iterator</td>
     <td>DoFHandler::begin()</td>
-  </tr>
-  <tr>
-    <th>hp::DoFHandler</th>
-    <td>typename hp::DoFHandler::cell_iterator</td>
-    <td>hp::DoFHandler::begin()</td>
   </tr>
 </table>
 
@@ -317,11 +311,6 @@ Active iterators have the following properties:
     <td>typename DoFHandler::active_cell_iterator</td>
     <td>DoFHandler::begin_active()</td>
   </tr>
-  <tr>
-    <th>hp::DoFHandler</th>
-    <td>typename hp::DoFHandler::active_cell_iterator</td>
-    <td>hp::DoFHandler::begin_active()</td>
-  </tr>
 </table>
 
 The Triangulation class also supports iterating across active cell faces with
@@ -338,18 +327,16 @@ just as the ones above, exist in active and non-active forms.
 The actual definition of all the typedefs local to the mesh classes are
 stated in the
 
-- internal::Triangulation::Iterators<1,spacedim>,
-  internal::Triangulation::Iterators<2,spacedim>, and
-  internal::Triangulation::Iterators<3,spacedim> classes for Triangulation
-  iterators,
+- <a class="el"
+href="structinternal_1_1TriangulationImplementation_1_1Iterators_3_011_00_01spacedim_01_4.html">internal::TriangulationImplementation::Iterators<1,spacedim></a>, <a class="el"
+href="structinternal_1_1TriangulationImplementation_1_1Iterators_3_012_00_01spacedim_01_4.html">internal::TriangulationImplementation::Iterators<2,spacedim></a>, and <a class="el"
+href="structinternal_1_1TriangulationImplementation_1_1Iterators_3_013_00_01spacedim_01_4.html">internal::TriangulationImplementation::Iterators<3,spacedim></a> classes for Triangulation iterators,
 
 - <a class="el"
-href="structinternal_1_1DoFHandler_1_1Iterators_3_01DoFHandlerType_3_011_00_01spacedim_01_4_00_01lda_01_4.html">internal::DoFHandler::Iterators&lt;DoFHandlerType&lt;1,spacedim&gt;,
-lda&gt;</a>, <a class="el"
-href="structinternal_1_1Triangulation_1_1Iterators_3_012_00_01spacedim_01_4.html">internal::DoFHandler::Iterators&lt;DoFHandlerType&lt;1,spacedim&gt;,
-lda&gt;</a>, and <a class="el"
-href="structinternal_1_1Triangulation_1_1Iterators_3_013_00_01spacedim_01_4.html">internal::DoFHandler::Iterators&lt;DoFHandlerType&lt;1,spacedim&gt;,
-lda&gt;</a> classes for DoFHandler and hp::DoFHandler iterators.
+href="structinternal_1_1DoFHandlerImplementation_1_1Iterators_3_011_00_01spacedim_00_01lda_01_4.html">internal::DoFHandlerImplementation::Iterators<1,spacedim,lda></a>, <a class="el"
+href="structinternal_1_1DoFHandlerImplementation_1_1Iterators_3_012_00_01spacedim_00_01lda_01_4.html">internal::DoFHandlerImplementation::Iterators<2,spacedim,lda></a>, and <a class="el"
+href="structinternal_1_1DoFHandlerImplementation_1_1Iterators_3_013_00_01spacedim_00_01lda_01_4.html">internal::DoFHandlerImplementation::Iterators<3,spacedim,lda></a> classes for DoFHandler iterators.
+
 
 @section IteratorAccessorInternals Iterator and accessor internals
 
