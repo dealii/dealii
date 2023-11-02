@@ -51,17 +51,17 @@ namespace internal
     return false;
   }
 
-  template <class ACCESSOR>
+  template <typename AccessorType>
   inline bool
-  is_active_iterator(const TriaActiveIterator<ACCESSOR> &)
+  is_active_iterator(const TriaActiveIterator<AccessorType> &)
   {
     return true;
   }
 
-  template <class ACCESSOR>
+  template <typename AccessorType>
   inline bool
   is_active_iterator(
-    const dealii::FilteredIterator<TriaActiveIterator<ACCESSOR>> &)
+    const dealii::FilteredIterator<TriaActiveIterator<AccessorType>> &)
   {
     return true;
   }
@@ -186,10 +186,14 @@ namespace MeshWorker
    *
    * @ingroup MeshWorker
    */
-  template <class INFOBOX, class DOFINFO, int dim, int spacedim, class ITERATOR>
+  template <class INFOBOX,
+            class DOFINFO,
+            int dim,
+            int spacedim,
+            typename IteratorType>
   void
   cell_action(
-    ITERATOR                  cell,
+    IteratorType              cell,
     DoFInfoBox<dim, DOFINFO> &dof_info,
     INFOBOX                  &info,
     const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
@@ -245,7 +249,7 @@ namespace MeshWorker
     if (integrate_interior_face || integrate_boundary)
       for (const unsigned int face_no : cell->face_indices())
         {
-          typename ITERATOR::AccessorType::Container::face_iterator face =
+          typename IteratorType::AccessorType::Container::face_iterator face =
             cell->face(face_no);
           if (cell->at_boundary(face_no) &&
               !cell->has_periodic_neighbor(face_no))
@@ -262,7 +266,7 @@ namespace MeshWorker
           else if (integrate_interior_face)
             {
               // Interior face
-              TriaIterator<typename ITERATOR::AccessorType> neighbor =
+              TriaIterator<typename IteratorType::AccessorType> neighbor =
                 cell->neighbor_or_periodic_neighbor(face_no);
 
               types::subdomain_id neighbid = numbers::artificial_subdomain_id;
@@ -315,7 +319,7 @@ namespace MeshWorker
                       cell->periodic_neighbor_of_coarser_periodic_neighbor(
                         face_no) :
                       cell->neighbor_of_coarser_neighbor(face_no);
-                  const typename ITERATOR::AccessorType::Container::
+                  const typename IteratorType::AccessorType::Container::
                     face_iterator nface =
                       neighbor->face(neighbor_face_no.first);
 
@@ -433,13 +437,13 @@ namespace MeshWorker
             int spacedim,
             class DOFINFO,
             class INFOBOX,
-            class ASSEMBLER,
-            class ITERATOR>
+            typename AssemblerType,
+            typename IteratorType>
   void
-  loop(ITERATOR                             begin,
-       std_cxx20::type_identity_t<ITERATOR> end,
-       DOFINFO                             &dinfo,
-       INFOBOX                             &info,
+  loop(IteratorType                             begin,
+       std_cxx20::type_identity_t<IteratorType> end,
+       DOFINFO                                 &dinfo,
+       INFOBOX                                 &info,
        const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
          &cell_worker,
        const std::function<void(DOFINFO &, typename INFOBOX::CellInfo &)>
@@ -448,7 +452,7 @@ namespace MeshWorker
                                 DOFINFO &,
                                 typename INFOBOX::CellInfo &,
                                 typename INFOBOX::CellInfo &)> &face_worker,
-       ASSEMBLER                                               &assembler,
+       AssemblerType                                           &assembler,
        const LoopControl &lctrl = LoopControl())
   {
     DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
@@ -465,17 +469,19 @@ namespace MeshWorker
       begin,
       end,
       [&cell_worker, &boundary_worker, &face_worker, &lctrl](
-        ITERATOR cell, INFOBOX &info, DoFInfoBox<dim, DOFINFO> &dof_info) {
-        cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>(cell,
-                                                               dof_info,
-                                                               info,
-                                                               cell_worker,
-                                                               boundary_worker,
-                                                               face_worker,
-                                                               lctrl);
+        IteratorType cell, INFOBOX &info, DoFInfoBox<dim, DOFINFO> &dof_info) {
+        cell_action<INFOBOX, DOFINFO, dim, spacedim, IteratorType>(
+          cell,
+          dof_info,
+          info,
+          cell_worker,
+          boundary_worker,
+          face_worker,
+          lctrl);
       },
       [&assembler](const MeshWorker::DoFInfoBox<dim, DOFINFO> &dinfo) {
-        dealii::internal::assemble<dim, DOFINFO, ASSEMBLER>(dinfo, &assembler);
+        dealii::internal::assemble<dim, DOFINFO, AssemblerType>(dinfo,
+                                                                &assembler);
       },
       info,
       dof_info);
@@ -488,15 +494,18 @@ namespace MeshWorker
    *
    * @ingroup MeshWorker
    */
-  template <int dim, int spacedim, class ITERATOR, class ASSEMBLER>
+  template <int dim,
+            int spacedim,
+            typename IteratorType,
+            typename AssemblerType>
   void
-  integration_loop(ITERATOR                              begin,
-                   std_cxx20::type_identity_t<ITERATOR>  end,
-                   DoFInfo<dim, spacedim>               &dof_info,
-                   IntegrationInfoBox<dim, spacedim>    &box,
-                   const LocalIntegrator<dim, spacedim> &integrator,
-                   ASSEMBLER                            &assembler,
-                   const LoopControl                    &lctrl = LoopControl())
+  integration_loop(IteratorType                             begin,
+                   std_cxx20::type_identity_t<IteratorType> end,
+                   DoFInfo<dim, spacedim>                  &dof_info,
+                   IntegrationInfoBox<dim, spacedim>       &box,
+                   const LocalIntegrator<dim, spacedim>    &integrator,
+                   AssemblerType                           &assembler,
+                   const LoopControl &lctrl = LoopControl())
   {
     std::function<void(DoFInfo<dim, spacedim> &,
                        IntegrationInfo<dim, spacedim> &)>
