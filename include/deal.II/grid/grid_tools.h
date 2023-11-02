@@ -3382,7 +3382,12 @@ namespace GridTools
               "operate on a single layer of ghost cells. However, you have "
               "given a Triangulation object of type "
               "parallel::shared::Triangulation without artificial cells "
-              "resulting in arbitrary numbers of ghost layers."));
+              "resulting in an arbitrary number of ghost layers. "
+              "To use this function for a Triangulation object of type "
+              "parallel::shared::Triangulation, make sure to create the "
+              "Triangulation object with allow_artificial_cells set to true. "
+              "This results in a parallel::shared::Triangulation with only "
+              "a single layer of ghost cells."));
         }
 
       // build list of cells to request for each neighbor
