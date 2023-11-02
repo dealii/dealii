@@ -265,8 +265,9 @@ private:
   check_no_subscribers() const noexcept;
 
   /**
-   * A mutex used to ensure data consistency when printing out the list
-   * of subscribers.
+   * A mutex used to ensure data consistency when accessing the `mutable`
+   * members of this class. This lock is used in the subscribe() and
+   * unsubscribe() functions, as well as in `list_subscribers()`.
    */
   static std::mutex mutex;
 };
