@@ -191,9 +191,12 @@ namespace BlockMatrixIterators
     operator==(const Accessor &a) const;
 
     template <typename>
-    friend class MatrixIterator;
+    friend class dealii::MatrixIterator;
+
     friend class Accessor<BlockMatrixType, true>;
   };
+
+
 
   /**
    * Block matrix accessor for constant matrices, implementing the stepping
