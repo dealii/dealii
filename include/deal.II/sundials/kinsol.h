@@ -214,6 +214,52 @@ namespace SUNDIALS
         picard = KIN_PICARD,
       };
 
+
+      /**
+       * Orthogonalization strategy used for fixed-point iteration with
+       * Anderson acceleration. While `modified_gram_schmidt` is a good default
+       * choice, it suffers from excessive communication for a growing number of
+       * acceleration vectors. Instead, the user may use one of the other
+       * strategies.  For a detailed documentation consult the SUNDIALS manual.
+       *
+       * @note Similar strategies are defined in
+       * LinearAlgebra::OrthogonalizationStrategy.
+       *
+       * @note The values assigned to the enum constants matter since they are
+       * directly passed to KINSOL.
+       */
+      enum OrthogonalizationStrategy
+      {
+        /**
+         * The default, stable strategy. Requires an increasing number of
+         * communication steps with increasing Anderson subspace size.
+         */
+        modified_gram_schmidt = 0,
+
+        /**
+         * Use a compact WY representation in the orthogonalization process of
+         * the inverse iteration with the Householder transformation. This
+         * strategy requires two communication steps and a very small linear
+         * system solve.
+         */
+        inverse_compact = 1,
+
+        /**
+         * Classical Gram Schmidt, that can work on multi-vectors in parallel
+         * and thus always requires three communication steps. However, it
+         * is less stable in terms of roundoff error propagation, requiring
+         * additional re-orthogonalization steps more frequently.
+         */
+        classical_gram_schmidt = 2,
+
+        /**
+         * Classical Gram Schmidt with delayed re-orthogonalization, which
+         * reduces the number of communication steps from three to two compared
+         * to `classical_gram_schmidt`.
+         */
+        delayed_classical_gram_schmidt = 3,
+      };
+
       /**
        * Initialization parameters for KINSOL.
        *
@@ -241,6 +287,8 @@ namespace SUNDIALS
        * Fixed point and Picard parameters:
        *
        * @param anderson_subspace_size Anderson acceleration subspace size
+       * @param anderson_qr_orthogonalization Orthogonalization strategy for QR
+       * factorization when using Anderson acceleration
        */
       AdditionalData(const SolutionStrategy &strategy = linesearch,
                      const unsigned int maximum_non_linear_iterations = 200,
@@ -251,7 +299,9 @@ namespace SUNDIALS
                      const double       maximum_newton_step           = 0.0,
                      const double       dq_relative_error             = 0.0,
                      const unsigned int maximum_beta_failures         = 0,
-                     const unsigned int anderson_subspace_size        = 0);
+                     const unsigned int anderson_subspace_size        = 0,
+                     const OrthogonalizationStrategy
+                       anderson_qr_orthogonalization = modified_gram_schmidt);
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
@@ -374,6 +424,12 @@ namespace SUNDIALS
        * If you set this to 0, no acceleration is used.
        */
       unsigned int anderson_subspace_size;
+
+      /**
+       * In case Anderson acceleration is used, this parameter selects the
+       * orthogonalization strategy used in the QR factorization.
+       */
+      OrthogonalizationStrategy anderson_qr_orthogonalization;
     };
 
     /**
