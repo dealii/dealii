@@ -375,7 +375,7 @@ private:
    * @p new_points to point to the same array, so make sure to pass different
    * objects into the function.
    */
-  virtual void
+  void
   get_new_points(const ArrayView<const Point<spacedim>> &surrounding_points,
                  const ArrayView<const double>          &weights,
                  ArrayView<Point<spacedim>>              new_points) const;
