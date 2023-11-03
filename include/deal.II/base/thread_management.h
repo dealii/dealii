@@ -544,7 +544,7 @@ namespace Threads
           // and at least some TBB variants require that as well. So
           // instead we move the std::unique_ptr used above into a
           // std::shared_ptr to be stored within the lambda function object.
-          task_data->task_group.run(
+          task_data->task_group->run(
             [function_object,
              promise =
                std::shared_ptr<std::promise<RT>>(std::move(promise))]() {
@@ -786,6 +786,9 @@ namespace Threads
       TaskData(std::future<RT> &&future) noexcept
         : future(std::move(future))
         , task_has_finished(false)
+#ifdef DEAL_II_WITH_TBB
+        , task_group(std::make_unique<tbb::task_group>())
+#endif
       {}
 
       /**
@@ -883,7 +886,17 @@ namespace Threads
             // task. The way to avoid this is to add the task to a
             // tbb::task_group, and then here wait for the single task
             // associated with that task group.
-            task_group.wait();
+            //
+            // If we get here, we know for a fact that atomically
+            // (because under a lock), no other thread has so far
+            // determined that we are finished and removed the
+            // 'task_group' object. So we know that the pointer is
+            // still valid. But we also know that, because below we
+            // set the task_has_finished flag to 'true', that no other
+            // thread will ever get back to this point and query the
+            // 'task_group' object, so we can delete it.
+            task_group->wait();
+            task_group.reset();
 #endif
 
             // Wait for the task to finish and then move its
@@ -972,9 +985,13 @@ namespace Threads
 
 #ifdef DEAL_II_WITH_TBB
       /**
-       * A task group object we can wait for.
+       * A task group object we can wait for. This object is created in
+       * the constructor, and is removed as soon as we have determined
+       * that the task has finished, so as to free any resources the TBB
+       * may still be holding in order to allow programs to still check
+       * on the status of a task in this group.
        */
-      tbb::task_group task_group;
+      std::unique_ptr<tbb::task_group> task_group;
 
       friend class Task<RT>;
 #endif
