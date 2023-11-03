@@ -568,8 +568,9 @@ SparseBlockVanka<number>::vmult(Vector<number2>       &dst,
 
   Threads::TaskGroup<> tasks;
   for (unsigned int block = 0; block < n_blocks; ++block)
-    tasks += Threads::new_task(
-      [&, block] { this->apply_preconditioner(dst, src, &dof_masks[block]); });
+    tasks += Threads::new_task([&, block]() {
+      this->apply_preconditioner(dst, src, &dof_masks[block]);
+    });
   tasks.join_all();
 }
 

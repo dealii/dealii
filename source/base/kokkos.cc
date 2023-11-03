@@ -37,7 +37,7 @@ namespace internal
     )
       {
         // only execute once
-        static bool dummy = [] {
+        static bool dummy = []() {
           dealii_initialized_kokkos = true;
 #if KOKKOS_VERSION >= 30700
           const auto settings =
