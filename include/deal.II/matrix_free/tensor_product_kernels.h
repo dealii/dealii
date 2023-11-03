@@ -2084,7 +2084,8 @@ namespace internal
             typename Number2,
             typename Number,
             int  n_values    = 1,
-            bool do_renumber = true>
+            bool do_renumber = true,
+            int  stride      = 1>
   inline
 #ifndef DEBUG
     DEAL_II_ALWAYS_INLINE
@@ -2108,8 +2109,9 @@ namespace internal
     // is used to interpolate normal derivatives onto faces.
     const Number *values_2 =
       n_values > 1 ?
-        values + (length > 0 ? Utilities::pow(length, dim) :
-                               Utilities::fixed_power<dim>(n_shapes_runtime)) :
+        values + stride * (length > 0 ?
+                             Utilities::pow(length, dim) :
+                             Utilities::fixed_power<dim>(n_shapes_runtime)) :
         nullptr;
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
     std::array<Number3, 2 + n_values> result = {};
@@ -2124,21 +2126,24 @@ namespace internal
           for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
             {
               // gradient
-              inner_result[0] += shapes[i0][1][0] * values[renumber[i]];
+              inner_result[0] +=
+                shapes[i0][1][0] * values[renumber[i] * stride];
               // values
-              inner_result[1] += shapes[i0][0][0] * values[renumber[i]];
+              inner_result[1] +=
+                shapes[i0][0][0] * values[renumber[i] * stride];
               if (n_values > 1)
-                inner_result[2] += shapes[i0][0][0] * values_2[renumber[i]];
+                inner_result[2] +=
+                  shapes[i0][0][0] * values_2[renumber[i] * stride];
             }
         else
           for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
             {
               // gradient
-              inner_result[0] += shapes[i0][1][0] * values[i];
+              inner_result[0] += shapes[i0][1][0] * values[i * stride];
               // values
-              inner_result[1] += shapes[i0][0][0] * values[i];
+              inner_result[1] += shapes[i0][0][0] * values[i * stride];
               if (n_values > 1)
-                inner_result[2] += shapes[i0][0][0] * values_2[i];
+                inner_result[2] += shapes[i0][0][0] * values_2[i * stride];
             }
 
         if (dim > 1)
@@ -2175,7 +2180,8 @@ namespace internal
             typename Number,
             typename Number2,
             int  n_values    = 1,
-            bool do_renumber = true>
+            bool do_renumber = true,
+            int  stride      = 1>
   inline std::array<typename ProductTypeNoPoint<Number, Number2>::type,
                     dim + n_values>
   evaluate_tensor_product_value_and_gradient_shapes(
@@ -2198,7 +2204,7 @@ namespace internal
         // point, simply set the result vector accordingly.
         result[0] = values[0];
         if (n_values > 1)
-          result[1] = values[1];
+          result[1] = values[1 * stride];
         return result;
       }
 
@@ -2211,28 +2217,58 @@ namespace internal
         // cases
         if (n_shapes == 2)
           inner_result =
-            do_interpolate_xy<dim, 2, Number2, Number, n_values, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+            do_interpolate_xy<dim,
+                              2,
+                              Number2,
+                              Number,
+                              n_values,
+                              do_renumber,
+                              stride>(values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 3)
           inner_result =
-            do_interpolate_xy<dim, 3, Number2, Number, n_values, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+            do_interpolate_xy<dim,
+                              3,
+                              Number2,
+                              Number,
+                              n_values,
+                              do_renumber,
+                              stride>(values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 4)
           inner_result =
-            do_interpolate_xy<dim, 4, Number2, Number, n_values, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+            do_interpolate_xy<dim,
+                              4,
+                              Number2,
+                              Number,
+                              n_values,
+                              do_renumber,
+                              stride>(values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 5)
           inner_result =
-            do_interpolate_xy<dim, 5, Number2, Number, n_values, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+            do_interpolate_xy<dim,
+                              5,
+                              Number2,
+                              Number,
+                              n_values,
+                              do_renumber,
+                              stride>(values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 6)
           inner_result =
-            do_interpolate_xy<dim, 6, Number2, Number, n_values, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+            do_interpolate_xy<dim,
+                              6,
+                              Number2,
+                              Number,
+                              n_values,
+                              do_renumber,
+                              stride>(values, renumber, shapes, n_shapes, i);
         else
           inner_result =
-            do_interpolate_xy<dim, -1, Number2, Number, n_values, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+            do_interpolate_xy<dim,
+                              -1,
+                              Number2,
+                              Number,
+                              n_values,
+                              do_renumber,
+                              stride>(values, renumber, shapes, n_shapes, i);
         if (dim == 3)
           {
             // derivative + interpolation in z direction
@@ -2292,9 +2328,6 @@ namespace internal
 
     using Number3 = typename ProductTypeNoPoint<Number, Number2>::type;
 
-    static_assert(
-      n_values == 1 || stride == 1,
-      "Either n_values or stride has to be one for correct data access!");
     // If n_values > 1, we want to interpolate from a second array,
     // placed in the same array immediately after the main data. This
     // is used to interpolate normal derivatives onto faces.
@@ -2305,7 +2338,7 @@ namespace internal
         // we only need the value on faces of a 1d element
         result[0] = values[0];
         if (n_values > 1)
-          result[1] = values[1];
+          result[1] = values[1 * stride];
       }
     else if (dim == 1)
       {
@@ -2314,7 +2347,8 @@ namespace internal
         // values
         result[1] = Number3(values[0]) + p[0] * result[0];
         if (n_values > 1)
-          result[2] = Number3(values[2]) + p[0] * (values[3] - values[2]);
+          result[2] = Number3(values[2 * stride]) +
+                      p[0] * (values[3 * stride] - values[2 * stride]);
       }
     else if (dim == 2)
       {
@@ -2333,9 +2367,11 @@ namespace internal
         if (n_values > 1)
           {
             const Number3 tmp0_2 =
-              Number3(values[4]) + p[0] * (values[5] - values[4]);
+              Number3(values[4 * stride]) +
+              p[0] * (values[5 * stride] - values[4 * stride]);
             const Number3 tmp1_2 =
-              Number3(values[6]) + p[0] * (values[7] - values[6]);
+              Number3(values[6 * stride]) +
+              p[0] * (values[7 * stride] - values[6 * stride]);
             result[3] = tmp0_2 + p[1] * (tmp1_2 - tmp0_2);
           }
       }
@@ -2445,7 +2481,8 @@ namespace internal
             int length,
             typename Number2,
             typename Number,
-            bool do_renumber = true>
+            bool do_renumber = true,
+            int  stride      = 1>
   inline
 #ifndef DEBUG
     DEAL_II_ALWAYS_INLINE
@@ -2469,10 +2506,10 @@ namespace internal
         // renumbering or not
         if (do_renumber && !renumber.empty())
           for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-            value += shapes[i0][0][0] * values[renumber[i]];
+            value += shapes[i0][0][0] * values[renumber[i] * stride];
         else
           for (int i0 = 0; i0 < n_shapes; ++i0, ++i)
-            value += shapes[i0][0][0] * values[i];
+            value += shapes[i0][0][0] * values[i * stride];
 
         if (dim > 1)
           result += value * shapes[i1][0][1];
@@ -2484,7 +2521,11 @@ namespace internal
 
 
 
-  template <int dim, typename Number, typename Number2, bool do_renumber = true>
+  template <int dim,
+            typename Number,
+            typename Number2,
+            bool do_renumber = true,
+            int  stride      = 1>
   inline typename ProductTypeNoPoint<Number, Number2>::type
   evaluate_tensor_product_value_shapes(
     const dealii::ndarray<Number2, 2, dim> *shapes,
@@ -2511,29 +2552,53 @@ namespace internal
         // Generate separate code with known loop bounds for the most common
         // cases
         if (n_shapes == 2)
-          inner_result =
-            do_interpolate_xy_value<dim, 2, Number2, Number, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+          inner_result = do_interpolate_xy_value<dim,
+                                                 2,
+                                                 Number2,
+                                                 Number,
+                                                 do_renumber,
+                                                 stride>(
+            values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 3)
-          inner_result =
-            do_interpolate_xy_value<dim, 3, Number2, Number, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+          inner_result = do_interpolate_xy_value<dim,
+                                                 3,
+                                                 Number2,
+                                                 Number,
+                                                 do_renumber,
+                                                 stride>(
+            values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 4)
-          inner_result =
-            do_interpolate_xy_value<dim, 4, Number2, Number, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+          inner_result = do_interpolate_xy_value<dim,
+                                                 4,
+                                                 Number2,
+                                                 Number,
+                                                 do_renumber,
+                                                 stride>(
+            values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 5)
-          inner_result =
-            do_interpolate_xy_value<dim, 5, Number2, Number, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+          inner_result = do_interpolate_xy_value<dim,
+                                                 5,
+                                                 Number2,
+                                                 Number,
+                                                 do_renumber,
+                                                 stride>(
+            values, renumber, shapes, n_shapes, i);
         else if (n_shapes == 6)
-          inner_result =
-            do_interpolate_xy_value<dim, 6, Number2, Number, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+          inner_result = do_interpolate_xy_value<dim,
+                                                 6,
+                                                 Number2,
+                                                 Number,
+                                                 do_renumber,
+                                                 stride>(
+            values, renumber, shapes, n_shapes, i);
         else
-          inner_result =
-            do_interpolate_xy_value<dim, -1, Number2, Number, do_renumber>(
-              values, renumber, shapes, n_shapes, i);
+          inner_result = do_interpolate_xy_value<dim,
+                                                 -1,
+                                                 Number2,
+                                                 Number,
+                                                 do_renumber,
+                                                 stride>(
+            values, renumber, shapes, n_shapes, i);
         if (dim == 3)
           {
             // Interpolation + derivative in z direction

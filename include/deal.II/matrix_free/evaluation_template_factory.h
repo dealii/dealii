@@ -67,10 +67,34 @@ namespace internal
              FEEvaluationData<dim, Number, true>   &fe_eval);
 
     static void
+    project_to_face(const unsigned int                     n_components,
+                    const EvaluationFlags::EvaluationFlags evaluation_flag,
+                    const Number                          *values_dofs,
+                    FEEvaluationData<dim, Number, true>   &fe_eval);
+
+    static void
+    evaluate_in_face(const unsigned int                     n_components,
+                     const EvaluationFlags::EvaluationFlags evaluation_flag,
+                     FEEvaluationData<dim, Number, true>   &fe_eval);
+
+    static void
     integrate(const unsigned int                     n_components,
               const EvaluationFlags::EvaluationFlags integration_flag,
               Number                                *values_dofs,
-              FEEvaluationData<dim, Number, true>   &fe_eval);
+              FEEvaluationData<dim, Number, true>   &fe_eval,
+              const bool                             sum_into_values);
+
+    static void
+    collect_from_face(const unsigned int                     n_components,
+                      const EvaluationFlags::EvaluationFlags integration_flag,
+                      Number                                *values_dofs,
+                      FEEvaluationData<dim, Number, true>   &fe_eval,
+                      const bool                             sum_into_values);
+
+    static void
+    integrate_in_face(const unsigned int                     n_components,
+                      const EvaluationFlags::EvaluationFlags integration_flag,
+                      FEEvaluationData<dim, Number, true>   &fe_eval);
 
     static bool
     fast_evaluation_supported(const unsigned int given_degree,
