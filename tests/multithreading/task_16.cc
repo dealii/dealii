@@ -14,7 +14,7 @@
 // ---------------------------------------------------------------------
 
 
-// Check TaskGroup::return_values()
+// Like the _15 test, but check that arguments are properly copied.
 
 
 #include <deal.II/base/thread_management.h>
@@ -43,7 +43,7 @@ main()
   // because it would otherwise use outdated values.
   Threads::TaskGroup<int> tg;
   for (unsigned int i = 0; i < 10; ++i)
-    tg += Threads::new_task(&test, i);
+    tg += Threads::new_task([](int ii) { return test(ii); }, i);
 
   // Then wait for them all to finish and output their respective
   // return values. They should be ordered the same way the tasks were
