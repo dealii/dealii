@@ -25,6 +25,7 @@
 #ifdef DEAL_II_WITH_SUNDIALS
 
 #  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/mpi.templates.h>
 
 #  include <deal.II/lac/block_vector.h>
 #  include <deal.II/lac/la_parallel_block_vector.h>
@@ -170,6 +171,84 @@ namespace SUNDIALS
 #  endif
     );
 
+
+    /**
+     * Variable template that is true for distributed deal.II vectors and false
+     * otherwise.
+     */
+    template <typename VectorType>
+    constexpr bool is_dealii_compatible_distributed_vector =
+      std::is_same_v<
+        VectorType,
+        LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                           MemorySpace::Host>> ||
+      std::is_same_v<VectorType,
+                     LinearAlgebra::distributed::BlockVector<
+                       typename VectorType::value_type>>;
+
+    template <typename VectorType,
+              std::enable_if_t<!IsBlockVector<VectorType>::value> * = nullptr>
+    unsigned int
+    n_blocks(const VectorType &)
+    {
+      return 1;
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<IsBlockVector<VectorType>::value> * = nullptr>
+    unsigned int
+    n_blocks(const VectorType &vector)
+    {
+      return vector.n_blocks();
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<!IsBlockVector<VectorType>::value> * = nullptr>
+    VectorType &
+    block(VectorType &vector, const unsigned int b)
+    {
+      AssertDimension(b, 0);
+      (void)b;
+      return vector;
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<!IsBlockVector<VectorType>::value> * = nullptr>
+    const VectorType &
+    block(const VectorType &vector, const unsigned int b)
+    {
+      AssertDimension(b, 0);
+      (void)b;
+      return vector;
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<IsBlockVector<VectorType>::value> * = nullptr>
+    typename VectorType::BlockType &
+    block(VectorType &vector, const unsigned int b)
+    {
+      return vector.block(b);
+    }
+
+
+
+    template <typename VectorType,
+              std::enable_if_t<IsBlockVector<VectorType>::value> * = nullptr>
+    const typename VectorType::BlockType &
+    block(const VectorType &vector, const unsigned int b)
+    {
+      return vector.block(b);
+    }
+
+
     /**
      * Collection of all operations specified by SUNDIALS N_Vector
      * documentation. These functions are attached to the generic N_Vector
@@ -203,9 +282,38 @@ namespace SUNDIALS
                  N_Vector           y,
                  N_Vector           z);
 
+      template <
+        typename VectorType,
+        std::enable_if_t<is_dealii_compatible_distributed_vector<VectorType>>
+          * = nullptr>
+      int
+      linear_combination(int nv, realtype *c, N_Vector *x, N_Vector z);
+
       template <typename VectorType>
       SUNDIALS::realtype
       dot_product(N_Vector x, N_Vector y);
+
+      template <
+        typename VectorType,
+        std::enable_if_t<is_dealii_compatible_distributed_vector<VectorType>>
+          * = nullptr>
+      int
+      dot_product_multi(int nv, N_Vector x, N_Vector *Y, realtype *d);
+
+      template <
+        typename VectorType,
+        std::enable_if_t<is_dealii_compatible_distributed_vector<VectorType>>
+          * = nullptr>
+      int
+      dot_product_multi_local(int nv, N_Vector x, N_Vector *y, realtype *d);
+
+
+      template <
+        typename VectorType,
+        std::enable_if_t<is_dealii_compatible_distributed_vector<VectorType>>
+          * = nullptr>
+      int
+      dot_product_multi_all_reduce(int nv, N_Vector x, realtype *d);
 
       template <typename VectorType>
       SUNDIALS::realtype
@@ -674,12 +782,95 @@ namespace SUNDIALS
 
 
 
+      template <
+        typename VectorType,
+        std::enable_if_t<is_dealii_compatible_distributed_vector<VectorType>> *>
+      int
+      linear_combination(int nv, realtype *c, N_Vector *x, N_Vector z)
+      {
+        std::vector<const VectorType *> unwrapped_vectors(nv);
+        for (int i = 0; i < nv; ++i)
+          unwrapped_vectors[i] = unwrap_nvector_const<VectorType>(x[i]);
+        auto *z_dealii = unwrap_nvector<VectorType>(z);
+
+        // N.B. The first pointer may alias with z.
+        for (unsigned int b = 0; b < n_blocks(*z_dealii); ++b)
+          for (unsigned int j = 0; j < block(*z_dealii, b).locally_owned_size();
+               ++j)
+            {
+              double temp = 0.;
+              for (int i = 0; i < nv; ++i)
+                temp += block(*unwrapped_vectors[i], b).local_element(j) * c[i];
+              block(*z_dealii, b).local_element(j) = temp;
+            }
+
+        return 0;
+      }
+
+
+
       template <typename VectorType>
       SUNDIALS::realtype
       dot_product(N_Vector x, N_Vector y)
       {
         return *unwrap_nvector_const<VectorType>(x) *
                *unwrap_nvector_const<VectorType>(y);
+      }
+
+
+
+      template <
+        typename VectorType,
+        std::enable_if_t<is_dealii_compatible_distributed_vector<VectorType>> *>
+      int
+      dot_product_multi(int nv, N_Vector x, N_Vector *y, realtype *d)
+      {
+        const int status = dot_product_multi_local<VectorType>(nv, x, y, d);
+        if (status != 0)
+          return status;
+
+        return dot_product_multi_all_reduce<VectorType>(nv, x, d);
+      }
+
+
+
+      template <
+        typename VectorType,
+        std::enable_if_t<is_dealii_compatible_distributed_vector<VectorType>> *>
+      int
+      dot_product_multi_local(int nv, N_Vector x, N_Vector *y, realtype *d)
+      {
+        std::vector<const VectorType *> unwrapped_vectors(nv);
+        for (int i = 0; i < nv; ++i)
+          unwrapped_vectors[i] = unwrap_nvector_const<VectorType>(y[i]);
+        const VectorType *x_dealii = unwrap_nvector_const<VectorType>(x);
+
+        std::fill(d, d + nv, 0.);
+
+        for (unsigned int b = 0; b < n_blocks(*x_dealii); ++b)
+          for (unsigned int j = 0; j < block(*x_dealii, b).locally_owned_size();
+               ++j)
+            {
+              for (int i = 0; i < nv; ++i)
+                d[i] += block(*x_dealii, b).local_element(j) *
+                        block(*unwrapped_vectors[i], b).local_element(j);
+            }
+        return 0;
+      }
+
+
+
+      template <
+        typename VectorType,
+        std::enable_if_t<is_dealii_compatible_distributed_vector<VectorType>> *>
+      int
+      dot_product_multi_all_reduce(int nv, N_Vector x, realtype *d)
+      {
+        ArrayView<realtype> products(d, nv);
+        Utilities::MPI::sum(products,
+                            get_communicator<VectorType>(x),
+                            products);
+        return 0;
       }
 
 
@@ -1069,23 +1260,87 @@ namespace SUNDIALS
       v->ops->nvl1norm    = &NVectorOperations::l1_norm<VectorType>;
       v->ops->nvwrmsnormmask =
         &NVectorOperations::weighted_rms_norm_mask<VectorType>;
-      //  v->ops->nvcompare      = undef;
-      //  v->ops->nvinvtest      = undef;
-      //  v->ops->nvconstrmask   = undef;
-      //  v->ops->nvminquotient  = undef;
 
-      /* fused and vector array operations are disabled (NULL) by default */
+      /* The following are declared as standard by SUNDIALS but were not
+       * necessary so far.
+       */
+      v->ops->nvcompare     = nullptr;
+      v->ops->nvinvtest     = nullptr;
+      v->ops->nvconstrmask  = nullptr;
+      v->ops->nvminquotient = nullptr;
 
-      /* local reduction operations */
-      //  v->ops->nvdotprodlocal     = undef;
-      //  v->ops->nvmaxnormlocal     = undef;
-      //  v->ops->nvminlocal         = undef;
-      //  v->ops->nvl1normlocal      = undef;
-      //  v->ops->nvinvtestlocal     = undef;
-      //  v->ops->nvconstrmasklocal  = undef;
-      //  v->ops->nvminquotientlocal = undef;
-      //  v->ops->nvwsqrsumlocal     = undef;
-      //  v->ops->nvwsqrsummasklocal = undef;
+      /* fused and vector array operations are disabled by default */
+
+      /* OPTIONAL fused vector operations */
+
+      // These operations are only implemented for deal.II vectors. SUNDIALS
+      // will automatically fall back to a less optimized version implemented
+      // through the standard functions above for other VectorTypes.
+      if constexpr (is_dealii_compatible_distributed_vector<VectorType>)
+        {
+          v->ops->nvlinearcombination =
+            &NVectorOperations::linear_combination<VectorType>;
+          v->ops->nvdotprodmulti =
+            &NVectorOperations::dot_product_multi<VectorType>;
+        }
+      else
+        {
+          v->ops->nvlinearcombination = nullptr;
+          v->ops->nvdotprodmulti      = nullptr;
+        }
+
+      v->ops->nvscaleaddmulti = nullptr;
+
+      /* OPTIONAL vector array operations */
+      v->ops->nvlinearsumvectorarray         = nullptr;
+      v->ops->nvscalevectorarray             = nullptr;
+      v->ops->nvconstvectorarray             = nullptr;
+      v->ops->nvwrmsnormvectorarray          = nullptr;
+      v->ops->nvwrmsnormmaskvectorarray      = nullptr;
+      v->ops->nvscaleaddmultivectorarray     = nullptr;
+      v->ops->nvlinearcombinationvectorarray = nullptr;
+
+      /* Local reduction kernels (no parallel communication) */
+      v->ops->nvdotprodlocal     = nullptr;
+      v->ops->nvmaxnormlocal     = nullptr;
+      v->ops->nvminlocal         = nullptr;
+      v->ops->nvl1normlocal      = nullptr;
+      v->ops->nvinvtestlocal     = nullptr;
+      v->ops->nvconstrmasklocal  = nullptr;
+      v->ops->nvminquotientlocal = nullptr;
+      v->ops->nvwsqrsumlocal     = nullptr;
+      v->ops->nvwsqrsummasklocal = nullptr;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+      /* Single buffer reduction operations */
+
+      // These operations are only implemented for deal.II vectors. SUNDIALS
+      // will automatically fall back to a less optimized version implemented
+      // through the standard functions above for other VectorTypes.
+      if constexpr (is_dealii_compatible_distributed_vector<VectorType>)
+        {
+          v->ops->nvdotprodmultilocal =
+            &NVectorOperations::dot_product_multi_local<VectorType>;
+          v->ops->nvdotprodmultiallreduce =
+            &NVectorOperations::dot_product_multi_all_reduce<VectorType>;
+        }
+      else
+        {
+          v->ops->nvdotprodmultilocal     = nullptr;
+          v->ops->nvdotprodmultiallreduce = nullptr;
+        }
+#  endif
+
+      /* XBraid interface operations */
+      v->ops->nvbufsize   = nullptr;
+      v->ops->nvbufpack   = nullptr;
+      v->ops->nvbufunpack = nullptr;
+
+      /* Debugging functions (called when SUNDIALS_DEBUG_PRINTVEC is defined).
+       */
+      v->ops->nvprint     = nullptr;
+      v->ops->nvprintfile = nullptr;
+
       return v;
     }
 

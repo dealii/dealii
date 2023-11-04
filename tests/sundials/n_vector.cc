@@ -16,8 +16,6 @@
 // Test SUNDIALS' vector operations on N_Vector implementation. The N_Vectors
 // are created by calling NVectorView on one of the internal vector types.
 
-#include "../../include/deal.II/sundials/n_vector.h"
-
 #include <deal.II/base/logstream.h>
 
 #include <deal.II/lac/block_vector.h>
@@ -26,8 +24,8 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 
-#include "../../include/deal.II/sundials/n_vector.templates.h"
 #include <deal.II/sundials/n_vector.h>
+#include <deal.II/sundials/n_vector.templates.h>
 
 #ifdef DEAL_II_WITH_MPI
 #  include <mpi.h>
@@ -468,6 +466,66 @@ test_linear_sum()
 
 template <typename VectorType>
 void
+test_linear_combination()
+{
+  auto va       = create_test_vector<VectorType>();
+  auto vb       = create_test_vector<VectorType>();
+  auto vc       = create_test_vector<VectorType>();
+  auto v_dst    = create_test_vector<VectorType>();
+  auto expected = create_test_vector<VectorType>();
+
+  auto nv_a = make_nvector_view(va
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                ,
+                                global_nvector_context
+#endif
+  );
+  auto nv_b = make_nvector_view(vb
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                ,
+                                global_nvector_context
+#endif
+  );
+  auto nv_c = make_nvector_view(vc
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                ,
+                                global_nvector_context
+#endif
+  );
+  auto nv_dst = make_nvector_view(v_dst
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                  ,
+                                  global_nvector_context
+#endif
+  );
+
+  va = 1.0;
+  vb = 2.0;
+  vc = 3.0;
+
+  expected = 1. * 1. + 2. * 2. + 3. * 3.;
+
+  // Make a contiguous array of N_Vectors for consumption by SUNDIALS
+  // N.B. The array needs to contain N_Vector and not our NVectorView, so we use
+  // the conversion operator.
+  std::array<N_Vector, 3> n_vectors{
+    {(N_Vector)nv_a, (N_Vector)nv_b, (N_Vector)nv_c}};
+
+  std::array<double, 3> weights{{1., 2., 3.}};
+  // test sum three vectors
+  N_VLinearCombination(3, weights.data(), n_vectors.data(), nv_dst);
+  Assert(vector_equal(v_dst, expected), NVectorTestError());
+  // repeat to test that sum overwrites initial content
+  N_VLinearCombination(3, weights.data(), n_vectors.data(), nv_dst);
+  Assert(vector_equal(v_dst, expected), NVectorTestError());
+
+  deallog << "test_linear_combination OK" << std::endl;
+}
+
+
+
+template <typename VectorType>
+void
 test_dot_product()
 {
   const auto va   = create_test_vector<VectorType>(2.0);
@@ -497,6 +555,49 @@ test_dot_product()
   Assert(std::fabs(result - expected) < 1e-12, NVectorTestError());
 
   deallog << "test_dot_product OK" << std::endl;
+}
+
+
+
+template <typename VectorType>
+void
+test_dot_product_multi()
+{
+  const auto va   = create_test_vector<VectorType>(1.0);
+  const auto vb   = create_test_vector<VectorType>(2.0);
+  const auto vc   = create_test_vector<VectorType>(3.0);
+  const auto size = va.size();
+
+  auto nv_a = make_nvector_view(va
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                ,
+                                global_nvector_context
+#endif
+  );
+  auto nv_b = make_nvector_view(vb
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                ,
+                                global_nvector_context
+#endif
+  );
+  auto nv_c = make_nvector_view(vc
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                ,
+                                global_nvector_context
+#endif
+  );
+
+  std::array<N_Vector, 2> nv_array{{(N_Vector)nv_b, (N_Vector)nv_c}};
+  std::array<double, 2>   dst;
+
+  int status =
+    N_VDotProdMulti(nv_array.size(), nv_a, nv_array.data(), dst.data());
+  Assert(status == 0, NVectorTestError());
+
+  Assert(std::fabs(dst[0] - 2. * size) < 1e-12, NVectorTestError());
+  Assert(std::fabs(dst[1] - 3. * size) < 1e-12, NVectorTestError());
+
+  deallog << "test_dot_product_multi OK" << std::endl;
 }
 
 
@@ -976,7 +1077,9 @@ run_all_tests(const std::string &prefix)
   test_get_communicator<VectorType>();
   test_length<VectorType>();
   test_linear_sum<VectorType>();
+  test_linear_combination<VectorType>();
   test_dot_product<VectorType>();
+  test_dot_product_multi<VectorType>();
   test_set_constant<VectorType>();
   test_add_constant<VectorType>();
   test_elementwise_product<VectorType>();
