@@ -2741,7 +2741,7 @@ void DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
           [this]() { this->pre_distributed_transfer_action(); }));
       this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_distributed_repartition.connect(
-          [this] { this->post_distributed_transfer_action(); }));
+          [this]() { this->post_distributed_transfer_action(); }));
 
       // refinement signals
       this->tria_listeners_for_transfer.push_back(
@@ -2778,20 +2778,20 @@ void DoFHandler<dim, spacedim>::connect_to_triangulation_signals()
         }));
       this->tria_listeners_for_transfer.push_back(
         this->tria->signals.pre_refinement.connect(
-          [this] { this->pre_transfer_action(); }));
+          [this]() { this->pre_transfer_action(); }));
       this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_refinement.connect(
-          [this] { this->post_transfer_action(); }));
+          [this]() { this->post_transfer_action(); }));
     }
   else
     {
       // refinement signals
       this->tria_listeners_for_transfer.push_back(
         this->tria->signals.pre_refinement.connect(
-          [this] { this->pre_transfer_action(); }));
+          [this]() { this->pre_transfer_action(); }));
       this->tria_listeners_for_transfer.push_back(
         this->tria->signals.post_refinement.connect(
-          [this] { this->post_transfer_action(); }));
+          [this]() { this->post_transfer_action(); }));
     }
 }
 
