@@ -418,12 +418,11 @@ library        - builds and installs the 'library' component
     </p>
 
     <p>
-      The library will be compiled with the default C++ standard enabled by
-      the compiler. This is (as of May 2020) C++14 for all compilers. If
-      you want to override this behavior, please set the C++ standard
-      directly for example by configuring with
-      <code>-DDEAL_II_CXX_FLAGS="-std=c++17"</code>, or by setting the
-      environment variable <code>CXXFLAGS="-std=c++17"</code>.
+      deal.II (as of version 9.6) requires a compiler which supports the C++17
+      language standard. If you want to override this behavior, please set the
+      C++ standard directly for example by configuring with
+      <code>-DDEAL_II_CXX_FLAGS="-std=c++23"</code>, or by setting the
+      environment variable <code>CXXFLAGS="-std=c++23"</code>.
 
       Similarly, for enabling SIMD vectorization support, you have to set
       an appropriate target architecture via <code>-march=...</code>, for
