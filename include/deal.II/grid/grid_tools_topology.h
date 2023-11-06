@@ -27,7 +27,10 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 
 #include <list>
+#include <map>
+#include <set>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
