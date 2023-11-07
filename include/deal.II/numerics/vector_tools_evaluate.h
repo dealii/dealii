@@ -68,8 +68,9 @@ namespace VectorTools
   } // namespace EvaluationFlags
 
   /**
-   * Given a (distributed) solution vector @p vector, evaluate the values at
-   * the (arbitrary and even remote) points specified by @p evaluation_points.
+   * Given a (distributed) solution vector @p vector, reinitialize @p cache and
+   * evaluate the values at the (arbitrary and even remote) points specified by
+   * @p evaluation_points.
    *
    * The following code snippet shows the usage of this function. Given
    * a Mapping object, a DoFHandler object, and solution vector as well as a
@@ -80,13 +81,15 @@ namespace VectorTools
    * further function calls (see also the function below).
    *
    * @code
-   * // first usage: set up cache
    * Utilities::MPI::RemotePointEvaluation<dim, spacedim> cache;
    *
+   * // Set up the cache and perform evaluation. This overload always
+   * // reinitializes the RemotePointEvaluation cache object so, typically, it
+   * // should only be called once.
    * const auto result_1 = VectorTools::point_values(
    *   mapping, dof_handler_1, vector_1, evaluation_points, cache);
    *
-   * // further usages: reuse the cache
+   * // This overload does not initialize or reinitialize the cache.
    * const auto result_2 = VectorTools::point_values(
    *   cache, dof_handler_2, vector_2);
    * @endcode
