@@ -123,7 +123,7 @@ public:
   /**
    * Convert a tensor to a point.
    */
-  constexpr explicit DEAL_II_HOST_DEVICE
+  constexpr DEAL_II_HOST_DEVICE
   Point(const Tensor<1, dim, Number> &);
 
   /**
@@ -206,92 +206,9 @@ public:
   operator=(const Tensor<1, dim, OtherNumber> &p);
 
   /**
-   * @name Addition and subtraction of points.
+   * @name Norms and distance between points
    * @{
    */
-
-  /**
-   * Add an offset given as Tensor<1,dim,Number> to a point.
-   *
-   * @note This function can also be used in @ref GlossDevice "device" code.
-   */
-  constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
-                                operator+(const Tensor<1, dim, Number> &) const;
-
-  /**
-   * Subtract two points, i.e., obtain the vector that connects the two. As
-   * discussed in the documentation of this class, subtracting two points
-   * results in a vector anchored at one of the two points (rather than at the
-   * origin) and, consequently, the result is returned as a Tensor@<1,dim@>
-   * rather than as a Point@<dim@>.
-   *
-   * @note This function can also be used in @ref GlossDevice "device" code.
-   */
-  constexpr DEAL_II_HOST_DEVICE Tensor<1, dim, Number>
-                                operator-(const Point<dim, Number> &) const;
-
-  /**
-   * Subtract a difference vector (represented by a Tensor@<1,dim@>) from the
-   * current point. This results in another point and, as discussed in the
-   * documentation of this class, the result is then naturally returned as a
-   * Point@<dim@> object rather than as a Tensor@<1,dim@>.
-   *
-   * @note This function can also be used in @ref GlossDevice "device" code.
-   */
-  constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
-                                operator-(const Tensor<1, dim, Number> &) const;
-
-  /**
-   * The opposite vector.
-   *
-   * @note This function can also be used in @ref GlossDevice "device" code.
-   */
-  constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
-                                operator-() const;
-
-  /**
-   * @}
-   */
-
-  /**
-   * @name Multiplication and scaling of points. Dot products. Norms.
-   * @{
-   */
-
-  /**
-   * Multiply the current point by a factor.
-   *
-   * @note This function can also be used in @ref GlossDevice "device" code.
-   *
-   * @relatesalso EnableIfScalar
-   */
-  template <typename OtherNumber>
-  constexpr DEAL_II_HOST_DEVICE Point<
-    dim,
-    typename ProductType<Number,
-                         typename EnableIfScalar<OtherNumber>::type>::type>
-  operator*(const OtherNumber) const;
-
-  /**
-   * Divide the current point by a factor.
-   *
-   * @note This function can also be used in @ref GlossDevice "device" code.
-   */
-  template <typename OtherNumber>
-  constexpr DEAL_II_HOST_DEVICE Point<
-    dim,
-    typename ProductType<Number,
-                         typename EnableIfScalar<OtherNumber>::type>::type>
-  operator/(const OtherNumber) const;
-
-  /**
-   * Return the scalar product of the vectors representing two points.
-   *
-   * @note This function can also be used in @ref GlossDevice "device" code.
-   */
-  constexpr DEAL_II_HOST_DEVICE Number
-  operator*(const Tensor<1, dim, Number> &p) const;
-
   /**
    * Return the scalar product of this point vector with itself, i.e. the
    * square, or the square of the norm. In case of a complex number type it is
@@ -494,101 +411,6 @@ constexpr DEAL_II_ALWAYS_INLINE Point<dim, Number>
 }
 
 
-
-template <int dim, typename Number>
-DEAL_II_CXX20_REQUIRES(dim >= 0)
-constexpr DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator+(
-  const Tensor<1, dim, Number> &p) const
-{
-  Point<dim, Number> tmp = *this;
-  tmp += p;
-  return tmp;
-}
-
-
-
-template <int dim, typename Number>
-DEAL_II_CXX20_REQUIRES(dim >= 0)
-constexpr DEAL_II_HOST_DEVICE
-  Tensor<1, dim, Number> Point<dim, Number>::operator-(
-    const Point<dim, Number> &p) const
-{
-  return (Tensor<1, dim, Number>(*this) -= p);
-}
-
-
-
-template <int dim, typename Number>
-DEAL_II_CXX20_REQUIRES(dim >= 0)
-constexpr DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-(
-  const Tensor<1, dim, Number> &p) const
-{
-  Point<dim, Number> tmp = *this;
-  tmp -= p;
-  return tmp;
-}
-
-
-
-template <int dim, typename Number>
-DEAL_II_CXX20_REQUIRES(dim >= 0)
-constexpr DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-()
-  const
-{
-  Point<dim, Number> result;
-  for (unsigned int i = 0; i < dim; ++i)
-    result.values[i] = -this->values[i];
-  return result;
-}
-
-
-
-template <int dim, typename Number>
-DEAL_II_CXX20_REQUIRES(dim >= 0)
-template <typename OtherNumber>
-constexpr DEAL_II_HOST_DEVICE Point<
-  dim,
-  typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::
-    type> Point<dim, Number>::operator*(const OtherNumber factor) const
-{
-  Point<dim, typename ProductType<Number, OtherNumber>::type> tmp;
-  for (unsigned int i = 0; i < dim; ++i)
-    tmp[i] = this->operator[](i) * factor;
-  return tmp;
-}
-
-
-
-template <int dim, typename Number>
-DEAL_II_CXX20_REQUIRES(dim >= 0)
-template <typename OtherNumber>
-constexpr DEAL_II_HOST_DEVICE Point<
-  dim,
-  typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::
-    type> Point<dim, Number>::operator/(const OtherNumber factor) const
-{
-  const Tensor<1, dim, Number> &base_object = *this;
-  return Point<
-    dim,
-    typename ProductType<Number,
-                         typename EnableIfScalar<OtherNumber>::type>::type>(
-    dealii::operator/(base_object, factor));
-}
-
-
-
-template <int dim, typename Number>
-DEAL_II_CXX20_REQUIRES(dim >= 0)
-constexpr DEAL_II_HOST_DEVICE Number Point<dim, Number>::operator*(
-  const Tensor<1, dim, Number> &p) const
-{
-  Number res = Number();
-  for (unsigned int i = 0; i < dim; ++i)
-    res += this->operator[](i) * p[i];
-  return res;
-}
-
-
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
 constexpr DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
@@ -641,6 +463,57 @@ inline void Point<dim, Number>::serialize(Archive &ar, const unsigned int)
 
 /*--------------------------- Global functions: Point -----------------------*/
 
+/**
+ * Add an offset given as Tensor<1,dim,Number> to a point.
+ *
+ * @note This function can also be used in @ref GlossDevice "device" code.
+ */
+template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
+operator+(const Point<dim, Number> &p, const Tensor<1, dim, Number> &offset)
+{
+  Point<dim, Number> tmp{p};
+  tmp += offset;
+  return tmp;
+}
+
+/**
+ * Subtract two points, i.e., obtain the vector that connects the two. As
+ * discussed in the documentation of this class, subtracting two points
+ * results in a vector anchored at one of the two points (rather than at the
+ * origin) and, consequently, the result is returned as a Tensor@<1,dim@>
+ * rather than as a Point@<dim@>.
+ *
+ * @note This function can also be used in @ref GlossDevice "device" code.
+ */
+template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
+constexpr DEAL_II_HOST_DEVICE Tensor<1, dim, Number>
+operator-(const Point<dim, Number> &p, const Point<dim, Number> &p2)
+{
+  Tensor<1, dim, Number> tmp{p};
+  tmp -= p2;
+  return tmp;
+}
+
+/**
+ * Subtract a difference vector (represented by a Tensor@<1,dim@>) from the
+ * current point. This results in another point and, as discussed in the
+ * documentation of this class, the result is then naturally returned as a
+ * Point@<dim@> object rather than as a Tensor@<1,dim@>.
+ *
+ * @note This function can also be used in @ref GlossDevice "device" code.
+ */
+template <int dim, typename Number>
+DEAL_II_CXX20_REQUIRES(dim >= 0)
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
+operator-(const Point<dim, Number> &p, const Tensor<1, dim, Number> &diff)
+{
+  Point<dim, Number> tmp{p};
+  tmp -= diff;
+  return tmp;
+}
 
 /**
  * Global operator scaling a point vector by a scalar.
