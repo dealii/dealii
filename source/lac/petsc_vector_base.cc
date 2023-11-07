@@ -1008,7 +1008,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::swap(VectorBase &v)
+  VectorBase::swap(VectorBase &v) noexcept
   {
     std::swap(this->vector, v.vector);
     std::swap(this->ghosted, v.ghosted);

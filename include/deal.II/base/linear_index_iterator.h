@@ -57,9 +57,9 @@ DEAL_II_NAMESPACE_OPEN
  *   public:
  *     // const iterators store a const pointer
  *     using container_pointer_type
- *       = typename std::conditional<Constness,
- *                                   const Container<T>*,
- *                                   Container<T>*>::type;
+ *       = std::conditional_t<Constness,
+ *                            const Container<T>*,
+ *                            Container<T>*>;
  *
  *     // This alias is assumed to exist.
  *     using size_type = std::size_t;

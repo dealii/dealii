@@ -372,7 +372,7 @@ namespace DataOutBase
      * Swap the current object's contents with those of the given argument.
      */
     void
-    swap(Patch<dim, spacedim> &other_patch);
+    swap(Patch<dim, spacedim> &other_patch) noexcept;
 
     /**
      * Value to be used if this patch has no neighbor on one side.
@@ -524,7 +524,7 @@ namespace DataOutBase
      * Swap the current object's contents with those of the given argument.
      */
     void
-    swap(Patch<0, spacedim> &other_patch);
+    swap(Patch<0, spacedim> &other_patch) noexcept;
 
     /**
      * Value to be used if this patch has no neighbor on one side.

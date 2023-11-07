@@ -315,17 +315,17 @@ public:
    *
    * @note The actual return type of this function is
    * @code
-   * std::conditional<dim == 1,
-   *                  std::array<Quadrature<1>, dim>,
-   *                  const std::array<Quadrature<1>, dim> &>::type
+   * std::conditional_t<dim == 1,
+   *                    std::array<Quadrature<1>, dim>,
+   *                    const std::array<Quadrature<1>, dim> &>
    * @endcode
    * The type is abbreviated in the online documentation to improve
    * readability of this page.
    */
 #ifndef DOXYGEN
-  typename std::conditional<dim == 1,
-                            std::array<Quadrature<1>, dim>,
-                            const std::array<Quadrature<1>, dim> &>::type
+  std::conditional_t<dim == 1,
+                     std::array<Quadrature<1>, dim>,
+                     const std::array<Quadrature<1>, dim> &>
 #else
   const std::array<Quadrature<1>, dim> &
 #endif

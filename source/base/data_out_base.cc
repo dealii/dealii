@@ -1845,7 +1845,7 @@ namespace DataOutBase
 
   template <int dim, int spacedim>
   void
-  Patch<dim, spacedim>::swap(Patch<dim, spacedim> &other_patch)
+  Patch<dim, spacedim>::swap(Patch<dim, spacedim> &other_patch) noexcept
   {
     std::swap(vertices, other_patch.vertices);
     std::swap(neighbors, other_patch.neighbors);
@@ -1935,7 +1935,7 @@ namespace DataOutBase
 
   template <int spacedim>
   void
-  Patch<0, spacedim>::swap(Patch<0, spacedim> &other_patch)
+  Patch<0, spacedim>::swap(Patch<0, spacedim> &other_patch) noexcept
   {
     std::swap(vertices, other_patch.vertices);
     std::swap(patch_index, other_patch.patch_index);

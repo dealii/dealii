@@ -35,6 +35,7 @@ Checks: >
   performance-*,
   -performance-inefficient-string-concatenation,
   -performance-no-automatic-move,
+  -performance-avoid-endl,
   readability-qualified-auto
 
 WarningsAsErrors: '*'
