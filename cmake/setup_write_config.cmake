@@ -82,8 +82,6 @@ elseif(DEAL_II_HAVE_CXX20)
   _both("#        C++ language standard:  C++20\n")
 elseif(DEAL_II_HAVE_CXX17)
   _both("#        C++ language standard:  C++17\n")
-elseif(DEAL_II_HAVE_CXX14)
-  _both("#        C++ language standard:  C++14\n")
 endif()
 
 _both("#        Vectorization level:    ${DEAL_II_VECTORIZATION_WIDTH_IN_BITS} bit")
