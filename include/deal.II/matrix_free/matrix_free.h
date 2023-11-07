@@ -1618,7 +1618,7 @@ public:
    */
   unsigned int
   get_cell_active_fe_index(
-    const std::pair<unsigned int, unsigned int> range) const;
+    const std::pair<unsigned int, unsigned int> range, unsigned int dof_index) const;
 
   /**
    * In the hp-adaptive case, return the active FE index of a face range.
@@ -2689,11 +2689,12 @@ MatrixFree<dim, Number, VectorizedArrayType>::n_active_fe_indices() const
 template <int dim, typename Number, typename VectorizedArrayType>
 unsigned int
 MatrixFree<dim, Number, VectorizedArrayType>::get_cell_active_fe_index(
-  const std::pair<unsigned int, unsigned int> range) const
+  const std::pair<unsigned int, unsigned int> range, unsigned int dof_handler_index) const
 {
   const auto &fe_indices = dof_info[0].cell_active_fe_index;
 
-  if (fe_indices.empty() == true)
+  if (fe_indices.empty() == true ||
+     dof_handlers[dof_handler_index]->get_fe_collection().size() == 1)
     return 0;
 
   const auto index = fe_indices[range.first];

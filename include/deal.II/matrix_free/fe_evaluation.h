@@ -7121,7 +7121,7 @@ inline FEEvaluation<dim,
                  dof_no,
                  quad_no,
                  first_selected_component,
-                 matrix_free.get_cell_active_fe_index(range))
+                 matrix_free.get_cell_active_fe_index(range, dof_no))
 {}
 
 

@@ -25,7 +25,7 @@ template <int dim,
           typename Number              = double,
           typename VectorizedArrayType = VectorizedArray<Number>>
 void
-test()
+test(bool use_categorization = false)
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
 
@@ -38,6 +38,15 @@ test()
       cell->set_refine_flag();
   tria.execute_coarsening_and_refinement();
 
+  if (use_categorization)
+    {
+      for (auto &cell : tria.active_cell_iterators())
+        if (cell->is_active() && cell->is_locally_owned() &&
+            cell->center()[0] < 0.0)
+          cell->set_material_id(42);
+        else
+          cell->set_material_id(0);
+    }
   const FE_Q<dim>     fe_q(fe_degree);
   const FESystem<dim> fe(fe_q, n_components);
 
@@ -59,6 +68,18 @@ test()
   typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData
     additional_data;
   additional_data.mapping_update_flags = update_values | update_gradients;
+
+  if (use_categorization)
+    {
+      additional_data.cell_vectorization_category.resize(tria.n_active_cells());
+      for (const auto &cell : tria.active_cell_iterators())
+        if (cell->is_locally_owned())
+          additional_data
+            .cell_vectorization_category[cell->active_cell_index()] =
+            cell->material_id();
+
+      additional_data.cell_vectorization_categories_strict = true;
+    }
 
   MappingQ<dim> mapping(1);
   QGauss<1>     quad(fe_degree + 1);
@@ -96,4 +117,9 @@ main(int argc, char **argv)
 
   test<2, 1, 2, 1, float>(); // scalar
   test<2, 1, 2, 2, float>(); // vector
+
+  // Same as above, but testing additional categorization of vectorized cell
+  // batches
+  test<2, 1, 2, 1, float>(true); // scalar
+  test<2, 1, 2, 2, float>(true); // vector
 }
