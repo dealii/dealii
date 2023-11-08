@@ -2899,7 +2899,10 @@ inline TriaAccessor<0, 1, spacedim>::TriaAccessor(
   // accessor
   (void)level;
   (void)index;
-  Assert((level == -2) && (index == -2), ExcInternalError());
+  Assert((level == -2) && (index == -2),
+         ExcMessage(
+           "This constructor can not be called for face iterators in 1d, "
+           "except to default-construct iterator objects."));
 }
 
 
