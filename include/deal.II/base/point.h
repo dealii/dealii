@@ -467,6 +467,7 @@ inline void Point<dim, Number>::serialize(Archive &ar, const unsigned int)
  * Add an offset given as Tensor<1,dim,Number> to a point.
  *
  * @note This function can also be used in @ref GlossDevice "device" code.
+ * @relates Point
  */
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
@@ -486,6 +487,7 @@ operator+(const Point<dim, Number> &p, const Tensor<1, dim, Number> &offset)
  * rather than as a Point@<dim@>.
  *
  * @note This function can also be used in @ref GlossDevice "device" code.
+ * @relates Point
  */
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
@@ -504,6 +506,7 @@ operator-(const Point<dim, Number> &p, const Point<dim, Number> &p2)
  * Point@<dim@> object rather than as a Tensor@<1,dim@>.
  *
  * @note This function can also be used in @ref GlossDevice "device" code.
+ * @relates Point
  */
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
