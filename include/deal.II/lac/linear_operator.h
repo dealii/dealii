@@ -1427,10 +1427,10 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
       Domain>::reinit_domain_vector(operator_exemplar, v, omit_zeroing_entries);
   };
 
-  typename std::conditional<
+  std::conditional_t<
     has_vmult_add_and_Tvmult_add<Range, Domain, Matrix>::type::value,
     MatrixInterfaceWithVmultAdd<Range, Domain, Payload>,
-    MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>::type()
+    MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>()
     .
     operator()(return_op, matrix);
 
@@ -1464,10 +1464,10 @@ linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
   // Initialize the payload based on the LinearOperator exemplar
   auto return_op = operator_exemplar;
 
-  typename std::conditional<
+  std::conditional_t<
     has_vmult_add_and_Tvmult_add<Range, Domain, Matrix>::type::value,
     MatrixInterfaceWithVmultAdd<Range, Domain, Payload>,
-    MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>::type()
+    MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>()
     .
     operator()(return_op, matrix);
 

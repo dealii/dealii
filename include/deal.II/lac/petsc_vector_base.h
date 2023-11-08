@@ -774,7 +774,7 @@ namespace PETScWrappers
      * analogy to standard functions.
      */
     void
-    swap(VectorBase &v);
+    swap(VectorBase &v) noexcept;
 
     /**
      * Conversion operator to gain access to the underlying PETSc type. If you
@@ -866,7 +866,7 @@ namespace PETScWrappers
    * @relatesalso PETScWrappers::VectorBase
    */
   inline void
-  swap(VectorBase &u, VectorBase &v)
+  swap(VectorBase &u, VectorBase &v) noexcept
   {
     u.swap(v);
   }

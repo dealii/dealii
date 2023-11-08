@@ -332,9 +332,9 @@ Quadrature<dim>::memory_consumption() const
 
 
 template <int dim>
-typename std::conditional<dim == 1,
-                          std::array<Quadrature<1>, dim>,
-                          const std::array<Quadrature<1>, dim> &>::type
+typename std::conditional_t<dim == 1,
+                            std::array<Quadrature<1>, dim>,
+                            const std::array<Quadrature<1>, dim> &>
 Quadrature<dim>::get_tensor_basis() const
 {
   Assert(this->is_tensor_product_flag == true,
