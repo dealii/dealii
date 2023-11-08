@@ -15,6 +15,10 @@
 
 
 // Test MatrixFreeTools::compute_diagonal() for a Laplace operator
+// If the flag 'use_categorization = true' is set, additional categorization
+// of cells according to their material_id is performed and enforced in
+// MatrixFree via MF::AD::cell_vectorization_categories_strict See
+// https://github.com/dealii/dealii/issues/16250 for more details.
 
 #include "compute_diagonal_util.h"
 
