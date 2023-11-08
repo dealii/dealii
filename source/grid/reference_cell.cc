@@ -977,7 +977,7 @@ ReferenceCell::closest_point(const Point<dim> &p) const
     }
 
   double min_distance_square = std::numeric_limits<double>::max();
-  if (dim == 2)
+  if constexpr (dim == 2)
     {
       for (const unsigned int face_no :
            faces_for_given_vertex(closest_vertex_no))
