@@ -190,7 +190,7 @@ set_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase}
 #     enable_if_supported(DEAL_II_CXX_FLAGS "-march=native")
 #   ENDIF()
 #
-# Checks for compiler features (such as C++14 support) and compiler
+# Checks for compiler features (such as C++17 support) and compiler
 # specific bugs that
 #   - usually set up further configuration (such as preprocessor
 #     definitions)
@@ -223,7 +223,7 @@ set_target_properties(${DEAL_II_TARGET_NAME}_${build_lowercase}
     guarded with DEAL_II_ALLOW_PLATFORM_INTROSPECTION
 
 ./cmake/checks/check_01_cxx_features.cmake
-  - Check for supported C++ language features such as sufficient C++14
+  - Check for supported C++ language features such as sufficient C++17
     support
 
 ./cmake/checks/check_02_compiler_features.cmake

@@ -96,14 +96,6 @@ enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-literal-suffix")
 #
 enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-psabi")
 
-#
-# Disable warnings regarding improper direct memory access
-# if compiling without C++17 support
-#
-if(NOT DEAL_II_HAVE_CXX17)
-  enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-class-memaccess")
-endif()
-
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Enable warnings for conversion from real types to integer types.
   # The warning is too noisy in gcc and therefore only enabled for clang.

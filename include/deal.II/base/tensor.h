@@ -1451,13 +1451,7 @@ constexpr DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE const typename Tensor<rank_, dim, Number>::value_type &
   Tensor<rank_, dim, Number>::operator[](const unsigned int i) const
 {
-#  if KOKKOS_VERSION < 30700
-#    ifdef KOKKOS_ACTIVE_MEMORY_SPACE_HOST
   AssertIndexRange(i, dim);
-#    endif
-#  else
-  KOKKOS_IF_ON_HOST((AssertIndexRange(i, dim);))
-#  endif
 
   return values[i];
 }
@@ -1467,17 +1461,8 @@ template <int rank_, int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE const Number &
 Tensor<rank_, dim, Number>::operator[](const TableIndices<rank_> &indices) const
 {
-#  if KOKKOS_VERSION < 30700
-#    ifdef KOKKOS_ACTIVE_MEMORY_SPACE_HOST
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
-#    endif
-#  else
-  KOKKOS_IF_ON_HOST(
-    (Assert(dim != 0,
-            ExcMessage(
-              "Cannot access an object of type Tensor<rank_,0,Number>"));))
-#  endif
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
@@ -1488,17 +1473,8 @@ template <int rank_, int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Number &
 Tensor<rank_, dim, Number>::operator[](const TableIndices<rank_> &indices)
 {
-#  if KOKKOS_VERSION < 30700
-#    ifdef KOKKOS_ACTIVE_MEMORY_SPACE_HOST
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
-#    endif
-#  else
-  KOKKOS_IF_ON_HOST(
-    (Assert(dim != 0,
-            ExcMessage(
-              "Cannot access an object of type Tensor<rank_,0,Number>"));))
-#  endif
 
   return TensorAccessors::extract<rank_>(*this, indices);
 }
