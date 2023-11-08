@@ -27,6 +27,9 @@ template <int dim>
 void
 check()
 {
+  static_assert(
+    Point<dim>((Point<dim>::unit_vector(0) + Point<dim>::unit_vector(0)) -
+               2. * Point<dim>::unit_vector(0))(0) == 0.);
   Point<dim> p;
   for (unsigned int i = 0; i < dim; ++i)
     p[i] = i;
@@ -41,6 +44,10 @@ main()
 {
   initlog();
   deallog << std::setprecision(3);
+
+  static_assert((Point<1>() / 1.).norm_square() == 0.);
+  static_assert(Point<2>{0., 1.}.distance_square(Point<2>{}) == 1.);
+  static_assert(Point<3>(0., 0., 1.).square() == 1.);
 
   check<1>();
   check<2>();
