@@ -317,10 +317,11 @@ test(const Triangulation<dim, spacedim> &tria,
                                         Functions::ZeroFunction<dim>(),
                                         difference,
                                         quad,
-                                        VectorTools::NormType::L2_norm);
+                                        VectorTools::L2_norm);
 
-      deallog << VectorTools::compute_global_error(
-                   tria, difference, VectorTools::NormType::L2_norm)
+      deallog << VectorTools::compute_global_error(tria,
+                                                   difference,
+                                                   VectorTools::L2_norm)
               << std::endl;
       DataOut<dim> data_out;
 

@@ -310,11 +310,11 @@ namespace Step40
                                       Functions::ZeroFunction<dim>(),
                                       difference,
                                       quadrature_formula,
-                                      VectorTools::NormType::L2_norm);
+                                      VectorTools::L2_norm);
 
     deallog << VectorTools::compute_global_error(triangulation,
                                                  difference,
-                                                 VectorTools::NormType::L2_norm)
+                                                 VectorTools::L2_norm)
             << std::endl;
   }
 

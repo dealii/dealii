@@ -301,12 +301,10 @@ test(const unsigned int degree)
                                       Functions::ZeroFunction<dim>(),
                                       difference,
                                       quad,
-                                      VectorTools::NormType::L2_norm);
+                                      VectorTools::L2_norm);
 
     const double error =
-      VectorTools::compute_global_error(tria,
-                                        difference,
-                                        VectorTools::NormType::L2_norm);
+      VectorTools::compute_global_error(tria, difference, VectorTools::L2_norm);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
       printf("Error %f.\n", error);

@@ -312,12 +312,10 @@ test(const unsigned version, const unsigned int degree)
                                       Functions::ZeroFunction<dim>(),
                                       difference,
                                       quads,
-                                      VectorTools::NormType::L2_norm);
+                                      VectorTools::L2_norm);
 
     const double error =
-      VectorTools::compute_global_error(tria,
-                                        difference,
-                                        VectorTools::NormType::L2_norm);
+      VectorTools::compute_global_error(tria, difference, VectorTools::L2_norm);
 
     if (error < 0.042)
       deallog << "OK" << std::endl;

@@ -404,14 +404,14 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
 
   switch (norm_type)
     {
-      case VectorTools::NormType::L1_norm:
+      case VectorTools::L1_norm:
         // evaluate norms on subsets and compare them as
         //   c_0 + c_1 + ... < fraction * l1-norm(c)
         refine_and_coarsen_fixed_fraction_via_l1_norm(
           tria, criteria, top_fraction, bottom_fraction, max_n_cells);
         break;
 
-      case VectorTools::NormType::L2_norm:
+      case VectorTools::L2_norm:
         {
           // we do not want to evaluate norms on subsets as:
           //   sqrt(c_0^2 + c_1^2 + ...) < fraction * l2-norm(c)

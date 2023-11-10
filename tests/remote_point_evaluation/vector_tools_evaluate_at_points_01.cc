@@ -249,12 +249,10 @@ test()
                                     AnalyticalFunction<dim>(),
                                     difference,
                                     quadrature_2,
-                                    VectorTools::NormType::L2_norm);
+                                    VectorTools::L2_norm);
 
   double error =
-    VectorTools::compute_global_error(tria_2,
-                                      difference,
-                                      VectorTools::NormType::L2_norm);
+    VectorTools::compute_global_error(tria_2, difference, VectorTools::L2_norm);
 
 
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
