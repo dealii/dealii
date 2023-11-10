@@ -635,6 +635,68 @@ namespace Threads
     Task() = default;
 
     /**
+     * Copy constructor. At the end of this operation, both the original and the
+     * new object refer to the same task, and both can ask for the returned
+     * object. That is, if you do
+     * @code
+     *   Threads::Task<T> t1 = Threads::new_task(...);
+     *   Threads::Task<T> t2 (t1);
+     * @endcode
+     * then calling `t2.return_value()` will return the same object (not just an
+     * object with the same value, but in fact the same address!) as
+     * calling `t1.return_value()`.
+     */
+    Task(const Task &other) = default;
+
+    /**
+     * Move constructor. At the end of this operation, the original object no
+     * longer refers to a task, and the new object refers to the same task
+     * as the original one originally did. That is, if you do
+     * @code
+     *   Threads::Task<T> t1 = Threads::new_task(...);
+     *   Threads::Task<T> t2 (std::move(t1));
+     * @endcode
+     * then calling `t2.return_value()` will return the object computed by
+     * the task, and `t1.return_value()` will result in an error because `t1`
+     * no longer refers to a task and consequently does not know anything
+     * about a return value.
+     */
+    Task(Task &&other) noexcept = default;
+
+    /**
+     * Copy operator. At the end of this operation, both the right hand and the
+     * left hand object refer to the same task, and both can ask for the
+     * returned object. That is, if you do
+     * @code
+     *   Threads::Task<T> t1 = Threads::new_task(...);
+     *   Threads::Task<T> t2;
+     *   t2 = t1;
+     * @endcode
+     * then calling `t2.return_value()` will return the same object (not just an
+     * object with the same value, but in fact the same address!) as
+     * calling `t1.return_value()`.
+     */
+    Task &
+    operator=(const Task &other) = default;
+
+    /**
+     * Move operator. At the end of this operation, the right hand side object
+     * no longer refers to a task, and the left hand side object refers to the
+     * same task as the right hand side one originally did. That is, if you do
+     * @code
+     *   Threads::Task<T> t1 = Threads::new_task(...);
+     *   Threads::Task<T> t2;
+     *   t2 = std::move(t1);
+     * @endcode
+     * then calling `t2.return_value()` will return the object computed by
+     * the task, and `t1.return_value()` will result in an error because `t1`
+     * no longer refers to a task and consequently does not know anything
+     * about a return value.
+     */
+    Task &
+    operator=(Task &&other) noexcept = default;
+
+    /**
      * Join the task represented by this object, i.e. wait for it to finish.
      *
      * A task can be joined multiple times (while the first join() operation
