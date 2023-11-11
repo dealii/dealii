@@ -2055,8 +2055,9 @@ namespace internal
               if (indices[0] == indices[1])
                 return indices[0];
 
-              TableIndices<2> sorted_indices(indices);
-              sorted_indices.sort();
+              const TableIndices<2> sorted_indices(
+                std::min(indices[0], indices[1]),
+                std::max(indices[0], indices[1]));
 
               for (unsigned int d = 0, c = 0; d < dim; ++d)
                 for (unsigned int e = d + 1; e < dim; ++e, ++c)
