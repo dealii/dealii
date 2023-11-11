@@ -2333,41 +2333,16 @@ SymmetricTensor<rank_, dim, Number>::end_raw() const
 
 
 
-namespace internal
-{
-  namespace SymmetricTensorImplementation
-  {
-    template <int dim, typename Number>
-    constexpr unsigned int
-    entry_to_indices(const dealii::SymmetricTensor<2, dim, Number> &,
-                     const unsigned int index)
-    {
-      return index;
-    }
-
-
-    template <int dim, typename Number>
-    constexpr dealii::TableIndices<2>
-    entry_to_indices(const dealii::SymmetricTensor<4, dim, Number> &,
-                     const unsigned int index)
-    {
-      return internal::SymmetricTensorAccessors::StorageType<4, dim, Number>::
-        base_tensor_type::unrolled_to_component_indices(index);
-    }
-
-  } // namespace SymmetricTensorImplementation
-} // namespace internal
-
-
-
 template <int rank_, int dim, typename Number>
 DEAL_II_HOST constexpr inline const Number &
 SymmetricTensor<rank_, dim, Number>::access_raw_entry(
   const unsigned int index) const
 {
   AssertIndexRange(index, n_independent_components);
-  return data[internal::SymmetricTensorImplementation::entry_to_indices(*this,
-                                                                        index)];
+  if constexpr (rank == 2)
+    return data[index];
+  else
+    return data[decltype(data)::unrolled_to_component_indices(index)];
 }
 
 
@@ -2377,8 +2352,10 @@ DEAL_II_HOST constexpr inline Number &
 SymmetricTensor<rank_, dim, Number>::access_raw_entry(const unsigned int index)
 {
   AssertIndexRange(index, n_independent_components);
-  return data[internal::SymmetricTensorImplementation::entry_to_indices(*this,
-                                                                        index)];
+  if constexpr (rank == 2)
+    return data[index];
+  else
+    return data[decltype(data)::unrolled_to_component_indices(index)];
 }
 
 
