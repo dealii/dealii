@@ -2092,43 +2092,8 @@ namespace internal
                           typename SymmetricTensorAccessors::
                             StorageType<2, dim, Number>::base_tensor_type &data)
   {
-    // 1d is very simple and done first
-    if (dim == 1)
-      return data[0];
-
-    // first treat the main diagonal elements, which are stored consecutively
-    // at the beginning
-    if (indices[0] == indices[1])
-      return data[indices[0]];
-
-    // the rest is messier and requires a few switches.
-    switch (dim)
-      {
-        case 2:
-          // at least for the 2x2 case it is reasonably simple
-          Assert(((indices[0] == 1) && (indices[1] == 0)) ||
-                   ((indices[0] == 0) && (indices[1] == 1)),
-                 ExcInternalError());
-          return data[2];
-
-        default:
-          // to do the rest, sort our indices before comparing
-          {
-            TableIndices<2> sorted_indices(std::min(indices[0], indices[1]),
-                                           std::max(indices[0], indices[1]));
-            for (unsigned int d = 0, c = 0; d < dim; ++d)
-              for (unsigned int e = d + 1; e < dim; ++e, ++c)
-                if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
-                  return data[dim + c];
-            Assert(false, ExcInternalError());
-          }
-      }
-
-    // The code should never reach here.
-    // We cannot return a static variable, as this class must support number
-    // types that require no instances of the number type to be in scope during
-    // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    return data[0];
+    return data[SymmetricTensorImplementation::component_to_unrolled_index<dim>(
+      indices)];
   }
 
 
@@ -2139,43 +2104,8 @@ namespace internal
                           const typename SymmetricTensorAccessors::
                             StorageType<2, dim, Number>::base_tensor_type &data)
   {
-    // 1d is very simple and done first
-    if (dim == 1)
-      return data[0];
-
-    // first treat the main diagonal elements, which are stored consecutively
-    // at the beginning
-    if (indices[0] == indices[1])
-      return data[indices[0]];
-
-    // the rest is messier and requires a few switches.
-    switch (dim)
-      {
-        case 2:
-          // at least for the 2x2 case it is reasonably simple
-          Assert(((indices[0] == 1) && (indices[1] == 0)) ||
-                   ((indices[0] == 0) && (indices[1] == 1)),
-                 ExcInternalError());
-          return data[2];
-
-        default:
-          // to do the rest, sort our indices before comparing
-          {
-            TableIndices<2> sorted_indices(std::min(indices[0], indices[1]),
-                                           std::max(indices[0], indices[1]));
-            for (unsigned int d = 0, c = 0; d < dim; ++d)
-              for (unsigned int e = d + 1; e < dim; ++e, ++c)
-                if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
-                  return data[dim + c];
-            Assert(false, ExcInternalError());
-          }
-      }
-
-    // The code should never reach here.
-    // We cannot return a static variable, as this class must support number
-    // types that require no instances of the number type to be in scope during
-    // a reinitialization procedure (e.g. ADOL-C adtl::adouble).
-    return data[0];
+    return data[SymmetricTensorImplementation::component_to_unrolled_index<dim>(
+      indices)];
   }
 
 
