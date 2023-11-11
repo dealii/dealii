@@ -77,7 +77,7 @@ test()
 
   deallog << "l1-norm: ";
   parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(
-    tria, indicator, 0.3, 0.3, VectorTools::NormType::L1_norm);
+    tria, indicator, 0.3, 0.3, VectorTools::L1_norm);
   count_flags(tria);
   deallog << std::endl;
 
@@ -91,7 +91,7 @@ test()
 
   deallog << "l2-norm: ";
   parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction(
-    tria, indicator, 0.3, 0.3, VectorTools::NormType::L2_norm);
+    tria, indicator, 0.3, 0.3, VectorTools::L2_norm);
   count_flags(tria);
   deallog << std::endl;
 }

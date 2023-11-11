@@ -363,11 +363,11 @@ test(const unsigned int degree)
                                       Functions::ZeroFunction<dim>(),
                                       difference,
                                       quadrature,
-                                      VectorTools::NormType::L2_norm);
+                                      VectorTools::L2_norm);
 
     deallog << VectorTools::compute_global_error(tria,
                                                  difference,
-                                                 VectorTools::NormType::L2_norm)
+                                                 VectorTools::L2_norm)
             << std::endl;
 
     return {reduction_control.last_step(), reduction_control.last_value()};

@@ -595,7 +595,7 @@ namespace Step37
                                       ManufacturedSolution<dim>(),
                                       errors,
                                       QIterated<dim>(QTrapezoid<1>(), 4),
-                                      VectorTools::NormType::Linfty_norm);
+                                      VectorTools::Linfty_norm);
     double max_cell_error = 1.0;
     if (errors.begin() != errors.end())
       max_cell_error = *std::max_element(errors.begin(), errors.end());

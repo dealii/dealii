@@ -206,7 +206,7 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
                                       Functions::ZeroFunction<dim>(),
                                       difference,
                                       quads,
-                                      VectorTools::NormType::L2_norm);
+                                      VectorTools::L2_norm);
 
     std::tuple<unsigned int, double, double, double> result(
       reduction_control.last_step(),
@@ -214,7 +214,7 @@ test(const unsigned version, const unsigned int degree, const bool do_helmholtz)
       x.linfty_norm(),
       VectorTools::compute_global_error(tria,
                                         difference,
-                                        VectorTools::NormType::L2_norm));
+                                        VectorTools::L2_norm));
 
     return result;
   };

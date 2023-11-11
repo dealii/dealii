@@ -753,7 +753,7 @@ inconvenience this causes.
 
   <li> New: The VectorTools::integrate_difference() function can now
   also compute the $H_\text{div}$ seminorm, using the
-  VectorTools::NormType::Hdiv_seminorm argument.
+  VectorTools::Hdiv_seminorm argument.
   <br>
   (Zhen Tao, Arezou Ghesmati, Wolfgang Bangerth, 2015/04/17)
   </li>

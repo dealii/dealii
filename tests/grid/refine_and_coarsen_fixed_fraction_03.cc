@@ -73,7 +73,7 @@ test()
     0.3,
     0.3,
     std::numeric_limits<unsigned int>::max(),
-    VectorTools::NormType::L1_norm);
+    VectorTools::L1_norm);
   count_flags(tria);
   deallog << std::endl;
 
@@ -91,7 +91,7 @@ test()
     0.3,
     0.3,
     std::numeric_limits<unsigned int>::max(),
-    VectorTools::NormType::L2_norm);
+    VectorTools::L2_norm);
   count_flags(tria);
   deallog << std::endl;
 }
