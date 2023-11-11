@@ -2005,6 +2005,87 @@ DEAL_II_HOST DEAL_II_CONSTEXPR inline
 // into a separate namespace
 namespace internal
 {
+  namespace SymmetricTensorImplementation
+  {
+    // a function to do the unrolling from a set of indices to a
+    // scalar index into the array in which we store the elements of
+    // a symmetric tensor
+    //
+    // this function is for rank-2 tensors
+    template <int dim>
+    constexpr inline DEAL_II_ALWAYS_INLINE unsigned int
+    component_to_unrolled_index(const TableIndices<2> &indices)
+    {
+      AssertIndexRange(indices[0], dim);
+      AssertIndexRange(indices[1], dim);
+
+      switch (dim)
+        {
+          case 1:
+            {
+              return 0;
+            }
+
+          case 2:
+            {
+              constexpr unsigned int table[2][2] = {{0, 2}, {2, 1}};
+              return table[indices[0]][indices[1]];
+            }
+
+          case 3:
+            {
+              constexpr unsigned int table[3][3] = {{0, 3, 4},
+                                                    {3, 1, 5},
+                                                    {4, 5, 2}};
+              return table[indices[0]][indices[1]];
+            }
+
+          case 4:
+            {
+              constexpr unsigned int table[4][4] = {{0, 4, 5, 6},
+                                                    {4, 1, 7, 8},
+                                                    {5, 7, 2, 9},
+                                                    {6, 8, 9, 3}};
+              return table[indices[0]][indices[1]];
+            }
+
+          default:
+            // for the remainder, manually figure out the numbering
+            {
+              if (indices[0] == indices[1])
+                return indices[0];
+
+              TableIndices<2> sorted_indices(indices);
+              sorted_indices.sort();
+
+              for (unsigned int d = 0, c = 0; d < dim; ++d)
+                for (unsigned int e = d + 1; e < dim; ++e, ++c)
+                  if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
+                    return dim + c;
+
+              // should never get here:
+              Assert(false, ExcInternalError());
+              return 0;
+            }
+        }
+    }
+
+    // a function to do the unrolling from a set of indices to a
+    // scalar index into the array in which we store the elements of
+    // a symmetric tensor
+    //
+    // this function is for tensors of ranks not already handled
+    // above
+    template <int dim, int rank_>
+    constexpr inline unsigned int
+    component_to_unrolled_index(const TableIndices<rank_> &indices)
+    {
+      (void)indices;
+      Assert(false, ExcNotImplemented());
+      return numbers::invalid_unsigned_int;
+    }
+  } // namespace SymmetricTensorImplementation
+
   template <int dim, typename Number>
   constexpr inline DEAL_II_ALWAYS_INLINE Number &
   symmetric_tensor_access(const TableIndices<2> &indices,
@@ -2458,91 +2539,6 @@ SymmetricTensor<rank_, dim, Number>::norm() const
   return internal::compute_norm<dim, Number>(data);
 }
 
-
-
-namespace internal
-{
-  namespace SymmetricTensorImplementation
-  {
-    // a function to do the unrolling from a set of indices to a
-    // scalar index into the array in which we store the elements of
-    // a symmetric tensor
-    //
-    // this function is for rank-2 tensors
-    template <int dim>
-    constexpr inline DEAL_II_ALWAYS_INLINE unsigned int
-    component_to_unrolled_index(const TableIndices<2> &indices)
-    {
-      AssertIndexRange(indices[0], dim);
-      AssertIndexRange(indices[1], dim);
-
-      switch (dim)
-        {
-          case 1:
-            {
-              return 0;
-            }
-
-          case 2:
-            {
-              constexpr unsigned int table[2][2] = {{0, 2}, {2, 1}};
-              return table[indices[0]][indices[1]];
-            }
-
-          case 3:
-            {
-              constexpr unsigned int table[3][3] = {{0, 3, 4},
-                                                    {3, 1, 5},
-                                                    {4, 5, 2}};
-              return table[indices[0]][indices[1]];
-            }
-
-          case 4:
-            {
-              constexpr unsigned int table[4][4] = {{0, 4, 5, 6},
-                                                    {4, 1, 7, 8},
-                                                    {5, 7, 2, 9},
-                                                    {6, 8, 9, 3}};
-              return table[indices[0]][indices[1]];
-            }
-
-          default:
-            // for the remainder, manually figure out the numbering
-            {
-              if (indices[0] == indices[1])
-                return indices[0];
-
-              TableIndices<2> sorted_indices(indices);
-              sorted_indices.sort();
-
-              for (unsigned int d = 0, c = 0; d < dim; ++d)
-                for (unsigned int e = d + 1; e < dim; ++e, ++c)
-                  if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
-                    return dim + c;
-
-              // should never get here:
-              Assert(false, ExcInternalError());
-              return 0;
-            }
-        }
-    }
-
-    // a function to do the unrolling from a set of indices to a
-    // scalar index into the array in which we store the elements of
-    // a symmetric tensor
-    //
-    // this function is for tensors of ranks not already handled
-    // above
-    template <int dim, int rank_>
-    constexpr inline unsigned int
-    component_to_unrolled_index(const TableIndices<rank_> &indices)
-    {
-      (void)indices;
-      Assert(false, ExcNotImplemented());
-      return numbers::invalid_unsigned_int;
-    }
-  } // namespace SymmetricTensorImplementation
-} // namespace internal
 
 
 template <int rank_, int dim, typename Number>
