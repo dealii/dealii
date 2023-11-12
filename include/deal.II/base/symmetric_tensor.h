@@ -19,6 +19,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/table_indices.h>
 #include <deal.II/base/template_constraints.h>
@@ -2025,30 +2026,27 @@ namespace internal
             {
               return 0;
             }
-
           case 2:
             {
-              constexpr unsigned int table[2][2] = {{0, 2}, {2, 1}};
+              constexpr dealii::ndarray<unsigned int, 2, 2> table = {
+                {{{0, 2}}, {{2, 1}}}};
               return table[indices[0]][indices[1]];
             }
-
           case 3:
             {
-              constexpr unsigned int table[3][3] = {{0, 3, 4},
-                                                    {3, 1, 5},
-                                                    {4, 5, 2}};
+              constexpr dealii::ndarray<unsigned int, 3, 3> table = {
+                {{{0, 3, 4}}, {{3, 1, 5}}, {{4, 5, 2}}}};
               return table[indices[0]][indices[1]];
             }
-
           case 4:
             {
-              constexpr unsigned int table[4][4] = {{0, 4, 5, 6},
-                                                    {4, 1, 7, 8},
-                                                    {5, 7, 2, 9},
-                                                    {6, 8, 9, 3}};
+              constexpr dealii::ndarray<unsigned int, 4, 4> table = {
+                {{{0, 4, 5, 6}},
+                 {{4, 1, 7, 8}},
+                 {{5, 7, 2, 9}},
+                 {{6, 8, 9, 3}}}};
               return table[indices[0]][indices[1]];
             }
-
           default:
             // for the remainder, manually figure out the numbering
             {
