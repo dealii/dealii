@@ -2057,7 +2057,11 @@ namespace internal
                 std::min(indices[0], indices[1]),
                 std::max(indices[0], indices[1]));
 
-              for (unsigned int d = 0, c = 0; d < dim; ++d)
+              // Here (d, e) are the row and column of the symmetric matrix and
+              // 'dim + c' is the index into the Tensor<1, dim> actually used
+              // for storage.
+              unsigned int c = 0;
+              for (unsigned int d = 0; d < dim; ++d)
                 for (unsigned int e = d + 1; e < dim; ++e, ++c)
                   if ((sorted_indices[0] == d) && (sorted_indices[1] == e))
                     return dim + c;
