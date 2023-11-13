@@ -314,7 +314,7 @@ This suggest a semismooth Newton step of the form
 \end{pmatrix}
 =
 -\begin{pmatrix}
- (AU^k + \Lambda^k - F)_{\mathcal{F}_k}\\ (AU^k + \Lambda^k - F)_{\mathcal{A}_k}\\ -\Lambda^k_{\mathcal{F}_k}\\ c(B_{\mathcal{A}_k} U^k - G)_{\mathcal{A}_k}
+ (AU^k + B\Lambda^k - F)_{\mathcal{F}_k}\\ (AU^k + B\Lambda^k - F)_{\mathcal{A}_k}\\ -\Lambda^k_{\mathcal{F}_k}\\ c(B_{\mathcal{A}_k} U^k - G)_{\mathcal{A}_k}
 \end{pmatrix},
 @f}
 where we have split matrices $A,B$ as well as vectors in the natural way into
