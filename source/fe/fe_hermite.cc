@@ -748,6 +748,77 @@ FE_Hermite<dim, spacedim>::get_lexicographic_to_hierarchic_numbering() const
 
 
 template <int dim, int spacedim>
+Table<2, unsigned int>
+FE_Hermite<dim, spacedim>::get_dofs_corresponding_to_outward_normal_derivatives(
+  const unsigned int derivative_order) const
+{
+  /*
+   * Create a look-up table for finding relevant dofs on all
+   * 2*dim faces of reference cell
+   */
+  const unsigned int degree        = this->degree;
+  const unsigned int regularity    = this->get_regularity();
+  const unsigned int dofs_per_face = this->n_dofs_per_face();
+  AssertDimension(dofs_per_face,
+                  (regularity + 1) * Utilities::pow(degree + 1, dim - 1));
+
+  const unsigned int relevant_dofs_per_face = dofs_per_face / (regularity + 1);
+  Table<2, unsigned int> dofs_on_each_face(2 * dim, relevant_dofs_per_face);
+
+  /*
+   * Use knowledge of the local degree numbering for this version,
+   * saving expensive calls to reinit
+   */
+  const std::vector<unsigned int> l2h =
+    get_lexicographic_to_hierarchic_numbering();
+  const unsigned int dofs_per_cell = Utilities::pow(degree + 1, dim);
+  AssertDimension(dofs_per_cell, l2h.size());
+  (void)dofs_per_cell;
+
+  /*
+   * The following loop uses the variables batch_size, batch_index
+   * and local_index to simplify calculations. The idea is to find
+   * relevant DoFs in batches, with each batch representing a
+   * set of DoFs of interest on a given face that occur consecutively
+   * in the ordering of all DoFs on the reference cell.
+   * To quickly summarise what the variables mean:
+   * sublist_index: index of a DoF in the list of relevant DoF indices
+   * index: index of a DoF in the list of all DoFs on the cell
+   * batch_size: Number of consecutive DoFs in the ordering that are
+   *             all of interest,
+   * batch index: Index of the current batch in the list of batches
+   * local_index: Index of the current DoF within a batch
+   *
+   * The variable correction is used because the pattern of relevant
+   * DoFs on opposite face pairs is always the same, just separated by
+   * a constant offset value in the indices, so it's easier to calculate
+   * the pattern once and find this offset value.
+   */
+  for (unsigned int d = 0, batch_size = 1; d < dim;
+       ++d, batch_size *= degree + 1)
+    for (unsigned int sublist_index = 0; sublist_index < relevant_dofs_per_face;
+         ++sublist_index)
+      {
+        const unsigned int local_index = sublist_index % batch_size;
+        const unsigned int batch_index = sublist_index / batch_size;
+
+        unsigned int index =
+          local_index +
+          (batch_index * (degree + 1) + derivative_order) * batch_size;
+        unsigned int correction = batch_size * (regularity + 1);
+        Assert(index + correction < dofs_per_cell,
+               ExcDimensionMismatch(index + correction, dofs_per_cell));
+
+        dofs_on_each_face(2 * d, sublist_index)     = l2h[index];
+        dofs_on_each_face(2 * d + 1, sublist_index) = l2h[index + correction];
+      }
+
+  return dofs_on_each_face;
+}
+
+
+
+template <int dim, int spacedim>
 void
 FE_Hermite<dim, spacedim>::fill_fe_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
