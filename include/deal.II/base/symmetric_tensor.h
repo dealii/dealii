@@ -4113,8 +4113,11 @@ operator*(const SymmetricTensor<2, dim, Number> &src1,
 {
   Tensor<1, dim, typename ProductType<Number, OtherNumber>::type> dest;
   for (unsigned int i = 0; i < dim; ++i)
-    for (unsigned int j = 0; j < dim; ++j)
-      dest[i] += src1[i][j] * src2[j];
+    {
+      dest[i] = src1[i][0] * src2[0];
+      for (unsigned int j = 1; j < dim; ++j)
+        dest[i] += src1[i][j] * src2[j];
+    }
   return dest;
 }
 
