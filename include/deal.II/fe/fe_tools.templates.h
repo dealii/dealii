@@ -69,6 +69,7 @@
 #include <cctype>
 #include <iostream>
 #include <memory>
+#include <shared_mutex>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -1219,15 +1220,12 @@ namespace FETools
       }
 
 
-      // have a lock that guarantees that at most one thread is changing
-      // and accessing the fe_name_map variable. make this lock local to
-      // this file.
-      //
-      // This variable is declared static (even though
-      // it belongs to an internal namespace) in order to make icc happy
-      // (which otherwise reports a multiply defined symbol when linking
-      // libraries for more than one space dimension together)
-      static std::mutex fe_name_map_lock;
+      // Have a lock that guarantees that at most one thread is changing
+      // and accessing the fe_name_map variable. The variable
+      // is declared 'extern' here because we are in a .h file, but
+      // it really needs to be defined in a .cc file (and indeed we have
+      // the definition there).
+      extern std::shared_mutex fe_name_map_lock;
 
       // This is the map used by FETools::get_fe_by_name and
       // FETools::add_fe_name. It is only accessed by functions in this
@@ -2295,25 +2293,32 @@ namespace FETools
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
     if (name_end < name.size())
       name.erase(name_end);
-    // first make sure that no other
-    // thread intercepts the
-    // operation of this function;
-    // for this, acquire the lock
-    // until we quit this function
-    std::lock_guard<std::mutex> lock(
+
+      // Ensure that the element we are looking for isn't in the map
+      // yet. This only requires us to read the map, so it can happen
+      // in a shared locked state
+#if DEBUG
+    {
+      std::shared_lock<std::shared_mutex> lock(
+        internal::FEToolsAddFENameHelper::fe_name_map_lock);
+
+      Assert(
+        internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim].find(
+          name) ==
+          internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
+            .end(),
+        ExcMessage(
+          "Cannot change existing element in finite element name list"));
+    }
+#endif
+
+
+    // Insert the normalized name into the map. This changes the map, so it
+    // has to happen under a non-shared (writer) lock:
+    std::unique_lock<std::shared_mutex> lock(
       internal::FEToolsAddFENameHelper::fe_name_map_lock);
-
-    Assert(
-      internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim].find(
-        name) ==
-        internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]
-          .end(),
-      ExcMessage("Cannot change existing element in finite element name list"));
-
-    // Insert the normalized name into
-    // the map
-    internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim][name] =
-      std::unique_ptr<const Subscriptor>(factory);
+    internal::FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim].emplace(
+      name, std::unique_ptr<const Subscriptor>(factory));
   }
 
 
@@ -2457,16 +2462,16 @@ namespace FETools
           }
         else
           {
-            // Make sure no other thread
-            // is just adding an element
-            std::lock_guard<std::mutex> lock(
+            // Lock access to the name map, but do so in a way that allows other
+            // readers to access it concurrently:
+            std::shared_lock<std::shared_mutex> lock(
               internal::FEToolsAddFENameHelper::fe_name_map_lock);
+
             AssertThrow(fe_name_map.find(name_part) != fe_name_map.end(),
                         FETools::ExcInvalidFEName(name));
 
-            // Now, just the (degree)
-            // or (Quadrature<1>(degree+1))
-            // part should be left.
+            // Now, just the (degree) or (Quadrature<1>(degree+1)) part should
+            // be left.
             if (name.empty() || name[0] != '(')
               throw std::string("Invalid first character in ") + name;
             name.erase(0, 1);
