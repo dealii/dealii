@@ -26,6 +26,8 @@
 #include <atomic>
 #include <mutex>
 #include <optional>
+#include <type_traits>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -136,7 +138,8 @@ public:
    */
   template <typename Callable>
   void
-  ensure_initialized(const Callable &creator) const;
+  ensure_initialized(const Callable &creator) const
+    DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>));
 
 
   /**
@@ -184,7 +187,8 @@ public:
    */
   template <typename Callable>
   const T &
-  value_or_initialize(const Callable &creator) const;
+  value_or_initialize(const Callable &creator) const
+    DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>));
 
 
   /**
@@ -192,7 +196,8 @@ public:
    */
   template <typename Callable>
   DEAL_II_ALWAYS_INLINE inline T &
-  value_or_initialize(const Callable &creator);
+  value_or_initialize(const Callable &creator)
+    DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>));
 
 
   /**
@@ -284,6 +289,7 @@ template <typename T>
 template <typename Callable>
 inline DEAL_II_ALWAYS_INLINE void
 Lazy<T>::ensure_initialized(const Callable &creator) const
+  DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>))
 {
   //
   // Use Schmidt's double checking [1] for checking and initializing the
@@ -387,6 +393,7 @@ template <typename T>
 template <typename Callable>
 inline DEAL_II_ALWAYS_INLINE const T &
 Lazy<T>::value_or_initialize(const Callable &creator) const
+  DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>))
 {
   ensure_initialized(creator);
   return object.value();
@@ -397,6 +404,7 @@ template <typename T>
 template <typename Callable>
 inline DEAL_II_ALWAYS_INLINE T &
 Lazy<T>::value_or_initialize(const Callable &creator)
+  DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>))
 {
   ensure_initialized(creator);
   return object.value();
