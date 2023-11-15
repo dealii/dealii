@@ -197,7 +197,12 @@ namespace SUNDIALS
                         SUNMatrix /*ignored*/,
                         N_Vector x,
                         N_Vector b,
-                        realtype tol)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                        sunrealtype tol
+#  else
+                        realtype tol
+#  endif
+    )
     {
       LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
 

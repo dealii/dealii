@@ -227,8 +227,16 @@ namespace SUNDIALS
 
     status = IDAInit(
       ida_mem,
-      [](realtype tt, N_Vector yy, N_Vector yp, N_Vector rr, void *user_data)
-        -> int {
+      [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+        sunrealtype tt,
+#  else
+        realtype tt,
+#  endif
+        N_Vector yy,
+        N_Vector yp,
+        N_Vector rr,
+        void    *user_data) -> int {
         IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
 
         auto *src_yy   = internal::unwrap_nvector_const<VectorType>(yy);
@@ -313,7 +321,7 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     LS = SUNLinSolNewEmpty();
 #  else
-    LS      = SUNLinSolNewEmpty(ida_ctx);
+    LS = SUNLinSolNewEmpty(ida_ctx);
 #  endif
 
     LS->content = this;
@@ -343,7 +351,12 @@ namespace SUNDIALS
                         SUNMatrix /*ignored*/,
                         N_Vector x,
                         N_Vector b,
-                        realtype tol) -> int {
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                        sunrealtype tol
+#  else
+                        realtype tol
+#  endif
+                        ) -> int {
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(LS->content);
 
       auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
@@ -378,7 +391,7 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
     J = SUNMatNewEmpty();
 #  else
-    J       = SUNMatNewEmpty(ida_ctx);
+    J = SUNMatNewEmpty(ida_ctx);
 #  endif
     J->content = this;
 
@@ -411,16 +424,22 @@ namespace SUNDIALS
     // calling IDASetLinearSolver
     status = IDASetJacFn(
       ida_mem,
-      [](realtype tt,
-         realtype cj,
-         N_Vector yy,
-         N_Vector yp,
-         N_Vector /* residual */,
-         SUNMatrix /* ignored */,
-         void *user_data,
-         N_Vector /* tmp1 */,
-         N_Vector /* tmp2 */,
-         N_Vector /* tmp3 */) -> int {
+      [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+        sunrealtype tt,
+        sunrealtype cj,
+#  else
+        realtype tt,
+        realtype cj,
+#  endif
+        N_Vector yy,
+        N_Vector yp,
+        N_Vector /* residual */,
+        SUNMatrix /* ignored */,
+        void *user_data,
+        N_Vector /* tmp1 */,
+        N_Vector /* tmp2 */,
+        N_Vector /* tmp3 */) -> int {
         Assert(user_data != nullptr, ExcInternalError());
         IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
 

@@ -176,6 +176,12 @@ namespace SUNDIALS
      */
     namespace NVectorOperations
     {
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+      using realtype = ::sunrealtype;
+#  else
+      using realtype = ::realtype;
+#  endif
+
       N_Vector_ID
       get_vector_id(N_Vector v);
 

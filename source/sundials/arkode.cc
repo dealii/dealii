@@ -269,8 +269,15 @@ namespace SUNDIALS
     Assert(explicit_function || implicit_function,
            ExcFunctionNotProvided("explicit_function || implicit_function"));
 
-    auto explicit_function_callback =
-      [](realtype tt, N_Vector yy, N_Vector yp, void *user_data) -> int {
+    auto explicit_function_callback = [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                        sunrealtype tt,
+#  else
+                                        realtype tt,
+#  endif
+                                        N_Vector yy,
+                                        N_Vector yp,
+                                        void    *user_data) -> int {
       Assert(user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
         *static_cast<ARKode<VectorType> *>(user_data);
@@ -287,8 +294,15 @@ namespace SUNDIALS
     };
 
 
-    auto implicit_function_callback =
-      [](realtype tt, N_Vector yy, N_Vector yp, void *user_data) -> int {
+    auto implicit_function_callback = [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                        sunrealtype tt,
+#  else
+                                        realtype tt,
+#  endif
+                                        N_Vector yy,
+                                        N_Vector yp,
+                                        void    *user_data) -> int {
       Assert(user_data != nullptr, ExcInternalError());
       ARKode<VectorType> &solver =
         *static_cast<ARKode<VectorType> *>(user_data);
@@ -416,7 +430,11 @@ namespace SUNDIALS
 
         auto jacobian_times_vector_callback = [](N_Vector v,
                                                  N_Vector Jv,
-                                                 realtype t,
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                 sunrealtype t,
+#  else
+                                                 realtype      t,
+#  endif
                                                  N_Vector y,
                                                  N_Vector fy,
                                                  void    *user_data,
@@ -441,8 +459,15 @@ namespace SUNDIALS
             *src_fy);
         };
 
-        auto jacobian_times_vector_setup_callback =
-          [](realtype t, N_Vector y, N_Vector fy, void *user_data) -> int {
+        auto jacobian_times_vector_setup_callback = [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                      sunrealtype t,
+#  else
+                                                      realtype t,
+#  endif
+                                                      N_Vector y,
+                                                      N_Vector fy,
+                                                      void *user_data) -> int {
           Assert(user_data != nullptr, ExcInternalError());
           ARKode<VectorType> &solver =
             *static_cast<ARKode<VectorType> *>(user_data);
@@ -465,15 +490,25 @@ namespace SUNDIALS
         AssertARKode(status);
         if (jacobian_preconditioner_solve)
           {
-            auto solve_with_jacobian_callback = [](realtype t,
-                                                   N_Vector y,
-                                                   N_Vector fy,
-                                                   N_Vector r,
-                                                   N_Vector z,
-                                                   realtype gamma,
-                                                   realtype delta,
-                                                   int      lr,
-                                                   void    *user_data) -> int {
+            auto solve_with_jacobian_callback = [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                  sunrealtype t,
+#  else
+                                                  realtype   t,
+#  endif
+                                                  N_Vector y,
+                                                  N_Vector fy,
+                                                  N_Vector r,
+                                                  N_Vector z,
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                  sunrealtype gamma,
+                                                  sunrealtype delta,
+#  else
+                                                  realtype   gamma,
+                                                  realtype   delta,
+#  endif
+                                                  int   lr,
+                                                  void *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
               ARKode<VectorType> &solver =
                 *static_cast<ARKode<VectorType> *>(user_data);
@@ -497,13 +532,22 @@ namespace SUNDIALS
                 lr);
             };
 
-            auto jacobian_solver_setup_callback = [](realtype     t,
-                                                     N_Vector     y,
-                                                     N_Vector     fy,
-                                                     booleantype  jok,
-                                                     booleantype *jcurPtr,
-                                                     realtype     gamma,
-                                                     void *user_data) -> int {
+            auto jacobian_solver_setup_callback = [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                    sunrealtype t,
+#  else
+                                                    realtype t,
+#  endif
+                                                    N_Vector     y,
+                                                    N_Vector     fy,
+                                                    booleantype  jok,
+                                                    booleantype *jcurPtr,
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                    sunrealtype gamma,
+#  else
+                                                    realtype gamma,
+#  endif
+                                                    void *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
               ARKode<VectorType> &solver =
                 *static_cast<ARKode<VectorType> *>(user_data);
@@ -621,7 +665,13 @@ namespace SUNDIALS
         AssertARKode(status);
 
         auto mass_matrix_times_vector_setup_callback =
-          [](realtype t, void *mtimes_data) -> int {
+          [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+            sunrealtype t,
+#  else
+            realtype                                         t,
+#  endif
+            void *mtimes_data) -> int {
           Assert(mtimes_data != nullptr, ExcInternalError());
           ARKode<VectorType> &solver =
             *static_cast<ARKode<VectorType> *>(mtimes_data);
@@ -630,8 +680,14 @@ namespace SUNDIALS
             solver.mass_times_setup, solver.pending_exception, t);
         };
 
-        auto mass_matrix_times_vector_callback =
-          [](N_Vector v, N_Vector Mv, realtype t, void *mtimes_data) -> int {
+        auto mass_matrix_times_vector_callback = [](N_Vector v,
+                                                    N_Vector Mv,
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                    sunrealtype t,
+#  else
+                                                    realtype t,
+#  endif
+                                                    void *mtimes_data) -> int {
           Assert(mtimes_data != nullptr, ExcInternalError());
           ARKode<VectorType> &solver =
             *static_cast<ARKode<VectorType> *>(mtimes_data);
@@ -657,8 +713,13 @@ namespace SUNDIALS
 
         if (mass_preconditioner_solve)
           {
-            auto mass_matrix_solver_setup_callback =
-              [](realtype t, void *user_data) -> int {
+            auto mass_matrix_solver_setup_callback = [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                       sunrealtype t,
+#  else
+                                                       realtype t,
+#  endif
+                                                       void *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
               ARKode<VectorType> &solver =
                 *static_cast<ARKode<VectorType> *>(user_data);
@@ -667,12 +728,21 @@ namespace SUNDIALS
                 solver.mass_preconditioner_setup, solver.pending_exception, t);
             };
 
-            auto solve_with_mass_matrix_callback = [](realtype t,
-                                                      N_Vector r,
-                                                      N_Vector z,
-                                                      realtype delta,
-                                                      int      lr,
-                                                      void *user_data) -> int {
+            auto solve_with_mass_matrix_callback = [](
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                     sunrealtype t,
+#  else
+                                                     realtype   t,
+#  endif
+                                                     N_Vector r,
+                                                     N_Vector z,
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                     sunrealtype delta,
+#  else
+                                                     realtype   delta,
+#  endif
+                                                     int   lr,
+                                                     void *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
               ARKode<VectorType> &solver =
                 *static_cast<ARKode<VectorType> *>(user_data);
