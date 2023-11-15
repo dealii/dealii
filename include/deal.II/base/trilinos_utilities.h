@@ -32,6 +32,10 @@
 #  endif
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  include <Teuchos_RCPDecl.hpp>
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -180,6 +184,35 @@ namespace Utilities
     duplicate_map(const Epetra_BlockMap &map, const Epetra_Comm &comm);
   } // namespace Trilinos
 #endif
+
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  namespace Trilinos
+  {
+    namespace internal
+    {
+      /**
+       * Creates and returns a
+       * <a
+       * href="https://docs.trilinos.org/dev/packages/teuchos/doc/html/classTeuchos_1_1RCP.html">Teuchos::RCP</a>
+       * object for type T.
+       *
+       * @note In Trilinos 14.0.0, the function
+       * <a
+       * href="https://docs.trilinos.org/dev/packages/teuchos/doc/html/namespaceTeuchos.html#a280c0ab8c9ee8d0481114d4edf5a3393">Teuchos::make_rcp()</a>
+       * was introduced, which should be preferred to this function.
+       */
+#  if defined(DOXYGEN) || !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+      template <class T, class... Args>
+      Teuchos::RCP<T>
+      make_rcp(Args &&...args);
+#  else
+      using Teuchos::make_rcp;
+#  endif // defined DOXYGEN || !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+    }    // namespace internal
+  }      // namespace Trilinos
+#endif   // DEAL_II_TRILINOS_WITH_TPETRA
+
 } // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE
