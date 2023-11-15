@@ -4426,8 +4426,9 @@ GeometryInfo<2>::child_cell_on_face(const RefinementCase<2> &ref_case,
   // refined neighbor. this simplifies setting neighbor
   // information in execute_refinement.
   constexpr unsigned int
-    subcells[2][RefinementPossibilities<2>::isotropic_refinement]
-            [faces_per_cell][max_children_per_face] = {
+    subcells[/* possible face orientation */ 2]
+            [/* number of different ways to refine a cell */ 4]
+            [/* faces_per_cell */ 4][/* max_children_per_face */ 2] = {
               {
                 // Normal orientation (face_flip = false)
                 {{0, 0}, {1, 1}, {0, 1}, {0, 1}}, // cut_x
