@@ -135,6 +135,8 @@ public:
    * of the calling threads and that after completion the initialization
    * result (which is stored in the std::optional) is visible on all
    * threads.
+   *
+   * @dealiiConceptRequires{std::is_invocable_r_v<T, Callable>}
    */
   template <typename Callable>
   void
@@ -184,6 +186,8 @@ public:
    *
    * @post The underlying object is initialized, meaning, has_value()
    * returns true.
+   *
+   * @dealiiConceptRequires{std::is_invocable_r_v<T, Callable>}
    */
   template <typename Callable>
   const T &
@@ -193,6 +197,8 @@ public:
 
   /**
    * Variant of above function that returns a non-const reference.
+   *
+   * @dealiiConceptRequires{std::is_invocable_r_v<T, Callable>}
    */
   template <typename Callable>
   DEAL_II_ALWAYS_INLINE inline T &
