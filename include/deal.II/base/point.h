@@ -117,13 +117,13 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE
+  constexpr DEAL_II_HOST_DEVICE
   Point();
 
   /**
    * Convert a tensor to a point.
    */
-  explicit DEAL_II_HOST_DEVICE
+  constexpr explicit DEAL_II_HOST_DEVICE
   Point(const Tensor<1, dim, Number> &);
 
   /**
@@ -134,7 +134,7 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  explicit DEAL_II_HOST_DEVICE
+  constexpr explicit DEAL_II_HOST_DEVICE
   Point(const Number x);
 
   /**
@@ -146,7 +146,7 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE
+  constexpr DEAL_II_HOST_DEVICE
   Point(const Number x, const Number y);
 
   /**
@@ -158,7 +158,7 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE
+  constexpr DEAL_II_HOST_DEVICE
   Point(const Number x, const Number y, const Number z);
 
   /**
@@ -166,8 +166,9 @@ public:
    */
   template <std::size_t dummy_dim,
             std::enable_if_t<(dim == dummy_dim) && (dummy_dim != 0), int> = 0>
-  Point(const boost::geometry::model::
-          point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt);
+  constexpr Point(
+    const boost::geometry::model::
+      point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt);
 
   /**
    * Return a unit vector in coordinate direction <tt>i</tt>, i.e., a vector
@@ -176,15 +177,15 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  static DEAL_II_HOST_DEVICE Point<dim, Number>
-                             unit_vector(const unsigned int i);
+  static constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
+                                       unit_vector(const unsigned int i);
 
   /**
    * Read access to the <tt>index</tt>th coordinate.
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE Number
+  constexpr DEAL_II_HOST_DEVICE Number
   operator()(const unsigned int index) const;
 
   /**
@@ -192,7 +193,7 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE Number &
+  constexpr DEAL_II_HOST_DEVICE Number &
   operator()(const unsigned int index);
 
   /**
@@ -201,7 +202,7 @@ public:
    * convertible to @p Number.
    */
   template <typename OtherNumber>
-  Point<dim, Number> &
+  constexpr Point<dim, Number> &
   operator=(const Tensor<1, dim, OtherNumber> &p);
 
   /**
@@ -214,8 +215,8 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE Point<dim, Number>
-                      operator+(const Tensor<1, dim, Number> &) const;
+  constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
+                                operator+(const Tensor<1, dim, Number> &) const;
 
   /**
    * Subtract two points, i.e., obtain the vector that connects the two. As
@@ -226,8 +227,8 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE Tensor<1, dim, Number>
-                      operator-(const Point<dim, Number> &) const;
+  constexpr DEAL_II_HOST_DEVICE Tensor<1, dim, Number>
+                                operator-(const Point<dim, Number> &) const;
 
   /**
    * Subtract a difference vector (represented by a Tensor@<1,dim@>) from the
@@ -237,16 +238,16 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE Point<dim, Number>
-                      operator-(const Tensor<1, dim, Number> &) const;
+  constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
+                                operator-(const Tensor<1, dim, Number> &) const;
 
   /**
    * The opposite vector.
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE Point<dim, Number>
-                      operator-() const;
+  constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
+                                operator-() const;
 
   /**
    * @}
@@ -265,7 +266,7 @@ public:
    * @relatesalso EnableIfScalar
    */
   template <typename OtherNumber>
-  DEAL_II_HOST_DEVICE Point<
+  constexpr DEAL_II_HOST_DEVICE Point<
     dim,
     typename ProductType<Number,
                          typename EnableIfScalar<OtherNumber>::type>::type>
@@ -277,7 +278,7 @@ public:
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
-  DEAL_II_HOST_DEVICE Point<
+  constexpr DEAL_II_HOST_DEVICE Point<
     dim,
     typename ProductType<Number,
                          typename EnableIfScalar<OtherNumber>::type>::type>
@@ -288,7 +289,7 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE Number
+  constexpr DEAL_II_HOST_DEVICE Number
   operator*(const Tensor<1, dim, Number> &p) const;
 
   /**
@@ -303,8 +304,9 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
-  square() const;
+  constexpr DEAL_II_HOST_DEVICE
+    typename numbers::NumberTraits<Number>::real_type
+    square() const;
 
   /**
    * Return the Euclidean distance of <tt>this</tt> point to the point
@@ -322,8 +324,9 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
-  distance_square(const Point<dim, Number> &p) const;
+  constexpr DEAL_II_HOST_DEVICE
+    typename numbers::NumberTraits<Number>::real_type
+    distance_square(const Point<dim, Number> &p) const;
 
   /**
    * @}
@@ -347,14 +350,14 @@ public:
 // and we can't use 'Point<dim,Number>::Point () = default' here.
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Point<dim, Number>::Point() // NOLINT
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number>::Point() // NOLINT
 {}
 
 
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Point<dim, Number>::Point(
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number>::Point(
   const Tensor<1, dim, Number> &t)
   : Tensor<1, dim, Number>(t)
 {}
@@ -363,7 +366,7 @@ inline DEAL_II_HOST_DEVICE Point<dim, Number>::Point(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Point<dim, Number>::Point(const Number x)
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number>::Point(const Number x)
 {
   Assert(dim == 1,
          ExcMessage(
@@ -389,8 +392,8 @@ inline DEAL_II_HOST_DEVICE Point<dim, Number>::Point(const Number x)
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Point<dim, Number>::Point(const Number x,
-                                                     const Number y)
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number>::Point(const Number x,
+                                                        const Number y)
 {
   Assert(dim == 2,
          ExcMessage(
@@ -411,9 +414,9 @@ inline DEAL_II_HOST_DEVICE Point<dim, Number>::Point(const Number x,
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Point<dim, Number>::Point(const Number x,
-                                                     const Number y,
-                                                     const Number z)
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number>::Point(const Number x,
+                                                        const Number y,
+                                                        const Number z)
 {
   Assert(dim == 3,
          ExcMessage(
@@ -438,7 +441,7 @@ template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
 template <std::size_t dummy_dim,
           std::enable_if_t<(dim == dummy_dim) && (dummy_dim != 0), int>>
-inline Point<dim, Number>::Point(
+constexpr Point<dim, Number>::Point(
   const boost::geometry::model::
     point<Number, dummy_dim, boost::geometry::cs::cartesian> &boost_pt)
 {
@@ -458,8 +461,8 @@ inline Point<dim, Number>::Point(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::unit_vector(
-  unsigned int i)
+constexpr DEAL_II_HOST_DEVICE
+  Point<dim, Number> Point<dim, Number>::unit_vector(unsigned int i)
 {
   Point<dim, Number> p;
   p[i] = 1.;
@@ -469,7 +472,7 @@ inline DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::unit_vector(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Number Point<dim, Number>::operator()(
+constexpr DEAL_II_HOST_DEVICE Number Point<dim, Number>::operator()(
   const unsigned int index) const
 {
   AssertIndexRange(static_cast<int>(index), dim);
@@ -480,7 +483,7 @@ inline DEAL_II_HOST_DEVICE Number Point<dim, Number>::operator()(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Number &Point<dim, Number>::operator()(
+constexpr DEAL_II_HOST_DEVICE Number &Point<dim, Number>::operator()(
   const unsigned int index)
 {
   AssertIndexRange(static_cast<int>(index), dim);
@@ -492,8 +495,8 @@ inline DEAL_II_HOST_DEVICE Number &Point<dim, Number>::operator()(
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
 template <typename OtherNumber>
-inline DEAL_II_ALWAYS_INLINE Point<dim, Number> &Point<dim, Number>::operator=(
-  const Tensor<1, dim, OtherNumber> &p)
+constexpr DEAL_II_ALWAYS_INLINE Point<dim, Number>
+  &Point<dim, Number>::operator=(const Tensor<1, dim, OtherNumber> &p)
 {
   Tensor<1, dim, Number>::operator=(p);
   return *this;
@@ -503,7 +506,7 @@ inline DEAL_II_ALWAYS_INLINE Point<dim, Number> &Point<dim, Number>::operator=(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator+(
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator+(
   const Tensor<1, dim, Number> &p) const
 {
   Point<dim, Number> tmp = *this;
@@ -515,8 +518,9 @@ inline DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator+(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Tensor<1, dim, Number> Point<dim, Number>::operator-(
-  const Point<dim, Number> &p) const
+constexpr DEAL_II_HOST_DEVICE
+  Tensor<1, dim, Number> Point<dim, Number>::operator-(
+    const Point<dim, Number> &p) const
 {
   return (Tensor<1, dim, Number>(*this) -= p);
 }
@@ -525,7 +529,7 @@ inline DEAL_II_HOST_DEVICE Tensor<1, dim, Number> Point<dim, Number>::operator-(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-(
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-(
   const Tensor<1, dim, Number> &p) const
 {
   Point<dim, Number> tmp = *this;
@@ -537,7 +541,7 @@ inline DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-()
+constexpr DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-()
   const
 {
   Point<dim, Number> result;
@@ -551,7 +555,7 @@ inline DEAL_II_HOST_DEVICE Point<dim, Number> Point<dim, Number>::operator-()
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
 template <typename OtherNumber>
-inline DEAL_II_HOST_DEVICE Point<
+constexpr DEAL_II_HOST_DEVICE Point<
   dim,
   typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::
     type> Point<dim, Number>::operator*(const OtherNumber factor) const
@@ -567,7 +571,7 @@ inline DEAL_II_HOST_DEVICE Point<
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
 template <typename OtherNumber>
-inline DEAL_II_HOST_DEVICE Point<
+constexpr DEAL_II_HOST_DEVICE Point<
   dim,
   typename ProductType<Number, typename EnableIfScalar<OtherNumber>::type>::
     type> Point<dim, Number>::operator/(const OtherNumber factor) const
@@ -584,7 +588,7 @@ inline DEAL_II_HOST_DEVICE Point<
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE Number Point<dim, Number>::operator*(
+constexpr DEAL_II_HOST_DEVICE Number Point<dim, Number>::operator*(
   const Tensor<1, dim, Number> &p) const
 {
   Number res = Number();
@@ -596,7 +600,7 @@ inline DEAL_II_HOST_DEVICE Number Point<dim, Number>::operator*(
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
+constexpr DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
   Point<dim, Number>::square() const
 {
   return this->norm_square();
@@ -616,7 +620,7 @@ inline DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
 
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)
-inline DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
+constexpr DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
   Point<dim, Number>::distance_square(const Point<dim, Number> &p) const
 {
   Number sum = internal::NumberType<Number>::value(0.0);
@@ -655,7 +659,7 @@ inline void Point<dim, Number>::serialize(Archive &ar, const unsigned int)
  * @relates Point
  */
 template <int dim, typename Number, typename OtherNumber>
-inline DEAL_II_HOST_DEVICE
+constexpr DEAL_II_HOST_DEVICE
   Point<dim,
         typename ProductType<Number,
                              typename EnableIfScalar<OtherNumber>::type>::type>
