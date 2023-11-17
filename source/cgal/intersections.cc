@@ -52,9 +52,7 @@
 #  include <CGAL/Triangulation_face_base_with_info_2.h>
 #  include <deal.II/cgal/utilities.h>
 
-#  include <fstream>
 #  include <optional>
-#  include <type_traits>
 #  include <variant>
 
 DEAL_II_NAMESPACE_OPEN
@@ -430,7 +428,6 @@ namespace CGALWrappers
                                     true);
 
               internal::mark_domains(cdt);
-              std::array<Point<2>, 3> vertices;
 
               for (Face_handle f : cdt.finite_face_handles())
                 {
