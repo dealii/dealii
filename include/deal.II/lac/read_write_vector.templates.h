@@ -1036,12 +1036,12 @@ namespace LinearAlgebra
     const MPI_Comm  mpi_comm)
   {
     source_stored_elements = source_index_set;
-    TpetraWrappers::CommunicationPattern epetra_comm_pattern(
+    TpetraWrappers::CommunicationPattern tpetra_comm_pattern(
       source_stored_elements, stored_elements, mpi_comm);
     comm_pattern = std::make_shared<TpetraWrappers::CommunicationPattern>(
       source_stored_elements, stored_elements, mpi_comm);
 
-    return epetra_comm_pattern;
+    return tpetra_comm_pattern;
   }
 #  endif
 

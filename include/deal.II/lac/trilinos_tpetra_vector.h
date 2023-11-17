@@ -260,6 +260,10 @@ namespace LinearAlgebra
       using MapType = Tpetra::Map<int, dealii::types::signed_global_dof_index>;
       using VectorType =
         Tpetra::Vector<Number, int, dealii::types::signed_global_dof_index>;
+      using ExportType =
+        Tpetra::Export<int, dealii::types::signed_global_dof_index>;
+      using ImportType =
+        Tpetra::Import<int, dealii::types::signed_global_dof_index>;
 
       /**
        * @name 1: Basic Object-handling
@@ -419,6 +423,32 @@ namespace LinearAlgebra
        */
       reference
       operator()(const size_type index);
+
+      /**
+       * Provide read-only access to an element.
+       *
+       * When using a vector distributed with MPI, this operation only makes
+       * sense for elements that are actually present on the calling processor.
+       * Otherwise, an exception is thrown.
+       */
+      Number
+      operator()(const size_type index) const;
+
+      /**
+       * Provide access to a given element, both read and write.
+       *
+       * Exactly the same as operator().
+       */
+      reference
+      operator[](const size_type index);
+
+      /**
+       * Provide read-only access to an element.
+       *
+       * Exactly the same as operator().
+       */
+      Number
+      operator[](const size_type index) const;
 
       /** @} */
 
@@ -611,8 +641,7 @@ namespace LinearAlgebra
       /** @{ */
 
       /**
-       * This function always returns false and is present only for backward
-       * compatibility.
+       * Return whether the vector has ghost elements or not.
        */
       bool
       has_ghost_elements() const;
@@ -630,6 +659,14 @@ namespace LinearAlgebra
        */
       size_type
       locally_owned_size() const;
+
+      /**
+       * Return the state of the vector, i.e., whether compress() needs to be
+       * called after an operation requiring data exchange. A call to compress()
+       * is also needed when the method set() or add() has been called.
+       */
+      bool
+      is_compressed() const;
 
       /**
        * Return the underlying MPI communicator.
@@ -663,6 +700,11 @@ namespace LinearAlgebra
        * flush the buffers of the vector object if it has any. This function is
        * necessary after writing into a vector element-by-element and before
        * anything else can be done on it.
+       *
+       * @param operation The compress mode (<code>Add</code> or <code>Insert</code>)
+       * in case the vector has not been written to since the last time this
+       * function was called. The argument is ignored if the vector has been
+       * added or written to since the last time compress() was called.
        *
        * See
        * @ref GlossCompress "Compressing distributed objects"
@@ -739,6 +781,47 @@ namespace LinearAlgebra
        */
       DeclException0(ExcVectorTypeNotCompatible);
 
+      /*
+       * Access to a an element that is not (locally-)owned.
+       *
+       * @ingroup Exceptions
+       */
+      DeclException4(
+        ExcAccessToNonLocalElement,
+        size_type,
+        size_type,
+        size_type,
+        size_type,
+        << "You are trying to access element " << arg1
+        << " of a distributed vector, but this element is not stored "
+        << "on the current processor. Note: There are " << arg2
+        << " elements stored "
+        << "on the current processor from within the range [" << arg3 << ','
+        << arg4 << "] but Trilinos vectors need not store contiguous "
+        << "ranges on each processor, and not every element in "
+        << "this range may in fact be stored locally."
+        << "\n\n"
+        << "A common source for this kind of problem is that you "
+        << "are passing a 'fully distributed' vector into a function "
+        << "that needs read access to vector elements that correspond "
+        << "to degrees of freedom on ghost cells (or at least to "
+        << "'locally active' degrees of freedom that are not also "
+        << "'locally owned'). You need to pass a vector that has these "
+        << "elements as ghost entries.");
+
+      /**
+       * Missing index set.
+       *
+       * @ingroup Exceptions
+       */
+      DeclExceptionMsg(ExcMissingIndexSet,
+                       "To compress a vector, a locally_relevant_dofs "
+                       "index set, and a locally_owned_dofs index set "
+                       "must be provided. These index sets must be "
+                       "provided either when the vector is initialized "
+                       "or when compress is called. See the documentation "
+                       "of compress() for more information.");
+
       /**
        * Exception thrown by an error in Trilinos.
        *
@@ -760,14 +843,37 @@ namespace LinearAlgebra
                                  const MPI_Comm  mpi_comm);
 
       /**
+       * Store whether the vector has ghost elements or not.
+       *
+       * If the vector has no ghost elements, it can only access and modify
+       * entries included in the locally owned index set.
+       * And if the vector has ghost elements it can access and modify
+       * entries included in the locally relevant index set.
+       */
+      bool has_ghost;
+
+      /**
        * Teuchos::RCP to the actual Tpetra vector object.
        */
       Teuchos::RCP<VectorType> vector;
 
       /**
+       * Pointer to the Tpetra::Map storing the owned elemenets
+       * per rank. This map has a one-to-one mapping.
+       */
+      Teuchos::RCP<MapType> locally_owned_map;
+
+      /**
+       * Pointer to the Tpetra::Map storing the relevant elements
+       * per rank. There are entries in this map, that belong to multiple
+       * ranks.
+       */
+      Teuchos::RCP<MapType> locally_relevant_map;
+
+      /**
        * IndexSet of the elements of the last imported vector.
        */
-      ::dealii::IndexSet source_stored_elements;
+      dealii::IndexSet source_stored_elements;
 
       /**
        * CommunicationPattern for the communication between the
@@ -787,7 +893,16 @@ namespace LinearAlgebra
     inline bool
     Vector<Number>::has_ghost_elements() const
     {
-      return false;
+      return has_ghost;
+    }
+
+
+
+    template <typename Number>
+    inline bool
+    Vector<Number>::is_compressed() const
+    {
+      return !has_ghost;
     }
 
 
@@ -826,9 +941,26 @@ namespace LinearAlgebra
 
       for (size_type i = 0; i < n_elements; ++i)
         {
-          const size_type                         row = indices[i];
-          const TrilinosWrappers::types::int_type local_row =
+          const size_type                   row = indices[i];
+          TrilinosWrappers::types::int_type local_row =
             vector->getMap()->getLocalElement(row);
+
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+          Assert(
+            local_row != Teuchos::OrdinalTraits<int>::invalid(),
+            ExcAccessToNonLocalElement(row,
+                                       vector->getMap()->getLocalNumElements(),
+                                       vector->getMap()->getMinLocalIndex(),
+                                       vector->getMap()->getMaxLocalIndex()));
+#  else
+          Assert(
+            local_row != Teuchos::OrdinalTraits<int>::invalid(),
+            ExcAccessToNonLocalElement(row,
+                                       vector->getMap()->getNodeNumElements(),
+                                       vector->getMap()->getMinLocalIndex(),
+                                       vector->getMap()->getMaxLocalIndex()));
+
+#  endif
 
           if (local_row != Teuchos::OrdinalTraits<int>::invalid())
             vector_1d(local_row) += values[i];
@@ -863,9 +995,25 @@ namespace LinearAlgebra
 
       for (size_type i = 0; i < n_elements; ++i)
         {
-          const size_type                         row = indices[i];
-          const TrilinosWrappers::types::int_type local_row =
+          const size_type                   row = indices[i];
+          TrilinosWrappers::types::int_type local_row =
             vector->getMap()->getLocalElement(row);
+
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+          Assert(
+            local_row != Teuchos::OrdinalTraits<int>::invalid(),
+            ExcAccessToNonLocalElement(row,
+                                       vector->getMap()->getLocalNumElements(),
+                                       vector->getMap()->getMinLocalIndex(),
+                                       vector->getMap()->getMaxLocalIndex()));
+#  else
+          Assert(
+            local_row != Teuchos::OrdinalTraits<int>::invalid(),
+            ExcAccessToNonLocalElement(row,
+                                       vector->getMap()->getNodeNumElements(),
+                                       vector->getMap()->getMinLocalIndex(),
+                                       vector->getMap()->getMaxLocalIndex()));
+#  endif
 
           if (local_row != Teuchos::OrdinalTraits<int>::invalid())
             vector_1d(local_row) = values[i];
@@ -885,6 +1033,20 @@ namespace LinearAlgebra
     Vector<Number>::operator()(const size_type index)
     {
       return internal::VectorReference(*this, index);
+    }
+
+    template <typename Number>
+    inline internal::VectorReference<Number>
+    Vector<Number>::operator[](const size_type index)
+    {
+      return operator()(index);
+    }
+
+    template <typename Number>
+    inline Number
+    Vector<Number>::operator[](const size_type index) const
+    {
+      return operator()(index);
     }
 
 #  ifndef DOXYGEN
