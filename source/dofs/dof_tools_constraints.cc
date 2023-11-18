@@ -2462,7 +2462,7 @@ namespace DoFTools
     if (face_1->has_children() && face_2->has_children())
       {
         // In the case that both faces have children, we loop over all children
-        // and apply make_periodicty_constrains recursively:
+        // and apply make_periodicity_constraints() recursively:
 
         Assert(face_1->n_children() ==
                    GeometryInfo<dim>::max_children_per_face &&
@@ -2474,7 +2474,7 @@ namespace DoFTools
              ++i)
           {
             // Lookup the index for the second face
-            unsigned int j;
+            unsigned int j = numbers::invalid_unsigned_int;
             switch (dim)
               {
                 case 2:
