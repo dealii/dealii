@@ -21,6 +21,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/mutex.h>
+#include <deal.II/base/trilinos_utilities.h>
 
 #include <boost/container/small_vector.hpp>
 
