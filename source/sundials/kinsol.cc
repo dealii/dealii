@@ -362,14 +362,9 @@ namespace SUNDIALS
 
         LS->ops->solve = [](SUNLinearSolver LS,
                             SUNMatrix /*ignored*/,
-                            N_Vector x,
-                            N_Vector b,
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                            sunrealtype tol
-#  else
-                            realtype tol
-#  endif
-                            ) -> int {
+                            N_Vector           x,
+                            N_Vector           b,
+                            SUNDIALS::realtype tol) -> int {
           // Receive the object that describes the linear solver and
           // unpack the pointer to the KINSOL object from which we can then
           // get the 'reinit' and 'solve' functions.
@@ -399,7 +394,7 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
         J = SUNMatNewEmpty();
 #  else
-        J = SUNMatNewEmpty(kinsol_ctx);
+        J  = SUNMatNewEmpty(kinsol_ctx);
 #  endif
         J->content = this;
 

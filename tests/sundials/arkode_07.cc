@@ -95,17 +95,11 @@ main()
   };
 
 
-  ode.jacobian_times_setup = [&](
-#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                               sunrealtype t,
-#else
-                               realtype t,
-#endif
-                               const VectorType &y,
-                               const VectorType &fy) {
-    J       = 0;
-    J(2, 2) = -1.0 / eps;
-  };
+  ode.jacobian_times_setup =
+    [&](SUNDIALS::realtype t, const VectorType &y, const VectorType &fy) {
+      J       = 0;
+      J(2, 2) = -1.0 / eps;
+    };
 
   ode.jacobian_times_vector = [&](const VectorType &v,
                                   VectorType       &Jv,

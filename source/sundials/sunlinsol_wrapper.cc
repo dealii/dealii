@@ -36,6 +36,7 @@
 #  endif
 
 #  include <deal.II/sundials/n_vector.h>
+#  include <deal.II/sundials/sundials_types.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -195,14 +196,9 @@ namespace SUNDIALS
     int
     arkode_linsol_solve(SUNLinearSolver LS,
                         SUNMatrix /*ignored*/,
-                        N_Vector x,
-                        N_Vector b,
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                        sunrealtype tol
-#  else
-                        realtype tol
-#  endif
-    )
+                        N_Vector           x,
+                        N_Vector           b,
+                        SUNDIALS::realtype tol)
     {
       LinearSolverContent<VectorType> *content = access_content<VectorType>(LS);
 

@@ -20,6 +20,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/sundials/n_vector.h>
+#include <deal.II/sundials/sundials_types.h>
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
@@ -176,12 +177,6 @@ namespace SUNDIALS
      */
     namespace NVectorOperations
     {
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-      using realtype = ::sunrealtype;
-#  else
-      using realtype = ::realtype;
-#  endif
-
       N_Vector_ID
       get_vector_id(N_Vector v);
 
@@ -202,18 +197,22 @@ namespace SUNDIALS
 
       template <typename VectorType>
       void
-      linear_sum(realtype a, N_Vector x, realtype b, N_Vector y, N_Vector z);
+      linear_sum(SUNDIALS::realtype a,
+                 N_Vector           x,
+                 SUNDIALS::realtype b,
+                 N_Vector           y,
+                 N_Vector           z);
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       dot_product(N_Vector x, N_Vector y);
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       weighted_l2_norm(N_Vector x, N_Vector y);
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       l1_norm(N_Vector x);
 
       template <typename VectorType>
@@ -251,47 +250,47 @@ namespace SUNDIALS
       elementwise_abs(N_Vector x, N_Vector z);
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       weighted_rms_norm(N_Vector x, N_Vector w);
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       weighted_rms_norm_mask(N_Vector x, N_Vector w, N_Vector mask);
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       max_norm(N_Vector x);
 
       template <typename VectorType,
                 std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
-      realtype
+      SUNDIALS::realtype
       min_element(N_Vector x);
 
       template <typename VectorType,
                 std::enable_if_t<!is_serial_vector<VectorType>::value &&
                                    !IsBlockVector<VectorType>::value,
                                  int> = 0>
-      realtype
+      SUNDIALS::realtype
       min_element(N_Vector x);
 
       template <typename VectorType,
                 std::enable_if_t<!is_serial_vector<VectorType>::value &&
                                    IsBlockVector<VectorType>::value,
                                  int> = 0>
-      realtype
+      SUNDIALS::realtype
       min_element(N_Vector x);
 
       template <typename VectorType>
       void
-      scale(realtype c, N_Vector x, N_Vector z);
+      scale(SUNDIALS::realtype c, N_Vector x, N_Vector z);
 
       template <typename VectorType>
       void
-      set_constant(realtype c, N_Vector v);
+      set_constant(SUNDIALS::realtype c, N_Vector v);
 
       template <typename VectorType>
       void
-      add_constant(N_Vector x, realtype b, N_Vector z);
+      add_constant(N_Vector x, SUNDIALS::realtype b, N_Vector z);
 
       template <typename VectorType>
       const MPI_Comm &
@@ -652,7 +651,11 @@ namespace SUNDIALS
 
       template <typename VectorType>
       void
-      linear_sum(realtype a, N_Vector x, realtype b, N_Vector y, N_Vector z)
+      linear_sum(SUNDIALS::realtype a,
+                 N_Vector           x,
+                 SUNDIALS::realtype b,
+                 N_Vector           y,
+                 N_Vector           z)
       {
         auto *x_dealii = unwrap_nvector_const<VectorType>(x);
         auto *y_dealii = unwrap_nvector_const<VectorType>(y);
@@ -672,7 +675,7 @@ namespace SUNDIALS
 
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       dot_product(N_Vector x, N_Vector y)
       {
         return *unwrap_nvector_const<VectorType>(x) *
@@ -682,7 +685,7 @@ namespace SUNDIALS
 
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       weighted_l2_norm(N_Vector x, N_Vector w)
       {
         // TODO copy can be avoided by a custom kernel
@@ -695,7 +698,7 @@ namespace SUNDIALS
 
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       l1_norm(N_Vector x)
       {
         return unwrap_nvector_const<VectorType>(x)->l1_norm();
@@ -705,7 +708,7 @@ namespace SUNDIALS
 
       template <typename VectorType>
       void
-      set_constant(realtype c, N_Vector v)
+      set_constant(SUNDIALS::realtype c, N_Vector v)
       {
         auto *v_dealii = unwrap_nvector<VectorType>(v);
         *v_dealii      = c;
@@ -715,7 +718,7 @@ namespace SUNDIALS
 
       template <typename VectorType>
       void
-      add_constant(N_Vector x, realtype b, N_Vector z)
+      add_constant(N_Vector x, SUNDIALS::realtype b, N_Vector z)
       {
         auto *x_dealii = unwrap_nvector_const<VectorType>(x);
         auto *z_dealii = unwrap_nvector<VectorType>(z);
@@ -752,7 +755,7 @@ namespace SUNDIALS
 
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       weighted_rms_norm(N_Vector x, N_Vector w)
       {
         // TODO copy can be avoided by a custom kernel
@@ -766,7 +769,7 @@ namespace SUNDIALS
 
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       weighted_rms_norm_mask(N_Vector x, N_Vector w, N_Vector mask)
       {
         // TODO copy can be avoided by a custom kernel
@@ -782,7 +785,7 @@ namespace SUNDIALS
 
 
       template <typename VectorType>
-      realtype
+      SUNDIALS::realtype
       max_norm(N_Vector x)
       {
         return unwrap_nvector_const<VectorType>(x)->linfty_norm();
@@ -792,7 +795,7 @@ namespace SUNDIALS
 
       template <typename VectorType,
                 std::enable_if_t<is_serial_vector<VectorType>::value, int>>
-      realtype
+      SUNDIALS::realtype
       min_element(N_Vector x)
       {
         auto *vector = unwrap_nvector_const<VectorType>(x);
@@ -805,7 +808,7 @@ namespace SUNDIALS
                 std::enable_if_t<!is_serial_vector<VectorType>::value &&
                                    !IsBlockVector<VectorType>::value,
                                  int>>
-      realtype
+      SUNDIALS::realtype
       min_element(N_Vector x)
       {
         auto *vector = unwrap_nvector_const<VectorType>(x);
@@ -831,7 +834,7 @@ namespace SUNDIALS
                 std::enable_if_t<!is_serial_vector<VectorType>::value &&
                                    IsBlockVector<VectorType>::value,
                                  int>>
-      realtype
+      SUNDIALS::realtype
       min_element(N_Vector x)
       {
         auto *vector = unwrap_nvector_const<VectorType>(x);
@@ -869,7 +872,7 @@ namespace SUNDIALS
 
       template <typename VectorType>
       void
-      scale(realtype c, N_Vector x, N_Vector z)
+      scale(SUNDIALS::realtype c, N_Vector x, N_Vector z)
       {
         auto *x_dealii = unwrap_nvector_const<VectorType>(x);
         auto *z_dealii = unwrap_nvector<VectorType>(z);
