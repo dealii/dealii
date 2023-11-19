@@ -95,7 +95,7 @@ check()
 
       // Print faces that connect to coarser DoF
       deallog << "  Faces neighboring coarser cells:" << std::endl;
-      for (const auto level_cell : dof_handler.cell_iterators_on_level(level))
+      for (const auto &level_cell : dof_handler.cell_iterators_on_level(level))
         {
           // Iterate over all faces
           for (const unsigned int i_face : GeometryInfo<dim>::face_indices())
@@ -128,7 +128,7 @@ check()
       // Print faces that have periodic neighbors
       deallog << "  Faces having periodic neighbors of same level:"
               << std::endl;
-      for (const auto level_cell : dof_handler.cell_iterators_on_level(level))
+      for (const auto &level_cell : dof_handler.cell_iterators_on_level(level))
         {
           // Iterate over all faces
           for (const unsigned int i_face : GeometryInfo<dim>::face_indices())

@@ -204,7 +204,7 @@ do_test()
     std::tuple<unsigned int, bool, bool>{0, false, true} // deformed hyper-cube
   };
 
-  for (const auto setting : settings)
+  for (const auto &setting : settings)
     {
       Triangulation<dim> tria;
 
