@@ -98,7 +98,7 @@ namespace internal
    * quadrature points. Each specialization defines its CommunicationObjectType
    * and whether a two level CRS structure is needed to access the data by the
    * memeber `cell_face_pairs`. The same type with a different numer of
-   * components can be obtained with FEEvaluationTypeComponents.
+   * components can be obtained with @p FEEvaluationTypeComponents.
    */
   template <typename FEEvaluationType, bool is_face>
   struct FEEvaluationTypeTraits
