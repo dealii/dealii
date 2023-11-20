@@ -231,7 +231,7 @@ namespace internal
     using gradient_type = typename FEEvaluationType::gradient_type;
 
     /**
-     * values at quadrature points.
+     * Values at quadrature points.
      */
     std::vector<value_type> values;
 
