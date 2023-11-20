@@ -474,7 +474,7 @@ public:
    * FEFaceEvaluation and another triangulation.
    *
    * @param[in] faces_marked_vertices Boundary ID and marked vertices which are
-   * possible connected. The ID corresponds to the faces which provide the
+   * possibly connected. The ID corresponds to the faces which provide the
    * quadrature points. Quadrature points are searched in cells with at least
    * one marked vortex.
    * @param[in] this_fe_eval FEFaceEvaluation object that describes the position
