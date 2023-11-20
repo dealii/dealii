@@ -43,13 +43,13 @@
 #  include <deal.II/base/discrete_time.h>
 
 #  include <deal.II/sundials/n_vector.h>
+#  include <deal.II/sundials/sundials_types.h>
 #  include <deal.II/sundials/sunlinsol_wrapper.h>
 
 #  include <boost/signals2.hpp>
 
 #  include <sundials/sundials_linearsolver.h>
 #  include <sundials/sundials_math.h>
-#  include <sundials/sundials_types.h>
 
 #  include <exception>
 #  include <memory>

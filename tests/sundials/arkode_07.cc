@@ -96,7 +96,7 @@ main()
 
 
   ode.jacobian_times_setup =
-    [&](realtype t, const VectorType &y, const VectorType &fy) {
+    [&](SUNDIALS::realtype t, const VectorType &y, const VectorType &fy) {
       J       = 0;
       J(2, 2) = -1.0 / eps;
     };

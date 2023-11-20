@@ -227,8 +227,11 @@ namespace SUNDIALS
 
     status = IDAInit(
       ida_mem,
-      [](realtype tt, N_Vector yy, N_Vector yp, N_Vector rr, void *user_data)
-        -> int {
+      [](SUNDIALS::realtype tt,
+         N_Vector           yy,
+         N_Vector           yp,
+         N_Vector           rr,
+         void              *user_data) -> int {
         IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(user_data);
 
         auto *src_yy   = internal::unwrap_nvector_const<VectorType>(yy);
@@ -341,9 +344,9 @@ namespace SUNDIALS
                 ExcFunctionNotProvided("solve_with_jacobian"));
     LS->ops->solve = [](SUNLinearSolver LS,
                         SUNMatrix /*ignored*/,
-                        N_Vector x,
-                        N_Vector b,
-                        realtype tol) -> int {
+                        N_Vector           x,
+                        N_Vector           b,
+                        SUNDIALS::realtype tol) -> int {
       IDA<VectorType> &solver = *static_cast<IDA<VectorType> *>(LS->content);
 
       auto *src_b = internal::unwrap_nvector_const<VectorType>(b);
@@ -411,10 +414,10 @@ namespace SUNDIALS
     // calling IDASetLinearSolver
     status = IDASetJacFn(
       ida_mem,
-      [](realtype tt,
-         realtype cj,
-         N_Vector yy,
-         N_Vector yp,
+      [](SUNDIALS::realtype tt,
+         SUNDIALS::realtype cj,
+         N_Vector           yy,
+         N_Vector           yp,
          N_Vector /* residual */,
          SUNMatrix /* ignored */,
          void *user_data,

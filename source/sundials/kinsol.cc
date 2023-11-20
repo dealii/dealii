@@ -362,9 +362,9 @@ namespace SUNDIALS
 
         LS->ops->solve = [](SUNLinearSolver LS,
                             SUNMatrix /*ignored*/,
-                            N_Vector x,
-                            N_Vector b,
-                            realtype tol) -> int {
+                            N_Vector           x,
+                            N_Vector           b,
+                            SUNDIALS::realtype tol) -> int {
           // Receive the object that describes the linear solver and
           // unpack the pointer to the KINSOL object from which we can then
           // get the 'reinit' and 'solve' functions.

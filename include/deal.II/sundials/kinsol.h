@@ -31,12 +31,13 @@
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/vector_memory.h>
 
+#  include <deal.II/sundials/sundials_types.h>
+
 #  include <boost/signals2.hpp>
 
 #  include <kinsol/kinsol.h>
 #  include <nvector/nvector_serial.h>
 #  include <sundials/sundials_math.h>
-#  include <sundials/sundials_types.h>
 
 #  include <exception>
 #  include <memory>

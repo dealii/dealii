@@ -39,6 +39,7 @@
 #    include <ida/ida.h>
 #  endif
 
+#  include <deal.II/sundials/sundials_types.h>
 #  include <deal.II/sundials/sunlinsol_wrapper.h>
 
 #  include <boost/signals2.hpp>
@@ -46,7 +47,6 @@
 #  include <nvector/nvector_serial.h>
 #  include <sundials/sundials_config.h>
 #  include <sundials/sundials_math.h>
-#  include <sundials/sundials_types.h>
 
 #  include <memory>
 
