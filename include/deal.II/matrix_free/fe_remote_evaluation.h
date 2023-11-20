@@ -825,7 +825,7 @@ private:
               AssertIndexRange(j, dst.size());
               AssertIndexRange(c, src.size());
 
-              copy_data(dst[j], v, src[c]);
+              copy_data_entries(dst[j], v, src[c]);
             }
       }
   }
