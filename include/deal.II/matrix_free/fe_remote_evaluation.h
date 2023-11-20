@@ -96,7 +96,7 @@ namespace internal
    * Type traits for supported FEEvaluationTypes. Different FEEvaluationTypes
    * need different communication objects and different access to data at
    * quadrature points. Each specialization defines its CommunicationObjectType
-   * and if a two level CRS structure is needed to access the data by the
+   * and whether a two level CRS structure is needed to access the data by the
    * memeber `cell_face_pairs`. The same type with a different numer of
    * components can be obtained with FEEvaluationTypeComponents.
    */
