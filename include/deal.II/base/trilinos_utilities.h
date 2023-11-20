@@ -210,8 +210,24 @@ namespace Utilities
       using Teuchos::make_rcp;
 #  endif // defined DOXYGEN || !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
     }    // namespace internal
-  }      // namespace Trilinos
-#endif   // DEAL_II_TRILINOS_WITH_TPETRA
+
+
+
+    /* ------------------------- Inline functions ---------------------- */
+    namespace internal
+    {
+#  if !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+      template <class T, class... Args>
+      inline Teuchos::RCP<T>
+      make_rcp(Args &&...args)
+      {
+        return Teuchos::RCP<T>(new T(std::forward<Args>(args)...));
+      }
+#  endif // !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+    }    // namespace internal
+
+  }    // namespace Trilinos
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
 
 } // namespace Utilities
 

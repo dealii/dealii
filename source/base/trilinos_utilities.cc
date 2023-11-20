@@ -169,23 +169,6 @@ namespace Utilities
     }
   } // namespace Trilinos
 #endif
-
-
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
-  namespace Trilinos
-  {
-#  if !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-    template <class T, class... Args>
-    Teuchos::RCP<T>
-    make_rcp(Args &&...args)
-    {
-      return Teuchos::RCP<T>(new T(std::forward<Args>(args)...));
-    }
-#  endif // !DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-
-  }    // namespace Trilinos
-#endif // DEAL_II_TRILINOS_WITH_TPETRA
-
 } // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE
