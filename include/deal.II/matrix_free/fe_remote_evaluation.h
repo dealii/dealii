@@ -236,7 +236,7 @@ namespace internal
     std::vector<value_type> values;
 
     /**
-     * gradients at quadrature points.
+     * Gradients at quadrature points.
      */
     std::vector<gradient_type> gradients;
   };
