@@ -369,7 +369,7 @@ namespace internal
     /**
      * This parameter can be used if cell_indices do not start with 0.
      */
-    unsigned int cell_start = 0;
+    unsigned int cell_start;
 
     /**
      * Pointers to first face of given cell_index.
