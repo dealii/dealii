@@ -305,7 +305,7 @@ namespace internal
     /**
      * This parameter can be used if indices do not start with 0.
      */
-    unsigned int start = 0;
+    unsigned int start;
     /**
      * Pointers to data at index.
      */
