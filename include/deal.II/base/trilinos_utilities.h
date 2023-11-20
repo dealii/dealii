@@ -189,6 +189,16 @@ namespace Utilities
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
   namespace Trilinos
   {
+    /**
+     * Return the underlying MPI_Comm communicator from the
+     * <a
+     * href="https://docs.trilinos.org/dev/packages/teuchos/doc/html/classTeuchos_1_1Comm.html">Teuchos::Comm</a>
+     * communicator.
+     */
+    MPI_Comm
+    teuchos_comm_to_mpi_comm(
+      const Teuchos::RCP<const Teuchos::Comm<int>> &teuchos_comm);
+
     namespace internal
     {
       /**

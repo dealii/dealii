@@ -235,12 +235,10 @@ namespace LinearAlgebra
                V.get_stored_elements().size()) ||
               (source_stored_elements != V.get_stored_elements()))
             {
-              const Teuchos::MpiComm<int> *mpi_comm =
-                dynamic_cast<const Teuchos::MpiComm<int> *>(
-                  vector->getMap()->getComm().get());
-              Assert(mpi_comm != nullptr, ExcInternalError());
-              create_tpetra_comm_pattern(V.get_stored_elements(),
-                                         *(mpi_comm->getRawMpiComm())());
+              create_tpetra_comm_pattern(
+                V.get_stored_elements(),
+                Utilities::Trilinos::teuchos_comm_to_mpi_comm(
+                  vector->getMap()->getComm()));
             }
         }
       else
@@ -526,12 +524,10 @@ namespace LinearAlgebra
         }
 
       // Check that the vector is zero on _all_ processors.
-      const Teuchos::MpiComm<int> *mpi_comm =
-        dynamic_cast<const Teuchos::MpiComm<int> *>(
-          vector->getMap()->getComm().get());
-      Assert(mpi_comm != nullptr, ExcInternalError());
       unsigned int num_nonzero =
-        Utilities::MPI::sum(flag, *(mpi_comm->getRawMpiComm())());
+        Utilities::MPI::sum(flag,
+                            Utilities::Trilinos::teuchos_comm_to_mpi_comm(
+                              vector->getMap()->getComm()));
 
       return num_nonzero == 0;
     }
@@ -609,11 +605,8 @@ namespace LinearAlgebra
     MPI_Comm
     Vector<Number>::get_mpi_communicator() const
     {
-      const auto *const tpetra_comm =
-        dynamic_cast<const Teuchos::MpiComm<int> *>(
-          vector->getMap()->getComm().get());
-      Assert(tpetra_comm != nullptr, ExcInternalError());
-      return *(tpetra_comm->getRawMpiComm())();
+      return Utilities::Trilinos::teuchos_comm_to_mpi_comm(
+        vector->getMap()->getComm());
     }
 
 
@@ -739,16 +732,8 @@ namespace LinearAlgebra
     MPI_Comm
     Vector<Number>::mpi_comm() const
     {
-      MPI_Comm out;
-#  ifdef DEAL_II_WITH_MPI
-      const Teuchos::MpiComm<int> *mpi_comm =
-        dynamic_cast<const Teuchos::MpiComm<int> *>(
-          vector->getMap()->getComm().get());
-      out = *mpi_comm->getRawMpiComm();
-#  else
-      out            = MPI_COMM_SELF;
-#  endif
-      return out;
+      return Utilities::Trilinos::teuchos_comm_to_mpi_comm(
+        vector->getMap()->getComm());
     }
 
 
