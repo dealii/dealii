@@ -169,6 +169,32 @@ namespace Utilities
     }
   } // namespace Trilinos
 #endif
+
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  namespace Trilinos
+  {
+    MPI_Comm
+    teuchos_comm_to_mpi_comm(
+      const Teuchos::RCP<const Teuchos::Comm<int>> &teuchos_comm)
+    {
+      MPI_Comm out;
+#  ifdef DEAL_II_WITH_MPI
+      // Cast from Teuchos::Comm<int> to Teuchos::MpiComm<int>.
+      const Teuchos::MpiComm<int> *mpi_comm =
+        dynamic_cast<const Teuchos::MpiComm<int> *>(teuchos_comm.get());
+      Assert(mpi_comm != nullptr, ExcInternalError());
+      // From the Teuchos::MpiComm<int> object we can extract
+      // the MPI_Comm object via the getRawMpiComm() function.
+      out = *(mpi_comm->getRawMpiComm())();
+#  else
+      out = MPI_COMM_SELF;
+#  endif
+      return out;
+    }
+  }    // namespace Trilinos
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
+
 } // namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE
