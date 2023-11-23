@@ -2002,9 +2002,9 @@ namespace GridGenerator
            ExcMessage("Outer radius R must be greater than the inner "
                       "radius r."));
     Assert(r > 0.0, ExcMessage("The inner radius r must be positive."));
-    Assert(n_cells_toroidal > 2,
+    Assert(n_cells_toroidal > static_cast<unsigned int>(phi / numbers::PI),
            ExcMessage("Number of cells in toroidal direction has "
-                      "to be at least 3."));
+                      "to be at least 3 for a torus of polar extent 2*pi."));
     AssertThrow(phi > 0.0 && phi < 2.0 * numbers::PI + 1.0e-15,
                 ExcMessage("Invalid angle phi specified."));
 
@@ -2063,20 +2063,20 @@ namespace GridGenerator
             cells[5 * c + 1].vertices[2 + j * 4] = offset + 4;
             cells[5 * c + 1].vertices[3 + j * 4] = offset + 5;
             // cell 2 in x-y-plane
-            cells[5 * c + 2].vertices[0 + j * 4] = offset + 4;
-            cells[5 * c + 2].vertices[1 + j * 4] = offset + 5;
-            cells[5 * c + 2].vertices[2 + j * 4] = offset + 6;
-            cells[5 * c + 2].vertices[3 + j * 4] = offset + 7;
+            cells[5 * c + 2].vertices[0 + j * 4] = offset + 6;
+            cells[5 * c + 2].vertices[1 + j * 4] = offset + 4;
+            cells[5 * c + 2].vertices[2 + j * 4] = offset + 7;
+            cells[5 * c + 2].vertices[3 + j * 4] = offset + 5;
             // cell 3 in x-y-plane
             cells[5 * c + 3].vertices[0 + j * 4] = offset + 0;
             cells[5 * c + 3].vertices[1 + j * 4] = offset + 2;
             cells[5 * c + 3].vertices[2 + j * 4] = offset + 6;
             cells[5 * c + 3].vertices[3 + j * 4] = offset + 4;
             // cell 4 in x-y-plane
-            cells[5 * c + 4].vertices[0 + j * 4] = offset + 3;
-            cells[5 * c + 4].vertices[1 + j * 4] = offset + 1;
-            cells[5 * c + 4].vertices[2 + j * 4] = offset + 5;
-            cells[5 * c + 4].vertices[3 + j * 4] = offset + 7;
+            cells[5 * c + 4].vertices[0 + j * 4] = offset + 1;
+            cells[5 * c + 4].vertices[1 + j * 4] = offset + 7;
+            cells[5 * c + 4].vertices[2 + j * 4] = offset + 3;
+            cells[5 * c + 4].vertices[3 + j * 4] = offset + 5;
           }
 
         cells[5 * c].material_id = 0;
