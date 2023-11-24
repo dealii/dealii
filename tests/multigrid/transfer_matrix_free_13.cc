@@ -41,7 +41,7 @@ check()
 
   tr.refine_global(1);
 
-  FE_Q<dim> fe = FE_Q<dim>(1);
+  FE_Q<dim> fe(1);
 
   DoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
@@ -63,7 +63,6 @@ check()
       if (user_constraints.can_store_line(face_dofs[i]))
         {
           user_constraints.constrain_dof_to_zero(face_dofs[i]);
-          user_constraints.set_inhomogeneity(face_dofs[i], 5.0);
         }
     }
   user_constraints.close();
@@ -74,6 +73,7 @@ check()
 
   deallog << "SRC Vector" << std::endl;
   LinearAlgebra::distributed::Vector<double> src_level_0(mgdof.n_dofs(0));
+  src_level_0 = 1.0;
   for (unsigned int i = 0; i < mgdof.n_dofs(0); ++i)
     deallog << src_level_0(i) << ' ';
   deallog << std::endl << std::endl;

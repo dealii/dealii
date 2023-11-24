@@ -1774,6 +1774,9 @@ namespace internal
                (mg_level_coarse + 1 == mg_level_fine),
              ExcNotImplemented());
 
+      AssertDimension(constraints_fine.n_inhomogeneities(), 0);
+      AssertDimension(constraints_coarse.n_inhomogeneities(), 0);
+
       transfer.dof_handler_fine = &dof_handler_fine;
       transfer.mg_level_fine    = mg_level_fine;
 
@@ -2316,6 +2319,9 @@ namespace internal
           "Polynomial transfer is only allowed on the active level "
           "(numbers::invalid_unsigned_int) or on refinement levels without "
           "hanging nodes."));
+
+      AssertDimension(constraints_fine.n_inhomogeneities(), 0);
+      AssertDimension(constraints_coarse.n_inhomogeneities(), 0);
 
       transfer.dof_handler_fine = &dof_handler_fine;
       transfer.mg_level_fine    = mg_level_fine;
