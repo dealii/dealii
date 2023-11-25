@@ -637,6 +637,39 @@ namespace internal
       dirichlet_indices.clear();
       weights_on_refined.clear();
 
+#ifdef DEBUG
+      if (mg_constrained_dofs)
+        {
+          const unsigned int n_levels =
+            dof_handler.get_triangulation().n_global_levels();
+
+          for (unsigned int l = 0; l < n_levels; ++l)
+            {
+              const auto &constraints =
+                mg_constrained_dofs->get_user_constraint_matrix(l);
+
+              // no inhomogeneities are supported
+              AssertDimension(constraints.n_inhomogeneities(), 0);
+
+              for (const auto dof : constraints.get_local_lines())
+                {
+                  const auto *entries_ptr =
+                    constraints.get_constraint_entries(dof);
+
+                  if (entries_ptr == nullptr)
+                    continue;
+
+                  // only homogeneous or identity constraints are supported
+                  Assert((entries_ptr->size() == 0) ||
+                           ((entries_ptr->size() == 1) &&
+                            (std::abs((*entries_ptr)[0].second - 1.) <
+                             100 * std::numeric_limits<double>::epsilon())),
+                         ExcNotImplemented());
+                }
+            }
+        }
+#endif
+
       // we collect all child DoFs of a mother cell together. For faster
       // tensorized operations, we align the degrees of freedom
       // lexicographically. We distinguish FE_Q elements and FE_DGQ elements
