@@ -1990,6 +1990,17 @@ namespace GridGenerator
 
 
 
+  namespace
+  {
+    static constexpr int circle_cell_vertices[5][4] = {{0, 1, 2, 3},
+                                                       {0, 2, 6, 4},
+                                                       {2, 3, 4, 5},
+                                                       {1, 7, 3, 5},
+                                                       {6, 4, 7, 5}};
+  }
+
+
+
   template <>
   void
   torus<3, 3>(Triangulation<3, 3> &tria,
@@ -2052,37 +2063,17 @@ namespace GridGenerator
             const unsigned int offset =
               (8 * (c + j)) % (8 * n_point_layers_toroidal);
 
-            // cell 0 in x-y-plane
-            cells[5 * c].vertices[0 + j * 4] = offset + 0;
-            cells[5 * c].vertices[1 + j * 4] = offset + 1;
-            cells[5 * c].vertices[2 + j * 4] = offset + 2;
-            cells[5 * c].vertices[3 + j * 4] = offset + 3;
-            // cell 1 in x-y-plane (cell on torus centerline)
-            cells[5 * c + 1].vertices[0 + j * 4] = offset + 2;
-            cells[5 * c + 1].vertices[1 + j * 4] = offset + 3;
-            cells[5 * c + 1].vertices[2 + j * 4] = offset + 4;
-            cells[5 * c + 1].vertices[3 + j * 4] = offset + 5;
-            // cell 2 in x-y-plane
-            cells[5 * c + 2].vertices[0 + j * 4] = offset + 6;
-            cells[5 * c + 2].vertices[1 + j * 4] = offset + 4;
-            cells[5 * c + 2].vertices[2 + j * 4] = offset + 7;
-            cells[5 * c + 2].vertices[3 + j * 4] = offset + 5;
-            // cell 3 in x-y-plane
-            cells[5 * c + 3].vertices[0 + j * 4] = offset + 0;
-            cells[5 * c + 3].vertices[1 + j * 4] = offset + 2;
-            cells[5 * c + 3].vertices[2 + j * 4] = offset + 6;
-            cells[5 * c + 3].vertices[3 + j * 4] = offset + 4;
-            // cell 4 in x-y-plane
-            cells[5 * c + 4].vertices[0 + j * 4] = offset + 1;
-            cells[5 * c + 4].vertices[1 + j * 4] = offset + 7;
-            cells[5 * c + 4].vertices[2 + j * 4] = offset + 3;
-            cells[5 * c + 4].vertices[3 + j * 4] = offset + 5;
+            // cells in x-y-plane
+            for (unsigned int c2 = 0; c2 < 5; ++c2)
+              for (unsigned int i = 0; i < 4; ++i)
+                cells[5 * c + c2].vertices[i + j * 4] =
+                  offset + circle_cell_vertices[c2][i];
           }
 
         cells[5 * c].material_id = 0;
         // mark cell on torus centerline
-        cells[5 * c + 1].material_id = 1;
-        cells[5 * c + 2].material_id = 0;
+        cells[5 * c + 1].material_id = 0;
+        cells[5 * c + 2].material_id = 1;
         cells[5 * c + 3].material_id = 0;
         cells[5 * c + 4].material_id = 0;
       }
@@ -4318,15 +4309,12 @@ namespace GridGenerator
       p + Point<2>(-1, +1) * (radius / std::sqrt(2.0)),
       p + Point<2>(+1, +1) * (radius / std::sqrt(2.0))};
 
-    const int cell_vertices[5][4] = {
-      {0, 1, 2, 3}, {0, 2, 6, 4}, {2, 3, 4, 5}, {1, 7, 3, 5}, {6, 4, 7, 5}};
-
     std::vector<CellData<2>> cells(5, CellData<2>());
 
     for (unsigned int i = 0; i < 5; ++i)
       {
         for (unsigned int j = 0; j < 4; ++j)
-          cells[i].vertices[j] = cell_vertices[i][j];
+          cells[i].vertices[j] = circle_cell_vertices[i][j];
         cells[i].material_id = 0;
         cells[i].manifold_id = i == 2 ? numbers::flat_manifold_id : 1;
       }
