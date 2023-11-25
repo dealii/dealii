@@ -2269,7 +2269,8 @@ namespace GridTools
     const unsigned int size_new = matched_pairs.size();
     for (unsigned int i = size_old; i < size_new; ++i)
       {
-        Assert(matched_pairs[i].orientation == 1,
+        Assert(matched_pairs[i].orientation ==
+                 ReferenceCell::default_combined_face_orientation(),
                ExcMessage(
                  "Found a face match with non standard orientation. "
                  "This function is only suitable for meshes with cells "
