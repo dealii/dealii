@@ -2247,42 +2247,11 @@ namespace internal
           // ... and store them cell-wise a DG format
           transfer.weights.resize(n_dof_indices_fine.back());
 
-          Number *weights_0 = transfer.weights.data() + n_dof_indices_fine[0];
-          Number *weights_1 = transfer.weights.data() + n_dof_indices_fine[1];
-          unsigned int *dof_indices_fine_0 =
-            transfer.constraint_info_fine.dof_indices.data() +
-            n_dof_indices_fine[0];
-          unsigned int *dof_indices_fine_1 =
-            transfer.constraint_info_fine.dof_indices.data() +
-            n_dof_indices_fine[1];
-
-          process_cells(
-            [&](const auto &, const auto &) {
-              for (unsigned int i = 0;
-                   i < transfer.schemes[0].n_dofs_per_cell_fine;
-                   ++i)
-                weights_0[i] =
-                  weight_vector.local_element(dof_indices_fine_0[i]);
-
-              dof_indices_fine_0 += transfer.schemes[0].n_dofs_per_cell_fine;
-              weights_0 += transfer.schemes[0].n_dofs_per_cell_fine;
-            },
-            [&](const auto &, const auto &, const auto c) {
-              for (unsigned int i = 0;
-                   i < transfer.schemes[1].n_dofs_per_cell_coarse;
-                   ++i)
-                weights_1[cell_local_children_indices[c][i]] =
-                  weight_vector.local_element(
-                    dof_indices_fine_1[cell_local_children_indices[c][i]]);
-
-              // move pointers (only once at the end)
-              if (c + 1 == GeometryInfo<dim>::max_children_per_cell)
-                {
-                  dof_indices_fine_1 +=
-                    transfer.schemes[1].n_dofs_per_cell_fine;
-                  weights_1 += transfer.schemes[1].n_dofs_per_cell_fine;
-                }
-            });
+          for (unsigned int i = 0;
+               i < transfer.constraint_info_fine.dof_indices.size();
+               ++i)
+            transfer.weights[i] = weight_vector.local_element(
+              transfer.constraint_info_fine.dof_indices[i]);
 
           if (is_feq)
             compress_weights(transfer);
@@ -2759,34 +2728,11 @@ namespace internal
           // ... and store them cell-wise a DG format
           transfer.weights.resize(n_dof_indices_fine.back());
 
-          std::vector<unsigned int *> level_dof_indices_fine_(
-            fe_index_pairs.size());
-          std::vector<Number *> weights_(fe_index_pairs.size());
-
-          for (unsigned int i = 0; i < fe_index_pairs.size(); ++i)
-            {
-              level_dof_indices_fine_[i] =
-                transfer.constraint_info_fine.dof_indices.data() +
-                n_dof_indices_fine[i];
-              weights_[i] = transfer.weights.data() + n_dof_indices_fine[i];
-            }
-
-          process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
-            const auto fe_pair_no =
-              fe_index_pairs[std::pair<unsigned int, unsigned int>(
-                cell_coarse->active_fe_index(), cell_fine->active_fe_index())];
-
-            for (unsigned int i = 0;
-                 i < transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
-                 i++)
-              weights_[fe_pair_no][i] = weight_vector.local_element(
-                level_dof_indices_fine_[fe_pair_no][i]);
-
-            level_dof_indices_fine_[fe_pair_no] +=
-              transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
-            weights_[fe_pair_no] +=
-              transfer.schemes[fe_pair_no].n_dofs_per_cell_fine;
-          });
+          for (unsigned int i = 0;
+               i < transfer.constraint_info_fine.dof_indices.size();
+               ++i)
+            transfer.weights[i] = weight_vector.local_element(
+              transfer.constraint_info_fine.dof_indices[i]);
 
           if (is_feq)
             compress_weights(transfer);
