@@ -19,6 +19,7 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/lazy.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/symmetric_tensor.h>
 #include <deal.II/base/tensor.h>
@@ -2054,11 +2055,12 @@ namespace internal
        * Caches for scalar and vector, and symmetric second-order tensor
        * valued views.
        */
-      std::vector<dealii::FEValuesViews::Scalar<dim, spacedim>> scalars;
-      std::vector<dealii::FEValuesViews::Vector<dim, spacedim>> vectors;
-      std::vector<dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim>>
+      std::vector<Lazy<dealii::FEValuesViews::Scalar<dim, spacedim>>> scalars;
+      std::vector<Lazy<dealii::FEValuesViews::Vector<dim, spacedim>>> vectors;
+      std::vector<
+        Lazy<dealii::FEValuesViews::SymmetricTensor<2, dim, spacedim>>>
         symmetric_second_order_tensors;
-      std::vector<dealii::FEValuesViews::Tensor<2, dim, spacedim>>
+      std::vector<Lazy<dealii::FEValuesViews::Tensor<2, dim, spacedim>>>
         second_order_tensors;
 
       /**

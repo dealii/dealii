@@ -1804,7 +1804,10 @@ FEValuesBase<dim, spacedim>::operator[](
 {
   AssertIndexRange(scalar.component, fe_values_views_cache.scalars.size());
 
-  return fe_values_views_cache.scalars[scalar.component];
+  return fe_values_views_cache.scalars[scalar.component].value_or_initialize(
+    [scalar, this]() {
+      return FEValuesViews::Scalar<dim, spacedim>(*this, scalar.component);
+    });
 }
 
 
@@ -1817,7 +1820,11 @@ FEValuesBase<dim, spacedim>::operator[](
   AssertIndexRange(vector.first_vector_component,
                    fe_values_views_cache.vectors.size());
 
-  return fe_values_views_cache.vectors[vector.first_vector_component];
+  return fe_values_views_cache.vectors[vector.first_vector_component]
+    .value_or_initialize([vector, this]() {
+      return FEValuesViews::Vector<dim, spacedim>(
+        *this, vector.first_vector_component);
+    });
 }
 
 
@@ -1835,7 +1842,11 @@ FEValuesBase<dim, spacedim>::operator[](
                   fe_values_views_cache.symmetric_second_order_tensors.size()));
 
   return fe_values_views_cache
-    .symmetric_second_order_tensors[tensor.first_tensor_component];
+    .symmetric_second_order_tensors[tensor.first_tensor_component]
+    .value_or_initialize([tensor, this]() {
+      return FEValuesViews::SymmetricTensor<2, dim, spacedim>(
+        *this, tensor.first_tensor_component);
+    });
 }
 
 
@@ -1849,7 +1860,11 @@ FEValuesBase<dim, spacedim>::operator[](
                    fe_values_views_cache.second_order_tensors.size());
 
   return fe_values_views_cache
-    .second_order_tensors[tensor.first_tensor_component];
+    .second_order_tensors[tensor.first_tensor_component]
+    .value_or_initialize([tensor, this]() {
+      return FEValuesViews::Tensor<2, dim, spacedim>(
+        *this, tensor.first_tensor_component);
+    });
 }
 
 
