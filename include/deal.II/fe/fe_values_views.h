@@ -548,13 +548,13 @@ namespace FEValuesViews
     /**
      * A pointer to the FEValuesBase object we operate on.
      */
-    const SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
+    SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
 
     /**
      * The single scalar component this view represents of the FEValuesBase
      * object.
      */
-    const unsigned int component;
+    unsigned int component;
 
     /**
      * Store the data about shape functions.
@@ -1271,13 +1271,13 @@ namespace FEValuesViews
     /**
      * A pointer to the FEValuesBase object we operate on.
      */
-    const SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
+    SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
 
     /**
      * The first component of the vector this view represents of the
      * FEValuesBase object.
      */
-    const unsigned int first_vector_component;
+    unsigned int first_vector_component;
 
     /**
      * Store the data about shape functions.
@@ -1584,13 +1584,13 @@ namespace FEValuesViews
     /**
      * A pointer to the FEValuesBase object we operate on.
      */
-    const SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
+    SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
 
     /**
      * The first component of the vector this view represents of the
      * FEValuesBase object.
      */
-    const unsigned int first_tensor_component;
+    unsigned int first_tensor_component;
 
     /**
      * Store the data about shape functions.
@@ -1958,13 +1958,13 @@ namespace FEValuesViews
     /**
      * A pointer to the FEValuesBase object we operate on.
      */
-    const SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
+    SmartPointer<const FEValuesBase<dim, spacedim>> fe_values;
 
     /**
      * The first component of the vector this view represents of the
      * FEValuesBase object.
      */
-    const unsigned int first_tensor_component;
+    unsigned int first_tensor_component;
 
     /**
      * Store the data about shape functions.
