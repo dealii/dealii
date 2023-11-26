@@ -76,8 +76,13 @@ DEAL_II_NAMESPACE_OPEN
  *   Lazy<FullMatrix<double>> prolongation_matrix;
  * };
  * ```
+ *
+ * @dealiiConceptRequires{std::is_constructible_v<T, T> &&
+                          std::is_assignable_v<T &, T &&>}
  */
 template <typename T>
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
 class Lazy
 {
 public:
@@ -241,12 +246,16 @@ private:
 
 
 template <typename T>
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
 inline Lazy<T>::Lazy()
   : object_is_initialized(false)
 {}
 
 
 template <typename T>
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
 inline Lazy<T>::Lazy(const Lazy &other)
   : object(other.object)
 {
@@ -255,6 +264,8 @@ inline Lazy<T>::Lazy(const Lazy &other)
 
 
 template <typename T>
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
 inline Lazy<T>::Lazy(Lazy &&other) noexcept
   : object(other.object)
 {
@@ -263,8 +274,9 @@ inline Lazy<T>::Lazy(Lazy &&other) noexcept
 
 
 template <typename T>
-inline Lazy<T> &
-Lazy<T>::operator=(const Lazy &other)
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
+inline Lazy<T> &Lazy<T>::operator=(const Lazy &other)
 {
   object = other.object;
   object_is_initialized.store(other.object_is_initialized.load());
@@ -273,8 +285,9 @@ Lazy<T>::operator=(const Lazy &other)
 
 
 template <typename T>
-inline Lazy<T> &
-Lazy<T>::operator=(Lazy &&other) noexcept
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
+inline Lazy<T> &Lazy<T>::operator=(Lazy &&other) noexcept
 {
   object = other.object;
   object_is_initialized.store(other.object_is_initialized.load());
@@ -283,8 +296,9 @@ Lazy<T>::operator=(Lazy &&other) noexcept
 
 
 template <typename T>
-inline void
-Lazy<T>::reset() noexcept
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
+inline void Lazy<T>::reset() noexcept
 {
   object_is_initialized.store(false);
   object.reset();
@@ -292,9 +306,11 @@ Lazy<T>::reset() noexcept
 
 
 template <typename T>
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
 template <typename Callable>
-inline DEAL_II_ALWAYS_INLINE void
-Lazy<T>::ensure_initialized(const Callable &creator) const
+inline DEAL_II_ALWAYS_INLINE
+  void Lazy<T>::ensure_initialized(const Callable &creator) const
   DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>))
 {
   //
@@ -354,8 +370,9 @@ Lazy<T>::ensure_initialized(const Callable &creator) const
 
 
 template <typename T>
-inline DEAL_II_ALWAYS_INLINE bool
-Lazy<T>::has_value() const
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
+inline DEAL_II_ALWAYS_INLINE bool Lazy<T>::has_value() const
 {
   //
   // In principle it would be sufficient to solely check the atomic<bool>
@@ -368,8 +385,9 @@ Lazy<T>::has_value() const
 
 
 template <typename T>
-inline DEAL_II_ALWAYS_INLINE const T &
-Lazy<T>::value() const
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
+inline DEAL_II_ALWAYS_INLINE const T &Lazy<T>::value() const
 {
   Assert(
     object_is_initialized && object.has_value(),
@@ -382,8 +400,9 @@ Lazy<T>::value() const
 
 
 template <typename T>
-inline DEAL_II_ALWAYS_INLINE T &
-Lazy<T>::value()
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
+inline DEAL_II_ALWAYS_INLINE T &Lazy<T>::value()
 {
   Assert(
     object_is_initialized && object.has_value(),
@@ -396,9 +415,11 @@ Lazy<T>::value()
 
 
 template <typename T>
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
 template <typename Callable>
-inline DEAL_II_ALWAYS_INLINE const T &
-Lazy<T>::value_or_initialize(const Callable &creator) const
+inline DEAL_II_ALWAYS_INLINE const T &Lazy<T>::value_or_initialize(
+  const Callable &creator) const
   DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>))
 {
   ensure_initialized(creator);
@@ -407,9 +428,11 @@ Lazy<T>::value_or_initialize(const Callable &creator) const
 
 
 template <typename T>
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
 template <typename Callable>
-inline DEAL_II_ALWAYS_INLINE T &
-Lazy<T>::value_or_initialize(const Callable &creator)
+inline DEAL_II_ALWAYS_INLINE T &Lazy<T>::value_or_initialize(
+  const Callable &creator)
   DEAL_II_CXX20_REQUIRES((std::is_invocable_r_v<T, Callable>))
 {
   ensure_initialized(creator);
@@ -418,8 +441,9 @@ Lazy<T>::value_or_initialize(const Callable &creator)
 
 
 template <typename T>
-std::size_t
-Lazy<T>::memory_consumption() const
+DEAL_II_CXX20_REQUIRES((std::is_constructible_v<T, T> &&
+                        std::is_assignable_v<T &, T &&>))
+std::size_t Lazy<T>::memory_consumption() const
 {
   return MemoryConsumption::memory_consumption(object) + //
          sizeof(*this) - sizeof(object);
