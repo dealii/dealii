@@ -1,0 +1,20 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: deal.II
+message: >-
+  If you use this software, please cite the overview paper
+  (doi) as well as the paper for the major release you used.
+type: software
+authors:
+  - name: The deal.II authors
+    website: 'https://www.dealii.org/authors.html'
+identifiers:
+  - type: doi
+    value: 10.1016/j.camwa.2020.02.022
+  - type: url
+    value: 'https://dealii.org/publications.html'
+repository-code: 'https://github.com/dealii/dealii'
+url: 'https://dealii.org'
+license: LGPL-2.1-or-later
