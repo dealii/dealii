@@ -39,6 +39,12 @@ cmake_minimum_required(VERSION 3.13.4)
 #
 cmake_policy(VERSION 3.13.4)
 
+if(POLICY CMP0074)
+  # Introduced in CMake 3.12: find_package(<PackageName>) also searches
+  # <PackageName>_ROOT CMake and environment variables when set to NEW. 
+  cmake_policy(SET CMP0074 NEW)
+endif()
+
 if(POLICY CMP0075)
   # Introduced in CMake 3.12: Use CMAKE_REQUIRED_LIBRARIES also in include
   # file checks. We set the policy to NEW explicitly in order to avoid
