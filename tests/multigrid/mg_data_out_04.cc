@@ -88,6 +88,12 @@ do_test()
     transfer.build(dof_handler);
     transfer.interpolate_to_mg(dof_handler, dof_vector, global_dof_vector);
 
+    for (unsigned int i = dof_vector.min_level(); i <= dof_vector.max_level();
+         ++i)
+      dof_vector[i].update_ghost_values();
+
+    transfer.interpolate_to_mg(dof_handler, dof_vector, global_dof_vector);
+
     for (unsigned int level = 0; level < triangulation.n_global_levels();
          ++level)
       {
