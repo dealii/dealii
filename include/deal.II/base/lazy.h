@@ -93,26 +93,40 @@ public:
 
 
   /**
-   * Copy constructor.
+   * Copy constructor. If the `other` object contains an initialized
+   * value, then that value will be copied into the current object. If the
+   * `other` object is uninitialized, then the current object will be as well.
    */
   Lazy(const Lazy &other);
 
 
   /**
-   * Move constructor.
+   * Move constructor. If the `other` object contains an initialized
+   * value, then that value will be moved into the current object, and the
+   * `other` object will end up being empty (as if default initialized). If the
+   * `other` object is uninitialized, then the current object will be as well.
    */
   Lazy(Lazy &&other) noexcept;
 
 
   /**
-   * Copy assignment.
+   * Copy assignment. If the `other` object contains an initialized
+   * value, then that value will be copied into the current object. If the
+   * `other` object is uninitialized, then the current object will be as well.
+   *
+   * Any content of the current object is lost in the assignment.
    */
   Lazy &
   operator=(const Lazy &other);
 
 
   /**
-   * Move assignment.
+   * Move assignment. If the `other` object contains an initialized
+   * value, then that value will be moved into the current object, and the
+   * `other` object will end up being empty (as if default initialized). If the
+   * `other` object is uninitialized, then the current object will be as well.
+   *
+   * Any content of the current object is lost in the move assignment.
    */
   Lazy &
   operator=(Lazy &&other) noexcept;
@@ -267,9 +281,17 @@ template <typename T>
 DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
 inline Lazy<T>::Lazy(Lazy &&other) noexcept
-  : object(other.object)
+  : object(std::move(other.object))
 {
   object_is_initialized.store(other.object_is_initialized.load());
+
+  // Mark the other object as uninitialized. This is marginally non-trivial
+  // because moving from std::optional<T> does *not* result in an empty
+  // std::optional<T> but instead one that does contain a T, but one that
+  // has been moved from -- typically something akin to a default-initialized
+  // T. That seems undesirable, so reset everything to an empty state.
+  other.object_is_initialized.store(false);
+  other.object.reset();
 }
 
 
@@ -289,8 +311,17 @@ DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
 inline Lazy<T> &Lazy<T>::operator=(Lazy &&other) noexcept
 {
-  object = other.object;
+  object = std::move(other.object);
   object_is_initialized.store(other.object_is_initialized.load());
+
+  // Mark the other object as uninitialized. This is marginally non-trivial
+  // because moving from std::optional<T> does *not* result in an empty
+  // std::optional<T> but instead one that does contain a T, but one that
+  // has been moved from -- typically something akin to a default-initialized
+  // T. That seems undesirable, so reset everything to an empty state.
+  other.object_is_initialized.store(false);
+  other.object.reset();
+
   return *this;
 }
 
@@ -380,7 +411,7 @@ inline DEAL_II_ALWAYS_INLINE bool Lazy<T>::has_value() const
   // semantics. But just in case let's check the object.has_value() boolean
   // as well:
   //
-  return object_is_initialized && object.has_value();
+  return (object_is_initialized && object.has_value());
 }
 
 
