@@ -2995,7 +2995,7 @@ namespace internal
           unsigned int end_index   = 0;
           while (start_index < n_dofs)
             {
-              while ((end_index) < n_dofs &&
+              while ((end_index < n_dofs) &&
                      (subdomain_association[end_index] ==
                       subdomain_association[start_index]))
                 ++end_index;
