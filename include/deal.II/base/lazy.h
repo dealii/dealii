@@ -379,6 +379,7 @@ inline DEAL_II_ALWAYS_INLINE
       //
       if (!object_is_initialized.load(std::memory_order_relaxed))
         {
+          Assert(object.has_value() == false, ExcInternalError());
           object.emplace(std::move(creator()));
 
           //
