@@ -1314,9 +1314,7 @@ namespace internal
       const FiniteElement<dim, spacedim> &fe = fe_values.get_fe();
 
       const unsigned int n_scalars = fe.n_components();
-      scalars.reserve(n_scalars);
-      for (unsigned int component = 0; component < n_scalars; ++component)
-        scalars.emplace_back(fe_values, component);
+      scalars.resize(n_scalars);
 
       // compute number of vectors that we can fit into this finite element.
       // note that this is based on the dimensionality 'dim' of the manifold,
@@ -1326,9 +1324,7 @@ namespace internal
            fe.n_components() - Tensor<1, spacedim>::n_independent_components +
              1 :
            0);
-      vectors.reserve(n_vectors);
-      for (unsigned int component = 0; component < n_vectors; ++component)
-        vectors.emplace_back(fe_values, component);
+      vectors.resize(n_vectors);
 
       // compute number of symmetric tensors in the same way as above
       const unsigned int n_symmetric_second_order_tensors =
@@ -1337,12 +1333,7 @@ namespace internal
            fe.n_components() -
              SymmetricTensor<2, spacedim>::n_independent_components + 1 :
            0);
-      symmetric_second_order_tensors.reserve(n_symmetric_second_order_tensors);
-      for (unsigned int component = 0;
-           component < n_symmetric_second_order_tensors;
-           ++component)
-        symmetric_second_order_tensors.emplace_back(fe_values, component);
-
+      symmetric_second_order_tensors.resize(n_symmetric_second_order_tensors);
 
       // compute number of symmetric tensors in the same way as above
       const unsigned int n_second_order_tensors =
@@ -1350,10 +1341,7 @@ namespace internal
            fe.n_components() - Tensor<2, spacedim>::n_independent_components +
              1 :
            0);
-      second_order_tensors.reserve(n_second_order_tensors);
-      for (unsigned int component = 0; component < n_second_order_tensors;
-           ++component)
-        second_order_tensors.emplace_back(fe_values, component);
+      second_order_tensors.resize(n_second_order_tensors);
     }
   } // namespace FEValuesViews
 } // namespace internal

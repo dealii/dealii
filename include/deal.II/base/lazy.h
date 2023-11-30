@@ -379,7 +379,8 @@ inline DEAL_II_ALWAYS_INLINE
       //
       if (!object_is_initialized.load(std::memory_order_relaxed))
         {
-          object = std::move(creator());
+          Assert(object.has_value() == false, ExcInternalError());
+          object.emplace(std::move(creator()));
 
           //
           // Flip the object_is_initialized boolean with "release"
