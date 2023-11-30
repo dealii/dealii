@@ -5,16 +5,45 @@ cff-version: 1.2.0
 title: deal.II
 message: >-
   If you use this software, please cite the overview paper
-  (doi) as well as the paper for the major release you used.
+  (preferred citation) as well as the paper for the major release you used.
 type: software
 authors:
   - name: The deal.II authors
     website: 'https://www.dealii.org/authors.html'
 identifiers:
-  - type: doi
-    value: 10.1016/j.camwa.2020.02.022
   - type: url
     value: 'https://dealii.org/publications.html'
 repository-code: 'https://github.com/dealii/dealii'
 url: 'https://dealii.org'
 license: LGPL-2.1-or-later
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Arndt"
+    given-names: "Daniel"
+  - family-names: "Bangerth"
+    given-names: "Wolfgang"
+  - family-names: "Davydov"
+    given-names: "Denis"
+  - family-names: "Heister"
+    given-names: "Timo"
+  - family-names: "Heltai"
+    given-names: "Luca"
+  - family-names: "Kronbichler"
+    given-names: "Martin"
+  - family-names: "Maier"
+    given-names: "Matthias"
+  - family-names: "Pelteret"
+    given-names: "Jean-Paul"
+  - family-names: "Turcksin"
+    given-names: "Bruno"
+  - family-names: "Wells"
+    given-names: "David"
+  doi: "10.1016/j.camwa.2020.02.022"
+  journal: "Computers & Mathematics with Applications"
+  month: 1
+  start: 407
+  end: 422
+  title: "The deal.II finite element library: Design, features, and insights"
+  volume: 81
+  year: 2021
