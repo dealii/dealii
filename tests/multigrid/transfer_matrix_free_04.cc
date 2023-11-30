@@ -26,6 +26,7 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 

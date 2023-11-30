@@ -16,6 +16,8 @@
 #ifndef dealii_vector_tools_project_templates_h
 #define dealii_vector_tools_project_templates_h
 
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_simplex_p_bubbles.h>
