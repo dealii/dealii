@@ -461,6 +461,11 @@ namespace
   void
   check_petsc_allocations()
   {
+#  if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
+    // TODO: the logging code below no longer works with PETSc 3.20 and newer. A
+    // new implementation should use the approach in sys/tutorials/ex7.c to log
+    // object creations and destructions globally.
+#  else
     PetscStageLog  stageLog;
     PetscErrorCode ierr;
 
@@ -494,6 +499,7 @@ namespace
 
     if (errors)
       throw dealii::ExcMessage("PETSc memory leak");
+#  endif
   }
 } // namespace
 #endif
