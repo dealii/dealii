@@ -23,6 +23,8 @@
 
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/grid/manifold.h>
+
 #include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/multigrid/mg_tools.h>
@@ -297,6 +299,7 @@ MGConstrainedDoFs::initialize(
   refinement_edge_indices.resize(nlevels);
   level_constraints.resize(nlevels);
   user_constraints.resize(nlevels);
+
   for (unsigned int l = min_level; l <= max_level; ++l)
     {
       if (use_provided_level_relevant_dofs)

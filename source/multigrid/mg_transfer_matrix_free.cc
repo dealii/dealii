@@ -319,6 +319,23 @@ MGTransferMatrixFree<dim, Number>::prolongate_and_add(
   if (dst_inplace == false)
     dst += dst_vec;
 
+  // apply constraints on the fine vector
+  if (this->mg_constrained_dofs != nullptr &&
+      this->mg_constrained_dofs->get_user_constraint_matrix(to_level)
+          .get_local_lines()
+          .size() > 0)
+    {
+      this->mg_constrained_dofs->get_user_constraint_matrix(to_level).set_zero(
+        dst);
+    }
+
+  if (this->mg_constrained_dofs != nullptr &&
+      this->mg_constrained_dofs->have_boundary_indices())
+    for (const auto i :
+         this->mg_constrained_dofs->get_boundary_indices(to_level))
+      if (dst.locally_owned_elements().is_element(i))
+        dst[i] = 0.0;
+
   if (src_inplace == true)
     src.zero_out_ghost_values();
 }
@@ -562,6 +579,37 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
     Utilities::fixed_power<dim>(n_child_dofs_1d);
   constexpr unsigned int three_to_dim = Utilities::pow(3, dim);
 
+  // If we have user defined MG constraints, we must create
+  // a non-const, ghosted version of the source vector to distribute
+  // constraints.
+  const LinearAlgebra::distributed::Vector<Number> *to_use = &src;
+  LinearAlgebra::distributed::Vector<Number>        new_src;
+  if (this->mg_constrained_dofs != nullptr &&
+      this->mg_constrained_dofs->get_user_constraint_matrix(from_level)
+          .get_local_lines()
+          .size() > 0)
+    {
+      LinearAlgebra::distributed::Vector<Number> copy_src(src);
+
+      // zero out dbc
+      if (this->mg_constrained_dofs->have_boundary_indices())
+        for (const auto i :
+             this->mg_constrained_dofs->get_boundary_indices(from_level))
+          if (copy_src.locally_owned_elements().is_element(i))
+            copy_src[i] = 0.0;
+
+      // zero out user constraints
+      this->mg_constrained_dofs->get_user_constraint_matrix(from_level)
+        .set_zero(copy_src);
+
+      // Re-initialize new ghosted vector with correct constraints
+      new_src.reinit(copy_src);
+      new_src = copy_src;
+      new_src.update_ghost_values();
+
+      to_use = &new_src;
+    }
+
   for (unsigned int cell = 0; cell < n_owned_level_cells[from_level - 1];
        cell += vec_size)
     {
@@ -577,7 +625,7 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
         for (unsigned int v = 0; v < n_lanes; ++v)
           {
             for (unsigned int i = 0; i < n_child_cell_dofs; ++i)
-              evaluation_data[i][v] = src.local_element(indices[i]);
+              evaluation_data[i][v] = to_use->local_element(indices[i]);
             indices += n_child_cell_dofs;
           }
       }
@@ -671,6 +719,17 @@ MGTransferMatrixFree<dim, Number>::do_restrict_add(
                       evaluation_data[m][v];
             }
         }
+    }
+
+  // condense coarse vector; note dbc and pbc are handled during cell loop
+
+  if (this->mg_constrained_dofs != nullptr &&
+      this->mg_constrained_dofs->get_user_constraint_matrix(from_level - 1)
+          .get_local_lines()
+          .size() > 0)
+    {
+      this->mg_constrained_dofs->get_user_constraint_matrix(from_level - 1)
+        .condense(dst);
     }
 }
 
