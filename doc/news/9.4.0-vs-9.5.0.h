@@ -1006,7 +1006,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Improved: The functions VectorTools::point_values()/::point_gradients() and
+  Improved: The functions VectorTools::point_values()/VectorTools::point_gradients() and
   the class Utilities::MPI::RemotePointEvaluation now allow to specify the first
   component to be selected. The feature is used in the class DataOutResample
   to output multi-component solutions.
