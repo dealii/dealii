@@ -13,19 +13,19 @@
 //
 // ---------------------------------------------------------------------
 
-#include <deal.II/matrix_free/cuda_matrix_free.templates.h>
+#include <deal.II/matrix_free/portable_matrix_free.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 
 
-namespace CUDAWrappers
+namespace Portable
 {
   // Do not instantiate for dim = 1
   template class MatrixFree<2, float>;
   template class MatrixFree<2, double>;
   template class MatrixFree<3, float>;
   template class MatrixFree<3, double>;
-} // namespace CUDAWrappers
+} // namespace Portable
 
 DEAL_II_NAMESPACE_CLOSE

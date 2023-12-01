@@ -167,9 +167,9 @@ main()
     FE_Q<2>                fe_1(fe_degree_1);
     DoFHandler<2>          dof_1(tria);
     dof_1.distribute_dofs(fe_1);
-    MappingQ<2>                                         mapping_1(fe_degree_1);
-    CUDAWrappers::MatrixFree<2, double>                 mf_data_1;
-    CUDAWrappers::MatrixFree<2, double>::AdditionalData additional_data_1;
+    MappingQ<2>                                     mapping_1(fe_degree_1);
+    Portable::MatrixFree<2, double>                 mf_data_1;
+    Portable::MatrixFree<2, double>::AdditionalData additional_data_1;
     additional_data_1.mapping_update_flags = update_values | update_gradients |
                                              update_JxW_values |
                                              update_quadrature_points;
@@ -192,9 +192,9 @@ main()
     FE_Q<2>                fe_2(fe_degree_2);
     DoFHandler<2>          dof_2(tria);
     dof_2.distribute_dofs(fe_2);
-    MappingQ<2>                                         mapping_2(fe_degree_2);
-    CUDAWrappers::MatrixFree<2, double>                 mf_data_2;
-    CUDAWrappers::MatrixFree<2, double>::AdditionalData additional_data_2;
+    MappingQ<2>                                     mapping_2(fe_degree_2);
+    Portable::MatrixFree<2, double>                 mf_data_2;
+    Portable::MatrixFree<2, double>::AdditionalData additional_data_2;
     additional_data_2.mapping_update_flags = update_values | update_gradients |
                                              update_JxW_values |
                                              update_quadrature_points;

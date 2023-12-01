@@ -14,7 +14,6 @@
 ## ---------------------------------------------------------------------
 
 set(_src
-  cuda_matrix_free.cc
   dof_info.cc
   evaluation_template_factory.cc
   evaluation_template_factory_inst2.cc
@@ -34,6 +33,7 @@ set(_src
   mapping_info_inst2.cc
   mapping_info_inst3.cc
   matrix_free.cc
+  portable_matrix_free.cc
   shape_info.cc
   task_info.cc
   vector_data_exchange.cc

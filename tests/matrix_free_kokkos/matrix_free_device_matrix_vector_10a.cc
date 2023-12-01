@@ -106,11 +106,10 @@ test()
 
   deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 
-  MappingQ<dim>                         mapping(fe_degree);
-  CUDAWrappers::MatrixFree<dim, Number> mf_data;
-  const QGauss<1>                       quad(fe_degree + 1);
-  typename CUDAWrappers::MatrixFree<dim, Number>::AdditionalData
-    additional_data;
+  MappingQ<dim>                     mapping(fe_degree);
+  Portable::MatrixFree<dim, Number> mf_data;
+  const QGauss<1>                   quad(fe_degree + 1);
+  typename Portable::MatrixFree<dim, Number>::AdditionalData additional_data;
   additional_data.mapping_update_flags = update_values | update_gradients |
                                          update_JxW_values |
                                          update_quadrature_points;
