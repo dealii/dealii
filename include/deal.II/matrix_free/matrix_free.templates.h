@@ -308,9 +308,6 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
   const unsigned int fe_component) const
 {
   AssertIndexRange(fe_component, dof_handlers.size());
-  AssertIndexRange(face_batch_index,
-                   n_inner_face_batches() +
-                     (interior ? n_boundary_face_batches() : 0));
 
   AssertIndexRange(lane_index,
                    n_active_entries_per_face_batch(face_batch_index));
@@ -322,6 +319,11 @@ MatrixFree<dim, Number, VectorizedArrayType>::get_face_iterator(
   const unsigned int cell_index = interior ?
                                     face2cell_info.cells_interior[lane_index] :
                                     face2cell_info.cells_exterior[lane_index];
+
+  Assert(cell_index != numbers::invalid_unsigned_int,
+         ExcMessage(
+           "Invalid cell index for requested face. Exterior cells cannot be"
+           " accessed on boundaries."));
 
   std::pair<unsigned int, unsigned int> index = cell_level_index[cell_index];
 
