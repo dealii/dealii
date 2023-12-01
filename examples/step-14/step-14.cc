@@ -145,7 +145,7 @@ namespace Step14
       AssertThrow(evaluation_point_found,
                   ExcEvaluationPointNotFound(evaluation_point));
 
-      std::cout << "   Point value=" << point_value << std::endl;
+      std::cout << "   Point value: " << point_value << std::endl;
     }
 
 
@@ -2238,7 +2238,7 @@ namespace Step14
             }
           ++present_cell;
         }
-      std::cout << "   Estimated error="
+      std::cout << "   Estimated error: "
                 << std::accumulate(error_indicators.begin(),
                                    error_indicators.end(),
                                    0.)
@@ -2778,7 +2778,7 @@ namespace Step14
         solver->solve_problem();
         solver->output_solution();
 
-        std::cout << "   Number of degrees of freedom=" << solver->n_dofs()
+        std::cout << "   Number of degrees of freedom: " << solver->n_dofs()
                   << std::endl;
 
         for (const auto &evaluator : descriptor.evaluator_list)

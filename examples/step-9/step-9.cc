@@ -828,9 +828,11 @@ namespace Step9
   void AdvectionProblem<dim>::output_results(const unsigned int cycle) const
   {
     {
-      GridOut       grid_out;
-      std::ofstream output("grid-" + std::to_string(cycle) + ".vtu");
+      GridOut           grid_out;
+      const std::string filename = "grid-" + std::to_string(cycle) + ".vtu";
+      std::ofstream     output(filename);
       grid_out.write_vtu(triangulation, output);
+      std::cout << "Grid written to " << filename << std::endl;
     }
 
     {
@@ -846,8 +848,10 @@ namespace Step9
       vtk_flags.compression_level = DataOutBase::CompressionLevel::best_speed;
       data_out.set_flags(vtk_flags);
 
-      std::ofstream output("solution-" + std::to_string(cycle) + ".vtu");
+      const std::string filename = "solution-" + std::to_string(cycle) + ".vtu";
+      std::ofstream     output(filename);
       data_out.write_vtu(output);
+      std::cout << "Solution written to " << filename << std::endl;
     }
   }
 
