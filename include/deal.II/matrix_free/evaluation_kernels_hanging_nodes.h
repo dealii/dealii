@@ -1704,7 +1704,7 @@ namespace internal
   struct FEEvaluationImplHangingNodes
   {
   public:
-    template <int fe_degree, int n_q_points_1d>
+    template <int fe_degree>
     static bool
     run(const unsigned int                            n_desired_components,
         const MatrixFreeFunctions::ShapeInfo<Number> &shape_info,
