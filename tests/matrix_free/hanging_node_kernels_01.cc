@@ -44,7 +44,7 @@ namespace dealii
     template <int dim, typename Number, bool is_face>
     struct FEEvaluationImplHangingNodesReference
     {
-      template <int fe_degree, int n_q_points_1d>
+      template <int fe_degree>
       static bool
       run(
         const FEEvaluationData<dim, Number, is_face> &fe_eval,
@@ -486,9 +486,9 @@ test(const unsigned int                                           degree,
       internal::FEEvaluationImplHangingNodesReference<
         dim,
         VectorizedArray<double>,
-        false>::template run<-1, -1>(eval, b == 1, cmask_, values1.data());
+        false>::template run<-1>(eval, b == 1, cmask_, values1.data());
       internal::FEEvaluationImplHangingNodes<dim, VectorizedArray<double>>::
-        template run<-1, -1>(
+        template run<-1>(
           1, eval.get_shape_info(), b == 1, cmask, values2.data());
 
       for (const auto i : values1)

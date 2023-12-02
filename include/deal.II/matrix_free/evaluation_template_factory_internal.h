@@ -82,7 +82,7 @@ namespace internal
   {
     if (given_degree == degree)
       {
-        return EvaluatorType::template run<degree, degree + 1>(args...);
+        return EvaluatorType::template run<degree>(args...);
       }
     else if (degree < FE_EVAL_FACTORY_DEGREE_MAX)
       return instantiation_helper_degree_run<
@@ -90,7 +90,7 @@ namespace internal
         EvaluatorType>(given_degree, args...);
     else
       // slow path
-      return EvaluatorType::template run<-1, 0>(args...);
+      return EvaluatorType::template run<-1>(args...);
   }
 
 } // end of namespace internal
