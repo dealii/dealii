@@ -1152,10 +1152,12 @@ namespace internal
                 typename VectorizedDouble>
       void
       mapping_q_compute_range(
-        const unsigned int                 begin_cell,
-        const unsigned int                 end_cell,
-        const std::vector<GeometryType>   &cell_type,
-        const std::vector<bool>           &process_cell,
+        const unsigned int                                        begin_cell,
+        const unsigned int                                        end_cell,
+        const dealii::Triangulation<dim>                         &tria,
+        const std::vector<std::pair<unsigned int, unsigned int>> &cell_array,
+        const std::vector<GeometryType>                          &cell_type,
+        const std::vector<bool>                                  &process_cell,
         const UpdateFlags                  update_flags_cells,
         const AlignedVector<double>       &plain_quadrature_points,
         const ShapeInfo<VectorizedDouble> &shape_info,
@@ -1243,7 +1245,23 @@ namespace internal
 
 #ifdef DEBUG
                     for (unsigned int v = 0; v < n_lanes_d; ++v)
-                      Assert(jac_det[v] > 0.0, ExcInternalError());
+                      {
+                        const typename Triangulation<dim>::cell_iterator
+                          cell_iterator(
+                            &tria,
+                            cell_array[cell * n_lanes + vv + v].first,
+                            cell_array[cell * n_lanes + vv + v].second);
+
+                        Assert(jac_det[v] >
+                                 1e-12 * Utilities::fixed_power<dim>(
+                                           cell_iterator->diameter() /
+                                           std::sqrt(double(dim))),
+                               (typename Mapping<dim>::ExcDistortedMappedCell(
+                                 cell_iterator->center(), jac_det[v], q)));
+                      }
+#else
+                    (void)tria;
+                    (void)cell_array;
 #endif
 
                     const Tensor<2, dim, VectorizedDouble> inv_jac =
@@ -2804,6 +2822,8 @@ namespace internal
                                                          VectorizedDouble>(
                 begin,
                 end,
+                tria,
+                cell_array,
                 cell_type,
                 process_cell,
                 update_flags_cells,
