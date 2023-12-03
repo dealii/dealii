@@ -1240,6 +1240,12 @@ namespace internal
                             jac[d][e] = 0.;
 
                     const VectorizedDouble jac_det = determinant(jac);
+
+#ifdef DEBUG
+                    for (unsigned int v = 0; v < n_lanes_d; ++v)
+                      Assert(jac_det[v] > 0.0, ExcInternalError());
+#endif
+
                     const Tensor<2, dim, VectorizedDouble> inv_jac =
                       transpose(invert(jac));
 
@@ -2308,6 +2314,11 @@ namespace internal
                     (face_type[face] <= affine ?
                        1. :
                        my_data.descriptor[0].quadrature.weight(q));
+
+#ifdef DEBUG
+                  for (unsigned int v = 0; v < n_lanes_d; ++v)
+                    Assert(JxW[v] > 0.0, ExcInternalError());
+#endif
 
                   store_vectorized_array(JxW,
                                          vv,
