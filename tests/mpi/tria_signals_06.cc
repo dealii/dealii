@@ -125,7 +125,7 @@ test()
 
       // Refine one fifth of all cells each time (but at least one).
       // Note that only the own marked cells will be refined.
-      // But refine flags on own cells could be effected by flags on ghost cells
+      // But refine flags on own cells could be affected by flags on ghost cells
       // through mesh smoothing.
       for (unsigned int i = 0; i < tria.n_active_cells() / 3 + 1; ++i)
         {

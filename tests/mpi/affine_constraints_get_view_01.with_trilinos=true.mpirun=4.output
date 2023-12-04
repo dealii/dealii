@@ -1,11 +1,11 @@
 
 DEAL::dim=2
-DEAL::Cells on process #0: 45
-DEAL::Total number of DoFs: 903
-DEAL::Number of constrains: 123
+DEAL::Cells on process #0: 42
+DEAL::Total number of DoFs: 878
+DEAL::Number of constrains: 121
 DEAL::OK
 DEAL::dim=3
-DEAL::Cells on process #0: 215
-DEAL::Total number of DoFs: 9429
-DEAL::Number of constrains: 2582
+DEAL::Cells on process #0: 124
+DEAL::Total number of DoFs: 6252
+DEAL::Number of constrains: 1651
 DEAL::OK
