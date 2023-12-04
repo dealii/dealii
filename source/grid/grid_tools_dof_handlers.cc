@@ -2124,9 +2124,9 @@ namespace GridTools
       constexpr int dim      = CellIterator::AccessorType::dimension;
       constexpr int spacedim = CellIterator::AccessorType::space_dimension;
       // For parallel::fullydistributed::Triangulation there might be unmatched
-      // faces on periodic boundaries on the coarse grid, which results that
-      // this assert is not fulfilled (not a bug!). See also the discussion in
-      // the method collect_periodic_faces.
+      // faces on periodic boundaries on the coarse grid. As a result
+      // this assert is not fulfilled (which is not a bug!). See also the
+      // discussion in the method collect_periodic_faces.
       if (!(((pairs1.size() > 0) &&
              (dynamic_cast<const parallel::fullydistributed::
                              Triangulation<dim, spacedim> *>(
@@ -2176,11 +2176,11 @@ namespace GridTools
           }
       }
 
-    // Assure that all faces are matched if not
-    // parallel::fullydistributed::Triangulation is used. This is related to the
-    // fact that the faces might not be successfully matched on the coarse grid
-    // (not a bug!). See also the comment above and in the
-    // method collect_periodic_faces.
+    // Assure that all faces are matched if
+    // parallel::fullydistributed::Triangulation is not used. This is related to
+    // the fact that the faces might not be successfully matched on the coarse
+    // grid (not a bug!). See also the comment above and in the method
+    // collect_periodic_faces.
     {
       constexpr int dim      = CellIterator::AccessorType::dimension;
       constexpr int spacedim = CellIterator::AccessorType::space_dimension;
@@ -2328,10 +2328,10 @@ namespace GridTools
           }
       }
 
-    // Assure that all faces are matched on the coare grid. This requirement
+    // Assure that all faces are matched on the coarse grid. This requirement
     // can only fulfilled if a process owns the complete coarse grid. This is
-    // not the case for a parallel::fullydistributed::Triangulation, i.e. this
-    // requirement has not to be met neither (consider faces on the outside of a
+    // not the case for a parallel::fullydistributed::Triangulation, i.e., this
+    // requirement has not to be met (consider faces on the outside of a
     // ghost cell that are periodic but for which the ghost neighbor doesn't
     // exist).
     if (!(((pairs1.size() > 0) &&
