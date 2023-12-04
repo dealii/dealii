@@ -66,9 +66,6 @@ else()
       enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=177")
       # warning #284-D: NULL reference is not allowed
       enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=284")
-      # extra parentheses:
-      enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-parentheses")
-
     endif()
   endif()
 
