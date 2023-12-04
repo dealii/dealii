@@ -594,8 +594,10 @@ void Step3::output_results() const
   // functions in the DataOut class we are using here that can write the
   // data in postscript, AVS, GMV, Gnuplot, or some other file
   // formats):
-  std::ofstream output("solution.vtk");
+  const std::string filename = "solution.vtk";
+  std::ofstream     output(filename);
   data_out.write_vtk(output);
+  std::cout << "Output written to " << filename << std::endl;
 }
 
 
