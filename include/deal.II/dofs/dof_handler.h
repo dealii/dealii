@@ -877,7 +877,7 @@ public:
    * The number is the same as for max_couplings_between_dofs() in one
    * dimension less.
    *
-   * @note The same applies to this function as to max_couplings_per_dofs() as
+   * @note The same applies to this function as to max_couplings_between_dofs() as
    * regards the performance of this function. Think about one of the dynamic
    * sparsity pattern classes instead (see
    * @ref Sparsity).
