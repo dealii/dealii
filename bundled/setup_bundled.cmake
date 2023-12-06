@@ -58,6 +58,7 @@ macro(feature_boost_configure_bundled)
   endif()
 
   enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-unused-local-typedefs")
+  enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-parentheses")
 
   list(APPEND DEAL_II_BUNDLED_INCLUDE_DIRS ${BOOST_FOLDER}/include)
 endmacro()
