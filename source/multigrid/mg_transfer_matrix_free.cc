@@ -101,6 +101,8 @@ MGTransferMatrixFree<dim, Number>::build(
   const std::vector<std::shared_ptr<const Utilities::MPI::Partitioner>>
     &external_partitioners)
 {
+  auto temp_time = std::chrono::system_clock::now();
+
   Assert(dof_handler.has_level_dofs(),
          ExcMessage(
            "The underlying DoFHandler object has not had its "
@@ -122,6 +124,15 @@ MGTransferMatrixFree<dim, Number>::build(
     }
 
   this->fill_and_communicate_copy_indices(dof_handler);
+
+
+
+  const auto time0 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::system_clock::now() - temp_time)
+                       .count() /
+                     1e9;
+
+  temp_time = std::chrono::system_clock::now();
 
   vector_partitioners.resize(0,
                              dof_handler.get_triangulation().n_global_levels() -
@@ -159,6 +170,15 @@ MGTransferMatrixFree<dim, Number>::build(
     else
       this->ghosted_level_vector[level].reinit(vector_partitioners[level]);
 
+
+
+  const auto time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::system_clock::now() - temp_time)
+                       .count() /
+                     1e9;
+
+  temp_time = std::chrono::system_clock::now();
+
   // unpack element info data
   fe_degree             = elem_info.fe_degree;
   element_is_continuous = elem_info.element_is_continuous;
@@ -194,6 +214,17 @@ MGTransferMatrixFree<dim, Number>::build(
             }
         }
     }
+
+
+
+  const auto time2 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::system_clock::now() - temp_time)
+                       .count() /
+                     1e9;
+
+  temp_time = std::chrono::system_clock::now();
+
+  std::cout << time0 << " " << time1 << " " << time2 << std::endl;
 
   evaluation_data.resize(n_child_cell_dofs);
 }

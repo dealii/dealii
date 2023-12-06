@@ -66,7 +66,16 @@ namespace
   class CellTransferFactory
   {
   public:
-    static const unsigned int max_degree = 9;
+    // Maximum degree to precompile. If no value is given by the user during
+    // compilation, we choose its value as FE_EVAL_FACTORY_DEGREE_MAX (default
+    // value 6).
+    static const unsigned int max_degree =
+#ifndef FE_EVAL_FACTORY_DEGREE_MAX
+      6
+#else
+      FE_EVAL_FACTORY_DEGREE_MAX
+#endif
+      ;
 
     CellTransferFactory(const unsigned int degree_fine,
                         const unsigned int degree_coarse)
@@ -698,102 +707,7 @@ namespace internal
       : dof_handler_fine(dof_handler_fine)
       , mg_level_fine(mg_level_fine)
     {
-      std::vector<types::global_dof_index> locally_active_non_local_indices;
-
-      if (this->mg_level_fine == numbers::invalid_unsigned_int)
-        {
-          is_locally_owned_dofs = dof_handler_fine.locally_owned_dofs();
-
-          std::vector<types::global_dof_index> dof_indices_cell;
-
-          loop_over_active_or_level_cells(
-            dof_handler_coarse,
-            numbers::invalid_unsigned_int,
-            [&](const auto &cell_coarse) {
-              // create fine cell in two steps, since the coarse cell and
-              // the fine cell are associated to different Trinagulation
-              // objects
-              const auto cell_id = cell_coarse->id();
-              const auto cell_fine_raw =
-                dof_handler_fine.get_triangulation().create_cell_iterator(
-                  cell_id);
-
-              if (cell_fine_raw->has_children() == false)
-                {
-                  // cell has no children on fine mesh
-
-                  // convert CellAccessor to DoFCellAccessor
-                  const auto cell_fine =
-                    cell_fine_raw->as_dof_handler_iterator(dof_handler_fine);
-
-                  dof_indices_cell.resize(
-                    cell_fine->get_fe().n_dofs_per_cell());
-                  cell_fine->get_dof_indices(dof_indices_cell);
-                  locally_active_non_local_indices.insert(
-                    locally_active_non_local_indices.end(),
-                    dof_indices_cell.begin(),
-                    dof_indices_cell.end());
-                }
-              else
-                {
-                  // cell has children on fine mesh: loop over all children
-                  for (const auto &child_raw : cell_fine_raw->child_iterators())
-                    {
-                      // convert CellAccessor of child to DoFCellAccessor
-                      const auto child =
-                        child_raw->as_dof_handler_iterator(dof_handler_fine);
-
-                      dof_indices_cell.resize(
-                        child->get_fe().n_dofs_per_cell());
-                      child->get_dof_indices(dof_indices_cell);
-
-                      for (const auto i : dof_indices_cell)
-                        if (is_locally_owned_dofs.is_element(i) == false)
-                          locally_active_non_local_indices.push_back(i);
-                    }
-                }
-            });
-        }
-      else
-        {
-          is_locally_owned_dofs =
-            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
-
-          Assert(mg_level_fine > 0, ExcInternalError());
-
-          std::vector<types::global_dof_index> dof_indices_cell;
-
-          loop_over_active_or_level_cells(
-            dof_handler_fine, mg_level_fine - 1, [&](const auto &cell) {
-              if (cell->has_children())
-                {
-                  for (const auto &child : cell->child_iterators())
-                    {
-                      dof_indices_cell.resize(
-                        child->get_fe().n_dofs_per_cell());
-                      child->get_mg_dof_indices(dof_indices_cell);
-
-                      for (const auto i : dof_indices_cell)
-                        if (is_locally_owned_dofs.is_element(i) == false)
-                          locally_active_non_local_indices.push_back(i);
-                    }
-                }
-            });
-        }
-
-      is_locally_active_dofs.set_size(is_locally_owned_dofs.size());
-
-      is_locally_active_dofs.add_indices(is_locally_owned_dofs);
-
-      std::sort(locally_active_non_local_indices.begin(),
-                locally_active_non_local_indices.end());
-      locally_active_non_local_indices.erase(
-        std::unique(locally_active_non_local_indices.begin(),
-                    locally_active_non_local_indices.end()),
-        locally_active_non_local_indices.end());
-      is_locally_active_dofs.add_indices(
-        locally_active_non_local_indices.begin(),
-        locally_active_non_local_indices.end());
+      (void)dof_handler_coarse;
     }
 
     virtual ~FirstChildPolicyFineDoFHandlerView() = default;
@@ -827,7 +741,7 @@ namespace internal
               const auto cell_fine_raw =
                 dof_handler_fine.get_triangulation().create_cell_iterator(
                   cell_id);
-              return cell_fine_raw->as_dof_handler_iterator(dof_handler_fine)
+              cell_fine_raw->as_dof_handler_iterator(dof_handler_fine)
                 ->get_dof_indices(dof_indices);
             }
           else
@@ -1780,6 +1694,8 @@ namespace internal
       transfer.dof_handler_fine = &dof_handler_fine;
       transfer.mg_level_fine    = mg_level_fine;
 
+      auto temp_time = std::chrono::system_clock::now();
+
       std::unique_ptr<FineDoFHandlerViewBase<dim>> dof_handler_fine_view;
 
       if (internal::h_transfer_uses_first_child_policy(dof_handler_fine,
@@ -1856,27 +1772,12 @@ namespace internal
 
       const auto reference_cell = dof_handler_fine.get_fe(0).reference_cell();
 
-      // create partitioners and vectors for internal purposes
-      {
-        // ... for fine mesh
-        {
-          transfer.partitioner_fine =
-            std::make_shared<Utilities::MPI::Partitioner>(
-              dof_handler_fine_view->locally_owned_dofs(),
-              dof_handler_fine_view->locally_active_dofs(),
-              dof_handler_fine.get_communicator());
-          transfer.vec_fine.reinit(transfer.partitioner_fine);
-        }
+      const auto time0 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
 
-        // ... coarse mesh (needed since user vector might be const)
-        {
-          transfer.partitioner_coarse =
-            create_coarse_partitioner(dof_handler_coarse,
-                                      constraints_coarse,
-                                      mg_level_coarse);
-          transfer.vec_coarse.reinit(transfer.partitioner_coarse);
-        }
-      }
+      temp_time = std::chrono::system_clock::now();
 
       // helper function: to process the fine level cells; function @p fu_non_refined is
       // performed on cells that are not refined and @fu_refined is performed on
@@ -1993,6 +1894,13 @@ namespace internal
           n_dof_indices_coarse[i + 1] += n_dof_indices_coarse[i];
         }
 
+      const auto time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
+
       // indices
       {
         std::vector<types::global_dof_index> local_dof_indices(
@@ -2031,15 +1939,16 @@ namespace internal
         unsigned int cell_no_0 = 0;
         unsigned int cell_no_1 = transfer.schemes[0].n_coarse_cells;
 
-        transfer.constraint_info_coarse.reinit(
-          dof_handler_coarse,
-          transfer.schemes[0].n_coarse_cells +
-            transfer.schemes[1].n_coarse_cells,
-          constraints_coarse.n_constraints() > 0 &&
-            use_fast_hanging_node_algorithm(dof_handler_coarse,
-                                            mg_level_coarse));
+        transfer.constraint_info_coarse
+          .template reinit<types::global_dof_index>(
+            dof_handler_coarse,
+            transfer.schemes[0].n_coarse_cells +
+              transfer.schemes[1].n_coarse_cells,
+            constraints_coarse.n_constraints() > 0 &&
+              use_fast_hanging_node_algorithm(dof_handler_coarse,
+                                              mg_level_coarse));
 
-        transfer.constraint_info_fine.reinit(
+        transfer.constraint_info_fine.template reinit<types::global_dof_index>(
           transfer.schemes[0].n_coarse_cells +
           transfer.schemes[1].n_coarse_cells);
 
@@ -2047,12 +1956,13 @@ namespace internal
           [&](const auto &cell_coarse, const auto &cell_fine) {
             // parent
             {
-              transfer.constraint_info_coarse.read_dof_indices(
-                cell_no_0,
-                mg_level_coarse,
-                cell_coarse,
-                constraints_coarse,
-                transfer.partitioner_coarse);
+              transfer.constraint_info_coarse
+                .template read_dof_indices<types::global_dof_index>(
+                  cell_no_0,
+                  mg_level_coarse,
+                  cell_coarse,
+                  constraints_coarse,
+                  {});
             }
 
             // child
@@ -2064,8 +1974,9 @@ namespace internal
                 level_dof_indices_fine_0[i] =
                   local_dof_indices[lexicographic_numbering_fine[i]];
 
-              transfer.constraint_info_fine.read_dof_indices(
-                cell_no_0, level_dof_indices_fine_0, transfer.partitioner_fine);
+              transfer.constraint_info_fine
+                .template read_dof_indices<types::global_dof_index>(
+                  cell_no_0, level_dof_indices_fine_0, {});
             }
 
             // move pointers
@@ -2077,12 +1988,13 @@ namespace internal
             // parent (only once at the beginning)
             if (c == 0)
               {
-                transfer.constraint_info_coarse.read_dof_indices(
-                  cell_no_1,
-                  mg_level_coarse,
-                  cell_coarse,
-                  constraints_coarse,
-                  transfer.partitioner_coarse);
+                transfer.constraint_info_coarse
+                  .template read_dof_indices<types::global_dof_index>(
+                    cell_no_1,
+                    mg_level_coarse,
+                    cell_coarse,
+                    constraints_coarse,
+                    {});
 
                 level_dof_indices_fine_1.assign(level_dof_indices_fine_1.size(),
                                                 numbers::invalid_dof_index);
@@ -2113,18 +2025,46 @@ namespace internal
             // move pointers (only once at the end)
             if (c + 1 == GeometryInfo<dim>::max_children_per_cell)
               {
-                transfer.constraint_info_fine.read_dof_indices(
-                  cell_no_1,
-                  level_dof_indices_fine_1,
-                  transfer.partitioner_fine);
+                transfer.constraint_info_fine
+                  .template read_dof_indices<types::global_dof_index>(
+                    cell_no_1, level_dof_indices_fine_1, {});
 
                 cell_no_1++;
               }
           });
-
-        transfer.constraint_info_coarse.finalize();
-        transfer.constraint_info_fine.finalize();
       }
+
+      const auto time2 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
+
+      transfer.partitioner_coarse =
+        transfer.constraint_info_coarse
+          .template finalize<types::global_dof_index>(
+            (mg_level_coarse == numbers::invalid_unsigned_int) ?
+              dof_handler_coarse.locally_owned_dofs() :
+              dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse),
+            dof_handler_coarse.get_communicator());
+      transfer.vec_coarse.reinit(transfer.partitioner_coarse);
+
+      transfer.partitioner_fine =
+        transfer.constraint_info_fine
+          .template finalize<types::global_dof_index>(
+            (mg_level_fine == numbers::invalid_unsigned_int) ?
+              dof_handler_fine.locally_owned_dofs() :
+              dof_handler_fine.locally_owned_mg_dofs(mg_level_fine),
+            dof_handler_fine.get_communicator());
+      transfer.vec_fine.reinit(transfer.partitioner_fine);
+
+      const auto time3 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
 
 
       // ------------- prolongation matrix (0) -> identity matrix --------------
@@ -2236,6 +2176,13 @@ namespace internal
           }
       }
 
+      const auto time4 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      temp_time = std::chrono::system_clock::now();
+
 
       // ------------------------------- weights -------------------------------
       if (transfer.fine_element_is_continuous)
@@ -2256,6 +2203,15 @@ namespace internal
           if (is_feq)
             compress_weights(transfer);
         }
+
+      const auto time5 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                           std::chrono::system_clock::now() - temp_time)
+                           .count() /
+                         1e9;
+
+      if (true)
+        std::cout << time0 << " " << time1 << " " << time2 << " " << time3
+                  << " " << time4 << " " << time5 << std::endl;
     }
 
 
@@ -4274,6 +4230,8 @@ MGTransferMF<dim, Number>::build(
   const bool use_local_smoothing =
     this->transfer.n_levels() == 0 || this->internal_transfer.n_levels() > 0;
 
+  auto temp_time = std::chrono::system_clock::now();
+
   if (use_local_smoothing)
     {
       this->initialize_internal_transfer(dof_handler,
@@ -4281,12 +4239,34 @@ MGTransferMF<dim, Number>::build(
       this->initialize_transfer_references(internal_transfer);
     }
 
+  const auto time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::system_clock::now() - temp_time)
+                       .count() /
+                     1e9;
+
+  temp_time = std::chrono::system_clock::now();
+
   this->build(external_partitioners);
+
+  const auto time2 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::system_clock::now() - temp_time)
+                       .count() /
+                     1e9;
+
+  temp_time = std::chrono::system_clock::now();
 
   if (use_local_smoothing)
     this->fill_and_communicate_copy_indices(dof_handler);
   else
     this->fill_and_communicate_copy_indices_global_coarsening(dof_handler);
+
+  const auto time3 = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::system_clock::now() - temp_time)
+                       .count() /
+                     1e9;
+
+  if (true)
+    std::cout << time1 << " " << time2 << " " << time3 << std::endl;
 }
 
 
@@ -5496,6 +5476,18 @@ MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
 {
   return signals_non_nested.restriction.connect(slot);
 }
+
+
+
+template <int dim, typename Number>
+MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
+  AdditionalData::AdditionalData(const double       tolerance,
+                                 const unsigned int rtree_level,
+                                 const bool         enforce_all_points_found)
+  : tolerance(tolerance)
+  , rtree_level(rtree_level)
+  , enforce_all_points_found(enforce_all_points_found)
+{}
 
 
 DEAL_II_NAMESPACE_CLOSE
