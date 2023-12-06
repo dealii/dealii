@@ -614,6 +614,7 @@ namespace GridGenerator
 
     for (unsigned int p = 0; p < n_pipes; ++p)
       tria.set_manifold(p, manifolds[p]);
+    tria.set_manifold(n_pipes, FlatManifold<3>());
 
     // Since GridGenerator::merge_triangulations() does not copy boundary IDs
     // either, we need to set them after the final geometry is created. Luckily,

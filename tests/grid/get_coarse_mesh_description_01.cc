@@ -18,6 +18,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 
 #include "../tests.h"
@@ -34,10 +35,17 @@ setup_tria(Triangulation<1> &tria)
       static_cast<types::material_id>(10.0 * (3.0 + cell->center()[0])));
   for (auto face : tria.active_face_iterators())
     if (0.5 < face->center()[0])
-      face->set_all_manifold_ids(42);
+      {
+        face->set_all_manifold_ids(42);
+        tria.set_manifold(42, FlatManifold<1>());
+      }
   for (auto &cell : tria.active_cell_iterators())
-    cell->set_manifold_id(
-      static_cast<types::material_id>(10.0 * (2.0 + cell->center()[0])));
+    {
+      const auto bid =
+        static_cast<types::material_id>(10.0 * (2.0 + cell->center()[0]));
+      cell->set_manifold_id(bid);
+      tria.set_manifold(bid, FlatManifold<1>());
+    }
 }
 
 
@@ -63,13 +71,19 @@ setup_tria(Triangulation<dim> &tria)
   // detail that unassigned manifolds are flat.
   for (auto face : tria.active_face_iterators())
     if (-0.1 < face->center()[0])
-      face->set_all_manifold_ids(42);
+      {
+        face->set_all_manifold_ids(42);
+        tria.set_manifold(42, FlatManifold<dim>());
+      }
   for (auto &cell : tria.active_cell_iterators())
     if (cell->center() != Point<dim>())
       {
         const double angle = std::atan2(cell->center()[0], cell->center()[1]);
-        cell->set_manifold_id(
-          static_cast<types::material_id>(361 - angle * 180.0 / numbers::PI));
+
+        const auto bid =
+          static_cast<types::material_id>(361 - angle * 180.0 / numbers::PI);
+        cell->set_manifold_id(bid);
+        tria.set_manifold(bid, FlatManifold<dim>());
       }
 }
 
@@ -92,6 +106,10 @@ test()
     Triangulation<dim> tria_2;
     tria_2.create_triangulation(vertices, cells, subcell_data);
     Assert(GridTools::have_same_coarse_mesh(tria, tria_2), ExcInternalError());
+
+    for (const auto bid : tria_2.get_manifold_ids())
+      if (bid != numbers::flat_manifold_id)
+        tria_2.set_manifold(bid, FlatManifold<dim>());
 
     GridOut grid_out;
     deallog << "Original Triangulation:" << std::endl;

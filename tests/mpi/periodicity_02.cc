@@ -35,6 +35,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/manifold_lib.h>
 
 #include <deal.II/lac/affine_constraints.h>
@@ -759,6 +760,9 @@ namespace Step22
       triangulation, center, inner_radius, outer_radius, 0, true);
     triangulation.set_all_manifold_ids(numbers::flat_manifold_id);
     GridTools::copy_boundary_to_manifold_id(triangulation);
+
+    for (const auto bid : triangulation.get_boundary_ids())
+      triangulation.set_manifold(bid, FlatManifold<dim>());
 
 #ifdef PERIODIC
     std::vector<GridTools::PeriodicFacePair<

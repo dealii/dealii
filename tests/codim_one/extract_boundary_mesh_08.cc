@@ -18,6 +18,7 @@
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
+#include <deal.II/grid/manifold.h>
 #include <deal.II/grid/tria.h>
 
 #include "../tests.h"
@@ -35,6 +36,11 @@ test()
   GridOut().write_gnuplot(triangulation, deallog.get_file_stream());
 
   Triangulation<dim - 1, dim> triangulation_surface;
+
+  for (const auto bid : triangulation.get_manifold_ids())
+    if (bid != numbers::flat_manifold_id)
+      triangulation_surface.set_manifold(bid, FlatManifold<2, 3>());
+
   GridGenerator::extract_boundary_mesh(triangulation, triangulation_surface);
   triangulation_surface.refine_global(2);
 

@@ -69,6 +69,7 @@ main()
   // of the face.
   tria.begin()->set_all_manifold_ids(1);
   tria.begin()->set_manifold_id(0);
+  tria.set_manifold(0, FlatManifold<3>());
 
   tria.refine_global(2);
 

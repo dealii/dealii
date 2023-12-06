@@ -45,6 +45,10 @@ test(unsigned int ref = 1)
   for (const unsigned int f : GeometryInfo<dim>::face_indices())
     tria.begin_active()->face(f)->set_manifold_id(2);
 
+  tria.set_manifold(1, FlatManifold<dim, spacedim>());
+  tria.set_manifold(2, FlatManifold<dim, spacedim>());
+  tria.set_manifold(3, FlatManifold<dim, spacedim>());
+
   tria.refine_global(1);
 
   for (cell = tria.begin_active(); cell != tria.end(); ++cell)

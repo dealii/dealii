@@ -1893,6 +1893,10 @@ public:
    * assignment of a different Manifold object by the function
    * Triangulation::set_manifold().
    *
+   * @note Geometric objects with the manifold ID @p manifold_number will
+   *   still have the same ID after calling this function so that the function
+   *   get_manifold_ids() will still return the same set of IDs.
+   *
    * @ingroup manifold
    *
    * @see
@@ -1906,6 +1910,11 @@ public:
    * manifold_id, to use a FlatManifold object. This undoes assignment
    * of all Manifold objects by the function
    * Triangulation::set_manifold().
+   *
+   * @note Geometric objects not having numbers::flat_manifold_id as manifold ID
+   *   will after calling this function still have the same IDs. Their IDs are
+   *   not replaced by numbers::flat_manifold_id so that the function
+   *   get_manifold_ids() will still return the same set of IDs.
    *
    * @ingroup manifold
    *

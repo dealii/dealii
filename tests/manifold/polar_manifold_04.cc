@@ -53,6 +53,7 @@ test(unsigned int ref = 1)
         cell->set_all_manifold_ids(0);
     }
 
+  tria.set_manifold(0, FlatManifold<dim, spacedim>());
   tria.set_manifold(1, manifold);
   tria.refine_global(2);
 
