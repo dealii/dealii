@@ -158,7 +158,10 @@ test(const unsigned int mapping_degree,
     }
 
   // initialize RPE without any marked points
-  dealii::Utilities::MPI::RemotePointEvaluation<dim> rpe(tolerance);
+  typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData
+    additional_data;
+  additional_data.tolerance = tolerance;
+  dealii::Utilities::MPI::RemotePointEvaluation<dim> rpe(additional_data);
   rpe.reinit(points, tria, mapping);
 
   unsigned int                    n_points_not_found_rpe = 0;
@@ -182,8 +185,13 @@ test(const unsigned int mapping_degree,
 
   // initialize RPE with all points marked
   std::vector<bool> marked_vertices(tria.n_vertices(), true);
-  dealii::Utilities::MPI::RemotePointEvaluation<dim> rpe2(
-    tolerance, false, 0, [marked_vertices]() { return marked_vertices; });
+
+  typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData
+    additional_data2(tolerance, false, 0, [marked_vertices]() {
+      return marked_vertices;
+    });
+
+  dealii::Utilities::MPI::RemotePointEvaluation<dim> rpe2(additional_data2);
 
   rpe2.reinit(points, tria, mapping);
 

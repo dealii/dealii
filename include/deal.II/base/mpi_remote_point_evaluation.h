@@ -54,7 +54,60 @@ namespace Utilities
     {
     public:
       /**
+       * AdditionalData structure that can be used to tweak parameters
+       * of RemotePointEvaluation.
+       */
+      struct AdditionalData
+      {
+      public:
+        /**
+         *  Constructor.
+         */
+        AdditionalData(
+          const double       tolerance                              = 1e-6,
+          const bool         enforce_unique_mapping                 = false,
+          const unsigned int rtree_level                            = 0,
+          const std::function<std::vector<bool>()> &marked_vertices = {});
+
+        /**
+         * Tolerance in terms of unit cell coordinates for determining all cells
+         * around a point passed to RemotePointEvaluation during reinit().
+         * Depending on the problem, it might be necessary to adjust the
+         * tolerance in order to be able to identify a cell. Floating point
+         * arithmetic implies that a point will, in general, not lie exactly on
+         * a vertex, edge, or face.
+         */
+        double tolerance;
+
+        /**
+         * Enforce unique mapping, i.e., (one-to-one) relation of points and
+         * cells.
+         */
+        bool enforce_unique_mapping;
+
+        /**
+         * RTree level to be used during the construction of the bounding boxes.
+         */
+        unsigned int rtree_level;
+
+        /**
+         * Function that marks relevant vertices to make search of active cells
+         * around point more efficient.
+         */
+        std::function<std::vector<bool>()> marked_vertices;
+      };
+
+      /**
        * Constructor.
+       *
+       * @param additional_data Configure options for RemotePointEvaluation.
+       */
+      RemotePointEvaluation(
+        const AdditionalData &additional_data = AdditionalData());
+
+      /**
+       * Constructor. This constructor is deprecated. Use the other constructor
+       * taking AdditionalData instead.
        *
        * @param tolerance Tolerance in terms of unit cell coordinates for
        *   determining all cells around a point passed to the class during
@@ -67,9 +120,13 @@ namespace Utilities
        * @param rtree_level RTree level to be used during the construction of the bounding boxes.
        * @param marked_vertices Function that marks relevant vertices to make search
        *   of active cells around point more efficient.
+       *
+       * @deprecated
        */
+      DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+        "Use the constructor with AdditionalData struct.")
       RemotePointEvaluation(
-        const double       tolerance                              = 1e-6,
+        const double       tolerance,
         const bool         enforce_unique_mapping                 = false,
         const unsigned int rtree_level                            = 0,
         const std::function<std::vector<bool>()> &marked_vertices = {});
@@ -312,27 +369,9 @@ namespace Utilities
 
     private:
       /**
-       * Tolerance to be used while determining the surrounding cells of a
-       * point.
+       * Additional data with basic settings.
        */
-      const double tolerance;
-
-      /**
-       * Enforce unique mapping, i.e., (one-to-one) relation of points and
-       * cells.
-       */
-      const bool enforce_unique_mapping;
-
-      /**
-       * RTree level to be used during the construction of the bounding boxes.
-       */
-      const unsigned int rtree_level;
-
-      /**
-       * Function that marks relevant vertices to make search of active cells
-       * around point more efficient.
-       */
-      const std::function<std::vector<bool>()> marked_vertices;
+      const AdditionalData additional_data;
 
       /**
        * Storage for the status of the triangulation signal.

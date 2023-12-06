@@ -4991,7 +4991,11 @@ template <int dim, typename Number>
 MGTwoLevelTransferNonNested<dim, LinearAlgebra::distributed::Vector<Number>>::
   MGTwoLevelTransferNonNested(const AdditionalData &data)
   : additional_data(data)
-  , rpe(data.tolerance, false, data.rtree_level, {})
+  , rpe(typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData(
+      data.tolerance,
+      false,
+      data.rtree_level,
+      {}))
 {}
 
 template <int dim, typename Number>

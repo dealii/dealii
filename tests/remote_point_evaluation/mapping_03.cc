@@ -55,7 +55,12 @@ test(const bool enforce_unique_map)
     // should be assigned to rank 0 for unique mapping
     evaluation_points.emplace_back(0.5, 0.5 + std::pow<double>(10.0, -i));
 
-  Utilities::MPI::RemotePointEvaluation<dim> eval(1e-6, enforce_unique_map);
+  typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData
+    additional_data;
+  additional_data.enforce_unique_mapping = enforce_unique_map;
+  additional_data.tolerance              = 1e-6;
+
+  Utilities::MPI::RemotePointEvaluation<dim> eval(additional_data);
 
   const auto result_avg =
     VectorTools::point_values<1>(mapping,

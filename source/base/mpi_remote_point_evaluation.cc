@@ -36,7 +36,7 @@ namespace Utilities
   namespace MPI
   {
     template <int dim, int spacedim>
-    RemotePointEvaluation<dim, spacedim>::RemotePointEvaluation(
+    RemotePointEvaluation<dim, spacedim>::AdditionalData::AdditionalData(
       const double                              tolerance,
       const bool                                enforce_unique_mapping,
       const unsigned int                        rtree_level,
@@ -45,6 +45,29 @@ namespace Utilities
       , enforce_unique_mapping(enforce_unique_mapping)
       , rtree_level(rtree_level)
       , marked_vertices(marked_vertices)
+    {}
+
+
+
+    template <int dim, int spacedim>
+    RemotePointEvaluation<dim, spacedim>::RemotePointEvaluation(
+      const AdditionalData &additional_data)
+      : additional_data(additional_data)
+      , ready_flag(false)
+    {}
+
+
+
+    template <int dim, int spacedim>
+    RemotePointEvaluation<dim, spacedim>::RemotePointEvaluation(
+      const double                              tolerance,
+      const bool                                enforce_unique_mapping,
+      const unsigned int                        rtree_level,
+      const std::function<std::vector<bool>()> &marked_vertices)
+      : additional_data(tolerance,
+                        enforce_unique_mapping,
+                        rtree_level,
+                        marked_vertices)
       , ready_flag(false)
     {}
 
@@ -88,7 +111,8 @@ namespace Utilities
 
       // compress r-tree to a minimal set of bounding boxes
       std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes(1);
-      global_bboxes[0] = extract_rtree_level(local_tree, rtree_level);
+      global_bboxes[0] =
+        extract_rtree_level(local_tree, additional_data.rtree_level);
 
       const GridTools::Cache<dim, spacedim> cache(tria, mapping);
 
@@ -97,10 +121,11 @@ namespace Utilities
           cache,
           points,
           global_bboxes,
-          marked_vertices ? marked_vertices() : std::vector<bool>(),
-          tolerance,
+          additional_data.marked_vertices ? additional_data.marked_vertices() :
+                                            std::vector<bool>(),
+          additional_data.tolerance,
           true,
-          enforce_unique_mapping);
+          additional_data.enforce_unique_mapping);
 
       this->reinit(data, tria, mapping);
 #endif
@@ -185,7 +210,7 @@ namespace Utilities
           all_points_found_flag = std::get<0>(n_owning_processes_global) > 0;
         }
 
-      Assert(enforce_unique_mapping == false || unique_mapping,
+      Assert(additional_data.enforce_unique_mapping == false || unique_mapping,
              ExcInternalError());
 
       cell_data        = std::make_unique<CellData>(tria);
