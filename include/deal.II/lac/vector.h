@@ -24,6 +24,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/vectorization.h>
 
 #include <deal.II/lac/read_vector.h>
 #include <deal.II/lac/vector_operation.h>
@@ -110,19 +111,6 @@ class Vector : public Subscriptor, public ReadVector<Number>
 {
 public:
   /**
-   * This class only supports basic numeric types (i.e., we support double and
-   * float but not automatically differentiated numbers).
-   *
-   * @note we test real_type here to get the underlying scalar type when using
-   * std::complex.
-   */
-  static_assert(
-    std::is_arithmetic<
-      typename numbers::NumberTraits<Number>::real_type>::value,
-    "The Vector class only supports basic numeric types. In particular, it "
-    "does not support automatically differentiated numbers.");
-
-  /**
    * Declare standard types used in all containers. These types parallel those
    * in the <tt>C++</tt> standard libraries <tt>vector<...></tt> class.
    */
@@ -135,6 +123,11 @@ public:
   using const_reference = const value_type &;
   using size_type       = types::global_dof_index;
 
+  static constexpr std::size_t width =
+    internal::VectorizedArrayTrait<Number>::width();
+  using scalar_value_type =
+    typename internal::VectorizedArrayTrait<Number>::value_type;
+
   /**
    * Declare a type that has holds real-valued numbers with the same precision
    * as the template argument to this class. If the template argument of this
@@ -144,7 +137,21 @@ public:
    *
    * This alias is used to represent the return type of norms.
    */
-  using real_type = typename numbers::NumberTraits<Number>::real_type;
+  using real_type = typename numbers::NumberTraits<value_type>::real_type;
+  using scalar_real_type =
+    typename numbers::NumberTraits<scalar_value_type>::real_type;
+
+  /**
+   * This class only supports basic numeric types (i.e., we support double and
+   * float but not automatically differentiated numbers).
+   *
+   * @note we test real_type here to get the underlying scalar type when using
+   * std::complex.
+   */
+  static_assert(
+    std::is_arithmetic<scalar_real_type>::value,
+    "The Vector class only supports basic numeric types. In particular, it "
+    "does not support automatically differentiated numbers.");
 
   /**
    * @name Basic object handling
@@ -510,7 +517,7 @@ public:
    * with the same order of summation in every run, which gives fully
    * repeatable results from one run to another.
    */
-  real_type
+  scalar_real_type
   l1_norm() const;
 
   /**
@@ -521,7 +528,7 @@ public:
    * with the same order of summation in every run, which gives fully
    * repeatable results from one run to another.
    */
-  real_type
+  scalar_real_type
   l2_norm() const;
 
   /**
@@ -532,13 +539,13 @@ public:
    * with the same order of summation in every run, which gives fully
    * repeatable results from one run to another.
    */
-  real_type
-  lp_norm(const real_type p) const;
+  scalar_real_type
+  lp_norm(const scalar_real_type p) const;
 
   /**
    * Maximum absolute value of the elements.
    */
-  real_type
+  scalar_real_type
   linfty_norm() const;
 
   /**
@@ -1266,8 +1273,13 @@ template <typename Number>
 inline Vector<Number> &
 Vector<Number>::operator/=(const Number factor)
 {
-  AssertIsFinite(factor);
-  Assert(factor != Number(0.), ExcZero());
+  for (unsigned int v = 0; v < width; ++v)
+    {
+      AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(factor, v));
+      Assert(internal::VectorizedArrayTrait<Number>::get(factor, v) !=
+               scalar_value_type(0.),
+             ExcZero());
+    }
 
   this->operator*=(Number(1.) / factor);
   return *this;

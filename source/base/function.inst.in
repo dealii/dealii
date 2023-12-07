@@ -27,6 +27,19 @@ for (S : REAL_SCALARS; dim : SPACE_DIMENSIONS)
     template class VectorFunctionFromTensorFunction<dim, S>;
   }
 
+for (S : REAL_SCALARS_VECTORIZED; dim : SPACE_DIMENSIONS)
+  {
+    template class Function<dim, S, S>;
+    template class Functions::ZeroFunction<dim, S, S>;
+    template class Functions::ConstantFunction<dim, S, S>;
+    template class Functions::IdentityFunction<dim, S, S>;
+    template class ComponentSelectFunction<dim, S, S>;
+    template class ScalarFunctionFromFunctionObject<dim, S, S>;
+    template class VectorFunctionFromScalarFunctionObject<dim, S, S>;
+    template class FunctionFromFunctionObjects<dim, S, S>;
+    template class VectorFunctionFromTensorFunction<dim, S, S>;
+  }
+
 for (S : COMPLEX_SCALARS; dim : SPACE_DIMENSIONS)
   {
     template class Function<dim, S>;

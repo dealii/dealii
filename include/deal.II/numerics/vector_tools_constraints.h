@@ -32,7 +32,7 @@ template <typename number>
 class AffineConstraints;
 template <int dim, int spacedim>
 struct StaticMappingQ1;
-template <int dim, typename Number>
+template <int dim, typename Number, typename Number2>
 class Function;
 template <int dim, int spacedim>
 class Mapping;

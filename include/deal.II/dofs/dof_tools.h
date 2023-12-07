@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 #ifndef DOXYGEN
 class BlockMask;
-template <int dim, typename RangeNumberType>
+template <int dim, typename RangeNumberType, typename PointNumberType>
 class Function;
 template <int dim, int spacedim>
 class FiniteElement;

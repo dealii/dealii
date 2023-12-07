@@ -21,6 +21,13 @@ for (S : REAL_SCALARS; rank : RANKS; dim : SPACE_DIMENSIONS)
     template class ZeroTensorFunction<rank, dim, S>;
   }
 
+for (S : REAL_SCALARS_VECTORIZED; rank : RANKS; dim : SPACE_DIMENSIONS)
+  {
+    template class TensorFunction<rank, dim, S, S>;
+    template class ConstantTensorFunction<rank, dim, S, S>;
+    template class ZeroTensorFunction<rank, dim, S, S>;
+  }
+
 for (S : COMPLEX_SCALARS; rank : RANKS; dim : SPACE_DIMENSIONS)
   {
     template class TensorFunction<rank, dim, S>;

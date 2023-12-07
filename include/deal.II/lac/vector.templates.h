@@ -250,8 +250,10 @@ Vector<Number>::all_zero() const
   Assert(size() != 0, ExcEmptyObject());
 
   for (size_type i = 0; i < size(); ++i)
-    if (values[i] != Number())
-      return false;
+    for (unsigned int v = 0; v < width; ++v)
+      if (internal::VectorizedArrayTrait<Number>::get(values[i], v) !=
+          scalar_value_type())
+        return false;
   return true;
 }
 
@@ -264,8 +266,10 @@ Vector<Number>::is_non_negative() const
   Assert(size() != 0, ExcEmptyObject());
 
   for (size_type i = 0; i < size(); ++i)
-    if (!internal::VectorOperations::is_non_negative(values[i]))
-      return false;
+    for (unsigned int v = 0; v < width; ++v)
+      if (!internal::VectorOperations::is_non_negative(
+            internal::VectorizedArrayTrait<Number>::get(values[i], v)))
+        return false;
 
   return true;
 }
@@ -276,9 +280,12 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator=(const Number s)
 {
-  AssertIsFinite(s);
-  if (s != Number())
-    Assert(size() != 0, ExcEmptyObject());
+  for (unsigned int v = 0; v < width; ++v)
+    AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(s, v));
+  for (unsigned int v = 0; v < width; ++v)
+    if (internal::VectorizedArrayTrait<Number>::get(s, v) !=
+        scalar_value_type())
+      Assert(size() != 0, ExcEmptyObject());
 
   if (size() > 0)
     {
@@ -298,7 +305,8 @@ template <typename Number>
 Vector<Number> &
 Vector<Number>::operator*=(const Number factor)
 {
-  AssertIsFinite(factor);
+  for (unsigned int v = 0; v < width; ++v)
+    AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(factor, v));
 
   Assert(size() != 0, ExcEmptyObject());
 
@@ -319,7 +327,8 @@ template <typename Number>
 void
 Vector<Number>::add(const Number a, const Vector<Number> &v)
 {
-  AssertIsFinite(a);
+  for (unsigned int v = 0; v < width; ++v)
+    AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(a, v));
 
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
@@ -338,8 +347,11 @@ template <typename Number>
 void
 Vector<Number>::sadd(const Number x, const Number a, const Vector<Number> &v)
 {
-  AssertIsFinite(x);
-  AssertIsFinite(a);
+  for (unsigned int v = 0; v < width; ++v)
+    {
+      AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(x, 0));
+      AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(a, 0));
+    }
 
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
@@ -371,7 +383,8 @@ Vector<Number>::operator*(const Vector<Number2> &v) const
                                                        v.values.begin());
   internal::VectorOperations::parallel_reduce(
     dot, 0, size(), sum, thread_loop_partitioner);
-  AssertIsFinite(sum);
+  for (unsigned int v = 0; v < width; ++v)
+    AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(sum, v));
 
   return sum;
 }
@@ -389,7 +402,8 @@ Vector<Number>::norm_sqr() const
   internal::VectorOperations::parallel_reduce(
     norm2, 0, size(), sum, thread_loop_partitioner);
 
-  AssertIsFinite(sum);
+  for (unsigned int v = 0; v < width; ++v)
+    AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(sum, v));
 
   return sum;
 }
@@ -413,13 +427,15 @@ Vector<Number>::mean_value() const
 
 
 template <typename Number>
-typename Vector<Number>::real_type
+typename Vector<Number>::scalar_real_type
 Vector<Number>::l1_norm() const
 {
+  Assert(width == 1, ExcNotImplemented());
   Assert(size() != 0, ExcEmptyObject());
 
-  real_type                                            sum;
-  internal::VectorOperations::Norm1<Number, real_type> norm1(values.begin());
+  scalar_real_type                                                       sum;
+  internal::VectorOperations::Norm1<scalar_value_type, scalar_real_type> norm1(
+    &(internal::VectorizedArrayTrait<Number>::get(values[0], 0)));
   internal::VectorOperations::parallel_reduce(
     norm1, 0, size(), sum, thread_loop_partitioner);
 
@@ -429,9 +445,11 @@ Vector<Number>::l1_norm() const
 
 
 template <typename Number>
-typename Vector<Number>::real_type
+typename Vector<Number>::scalar_real_type
 Vector<Number>::l2_norm() const
 {
+  Assert(width == 1, ExcNotImplemented());
+
   // if l2_norm()^2 is finite and non-zero, the answer is computed as
   // std::sqrt(norm_sqr()). If norm_sqr() is infinite or zero, the l2 norm
   // might still be finite. In that case, recompute it (this is a rare case,
@@ -439,24 +457,27 @@ Vector<Number>::l2_norm() const
   // precision) using the BLAS approach with a weight, see e.g. dnrm2.f.
   Assert(size() != 0, ExcEmptyObject());
 
-  real_type                                            norm_square;
-  internal::VectorOperations::Norm2<Number, real_type> norm2(values.begin());
+  scalar_real_type norm_square;
+  internal::VectorOperations::Norm2<scalar_value_type, scalar_real_type> norm2(
+    &(internal::VectorizedArrayTrait<Number>::get(values[0], 0)));
   internal::VectorOperations::parallel_reduce(
     norm2, 0, size(), norm_square, thread_loop_partitioner);
   if (numbers::is_finite(norm_square) &&
-      norm_square >= std::numeric_limits<real_type>::min())
-    return static_cast<typename Vector<Number>::real_type>(
+      norm_square >= std::numeric_limits<scalar_real_type>::min())
+    return static_cast<typename Vector<Number>::scalar_real_type>(
       std::sqrt(norm_square));
   else
     {
-      real_type scale = 0.;
-      real_type sum   = 1.;
+      scalar_real_type scale = 0.;
+      scalar_real_type sum   = 1.;
       for (size_type i = 0; i < size(); ++i)
         {
-          if (values[i] != Number())
+          if (internal::VectorizedArrayTrait<Number>::get(values[i], 0) !=
+              scalar_value_type())
             {
-              const real_type abs_x =
-                numbers::NumberTraits<Number>::abs(values[i]);
+              const scalar_real_type abs_x =
+                numbers::NumberTraits<scalar_value_type>::abs(
+                  internal::VectorizedArrayTrait<Number>::get(values[i], 0));
               if (scale < abs_x)
                 {
                   sum   = 1 + sum * (scale / abs_x) * (scale / abs_x);
@@ -466,18 +487,22 @@ Vector<Number>::l2_norm() const
                 sum += (abs_x / scale) * (abs_x / scale);
             }
         }
-      AssertIsFinite(scale * std::sqrt(sum));
-      return static_cast<typename Vector<Number>::real_type>(scale *
-                                                             std::sqrt(sum));
+      for (unsigned int v = 0; v < width; ++v)
+        AssertIsFinite(
+          internal::VectorizedArrayTrait<Number>::get(scale, v) *
+          std::sqrt(internal::VectorizedArrayTrait<Number>::get(sum, v)));
+      return static_cast<typename Vector<Number>::scalar_real_type>(
+        scale * std::sqrt(sum));
     }
 }
 
 
 
 template <typename Number>
-typename Vector<Number>::real_type
-Vector<Number>::lp_norm(const real_type p) const
+typename Vector<Number>::scalar_real_type
+Vector<Number>::lp_norm(const scalar_real_type p) const
 {
+  Assert(width == 1, ExcNotImplemented());
   Assert(size() != 0, ExcEmptyObject());
 
   if (p == 1.)
@@ -485,23 +510,27 @@ Vector<Number>::lp_norm(const real_type p) const
   else if (p == 2.)
     return l2_norm();
 
-  real_type                                            sum;
-  internal::VectorOperations::NormP<Number, real_type> normp(values.begin(), p);
+  scalar_real_type                                                       sum;
+  internal::VectorOperations::NormP<scalar_value_type, scalar_real_type> normp(
+    &(internal::VectorizedArrayTrait<Number>::get(values[0], 0)), p);
   internal::VectorOperations::parallel_reduce(
     normp, 0, size(), sum, thread_loop_partitioner);
 
-  if (numbers::is_finite(sum) && sum >= std::numeric_limits<real_type>::min())
-    return std::pow(sum, static_cast<real_type>(1. / p));
+  if (numbers::is_finite(sum) &&
+      sum >= std::numeric_limits<scalar_real_type>::min())
+    return std::pow(sum, static_cast<scalar_real_type>(1. / p));
   else
     {
-      real_type scale = 0.;
-      real_type sum   = 1.;
+      scalar_real_type scale = 0.;
+      scalar_real_type sum   = 1.;
       for (size_type i = 0; i < size(); ++i)
         {
-          if (values[i] != Number())
+          if (internal::VectorizedArrayTrait<Number>::get(values[i], 0) !=
+              scalar_value_type())
             {
-              const real_type abs_x =
-                numbers::NumberTraits<Number>::abs(values[i]);
+              const scalar_real_type abs_x =
+                numbers::NumberTraits<scalar_value_type>::abs(
+                  internal::VectorizedArrayTrait<Number>::get(values[i], 0));
               if (scale < abs_x)
                 {
                   sum   = 1. + sum * std::pow(scale / abs_x, p);
@@ -511,22 +540,25 @@ Vector<Number>::lp_norm(const real_type p) const
                 sum += std::pow(abs_x / scale, p);
             }
         }
-      return scale * std::pow(sum, static_cast<real_type>(1. / p));
+      return scale * std::pow(sum, static_cast<scalar_real_type>(1. / p));
     }
 }
 
 
 
 template <typename Number>
-typename Vector<Number>::real_type
+typename Vector<Number>::scalar_real_type
 Vector<Number>::linfty_norm() const
 {
+  Assert(width == 1, ExcNotImplemented());
   Assert(size() != 0, ExcEmptyObject());
 
-  real_type max = 0.;
+  scalar_real_type max = 0.;
 
   for (size_type i = 0; i < size(); ++i)
-    max = std::max(numbers::NumberTraits<Number>::abs(values[i]), max);
+    max = std::max(numbers::NumberTraits<scalar_value_type>::abs(
+                     internal::VectorizedArrayTrait<Number>::get(values[i], 0)),
+                   max);
 
   return max;
 }
@@ -550,7 +582,9 @@ Vector<Number>::add_and_dot(const Number          a,
                                                       a);
   internal::VectorOperations::parallel_reduce(
     adder, 0, size(), sum, thread_loop_partitioner);
-  AssertIsFinite(sum);
+
+  for (unsigned int v = 0; v < width; ++v)
+    AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(sum, v));
 
   return sum;
 }
@@ -633,8 +667,11 @@ Vector<Number>::add(const Number          a,
                     const Number          b,
                     const Vector<Number> &w)
 {
-  AssertIsFinite(a);
-  AssertIsFinite(b);
+  for (unsigned int v = 0; v < width; ++v)
+    {
+      AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(a, v));
+      AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(b, v));
+    }
 
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
@@ -654,7 +691,8 @@ template <typename Number>
 void
 Vector<Number>::sadd(const Number x, const Vector<Number> &v)
 {
-  AssertIsFinite(x);
+  for (unsigned int v = 0; v < width; ++v)
+    AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(x, v));
 
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
@@ -704,7 +742,8 @@ template <typename Number>
 void
 Vector<Number>::equ(const Number a, const Vector<Number> &u)
 {
-  AssertIsFinite(a);
+  for (unsigned int v = 0; v < width; ++v)
+    AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(a, v));
 
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == u.size(), ExcDimensionMismatch(size(), u.size()));
@@ -724,7 +763,8 @@ template <typename Number2>
 void
 Vector<Number>::equ(const Number a, const Vector<Number2> &u)
 {
-  AssertIsFinite(a);
+  for (unsigned int v = 0; v < width; ++v)
+    AssertIsFinite(internal::VectorizedArrayTrait<Number>::get(a, v));
 
   Assert(size() != 0, ExcEmptyObject());
   Assert(size() == u.size(), ExcDimensionMismatch(size(), u.size()));
