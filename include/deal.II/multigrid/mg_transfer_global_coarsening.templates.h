@@ -575,18 +575,6 @@ namespace internal
     virtual FineDoFHandlerViewCell
     get_cell_view(const typename DoFHandler<dim>::cell_iterator &cell,
                   const unsigned int                             c) const = 0;
-
-    /**
-     * Return locally owned DoFs.
-     */
-    virtual const IndexSet &
-    locally_owned_dofs() const = 0;
-
-    /**
-     * Return ghost DoFs.
-     */
-    virtual const IndexSet &
-    locally_active_dofs() const = 0;
   };
 
 
@@ -599,22 +587,7 @@ namespace internal
                                const unsigned int     mg_level_fine)
       : dof_handler_fine(dof_handler_fine)
       , mg_level_fine(mg_level_fine)
-    {
-      if (this->mg_level_fine == numbers::invalid_unsigned_int)
-        {
-          is_locally_owned_dofs = dof_handler_fine.locally_owned_dofs();
-          is_locally_active_dofs =
-            DoFTools::extract_locally_active_dofs(dof_handler_fine);
-        }
-      else
-        {
-          is_locally_owned_dofs =
-            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
-          is_locally_active_dofs =
-            DoFTools::extract_locally_active_level_dofs(dof_handler_fine,
-                                                        mg_level_fine);
-        }
-    }
+    {}
 
     virtual ~IdentityFineDoFHandlerView() = default;
 
@@ -663,26 +636,9 @@ namespace internal
         });
     }
 
-    const IndexSet &
-    locally_owned_dofs() const override
-    {
-      return is_locally_owned_dofs;
-    }
-
-    /**
-     * Return ghost DoFs.
-     */
-    const IndexSet &
-    locally_active_dofs() const override
-    {
-      return is_locally_active_dofs;
-    }
-
   private:
     const DoFHandler<dim> &dof_handler_fine;
     const unsigned int     mg_level_fine;
-    IndexSet               is_locally_owned_dofs;
-    IndexSet               is_locally_active_dofs;
   };
 
 
@@ -691,110 +647,11 @@ namespace internal
   class FirstChildPolicyFineDoFHandlerView : public FineDoFHandlerViewBase<dim>
   {
   public:
-    FirstChildPolicyFineDoFHandlerView(
-      const DoFHandler<dim> &dof_handler_fine,
-      const DoFHandler<dim> &dof_handler_coarse,
-      const unsigned int     mg_level_fine)
+    FirstChildPolicyFineDoFHandlerView(const DoFHandler<dim> &dof_handler_fine,
+                                       const unsigned int     mg_level_fine)
       : dof_handler_fine(dof_handler_fine)
       , mg_level_fine(mg_level_fine)
-    {
-      std::vector<types::global_dof_index> locally_active_non_local_indices;
-
-      if (this->mg_level_fine == numbers::invalid_unsigned_int)
-        {
-          is_locally_owned_dofs = dof_handler_fine.locally_owned_dofs();
-
-          std::vector<types::global_dof_index> dof_indices_cell;
-
-          loop_over_active_or_level_cells(
-            dof_handler_coarse,
-            numbers::invalid_unsigned_int,
-            [&](const auto &cell_coarse) {
-              // create fine cell in two steps, since the coarse cell and
-              // the fine cell are associated to different Trinagulation
-              // objects
-              const auto cell_id = cell_coarse->id();
-              const auto cell_fine_raw =
-                dof_handler_fine.get_triangulation().create_cell_iterator(
-                  cell_id);
-
-              if (cell_fine_raw->has_children() == false)
-                {
-                  // cell has no children on fine mesh
-
-                  // convert CellAccessor to DoFCellAccessor
-                  const auto cell_fine =
-                    cell_fine_raw->as_dof_handler_iterator(dof_handler_fine);
-
-                  dof_indices_cell.resize(
-                    cell_fine->get_fe().n_dofs_per_cell());
-                  cell_fine->get_dof_indices(dof_indices_cell);
-                  locally_active_non_local_indices.insert(
-                    locally_active_non_local_indices.end(),
-                    dof_indices_cell.begin(),
-                    dof_indices_cell.end());
-                }
-              else
-                {
-                  // cell has children on fine mesh: loop over all children
-                  for (const auto &child_raw : cell_fine_raw->child_iterators())
-                    {
-                      // convert CellAccessor of child to DoFCellAccessor
-                      const auto child =
-                        child_raw->as_dof_handler_iterator(dof_handler_fine);
-
-                      dof_indices_cell.resize(
-                        child->get_fe().n_dofs_per_cell());
-                      child->get_dof_indices(dof_indices_cell);
-
-                      for (const auto i : dof_indices_cell)
-                        if (is_locally_owned_dofs.is_element(i) == false)
-                          locally_active_non_local_indices.push_back(i);
-                    }
-                }
-            });
-        }
-      else
-        {
-          is_locally_owned_dofs =
-            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
-
-          Assert(mg_level_fine > 0, ExcInternalError());
-
-          std::vector<types::global_dof_index> dof_indices_cell;
-
-          loop_over_active_or_level_cells(
-            dof_handler_fine, mg_level_fine - 1, [&](const auto &cell) {
-              if (cell->has_children())
-                {
-                  for (const auto &child : cell->child_iterators())
-                    {
-                      dof_indices_cell.resize(
-                        child->get_fe().n_dofs_per_cell());
-                      child->get_mg_dof_indices(dof_indices_cell);
-
-                      for (const auto i : dof_indices_cell)
-                        if (is_locally_owned_dofs.is_element(i) == false)
-                          locally_active_non_local_indices.push_back(i);
-                    }
-                }
-            });
-        }
-
-      is_locally_active_dofs.set_size(is_locally_owned_dofs.size());
-
-      is_locally_active_dofs.add_indices(is_locally_owned_dofs);
-
-      std::sort(locally_active_non_local_indices.begin(),
-                locally_active_non_local_indices.end());
-      locally_active_non_local_indices.erase(
-        std::unique(locally_active_non_local_indices.begin(),
-                    locally_active_non_local_indices.end()),
-        locally_active_non_local_indices.end());
-      is_locally_active_dofs.add_indices(
-        locally_active_non_local_indices.begin(),
-        locally_active_non_local_indices.end());
-    }
+    {}
 
     virtual ~FirstChildPolicyFineDoFHandlerView() = default;
 
@@ -893,26 +750,9 @@ namespace internal
         });
     }
 
-    const IndexSet &
-    locally_owned_dofs() const override
-    {
-      return is_locally_owned_dofs;
-    }
-
-    /**
-     * Return ghost DoFs.
-     */
-    const IndexSet &
-    locally_active_dofs() const override
-    {
-      return is_locally_active_dofs;
-    }
-
   private:
     const DoFHandler<dim> &dof_handler_fine;
     const unsigned int     mg_level_fine;
-    IndexSet               is_locally_owned_dofs;
-    IndexSet               is_locally_active_dofs;
   };
 
 
@@ -1008,13 +848,7 @@ namespace internal
       this->is_dst_remote        = is_dst_remote;
       this->is_src_locally_owned = is_src_locally_owned;
 
-      this->is_extended_locally_owned =
-        mg_level_fine == numbers::invalid_unsigned_int ?
-          dof_handler_fine.locally_owned_dofs() :
-          dof_handler_fine.locally_owned_mg_dofs(mg_level_fine);
-
       const auto targets_with_indexset = process.get_requesters();
-      std::vector<types::global_dof_index> ghost_indices;
 
 #ifndef DEAL_II_WITH_MPI
       Assert(targets_with_indexset.empty(), ExcInternalError());
@@ -1073,31 +907,6 @@ namespace internal
 
       // process local cells
       {
-        std::vector<types::global_dof_index> indices;
-
-        for (const auto id : is_dst_locally_owned)
-          {
-            const auto cell_id = cell_id_translator.to_cell_id(id);
-
-            typename DoFHandler<dim>::cell_iterator cell_(
-              *dof_handler_fine.get_triangulation().create_cell_iterator(
-                cell_id),
-              &dof_handler_fine);
-
-            indices.resize(cell_->get_fe().n_dofs_per_cell());
-
-            if (mg_level_fine == numbers::invalid_unsigned_int)
-              cell_->get_dof_indices(indices);
-            else
-              cell_->get_mg_dof_indices(indices);
-
-            for (const auto i : indices)
-              if (!is_extended_locally_owned.is_element(i))
-                ghost_indices.push_back(i);
-          }
-      }
-
-      {
         std::map<unsigned int, std::vector<types::global_dof_index>>
           rank_to_ids;
         for (unsigned int i = 0; i < is_dst_remote_owners.size(); ++i)
@@ -1139,19 +948,6 @@ namespace internal
               MPI_STATUS_IGNORE);
             AssertThrowMPI(ierr_3);
 
-            for (unsigned int i = 0; i < buffer.size();)
-              {
-                const unsigned int dofs_per_cell =
-                  dof_handler_fine.get_fe(buffer[i]).n_dofs_per_cell();
-                ++i;
-                for (unsigned int j = 0; j < dofs_per_cell; ++j, ++i)
-                  {
-                    AssertIndexRange(i, buffer.size());
-                    if (!is_extended_locally_owned.is_element(buffer[i]))
-                      ghost_indices.push_back(buffer[i]);
-                  }
-              }
-
             const unsigned int rank = status.MPI_SOURCE;
 
             const auto ids = rank_to_ids[rank];
@@ -1180,16 +976,6 @@ namespace internal
           }
       }
 #endif
-
-      std::sort(ghost_indices.begin(), ghost_indices.end());
-
-      this->is_extended_ghosts =
-        IndexSet(mg_level_fine == numbers::invalid_unsigned_int ?
-                   dof_handler_fine.n_dofs() :
-                   dof_handler_fine.n_dofs(mg_level_fine));
-      this->is_extended_ghosts.add_indices(ghost_indices.begin(),
-                                           ghost_indices.end());
-      this->is_extended_ghosts.subtract_set(this->is_extended_locally_owned);
     }
 
     FineDoFHandlerViewCell
@@ -1318,18 +1104,6 @@ namespace internal
         });
     }
 
-    const IndexSet &
-    locally_owned_dofs() const override
-    {
-      return is_extended_locally_owned;
-    }
-
-    const IndexSet &
-    locally_active_dofs() const override
-    {
-      return is_extended_ghosts;
-    }
-
   private:
     const DoFHandler<dim> &dof_handler_fine;
     const DoFHandler<dim> &dof_handler_coarse;
@@ -1343,9 +1117,6 @@ namespace internal
 
   private:
     IndexSet is_src_locally_owned;
-
-    IndexSet is_extended_locally_owned;
-    IndexSet is_extended_ghosts;
 
     std::map<types::global_cell_index,
              std::pair<unsigned int, std::vector<types::global_dof_index>>>
@@ -1789,7 +1560,7 @@ namespace internal
                                                        mg_level_coarse))
         dof_handler_fine_view =
           std::make_unique<FirstChildPolicyFineDoFHandlerView<dim>>(
-            dof_handler_fine, dof_handler_coarse, mg_level_fine);
+            dof_handler_fine, mg_level_fine);
       else
         dof_handler_fine_view =
           std::make_unique<GlobalCoarseningFineDoFHandlerView<dim>>(
@@ -1856,28 +1627,6 @@ namespace internal
       transfer.n_components = fe_fine.n_components();
 
       const auto reference_cell = dof_handler_fine.get_fe(0).reference_cell();
-
-      // create partitioners and vectors for internal purposes
-      {
-        // ... for fine mesh
-        {
-          transfer.partitioner_fine =
-            std::make_shared<Utilities::MPI::Partitioner>(
-              dof_handler_fine_view->locally_owned_dofs(),
-              dof_handler_fine_view->locally_active_dofs(),
-              dof_handler_fine.get_communicator());
-          transfer.vec_fine.reinit(transfer.partitioner_fine);
-        }
-
-        // ... coarse mesh (needed since user vector might be const)
-        {
-          transfer.partitioner_coarse =
-            create_coarse_partitioner(dof_handler_coarse,
-                                      constraints_coarse,
-                                      mg_level_coarse);
-          transfer.vec_coarse.reinit(transfer.partitioner_coarse);
-        }
-      }
 
       // helper function: to process the fine level cells; function @p fu_non_refined is
       // performed on cells that are not refined and @fu_refined is performed on
@@ -2032,28 +1781,38 @@ namespace internal
         unsigned int cell_no_0 = 0;
         unsigned int cell_no_1 = transfer.schemes[0].n_coarse_cells;
 
-        transfer.constraint_info_coarse.reinit(
-          dof_handler_coarse,
-          transfer.schemes[0].n_coarse_cells +
-            transfer.schemes[1].n_coarse_cells,
-          constraints_coarse.n_constraints() > 0 &&
-            use_fast_hanging_node_algorithm(dof_handler_coarse,
-                                            mg_level_coarse));
+        transfer.constraint_info_coarse
+          .template reinit<types::global_dof_index>(
+            dof_handler_coarse,
+            transfer.schemes[0].n_coarse_cells +
+              transfer.schemes[1].n_coarse_cells,
+            constraints_coarse.n_constraints() > 0 &&
+              use_fast_hanging_node_algorithm(dof_handler_coarse,
+                                              mg_level_coarse));
+        transfer.constraint_info_coarse.set_locally_owned_indices(
+          (mg_level_coarse == numbers::invalid_unsigned_int) ?
+            dof_handler_coarse.locally_owned_dofs() :
+            dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse));
 
-        transfer.constraint_info_fine.reinit(
+        transfer.constraint_info_fine.template reinit<types::global_dof_index>(
           transfer.schemes[0].n_coarse_cells +
           transfer.schemes[1].n_coarse_cells);
+        transfer.constraint_info_fine.set_locally_owned_indices(
+          (mg_level_fine == numbers::invalid_unsigned_int) ?
+            dof_handler_fine.locally_owned_dofs() :
+            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine));
 
         process_cells(
           [&](const auto &cell_coarse, const auto &cell_fine) {
             // parent
             {
-              transfer.constraint_info_coarse.read_dof_indices(
-                cell_no_0,
-                mg_level_coarse,
-                cell_coarse,
-                constraints_coarse,
-                transfer.partitioner_coarse);
+              transfer.constraint_info_coarse
+                .template read_dof_indices<types::global_dof_index>(
+                  cell_no_0,
+                  mg_level_coarse,
+                  cell_coarse,
+                  constraints_coarse,
+                  {});
             }
 
             // child
@@ -2065,8 +1824,9 @@ namespace internal
                 level_dof_indices_fine_0[i] =
                   local_dof_indices[lexicographic_numbering_fine[i]];
 
-              transfer.constraint_info_fine.read_dof_indices(
-                cell_no_0, level_dof_indices_fine_0, transfer.partitioner_fine);
+              transfer.constraint_info_fine
+                .template read_dof_indices<types::global_dof_index>(
+                  cell_no_0, level_dof_indices_fine_0, {});
             }
 
             // move pointers
@@ -2078,12 +1838,13 @@ namespace internal
             // parent (only once at the beginning)
             if (c == 0)
               {
-                transfer.constraint_info_coarse.read_dof_indices(
-                  cell_no_1,
-                  mg_level_coarse,
-                  cell_coarse,
-                  constraints_coarse,
-                  transfer.partitioner_coarse);
+                transfer.constraint_info_coarse
+                  .template read_dof_indices<types::global_dof_index>(
+                    cell_no_1,
+                    mg_level_coarse,
+                    cell_coarse,
+                    constraints_coarse,
+                    {});
 
                 level_dof_indices_fine_1.assign(level_dof_indices_fine_1.size(),
                                                 numbers::invalid_dof_index);
@@ -2114,17 +1875,27 @@ namespace internal
             // move pointers (only once at the end)
             if (c + 1 == GeometryInfo<dim>::max_children_per_cell)
               {
-                transfer.constraint_info_fine.read_dof_indices(
-                  cell_no_1,
-                  level_dof_indices_fine_1,
-                  transfer.partitioner_fine);
+                transfer.constraint_info_fine
+                  .template read_dof_indices<types::global_dof_index>(
+                    cell_no_1, level_dof_indices_fine_1, {});
 
                 cell_no_1++;
               }
           });
+      }
 
-        transfer.constraint_info_coarse.finalize();
-        transfer.constraint_info_fine.finalize();
+      {
+        transfer.partitioner_coarse =
+          transfer.constraint_info_coarse
+            .template finalize<types::global_dof_index>(
+              dof_handler_coarse.get_communicator());
+        transfer.vec_coarse.reinit(transfer.partitioner_coarse);
+
+        transfer.partitioner_fine =
+          transfer.constraint_info_fine
+            .template finalize<types::global_dof_index>(
+              dof_handler_fine.get_communicator());
+        transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
 
 
@@ -2391,22 +2162,6 @@ namespace internal
             dof_handler_fine.get_fe(fe_index_pair.first.second).degree;
         }
 
-      {
-        transfer.partitioner_fine =
-          std::make_shared<Utilities::MPI::Partitioner>(
-            dof_handler_fine_view->locally_owned_dofs(),
-            dof_handler_fine_view->locally_active_dofs(),
-            dof_handler_fine.get_communicator());
-        transfer.vec_fine.reinit(transfer.partitioner_fine);
-      }
-      {
-        transfer.partitioner_coarse =
-          create_coarse_partitioner(dof_handler_coarse,
-                                    constraints_coarse,
-                                    mg_level_coarse);
-        transfer.vec_coarse.reinit(transfer.partitioner_coarse);
-      }
-
       std::vector<unsigned int> n_dof_indices_fine(fe_index_pairs.size() + 1);
       std::vector<unsigned int> n_dof_indices_coarse(fe_index_pairs.size() + 1);
       std::vector<unsigned int> cell_no(fe_index_pairs.size() + 1, 0);
@@ -2513,8 +2268,16 @@ namespace internal
           constraints_coarse.n_constraints() > 0 &&
             use_fast_hanging_node_algorithm(dof_handler_coarse,
                                             mg_level_coarse));
+        transfer.constraint_info_coarse.set_locally_owned_indices(
+          (mg_level_coarse == numbers::invalid_unsigned_int) ?
+            dof_handler_coarse.locally_owned_dofs() :
+            dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse));
 
         transfer.constraint_info_fine.reinit(cell_no.back());
+        transfer.constraint_info_fine.set_locally_owned_indices(
+          (mg_level_fine == numbers::invalid_unsigned_int) ?
+            dof_handler_fine.locally_owned_dofs() :
+            dof_handler_fine.locally_owned_mg_dofs(mg_level_fine));
 
         process_cells([&](const auto &cell_coarse, const auto &cell_fine) {
           const auto fe_pair_no =
@@ -2523,12 +2286,13 @@ namespace internal
 
           // parent
           {
-            transfer.constraint_info_coarse.read_dof_indices(
-              cell_no[fe_pair_no],
-              mg_level_coarse,
-              cell_coarse,
-              constraints_coarse,
-              transfer.partitioner_coarse);
+            transfer.constraint_info_coarse
+              .template read_dof_indices<types::global_dof_index>(
+                cell_no[fe_pair_no],
+                mg_level_coarse,
+                cell_coarse,
+                constraints_coarse,
+                {});
           }
 
           // child
@@ -2541,10 +2305,11 @@ namespace internal
               local_dof_indices_fine_lex[fe_pair_no][i] = local_dof_indices_fine
                 [fe_pair_no][lexicographic_numbering_fine[fe_pair_no][i]];
 
-            transfer.constraint_info_fine.read_dof_indices(
-              cell_no[fe_pair_no],
-              local_dof_indices_fine_lex[fe_pair_no],
-              transfer.partitioner_fine);
+            transfer.constraint_info_fine
+              .template read_dof_indices<types::global_dof_index>(
+                cell_no[fe_pair_no],
+                local_dof_indices_fine_lex[fe_pair_no],
+                {});
           }
 
           // move pointers
@@ -2552,9 +2317,20 @@ namespace internal
             cell_no[fe_pair_no]++;
           }
         });
+      }
 
-        transfer.constraint_info_coarse.finalize();
-        transfer.constraint_info_fine.finalize();
+      {
+        transfer.partitioner_coarse =
+          transfer.constraint_info_coarse
+            .template finalize<types::global_dof_index>(
+              dof_handler_coarse.get_communicator());
+        transfer.vec_coarse.reinit(transfer.partitioner_coarse);
+
+        transfer.partitioner_fine =
+          transfer.constraint_info_fine
+            .template finalize<types::global_dof_index>(
+              dof_handler_fine.get_communicator());
+        transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
 
       // ------------------------- prolongation matrix -------------------------

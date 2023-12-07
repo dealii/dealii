@@ -86,14 +86,28 @@ namespace internal
     {
     public:
       /**
+       * Constructor.
+       */
+      ConstraintInfo();
+
+      /**
+       * Set locally owned indices to accelerate the conversion of global to
+       * local indices.
+       */
+      void
+      set_locally_owned_indices(const IndexSet &locally_owned_indices);
+
+      /**
        * Version 1: indices are extracted from DoFCellAccessor and
        * constraints are resolved with the help of AffineConstraints.
        */
+      template <typename T = unsigned int>
       void
       reinit(const DoFHandler<dim> &dof_handler,
              const unsigned int     n_cells,
              const bool             use_fast_hanging_node_algorithm = true);
 
+      template <typename T = unsigned int>
       void
       read_dof_indices(
         const unsigned int                                    cell_no,
@@ -106,17 +120,24 @@ namespace internal
       /**
        * Version 2: no constraints, indices are user-provided.
        */
+      template <typename T = unsigned int>
       void
       reinit(const unsigned int n_cells);
 
+      template <typename T = unsigned int>
       void
       read_dof_indices(
         const unsigned int                                        cell_no,
         const std::vector<types::global_dof_index>               &dof_indices,
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
+      template <typename T = unsigned int>
       void
       finalize();
+
+      template <typename T = unsigned int>
+      std::shared_ptr<const Utilities::MPI::Partitioner>
+      finalize(const MPI_Comm comm);
 
       template <typename T, typename VectorType>
       void
@@ -146,11 +167,18 @@ namespace internal
       ConstraintValues<double>               constraint_values;
       std::vector<std::vector<unsigned int>> dof_indices_per_cell;
       std::vector<std::vector<unsigned int>> plain_dof_indices_per_cell;
+      std::vector<std::vector<types::global_dof_index>>
+        dof_indices_per_cell_long;
+      std::vector<std::vector<types::global_dof_index>>
+        plain_dof_indices_per_cell_long;
       std::vector<std::vector<std::pair<unsigned short, unsigned short>>>
         constraint_indicator_per_cell;
 
       std::unique_ptr<HangingNodes<dim>>     hanging_nodes;
       std::vector<std::vector<unsigned int>> lexicographic_numbering;
+
+      IndexSet locally_owned_indices;
+      std::pair<types::global_dof_index, types::global_dof_index> local_range;
 
     public:
       // for read_write_operation()
@@ -176,6 +204,35 @@ namespace internal
 
       inline const typename Number::value_type *
       constraint_pool_end(const unsigned int row) const;
+
+      // TODO
+      std::vector<types::global_dof_index> local_dof_indices;
+      std::vector<types::global_dof_index> local_dof_indices_lex;
+      std::vector<ConstraintKinds>         mask;
+
+      template <typename T>
+      std::vector<std::vector<T>> &
+      get_dof_indices_per_cell()
+      {
+        if constexpr (std::is_same_v<T, unsigned int>)
+          return dof_indices_per_cell;
+        else if constexpr (std::is_same_v<T, types::global_dof_index>)
+          return dof_indices_per_cell_long;
+        else
+          return {};
+      }
+
+      template <typename T>
+      std::vector<std::vector<T>> &
+      get_plain_dof_indices_per_cell()
+      {
+        if constexpr (std::is_same_v<T, unsigned int>)
+          return plain_dof_indices_per_cell;
+        else if constexpr (std::is_same_v<T, types::global_dof_index>)
+          return plain_dof_indices_per_cell_long;
+        else
+          return {};
+      }
     };
 
 
@@ -249,14 +306,39 @@ namespace internal
 
 
     template <int dim, typename Number>
+    ConstraintInfo<dim, Number>::ConstraintInfo()
+      : local_range({0, 0})
+    {}
+
+
+
+    template <int dim, typename Number>
+    void
+    ConstraintInfo<dim, Number>::set_locally_owned_indices(
+      const IndexSet &locally_owned_indices)
+    {
+      this->locally_owned_indices = locally_owned_indices;
+
+      if (locally_owned_indices.is_empty())
+        local_range = {0, 0};
+      else
+        local_range = {locally_owned_indices.nth_index_in_set(0),
+                       locally_owned_indices.nth_index_in_set(0) +
+                         locally_owned_indices.n_elements()};
+    }
+
+
+
+    template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::reinit(
       const DoFHandler<dim> &dof_handler,
       const unsigned int     n_cells,
       const bool             use_fast_hanging_node_algorithm)
     {
-      this->dof_indices_per_cell.resize(n_cells);
-      this->plain_dof_indices_per_cell.resize(n_cells);
+      this->template get_dof_indices_per_cell<T>().resize(n_cells);
+      this->template get_plain_dof_indices_per_cell<T>().resize(n_cells);
       this->constraint_indicator_per_cell.resize(n_cells);
 
       // note: has_hanging_nodes() is a global operatrion
@@ -299,17 +381,19 @@ namespace internal
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::reinit(const unsigned int n_cells)
     {
-      this->dof_indices_per_cell.resize(n_cells);
-      this->plain_dof_indices_per_cell.resize(0);
+      this->template get_dof_indices_per_cell<T>().resize(n_cells);
+      this->template get_plain_dof_indices_per_cell<T>().resize(0);
       this->constraint_indicator_per_cell.resize(n_cells);
     }
 
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::read_dof_indices(
       const unsigned int                                            cell_no,
@@ -318,10 +402,8 @@ namespace internal
       const dealii::AffineConstraints<typename Number::value_type> &constraints,
       const std::shared_ptr<const Utilities::MPI::Partitioner>     &partitioner)
     {
-      std::vector<types::global_dof_index> local_dof_indices(
-        cell->get_fe().n_dofs_per_cell());
-      std::vector<types::global_dof_index> local_dof_indices_lex(
-        cell->get_fe().n_dofs_per_cell());
+      local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+      local_dof_indices_lex.resize(cell->get_fe().n_dofs_per_cell());
 
       if (mg_level == numbers::invalid_unsigned_int)
         cell->get_dof_indices(local_dof_indices);
@@ -345,24 +427,34 @@ namespace internal
       std::pair<unsigned short, unsigned short> constraint_iterator(0, 0);
 
       AssertIndexRange(cell_no, this->constraint_indicator_per_cell.size());
-      AssertIndexRange(cell_no, this->dof_indices_per_cell.size());
-      AssertIndexRange(cell_no, this->plain_dof_indices_per_cell.size());
-      AssertIndexRange(cell_no, this->plain_dof_indices_per_cell.size());
+      AssertIndexRange(cell_no,
+                       this->template get_dof_indices_per_cell<T>().size());
+      AssertIndexRange(
+        cell_no, this->template get_plain_dof_indices_per_cell<T>().size());
 
       auto &constraint_indicator = this->constraint_indicator_per_cell[cell_no];
-      auto &dof_indices          = this->dof_indices_per_cell[cell_no];
-      auto &plain_dof_indices    = this->plain_dof_indices_per_cell[cell_no];
+      auto &dof_indices = this->template get_dof_indices_per_cell<T>()[cell_no];
+      auto &plain_dof_indices =
+        this->template get_plain_dof_indices_per_cell<T>()[cell_no];
 
       AssertDimension(constraint_indicator_per_cell[cell_no].size(), 0);
-      AssertDimension(dof_indices_per_cell[cell_no].size(), 0);
-      AssertDimension(plain_dof_indices_per_cell[cell_no].size(), 0);
+      AssertDimension(
+        this->template get_dof_indices_per_cell<T>()[cell_no].size(), 0);
+      AssertDimension(
+        this->template get_plain_dof_indices_per_cell<T>()[cell_no].size(), 0);
 
       const auto global_to_local =
-        [&](const types::global_dof_index global_index) -> unsigned int {
+        [&](const types::global_dof_index global_index) -> T {
         if (partitioner)
           return partitioner->global_to_local(global_index);
         else
-          return global_index;
+          {
+            if (local_range.first <= global_index &&
+                global_index < local_range.second)
+              return global_index - local_range.first;
+            else
+              return global_index + (local_range.second - local_range.first);
+          }
       };
 
       // plain indices
@@ -375,7 +467,9 @@ namespace internal
           AssertIndexRange(cell_no, this->hanging_node_constraint_masks.size());
           AssertIndexRange(cell_no, this->active_fe_indices.size());
 
-          std::vector<ConstraintKinds> mask(cell->get_fe().n_components());
+          mask.assign(
+            cell->get_fe().n_components(),
+            internal::MatrixFreeFunctions::ConstraintKinds::unconstrained);
           hanging_nodes->setup_constraints(
             cell, {}, lexicographic_numbering, local_dof_indices_lex, mask);
 
@@ -437,6 +531,7 @@ namespace internal
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::read_dof_indices(
       const unsigned int                          cell_no,
@@ -444,17 +539,23 @@ namespace internal
       const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner)
     {
       const auto global_to_local =
-        [&](const types::global_dof_index global_index) -> unsigned int {
+        [&](const types::global_dof_index global_index) -> T {
         if (partitioner)
           return partitioner->global_to_local(global_index);
         else
-          return global_index;
+          {
+            if (local_range.first <= global_index &&
+                global_index < local_range.second)
+              return global_index - local_range.first;
+            else
+              return global_index + (local_range.second - local_range.first);
+          }
       };
 
       std::pair<unsigned short, unsigned short> constraint_iterator(0, 0);
 
       auto &constraint_indicator = this->constraint_indicator_per_cell[cell_no];
-      auto &dof_indices          = this->dof_indices_per_cell[cell_no];
+      auto &dof_indices = this->template get_dof_indices_per_cell<T>()[cell_no];
 
       for (const auto current_dof : local_dof_indices_lex)
         {
@@ -488,9 +589,15 @@ namespace internal
 
 
     template <int dim, typename Number>
+    template <typename T>
     inline void
     ConstraintInfo<dim, Number>::finalize()
     {
+      Assert((local_range ==
+              std::pair<types::global_dof_index, types::global_dof_index>{0,
+                                                                          0}),
+             ExcNotImplemented());
+
       this->dof_indices          = {};
       this->plain_dof_indices    = {};
       this->constraint_indicator = {};
@@ -498,17 +605,20 @@ namespace internal
       this->row_starts = {};
       this->row_starts.emplace_back(0, 0);
 
-      if (plain_dof_indices_per_cell.empty() == false)
+      if (this->template get_plain_dof_indices_per_cell<T>().empty() == false)
         {
           this->row_starts_plain_indices = {};
           this->row_starts_plain_indices.emplace_back(0);
         }
 
-      for (unsigned int i = 0; i < dof_indices_per_cell.size(); ++i)
+      for (unsigned int i = 0;
+           i < this->template get_dof_indices_per_cell<T>().size();
+           ++i)
         {
-          this->dof_indices.insert(this->dof_indices.end(),
-                                   dof_indices_per_cell[i].begin(),
-                                   dof_indices_per_cell[i].end());
+          this->dof_indices.insert(
+            this->dof_indices.end(),
+            this->template get_dof_indices_per_cell<T>()[i].begin(),
+            this->template get_dof_indices_per_cell<T>()[i].end());
           this->constraint_indicator.insert(
             this->constraint_indicator.end(),
             constraint_indicator_per_cell[i].begin(),
@@ -517,12 +627,13 @@ namespace internal
           this->row_starts.emplace_back(this->dof_indices.size(),
                                         this->constraint_indicator.size());
 
-          if (plain_dof_indices_per_cell.empty() == false)
+          if (this->template get_plain_dof_indices_per_cell<T>().empty() ==
+              false)
             {
               this->plain_dof_indices.insert(
                 this->plain_dof_indices.end(),
-                plain_dof_indices_per_cell[i].begin(),
-                plain_dof_indices_per_cell[i].end());
+                this->template get_plain_dof_indices_per_cell<T>()[i].begin(),
+                this->template get_plain_dof_indices_per_cell<T>()[i].end());
 
               this->row_starts_plain_indices.emplace_back(
                 this->plain_dof_indices.size());
@@ -556,7 +667,7 @@ namespace internal
 
       AssertDimension(constraint_pool_data.size(), length);
 
-      dof_indices_per_cell.clear();
+      this->template get_dof_indices_per_cell<T>().clear();
       constraint_indicator_per_cell.clear();
 
       if (hanging_nodes &&
@@ -566,6 +677,150 @@ namespace internal
                         return i == unconstrained_compressed_constraint_kind;
                       }))
         hanging_node_constraint_masks.clear();
+    }
+
+
+    template <int dim, typename Number>
+    template <typename T>
+    inline std::shared_ptr<const Utilities::MPI::Partitioner>
+    ConstraintInfo<dim, Number>::finalize(const MPI_Comm comm)
+    {
+      this->dof_indices.clear();
+      this->plain_dof_indices.clear();
+      this->constraint_indicator.clear();
+
+      this->row_starts.clear();
+      this->row_starts.reserve(
+        this->template get_dof_indices_per_cell<T>().size());
+      this->row_starts.emplace_back(0, 0);
+
+      if (this->template get_plain_dof_indices_per_cell<T>().empty() == false)
+        {
+          this->row_starts_plain_indices.clear();
+          this->row_starts_plain_indices.reserve(
+            this->template get_dof_indices_per_cell<T>().size());
+          this->row_starts_plain_indices.emplace_back(0);
+        }
+
+      std::vector<types::global_dof_index>  ghost_dofs;
+      std::pair<unsigned int, unsigned int> counts = {0, 0};
+
+      for (unsigned int i = 0;
+           i < this->template get_dof_indices_per_cell<T>().size();
+           ++i)
+        {
+          counts.first +=
+            this->template get_dof_indices_per_cell<T>()[i].size();
+
+          for (const auto &j : this->template get_dof_indices_per_cell<T>()[i])
+            if (j >= (local_range.second - local_range.first))
+              ghost_dofs.push_back(j -
+                                   (local_range.second - local_range.first));
+
+          if (this->template get_plain_dof_indices_per_cell<T>().empty() ==
+              false)
+            {
+              counts.second +=
+                this->template get_plain_dof_indices_per_cell<T>()[i].size();
+
+              for (const auto &j :
+                   this->template get_plain_dof_indices_per_cell<T>()[i])
+                if (j >= (local_range.second - local_range.first))
+                  ghost_dofs.push_back(
+                    j - (local_range.second - local_range.first));
+            }
+        }
+
+      std::sort(ghost_dofs.begin(), ghost_dofs.end());
+      ghost_dofs.erase(std::unique(ghost_dofs.begin(), ghost_dofs.end()),
+                       ghost_dofs.end());
+
+      IndexSet locally_relevant_dofs(locally_owned_indices.size());
+      locally_relevant_dofs.add_indices(ghost_dofs.begin(), ghost_dofs.end());
+
+      const auto partitioner =
+        std::make_shared<Utilities::MPI::Partitioner>(locally_owned_indices,
+                                                      locally_relevant_dofs,
+                                                      comm);
+
+      this->dof_indices.reserve(counts.first);
+      this->plain_dof_indices.reserve(counts.second);
+
+      for (unsigned int i = 0;
+           i < this->template get_dof_indices_per_cell<T>().size();
+           ++i)
+        {
+          for (const auto &j : this->template get_dof_indices_per_cell<T>()[i])
+            if (j < (local_range.second - local_range.first))
+              this->dof_indices.push_back(j);
+            else
+              this->dof_indices.push_back(partitioner->global_to_local(
+                j - (local_range.second - local_range.first)));
+
+          this->constraint_indicator.insert(
+            this->constraint_indicator.end(),
+            constraint_indicator_per_cell[i].begin(),
+            constraint_indicator_per_cell[i].end());
+
+          this->row_starts.emplace_back(this->dof_indices.size(),
+                                        this->constraint_indicator.size());
+
+          if (this->template get_plain_dof_indices_per_cell<T>().empty() ==
+              false)
+            {
+              for (const auto &j :
+                   this->template get_plain_dof_indices_per_cell<T>()[i])
+                if (j < (local_range.second - local_range.first))
+                  this->plain_dof_indices.push_back(j);
+                else
+                  this->plain_dof_indices.push_back(
+                    partitioner->global_to_local(
+                      j - (local_range.second - local_range.first)));
+
+              this->row_starts_plain_indices.emplace_back(
+                this->plain_dof_indices.size());
+            }
+        }
+
+      std::vector<const std::vector<double> *> constraints(
+        constraint_values.constraints.size());
+      unsigned int length = 0;
+      for (const auto &it : constraint_values.constraints)
+        {
+          AssertIndexRange(it.second, constraints.size());
+          constraints[it.second] = &it.first;
+          length += it.first.size();
+        }
+
+      constraint_pool_data.clear();
+      constraint_pool_data.reserve(length);
+      constraint_pool_row_index.reserve(constraint_values.constraints.size() +
+                                        1);
+      constraint_pool_row_index.resize(1, 0);
+
+      for (const auto &constraint : constraints)
+        {
+          Assert(constraint != nullptr, ExcInternalError());
+          constraint_pool_data.insert(constraint_pool_data.end(),
+                                      constraint->begin(),
+                                      constraint->end());
+          constraint_pool_row_index.push_back(constraint_pool_data.size());
+        }
+
+      AssertDimension(constraint_pool_data.size(), length);
+
+      this->template get_dof_indices_per_cell<T>().clear();
+      constraint_indicator_per_cell.clear();
+
+      if (hanging_nodes &&
+          std::all_of(hanging_node_constraint_masks.begin(),
+                      hanging_node_constraint_masks.end(),
+                      [](const auto i) {
+                        return i == unconstrained_compressed_constraint_kind;
+                      }))
+        hanging_node_constraint_masks.clear();
+
+      return partitioner;
     }
 
 
@@ -741,6 +996,9 @@ namespace internal
       size += MemoryConsumption::memory_consumption(constraint_values);
       size += MemoryConsumption::memory_consumption(dof_indices_per_cell);
       size += MemoryConsumption::memory_consumption(plain_dof_indices_per_cell);
+      size += MemoryConsumption::memory_consumption(dof_indices_per_cell_long);
+      size +=
+        MemoryConsumption::memory_consumption(plain_dof_indices_per_cell_long);
       size +=
         MemoryConsumption::memory_consumption(constraint_indicator_per_cell);
 
