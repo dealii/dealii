@@ -1975,8 +1975,8 @@ namespace Step31
       TrilinosWrappers::MPI::Vector(temperature_solution)};
     temperature_trans.interpolate(x_temperature, tmp);
 
-    temperature_solution     = std::move(tmp[0]);
-    old_temperature_solution = std::move(tmp[1]);
+    temperature_solution     = tmp[0];
+    old_temperature_solution = tmp[1];
 
     // After the solution has been transferred we then enforce the constraints
     // on the transferred solution.

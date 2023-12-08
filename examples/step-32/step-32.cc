@@ -3326,8 +3326,11 @@ namespace Step32
         temperature_constraints.distribute(distributed_temp1);
         temperature_constraints.distribute(distributed_temp2);
 
-        temperature_solution     = std::move(distributed_temp1);
-        old_temperature_solution = std::move(distributed_temp2);
+        temperature_solution     = distributed_temp1;
+        old_temperature_solution = distributed_temp2;
+
+        Assert(old_temperature_solution.has_ghost_elements(),
+               ExcInternalError());
       }
 
       {
@@ -3344,8 +3347,8 @@ namespace Step32
         stokes_constraints.distribute(distributed_stokes);
         stokes_constraints.distribute(old_distributed_stokes);
 
-        stokes_solution     = std::move(distributed_stokes);
-        old_stokes_solution = std::move(old_distributed_stokes);
+        stokes_solution     = distributed_stokes;
+        old_stokes_solution = old_distributed_stokes;
       }
     }
   }
