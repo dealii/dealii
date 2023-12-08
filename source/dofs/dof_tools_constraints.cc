@@ -1594,19 +1594,19 @@ namespace DoFTools
                 // internal lines
                 for (unsigned int line = 0; line < n_internal_lines_on_children;
                      ++line)
-                {
-                  unsigned int row_start   = line * fe.n_dofs_per_line();
-                  unsigned int line_mother = line / 2;
-                  unsigned int row_mother =
-                    (line_mother * 2) * fe.n_dofs_per_line();
-                  for (unsigned int row = 0; row < fe.n_dofs_per_line();
-                       ++row)
-                    for (unsigned int i = 0;
-                         i < n_lines_on_mother * fe.n_dofs_per_line();
-                         ++i)
-                      constraints_matrix[row + row_start][i] =
-                        fe.constraints()(row + row_mother, i);
-                }
+                  {
+                    unsigned int row_start   = line * fe.n_dofs_per_line();
+                    unsigned int line_mother = line / 2;
+                    unsigned int row_mother =
+                      (line_mother * 2) * fe.n_dofs_per_line();
+                    for (unsigned int row = 0; row < fe.n_dofs_per_line();
+                         ++row)
+                      for (unsigned int i = 0;
+                           i < n_lines_on_mother * fe.n_dofs_per_line();
+                           ++i)
+                        constraints_matrix[row + row_start][i] =
+                          fe.constraints()(row + row_mother, i);
+                  }
 
                 for (unsigned int line = 0; line < n_internal_lines_on_children;
                      ++line)
@@ -1617,7 +1617,8 @@ namespace DoFTools
                       (line_mother * 2) * fe.n_dofs_per_line();
                     for (unsigned int row = 0; row < fe.n_dofs_per_line();
                          ++row)
-                      for (unsigned int i = n_lines_on_mother * fe.n_dofs_per_line();
+                      for (unsigned int i =
+                             n_lines_on_mother * fe.n_dofs_per_line();
                            i < dofs_on_mother.size();
                            ++i)
                         constraints_matrix[row + row_start][i] =
