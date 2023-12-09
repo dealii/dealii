@@ -2868,7 +2868,9 @@ namespace Step32
     // minimal mesh size as in step-31, we compute local CFL numbers, i.e., on
     // each cell we compute the maximum velocity times the mesh size, and
     // compute the maximum of them. Hence, we need to choose the factor in
-    // front of the time step slightly smaller.
+    // front of the time step slightly smaller. (We later re-considered this
+    // approach towards time stepping. If you're curious about this, you may
+    // want to read the time stepping section in @cite HDGB17 .)
     //
     // After temperature right hand side assembly, we solve the linear system
     // for temperature (with fully distributed vectors without any ghosts),
