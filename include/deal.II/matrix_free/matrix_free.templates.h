@@ -1044,6 +1044,7 @@ namespace internal
                                         > &map,
     DynamicSparsityPattern                &connectivity_direct)
   {
+    const unsigned int locally_owned_size = connectivity_direct.n_rows();
     std::vector<types::global_dof_index> new_indices;
     for (unsigned int cell = begin; cell < end; ++cell)
       {
@@ -1064,7 +1065,8 @@ namespace internal
                 if (it != map.end())
                   {
                     const unsigned int neighbor_cell = it->second;
-                    if (neighbor_cell != cell)
+                    if (neighbor_cell != cell &&
+                        neighbor_cell < locally_owned_size)
                       new_indices.push_back(neighbor_cell);
                   }
               }
