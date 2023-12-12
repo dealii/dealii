@@ -3982,12 +3982,6 @@ public:
                  int,
                  << "You tried to do something on level " << arg1
                  << ", but this level is empty.");
-  /**
-   * Exception
-   *
-   * @ingroup Exceptions
-   */
-  DeclException0(ExcNonOrientableTriangulation);
 
   /**
    * Exception
