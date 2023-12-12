@@ -6596,13 +6596,13 @@ namespace GridGenerator
     // if either Triangulation is empty then merging is just a copy.
     if (triangulation_1.n_cells() == 0)
       {
-        result.copy_triangulation(triangulation_2);
-        return;
+        if (&result != &triangulation_2)
+          result.copy_triangulation(triangulation_2);
       }
     else if (triangulation_2.n_cells() == 0)
       {
-        result.copy_triangulation(triangulation_1);
-        return;
+        if (&result != &triangulation_1)
+          result.copy_triangulation(triangulation_1);
       }
     else
       merge_triangulations({&triangulation_1, &triangulation_2},
