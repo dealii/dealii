@@ -6599,16 +6599,17 @@ namespace GridGenerator
         result.copy_triangulation(triangulation_2);
         return;
       }
-    if (triangulation_2.n_cells() == 0)
+    else if (triangulation_2.n_cells() == 0)
       {
         result.copy_triangulation(triangulation_1);
         return;
       }
-    merge_triangulations({&triangulation_1, &triangulation_2},
-                         result,
-                         duplicated_vertex_tolerance,
-                         copy_manifold_ids,
-                         copy_boundary_ids);
+    else
+      merge_triangulations({&triangulation_1, &triangulation_2},
+                           result,
+                           duplicated_vertex_tolerance,
+                           copy_manifold_ids,
+                           copy_boundary_ids);
   }
 
 
