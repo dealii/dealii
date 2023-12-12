@@ -12682,7 +12682,7 @@ void Triangulation<dim, spacedim>::create_triangulation(
       more readable.
 
     */
-  if (dim < spacedim && all_reference_cells_are_hyper_cube())
+  if ((dim == spacedim - 1) && all_reference_cells_are_hyper_cube())
     {
       Table<2, bool> correct(GeometryInfo<dim>::faces_per_cell,
                              GeometryInfo<dim>::faces_per_cell);
