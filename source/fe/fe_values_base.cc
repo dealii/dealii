@@ -1440,7 +1440,7 @@ FEValuesBase<dim, spacedim>::check_cell_similarity(
            CellSimilarity::translation :
            CellSimilarity::none);
 
-  if ((dim < spacedim) && (cell_similarity == CellSimilarity::translation))
+  if ((dim == spacedim - 1) && (cell_similarity == CellSimilarity::translation))
     {
       if (static_cast<const typename Triangulation<dim, spacedim>::cell_iterator
                         &>(this->present_cell)
