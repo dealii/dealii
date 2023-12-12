@@ -334,8 +334,8 @@ void Step5<dim>::run()
   // could skip this check, in this version of the program, without any ill
   // effects.
   //
-  // It turns out that more than 90 per cent of programming errors are invalid
-  // function parameters such as invalid array sizes, etc, so we use
+  // It turns out that perhaps 90 per cent of programming errors are invalid
+  // function parameters such as invalid array sizes, etc., so we use
   // assertions heavily throughout deal.II to catch such mistakes. For this,
   // the <code>Assert</code> macro is a good choice, since it makes sure that
   // the condition which is given as first argument is valid, and if not
@@ -359,7 +359,7 @@ void Step5<dim>::run()
   // from calling functions with wrong arguments, walking off of arrays, etc.)
   // by compiling your program in optimized mode usually makes things run
   // about four times faster. Even though optimized programs are more
-  // performant, we still recommend developing in debug mode since it allows
+  // performant, you should always develop in debug mode since it allows
   // the library to find lots of common programming errors automatically. For
   // those who want to try: The way to switch from debug mode to optimized
   // mode is to recompile your program with the command <code>make
@@ -368,17 +368,21 @@ void Step5<dim>::run()
   // it will later also be linked to libraries that have been compiled for
   // optimized mode. In order to switch back to debug mode, simply recompile
   // with the command <code>make debug</code>.
-  Assert(dim == 2, ExcInternalError());
-  // ExcInternalError is a globally defined exception, which may be thrown
-  // whenever something is terribly wrong. Usually, one would like to use more
-  // specific exceptions, and particular in this case one would of course try
+  Assert(dim == 2, ExcNotImplemented());
+  // ExcNotImplemented is a globally defined exception, which may be thrown
+  // whenever a piece of code has simply not been implemented for a case
+  // other than the condition checked in the assertion. Here, it would not
+  // be difficult to simply implement reading a *different* mesh file that
+  // contains a description of a 1d or 3d geometry, but this has not (yet)
+  // been implemented and so the exception is appropriate.
+  //
+  // Usually, one would like to use more specific
+  // exception classes, and particular in this case one would of course try
   // to do something else if <code>dim</code> is not equal to two, e.g. create
   // a grid using library functions. Aborting a program is usually not a good
   // idea and assertions should really only be used for exceptional cases
   // which should not occur, but might due to stupidity of the programmer,
-  // user, or someone else. The situation above is not a very clever use of
-  // Assert, but again: this is a tutorial and it might be worth to show what
-  // not to do, after all.
+  // user, or someone else.
 
   // So if we got past the assertion, we know that dim==2, and we can now
   // actually read the grid. It is in UCD (unstructured cell data) format

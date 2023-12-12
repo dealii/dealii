@@ -3,43 +3,63 @@
 
 @dealiiVideoLecture{14}
 
-This example does not show revolutionary new things, but it shows many
-small improvements over the previous examples, and also many small
-things that can usually be found in finite element programs. Among
-them are:
-<ul>
-  <li> Computations on successively refined grids. At least in the
-       mathematical sciences, it is common to compute solutions on
-       a hierarchy of grids, in order to get a feeling for the accuracy
-       of the solution; if you only have one solution on a single grid, you
-       usually can't guess the accuracy of the
-       solution. Furthermore, deal.II is designed to support adaptive
-       algorithms where iterative solution on successively refined
-       grids is at the heart of algorithms. Although adaptive grids
-       are not used in this example, the foundations for them is laid
-       here.
-  <li> In practical applications, the domains are often subdivided
-       into triangulations by automatic mesh generators. In order to
-       use them, it is important to read coarse grids from a file. In
-       this example, we will read a coarse grid in UCD (unstructured
-       cell data) format. When this program was first written around
-       2000, UCD format was what the AVS Explorer used -- a program
-       reasonably widely used at the time but now no longer of
-       importance. (Nonetheless, the file format has survived and is
-       still understood by a number of programs.)
-  <li> Finite element programs usually use extensive amounts of
-       computing time, so some optimizations are sometimes
-       necessary. We will show some of them.
-  <li> On the other hand, finite element programs tend to be rather
-       complex, so debugging is an important aspect. We support safe
-       programming by using assertions that check the validity of
-       parameters and %internal states in a debug mode, but are removed
-       in optimized mode. (@dealiiVideoLectureSeeAlso{18})
-  <li> Regarding the mathematical side, we show how to support a
-       variable coefficient in the elliptic operator and how to use
-       preconditioned iterative solvers for the linear systems of
-       equations.
-</ul>
+This example shows a number of improvements over the previous examples,
+along with some of the things that can usually be found in finite element
+programs. Let us outline these in the following.
+
+<h3> Successively refined grids </h3>
+
+You know from theory that the solution of a partial differential equation
+computed by the finite element method is an approximation of the exact
+solution, and that the approximation *converges* to the exact solution.
+But if you only compute on a single mesh (as we have done in step-3 and
+step-4), how do you know that the approximation is good enough (however
+you want to define that)? In practice, there are two ways you can assess
+this: First, you can compute the solution on a whole sequence of meshes and
+observe how the solution changes (or doesn't) from one mesh to another.
+Second, you can just compare the solution on one mesh against the solution
+computed on a once-refined meshes. Both step-3 and step-4 discuss these
+sorts of things in their respective "Results" sections, doing the mesh
+refinement mostly by hand: You had to make a change in the program,
+re-compile everything, and then run the program again.
+
+This program automates this process via a loop over a sequence of
+more-and-more refined meshes, doing the mesh refinement as part of the
+loop. In this program, the mesh is refined by simply replacing every
+(quadrilateral) cell of the mesh by its four children. In reality,
+this is often not necessary, because the solution is already sufficiently
+good in some parts of the domain whereas the mesh is still too coarse in
+other parts, and in those cases one can get away with refining only *some*
+of the cells -- but this is the topic of step-6, and we leave it for there.
+
+
+<h3> Reading in an externally generated mesh </h3>
+
+In practical applications, the domain on which you want to solve a partial
+differential equation is often subdivided into a triangulations by
+automatic *mesh generators*, i.e., specialized
+tools external to deal.II. (deal.II can generate some *simple* meshes
+using the functions in namespace GridGenerator, and it also has interfaces
+to the %Gmsh mesh generator in namespace Gmsh, but for most complex
+geometries, you will want to use an external mesh generator.) These mesh
+generators will typically write the mesh they create into a file.
+In order to use such meshes, it is important to read these files into
+the coarse grid triangulation from which we can then continue by refining
+the mesh appropriately. For reading meshes,
+we will use the GridIn class that can read meshes in a substantial
+number of formats produced by most of the widely used mesh generators.
+In this tutorial, we will read a coarse grid in UCD (short for "unstructured
+cell data") format: When this program was first written around
+2000, the UCD format was what the AVS Explorer used -- a program
+reasonably widely used at the time though today no longer of
+importance. The file format itself has survived and is
+still widely understood, but because GridIn reads so many different
+formats, the specific choice used in this tutorial program is perhaps
+not all that important.
+
+
+<h3> Solving a generalized Laplace (Poisson) equation </h3>
+
 
 The equation to solve here is as follows:
 @f{align*}{
@@ -48,27 +68,125 @@ The equation to solve here is as follows:
   u &= 0 \qquad\qquad & \text{on}\ \partial\Omega.
 @f}
 If $a(\mathbf x)$ was a constant coefficient, this would simply be the Poisson
-equation. However, if it is indeed spatially variable, it is a more complex
-equation (often referred to as the "extended Poisson equation"). Depending on
-what the variable $u$ refers to it models a variety of situations with wide
+equation that we have already solved in step-3 and step-4. However, if it is
+indeed spatially variable, it is a more complex equation (sometimes referred
+to as the "Poisson equation with a coefficient"). Depending on
+what the variable $u$ refers to, it models a variety of situations with wide
 applicability:
 
 - If $u$ is the electric potential, then $-a\nabla u$ is the electric current
   in a medium and the coefficient $a$ is the conductivity of the medium at any
   given point. (In this situation, the right hand side of the equation would
   be the electric source density and would usually be zero or consist of
-  localized, Delta-like, functions.)
-- If $u$ is the vertical deflection of a thin membrane, then $a$ would be a
-  measure of the local stiffness. This is the interpretation that will allow
+  localized, Delta-like, functions if specific points of the domain are
+  connected to current sources that send electrons into or out of the domain.)
+  In many media, $a=a(\mathbf x)$ is indeed spatially variable because the
+  medium is not homogeneous. For example, in
+  [electrical impedance tomography](https://en.wikipedia.org/wiki/Electrical_impedance_tomography),
+  a biomedical imaging technique, one wants to image the body's interior
+  by sending electric currents through the body between electrodes attached
+  to the skin; in this case, $a(\mathbf x)$ describes the electrical
+  conductivity of the different parts of the human body -- so $a(\mathbf x)$
+  would be large for points $\mathbf x$ that lie in organs well supplied by
+  blood (such as the heart), whereas it would be small for organs such as
+  the lung that do not conduct electricity well (because air is a poor
+  conductor). Similarly, if you are simulating an electronic device,
+  $a(\mathbf x)$ would be large in parts of the volume occupied by
+  conductors such as copper, gold, or aluminum; it would have intermediate
+  values for parts of the volume occupied by semiconductors such as
+  silicon; and it would be small in non-conducting and insulating parts of the
+  volume (e.g., those occupied by air, or the circuit board on which the
+  electronics are mounted).
+
+- If we are describing the vertical deflection $u$ of a thin membrane under
+  a vertical force $f$, then $a$ would be a measure of the local stiffness
+  of the membrane, which can be spatially variable if the membrane is
+  made from different materials, or if the thickness of the membrane varies
+  spatially. This is the interpretation of the equation that will allow
   us to interpret the images shown in the results section below.
 
-Since the Laplace/Poisson equation appears in so many contexts, there are many
-more interpretations than just the two listed above.
+Since the Laplace/Poisson equation appears in so many contexts, there are of
+course many more uses than just the two listed above, each providing a
+different interpretation what a spatially variable coefficient would mean
+in that context.
 
-When assembling the linear system for this equation, we need the weak form
+What you should have taken away from this is that equations with spatially
+variable coefficients in the differential operator are quite common, and indeed
+quite useful in describing the world around us. As a consequence, we should
+be able to reflect such cases in the numerical methods we use. It turns out
+that it is not entirely obvious how to deal with such spatially variable
+coefficients in finite difference methods (though it is also not too
+complicated to come with ways to do that systematically). But we are using
+finite element methods, and for these it is entirely trivial to incorporate
+such coefficients: You just do what you always do, namely multiply by a test
+function, then integrate by parts. This yields the weak form,
 which here reads as follows:
+@f{align*}{
+  \int_\Omega a(\mathbf x) \nabla \varphi(\mathbf x) \cdot
+            \nabla u(\mathbf x) \; dx
+  &=
+  \int_\Omega \varphi(\mathbf x) f(\mathbf x) \; dx \qquad \qquad \forall \varphi.
+@f}
+For this program here, we will specifically use $f(\mathbf x)=1$.
+In our usual short-hand notation, the equation's weak form can then be
+written as
 @f{align*}{
   (a \nabla \varphi, \nabla u) &= (\varphi, 1) \qquad \qquad \forall \varphi.
 @f}
-The implementation in the <code>assemble_system</code> function follows
-immediately from this.
+
+As you will recall from step-3 and step-4, the weak formulation is implemented
+in the <code>assemble_system</code> function, substituting integrals by
+quadrature. Indeed, what you will find in this program is that as before,
+the implementation follows immediately from the statement of the weak form
+above.
+
+
+<h3> Support for debugging: Assertions </h3>
+
+Finite element programs tend to be complex pieces of software, so debugging
+is an important aspect of developing finite element codes. deal.II supports safe
+programming by using assertions that check the validity of
+parameters and %internal states in a "debug" mode, but are removed
+in "optimized" (or "release") mode. (@dealiiVideoLectureSeeAlso{18})
+This program will show you how to write such
+[assertions](https://en.wikipedia.org/wiki/Assertion_(software_development)).
+
+The usefulness of assertions is that they allow you to put whatever you *think*
+must be true into actual code, and let the computer check that you are right.
+To give an example, here is the function that adds one vector to another:
+@code
+template <typename Number>
+Vector<Number> &
+Vector<Number>::operator+=(const Vector<Number> &v)
+{
+  Assert(size() != 0, ExcEmptyObject());
+  Assert(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+
+  ... do the actual addition of elements ...
+
+  return *this;
+}
+@endcode
+The point here is that it only makes sense to add two vectors together if
+(i) the vectors have nonzero size, and (ii) have the same size. It does
+not make sense to add a vector of size 10 to a vector of size 20. That
+is an obvious statement, and one could argue that if anyone tried to do
+so anyway, they get what they deserve -- most often this may be wrong
+results, overwritten memory, or other terrible things that are difficult
+to debug. It is much better to *check* such conditions -- i.e., to
+check the *assumptions* a function such as the one above makes on function
+arguments or the internal state of the program it is working on -- because
+if you check, you can do two things: (i) If an assumption is violated, you
+can abort the program at the first moment where you know that something
+is going wrong, rather than letting the program later spend quality hours
+with a debugger trying to figure out why the program is producing wrong
+results; (ii) if an assumption is violated, you can print information
+that explicitly shows what the violated assumption is, where in the
+program this happened, and how you got to this place (i.e., it can show you the
+[stack trace](https://en.wikipedia.org/wiki/Stack_trace)).
+
+The two `Assert` statements above do exactly this: The first argument to
+`Assert` is the condition whose truth we want to ensure. The second argument
+is an object that contains information (and can print this information)
+used if the condition is not true. The program will show a real-world case
+where assertions are useful in user code.
