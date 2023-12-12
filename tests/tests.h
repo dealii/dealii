@@ -456,52 +456,72 @@ struct LimitConcurrency
 #ifdef DEAL_II_WITH_PETSC
 #  include <petscsys.h>
 
-namespace
-{
-  void
-  check_petsc_allocations()
-  {
+// PETSc 3.20 includes a new logging implementation which is much less reliant
+// on global state. At the same time the old version doesn't work any more so we
+// have to use it.
+//
+// This is based on src/sys/tutorials/ex7.c.
 #  if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
-    // TODO: the logging code below no longer works with PETSc 3.20 and newer. A
-    // new implementation should use the approach in sys/tutorials/ex7.c to log
-    // object creations and destructions globally.
-#  else
-    PetscStageLog  stageLog;
-    PetscErrorCode ierr;
+// We need to modify the internal state of a PetscLogHandler to add our own
+// logging, so we need the internal header:
+#    include <petsc/private/loghandlerimpl.h>
 
-    ierr = PetscLogGetStageLog(&stageLog);
-    AssertThrow(ierr == 0, ExcPETScError(ierr));
+struct PETScReferenceCountContext
+{
+  static PetscErrorCode
+  construct(PetscLogHandler handler)
+  {
+    handler->data               = new PETScReferenceCountContext();
+    handler->ops->destroy       = destruct;
+    handler->ops->objectcreate  = log_object_constructor;
+    handler->ops->objectdestroy = log_object_destructor;
 
-    // I don't quite understand petsc and it looks like
-    // stageLog->stageInfo->classLog->classInfo[i].id is always -1, so we look
-    // it up in stageLog->classLog, make sure it has the same number of entries:
-    Assert(stageLog->stageInfo->classLog->numClasses ==
-             stageLog->classLog->numClasses,
-           dealii::ExcInternalError());
-
-    bool errors = false;
-    for (int i = 0; i < stageLog->stageInfo->classLog->numClasses; ++i)
-      {
-        if (stageLog->stageInfo->classLog->classInfo[i].destructions !=
-            stageLog->stageInfo->classLog->classInfo[i].creations)
-          {
-            errors = true;
-            std::cerr
-              << "ERROR: PETSc objects leaking of type '"
-              << stageLog->classLog->classInfo[i].name << "'"
-              << " with "
-              << stageLog->stageInfo->classLog->classInfo[i].creations
-              << " creations and only "
-              << stageLog->stageInfo->classLog->classInfo[i].destructions
-              << " destructions." << std::endl;
-          }
-      }
-
-    if (errors)
-      throw dealii::ExcMessage("PETSc memory leak");
-#  endif
+    return PETSC_SUCCESS;
   }
-} // namespace
+
+
+
+  static PetscErrorCode
+  destruct(PetscLogHandler handler)
+  {
+    delete reinterpret_cast<PETScReferenceCountContext *>(handler->data);
+    return PETSC_SUCCESS;
+  }
+
+
+
+  static PetscErrorCode
+  log_object_constructor(PetscLogHandler handler, PetscObject obj)
+  {
+    const char    *classname = nullptr;
+    PetscErrorCode ierr      = PetscObjectGetClassName(obj, &classname);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    reinterpret_cast<PETScReferenceCountContext *>(handler->data)
+      ->ctor_dtor_map[classname]
+      .first += 1;
+    return PETSC_SUCCESS;
+  }
+
+
+
+  static PetscErrorCode
+  log_object_destructor(PetscLogHandler handler, PetscObject obj)
+  {
+    const char    *classname = nullptr;
+    PetscErrorCode ierr      = PetscObjectGetClassName(obj, &classname);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    reinterpret_cast<PETScReferenceCountContext *>(handler->data)
+      ->ctor_dtor_map[classname]
+      .second += 1;
+    return PETSC_SUCCESS;
+  }
+
+  // Map between the PETSc class name and the number of constructions /
+  // destructions
+  std::map<std::string, std::pair<PetscInt, PetscInt>> ctor_dtor_map;
+};
+
+#  endif
 #endif
 
 
@@ -587,6 +607,19 @@ struct MPILogInitAll
     deallog.depth_console(console ? 10 : 0);
 
     deallog.push(Utilities::int_to_string(myid));
+#ifdef DEAL_II_WITH_PETSC
+#  if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
+    PetscErrorCode ierr =
+      PetscLogHandlerRegister("MPILogInitAll",
+                              PETScReferenceCountContext::construct);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = PetscLogHandlerCreate(PETSC_COMM_WORLD, &petsc_log);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = PetscLogHandlerSetType(petsc_log, "MPILogInitAll");
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    ierr = PetscLogHandlerStart(petsc_log);
+#  endif
+#endif
   }
 
   ~MPILogInitAll()
@@ -607,10 +640,63 @@ struct MPILogInitAll
     MPI_Barrier(MPI_COMM_WORLD);
 
 #  ifdef DEAL_II_WITH_PETSC
-    check_petsc_allocations();
-    MPI_Barrier(MPI_COMM_WORLD);
+    bool leaks = false;
+#    if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
+    PetscErrorCode ierr = PetscLogHandlerStop(petsc_log);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    auto *context =
+      reinterpret_cast<PETScReferenceCountContext *>(petsc_log->data);
+    for (const auto &pair : context->ctor_dtor_map)
+      if (pair.second.first != pair.second.second)
+        {
+          leaks = true;
+          std::cerr << "ERROR: PETSc objects leaking of type '" << pair.first
+                    << "'"
+                    << " with " << pair.second.first << " creations and only "
+                    << pair.second.second << " destructions." << std::endl;
+        }
+    ierr = PetscLogHandlerDestroy(&petsc_log);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+#    else
+    PetscStageLog  stageLog;
+    PetscErrorCode ierr;
+
+    ierr = PetscLogGetStageLog(&stageLog);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // I don't quite understand petsc and it looks like
+    // stageLog->stageInfo->classLog->classInfo[i].id is always -1, so we look
+    // it up in stageLog->classLog, make sure it has the same number of
+    // entries:
+    Assert(stageLog->stageInfo->classLog->numClasses ==
+             stageLog->classLog->numClasses,
+           dealii::ExcInternalError());
+
+    for (int i = 0; i < stageLog->stageInfo->classLog->numClasses; ++i)
+      {
+        if (stageLog->stageInfo->classLog->classInfo[i].destructions !=
+            stageLog->stageInfo->classLog->classInfo[i].creations)
+          {
+            leaks = true;
+            std::cerr
+              << "ERROR: PETSc objects leaking of type '"
+              << stageLog->classLog->classInfo[i].name << "'"
+              << " with "
+              << stageLog->stageInfo->classLog->classInfo[i].creations
+              << " creations and only "
+              << stageLog->stageInfo->classLog->classInfo[i].destructions
+              << " destructions." << std::endl;
+          }
+      }
+#    endif
+
+    // The test should fail if there are PETSc leaks, so abort at this point and
+    // don't write any combined output.
+    if (leaks)
+      std::abort();
 #  endif
 
+    MPI_Barrier(MPI_COMM_WORLD);
     if (myid == 0)
       {
         for (unsigned int i = 1; i < nproc; ++i)
@@ -622,6 +708,12 @@ struct MPILogInitAll
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
   }
+
+#ifdef DEAL_II_WITH_PETSC
+#  if DEAL_II_PETSC_VERSION_GTE(3, 20, 0)
+  PetscLogHandler petsc_log;
+#  endif
+#endif
 };
 
 
