@@ -2225,11 +2225,17 @@ bool
 CellAccessor<dim, spacedim>::direction_flag() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  if (dim == spacedim)
+  if constexpr (dim == spacedim)
     return true;
-  else
+  else if constexpr (dim == spacedim - 1)
     return this->tria->levels[this->present_level]
       ->direction_flags[this->present_index];
+  else
+    {
+      Assert(false,
+             ExcMessage("This function cannot be called if dim<spacedim-1."));
+      return true;
+    }
 }
 
 
@@ -2240,13 +2246,17 @@ CellAccessor<dim, spacedim>::set_direction_flag(
   const bool new_direction_flag) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  if (dim < spacedim)
+  if constexpr (dim == spacedim)
+    Assert(new_direction_flag == true,
+           ExcMessage("If dim==spacedim, direction flags are always true and "
+                      "can not be set to anything else."));
+  else if constexpr (dim == spacedim - 1)
     this->tria->levels[this->present_level]
       ->direction_flags[this->present_index] = new_direction_flag;
   else
     Assert(new_direction_flag == true,
-           ExcMessage("If dim==spacedim, direction flags are always true and "
-                      "can not be set to anything else."));
+           ExcMessage("If dim<spacedim-1, then this function can be called "
+                      "only if the argument is 'true'."));
 }
 
 
