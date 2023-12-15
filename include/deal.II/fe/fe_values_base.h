@@ -48,6 +48,7 @@
 #include <memory>
 #include <optional>
 #include <type_traits>
+#include <variant>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -1572,22 +1573,28 @@ protected:
       "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
 
     /**
-     * Constructor.
+     * Constructor. Creates an unusable object that is not associated with
+     * any cell at all.
      */
-    CellIteratorContainer();
-
-    /**
-     * Constructor.
-     */
-    template <bool lda>
-    CellIteratorContainer(
-      const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell);
+    CellIteratorContainer() = default;
 
     /**
      * Constructor.
      */
     CellIteratorContainer(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell);
+
+    /**
+     * Constructor.
+     */
+    CellIteratorContainer(
+      const typename DoFHandler<dim, spacedim>::cell_iterator &cell);
+
+    /**
+     * Constructor.
+     */
+    CellIteratorContainer(
+      const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell);
 
     /**
      * Indicate whether FEValues::reinit() was called.
@@ -1628,9 +1635,16 @@ protected:
                                 Vector<IndexSet::value_type> &out) const;
 
   private:
-    std::optional<typename Triangulation<dim, spacedim>::cell_iterator> cell;
-    const DoFHandler<dim, spacedim> *dof_handler;
-    bool                             level_dof_access;
+    /**
+     * The cell in question, if one has been assigned to this object. The
+     * concrete data type can either be a Triangulation cell iterator, a
+     * DoFHandler cell iterator, or a DoFHandler level cell iterator.
+     */
+    std::optional<
+      std::variant<typename Triangulation<dim, spacedim>::cell_iterator,
+                   typename DoFHandler<dim, spacedim>::cell_iterator,
+                   typename DoFHandler<dim, spacedim>::level_cell_iterator>>
+      cell;
   };
 
   /**
@@ -1783,18 +1797,6 @@ private:
 #ifndef DOXYGEN
 
 /*---------------------- Inline functions: FEValuesBase ---------------------*/
-
-template <int dim, int spacedim>
-template <bool lda>
-inline FEValuesBase<dim, spacedim>::CellIteratorContainer::
-  CellIteratorContainer(
-    const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell)
-  : cell(cell)
-  , dof_handler(&cell->get_dof_handler())
-  , level_dof_access(lda)
-{}
-
-
 
 template <int dim, int spacedim>
 inline const FEValuesViews::Scalar<dim, spacedim> &
