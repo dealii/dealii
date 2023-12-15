@@ -2182,7 +2182,7 @@ namespace internal
             total_cells - tria_level.global_level_cell_indices.size(),
             numbers::invalid_dof_index);
 
-          if (dimension < space_dimension)
+          if (dimension == space_dimension - 1)
             {
               tria_level.direction_flags.reserve(total_cells);
               tria_level.direction_flags.insert(
@@ -3646,7 +3646,7 @@ namespace internal
 
         level.parents.assign((size + 1) / 2, -1);
 
-        if (dim < spacedim)
+        if (dim == spacedim - 1)
           level.direction_flags.assign(size, true);
 
         level.neighbors.assign(size * max_faces_per_cell, {-1, -1});
