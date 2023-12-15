@@ -109,8 +109,7 @@ namespace internal
 
 template <int dim, int spacedim>
 FEValuesBase<dim, spacedim>::CellIteratorContainer::CellIteratorContainer()
-  : initialized(false)
-  , cell(typename Triangulation<dim, spacedim>::cell_iterator(nullptr, -1, -1))
+  : cell()
   , dof_handler(nullptr)
   , level_dof_access(false)
 {}
@@ -120,8 +119,7 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::CellIteratorContainer()
 template <int dim, int spacedim>
 FEValuesBase<dim, spacedim>::CellIteratorContainer::CellIteratorContainer(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell)
-  : initialized(true)
-  , cell(cell)
+  : cell(cell)
   , dof_handler(nullptr)
   , level_dof_access(false)
 {}
@@ -132,7 +130,7 @@ template <int dim, int spacedim>
 bool
 FEValuesBase<dim, spacedim>::CellIteratorContainer::is_initialized() const
 {
-  return initialized;
+  return cell.has_value();
 }
 
 
@@ -143,7 +141,7 @@ operator typename Triangulation<dim, spacedim>::cell_iterator() const
 {
   Assert(is_initialized(), ExcNotReinited());
 
-  return cell;
+  return cell.value();
 }
 
 
@@ -172,15 +170,15 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
   Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
 
   if (level_dof_access)
-    DoFCellAccessor<dim, spacedim, true>(&cell->get_triangulation(),
-                                         cell->level(),
-                                         cell->index(),
+    DoFCellAccessor<dim, spacedim, true>(&cell.value()->get_triangulation(),
+                                         cell.value()->level(),
+                                         cell.value()->index(),
                                          dof_handler)
       .get_interpolated_dof_values(in, out);
   else
-    DoFCellAccessor<dim, spacedim, false>(&cell->get_triangulation(),
-                                          cell->level(),
-                                          cell->index(),
+    DoFCellAccessor<dim, spacedim, false>(&cell.value()->get_triangulation(),
+                                          cell.value()->level(),
+                                          cell.value()->index(),
                                           dof_handler)
       .get_interpolated_dof_values(in, out);
 }
@@ -198,7 +196,10 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
   Assert(level_dof_access == false, ExcNotImplemented());
 
   const DoFCellAccessor<dim, spacedim, false> cell_dofs(
-    &cell->get_triangulation(), cell->level(), cell->index(), dof_handler);
+    &cell.value()->get_triangulation(),
+    cell.value()->level(),
+    cell.value()->index(),
+    dof_handler);
 
   std::vector<types::global_dof_index> dof_indices(
     cell_dofs.get_fe().n_dofs_per_cell());
