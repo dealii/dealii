@@ -238,11 +238,10 @@ namespace SparseMatrixTools
     {
       std::vector<unsigned int> dummy(locally_active_dofs.n_elements());
 
-      const auto local_size = get_local_size(system_matrix);
-      const auto prefix_sum = compute_prefix_sum(local_size, comm);
-      IndexSet   locally_owned_dofs(std::get<1>(prefix_sum));
-      locally_owned_dofs.add_range(std::get<0>(prefix_sum),
-                                   std::get<0>(prefix_sum) + local_size);
+      const auto local_size              = get_local_size(system_matrix);
+      const auto [prefix_sum, total_sum] = compute_prefix_sum(local_size, comm);
+      IndexSet locally_owned_dofs(total_sum);
+      locally_owned_dofs.add_range(prefix_sum, prefix_sum + local_size);
 
       Utilities::MPI::internal::ComputeIndexOwner::ConsensusAlgorithmsPayload
         process(locally_owned_dofs, locally_active_dofs, comm, dummy, true);
