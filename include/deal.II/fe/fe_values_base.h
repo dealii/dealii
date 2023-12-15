@@ -1626,14 +1626,6 @@ protected:
     get_interpolated_dof_values(const ReadVector<Number> &in,
                                 Vector<Number>           &out) const;
 
-    /**
-     * Call @p get_interpolated_dof_values of the iterator with the
-     * given arguments.
-     */
-    void
-    get_interpolated_dof_values(const IndexSet               &in,
-                                Vector<IndexSet::value_type> &out) const;
-
   private:
     /**
      * The cell in question, if one has been assigned to this object. The

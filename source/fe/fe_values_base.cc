@@ -207,43 +207,6 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
 
 
 
-template <int dim, int spacedim>
-void
-FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
-  const IndexSet               &in,
-  Vector<IndexSet::value_type> &out) const
-{
-  Assert(is_initialized(), ExcNotReinited());
-
-  switch (cell.value().index())
-    {
-      case 1:
-        {
-          const typename DoFHandler<dim, spacedim>::cell_iterator cell =
-            std::get<1>(this->cell.value());
-
-          std::vector<types::global_dof_index> dof_indices(
-            cell->get_fe().n_dofs_per_cell());
-
-          cell->get_dof_indices(dof_indices);
-
-          for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell(); ++i)
-            out[i] = (in.is_element(dof_indices[i]) ? 1 : 0);
-
-          break;
-        }
-      case 2:
-        Assert(false, ExcNotImplemented());
-        break;
-
-      default:
-        Assert(false, ExcNeedsDoFHandler());
-        break;
-    }
-}
-
-
-
 /*------------------------------- FEValuesBase ---------------------------*/
 
 
