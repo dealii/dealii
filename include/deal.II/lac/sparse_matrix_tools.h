@@ -151,23 +151,25 @@ namespace SparseMatrixTools
       (void)comm;
       return {0, value};
 #  else
-      if (comm == MPI_COMM_SELF)
-        return {0, value}; // serial triangulation
+      if (Utilities::MPI::n_mpi_processes(comm) == 1)
+        return {0, value};
+      else
+        {
+          T prefix = {};
 
-      T prefix = {};
+          int ierr =
+            MPI_Exscan(&value,
+                       &prefix,
+                       1,
+                       Utilities::MPI::mpi_type_id_for_type<decltype(value)>,
+                       MPI_SUM,
+                       comm);
+          AssertThrowMPI(ierr);
 
-      int ierr =
-        MPI_Exscan(&value,
-                   &prefix,
-                   1,
-                   Utilities::MPI::mpi_type_id_for_type<decltype(value)>,
-                   MPI_SUM,
-                   comm);
-      AssertThrowMPI(ierr);
+          T sum = Utilities::MPI::sum(value, comm);
 
-      T sum = Utilities::MPI::sum(value, comm);
-
-      return {prefix, sum};
+          return {prefix, sum};
+        }
 #  endif
     }
 
