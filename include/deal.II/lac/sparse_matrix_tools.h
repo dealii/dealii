@@ -157,6 +157,7 @@ namespace SparseMatrixTools
         {
           T prefix = {};
 
+          // First obtain every process's prefix sum:
           int ierr =
             MPI_Exscan(&value,
                        &prefix,
@@ -166,7 +167,12 @@ namespace SparseMatrixTools
                        comm);
           AssertThrowMPI(ierr);
 
-          T sum = Utilities::MPI::sum(value, comm);
+          // Then we also need the total sum. We could obtain it by
+          // calling Utilities::MPI::sum(), but it is cheaper if we
+          // broadcast it from the last process, which can compute it
+          // from its own prefix sum plus its own value.
+          T sum = Utilities::MPI::broadcast(
+            comm, prefix + value, Utilities::MPI::n_mpi_processes(comm) - 1);
 
           return {prefix, sum};
         }
