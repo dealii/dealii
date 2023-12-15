@@ -46,6 +46,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1627,10 +1628,9 @@ protected:
                                 Vector<IndexSet::value_type> &out) const;
 
   private:
-    bool                                                 initialized;
-    typename Triangulation<dim, spacedim>::cell_iterator cell;
-    const DoFHandler<dim, spacedim>                     *dof_handler;
-    bool                                                 level_dof_access;
+    std::optional<typename Triangulation<dim, spacedim>::cell_iterator> cell;
+    const DoFHandler<dim, spacedim> *dof_handler;
+    bool                             level_dof_access;
   };
 
   /**
@@ -1789,8 +1789,7 @@ template <bool lda>
 inline FEValuesBase<dim, spacedim>::CellIteratorContainer::
   CellIteratorContainer(
     const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell)
-  : initialized(true)
-  , cell(cell)
+  : cell(cell)
   , dof_handler(&cell->get_dof_handler())
   , level_dof_access(lda)
 {}
