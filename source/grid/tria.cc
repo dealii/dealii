@@ -4947,7 +4947,7 @@ namespace internal
         // already cleared at the
         // beginning of this function
 
-        if (dim < spacedim)
+        if (dim == spacedim - 1)
           for (unsigned int c = 0; c < n_children; ++c)
             cell->child(c)->set_direction_flag(cell->direction_flag());
       }
@@ -5414,7 +5414,7 @@ namespace internal
 
           cell->set_refinement_case(ref_case);
 
-          if (dim < spacedim)
+          if (dim == spacedim - 1)
             for (unsigned int c = 0; c < n_children; ++c)
               cell->child(c)->set_direction_flag(cell->direction_flag());
         };
@@ -5595,7 +5595,8 @@ namespace internal
                   first_child->set_material_id(cell->material_id());
                   first_child->set_manifold_id(cell->manifold_id());
                   first_child->set_subdomain_id(subdomainid);
-                  first_child->set_direction_flag(cell->direction_flag());
+                  if (dim == spacedim - 1)
+                    first_child->set_direction_flag(cell->direction_flag());
 
                   first_child->set_parent(cell->index());
 
@@ -5646,7 +5647,8 @@ namespace internal
                   second_child->set_material_id(cell->material_id());
                   second_child->set_manifold_id(cell->manifold_id());
                   second_child->set_subdomain_id(subdomainid);
-                  second_child->set_direction_flag(cell->direction_flag());
+                  if (dim == spacedim - 1)
+                    second_child->set_direction_flag(cell->direction_flag());
 
                   if (cell->neighbor(1).state() != IteratorState::valid)
                     second_child->set_neighbor(1, cell->neighbor(1));
@@ -12929,7 +12931,8 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::flip_all_direction_flags()
 {
   AssertThrow(dim + 1 == spacedim,
-              ExcMessage("Only works for dim == spacedim-1"));
+              ExcMessage(
+                "This function can only be called if dim == spacedim-1."));
   for (const auto &cell : this->active_cell_iterators())
     cell->set_direction_flag(!cell->direction_flag());
 }

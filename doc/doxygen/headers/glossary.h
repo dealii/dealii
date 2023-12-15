@@ -827,7 +827,7 @@
  * can change all direction flags of a triangulation using the
  * Triangulation::flip_all_direction_flags() function.
  *
- * The flag is necessary to make cases like this work: assume we have a
+ * The flag is necessary to make cases like this work: Assume we have a
  * one-dimensional mesh embedded in a two-dimensional space,
  *
  *   @image html direction_flag.png "One dimensional mesh in two dimensions"
@@ -863,6 +863,14 @@
  * dimensions. We note that it would not be possible to find consistent
  * direction flags if the two-dimensional manifold is not orientable; such
  * manifolds are not currently supported by deal.II.
+ *
+ * Finally, the direction flag cannot be used for triangulations where
+ * `spacedim>dim+1`, such as for meshes with one-dimensional cells in 3d.
+ * In these cases, the normal vector to a cell does not simply point to
+ * one side or the other of a cell, but must lie in a two-dimensional sub-space
+ * perpendicular to the cell. As a consequence, we cannot make normal vectors
+ * consistent between adjacent cells simply by flipping it from one side to
+ * the other.
  * </dd>
  *
  *

@@ -3858,7 +3858,10 @@ public:
    */
 
   /**
-   * Return the orientation of this cell.
+   * Return the orientation of this cell. This function always returns
+   * `true` if `dim==spacedim`. It can return `true` or `false` if
+   * `dim==spacedim-1`. The function cannot be called (and will abort
+   * with an error) if called for `dim<spacedim-1`.
    *
    * For the meaning of this flag, see
    * @ref GlossDirectionFlag.
@@ -4172,7 +4175,11 @@ private:
   set_parent(const unsigned int parent_index);
 
   /**
-   * Set the orientation of this cell.
+   * Set the orientation of this cell. This function can only be
+   * called if the argument is `true` if `dim==spacedim`. It can be
+   * called with either `true` or `false` if `dim==spacedim-1`. The
+   * function cannot be called (and will abort with an error) if called
+   * for `dim<spacedim-1`.
    *
    * For the meaning of this flag, see
    * @ref GlossDirectionFlag.

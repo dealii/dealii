@@ -2098,10 +2098,12 @@ public:
       &construction_data);
 
   /**
-   * Revert or flip the direction_flags of a dim<spacedim triangulation, see
+   * Revert or flip the direction flags of a triangulation with
+   * `dim==spacedim-1`, see
    * @ref GlossDirectionFlag.
    *
-   * This function throws an exception if dim equals spacedim.
+   * This function throws an exception if `dim==spacedim` or if
+   * `dim<spacedim-1`.
    */
   void
   flip_all_direction_flags();
