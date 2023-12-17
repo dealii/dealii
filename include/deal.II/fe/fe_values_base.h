@@ -1558,6 +1558,16 @@ protected:
    * to the present cell in order to be able to extract the values of the
    * degrees of freedom on this cell in the get_function_values() and assorted
    * functions.
+   *
+   * The problem is that the iterators given to the various reinit() functions
+   * can either be Triangulation iterators, or DoFHandler cell or level
+   * iterators. All three are valid, and provide different functionality that is
+   * used in different contexts; as a consequence we need to be able to store
+   * all three. This class provides the ability to store an object of any of
+   * these types, via a member variable that is a std::variant that encapsulates
+   * an object of any of the three types. Because a std::variant always stores
+   * an object of *one* of these types, we wrap the std::variant object into a
+   * std::optional that allows us to encode a "not yet initialized" state.
    */
   class CellIteratorWrapper
   {
