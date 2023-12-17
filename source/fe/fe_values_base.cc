@@ -107,21 +107,27 @@ namespace internal
 
 /* ------------ FEValuesBase<dim,spacedim>::CellIteratorContainer ----------- */
 
+
 template <int dim, int spacedim>
-FEValuesBase<dim, spacedim>::CellIteratorContainer::CellIteratorContainer()
-  : cell()
-  , dof_handler(nullptr)
-  , level_dof_access(false)
+FEValuesBase<dim, spacedim>::CellIteratorContainer::CellIteratorContainer(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  : cell(cell)
 {}
 
 
 
 template <int dim, int spacedim>
 FEValuesBase<dim, spacedim>::CellIteratorContainer::CellIteratorContainer(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+  const typename DoFHandler<dim, spacedim>::cell_iterator &cell)
   : cell(cell)
-  , dof_handler(nullptr)
-  , level_dof_access(false)
+{}
+
+
+
+template <int dim, int spacedim>
+FEValuesBase<dim, spacedim>::CellIteratorContainer::CellIteratorContainer(
+  const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell)
+  : cell(cell)
 {}
 
 
@@ -141,7 +147,14 @@ operator typename Triangulation<dim, spacedim>::cell_iterator() const
 {
   Assert(is_initialized(), ExcNotReinited());
 
-  return cell.value();
+  // We can always convert to a tria iterator, regardless of which of
+  // the three types of cell we store.
+  return std::visit(
+    [](auto &cell_iterator) ->
+    typename Triangulation<dim, spacedim>::cell_iterator {
+      return cell_iterator;
+    },
+    cell.value());
 }
 
 
@@ -152,9 +165,17 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::n_dofs_for_dof_handler()
   const
 {
   Assert(is_initialized(), ExcNotReinited());
-  Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
 
-  return dof_handler->n_dofs();
+  switch (cell.value().index())
+    {
+      case 1:
+        return std::get<1>(cell.value())->get_dof_handler().n_dofs();
+      case 2:
+        return std::get<2>(cell.value())->get_dof_handler().n_dofs();
+      default:
+        Assert(false, ExcNeedsDoFHandler());
+        return numbers::invalid_dof_index;
+    }
 }
 
 
@@ -167,20 +188,21 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
   Vector<Number>           &out) const
 {
   Assert(is_initialized(), ExcNotReinited());
-  Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
 
-  if (level_dof_access)
-    DoFCellAccessor<dim, spacedim, true>(&cell.value()->get_triangulation(),
-                                         cell.value()->level(),
-                                         cell.value()->index(),
-                                         dof_handler)
-      .get_interpolated_dof_values(in, out);
-  else
-    DoFCellAccessor<dim, spacedim, false>(&cell.value()->get_triangulation(),
-                                          cell.value()->level(),
-                                          cell.value()->index(),
-                                          dof_handler)
-      .get_interpolated_dof_values(in, out);
+  switch (cell.value().index())
+    {
+      case 1:
+        std::get<1>(cell.value())->get_interpolated_dof_values(in, out);
+        break;
+
+      case 2:
+        std::get<2>(cell.value())->get_interpolated_dof_values(in, out);
+        break;
+
+      default:
+        Assert(false, ExcNeedsDoFHandler());
+        break;
+    }
 }
 
 
@@ -192,21 +214,32 @@ FEValuesBase<dim, spacedim>::CellIteratorContainer::get_interpolated_dof_values(
   Vector<IndexSet::value_type> &out) const
 {
   Assert(is_initialized(), ExcNotReinited());
-  Assert(dof_handler != nullptr, ExcNeedsDoFHandler());
-  Assert(level_dof_access == false, ExcNotImplemented());
 
-  const DoFCellAccessor<dim, spacedim, false> cell_dofs(
-    &cell.value()->get_triangulation(),
-    cell.value()->level(),
-    cell.value()->index(),
-    dof_handler);
+  switch (cell.value().index())
+    {
+      case 1:
+        {
+          const typename DoFHandler<dim, spacedim>::cell_iterator cell =
+            std::get<1>(this->cell.value());
 
-  std::vector<types::global_dof_index> dof_indices(
-    cell_dofs.get_fe().n_dofs_per_cell());
-  cell_dofs.get_dof_indices(dof_indices);
+          std::vector<types::global_dof_index> dof_indices(
+            cell->get_fe().n_dofs_per_cell());
 
-  for (unsigned int i = 0; i < cell_dofs.get_fe().n_dofs_per_cell(); ++i)
-    out[i] = (in.is_element(dof_indices[i]) ? 1 : 0);
+          cell->get_dof_indices(dof_indices);
+
+          for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell(); ++i)
+            out[i] = (in.is_element(dof_indices[i]) ? 1 : 0);
+
+          break;
+        }
+      case 2:
+        Assert(false, ExcNotImplemented());
+        break;
+
+      default:
+        Assert(false, ExcNeedsDoFHandler());
+        break;
+    }
 }
 
 
