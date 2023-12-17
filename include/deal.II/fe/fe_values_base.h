@@ -1559,7 +1559,7 @@ protected:
    * degrees of freedom on this cell in the get_function_values() and assorted
    * functions.
    */
-  class CellIteratorContainer
+  class CellIteratorWrapper
   {
   public:
     DeclExceptionMsg(
@@ -1576,24 +1576,24 @@ protected:
      * Constructor. Creates an unusable object that is not associated with
      * any cell at all.
      */
-    CellIteratorContainer() = default;
+    CellIteratorWrapper() = default;
 
     /**
      * Constructor.
      */
-    CellIteratorContainer(
+    CellIteratorWrapper(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell);
 
     /**
      * Constructor.
      */
-    CellIteratorContainer(
+    CellIteratorWrapper(
       const typename DoFHandler<dim, spacedim>::cell_iterator &cell);
 
     /**
      * Constructor.
      */
-    CellIteratorContainer(
+    CellIteratorWrapper(
       const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell);
 
     /**
@@ -1644,7 +1644,7 @@ protected:
    * is necessary for the <tt>get_function_*</tt> functions as well as the
    * functions of same name in the extractor classes.
    */
-  CellIteratorContainer present_cell;
+  CellIteratorWrapper present_cell;
 
   /**
    * A signal connection we use to ensure we get informed whenever the
