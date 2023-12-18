@@ -160,35 +160,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: setup apt repo
-      run: |
-        # download the key to system keyring
-        wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
-        # add signed entry to apt sources and configure the APT client to use Intel repository:
-        echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-        sudo apt-get update
-    - name: collect versioned dependencies of apt packages
-      run : |
-        # oneapi-ci/scripts/apt_depends.sh
-        apt-cache depends intel-oneapi-compiler-dpcpp-cpp \
-                          intel-oneapi-mpi-devel \
-                          intel-oneapi-mkl-devel \
-                          intel-oneapi-tbb-devel | tee dependencies.txt
-    - name: cache install
-      id: cache-install
-      uses: actions/cache@v4
+    - uses: rscohn2/setup-oneapi@v0
       with:
-        path: /opt/intel/oneapi
-        key: install-${{ hashFiles('**/dependencies.txt') }}
-    - name: install
-      if: steps.cache-install.outputs.cache-hit != 'true'
-      run: |
-        # oneapi-ci/scripts/install_linux_apt.sh
-        sudo apt-get install -y intel-oneapi-compiler-dpcpp-cpp \
-                                intel-oneapi-mpi-devel \
-                                intel-oneapi-mkl-devel \
-                                intel-oneapi-tbb-devel
-        sudo apt-get clean
+        components: |
+          icx
+          impi
+          mkl
+          tbb
     - name: info
       run: |
         source /opt/intel/oneapi/setvars.sh
