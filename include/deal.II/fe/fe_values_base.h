@@ -1558,8 +1558,18 @@ protected:
    * to the present cell in order to be able to extract the values of the
    * degrees of freedom on this cell in the get_function_values() and assorted
    * functions.
+   *
+   * The problem is that the iterators given to the various reinit() functions
+   * can either be Triangulation iterators, or DoFHandler cell or level
+   * iterators. All three are valid, and provide different functionality that is
+   * used in different contexts; as a consequence we need to be able to store
+   * all three. This class provides the ability to store an object of any of
+   * these types, via a member variable that is a std::variant that encapsulates
+   * an object of any of the three types. Because a std::variant always stores
+   * an object of *one* of these types, we wrap the std::variant object into a
+   * std::optional that allows us to encode a "not yet initialized" state.
    */
-  class CellIteratorContainer
+  class CellIteratorWrapper
   {
   public:
     DeclExceptionMsg(
@@ -1576,24 +1586,24 @@ protected:
      * Constructor. Creates an unusable object that is not associated with
      * any cell at all.
      */
-    CellIteratorContainer() = default;
+    CellIteratorWrapper() = default;
 
     /**
      * Constructor.
      */
-    CellIteratorContainer(
+    CellIteratorWrapper(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell);
 
     /**
      * Constructor.
      */
-    CellIteratorContainer(
+    CellIteratorWrapper(
       const typename DoFHandler<dim, spacedim>::cell_iterator &cell);
 
     /**
      * Constructor.
      */
-    CellIteratorContainer(
+    CellIteratorWrapper(
       const typename DoFHandler<dim, spacedim>::level_cell_iterator &cell);
 
     /**
@@ -1626,14 +1636,6 @@ protected:
     get_interpolated_dof_values(const ReadVector<Number> &in,
                                 Vector<Number>           &out) const;
 
-    /**
-     * Call @p get_interpolated_dof_values of the iterator with the
-     * given arguments.
-     */
-    void
-    get_interpolated_dof_values(const IndexSet               &in,
-                                Vector<IndexSet::value_type> &out) const;
-
   private:
     /**
      * The cell in question, if one has been assigned to this object. The
@@ -1652,7 +1654,7 @@ protected:
    * is necessary for the <tt>get_function_*</tt> functions as well as the
    * functions of same name in the extractor classes.
    */
-  CellIteratorContainer present_cell;
+  CellIteratorWrapper present_cell;
 
   /**
    * A signal connection we use to ensure we get informed whenever the
