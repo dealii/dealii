@@ -178,7 +178,7 @@ namespace Step42
   // strain to the stress according to the projection given above,
   // when evaluated at a particular strain point. We need this
   // function to calculate the nonlinear residual in
-  // <code>PlasticityContactProblem::residual_nl_system()</code> where
+  // <code>PlasticityContactProblem::compute_nonlinear_residual()</code> where
   // we multiply this tensor with the strain given in a quadrature
   // point. The computations follow the formulas laid out in the
   // introduction. In comparing the formulas there with the
@@ -226,8 +226,9 @@ namespace Step42
   // linearization point. The function returns the derivative of the nonlinear
   // constitutive law in the variable stress_strain_tensor, as well as the
   // stress-strain tensor of the linearized problem in
-  // stress_strain_tensor_linearized.  See
-  // PlasticityContactProblem::assemble_nl_system where this function is used.
+  // stress_strain_tensor_linearized. See
+  // `PlasticityContactProblem::assemble_newton_system()` where this function
+  // is used.
   template <int dim>
   void ConstitutiveLaw<dim>::get_linearized_stress_strain_tensors(
     const SymmetricTensor<2, dim> &strain_tensor,
