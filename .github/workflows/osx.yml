@@ -47,7 +47,7 @@ jobs:
         make VERBOSE=1 -j2
         make -j3 test # quicktests
     - name: upload CMakeCongiureLog
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       continue-on-error: true
       with:
@@ -91,7 +91,7 @@ jobs:
         make VERBOSE=1 -j2
         make -j3 test #quicktests
     - name: upload CMakeConfigureLog
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       continue-on-error: true
       with:
