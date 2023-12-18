@@ -399,7 +399,7 @@ jobs:
               ..
         cat detailed.log
     - name: archive detailed.log
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: linux-cuda-clang-detailed.log
         path: build/detailed.log
