@@ -442,11 +442,11 @@ namespace TriangulationDescription
             tria, coinciding_vertex_groups, vertex_to_coinciding_vertex_group);
         }
 
-        template <typename T>
-        T
+        template <typename DescriptionType>
+        DescriptionType
         create_description_for_rank(const unsigned int my_rank) const
         {
-          T construction_data;
+          DescriptionType construction_data;
 
           set_additional_data(construction_data);
 
