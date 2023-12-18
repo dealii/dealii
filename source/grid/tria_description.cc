@@ -741,41 +741,46 @@ namespace TriangulationDescription
       const TriangulationDescription::Settings    settings,
       const unsigned int                          my_rank_in)
     {
-      if (const auto tria_pdt = dynamic_cast<
-            const parallel::distributed::Triangulation<dim, spacedim> *>(&tria))
-        Assert(comm == tria_pdt->get_communicator(),
-               ExcMessage("MPI communicators do not match."));
+      if (const auto ptria =
+            dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+              &tria))
+        {
+          Assert(comm == ptria->get_communicator(),
+                 ExcMessage("MPI communicators do not match."));
+          Assert(my_rank_in == numbers::invalid_unsigned_int ||
+                   my_rank_in == dealii::Utilities::MPI::this_mpi_process(comm),
+                 ExcMessage(
+                   "For creation from a parallel::Triangulation, "
+                   "my_rank has to equal the rank of the current process "
+                   "in the given communicator."));
+        }
+
+      // If we are dealing with a sequential triangulation, then someone
+      // will have needed to set the subdomain_ids by hand. Make sure that
+      // all ids we see are less than the number of processes we are
+      // supposed to split the triangulation into.
+      if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+            &tria) == nullptr)
+        {
+#if DEBUG
+          const unsigned int n_mpi_processes =
+            dealii::Utilities::MPI::n_mpi_processes(comm);
+          for (const auto &cell : tria.active_cell_iterators())
+            Assert(cell->subdomain_id() < n_mpi_processes,
+                   ExcMessage("You can't have a cell with subdomain_id of " +
+                              std::to_string(cell->subdomain_id()) +
+                              " when splitting the triangulation using an MPI "
+                              " communicator with only " +
+                              std::to_string(n_mpi_processes) + " processes."));
+#endif
+        }
 
       // First, figure out for what rank we are supposed to build the
       // TriangulationDescription::Description object
-      unsigned int my_rank = my_rank_in;
-      Assert(my_rank == numbers::invalid_unsigned_int ||
-               my_rank < dealii::Utilities::MPI::n_mpi_processes(comm),
-             ExcMessage("Rank has to be smaller than available processes."));
-
-      if (auto tria_pdt = dynamic_cast<
-            const parallel::distributed::Triangulation<dim, spacedim> *>(&tria))
-        {
-          Assert(my_rank == numbers::invalid_unsigned_int ||
-                   my_rank == dealii::Utilities::MPI::this_mpi_process(comm),
-                 ExcMessage(
-                   "For creation from a parallel::distributed::Triangulation, "
-                   "my_rank has to equal global rank."));
-
-          my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
-        }
-      else if (auto tria_serial =
-                 dynamic_cast<const dealii::Triangulation<dim, spacedim> *>(
-                   &tria))
-        {
-          if (my_rank == numbers::invalid_unsigned_int)
-            my_rank = dealii::Utilities::MPI::this_mpi_process(comm);
-        }
-      else
-        {
-          Assert(false,
-                 ExcMessage("This type of triangulation is not supported!"));
-        }
+      const unsigned int my_rank =
+        (my_rank_in == numbers::invalid_unsigned_int ?
+           dealii::Utilities::MPI::this_mpi_process(comm) :
+           my_rank_in);
 
       const auto subdomain_id_function = [](const auto &cell) {
         return cell->subdomain_id();
