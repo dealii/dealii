@@ -54,9 +54,9 @@ The classical formulation of the problem possesses the following form:
  \sigma &= \nabla u & &\quad\text{in } \Omega,\\
  u(\mathbf x) &= 0 & &\quad\text{on }\partial\Omega,\\
 (-\Delta u - f)(u - g) &= 0 & &\quad\text{in } \Omega,\\
- u(\mathbf x) &\geq g(\mathbf x) & &\quad\text{in } \Omega
+ u(\mathbf x) &\geq g(\mathbf x) & &\quad\text{in } \Omega,
 @f}
-with $u\in H^2(\Omega)$.  $u$ is a scalar valued function that denotes the
+where $u$ is a scalar valued function that denotes the
 vertical displacement of the membrane. The first equation is called equilibrium
 condition with a force of areal density $f$. Here, we will consider this force
 to be gravity. The second one is known as Hooke's Law that says that the stresses
