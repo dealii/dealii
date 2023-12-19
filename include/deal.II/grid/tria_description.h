@@ -470,69 +470,90 @@ namespace TriangulationDescription
   namespace Utilities
   {
     /**
-     * Construct TriangulationDescription::Description from a given
-     * partitioned triangulation `tria` and a specified process.
+     * Construct a TriangulationDescription::Description object that for the
+     * current process, using a given triangulation `tria` describes how
+     * one can re-create a partitioned triangulation (such as a
+     * parallel::fullydistributed::Triangulation).
      * The input triangulation can be either
      * a serial triangulation of type dealii::Triangulation which has been
-     * colored (subdomain_id and/or level_subdomain_id has been set) or a
-     * distributed triangulation of type
-     * dealii::parallel::distributed::Triangulation, where the partitioning is
-     * adopted unaltered.
+     * colored (i.e., for which the subdomain_id and/or level_subdomain_id have
+     * been set to create partitions), or a distributed triangulation of type
+     * dealii::parallel::distributed::Triangulation, where the output of
+     * this function takes over the existing partitioning unaltered.
      *
-     * Example for a serial Triangulation:
-     *
+     * An example for a serial Triangulation looks like this:
      * @code
      * Triangulation<dim, spacedim> tria_base;
      *
-     * // fill serial triangulation (e.g., read external mesh)
+     * // Create a serial triangulation (here by reading an external mesh):
      * GridIn<dim, spacedim> grid_in;
      * grid_in.attach_triangulation(tria_base);
      * grid_in.read(file_name);
      *
-     * // partition serial triangulation
+     * // Partition serial triangulation:
      * GridTools::partition_triangulation(
      *   Utilities::MPI::n_mpi_processes(comm), tria_base);
      *
-     * // create description
+     * // Create building blocks:
      * const TriangulationDescription::Description<dim, spacedim> description =
      *   TriangulationDescription::Utilities::
      *     create_description_from_triangulation(tria_base, comm);
      *
-     * // create triangulation
+     * // Create a fully distributed triangulation:
      * parallel::fullydistributed::Triangulation<dim, spacedim> tria_pft(comm);
      * tria_pft.create_triangulation(description);
      * @endcode
+     * In this example, *all* processes in a parallel universe read the same
+     * mesh, and partition it in the same way based on the subdomain ids set
+     * by GridTools::partition_triangulation(). Then, on each process,
+     * the current function creates building blocks that extract information
+     * about those cells whose subdomain ids match the current process's
+     * rank (plus perhaps other necessary information), and in a last step,
+     * we create a fully distributed triangulation out of these building blocks.
      *
-     * Example for parallel::distributed::Triangulation (partitioning can be
-     * skipped, since the triangulation has already been partitioned by p4est):
-     *
+     * In contrast, when starting with a parallel::distributed::Triangulation
+     * object, partitioning can be skipped, since the triangulation has already
+     * been partitioned and the corresponding code looks as follows:
      * @code
      * parallel::distributed::Triangulation<dim, spacedim> tria_base(comm);
      *
-     * // fill tria_base (not shown)
+     * // Create a triangulation (not shown, see for example step-40)
+     * ...
      *
-     * // create triangulation
+     * // Create building blocks:
      * const TriangulationDescription::Description<dim, spacedim> description =
      *   TriangulationDescription::Utilities::
      *     create_description_from_triangulation(tria_base, comm);
      *
-     * // create triangulation
+     * // Create a fully distributed triangulation:
      * parallel::fullydistributed::Triangulation<dim, spacedim> tria_pft(comm);
      * tria_pft.create_triangulation(description);
      * @endcode
+     * This code therefore takes a dealii::parallel::distributed::Triangulation
+     * object (such as the ones used, for example, in step-40 and many other
+     * tutorial programs) and converts it into a
+     * dealii::parallel::fullydistributed::Triangulation.
      *
-     * @param tria Partitioned input triangulation.
-     * @param comm MPI_Communicator to be used. In the case
-     *   of dealii::parallel::distributed::Triangulation, the communicators have
-     * to match.
-     * @param settings See the description of the Settings enumerator.
-     * @param my_rank_in Construct Description for the specified rank (only
-     *   working for serial triangulations that have been partitioned by
-     *   functions like GridTools::partition_triangulation()).
-     * @return Description to be used to set up a Triangulation.
+     * @param[in] tria The input triangulation. This function uses the
+     * partitioning provided by either explicitly setting subdomain_ids (if the
+     * triangulation is sequential) or based on how the existing triangulation
+     * is already distributed to different processes.
+     * @param[in] comm The MPI communicator to be used. If the input
+     * triangulation is parallel, then the communicators have to match.
+     * @param[in] settings See the description of the Settings enumerator.
+     * @param[in] my_rank_in Construct Description for the specified rank. This
+     *   parameter can only be set for serial input triangulations that have
+     * been partitioned by functions like GridTools::partition_triangulation().
+     * For parallel input triangulations, `my_rank_in` needs to equal to the
+     * default value, or to the rank of the current process within the given
+     *   communicator.
+     * @return The Description object that can then be used to set up a
+     *   dealii::parallel::fullydistributed::Triangulation.
      *
-     * @note If construct_multigrid_hierarchy is set in the settings, the source
-     *   triangulation has to be set up with limit_level_difference_at_vertices.
+     * @note If `construct_multigrid_hierarchy` is set in the @p settings, then
+     *   the input triangulation has to be set up with
+     *   `limit_level_difference_at_vertices` among the triangulation's
+     * smoothing flags provided to the triangulation constructor.
      */
     template <int dim, int spacedim = dim>
     Description<dim, spacedim>
@@ -544,14 +565,16 @@ namespace TriangulationDescription
       const unsigned int my_rank_in = numbers::invalid_unsigned_int);
 
     /**
-     * Similar to the above function but the owner of active cells are provided
-     * by a cell vector (see also
+     * Similar to the above function but the desired owners of active cells are
+     * not provided via the subdomain_ids of cells, but rather by the
+     * corresponding values of a cell vector (see also
      * parallel::TriangulationBase::global_active_cell_index_partitioner() and
-     * CellAccessor::global_active_cell_index()). This function allows to
-     * repartition distributed Triangulation objects.
+     * CellAccessor::global_active_cell_index()). This function allows
+     * repartitioning Triangulation objects that are already distributed and
+     * that may be partitioned differently than the desired partitioning.
      *
-     * If the setup of multigrid levels is requested, they are partitioned
-     * according to a first-child policy.
+     * If the setup of multigrid levels is requested by the @p settings argument,
+     * they are partitioned according to a first-child policy.
      *
      * @note The communicator is extracted from the vector @p partition.
      *
@@ -560,7 +583,7 @@ namespace TriangulationDescription
      *   subcommunicator need to set up the local triangulation with the
      *   special-purpose communicator MPI_COMM_NULL.
      *
-     * @note The multgrid levels are currently not constructed, since
+     * @note The multigrid levels are currently not constructed, since
      *   @p partition only describes the partitioning of the active level.
      */
     template <int dim, int spacedim>
