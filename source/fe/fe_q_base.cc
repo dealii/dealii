@@ -1170,9 +1170,9 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
             break;
 
           case 2:
-            // in 2d, only face_flip has a meaning. if it is set, consider
-            // dofs in reverse order
-            if (face_flip == false)
+            // in 2d, only face_orientation has a meaning. if it is false (i.e.,
+            // the non-default case), then consider dofs in reverse order
+            if (face_orientation == true)
               adjusted_dof_index_on_line = dof_index_on_line;
             else
               adjusted_dof_index_on_line =

@@ -2472,17 +2472,9 @@ namespace GridTools
         // value so we have to do an additional translation step
         else if (dim == 2)
           {
-            // In 2D, calls in set_periodicity_constraints() ultimately require
-            // calling FiniteElement::face_to_cell_index(), which in turn (for
-            // hypercubes) calls GeometryInfo<2>::child_cell_on_face(). The
-            // final function assumes that orientation in 2D is encoded solely
-            // in face_flip (the second bit) whereas the orientation bit is
-            // ignored. Hence, the backwards orientation is 1 + 2 and the
-            // standard orientation is 1 + 0.
-            constexpr std::array<unsigned int, 2> translation{{3, 1}};
-            AssertIndexRange(combined_orientation, translation.size());
-            orientation =
-              translation[std::min<unsigned int>(combined_orientation, 1u)];
+            // In 2D only the first bit (orientation) is set
+            AssertIndexRange(combined_orientation, 2);
+            orientation = combined_orientation;
           }
         else
           {

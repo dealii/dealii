@@ -739,10 +739,8 @@ namespace internal
          * In 1d, face_flip is always false as there is no such concept as
          * "flipped" faces in 1d.
          *
-         * In 2d, we currently only support meshes where all faces are in
-         * standard orientation, so the result is also false. This also
-         * matches the fact that one can *always* orient faces in 2d in such a
-         * way that the don't need to be flipped
+         * In 2d the orientation is a single bit (i.e., the orientation of a
+         * line) encoded in face_orientation so face_flip is also always false.
          */
         return false;
       }

@@ -1865,6 +1865,14 @@ ReferenceCell::face_to_cell_vertices(
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
+  // TODO: once the default orientation is switched to 0 then we can remove this
+  // special case for 1D.
+  if (get_dimension() == 1)
+    Assert(combined_face_orientation ==
+             ReferenceCell::default_combined_face_orientation(),
+           ExcMessage("In 1D, all cells must have the default orientation."));
+  else
+    AssertIndexRange(combined_face_orientation, n_face_orientations(face));
 
   switch (this->kind)
     {

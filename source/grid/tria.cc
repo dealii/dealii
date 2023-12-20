@@ -1665,7 +1665,7 @@ namespace
                       "(face_orientation, face_flip, face_rotation) "
                       "is invalid for 1d"));
 
-    Assert((dim != 2) || (face_orientation == true && face_rotation == false),
+    Assert((dim != 2) || (face_flip == false && face_rotation == false),
            ExcMessage("The supplied orientation "
                       "(face_orientation, face_flip, face_rotation) "
                       "is invalid for 2d"));
@@ -1731,10 +1731,10 @@ namespace
         // see Documentation of GeometryInfo for details
 
         static const int lookup_table_2d[2][2] =
-          //               flip:
+          //               orientation:
           {
-            {0, 1}, // false
-            {1, 0}  // true
+            {1, 0}, // false
+            {0, 1}  // true
           };
 
         static const int lookup_table_3d[2][2][2][4] =
@@ -1779,7 +1779,7 @@ namespace
                     switch (dim)
                       {
                         case 2:
-                          j = lookup_table_2d[face_flip][i];
+                          j = lookup_table_2d[face_orientation][i];
                           break;
                         case 3:
                           j = lookup_table_3d[face_orientation][face_flip]
