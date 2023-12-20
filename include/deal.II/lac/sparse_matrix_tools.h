@@ -144,42 +144,6 @@ namespace SparseMatrixTools
   namespace internal
   {
     template <typename T>
-    std::tuple<T, T>
-    compute_prefix_sum(const T &value, const MPI_Comm comm)
-    {
-#  ifndef DEAL_II_WITH_MPI
-      (void)comm;
-      return {0, value};
-#  else
-      if (Utilities::MPI::n_mpi_processes(comm) == 1)
-        return {0, value};
-      else
-        {
-          T prefix = {};
-
-          // First obtain every process's prefix sum:
-          int ierr =
-            MPI_Exscan(&value,
-                       &prefix,
-                       1,
-                       Utilities::MPI::mpi_type_id_for_type<decltype(value)>,
-                       MPI_SUM,
-                       comm);
-          AssertThrowMPI(ierr);
-
-          // Then we also need the total sum. We could obtain it by
-          // calling Utilities::MPI::sum(), but it is cheaper if we
-          // broadcast it from the last process, which can compute it
-          // from its own prefix sum plus its own value.
-          T sum = Utilities::MPI::broadcast(
-            comm, prefix + value, Utilities::MPI::n_mpi_processes(comm) - 1);
-
-          return {prefix, sum};
-        }
-#  endif
-    }
-
-    template <typename T>
     using get_mpi_communicator_t =
       decltype(std::declval<const T>().get_mpi_communicator());
 
@@ -246,8 +210,9 @@ namespace SparseMatrixTools
     {
       std::vector<unsigned int> dummy(locally_active_dofs.n_elements());
 
-      const auto local_size              = get_local_size(system_matrix);
-      const auto [prefix_sum, total_sum] = compute_prefix_sum(local_size, comm);
+      const auto local_size = get_local_size(system_matrix);
+      const auto [prefix_sum, total_sum] =
+        Utilities::MPI::partial_and_total_sum(local_size, comm);
       IndexSet locally_owned_dofs(total_sum);
       locally_owned_dofs.add_range(prefix_sum, prefix_sum + local_size);
 
@@ -495,7 +460,7 @@ namespace SparseMatrixTools
   {
     // 0) determine which rows are locally owned and which ones are remote
     const auto local_size = internal::get_local_size(system_matrix);
-    const auto prefix_sum = internal::compute_prefix_sum(
+    const auto prefix_sum = Utilities::MPI::partial_and_total_sum(
       local_size, internal::get_mpi_communicator(system_matrix));
     IndexSet locally_owned_dofs(std::get<1>(prefix_sum));
     locally_owned_dofs.add_range(std::get<0>(prefix_sum),
