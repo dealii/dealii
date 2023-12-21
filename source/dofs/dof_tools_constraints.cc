@@ -2355,7 +2355,7 @@ namespace DoFTools
                       "(face_orientation, face_flip, face_rotation) "
                       "is invalid for 1d"));
 
-    Assert((dim != 2) || (face_orientation == true && face_rotation == false),
+    Assert((dim != 2) || (face_flip == false && face_rotation == false),
            ExcMessage("The supplied orientation "
                       "(face_orientation, face_flip, face_rotation) "
                       "is invalid for 2d"));

@@ -4410,8 +4410,8 @@ inline unsigned int
 GeometryInfo<2>::child_cell_on_face(const RefinementCase<2> &ref_case,
                                     const unsigned int       face,
                                     const unsigned int       subface,
-                                    const bool /*face_orientation*/,
-                                    const bool face_flip,
+                                    const bool               face_orientation,
+                                    const bool /*face_flip*/,
                                     const bool /*face_rotation*/,
                                     const RefinementCase<1> &)
 {
@@ -4430,19 +4430,19 @@ GeometryInfo<2>::child_cell_on_face(const RefinementCase<2> &ref_case,
             [/* number of different ways to refine a cell */ 4]
             [/* faces_per_cell */ 4][/* max_children_per_face */ 2] = {
               {
-                // Normal orientation (face_flip = false)
-                {{0, 0}, {1, 1}, {0, 1}, {0, 1}}, // cut_x
-                {{0, 1}, {0, 1}, {0, 0}, {1, 1}}, // cut_y
-                {{0, 2}, {1, 3}, {0, 1}, {2, 3}}  // cut_xy, i.e., isotropic
-              },
-              {
-                // Flipped orientation (face_flip = true)
+                // Flipped orientation (face_orientation = false)
                 {{0, 0}, {1, 1}, {1, 0}, {1, 0}}, // cut_x
                 {{1, 0}, {1, 0}, {0, 0}, {1, 1}}, // cut_y
                 {{2, 0}, {3, 1}, {1, 0}, {3, 2}}  // cut_xy, i.e., isotropic
+              },
+              {
+                // Normal orientation (face_orientation = true)
+                {{0, 0}, {1, 1}, {0, 1}, {0, 1}}, // cut_x
+                {{0, 1}, {0, 1}, {0, 0}, {1, 1}}, // cut_y
+                {{0, 2}, {1, 3}, {0, 1}, {2, 3}}  // cut_xy, i.e., isotropic
               }};
 
-  return subcells[face_flip][ref_case - 1][face][subface];
+  return subcells[face_orientation][ref_case - 1][face][subface];
 }
 
 

@@ -198,8 +198,8 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler)
 
 
   std::bitset<3> orientation;
-  orientation[0] = 1;
-  orientation[1] = 1;
+  orientation[0] = 0;
+  orientation[1] = 0;
   orientation[2] = 0;
 
   DoFTools::make_periodicity_constraints(face_1,

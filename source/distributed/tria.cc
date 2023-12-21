@@ -3748,13 +3748,13 @@ namespace parallel
           // p4est wants to know which corner the first corner on
           // the face with the lower id is mapped to on the face with
           // with the higher id. For d==2 there are only two possibilities
-          // that are determined by it->orientation[1].
-          // For d==3 we have to use GridTools::OrientationLookupTable.
+          // that are determined by it->orientation[0] (the face_orientation
+          // flag). For d==3 we have to use GridTools::OrientationLookupTable.
           // The result is given below.
 
           unsigned int p4est_orientation = 0;
           if (dim == 2)
-            p4est_orientation = face_pair.orientation[1];
+            p4est_orientation = face_pair.orientation[0] == true ? 0u : 1u;
           else
             {
               const unsigned int  face_idx_list[] = {face_left, face_right};

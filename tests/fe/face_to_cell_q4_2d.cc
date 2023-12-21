@@ -15,8 +15,8 @@
 
 
 // it turns out that FE_Q::face_to_cell_index() had a bug for elements beyond
-// Q2 when using the face flip flag. this test is for the 2d case for the Q4
-// case
+// Q2 when using the face orientation flag. this test is for the 2d case for the
+// Q4 case
 
 #include <deal.II/fe/fe_q.h>
 
@@ -35,13 +35,17 @@ test()
     {
       deallog << "Face=" << face << std::endl;
 
-      for (int flip = 0; flip < 2; ++flip)
+      for (int orientation = 0; orientation < 2; ++orientation)
         {
-          deallog << "  flip=" << (flip == 0 ? "false" : "true") << std::endl
+          deallog << "  orientation=" << (orientation == 0 ? "false" : "true")
+                  << std::endl
                   << "    ";
           for (unsigned int i = 0; i < dofs_per_face; ++i)
-            deallog << fe.face_to_cell_index(
-                         i, face, true, (flip == 0 ? false : true), false)
+            deallog << fe.face_to_cell_index(i,
+                                             face,
+                                             (orientation == 0 ? false : true),
+                                             false,
+                                             false)
                     << " - ";
           deallog << std::endl;
         }
