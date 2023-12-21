@@ -304,29 +304,11 @@ namespace RepartitioningPolicyTools
     for (const auto &weight : weights)
       process_local_weight += weight;
 
-    // determine partial sum of weights of this process
-    std::uint64_t process_local_weight_offset = 0;
-
-    int ierr = MPI_Exscan(
-      &process_local_weight,
-      &process_local_weight_offset,
-      1,
-      Utilities::MPI::mpi_type_id_for_type<decltype(process_local_weight)>,
-      MPI_SUM,
-      tria->get_communicator());
-    AssertThrowMPI(ierr);
-
-    // total weight of all processes
-    std::uint64_t total_weight =
-      process_local_weight_offset + process_local_weight;
-
-    ierr =
-      MPI_Bcast(&total_weight,
-                1,
-                Utilities::MPI::mpi_type_id_for_type<decltype(total_weight)>,
-                n_subdomains - 1,
-                mpi_communicator);
-    AssertThrowMPI(ierr);
+    // determine partial sum of weights of this process, as well as the total
+    // weight
+    const auto [process_local_weight_offset, total_weight] =
+      Utilities::MPI::partial_and_total_sum(process_local_weight,
+                                            tria->get_communicator());
 
     // set up partition
     LinearAlgebra::distributed::Vector<double> partition(partitioner);

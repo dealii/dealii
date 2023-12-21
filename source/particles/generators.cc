@@ -312,18 +312,21 @@ namespace Particles
                                          cumulative_cell_weights.back() :
                                          0.0;
 
-        double global_weight_integral;
+
+        double local_start_weight     = numbers::signaling_nan<double>();
+        double global_weight_integral = numbers::signaling_nan<double>();
 
         if (const auto tria =
               dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
                 &triangulation))
           {
-            global_weight_integral =
-              Utilities::MPI::sum(local_weight_integral,
-                                  tria->get_communicator());
+            std::tie(local_start_weight, global_weight_integral) =
+              Utilities::MPI::partial_and_total_sum(local_weight_integral,
+                                                    tria->get_communicator());
           }
         else
           {
+            local_start_weight     = 0;
             global_weight_integral = local_weight_integral;
           }
 
@@ -336,25 +339,6 @@ namespace Particles
                       "provided function is positive in at least a "
                       "part of the domain; also check the syntax of "
                       "the function."));
-
-        // Determine the starting weight of this process, which is the sum of
-        // the weights of all processes with a lower rank
-        double local_start_weight = 0.0;
-
-#ifdef DEAL_II_WITH_MPI
-        if (const auto tria =
-              dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-                &triangulation))
-          {
-            const int ierr = MPI_Exscan(&local_weight_integral,
-                                        &local_start_weight,
-                                        1,
-                                        MPI_DOUBLE,
-                                        MPI_SUM,
-                                        tria->get_communicator());
-            AssertThrowMPI(ierr);
-          }
-#endif
 
         // Calculate start id
         start_particle_id =

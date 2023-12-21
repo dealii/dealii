@@ -1416,6 +1416,23 @@ namespace Utilities
            const std::function<T(const T &, const T &)> &combiner,
            const unsigned int                            root_process = 0);
 
+
+    /**
+     * For each process $p$ on a communicator with $P$ processes, compute both
+     * the (exclusive) partial sum $\sum_{i=0}^{p-1} v_i$ and the total
+     * sum $\sum_{i=0}^{P-1} v_i$, and return these two values as a pair.
+     * The former is computed via the `MPI_Exscan` function where the partial
+     * sum is typically called "(exclusive) scan" of the values $v_p$ provided
+     * by the individual processes. The term "prefix sum" is also used.
+     *
+     * This function is only available if `T` is a type natively supported
+     * by MPI.
+     */
+    template <typename T, typename = std::enable_if_t<is_mpi_type<T> == true>>
+    std::pair<T, T>
+    partial_and_total_sum(const T &value, const MPI_Comm comm);
+
+
     /**
      * A function that combines values @p local_value from all processes
      * via a user-specified binary operation @p combiner and distributes the
@@ -1967,6 +1984,44 @@ namespace Utilities
 
       return received_objects;
 #  endif // deal.II with MPI
+    }
+
+
+
+    template <typename T, typename>
+    std::pair<T, T>
+    partial_and_total_sum(const T &value, const MPI_Comm comm)
+    {
+#  ifndef DEAL_II_WITH_MPI
+      (void)comm;
+      return {0, value};
+#  else
+      if (Utilities::MPI::n_mpi_processes(comm) == 1)
+        return {0, value};
+      else
+        {
+          T prefix = {};
+
+          // First obtain every process's prefix sum:
+          int ierr =
+            MPI_Exscan(&value,
+                       &prefix,
+                       1,
+                       Utilities::MPI::mpi_type_id_for_type<decltype(value)>,
+                       MPI_SUM,
+                       comm);
+          AssertThrowMPI(ierr);
+
+          // Then we also need the total sum. We could obtain it by
+          // calling Utilities::MPI::sum(), but it is cheaper if we
+          // broadcast it from the last process, which can compute it
+          // from its own prefix sum plus its own value.
+          const T sum = Utilities::MPI::broadcast(
+            comm, prefix + value, Utilities::MPI::n_mpi_processes(comm) - 1);
+
+          return {prefix, sum};
+        }
+#  endif
     }
 
 

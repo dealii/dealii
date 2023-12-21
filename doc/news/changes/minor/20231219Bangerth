@@ -1,0 +1,3 @@
+New: There is now a function Utilities::MPI::partial_and_total_sum().
+<br>
+(Wolfgang Bangerth, 2023/12/19)

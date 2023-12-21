@@ -3694,14 +3694,10 @@ namespace internal
 
         // --------- Phase 4: shift indices so that each processor has a unique
         //                    range of indices
-        dealii::types::global_dof_index my_shift = 0;
-        const int                       ierr = MPI_Exscan(&n_locally_owned_dofs,
-                                    &my_shift,
-                                    1,
-                                    DEAL_II_DOF_INDEX_MPI_TYPE,
-                                    MPI_SUM,
-                                    triangulation->get_communicator());
-        AssertThrowMPI(ierr);
+        const auto [my_shift, n_global_dofs] =
+          Utilities::MPI::partial_and_total_sum(
+            n_locally_owned_dofs, triangulation->get_communicator());
+
 
         // make dof indices globally consecutive
         Implementation::enumerate_dof_indices_for_renumbering(
@@ -3714,11 +3710,6 @@ namespace internal
                                       IndexSet(0),
                                       *dof_handler,
                                       /*check_validity=*/false);
-
-        // now a little bit of housekeeping
-        const dealii::types::global_dof_index n_global_dofs =
-          Utilities::MPI::sum(n_locally_owned_dofs,
-                              triangulation->get_communicator());
 
         NumberCache number_cache;
         number_cache.n_global_dofs        = n_global_dofs;
@@ -3899,33 +3890,17 @@ namespace internal
 
             //* 3. communicate local dofcount and shift ids to make
             // them unique
-            dealii::types::global_dof_index my_shift = 0;
-            int ierr = MPI_Exscan(&level_number_cache.n_locally_owned_dofs,
-                                  &my_shift,
-                                  1,
-                                  DEAL_II_DOF_INDEX_MPI_TYPE,
-                                  MPI_SUM,
-                                  triangulation->get_communicator());
-            AssertThrowMPI(ierr);
-
-            // The last processor knows about the total number of dofs, so we
-            // can use a cheaper broadcast rather than an MPI_Allreduce via
-            // MPI::sum().
-            level_number_cache.n_global_dofs =
-              my_shift + level_number_cache.n_locally_owned_dofs;
-            ierr = MPI_Bcast(&level_number_cache.n_global_dofs,
-                             1,
-                             DEAL_II_DOF_INDEX_MPI_TYPE,
-                             Utilities::MPI::n_mpi_processes(
-                               triangulation->get_communicator()) -
-                               1,
-                             triangulation->get_communicator());
-            AssertThrowMPI(ierr);
+            const auto [my_shift, n_global_dofs] =
+              Utilities::MPI::partial_and_total_sum(
+                level_number_cache.n_locally_owned_dofs,
+                triangulation->get_communicator());
+            level_number_cache.n_global_dofs = n_global_dofs;
 
             // assign appropriate indices
+            types::global_dof_index next_free_index = my_shift;
             for (types::global_dof_index &index : renumbering)
               if (index == enumeration_dof_index)
-                index = my_shift++;
+                index = next_free_index++;
 
             // now re-enumerate all dofs to this shifted and condensed
             // numbering form.  we renumber some dofs as invalid, so
@@ -3943,7 +3918,8 @@ namespace internal
             level_number_cache.locally_owned_dofs =
               IndexSet(level_number_cache.n_global_dofs);
             level_number_cache.locally_owned_dofs.add_range(
-              my_shift - level_number_cache.n_locally_owned_dofs, my_shift);
+              next_free_index - level_number_cache.n_locally_owned_dofs,
+              next_free_index);
             level_number_cache.locally_owned_dofs.compress();
 
             number_caches.emplace_back(level_number_cache);
