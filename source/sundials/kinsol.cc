@@ -55,16 +55,17 @@ namespace SUNDIALS
 {
   template <typename VectorType>
   KINSOL<VectorType>::AdditionalData::AdditionalData(
-    const SolutionStrategy &strategy,
-    const unsigned int      maximum_non_linear_iterations,
-    const double            function_tolerance,
-    const double            step_tolerance,
-    const bool              no_init_setup,
-    const unsigned int      maximum_setup_calls,
-    const double            maximum_newton_step,
-    const double            dq_relative_error,
-    const unsigned int      maximum_beta_failures,
-    const unsigned int      anderson_subspace_size)
+    const SolutionStrategy         &strategy,
+    const unsigned int              maximum_non_linear_iterations,
+    const double                    function_tolerance,
+    const double                    step_tolerance,
+    const bool                      no_init_setup,
+    const unsigned int              maximum_setup_calls,
+    const double                    maximum_newton_step,
+    const double                    dq_relative_error,
+    const unsigned int              maximum_beta_failures,
+    const unsigned int              anderson_subspace_size,
+    const OrthogonalizationStrategy anderson_qr_orthogonalization)
     : strategy(strategy)
     , maximum_non_linear_iterations(maximum_non_linear_iterations)
     , function_tolerance(function_tolerance)
@@ -75,6 +76,7 @@ namespace SUNDIALS
     , dq_relative_error(dq_relative_error)
     , maximum_beta_failures(maximum_beta_failures)
     , anderson_subspace_size(anderson_subspace_size)
+    , anderson_qr_orthogonalization(anderson_qr_orthogonalization)
   {}
 
 
@@ -125,6 +127,30 @@ namespace SUNDIALS
     prm.enter_subsection("Fixed point and Picard parameters");
     prm.add_parameter("Anderson acceleration subspace size",
                       anderson_subspace_size);
+
+    static std::string orthogonalization_str("modified_gram_schmidt");
+    prm.add_parameter(
+      "Anderson QR orthogonalization",
+      orthogonalization_str,
+      "Choose among modified_gram_schmidt|inverse_compact|"
+      "classical_gram_schmidt|delayed_classical_gram_schmidt",
+      Patterns::Selection(
+        "modified_gram_schmidt|inverse_compact|classical_gram_schmidt|"
+        "delayed_classical_gram_schmidt"));
+    prm.add_action("Anderson QR orthogonalization",
+                   [&](const std::string &value) {
+                     if (value == "modified_gram_schmidt")
+                       anderson_qr_orthogonalization = modified_gram_schmidt;
+                     else if (value == "inverse_compact")
+                       anderson_qr_orthogonalization = inverse_compact;
+                     else if (value == "classical_gram_schmidt")
+                       anderson_qr_orthogonalization = classical_gram_schmidt;
+                     else if (value == "delayed_classical_gram_schmidt")
+                       anderson_qr_orthogonalization =
+                         delayed_classical_gram_schmidt;
+                     else
+                       Assert(false, ExcInternalError());
+                   });
     prm.leave_subsection();
   }
 
@@ -257,6 +283,21 @@ namespace SUNDIALS
     // From the manual: this must be called BEFORE KINInit
     status = KINSetMAA(kinsol_mem, data.anderson_subspace_size);
     AssertKINSOL(status);
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    // From the manual: this must be called BEFORE KINInit
+    status = KINSetOrthAA(kinsol_mem, data.anderson_qr_orthogonalization);
+    AssertKINSOL(status);
+#  else
+    AssertThrow(
+      data.anderson_qr_orthogonalization ==
+        AdditionalData::modified_gram_schmidt,
+      ExcMessage(
+        "You specified an orthogonalization strategy for QR factorization "
+        "different from the default (modified Gram-Schmidt) but the installed "
+        "SUNDIALS version does not support this feature. Either choose the "
+        "default or install a SUNDIALS version >= 6.0.0."));
+#  endif
 
     if (data.strategy == AdditionalData::fixed_point)
       status = KINInit(
