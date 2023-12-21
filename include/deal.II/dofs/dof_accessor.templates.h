@@ -1113,11 +1113,7 @@ namespace internal
                   fe_index,
                   [&](const auto d) {
                     return fe.adjust_quad_dof_index_for_face_orientation(
-                      d,
-                      face_no,
-                      accessor.face_orientation(face_no),
-                      accessor.face_flip(face_no),
-                      accessor.face_rotation(face_no));
+                      d, face_no, combined_orientation);
                   },
                   std::integral_constant<int, 2>(),
                   dof_indices_ptr,

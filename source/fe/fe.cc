@@ -646,11 +646,9 @@ FiniteElement<dim, spacedim>::face_to_cell_index(
 template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
-  const unsigned int index,
-  const unsigned int face,
-  const bool         face_orientation,
-  const bool         face_flip,
-  const bool         face_rotation) const
+  const unsigned int  index,
+  const unsigned int  face,
+  const unsigned char combined_orientation) const
 {
   // general template for 1d and 2d: not
   // implemented. in fact, the function
@@ -677,10 +675,7 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
         this->n_dofs_per_quad(face),
     ExcInternalError());
   return index + adjust_quad_dof_index_for_face_orientation_table[table_n](
-                   index,
-                   internal::combined_face_orientation(face_orientation,
-                                                       face_rotation,
-                                                       face_flip));
+                   index, combined_orientation);
 }
 
 

@@ -1458,19 +1458,16 @@ public:
                                  const unsigned int face_no = 0) const;
 
   /**
-   * For faces with non-standard face_orientation in 3d, the dofs on faces
-   * (quads) have to be permuted in order to be combined with the correct
-   * shape functions. Given a local dof @p index on a quad, return the local
-   * index, if the face has non-standard face_orientation, face_flip or
-   * face_rotation. In 2d and 1d there is no need for permutation and
-   * consequently an exception is thrown.
+   * Given a local dof @p index on a quad, return the local index accounting for
+   * the face orientation @p combined_orientation. This is only necessary in 3d:
+   * consequently, if this function is called in 1d or 2d then an exception is
+   * thrown.
    */
   unsigned int
-  adjust_quad_dof_index_for_face_orientation(const unsigned int index,
-                                             const unsigned int face_no,
-                                             const bool face_orientation,
-                                             const bool face_flip,
-                                             const bool face_rotation) const;
+  adjust_quad_dof_index_for_face_orientation(
+    const unsigned int  index,
+    const unsigned int  face_no,
+    const unsigned char combined_orientation) const;
 
   /**
    * Given an index in the natural ordering of indices on a face, return the
