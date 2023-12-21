@@ -540,6 +540,13 @@ namespace PETScWrappers
   void
   VectorBase::compress(const VectorOperation::values operation)
   {
+    Assert(has_ghost_elements() == false,
+           ExcMessage("Calling compress() is only useful if a vector "
+                      "has been written into, but this is a vector with ghost "
+                      "elements and consequently is read-only. It does "
+                      "not make sense to call compress() for such "
+                      "vectors."));
+
     {
 #  ifdef DEBUG
       // Check that all processors agree that last_action is the same (or none!)
