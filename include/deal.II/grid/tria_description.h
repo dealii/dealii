@@ -288,12 +288,22 @@ CellData<structdim>::serialize(Archive &ar, const unsigned int /*version*/)
 
 /**
  * A namespace dedicated to the struct Description, which can be used in
- * Triangulation::create_triangulation().
+ * one of the overloads of Triangulation::create_triangulation(). All
+ * triangulations in deal.II are, in one way or the other, created by
+ * calling Triangulation::create_triangulation(); for example, all of the
+ * functions in class GridIn and namespace GridGenerator call these
+ * functions. Most of these call the overload that takes a vector of
+ * vertices plus a vector of CellData objects that describe which vertices
+ * form each cell (along with some other information). But there are other
+ * overloads of Triangulation::create_triangulation() that require more
+ * elaborate descriptions of triangulations, and these typically use an
+ * object of type TriangulationDescription::Description declared in this
+ * namespace.
  */
 namespace TriangulationDescription
 {
   /**
-   * Configuration flags for Triangulations.
+   * Configuration flags for Triangulation objects.
    * Settings can be combined using bitwise OR.
    */
   enum Settings
@@ -311,16 +321,20 @@ namespace TriangulationDescription
   };
 
   /**
-   * Information needed for each locally relevant cell, stored in
-   * Description and used during construction of a
-   * Triangulation. This struct stores
-   * the cell id, the subdomain_id and the level_subdomain_id as well as
+   * This class stores information needed for creating a locally relevant
+   * cell when calling the overload of Triangulation::create_triangulation()
+   * that takes an object of type TriangulationDescription::Description.
+   * Objects of the current type are stored in Description. In contrast to
+   * the dealii::CellData class, the current class also stores information
+   * relevant for the parallel partitioning of a triangulation, such as
+   * a global cell id, the subdomain_id, and the level_subdomain_id as well as
    * information related to manifold_id and boundary_id.
    *
-   * @note Similarly to dealii::CellData, this structure stores information
-   * about a cell. However, in contrast to dealii::CellData, it also stores
-   * a unique id, partitioning information, and information related to cell
-   * faces and edges.
+   * In contrast to dealii::CellData, it does not store geometric information
+   * such as vertex locations. This information is only needed on the coarsest
+   * level of a triangulation (whereas the current structure is also used for
+   * refined levels of a triangulation) and is stored separately by
+   * the Description class.
    */
   template <int dim>
   struct CellData
@@ -389,8 +403,12 @@ namespace TriangulationDescription
     std::vector<std::pair<unsigned int, types::boundary_id>> boundary_ids;
   };
 
+
   /**
-   * Data used in Triangulation::create_triangulation().
+   * Data used in the Triangulation::create_triangulation() overloads that
+   * builds a triangulation out of objects of the current type. The contents
+   * of this kind of object are typically creates by functions such as
+   * TriangulationDescription::Utilities::create_description_from_triangulation().
    */
   template <int dim, int spacedim = dim>
   struct Description
