@@ -2245,6 +2245,10 @@ void
 CellAccessor<dim, spacedim>::set_direction_flag(
   const bool new_direction_flag) const
 {
+  // Some older compilers (GCC 9) print an unused variable warning about
+  // new_direction_flag when it is only used in a subset of 'if constexpr'
+  // statements
+  (void)new_direction_flag;
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   if constexpr (dim == spacedim)
     Assert(new_direction_flag == true,
