@@ -134,7 +134,16 @@ namespace parallel
       virtual ~Triangulation() = default;
 
       /**
-       * @copydoc deal.II/grid/tria.h Triangulation::create_triangulation(const TriangulationDescription::Description<dim, spacedim>&)
+       * Create a triangulation from the provided
+       * TriangulationDescription::Description.
+       *
+       * @note Don't forget to attach the manifolds with set_manifold() before
+       *   calling this function if manifolds are needed.
+       *
+       * @note The namespace TriangulationDescription::Utilities contains functions
+       *   to create TriangulationDescription::Description.
+       *
+       * @param construction_data The data needed for this process.
        *
        * @note This is the function to be used instead of
        * Triangulation::create_triangulation() for some of the other

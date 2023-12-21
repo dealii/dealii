@@ -211,7 +211,16 @@ namespace parallel
       const unsigned int level) const override;
 
     /**
-     * @copydoc deal.II/grid/tria.h Triangulation::get_boundary_ids()
+     * Return a vector containing all boundary indicators assigned to boundary
+     * faces of active cells of this Triangulation object. Note, that each
+     * boundary indicator is reported only once. The size of the return vector
+     * will represent the number of different indicators (which is greater or
+     * equal one).
+     *
+     * @ingroup boundary
+     *
+     * @see
+     * @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
      *
      * @note This function involves a global communication gathering all current
      *   IDs from all processes.
@@ -220,7 +229,16 @@ namespace parallel
     get_boundary_ids() const override;
 
     /**
-     * @copydoc deal.II/grid/tria.h Triangulation::get_manifold_ids()
+     * Return a vector containing all manifold indicators assigned to the
+     * objects of the active cells of this Triangulation. Note, that each
+     * manifold indicator is reported only once. The size of the return vector
+     * will represent the number of different indicators (which is greater or
+     * equal one).
+     *
+     * @ingroup manifold
+     *
+     * @see
+     * @ref GlossManifoldIndicator "Glossary entry on manifold indicators"
      *
      * @note This function involves a global communication gathering all current
      *   IDs from all processes.
@@ -370,9 +388,6 @@ namespace parallel
     virtual void
     update_number_cache();
 
-    /**
-     * @copydoc deal.II/grid/tria.h Triangulation::update_reference_cells()
-     */
     void
     update_reference_cells() override;
 
