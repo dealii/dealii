@@ -1497,15 +1497,8 @@ public:
    * index must be between zero and dofs_per_face.
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
-   * @param face_orientation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
-   * @param face_flip One part of the description of the orientation of the
-   * face. See
-   * @ref GlossFaceOrientation.
-   * @param face_rotation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
+   * @param combined_orientation The combined orientation flag containing the
+   * orientation, rotation, and flip of the face. See @ref GlossFaceOrientation.
    * @return The index of this degree of freedom within the set of degrees of
    * freedom on the entire cell. The returned value will be between zero and
    * dofs_per_cell.
@@ -1527,11 +1520,11 @@ public:
    * freedom actually represent.
    */
   virtual unsigned int
-  face_to_cell_index(const unsigned int face_dof_index,
-                     const unsigned int face,
-                     const bool         face_orientation = true,
-                     const bool         face_flip        = false,
-                     const bool         face_rotation    = false) const;
+  face_to_cell_index(
+    const unsigned int  face_dof_index,
+    const unsigned int  face,
+    const unsigned char combined_orientation =
+      ReferenceCell::default_combined_face_orientation()) const;
 
   /**
    * For lines with non-standard line_orientation in 3d, the dofs on lines

@@ -1113,11 +1113,10 @@ FE_Q_Base<dim, spacedim>::initialize_quad_dof_index_permutation()
 
 template <int dim, int spacedim>
 unsigned int
-FE_Q_Base<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
-                                             const unsigned int face,
-                                             const bool face_orientation,
-                                             const bool face_flip,
-                                             const bool face_rotation) const
+FE_Q_Base<dim, spacedim>::face_to_cell_index(
+  const unsigned int  face_index,
+  const unsigned int  face,
+  const unsigned char combined_orientation) const
 {
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, GeometryInfo<dim>::faces_per_cell);
@@ -1144,10 +1143,10 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
 
       // then get the number of this vertex on the cell and translate
       // this to a DoF number on the cell
-      return (GeometryInfo<dim>::face_to_cell_vertices(
-                face, face_vertex, face_orientation, face_flip, face_rotation) *
-                this->n_dofs_per_vertex() +
-              dof_index_on_vertex);
+      return this->reference_cell().face_to_cell_vertices(
+               face, face_vertex, combined_orientation) *
+               this->n_dofs_per_vertex() +
+             dof_index_on_vertex;
     }
   else if (face_index < this->get_first_face_quad_index(face))
     // DoF is on a face
@@ -1170,9 +1169,8 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
             break;
 
           case 2:
-            // in 2d, only face_orientation has a meaning. if it is false (i.e.,
-            // the non-default case), then consider dofs in reverse order
-            if (face_orientation == true)
+            if (combined_orientation ==
+                ReferenceCell::default_combined_face_orientation())
               adjusted_dof_index_on_line = dof_index_on_line;
             else
               adjusted_dof_index_on_line =
@@ -1188,8 +1186,8 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
             // that said, the Q2 case is easy enough to implement, as is the
             // case where everything is in standard orientation
             Assert((this->n_dofs_per_line() <= 1) ||
-                     ((face_orientation == true) && (face_flip == false) &&
-                      (face_rotation == false)),
+                     combined_orientation ==
+                       ReferenceCell::default_combined_face_orientation(),
                    ExcNotImplemented());
             adjusted_dof_index_on_line = dof_index_on_line;
             break;
@@ -1199,8 +1197,9 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
         }
 
       return (this->get_first_line_index() +
-              GeometryInfo<dim>::face_to_cell_lines(
-                face, face_line, face_orientation, face_flip, face_rotation) *
+              this->reference_cell().face_to_cell_lines(face,
+                                                        face_line,
+                                                        combined_orientation) *
                 this->n_dofs_per_line() +
               adjusted_dof_index_on_line);
     }
@@ -1217,8 +1216,8 @@ FE_Q_Base<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
       // just have to draw a bunch of pictures. in the meantime,
       // we can implement the Q2 case in which it is simple
       Assert((this->n_dofs_per_quad(face) <= 1) ||
-               ((face_orientation == true) && (face_flip == false) &&
-                (face_rotation == false)),
+               combined_orientation ==
+                 ReferenceCell::default_combined_face_orientation(),
              ExcNotImplemented());
       return (this->get_first_quad_index(face) + index);
     }

@@ -2192,11 +2192,8 @@ namespace VectorTools
             dof_values(i) +=
               tmp * (normals[q_point] *
                      fe_values[vec].value(
-                       fe.face_to_cell_index(i,
-                                             face,
-                                             cell->face_orientation(face),
-                                             cell->face_flip(face),
-                                             cell->face_rotation(face)),
+                       fe.face_to_cell_index(
+                         i, face, cell->combined_face_orientation(face)),
                        q_point));
         }
 
@@ -2213,9 +2210,7 @@ namespace VectorTools
             fe.get_nonzero_components(fe.face_to_cell_index(
               i,
               face,
-              cell->face_orientation(face),
-              cell->face_flip(face),
-              cell->face_rotation(face)))[first_vector_component])
+              cell->combined_face_orientation(face)))[first_vector_component])
           constraints.add_constraint(face_dof_indices[i],
                                      {},
                                      (std::abs(dof_values[i]) > 1e-14 ?
@@ -2303,11 +2298,8 @@ namespace VectorTools
             dof_values_local(i) +=
               tmp * (normals[q_point] *
                      fe_values[vec].value(
-                       fe.face_to_cell_index(i,
-                                             face,
-                                             cell->face_orientation(face),
-                                             cell->face_flip(face),
-                                             cell->face_rotation(face)),
+                       fe.face_to_cell_index(
+                         i, face, cell->combined_face_orientation(face)),
                        q_point));
         }
 
@@ -2322,9 +2314,7 @@ namespace VectorTools
             fe.get_nonzero_components(fe.face_to_cell_index(
               i,
               face,
-              cell->face_orientation(face),
-              cell->face_flip(face),
-              cell->face_rotation(face)))[first_vector_component])
+              cell->combined_face_orientation(face)))[first_vector_component])
           {
             dof_values[face_dof_indices[i]]     = dof_values_local(i);
             projected_dofs[face_dof_indices[i]] = fe.degree;

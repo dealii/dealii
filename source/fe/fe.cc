@@ -562,11 +562,10 @@ FiniteElement<dim, spacedim>::block_mask(
 
 template <int dim, int spacedim>
 unsigned int
-FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
-                                                 const unsigned int face,
-                                                 const bool face_orientation,
-                                                 const bool face_flip,
-                                                 const bool face_rotation) const
+FiniteElement<dim, spacedim>::face_to_cell_index(
+  const unsigned int  face_index,
+  const unsigned int  face,
+  const unsigned char combined_orientation) const
 {
   AssertIndexRange(face_index, this->n_dofs_per_face(face));
   AssertIndexRange(face, this->reference_cell().n_faces());
@@ -583,9 +582,9 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
   // see the function's documentation for an explanation of this
   // assertion -- in essence, derived classes have to implement
   // an overloaded version of this function if we are to use any
-  // other than standard orientation
-  if ((face_orientation != true) || (face_flip != false) ||
-      (face_rotation != false))
+  // other than default (standard) orientation
+  if (combined_orientation !=
+      ReferenceCell::default_combined_face_orientation())
     Assert((this->n_dofs_per_line() <= 1) && (this->n_dofs_per_quad(face) <= 1),
            ExcMessage(
              "The function in this base class can not handle this case. "
@@ -607,11 +606,7 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
       // then get the number of this vertex on the cell and translate
       // this to a DoF number on the cell
       return (this->reference_cell().face_to_cell_vertices(
-                face,
-                face_vertex,
-                internal::combined_face_orientation(face_orientation,
-                                                    face_rotation,
-                                                    face_flip)) *
+                face, face_vertex, combined_orientation) *
                 this->n_dofs_per_vertex() +
               dof_index_on_vertex);
     }
@@ -627,12 +622,9 @@ FiniteElement<dim, spacedim>::face_to_cell_index(const unsigned int face_index,
       const unsigned int dof_index_on_line = index % this->n_dofs_per_line();
 
       return (this->get_first_line_index() +
-              this->reference_cell().face_to_cell_lines(
-                face,
-                face_line,
-                internal::combined_face_orientation(face_orientation,
-                                                    face_rotation,
-                                                    face_flip)) *
+              this->reference_cell().face_to_cell_lines(face,
+                                                        face_line,
+                                                        combined_orientation) *
                 this->n_dofs_per_line() +
               dof_index_on_line);
     }

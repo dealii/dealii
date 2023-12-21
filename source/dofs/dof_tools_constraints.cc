@@ -1869,6 +1869,11 @@ namespace DoFTools
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
+      const unsigned char combined_face_orientation =
+        ::dealii::internal::combined_face_orientation(face_orientation,
+                                                      face_rotation,
+                                                      face_flip);
+
       const bool use_mg = (level != numbers::invalid_unsigned_int);
 
       // If we don't use multigrid, we should be in the case where face_1 is
@@ -2008,15 +2013,10 @@ namespace DoFTools
       // Build up a cell to face index for face_2:
       for (unsigned int i = 0; i < dofs_per_face; ++i)
         {
-          const unsigned int cell_index =
-            fe.face_to_cell_index(i,
-                                  0, /* It doesn't really matter, just
-                                      * assume we're on the first face...
-                                      */
-                                  true,
-                                  false,
-                                  false // default orientation
-            );
+          const unsigned int cell_index = fe.face_to_cell_index(
+            i,
+            // It doesn't really matter, just assume we're on the first face...
+            0);
           cell_to_rotated_face_index[cell_index] = i;
         }
 
@@ -2100,7 +2100,7 @@ namespace DoFTools
                   // given orientation:
                   const unsigned int j =
                     cell_to_rotated_face_index[fe.face_to_cell_index(
-                      jj, 0, face_orientation, face_flip, face_rotation)];
+                      jj, 0, combined_face_orientation)];
 
                   if (std::abs(transformation(i, jj)) > eps)
                     constraint_entries.emplace_back(dofs_1[j],
@@ -2123,7 +2123,7 @@ namespace DoFTools
           // orientation:
           const unsigned int j =
             cell_to_rotated_face_index[fe.face_to_cell_index(
-              target, 0, face_orientation, face_flip, face_rotation)];
+              target, 0, combined_face_orientation)];
 
           auto dof_left  = dofs_1[j];
           auto dof_right = dofs_2[i];
