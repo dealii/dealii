@@ -379,6 +379,16 @@ namespace NonMatching
       const unsigned int n_unfiltered_cells = numbers::invalid_unsigned_int);
 
     /**
+     * Same as above, but quadratures on faces are of dimension `dim`.
+     */
+    template <typename ContainerType>
+    void
+    reinit_faces(
+      const ContainerType                             &cell_iterator_range,
+      const std::vector<std::vector<Quadrature<dim>>> &quadrature_vector,
+      const unsigned int n_unfiltered_cells = numbers::invalid_unsigned_int);
+
+    /**
      * Return if this MappingInfo object is reinitialized for faces (by
      * reinit_faces()) or not.
      */
@@ -1213,6 +1223,47 @@ namespace NonMatching
     const std::vector<std::vector<Quadrature<dim - 1>>> &quadrature_vector,
     const unsigned int                                   n_unfiltered_cells)
   {
+    // First construct a vector of quadratures that is defined on cells.
+    std::vector<std::vector<Quadrature<dim>>> quadrature_vector_cells;
+
+    QProjector<dim> q_projector;
+    for (const auto &cell : cell_iterator_range)
+      {
+        const auto &quadratures_on_faces = quadrature_vector[cell_index];
+        std::vector < Quadrature<dim> quadratures_on_cell(cell->n_faces());
+
+        Assert(quadratures_on_faces.size() == quadratures_on_cell.size(),
+               ExcDimensionMismatch(quadratures_on_faces.size(),
+                                    quadratures_on_cell.size()));
+
+        for (const auto &f : cell->face_indices())
+          {
+            const auto &quadrature_on_face = quadratures_on_faces[f];
+
+            quadratures_on_cell[f] =
+              q_projector.project_to_face(cell->reference_cell(),
+                                          quadrature_on_face,
+                                          f);
+          }
+
+        quadrature_vector_cells.push_back(quadratures_on_cell);
+      }
+
+    // And call reinit faces with quadrature_vector_cells
+    reinit_faces(cell_iterator_range,
+                 quadrature_vector_cells,
+                 n_unfiltered_cells);
+  }
+
+
+  template <int dim, int spacedim, typename Number>
+  template <typename ContainerType>
+  void
+  MappingInfo<dim, spacedim, Number>::reinit_faces(
+    const ContainerType                             &cell_iterator_range,
+    const std::vector<std::vector<Quadrature<dim>>> &quadrature_vector,
+    const unsigned int                               n_unfiltered_cells)
+  {
     clear();
 
     Assert(additional_data.store_cells == false, ExcNotImplemented());
@@ -1291,24 +1342,18 @@ namespace NonMatching
     bool         first_set            = false;
     unsigned int size_compressed_data = 0;
     cell_index                        = 0;
-    QProjector<dim> q_projector;
     for (const auto &cell : cell_iterator_range)
       {
-        const auto &quadratures_on_faces = quadrature_vector[cell_index];
+        const auto &quadratures_on_cell = quadrature_vector[cell_index];
 
-        Assert(quadratures_on_faces.size() == cell->n_faces(),
-               ExcDimensionMismatch(quadratures_on_faces.size(),
+        Assert(quadratures_on_cell.size() == cell->n_faces(),
+               ExcDimensionMismatch(quadratures_on_cell.size(),
                                     cell->n_faces()));
 
         for (const auto &f : cell->face_indices())
           {
-            const auto &quadrature_on_face = quadratures_on_faces[f];
-            const bool  empty              = quadrature_on_face.empty();
-
-            const auto quadrature_on_cell =
-              q_projector.project_to_face(cell->reference_cell(),
-                                          quadrature_on_face,
-                                          f);
+            const auto &quadrature_on_cell = quadratures_on_cell[f];
+            const bool  empty              = quadratures_on_cell.empty();
 
             const unsigned int current_face_index =
               cell_index_offset[cell_index] + f;
