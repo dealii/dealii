@@ -1781,20 +1781,19 @@ namespace internal
         unsigned int cell_no_0 = 0;
         unsigned int cell_no_1 = transfer.schemes[0].n_coarse_cells;
 
-        transfer.constraint_info_coarse
-          .template reinit<types::global_dof_index>(
-            dof_handler_coarse,
-            transfer.schemes[0].n_coarse_cells +
-              transfer.schemes[1].n_coarse_cells,
-            constraints_coarse.n_constraints() > 0 &&
-              use_fast_hanging_node_algorithm(dof_handler_coarse,
-                                              mg_level_coarse));
+        transfer.constraint_info_coarse.reinit(
+          dof_handler_coarse,
+          transfer.schemes[0].n_coarse_cells +
+            transfer.schemes[1].n_coarse_cells,
+          constraints_coarse.n_constraints() > 0 &&
+            use_fast_hanging_node_algorithm(dof_handler_coarse,
+                                            mg_level_coarse));
         transfer.constraint_info_coarse.set_locally_owned_indices(
           (mg_level_coarse == numbers::invalid_unsigned_int) ?
             dof_handler_coarse.locally_owned_dofs() :
             dof_handler_coarse.locally_owned_mg_dofs(mg_level_coarse));
 
-        transfer.constraint_info_fine.template reinit<types::global_dof_index>(
+        transfer.constraint_info_fine.reinit(
           transfer.schemes[0].n_coarse_cells +
           transfer.schemes[1].n_coarse_cells);
         transfer.constraint_info_fine.set_locally_owned_indices(
@@ -1806,13 +1805,12 @@ namespace internal
           [&](const auto &cell_coarse, const auto &cell_fine) {
             // parent
             {
-              transfer.constraint_info_coarse
-                .template read_dof_indices<types::global_dof_index>(
-                  cell_no_0,
-                  mg_level_coarse,
-                  cell_coarse,
-                  constraints_coarse,
-                  {});
+              transfer.constraint_info_coarse.read_dof_indices(
+                cell_no_0,
+                mg_level_coarse,
+                cell_coarse,
+                constraints_coarse,
+                {});
             }
 
             // child
@@ -1824,9 +1822,8 @@ namespace internal
                 level_dof_indices_fine_0[i] =
                   local_dof_indices[lexicographic_numbering_fine[i]];
 
-              transfer.constraint_info_fine
-                .template read_dof_indices<types::global_dof_index>(
-                  cell_no_0, level_dof_indices_fine_0, {});
+              transfer.constraint_info_fine.read_dof_indices(
+                cell_no_0, level_dof_indices_fine_0, {});
             }
 
             // move pointers
@@ -1838,13 +1835,12 @@ namespace internal
             // parent (only once at the beginning)
             if (c == 0)
               {
-                transfer.constraint_info_coarse
-                  .template read_dof_indices<types::global_dof_index>(
-                    cell_no_1,
-                    mg_level_coarse,
-                    cell_coarse,
-                    constraints_coarse,
-                    {});
+                transfer.constraint_info_coarse.read_dof_indices(
+                  cell_no_1,
+                  mg_level_coarse,
+                  cell_coarse,
+                  constraints_coarse,
+                  {});
 
                 level_dof_indices_fine_1.assign(level_dof_indices_fine_1.size(),
                                                 numbers::invalid_dof_index);
@@ -1875,9 +1871,8 @@ namespace internal
             // move pointers (only once at the end)
             if (c + 1 == GeometryInfo<dim>::max_children_per_cell)
               {
-                transfer.constraint_info_fine
-                  .template read_dof_indices<types::global_dof_index>(
-                    cell_no_1, level_dof_indices_fine_1, {});
+                transfer.constraint_info_fine.read_dof_indices(
+                  cell_no_1, level_dof_indices_fine_1, {});
 
                 cell_no_1++;
               }
@@ -1885,16 +1880,12 @@ namespace internal
       }
 
       {
-        transfer.partitioner_coarse =
-          transfer.constraint_info_coarse
-            .template finalize<types::global_dof_index>(
-              dof_handler_coarse.get_communicator());
+        transfer.partitioner_coarse = transfer.constraint_info_coarse.finalize(
+          dof_handler_coarse.get_communicator());
         transfer.vec_coarse.reinit(transfer.partitioner_coarse);
 
-        transfer.partitioner_fine =
-          transfer.constraint_info_fine
-            .template finalize<types::global_dof_index>(
-              dof_handler_fine.get_communicator());
+        transfer.partitioner_fine = transfer.constraint_info_fine.finalize(
+          dof_handler_fine.get_communicator());
         transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
 
@@ -2286,13 +2277,12 @@ namespace internal
 
           // parent
           {
-            transfer.constraint_info_coarse
-              .template read_dof_indices<types::global_dof_index>(
-                cell_no[fe_pair_no],
-                mg_level_coarse,
-                cell_coarse,
-                constraints_coarse,
-                {});
+            transfer.constraint_info_coarse.read_dof_indices(
+              cell_no[fe_pair_no],
+              mg_level_coarse,
+              cell_coarse,
+              constraints_coarse,
+              {});
           }
 
           // child
@@ -2305,11 +2295,8 @@ namespace internal
               local_dof_indices_fine_lex[fe_pair_no][i] = local_dof_indices_fine
                 [fe_pair_no][lexicographic_numbering_fine[fe_pair_no][i]];
 
-            transfer.constraint_info_fine
-              .template read_dof_indices<types::global_dof_index>(
-                cell_no[fe_pair_no],
-                local_dof_indices_fine_lex[fe_pair_no],
-                {});
+            transfer.constraint_info_fine.read_dof_indices(
+              cell_no[fe_pair_no], local_dof_indices_fine_lex[fe_pair_no], {});
           }
 
           // move pointers
@@ -2320,16 +2307,12 @@ namespace internal
       }
 
       {
-        transfer.partitioner_coarse =
-          transfer.constraint_info_coarse
-            .template finalize<types::global_dof_index>(
-              dof_handler_coarse.get_communicator());
+        transfer.partitioner_coarse = transfer.constraint_info_coarse.finalize(
+          dof_handler_coarse.get_communicator());
         transfer.vec_coarse.reinit(transfer.partitioner_coarse);
 
-        transfer.partitioner_fine =
-          transfer.constraint_info_fine
-            .template finalize<types::global_dof_index>(
-              dof_handler_fine.get_communicator());
+        transfer.partitioner_fine = transfer.constraint_info_fine.finalize(
+          dof_handler_fine.get_communicator());
         transfer.vec_fine.reinit(transfer.partitioner_fine);
       }
 
@@ -3406,7 +3389,7 @@ namespace internal
 } // namespace internal
 
 template <typename Number>
-template <int dim, std::size_t width>
+template <int dim, std::size_t width, typename IndexType>
 void
 MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
   internal_enable_inplace_operations_if_possible(
@@ -3415,10 +3398,10 @@ MGTwoLevelTransferBase<LinearAlgebra::distributed::Vector<Number>>::
     const std::shared_ptr<const Utilities::MPI::Partitioner>
          &external_partitioner_fine,
     bool &vec_fine_needs_ghost_update,
-    internal::MatrixFreeFunctions::ConstraintInfo<
-      dim,
-      VectorizedArray<Number, width>> &constraint_info_coarse,
-    std::vector<unsigned int>         &dof_indices_fine)
+    internal::MatrixFreeFunctions::
+      ConstraintInfo<dim, VectorizedArray<Number, width>, IndexType>
+                              &constraint_info_coarse,
+    std::vector<unsigned int> &dof_indices_fine)
 {
   if (this->partitioner_coarse->is_globally_compatible(
         *external_partitioner_coarse))

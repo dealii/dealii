@@ -357,17 +357,17 @@ protected:
    * Enable inplace vector operations if external and internal vectors
    * are compatible.
    */
-  template <int dim, std::size_t width>
+  template <int dim, std::size_t width, typename IndexType>
   void
   internal_enable_inplace_operations_if_possible(
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &partitioner_coarse,
     const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner_fine,
     bool &vec_fine_needs_ghost_update,
-    internal::MatrixFreeFunctions::ConstraintInfo<
-      dim,
-      VectorizedArray<Number, width>> &constraint_info_coarse,
-    std::vector<unsigned int>         &dof_indices_fine);
+    internal::MatrixFreeFunctions::
+      ConstraintInfo<dim, VectorizedArray<Number, width>, IndexType>
+                              &constraint_info_coarse,
+    std::vector<unsigned int> &dof_indices_fine);
 
   /**
    * Flag if the finite elements on the fine cells are continuous. If yes,
@@ -684,14 +684,16 @@ private:
    * Helper class for reading from and writing to global coarse vectors and for
    * applying constraints.
    */
-  internal::MatrixFreeFunctions::ConstraintInfo<dim, VectorizedArrayType>
-    constraint_info_coarse;
+  internal::MatrixFreeFunctions::
+    ConstraintInfo<dim, VectorizedArrayType, types::global_dof_index>
+      constraint_info_coarse;
 
   /**
    * Helper class for reading from and writing to global fine vectors.
    */
-  internal::MatrixFreeFunctions::ConstraintInfo<dim, VectorizedArrayType>
-    constraint_info_fine;
+  internal::MatrixFreeFunctions::
+    ConstraintInfo<dim, VectorizedArrayType, types::global_dof_index>
+      constraint_info_fine;
 
   /**
    * Weights for continuous elements.
@@ -959,8 +961,9 @@ private:
    * Helper class for reading from and writing to global vectors and for
    * applying constraints.
    */
-  internal::MatrixFreeFunctions::ConstraintInfo<dim, VectorizedArrayType>
-    constraint_info;
+  internal::MatrixFreeFunctions::
+    ConstraintInfo<dim, VectorizedArrayType, unsigned int>
+      constraint_info;
 
   /**
    * Finite element of the coarse DoFHandler passed to reinit().
