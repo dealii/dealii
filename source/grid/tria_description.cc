@@ -448,6 +448,8 @@ namespace TriangulationDescription
             construction_data.smoothing = tria.get_mesh_smoothing();
             construction_data.settings  = settings;
           }
+        else
+          (void)comm;
 
         // helper function, which collects all vertices belonging to a cell
         // (also taking into account periodicity)
