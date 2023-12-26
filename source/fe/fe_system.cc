@@ -1027,11 +1027,10 @@ FESystem<dim, spacedim>::get_prolongation_matrix(
 
 template <int dim, int spacedim>
 unsigned int
-FESystem<dim, spacedim>::face_to_cell_index(const unsigned int face_dof_index,
-                                            const unsigned int face,
-                                            const bool         face_orientation,
-                                            const bool         face_flip,
-                                            const bool face_rotation) const
+FESystem<dim, spacedim>::face_to_cell_index(
+  const unsigned int  face_dof_index,
+  const unsigned int  face,
+  const unsigned char combined_orientation) const
 {
   // we need to ask the base elements how they want to translate
   // the DoFs within their own numbering. thus, translate to
@@ -1041,11 +1040,7 @@ FESystem<dim, spacedim>::face_to_cell_index(const unsigned int face_dof_index,
 
   const unsigned int base_face_to_cell_index =
     this->base_element(face_base_index.first.first)
-      .face_to_cell_index(face_base_index.second,
-                          face,
-                          face_orientation,
-                          face_flip,
-                          face_rotation);
+      .face_to_cell_index(face_base_index.second, face, combined_orientation);
 
   // it would be nice if we had a base_to_system_index function, but
   // all that exists is a component_to_system_index function. we can't do

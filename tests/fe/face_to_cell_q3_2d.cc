@@ -35,18 +35,13 @@ test()
     {
       deallog << "Face=" << face << std::endl;
 
-      for (int orientation = 0; orientation < 2; ++orientation)
+      for (unsigned char orientation = 0; orientation < 2; ++orientation)
         {
           deallog << "  orientation=" << (orientation == 0 ? "false" : "true")
                   << std::endl
                   << "    ";
           for (unsigned int i = 0; i < dofs_per_face; ++i)
-            deallog << fe.face_to_cell_index(i,
-                                             face,
-                                             (orientation == 0 ? false : true),
-                                             false,
-                                             false)
-                    << " - ";
+            deallog << fe.face_to_cell_index(i, face, orientation) << " - ";
           deallog << std::endl;
         }
     }

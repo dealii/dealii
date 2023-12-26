@@ -1,0 +1,6 @@
+Changed: FiniteElement::adjust_quad_dof_index_for_face_orientation() and
+FiniteElement::face_to_cell_index() now use the standardized
+<tt>combined_orientation</tt> orientation encoding as input arguments rather
+than three booleans.
+<br>
+(David Wells, 2023/12/21)

@@ -1458,19 +1458,16 @@ public:
                                  const unsigned int face_no = 0) const;
 
   /**
-   * For faces with non-standard face_orientation in 3d, the dofs on faces
-   * (quads) have to be permuted in order to be combined with the correct
-   * shape functions. Given a local dof @p index on a quad, return the local
-   * index, if the face has non-standard face_orientation, face_flip or
-   * face_rotation. In 2d and 1d there is no need for permutation and
-   * consequently an exception is thrown.
+   * Given a local dof @p index on a quad, return the local index accounting for
+   * the face orientation @p combined_orientation. This is only necessary in 3d:
+   * consequently, if this function is called in 1d or 2d then an exception is
+   * thrown.
    */
   unsigned int
-  adjust_quad_dof_index_for_face_orientation(const unsigned int index,
-                                             const unsigned int face_no,
-                                             const bool face_orientation,
-                                             const bool face_flip,
-                                             const bool face_rotation) const;
+  adjust_quad_dof_index_for_face_orientation(
+    const unsigned int  index,
+    const unsigned int  face_no,
+    const unsigned char combined_orientation) const;
 
   /**
    * Given an index in the natural ordering of indices on a face, return the
@@ -1497,15 +1494,8 @@ public:
    * index must be between zero and dofs_per_face.
    * @param face The number of the face this degree of freedom lives on. This
    * number must be between zero and GeometryInfo::faces_per_cell.
-   * @param face_orientation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
-   * @param face_flip One part of the description of the orientation of the
-   * face. See
-   * @ref GlossFaceOrientation.
-   * @param face_rotation One part of the description of the orientation of
-   * the face. See
-   * @ref GlossFaceOrientation.
+   * @param combined_orientation The combined orientation flag containing the
+   * orientation, rotation, and flip of the face. See @ref GlossFaceOrientation.
    * @return The index of this degree of freedom within the set of degrees of
    * freedom on the entire cell. The returned value will be between zero and
    * dofs_per_cell.
@@ -1527,11 +1517,11 @@ public:
    * freedom actually represent.
    */
   virtual unsigned int
-  face_to_cell_index(const unsigned int face_dof_index,
-                     const unsigned int face,
-                     const bool         face_orientation = true,
-                     const bool         face_flip        = false,
-                     const bool         face_rotation    = false) const;
+  face_to_cell_index(
+    const unsigned int  face_dof_index,
+    const unsigned int  face,
+    const unsigned char combined_orientation =
+      ReferenceCell::default_combined_face_orientation()) const;
 
   /**
    * For lines with non-standard line_orientation in 3d, the dofs on lines
