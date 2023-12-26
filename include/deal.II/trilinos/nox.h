@@ -198,7 +198,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -212,7 +212,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -231,7 +231,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -253,7 +253,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -274,10 +274,13 @@ namespace TrilinosWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions. NOX can deal with "recoverable"
+     * errors for this callback, if the NOX parameter
+     * "Newton/Rescue Bad Newton Solve" is set to @p true (which is, in
+     * fact, its default value). If this parameters is set to @p true,
+     * then exceptions of type RecoverableUserCallbackError are eaten for
+     * this callback and NOX can safely proceed with a recovery step.
+     * Exceptions of other types are still treated as "irrecoverable".
      */
     std::function<
       void(const VectorType &y, VectorType &x, const double tolerance)>
@@ -307,10 +310,13 @@ namespace TrilinosWrappers
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
-     * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
-     * throws an exception of type RecoverableUserCallbackError, then this
-     * exception is treated like any other exception.
+     * requirements and conventions. NOX can deal with "recoverable"
+     * errors for this callback, if the NOX parameter
+     * "Newton/Rescue Bad Newton Solve" is set to @p true (which is, in
+     * fact, its default value). If this parameters is set to @p true,
+     * then exceptions of type RecoverableUserCallbackError are eaten for
+     * this callback and NOX can safely proceed with a recovery step.
+     * Exceptions of other types are still treated as "irrecoverable".
      */
     std::function<
       int(const VectorType &y, VectorType &x, const double tolerance)>
@@ -331,7 +337,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
@@ -355,7 +361,7 @@ namespace TrilinosWrappers
      * @ref GlossUserProvidedCallBack "user provided callback".
      * See there for a description of how to deal with errors and other
      * requirements and conventions. NOX can not deal
-     * with "recoverable" errors, so if a callback
+     * with "recoverable" errors for this callback, so if it
      * throws an exception of type RecoverableUserCallbackError, then this
      * exception is treated like any other exception.
      */
