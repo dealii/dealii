@@ -53,32 +53,36 @@
     <h3>Supported platforms</h3>
 
     <p>
-      <acronym>deal.II</acronym> is mostly developed on Linux using the
-      <a href="https://gcc.gnu.org">GCC</a> compiler. However, it is
-      not platform specific and we strive to keep the source code
-      compliant with
-      the <a href="https://en.cppreference.com/w/cpp/links">C++ 2014
-      Standard</a> (see
-      also <a href="https://github.com/cplusplus/draft/blob/master/papers/n4140.pdf?raw=true">here</a>
+      <acronym>deal.II</acronym> is a platform-independent library
+      written in
+      <a href="https://en.cppreference.com/w/">C++</a>, with configuration and build support provided by
+      <a href="https://cmake.org/">CMake</a>.
+      Until deal.II version 9.5, deal.II used the C++14
+      standard; subsequent versions require C++17 (see
+      <a href="https://open-std.org/JTC1/SC22/WG21/docs/standards">here</a>
       for PDFs of the various C++ standards).
     </p>
 
     <p>
-        <acronym>deal.II</acronym> supports at least the following platforms:
-    </p>
-    <ul>
-        <li>GNU/Linux: GCC version 5.0 or later; Clang version 5.0 or later; ICC versions 15 or later</li>
-        <li>Mac OS X: GCC version 5.0 or later; Clang version 5.0 or later; <a href="https://en.wikipedia.org/wiki/Xcode#Xcode_7.0_-_11.x_(since_Free_On-Device_Development)">Apple Clang version 9.0</a>  or later.
-            Please see the <a href="https://github.com/dealii/dealii/wiki/MacOSX" target="_top">deal.II Wiki</a> for installation instructions.</li>
-        <li>Windows: experimental support for Visual Studio 2017. Please have a look at the
-            <a href="https://github.com/dealii/dealii/wiki/Frequently-Asked-Questions#can-i-use-dealii-on-a-windows-platform">
-      FAQ</a> and at the <a href="https://github.com/dealii/dealii/wiki/Windows" target="_top">deal.II Wiki</a> for more information and alternative solutions.</li>
-        </li>
-    </ul>
-
-    <p>
-        Most other combinations of POSIX-style operating systems and C++ Standard compliant compilers should also work. <i>If they don't,
-  please report it as a bug.</i>
+      The easiest way to install <acronym>deal.II</acronym> is to use
+      <a href="https://dealii.org/download.html">the many packages
+        available for different platforms</a>.
+      But it can of course also be compiled from scratch.
+      Given that C++ compilers and CMake are available on a wide
+      variety of platforms, <acronym>deal.II</acronym> can be compiled
+      on most widely used systems. In particular, we regularly test
+      that it can be compiled using the GCC compiler (on Linux and
+      Windows), Clang (on Linux, and both Intel- and ARM-based Apple
+      Mac systems via Xcode), the Intel compiler (on Linux), and Microsoft
+      Visual Studio (on Microsoft Windows), as long as these compilers
+      are sufficiently new to support the required language
+      standard. You may want to take a look
+      at <a href="https://github.com/dealii/dealii/wiki"
+      target="_top">deal.II Wiki</a> for instructions on specific
+      platforms. In general, most combinations of POSIX-style operating systems
+      and C++ Standard compliant compilers should work. <i>If they
+        don't, please
+        <a href="https://github.com/dealii/dealii/issues">report it as a bug</a>.</i>
     </p>
 
 
@@ -94,7 +98,10 @@
         </li>
 
         <li>
-            <a href="https://www.gnu.org/software/make/" target="_top">GNU make</a>, version 3.78 or later (or any other generator supported by CMake)
+            <a href="https://www.gnu.org/software/make/"
+            target="_top">GNU make</a> (version 3.78 or later), or any
+            other generator supported by CMake such
+            as <a href="https://ninja-build.org/">Ninja</a> or Visual Studio.
         </li>
 
         <li>
