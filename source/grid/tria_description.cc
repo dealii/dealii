@@ -1067,9 +1067,9 @@ namespace TriangulationDescription
            settings_in);
 
       const auto subdomain_id_function =
-        [&partition](const auto &cell) -> unsigned int {
+        [&partition](const auto &cell) -> types::subdomain_id {
         if ((cell->is_active() && (cell->is_artificial() == false)))
-          return static_cast<unsigned int>(
+          return static_cast<types::subdomain_id>(
             partition[cell->global_active_cell_index()]);
         else
           return numbers::artificial_subdomain_id;
@@ -1077,9 +1077,9 @@ namespace TriangulationDescription
 
       const auto level_subdomain_id_function =
         [&construct_multigrid,
-         &partitions_mg](const auto &cell) -> unsigned int {
+         &partitions_mg](const auto &cell) -> types::subdomain_id {
         if (construct_multigrid && (cell->is_artificial_on_level() == false))
-          return static_cast<unsigned int>(
+          return static_cast<types::subdomain_id>(
             partitions_mg[cell->level()][cell->global_level_cell_index()]);
         else
           return numbers::artificial_subdomain_id;
