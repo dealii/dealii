@@ -975,25 +975,28 @@ namespace TriangulationDescription
 
           // Make sure we know about all of the owners of the active cells,
           // whether locally owned or not. Then we traverse the triangulation
-          // from the finest level to the coarsest level:
+          // from the finest level to the coarsest level.
+          //
+          // On each level, traverse the cell. If the cell is not locally
+          // owned, we don't care about it. If it is active, we copy the
+          // owner process from the cell's non-level owner. Otherwise,
+          // use the owner of the first cell.
           partition.update_ghost_values();
           for (int level = tria.n_global_levels() - 1; level >= 0; --level)
             {
-              // On each level, traverse the cell. If the cell is not locally
-              // owned, we don't care about it. If it is active, we copy the
-              // owner process from the cell's non-level owner. Otherwise,
-              // use the owner of the first cell
               for (const auto &cell : tria.cell_iterators_on_level(level))
                 {
-                  if (cell->is_locally_owned_on_level() == false)
-                    continue;
-                  else if (cell->is_active())
-                    partitions_mg[level][cell->global_level_cell_index()] =
-                      partition[cell->global_active_cell_index()];
-                  else
-                    partitions_mg[level][cell->global_level_cell_index()] =
-                      partitions_mg[level + 1]
-                                   [cell->child(0)->global_level_cell_index()];
+                  if (cell->is_locally_owned_on_level())
+                    {
+                      if (cell->is_active())
+                        partitions_mg[level][cell->global_level_cell_index()] =
+                          partition[cell->global_active_cell_index()];
+                      else
+                        partitions_mg[level][cell->global_level_cell_index()] =
+                          partitions_mg[level + 1]
+                                       [cell->child(0)
+                                          ->global_level_cell_index()];
+                    }
                 }
 
               // Having touched all of the locally owned cells on the
