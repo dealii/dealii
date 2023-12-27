@@ -1,0 +1,106 @@
+Solving with Q1 elements, adaptive refinement
+=============================================
+
+Cycle 0:
+   Number of active cells:       64
+   Number of degrees of freedom: 81
+Cycle 1:
+   Number of active cells:       121
+   Number of degrees of freedom: 154
+Cycle 2:
+   Number of active cells:       280
+   Number of degrees of freedom: 341
+Cycle 3:
+   Number of active cells:       565
+   Number of degrees of freedom: 678
+Cycle 4:
+   Number of active cells:       1075
+   Number of degrees of freedom: 1240
+Cycle 5:
+   Number of active cells:       2041
+   Number of degrees of freedom: 2306
+
+cycle cells dofs    L2        H1      Linfty   
+    0    64   81 1.840e+00 2.858e+00 1.835e+00 
+    1   121  154 5.336e-02 1.200e+00 1.354e-01 
+    2   280  341 1.439e-02 7.892e-01 7.554e-02 
+    3   565  678 8.696e-03 5.086e-01 2.843e-02 
+    4  1075 1240 3.245e-03 3.059e-01 1.072e-02 
+    5  2041 2306 2.407e-03 2.147e-01 5.156e-03 
+
+Solving with Q1 elements, global refinement
+===========================================
+
+Cycle 0:
+   Number of active cells:       64
+   Number of degrees of freedom: 81
+Cycle 1:
+   Number of active cells:       256
+   Number of degrees of freedom: 289
+Cycle 2:
+   Number of active cells:       1024
+   Number of degrees of freedom: 1089
+
+cycle cells dofs    L2        H1      Linfty   
+    0    64   81 1.840e+00 2.858e+00 1.835e+00 
+    1   256  289 3.570e-02 1.199e+00 1.307e-01 
+    2  1024 1089 1.192e-02 7.565e-01 7.168e-02 
+
+n cells         H1                   L2          
+0    64 2.858e+00    -    - 1.840e+00     -    - 
+1   256 1.199e+00 2.38 1.25 3.570e-02 51.54 5.69 
+2  1024 7.565e-01 1.58 0.66 1.192e-02  2.99 1.58 
+
+Solving with Q2 elements, global refinement
+===========================================
+
+Cycle 0:
+   Number of active cells:       64
+   Number of degrees of freedom: 289
+Cycle 1:
+   Number of active cells:       256
+   Number of degrees of freedom: 1089
+Cycle 2:
+   Number of active cells:       1024
+   Number of degrees of freedom: 4225
+
+cycle cells dofs    L2        H1      Linfty   
+    0    64  289 1.606e-01 1.278e+00 3.029e-01 
+    1   256 1089 7.638e-03 5.248e-01 4.816e-02 
+    2  1024 4225 8.601e-04 1.086e-01 4.827e-03 
+
+n cells         H1                   L2          
+0    64 1.278e+00    -    - 1.606e-01     -    - 
+1   256 5.248e-01 2.43 1.28 7.638e-03 21.03 4.39 
+2  1024 1.086e-01 4.83 2.27 8.601e-04  8.88 3.15 
+
+Solving with Q2 elements, adaptive refinement
+===========================================
+
+Cycle 0:
+   Number of active cells:       64
+   Number of degrees of freedom: 289
+Cycle 1:
+   Number of active cells:       121
+   Number of degrees of freedom: 569
+Cycle 2:
+   Number of active cells:       280
+   Number of degrees of freedom: 1317
+Cycle 3:
+   Number of active cells:       529
+   Number of degrees of freedom: 2459
+Cycle 4:
+   Number of active cells:       1015
+   Number of degrees of freedom: 4719
+Cycle 5:
+   Number of active cells:       1963
+   Number of degrees of freedom: 9039
+
+cycle cells dofs    L2        H1      Linfty   
+    0    64  289 1.606e-01 1.278e+00 3.029e-01 
+    1   121  569 7.916e-03 5.257e-01 4.857e-02 
+    2   280 1317 1.092e-03 1.165e-01 4.832e-03 
+    3   529 2459 5.999e-04 5.177e-02 1.873e-03 
+    4  1015 4719 2.100e-04 3.245e-02 7.938e-04 
+    5  1963 9039 7.821e-05 1.990e-02 7.260e-04 
+

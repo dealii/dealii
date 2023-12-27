@@ -1,0 +1,32 @@
+Cycle 0:
+   Number of active cells:       64
+   Number of degrees of freedom: 162 (by partition: 162)
+   Solver converged in 9 iterations.
+Cycle 1:
+   Number of active cells:       121
+   Number of degrees of freedom: 298 (by partition: 298)
+   Solver converged in 17 iterations.
+Cycle 2:
+   Number of active cells:       229
+   Number of degrees of freedom: 550 (by partition: 550)
+   Solver converged in 26 iterations.
+Cycle 3:
+   Number of active cells:       433
+   Number of degrees of freedom: 1004 (by partition: 1004)
+   Solver converged in 36 iterations.
+Cycle 4:
+   Number of active cells:       820
+   Number of degrees of freedom: 1826 (by partition: 1826)
+   Solver converged in 51 iterations.
+Cycle 5:
+   Number of active cells:       1558
+   Number of degrees of freedom: 3348 (by partition: 3348)
+   Solver converged in 67 iterations.
+Cycle 6:
+   Number of active cells:       2953
+   Number of degrees of freedom: 6318 (by partition: 6318)
+   Solver converged in 93 iterations.
+Cycle 7:
+   Number of active cells:       5596
+   Number of degrees of freedom: 11706 (by partition: 11706)
+   Solver converged in 122 iterations.

@@ -1,0 +1,4 @@
+675c675
+<   deallog.depth_console(2);
+---
+>   //deallog.depth_console(2);

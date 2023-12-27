@@ -1,0 +1,36 @@
+Cycle 0
+  Number of active cells:       64
+  Number of degrees of freedom: 256
+Solver stopped within 3 - 100 iterations
+  Writing solution to <solution-0.vtk>
+  L-infinity norm: 1.09057
+Cycle 1
+  Number of active cells:       109
+  Number of degrees of freedom: 436
+Solver stopped within 3 - 100 iterations
+  Writing solution to <solution-1.vtk>
+  L-infinity norm: 1.10402
+Cycle 2
+  Number of active cells:       205
+  Number of degrees of freedom: 820
+Solver stopped within 3 - 100 iterations
+  Writing solution to <solution-2.vtk>
+  L-infinity norm: 1.09813
+Cycle 3
+  Number of active cells:       394
+  Number of degrees of freedom: 1576
+Solver stopped within 3 - 100 iterations
+  Writing solution to <solution-3.vtk>
+  L-infinity norm: 1.09579
+Cycle 4
+  Number of active cells:       766
+  Number of degrees of freedom: 3064
+Solver stopped within 3 - 100 iterations
+  Writing solution to <solution-4.vtk>
+  L-infinity norm: 1.09612
+Cycle 5
+  Number of active cells:       1504
+  Number of degrees of freedom: 6016
+Solver stopped within 3 - 100 iterations
+  Writing solution to <solution-5.vtk>
+  L-infinity norm: 1.09532

@@ -1,0 +1,11 @@
+21a22
+> #include "../example_test.h"
+589c590,595
+<     solver.solve(system_matrix, solution, system_rhs, preconditioner);
+---
+>     check_solver_within_range(std::cout,
+>     solver.solve(system_matrix, solution, system_rhs, preconditioner),
+>                               solver_control.last_step(),
+>                               7,
+>                               16);
+> 

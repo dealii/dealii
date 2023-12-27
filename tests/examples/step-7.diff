@@ -1,0 +1,4 @@
+958c958
+<       (refinement_mode == global_refinement) ? 5 : 9;
+---
+>       (refinement_mode == global_refinement) ? 3 : 6;

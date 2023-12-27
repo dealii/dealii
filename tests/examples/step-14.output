@@ -1,0 +1,36 @@
+Refinement cycle: 0
+   Number of degrees of freedom: 72
+   Point value: 0.03243
+   Estimated error: 0.000702385
+Refinement cycle: 1
+   Number of degrees of freedom: 67
+   Point value: 0.0324827
+   Estimated error: 0.000888953
+Refinement cycle: 2
+   Number of degrees of freedom: 130
+   Point value: 0.0329619
+   Estimated error: 0.000454606
+Refinement cycle: 3
+   Number of degrees of freedom: 307
+   Point value: 0.0331934
+   Estimated error: 0.000241254
+Refinement cycle: 4
+   Number of degrees of freedom: 718
+   Point value: 0.0333675
+   Estimated error: 7.4912e-05
+Refinement cycle: 5
+   Number of degrees of freedom: 1665
+   Point value: 0.0334083
+   Estimated error: 3.69111e-05
+Refinement cycle: 6
+   Number of degrees of freedom: 3975
+   Point value: 0.033431
+   Estimated error: 1.54218e-05
+Refinement cycle: 7
+   Number of degrees of freedom: 8934
+   Point value: 0.0334406
+   Estimated error: 6.28359e-06
+Refinement cycle: 8
+   Number of degrees of freedom: 21799
+   Point value: 0.0334444
+
