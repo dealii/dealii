@@ -955,42 +955,59 @@ namespace TriangulationDescription
 
       std::vector<LinearAlgebra::distributed::Vector<double>> partitions_mg;
 
-      if (construct_multigrid) // perform first child policy
+      // If desired, also create a multigrid hierarchy. For this, we have to
+      // build a hierarchy of partitions (one for each level of the
+      // triangulation) in which each cell is assigned to the same process
+      // as its first child (if not active) or to the same process that already
+      // owns the cell (for an active level-cell).
+      if (construct_multigrid)
         {
           const auto tria_parallel =
             dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
               &tria);
+          Assert(tria_parallel, ExcNotImplemented());
 
-          Assert(tria_parallel, ExcInternalError());
-
-          partition.update_ghost_values();
-
+          // Give the level partitioners the right size:
           partitions_mg.resize(tria.n_global_levels());
-
           for (unsigned int l = 0; l < tria.n_global_levels(); ++l)
             partitions_mg[l].reinit(
               tria_parallel->global_level_cell_index_partitioner(l).lock());
 
+          // Make sure we know about all of the owners of the active cells,
+          // whether locally owned or not. Then we traverse the triangulation
+          // from the finest level to the coarsest level.
+          //
+          // On each level, traverse the cell. If the cell is not locally
+          // owned, we don't care about it. If it is active, we copy the
+          // owner process from the cell's non-level owner. Otherwise,
+          // use the owner of the first cell.
+          partition.update_ghost_values();
           for (int level = tria.n_global_levels() - 1; level >= 0; --level)
             {
               for (const auto &cell : tria.cell_iterators_on_level(level))
                 {
-                  if (cell->is_locally_owned_on_level() == false)
-                    continue;
-
-                  if (cell->is_active())
-                    partitions_mg[level][cell->global_level_cell_index()] =
-                      partition[cell->global_active_cell_index()];
-                  else
-                    partitions_mg[level][cell->global_level_cell_index()] =
-                      partitions_mg[level + 1]
-                                   [cell->child(0)->global_level_cell_index()];
+                  if (cell->is_locally_owned_on_level())
+                    {
+                      if (cell->is_active())
+                        partitions_mg[level][cell->global_level_cell_index()] =
+                          partition[cell->global_active_cell_index()];
+                      else
+                        partitions_mg[level][cell->global_level_cell_index()] =
+                          partitions_mg[level + 1]
+                                       [cell->child(0)
+                                          ->global_level_cell_index()];
+                    }
                 }
 
+              // Having touched all of the locally owned cells on the
+              // current level, exchange information with the other processes
+              // about the cells that are ghosts so that on the next coarser
+              // level we can access information about children again:
               partitions_mg[level].update_ghost_values();
             }
         }
 
+      // Forward to the other function.
       return create_description_from_triangulation(tria,
                                                    partition,
                                                    partitions_mg,
@@ -1043,31 +1060,33 @@ namespace TriangulationDescription
                                          relevant_processes.end());
       }();
 
-      const bool construct_multigrid = partitions_mg.size() > 0;
+      const bool construct_multigrid = (partitions_mg.size() > 0);
 
-      TriangulationDescription::Settings settings = settings_in;
+      const TriangulationDescription::Settings settings =
+        (construct_multigrid ?
+           static_cast<TriangulationDescription::Settings>(
+             settings_in | TriangulationDescription::Settings::
+                             construct_multigrid_hierarchy) :
+           settings_in);
 
-      if (construct_multigrid)
-        settings = static_cast<TriangulationDescription::Settings>(
-          settings |
-          TriangulationDescription::Settings::construct_multigrid_hierarchy);
-
-      const auto subdomain_id_function = [&partition](const auto &cell) {
+      const auto subdomain_id_function =
+        [&partition](const auto &cell) -> types::subdomain_id {
         if ((cell->is_active() && (cell->is_artificial() == false)))
-          return static_cast<unsigned int>(
+          return static_cast<types::subdomain_id>(
             partition[cell->global_active_cell_index()]);
         else
           return numbers::artificial_subdomain_id;
       };
 
       const auto level_subdomain_id_function =
-        [&construct_multigrid, &partitions_mg](const auto &cell) {
-          if (construct_multigrid && (cell->is_artificial_on_level() == false))
-            return static_cast<unsigned int>(
-              partitions_mg[cell->level()][cell->global_level_cell_index()]);
-          else
-            return numbers::artificial_subdomain_id;
-        };
+        [&construct_multigrid,
+         &partitions_mg](const auto &cell) -> types::subdomain_id {
+        if (construct_multigrid && (cell->is_artificial_on_level() == false))
+          return static_cast<types::subdomain_id>(
+            partitions_mg[cell->level()][cell->global_level_cell_index()]);
+        else
+          return numbers::artificial_subdomain_id;
+      };
 
       CreateDescriptionFromTriangulationHelper<dim, spacedim> helper(
         tria,
