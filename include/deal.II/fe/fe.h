@@ -1524,15 +1524,17 @@ public:
       ReferenceCell::default_combined_face_orientation()) const;
 
   /**
-   * For lines with non-standard line_orientation in 3d, the dofs on lines
-   * have to be permuted in order to be combined with the correct shape
-   * functions. Given a local dof @p index on a line, return the local index,
-   * if the line has non-standard line_orientation. In 2d and 1d there is no
-   * need for permutation, so the given index is simply returned.
+   * Given a local dof @p index on a line and the orientation @p
+   * combined_orientation of that line, return the local dof which accounts for
+   * @p combined_orientation.
+   *
+   * @note In both 1d and all-quadrilateral meshes in 2d all lines have the
+   * standard orientation.
    */
   unsigned int
-  adjust_line_dof_index_for_line_orientation(const unsigned int index,
-                                             const bool line_orientation) const;
+  adjust_line_dof_index_for_line_orientation(
+    const unsigned int  index,
+    const unsigned char combined_orientation) const;
 
   /**
    * Return in which of the vector components of this finite element the @p

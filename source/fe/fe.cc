@@ -683,14 +683,19 @@ FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
 template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
-  const unsigned int index,
-  const bool         line_orientation) const
+  const unsigned int  index,
+  const unsigned char combined_orientation) const
 {
   // We orient quads (and 1D meshes are always oriented) so always skip those
   // cases
   //
   // TODO - we may want to change this in the future: see also the notes in
   // face_to_cell_index()
+  Assert(combined_orientation ==
+             ReferenceCell::default_combined_face_orientation() ||
+           combined_orientation ==
+             ReferenceCell::reversed_combined_line_orientation(),
+         ExcInternalError());
   if (this->reference_cell() == ReferenceCells::Line ||
       this->reference_cell() == ReferenceCells::Quadrilateral)
     return index;
@@ -699,7 +704,8 @@ FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
   Assert(adjust_line_dof_index_for_line_orientation_table.size() ==
            this->n_dofs_per_line(),
          ExcInternalError());
-  if (line_orientation)
+  if (combined_orientation ==
+      ReferenceCell::default_combined_face_orientation())
     return index;
   else
     return index + adjust_line_dof_index_for_line_orientation_table[index];
