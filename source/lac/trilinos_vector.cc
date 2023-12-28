@@ -599,6 +599,14 @@ namespace TrilinosWrappers
     void
     Vector::compress(VectorOperation::values given_last_action)
     {
+      Assert(has_ghost_elements() == false,
+             ExcMessage(
+               "Calling compress() is only useful if a vector "
+               "has been written into, but this is a vector with ghost "
+               "elements and consequently is read-only. It does "
+               "not make sense to call compress() for such "
+               "vectors."));
+
       // Select which mode to send to Trilinos. Note that we use last_action if
       // available and ignore what the user tells us to detect wrongly mixed
       // operations. Typically given_last_action is only used on machines that
