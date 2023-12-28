@@ -371,7 +371,7 @@ namespace Utilities
       /**
        * Constructor of this class.
        */
-      explicit CollectiveMutex();
+      CollectiveMutex();
 
       /**
        * Destroy the mutex. Assumes the lock is not currently held.

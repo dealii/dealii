@@ -58,7 +58,7 @@ namespace MeshWorker
      * @p local_dof_indices are empty, and should be initialized using
      * one of the reinit() functions.
      */
-    explicit CopyData() = default;
+    CopyData() = default;
 
     /**
      * Initialize everything with the same @p size. This is usually the number
