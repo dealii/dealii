@@ -1104,7 +1104,7 @@ namespace internal
        * cell->line_orientation(), 1d specialization
        */
       template <int dim, int spacedim>
-      static std::array<unsigned int, 1>
+      static std::array<unsigned char, 1>
       get_line_orientations_of_cell(const TriaAccessor<1, dim, spacedim> &)
       {
         Assert(false, ExcInternalError());
@@ -1118,14 +1118,17 @@ namespace internal
        * cell->line_orientation(), 2d specialization
        */
       template <int dim, int spacedim>
-      static std::array<bool, 4>
+      static std::array<unsigned char, 4>
       get_line_orientations_of_cell(const TriaAccessor<2, dim, spacedim> &cell)
       {
         // For 2d cells the access cell->line_orientation() is already
         // efficient
-        std::array<bool, 4> line_orientations = {};
+        std::array<unsigned char, 4> line_orientations = {};
         for (const unsigned int line : cell.line_indices())
-          line_orientations[line] = cell.line_orientation(line);
+          line_orientations[line] =
+            cell.line_orientation(line) == true ?
+              ReferenceCell::default_combined_face_orientation() :
+              ReferenceCell::reversed_combined_line_orientation();
         return line_orientations;
       }
 
@@ -1136,10 +1139,10 @@ namespace internal
        * cell->line_orientation(), 3d specialization
        */
       template <int dim, int spacedim>
-      static std::array<bool, 12>
+      static std::array<unsigned char, 12>
       get_line_orientations_of_cell(const TriaAccessor<3, dim, spacedim> &cell)
       {
-        std::array<bool, 12> line_orientations = {};
+        std::array<unsigned char, 12> line_orientations = {};
 
         // For hexahedra, the classical access via quads -> lines is too
         // inefficient. Unroll this code here to allow the compiler to inline
