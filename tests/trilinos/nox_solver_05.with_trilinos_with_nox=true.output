@@ -1,0 +1,28 @@
+
+DEAL::Evaluating the solution at u=(0.500000,1.23400)
+DEAL::Setting up Jacobian system at u=(0.500000,1.23400)
+DEAL::Solving Jacobian system with rhs=(-0.162480,1.79816)
+DEAL::Evaluating the solution at u=(-0.282294,0.265967)
+DEAL::Setting up Jacobian system at u=(-0.282294,0.265967)
+DEAL::Solving Jacobian system with rhs=(-0.564722,0.0107297)
+DEAL::Evaluating the solution at u=(-0.564143,0.485115)
+DEAL::Evaluating the solution at u=(-0.564143,0.485115)
+DEAL::Setting up Jacobian system at u=(-0.564143,0.485115)
+DEAL::Solving Jacobian system with rhs=(-1.13141,0.103177)
+DEAL::Evaluating the solution at u=(-0.0103358,0.232689)
+DEAL::Setting up Jacobian system at u=(-0.0103358,0.232689)
+DEAL::Solving Jacobian system with rhs=(-0.0452903,0.224738)
+DEAL::Evaluating the solution at u=(-0.0117725,0.0157208)
+DEAL::Setting up Jacobian system at u=(-0.0117725,0.0157208)
+DEAL::Solving Jacobian system with rhs=(-0.0235528,0.00395177)
+DEAL::Caught an irrecoverable exception in a callback:
+DEAL::
+--------------------------------------------------------
+An error occurred in line <0> of file <> in function
+    
+The violated condition was: 
+    
+Additional information: 
+    Irrecoverable failure in solve_with_jacobian.
+--------------------------------------------------------
+
