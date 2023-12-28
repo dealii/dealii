@@ -1046,6 +1046,8 @@ namespace TrilinosWrappers
       [&](const VectorType &f, VectorType &x, const double tolerance) -> int {
         ++n_nonlinear_iterations;
 
+        int ret_code = 0;
+
         // invert Jacobian
         if (solve_with_jacobian)
           {
@@ -1056,8 +1058,9 @@ namespace TrilinosWrappers
                 "solve_with_jacobian_and_track_n_linear_iterations!"));
 
             // without tracking of linear iterations
-            return internal::NOXWrappers::call_and_possibly_capture_exception(
-              solve_with_jacobian, pending_exception, f, x, tolerance);
+            ret_code =
+              internal::NOXWrappers::call_and_possibly_capture_exception(
+                solve_with_jacobian, pending_exception, f, x, tolerance);
           }
         else if (solve_with_jacobian_and_track_n_linear_iterations)
           {
@@ -1070,14 +1073,14 @@ namespace TrilinosWrappers
             // trigger an exception that will propagate through the lambda
             // function and be treated correctly by the logic in
             // internal::NOXWrappers::call_and_possibly_capture_exception.
-            return internal::NOXWrappers::call_and_possibly_capture_exception(
-              [&]() {
-                this->n_last_linear_iterations =
-                  solve_with_jacobian_and_track_n_linear_iterations(f,
-                                                                    x,
-                                                                    tolerance);
-              },
-              pending_exception);
+            ret_code =
+              internal::NOXWrappers::call_and_possibly_capture_exception(
+                [&]() {
+                  this->n_last_linear_iterations =
+                    solve_with_jacobian_and_track_n_linear_iterations(
+                      f, x, tolerance);
+                },
+                pending_exception);
           }
         else
           {
@@ -1089,8 +1092,49 @@ namespace TrilinosWrappers
                 "has been attached to the NOXSolver object."));
 
             Assert(false, ExcNotImplemented());
-            return 1;
+            ret_code = 1;
           }
+
+        // NOX has a recovery feature that is enabled by default. In this case,
+        // if a solve_with_jacobian or a
+        // solve_with_jacobian_and_track_n_linear_iterations function triggers
+        // an exception and therefore call_and_possibly_capture_exception
+        // returns code different from 0, then NOX does not interrupt the
+        // solution process but rather performs a recovery step. To ensure this
+        // feature is available to the user, we need to supress the exception in
+        // this case, since it is exactly that, what NOX expects from our
+        // callbacks.
+        const bool do_rescue =
+          parameters->sublist("Newton").get("Rescue Bad Newton Solve", true);
+        if (do_rescue && (pending_exception != nullptr))
+          {
+            try
+              {
+                std::rethrow_exception(pending_exception);
+              }
+            catch (const RecoverableUserCallbackError &exc)
+              {
+                pending_exception = nullptr;
+
+                // If the callback threw a recoverable exception, and if
+                // recovery is enabled, then eat the exception and return the
+                // error code.
+                return ret_code;
+              }
+            catch (...)
+              {
+                // If not a recoverable exception, then just re-throw the
+                // exception and hope that NOX knows what to do with propagating
+                // exceptions (i.e., does not create a resource leak, for
+                // example).
+                pending_exception = nullptr;
+                throw;
+              }
+          }
+        else
+          // Rescue not allowed, or there was no exception -> simply return
+          // the value produced by the callback.
+          return ret_code;
       }));
 
     // setup solver control
