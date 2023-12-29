@@ -4105,10 +4105,17 @@ namespace GridTools
         const unsigned int                  n_points_1D,
         const Triangulation<dim, spacedim> &tria,
         const Mapping<dim, spacedim>       &mapping,
+        std::vector<Quadrature<spacedim>>  *mapped_quadratures_recv_comp,
         const bool consistent_numbering_of_sender_and_receiver) const
     {
       using CellIterator =
         typename Triangulation<dim, spacedim>::active_cell_iterator;
+
+      if (mapped_quadratures_recv_comp != nullptr)
+        {
+          AssertDimension(mapped_quadratures_recv_comp->size(), 0);
+          mapped_quadratures_recv_comp->reserve(recv_components.size());
+        }
 
       GridTools::internal::DistributedComputePointLocationsInternal<dim,
                                                                     spacedim>
@@ -4141,6 +4148,10 @@ namespace GridTools
                 result.recv_components.size(), // number of point
                 numbers::invalid_unsigned_int);
             }
+
+          // append quadrature
+          if (mapped_quadratures_recv_comp != nullptr)
+            mapped_quadratures_recv_comp->push_back(quad);
         }
 
       // since empty quadratures might be present we have to set the number

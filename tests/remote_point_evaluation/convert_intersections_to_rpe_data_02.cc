@@ -99,7 +99,7 @@ do_test(const unsigned int n_quad_points)
 
   auto rpe_data = intersection_location
                     .convert_to_distributed_compute_point_locations_internal(
-                      n_quad_points, tria, mapping, true);
+                      n_quad_points, tria, mapping, nullptr, true);
 
   deallog << "Recv Components " << std::endl;
   for (const auto &rc : rpe_data.recv_components)

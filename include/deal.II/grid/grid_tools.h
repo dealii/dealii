@@ -877,6 +877,11 @@ namespace GridTools
        * from class members. This can be done without searching for points again
        * since all information is locally known.
        *
+       * @p mapped_quadratures_recv_comp is a pointer to an empty vector of
+       * mapped quadratures. By default it is a `nullptr` and the parameter is
+       * ignored. Otherwise, the vector is filled with the mapped quadrature
+       * rules (in real coordinates) corresponding to recv_components.
+       *
        * The parameter @p consistent_numbering_of_sender_and_receiver can be used to ensure
        * points on sender and receiver side are numbered consistently.
        * This parameter is optional if DistributedComputePointLocationsInternal
@@ -892,6 +897,8 @@ namespace GridTools
         const unsigned int                  n_points_1D,
         const Triangulation<dim, spacedim> &tria,
         const Mapping<dim, spacedim>       &mapping,
+        std::vector<Quadrature<spacedim>>  *mapped_quadratures_recv_comp =
+          nullptr,
         const bool consistent_numbering_of_sender_and_receiver = false) const;
 
     private:
