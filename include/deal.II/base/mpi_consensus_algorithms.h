@@ -1276,21 +1276,7 @@ namespace Utilities
         /**
          * Return whether a vector of targets (MPI ranks) has only unique
          * elements.
-         *
-         * This function is only used within assertions, which causes GCC
-         * to issue a warning in release mode that due to -Werror then causes an
-         * error. We suppress this by using the [[gnu::unused]] error (because
-         * the
-         * [[maybe_unused]] attribute is only supported from C++17 forward).
-         *
-         * Unfortunately, in contrast to what the standard says, the Microsoft
-         * compiler does not ignore the gnu::unused attribute as it should,
-         * and then produces an error of its own. So we disable the attribute
-         * for that compiler.
          */
-#  ifndef DEAL_II_MSVC
-        [[gnu::unused]]
-#  endif
         inline bool
         has_unique_elements(const std::vector<unsigned int> &targets)
         {
