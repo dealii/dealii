@@ -194,8 +194,8 @@ namespace parallel
      * that this function is in fact a member function of the class that
      * generates the mesh, for example because it needs to access run-time
      * parameters. This can be achieved as follows: assuming the
-     * <code>set_boundary_ids()</code> function has been declared as a (non-
-     * static, but possibly private) member function of the
+     * <code>set_boundary_ids()</code> function has been declared as a
+     * (non-static, but possibly private) member function of the
      * <code>MyClass</code> class, then the following will work:
      * @code
      * #include <functional>

@@ -502,8 +502,8 @@ class PreconditionMG : public Subscriptor
 {
 public:
   /**
-   * Constructor. Arguments are the multigrid object, pre-smoother, post-
-   * smoother and coarse grid solver.
+   * Constructor. Arguments are the multigrid object, pre-smoother,
+   * post-smoother and coarse grid solver.
    */
   PreconditionMG(const DoFHandler<dim> &dof_handler,
                  Multigrid<VectorType> &mg,

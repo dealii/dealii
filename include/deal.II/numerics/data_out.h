@@ -247,9 +247,9 @@ public:
    * tri)quadratic elements, then what is written into the output file is just
    * a (bi-, tri)linear interpolation onto the current mesh, i.e., only the
    * values at the vertices. If this is not good enough, you can, for example,
-   * specify @p n_subdivisions equal to 2 to plot the solution on a once-
-   * refined mesh, or if set to 3, on a mesh where each cell is represented by
-   * 3-by-3 patches. On each of these smaller patches, given the limitations
+   * specify @p n_subdivisions equal to 2 to plot the solution on a
+   * once-refined mesh, or if set to 3, on a mesh where each cell is represented
+   * by 3-by-3 patches. On each of these smaller patches, given the limitations
    * of output formats, the data is still linearly interpolated, but a linear
    * interpolation of quadratic data on a finer mesh is still a better
    * representation of the actual quadratic surface than on the original mesh.

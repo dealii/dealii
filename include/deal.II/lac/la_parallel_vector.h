@@ -562,10 +562,10 @@ namespace LinearAlgebra
       update_ghost_values() const;
 
       /**
-       * Initiates communication for the @p compress() function with non-
-       * blocking communication. This function does not wait for the transfer
-       * to finish, in order to allow for other computations during the time
-       * it takes until all data arrives.
+       * Initiates communication for the @p compress() function with
+       * non-blocking communication. This function does not wait for the
+       * transfer to finish, in order to allow for other computations during the
+       * time it takes until all data arrives.
        *
        * Before the data is actually exchanged, the function must be followed
        * by a call to @p compress_finish().

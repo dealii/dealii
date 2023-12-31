@@ -961,10 +961,11 @@ public:
   shape_3rd_derivative(const unsigned int i, const Point<dim> &p) const;
 
   /**
-   * Just like for shape_3rd_derivative(), but this function will be called
-   * when the shape function has more than one non-zero vector component. In
-   * that case, this function should return the gradient of the @p component-
-   * th vector component of the @p ith shape function at point @p p.
+   * Just like for shape_3rd_derivative(), but this function will be
+   * called when the shape function has more than one non-zero vector
+   * component. In that case, this function should return the gradient
+   * of the @p component-th vector component of the @p ith shape
+   * function at point @p p.
    */
   virtual Tensor<3, dim>
   shape_3rd_derivative_component(const unsigned int i,
@@ -998,8 +999,9 @@ public:
   /**
    * Just like for shape_4th_derivative(), but this function will be called
    * when the shape function has more than one non-zero vector component. In
-   * that case, this function should return the gradient of the @p component-
-   * th vector component of the @p ith shape function at point @p p.
+   * that case, this function should return the gradient of the
+   * @p component-th vector component of the @p ith shape function at point
+   * @p p.
    */
   virtual Tensor<4, dim>
   shape_4th_derivative_component(const unsigned int i,
@@ -1580,11 +1582,11 @@ public:
   is_primitive() const;
 
   /**
-   * Return whether the @p ith shape function is primitive in the sense that
-   * the shape function is non-zero in only one vector component. Non-
-   * primitive shape functions would then, for example, be those of divergence
-   * free ansatz spaces, in which the individual vector components are
-   * coupled.
+   * Return whether the @p ith shape function is primitive in the
+   * sense that the shape function is non-zero in only one vector
+   * component. Non-primitive shape functions would then, for example,
+   * be those of divergence free ansatz spaces, in which the
+   * individual vector components are coupled.
    *
    * The result of the function is @p true if and only if the result of
    * <tt>n_nonzero_components(i)</tt> is equal to one.
@@ -2133,18 +2135,20 @@ public:
    * For a given degree of freedom, return whether it is logically associated
    * with a vertex, line, quad or hex.
    *
-   * For instance, for continuous finite elements this coincides with the
-   * lowest dimensional object the support point of the degree of freedom lies
-   * on. To give an example, for $Q_1$ elements in 3d, every degree of freedom
-   * is defined by a shape function that we get by interpolating using support
-   * points that lie on the vertices of the cell. The support of these points
-   * of course extends to all edges connected to this vertex, as well as the
-   * adjacent faces and the cell interior, but we say that logically the
-   * degree of freedom is associated with the vertex as this is the lowest-
-   * dimensional object it is associated with. Likewise, for $Q_2$ elements in
-   * 3d, the degrees of freedom with support points at edge midpoints would
-   * yield a value of GeometryPrimitive::line from this function, whereas
-   * those on the centers of faces in 3d would return GeometryPrimitive::quad.
+   * For instance, for continuous finite elements this coincides with
+   * the lowest dimensional object the support point of the degree of
+   * freedom lies on. To give an example, for $Q_1$ elements in 3d,
+   * every degree of freedom is defined by a shape function that we
+   * get by interpolating using support points that lie on the
+   * vertices of the cell. The support of these points of course
+   * extends to all edges connected to this vertex, as well as the
+   * adjacent faces and the cell interior, but we say that logically
+   * the degree of freedom is associated with the vertex as this is
+   * the lowest-dimensional object it is associated with. Likewise,
+   * for $Q_2$ elements in 3d, the degrees of freedom with support
+   * points at edge midpoints would yield a value of
+   * GeometryPrimitive::line from this function, whereas those on the
+   * centers of faces in 3d would return GeometryPrimitive::quad.
    *
    * To make this more formal, the kind of object returned by this function
    * represents the object so that the support of the shape function
@@ -2587,10 +2591,11 @@ protected:
   const bool cached_primitivity;
 
   /**
-   * Return the size of interface constraint matrices. Since this is needed in
-   * every derived finite element class when initializing their size, it is
-   * placed into this function, to avoid having to recompute the dimension-
-   * dependent size of these matrices each time.
+   * Return the size of interface constraint matrices. Since this is
+   * needed in every derived finite element class when initializing
+   * their size, it is placed into this function, to avoid having to
+   * recompute the dimension-dependent size of these matrices each
+   * time.
    *
    * Note that some elements do not implement the interface constraints for
    * certain polynomial degrees. In this case, this function still returns the
@@ -2655,8 +2660,8 @@ protected:
    * last argument. This output argument is guaranteed to always be the same one
    * when used with the InternalDataBase object returned by this function. In
    * other words, the subdivision of scratch data and final data in the returned
-   * object and the @p output_data object is as follows: If data can be pre-
-   * computed on the reference cell in the exact form in which it will later
+   * object and the @p output_data object is as follows: If data can be
+   * pre-computed on the reference cell in the exact form in which it will later
    * be needed on a concrete cell, then this function should already emplace
    * it in the @p output_data object. An example are the values of shape
    * functions at quadrature points for the usual Lagrange elements which on a
@@ -2684,9 +2689,10 @@ protected:
    * compute. This set of flags may also include information that the finite
    * element can not compute, e.g., flags that pertain to data produced by the
    * mapping. An implementation of this function needs to set up all data
-   * fields in the returned object that are necessary to produce the finite-
-   * element related data specified by these flags, and may already pre-
-   * compute part of this information as discussed above. Elements may want to
+   * fields in the returned object that are necessary to produce the
+   * finite-element related data specified by these flags, and may already
+   * pre-compute part of this information as discussed above. Elements may
+   * want to
    * store these update flags (or a subset of these flags) in
    * InternalDataBase::update_each so they know at the time when
    * FiniteElement::fill_fe_values() is called what they are supposed to
@@ -2703,10 +2709,10 @@ protected:
    * above. FEValues guarantees that this output object and the object
    * returned by the current function will always be used together.
    * @return A pointer to an object of a type derived from InternalDataBase
-   * and that derived classes can use to store scratch data that can be pre-
-   * computed, or for scratch arrays that then only need to be allocated once.
-   * The calling site assumes ownership of this object and will delete it when
-   * it is no longer necessary.
+   * and that derived classes can use to store scratch data that can be
+   * pre-computed, or for scratch arrays that then only need to be allocated
+   * once. The calling site assumes ownership of this object and will delete it
+   * when it is no longer necessary.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_data(const UpdateFlags             update_flags,
@@ -2732,9 +2738,10 @@ protected:
    * compute. This set of flags may also include information that the finite
    * element can not compute, e.g., flags that pertain to data produced by the
    * mapping. An implementation of this function needs to set up all data
-   * fields in the returned object that are necessary to produce the finite-
-   * element related data specified by these flags, and may already pre-
-   * compute part of this information as discussed above. Elements may want to
+   * fields in the returned object that are necessary to produce the
+   * finite-element related data specified by these flags, and may already
+   * pre-compute part of this information as discussed above. Elements may
+   * want to
    * store these update flags (or a subset of these flags) in
    * InternalDataBase::update_each so they know at the time when
    * FiniteElement::fill_fe_face_values() is called what they are supposed to
@@ -2751,10 +2758,10 @@ protected:
    * discussed above. FEValues guarantees that this output object and the
    * object returned by the current function will always be used together.
    * @return A pointer to an object of a type derived from InternalDataBase
-   * and that derived classes can use to store scratch data that can be pre-
-   * computed, or for scratch arrays that then only need to be allocated once.
-   * The calling site assumes ownership of this object and will delete it when
-   * it is no longer necessary.
+   * and that derived classes can use to store scratch data that can be
+   * pre-computed, or for scratch arrays that then only need to be allocated
+   * once. The calling site assumes ownership of this object and will
+   * delete it when it is no longer necessary.
    */
   virtual std::unique_ptr<InternalDataBase>
   get_face_data(const UpdateFlags               update_flags,
@@ -2791,9 +2798,10 @@ protected:
    * compute. This set of flags may also include information that the finite
    * element can not compute, e.g., flags that pertain to data produced by the
    * mapping. An implementation of this function needs to set up all data
-   * fields in the returned object that are necessary to produce the finite-
-   * element related data specified by these flags, and may already pre-
-   * compute part of this information as discussed above. Elements may want to
+   * fields in the returned object that are necessary to produce the
+   * finite-element related data specified by these flags, and may already
+   * pre-compute part of this information as discussed above. Elements may
+   * want to
    * store these update flags (or a subset of these flags) in
    * InternalDataBase::update_each so they know at the time when
    * FiniteElement::fill_fe_subface_values() is called what they are supposed
@@ -2810,8 +2818,9 @@ protected:
    * discussed above. FEValues guarantees that this output object and the
    * object returned by the current function will always be used together.
    * @return A pointer to an object of a type derived from InternalDataBase
-   * and that derived classes can use to store scratch data that can be pre-
-   * computed, or for scratch arrays that then only need to be allocated once.
+   * and that derived classes can use to store scratch data that can be
+   * pre-computed, or for scratch arrays that then only need to be allocated
+   * once.
    * The calling site assumes ownership of this object and will delete it when
    * it is no longer necessary.
    */

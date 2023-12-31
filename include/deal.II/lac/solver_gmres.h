@@ -164,9 +164,9 @@ namespace internal
  *
  * Note that the minimizing property of GMRes only pertains to the Krylov
  * space spanned by the Arnoldi basis. Therefore, restarted GMRes is
- * <b>not</b> minimizing anymore. The choice of the basis length is a trade-
- * off between memory consumption and convergence speed, since a longer basis
- * means minimization over a larger space.
+ * <b>not</b> minimizing anymore. The choice of the basis length is a
+ * trade-off between memory consumption and convergence speed, since a longer
+ * basis means minimization over a larger space.
  *
  * For the requirements on matrices and vectors in order to work with this
  * class, see the documentation of the Solver base class.

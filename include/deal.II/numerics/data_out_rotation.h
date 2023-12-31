@@ -89,8 +89,8 @@ namespace internal
  * The one coordinate in the triangulation used by the DoFHandler object
  * passed to this class is taken as the radial variable, and the output will
  * then be either a circle or a ring domain. It is in the user's
- * responsibility to assure that the radial coordinate only attains non-
- * negative values.
+ * responsibility to assure that the radial coordinate only attains
+ * non-negative values.
  *
  *
  * <h3>Details for 2d computations</h3>

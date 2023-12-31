@@ -306,10 +306,10 @@ public:
 private:
   /**
    * Internal wrapper around thread-local prefixes. This private function will
-   * return the correct internal prefix stack. More important, a new thread-
-   * local stack will be copied from the current stack of the "blessed" thread
-   * that created this LogStream instance (usually, in the case of deallog,
-   * the "main" thread).
+   * return the correct internal prefix stack. More important, a new
+   * thread-local stack will be copied from the current stack of the "blessed"
+   * thread that created this LogStream instance (usually, in the case of
+   * deallog, the "main" thread).
    */
   std::stack<std::string> &
   get_prefixes() const;

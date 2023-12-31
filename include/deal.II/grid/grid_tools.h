@@ -327,8 +327,8 @@ namespace GridTools
    * all boundary vertices (although you then lose control over the exact
    * shape of the mapped domain).
    *
-   * @param[in,out] tria The Triangulation object. This object is changed in-
-   * place, i.e., the previous locations of vertices are overwritten.
+   * @param[in,out] tria The Triangulation object. This object is changed
+   * in-place, i.e., the previous locations of vertices are overwritten.
    *
    * @param[in] coefficient An optional coefficient for the Laplace problem.
    * Larger values make cells less prone to deformation (effectively

@@ -1914,8 +1914,8 @@ class TriaAccessor<0, dim, spacedim>
 public:
   /**
    * Dimension of the space the object represented by this accessor lives in.
-   * For example, if this accessor represents a quad that is part of a two-
-   * dimensional surface in four-dimensional space, then this value is four.
+   * For example, if this accessor represents a quad that is part of a
+   * two-dimensional surface in four-dimensional space, then this value is four.
    */
   static constexpr unsigned int space_dimension = spacedim;
 
@@ -2326,8 +2326,8 @@ class TriaAccessor<0, 1, spacedim>
 public:
   /**
    * Dimension of the space the object represented by this accessor lives in.
-   * For example, if this accessor represents a quad that is part of a two-
-   * dimensional surface in four-dimensional space, then this value is four.
+   * For example, if this accessor represents a quad that is part of a
+   * two-dimensional surface in four-dimensional space, then this value is four.
    */
   static constexpr unsigned int space_dimension = spacedim;
 
@@ -2965,8 +2965,8 @@ public:
   set_manifold_id(const types::manifold_id);
 
   /**
-   * Set the boundary indicator of this object and all of its lower-
-   * dimensional sub-objects.  Since this object only represents a single
+   * Set the boundary indicator of this object and all of its
+   * lower-dimensional sub-objects.  Since this object only represents a single
    * vertex, there are no lower-dimensional object and this function is
    * equivalent to calling set_boundary_id() with the same argument.
    *
@@ -2979,8 +2979,8 @@ public:
   set_all_boundary_ids(const types::boundary_id) const;
 
   /**
-   * Set the manifold indicator of this object and all of its lower-
-   * dimensional sub-objects.  Since this object only represents a single
+   * Set the manifold indicator of this object and all of its
+   * lower-dimensional sub-objects.  Since this object only represents a single
    * vertex, there are no lower-dimensional object and this function is
    * equivalent to calling set_manifold_id() with the same argument.
    *
@@ -3723,8 +3723,8 @@ public:
   set_material_id(const types::material_id new_material_id) const;
 
   /**
-   * Set the material id of this cell and all its children (and grand-
-   * children, and so on) to the given value.
+   * Set the material id of this cell and all its children (and
+   * grand-children, and so on) to the given value.
    *
    * See the
    * @ref GlossMaterialId "glossary"

@@ -128,8 +128,8 @@ DEAL_II_NAMESPACE_OPEN
  * set of functions as above, except that for vector valued finite elements
  * they return only one vector component. This is useful for elements of which
  * shape functions have more than one non-zero component, since then the above
- * functions cannot be used, and you have to walk over all (or only the non-
- * zero) components of the shape function using this set of functions.
+ * functions cannot be used, and you have to walk over all (or only the
+ * non-zero) components of the shape function using this set of functions.
  *
  * <li> get_function_values(), get_function_gradients(), etc.: Compute a
  * finite element function or its derivative in quadrature points.
@@ -257,8 +257,8 @@ public:
    * subface selected the last time the <tt>reinit</tt> function of the
    * derived class was called.
    *
-   * If the shape function is vector-valued, then this returns the only non-
-   * zero component. If the shape function has more than one non-zero
+   * If the shape function is vector-valued, then this returns the only
+   * non-zero component. If the shape function has more than one non-zero
    * component (i.e. it is not primitive), then throw an exception of type
    * ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_value_component() function.
@@ -309,8 +309,8 @@ public:
    * reference to the gradient's value is returned, there should be no major
    * performance drawback.
    *
-   * If the shape function is vector-valued, then this returns the only non-
-   * zero component. If the shape function has more than one non-zero
+   * If the shape function is vector-valued, then this returns the only
+   * non-zero component. If the shape function has more than one non-zero
    * component (i.e. it is not primitive), then it will throw an exception of
    * type ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_grad_component() function.
@@ -357,8 +357,8 @@ public:
    * one component. Since only a reference to the hessian values is returned,
    * there should be no major performance drawback.
    *
-   * If the shape function is vector-valued, then this returns the only non-
-   * zero component. If the shape function has more than one non-zero
+   * If the shape function is vector-valued, then this returns the only
+   * non-zero component. If the shape function has more than one non-zero
    * component (i.e. it is not primitive), then throw an exception of type
    * ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_hessian_component() function.
@@ -400,8 +400,8 @@ public:
    * to extract one component. Since only a reference to the 3rd derivative
    * values is returned, there should be no major performance drawback.
    *
-   * If the shape function is vector-valued, then this returns the only non-
-   * zero component. If the shape function has more than one non-zero
+   * If the shape function is vector-valued, then this returns the only
+   * non-zero component. If the shape function has more than one non-zero
    * component (i.e. it is not primitive), then throw an exception of type
    * ExcShapeFunctionNotPrimitive. In that case, use the
    * shape_3rdderivative_component() function.
@@ -985,8 +985,9 @@ public:
 
   /**
    * This function does the same as the other
-   * get_function_third_derivatives(), but applied to multi-component (vector-
-   * valued) elements. The meaning of the arguments is as explained there.
+   * get_function_third_derivatives(), but applied to multi-component
+   * (vector-valued) elements. The meaning of the arguments is as explained
+   * there.
    *
    * @post <code>third_derivatives[q]</code> is a vector of third derivatives
    * of the field described by fe_function at the $q$th quadrature point. The

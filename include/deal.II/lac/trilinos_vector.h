@@ -710,9 +710,9 @@ namespace TrilinosWrappers
        * then queried from the input vector. Note that you should not write to
        * the resulting vector any more, since the some data can be stored
        * several times on different processors, leading to unpredictable
-       * results. In particular, such a vector cannot be used for matrix-
-       * vector products as for example done during the solution of linear
-       * systems.
+       * results. In particular, such a vector cannot be used for
+       * matrix-vector products as for example done during the solution of
+       * linear systems.
        */
       void
       import_nonlocal_data_for_fe(
@@ -1169,10 +1169,10 @@ namespace TrilinosWrappers
        * then it is possible to add data from a vector that uses a different
        * map, i.e., a vector whose elements are split across processors
        * differently. This may include vectors with ghost elements, for example.
-       * In general, however, adding vectors with a different element-to-
-       * processor map requires communicating data among processors and,
-       * consequently, is a slower operation than when using vectors using the
-       * same map.
+       * In general, however, adding vectors with a different
+       * element-to-processor map requires communicating data among processors
+       * and, consequently, is a slower operation than when using vectors using
+       * the same map.
        */
       void
       add(const Vector &V, const bool allow_different_maps = false);

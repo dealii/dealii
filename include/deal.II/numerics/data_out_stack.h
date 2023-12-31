@@ -51,8 +51,8 @@ class DoFHandler;
  * We will explain the concept for a time dependent problem, but instead of
  * the time any parameter can be substituted. In our example, a solution of an
  * equation is computed for each discrete time level. This is then added to an
- * object of the present class and after all time levels are added, a space-
- * time plot will be written in any of the output formats supported by the
+ * object of the present class and after all time levels are added, a
+ * space-time plot will be written in any of the output formats supported by the
  * base class. Upon output, the (spatial) solution on each time level is
  * extended into the time direction by writing it twice, once for the time
  * level itself and once for a time equal to the time level minus a given time

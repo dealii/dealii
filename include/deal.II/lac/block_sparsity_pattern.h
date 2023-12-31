@@ -200,8 +200,8 @@ public:
   /**
    * Return whether the object is empty. It is empty if no memory is
    * allocated, which is the same as that both dimensions are zero. This
-   * function is just the concatenation of the respective call to all sub-
-   * matrices.
+   * function is just the concatenation of the respective call to all
+   * sub-matrices.
    */
   bool
   empty() const;
@@ -263,8 +263,8 @@ public:
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
-   * the range space. It is the sum of columns of the (block-)columns of sub-
-   * matrices.
+   * the range space. It is the sum of columns of the (block-)columns of
+   * sub-matrices.
    */
   using SparsityPatternBase::n_cols;
 
@@ -476,8 +476,8 @@ public:
 
 
   /**
-   * Return whether the structure is compressed or not, i.e. whether all sub-
-   * matrices are compressed.
+   * Return whether the structure is compressed or not, i.e. whether all
+   * sub-matrices are compressed.
    */
   bool
   is_compressed() const;

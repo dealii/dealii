@@ -1845,10 +1845,9 @@ namespace internal
    *                            is performed. This is a typical scenario in
    *                            FEFaceEvaluation::evaluate() calls. If false,
    *                            data from n_rows^(dim-1) points is expanded
-   *                            into the n_rows^dim points of the higher-
-   *                            dimensional data array. Derivatives in the
-   *                            case contract_onto_face==false are summed
-   *                            together.
+   *                            into the n_rows^dim points of the
+   *                            higher-dimensional data array. Derivatives in
+   * the case contract_onto_face==false are summed together.
    * @tparam add If true, the result is added to the output vector, else
    *             the computed values overwrite the content in the output.
    * @tparam max_derivative Sets the number of derivatives that should be

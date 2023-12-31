@@ -577,8 +577,8 @@ namespace VectorTools
   /**
    * This function is an updated version of the
    * project_boundary_values_curl_conforming function. The intention is to fix
-   * a problem when using the previous function in conjunction with non-
-   * rectangular geometries (i.e. elements with non-rectangular faces). The
+   * a problem when using the previous function in conjunction with
+   * non-rectangular geometries (i.e. elements with non-rectangular faces). The
    * L2-projection method used has been taken from the paper "Electromagnetic
    * scattering simulation using an H (curl) conforming hp-finite element
    * method in three dimensions" by PD Ledger, K Morgan and O Hassan ( Int. J.
@@ -592,9 +592,9 @@ namespace VectorTools
    * <h4>Computing constraints</h4>
    *
    * To compute the constraints we use a projection method based upon the
-   * paper mentioned above. In 2d this is done in a single stage for the edge-
-   * based shape functions, regardless of the order of the finite element. In
-   * 3d this is done in two stages, edges first and then faces.
+   * paper mentioned above. In 2d this is done in a single stage for the
+   * edge-based shape functions, regardless of the order of the finite element.
+   * In 3d this is done in two stages, edges first and then faces.
    *
    * For each cell, each edge, $e$, is projected by solving the linear system
    * $Ax=b$ where $x$ is the vector of constraints on degrees of freedom on the

@@ -849,9 +849,9 @@ public:
    * This function essentially exists to allow adding several constraints of
    * the form <i>x<sub>i</sub></i>=0 all at once, where the set of indices
    * <i>i</i> for which these constraints should be added are given by the
-   * argument of this function. On the other hand, just as if the single-
-   * argument add_line() function were called repeatedly, the constraints can
-   * later be modified to include linear dependencies using the add_entry()
+   * argument of this function. On the other hand, just as if the
+   * single-argument add_line() function were called repeatedly, the constraints
+   * can later be modified to include linear dependencies using the add_entry()
    * function as well as inhomogeneities using set_inhomogeneity().
    */
   void
@@ -864,9 +864,9 @@ public:
    * This function essentially exists to allow adding several constraints of
    * the form <i>x<sub>i</sub></i>=0 all at once, where the set of indices
    * <i>i</i> for which these constraints should be added are given by the
-   * argument of this function. On the other hand, just as if the single-
-   * argument add_line() function were called repeatedly, the constraints can
-   * later be modified to include linear dependencies using the add_entry()
+   * argument of this function. On the other hand, just as if the
+   * single-argument add_line() function were called repeatedly, the constraints
+   * can later be modified to include linear dependencies using the add_entry()
    * function as well as inhomogeneities using set_inhomogeneity().
    */
   void
@@ -879,9 +879,9 @@ public:
    * This function essentially exists to allow adding several constraints of
    * the form <i>x<sub>i</sub></i>=0 all at once, where the set of indices
    * <i>i</i> for which these constraints should be added are given by the
-   * argument of this function. On the other hand, just as if the single-
-   * argument add_line() function were called repeatedly, the constraints can
-   * later be modified to include linear dependencies using the add_entry()
+   * argument of this function. On the other hand, just as if the
+   * single-argument add_line() function were called repeatedly, the constraints
+   * can later be modified to include linear dependencies using the add_entry()
    * function as well as inhomogeneities using set_inhomogeneity().
    */
   void
@@ -1158,8 +1158,8 @@ public:
   max_constraint_indirections() const;
 
   /**
-   * Return <tt>true</tt> in case the dof is constrained and there is a non-
-   * trivial inhomogeneous values set to the dof.
+   * Return <tt>true</tt> in case the dof is constrained and there is a
+   * non-trivial inhomogeneous values set to the dof.
    */
   bool
   is_inhomogeneously_constrained(const size_type index) const;

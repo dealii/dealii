@@ -270,8 +270,8 @@ protected:
 
   /**
    * Each tensor product polynomial <i>i</i> is a product of one-dimensional
-   * polynomials in each space direction. Compute the indices of these one-
-   * dimensional polynomials for each space direction, given the index
+   * polynomials in each space direction. Compute the indices of these
+   * one-dimensional polynomials for each space direction, given the index
    * <i>i</i>.
    */
   void
@@ -473,8 +473,8 @@ private:
 
   /**
    * Each tensor product polynomial $p_i$ is a product of one-dimensional
-   * polynomials in each space direction. Compute the indices of these one-
-   * dimensional polynomials for each space direction, given the index
+   * polynomials in each space direction. Compute the indices of these
+   * one-dimensional polynomials for each space direction, given the index
    * <tt>i</tt>.
    */
   void

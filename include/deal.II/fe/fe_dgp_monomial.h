@@ -32,8 +32,8 @@ DEAL_II_NAMESPACE_OPEN
 /**
  * Discontinuous finite elements based on monomials.
  *
- * This finite element implements complete polynomial spaces, that is, dim-
- * dimensional polynomials of degree p. For example, in 2d the element
+ * This finite element implements complete polynomial spaces, that is,
+ * dim-dimensional polynomials of degree p. For example, in 2d the element
  * FE_DGP(1) would represent the span of the functions $\{1,\hat x,\hat y\}$,
  * which is in contrast to the element FE_DGQ(1) that is formed by the span of
  * $\{1,\hat x,\hat y,\hat x\hat y\}$. Since the DGP space has only three

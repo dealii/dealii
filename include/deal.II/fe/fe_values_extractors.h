@@ -122,8 +122,8 @@ namespace FEValuesExtractors
 
 
   /**
-   * Extractor for a vector of <code>spacedim</code> components of a vector-
-   * valued element. The value of <code>spacedim</code> is defined by the
+   * Extractor for a vector of <code>spacedim</code> components of a
+   * vector-valued element. The value of <code>spacedim</code> is defined by the
    * FEValues object the extractor is applied to. The result of applying an
    * object of this type to an FEValues, FEFaceValues or FESubfaceValues
    * object is of type FEValuesViews::Vector.
@@ -180,8 +180,8 @@ namespace FEValuesExtractors
   /**
    * Extractor for a symmetric tensor of a rank specified by the template
    * argument. For a second order symmetric tensor, this represents a
-   * collection of <code>(dim*dim + dim)/2</code> components of a vector-
-   * valued element. The value of <code>dim</code> is defined by the FEValues
+   * collection of <code>(dim*dim + dim)/2</code> components of a vector-valued
+   * element. The value of <code>dim</code> is defined by the FEValues
    * object the extractor is applied to. The result of applying an object of
    * this type to an FEValues, FEFaceValues or FESubfaceValues object is of
    * type FEValuesViews::SymmetricTensor.

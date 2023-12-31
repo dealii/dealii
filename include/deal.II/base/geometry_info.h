@@ -2546,8 +2546,8 @@ struct GeometryInfo
    * v_1\wedge \mathbf v_2 \wedge \mathbf v_3 = (\mathbf v_1\times \mathbf
    * v_2)\cdot \mathbf v_3$, where $\mathbf v_1, \mathbf v_2, \mathbf v_3$ are
    * the images of the unit vectors at a vertex of the unit dim-dimensional
-   * cell under transformation to the dim-dimensional cell in spacedim-
-   * dimensional space. In both cases, i.e. for dim==2 or 3, the result
+   * cell under transformation to the dim-dimensional cell in
+   * spacedim-dimensional space. In both cases, i.e. for dim==2 or 3, the result
    * happens to equal the determinant of the Jacobian of the mapping from
    * reference cell to cell in real space. Note that it is the actual
    * determinant, not its absolute value as often used in transforming

@@ -52,9 +52,9 @@ DEAL_II_NAMESPACE_OPEN
  * sparsity pattern of the decomposition is a superset of the sparsity pattern
  * in the original matrix.
  *
- * Such fill-in can be accomplished by various ways, one of which is the copy-
- * constructor of the SparsityPattern class that allows the addition of side-
- * diagonals to a given sparsity structure.
+ * Such fill-in can be accomplished by various ways, one of which is the
+ * copy-constructor of the SparsityPattern class that allows the addition of
+ * side-diagonals to a given sparsity structure.
  *
  *
  * <h3>Unified use of preconditioners</h3>

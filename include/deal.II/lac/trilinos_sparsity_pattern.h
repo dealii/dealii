@@ -487,8 +487,8 @@ namespace TrilinosWrappers
                     const std::vector<size_type> &n_entries_per_row);
 
     /**
-     * This constructor constructs general sparsity patterns, possible non-
-     * square ones. Constructing a sparsity pattern this way allows the user
+     * This constructor constructs general sparsity patterns, possible
+     * non-square ones. Constructing a sparsity pattern this way allows the user
      * to explicitly specify the rows into which we are going to add elements.
      * This set is required to be a superset of the first index set @p
      * row_parallel_partitioning that includes also rows that are owned by
@@ -576,8 +576,8 @@ namespace TrilinosWrappers
            const size_type n_entries_per_row = 0);
 
     /**
-     * This reinit function is used to specify general matrices, possibly non-
-     * square ones. In addition to the arguments of the other reinit method
+     * This reinit function is used to specify general matrices, possibly
+     * non-square ones. In addition to the arguments of the other reinit method
      * above, it allows the user to explicitly specify the rows into which we
      * are going to add elements. This set is a superset of the first index
      * set @p row_parallel_partitioning that includes also rows that are owned
@@ -805,8 +805,8 @@ namespace TrilinosWrappers
     /**
      * Return a const reference to the underlying Trilinos Epetra_Map that
      * sets the partitioning of the range space of this sparsity pattern,
-     * i.e., the partitioning of the vectors that are result from matrix-
-     * vector products.
+     * i.e., the partitioning of the vectors that are result from
+     * matrix-vector products.
      */
     const Epetra_Map &
     range_partitioner() const;

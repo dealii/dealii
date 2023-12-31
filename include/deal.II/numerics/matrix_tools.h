@@ -255,8 +255,8 @@ namespace TrilinosWrappers
  * find difficulties: when we eliminate a degree of freedom, we delete the row
  * and column of this unknown, and set the diagonal entry to some positive
  * value. To make the problem more or less well-conditioned, we set this
- * diagonal entry to the absolute value of its prior value if that was non-
- * zero, or to the average magnitude of all other nonzero diagonal elements.
+ * diagonal entry to the absolute value of its prior value if that was
+ * non-zero, or to the average magnitude of all other nonzero diagonal elements.
  * Then we set the right hand side value such that the resulting solution
  * entry has the right value as given by the boundary values. Since we add
  * these contributions up over all local contributions, the diagonal entry and

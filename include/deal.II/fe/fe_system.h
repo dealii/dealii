@@ -670,14 +670,15 @@ public:
                        const unsigned int component) const override;
 
   /**
-   * Return the tensor of second derivatives of the @p ith shape function at
-   * point @p p on the unit cell. The derivatives are derivatives on the unit
-   * cell with respect to unit cell coordinates. Since this finite element is
-   * always vector-valued, we return the value of the only non-zero component
-   * of the vector value of this shape function. If the shape function has
-   * more than one non-zero component (which we refer to with the term non-
-   * primitive), then throw an exception of type @p
-   * ExcShapeFunctionNotPrimitive.
+   * Return the tensor of second derivatives of the @p ith shape
+   * function at point @p p on the unit cell. The derivatives are
+   * derivatives on the unit cell with respect to unit cell
+   * coordinates. Since this finite element is always vector-valued,
+   * we return the value of the only non-zero component of the vector
+   * value of this shape function. If the shape function has more than
+   * one non-zero component (which we refer to with the term
+   * non-primitive), then throw an exception of type
+   * @p ExcShapeFunctionNotPrimitive.
    *
    * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
    * @p FiniteElement (corresponding to the @p ith shape function) depend on
@@ -705,8 +706,8 @@ public:
    * cell with respect to unit cell coordinates. Since this finite element is
    * always vector-valued, we return the value of the only non-zero component
    * of the vector value of this shape function. If the shape function has
-   * more than one non-zero component (which we refer to with the term non-
-   * primitive), then throw an exception of type @p
+   * more than one non-zero component (which we refer to with the term
+   * non-primitive), then throw an exception of type @p
    * ExcShapeFunctionNotPrimitive.
    *
    * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
@@ -736,9 +737,9 @@ public:
    * cell with respect to unit cell coordinates. Since this finite element is
    * always vector-valued, we return the value of the only non-zero component
    * of the vector value of this shape function. If the shape function has
-   * more than one non-zero component (which we refer to with the term non-
-   * primitive), then throw an exception of type @p
-   * ExcShapeFunctionNotPrimitive.
+   * more than one non-zero component (which we refer to with the term
+   * non-primitive), then throw an exception of type
+   * @p ExcShapeFunctionNotPrimitive.
    *
    * An @p ExcUnitShapeValuesDoNotExist is thrown if the shape values of the
    * @p FiniteElement (corresponding to the @p ith shape function) depend on

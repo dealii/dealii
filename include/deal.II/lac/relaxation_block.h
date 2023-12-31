@@ -42,8 +42,8 @@ DEAL_II_NAMESPACE_OPEN
  * PreconditionBlock, since the index sets may be arbitrary and overlapping,
  * while there only contiguous, disjoint sets of equal size are allowed. As a
  * drawback, this class cannot be used as a preconditioner, since its
- * implementation relies on a straight forward implementation of the Gauss-
- * Seidel process.
+ * implementation relies on a straight forward implementation of the
+ * Gauss-Seidel process.
  *
  * Parallel computations require you to specify an initialized
  * ghost vector in AdditionalData::temp_ghost_vector.
