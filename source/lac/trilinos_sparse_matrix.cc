@@ -664,19 +664,22 @@ namespace TrilinosWrappers
       std::vector<TrilinosWrappers::types::int_type> ghost_rows;
       std::vector<int> n_entries_per_row(row_space_map.NumMyElements());
       std::vector<int> n_entries_per_ghost_row;
-      for (unsigned int i = 0, own = 0; i < n_rows; ++i)
-        {
-          const TrilinosWrappers::types::int_type global_row =
-            relevant_rows.nth_index_in_set(i);
-          if (row_space_map.MyGID(global_row))
-            n_entries_per_row[own++] = sparsity_pattern.row_length(global_row);
-          else if (sparsity_pattern.row_length(global_row) > 0)
-            {
-              ghost_rows.push_back(global_row);
-              n_entries_per_ghost_row.push_back(
-                sparsity_pattern.row_length(global_row));
-            }
-        }
+      {
+        SparseMatrix::size_type own = 0;
+        for (const auto global_row : relevant_rows)
+          {
+            if (row_space_map.MyGID(
+                  static_cast<TrilinosWrappers::types::int_type>(global_row)))
+              n_entries_per_row[own++] =
+                sparsity_pattern.row_length(global_row);
+            else if (sparsity_pattern.row_length(global_row) > 0)
+              {
+                ghost_rows.push_back(global_row);
+                n_entries_per_ghost_row.push_back(
+                  sparsity_pattern.row_length(global_row));
+              }
+          }
+      }
 
       Epetra_Map off_processor_map(-1,
                                    ghost_rows.size(),
