@@ -444,8 +444,6 @@ namespace TrilinosWrappers
 
   namespace
   {
-    using size_type = SparseMatrix::size_type;
-
     template <typename SparsityPatternType>
     void
     reinit_matrix(const IndexSet              &row_parallel_partitioning,
@@ -495,12 +493,14 @@ namespace TrilinosWrappers
           return;
         }
 
-      const size_type first_row = TrilinosWrappers::min_my_gid(row_space_map),
-                      last_row =
-                        TrilinosWrappers::max_my_gid(row_space_map) + 1;
+      const SparseMatrix::size_type first_row = TrilinosWrappers::min_my_gid(
+                                      row_space_map),
+                                    last_row = TrilinosWrappers::max_my_gid(
+                                                 row_space_map) +
+                                               1;
       std::vector<int> n_entries_per_row(last_row - first_row);
 
-      for (size_type row = first_row; row < last_row; ++row)
+      for (SparseMatrix::size_type row = first_row; row < last_row; ++row)
         n_entries_per_row[row - first_row] = sparsity_pattern.row_length(row);
 
       // The deal.II notation of a Sparsity pattern corresponds to the Epetra
@@ -537,7 +537,7 @@ namespace TrilinosWrappers
       // now insert the indices
       std::vector<TrilinosWrappers::types::int_type> row_indices;
 
-      for (size_type row = first_row; row < last_row; ++row)
+      for (SparseMatrix::size_type row = first_row; row < last_row; ++row)
         {
           const int row_length = sparsity_pattern.row_length(row);
           if (row_length == 0)
@@ -547,7 +547,9 @@ namespace TrilinosWrappers
           {
             typename SparsityPatternType::iterator p =
               sparsity_pattern.begin(row);
-            for (size_type col = 0; p != sparsity_pattern.end(row); ++p, ++col)
+            for (SparseMatrix::size_type col = 0;
+                 p != sparsity_pattern.end(row);
+                 ++p, ++col)
               row_indices[col] = p->column();
           }
           graph->Epetra_CrsGraph::InsertGlobalIndices(row,
