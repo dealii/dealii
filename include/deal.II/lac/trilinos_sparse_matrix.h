@@ -1908,29 +1908,6 @@ namespace TrilinosWrappers
 
 
   protected:
-    /**
-     * For some matrix storage formats, in particular for the PETSc
-     * distributed blockmatrices, set and add operations on individual
-     * elements can not be freely mixed. Rather, one has to synchronize
-     * operations when one wants to switch from setting elements to adding to
-     * elements.  BlockMatrixBase automatically synchronizes the access by
-     * calling this helper function for each block.  This function ensures
-     * that the matrix is in a state that allows adding elements; if it
-     * previously already was in this state, the function does nothing.
-     */
-    void
-    prepare_add();
-
-    /**
-     * Same as prepare_add() but prepare the matrix for setting elements if
-     * the representation of elements in this class requires such an
-     * operation.
-     */
-    void
-    prepare_set();
-
-
-
   private:
     /**
      * Pointer to the user-supplied Epetra Trilinos mapping of the matrix
@@ -1975,6 +1952,31 @@ namespace TrilinosWrappers
      * compressed or not.
      */
     bool compressed;
+
+    /**
+     * For some matrix storage formats, in particular for the PETSc
+     * distributed blockmatrices, set and add operations on individual
+     * elements can not be freely mixed. Rather, one has to synchronize
+     * operations when one wants to switch from setting elements to adding to
+     * elements.  BlockMatrixBase automatically synchronizes the access by
+     * calling this helper function for each block.  This function ensures
+     * that the matrix is in a state that allows adding elements; if it
+     * previously already was in this state, the function does nothing.
+     *
+     * This function is called from BlockMatrixBase.
+     */
+    void
+    prepare_add();
+
+    /**
+     * Same as prepare_add() but prepare the matrix for setting elements if
+     * the representation of elements in this class requires such an
+     * operation.
+     *
+     * This function is called from BlockMatrixBase.
+     */
+    void
+    prepare_set();
 
     // To allow calling protected prepare_add() and prepare_set().
     friend class BlockMatrixBase<SparseMatrix>;
