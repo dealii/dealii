@@ -660,23 +660,25 @@ namespace TrilinosWrappers
         return !relevant_map.SameAs(row_space_map);
       }();
 
-      const unsigned int n_rows = relevant_rows.n_elements();
       std::vector<TrilinosWrappers::types::int_type> ghost_rows;
       std::vector<int> n_entries_per_row(row_space_map.NumMyElements());
       std::vector<int> n_entries_per_ghost_row;
-      for (unsigned int i = 0, own = 0; i < n_rows; ++i)
-        {
-          const TrilinosWrappers::types::int_type global_row =
-            relevant_rows.nth_index_in_set(i);
-          if (row_space_map.MyGID(global_row))
-            n_entries_per_row[own++] = sparsity_pattern.row_length(global_row);
-          else if (sparsity_pattern.row_length(global_row) > 0)
-            {
-              ghost_rows.push_back(global_row);
-              n_entries_per_ghost_row.push_back(
-                sparsity_pattern.row_length(global_row));
-            }
-        }
+      {
+        SparseMatrix::size_type own = 0;
+        for (const auto global_row : relevant_rows)
+          {
+            if (row_space_map.MyGID(
+                  static_cast<TrilinosWrappers::types::int_type>(global_row)))
+              n_entries_per_row[own++] =
+                sparsity_pattern.row_length(global_row);
+            else if (sparsity_pattern.row_length(global_row) > 0)
+              {
+                ghost_rows.push_back(global_row);
+                n_entries_per_ghost_row.push_back(
+                  sparsity_pattern.row_length(global_row));
+              }
+          }
+      }
 
       Epetra_Map off_processor_map(-1,
                                    ghost_rows.size(),
@@ -714,10 +716,8 @@ namespace TrilinosWrappers
       // now insert the indices, select between the right matrix
       std::vector<TrilinosWrappers::types::int_type> row_indices;
 
-      for (unsigned int i = 0; i < n_rows; ++i)
+      for (const auto global_row : relevant_rows)
         {
-          const TrilinosWrappers::types::int_type global_row =
-            relevant_rows.nth_index_in_set(i);
           const int row_length = sparsity_pattern.row_length(global_row);
           if (row_length == 0)
             continue;
@@ -726,7 +726,8 @@ namespace TrilinosWrappers
           for (int col = 0; col < row_length; ++col)
             row_indices[col] = sparsity_pattern.column_number(global_row, col);
 
-          if (row_space_map.MyGID(global_row))
+          if (row_space_map.MyGID(
+                static_cast<TrilinosWrappers::types::int_type>(global_row)))
             graph->InsertGlobalIndices(global_row,
                                        row_length,
                                        row_indices.data());
