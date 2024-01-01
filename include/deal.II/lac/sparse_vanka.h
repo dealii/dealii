@@ -377,9 +377,9 @@ private:
  * Splitting the matrix into blocks is always done in a way such that the
  * blocks are not necessarily of equal size, but such that the number of
  * selected degrees of freedom for which a local system is to be solved is
- * equal between blocks. The reason for this strategy to subdivision is load-
- * balancing for multithreading. There are several possibilities to actually
- * split the matrix into blocks, which are selected by the flag @p
+ * equal between blocks. The reason for this strategy to subdivision is
+ * load-balancing for multithreading. There are several possibilities to
+ * actually split the matrix into blocks, which are selected by the flag @p
  * blocking_strategy that is passed to the constructor. By a block, we will in
  * the sequel denote a list of indices of degrees of freedom; the algorithm
  * will work on each block separately, i.e. the solutions of the local systems

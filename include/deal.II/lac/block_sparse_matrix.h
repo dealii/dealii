@@ -144,8 +144,8 @@ public:
    * latter tells the matrix how many nonzero elements there need to be
    * reserved.
    *
-   * Basically, this function only calls SparseMatrix::reinit() of the sub-
-   * matrices with the block sparsity patterns of the parameter.
+   * Basically, this function only calls SparseMatrix::reinit() of the
+   * sub-matrices with the block sparsity patterns of the parameter.
    *
    * You have to make sure that the lifetime of the sparsity structure is at
    * least as long as that of this matrix or as long as reinit(const

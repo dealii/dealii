@@ -269,11 +269,11 @@ namespace internal
        *
        * The strategy is based on a two-level approach. The outer level is
        * subdivided into partitions similar to the type of neighbors in
-       * Cuthill-McKee, and the inner level is again subdivided into Cuthill-
-       * McKee-like partitions (partitions whose level differs by more than 2
-       * can be worked on independently). One task is represented by a chunk
-       * of cells. The cell chunks are formed after subdivision into the two
-       * levels of partitions.
+       * Cuthill-McKee, and the inner level is again subdivided into
+       * Cuthill-McKee-like partitions (partitions whose level differs by more
+       * than 2 can be worked on independently). One task is represented by a
+       * chunk of cells. The cell chunks are formed after subdivision into the
+       * two levels of partitions.
        *
        * @param cell_active_fe_index The active FE index corresponding to the
        * individual indices in the list of all cell indices, in order to be

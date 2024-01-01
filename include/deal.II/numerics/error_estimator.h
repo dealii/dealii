@@ -191,8 +191,8 @@ namespace hp
  * contribution of the face $F\in\partial K$ looks like \f[ n_F\int_F
  * \left|g-a\frac{\partial u_h}{\partial n}\right|^2 ds \f] where $g$ is the
  * Neumann boundary function, $n_F=\frac {h_K}{24}$ and $n_F=\frac {h_F}{p}$ for
- * the Kelly and hp-estimator, respectively. If the finite element is vector-
- * valued, then obviously the function denoting the Neumann boundary
+ * the Kelly and hp-estimator, respectively. If the finite element is
+ * vector-valued, then obviously the function denoting the Neumann boundary
  * conditions needs to be vector-valued as well.
  *
  * <li> No other boundary conditions are considered.

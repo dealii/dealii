@@ -94,8 +94,8 @@ class TensorFunction;
  * or several points (i.e. vector_value(), vector_value_list()), will
  * <em>not</em> call the function returning one component at one point
  * repeatedly, once for each point and component. The reason is efficiency:
- * this would amount to too many virtual function calls. If you have vector-
- * valued functions, you should therefore also provide overloads of the
+ * this would amount to too many virtual function calls. If you have
+ * vector-valued functions, you should therefore also provide overloads of the
  * virtual functions for all components at a time.
  *
  * Also note, that unless only called a very small number of times, you should
@@ -186,8 +186,8 @@ public:
    * Virtual destructor; absolutely necessary in this case.
    *
    * This destructor is declared pure virtual, such that objects of this class
-   * cannot be created. Since all the other virtual functions have a pseudo-
-   * implementation to avoid overhead in derived classes, they can not be
+   * cannot be created. Since all the other virtual functions have a
+   * pseudo-implementation to avoid overhead in derived classes, they can not be
    * abstract. As a consequence, we could generate an object of this class
    * because none of this class's functions are abstract.
    *

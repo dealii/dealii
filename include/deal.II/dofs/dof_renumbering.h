@@ -162,12 +162,13 @@ class MatrixFree;
  * all the pressures so that the resulting matrix naturally decomposes into a
  * $2\times 2$ system.
  *
- * This kind of numbering may be obtained by calling the component_wise()
- * function of this class. Since it does not touch the order of indices within
- * each component, it may be worthwhile to first renumber using the Cuthill-
- * McKee or a similar algorithm and afterwards renumbering component-wise.
- * This will bring out the matrix structure and additionally have a good
- * numbering within each block.
+ * This kind of numbering may be obtained by calling the
+ * component_wise() function of this class. Since it does not touch
+ * the order of indices within each component, it may be worthwhile to
+ * first renumber using the Cuthill-McKee or a similar algorithm and
+ * afterwards renumbering component-wise.  This will bring out the
+ * matrix structure and additionally have a good numbering within each
+ * block.
  *
  * The component_wise() function allows not only to honor enumeration based on
  * vector components, but also allows to group together vector components into

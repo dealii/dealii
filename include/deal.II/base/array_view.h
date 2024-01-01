@@ -1268,8 +1268,8 @@ make_array_view(const std::vector<ElementType> &vector)
 
 /**
  * Create a view to a part of a std::vector object. This is equivalent to
- * initializing the ArrayView object with a pointer to the @p starting_index-
- * th element and the @p size_of_view as the length of the view.
+ * initializing the ArrayView object with a pointer to the
+ * @p starting_index-th element and the @p size_of_view as the length of the view.
  *
  * This function is used for non-@p const references to objects of vector
  * type. Such objects contain elements that can be written to. Consequently,
@@ -1302,8 +1302,8 @@ make_array_view(std::vector<ElementType> &vector,
 
 /**
  * Create a view to a part of a std::vector object. This is equivalent to
- * initializing the ArrayView object with a pointer to the @p starting_index-
- * th element and the @p size_of_view as the length of the view.
+ * initializing the ArrayView object with a pointer to the @p starting_index-th
+ * element and the @p size_of_view as the length of the view.
  *
  * This function is used for @p const references to objects of vector type
  * because they contain immutable elements. Consequently, the return type of

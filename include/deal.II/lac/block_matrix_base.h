@@ -858,8 +858,8 @@ protected:
    * matrix to indices into the subobjects. You *must* call this function each
    * time after you have changed the size of the sub-objects.
    *
-   * Derived classes should call this function whenever the size of the sub-
-   * objects has changed and the @p X_block_indices arrays need to be updated.
+   * Derived classes should call this function whenever the size of the
+   * sub-objects has changed and the @p X_block_indices arrays need to be updated.
    *
    * Note that this function is not public since not all derived classes need
    * to export its interface. For example, for the usual deal.II SparseMatrix

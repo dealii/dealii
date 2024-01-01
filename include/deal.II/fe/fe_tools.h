@@ -435,9 +435,9 @@ namespace FETools
    * data <tt>u<sub>q</sub>, 0 <= q < Q:=quadrature.size()</tt> defined at the
    * quadrature points of a cell, with the points defined by the given
    * <tt>rhs_quadrature</tt> object. We may then want to ask for that finite
-   * element function (on a single cell) <tt>v<sub>h</sub></tt> in the finite-
-   * dimensional space defined by the given FE object that is the projection
-   * of <tt>u</tt> in the following sense:
+   * element function (on a single cell) <tt>v<sub>h</sub></tt> in the
+   * finite-dimensional space defined by the given FE object that is the
+   * projection of <tt>u</tt> in the following sense:
    *
    * Usually, the projection <tt>v<sub>h</sub></tt> is that function that
    * satisfies <tt>(v<sub>h</sub>,w)=(u,w)</tt> for all discrete test
@@ -492,9 +492,9 @@ namespace FETools
    * The first one is that it really only makes sense to project onto a finite
    * element that has at most as many degrees of freedom per cell as there are
    * quadrature points; the projection of N quadrature point data into a space
-   * with M>N unknowns is well-defined, but often yields funny and non-
-   * intuitive results. Secondly, one would think that if the quadrature point
-   * data is defined in the support points of the finite element, i.e. the
+   * with M>N unknowns is well-defined, but often yields funny and
+   * non-intuitive results. Secondly, one would think that if the quadrature
+   * point data is defined in the support points of the finite element, i.e. the
    * quadrature points of <tt>rhs_quadrature</tt> equal
    * <tt>fe.get_unit_support_points()</tt>, then the projection should be the
    * identity, i.e. each degree of freedom of the finite element equals the
@@ -1251,8 +1251,8 @@ namespace FETools
    * The format of the @p name parameter should include the name of a finite
    * element. However, it is safe to use either the class name alone or to use
    * the result of FiniteElement::get_name (which includes the space dimension
-   * as well as the polynomial degree), since everything after the first non-
-   * name character will be ignored.
+   * as well as the polynomial degree), since everything after the first
+   * non-name character will be ignored.
    *
    * The FEFactory object should be an object newly created with <tt>new</tt>.
    * FETools will take ownership of this object and delete it once it is not

@@ -747,9 +747,9 @@ namespace TrilinosWrappers
      * actual matrix structure has more nonzero entries than specified in the
      * constructor. However it is still advantageous to provide good estimates
      * here since this will considerably increase the performance of the
-     * matrix setup. However, there is no effect in the performance of matrix-
-     * vector products, since Trilinos reorganizes the matrix memory prior to
-     * use (in the compress() step).
+     * matrix setup. However, there is no effect in the performance of
+     * matrix-vector products, since Trilinos reorganizes the matrix memory
+     * prior to use (in the compress() step).
      */
     SparseMatrix(const IndexSet    &parallel_partitioning,
                  const MPI_Comm     communicator          = MPI_COMM_WORLD,
@@ -1029,9 +1029,9 @@ namespace TrilinosWrappers
      * </ul>
      *
      * In both cases, this function compresses the data structures and allows
-     * the resulting matrix to be used in all other operations like matrix-
-     * vector products. This is a collective operation, i.e., it needs to be
-     * run on all processors when used in %parallel.
+     * the resulting matrix to be used in all other operations like
+     * matrix-vector products. This is a collective operation, i.e., it needs to
+     * be run on all processors when used in %parallel.
      *
      * See
      * @ref GlossCompress "Compressing distributed objects"
@@ -1712,9 +1712,9 @@ namespace TrilinosWrappers
      * that all elements of one row are accessed before the elements of the
      * next row. If your algorithm relies on visiting elements within one row,
      * you will need to consult with the Trilinos documentation on the order
-     * in which it stores data. It is, however, generally not a good and long-
-     * term stable idea to rely on the order in which receive elements if you
-     * iterate over them.
+     * in which it stores data. It is, however, generally not a good and
+     * long-term stable idea to rely on the order in which receive elements if
+     * you iterate over them.
      *
      * When you iterate over the elements of a parallel matrix, you will only
      * be able to access the locally owned rows. (You can access the other
@@ -1758,9 +1758,9 @@ namespace TrilinosWrappers
      * that all elements of one row are accessed before the elements of the
      * next row. If your algorithm relies on visiting elements within one row,
      * you will need to consult with the Trilinos documentation on the order
-     * in which it stores data. It is, however, generally not a good and long-
-     * term stable idea to rely on the order in which receive elements if you
-     * iterate over them.
+     * in which it stores data. It is, however, generally not a good and
+     * long-term stable idea to rely on the order in which receive elements if
+     * you iterate over them.
      *
      * @note When you access the elements of a parallel matrix, you can only
      * access the elements of rows that are actually stored locally. (You can
@@ -1946,8 +1946,8 @@ namespace TrilinosWrappers
     std::unique_ptr<Epetra_FECrsMatrix> matrix;
 
     /**
-     * A sparse matrix object in Trilinos to be used for collecting the non-
-     * local elements if the matrix was constructed from a Trilinos sparsity
+     * A sparse matrix object in Trilinos to be used for collecting the
+     * non-local elements if the matrix was constructed from a Trilinos sparsity
      * pattern with the respective option.
      */
     std::unique_ptr<Epetra_CrsMatrix> nonlocal_matrix;

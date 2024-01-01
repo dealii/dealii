@@ -36,8 +36,8 @@ DEAL_II_NAMESPACE_OPEN
  * parallel programs, this means that each of the MPI processes write to the
  * screen, which yields many repetitions of the same text. To avoid it, one
  * would have to have a designated process, say the one with MPI process
- * number zero, do the output, and guard each write statement with an if-
- * condition. This becomes cumbersome and clutters up the code. Rather than
+ * number zero, do the output, and guard each write statement with an
+ * if-condition. This becomes cumbersome and clutters up the code. Rather than
  * doing so, the present class can be used: objects of its type act just like
  * a standard output stream, but they only print something based on a
  * condition that can be set to, for example, <tt>mpi_process==0</tt>, so that
@@ -67,8 +67,8 @@ DEAL_II_NAMESPACE_OPEN
  * @code
  * system_matrix.print_formatted(pout);
  * @endcode
- * is <em>not</em> possible. Instead use the is_active() function for a work-
- * around:
+ * is <em>not</em> possible. Instead use the is_active() function for a
+ * work-around:
  *
  * @code
  * if (pout.is_active())

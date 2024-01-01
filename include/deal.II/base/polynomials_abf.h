@@ -35,9 +35,9 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class implements the <i>H<sup>div</sup></i>-conforming, vector-valued
- * Arnold-Boffi-Falk polynomials as described in the article by Arnold-Boffi-
- * Falk: Quadrilateral H(div) finite elements, SIAM J. Numer. Anal. Vol.42,
- * No.6, pp.2429-2451
+ * Arnold-Boffi-Falk polynomials as described in the article by Arnold, Boffi,
+ * and Falk: Quadrilateral H(div) finite elements, SIAM J. Numer. Anal., Vol.
+ * 42, No. 6, pp.2429-2451
  *
  *
  * The ABF polynomials are constructed such that the divergence is in the
@@ -64,8 +64,8 @@ public:
   PolynomialsABF(const unsigned int k);
 
   /**
-   * Compute the value and the first and second derivatives of each Raviart-
-   * Thomas polynomial at @p unit_point.
+   * Compute the value and the first and second derivatives of each
+   * Raviart-Thomas polynomial at @p unit_point.
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
    * the first case, the function will not compute these values.

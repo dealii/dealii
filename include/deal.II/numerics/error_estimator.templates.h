@@ -194,8 +194,8 @@ namespace internal
 
     /**
      * Resize the arrays so that they fit the number of quadrature points
-     * associated with the given finite element index into the hp-
-     * collections.
+     * associated with the given finite element index into the
+     * hp-collections.
      */
     void
     resize(const unsigned int active_fe_index);

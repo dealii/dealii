@@ -29,8 +29,8 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class handles the history of a triangulation and can rebuild it after
- * it was deleted some time before. Its main purpose is support for time-
- * dependent problems where one frequently deletes a triangulation due to
+ * it was deleted some time before. Its main purpose is support for
+ * time-dependent problems where one frequently deletes a triangulation due to
  * memory pressure and later wants to rebuild it; this class has all the
  * information to rebuild it exactly as it was before including the mapping of
  * cell numbers to the geometrical cells.

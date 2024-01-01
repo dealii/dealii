@@ -1974,8 +1974,8 @@ namespace DoFTools
    * details of the generated patches. The default settings are those for
    * Arnold-Falk-Winther type smoothers for divergence and curl conforming
    * finite elements with essential boundary conditions. Other applications
-   * are possible, in particular changing <tt>boundary_patches</tt> for non-
-   * essential boundary conditions.
+   * are possible, in particular changing <tt>boundary_patches</tt> for
+   * non-essential boundary conditions.
    *
    * This function returns the <tt>vertex_mapping</tt>,
    * that contains the mapping from the vertex indices to the block indices
@@ -2065,8 +2065,8 @@ namespace DoFTools
    * details of the generated patches. The default settings are those for
    * Arnold-Falk-Winther type smoothers for divergence and curl conforming
    * finite elements with essential boundary conditions. Other applications
-   * are possible, in particular changing <tt>boundary_dofs</tt> for non-
-   * essential boundary conditions.
+   * are possible, in particular changing <tt>boundary_dofs</tt> for
+   * non-essential boundary conditions.
    *
    * @arg <tt>block_list</tt>: the SparsityPattern into which the patches will
    * be stored.
@@ -2146,8 +2146,8 @@ namespace DoFTools
    * components of a nonprimitive vector valued element is collected only in
    * the first component. All other components will have a count of zero.
    *
-   * The additional optional argument @p target_component allows for a re-
-   * sorting and grouping of components. To this end, it contains for each
+   * The additional optional argument @p target_component allows for a
+   * re-sorting and grouping of components. To this end, it contains for each
    * component the component number it shall be counted as. Having the same
    * number entered several times sums up several components as the same. One
    * of the applications of this argument is when you want to form block
@@ -2585,8 +2585,8 @@ namespace DoFTools
    * module for handling the case where there are conflicting constraints on
    * individual degrees of freedom.
    * @param component_mask An optional component mask that restricts the
-   * functionality of this function to a subset of an FESystem. For non-
-   * @ref GlossPrimitive "primitive"
+   * functionality of this function to a subset of an FESystem. For
+   * non-@ref GlossPrimitive "primitive"
    * shape functions, any degree of freedom is affected that belongs to a
    * shape function where at least one of its nonzero components is affected
    * by the component mask (see

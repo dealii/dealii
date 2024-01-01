@@ -310,9 +310,9 @@ public:
    *   @endcode
    * - <code>table_with_separate_column_description</code>: This is a better
    * format when there are many columns and the table as a whole can not be
-   * displayed on the screen. Here, the column keys are first listed one-by-
-   * one on lines of their own, and are numbered for better readability. In
-   * addition, each of these description lines are prefixed by '#' to mark
+   * displayed on the screen. Here, the column keys are first listed
+   * one-by-one on lines of their own, and are numbered for better readability.
+   * In addition, each of these description lines are prefixed by '#' to mark
    * these lines as comments for programs that want to read the following
    * table as data and should ignore these descriptive lines. GNUPLOT is one
    * such program that will automatically ignore lines so prefixed. Output

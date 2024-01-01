@@ -1173,8 +1173,8 @@ namespace internal
  *   previous_cell = Triangulation<dim>::active_cell_iterator();
  * }
  * @endcode
- * Here, whenever the triangulation is refined, it triggers the post-
- * refinement signal which calls the function object attached to it. This
+ * Here, whenever the triangulation is refined, it triggers the
+ * post-refinement signal which calls the function object attached to it. This
  * function object is the member function
  * <code>FEValues<dim>::invalidate_previous_cell</code> where we have bound
  * the single argument (the <code>this</code> pointer of a member function
@@ -1352,8 +1352,8 @@ public:
   enum MeshSmoothing
   {
     /**
-     * No mesh smoothing at all, except that meshes have to remain one-
-     * irregular.
+     * No mesh smoothing at all, except that meshes have to remain
+     * one-irregular.
      */
     none = 0x0,
     /**
@@ -3026,8 +3026,8 @@ public:
 
   /**
    * Return an iterator range that contains all cells (active or not) that
-   * make up this triangulation. Such a range is useful to initialize range-
-   * based for loops as supported by C++11. See the example in the
+   * make up this triangulation. Such a range is useful to initialize
+   * range-based for loops as supported by C++11. See the example in the
    * documentation of active_cell_iterators().
    *
    * @return The half open range <code>[this->begin(), this->end())</code>

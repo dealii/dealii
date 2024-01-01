@@ -108,8 +108,8 @@ public:
   vmult(Vector<somenumber> &dst, const Vector<somenumber> &src) const;
 
   /**
-   * Apply the transpose of the incomplete decomposition, i.e. do one forward-
-   * backward step $dst=(LU)^{-1}src$.
+   * Apply the transpose of the incomplete decomposition, i.e. do one
+   * forward-backward step $dst=(LU)^{-1}src$.
    *
    * Call @p initialize before calling this function.
    *

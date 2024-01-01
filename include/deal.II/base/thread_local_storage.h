@@ -231,8 +231,8 @@ namespace Threads
      * same time, the purpose of this function is to release memory other
      * threads may have allocated for their own thread local objects after
      * which every use of this object will require some kind of
-     * initialization. This is necessary both in the multithreaded or non-
-     * multithreaded case.
+     * initialization. This is necessary both in the multithreaded or
+     * non-multithreaded case.
      */
     void
     clear();

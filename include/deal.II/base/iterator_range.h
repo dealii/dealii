@@ -64,8 +64,8 @@ class IteratorOverIterators;
  * <h3>Class design: Motivation</h3>
  *
  * Informally, the way the C++11 standard describes <a
- * href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">range-
- * based for loops</a> works as follows: A <i>range-based for loop</i> of the
+ * href="http://en.wikipedia.org/wiki/C%2B%2B11#Range-based_for_loop">range-based
+ * for loops</a> works as follows: A <i>range-based for loop</i> of the
  * form
  * @code
  *   Container c;
@@ -99,8 +99,8 @@ class IteratorOverIterators;
  * a call such as Triangulation::active_cell_iterators() returns an object
  * that represents a <i>collection of iterators</i> of the kind <code>{begin,
  * begin+1, ..., end-1}</code>. This is conveniently expressed as the half
- * open interval <code>[begin,end)</code>. The loop variable in the range-
- * based for loop would then take on each of these iterators in turn.
+ * open interval <code>[begin,end)</code>. The loop variable in the
+ * range-based for loop would then take on each of these iterators in turn.
  *
  *
  * <h3>Class design: Implementation</h3>

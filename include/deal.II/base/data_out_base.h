@@ -928,9 +928,9 @@ namespace DataOutBase
     /**
      * Flag whether to fill the regions between the lines bounding the cells
      * or not. If not, no hidden line removal is performed, which in this
-     * crude implementation is done through writing the cells in a back-to-
-     * front order, thereby hiding the cells in the background by cells in the
-     * foreground.
+     * crude implementation is done through writing the cells in a
+     * back-to-front order, thereby hiding the cells in the background by
+     * cells in the foreground.
      *
      * If this flag is <tt>false</tt> and #draw_mesh is <tt>false</tt> as
      * well, nothing will be printed.
@@ -1099,8 +1099,8 @@ namespace DataOutBase
     const char *zone_name;
 
     /**
-     * Solution time for each zone in a strand. This value must be non-
-     * negative, otherwise it will not be written to file. Do not assign any
+     * Solution time for each zone in a strand. This value must be
+     * non-negative, otherwise it will not be written to file. Do not assign any
      * value for this in case of a static zone.
      */
     double solution_time;
@@ -1760,9 +1760,9 @@ namespace DataOutBase
     std::ostream   &out);
 
   /**
-   * This is the same function as above except for domains that are not two-
-   * dimensional. This function is not implemented (and will throw an error if
-   * called) but is declared to allow for dimension-independent programs.
+   * This is the same function as above except for domains that are not
+   * two-dimensional. This function is not implemented (and will throw an error
+   * if called) but is declared to allow for dimension-independent programs.
    */
   template <int dim, int spacedim>
   void

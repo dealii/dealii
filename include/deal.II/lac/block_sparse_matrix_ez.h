@@ -157,8 +157,8 @@ public:
   /**
    * Return whether the object is empty. It is empty if no memory is
    * allocated, which is the same as that both dimensions are zero. This
-   * function is just the concatenation of the respective call to all sub-
-   * matrices.
+   * function is just the concatenation of the respective call to all
+   * sub-matrices.
    */
   bool
   empty() const;
@@ -174,9 +174,9 @@ public:
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
-   * the domain space. It is the sum of the number of columns over the sub-
-   * matrix blocks of this matrix. Recall that the matrix is of size m() times
-   * n().
+   * the domain space. It is the sum of the number of columns over the
+   * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
+   * times n().
    */
   size_type
   n() const;

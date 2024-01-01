@@ -557,8 +557,8 @@ namespace Polynomials
     compute_coefficients(const unsigned int p);
 
     /**
-     * Get coefficients for constructor.  This way, it can use the non-
-     * standard constructor of Polynomial.
+     * Get coefficients for constructor.  This way, it can use the
+     * non-standard constructor of Polynomial.
      */
     static const std::vector<double> &
     get_coefficients(const unsigned int p);

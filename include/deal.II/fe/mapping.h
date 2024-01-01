@@ -612,8 +612,8 @@ public:
    * - To provide scratch space for computations that are done in
    * Mapping::fill_fe_values() and similar functions. Some of the derived
    * classes would like to use scratch arrays and it would be a waste of time
-   * to allocate these arrays every time this function is called, just to de-
-   * allocate it again at the end of the function. Rather, one could allocate
+   * to allocate these arrays every time this function is called, just to
+   * de-allocate it again at the end of the function. Rather, one could allocate
    * this memory once as a member variable of the current class, and simply
    * use it in Mapping::fill_fe_values().
    * - After calling Mapping::fill_fe_values(), FEValues::reinit()
@@ -721,8 +721,8 @@ protected:
    * interface of mappings with the FEValues class).
    *
    * Derived classes will return pointers to objects of a type derived from
-   * Mapping::InternalDataBase (see there for more information) and may pre-
-   * compute some information already (in accordance with what will be asked
+   * Mapping::InternalDataBase (see there for more information) and may
+   * pre-compute some information already (in accordance with what will be asked
    * of the mapping in the future, as specified by the update flags) and for
    * the given quadrature object. Subsequent calls to transform() or
    * fill_fe_values() and friends will then receive back the object created

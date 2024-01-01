@@ -570,9 +570,9 @@ public:
   n_active_fe_indices() const;
 
   /**
-   * Return the @p n-th active FE index on this object. For cells and all non-
-   * hp-objects, there is only a single active FE index, so the argument must
-   * be equal to zero. For lower-dimensional hp-objects, there are
+   * Return the @p n-th active FE index on this object. For cells and all
+   * non-hp-objects, there is only a single active FE index, so the argument
+   * must be equal to zero. For lower-dimensional hp-objects, there are
    * n_active_fe_indices() active finite elements, and this function can be
    * queried for their indices.
    */
@@ -590,8 +590,8 @@ public:
 
   /**
    * Return true if the finite element with given index is active on the
-   * present object. When the current DoFHandler does not have hp-
-   * capabilities, this is of course the case only if @p fe_index equals
+   * present object. When the current DoFHandler does not have
+   * hp-capabilities, this is of course the case only if @p fe_index equals
    * zero. For cells, it is the case if @p fe_index equals active_fe_index()
    * of this cell. For faces and other lower- dimensional objects, there may
    * be more than one @p fe_index that are active on any given object (see
@@ -800,8 +800,8 @@ public:
   DoFAccessor();
 
   /**
-   * Constructor to be used if the object here refers to a vertex of a one-
-   * dimensional triangulation, i.e. a face of the triangulation.
+   * Constructor to be used if the object here refers to a vertex of a
+   * one-dimensional triangulation, i.e. a face of the triangulation.
    *
    * Since there is no mapping from vertices to cells, an accessor object for
    * a point has no way to figure out whether it is at the boundary of the
@@ -1718,8 +1718,8 @@ public:
    * If the cell is part of a DoFHandler with hp-capabilities, cells only have
    * an associated finite element space if they are active. However, this
    * function is supposed to also work on inactive cells with children.
-   * Consequently, it carries a third argument that can be used in the hp-
-   * context that denotes the finite element space we are supposed to
+   * Consequently, it carries a third argument that can be used in the
+   * hp-context that denotes the finite element space we are supposed to
    * interpret the input vector of this function in. If the cell is active,
    * this function then interpolates the input vector interpreted as an
    * element of the space described by the <code>fe_index</code>th element of
@@ -1986,8 +1986,8 @@ public:
   /**
    * Set the index of the FiniteElement used for this cell. This determines
    * which element in an hp::FECollection to use. This function is only useful
-   * if the DoF handler object associated with the current cell has hp-
-   * capabilities enabled.
+   * if the DoF handler object associated with the current cell has
+   * hp-capabilities enabled.
    *
    * @note Since degrees of freedom only exist on active cells for DoFHandler
    * objects with hp-capabilities (i.e., there is currently no implementation
@@ -2043,8 +2043,8 @@ public:
    * will be returned.
    *
    * For DoFHandlers without hp-capabilities enabled, this is of course always
-   * the same element, independent of the cell we are presently on, but for hp-
-   * DoFHandler objects this may change from cell to cell.
+   * the same element, independent of the cell we are presently on, but for
+   * hp-DoFHandler objects this may change from cell to cell.
    *
    * @note Since degrees of freedom only exist on active cells for DoFHandler
    * objects with hp-capabilities (i.e., there is currently no implementation

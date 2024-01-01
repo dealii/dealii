@@ -881,10 +881,10 @@ vectorized_load_and_transpose(const unsigned int                 n_entries,
 /**
  * This method stores the vectorized arrays in transposed form into the given
  * output array @p out with the given offsets @p offsets. This operation
- * corresponds to a transformation of a struct-of-array (input) into an array-
- * of-struct (output). This method operates on plain array, so no checks for
- * valid data access are made. It is the user's responsibility to ensure that
- * the given arrays are valid according to the access layout below.
+ * corresponds to a transformation of a struct-of-array (input) into an
+ * array-of-struct (output). This method operates on plain array, so no checks
+ * for valid data access are made. It is the user's responsibility to ensure
+ * that the given arrays are valid according to the access layout below.
  *
  * This method assumes that the specified offsets do not overlap. Otherwise,
  * the behavior is undefined in the vectorized case. It is the user's

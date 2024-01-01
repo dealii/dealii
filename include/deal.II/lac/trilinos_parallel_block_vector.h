@@ -271,9 +271,9 @@ namespace TrilinosWrappers
        * then queried from the input vector. Note that you should not write to
        * the resulting vector any more, since the some data can be stored
        * several times on different processors, leading to unpredictable
-       * results. In particular, such a vector cannot be used for matrix-
-       * vector products as for example done during the solution of linear
-       * systems.
+       * results. In particular, such a vector cannot be used for
+       * matrix-vector products as for example done during the solution of
+       * linear systems.
        */
       void
       import_nonlocal_data_for_fe(const TrilinosWrappers::BlockSparseMatrix &m,

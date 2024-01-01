@@ -262,8 +262,7 @@ namespace PETScWrappers
        * This function collects the sizes of the sub-objects and stores them
        * in internal arrays, in order to be able to relay global indices into
        * the vector to indices into the subobjects. You *must* call this
-       * function each time after you have changed the size of the sub-
-       * objects.
+       * function each time after you have changed the size of the sub-objects.
        */
       void
       collect_sizes();

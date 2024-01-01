@@ -514,8 +514,8 @@ public:
    *
    * This constructs objects intended for the application of the ILU(n)-method
    * or other incomplete decompositions.  Therefore, additional to the
-   * original entry structure, space for <tt>extra_off_diagonals</tt> side-
-   * diagonals is provided on both sides of the main diagonal.
+   * original entry structure, space for <tt>extra_off_diagonals</tt>
+   * side-diagonals is provided on both sides of the main diagonal.
    *
    * <tt>max_per_row</tt> is the maximum number of nonzero elements per row
    * which this structure is to hold. It is assumed that this number is
@@ -524,8 +524,8 @@ public:
    * will usually want to give the same number as you gave for
    * <tt>original</tt> plus the number of side diagonals times two. You may
    * however give a larger value if you wish to add further nonzero entries
-   * for the decomposition based on other criteria than their being on side-
-   * diagonals.
+   * for the decomposition based on other criteria than their being on
+   * side-diagonals.
    *
    * This function requires that <tt>original</tt> refers to a quadratic
    * matrix structure.  It must be compressed. The matrix structure is not

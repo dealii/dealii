@@ -1498,8 +1498,8 @@ private:
   BlockInfo block_info_object;
 
   /**
-   * Boolean indicating whether or not the current DoFHandler has hp-
-   * capabilities.
+   * Boolean indicating whether or not the current DoFHandler has
+   * hp-capabilities.
    */
   bool hp_capability_enabled;
 

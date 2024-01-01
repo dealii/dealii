@@ -1462,8 +1462,8 @@ namespace MeshWorker
     hp::QCollection<dim - 1> face_quadrature_collection;
 
     /**
-     * Boolean indicating whether or not the current ScratchData has hp-
-     * capabilities.
+     * Boolean indicating whether or not the current ScratchData has
+     * hp-capabilities.
      */
     bool hp_capability_enabled;
 

@@ -1517,8 +1517,8 @@ public:
 
   /**
    * Print parameters to a logstream. This function allows to print all
-   * parameters into a log-file. Sections will be indented in the usual log-
-   * file style.
+   * parameters into a log-file. Sections will be indented in the usual
+   * log-file style.
    *
    * All current parameters and subsections are sorted
    * alphabetically by default.

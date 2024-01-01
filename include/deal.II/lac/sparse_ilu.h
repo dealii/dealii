@@ -113,8 +113,8 @@ public:
 
 
   /**
-   * Apply the transpose of the incomplete decomposition, i.e. do one forward-
-   * backward step $dst=(LU)^{-T}src$.
+   * Apply the transpose of the incomplete decomposition, i.e. do one
+   * forward-backward step $dst=(LU)^{-T}src$.
    *
    * The initialize() function needs to be called before.
    */

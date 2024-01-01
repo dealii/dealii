@@ -240,8 +240,8 @@ namespace internal
       AlignedVector<Number> shape_values_eo;
 
       /**
-       * Stores the shape gradients in a different format, namely the so-
-       * called even-odd scheme where the symmetries in shape_gradients are
+       * Stores the shape gradients in a different format, namely the
+       * so-called even-odd scheme where the symmetries in shape_gradients are
        * used for faster evaluation.
        */
       AlignedVector<Number> shape_gradients_eo;
@@ -417,8 +417,8 @@ namespace internal
        * Initializes the data fields. Takes a one-dimensional quadrature
        * formula and a finite element as arguments and evaluates the shape
        * functions, gradients and Hessians on the one-dimensional unit cell.
-       * This function assumes that the finite element is derived from a one-
-       * dimensional element by a tensor product and that the zeroth shape
+       * This function assumes that the finite element is derived from a
+       * one-dimensional element by a tensor product and that the zeroth shape
        * function in zero evaluates to one.
        */
       template <int dim, int spacedim, int dim_q>

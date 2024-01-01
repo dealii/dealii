@@ -159,8 +159,8 @@ namespace internal
       clear();
 
       /**
-       * Return the FE index for a given finite element degree. If not in hp-
-       * mode, this function always returns index 0. If an index is not found
+       * Return the FE index for a given finite element degree. If not in
+       * hp-mode, this function always returns index 0. If an index is not found
        * in hp-mode, it returns numbers::invalid_unsigned_int.
        */
       unsigned int
@@ -710,8 +710,8 @@ namespace internal
       std::vector<unsigned int> cell_active_fe_index;
 
       /**
-       * Stores the maximum degree of different finite elements for the hp-
-       * case.
+       * Stores the maximum degree of different finite elements for the
+       * hp-case.
        */
       unsigned int max_fe_index;
 

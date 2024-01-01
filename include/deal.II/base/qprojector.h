@@ -299,9 +299,9 @@ public:
      * course is only allowed if <tt>dim>=2</tt>, and the face orientation,
      * flip and rotation are ignored if the space dimension equals 2.
      *
-     * The last argument denotes the number of quadrature points the lower-
-     * dimensional face quadrature formula (the one that has been projected
-     * onto the faces) has.
+     * The last argument denotes the number of quadrature points the
+     * lower-dimensional face quadrature formula (the one that has been
+     * projected onto the faces) has.
      */
     static DataSetDescriptor
     face(const ReferenceCell &reference_cell,

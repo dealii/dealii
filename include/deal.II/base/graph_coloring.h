@@ -90,8 +90,8 @@ namespace GraphColoring
      * shells around the very first cell. Note that elements in each zone may
      * conflict with other elements in the same zone.
      *
-     * The question whether two iterators conflict is determined by a user-
-     * provided function. The meaning of this function is discussed in the
+     * The question whether two iterators conflict is determined by a
+     * user-provided function. The meaning of this function is discussed in the
      * documentation of the GraphColoring::make_graph_coloring() function.
      *
      * @param[in] begin The first element of a range of iterators for which a

@@ -230,9 +230,9 @@ DEAL_II_NAMESPACE_OPEN
  * rendering its behavior constant.
  *
  * Further examples of this functionality can be found in the test-suite, such
- * as <code>tests/lac/schur_complement_01.cc</code> . The solution of a multi-
- * component problem (namely step-22) using the schur_complement can be found
- * in <code>tests/lac/schur_complement_03.cc</code> .
+ * as <code>tests/lac/schur_complement_01.cc</code>. The solution of a
+ * multi-component problem (namely step-22) using the schur_complement can be
+ * found in <code>tests/lac/schur_complement_03.cc</code>.
  *
  * @see
  * @ref GlossBlockLA "Block (linear algebra)"

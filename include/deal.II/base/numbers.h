@@ -436,8 +436,8 @@ namespace numbers
     /**
      * For this data type, alias the corresponding real type. Since the
      * general template is selected for all data types that are not
-     * specializations of std::complex<T>, the underlying type must be real-
-     * values, so the real_type is equal to the underlying type.
+     * specializations of std::complex<T>, the underlying type must be
+     * real-values, so the real_type is equal to the underlying type.
      */
     using real_type = number;
 

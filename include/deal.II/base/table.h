@@ -104,8 +104,8 @@ namespace internal
 
     /**
      * @internal Have a class which declares some nested alias, depending
-     * on its template parameters. Specialization for accessors to non-
-     * constant objects.
+     * on its template parameters. Specialization for accessors to
+     * non-constant objects.
      */
     template <int N, typename T>
     struct Types<N, T, false>
@@ -1563,8 +1563,8 @@ public:
   using TableBase<3, T>::reinit;
 
   /**
-   * Access operator. Generate an object that accesses the requested two-
-   * dimensional subobject of this three-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * two-dimensional subobject of this three-dimensional table. Range checks are
    * performed.
    *
    * This version of the function only allows read access.
@@ -1573,9 +1573,9 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested two-
-   * dimensional subobject of this three-dimensional table. Range checks are
-   * performed.
+   * Access operator. Generate an object that accesses the requested
+   * two-dimensional subobject of this three-dimensional table. Range
+   * checks are performed.
    *
    * This version of the function allows read-write access.
    */
@@ -1641,9 +1641,9 @@ public:
         const size_type size4);
 
   /**
-   * Access operator. Generate an object that accesses the requested three-
-   * dimensional subobject of this four-dimensional table. Range checks are
-   * performed.
+   * Access operator. Generate an object that accesses the requested
+   * three-dimensional subobject of this four-dimensional table. Range checks
+   * are performed.
    *
    * This version of the function only allows read access.
    */
@@ -1651,9 +1651,9 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested three-
-   * dimensional subobject of this four-dimensional table. Range checks are
-   * performed.
+   * Access operator. Generate an object that accesses the requested
+   * three-dimensional subobject of this four-dimensional table. Range checks
+   * are performed.
    *
    * This version of the function allows read-write access.
    */
@@ -1727,8 +1727,8 @@ public:
         const size_type size5);
 
   /**
-   * Access operator. Generate an object that accesses the requested four-
-   * dimensional subobject of this five-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * four-dimensional subobject of this five-dimensional table. Range checks are
    * performed.
    *
    * This version of the function only allows read access.
@@ -1737,8 +1737,8 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested four-
-   * dimensional subobject of this five-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * four-dimensional subobject of this five-dimensional table. Range checks are
    * performed.
    *
    * This version of the function allows read-write access.
@@ -1814,8 +1814,8 @@ public:
         const size_type size6);
 
   /**
-   * Access operator. Generate an object that accesses the requested five-
-   * dimensional subobject of this six-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * five-dimensional subobject of this six-dimensional table. Range checks are
    * performed.
    *
    * This version of the function only allows read access.
@@ -1824,8 +1824,8 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested five-
-   * dimensional subobject of this six-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * five-dimensional subobject of this six-dimensional table. Range checks are
    * performed.
    *
    * This version of the function allows read-write access.
@@ -1903,8 +1903,8 @@ public:
         const size_type size7);
 
   /**
-   * Access operator. Generate an object that accesses the requested six-
-   * dimensional subobject of this seven-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * six-dimensional subobject of this seven-dimensional table. Range checks are
    * performed.
    *
    * This version of the function only allows read access.
@@ -1913,8 +1913,8 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access operator. Generate an object that accesses the requested six-
-   * dimensional subobject of this seven-dimensional table. Range checks are
+   * Access operator. Generate an object that accesses the requested
+   * six-dimensional subobject of this seven-dimensional table. Range checks are
    * performed.
    *
    * This version of the function allows read-write access.

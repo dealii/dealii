@@ -1322,8 +1322,8 @@ public:
    * Return the $l_1$-norm of the matrix, that is $|M|_1=\max_{\mathrm{all\
    * columns\ }j}\sum_{\mathrm{all\ rows\ } i} |M_{ij}|$, (max. sum of
    * columns).  This is the natural matrix norm that is compatible to the
-   * $l_1$-norm for vectors, i.e.  $|Mv|_1\leq |M|_1 |v|_1$. (cf. Haemmerlin-
-   * Hoffmann: Numerische Mathematik)
+   * $l_1$-norm for vectors, i.e.  $|Mv|_1\leq |M|_1 |v|_1$. (cf.
+   * Haemmerlin-Hoffmann: Numerische Mathematik)
    */
   real_type
   l1_norm() const;

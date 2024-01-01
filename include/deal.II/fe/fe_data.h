@@ -63,11 +63,11 @@ namespace FiniteElementDomination
    *
    * Note that there are situations where neither side dominates. The
    * @ref hp_paper "hp-paper"
-   * lists two case, with the simpler one being that a $Q_2\times Q_1$ vector-
-   * valued element (i.e. a <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>) meets
-   * a $Q_1\times Q_2$ element: here, for each of the two vector-components,
-   * we can define a domination relationship, but it is different for the two
-   * components.
+   * lists two case, with the simpler one being that a $Q_2\times Q_1$
+   * vector-valued element (i.e. a <code>FESystem(FE_Q(2),1,FE_Q(1),1)</code>)
+   * meets a $Q_1\times Q_2$ element: here, for each of the two
+   * vector-components, we can define a domination relationship, but it is
+   * different for the two components.
    *
    * It is clear that the concept of domination doesn't matter for
    * discontinuous elements. However, discontinuous elements may be part of

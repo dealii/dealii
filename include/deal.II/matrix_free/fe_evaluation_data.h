@@ -323,8 +323,8 @@ public:
    * Return a read-only pointer to the first field of function hessians on
    * quadrature points. First comes the xx-component of the hessian for the
    * first component on all quadrature points, then the yy-component,
-   * zz-component in (3d), then the xy-component, and so on. Next comes the xx-
-   * component of the second component, and so on. This is related to the
+   * zz-component in (3d), then the xy-component, and so on. Next comes the
+   * xx-component of the second component, and so on. This is related to the
    * internal data structures used in this class. The raw data after a call to
    * @p evaluate only contains unit cell operations, so possible
    * transformations, quadrature weights etc. must be applied manually. In
