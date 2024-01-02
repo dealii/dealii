@@ -124,7 +124,7 @@ namespace TrilinosWrappers
       /**
        * The matrix accessed.
        */
-      mutable SparsityPattern *sparsity_pattern;
+      SparsityPattern *sparsity_pattern;
 
       /**
        * Current row number.
