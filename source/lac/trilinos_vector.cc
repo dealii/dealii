@@ -657,17 +657,21 @@ namespace TrilinosWrappers
 #  endif
 
       // Now pass over the information about what we did last to the vector.
-      int ierr = 0;
       if (nonlocal_vector.get() == nullptr || mode != Add)
-        ierr = vector->GlobalAssemble(mode);
+        {
+          const auto ierr = vector->GlobalAssemble(mode);
+          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+        }
       else
         {
           Epetra_Export exporter(nonlocal_vector->Map(), vector->Map());
-          ierr = vector->Export(*nonlocal_vector, exporter, mode);
+
+          int ierr = vector->Export(*nonlocal_vector, exporter, mode);
           AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+
           ierr = nonlocal_vector->PutScalar(0.);
+          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
         }
-      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
       last_action = Zero;
 
       compressed = true;
