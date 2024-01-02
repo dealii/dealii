@@ -921,9 +921,7 @@ namespace TrilinosWrappers
   unsigned int
   SparsityPattern::local_size() const
   {
-    int n_rows = graph->NumMyRows();
-
-    return n_rows;
+    return graph->NumMyRows();
   }
 
 
@@ -931,11 +929,10 @@ namespace TrilinosWrappers
   std::pair<SparsityPattern::size_type, SparsityPattern::size_type>
   SparsityPattern::local_range() const
   {
-    size_type begin, end;
-    begin = TrilinosWrappers::min_my_gid(graph->RowMap());
-    end   = TrilinosWrappers::max_my_gid(graph->RowMap()) + 1;
+    const size_type begin = TrilinosWrappers::min_my_gid(graph->RowMap());
+    const size_type end   = TrilinosWrappers::max_my_gid(graph->RowMap()) + 1;
 
-    return std::make_pair(begin, end);
+    return {begin, end};
   }
 
 
@@ -943,9 +940,7 @@ namespace TrilinosWrappers
   std::uint64_t
   SparsityPattern::n_nonzero_elements() const
   {
-    TrilinosWrappers::types::int64_type nnz = n_global_entries(*graph);
-
-    return static_cast<std::uint64_t>(nnz);
+    return n_global_entries(*graph);
   }
 
 
@@ -953,9 +948,7 @@ namespace TrilinosWrappers
   unsigned int
   SparsityPattern::max_entries_per_row() const
   {
-    int nnz = graph->MaxNumIndices();
-
-    return static_cast<unsigned int>(nnz);
+    return graph->MaxNumIndices();
   }
 
 
