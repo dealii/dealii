@@ -596,7 +596,7 @@ namespace LineMinimization
           const auto fgi = func(ai);
           fi             = fgi.first;
           gi             = fgi.second;
-          i++;
+          ++i;
 
           if (debug_output)
             deallog << "Bracketing phase: " << i << std::endl
@@ -704,7 +704,7 @@ namespace LineMinimization
         const std::pair<NumberType, NumberType> fgi = func(ai);
         fi                                          = fgi.first;
         gi                                          = fgi.second;
-        i++;
+        ++i;
 
         if (debug_output)
           deallog << "Sectioning phase: " << i << std::endl

@@ -293,7 +293,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
           else
             points[index - 1] = unit_support_points[j](0);
 
-          index++;
+          ++index;
         }
     }
   // Do not consider the discontinuous node for dimension 1

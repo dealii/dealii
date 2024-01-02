@@ -1851,7 +1851,7 @@ namespace Particles
                         parallel_triangulation->get_communicator(),
                         &(requests[send_ops]));
             AssertThrowMPI(ierr);
-            send_ops++;
+            ++send_ops;
           }
 
       for (unsigned int i = 0; i < n_neighbors; ++i)
@@ -1866,7 +1866,7 @@ namespace Particles
                         parallel_triangulation->get_communicator(),
                         &(requests[send_ops + recv_ops]));
             AssertThrowMPI(ierr);
-            recv_ops++;
+            ++recv_ops;
           }
       const int ierr =
         MPI_Waitall(send_ops + recv_ops, requests.data(), MPI_STATUSES_IGNORE);
@@ -2009,7 +2009,7 @@ namespace Particles
                         parallel_triangulation->get_communicator(),
                         &(requests[send_ops]));
             AssertThrowMPI(ierr);
-            send_ops++;
+            ++send_ops;
           }
 
       for (unsigned int i = 0; i < neighbors.size(); ++i)
@@ -2024,7 +2024,7 @@ namespace Particles
                         parallel_triangulation->get_communicator(),
                         &(requests[send_ops + recv_ops]));
             AssertThrowMPI(ierr);
-            recv_ops++;
+            ++recv_ops;
           }
       const int ierr =
         MPI_Waitall(send_ops + recv_ops, requests.data(), MPI_STATUSES_IGNORE);

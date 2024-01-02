@@ -1684,7 +1684,7 @@ namespace GridTools
     while (continue_refinement && (iter < max_iterations))
       {
         if (max_iterations != numbers::invalid_unsigned_int)
-          iter++;
+          ++iter;
         continue_refinement = false;
 
         for (const auto &cell : tria.active_cell_iterators())
@@ -1718,7 +1718,7 @@ namespace GridTools
 
     while (continue_refinement && (iter < max_iterations))
       {
-        iter++;
+        ++iter;
         continue_refinement = false;
         for (const auto &cell : tria.active_cell_iterators())
           {

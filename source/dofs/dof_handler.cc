@@ -761,7 +761,7 @@ namespace internal
                        ++fe)
                     if (vertex_fe_association[fe][v] == true)
                       {
-                        fe_slots_needed++;
+                        ++fe_slots_needed;
                         vertex_slots_needed +=
                           dof_handler.get_fe(fe).n_dofs_per_vertex();
                       }
@@ -1202,7 +1202,7 @@ namespace internal
                          ++fe)
                       if (line_fe_association[fe][line] == true)
                         {
-                          fe_slots_needed++;
+                          ++fe_slots_needed;
                           line_slots_needed +=
                             dof_handler.get_fe(fe).n_dofs_per_line();
                         }

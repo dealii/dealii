@@ -633,7 +633,7 @@ PointValueHistory<dim>::evaluate_field(const std::string &vector_name,
                 .push_back(
                   internal::ElementAccess<VectorType>::get(solution,
                                                            solution_index));
-              store_index++;
+              ++store_index;
             }
         }
     }
@@ -864,7 +864,7 @@ PointValueHistory<dim>::evaluate_field(
                   data_store_field
                     ->second[data_store_index * n_stored + store_index]
                     .push_back(computed_quantities[0](comp));
-                  store_index++;
+                  ++store_index;
                 }
             }
         }
@@ -952,7 +952,7 @@ PointValueHistory<dim>::evaluate_field_at_requested_location(
               data_store_field
                 ->second[data_store_index * n_stored + store_index]
                 .push_back(value(comp));
-              store_index++;
+              ++store_index;
             }
         }
     }

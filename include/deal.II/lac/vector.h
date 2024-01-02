@@ -1255,8 +1255,8 @@ Vector<Number>::extract_subvector_to(ForwardIterator       indices_begin,
   while (indices_begin != indices_end)
     {
       *values_begin = operator()(*indices_begin);
-      indices_begin++;
-      values_begin++;
+      ++indices_begin;
+      ++values_begin;
     }
 }
 

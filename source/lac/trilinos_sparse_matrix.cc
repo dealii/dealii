@@ -1455,7 +1455,7 @@ namespace TrilinosWrappers
               {
                 local_index_array[n_columns] = col_indices[j];
                 local_value_array[n_columns] = value;
-                n_columns++;
+                ++n_columns;
               }
           }
 

@@ -2909,7 +2909,7 @@ namespace GridGenerator
     unsigned int n_val_cells = 0;
     for (unsigned int i = 0; i < n_cells; ++i)
       if (material_id[i] != numbers::invalid_material_id)
-        n_val_cells++;
+        ++n_val_cells;
 
     std::vector<CellData<1>> cells(n_val_cells);
     unsigned int             id = 0;
@@ -2919,7 +2919,7 @@ namespace GridGenerator
           cells[id].vertices[0] = x;
           cells[id].vertices[1] = x + 1;
           cells[id].material_id = material_id[x];
-          id++;
+          ++id;
         }
     // create triangulation
     SubCellData t;
@@ -2978,7 +2978,7 @@ namespace GridGenerator
     for (unsigned int i = 0; i < material_id.size(0); ++i)
       for (unsigned int j = 0; j < material_id.size(1); ++j)
         if (material_id[i][j] != numbers::invalid_material_id)
-          n_val_cells++;
+          ++n_val_cells;
 
     std::vector<CellData<2>> cells(n_val_cells);
     unsigned int             id = 0;
@@ -2991,7 +2991,7 @@ namespace GridGenerator
             cells[id].vertices[2] = (y + 1) * (repetitions[0] + 1) + x;
             cells[id].vertices[3] = (y + 1) * (repetitions[0] + 1) + x + 1;
             cells[id].material_id = material_id[x][y];
-            id++;
+            ++id;
           }
 
     // create triangulation
@@ -3079,7 +3079,7 @@ namespace GridGenerator
       for (unsigned int j = 0; j < material_id.size(1); ++j)
         for (unsigned int k = 0; k < material_id.size(2); ++k)
           if (material_id[i][j][k] != numbers::invalid_material_id)
-            n_val_cells++;
+            ++n_val_cells;
 
     std::vector<CellData<dim>> cells(n_val_cells);
     unsigned int               id  = 0;
@@ -3099,7 +3099,7 @@ namespace GridGenerator
               cells[id].vertices[6] = (z + 1) * n_xy + (y + 1) * n_x + x;
               cells[id].vertices[7] = (z + 1) * n_xy + (y + 1) * n_x + x + 1;
               cells[id].material_id = material_id[x][y][z];
-              id++;
+              ++id;
             }
 
     // create triangulation
@@ -4215,12 +4215,12 @@ namespace GridGenerator
 
         cell->face(0)->set_boundary_id(0);
         cell->face(2)->set_boundary_id(1);
-        cell++;
+        ++cell;
 
         cell->face(1)->set_boundary_id(2);
         cell->face(2)->set_boundary_id(1);
         cell->face(3)->set_boundary_id(3);
-        cell++;
+        ++cell;
 
         cell->face(0)->set_boundary_id(0);
         cell->face(1)->set_boundary_id(4);

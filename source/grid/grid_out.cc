@@ -2213,7 +2213,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
               << "stroke:rgb(25,25,25); stroke-width:"
               << svg_flags.line_thickness << '}' << '\n';
 
-          labeling_index++;
+          ++labeling_index;
         }
     }
 
@@ -2956,7 +2956,7 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
           out << "</text>" << '\n';
 
-          labeling_index++;
+          ++labeling_index;
         }
     }
 
@@ -3784,7 +3784,7 @@ GridOut::n_boundary_faces(const Triangulation<dim, spacedim> &tria) const
 
   for (const auto &face : tria.active_face_iterators())
     if ((face->at_boundary()) && (face->boundary_id() != 0))
-      n_faces++;
+      ++n_faces;
 
   return n_faces;
 }

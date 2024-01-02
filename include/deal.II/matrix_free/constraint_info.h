@@ -641,7 +641,7 @@ namespace internal
                                              value);
 
               operation.post_constraints(value, local_vector[ind_local][v]);
-              ind_local++;
+              ++ind_local;
             }
 
           AssertIndexRange(ind_local, n_dofs_per_cell + 1);

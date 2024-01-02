@@ -733,7 +733,7 @@ namespace Step75
               {
                 if (cell->is_locally_owned())
                   cell->set_active_fe_index(cell_other->active_fe_index());
-                cell_other++;
+                ++cell_other;
               }
           }
         else // coarse level
@@ -758,7 +758,7 @@ namespace Step75
 
                     cell->set_active_fe_index(fe_index_for_degree[next_degree]);
                   }
-                cell_other++;
+                ++cell_other;
               }
           }
 

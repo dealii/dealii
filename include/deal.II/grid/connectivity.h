@@ -1120,7 +1120,7 @@ namespace internal
                 {
                   ref_key = std::get<0>(keys[i]);
 
-                  n_unique_entities++;
+                  ++n_unique_entities;
                   n_unique_entity_vertices +=
                     cell_types[static_cast<types::geometric_entity_type>(
                                  ad_entity_types[offset_i])]
@@ -1151,7 +1151,7 @@ namespace internal
           if (ref_key != std::get<0>(keys[i]))
             {
               // new key: default orientation is correct
-              counter++;
+              ++counter;
               ref_key     = std::get<0>(keys[i]);
               ref_indices = ad_entity_vertices[offset_i];
 

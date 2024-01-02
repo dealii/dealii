@@ -1298,7 +1298,7 @@ SolverCG<VectorType>::solve(const MatrixType         &A,
 
   while (solver_state == SolverControl::iterate)
     {
-      it++;
+      ++it;
 
       worker.do_iteration(it);
 

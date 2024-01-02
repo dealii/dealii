@@ -529,7 +529,7 @@ namespace Utilities
                   indices.first.push_back(i);
                   indices.second.push_back(index);
                 }
-              index++;
+              ++index;
             }
 
           Assert(targets.size() == indices_to_look_up_by_dict_rank.size(),

@@ -2308,7 +2308,7 @@ namespace DoFTools
                     vector_dofs[fe.face_system_to_component_index(k, face_no)
                                   .first -
                                 first_vector_component] = k;
-                    n_found++;
+                    ++n_found;
                     if (n_found == dim)
                       break;
                   }

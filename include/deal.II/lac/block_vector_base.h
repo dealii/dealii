@@ -2179,8 +2179,8 @@ BlockVectorBase<VectorType>::extract_subvector_to(
   while (indices_begin != indices_end)
     {
       *values_begin = operator()(*indices_begin);
-      indices_begin++;
-      values_begin++;
+      ++indices_begin;
+      ++values_begin;
     }
 }
 

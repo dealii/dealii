@@ -269,7 +269,7 @@ namespace Functions
           t = std::min(numbers::PI_2, std::max(0.0, t));
           x = a * std::cos(t);
           y = b * std::sin(t);
-          iter++;
+          ++iter;
         }
       while (std::abs(delta_t) > tolerance && iter < max_iter);
       AssertIndexRange(iter, max_iter);
