@@ -1761,14 +1761,23 @@ namespace TrilinosWrappers
   SparseMatrix &
   SparseMatrix::operator=(const double d)
   {
+    (void)d;
     Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
     compress(VectorOperation::unknown); // TODO: why do we do this? Should we
                                         // not check for is_compressed?
 
-    const int ierr = matrix->PutScalar(d);
+    // As checked above, we are only allowed to use d==0.0, so pass
+    // a constant zero (instead of a run-time value 'd' that *happens* to
+    // have a zero value) to the underlying class in hopes that the compiler
+    // can optimize this somehow.
+    const int ierr = matrix->PutScalar(/*d=*/0.0);
     AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+
     if (nonlocal_matrix.get() != nullptr)
-      nonlocal_matrix->PutScalar(d);
+      {
+        const int ierr = nonlocal_matrix->PutScalar(/*d=*/0.0);
+        AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+      }
 
     return *this;
   }
