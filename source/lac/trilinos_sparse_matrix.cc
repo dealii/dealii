@@ -1424,9 +1424,9 @@ namespace TrilinosWrappers
     TrilinosWrappers::types::int_type        n_columns;
 
     boost::container::small_vector<TrilinosScalar, 200> local_value_array(
-      n_cols);
+      elide_zero_values ? n_cols : 0);
     boost::container::small_vector<TrilinosWrappers::types::int_type, 200>
-      local_index_array(n_cols);
+      local_index_array(elide_zero_values ? n_cols : 0);
 
     // If we don't elide zeros, the pointers are already available... need to
     // cast to non-const pointers as that is the format taken by Trilinos (but
