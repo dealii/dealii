@@ -660,18 +660,18 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
   std::map<int, int>
     vertex_indices; // # vert in unv (key) ---> # vert in deal.II (value)
 
-  int no_vertex = 0; // deal.II
+  int n_vertices = 0; // deal.II
 
   while (tmp != -1) // we do until reach end of 2411
     {
-      int    no; // unv
+      int    vertex_index; // unv
       int    dummy;
       double x[3];
 
       AssertThrow(in.fail() == false, ExcIO());
-      in >> no;
+      in >> vertex_index;
 
-      tmp = no;
+      tmp = vertex_index;
       if (tmp == -1)
         break;
 
@@ -685,9 +685,9 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       for (unsigned int d = 0; d < spacedim; ++d)
         vertices.back()(d) = x[d];
 
-      vertex_indices[no] = no_vertex;
+      vertex_indices[vertex_index] = n_vertices;
 
-      no_vertex++;
+      ++n_vertices;
     }
 
   AssertThrow(in.fail() == false, ExcIO());
@@ -709,20 +709,20 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
   std::map<int, int>
     quad_indices; // # quad in unv (key) ---> # quad in deal.II (value)
 
-  int no_cell = 0; // deal.II
-  int no_line = 0; // deal.II
-  int no_quad = 0; // deal.II
+  int n_cells = 0; // deal.II
+  int n_lines = 0; // deal.II
+  int n_quads = 0; // deal.II
 
   while (tmp != -1) // we do until reach end of 2412
     {
-      int no; // unv
+      int object_index; // unv
       int type;
       int dummy;
 
       AssertThrow(in.fail() == false, ExcIO());
-      in >> no;
+      in >> object_index;
 
-      tmp = no;
+      tmp = object_index;
       if (tmp == -1)
         break;
 
@@ -747,9 +747,9 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
             cells.back().vertices[v] = vertex_indices[cells.back().vertices[v]];
 
-          cell_indices[no] = no_cell;
+          cell_indices[object_index] = n_cells;
 
-          no_cell++;
+          ++n_cells;
         }
       else if (((type == 11) && (dim == 2)) ||
                ((type == 11) && (dim == 3))) // boundary line
@@ -770,9 +770,9 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
                subcelldata.boundary_lines.back().vertices)
             vertex = vertex_indices[vertex];
 
-          line_indices[no] = no_line;
+          line_indices[object_index] = n_lines;
 
-          no_line++;
+          ++n_lines;
         }
       else if (((type == 44) || (type == 94)) && (dim == 3)) // boundary quad
         {
@@ -793,9 +793,9 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
                subcelldata.boundary_quads.back().vertices)
             vertex = vertex_indices[vertex];
 
-          quad_indices[no] = no_quad;
+          quad_indices[object_index] = n_quads;
 
-          no_quad++;
+          ++n_quads;
         }
       else
         AssertThrow(false,
