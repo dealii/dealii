@@ -895,8 +895,7 @@ namespace TrilinosWrappers
   SparsityPattern::size_type
   SparsityPattern::bandwidth() const
   {
-    size_type                         local_b  = 0;
-    TrilinosWrappers::types::int_type global_b = 0;
+    size_type local_b = 0;
     for (int i = 0; i < static_cast<int>(local_size()); ++i)
       {
         int *indices;
@@ -909,6 +908,8 @@ namespace TrilinosWrappers
               local_b = std::abs(i - indices[j]);
           }
       }
+
+    TrilinosWrappers::types::int_type global_b = 0;
     graph->Comm().MaxAll(reinterpret_cast<TrilinosWrappers::types::int_type *>(
                            &local_b),
                          &global_b,
