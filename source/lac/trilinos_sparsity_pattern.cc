@@ -412,58 +412,40 @@ namespace TrilinosWrappers
 
       std::vector<TrilinosWrappers::types::int_type> row_indices;
 
-      // Include possibility to exchange data since DynamicSparsityPattern is
-      // able to do so
-      if (exchange_data == false)
-        for (size_type row = first_row; row < last_row; ++row)
-          {
-            const TrilinosWrappers::types::int_type row_length =
-              sp.row_length(row);
-            if (row_length == 0)
-              continue;
+      for (size_type row = first_row; row < last_row; ++row)
+        {
+          const TrilinosWrappers::types::int_type row_length =
+            sp.row_length(row);
+          if (row_length == 0)
+            continue;
 
-            row_indices.resize(row_length, -1);
-            {
-              typename SparsityPatternType::iterator p = sp.begin(row);
-              // avoid incrementing p over the end of the current row because
-              // it is slow for DynamicSparsityPattern in parallel
-              for (int col = 0; col < row_length;)
-                {
-                  row_indices[col++] = p->column();
-                  if (col < row_length)
-                    ++p;
-                }
-            }
+          row_indices.resize(row_length, -1);
+          {
+            typename SparsityPatternType::iterator p = sp.begin(row);
+            // avoid incrementing p over the end of the current row because
+            // it is slow for DynamicSparsityPattern in parallel
+            for (int col = 0; col < row_length;)
+              {
+                row_indices[col++] = p->column();
+                if (col < row_length)
+                  ++p;
+              }
+          }
+          if (exchange_data == false)
             graph->Epetra_CrsGraph::InsertGlobalIndices(row,
                                                         row_length,
                                                         row_indices.data());
-          }
-      else
-        for (size_type row = 0; row < sp.n_rows(); ++row)
-          {
-            const TrilinosWrappers::types::int_type row_length =
-              sp.row_length(row);
-            if (row_length == 0)
-              continue;
-
-            row_indices.resize(row_length, -1);
+          else
             {
-              typename SparsityPatternType::iterator p = sp.begin(row);
-              // avoid incrementing p over the end of the current row because
-              // it is slow for DynamicSparsityPattern in parallel
-              for (int col = 0; col < row_length;)
-                {
-                  row_indices[col++] = p->column();
-                  if (col < row_length)
-                    ++p;
-                }
+              // Include possibility to exchange data since
+              // DynamicSparsityPattern is able to do so
+              const TrilinosWrappers::types::int_type trilinos_row = row;
+              graph->InsertGlobalIndices(1,
+                                         &trilinos_row,
+                                         row_length,
+                                         row_indices.data());
             }
-            const TrilinosWrappers::types::int_type trilinos_row = row;
-            graph->InsertGlobalIndices(1,
-                                       &trilinos_row,
-                                       row_length,
-                                       row_indices.data());
-          }
+        }
 
       // TODO A dynamic_cast fails here, this is suspicious.
       const auto &range_map =
