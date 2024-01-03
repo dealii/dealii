@@ -2105,10 +2105,8 @@ namespace MatrixCreator
       *const                                                        coefficient,
     const AffineConstraints<typename SparseMatrixType::value_type> &constraints)
   {
-    Assert(matrix.m() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.m(), dof.n_dofs()));
-    Assert(matrix.n() == dof.n_dofs(),
-           ExcDimensionMismatch(matrix.n(), dof.n_dofs()));
+    AssertIndexRange(dof.n_dofs(), matrix.m() + 1);
+    AssertIndexRange(dof.n_dofs(), matrix.n() + 1);
 
     MatrixCreator::internal::AssemblerData::
       Scratch<dim, spacedim, typename SparseMatrixType::value_type>

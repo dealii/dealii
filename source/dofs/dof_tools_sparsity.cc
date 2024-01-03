@@ -60,13 +60,8 @@ namespace DoFTools
                         const bool                       keep_constrained_dofs,
                         const types::subdomain_id        subdomain_id)
   {
-    const types::global_dof_index n_dofs = dof.n_dofs();
-    (void)n_dofs;
-
-    Assert(sparsity.n_rows() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_rows(), n_dofs));
-    Assert(sparsity.n_cols() == n_dofs,
-           ExcDimensionMismatch(sparsity.n_cols(), n_dofs));
+    AssertIndexRange(dof.n_dofs(), sparsity.n_rows() + 1);
+    AssertIndexRange(dof.n_dofs(), sparsity.n_cols() + 1);
 
     // If we have a distributed Triangulation only allow locally_owned
     // subdomain. Not setting a subdomain is also okay, because we skip
