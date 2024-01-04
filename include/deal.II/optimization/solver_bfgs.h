@@ -372,7 +372,7 @@ SolverBFGS<VectorType>::solve(
         deallog << "Line search a=" << alpha << " f=" << f << std::endl;
 
       // 3. Check convergence
-      k++;
+      ++k;
       const Number g_l2 = g.l2_norm();
       conv              = this->iteration_status(k, g_l2, x);
       if (conv != SolverControl::iterate)

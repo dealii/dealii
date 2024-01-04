@@ -473,12 +473,12 @@ namespace internal
                                                slice_index,
                                                *this,
                                                false);
-                      slice_index++;
+                      ++slice_index;
                       for (; slice_index < partition_row_index[part + 1];
                            slice_index++)
                         {
                           worker[worker_index]->set_ref_count(1);
-                          worker_index++;
+                          ++worker_index;
                           worker[worker_index] =
                             new (worker[worker_index - 1]->allocate_child())
                               color::PartitionWork(funct,
@@ -492,7 +492,7 @@ namespace internal
                           blocked_worker[(part - 1) / 2]->dummy =
                             new (worker[worker_index]->allocate_child())
                               tbb::empty_task;
-                          worker_index++;
+                          ++worker_index;
                           if (spawn_index_child == -1)
                             tbb::task::spawn(*blocked_worker[(part - 1) / 2]);
                           else
@@ -509,7 +509,7 @@ namespace internal
                             new (worker[worker_index]->allocate_child())
                               MPICommunication(funct, false);
                           tbb::task::spawn(*worker_dist);
-                          worker_index++;
+                          ++worker_index;
                         }
                       part += 1;
                       if (part < partition_row_index.size() - 1)
@@ -522,7 +522,7 @@ namespace internal
                                                        slice_index,
                                                        *this,
                                                        true);
-                              slice_index++;
+                              ++slice_index;
                               if (slice_index < partition_row_index[part + 1])
                                 {
                                   blocked_worker[part / 2]->set_ref_count(1);
@@ -532,7 +532,7 @@ namespace internal
                                                          slice_index,
                                                          *this,
                                                          false);
-                                  slice_index++;
+                                  ++slice_index;
                                 }
                               else
                                 {
@@ -546,7 +546,7 @@ namespace internal
                               if (slice_index > partition_row_index[part])
                                 {
                                   worker[worker_index]->set_ref_count(1);
-                                  worker_index++;
+                                  ++worker_index;
                                 }
                               worker[worker_index] =
                                 new (worker[worker_index - 1]->allocate_child())
@@ -556,7 +556,7 @@ namespace internal
                                                        false);
                             }
                           spawn_index_child = worker_index;
-                          worker_index++;
+                          ++worker_index;
                         }
                       else
                         {
@@ -1778,7 +1778,7 @@ namespace internal
                             partition_list[start_up]);
                           partition_partition_list[counter++] =
                             partition_list[start_up];
-                          start_up++;
+                          ++start_up;
                           break;
                         }
                   }
@@ -1805,7 +1805,7 @@ namespace internal
                                   neighbor_it->column());
                                 partition_partition_list[counter++] =
                                   neighbor_it->column();
-                                partition_counter++;
+                                ++partition_counter;
                               }
                           }
                       }
@@ -1862,7 +1862,7 @@ namespace internal
                           if (remaining_per_cell_batch[0] != 0)
                             {
                               filled = false;
-                              missing_macros++;
+                              ++missing_macros;
                             }
                         }
                       missing_macros =
@@ -1928,8 +1928,8 @@ namespace internal
                                           .push_back(neighbor->column());
                                       partition_partition_list[counter] =
                                         neighbor->column();
-                                      counter++;
-                                      partition_counter++;
+                                      ++counter;
+                                      ++partition_counter;
                                       if (remaining_per_cell_batch
                                               [this_index] == 0 &&
                                           missing_macros > 0)
@@ -1992,7 +1992,7 @@ namespace internal
                             {
                               irregular_cells[n_cell_batches_before] =
                                 partition_counter % vectorization_length;
-                              n_cell_batches_before++;
+                              ++n_cell_batches_before;
                             }
                         }
                     }
@@ -2072,7 +2072,7 @@ namespace internal
           for (unsigned int color = 0; color <= max_color; ++color)
             {
               cell_partition_data.push_back(color_counter);
-              index_counter++;
+              ++index_counter;
               for (unsigned int k = partition_size[part];
                    k < partition_size[part + 1];
                    k++)
@@ -2179,7 +2179,7 @@ namespace internal
               neighbor_list.push_back(start_up);
               partition_list[counter++] = start_up;
               partition_size.back()++;
-              start_up++;
+              ++start_up;
               remainder--;
               if (remainder == cluster_size)
                 remainder = 0;
@@ -2223,7 +2223,7 @@ namespace internal
 
           while (neighbor_list.size() > 0)
             {
-              partition++;
+              ++partition;
 
               // counter for number of cells so far in current partition
               unsigned int partition_counter = 0;
@@ -2251,7 +2251,7 @@ namespace internal
                           // use as neighbors in next partition
                           neighbor_neighbor_list.push_back(neighbor->column());
                           partition_list[counter++] = neighbor->column();
-                          partition_counter++;
+                          ++partition_counter;
                         }
                     }
                 }
@@ -2315,7 +2315,7 @@ namespace internal
               }
         }
       if (remainder != 0)
-        partition++;
+        ++partition;
 
       AssertDimension(partition_size[partition], n_blocks);
     }

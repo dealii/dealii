@@ -427,7 +427,7 @@ namespace internal
 
       for (const auto &i : constrained_indices_by_ranks)
         if (i.first != my_rank)
-          n_rec_ranks++;
+          ++n_rec_ranks;
 
       for (unsigned int i = 0; i < n_rec_ranks; ++i)
         {
@@ -3246,7 +3246,7 @@ namespace internal
       Assert(i >= n_inhomogeneous_rows, ExcInternalError());
       std::swap(total_row_indices[n_active_rows + i],
                 total_row_indices[n_active_rows + n_inhomogeneous_rows]);
-      n_inhomogeneous_rows++;
+      ++n_inhomogeneous_rows;
     }
 
 

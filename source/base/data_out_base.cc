@@ -7174,7 +7174,7 @@ namespace DataOutBase
                 << "\" style=\"stroke:black; fill:url(#" << triangle_counter
                 << "); stroke-width:" << flags.line_thickness << "\"/>" << '\n';
 
-            triangle_counter++;
+            ++triangle_counter;
           }
       }
 
@@ -8593,7 +8593,7 @@ DataOutBase::write_filtered_data(
       // Advance n_th_vector to at least the current data set we are on
       while (n_th_vector < nonscalar_data_ranges.size() &&
              std::get<0>(nonscalar_data_ranges[n_th_vector]) < data_set)
-        n_th_vector++;
+        ++n_th_vector;
 
       // Determine the dimension of this data
       if (n_th_vector < nonscalar_data_ranges.size() &&

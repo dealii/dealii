@@ -186,7 +186,7 @@ namespace MatrixTools
           if (boundary_value.first >= matrix.block(block, 0).m() + offset)
             {
               offset += matrix.block(block, 0).m();
-              block++;
+              ++block;
             }
           const types::global_dof_index index = boundary_value.first - offset;
           block_boundary_values[block].insert(
@@ -368,7 +368,7 @@ namespace MatrixTools
               if (boundary_value.first >= matrix.block(block, 0).m() + offset)
                 {
                   offset += matrix.block(block, 0).m();
-                  block++;
+                  ++block;
                 }
               const types::global_dof_index index =
                 boundary_value.first - offset;

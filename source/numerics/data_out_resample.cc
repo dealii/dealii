@@ -185,7 +185,7 @@ DataOutResample<dim, patch_dim, spacedim>::build_patches(
             DataOut_DoFData<patch_dim, patch_dim, spacedim, spacedim>::
               DataVectorType::type_dof_data);
 
-          counter++;
+          ++counter;
         }
     }
 

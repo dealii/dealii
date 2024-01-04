@@ -129,7 +129,7 @@ namespace PETScWrappers
           }
         else
           has_invalid = true;
-        loc++;
+        ++loc;
       }
     if (!has_invalid)
       indices_has_loc.clear();
@@ -145,7 +145,7 @@ namespace PETScWrappers
           }
         else
           has_invalid = true;
-        loc++;
+        ++loc;
       }
     if (!has_invalid)
       indices_want_loc.clear();
@@ -215,7 +215,7 @@ namespace PETScWrappers
           }
         remotes[cnt].rank  = owner;
         remotes[cnt].index = idx - ranges[owner];
-        cnt++;
+        ++cnt;
       }
 
     AssertPETSc(PetscSFCreate(communicator, &sf2));

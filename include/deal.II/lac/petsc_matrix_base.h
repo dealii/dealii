@@ -1373,7 +1373,7 @@ namespace PETScWrappers
               {
                 column_indices[n_columns] = col_indices[j];
                 column_values[n_columns]  = value;
-                n_columns++;
+                ++n_columns;
               }
           }
         AssertIndexRange(n_columns, n_cols + 1);
@@ -1517,7 +1517,7 @@ namespace PETScWrappers
               {
                 column_indices[n_columns] = col_indices[j];
                 column_values[n_columns]  = value;
-                n_columns++;
+                ++n_columns;
               }
           }
         AssertIndexRange(n_columns, n_cols + 1);

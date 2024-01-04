@@ -709,7 +709,7 @@ namespace Utilities
                       locally_owned_array[j] =
                         internal::get_min(*read_position,
                                           locally_owned_array[j]);
-                      read_position++;
+                      ++read_position;
                     }
               else if (vector_operation == VectorOperation::max)
                 for (const auto &import_range : import_indices_data)
@@ -720,7 +720,7 @@ namespace Utilities
                       locally_owned_array[j] =
                         internal::get_max(*read_position,
                                           locally_owned_array[j]);
-                      read_position++;
+                      ++read_position;
                     }
               else
                 for (const auto &import_range : import_indices_data)

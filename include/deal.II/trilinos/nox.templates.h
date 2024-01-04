@@ -985,7 +985,7 @@ namespace TrilinosWrappers
           ExcMessage(
             "No residual function has been attached to the NOXSolver object."));
 
-        n_residual_evaluations++;
+        ++n_residual_evaluations;
 
         // evaluate residual
         return internal::NOXWrappers::call_and_possibly_capture_exception(

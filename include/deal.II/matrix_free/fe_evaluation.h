@@ -3631,7 +3631,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
               for (unsigned int comp = 0; comp < n_components; ++comp)
                 operation.post_constraints(value[comp],
                                            values_dofs[comp][ind_local][v]);
-              ind_local++;
+              ++ind_local;
             }
 
           AssertIndexRange(ind_local, dofs_per_component + 1);
@@ -3687,7 +3687,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
                   operation.post_constraints(value,
                                              values_dofs[comp][ind_local][v]);
-                  ind_local++;
+                  ++ind_local;
                 }
 
               AssertIndexRange(ind_local, dofs_per_component + 1);

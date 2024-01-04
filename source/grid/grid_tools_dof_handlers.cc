@@ -711,7 +711,7 @@ namespace GridTools
                     vertex_indices[count_vertex_indices].first = d;
                     vertex_indices[count_vertex_indices].second =
                       unit_point[d] > 0.5 ? 1 : 0;
-                    count_vertex_indices++;
+                    ++count_vertex_indices;
                   }
                 else
                   free_direction = d;
@@ -985,7 +985,7 @@ namespace GridTools
         {
           for (const unsigned int v : cell->vertex_indices())
             vertices_outside_subdomain[cell->vertex_index(v)] = true;
-          n_non_predicate_cells++;
+          ++n_non_predicate_cells;
         }
 
     // If all the active cells conform to the predicate

@@ -104,7 +104,7 @@ namespace hp
     operator++()
     {
       AssertIndexRange(index + 1, data->size() + 1);
-      index++;
+      ++index;
       return *this;
     }
 

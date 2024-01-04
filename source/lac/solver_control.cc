@@ -401,7 +401,7 @@ ConsecutiveControl::check(const unsigned int step, const double check_value)
   // check if we need to override the success:
   if (state == success)
     {
-      n_converged_iterations++;
+      ++n_converged_iterations;
       if (n_converged_iterations == n_consecutive_iterations)
         {
           return success;

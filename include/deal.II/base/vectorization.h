@@ -173,7 +173,7 @@ public:
   operator++()
   {
     AssertIndexRange(lane + 1, T::size() + 1);
-    lane++;
+    ++lane;
     return *this;
   }
 

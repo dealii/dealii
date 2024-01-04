@@ -3038,7 +3038,7 @@ namespace GridTools
             unsigned int boundary_face_counter = 0;
             for (auto f : cell->face_indices())
               if (cell->face(f)->at_boundary())
-                boundary_face_counter++;
+                ++boundary_face_counter;
             if (boundary_face_counter > dim)
               {
                 has_cells_with_more_than_dim_faces_on_boundary = true;
@@ -3050,14 +3050,14 @@ namespace GridTools
         if (has_cells_with_more_than_dim_faces_on_boundary)
           {
             tria.refine_global(1);
-            refinement_cycles++;
+            ++refinement_cycles;
           }
       }
 
     if (has_cells_with_dim_faces_on_boundary)
       {
         tria.refine_global(1);
-        refinement_cycles++;
+        ++refinement_cycles;
       }
     else
       {
@@ -5025,7 +5025,7 @@ namespace GridTools
             vertex_list_reduced[local_vertex_count] =
               vertex_list_all[new_line_table[configuration][i]];
             local_remap[new_line_table[configuration][i]] = local_vertex_count;
-            local_vertex_count++;
+            ++local_vertex_count;
           }
 
       // write back vertices

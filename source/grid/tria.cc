@@ -3561,7 +3561,7 @@ namespace internal
                 subcell_object->vertices != key)
               continue;
 
-            counter++;
+            ++counter;
 
             // set manifold id
             manifold_id = subcell_object->manifold_id;

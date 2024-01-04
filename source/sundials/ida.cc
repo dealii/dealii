@@ -166,7 +166,7 @@ namespace SUNDIALS
         while (solver_should_restart(t, solution, solution_dot))
           reset(t, h, solution, solution_dot);
 
-        step_number++;
+        ++step_number;
 
         output_step(t, solution, solution_dot, step_number);
       }

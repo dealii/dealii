@@ -371,8 +371,8 @@ SolverQMRS<VectorType>::iterate(const MatrixType         &A,
 
   while (state == SolverControl::iterate)
     {
-      step++;
-      it++;
+      ++step;
+      ++it;
       //--------------------------------------------------------------
       // Step 1: apply the system matrix and compute one inner product
       //--------------------------------------------------------------
