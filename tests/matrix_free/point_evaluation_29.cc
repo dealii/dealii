@@ -34,7 +34,7 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
-#include <../tests.h>
+#include "../tests.h"
 
 using namespace dealii;
 
@@ -42,9 +42,10 @@ template <int dim, typename Number>
 void
 do_test(unsigned int degree)
 {
-  using VectorType = LinearAlgebra::distributed::Vector<Number>;
+  using VectorType          = LinearAlgebra::distributed::Vector<Number>;
+  using VectorizedArrayType = VectorizedArray<Number>;
 
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+  Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
@@ -54,14 +55,14 @@ do_test(unsigned int degree)
   AffineConstraints<Number> constraints;
   constraints.close();
 
-  typename MatrixFree<dim, Number>::AdditionalData data;
+  typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData data;
   data.mapping_update_flags                = update_values;
   data.mapping_update_flags_inner_faces    = update_values;
   data.mapping_update_flags_boundary_faces = update_values;
 
   MappingQ1<dim> mapping;
 
-  MatrixFree<dim, Number> matrix_free;
+  MatrixFree<dim, Number, VectorizedArrayType> matrix_free;
   matrix_free.reinit(
     mapping, dof_handler, constraints, QGauss<dim>(degree + 1), data);
 
@@ -96,7 +97,7 @@ do_test(unsigned int degree)
             vector_face_accessors.push_back(
               matrix_free.get_face_iterator(face_batch, 0));
 
-          quadrature_vector.emplace_back(Quadrature<dim - 1>(degree + 1));
+          quadrature_vector.push_back(QGauss<dim - 1>(degree + 1));
         }
     }
 
@@ -135,7 +136,7 @@ do_test(unsigned int degree)
                            src);
 
   const auto boundary_function_1 = [&](const auto &data,
-                                       auto &      dst,
+                                       auto       &dst,
                                        const auto &src,
                                        const auto  face_range) {
     FEFacePointEvaluation<dim, dim, dim, Number> phi_pnt(
@@ -168,7 +169,8 @@ do_test(unsigned int degree)
 
   const auto boundary_function_2 =
     [&](const auto &data, auto &dst, const auto &src, const auto face_range) {
-      FEFaceEvaluation<dim, -1, 0, dim, Number> phi(matrix_free, true, 0, 0, 1);
+      FEFaceEvaluation<dim, -1, 0, dim, Number, VectorizedArrayType> phi(
+        matrix_free, true, 0, 0, 1);
       FEFacePointEvaluation<dim, dim, dim, Number> phi_pnt(
         nm_mapping_info, data.get_dof_handler().get_fe(), true, 1);
 
@@ -183,14 +185,14 @@ do_test(unsigned int degree)
                ++v)
             {
               phi_pnt.reinit(face * n_lanes + v);
-              phi_pnt.evaluate_in_face(&phi.get_scratch_data().begin()[0][v],
-                                       EvaluationFlags::values);
+              phi_pnt.template evaluate_in_face<VectorizedArrayType::size()>(
+                &phi.get_scratch_data().begin()[0][v], EvaluationFlags::values);
 
               for (unsigned int q : phi_pnt.quadrature_point_indices())
                 phi_pnt.submit_value(phi_pnt.get_value(q), q);
 
-              phi_pnt.integrate_in_face(&phi.get_scratch_data().begin()[0][v],
-                                        EvaluationFlags::values);
+              phi_pnt.template integrate_in_face<VectorizedArrayType::size()>(
+                &phi.get_scratch_data().begin()[0][v], EvaluationFlags::values);
             }
           phi.collect_from_face(EvaluationFlags::values);
           phi.distribute_local_to_global(dst);
@@ -204,14 +206,14 @@ do_test(unsigned int degree)
   matrix_free.template loop<VectorType, VectorType>(
     {}, {}, boundary_function_2, dst_2, src, true);
 
-  Assert(std::abs(dst_1.l2_norm() - dst_2.l2_norm()) < 1.0e-12);
+  Assert(std::abs(dst_1.l2_norm() - dst_2.l2_norm()) < 1.0e-12,
+         ExcInternalError());
 }
 
 int
 main(int argc, char *argv[])
 {
-  Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
-  MPILogInitAll                    all;
+  initlog();
 
   do_test<2, double>(2);
 
