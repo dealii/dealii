@@ -39,7 +39,8 @@ namespace TrilinosWrappers
     {
       // if we are asked to visit the past-the-end line, then simply
       // release all our caches and go on with life
-      if (this->a_row == sparsity_pattern->n_rows())
+      if (this->a_row == sparsity_pattern->n_rows() ||
+          (sparsity_pattern->in_local_range(this->a_row) == false))
         {
           colnum_cache.reset();
           return;
