@@ -1,4 +1,4 @@
-Changed: When calling Triangulation::get_manifold(manifold_id) for 
+Changed: When calling Triangulation::get_manifold(manifold_id) for
 a non-existing manifold_id, the function returned a flat manifold.
 This behaviour has been changed and an assert is thrown in this case.
 Furthermore, the functions Triangulation::reset_manifold() and

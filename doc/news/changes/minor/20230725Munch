@@ -1,4 +1,4 @@
-New: Similar to the DataOut::add_data_vector() case, 
+New: Similar to the DataOut::add_data_vector() case,
 DataOut::add_mg_data_vector() now also copies the vector
 and performs the ghost-vector update internally.
 <br>

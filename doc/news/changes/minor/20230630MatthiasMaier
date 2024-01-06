@@ -4,4 +4,3 @@ category. Similarly, the top level target `setup_tests` concatenates these
 status lines and prints a summary after invocation.
 <br>
 (Matthias Maier, 2023/06/30)
-
