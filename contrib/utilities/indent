@@ -71,8 +71,12 @@ process_changed "source" ".*\.inst.in" format_inst
 process_changed "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|inst.in|output.*|cmake)" fix_permissions
 
+process_changed "doc/news/*/*" "*" fix_permissions
+
 process_changed "tests include source examples cmake/scripts contrib/python-bindings" \
   ".*\.(cc|h|inst.in|cmake)" dos_to_unix
+
+process_changed "doc/news/*/*" "*" dos_to_unix
 
 #
 # Removing trailing whitespace
@@ -81,9 +85,13 @@ process_changed "tests include source examples cmake/scripts contrib/python-bind
 process_changed "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|html|dox|txt)" remove_trailing_whitespace
 
+process_changed "doc/news/*/*" "*" remove_trailing_whitespace
+
 #
 # Ensure only a single newline at end of files
 #
 
 process_changed "tests include source examples cmake/scripts contrib/python-bindings doc" \
   ".*\.(cc|h|html|dox|txt)" ensure_single_trailing_newline
+
+process_changed "doc/news/*/*" "*" ensure_single_trailing_newline
