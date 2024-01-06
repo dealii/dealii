@@ -198,7 +198,7 @@ protected:
   Table<dim + 1, Number> coefficients;
 
   /**
-   * Utility function for barycentric polynomials - its convenient to loop
+   * Utility function for barycentric polynomials: it is convenient to loop
    * over all the indices at once in a dimension-independent way, but we also
    * need to access the actual indices of the underlying Table object. This
    * utility function converts an integral index into the equivalent
@@ -207,7 +207,7 @@ protected:
    */
   static TableIndices<dim + 1>
   index_to_indices(const std::size_t           &index,
-                   const TableIndices<dim + 1> &extent);
+                   const TableIndices<dim + 1> &extents);
 };
 
 /**
@@ -695,6 +695,8 @@ BarycentricPolynomial<dim, Number>::value(const Point<dim> &point) const
   return result;
 }
 
+
+
 template <int dim, typename Number>
 std::size_t
 BarycentricPolynomial<dim, Number>::memory_consumption() const
@@ -702,11 +704,13 @@ BarycentricPolynomial<dim, Number>::memory_consumption() const
   return coefficients.memory_consumption();
 }
 
+
+
 template <int dim, typename Number>
 TableIndices<dim + 1>
 BarycentricPolynomial<dim, Number>::index_to_indices(
   const std::size_t           &index,
-  const TableIndices<dim + 1> &extent)
+  const TableIndices<dim + 1> &extents)
 {
   TableIndices<dim + 1> result;
   auto                  temp = index;
@@ -715,12 +719,14 @@ BarycentricPolynomial<dim, Number>::index_to_indices(
     {
       std::size_t slice_size = 1;
       for (unsigned int n2 = n + 1; n2 < dim + 1; ++n2)
-        slice_size *= extent[n2];
+        slice_size *= extents[n2];
       result[n] = temp / slice_size;
       temp %= slice_size;
     }
   return result;
 }
+
+
 
 template <int dim>
 const BarycentricPolynomial<dim> &
