@@ -158,28 +158,27 @@ namespace TrilinosWrappers
 
       // get a representation of the present row
       int                               ncols;
-      TrilinosWrappers::types::int_type colnums = matrix->n();
+      TrilinosWrappers::types::int_type colnums =
+        matrix->row_length(this->a_row);
       if (value_cache.get() == nullptr)
         {
-          value_cache =
-            std::make_shared<std::vector<TrilinosScalar>>(matrix->n());
-          colnum_cache = std::make_shared<std::vector<size_type>>(matrix->n());
+          value_cache  = std::make_shared<std::vector<TrilinosScalar>>(colnums);
+          colnum_cache = std::make_shared<std::vector<size_type>>(colnums);
         }
       else
         {
-          value_cache->resize(matrix->n());
-          colnum_cache->resize(matrix->n());
+          value_cache->resize(colnums);
+          colnum_cache->resize(colnums);
         }
 
-      int ierr = matrix->trilinos_matrix().ExtractGlobalRowCopy(
+      const int ierr = matrix->trilinos_matrix().ExtractGlobalRowCopy(
         this->a_row,
         colnums,
         ncols,
         value_cache->data(),
         reinterpret_cast<TrilinosWrappers::types::int_type *>(
           colnum_cache->data()));
-      value_cache->resize(ncols);
-      colnum_cache->resize(ncols);
+      AssertDimension(ncols, colnums);
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
       // copy it into our caches if the
