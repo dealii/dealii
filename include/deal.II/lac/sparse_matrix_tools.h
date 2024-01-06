@@ -252,6 +252,10 @@ namespace SparseMatrixTools
 
       std::map<unsigned int, T1> data;
 
+      std::pair<types::global_dof_index,
+                std::vector<std::pair<types::global_dof_index, Number>>>
+        buffer;
+
       for (unsigned int i = 0; i < row_to_procs.size(); ++i)
         {
           if (row_to_procs[i].empty())
@@ -262,22 +266,13 @@ namespace SparseMatrixTools
 
           const unsigned int row_length = sparsity_pattern.row_length(row);
 
-
-          std::pair<types::global_dof_index,
-                    std::vector<std::pair<types::global_dof_index, Number>>>
-            buffer;
           buffer.first = row;
+          buffer.second.resize(row_length);
 
-          for (unsigned int i = 0; i < row_length; ++i)
-            {
-              buffer.second.emplace_back(entry->column(), entry->value());
+          for (unsigned int j = 0; j < row_length; ++j, ++entry)
+            buffer.second[j] = {entry->column(), entry->value()};
 
-              if (i + 1 != row_length)
-                ++entry;
-            }
-
-          for (const auto &proc :
-               row_to_procs[locally_owned_dofs.index_within_set(buffer.first)])
+          for (const auto &proc : row_to_procs[i])
             data[proc].emplace_back(buffer);
         }
 
