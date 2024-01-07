@@ -205,7 +205,7 @@ namespace GridTools
      * Constructing or updating the rtree requires a call to
      * GridTools::build_global_description_tree(), which exchanges
      * bounding boxes between all processes using
-     * Utilities::MPI::all_gather(), a collective operation.
+     * Utilities::MPI::all_gather(), a @ref GlossCollectiveOperation "collective operation".
      * Therefore this function must be called by all processes
      * at the same time.
      *

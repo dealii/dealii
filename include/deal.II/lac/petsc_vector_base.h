@@ -625,7 +625,7 @@ namespace PETScWrappers
 
     /**
      * Return whether the vector contains only elements with value zero. This
-     * is a collective operation. This function is expensive, because
+     * is a @ref GlossCollectiveOperation "collective operation". This function is expensive, because
      * potentially all elements have to be checked.
      */
     bool

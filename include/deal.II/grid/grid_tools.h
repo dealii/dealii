@@ -681,7 +681,7 @@ namespace GridTools
    * In a serial execution the first three elements of the tuple are the same
    * as in GridTools::compute_point_locations .
    *
-   * Note: this function is a collective operation.
+   * Note: this function is a @ref GlossCollectiveOperation "collective operation".
    *
    * @note The actual return type of this function, i.e., the type referenced
    * above as @p return_type, is
@@ -2813,7 +2813,7 @@ namespace GridTools
     const MPI_Comm                            mpi_communicator);
 
   /**
-   * In this collective operation each process provides a vector
+   * In this @ref GlossCollectiveOperation "collective operation" each process provides a vector
    * of bounding boxes and a communicator.
    * All these vectors are gathered on each of the processes,
    * organized in a search tree, and then returned.
@@ -2842,7 +2842,7 @@ namespace GridTools
    * the second being the rank of the process for which at least some
    * of the locally owned cells overlap with the bounding box.
    *
-   * @note This function is a collective operation.
+   * @note This function is a @ref GlossCollectiveOperation "collective operation".
    */
   template <int spacedim>
   RTree<std::pair<BoundingBox<spacedim>, unsigned int>>

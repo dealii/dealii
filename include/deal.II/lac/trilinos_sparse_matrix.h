@@ -666,7 +666,7 @@ namespace TrilinosWrappers
      * holds the sparsity_pattern structure because each processor sets its
      * rows.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      */
     template <typename SparsityPatternType>
@@ -677,7 +677,7 @@ namespace TrilinosWrappers
      * This function reinitializes the Trilinos sparse matrix from a (possibly
      * distributed) Trilinos sparsity pattern.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      *
      * If you want to write to the matrix from several threads and use MPI,
@@ -693,7 +693,7 @@ namespace TrilinosWrappers
      * matrix. The values are not copied, but you can use copy_from() for
      * this.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      */
     void
@@ -709,7 +709,7 @@ namespace TrilinosWrappers
      * sparsity structure of the input matrix should be used or the matrix
      * entries should be copied, too.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a deadlock.
      *
      * @note If a different sparsity pattern is given in the last argument
@@ -821,7 +821,7 @@ namespace TrilinosWrappers
      * processor just sets the elements in the sparsity pattern that belong to
      * its rows.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      */
     template <typename SparsityPatternType>
@@ -840,7 +840,7 @@ namespace TrilinosWrappers
      * only implemented for input sparsity patterns of type
      * DynamicSparsityPattern.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      */
     template <typename SparsityPatternType>
@@ -865,7 +865,7 @@ namespace TrilinosWrappers
      * sparsity structure of the input matrix should be used or the matrix
      * entries should be copied, too.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      */
     template <typename number>
@@ -887,7 +887,7 @@ namespace TrilinosWrappers
      * sparsity structure of the input matrix should be used or the matrix
      * entries should be copied, too.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      */
     template <typename number>
@@ -1004,7 +1004,7 @@ namespace TrilinosWrappers
      * Release all memory and return to a state just like after having called
      * the default constructor.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      */
     void
@@ -1030,7 +1030,7 @@ namespace TrilinosWrappers
      *
      * In both cases, this function compresses the data structures and allows
      * the resulting matrix to be used in all other operations like
-     * matrix-vector products. This is a collective operation, i.e., it needs to
+     * matrix-vector products. This is a @ref GlossCollectiveOperation "collective operation", i.e., it needs to
      * be run on all processors when used in %parallel.
      *
      * See

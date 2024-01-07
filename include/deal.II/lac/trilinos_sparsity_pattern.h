@@ -398,7 +398,7 @@ namespace TrilinosWrappers
      * Release all memory and return to a state just like after having called
      * the default constructor.
      *
-     * This is a collective operation that needs to be called on all
+     * This is a @ref GlossCollectiveOperation "collective operation" that needs to be called on all
      * processors in order to avoid a dead lock.
      */
     void
@@ -410,7 +410,7 @@ namespace TrilinosWrappers
      * actually generating a (Trilinos-based) matrix. This function also
      * exchanges non-local data that might have accumulated during the
      * addition of new elements. This function must therefore be called once
-     * the structure is fixed. This is a collective operation, i.e., it needs
+     * the structure is fixed. This is a @ref GlossCollectiveOperation "collective operation", i.e., it needs
      * to be run on all processors when used in parallel.
      */
     void

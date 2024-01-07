@@ -228,7 +228,7 @@ public:
    * the same time. This means that unless you use a split MPI communicator
    * then it is not normally possible for only one or a subset of processes
    * to obtain a copy of a parallel vector while the other jobs do something
-   * else. In other words, calling this function is a 'collective operation'
+   * else. In other words, calling this function is a @ref GlossCollectiveOperation "collective operation"
    * that needs to be executed by all MPI processes that jointly share @p v.
    */
   explicit Vector(const TrilinosWrappers::MPI::Vector &v);
@@ -433,7 +433,7 @@ public:
    * the same time. This means that unless you use a split MPI communicator
    * then it is not normally possible for only one or a subset of processes
    * to obtain a copy of a parallel vector while the other jobs do something
-   * else. In other words, calling this function is a 'collective operation'
+   * else. In other words, calling this function is a @ref GlossCollectiveOperation "collective operation"
    * that needs to be executed by all MPI processes that jointly share @p v.
    */
   Vector<Number> &

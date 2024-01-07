@@ -988,7 +988,7 @@ namespace Utilities
 
     /**
      * Return sum, average, minimum, maximum, processor id of minimum and
-     * maximum as a collective operation of on the given MPI
+     * maximum as a @ref GlossCollectiveOperation "collective operation" of on the given MPI
      * @ref GlossMPICommunicator "communicator"
      * @p mpi_communicator. Each processor's value is given in @p my_value and
      * the result will be returned. The result is available on all machines.
@@ -1005,7 +1005,7 @@ namespace Utilities
 
     /**
      * Same as above but returning the sum, average, minimum, maximum,
-     * process id of minimum and maximum as a collective operation on the
+     * process id of minimum and maximum as a @ref GlossCollectiveOperation "collective operation" on the
      * given MPI
      * @ref GlossMPICommunicator "communicator"
      * @p mpi_communicator for each entry of the vector.
@@ -1021,7 +1021,7 @@ namespace Utilities
 
     /**
      * Same as above but returning the sum, average, minimum, maximum,
-     * process id of minimum and maximum as a collective operation on the
+     * process id of minimum and maximum as a @ref GlossCollectiveOperation "collective operation" on the
      * given MPI
      * @ref GlossMPICommunicator "communicator"
      * @p mpi_communicator for each entry of the ArrayView.
@@ -1525,7 +1525,7 @@ namespace Utilities
      * owned indices, these indices will be treated correctly and the rank of
      * this process is returned for those entries.
      *
-     * @note This is a collective operation: all processes within the given
+     * @note This is a @ref GlossCollectiveOperation "collective operation": all processes within the given
      * communicator have to call this function. Since this function does not
      * use MPI_Alltoall or MPI_Allgather, but instead uses non-blocking
      * point-to-point communication instead, and only a single non-blocking
@@ -1551,7 +1551,7 @@ namespace Utilities
      * Compute the union of the input vectors @p vec of all processes in the
      *   MPI communicator @p comm.
      *
-     * @note This is a collective operation. The result will available on all
+     * @note This is a @ref GlossCollectiveOperation "collective operation". The result will available on all
      *   processes.
      */
     template <typename T>

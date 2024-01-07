@@ -70,7 +70,7 @@ namespace GridTools
    *
    * This function also works for objects of type
    * parallel::distributed::Triangulation, in which case the function is a
-   * collective operation.
+   * @ref GlossCollectiveOperation "collective operation".
    *
    * @param tria The triangulation.
    * @return The dim-dimensional measure of the domain described by the
@@ -96,7 +96,7 @@ namespace GridTools
    *
    * This function also works for objects of type
    * parallel::distributed::Triangulation, in which case the function is a
-   * collective operation.
+   * @ref GlossCollectiveOperation "collective operation".
    *
    * @param tria The triangulation.
    * @param mapping The Mapping which computes the Jacobians used to
