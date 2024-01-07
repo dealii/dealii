@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 
 
-// check FEPointEvaluation::real_point(), FEPointEvaluation::unit_point(),
+// check FEPointEvaluation::quadrature_point(), FEPointEvaluation::unit_point(),
 // FEPointEvaluation::jacobian(), FEPointEvaluation::inverse_jacobian(),
 // FEPointEvaluation::get_unit_gradient().
 
@@ -97,7 +97,7 @@ test(const unsigned int degree)
         deallog << "unit point " << unit_points[i] << std::endl
                 << "unit point via evaluator: " << evaluator.unit_point(i)
                 << std::endl
-                << "real point: " << evaluator.real_point(i) << std::endl
+                << "real point: " << evaluator.quadrature_point(i) << std::endl
                 << "jacobian: " << Tensor<2, dim>(evaluator.jacobian(i))
                 << std::endl
                 << "inverse jacobian: "
