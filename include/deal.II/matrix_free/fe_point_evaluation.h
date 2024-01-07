@@ -861,12 +861,7 @@ public:
    */
   void
   evaluate(const ArrayView<const ScalarNumber>    &solution_values,
-           const EvaluationFlags::EvaluationFlags &evaluation_flags)
-  {
-    evaluate(StridedArrayView<const ScalarNumber, 1>(solution_values.data(),
-                                                     solution_values.size()),
-             evaluation_flags);
-  }
+           const EvaluationFlags::EvaluationFlags &evaluation_flags);
 
   /**
    * This function multiplies the quantities passed in by previous
@@ -2275,6 +2270,19 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
     }
   else
     evaluate_slow(solution_values, evaluation_flags);
+}
+
+
+
+template <int n_components_, int dim, int spacedim, typename Number>
+void
+FEPointEvaluation<n_components_, dim, spacedim, Number>::evaluate(
+  const ArrayView<const ScalarNumber>    &solution_values,
+  const EvaluationFlags::EvaluationFlags &evaluation_flags)
+{
+  evaluate(StridedArrayView<const ScalarNumber, 1>(solution_values.data(),
+                                                   solution_values.size()),
+           evaluation_flags);
 }
 
 
