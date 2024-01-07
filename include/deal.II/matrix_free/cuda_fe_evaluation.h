@@ -357,19 +357,19 @@ namespace CUDAWrappers
     if ((evaluate_flag & EvaluationFlags::values) &&
         (evaluate_flag & EvaluationFlags::gradients))
       {
-        evaluator_tensor_product.value_and_gradient_at_quad_pts(
+        evaluator_tensor_product.evaluate_values_and_gradients(
           shared_data->values, shared_data->gradients);
         shared_data->team_member.team_barrier();
       }
     else if (evaluate_flag & EvaluationFlags::gradients)
       {
-        evaluator_tensor_product.gradient_at_quad_pts(shared_data->values,
-                                                      shared_data->gradients);
+        evaluator_tensor_product.evaluate_gradients(shared_data->values,
+                                                    shared_data->gradients);
         shared_data->team_member.team_barrier();
       }
     else if (evaluate_flag & EvaluationFlags::values)
       {
-        evaluator_tensor_product.value_at_quad_pts(shared_data->values);
+        evaluator_tensor_product.evaluate_values(shared_data->values);
         shared_data->team_member.team_barrier();
       }
   }
@@ -416,17 +416,17 @@ namespace CUDAWrappers
     if ((integration_flag & EvaluationFlags::values) &&
         (integration_flag & EvaluationFlags::gradients))
       {
-        evaluator_tensor_product.integrate_value_and_gradient(
+        evaluator_tensor_product.integrate_values_and_gradients(
           shared_data->values, shared_data->gradients);
       }
     else if (integration_flag & EvaluationFlags::values)
       {
-        evaluator_tensor_product.integrate_value(shared_data->values);
+        evaluator_tensor_product.integrate_values(shared_data->values);
         shared_data->team_member.team_barrier();
       }
     else if (integration_flag & EvaluationFlags::gradients)
       {
-        evaluator_tensor_product.template integrate_gradient<false>(
+        evaluator_tensor_product.template integrate_gradients<false>(
           shared_data->values, shared_data->gradients);
         shared_data->team_member.team_barrier();
       }
