@@ -2127,20 +2127,6 @@ namespace TrilinosWrappers
 
 
 
-  TrilinosScalar
-  SparseMatrix::residual(MPI::Vector       &dst,
-                         const MPI::Vector &x,
-                         const MPI::Vector &b) const
-  {
-    vmult(dst, x);
-    dst -= b;
-    dst *= -1.;
-
-    return dst.l2_norm();
-  }
-
-
-
   namespace internals
   {
     using size_type = dealii::types::global_dof_index;
