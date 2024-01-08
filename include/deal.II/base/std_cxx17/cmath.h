@@ -55,18 +55,9 @@ namespace std_cxx17
     return boost::math::cyl_bessel_j(nu, x);
   }
 
-
-
-  inline long double
-  cyl_bessel_jl(long double nu, long double x)
-  {
-    return boost::math::cyl_bessel_j(nu, x);
-  }
-
 #else
   using std::cyl_bessel_j;
   using std::cyl_bessel_jf;
-  using std::cyl_bessel_jl;
 #endif
 
 #ifndef DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
