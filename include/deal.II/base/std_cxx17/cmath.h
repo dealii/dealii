@@ -91,28 +91,8 @@ namespace std_cxx17
 
 
 
-  inline long double
-  legendre(unsigned int l, long double x)
-  {
-    Assert(static_cast<int>(l) >= 0,
-           ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
-    return boost::math::legendre_p(static_cast<int>(l), x);
-  }
-
-
-
   inline float
   legendref(unsigned int l, float x)
-  {
-    Assert(static_cast<int>(l) >= 0,
-           ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
-    return boost::math::legendre_p(static_cast<int>(l), x);
-  }
-
-
-
-  inline long double
-  legendrel(unsigned int l, long double x)
   {
     Assert(static_cast<int>(l) >= 0,
            ExcIndexRange(l, 0, std::numeric_limits<int>::max()));
@@ -122,7 +102,6 @@ namespace std_cxx17
 #else
   using std::legendre;
   using std::legendref;
-  using std::legendrel;
 #endif
 } // namespace std_cxx17
 
