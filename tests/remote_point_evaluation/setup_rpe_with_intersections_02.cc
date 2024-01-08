@@ -91,7 +91,7 @@ do_test(const unsigned int n_quad_points)
           intersection_requests.emplace_back(vertices);
         }
     }
-  std::cout << "CALLING FUNCTION" << std::endl;
+
   auto intersection_location =
     GridTools::internal::distributed_compute_intersection_locations<structdim>(
       cache,
@@ -100,15 +100,11 @@ do_test(const unsigned int n_quad_points)
       std::vector<bool>(),
       1.0e-9);
 
-  std::cout << "FINISHED" << std::endl;
-
   auto rpe_intersection_data =
     intersection_location
       .convert_to_distributed_compute_point_locations_internal(n_quad_points,
                                                                tria,
                                                                mapping);
-  std::cout << "WTF" << std::endl;
-
   // setup rpe without additional search
   dealii::Utilities::MPI::RemotePointEvaluation<dim> rpe_intersections;
   rpe_intersections.reinit(rpe_intersection_data, tria, mapping);
