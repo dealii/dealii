@@ -749,8 +749,8 @@ namespace CGALWrappers
   } // namespace internal
 
 
-  template <int dim0, int dim1, int spacedim>
-  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  template <int structdim0, int structdim1, int spacedim>
+  std::vector<std::array<Point<spacedim>, structdim1 + 1>>
   compute_intersection_of_cells(
     const ArrayView<const Point<spacedim>> &vertices0,
     const ArrayView<const Point<spacedim>> &vertices1,
@@ -764,7 +764,7 @@ namespace CGALWrappers
       ExcMessage(
         "The intersection cannot be computed as at least one of the two cells has no vertices."));
 
-    if constexpr (dim0 == 2 && dim1 == 2 && spacedim == 2)
+    if constexpr (structdim0 == 2 && structdim1 == 2 && spacedim == 2)
       {
         if (n_vertices0 == 4 && n_vertices1 == 4)
           {
@@ -773,7 +773,7 @@ namespace CGALWrappers
                                                             tol);
           }
       }
-    else if constexpr (dim0 == 2 && dim1 == 1 && spacedim == 2)
+    else if constexpr (structdim0 == 2 && structdim1 == 1 && spacedim == 2)
       {
         if (n_vertices0 == 4 && n_vertices1 == 2)
           {
@@ -782,7 +782,7 @@ namespace CGALWrappers
                                                             tol);
           }
       }
-    else if constexpr (dim0 == 3 && dim1 == 1 && spacedim == 3)
+    else if constexpr (structdim0 == 3 && structdim1 == 1 && spacedim == 3)
       {
         if (n_vertices0 == 8 && n_vertices1 == 2)
           {
@@ -791,7 +791,7 @@ namespace CGALWrappers
                                                             tol);
           }
       }
-    else if constexpr (dim0 == 3 && dim1 == 2 && spacedim == 3)
+    else if constexpr (structdim0 == 3 && structdim1 == 2 && spacedim == 3)
       {
         if (n_vertices0 == 8 && n_vertices1 == 4)
           {
@@ -800,7 +800,7 @@ namespace CGALWrappers
                                                             tol);
           }
       }
-    else if constexpr (dim0 == 3 && dim1 == 3 && spacedim == 3)
+    else if constexpr (structdim0 == 3 && structdim1 == 3 && spacedim == 3)
       {
         if (n_vertices0 == 8 && n_vertices1 == 8)
           {
@@ -819,20 +819,20 @@ namespace CGALWrappers
   }
 
 
-  template <int dim0, int dim1, int spacedim>
-  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  template <int structdim0, int structdim1, int spacedim>
+  std::vector<std::array<Point<spacedim>, structdim1 + 1>>
   compute_intersection_of_cells(
-    const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
-    const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-    const Mapping<dim0, spacedim>                               &mapping0,
-    const Mapping<dim1, spacedim>                               &mapping1,
-    const double                                                 tol)
+    const typename Triangulation<structdim0, spacedim>::cell_iterator &cell0,
+    const typename Triangulation<structdim1, spacedim>::cell_iterator &cell1,
+    const Mapping<structdim0, spacedim>                               &mapping0,
+    const Mapping<structdim1, spacedim>                               &mapping1,
+    const double                                                       tol)
   {
     Assert(mapping0.get_vertices(cell0).size() ==
-             ReferenceCells::get_hypercube<dim0>().n_vertices(),
+             ReferenceCells::get_hypercube<structdim0>().n_vertices(),
            ExcNotImplemented());
     Assert(mapping1.get_vertices(cell1).size() ==
-             ReferenceCells::get_hypercube<dim1>().n_vertices(),
+             ReferenceCells::get_hypercube<structdim1>().n_vertices(),
            ExcNotImplemented());
 
     const auto &vertices0 =
@@ -840,9 +840,8 @@ namespace CGALWrappers
     const auto &vertices1 =
       CGALWrappers::get_vertices_in_cgal_order(cell1, mapping1);
 
-    return compute_intersection_of_cells<dim0, dim1, spacedim>(vertices0,
-                                                               vertices1,
-                                                               tol);
+    return compute_intersection_of_cells<structdim0, structdim1, spacedim>(
+      vertices0, vertices1, tol);
   }
 
 #  include "intersections.inst"
@@ -855,12 +854,12 @@ DEAL_II_NAMESPACE_CLOSE
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim0,
-          int dim1,
+template <int structdim0,
+          int structdim1,
           int spacedim,
           int n_components0,
           int n_components1>
-std::vector<std::array<Point<spacedim>, dim1 + 1>>
+std::vector<std::array<Point<spacedim>, structdim1 + 1>>
 compute_intersection_of_cells(
   const std::array<Point<spacedim>, n_components0> &vertices0,
   const std::array<Point<spacedim>, n_components1> &vertices1,
@@ -872,14 +871,14 @@ compute_intersection_of_cells(
   AssertThrow(false, ExcNeedsCGAL());
 }
 
-template <int dim0, int dim1, int spacedim>
-std::vector<std::array<Point<spacedim>, dim1 + 1>>
+template <int structdim0, int structdim1, int spacedim>
+std::vector<std::array<Point<spacedim>, structdim1 + 1>>
 compute_intersection_of_cells(
-  const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
-  const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-  const Mapping<dim0, spacedim>                               &mapping0,
-  const Mapping<dim1, spacedim>                               &mapping1,
-  const double                                                 tol)
+  const typename Triangulation<structdim0, spacedim>::cell_iterator &cell0,
+  const typename Triangulation<structdim1, spacedim>::cell_iterator &cell1,
+  const Mapping<structdim0, spacedim>                               &mapping0,
+  const Mapping<structdim1, spacedim>                               &mapping1,
+  const double                                                       tol)
 {
   (void)cell0;
   (void)cell1;
