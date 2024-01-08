@@ -1575,10 +1575,9 @@ namespace TrilinosWrappers
      * running on one processor, since the matrix object is inherently
      * distributed. Otherwise, an exception will be thrown.
      */
+    template <typename VectorType>
     TrilinosScalar
-    residual(MPI::Vector       &dst,
-             const MPI::Vector &x,
-             const MPI::Vector &b) const;
+    residual(VectorType &dst, const VectorType &x, const VectorType &b) const;
 
     /**
      * Perform the matrix-matrix multiplication <tt>C = A * B</tt>, or, if an
@@ -3113,6 +3112,21 @@ namespace TrilinosWrappers
   SparseMatrix::prepare_set()
   {
     // nothing to do here
+  }
+
+
+
+  template <typename VectorType>
+  inline TrilinosScalar
+  SparseMatrix::residual(VectorType       &dst,
+                         const VectorType &x,
+                         const VectorType &b) const
+  {
+    vmult(dst, x);
+    dst -= b;
+    dst *= -1.;
+
+    return dst.l2_norm();
   }
 
 
