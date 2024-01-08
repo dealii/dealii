@@ -556,7 +556,6 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <cmath>
   using std::cyl_bessel_j;
   using std::cyl_bessel_jf;
-  using std::cyl_bessel_jl;
   int main()
   {
   }
@@ -574,7 +573,6 @@ CHECK_CXX_SOURCE_COMPILES(
   #include <cmath>
   using std::legendre;
   using std::legendref;
-  using std::legendrel;
   int main()
   {
   }
