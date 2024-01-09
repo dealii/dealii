@@ -98,7 +98,8 @@ endforeach()
 ########################################################################
 
 if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
-    CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
+    CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
+    CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
   #
   # General setup for GCC and compilers sufficiently close to GCC:
   #
