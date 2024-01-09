@@ -711,7 +711,7 @@ namespace Step82
 
             const double mesh_inv = 1.0 / face->diameter(); // h_e^{-1}
             const double mesh3_inv =
-              1.0 / std::pow(face->diameter(), 3); // ĥ_e^{-3}
+              1.0 / std::pow(face->diameter(), 3); // h_e^{-3}
 
             fe_face.reinit(cell, face_no);
 
