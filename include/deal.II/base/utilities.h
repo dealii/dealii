@@ -437,7 +437,6 @@ namespace Utilities
   T
   fixed_power(const T t);
 
-
   /**
    * A replacement for <code>std::pow</code> that allows compile-time
    * calculations for constant expression arguments and if the exponent
@@ -447,58 +446,7 @@ namespace Utilities
    */
   template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
   constexpr DEAL_II_HOST_DEVICE T
-  pow(const T base, const int iexp)
-  {
-#if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
-    // Up to __builtin_expect this is the same code as in the 'Assert' macro.
-    // The call to __builtin_expect turns out to be problematic.
-#  if KOKKOS_VERSION >= 30600
-    KOKKOS_IF_ON_HOST(({
-      if (!(iexp >= 0))
-        ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
-          ::dealii::deal_II_exceptions::internals::ExceptionHandling::
-            abort_or_throw_on_exception,
-          __FILE__,
-          __LINE__,
-          __PRETTY_FUNCTION__,
-          "iexp>=0",
-          "ExcMessage(\"The exponent must not be negative!\")",
-          ExcMessage("The exponent must not be negative!"));
-    }))
-#  else
-#    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
-    if (!(iexp >= 0))
-      ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
-        ::dealii::deal_II_exceptions::internals::ExceptionHandling::
-          abort_or_throw_on_exception,
-        __FILE__,
-        __LINE__,
-        __PRETTY_FUNCTION__,
-        "iexp>=0",
-        "ExcMessage(\"The exponent must not be negative!\")",
-        ExcMessage("The exponent must not be negative!"));
-#    endif
-#  endif
-#endif
-    // The "exponentiation by squaring" algorithm used below has to be expressed
-    // in an iterative version since SYCL doesn't allow recursive functions used
-    // in device code.
-
-    if (iexp <= 0)
-      return 1;
-
-    int exp = iexp;
-    T   x   = base;
-    T   y   = 1;
-    while (exp > 1)
-      {
-        if (exp % 2 == 1)
-          y *= x;
-        x *= x;
-        exp /= 2;
-      }
-    return x * y;
-  }
+  pow(const T base, const int iexp);
 
   /**
    * Optimized replacement for <tt>std::lower_bound</tt> for searching within
@@ -524,7 +472,6 @@ namespace Utilities
   template <typename Iterator, typename T>
   Iterator
   lower_bound(Iterator first, Iterator last, const T &val);
-
 
   /**
    * The same function as above, but taking an argument that is used to
@@ -991,6 +938,63 @@ namespace Utilities
       // by repeated squaring:
       return ((N % 2 == 1) ? x * fixed_power<N / 2>(x * x) :
                              fixed_power<N / 2>(x * x));
+  }
+
+
+
+  template <typename T, typename>
+  constexpr DEAL_II_HOST_DEVICE T
+  pow(const T base, const int iexp)
+  {
+#if defined(DEBUG) && !defined(DEAL_II_CXX14_CONSTEXPR_BUG)
+    // Up to __builtin_expect this is the same code as in the 'Assert' macro.
+    // The call to __builtin_expect turns out to be problematic.
+#  if KOKKOS_VERSION >= 30600
+    KOKKOS_IF_ON_HOST(({
+      if (!(iexp >= 0))
+        ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
+          ::dealii::deal_II_exceptions::internals::ExceptionHandling::
+            abort_or_throw_on_exception,
+          __FILE__,
+          __LINE__,
+          __PRETTY_FUNCTION__,
+          "iexp>=0",
+          "ExcMessage(\"The exponent must not be negative!\")",
+          ExcMessage("The exponent must not be negative!"));
+    }))
+#  else
+#    ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST
+    if (!(iexp >= 0))
+      ::dealii::deal_II_exceptions::internals::issue_error_noreturn(
+        ::dealii::deal_II_exceptions::internals::ExceptionHandling::
+          abort_or_throw_on_exception,
+        __FILE__,
+        __LINE__,
+        __PRETTY_FUNCTION__,
+        "iexp>=0",
+        "ExcMessage(\"The exponent must not be negative!\")",
+        ExcMessage("The exponent must not be negative!"));
+#    endif
+#  endif
+#endif
+    // The "exponentiation by squaring" algorithm used below has to be expressed
+    // in an iterative version since SYCL doesn't allow recursive functions used
+    // in device code.
+
+    if (iexp <= 0)
+      return 1;
+
+    int exp = iexp;
+    T   x   = base;
+    T   y   = 1;
+    while (exp > 1)
+      {
+        if (exp % 2 == 1)
+          y *= x;
+        x *= x;
+        exp /= 2;
+      }
+    return x * y;
   }
 
 
