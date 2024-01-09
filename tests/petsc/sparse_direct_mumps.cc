@@ -40,30 +40,52 @@ main(int argc, char **argv)
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   {
-    const unsigned int size = 32;
-    unsigned int       dim  = (size - 1) * (size - 1);
+    const unsigned int n_points = 32;
+    unsigned int       size     = (n_points - 1) * (n_points - 1);
 
-    deallog << "Size " << size << " Unknowns " << dim << std::endl;
+    deallog << "Size " << n_points << " Unknowns " << size << std::endl;
 
     // Make matrix
-    FDMatrix                    testproblem(size, size);
-    PETScWrappers::SparseMatrix A(dim, dim, 5);
+    FDMatrix                    testproblem(n_points, n_points);
+    PETScWrappers::SparseMatrix A(size, size, 5);
     testproblem.five_point(A);
 
-    IndexSet indices(dim);
-    indices.add_range(0, dim);
+    IndexSet indices(size);
+    indices.add_range(0, size);
     PETScWrappers::MPI::Vector f(indices, MPI_COMM_WORLD);
     PETScWrappers::MPI::Vector u(indices, MPI_COMM_WORLD);
-    u = 0.;
-    f = 1.;
     A.compress(VectorOperation::insert);
 
-    SolverControl                    cn;
-    PETScWrappers::SparseDirectMUMPS solver(cn);
-    //    solver.set_symmetric_mode(true);
-    solver.solve(A, u, f);
+    // First test non-symmetric mode:
+    {
+      deallog << "Testing non-symmetric mode" << std::endl;
 
-    PETScWrappers::MPI::Vector tmp(indices, MPI_COMM_WORLD);
-    deallog << "residual = " << A.residual(tmp, u, f) << std::endl;
+      u = 0.;
+      f = 1.;
+
+      SolverControl                    cn;
+      PETScWrappers::SparseDirectMUMPS solver(cn);
+      solver.solve(A, u, f);
+
+      PETScWrappers::MPI::Vector tmp(indices, MPI_COMM_WORLD);
+      deallog << "residual = " << A.residual(tmp, u, f) << std::endl;
+    }
+
+    // Now also test the case where the matrix can be assumed to be
+    // symmetric (which of course it is here):
+    {
+      deallog << "Testing symmetric mode" << std::endl;
+
+      u = 0.;
+      f = 1.;
+
+      SolverControl                    cn;
+      PETScWrappers::SparseDirectMUMPS solver(cn);
+      solver.set_symmetric_mode(true);
+      solver.solve(A, u, f);
+
+      PETScWrappers::MPI::Vector tmp(indices, MPI_COMM_WORLD);
+      deallog << "residual = " << A.residual(tmp, u, f) << std::endl;
+    }
   }
 }
