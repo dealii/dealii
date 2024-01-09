@@ -82,6 +82,11 @@ namespace types
  * SparseMatrix<float>, SparseMatrixEZ<float>, SparseMatrixEZ<double>,
  * BlockSparseMatrix<double>, and BlockSparseMatrix<float>.
  *
+ * This class is not instantiated for the matrix types in namespace
+ * PETScWrappers or TrilinosWrappers. However, PETScWrappers::SparseDirectMUMPS
+ * can be used for PETSc matrices, and in fact even works for parallel
+ * computations.
+ *
  * @ingroup Solvers Preconditioners
  */
 class SparseDirectUMFPACK : public Subscriptor

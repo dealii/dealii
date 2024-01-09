@@ -934,12 +934,30 @@ namespace PETScWrappers
     solve(const MatrixBase &A, VectorBase &x, const VectorBase &b);
 
     /**
-     * The method allows to take advantage if the system matrix is symmetric
-     * by using LDL^T decomposition instead of more expensive LU. The argument
-     * indicates whether the matrix is symmetric or not.
+     * If called with `true` as argument, tell the direct solver
+     * to assume that the system matrix is symmetric.
+     * It does so by computing the LDL^T decomposition (in effect, a
+     * Cholesky decomposition) instead of more expensive LU decomposition.
+     * The argument indicates whether the matrix can be assumed to be
+     * symmetric or not.
+     *
+     * Note that most finite element matrices are "structurally symmetric",
+     * i.e., the *sparsity pattern* is symmetric, even though the matrix
+     * is not. An example of a matrix that is structurally symmetric
+     * but not symmetric is the matrix you obtain by discretizing the
+     * advection equation $\nabla \cdot (\vec\beta u) = f$ (see, for
+     * example step-12). Because the operator here is not symmetric, the
+     * matrix is not symmetric either; however, if matrix entry $A_{ij}$
+     * is nonzero, then matrix entry $A_{ji}$ is generally not zero either
+     * (and in any case, DoFTools::make_sparsity_pattern() will create a
+     * symmetric sparsity pattern). That said, the current function
+     * is not meant to indicate whether the *sparsity* pattern is symmetric,
+     * but whether the *matrix* itself is symmetric, and this typically
+     * requires that the differential operator you are considering is
+     * symmetric.
      */
     void
-    set_symmetric_mode(const bool flag);
+    set_symmetric_mode(const bool matrix_is_symmetric);
 
   protected:
     /**
