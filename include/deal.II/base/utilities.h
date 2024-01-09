@@ -437,12 +437,15 @@ namespace Utilities
   T
   fixed_power(const T t);
 
+
   /**
    * A replacement for <code>std::pow</code> that allows compile-time
-   * calculations for constant expression arguments. The @p base must
-   * be an integer type and the exponent @p iexp must not be negative.
+   * calculations for constant expression arguments and if the exponent
+   * is a positive integer. The @p base must be an arithmetic type
+   * (i.e., an integer or floating point type),
+   * and the exponent @p iexp must not be negative.
    */
-  template <typename T>
+  template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
   constexpr DEAL_II_HOST_DEVICE T
   pow(const T base, const int iexp)
   {
@@ -477,8 +480,6 @@ namespace Utilities
 #    endif
 #  endif
 #endif
-    static_assert(std::is_integral_v<T>, "Only integral types supported");
-
     // The "exponentiation by squaring" algorithm used below has to be expressed
     // in an iterative version since SYCL doesn't allow recursive functions used
     // in device code.
