@@ -15,20 +15,21 @@
 
 
 
-for (dim0 : DIMENSIONS; dim1 : DIMENSIONS; spacedim : SPACE_DIMENSIONS)
+for (structdim0 : DIMENSIONS; structdim1 : DIMENSIONS;
+     spacedim : SPACE_DIMENSIONS)
   {
-#if dim0 <= spacedim && dim0 >= dim1
+#if structdim0 <= spacedim && structdim0 >= structdim1
 
-    template std::vector<std::array<Point<spacedim>, dim1 + 1>>
-    compute_intersection_of_cells<dim0, dim1, spacedim>(
-      const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
-      const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-      const Mapping<dim0, spacedim>                               &mapping0,
-      const Mapping<dim1, spacedim>                               &mapping1,
-      const double                                                 tol);
+    template std::vector<std::array<Point<spacedim>, structdim1 + 1>>
+    compute_intersection_of_cells<structdim0, structdim1, spacedim>(
+      const typename Triangulation<structdim0, spacedim>::cell_iterator &cell0,
+      const typename Triangulation<structdim1, spacedim>::cell_iterator &cell1,
+      const Mapping<structdim0, spacedim> &mapping0,
+      const Mapping<structdim1, spacedim> &mapping1,
+      const double                         tol);
 
-    template std::vector<std::array<Point<spacedim>, dim1 + 1>>
-    compute_intersection_of_cells<dim0, dim1, spacedim>(
+    template std::vector<std::array<Point<spacedim>, structdim1 + 1>>
+    compute_intersection_of_cells<structdim0, structdim1, spacedim>(
       const ArrayView<const Point<spacedim>> &vertices0,
       const ArrayView<const Point<spacedim>> &vertices1,
       const double                            tol);

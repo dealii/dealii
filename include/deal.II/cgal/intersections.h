@@ -50,14 +50,14 @@ namespace CGALWrappers
    * @param tol Threshold to decide whether or not a simplex is included.
    * @return Vector of arrays, where each array identify a simplex by its vertices.
    */
-  template <int dim0, int dim1, int spacedim>
-  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  template <int structdim0, int structdim1, int spacedim>
+  std::vector<std::array<Point<spacedim>, structdim1 + 1>>
   compute_intersection_of_cells(
-    const typename Triangulation<dim0, spacedim>::cell_iterator &cell0,
-    const typename Triangulation<dim1, spacedim>::cell_iterator &cell1,
-    const Mapping<dim0, spacedim>                               &mapping0,
-    const Mapping<dim1, spacedim>                               &mapping1,
-    const double                                                 tol = 1e-9);
+    const typename Triangulation<structdim0, spacedim>::cell_iterator &cell0,
+    const typename Triangulation<structdim1, spacedim>::cell_iterator &cell1,
+    const Mapping<structdim0, spacedim>                               &mapping0,
+    const Mapping<structdim1, spacedim>                               &mapping1,
+    const double tol = 1e-9);
 
 
   /**
@@ -68,8 +68,8 @@ namespace CGALWrappers
    *
    * @note The vertices have to be given in CGAL order.
    */
-  template <int dim0, int dim1, int spacedim>
-  std::vector<std::array<Point<spacedim>, dim1 + 1>>
+  template <int structdim0, int structdim1, int spacedim>
+  std::vector<std::array<Point<spacedim>, structdim1 + 1>>
   compute_intersection_of_cells(
     const ArrayView<const Point<spacedim>> &vertices0,
     const ArrayView<const Point<spacedim>> &vertices1,
