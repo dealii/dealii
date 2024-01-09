@@ -40,7 +40,7 @@ namespace LinearAlgebra
 {
   namespace TpetraWrappers
   {
-    template <typename NodeType>
+    template <typename MemorySpace>
     class SparsityPattern;
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
@@ -89,9 +89,7 @@ namespace LinearAlgebra
      * SparseMatrix::resume_fill() first. Once you finish modifying
      * the matrix, you must call SparseMatrix::compress() again.
      */
-    template <typename Number,
-              typename NodeType =
-                Tpetra::KokkosClassic::DefaultNode::DefaultNodeType>
+    template <typename Number, typename MemorySpace = dealii::MemorySpace::Host>
     class SparseMatrix : public Subscriptor
     {
     public:
@@ -107,21 +105,32 @@ namespace LinearAlgebra
       using value_type = Number;
 
       /**
+       * Typedef for the NodeType
+       */
+      using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
+        typename MemorySpace::kokkos_space::execution_space,
+        typename MemorySpace::kokkos_space>;
+
+      /**
        * Typedef for Tpetra::CrsMatrix
        */
       using MatrixType =
-        Tpetra::CrsMatrix<Number, int, dealii::types::signed_global_dof_index>;
+        Tpetra::CrsMatrix<Number,
+                          int,
+                          dealii::types::signed_global_dof_index,
+                          NodeType>;
 
       /**
        * Typedef for Tpetra::Map
        */
-      using MapType = Tpetra::Map<int, dealii::types::signed_global_dof_index>;
+      using MapType =
+        Tpetra::Map<int, dealii::types::signed_global_dof_index, NodeType>;
 
       /**
        * Typedef for Tpetra::CrsGraph
        */
       using GraphType =
-        Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index>;
+        Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index, NodeType>;
 
       /**
        * @name Constructors and initialization.
@@ -135,30 +144,30 @@ namespace LinearAlgebra
       /**
        * Generate a matrix from a TpetraWrappers::SparsityPattern object.
        */
-      SparseMatrix(const SparsityPattern<NodeType> &sparsity_pattern);
+      SparseMatrix(const SparsityPattern<MemorySpace> &sparsity_pattern);
 
       /**
        * Move constructor. Create a new sparse matrix by stealing the internal
        * data of the `other` object.
        */
-      SparseMatrix(SparseMatrix<Number, NodeType> &&other) noexcept;
+      SparseMatrix(SparseMatrix<Number, MemorySpace> &&other) noexcept;
 
       /**
        * Copy constructor is deleted.
        */
-      SparseMatrix(const SparseMatrix<Number, NodeType> &) = delete;
+      SparseMatrix(const SparseMatrix<Number, MemorySpace> &) = delete;
 
       /**
        * operator= is deleted.
        */
-      SparseMatrix<Number, NodeType> &
-      operator=(const SparseMatrix<Number, NodeType> &) = delete;
+      SparseMatrix<Number, MemorySpace> &
+      operator=(const SparseMatrix<Number, MemorySpace> &) = delete;
 
       /**
        * Move assignment operator.
        */
-      SparseMatrix<Number, NodeType> &
-      operator=(SparseMatrix<Number, NodeType> &&other) noexcept;
+      SparseMatrix<Number, MemorySpace> &
+      operator=(SparseMatrix<Number, MemorySpace> &&other) noexcept;
 
       /**
        * Destructor. Made virtual so that one can use pointers to objects of
@@ -195,7 +204,7 @@ namespace LinearAlgebra
        * processors in order to avoid a dead lock.
        */
       void
-      reinit(const SparsityPattern<NodeType> &sparsity_pattern);
+      reinit(const SparsityPattern<MemorySpace> &sparsity_pattern);
       /** @} */
 
       /**
@@ -401,9 +410,9 @@ namespace LinearAlgebra
 
       /**
        * Add @p value to the element (<i>i,j</i>).
-       * Just as the respective call in deal.II SparseMatrix<Number, NodeType>
-       * class. Moreover, if <tt>value</tt> is not a finite number an exception
-       * is thrown.
+       * Just as the respective call in deal.II SparseMatrix<Number,
+       * MemorySpace> class. Moreover, if <tt>value</tt> is not a finite number
+       * an exception is thrown.
        *
        * @note When add is called on a compressed matrix, the matrix is set
        * back to an uncompressed state.
@@ -414,12 +423,12 @@ namespace LinearAlgebra
       /**
        * Add an array of values given by <tt>values</tt> in the given global
        * matrix row at columns specified by col_indices in the sparse matrix.
-       * Just as the respective call in deal.II SparseMatrix<Number, NodeType>
-       * class. The optional parameter <tt>elide_zero_values</tt> can be used to
-       * specify whether zero values should be added anyway or these should be
-       * filtered away and only non-zero data is added.
-       * The default value is <tt>true</tt>, i.e., zero values won't be added
-       * into the matrix.
+       * Just as the respective call in deal.II SparseMatrix<Number,
+       * MemorySpace> class. The optional parameter <tt>elide_zero_values</tt>
+       * can be used to specify whether zero values should be added anyway or
+       * these should be filtered away and only non-zero data is added. The
+       * default value is <tt>true</tt>, i.e., zero values won't be added into
+       * the matrix.
        *
        * @note When add is called on a compressed matrix, the matrix is set
        * back to an uncompressed state.
@@ -653,29 +662,29 @@ namespace LinearAlgebra
 
     /* ------------------------- Inline functions ---------------------- */
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     inline void
-    SparseMatrix<Number, NodeType>::add(const size_type      i,
-                                        const size_type      j,
-                                        const TrilinosScalar value)
+    SparseMatrix<Number, MemorySpace>::add(const size_type      i,
+                                           const size_type      j,
+                                           const TrilinosScalar value)
     {
       add(i, 1, &j, &value, false);
     }
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     inline dealii::types::signed_global_dof_index
-    SparseMatrix<Number, NodeType>::m() const
+    SparseMatrix<Number, MemorySpace>::m() const
     {
       return matrix->getRowMap()->getGlobalNumElements();
     }
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     inline dealii::types::signed_global_dof_index
-    SparseMatrix<Number, NodeType>::n() const
+    SparseMatrix<Number, MemorySpace>::n() const
     {
       // If the matrix structure has not been fixed (i.e., we did not have a
       // sparsity pattern), it does not know about the number of columns, so we
@@ -686,48 +695,61 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     inline bool
-    SparseMatrix<Number, NodeType>::is_compressed() const
+    SparseMatrix<Number, MemorySpace>::is_compressed() const
     {
       return compressed;
     }
 
 
 
-    template <typename Number, typename NodeType>
-    inline const Tpetra::
-      CrsMatrix<Number, int, types::signed_global_dof_index> &
-      SparseMatrix<Number, NodeType>::trilinos_matrix() const
+    template <typename Number, typename MemorySpace>
+    inline const Tpetra::CrsMatrix<
+      Number,
+      int,
+      types::signed_global_dof_index,
+      typename SparseMatrix<Number, MemorySpace>::NodeType> &
+    SparseMatrix<Number, MemorySpace>::trilinos_matrix() const
     {
       return *matrix;
     }
 
 
 
-    template <typename Number, typename NodeType>
-    inline Tpetra::CrsMatrix<Number, int, types::signed_global_dof_index> &
-    SparseMatrix<Number, NodeType>::trilinos_matrix()
+    template <typename Number, typename MemorySpace>
+    inline Tpetra::CrsMatrix<
+      Number,
+      int,
+      types::signed_global_dof_index,
+      typename SparseMatrix<Number, MemorySpace>::NodeType> &
+    SparseMatrix<Number, MemorySpace>::trilinos_matrix()
     {
       return *matrix;
     }
 
 
 
-    template <typename Number, typename NodeType>
-    inline Teuchos::RCP<
-      const Tpetra::CrsMatrix<Number, int, types::signed_global_dof_index>>
-    SparseMatrix<Number, NodeType>::trilinos_rcp() const
+    template <typename Number, typename MemorySpace>
+    inline Teuchos::RCP<const Tpetra::CrsMatrix<
+      Number,
+      int,
+      types::signed_global_dof_index,
+      typename SparseMatrix<Number, MemorySpace>::NodeType>>
+    SparseMatrix<Number, MemorySpace>::trilinos_rcp() const
     {
       return matrix.getConst();
     }
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     inline Teuchos::RCP<
-      Tpetra::CrsMatrix<Number, int, types::signed_global_dof_index>>
-    SparseMatrix<Number, NodeType>::trilinos_rcp()
+      Tpetra::CrsMatrix<Number,
+                        int,
+                        types::signed_global_dof_index,
+                        typename SparseMatrix<Number, MemorySpace>::NodeType>>
+    SparseMatrix<Number, MemorySpace>::trilinos_rcp()
     {
       return matrix;
     }

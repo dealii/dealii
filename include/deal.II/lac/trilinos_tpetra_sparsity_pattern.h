@@ -45,15 +45,15 @@ namespace LinearAlgebra
 {
   namespace TpetraWrappers
   {
-    template <typename NodeType>
+    template <typename MemorySpace>
     class SparsityPattern;
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     class SparseMatrix;
 
     namespace SparsityPatternIterators
     {
-      template <typename NodeType>
+      template <typename MemorySpace>
       class Iterator;
     }
   } // namespace TpetraWrappers
@@ -77,8 +77,7 @@ namespace LinearAlgebra
        *
        * @ingroup TrilinosWrappers
        */
-      template <typename NodeType =
-                  Tpetra::KokkosClassic::DefaultNode::DefaultNodeType>
+      template <typename MemorySpace = dealii::MemorySpace::Host>
       class Accessor
       {
       public:
@@ -88,11 +87,18 @@ namespace LinearAlgebra
         using size_type = dealii::types::signed_global_dof_index;
 
         /**
+         * Typedef for the NodeType
+         */
+        using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
+          typename MemorySpace::kokkos_space::execution_space,
+          typename MemorySpace::kokkos_space>;
+
+        /**
          * Constructor.
          */
-        Accessor(const SparsityPattern<NodeType> *sparsity_pattern,
-                 const size_type                  row,
-                 const size_type                  index);
+        Accessor(const SparsityPattern<MemorySpace> *sparsity_pattern,
+                 const size_type                     row,
+                 const size_type                     index);
 
         /**
          * Row number of the element represented by this object.
@@ -133,7 +139,7 @@ namespace LinearAlgebra
         /**
          * The matrix accessed.
          */
-        SparsityPattern<NodeType> *sparsity_pattern;
+        SparsityPattern<MemorySpace> *sparsity_pattern;
 
         /**
          * Current row number.
@@ -169,7 +175,7 @@ namespace LinearAlgebra
         visit_present_row();
 
         // Make enclosing class a friend.
-        friend class Iterator<NodeType>;
+        friend class Iterator<MemorySpace>;
       };
 
       /**
@@ -177,8 +183,7 @@ namespace LinearAlgebra
        * TrilinosWrappers::SparsityPattern. Access to individual elements of the
        * sparsity pattern is handled by the Accessor class in this namespace.
        */
-      template <typename NodeType =
-                  Tpetra::KokkosClassic::DefaultNode::DefaultNodeType>
+      template <typename MemorySpace = dealii::MemorySpace::Host>
       class Iterator
       {
       public:
@@ -188,22 +193,29 @@ namespace LinearAlgebra
         using size_type = size_t;
 
         /**
+         * Typedef for the NodeType
+         */
+        using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
+          typename MemorySpace::kokkos_space::execution_space,
+          typename MemorySpace::kokkos_space>;
+
+        /**
          * Constructor. Create an iterator into the matrix @p matrix for the
          * given row and the index within it.
          */
-        Iterator(const SparsityPattern<NodeType> *sparsity_pattern,
-                 const size_type                  row,
-                 const size_type                  index);
+        Iterator(const SparsityPattern<MemorySpace> *sparsity_pattern,
+                 const size_type                     row,
+                 const size_type                     index);
 
         /**
          * Copy constructor.
          */
-        Iterator(const Iterator<NodeType> &i);
+        Iterator(const Iterator<MemorySpace> &i);
 
         /**
          * Prefix increment.
          */
-        Iterator<NodeType> &
+        Iterator<MemorySpace> &
         operator++();
 
         /**
@@ -215,13 +227,13 @@ namespace LinearAlgebra
         /**
          * Dereferencing operator.
          */
-        const Accessor<NodeType> &
+        const Accessor<MemorySpace> &
         operator*() const;
 
         /**
          * Dereferencing operator.
          */
-        const Accessor<NodeType> *
+        const Accessor<MemorySpace> *
         operator->() const;
 
         /**
@@ -229,13 +241,13 @@ namespace LinearAlgebra
          * position.
          */
         bool
-        operator==(const Iterator<NodeType> &) const;
+        operator==(const Iterator<MemorySpace> &) const;
 
         /**
          * Inverse of <tt>==</tt>.
          */
         bool
-        operator!=(const Iterator<NodeType> &) const;
+        operator!=(const Iterator<MemorySpace> &) const;
 
         /**
          * Comparison operator. Result is true if either the first row number is
@@ -243,7 +255,7 @@ namespace LinearAlgebra
          * smaller.
          */
         bool
-        operator<(const Iterator<NodeType> &) const;
+        operator<(const Iterator<MemorySpace> &) const;
 
         /**
          * Exception
@@ -258,9 +270,9 @@ namespace LinearAlgebra
         /**
          * Store an object of the accessor class.
          */
-        Accessor<NodeType> accessor;
+        Accessor<MemorySpace> accessor;
 
-        friend class TpetraWrappers::SparsityPattern<NodeType>;
+        friend class TpetraWrappers::SparsityPattern<MemorySpace>;
       };
 
     } // namespace SparsityPatternIterators
@@ -277,14 +289,13 @@ namespace LinearAlgebra
      * This class has many similarities to the  DynamicSparsityPattern, since it
      * can dynamically add elements to the pattern without any memory being
      * previously reserved for it. However, it also has a method
-     * SparsityPattern<NodeType>::compress(), that finalizes the pattern and
+     * SparsityPattern<MemorySpace>::compress(), that finalizes the pattern and
      * enables its use with Trilinos sparse matrices.
      *
      * @ingroup TrilinosWrappers
      * @ingroup Sparsity
      */
-    template <typename NodeType =
-                Tpetra::KokkosClassic::DefaultNode::DefaultNodeType>
+    template <typename MemorySpace = dealii::MemorySpace::Host>
     class SparsityPattern : public SparsityPatternBase
     {
     public:
@@ -294,9 +305,16 @@ namespace LinearAlgebra
       using size_type = dealii::types::signed_global_dof_index;
 
       /**
+       * Typedef for the NodeType
+       */
+      using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
+        typename MemorySpace::kokkos_space::execution_space,
+        typename MemorySpace::kokkos_space>;
+
+      /**
        * Declare an alias for the iterator class.
        */
-      using const_iterator = SparsityPatternIterators::Iterator<NodeType>;
+      using const_iterator = SparsityPatternIterators::Iterator<MemorySpace>;
 
       /**
        * Typedef for Tpetra::Map
@@ -309,6 +327,7 @@ namespace LinearAlgebra
        */
       using GraphType =
         Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index, NodeType>;
+
 
       /**
        * @name Basic constructors and initialization
@@ -353,13 +372,14 @@ namespace LinearAlgebra
        * Move constructor. Create a new sparse matrix by stealing the internal
        * data.
        */
-      SparsityPattern(SparsityPattern<NodeType> &&other) noexcept;
+      SparsityPattern(SparsityPattern<MemorySpace> &&other) noexcept;
 
       /**
        * Copy constructor. Sets the calling sparsity pattern to be the same as
        * the input sparsity pattern.
        */
-      SparsityPattern(const SparsityPattern<NodeType> &input_sparsity_pattern);
+      SparsityPattern(
+        const SparsityPattern<MemorySpace> &input_sparsity_pattern);
 
       /**
        * Destructor. Made virtual so that one can use pointers to this class.
@@ -400,7 +420,7 @@ namespace LinearAlgebra
        * input sparsity pattern.
        */
       void
-      copy_from(const SparsityPattern<NodeType> &input_sparsity_pattern);
+      copy_from(const SparsityPattern<MemorySpace> &input_sparsity_pattern);
 
       /**
        * Copy function from one of the deal.II sparsity patterns. If used in
@@ -417,8 +437,8 @@ namespace LinearAlgebra
        * the compiler. Use copy_from() instead if you know that you really want
        * to copy a sparsity pattern with non-trivial content.
        */
-      SparsityPattern<NodeType> &
-      operator=(const SparsityPattern<NodeType> &input_sparsity_pattern);
+      SparsityPattern<MemorySpace> &
+      operator=(const SparsityPattern<MemorySpace> &input_sparsity_pattern);
 
       /**
        * Release all memory and return to a state just like after having called
@@ -468,7 +488,7 @@ namespace LinearAlgebra
        * each m row. Since we know the number of elements in the sparsity
        * pattern exactly in this case, we can already allocate the right amount
        * of memory, which makes the creation process by the respective
-       * SparsityPattern<NodeType>::reinit call considerably faster. However,
+       * SparsityPattern<MemorySpace>::reinit call considerably faster. However,
        * this is a rather unusual situation, since knowing the number of entries
        * in each row is usually connected to knowing the indices of nonzero
        * entries, which the sparsity pattern is designed to describe.
@@ -1017,9 +1037,9 @@ namespace LinearAlgebra
       Teuchos::RCP<GraphType> nonlocal_graph;
 
       // TODO: currently only for double
-      friend class SparseMatrix<double, NodeType>;
-      friend class SparsityPatternIterators::Accessor<NodeType>;
-      friend class SparsityPatternIterators::Iterator<NodeType>;
+      friend class SparseMatrix<double, MemorySpace>;
+      friend class SparsityPatternIterators::Accessor<MemorySpace>;
+      friend class SparsityPatternIterators::Iterator<MemorySpace>;
     };
 
 
@@ -1031,11 +1051,12 @@ namespace LinearAlgebra
 
     namespace SparsityPatternIterators
     {
-      template <typename NodeType>
-      inline Accessor<NodeType>::Accessor(const SparsityPattern<NodeType> *sp,
-                                          const size_type                  row,
-                                          const size_type index)
-        : sparsity_pattern(const_cast<SparsityPattern<NodeType> *>(sp))
+      template <typename MemorySpace>
+      inline Accessor<MemorySpace>::Accessor(
+        const SparsityPattern<MemorySpace> *sp,
+        const size_type                     row,
+        const size_type                     index)
+        : sparsity_pattern(const_cast<SparsityPattern<MemorySpace> *>(sp))
         , a_row(row)
         , a_index(index)
       {
@@ -1044,9 +1065,9 @@ namespace LinearAlgebra
 
 
 
-      template <typename NodeType>
-      inline typename Accessor<NodeType>::size_type
-      Accessor<NodeType>::row() const
+      template <typename MemorySpace>
+      inline typename Accessor<MemorySpace>::size_type
+      Accessor<MemorySpace>::row() const
       {
         Assert(a_row < sparsity_pattern->n_rows(),
                ExcBeyondEndOfSparsityPattern());
@@ -1055,9 +1076,9 @@ namespace LinearAlgebra
 
 
 
-      template <typename NodeType>
-      inline typename Accessor<NodeType>::size_type
-      Accessor<NodeType>::column() const
+      template <typename MemorySpace>
+      inline typename Accessor<MemorySpace>::size_type
+      Accessor<MemorySpace>::column() const
       {
         Assert(a_row < sparsity_pattern->n_rows(),
                ExcBeyondEndOfSparsityPattern());
@@ -1066,9 +1087,9 @@ namespace LinearAlgebra
 
 
 
-      template <typename NodeType>
-      inline typename Accessor<NodeType>::size_type
-      Accessor<NodeType>::index() const
+      template <typename MemorySpace>
+      inline typename Accessor<MemorySpace>::size_type
+      Accessor<MemorySpace>::index() const
       {
         Assert(a_row < sparsity_pattern->n_rows(),
                ExcBeyondEndOfSparsityPattern());
@@ -1077,23 +1098,25 @@ namespace LinearAlgebra
 
 
 
-      template <typename NodeType>
-      inline Iterator<NodeType>::Iterator(const SparsityPattern<NodeType> *sp,
-                                          const size_type                  row,
-                                          const size_type index)
+      template <typename MemorySpace>
+      inline Iterator<MemorySpace>::Iterator(
+        const SparsityPattern<MemorySpace> *sp,
+        const size_type                     row,
+        const size_type                     index)
         : accessor(sp, row, index)
       {}
 
 
 
-      template <typename NodeType>
-      inline Iterator<NodeType>::Iterator(const Iterator<NodeType> &) = default;
+      template <typename MemorySpace>
+      inline Iterator<MemorySpace>::Iterator(const Iterator<MemorySpace> &) =
+        default;
 
 
 
-      template <typename NodeType>
-      inline Iterator<NodeType> &
-      Iterator<NodeType>::operator++()
+      template <typename MemorySpace>
+      inline Iterator<MemorySpace> &
+      Iterator<MemorySpace>::operator++()
       {
         Assert(accessor.a_row < accessor.sparsity_pattern->n_rows(),
                ExcIteratorPastEnd());
@@ -1130,38 +1153,39 @@ namespace LinearAlgebra
 
 
 
-      template <typename NodeType>
-      inline Iterator<NodeType>
-      Iterator<NodeType>::operator++(int)
+      template <typename MemorySpace>
+      inline Iterator<MemorySpace>
+      Iterator<MemorySpace>::operator++(int)
       {
-        const Iterator<NodeType> old_state = *this;
+        const Iterator<MemorySpace> old_state = *this;
         ++(*this);
         return old_state;
       }
 
 
 
-      template <typename NodeType>
-      inline const Accessor<NodeType> &
-      Iterator<NodeType>::operator*() const
+      template <typename MemorySpace>
+      inline const Accessor<MemorySpace> &
+      Iterator<MemorySpace>::operator*() const
       {
         return accessor;
       }
 
 
 
-      template <typename NodeType>
-      inline const Accessor<NodeType> *
-      Iterator<NodeType>::operator->() const
+      template <typename MemorySpace>
+      inline const Accessor<MemorySpace> *
+      Iterator<MemorySpace>::operator->() const
       {
         return &accessor;
       }
 
 
 
-      template <typename NodeType>
+      template <typename MemorySpace>
       inline bool
-      Iterator<NodeType>::operator==(const Iterator<NodeType> &other) const
+      Iterator<MemorySpace>::operator==(
+        const Iterator<MemorySpace> &other) const
       {
         return (accessor.a_row == other.accessor.a_row &&
                 accessor.a_index == other.accessor.a_index);
@@ -1169,18 +1193,19 @@ namespace LinearAlgebra
 
 
 
-      template <typename NodeType>
+      template <typename MemorySpace>
       inline bool
-      Iterator<NodeType>::operator!=(const Iterator<NodeType> &other) const
+      Iterator<MemorySpace>::operator!=(
+        const Iterator<MemorySpace> &other) const
       {
         return !(*this == other);
       }
 
 
 
-      template <typename NodeType>
+      template <typename MemorySpace>
       inline bool
-      Iterator<NodeType>::operator<(const Iterator<NodeType> &other) const
+      Iterator<MemorySpace>::operator<(const Iterator<MemorySpace> &other) const
       {
         return (accessor.row() < other.accessor.row() ||
                 (accessor.row() == other.accessor.row() &&
@@ -1191,9 +1216,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename NodeType>
-    inline typename SparsityPattern<NodeType>::const_iterator
-    SparsityPattern<NodeType>::begin() const
+    template <typename MemorySpace>
+    inline typename SparsityPattern<MemorySpace>::const_iterator
+    SparsityPattern<MemorySpace>::begin() const
     {
       const size_type first_valid_row = this->local_range().first;
       return const_iterator(this, first_valid_row, 0);
@@ -1201,18 +1226,18 @@ namespace LinearAlgebra
 
 
 
-    template <typename NodeType>
-    inline typename SparsityPattern<NodeType>::const_iterator
-    SparsityPattern<NodeType>::end() const
+    template <typename MemorySpace>
+    inline typename SparsityPattern<MemorySpace>::const_iterator
+    SparsityPattern<MemorySpace>::end() const
     {
       return const_iterator(this, n_rows(), 0);
     }
 
 
 
-    template <typename NodeType>
-    inline typename SparsityPattern<NodeType>::const_iterator
-    SparsityPattern<NodeType>::begin(const size_type r) const
+    template <typename MemorySpace>
+    inline typename SparsityPattern<MemorySpace>::const_iterator
+    SparsityPattern<MemorySpace>::begin(const size_type r) const
     {
       AssertIndexRange(r, n_rows());
       if (row_length(r) > 0)
@@ -1223,9 +1248,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename NodeType>
-    inline typename SparsityPattern<NodeType>::const_iterator
-    SparsityPattern<NodeType>::end(const size_type r) const
+    template <typename MemorySpace>
+    inline typename SparsityPattern<MemorySpace>::const_iterator
+    SparsityPattern<MemorySpace>::end(const size_type r) const
     {
       AssertIndexRange(r, n_rows());
 
@@ -1245,9 +1270,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename NodeType>
+    template <typename MemorySpace>
     inline bool
-    SparsityPattern<NodeType>::in_local_range(const size_type index) const
+    SparsityPattern<MemorySpace>::in_local_range(const size_type index) const
     {
       const TrilinosWrappers::types::int_type begin =
         graph->getRowMap()->getMinGlobalIndex();
@@ -1260,40 +1285,40 @@ namespace LinearAlgebra
 
 
 
-    template <typename NodeType>
+    template <typename MemorySpace>
     inline bool
-    SparsityPattern<NodeType>::is_compressed() const
+    SparsityPattern<MemorySpace>::is_compressed() const
     {
       return graph->isFillComplete();
     }
 
 
 
-    template <typename NodeType>
+    template <typename MemorySpace>
     inline bool
-    SparsityPattern<NodeType>::empty() const
+    SparsityPattern<MemorySpace>::empty() const
     {
       return ((n_rows() == 0) && (n_cols() == 0));
     }
 
 
 
-    template <typename NodeType>
+    template <typename MemorySpace>
     inline void
-    SparsityPattern<NodeType>::add(const size_type i, const size_type j)
+    SparsityPattern<MemorySpace>::add(const size_type i, const size_type j)
     {
       add_entries(i, &j, &j + 1);
     }
 
 
 
-    template <typename NodeType>
+    template <typename MemorySpace>
     template <typename ForwardIterator>
     inline void
-    SparsityPattern<NodeType>::add_entries(const size_type row,
-                                           ForwardIterator begin,
-                                           ForwardIterator end,
-                                           const bool /*indices_are_sorted*/)
+    SparsityPattern<MemorySpace>::add_entries(const size_type row,
+                                              ForwardIterator begin,
+                                              ForwardIterator end,
+                                              const bool /*indices_are_sorted*/)
     {
       if (begin == end)
         return;
@@ -1322,6 +1347,9 @@ namespace LinearAlgebra
       AssertDimension(*col_index_ptr_end, *end);
       TrilinosWrappers::types::int_type trilinos_row_index = row;
 
+      // TODO: The following line creates an array by copying the entries.
+      //       Perhaps there is a way to only create a 'view' of these arrays
+      //       and pass that to Tpetra?
       Teuchos::Array<long long> array(col_index_ptr_begin, col_index_ptr_end);
 
       if (row_is_stored_locally(row))
@@ -1345,28 +1373,30 @@ namespace LinearAlgebra
 
 
 
-    template <typename NodeType>
+    template <typename MemorySpace>
     inline Teuchos::RCP<
-      Tpetra::CrsGraph<int, dealii::types::signed_global_dof_index, NodeType>>
-    SparsityPattern<NodeType>::trilinos_sparsity_pattern() const
+      Tpetra::CrsGraph<int,
+                       dealii::types::signed_global_dof_index,
+                       typename SparsityPattern<MemorySpace>::NodeType>>
+    SparsityPattern<MemorySpace>::trilinos_sparsity_pattern() const
     {
       return graph;
     }
 
 
 
-    template <typename NodeType>
+    template <typename MemorySpace>
     inline IndexSet
-    SparsityPattern<NodeType>::locally_owned_domain_indices() const
+    SparsityPattern<MemorySpace>::locally_owned_domain_indices() const
     {
       return IndexSet(graph->getDomainMap().getConst());
     }
 
 
 
-    template <typename NodeType>
+    template <typename MemorySpace>
     inline IndexSet
-    SparsityPattern<NodeType>::locally_owned_range_indices() const
+    SparsityPattern<MemorySpace>::locally_owned_range_indices() const
     {
       return IndexSet(graph->getRangeMap().getConst());
     }

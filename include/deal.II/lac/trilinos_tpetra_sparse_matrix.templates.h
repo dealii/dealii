@@ -184,8 +184,8 @@ namespace LinearAlgebra
     // Actually, it does not even matter how many threads there are, but
     // only if we use an MPI compiler or a standard compiler. So, even one
     // thread on a configuration with MPI will still get a parallel interface.
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType>::SparseMatrix()
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace>::SparseMatrix()
       : column_space_map(Utilities::Trilinos::internal::make_rcp<MapType>(
           0,
           0,
@@ -206,9 +206,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType>::SparseMatrix(
-      const SparsityPattern<NodeType> &sparsity_pattern)
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace>::SparseMatrix(
+      const SparsityPattern<MemorySpace> &sparsity_pattern)
       : matrix(Utilities::Trilinos::internal::make_rcp<MatrixType>(
           sparsity_pattern.trilinos_sparsity_pattern()))
     {
@@ -220,9 +220,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType>::SparseMatrix(
-      SparseMatrix<Number, NodeType> &&other) noexcept
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace>::SparseMatrix(
+      SparseMatrix<Number, MemorySpace> &&other) noexcept
       : column_space_map(std::move(other.column_space_map))
       , matrix(std::move(other.matrix))
       , compressed(std::move(other.compressed))
@@ -232,10 +232,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType> &
-    SparseMatrix<Number, NodeType>::operator=(
-      SparseMatrix<Number, NodeType> &&other) noexcept
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace> &
+    SparseMatrix<Number, MemorySpace>::operator=(
+      SparseMatrix<Number, MemorySpace> &&other) noexcept
     {
       column_space_map = std::move(other.column_space_map);
       matrix           = std::move(other.matrix);
@@ -246,10 +246,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     template <typename SparsityPatternType>
     void
-    SparseMatrix<Number, NodeType>::reinit(
+    SparseMatrix<Number, MemorySpace>::reinit(
       const SparsityPatternType &sparsity_pattern)
     {
       reinit_matrix<Number, NodeType, SparsityPatternType>(
@@ -267,10 +267,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, NodeType>::reinit(
-      const SparsityPattern<NodeType> &sparsity_pattern)
+    SparseMatrix<Number, MemorySpace>::reinit(
+      const SparsityPattern<MemorySpace> &sparsity_pattern)
     {
       column_space_map.reset();
       matrix.reset();
@@ -289,8 +289,8 @@ namespace LinearAlgebra
 
     // Constructors and initialization using an IndexSet description:
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType>::SparseMatrix(
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace>::SparseMatrix(
       const IndexSet    &parallel_partitioning,
       const MPI_Comm     communicator,
       const unsigned int n_max_entries_per_row)
@@ -304,8 +304,8 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType>::SparseMatrix(
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace>::SparseMatrix(
       const IndexSet                  &parallel_partitioning,
       const MPI_Comm                   communicator,
       const std::vector<unsigned int> &n_entries_per_row)
@@ -321,8 +321,8 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType>::SparseMatrix(
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace>::SparseMatrix(
       const IndexSet &row_parallel_partitioning,
       const IndexSet &col_parallel_partitioning,
       const MPI_Comm  communicator,
@@ -337,8 +337,8 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType>::SparseMatrix(
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace>::SparseMatrix(
       const IndexSet                  &row_parallel_partitioning,
       const IndexSet                  &col_parallel_partitioning,
       const MPI_Comm                   communicator,
@@ -356,10 +356,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     template <typename SparsityPatternType>
     inline void
-    SparseMatrix<Number, NodeType>::reinit(
+    SparseMatrix<Number, MemorySpace>::reinit(
       const IndexSet            &parallel_partitioning,
       const SparsityPatternType &sparsity_pattern,
       const MPI_Comm             communicator,
@@ -374,10 +374,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     template <typename SparsityPatternType>
     void
-    SparseMatrix<Number, NodeType>::reinit(
+    SparseMatrix<Number, MemorySpace>::reinit(
       const IndexSet &row_parallel_partitioning,
 
       const IndexSet            &col_parallel_partitioning,
@@ -402,19 +402,19 @@ namespace LinearAlgebra
 
     // Information on the matrix
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     inline unsigned int
-    SparseMatrix<Number, NodeType>::local_size() const
+    SparseMatrix<Number, MemorySpace>::local_size() const
     {
       return matrix->getLocalNumRows();
     }
 
 
 
-    template <typename Number, typename NodeType>
-    inline std::pair<typename SparseMatrix<Number, NodeType>::size_type,
-                     typename SparseMatrix<Number, NodeType>::size_type>
-    SparseMatrix<Number, NodeType>::local_range() const
+    template <typename Number, typename MemorySpace>
+    inline std::pair<typename SparseMatrix<Number, MemorySpace>::size_type,
+                     typename SparseMatrix<Number, MemorySpace>::size_type>
+    SparseMatrix<Number, MemorySpace>::local_range() const
     {
       size_type begin, end;
       begin = matrix->getRowMap()->getMinLocalIndex();
@@ -425,18 +425,18 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     inline size_t
-    SparseMatrix<Number, NodeType>::n_nonzero_elements() const
+    SparseMatrix<Number, MemorySpace>::n_nonzero_elements() const
     {
       return matrix->getGlobalNumEntries();
     }
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     MPI_Comm
-    SparseMatrix<Number, NodeType>::get_mpi_communicator() const
+    SparseMatrix<Number, MemorySpace>::get_mpi_communicator() const
     {
       return Utilities::Trilinos::teuchos_comm_to_mpi_comm(matrix->getComm());
     }
@@ -445,9 +445,9 @@ namespace LinearAlgebra
 
     // Modifying entries
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType> &
-    SparseMatrix<Number, NodeType>::operator=(const double d)
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace> &
+    SparseMatrix<Number, MemorySpace>::operator=(const double d)
     {
       (void)d;
       Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
@@ -469,9 +469,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType> &
-    SparseMatrix<Number, NodeType>::operator*=(const Number a)
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace> &
+    SparseMatrix<Number, MemorySpace>::operator*=(const Number a)
     {
       matrix->scale(a);
       return *this;
@@ -479,9 +479,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
-    SparseMatrix<Number, NodeType> &
-    SparseMatrix<Number, NodeType>::operator/=(const Number a)
+    template <typename Number, typename MemorySpace>
+    SparseMatrix<Number, MemorySpace> &
+    SparseMatrix<Number, MemorySpace>::operator/=(const Number a)
     {
       Assert(a != 0, ExcDivideByZero());
 
@@ -492,14 +492,15 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, NodeType>::add(const size_type       row,
-                                        const size_type       n_cols,
-                                        const size_type      *col_indices,
-                                        const TrilinosScalar *values,
-                                        const bool            elide_zero_values,
-                                        const bool /*col_indices_are_sorted*/)
+    SparseMatrix<Number, MemorySpace>::add(
+      const size_type       row,
+      const size_type       n_cols,
+      const size_type      *col_indices,
+      const TrilinosScalar *values,
+      const bool            elide_zero_values,
+      const bool /*col_indices_are_sorted*/)
     {
       AssertIndexRange(row, this->m());
 
@@ -558,10 +559,10 @@ namespace LinearAlgebra
 
     // Multiplications
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, NodeType>::vmult(Vector<Number>       &dst,
-                                          const Vector<Number> &src) const
+    SparseMatrix<Number, MemorySpace>::vmult(Vector<Number>       &dst,
+                                             const Vector<Number> &src) const
     {
       Assert(&src != &dst, ExcSourceEqualsDestination());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
@@ -574,10 +575,10 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, NodeType>::Tvmult(Vector<Number>       &dst,
-                                           const Vector<Number> &src) const
+    SparseMatrix<Number, MemorySpace>::Tvmult(Vector<Number>       &dst,
+                                              const Vector<Number> &src) const
     {
       Assert(&src != &dst, ExcSourceEqualsDestination());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
@@ -590,10 +591,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, NodeType>::vmult_add(Vector<Number>       &dst,
-                                              const Vector<Number> &src) const
+    SparseMatrix<Number, MemorySpace>::vmult_add(
+      Vector<Number>       &dst,
+      const Vector<Number> &src) const
     {
       Assert(&src != &dst, ExcSourceEqualsDestination());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
@@ -610,10 +612,11 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, NodeType>::Tvmult_add(Vector<Number>       &dst,
-                                               const Vector<Number> &src) const
+    SparseMatrix<Number, MemorySpace>::Tvmult_add(
+      Vector<Number>       &dst,
+      const Vector<Number> &src) const
     {
       Assert(&src != &dst, ExcSourceEqualsDestination());
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
@@ -629,9 +632,9 @@ namespace LinearAlgebra
     }
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, NodeType>::print(
+    SparseMatrix<Number, MemorySpace>::print(
       std::ostream &out,
       const bool    print_detailed_trilinos_information) const
     {
@@ -661,9 +664,9 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, NodeType>::compress(
+    SparseMatrix<Number, MemorySpace>::compress(
       [[maybe_unused]] VectorOperation::values operation)
     {
       if (!compressed)
@@ -673,9 +676,9 @@ namespace LinearAlgebra
         }
     }
 
-    template <typename Number, typename NodeType>
+    template <typename Number, typename MemorySpace>
     void
-    SparseMatrix<Number, NodeType>::resume_fill()
+    SparseMatrix<Number, MemorySpace>::resume_fill()
     {
       if (compressed)
         {
