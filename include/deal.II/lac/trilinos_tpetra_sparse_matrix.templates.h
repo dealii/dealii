@@ -112,7 +112,11 @@ namespace LinearAlgebra
 
         std::vector<TrilinosWrappers::types::int_type> ghost_rows;
         Teuchos::Array<size_t>                         n_entries_per_row(
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
           row_space_map->getLocalNumElements());
+#  else
+          row_space_map->getNodeNumElements());
+#  endif
         {
           size_type own = 0;
           for (const auto global_row : relevant_rows)
@@ -132,8 +136,13 @@ namespace LinearAlgebra
         // doubles aside.
         Teuchos::RCP<GraphType<NodeType>> graph;
 
+#  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
         graph = Utilities::Trilinos::internal::make_rcp<GraphType<NodeType>>(
-          row_space_map, n_entries_per_row());
+          row_space_map, n_entries_per_row);
+#  else
+        graph = Utilities::Trilinos::internal::make_rcp<GraphType<NodeType>>(
+          row_space_map, Teuchos::arcpFromArray(n_entries_per_row));
+#  endif
 
         // This functions assumes that the sparsity pattern sits on all
         // processors (completely). The parallel version uses a Tpetra graph
@@ -315,8 +324,13 @@ namespace LinearAlgebra
     {
       Teuchos::Array<size_t> n_entries_per_row_array(n_entries_per_row.begin(),
                                                      n_entries_per_row.end());
+#  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
       matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
-        column_space_map, n_entries_per_row_array());
+        column_space_map, n_entries_per_row_array);
+#  else
+      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
+        column_space_map, Teuchos::arcpFromArray(n_entries_per_row_array));
+#  endif
     }
 
 
@@ -349,9 +363,15 @@ namespace LinearAlgebra
     {
       Teuchos::Array<size_t> n_entries_per_row_array(n_entries_per_row.begin(),
                                                      n_entries_per_row.end());
+#  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
       matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
         row_parallel_partitioning.make_tpetra_map_rcp(communicator, false),
-        n_entries_per_row_array());
+        n_entries_per_row_array);
+#  else
+      matrix = Utilities::Trilinos::internal::make_rcp<MatrixType>(
+        row_parallel_partitioning.make_tpetra_map_rcp(communicator, false),
+        Teuchos::arcpFromArray(n_entries_per_row_array));
+#  endif
     }
 
 
@@ -406,7 +426,11 @@ namespace LinearAlgebra
     inline unsigned int
     SparseMatrix<Number, MemorySpace>::local_size() const
     {
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
       return matrix->getLocalNumRows();
+#  else
+      return matrix->getNodeNumRows();
+#  endif
     }
 
 
@@ -645,10 +669,19 @@ namespace LinearAlgebra
         }
       else
         {
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           typename MatrixType::values_host_view_type     values;
           typename MatrixType::local_inds_host_view_type indices;
+#  else
+          Teuchos::ArrayView<const Number> values;
+          Teuchos::ArrayView<const int>    indices;
+#  endif
 
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
           for (size_t i = 0; i < matrix->getLocalNumRows(); ++i)
+#  else
+          for (size_t i = 0; i < matrix->getNodeNumRows(); ++i)
+#  endif
             {
               matrix->getLocalRowView(i, indices, values);
 
