@@ -1720,9 +1720,27 @@ template <int rank_, int dim, typename Number>
 inline DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
 Tensor<rank_, dim, Number>::norm() const
 {
-  // Make things work with AD types
-  using std::sqrt;
-  return sqrt(norm_square());
+  // Handle cases of a tensor consisting of just one number more
+  // efficiently:
+  if constexpr ((rank_ == 1) && (dim == 1) && std::is_arithmetic_v<Number>)
+    {
+      return std::abs(values[0]);
+    }
+  else if constexpr ((rank_ == 2) && (dim == 1) && std::is_arithmetic_v<Number>)
+    {
+      return std::abs(values[0][0]);
+    }
+  else
+    {
+      // Otherwise fall back to the naive algorithm of taking the square root of
+      // the sum of squares.
+
+      // Make things work with AD types by letting the compiler look up
+      // the symbol sqrt in namespace std and in the type-associated
+      // namespaces
+      using std::sqrt;
+      return sqrt(norm_square());
+    }
 }
 
 
