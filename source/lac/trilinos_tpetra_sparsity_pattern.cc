@@ -60,11 +60,16 @@ namespace LinearAlgebra
           {
             // get a representation of the present row
             std::size_t ncols;
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
             typename Tpetra::CrsGraph<
               int,
               dealii::types::signed_global_dof_index,
               NodeType>::nonconst_global_inds_host_view_type
               column_indices_view(colnum_cache->data(), colnum_cache->size());
+#  else
+            Teuchos::ArrayView<long long> column_indices_view(
+              colnum_cache->data(), colnum_cache->size());
+#  endif
             sparsity_pattern->graph->getGlobalRowCopy(this->a_row,
                                                       column_indices_view,
                                                       ncols);
@@ -407,14 +412,26 @@ namespace LinearAlgebra
             "that. Either use more MPI processes or recompile Trilinos "
             "with 'local ordinate = long long' "));
 
+#  if DEAL_II_TRILINOS_VERSION_GTE(12, 16, 0)
         if (row_map->getComm()->getSize() > 1)
           graph =
             Utilities::Trilinos::internal::make_rcp<GraphType<MemorySpace>>(
-              row_map, n_entries_per_row());
+              row_map, n_entries_per_row);
         else
           graph =
             Utilities::Trilinos::internal::make_rcp<GraphType<MemorySpace>>(
-              row_map, col_map, n_entries_per_row());
+              row_map, col_map, n_entries_per_row);
+#  else
+        if (row_map->getComm()->getSize() > 1)
+          graph =
+            Utilities::Trilinos::internal::make_rcp<GraphType<MemorySpace>>(
+              row_map, Teuchos::arcpFromArray(n_entries_per_row));
+        else
+          graph =
+            Utilities::Trilinos::internal::make_rcp<GraphType<MemorySpace>>(
+              row_map, col_map, Teuchos::arcpFromArray(n_entries_per_row));
+
+#  endif
 
         AssertDimension(sp.n_rows(), graph->getGlobalNumRows());
         AssertDimension(sp.n_cols(), graph->getGlobalNumEntries());
@@ -717,8 +734,13 @@ namespace LinearAlgebra
       Assert(column_space_map.get(), ExcInternalError());
       if (nonlocal_graph.get() != nullptr)
         {
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
           if (nonlocal_graph->getRowMap()->getLocalNumElements() > 0 &&
               column_space_map->getGlobalNumElements() > 0)
+#  else
+          if (nonlocal_graph->getRowMap()->getNodeNumElements() > 0 &&
+              column_space_map->getGlobalNumElements() > 0)
+#  endif
             {
               // Insert dummy element at (row, column) that corresponds to row 0
               // in local index counting.
@@ -731,16 +753,27 @@ namespace LinearAlgebra
               if (column_space_map->getGlobalNumElements() ==
                   graph->getRangeMap()->getGlobalNumElements())
                 column = row;
-              // if not, take a column index that we have ourselves since we
-              // know for sure it is there (and it will not create spurious
-              // messages to many ranks like putting index 0 on many processors)
+                // if not, take a column index that we have ourselves since we
+                // know for sure it is there (and it will not create spurious
+                // messages to many ranks like putting index 0 on many
+                // processors)
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
               else if (column_space_map->getLocalNumElements() > 0)
+#  else
+              else if (column_space_map->getNodeNumElements() > 0)
+#  endif
                 column = column_space_map->getGlobalElement(0);
               nonlocal_graph->insertGlobalIndices(row, 1, &column);
             }
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
           Assert(nonlocal_graph->getRowMap()->getLocalNumElements() == 0 ||
                    column_space_map->getGlobalNumElements() == 0,
                  ExcInternalError());
+#  else
+          Assert(nonlocal_graph->getRowMap()->getNodeNumElements() == 0 ||
+                   column_space_map->getGlobalNumElements() == 0,
+                 ExcInternalError());
+#  endif
 
           nonlocal_graph->fillComplete(column_space_map, graph->getRangeMap());
           graph->fillComplete(column_space_map, graph->getRangeMap());
@@ -776,6 +809,7 @@ namespace LinearAlgebra
     SparsityPattern<MemorySpace>::exists(const size_type i,
                                          const size_type j) const
     {
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       if (!row_is_stored_locally(i))
         return false;
 
@@ -796,6 +830,10 @@ namespace LinearAlgebra
         col_indices.data();
 
       return static_cast<size_t>(local_col_index) != col_indices.size();
+#  else
+      Assert(false, ExcNotImplemented());
+      return false;
+#  endif
     }
 
 
@@ -807,7 +845,12 @@ namespace LinearAlgebra
       size_type local_b = 0;
       for (int i = 0; i < static_cast<int>(local_size()); ++i)
         {
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           typename GraphType::local_inds_host_view_type indices;
+#  else
+          Teuchos::ArrayView<const int> indices;
+#  endif
+
           graph->getLocalRowView(i, indices);
           const auto num_entries = indices.size();
           for (unsigned int j = 0; j < static_cast<unsigned int>(num_entries);
@@ -831,7 +874,11 @@ namespace LinearAlgebra
     unsigned int
     SparsityPattern<MemorySpace>::local_size() const
     {
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
       return graph->getLocalNumRows();
+#  else
+      return graph->getNodeNumRows();
+#  endif
     }
 
 
@@ -862,7 +909,11 @@ namespace LinearAlgebra
     unsigned int
     SparsityPattern<MemorySpace>::max_entries_per_row() const
     {
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
       return graph->getLocalMaxNumRowEntries();
+#  else
+      return graph->getNodeMaxNumRowEntries();
+#  endif
     }
 
 
@@ -950,9 +1001,17 @@ namespace LinearAlgebra
         out << *graph;
       else
         {
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
           for (unsigned int i = 0; i < graph->getLocalNumRows(); ++i)
+#  else
+          for (unsigned int i = 0; i < graph->getNodeNumRows(); ++i)
+#  endif
             {
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
               typename GraphType::local_inds_host_view_type indices;
+#  else
+              Teuchos::ArrayView<const int> indices;
+#  endif
               graph->getLocalRowView(i, indices);
               int num_entries = indices.size();
               for (int j = 0; j < num_entries; ++j)
@@ -975,7 +1034,11 @@ namespace LinearAlgebra
       for (dealii::types::signed_global_dof_index row = 0; row < local_size();
            ++row)
         {
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           typename GraphType::local_inds_host_view_type indices;
+#  else
+          Teuchos::ArrayView<const int> indices;
+#  endif
           graph->getLocalRowView(row, indices);
           int num_entries = indices.size();
 

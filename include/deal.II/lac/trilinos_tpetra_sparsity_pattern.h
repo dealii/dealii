@@ -89,9 +89,15 @@ namespace LinearAlgebra
         /**
          * Typedef for the NodeType
          */
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
         using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
           typename MemorySpace::kokkos_space::execution_space,
           typename MemorySpace::kokkos_space>;
+#  else
+        using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
+          typename MemorySpace::kokkos_space::execution_space,
+          typename MemorySpace::kokkos_space>;
+#  endif
 
         /**
          * Constructor.
@@ -195,9 +201,15 @@ namespace LinearAlgebra
         /**
          * Typedef for the NodeType
          */
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
         using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
           typename MemorySpace::kokkos_space::execution_space,
           typename MemorySpace::kokkos_space>;
+#  else
+        using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
+          typename MemorySpace::kokkos_space::execution_space,
+          typename MemorySpace::kokkos_space>;
+#  endif
 
         /**
          * Constructor. Create an iterator into the matrix @p matrix for the
@@ -307,9 +319,15 @@ namespace LinearAlgebra
       /**
        * Typedef for the NodeType
        */
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 2, 0)
       using NodeType = Tpetra::KokkosCompat::KokkosDeviceWrapperNode<
         typename MemorySpace::kokkos_space::execution_space,
         typename MemorySpace::kokkos_space>;
+#  else
+      using NodeType = Kokkos::Compat::KokkosDeviceWrapperNode<
+        typename MemorySpace::kokkos_space::execution_space,
+        typename MemorySpace::kokkos_space>;
+#  endif
 
       /**
        * Declare an alias for the iterator class.
