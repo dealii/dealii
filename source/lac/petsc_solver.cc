@@ -812,9 +812,9 @@ namespace PETScWrappers
 
 
   void
-  SparseDirectMUMPS::set_symmetric_mode(const bool flag)
+  SparseDirectMUMPS::set_symmetric_mode(const bool matrix_is_symmetric)
   {
-    symmetric_mode = flag;
+    symmetric_mode = matrix_is_symmetric;
   }
 
 } // namespace PETScWrappers
