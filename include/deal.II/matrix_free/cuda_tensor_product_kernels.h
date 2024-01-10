@@ -357,6 +357,7 @@ namespace CUDAWrappers
                                   n_q_points_1d,
                                   Number>
     {
+    public:
       using TeamHandle = Kokkos::TeamPolicy<
         MemorySpace::Default::kokkos_space::execution_space>::member_type;
 
@@ -370,8 +371,54 @@ namespace CUDAWrappers
           co_shape_gradients);
 
       /**
-       * Evaluate the values of a finite element function at the quadrature
+       * Evaluate the finite element function at the quadrature points.
+       */
+      template <typename ViewType>
+      DEAL_II_HOST_DEVICE void
+      evaluate_values(ViewType u);
+
+      /**
+       * Evaluate the gradients of the finite element function at the quadrature
        * points.
+       */
+      template <typename ViewTypeIn, typename ViewTypeOut>
+      DEAL_II_HOST_DEVICE void
+      evaluate_gradients(const ViewTypeIn u, ViewTypeOut grad_u);
+
+      /**
+       * Evaluate the values and the gradients of the finite element function at
+       * the quadrature points.
+       */
+      template <typename ViewType1, typename ViewType2>
+      DEAL_II_HOST_DEVICE void
+      evaluate_values_and_gradients(ViewType1 u, ViewType2 grad_u);
+
+      /**
+       * Helper function for integrate(). Integrate the finite element function.
+       */
+      template <typename ViewType>
+      DEAL_II_HOST_DEVICE void
+      integrate_values(ViewType u);
+
+      /**
+       * Helper function for integrate(). Integrate the gradients of the finite
+       * element function.
+       */
+      template <bool add, typename ViewType1, typename ViewType2>
+      DEAL_II_HOST_DEVICE void
+      integrate_gradients(ViewType1 u, ViewType2 grad_u);
+
+      /**
+       * Helper function for integrate(). Integrate the values and the gradients
+       * of the finite element function.
+       */
+      template <typename ViewType1, typename ViewType2>
+      DEAL_II_HOST_DEVICE void
+      integrate_values_and_gradients(ViewType1 u, ViewType2 grad_u);
+
+      /**
+       * Evaluate/integrate the values of a finite element function at the
+       * quadrature points for a given @p direction.
        */
       template <int  direction,
                 bool dof_to_quad,
@@ -383,8 +430,8 @@ namespace CUDAWrappers
       values(const ViewTypeIn in, ViewTypeOut out) const;
 
       /**
-       * Evaluate the gradient of a finite element function at the quadrature
-       * points for a given @p direction.
+       * Evaluate/integrate the gradient of a finite element function at the
+       * quadrature points for a given @p direction.
        */
       template <int  direction,
                 bool dof_to_quad,
@@ -395,6 +442,7 @@ namespace CUDAWrappers
       DEAL_II_HOST_DEVICE void
       gradients(const ViewTypeIn in, ViewTypeOut out) const;
 
+    public:
       /**
        * Evaluate the gradient of a finite element function at the quadrature
        * points for a given @p direction for collocation methods.
@@ -407,52 +455,6 @@ namespace CUDAWrappers
                 typename ViewTypeOut>
       DEAL_II_HOST_DEVICE void
       co_gradients(const ViewTypeIn in, ViewTypeOut out) const;
-
-      /**
-       * Evaluate the finite element function at the quadrature points.
-       */
-      template <typename ViewType>
-      DEAL_II_HOST_DEVICE void
-      value_at_quad_pts(ViewType u);
-
-      /**
-       * Helper function for integrate(). Integrate the finite element function.
-       */
-      template <typename ViewType>
-      DEAL_II_HOST_DEVICE void
-      integrate_value(ViewType u);
-
-      /**
-       * Evaluate the gradients of the finite element function at the quadrature
-       * points.
-       */
-      template <typename ViewTypeIn, typename ViewTypeOut>
-      DEAL_II_HOST_DEVICE void
-      gradient_at_quad_pts(const ViewTypeIn u, ViewTypeOut grad_u);
-
-      /**
-       * Evaluate the values and the gradients of the finite element function at
-       * the quadrature points.
-       */
-      template <typename ViewType1, typename ViewType2>
-      DEAL_II_HOST_DEVICE void
-      value_and_gradient_at_quad_pts(ViewType1 u, ViewType2 grad_u);
-
-      /**
-       * Helper function for integrate(). Integrate the gradients of the finite
-       * element function.
-       */
-      template <bool add, typename ViewType1, typename ViewType2>
-      DEAL_II_HOST_DEVICE void
-      integrate_gradient(ViewType1 u, ViewType2 grad_u);
-
-      /**
-       * Helper function for integrate(). Integrate the values and the gradients
-       * of the finite element function.
-       */
-      template <typename ViewType1, typename ViewType2>
-      DEAL_II_HOST_DEVICE void
-      integrate_value_and_gradient(ViewType1 u, ViewType2 grad_u);
 
       /**
        * TeamPolicy handle.
@@ -571,7 +573,7 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::value_at_quad_pts(ViewType u)
+                           Number>::evaluate_values(ViewType u)
     {
       if constexpr (dim == 1)
         values<0, true, false, true>(u, u);
@@ -602,7 +604,7 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::integrate_value(ViewType u)
+                           Number>::integrate_values(ViewType u)
     {
       if constexpr (dim == 1)
         values<0, false, false, true>(u, u);
@@ -633,8 +635,8 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::gradient_at_quad_pts(const ViewTypeIn u,
-                                                         ViewTypeOut grad_u)
+                           Number>::evaluate_gradients(const ViewTypeIn u,
+                                                       ViewTypeOut      grad_u)
     {
       if constexpr (dim == 1)
         {
@@ -698,9 +700,9 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::value_and_gradient_at_quad_pts(ViewType1 u,
-                                                                   ViewType2
-                                                                     grad_u)
+                           Number>::evaluate_values_and_gradients(ViewType1 u,
+                                                                  ViewType2
+                                                                    grad_u)
     {
       if constexpr (dim == 1)
         {
@@ -751,8 +753,8 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::integrate_gradient(ViewType1 u,
-                                                       ViewType2 grad_u)
+                           Number>::integrate_gradients(ViewType1 u,
+                                                        ViewType2 grad_u)
     {
       if constexpr (dim == 1)
         {
@@ -829,9 +831,9 @@ namespace CUDAWrappers
                            dim,
                            fe_degree,
                            n_q_points_1d,
-                           Number>::integrate_value_and_gradient(ViewType1 u,
-                                                                 ViewType2
-                                                                   grad_u)
+                           Number>::integrate_values_and_gradients(ViewType1 u,
+                                                                   ViewType2
+                                                                     grad_u)
     {
       if constexpr (dim == 1)
         {
