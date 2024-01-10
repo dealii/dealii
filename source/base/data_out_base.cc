@@ -4166,10 +4166,10 @@ namespace DataOutBase
                           h1(0) * h2(1) - h1(1) * h2(0);
 
                         // normalize Vector
-                        double norm =
-                          std::sqrt(std::pow(nrml[i * d1 + j * d2](0), 2.) +
-                                    std::pow(nrml[i * d1 + j * d2](1), 2.) +
-                                    std::pow(nrml[i * d1 + j * d2](2), 2.));
+                        double norm = std::sqrt(
+                          Utilities::fixed_power<2>(nrml[i * d1 + j * d2](0)) +
+                          Utilities::fixed_power<2>(nrml[i * d1 + j * d2](1)) +
+                          Utilities::fixed_power<2>(nrml[i * d1 + j * d2](2)));
 
                         if (nrml[i * d1 + j * d2](1) < 0)
                           norm *= -1.;

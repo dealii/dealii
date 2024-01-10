@@ -1862,7 +1862,7 @@ namespace Step44
             const double det_F_qp   = lqph[q_point]->get_det_F();
             const double J_tilde_qp = lqph[q_point]->get_J_tilde();
             const double the_error_qp_squared =
-              std::pow((det_F_qp - J_tilde_qp), 2);
+              Utilities::fixed_power<2>((det_F_qp - J_tilde_qp));
             const double JxW = fe_values.JxW(q_point);
 
             dil_L2_error += the_error_qp_squared * JxW;

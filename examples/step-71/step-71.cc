@@ -2319,7 +2319,7 @@ namespace Step71
       // The first derivative of the saturation function, noting that
       // $\frac{d \tanh(x)}{dx} = \text{sech}^{2}(x)$.
       const double dtanh_two_h_dot_h_div_h_sat_squ =
-        std::pow(1.0 / std::cosh(two_h_dot_h_div_h_sat_squ), 2.0);
+        Utilities::fixed_power<2>(1.0 / std::cosh(two_h_dot_h_div_h_sat_squ));
       const Tensor<1, dim> dtwo_h_dot_h_div_h_sat_squ_dH =
         2.0 * 2.0 / (this->get_mu_e_h_sat() * this->get_mu_e_h_sat()) * H;
 

@@ -2965,10 +2965,12 @@ namespace Functions
     const double pi_y = numbers::PI * point(1);
     const double pi_t = numbers::PI / T * this->get_time();
 
-    values[0] = -2 * std::cos(pi_t) * std::pow(std::sin(pi_x), 2) *
-                std::sin(pi_y) * std::cos(pi_y);
-    values[1] = +2 * std::cos(pi_t) * std::pow(std::sin(pi_y), 2) *
-                std::sin(pi_x) * std::cos(pi_x);
+    values[0] = -2 * std::cos(pi_t) *
+                Utilities::fixed_power<2>(std::sin(pi_x)) * std::sin(pi_y) *
+                std::cos(pi_y);
+    values[1] = +2 * std::cos(pi_t) *
+                Utilities::fixed_power<2>(std::sin(pi_y)) * std::sin(pi_x) *
+                std::cos(pi_x);
 
     if (dim == 3)
       values[2] = 0;

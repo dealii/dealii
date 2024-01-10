@@ -402,10 +402,11 @@ namespace step62
             std::abs(p[1] - force_center[1]) < max_force_width_y / 2)
           {
             return max_force_amplitude *
-                   std::exp(-(std::pow(p[0] - force_center[0], 2) /
-                                (2 * std::pow(force_sigma_x, 2)) +
-                              std::pow(p[1] - force_center[1], 2) /
-                                (2 * std::pow(force_sigma_y, 2))));
+                   std::exp(
+                     -(Utilities::fixed_power<2>(p[0] - force_center[0]) /
+                         (2 * Utilities::fixed_power<2>(force_sigma_x)) +
+                       Utilities::fixed_power<2>(p[1] - force_center[1]) /
+                         (2 * Utilities::fixed_power<2>(force_sigma_y))));
           }
         else
           {
@@ -967,7 +968,7 @@ namespace step62
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
                       std::complex<double> matrix_sum = 0;
-                      matrix_sum += -std::pow(omega, 2) *
+                      matrix_sum += -Utilities::fixed_power<2>(omega) *
                                     quadrature_data.mass_coefficient[i][j];
                       matrix_sum += quadrature_data.stiffness_coefficient[i][j];
                       cell_matrix(i, j) += matrix_sum * quadrature_data.JxW;
