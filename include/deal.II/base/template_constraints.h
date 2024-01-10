@@ -670,7 +670,10 @@ namespace LinearAlgebra
   {
     template <typename Number>
     class Vector;
-  }
+
+    template <typename Number, typename MemorySpace>
+    class SparseMatrix;
+  } // namespace TpetraWrappers
 #  endif
 } // namespace LinearAlgebra
 #endif

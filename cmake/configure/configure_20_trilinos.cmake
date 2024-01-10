@@ -481,6 +481,7 @@ macro(feature_trilinos_configure_external)
 
   if(${DEAL_II_TRILINOS_WITH_TPETRA})
     if(DEAL_II_HAVE_TPETRA_INST_DOUBLE)
+      set(DEAL_II_EXPAND_TPETRA_TYPES "double")
       set(DEAL_II_EXPAND_TPETRA_VECTOR_DOUBLE "LinearAlgebra::TpetraWrappers::Vector<double>")
     endif()
     if(DEAL_II_HAVE_TPETRA_INST_FLOAT)
