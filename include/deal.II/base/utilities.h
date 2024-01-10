@@ -429,12 +429,29 @@ namespace Utilities
    * Calculate a fixed power, provided as a template argument, of a number.
    *
    * This function provides an efficient way to calculate things like
-   * <code>t^N</code> where <code>N</code> is a known number at compile time.
+   * $t^N$ where <code>N</code> is a known number at compile time.
+   * The function computes the power of $t$ via the "recursive doubling"
+   * approach in which, for example, $t^7$ is computed as
+   * @f{align*}{
+   *   t^7 = (tttt)(tt)(t)
+   * @f}
+   * where computing $tt$ requires one product, computing $tttt$ is
+   * achieved by multiplying the previously computed $tt$ by itself
+   * (requiring another multiplication), and then the product is computed
+   * via two more multiplications for a total of 4 multiplications
+   * instead of the naively necessary 6.
    *
-   * Use this function as in <code>fixed_power@<dim@> (n)</code>.
+   * The major savings this function generates result, however, from the
+   * fact that it exploits that we have an integer power of the argument $t$.
+   * The alternative to computing such powers, `std::pow(t,7)` uses the
+   * `std::pow` function that takes the exponent as a floating point number
+   * and, because it has to cater to the complexities of the general situation,
+   * is vastly slower.
+   *
+   * Use this function as in `fixed_power<dim> (t)` or `fixed_power<7> (t)`.
    */
   template <int N, typename T>
-  T
+  constexpr T
   fixed_power(const T t);
 
   /**
@@ -971,7 +988,7 @@ namespace Utilities
 namespace Utilities
 {
   template <int N, typename T>
-  inline T
+  inline constexpr T
   fixed_power(const T x)
   {
     Assert(((std::is_integral_v<T> == true) && (N >= 0)) ||
