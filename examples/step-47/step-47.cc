@@ -130,7 +130,7 @@ namespace Step47
                            const unsigned int /*component*/ = 0) const override
 
       {
-        return 4 * std::pow(PI, 4.0) * std::sin(PI * p[0]) *
+        return 4 * Utilities::fixed_power<4>(PI) * std::sin(PI * p[0]) *
                std::sin(PI * p[1]);
       }
     };

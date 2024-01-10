@@ -650,7 +650,7 @@ namespace Step85
                 const double      error_at_point =
                   solution_values.at(q) - analytical_solution.value(point);
                 error_L2_squared +=
-                  std::pow(error_at_point, 2) * fe_values->JxW(q);
+                  Utilities::fixed_power<2>(error_at_point) * fe_values->JxW(q);
               }
           }
       }

@@ -300,7 +300,7 @@ namespace Step43
 
     const double numerator =
       2.0 * S * temp - S * S * (2.0 * S - 2.0 * viscosity * (1 - S));
-    const double denominator = std::pow(temp, 2.0);
+    const double denominator = Utilities::fixed_power<2>(temp);
 
     const double F_prime = numerator / denominator;
 
