@@ -633,16 +633,26 @@ namespace hp
           // step 1: exponential decay with p-adaptation
           if (cell->future_fe_index_set())
             {
-              predicted_errors[cell->active_cell_index()] *=
-                std::pow(gamma_p,
-                         int(future_fe_degree) - int(cell->get_fe().degree));
+              if (future_fe_degree > cell->get_fe().degree)
+                predicted_errors[cell->active_cell_index()] *=
+                  Utilities::pow(gamma_p,
+                                 future_fe_degree - cell->get_fe().degree);
+              else if (future_fe_degree < cell->get_fe().degree)
+                predicted_errors[cell->active_cell_index()] /=
+                  Utilities::pow(gamma_p,
+                                 cell->get_fe().degree - future_fe_degree);
+              else
+                {
+                  // The two degrees are the same; we do not need to
+                  // adapt the predicted error
+                }
             }
 
           // step 2: algebraic decay with h-adaptation
           if (cell->refine_flag_set())
             {
               predicted_errors[cell->active_cell_index()] *=
-                (gamma_h * std::pow(.5, future_fe_degree));
+                (gamma_h * Utilities::pow(.5, future_fe_degree));
 
               // predicted error will be split on children cells
               // after adaptation via CellDataTransfer
@@ -650,7 +660,7 @@ namespace hp
           else if (cell->coarsen_flag_set())
             {
               predicted_errors[cell->active_cell_index()] /=
-                (gamma_h * std::pow(.5, future_fe_degree));
+                (gamma_h * Utilities::pow(.5, future_fe_degree));
 
               // predicted error will be summed up on parent cell
               // after adaptation via CellDataTransfer
