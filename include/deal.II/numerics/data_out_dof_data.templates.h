@@ -803,15 +803,33 @@ namespace internal
         const VectorType                           &src,
         LinearAlgebra::distributed::Vector<Number> &dst)
       {
-        LinearAlgebra::ReadWriteVector<typename VectorType::value_type> temp;
-        temp.reinit(src.locally_owned_elements());
-        temp.import_elements(src, VectorOperation::insert);
+        // If source and destination vector have the same underlying scalar,
+        // we can directly import elements by using only one temporary vector:
+        if constexpr (std::is_same_v<typename VectorType::value_type, Number>)
+          {
+            LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
+              temp;
+            temp.reinit(src.locally_owned_elements());
+            temp.import_elements(src, VectorOperation::insert);
 
-        LinearAlgebra::ReadWriteVector<Number> temp2;
-        temp2.reinit(temp, true);
-        temp2 = temp;
+            dst.import_elements(temp, VectorOperation::insert);
+          }
+        else
+          // The source and destination vector have different scalar types. We
+          // need to split the parallel import and local copy operations into
+          // two phases
+          {
+            LinearAlgebra::ReadWriteVector<typename VectorType::value_type>
+              temp;
+            temp.reinit(src.locally_owned_elements());
+            temp.import_elements(src, VectorOperation::insert);
 
-        dst.import_elements(temp2, VectorOperation::insert);
+            LinearAlgebra::ReadWriteVector<Number> temp2;
+            temp2.reinit(temp, true);
+            temp2 = temp;
+
+            dst.import_elements(temp2, VectorOperation::insert);
+          }
       }
 
 #ifdef DEAL_II_WITH_TRILINOS
