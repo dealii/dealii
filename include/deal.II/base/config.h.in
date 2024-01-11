@@ -153,6 +153,7 @@
 #cmakedefine DEAL_II_HAVE_CXX14
 #cmakedefine DEAL_II_HAVE_CXX17
 #cmakedefine DEAL_II_HAVE_CXX20
+#cmakedefine DEAL_II_HAVE_CXX23
 
 /**
  * If we have C++20 available, we can have concepts and requires
