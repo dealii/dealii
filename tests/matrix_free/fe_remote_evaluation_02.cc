@@ -208,7 +208,7 @@ FERemoteEvaluationCommunicator<dim>
 construct_comm_for_cell_face_nos(const MatrixFree<dim, Number> &matrix_free)
 {
   // Setup Communication objects for all boundary faces
-  FERemoteCommunicationObjectFaces<dim> co;
+  FERemoteCommunicationObjectTwoLevel<dim> co;
 
   // Get range of boundary face indices
   const auto face_batch_range =

@@ -218,11 +218,11 @@ struct FERemoteCommunicationObjectEntityBatches
 /**
  * Similar as @c FERemoteCommunicationObjectEntityBatches.
  * To relate the points from @c RemotePointEvaluation to
- * quadrature points on corresponding cells, cell iterators
+ * quadrature points on corresponding entities, entity indices
  * have to be stored.
  */
 template <int dim>
-struct FERemoteCommunicationObjectCells
+struct FERemoteCommunicationObject
 {
   /**
    * Object that is reinitialized with the remote points we want to access.
@@ -230,27 +230,27 @@ struct FERemoteCommunicationObjectCells
   std::shared_ptr<Utilities::MPI::RemotePointEvaluation<dim>> rpe;
 
   /**
-   * A vector that stores the cell iterators related to the the remote points.
+   * A vector that stores the entity indices related to the the remote points.
    */
-  std::vector<typename Triangulation<dim>::cell_iterator> cells;
+  std::vector<unsigned int> indices;
 
   /**
-   * Function that gives access to @c cells. The function is only used
+   * Function that gives access to @c indices. The function is only used
    * for a unified access to the vector that stores additional information on
    * the points that are processed via @c rpe.
    */
-  std::vector<typename Triangulation<dim>::cell_iterator>
+  std::vector<unsigned int>
   get_communication_object_pntrs() const;
 };
 
 /**
- * Similar as @c FERemoteCommunicationObjectCells.
+ * Similar as @c FERemoteCommunicationObject.
  * To relate the points from @c RemotePointEvaluation to
  * quadrature points on corresponding faces, cell iterators
  * and face numbers have to be stored.
  */
 template <int dim>
-struct FERemoteCommunicationObjectFaces
+struct FERemoteCommunicationObjectTwoLevel
 {
   /**
    * Object that is reinitialized with the remote points we want to access.
@@ -296,15 +296,28 @@ public:
   /**
    * This function stores given communication objects
    * and constructs a @c PrecomputedEvaluationDataView
+   * object if remote points are related to faces.
+   */
+  void
+  reinit_faces(
+    const std::vector<FERemoteCommunicationObject<dim>> &comm_objects,
+    const std::pair<unsigned int, unsigned int>         &face_range,
+    const std::vector<Quadrature<dim - 1>>              &quadrature_vector);
+
+  /**
+   * This function stores given communication objects
+   * and constructs a @c PrecomputedEvaluationDataView
    * object if remote points are related to faces of given
    * cells.
    */
   template <typename Iterator>
   void
   reinit_faces(
-    const std::vector<FERemoteCommunicationObjectFaces<dim>> &comm_objects,
+    const std::vector<FERemoteCommunicationObjectTwoLevel<dim>> &comm_objects,
     const IteratorRange<Iterator>                       &cell_iterator_range,
     const std::vector<std::vector<Quadrature<dim - 1>>> &quadrature_vector);
+
+
 
   /**
    * Fill the fields stored in PrecomputedEvaluationData.
@@ -339,8 +352,8 @@ private:
    * A variant for all possible communication objects.
    */
   std::vector<std::variant<FERemoteCommunicationObjectEntityBatches<dim>,
-                           FERemoteCommunicationObjectCells<dim>,
-                           FERemoteCommunicationObjectFaces<dim>>>
+                           FERemoteCommunicationObject<dim>,
+                           FERemoteCommunicationObjectTwoLevel<dim>>>
     communication_objects;
 
   /**
@@ -352,19 +365,18 @@ private:
   public:
     /**
      * Copy data from @c src to @c dst. Overload for @c
-     * FERemoteCommunicationObjectCells.
+     * FERemoteCommunicationObject.
      */
     template <typename T1, typename T2>
     static void
-    copy_data(
-      const internal::PrecomputedEvaluationDataView                 &view,
-      AlignedVector<T1>                                             &dst,
-      const std::vector<T2>                                         &src,
-      const std::vector<typename Triangulation<dim>::cell_iterator> &cells);
+    copy_data(const internal::PrecomputedEvaluationDataView &view,
+              AlignedVector<T1>                             &dst,
+              const std::vector<T2>                         &src,
+              const std::vector<unsigned int>               &indices);
 
     /**
      * Copy data from @c src to @c dst. Overload for @c
-     * FERemoteCommunicationObjectFaces.
+     * FERemoteCommunicationObjectTwoLevel.
      */
     template <typename T1, typename T2>
     static void
@@ -651,15 +663,15 @@ FERemoteCommunicationObjectEntityBatches<dim>::get_communication_object_pntrs()
 }
 
 template <int dim>
-std::vector<typename Triangulation<dim>::cell_iterator>
-FERemoteCommunicationObjectCells<dim>::get_communication_object_pntrs() const
+std::vector<unsigned int>
+FERemoteCommunicationObject<dim>::get_communication_object_pntrs() const
 {
-  return cells;
+  return indices;
 }
 
 template <int dim>
 std::vector<std::pair<typename Triangulation<dim>::cell_iterator, unsigned int>>
-FERemoteCommunicationObjectFaces<dim>::get_communication_object_pntrs() const
+FERemoteCommunicationObjectTwoLevel<dim>::get_communication_object_pntrs() const
 {
   return cell_face_nos;
 }
@@ -696,12 +708,37 @@ FERemoteEvaluationCommunicator<dim>::reinit_faces(
 }
 
 template <int dim>
+void
+FERemoteEvaluationCommunicator<dim>::reinit_faces(
+  const std::vector<FERemoteCommunicationObject<dim>> &comm_objects,
+  const std::pair<unsigned int, unsigned int>         &face_range,
+  const std::vector<Quadrature<dim - 1>>              &quadrature_vector)
+{
+  // erase type
+  communication_objects.clear();
+  for (const auto &co : comm_objects)
+    communication_objects.push_back(co);
+
+  const unsigned int n_faces = quadrature_vector.size();
+  AssertDimension(n_faces, face_range.second - face_range.first);
+
+  // construct view:
+  view.start = face_range.first;
+
+  view.ptrs.resize(n_faces + 1);
+
+  view.ptrs[0] = 0;
+  for (unsigned int face = 0; face < n_faces; ++face)
+    view.ptrs[face + 1] = view.ptrs[face] + quadrature_vector[face].size();
+}
+
+template <int dim>
 template <typename Iterator>
 void
 FERemoteEvaluationCommunicator<dim>::reinit_faces(
-  const std::vector<FERemoteCommunicationObjectFaces<dim>> &comm_objects,
-  const IteratorRange<Iterator>                            &cell_iterator_range,
-  const std::vector<std::vector<Quadrature<dim - 1>>>      &quadrature_vector)
+  const std::vector<FERemoteCommunicationObjectTwoLevel<dim>> &comm_objects,
+  const IteratorRange<Iterator>                       &cell_iterator_range,
+  const std::vector<std::vector<Quadrature<dim - 1>>> &quadrature_vector)
 {
   // erase type
   communication_objects.clear();
@@ -810,18 +847,17 @@ template <int dim>
 template <typename T1, typename T2>
 void
 FERemoteEvaluationCommunicator<dim>::CopyInstructions::copy_data(
-  const internal::PrecomputedEvaluationDataView                 &view,
-  AlignedVector<T1>                                             &dst,
-  const std::vector<T2>                                         &src,
-  const std::vector<typename Triangulation<dim>::cell_iterator> &cells)
+  const internal::PrecomputedEvaluationDataView &view,
+  AlignedVector<T1>                             &dst,
+  const std::vector<T2>                         &src,
+  const std::vector<unsigned int>               &indices)
 {
   dst.resize(view.size());
 
   unsigned int c = 0;
-  for (const auto &cell : cells)
+  for (const auto idx : indices)
     {
-      for (unsigned int j = view.get_shift(cell->active_cell_index());
-           j < view.get_shift(cell->active_cell_index() + 1);
+      for (unsigned int j = view.get_shift(idx); j < view.get_shift(idx + 1);
            ++j, ++c)
         {
           AssertIndexRange(j, dst.size());
