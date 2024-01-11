@@ -1519,6 +1519,37 @@ namespace deal_II_exceptions
 } /*namespace deal_II_exceptions*/
 
 
+#if defined(__clang__)
+#  define DEAL_II_ASSUME(expr) __builtin_assume(static_cast<bool>(expr))
+#elif defined(__GNUC__) && !defined(__ICC)
+#  if __GNUC__ >= 13
+#    define DEAL_II_ASSUME(expr)                                         \
+      do                                                                 \
+        {                                                                \
+          _Pragma("GCC diagnostic push")                                 \
+            _Pragma("GCC diagnostic ignored \"-Wimplicit-fallthrough\"") \
+              [[assume(expr)]];                                          \
+          _Pragma("GCC diagnostic pop")                                  \
+        }                                                                \
+      while (false)
+#  else
+/* no way with GCC to express this without evaluating 'expr' */
+#    define DEAL_II_ASSUME(expr) \
+      do                         \
+        {                        \
+        }                        \
+      while (false)
+#  endif
+#elif defined(_MSC_VER) || defined(__ICC)
+#  define DEAL_II_ASSUME(expr) __assume(expr);
+#else
+#  define DEAL_II_ASSUME(expr) \
+    do                         \
+      {                        \
+      }                        \
+    while (false)
+#endif
+
 
 /**
  * A macro that serves as the main routine in the exception mechanism for debug
@@ -1638,11 +1669,7 @@ namespace deal_II_exceptions
 #    endif /*ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #  endif   /*KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #else      /*ifdef DEBUG*/
-#  define Assert(cond, exc) \
-    do                      \
-      {                     \
-      }                     \
-    while (false)
+#  define Assert(cond, exc) DEAL_II_ASSUME(cond)
 #endif /*ifdef DEBUG*/
 
 
@@ -1694,11 +1721,7 @@ namespace deal_II_exceptions
       while (false)
 #  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #else
-#  define AssertNothrow(cond, exc) \
-    do                             \
-      {                            \
-      }                            \
-    while (false)
+#  define AssertNothrow(cond, exc) DEAL_II_ASSUME(cond)
 #endif
 
 /**

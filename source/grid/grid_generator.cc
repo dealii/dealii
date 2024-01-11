@@ -1424,16 +1424,12 @@ namespace GridGenerator
           // above, so they are here (unless they are in the interior). Use
           // this to assign boundary indicators, but also make sure that we
           // encounter exactly 48 such faces
-#  ifdef DEBUG
           unsigned int count = 0;
-#  endif
           for (const auto &cell : tria.cell_iterators())
             if (cell->face(5)->at_boundary())
               {
                 cell->face(5)->set_all_boundary_ids(1);
-#  ifdef DEBUG
                 ++count;
-#  endif
               }
           Assert(count == 48, ExcInternalError());
         }
