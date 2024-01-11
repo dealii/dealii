@@ -127,8 +127,8 @@ namespace internal
       std::vector<long double> w(q);
 
       const long double factor =
-        std::pow(2., alpha + beta + 1) * gamma(alpha + q) * gamma(beta + q) /
-        ((q - 1) * gamma(q) * gamma(alpha + beta + q + 1));
+        Utilities::pow(2, alpha + beta + 1) * gamma(alpha + q) *
+        gamma(beta + q) / ((q - 1) * gamma(q) * gamma(alpha + beta + q + 1));
       for (unsigned int i = 0; i < q; ++i)
         {
           const long double s =
@@ -1168,22 +1168,19 @@ QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity)
   // We need to check if the singularity is at the boundary of the interval.
   if (std::abs(eta_star) <= tol)
     {
-      gamma_bar =
-        std::pow((eta_bar * eta_star + std::abs(eta_star)), 1.0 / 3.0) +
-        std::pow((eta_bar * eta_star - std::abs(eta_star)), 1.0 / 3.0) +
-        eta_bar;
+      gamma_bar = std::cbrt(eta_bar * eta_star + std::abs(eta_star)) +
+                  std::cbrt(eta_bar * eta_star - std::abs(eta_star)) + eta_bar;
     }
   else
     {
-      gamma_bar = (eta_bar * eta_star + std::abs(eta_star)) /
-                    std::abs(eta_bar * eta_star + std::abs(eta_star)) *
-                    std::pow(std::abs(eta_bar * eta_star + std::abs(eta_star)),
-                             1.0 / 3.0) +
-                  (eta_bar * eta_star - std::abs(eta_star)) /
-                    std::abs(eta_bar * eta_star - std::abs(eta_star)) *
-                    std::pow(std::abs(eta_bar * eta_star - std::abs(eta_star)),
-                             1.0 / 3.0) +
-                  eta_bar;
+      gamma_bar =
+        (eta_bar * eta_star + std::abs(eta_star)) /
+          std::abs(eta_bar * eta_star + std::abs(eta_star)) *
+          std::cbrt(std::abs(eta_bar * eta_star + std::abs(eta_star))) +
+        (eta_bar * eta_star - std::abs(eta_star)) /
+          std::abs(eta_bar * eta_star - std::abs(eta_star)) *
+          std::cbrt(std::abs(eta_bar * eta_star - std::abs(eta_star))) +
+        eta_bar;
     }
   for (unsigned int q = 0; q < quadrature_points.size(); ++q)
     {

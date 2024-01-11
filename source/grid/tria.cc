@@ -1577,7 +1577,8 @@ namespace
         GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
 
         for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-          if (determinants[i] <= 1e-9 * std::pow(cell->diameter(), 1. * dim))
+          if (determinants[i] <=
+              1e-9 * Utilities::fixed_power<dim>(cell->diameter()))
             {
               distorted_cells.distorted_cells.push_back(cell);
               break;
@@ -1612,7 +1613,7 @@ namespace
 
         for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
           if (determinants[i] <=
-              1e-9 * std::pow(cell->child(c)->diameter(), 1. * dim))
+              1e-9 * Utilities::fixed_power<dim>(cell->child(c)->diameter()))
             return true;
       }
 

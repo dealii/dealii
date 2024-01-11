@@ -2427,10 +2427,10 @@ namespace GridTools
         double objective = 0;
         for (unsigned int c = 0; c < object->n_children(); ++c)
           for (const unsigned int i : object->child(c)->vertex_indices())
-            objective +=
-              (child_alternating_forms[c][i] -
-               average_parent_alternating_form / std::pow(2., 1. * structdim))
-                .norm_square();
+            objective += (child_alternating_forms[c][i] -
+                          average_parent_alternating_form /
+                            Utilities::fixed_power<structdim>(2))
+                           .norm_square();
 
         return objective;
       }

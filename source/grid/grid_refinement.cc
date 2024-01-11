@@ -472,14 +472,15 @@ GridRefinement::refine_and_coarsen_optimize(Triangulation<dim, spacedim> &tria,
   double      min_cost = std::numeric_limits<double>::max();
   std::size_t min_arg  = 0;
 
+  const double reduction_factor = (1. - std::pow(2., -1. * order));
   for (std::size_t M = 0; M < criteria.size(); ++M)
     {
-      expected_error_reduction +=
-        (1 - std::pow(2., -1. * order)) * criteria(cell_indices[M]);
+      expected_error_reduction += reduction_factor * criteria(cell_indices[M]);
 
-      const double cost = std::pow(((std::pow(2., dim) - 1) * (1 + M) + N),
-                                   static_cast<double>(order) / dim) *
-                          (original_error - expected_error_reduction);
+      const double cost =
+        std::pow(((Utilities::fixed_power<dim>(2) - 1) * (1 + M) + N),
+                 static_cast<double>(order) / dim) *
+        (original_error - expected_error_reduction);
       if (cost <= min_cost)
         {
           min_cost = cost;

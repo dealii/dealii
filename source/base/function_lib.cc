@@ -1181,7 +1181,7 @@ namespace Functions
     const double phi       = std::atan2(y, -x) + numbers::PI;
     const double r_squared = x * x + y * y;
 
-    return std::pow(r_squared, 1. / 3.) * std::sin(2. / 3. * phi);
+    return std::cbrt(r_squared) * std::sin(2. / 3. * phi);
   }
 
 
@@ -1206,7 +1206,7 @@ namespace Functions
             const double phi       = std::atan2(y, -x) + numbers::PI;
             const double r_squared = x * x + y * y;
 
-            values[i] = std::pow(r_squared, 1. / 3.) * std::sin(2. / 3. * phi);
+            values[i] = std::cbrt(r_squared) * std::sin(2. / 3. * phi);
           }
       }
   }
@@ -1235,8 +1235,7 @@ namespace Functions
             const double phi       = std::atan2(y, -x) + numbers::PI;
             const double r_squared = x * x + y * y;
 
-            values[i](0) =
-              std::pow(r_squared, 1. / 3.) * std::sin(2. / 3. * phi);
+            values[i](0) = std::cbrt(r_squared) * std::sin(2. / 3. * phi);
           }
       }
   }
@@ -2965,10 +2964,12 @@ namespace Functions
     const double pi_y = numbers::PI * point(1);
     const double pi_t = numbers::PI / T * this->get_time();
 
-    values[0] = -2 * std::cos(pi_t) * std::pow(std::sin(pi_x), 2) *
-                std::sin(pi_y) * std::cos(pi_y);
-    values[1] = +2 * std::cos(pi_t) * std::pow(std::sin(pi_y), 2) *
-                std::sin(pi_x) * std::cos(pi_x);
+    values[0] = -2 * std::cos(pi_t) *
+                Utilities::fixed_power<2>(std::sin(pi_x)) * std::sin(pi_y) *
+                std::cos(pi_y);
+    values[1] = +2 * std::cos(pi_t) *
+                Utilities::fixed_power<2>(std::sin(pi_y)) * std::sin(pi_x) *
+                std::cos(pi_x);
 
     if (dim == 3)
       values[2] = 0;

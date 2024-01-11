@@ -665,7 +665,7 @@ namespace GridGenerator
                 const double x = i * 1 / (1.0 * number_points - 1);
                 const double y_t =
                   5 * t *
-                  (0.2969 * std::pow(x, 0.5) - 0.126 * x -
+                  (0.2969 * std::sqrt(x) - 0.126 * x -
                    0.3516 * Utilities::fixed_power<2>(x) +
                    0.2843 * Utilities::fixed_power<3>(x) -
                    0.1036 * Utilities::fixed_power<4>(
@@ -696,7 +696,7 @@ namespace GridGenerator
 
                 const double y_t =
                   5 * t *
-                  (0.2969 * std::pow(x, 0.5) - 0.126 * x -
+                  (0.2969 * std::sqrt(x) - 0.126 * x -
                    0.3516 * Utilities::fixed_power<2>(x) +
                    0.2843 * Utilities::fixed_power<3>(x) -
                    0.1036 * Utilities::fixed_power<4>(
