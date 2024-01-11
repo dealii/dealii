@@ -683,8 +683,9 @@ namespace internal
 
       if (hn_available == true)
         {
-          for (unsigned int v = n_lanes_filled; v < Number::size(); ++v)
-            constraint_mask[v] = unconstrained_compressed_constraint_kind;
+          std::fill(constraint_mask.begin() + n_lanes_filled,
+                    constraint_mask.end(),
+                    unconstrained_compressed_constraint_kind);
 
           for (unsigned int i = 1; i < n_lanes_filled; ++i)
             AssertDimension(active_fe_indices[first_cell],
