@@ -1031,8 +1031,8 @@ namespace LinearAlgebra
     SparsityPattern<MemorySpace>::print_gnuplot(std::ostream &out) const
     {
       Assert(graph->isFillComplete() == true, ExcInternalError());
-      for (dealii::types::signed_global_dof_index row = 0; row < local_size();
-           ++row)
+
+      for (unsigned int row = 0; row < local_size(); ++row)
         {
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           typename GraphType::local_inds_host_view_type indices;
