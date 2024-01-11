@@ -1519,6 +1519,7 @@ namespace deal_II_exceptions
 } /*namespace deal_II_exceptions*/
 
 
+
 /**
  * A macro that serves as the main routine in the exception mechanism for debug
  * mode error checking. It asserts that a certain condition is fulfilled,
