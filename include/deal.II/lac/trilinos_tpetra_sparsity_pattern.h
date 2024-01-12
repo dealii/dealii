@@ -1368,7 +1368,8 @@ namespace LinearAlgebra
       // TODO: The following line creates an array by copying the entries.
       //       Perhaps there is a way to only create a 'view' of these arrays
       //       and pass that to Tpetra?
-      Teuchos::Array<long long> array(col_index_ptr_begin, col_index_ptr_end);
+      Teuchos::Array<TrilinosWrappers::types::int_type> array(
+        col_index_ptr_begin, col_index_ptr_end);
 
       if (row_is_stored_locally(row))
         graph->insertGlobalIndices(trilinos_row_index, array());
