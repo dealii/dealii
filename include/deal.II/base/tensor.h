@@ -2103,54 +2103,6 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
 }
 
 
-namespace internal
-{
-  namespace TensorImplementation
-  {
-    template <int rank,
-              int dim,
-              typename Number,
-              typename OtherNumber,
-              std::enable_if_t<
-                !std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value,
-                int> = 0>
-    constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
-      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
-      division_operator(const Tensor<rank, dim, Number> &t,
-                        const OtherNumber               &factor)
-    {
-      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
-      const Number inverse_factor = Number(1.) / factor;
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        tt[d] = t[d] * inverse_factor;
-      return tt;
-    }
-
-
-    template <int rank,
-              int dim,
-              typename Number,
-              typename OtherNumber,
-              std::enable_if_t<
-                std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value,
-                int> = 0>
-    constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
-      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type>
-      division_operator(const Tensor<rank, dim, Number> &t,
-                        const OtherNumber               &factor)
-    {
-      Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        tt[d] = t[d] / factor;
-      return tt;
-    }
-  } // namespace TensorImplementation
-} // namespace internal
-
 
 /**
  * Division of a tensor of general rank with a scalar number. See the
@@ -2169,7 +2121,22 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
                               typename EnableIfScalar<OtherNumber>::type>::type>
   operator/(const Tensor<rank, dim, Number> &t, const OtherNumber &factor)
 {
-  return internal::TensorImplementation::division_operator(t, factor);
+  Tensor<rank, dim, typename ProductType<Number, OtherNumber>::type> tt;
+  if constexpr (std::is_integral<
+                  typename ProductType<Number, OtherNumber>::type>::value)
+    {
+      // recurse over the base objects
+      for (unsigned int d = 0; d < dim; ++d)
+        tt[d] = t[d] / factor;
+    }
+  else
+    {
+      const Number inverse_factor = Number(1.) / factor;
+      // recurse over the base objects
+      for (unsigned int d = 0; d < dim; ++d)
+        tt[d] = t[d] * inverse_factor;
+    }
+  return tt;
 }
 
 
