@@ -24,6 +24,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/trilinos_utilities.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparse_matrix.h>
@@ -2666,12 +2667,10 @@ namespace internal
     IndexSet parallel_partitioner = locally_owned_elements;
     parallel_partitioner.add_indices(needed_elements);
 
-    const MPI_Comm mpi_comm =
-      Trilinos::teuchos_comm_to_mpi_comm(vec.trilinos_rcp()->getMap()->getComm());
+    const MPI_Comm mpi_comm = Utilities::Trilinos::teuchos_comm_to_mpi_comm(
+      vec.trilinos_rcp()->getMap()->getComm());
 
-    output.reinit(locally_owned_elements,
-                  needed_elements,
-                  mpi_comm);
+    output.reinit(locally_owned_elements, needed_elements, mpi_comm);
 
     output = vec;
   }

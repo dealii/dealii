@@ -288,6 +288,7 @@ namespace LinearAlgebra
       Vector(const Teuchos::RCP<VectorType> V);
 
       /**
+       * TODO: This is not used
        * This constructor takes an IndexSet that defines how to distribute the
        * individual components among the MPI processors. Since it also
        * includes information about the size of the vector, this is all we
@@ -295,6 +296,25 @@ namespace LinearAlgebra
        */
       explicit Vector(const IndexSet &parallel_partitioner,
                       const MPI_Comm  communicator);
+
+      /**
+       * In addition to just specifying one index set as in all the other
+       * methods above, this method allows to supply an additional set of
+       * ghost entries.
+       *
+       * Depending on whether the @p locally_relevant_or_ghost_entries argument uniquely
+       * subdivides elements among processors or not, the resulting vector may
+       * or may not have ghost elements. See the general documentation of this
+       * class for more information.
+       *
+       * @see
+       * @ref GlossGhostedVector "vectors with ghost elements"
+
+       */
+      explicit Vector(const IndexSet &locally_owned_entries,
+                      const IndexSet &ghost_entries,
+                      const MPI_Comm  communicator,
+                      const bool      vector_writable = false);
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -306,7 +326,6 @@ namespace LinearAlgebra
       reinit(const IndexSet &parallel_partitioner,
              const MPI_Comm  communicator,
              const bool      omit_zeroing_entries = false);
-
 
       /**
        * Reinit functionality. This function destroys the old vector content
@@ -325,7 +344,8 @@ namespace LinearAlgebra
       void
       reinit(const IndexSet &locally_owned_entries,
              const IndexSet &locally_relevant_or_ghost_entries,
-             const MPI_Comm  communicator = MPI_COMM_WORLD);
+             const MPI_Comm  communicator    = MPI_COMM_WORLD,
+             const bool      vector_writable = false);
 
       /**
        * Change the dimension to that of the vector @p V. The elements of @p V are not
@@ -843,6 +863,12 @@ namespace LinearAlgebra
                                  const MPI_Comm  mpi_comm);
 
       /**
+       * A boolean variable to hold information on whether the vector is
+       * compressed or not.
+       */
+      bool compressed;
+
+      /**
        * Store whether the vector has ghost elements or not.
        *
        * If the vector has no ghost elements, it can only access and modify
@@ -858,17 +884,11 @@ namespace LinearAlgebra
       Teuchos::RCP<VectorType> vector;
 
       /**
-       * Pointer to the Tpetra::Map storing the owned elemenets
-       * per rank. This map has a one-to-one mapping.
+       * A vector object in Trilinos to be used for collecting the non-local
+       * elements if the vector was constructed with an additional IndexSet
+       * describing ghost elements.
        */
-      Teuchos::RCP<MapType> locally_owned_map;
-
-      /**
-       * Pointer to the Tpetra::Map storing the relevant elements
-       * per rank. There are entries in this map, that belong to multiple
-       * ranks.
-       */
-      Teuchos::RCP<MapType> locally_relevant_map;
+      Teuchos::RCP<VectorType> nonlocal_vector;
 
       /**
        * IndexSet of the elements of the last imported vector.
@@ -902,7 +922,7 @@ namespace LinearAlgebra
     inline bool
     Vector<Number>::is_compressed() const
     {
-      return !has_ghost;
+      return compressed;
     }
 
 
@@ -928,15 +948,24 @@ namespace LinearAlgebra
                         const Number    *values)
     {
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
+      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadWrite);
+      auto vector_2d_nonlocal =
+        nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
+          Tpetra::Access::ReadWrite);
 #  else
       vector->template sync<Kokkos::HostSpace>();
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>();
+      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>();
+      auto vector_2d_nonlocal =
+        nonlocal_vector->template getLocalView<Kokkos::HostSpace>();
 #  endif
-      auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+
+      auto vector_1d_local = Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0);
+      auto vector_1d_nonlocal =
+        Kokkos::subview(vector_2d_nonlocal, Kokkos::ALL(), 0);
 #  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       vector->template modify<Kokkos::HostSpace>();
+      nonlocal_vector->template modify<Kokkos::HostSpace>();
 #  endif
 
       for (size_type i = 0; i < n_elements; ++i)
@@ -944,6 +973,15 @@ namespace LinearAlgebra
           const size_type                   row = indices[i];
           TrilinosWrappers::types::int_type local_row =
             vector->getMap()->getLocalElement(row);
+
+          // check if the index is in the non local set
+          bool nonlocal = false;
+          if (local_row == Teuchos::OrdinalTraits<int>::invalid())
+            {
+              local_row  = nonlocal_vector->getMap()->getLocalElement(row);
+              nonlocal   = true;
+              compressed = false;
+            }
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
           Assert(
@@ -963,11 +1001,17 @@ namespace LinearAlgebra
 #  endif
 
           if (local_row != Teuchos::OrdinalTraits<int>::invalid())
-            vector_1d(local_row) += values[i];
+            if (nonlocal)
+              vector_1d_nonlocal(local_row) += values[i];
+            else
+              vector_1d_local(local_row) += values[i];
         }
 
 #  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       vector->template sync<
+        typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
+          device_type::memory_space>();
+      nonlocal_vector->template sync<
         typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
           device_type::memory_space>();
 #  endif
@@ -981,6 +1025,10 @@ namespace LinearAlgebra
                         const size_type *indices,
                         const Number    *values)
     {
+      // if we have ghost values, do not allow
+      // writing to this vector at all.
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
 #  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadWrite);
