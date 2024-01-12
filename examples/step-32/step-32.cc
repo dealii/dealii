@@ -2872,9 +2872,11 @@ namespace Step32
     // approach towards time stepping. If you're curious about this, you may
     // want to read the time stepping section in @cite HDGB17 .)
     //
-    // After temperature right hand side assembly, we solve the linear system
-    // for temperature (with fully distributed vectors without any ghosts),
-    // apply constraints and copy the vector back to one with ghosts.
+    // After temperature right hand side assembly, we solve the linear
+    // system for temperature (with fully distributed vectors without
+    // ghost elements and using the solution from the last timestep as
+    // our initial guess for the iterative solver), apply constraints,
+    // and copy the vector back to one with ghosts.
     //
     // In the end, we extract the temperature range similarly to step-31 to
     // produce some output (for example in order to help us choose the
@@ -2898,7 +2900,6 @@ namespace Step32
             << "Time step: " << time_step / EquationData::year_in_seconds
             << " years" << std::endl;
 
-      temperature_solution = old_temperature_solution;
       assemble_temperature_system(maximal_velocity);
     }
 
@@ -2912,7 +2913,7 @@ namespace Step32
 
       TrilinosWrappers::MPI::Vector distributed_temperature_solution(
         temperature_rhs);
-      distributed_temperature_solution = temperature_solution;
+      distributed_temperature_solution = old_temperature_solution;
 
       cg.solve(temperature_matrix,
                distributed_temperature_solution,
