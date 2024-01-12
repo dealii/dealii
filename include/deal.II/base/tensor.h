@@ -1932,7 +1932,7 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
  * @}
  */
 /**
- * @name Vector space operations on Tensor objects:
+ * @name Vector space operations on Tensor objects
  * @{
  */
 
