@@ -207,7 +207,7 @@ namespace TrilinosWrappers
      * internal arrays, in order to be able to relay global indices into the
      * matrix to indices into the subobjects. You *must* call this function
      * each time after you have changed the size of the sub-objects. Note that
-     * this is a collective operation, i.e., it needs to be called on all MPI
+     * this is a @ref GlossCollectiveOperation "collective operation", i.e., it needs to be called on all MPI
      * processes. This command internally calls the method
      * <tt>compress()</tt>, so you don't need to call that function in case
      * you use <tt>collect_sizes()</tt>.

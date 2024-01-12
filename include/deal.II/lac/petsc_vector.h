@@ -380,7 +380,7 @@ namespace PETScWrappers
        * @copydoc PETScWrappers::VectorBase::all_zero()
        *
        * @note This function overloads the one in the base class to make this
-       * a collective operation.
+       * a @ref GlossCollectiveOperation "collective operation".
        */
       bool
       all_zero() const;

@@ -579,7 +579,7 @@ namespace parallel
       memory_consumption_p4est() const;
 
       /**
-       * A collective operation that produces a sequence of output files with
+       * A @ref GlossCollectiveOperation "collective operation" that produces a sequence of output files with
        * the given file base name that contain the mesh in VTK format.
        *
        * More than anything else, this function is useful for debugging the

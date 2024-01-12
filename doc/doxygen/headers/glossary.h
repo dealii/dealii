@@ -499,6 +499,48 @@
  * </dd>
  *
  *
+ * <dt class="glossary">@anchor GlossCollectiveOperation <b>Collective operation</b></dt>
+ * <dd>
+ *   When running programs in parallel using MPI, a <em>collective
+ *   operation</em> is one in which all processes on an
+ *   @ref GlossMPICommunicator "MPI communicator"
+ *   have to participate. At its core, the concept of collective operations
+ *   rests on the mental model that MPI traditionally uses, namely where
+ *   processes communicate by sending messages to each other; in this model,
+ *   nothing happens if one process sends a message but the receiving process
+ *   does not expect or respond to it, or if one process needs access to a
+ *   piece of data stored elsewhere, but the storing process does not send it.
+ *
+ *   Collective operations are then operations that need to be called on all
+ *   processes at the same time to execute. An obvious example is calling the
+ *   `MPI_Sum` function in which every process provides a number that is then
+ *   summed over all processes. If in a program running with 4 processes only
+ *   three processes call `MPI_Sum`, the program will hang until the fourth
+ *   process eventually also gets to the place where this function is called.
+ *   If the fourth process never calls that function, for example because it
+ *   calls another MPI function in the belief that the other processes called
+ *   that function as well, a "deadlock" results: Every process is now waiting
+ *   for something to happen that cannot happen.
+ *
+ *   Many functions in deal.II are "collective operations" because internally
+ *   they call MPI functions that are collective. For some, this is obvious,
+ *   such as when you call
+ *   parallel::distributed::Triangulation::execute_coarsening_and_refinement()
+ *   in step-40, given that this function refines a mesh that is stored
+ *   in parallel on all processes in a parallel universe. In some other
+ *   cases, the name of the function is a hint that a function is collective,
+ *   such as in
+ *   GridTools::distributed_compute_point_locations() or
+ *   GridTools::build_global_description_tree(), where the "distributed"
+ *   and "global" components of the names are an indication; the latter
+ *   function also takes an explicit MPI communicator as argument. For yet
+ *   other functions, it is perhaps not as obvious that a function is
+ *   a collective operation. GridTools::volume() is an example; it is
+ *   collective because each process computes the volume of those cells it
+ *   locally owns, and these contributions then have to be added up.
+ * </dd>
+ *
+ *
  * <dt class="glossary">@anchor GlossColorization <b>Colorization</b></dt>
  * <dd><em>Colorization</em> is the process of marking certain parts of a
  * Triangulation with different labels. The use of the word <em>color</em>

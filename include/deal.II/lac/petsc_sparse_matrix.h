@@ -384,7 +384,7 @@ namespace PETScWrappers
         /**
          * It is not safe to elide additions of zeros to individual elements
          * of this matrix. The reason is that additions to the matrix may
-         * trigger collective operations synchronizing buffers on multiple
+         * trigger @ref GlossCollectiveOperation "collective operations" synchronizing buffers on multiple
          * processes. If an addition is elided on one process, this may lead
          * to other processes hanging in an infinite waiting loop.
          */
