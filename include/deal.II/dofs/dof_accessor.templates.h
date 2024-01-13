@@ -2957,7 +2957,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
     {
       global_matrix.add(dof_indices[i],
                         n_dofs,
-                        dof_indices.begin(),
+                        &dof_indices[0],
                         &local_matrix(i, 0));
       global_vector(dof_indices[i]) += local_vector(i);
     }
