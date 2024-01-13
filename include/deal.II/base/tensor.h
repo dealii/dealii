@@ -1406,34 +1406,6 @@ Tensor<rank_, dim, Number>::Tensor(Tensor<rank_, dim, Number> &&other) noexcept
 }
 #  endif
 
-namespace internal
-{
-  namespace TensorSubscriptor
-  {
-    template <typename ArrayElementType, int dim>
-    constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE ArrayElementType &
-    subscript(ArrayElementType  *values,
-              const unsigned int i,
-              std::integral_constant<int, dim>)
-    {
-      AssertIndexRange(i, dim);
-      return values[i];
-    }
-
-    template <typename ArrayElementType>
-    constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE ArrayElementType &
-    subscript(ArrayElementType *dummy,
-              const unsigned int,
-              std::integral_constant<int, 0>)
-    {
-      Assert(
-        false,
-        ExcMessage(
-          "Cannot access elements of an object of type Tensor<rank,0,Number>."));
-      return *dummy;
-    }
-  } // namespace TensorSubscriptor
-} // namespace internal
 
 
 template <int rank_, int dim, typename Number>
@@ -1441,8 +1413,11 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   typename Tensor<rank_, dim, Number>::value_type &
   Tensor<rank_, dim, Number>::operator[](const unsigned int i)
 {
-  return dealii::internal::TensorSubscriptor::subscript(
-    values, i, std::integral_constant<int, dim>());
+  Assert(dim != 0,
+         ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
+  AssertIndexRange(i, dim);
+
+  return values[i];
 }
 
 
@@ -1451,6 +1426,8 @@ constexpr DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE const typename Tensor<rank_, dim, Number>::value_type &
   Tensor<rank_, dim, Number>::operator[](const unsigned int i) const
 {
+  Assert(dim != 0,
+         ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
   AssertIndexRange(i, dim);
 
   return values[i];
@@ -1646,50 +1623,6 @@ constexpr inline DEAL_II_ALWAYS_INLINE
 }
 
 
-namespace internal
-{
-  namespace TensorImplementation
-  {
-    template <int rank,
-              int dim,
-              typename Number,
-              typename OtherNumber,
-              std::enable_if_t<
-                !std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value &&
-                  !std::is_same_v<Number, Differentiation::SD::Expression>,
-                int> = 0>
-    constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE void
-    division_operator(Tensor<rank, dim, Number> (&t)[dim],
-                      const OtherNumber &factor)
-    {
-      const Number inverse_factor = Number(1.) / factor;
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        t[d] *= inverse_factor;
-    }
-
-
-    template <int rank,
-              int dim,
-              typename Number,
-              typename OtherNumber,
-              std::enable_if_t<
-                std::is_integral<
-                  typename ProductType<Number, OtherNumber>::type>::value ||
-                  std::is_same_v<Number, Differentiation::SD::Expression>,
-                int> = 0>
-    constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE void
-    division_operator(Tensor<rank, dim, Number> (&t)[dim],
-                      const OtherNumber &factor)
-    {
-      // recurse over the base objects
-      for (unsigned int d = 0; d < dim; ++d)
-        t[d] /= factor;
-    }
-  } // namespace TensorImplementation
-} // namespace internal
-
 
 template <int rank_, int dim, typename Number>
 template <typename OtherNumber>
@@ -1697,7 +1630,23 @@ constexpr inline DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number> &
   Tensor<rank_, dim, Number>::operator/=(const OtherNumber &s)
 {
-  internal::TensorImplementation::division_operator(values, s);
+  if constexpr (std::is_integral<
+                  typename ProductType<Number, OtherNumber>::type>::value ||
+                std::is_same_v<Number, Differentiation::SD::Expression>)
+    {
+      // recurse over the base objects
+      for (unsigned int d = 0; d < dim; ++d)
+        values[d] /= s;
+    }
+  else
+    {
+      // If we can, avoid division by multiplying by the inverse of the given
+      // factor:
+      const Number inverse_factor = Number(1.) / s;
+      for (unsigned int d = 0; d < dim; ++d)
+        values[d] *= inverse_factor;
+    }
+
   return *this;
 }
 
@@ -1749,12 +1698,30 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   typename numbers::NumberTraits<Number>::real_type
   Tensor<rank_, dim, Number>::norm_square() const
 {
-  typename numbers::NumberTraits<Number>::real_type s = internal::NumberType<
-    typename numbers::NumberTraits<Number>::real_type>::value(0.0);
-  for (unsigned int i = 0; i < dim; ++i)
-    s += values[i].norm_square();
+  if constexpr (rank_ == 1)
+    {
+      // For rank-1 tensors, the square of the norm is simply the sum of
+      // squares of the elements:
+      typename numbers::NumberTraits<Number>::real_type s =
+        internal::NumberType<
+          typename numbers::NumberTraits<Number>::real_type>::value(0.0);
+      for (unsigned int i = 0; i < dim; ++i)
+        s += numbers::NumberTraits<Number>::abs_square(values[i]);
 
-  return s;
+      return s;
+    }
+  else
+    {
+      // For higher-rank tensors, the square of the norm is the sum
+      // of squares of sub-tensors
+      typename numbers::NumberTraits<Number>::real_type s =
+        internal::NumberType<
+          typename numbers::NumberTraits<Number>::real_type>::value(0.0);
+      for (unsigned int i = 0; i < dim; ++i)
+        s += values[i].norm_square();
+
+      return s;
+    }
 }
 
 
