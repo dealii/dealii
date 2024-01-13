@@ -67,8 +67,8 @@ namespace LinearAlgebra
               NodeType>::nonconst_global_inds_host_view_type
               column_indices_view(colnum_cache->data(), colnum_cache->size());
 #  else
-            Teuchos::ArrayView<long long> column_indices_view(
-              colnum_cache->data(), colnum_cache->size());
+            Teuchos::ArrayView<dealii::types::signed_global_dof_index>
+              column_indices_view(colnum_cache->data(), colnum_cache->size());
 #  endif
             sparsity_pattern->graph->getGlobalRowCopy(this->a_row,
                                                       column_indices_view,
