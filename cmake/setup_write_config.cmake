@@ -104,6 +104,8 @@ endif()
 if(NOT "${_instructions}" STREQUAL "")
   to_string(_string ${_instructions})
   _both(" (${_string})\n")
+else()
+  _both("\n")
 endif()
 
 if(CMAKE_CROSSCOMPILING)
