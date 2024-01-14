@@ -1698,14 +1698,16 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
   typename numbers::NumberTraits<Number>::real_type
   Tensor<rank_, dim, Number>::norm_square() const
 {
-  if constexpr (rank_ == 1)
+  if constexpr (dim == 0)
+    return internal::NumberType<
+      typename numbers::NumberTraits<Number>::real_type>::value(0.0);
+  else if constexpr (rank_ == 1)
     {
       // For rank-1 tensors, the square of the norm is simply the sum of
       // squares of the elements:
       typename numbers::NumberTraits<Number>::real_type s =
-        internal::NumberType<
-          typename numbers::NumberTraits<Number>::real_type>::value(0.0);
-      for (unsigned int i = 0; i < dim; ++i)
+        numbers::NumberTraits<Number>::abs_square(values[0]);
+      for (unsigned int i = 1; i < dim; ++i)
         s += numbers::NumberTraits<Number>::abs_square(values[i]);
 
       return s;
@@ -1715,9 +1717,8 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
       // For higher-rank tensors, the square of the norm is the sum
       // of squares of sub-tensors
       typename numbers::NumberTraits<Number>::real_type s =
-        internal::NumberType<
-          typename numbers::NumberTraits<Number>::real_type>::value(0.0);
-      for (unsigned int i = 0; i < dim; ++i)
+        values[0].norm_square();
+      for (unsigned int i = 1; i < dim; ++i)
         s += values[i].norm_square();
 
       return s;
