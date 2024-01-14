@@ -11,20 +11,20 @@ DEAL:0::Checksum: 2102618372 2102618372
 DEAL:0::locally owned cells: 378 / 1162
 DEAL:0::err: 0.000842838
 DEAL:0::Checksum: 1959145913 1959145913
-DEAL:0::locally owned cells: 1146 / 3505
+DEAL:0::locally owned cells: 1143 / 3502
 DEAL:0::err: 0.000338503
-DEAL:0::Checksum: 1046055222 1046055222
+DEAL:0::Checksum: 1821542537 1821542537
 
 DEAL:1::locally owned cells: 0 / 49
 DEAL:1::locally owned cells: 51 / 148
 DEAL:1::locally owned cells: 140 / 415
 DEAL:1::locally owned cells: 395 / 1162
-DEAL:1::locally owned cells: 1172 / 3505
+DEAL:1::locally owned cells: 1172 / 3502
 
 
 DEAL:2::locally owned cells: 49 / 49
 DEAL:2::locally owned cells: 40 / 148
 DEAL:2::locally owned cells: 127 / 415
 DEAL:2::locally owned cells: 389 / 1162
-DEAL:2::locally owned cells: 1187 / 3505
+DEAL:2::locally owned cells: 1187 / 3502
 

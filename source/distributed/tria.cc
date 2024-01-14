@@ -564,7 +564,40 @@ namespace
         cell->set_subdomain_id(ghost_owner);
       }
   }
+  template <int dim, int spacedim>
+  void
+  exchange_refinement_flags(Triangulation<dim, spacedim> &tria)
+  {
+    // Communicate refinement flags on ghost cells from the owner of the
+    // cell. This is necessary to get consistent refinement, as mesh
+    // smoothing would undo some of the requested coarsening/refinement.
 
+    auto pack =
+      [](
+        const typename Triangulation<dim, spacedim>::active_cell_iterator &cell)
+      -> std::uint8_t {
+      if (cell->refine_flag_set())
+        return 1;
+      if (cell->coarsen_flag_set())
+        return 2;
+      return 0;
+    };
+    auto unpack =
+      [](
+        const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
+        const std::uint8_t &flag) -> void {
+      cell->clear_coarsen_flag();
+      cell->clear_refine_flag();
+      if (flag == 1)
+        cell->set_refine_flag();
+      else if (flag == 2)
+        cell->set_coarsen_flag();
+    };
+
+    GridTools::exchange_cell_data_to_ghosts<std::uint8_t,
+                                            Triangulation<dim, spacedim>>(
+      tria, pack, unpack);
+  }
 
 #  ifdef P4EST_SEARCH_LOCAL
   template <int dim>
@@ -2742,34 +2775,16 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
     {
-      bool         mesh_changed = false;
-      unsigned int loop_counter = 0;
-      unsigned int n_changes    = 0;
-      do
-        {
-          n_changes += this->dealii::Triangulation<dim, spacedim>::
-                         prepare_coarsening_and_refinement();
-          this->update_periodic_face_map();
-          // enforce 2:1 mesh balance over periodic boundaries
-          mesh_changed = enforce_mesh_balance_over_periodic_boundaries(*this);
-          n_changes += mesh_changed;
+      // First exchange coarsen/refinement flags on ghost cells. After this
+      // collective communication call all flags on ghost cells match the
+      // flags set by the user on the owning rank.
+      exchange_refinement_flags(*this);
 
-          // We can't be sure that we won't run into a situation where we can
-          // not reconcile mesh smoothing and balancing of periodic faces. As
-          // we don't know what else to do, at least abort with an error
-          // message.
-          ++loop_counter;
-          AssertThrow(
-            loop_counter < 32,
-            ExcMessage(
-              "Infinite loop in "
-              "parallel::distributed::Triangulation::prepare_coarsening_and_refinement() "
-              "for periodic boundaries detected. Aborting."));
-        }
-      while (mesh_changed);
-
-      // report if we observed changes in any of the sub-functions
-      return n_changes > 0;
+      // Now we can call the sequential version to apply mesh smoothing and
+      // other modifications:
+      const bool any_changes = this->dealii::Triangulation<dim, spacedim>::
+                                 prepare_coarsening_and_refinement();
+      return any_changes;
     }
 
 
@@ -2929,8 +2944,43 @@ namespace parallel
                                             ghost_owner);
             }
 
-          // fix all the flags to make sure we have a consistent mesh
-          this->prepare_coarsening_and_refinement();
+          // Fix all the flags to make sure we have a consistent local
+          // mesh. For some reason periodic boundaries involving artificial
+          // cells are not obeying the 2:1 ratio that we require (and that is
+          // enforced by p4est between active cells). So, here we will loop
+          // refining across periodic boundaries until 2:1 is satisfied. Note
+          // that we are using the base class (sequential) prepare and execute
+          // calls here, not involving communication, because we are only
+          // trying to recreate a local triangulation from the p4est data.
+          {
+            bool         mesh_changed = true;
+            unsigned int loop_counter = 0;
+
+            do
+              {
+                this->dealii::Triangulation<dim, spacedim>::
+                  prepare_coarsening_and_refinement();
+
+                this->update_periodic_face_map();
+
+                mesh_changed =
+                  enforce_mesh_balance_over_periodic_boundaries(*this);
+
+                // We can't be sure that we won't run into a situation where we
+                // can not reconcile mesh smoothing and balancing of periodic
+                // faces. As we don't know what else to do, at least abort with
+                // an error message.
+                ++loop_counter;
+
+                AssertThrow(
+                  loop_counter < 32,
+                  ExcMessage(
+                    "Infinite loop in "
+                    "parallel::distributed::Triangulation::copy_local_forest_to_triangulation() "
+                    "for periodic boundaries detected. Aborting."));
+              }
+            while (mesh_changed);
+          }
 
           // see if any flags are still set
           mesh_changed =

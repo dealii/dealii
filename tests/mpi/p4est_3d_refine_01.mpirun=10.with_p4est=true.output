@@ -10,12 +10,12 @@ DEAL:0:3d::refine_loop...
 DEAL:0:3d::#cells = 386
 DEAL:0:3d::Checksum: 4143996808
 DEAL:0:3d::refine_loop...
-DEAL:0:3d::#cells = 1590
-DEAL:0:3d::Checksum: 3261418524
+DEAL:0:3d::#cells = 1527
+DEAL:0:3d::Checksum: 1021645228
 DEAL:0:3d::refine_loop...
-DEAL:0:3d::#cells = 5895
-DEAL:0:3d::Checksum: 221486420
+DEAL:0:3d::#cells = 5377
+DEAL:0:3d::Checksum: 3053003498
 DEAL:0:3d::refine_loop...
-DEAL:0:3d::#cells = 21197
-DEAL:0:3d::Checksum: 4164589755
+DEAL:0:3d::#cells = 18684
+DEAL:0:3d::Checksum: 3462661286
 DEAL:0:3d::OK
