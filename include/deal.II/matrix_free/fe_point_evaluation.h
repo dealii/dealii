@@ -881,7 +881,8 @@ public:
    * integrated at the points.
    *
    * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
    *
    */
   template <std::size_t stride_view>
@@ -908,7 +909,8 @@ public:
    * integrated at the points.
    *
    * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
    *
    */
   void
@@ -938,7 +940,8 @@ public:
    * integrated at the points.
    *
    * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
    *
    */
   template <std::size_t stride_view>
@@ -970,7 +973,8 @@ public:
    * integrated at the points.
    *
    * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
    *
    */
   void
