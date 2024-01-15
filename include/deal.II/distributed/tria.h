@@ -484,14 +484,17 @@ namespace parallel
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
        *
-       * Since the current processor only has control over those cells it owns
-       * (i.e. the ones for which <code>cell-@>subdomain_id() ==
-       * this-@>locally_owned_subdomain()</code>), refinement and coarsening
-       * flags are only respected for those locally owned cells. Flags may be
-       * set on other cells as well (and may often, in fact, if you call
-       * dealii::Triangulation::prepare_coarsening_and_refinement()) but will
-       * be largely ignored: the decision to refine the global mesh will only
-       * be affected by flags set on locally owned cells.
+       * Since the current processor only has control over those cells
+       * it owns (i.e. the ones for which <code>cell-@>subdomain_id()
+       * == this-@>locally_owned_subdomain()</code>), refinement and
+       * coarsening flags are only respected for those locally owned
+       * cells. Flags set on other cells will be ignored: the decision
+       * to refine the global mesh will only be affected by flags set
+       * on locally owned cells.
+       *
+       * This is a
+       * @ref GlossCollectiveOperation "collective operation"
+       * and needs to be called by all participating MPI ranks.
        *
        * @note This function by default partitions the mesh in such a way that
        * the number of cells on all processors is roughly equal. If you want
@@ -513,10 +516,16 @@ namespace parallel
       execute_coarsening_and_refinement() override;
 
       /**
-       * Override the implementation of prepare_coarsening_and_refinement from
-       * the base class. This is necessary if periodic boundaries are enabled
-       * and the level difference over vertices over the periodic boundary
-       * must not be more than 2:1.
+       * Prepare the triangulation for coarsening and refinement.
+       *
+       * This function performs necessary modifications of the
+       * coarsening and refinement flags to be consistent in parallel,
+       * to conform to smoothing flags set, and to conform to 2:1
+       * hanging node constraints.
+       *
+       * This is a
+       * @ref GlossCollectiveOperation "collective operation"
+       * and needs to be called by all participating MPI ranks.
        */
       virtual bool
       prepare_coarsening_and_refinement() override;
@@ -579,7 +588,9 @@ namespace parallel
       memory_consumption_p4est() const;
 
       /**
-       * A @ref GlossCollectiveOperation "collective operation" that produces a sequence of output files with
+       * A
+       * @ref GlossCollectiveOperation "collective operation"
+       * that produces a sequence of output files with
        * the given file base name that contain the mesh in VTK format.
        *
        * More than anything else, this function is useful for debugging the
