@@ -1757,45 +1757,6 @@ Tensor<rank_, dim, Number>::component_to_unrolled_index(
 
 
 
-namespace internal
-{
-  // unrolled_to_component_indices is instantiated from DataOut for dim==0
-  // and rank=2. Make sure we don't have compiler warnings.
-
-  template <int dim>
-  DEAL_II_HOST_DEVICE inline constexpr unsigned int
-  mod(const unsigned int x)
-  {
-    return x % dim;
-  }
-
-  template <>
-  DEAL_II_HOST_DEVICE inline unsigned int
-  mod<0>(const unsigned int x)
-  {
-    Assert(false, ExcInternalError());
-    return x;
-  }
-
-  template <int dim>
-  DEAL_II_HOST_DEVICE inline constexpr unsigned int
-  div(const unsigned int x)
-  {
-    return x / dim;
-  }
-
-  template <>
-  DEAL_II_HOST_DEVICE inline unsigned int
-  div<0>(const unsigned int x)
-  {
-    Assert(false, ExcInternalError());
-    return x;
-  }
-
-} // namespace internal
-
-
-
 template <int rank_, int dim, typename Number>
 constexpr inline TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
@@ -1805,17 +1766,28 @@ Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
   AssertIndexRange(i, dummy);
   (void)dummy;
 
-  TableIndices<rank_> indices;
-
-  unsigned int remainder = i;
-  for (int r = rank_ - 1; r >= 0; --r)
+  if constexpr (dim == 0)
     {
-      indices[r] = internal::mod<dim>(remainder);
-      remainder  = internal::div<dim>(remainder);
+      Assert(false,
+             ExcMessage(
+               "A tensor with dimension 0 does not store any elements. "
+               "There is no indexing that can address its elements."));
+      return {};
     }
-  Assert(remainder == 0, ExcInternalError());
+  else
+    {
+      TableIndices<rank_> indices;
 
-  return indices;
+      unsigned int remainder = i;
+      for (int r = rank_ - 1; r >= 0; --r)
+        {
+          indices[r] = remainder % dim;
+          remainder  = remainder / dim;
+        }
+      Assert(remainder == 0, ExcInternalError());
+
+      return indices;
+    }
 }
 
 
