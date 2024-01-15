@@ -192,8 +192,15 @@ test()
     pressure_constraints.distribute(check_vector_2.block(1));
   }
 
-  // Now the assertion part: These vectors are the same:
-  Assert(check_vector_1 == check_vector_2, ExcInternalError());
+  // Finally check that these two vectors are the same. Note that
+  // when we compile with native optimizations we might have a slight
+  // difference in results:
+  {
+    TrilinosWrappers::MPI::BlockVector result = check_vector_1;
+    result -= check_vector_2;
+    Assert(result.l2_norm() / check_vector_1.l2_norm() < 1e-8,
+           ExcInternalError());
+  }
 
   deallog << "OK" << std::endl;
 }
