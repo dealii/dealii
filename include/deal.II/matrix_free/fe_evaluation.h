@@ -8468,8 +8468,23 @@ FEFaceEvaluation<dim,
     {
       this->face_orientations[0] = 0;
       this->face_numbers[0]      = face_number;
-      for (unsigned int i = 0; i < n_lanes; ++i)
-        this->cell_ids[i] = cell_index * n_lanes + i;
+      if (this->matrix_free->n_active_entries_per_cell_batch(this->cell) ==
+          n_lanes)
+        {
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (unsigned int i = 0; i < n_lanes; ++i)
+            this->cell_ids[i] = cell_index * n_lanes + i;
+        }
+      else
+        {
+          unsigned int i = 0;
+          for (; i <
+                 this->matrix_free->n_active_entries_per_cell_batch(this->cell);
+               ++i)
+            this->cell_ids[i] = cell_index * n_lanes + i;
+          for (; i < n_lanes; ++i)
+            this->cell_ids[i] = numbers::invalid_unsigned_int;
+        }
       for (unsigned int i = 0; i < n_lanes; ++i)
         this->face_ids[i] =
           this->matrix_free->get_cell_and_face_to_plain_faces()(cell_index,
