@@ -210,13 +210,15 @@ namespace Step55
                   std::exp(R_x * (-2 * std::sqrt(25.0 + 4 * pi2) + 10.0)) -
                 0.4 * pi2 * std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::cos(2 * R_y * pi) +
-                0.1 * std::pow(-std::sqrt(25.0 + 4 * pi2) + 5.0, 2) *
+                0.1 *
+                  Utilities::fixed_power<2>(-std::sqrt(25.0 + 4 * pi2) + 5.0) *
                   std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::cos(2 * R_y * pi);
     values[1] = 0.2 * pi * (-std::sqrt(25.0 + 4 * pi2) + 5.0) *
                   std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::sin(2 * R_y * pi) -
-                0.05 * std::pow(-std::sqrt(25.0 + 4 * pi2) + 5.0, 3) *
+                0.05 *
+                  Utilities::fixed_power<3>(-std::sqrt(25.0 + 4 * pi2) + 5.0) *
                   std::exp(R_x * (-std::sqrt(25.0 + 4 * pi2) + 5.0)) *
                   std::sin(2 * R_y * pi) / pi;
 

@@ -2455,9 +2455,9 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
                 }
 
               const double distance_to_camera =
-                std::sqrt(std::pow(point[0] - camera_position[0], 2.) +
-                          std::pow(point[1] - camera_position[1], 2.) +
-                          std::pow(point[2] - camera_position[2], 2.));
+                std::hypot(point[0] - camera_position[0],
+                           point[1] - camera_position[1],
+                           point[2] - camera_position[2]);
               const double distance_factor =
                 distance_to_camera / (2. * std::max(x_dimension, y_dimension));
 
@@ -2625,10 +2625,10 @@ GridOut::write_svg(const Triangulation<2, 2> &tria, std::ostream &out) const
 
                       if (svg_flags.label_boundary_id)
                         {
-                          const double distance_to_camera = std::sqrt(
-                            std::pow(point[0] - camera_position[0], 2.) +
-                            std::pow(point[1] - camera_position[1], 2.) +
-                            std::pow(point[2] - camera_position[2], 2.));
+                          const double distance_to_camera =
+                            std::hypot(point[0] - camera_position[0],
+                                       point[1] - camera_position[1],
+                                       point[2] - camera_position[2]);
                           const double distance_factor =
                             distance_to_camera /
                             (2. * std::max(x_dimension, y_dimension));

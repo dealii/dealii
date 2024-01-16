@@ -336,11 +336,12 @@ namespace Step25
     // First we assemble the Jacobian matrix $F'_h(U^{n,l})$, where $U^{n,l}$
     // is stored in the vector <code>solution</code> for convenience.
     system_matrix.copy_from(mass_matrix);
-    system_matrix.add(std::pow(time_step * theta, 2), laplace_matrix);
+    system_matrix.add(Utilities::fixed_power<2>(time_step * theta),
+                      laplace_matrix);
 
     SparseMatrix<double> tmp_matrix(sparsity_pattern);
     compute_nl_matrix(old_solution, solution, tmp_matrix);
-    system_matrix.add(std::pow(time_step * theta, 2), tmp_matrix);
+    system_matrix.add(Utilities::fixed_power<2>(time_step * theta), tmp_matrix);
 
     // Next we compute the right-hand side vector. This is just the
     // combination of matrix-vector products implied by the description of
@@ -351,17 +352,18 @@ namespace Step25
 
     mass_matrix.vmult(system_rhs, solution);
     laplace_matrix.vmult(tmp_vector, solution);
-    system_rhs.add(std::pow(time_step * theta, 2), tmp_vector);
+    system_rhs.add(Utilities::fixed_power<2>(time_step * theta), tmp_vector);
 
     mass_matrix.vmult(tmp_vector, old_solution);
     system_rhs.add(-1.0, tmp_vector);
     laplace_matrix.vmult(tmp_vector, old_solution);
-    system_rhs.add(std::pow(time_step, 2) * theta * (1 - theta), tmp_vector);
+    system_rhs.add(Utilities::fixed_power<2>(time_step) * theta * (1 - theta),
+                   tmp_vector);
 
     system_rhs.add(-time_step, M_x_velocity);
 
     compute_nl_term(old_solution, solution, tmp_vector);
-    system_rhs.add(std::pow(time_step, 2) * theta, tmp_vector);
+    system_rhs.add(Utilities::fixed_power<2>(time_step) * theta, tmp_vector);
 
     system_rhs *= -1.;
   }

@@ -263,9 +263,9 @@ namespace Step53
     const double th  = std::atan2(R * x(2), b * p);
     const double phi = std::atan2(x(1), x(0));
     const double theta =
-      std::atan2(x(2) + ep * ep * b * std::pow(std::sin(th), 3),
-                 (p -
-                  (ellipticity * ellipticity * R * std::pow(std::cos(th), 3))));
+      std::atan2(x(2) + ep * ep * b * Utilities::fixed_power<3>(std::sin(th)),
+                 (p - (ellipticity * ellipticity * R *
+                       Utilities::fixed_power<3>(std::cos(th)))));
     const double R_bar =
       R / (std::sqrt(1 - ellipticity * ellipticity * std::sin(theta) *
                            std::sin(theta)));
