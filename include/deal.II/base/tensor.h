@@ -548,16 +548,26 @@ public:
   /**
    * Type of objects encapsulated by this container and returned by
    * operator[](). This is a tensor of lower rank for a general tensor, and a
-   * scalar number type for Tensor<1,dim,Number>.
+   * scalar number type for rank-1 tensors.
    */
-  using value_type = typename Tensor<rank_ - 1, dim, Number>::tensor_type;
+  using value_type =
+    std::conditional_t<rank_ == 1, Number, Tensor<rank_ - 1, dim, Number>>;
 
   /**
    * Declare an array type which can be used to initialize an object of this
-   * type statically. For `dim == 0`, its size is 1. Otherwise, it is `dim`.
+   * type statically. For rank-1 tensors, this array is simply an array of
+   * length `dim` of scalars of type `Number`. For higher-rank tensors, it is an
+   * array of length `dim` of the `array_type` of the next lower-rank tensor.
+   *
+   * This class is occasionally instantiated for `dim == 0`. C++ does not allow
+   * the creation of zero-length arrays. As a consequence, if `dim==0`, then all
+   * arrays that *should* have length `dim` are instead declared as having
+   * length 1 to avoid compiler errors.
    */
-  using array_type =
-    typename Tensor<rank_ - 1, dim, Number>::array_type[(dim != 0) ? dim : 1];
+  using array_type = std::conditional_t<
+    rank_ == 1,
+    Number[(dim != 0) ? dim : 1],
+    typename Tensor<rank_ - 1, dim, Number>::array_type[(dim != 0) ? dim : 1]>;
 
   /**
    * Constructor. Initialize all entries to zero.
