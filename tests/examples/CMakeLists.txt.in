@@ -27,6 +27,12 @@ foreach(_diff_file ${_diff_files})
     set(_destination "${CMAKE_CURRENT_SOURCE_DIR}/${_destination}")
     file(CREATE_LINK ${_file} ${_destination} SYMBOLIC)
   endforeach()
+
+  # Create a symbolic link in the temporary source directory
+  # so that we can access files in the example folders:
+  file(CREATE_LINK "${DEAL_II_SOURCE_DIR}/examples/${_step}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/${_step}" SYMBOLIC
+  )
 endforeach()
 
 #
