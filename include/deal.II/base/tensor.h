@@ -29,6 +29,16 @@
 #  include <adolc/adouble.h> // Taped double
 #endif
 
+// boost::serialization::make_array used to be in array.hpp, but was
+// moved to a different file in BOOST 1.64
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 106400
+#  include <boost/serialization/array_wrapper.hpp>
+#else
+#  include <boost/serialization/array.hpp>
+#endif
+
+
 #include <cmath>
 #include <ostream>
 
@@ -874,9 +884,7 @@ private:
   /**
    * Array of tensors holding the subelements.
    */
-  Tensor<rank_ - 1, dim, Number> values[(dim != 0) ? dim : 1];
-  // ... avoid a compiler warning in case of dim == 0 and ensure that the
-  // array always has positive size.
+  std::array<Tensor<rank_ - 1, dim, Number>, dim> values;
 
   /**
    * This constructor is for internal use. It provides a way
@@ -1289,7 +1297,7 @@ template <typename ArrayLike, std::size_t... indices>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
                                    std::index_sequence<indices...>)
-  : values{Tensor<rank_ - 1, dim, Number>(initializer[indices])...}
+  : values{{Tensor<rank_ - 1, dim, Number>(initializer[indices])...}}
 {
   static_assert(sizeof...(indices) == dim,
                 "dim should match the number of indices");
@@ -1356,7 +1364,9 @@ template <typename OtherNumber>
 constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>::
 operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const
 {
-  return Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>(values);
+  Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>> x;
+  std::copy(values.begin(), values.end(), x.values.begin());
+  return x;
 }
 
 
@@ -1813,7 +1823,10 @@ template <class Archive>
 inline void
 Tensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
 {
-  ar &values;
+  if constexpr (rank_ > 1)
+    ar &values;
+  else
+    ar &boost::serialization::make_array(&values[0], dim);
 }
 
 
