@@ -41,6 +41,7 @@
 
 #include <cmath>
 #include <ostream>
+#include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -882,9 +883,14 @@ public:
 
 private:
   /**
-   * Array of tensors holding the subelements.
+   * Array of tensors holding the elements of the tensor. If this is
+   * a rank-1 tensor, then we simply need an array of scalars.
+   * Otherwise, it is an array of tensors one rank lower.
    */
-  std::array<Tensor<rank_ - 1, dim, Number>, dim> values;
+  std::conditional_t<rank_ == 1,
+                     std::array<Number, dim>,
+                     std::array<Tensor<rank_ - 1, dim, Number>, dim>>
+    values;
 
   /**
    * This constructor is for internal use. It provides a way
@@ -1308,10 +1314,13 @@ Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor()
-  // We would like to use =default, but this causes compile errors with some
-  // MSVC versions and internal compiler errors with -O1 in gcc 5.4.
-  : values{}
-{}
+{
+  // The default constructor of std::array does not initialize its elements.
+  // So we have to do it by hand.
+  std::fill(values.begin(),
+            values.end(),
+            internal::NumberType<Number>::value(0.0));
+}
 
 
 
