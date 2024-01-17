@@ -120,6 +120,7 @@ namespace parallel
   DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   TriangulationBase<dim, spacedim>::NumberCache::NumberCache()
     : n_locally_owned_active_cells(0)
+    , n_global_active_cells(0)
     , number_of_global_coarse_cells(0)
     , n_global_levels(0)
   {}
