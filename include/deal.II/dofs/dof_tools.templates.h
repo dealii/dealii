@@ -901,105 +901,102 @@ namespace DoFTools
 
   namespace internal
   {
-    namespace
+    template <int spacedim>
+    IndexSet
+    extract_hanging_node_dofs(const DoFHandler<1, spacedim> &dof_handler)
     {
-      template <int spacedim>
-      IndexSet
-      extract_hanging_node_dofs(const DoFHandler<1, spacedim> &dof_handler)
-      {
-        // there are no hanging nodes in 1d
-        return IndexSet(dof_handler.n_dofs());
-      }
+      // there are no hanging nodes in 1d
+      return IndexSet(dof_handler.n_dofs());
+    }
 
 
-      template <int spacedim>
-      IndexSet
-      extract_hanging_node_dofs(const DoFHandler<2, spacedim> &dof_handler)
-      {
-        const unsigned int dim = 2;
+    template <int spacedim>
+    IndexSet
+    extract_hanging_node_dofs(const DoFHandler<2, spacedim> &dof_handler)
+    {
+      const unsigned int dim = 2;
 
-        IndexSet selected_dofs(dof_handler.n_dofs());
+      IndexSet selected_dofs(dof_handler.n_dofs());
 
-        const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
+      const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
 
-        // this function is similar to the make_sparsity_pattern function,
-        // see there for more information
-        for (const auto &cell : dof_handler.active_cell_iterators())
-          if (!cell->is_artificial())
+      // this function is similar to the make_sparsity_pattern function,
+      // see there for more information
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (!cell->is_artificial())
+          {
+            for (const unsigned int face : cell->face_indices())
+              if (cell->face(face)->has_children())
+                {
+                  const typename DoFHandler<dim, spacedim>::line_iterator line =
+                    cell->face(face);
+
+                  for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
+                       ++dof)
+                    selected_dofs.add_index(
+                      line->child(0)->vertex_dof_index(1, dof));
+
+                  for (unsigned int child = 0; child < 2; ++child)
+                    {
+                      if (cell->neighbor_child_on_subface(face, child)
+                            ->is_artificial())
+                        continue;
+                      for (unsigned int dof = 0; dof != fe.n_dofs_per_line();
+                           ++dof)
+                        selected_dofs.add_index(
+                          line->child(child)->dof_index(dof));
+                    }
+                }
+          }
+
+      selected_dofs.compress();
+      return selected_dofs;
+    }
+
+
+    template <int spacedim>
+    IndexSet
+    extract_hanging_node_dofs(const DoFHandler<3, spacedim> &dof_handler)
+    {
+      const unsigned int dim = 3;
+
+      IndexSet selected_dofs(dof_handler.n_dofs());
+      IndexSet unconstrained_dofs(dof_handler.n_dofs());
+
+      const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
+
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        if (!cell->is_artificial())
+          for (auto f : cell->face_indices())
             {
-              for (const unsigned int face : cell->face_indices())
-                if (cell->face(face)->has_children())
-                  {
-                    const typename DoFHandler<dim, spacedim>::line_iterator
-                      line = cell->face(face);
+              const typename DoFHandler<dim, spacedim>::face_iterator face =
+                cell->face(f);
+              if (cell->face(f)->has_children())
+                {
+                  for (unsigned int child = 0; child < 4; ++child)
+                    if (!cell->neighbor_child_on_subface(f, child)
+                           ->is_artificial())
+                      {
+                        // simply take all DoFs that live on this subface
+                        std::vector<types::global_dof_index> ldi(
+                          fe.n_dofs_per_face(f, child));
+                        face->child(child)->get_dof_indices(ldi);
+                        selected_dofs.add_indices(ldi.begin(), ldi.end());
+                      }
 
+                  // and subtract (in the end) all the indices which a shared
+                  // between this face and its subfaces
+                  for (unsigned int vertex = 0; vertex < 4; ++vertex)
                     for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
                          ++dof)
-                      selected_dofs.add_index(
-                        line->child(0)->vertex_dof_index(1, dof));
-
-                    for (unsigned int child = 0; child < 2; ++child)
-                      {
-                        if (cell->neighbor_child_on_subface(face, child)
-                              ->is_artificial())
-                          continue;
-                        for (unsigned int dof = 0; dof != fe.n_dofs_per_line();
-                             ++dof)
-                          selected_dofs.add_index(
-                            line->child(child)->dof_index(dof));
-                      }
-                  }
+                      unconstrained_dofs.add_index(
+                        face->vertex_dof_index(vertex, dof));
+                }
             }
-
-        selected_dofs.compress();
-        return selected_dofs;
-      }
-
-
-      template <int spacedim>
-      IndexSet
-      extract_hanging_node_dofs(const DoFHandler<3, spacedim> &dof_handler)
-      {
-        const unsigned int dim = 3;
-
-        IndexSet selected_dofs(dof_handler.n_dofs());
-        IndexSet unconstrained_dofs(dof_handler.n_dofs());
-
-        const FiniteElement<dim, spacedim> &fe = dof_handler.get_fe();
-
-        for (const auto &cell : dof_handler.active_cell_iterators())
-          if (!cell->is_artificial())
-            for (auto f : cell->face_indices())
-              {
-                const typename DoFHandler<dim, spacedim>::face_iterator face =
-                  cell->face(f);
-                if (cell->face(f)->has_children())
-                  {
-                    for (unsigned int child = 0; child < 4; ++child)
-                      if (!cell->neighbor_child_on_subface(f, child)
-                             ->is_artificial())
-                        {
-                          // simply take all DoFs that live on this subface
-                          std::vector<types::global_dof_index> ldi(
-                            fe.n_dofs_per_face(f, child));
-                          face->child(child)->get_dof_indices(ldi);
-                          selected_dofs.add_indices(ldi.begin(), ldi.end());
-                        }
-
-                    // and subtract (in the end) all the indices which a shared
-                    // between this face and its subfaces
-                    for (unsigned int vertex = 0; vertex < 4; ++vertex)
-                      for (unsigned int dof = 0; dof != fe.n_dofs_per_vertex();
-                           ++dof)
-                        unconstrained_dofs.add_index(
-                          face->vertex_dof_index(vertex, dof));
-                  }
-              }
-        selected_dofs.subtract_set(unconstrained_dofs);
-        return selected_dofs;
-      }
-    } // namespace
-  }   // namespace internal
+      selected_dofs.subtract_set(unconstrained_dofs);
+      return selected_dofs;
+    }
+  } // namespace internal
 
 
 
@@ -1891,36 +1888,33 @@ namespace DoFTools
 
   namespace internal
   {
-    namespace
+    /**
+     * Return true if the given element is primitive.
+     */
+    template <int dim, int spacedim>
+    bool
+    all_elements_are_primitive(const FiniteElement<dim, spacedim> &fe)
     {
-      /**
-       * Return true if the given element is primitive.
-       */
-      template <int dim, int spacedim>
-      bool
-      all_elements_are_primitive(const FiniteElement<dim, spacedim> &fe)
-      {
-        return fe.is_primitive();
-      }
+      return fe.is_primitive();
+    }
 
 
-      /**
-       * Return true if each element of the given element collection is
-       * primitive.
-       */
-      template <int dim, int spacedim>
-      bool
-      all_elements_are_primitive(
-        const dealii::hp::FECollection<dim, spacedim> &fe_collection)
-      {
-        for (unsigned int i = 0; i < fe_collection.size(); ++i)
-          if (fe_collection[i].is_primitive() == false)
-            return false;
+    /**
+     * Return true if each element of the given element collection is
+     * primitive.
+     */
+    template <int dim, int spacedim>
+    bool
+    all_elements_are_primitive(
+      const dealii::hp::FECollection<dim, spacedim> &fe_collection)
+    {
+      for (unsigned int i = 0; i < fe_collection.size(); ++i)
+        if (fe_collection[i].is_primitive() == false)
+          return false;
 
-        return true;
-      }
-    } // namespace
-  }   // namespace internal
+      return true;
+    }
+  } // namespace internal
 
 
 
@@ -2188,108 +2182,104 @@ namespace DoFTools
 
   namespace internal
   {
-    namespace
+    template <int dim, int spacedim>
+    std::map<types::global_dof_index, Point<spacedim>>
+    map_dofs_to_support_points(
+      const hp::MappingCollection<dim, spacedim> &mapping,
+      const DoFHandler<dim, spacedim>            &dof_handler,
+      const ComponentMask                        &in_mask)
     {
-      template <int dim, int spacedim>
-      std::map<types::global_dof_index, Point<spacedim>>
-      map_dofs_to_support_points(
-        const hp::MappingCollection<dim, spacedim> &mapping,
-        const DoFHandler<dim, spacedim>            &dof_handler,
-        const ComponentMask                        &in_mask)
-      {
-        std::map<types::global_dof_index, Point<spacedim>> support_points;
+      std::map<types::global_dof_index, Point<spacedim>> support_points;
 
-        const hp::FECollection<dim, spacedim> &fe_collection =
-          dof_handler.get_fe_collection();
-        hp::QCollection<dim> q_coll_dummy;
+      const hp::FECollection<dim, spacedim> &fe_collection =
+        dof_handler.get_fe_collection();
+      hp::QCollection<dim> q_coll_dummy;
 
-        for (unsigned int fe_index = 0; fe_index < fe_collection.size();
-             ++fe_index)
+      for (unsigned int fe_index = 0; fe_index < fe_collection.size();
+           ++fe_index)
+        {
+          // check whether every FE in the collection has support points
+          Assert((fe_collection[fe_index].n_dofs_per_cell() == 0) ||
+                   (fe_collection[fe_index].has_support_points()),
+                 typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
+          q_coll_dummy.push_back(
+            Quadrature<dim>(fe_collection[fe_index].get_unit_support_points()));
+        }
+
+      // Take care of components
+      const ComponentMask mask =
+        (in_mask.size() == 0 ?
+           ComponentMask(fe_collection.n_components(), true) :
+           in_mask);
+
+      // Now loop over all cells and enquire the support points on each
+      // of these. we use dummy quadrature formulas where the quadrature
+      // points are located at the unit support points to enquire the
+      // location of the support points in real space.
+      //
+      // The weights of the quadrature rule have been set to invalid
+      // values by the used constructor.
+      hp::FEValues<dim, spacedim> hp_fe_values(mapping,
+                                               fe_collection,
+                                               q_coll_dummy,
+                                               update_quadrature_points);
+
+      std::vector<types::global_dof_index> local_dof_indices;
+      for (const auto &cell : dof_handler.active_cell_iterators())
+        // only work on locally relevant cells
+        if (cell->is_artificial() == false)
           {
-            // check whether every FE in the collection has support points
-            Assert((fe_collection[fe_index].n_dofs_per_cell() == 0) ||
-                     (fe_collection[fe_index].has_support_points()),
-                   typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
-            q_coll_dummy.push_back(Quadrature<dim>(
-              fe_collection[fe_index].get_unit_support_points()));
+            hp_fe_values.reinit(cell);
+            const FEValues<dim, spacedim> &fe_values =
+              hp_fe_values.get_present_fe_values();
+
+            local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
+            cell->get_dof_indices(local_dof_indices);
+
+            const std::vector<Point<spacedim>> &points =
+              fe_values.get_quadrature_points();
+            for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell(); ++i)
+              {
+                const unsigned int dof_comp =
+                  cell->get_fe().system_to_component_index(i).first;
+
+                // insert the values into the map if it is a valid component
+                if (mask[dof_comp])
+                  support_points[local_dof_indices[i]] = points[i];
+              }
           }
 
-        // Take care of components
-        const ComponentMask mask =
-          (in_mask.size() == 0 ?
-             ComponentMask(fe_collection.n_components(), true) :
-             in_mask);
-
-        // Now loop over all cells and enquire the support points on each
-        // of these. we use dummy quadrature formulas where the quadrature
-        // points are located at the unit support points to enquire the
-        // location of the support points in real space.
-        //
-        // The weights of the quadrature rule have been set to invalid
-        // values by the used constructor.
-        hp::FEValues<dim, spacedim> hp_fe_values(mapping,
-                                                 fe_collection,
-                                                 q_coll_dummy,
-                                                 update_quadrature_points);
-
-        std::vector<types::global_dof_index> local_dof_indices;
-        for (const auto &cell : dof_handler.active_cell_iterators())
-          // only work on locally relevant cells
-          if (cell->is_artificial() == false)
-            {
-              hp_fe_values.reinit(cell);
-              const FEValues<dim, spacedim> &fe_values =
-                hp_fe_values.get_present_fe_values();
-
-              local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
-              cell->get_dof_indices(local_dof_indices);
-
-              const std::vector<Point<spacedim>> &points =
-                fe_values.get_quadrature_points();
-              for (unsigned int i = 0; i < cell->get_fe().n_dofs_per_cell();
-                   ++i)
-                {
-                  const unsigned int dof_comp =
-                    cell->get_fe().system_to_component_index(i).first;
-
-                  // insert the values into the map if it is a valid component
-                  if (mask[dof_comp])
-                    support_points[local_dof_indices[i]] = points[i];
-                }
-            }
-
-        return support_points;
-      }
+      return support_points;
+    }
 
 
-      template <int dim, int spacedim>
-      std::vector<Point<spacedim>>
-      map_dofs_to_support_points_vector(
-        const hp::MappingCollection<dim, spacedim> &mapping,
-        const DoFHandler<dim, spacedim>            &dof_handler,
-        const ComponentMask                        &mask)
-      {
-        std::vector<Point<spacedim>> support_points(dof_handler.n_dofs());
+    template <int dim, int spacedim>
+    std::vector<Point<spacedim>>
+    map_dofs_to_support_points_vector(
+      const hp::MappingCollection<dim, spacedim> &mapping,
+      const DoFHandler<dim, spacedim>            &dof_handler,
+      const ComponentMask                        &mask)
+    {
+      std::vector<Point<spacedim>> support_points(dof_handler.n_dofs());
 
-        // get the data in the form of the map as above
-        const std::map<types::global_dof_index, Point<spacedim>>
-          x_support_points =
-            map_dofs_to_support_points(mapping, dof_handler, mask);
+      // get the data in the form of the map as above
+      const std::map<types::global_dof_index, Point<spacedim>>
+        x_support_points =
+          map_dofs_to_support_points(mapping, dof_handler, mask);
 
-        // now convert from the map to the linear vector. make sure every
-        // entry really appeared in the map
-        for (types::global_dof_index i = 0; i < dof_handler.n_dofs(); ++i)
-          {
-            Assert(x_support_points.find(i) != x_support_points.end(),
-                   ExcInternalError());
+      // now convert from the map to the linear vector. make sure every
+      // entry really appeared in the map
+      for (types::global_dof_index i = 0; i < dof_handler.n_dofs(); ++i)
+        {
+          Assert(x_support_points.find(i) != x_support_points.end(),
+                 ExcInternalError());
 
-            support_points[i] = x_support_points.find(i)->second;
-          }
+          support_points[i] = x_support_points.find(i)->second;
+        }
 
-        return support_points;
-      }
-    } // namespace
-  }   // namespace internal
+      return support_points;
+    }
+  } // namespace internal
 
 
   template <int dim, int spacedim>
