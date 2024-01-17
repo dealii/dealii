@@ -69,34 +69,42 @@ Tensor<1, dim>
 PolynomialsRannacherTurek<dim>::compute_grad(const unsigned int i,
                                              const Point<dim>  &p) const
 {
-  Assert(dim == 2, ExcNotImplemented());
-  Tensor<1, dim> grad;
-  if (i == 0)
+  if constexpr (dim == 2)
     {
-      grad[0] = -2.5 + 3 * p(0);
-      grad[1] = 1.5 - 3 * p(1);
+      Tensor<1, dim> grad;
+      if (i == 0)
+        {
+          grad[0] = -2.5 + 3 * p(0);
+          grad[1] = 1.5 - 3 * p(1);
+        }
+      else if (i == 1)
+        {
+          grad[0] = -0.5 + 3.0 * p(0);
+          grad[1] = 1.5 - 3.0 * p(1);
+        }
+      else if (i == 2)
+        {
+          grad[0] = 1.5 - 3.0 * p(0);
+          grad[1] = -2.5 + 3.0 * p(1);
+        }
+      else if (i == 3)
+        {
+          grad[0] = 1.5 - 3.0 * p(0);
+          grad[1] = -0.5 + 3.0 * p(1);
+        }
+      else
+        {
+          Assert(false, ExcNotImplemented());
+        }
+
+      return grad;
     }
-  else if (i == 1)
-    {
-      grad[0] = -0.5 + 3.0 * p(0);
-      grad[1] = 1.5 - 3.0 * p(1);
-    }
-  else if (i == 2)
-    {
-      grad[0] = 1.5 - 3.0 * p(0);
-      grad[1] = -2.5 + 3.0 * p(1);
-    }
-  else if (i == 3)
-    {
-      grad[0] = 1.5 - 3.0 * p(0);
-      grad[1] = -0.5 + 3.0 * p(1);
-    }
+
   else
     {
       Assert(false, ExcNotImplemented());
+      return {};
     }
-
-  return grad;
 }
 
 
@@ -107,37 +115,45 @@ PolynomialsRannacherTurek<dim>::compute_grad_grad(
   const unsigned int i,
   const Point<dim> & /*p*/) const
 {
-  Assert(dim == 2, ExcNotImplemented());
-  Tensor<2, dim> grad_grad;
-  if (i == 0)
+  if constexpr (dim == 2)
     {
-      grad_grad[0][0] = 3;
-      grad_grad[0][1] = 0;
-      grad_grad[1][0] = 0;
-      grad_grad[1][1] = -3;
+      Tensor<2, dim> grad_grad;
+      if (i == 0)
+        {
+          grad_grad[0][0] = 3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = -3;
+        }
+      else if (i == 1)
+        {
+          grad_grad[0][0] = 3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = -3;
+        }
+      else if (i == 2)
+        {
+          grad_grad[0][0] = -3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = 3;
+        }
+      else if (i == 3)
+        {
+          grad_grad[0][0] = -3;
+          grad_grad[0][1] = 0;
+          grad_grad[1][0] = 0;
+          grad_grad[1][1] = 3;
+        }
+      return grad_grad;
     }
-  else if (i == 1)
+
+  else
     {
-      grad_grad[0][0] = 3;
-      grad_grad[0][1] = 0;
-      grad_grad[1][0] = 0;
-      grad_grad[1][1] = -3;
+      Assert(false, ExcNotImplemented());
+      return {};
     }
-  else if (i == 2)
-    {
-      grad_grad[0][0] = -3;
-      grad_grad[0][1] = 0;
-      grad_grad[1][0] = 0;
-      grad_grad[1][1] = 3;
-    }
-  else if (i == 3)
-    {
-      grad_grad[0][0] = -3;
-      grad_grad[0][1] = 0;
-      grad_grad[1][0] = 0;
-      grad_grad[1][1] = 3;
-    }
-  return grad_grad;
 }
 
 
