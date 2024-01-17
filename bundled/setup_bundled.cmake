@@ -57,6 +57,16 @@ macro(feature_boost_configure_bundled)
     list(APPEND DEAL_II_DEFINITIONS "BOOST_ALL_NO_LIB")
   endif()
 
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    #
+    # std::unary_function has been removed in C++17. Fix compilation with
+    # clang (that enforces strict standard compliance) by exporting
+    # BOOST_NO_CXX98_FUNCTION_BASE,
+    # https://github.com/boostorg/config/pull/430
+    #
+    list(APPEND DEAL_II_DEFINITIONS "BOOST_NO_CXX98_FUNCTION_BASE")
+  endif()
+
   enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-unused-local-typedefs")
   enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-parentheses")
 
