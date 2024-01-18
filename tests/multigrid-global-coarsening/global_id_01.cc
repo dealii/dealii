@@ -29,7 +29,7 @@
 
 #include <deal.II/lac/la_parallel_vector.h>
 
-#include <deal.II/multigrid/mg_transfer_global_coarsening.templates.h>
+#include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
 
 #include <set>
 
