@@ -685,7 +685,7 @@ namespace LinearAlgebra
             {
               matrix->getLocalRowView(i, indices, values);
 
-              for (size_t j = 0; j < indices.size(); ++j)
+              for (size_type j = 0; j < indices.size(); ++j)
                 out << "(" << matrix->getRowMap()->getGlobalElement(i) << ","
                     << matrix->getColMap()->getGlobalElement(indices[j]) << ") "
                     << values[j] << std::endl;
