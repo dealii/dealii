@@ -341,7 +341,7 @@ namespace numbers
    * of @p value_1.
    */
   template <typename Number1, typename Number2>
-  bool
+  constexpr bool
   values_are_not_equal(const Number1 &value_1, const Number2 &value_2);
 
   /**
@@ -925,7 +925,7 @@ namespace numbers
 
 
   template <typename Number1, typename Number2>
-  inline bool
+  inline constexpr bool
   values_are_not_equal(const Number1 &value_1, const Number2 &value_2)
   {
     return !(values_are_equal(value_1, value_2));

@@ -41,6 +41,7 @@
 
 #include <cmath>
 #include <ostream>
+#include <type_traits>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -547,16 +548,26 @@ public:
   /**
    * Type of objects encapsulated by this container and returned by
    * operator[](). This is a tensor of lower rank for a general tensor, and a
-   * scalar number type for Tensor<1,dim,Number>.
+   * scalar number type for rank-1 tensors.
    */
-  using value_type = typename Tensor<rank_ - 1, dim, Number>::tensor_type;
+  using value_type =
+    std::conditional_t<rank_ == 1, Number, Tensor<rank_ - 1, dim, Number>>;
 
   /**
    * Declare an array type which can be used to initialize an object of this
-   * type statically. For `dim == 0`, its size is 1. Otherwise, it is `dim`.
+   * type statically. For rank-1 tensors, this array is simply an array of
+   * length `dim` of scalars of type `Number`. For higher-rank tensors, it is an
+   * array of length `dim` of the `array_type` of the next lower-rank tensor.
+   *
+   * This class is occasionally instantiated for `dim == 0`. C++ does not allow
+   * the creation of zero-length arrays. As a consequence, if `dim==0`, then all
+   * arrays that *should* have length `dim` are instead declared as having
+   * length 1 to avoid compiler errors.
    */
-  using array_type =
-    typename Tensor<rank_ - 1, dim, Number>::array_type[(dim != 0) ? dim : 1];
+  using array_type = std::conditional_t<
+    rank_ == 1,
+    Number[(dim != 0) ? dim : 1],
+    typename Tensor<rank_ - 1, dim, Number>::array_type[(dim != 0) ? dim : 1]>;
 
   /**
    * Constructor. Initialize all entries to zero.
@@ -882,9 +893,14 @@ public:
 
 private:
   /**
-   * Array of tensors holding the subelements.
+   * Array of tensors holding the elements of the tensor. If this is
+   * a rank-1 tensor, then we simply need an array of scalars.
+   * Otherwise, it is an array of tensors one rank lower.
    */
-  std::array<Tensor<rank_ - 1, dim, Number>, dim> values;
+  std::conditional_t<rank_ == 1,
+                     std::array<Number, dim>,
+                     std::array<Tensor<rank_ - 1, dim, Number>, dim>>
+    values;
 
   /**
    * This constructor is for internal use. It provides a way
@@ -1304,15 +1320,119 @@ Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
 }
 
 
+#  ifdef DEAL_II_HAVE_CXX20
 
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor()
-  // We would like to use =default, but this causes compile errors with some
-  // MSVC versions and internal compiler errors with -O1 in gcc 5.4.
-  : values{}
+  : values(
+      // In order to initialize the std::array<Number,dim>, we would need a
+      // brace-enclosed list of length 'dim'. There is no way in C++ to create
+      // such a list in-place, but we can come up with a lambda function that
+      // expands such a list via template-pack expansion, and then uses this
+      // list to initialize a std::array which it then returns.
+      //
+      // The trick to come up with such a lambda function is to have a function
+      // that takes an argument that depends on a template-pack of integers.
+      // We will call the function with an integer list of length 'dim', and
+      // in the function itself expand that pack in a way that it serves as
+      // a brace-enclosed list of initializers for a std::array.
+      //
+      // Of course, we do not want to initialize the array with the integers,
+      // but with  zeros. (Or, more correctly, a zero of the element type.)
+      // The canonical way to do this would be using the comma operator:
+      //     (sequence_element, 0.0)
+      // returns zero, and
+      //     (sequence, 0.0)...
+      // returns a list of zeros of the right length. Unfortunately, some
+      // compilers then warn that the left side of the comma expression has
+      // no effect -- well, bummer, that was of course exactly the idea.
+      // We could work around this by using
+      //     (sequence_element * 0.0)
+      // instead, assuming that the compiler will optimize (known) integer
+      // times zero to zero, and similarly for (known) integer times times
+      // default-initialized tensor.
+      //
+      // But, instead of relying on compiler optimizations, a better way is
+      // to simply have another (nested) lambda function that takes the
+      // integer sequence element as an argument and ignores it, just
+      // returning a zero instead.
+      []<std::size_t... I>(
+        const std::index_sequence<I...> &) constexpr -> decltype(values) {
+        if constexpr (rank_ == 1)
+          {
+            auto get_zero_and_ignore_argument = [](int) {
+              return internal::NumberType<Number>::value(0.0);
+            };
+            return {{(get_zero_and_ignore_argument(I))...}};
+          }
+        else
+          {
+            auto get_zero_and_ignore_argument = [](int) {
+              return Tensor<rank_ - 1, dim, Number>();
+            };
+            return {{(get_zero_and_ignore_argument(I))...}};
+          }
+      }(std::make_index_sequence<dim>()))
 {}
 
+#  else
+
+// The C++17 case works in essence the same, except that we can't use a
+// lambda function with explicit template parameters, i.e., we can't do
+//   []<std::size_t... I>(const std::index_sequence<I...> &)
+// as above because that's a C++20 feature. Lambda functions in C++17 can
+// have template packs as arguments, but we need the ability to *name*
+// that template pack (the 'I' above) and that's not possible in C++17.
+//
+// We work around this by moving the lambda function to a global function
+// and using the traditional template syntax on it.
+namespace internal
+{
+  namespace TensorInitialization
+  {
+    template <int rank, int dim, typename Number, std::size_t... I>
+    constexpr std::array<typename Tensor<rank, dim, Number>::value_type, dim>
+    make_zero_array(const std::index_sequence<I...> &)
+    {
+      static_assert(sizeof...(I) == dim, "This is bad.");
+
+      // First peel off the case dim==0. If we don't, some compilers
+      // will warn below that we define these lambda functions but
+      // never use them (because the expanded list has zero elements,
+      // and the get_zero_and_ignore_argument() function is not used...)
+      if constexpr (dim == 0)
+        {
+          return {};
+        }
+      else if constexpr (rank == 1)
+        {
+          auto get_zero_and_ignore_argument = [](int) {
+            return internal::NumberType<Number>::value(0.0);
+          };
+          return {{(get_zero_and_ignore_argument(I))...}};
+        }
+      else
+        {
+          auto get_zero_and_ignore_argument = [](int) {
+            return Tensor<rank - 1, dim, Number>();
+          };
+          return {{(get_zero_and_ignore_argument(I))...}};
+        }
+    }
+  } // namespace TensorInitialization
+} // namespace internal
+
+
+template <int rank_, int dim, typename Number>
+constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
+Tensor<rank_, dim, Number>::Tensor()
+  : values(internal::TensorInitialization::make_zero_array<rank_, dim, Number>(
+      std::make_index_sequence<dim>()))
+{}
+
+
+#  endif
 
 
 template <int rank_, int dim, typename Number>
@@ -1538,8 +1658,16 @@ constexpr inline bool
 Tensor<rank_, dim, Number>::operator==(
   const Tensor<rank_, dim, OtherNumber> &p) const
 {
+#  ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
+  Assert(!(std::is_same_v<Number, adouble> ||
+           std::is_same_v<OtherNumber, adouble>),
+         ExcMessage(
+           "The Tensor equality operator for ADOL-C taped numbers has not yet "
+           "been extended to support advanced branching."));
+#  endif
+
   for (unsigned int i = 0; i < dim; ++i)
-    if (values[i] != p.values[i])
+    if (numbers::values_are_not_equal(values[i], p.values[i]))
       return false;
   return true;
 }
