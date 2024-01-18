@@ -1111,6 +1111,688 @@ protected:
   const bool is_interior;
 };
 
+
+
+/**
+ * This class provides an interface to the evaluation of interpolated solution
+ * values and gradients on cells on arbitrary reference point positions. These
+ * points can change from cell to cell, both with respect to their quantity as
+ * well to the location. The two typical use cases are evaluations on
+ * non-matching grids and particle simulations.
+ *
+ * The use of this class is similar to FEValues or FEEvaluation: The class is
+ * first initialized to a cell by calling `FEPointEvaluation::reinit(cell,
+ * unit_points)`, with the main difference to the other concepts that the
+ * underlying points in reference coordinates need to be passed along. Then,
+ * upon call to evaluate() or integrate(), the user can compute information at
+ * the give points. Eventually, the access functions get_value() or
+ * get_gradient() allow to query this information at a specific point index.
+ *
+ * The functionality is similar to creating an FEValues object with a
+ * Quadrature object on the `unit_points` on every cell separately and then
+ * calling FEValues::get_function_values or FEValues::get_function_gradients,
+ * and for some elements and mappings this is what actually happens
+ * internally. For specific combinations of Mapping and FiniteElement
+ * realizations, however, there is a much more efficient implementation that
+ * avoids the memory allocation and other expensive start-up cost of
+ * FEValues. Currently, the functionality is specialized for mappings derived
+ * from MappingQ and MappingCartesian and for finite elements with tensor
+ * product structure that work with the
+ * @ref matrixfree
+ * module. In those cases, the cost implied
+ * by this class is similar (or sometimes even somewhat lower) than using
+ * `FEValues::reinit(cell)` followed by `FEValues::get_function_gradients`.
+ */
+template <int n_components_,
+          int dim,
+          int spacedim    = dim,
+          typename Number = double>
+class FEPointEvaluation
+  : public FEPointEvaluationBase<n_components_, dim, spacedim, Number>
+{
+public:
+  static constexpr unsigned int dimension    = dim;
+  static constexpr unsigned int n_components = n_components_;
+
+  using number_type = Number;
+
+  using ScalarNumber =
+    typename internal::VectorizedArrayTrait<Number>::value_type;
+  using VectorizedArrayType = typename dealii::internal::VectorizedArrayTrait<
+    Number>::vectorized_value_type;
+  using ETT = typename internal::FEPointEvaluation::
+    EvaluatorTypeTraits<dim, n_components, Number>;
+  using value_type            = typename ETT::value_type;
+  using scalar_value_type     = typename ETT::scalar_value_type;
+  using vectorized_value_type = typename ETT::vectorized_value_type;
+  using gradient_type         = typename ETT::gradient_type;
+  using interface_vectorized_gradient_type =
+    typename ETT::interface_vectorized_gradient_type;
+
+  /**
+   * Constructor.
+   *
+   * @param mapping The Mapping class describing the actual geometry of a cell
+   * passed to the evaluate() function.
+   *
+   * @param fe The FiniteElement object that is used for the evaluation, which
+   * is typically the same on all cells to be evaluated.
+   *
+   * @param update_flags Specify the quantities to be computed by the mapping
+   * during the call of reinit(). During evaluate() or integrate(), this data
+   * is queried to produce the desired result (e.g., the gradient of a finite
+   * element solution).
+   *
+   * @param first_selected_component For multi-component FiniteElement
+   * objects, this parameter allows to select a range of `n_components`
+   * components starting from this parameter.
+   */
+  FEPointEvaluation(const Mapping<dim>       &mapping,
+                    const FiniteElement<dim> &fe,
+                    const UpdateFlags         update_flags,
+                    const unsigned int        first_selected_component = 0);
+
+  /**
+   * Constructor to make the present class able to re-use the geometry
+   * data also used by other `FEPointEvaluation` objects.
+   *
+   * @param mapping_info The MappingInfo class describes the geometry-related
+   * data for evaluating finite-element solutions. This object enables to
+   * construct such an object on the outside, possibly re-using it between
+   * several objects or between several calls to the same cell and unit points.
+   *
+   * @param fe The FiniteElement object that is used for the evaluation, which
+   * is typically the same on all cells to be evaluated.
+   *
+   * @param first_selected_component For multi-component FiniteElement
+   * objects, this parameter allows to select a range of `n_components`
+   * components starting from this parameter.
+   */
+  FEPointEvaluation(
+    NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
+    const FiniteElement<dim>                        &fe,
+    const unsigned int first_selected_component = 0);
+
+  /**
+   * Set up the mapping information for the given cell, e.g., by computing the
+   * Jacobian of the mapping for the given points if gradients of the functions
+   * are requested.
+   *
+   * @param[in] cell An iterator to the current cell
+   *
+   * @param[in] unit_points List of points in the reference locations of the
+   * current cell where the FiniteElement object should be
+   * evaluated/integrated in the evaluate() and integrate() functions.
+   */
+  void
+  reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+         const ArrayView<const Point<dim>> &unit_points);
+
+  /**
+   * Reinitialize the evaluator to point to the correct precomputed mapping of
+   * the single cell in the MappingInfo object.
+   */
+  void
+  reinit();
+
+  /**
+   * Reinitialize the evaluator to point to the correct precomputed mapping of
+   * the cell in the MappingInfo object.
+   */
+  void
+  reinit(const unsigned int cell_index);
+
+
+  /**
+   * This function interpolates the finite element solution, represented by
+   * `solution_values`, on the cell and `unit_points` passed to reinit().
+   *
+   * @param[in] solution_values This array is supposed to contain the unknown
+   * values on the element read out by
+   * `FEEvaluation::read_dof_values(global_vector)`.
+   *
+   * @param[in] evaluation_flags Flags specifying which quantities should be
+   * evaluated at the points.
+   */
+  template <std::size_t stride_view>
+  void
+  evaluate(
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
+
+  /**
+   * This function interpolates the finite element solution, represented by
+   * `solution_values`, on the cell and `unit_points` passed to reinit().
+   *
+   * @param[in] solution_values This array is supposed to contain the unknown
+   * values on the element as returned by `cell->get_dof_values(global_vector,
+   * solution_values)`.
+   *
+   * @param[in] evaluation_flags Flags specifying which quantities should be
+   * evaluated at the points.
+   */
+  void
+  evaluate(const ArrayView<const ScalarNumber>    &solution_values,
+           const EvaluationFlags::EvaluationFlags &evaluation_flags);
+
+  /**
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points multiplied be
+   * the Jacobian determinant times the quadrature weight (JxW).
+   *
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used during
+   * `FEEvaluation::set_dof_values(global_vector)` or
+   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   * @param[in] sum_into_values Flag specifying if the integrated values
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
+   *
+   */
+  template <std::size_t stride_view>
+  void
+  integrate(const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+            const EvaluationFlags::EvaluationFlags &integration_flags,
+            const bool                              sum_into_values = false);
+
+  /**
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points multiplied be
+   * the Jacobian determinant times the quadrature weight (JxW).
+   *
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used to during
+   * `cell->set_dof_values(solution_values, global_vector)` or
+   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   * @param[in] sum_into_values Flag specifying if the integrated values
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
+   *
+   */
+  void
+  integrate(const ArrayView<ScalarNumber>          &solution_values,
+            const EvaluationFlags::EvaluationFlags &integration_flags,
+            const bool                              sum_into_values = false);
+
+  /**
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points. This is
+   * similar to the integration of a bilinear form in terms of the test
+   * function, with the difference that this formula does not include a `JxW`
+   * factor (in contrast to the integrate function of this class). This allows
+   * the class to naturally embed point information (e.g. particles) into a
+   * finite element formulation.
+   *
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used during
+   * `FEEvaluation::set_dof_values(global_vector)` or
+   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   * @param[in] sum_into_values Flag specifying if the integrated values
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
+   *
+   */
+  template <std::size_t stride_view>
+  void
+  test_and_sum(
+    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags            &integration_flags,
+    const bool                                         sum_into_values = false);
+
+  /**
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points. This is
+   * similar to the integration of a bilinear form in terms of the test
+   * function, with the difference that this formula does not include a `JxW`
+   * factor (in contrast to the integrate function of this class). This allows
+   * the class to naturally embed point information (e.g. particles) into a
+   * finite element formulation.
+   *
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used during
+   * `cell->set_dof_values(solution_values, global_vector)` or
+   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   * @param[in] sum_into_values Flag specifying if the integrated values
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
+   *
+   */
+  void
+  test_and_sum(const ArrayView<ScalarNumber>          &solution_values,
+               const EvaluationFlags::EvaluationFlags &integration_flags,
+               const bool                              sum_into_values = false);
+
+  /**
+   * Return the normal vector. This class or the MappingInfo object passed to
+   * this function needs to be constructed with UpdateFlags containing
+   * `update_normal_vectors`.
+   */
+  Tensor<1, spacedim, Number>
+  normal_vector(const unsigned int point_index) const;
+
+private:
+  static constexpr std::size_t n_lanes_user_interface =
+    internal::VectorizedArrayTrait<Number>::width();
+  static constexpr std::size_t n_lanes_internal =
+    internal::VectorizedArrayTrait<VectorizedArrayType>::width();
+  static constexpr std::size_t stride =
+    internal::VectorizedArrayTrait<Number>::stride();
+
+  /**
+   * Resizes necessary data fields, reads in and renumbers solution values.
+   * Interpolates onto face if face path is selected.
+   */
+  template <bool is_linear, std::size_t stride_view>
+  void
+  prepare_evaluate_fast(
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values);
+
+  /**
+   * Evaluates the actual interpolation on the cell or face for a quadrature
+   * batch.
+   */
+  template <bool is_linear, std::size_t stride_view>
+  void
+  compute_evaluate_fast(
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
+    const unsigned int                                       n_shapes,
+    const unsigned int                                       qb,
+    vectorized_value_type                                   &value,
+    interface_vectorized_gradient_type                      &gradient);
+
+  /**
+   * Fast path of the evaluate function.
+   */
+  template <bool is_linear, std::size_t stride_view>
+  void
+  evaluate_fast(
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
+
+  /**
+   * Slow path of the evaluate function using FEValues.
+   */
+  template <std::size_t stride_view>
+  void
+  evaluate_slow(
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
+
+  /**
+   * Integrates the product of the data passed in by submit_value() and
+   * submit_gradient() with the values or gradients of test functions on the
+   * cell or face for a given quadrature batch.
+   */
+  template <bool is_linear>
+  void
+  compute_integrate_fast(
+    const EvaluationFlags::EvaluationFlags  &integration_flags,
+    const unsigned int                       n_shapes,
+    const unsigned int                       qb,
+    const vectorized_value_type              value,
+    const interface_vectorized_gradient_type gradient,
+    vectorized_value_type                   *solution_values_vectorized_linear);
+
+  /**
+   * Addition across the lanes of VectorizedArray as accumulated by the
+   * compute_integrate_fast_function(), writing the sum into the result vector.
+   * Applies face contributions to cell contributions for face path.
+   */
+  template <bool is_linear, std::size_t stride_view>
+  void
+  finish_integrate_fast(
+    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+    vectorized_value_type *solution_values_vectorized_linear,
+    const bool             sum_into_values);
+
+  /**
+   * Fast path of the integrate function.
+   */
+  template <bool do_JxW, bool is_linear, std::size_t stride_view>
+  void
+  integrate_fast(
+    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags            &integration_flags,
+    const bool                                         sum_into_values);
+
+  /**
+   * Slow path of the integrate function using FEValues.
+   */
+  template <bool do_JxW, std::size_t stride_view>
+  void
+  integrate_slow(
+    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags            &integration_flags,
+    const bool                                         sum_into_values);
+
+  /**
+   * Implementation of the integrate/test_and_sum function.
+   */
+  template <bool do_JxW, std::size_t stride_view>
+  void
+  do_integrate(
+    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags            &integration_flags,
+    const bool                                         sum_into_values);
+};
+
+
+
+/**
+ * This class provides an interface to the evaluation of interpolated solution
+ * values and gradients on faces on arbitrary reference point positions. These
+ * points can change from face to face, both with respect to their quantity as
+ * well to the location. A typical use case is evaluations on non-matching
+ * grids.
+ *
+ * The use of this class is similar to FEEvaluation: In the constructor, a
+ * reference to a NonMatching::MappingInfo object is passed, where the
+ * quadrature points in reference position is stored together with the mapping
+ * information. The class is then reinitialized to a cell by calling
+ * `FEFacePointEvaluation::reinit(face_index)` or
+ * `FEFacePointEvaluation::reinit(cell_index, face_number)`. Then, upon call to
+ * evaluate() or integrate(), the user can compute information at the given
+ * points. Eventually, the access functions get_value() or get_gradient() allow
+ * to query this information at a specific point index.
+ */
+template <int n_components_,
+          int dim,
+          int spacedim    = dim,
+          typename Number = double>
+class FEFacePointEvaluation
+  : public FEPointEvaluationBase<n_components_, dim, spacedim, Number>
+{
+public:
+  static constexpr unsigned int dimension    = dim;
+  static constexpr unsigned int n_components = n_components_;
+
+  using number_type = Number;
+
+  using ScalarNumber =
+    typename internal::VectorizedArrayTrait<Number>::value_type;
+  using VectorizedArrayType = typename dealii::internal::VectorizedArrayTrait<
+    Number>::vectorized_value_type;
+  using ETT = typename internal::FEPointEvaluation::
+    EvaluatorTypeTraits<dim, n_components, Number>;
+  using value_type            = typename ETT::value_type;
+  using scalar_value_type     = typename ETT::scalar_value_type;
+  using vectorized_value_type = typename ETT::vectorized_value_type;
+  using gradient_type         = typename ETT::gradient_type;
+  using interface_vectorized_gradient_type =
+    typename ETT::interface_vectorized_gradient_type;
+
+  /**
+   * Constructor. Allows to select if interior or exterior face is selected.
+   */
+  FEFacePointEvaluation(
+    NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
+    const FiniteElement<dim>                        &fe,
+    const bool                                       is_interior = true,
+    const unsigned int first_selected_component                  = 0);
+
+  /**
+   * Reinitialize the evaluator to point to the correct precomputed mapping of
+   * the face in the MappingInfo object. Used in element-centric loops (ECL).
+   */
+  void
+  reinit(const unsigned int cell_index, const unsigned int face_number);
+
+  /**
+   * Reinitialize the evaluator to point to the correct precomputed mapping of
+   * the face in the MappingInfo object. Used in face-centric loops (FCL).
+   */
+  void
+  reinit(const unsigned int face_index);
+
+  /**
+   * This function interpolates the finite element solution, represented by
+   * `solution_values`, on the cell and `unit_points` passed to reinit().
+   *
+   * @param[in] solution_values This array is supposed to contain the unknown
+   * values on the element read out by
+   * `FEEvaluation::read_dof_values(global_vector)`.
+   *
+   * @param[in] evaluation_flags Flags specifying which quantities should be
+   * evaluated at the points.
+   */
+  template <std::size_t stride_view>
+  void
+  evaluate(
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
+
+  /**
+   * This function interpolates the finite element solution, represented by
+   * `solution_values`, on the cell and `unit_points` passed to reinit().
+   *
+   * @param[in] solution_values This array is supposed to contain the unknown
+   * values on the element as returned by `cell->get_dof_values(global_vector,
+   * solution_values)`.
+   *
+   * @param[in] evaluation_flags Flags specifying which quantities should be
+   * evaluated at the points.
+   */
+  void
+  evaluate(const ArrayView<const ScalarNumber>    &solution_values,
+           const EvaluationFlags::EvaluationFlags &evaluation_flags);
+
+  /**
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points multiplied be
+   * the Jacobian determinant times the quadrature weight (JxW).
+   *
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used during
+   * `FEEvaluation::set_dof_values(global_vector)` or
+   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   * @param[in] sum_into_values Flag specifying if the integrated values
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
+   *
+   */
+  template <std::size_t stride_view>
+  void
+  integrate(const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+            const EvaluationFlags::EvaluationFlags &integration_flags,
+            const bool                              sum_into_values = false);
+
+  /**
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points multiplied be
+   * the Jacobian determinant times the quadrature weight (JxW).
+   *
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used to during
+   * `cell->set_dof_values(solution_values, global_vector)` or
+   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   * @param[in] sum_into_values Flag specifying if the integrated values
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
+   *
+   */
+  void
+  integrate(const ArrayView<ScalarNumber>          &solution_values,
+            const EvaluationFlags::EvaluationFlags &integration_flags,
+            const bool                              sum_into_values = false);
+
+  /**
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points multiplied be
+   * the Jacobian determinant times the quadrature weight (JxW).
+   *
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used during
+   * `FEEvaluation::set_dof_values(global_vector)` or
+   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   * @param[in] sum_into_values Flag specifying if the integrated values
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
+   *
+   */
+  template <std::size_t stride_view>
+  void
+  test_and_sum(
+    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags            &integration_flags,
+    const bool                                         sum_into_values = false);
+
+  /**
+   * This function multiplies the quantities passed in by previous
+   * submit_value() or submit_gradient() calls by the value or gradient of the
+   * test functions, and performs summation over all given points multiplied be
+   * the Jacobian determinant times the quadrature weight (JxW).
+   *
+   * @param[out] solution_values This array will contain the result of the
+   * integral, which can be used to during
+   * `cell->set_dof_values(solution_values, global_vector)` or
+   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
+   * that for multi-component systems where only some of the components are
+   * selected by the present class, the entries in `solution_values` not touched
+   * by this class will be set to zero.
+   *
+   * @param[in] integration_flags Flags specifying which quantities should be
+   * integrated at the points.
+   *
+   * @param[in] sum_into_values Flag specifying if the integrated values
+   * should be summed into the solution values. For the default value
+   * `sum_into_values=false` every value of @p solution_values is zeroed out.
+   *
+   */
+  void
+  test_and_sum(const ArrayView<ScalarNumber>          &solution_values,
+               const EvaluationFlags::EvaluationFlags &integration_flags,
+               const bool                              sum_into_values = false);
+
+  /**
+   * Evaluate values and gradients in face for the selected face (lane) of the
+   * batch. Default stride into the face dofs is width of
+   * VectorizedArray<selected_floating_point_type> which is the default
+   * vectorization over faces for FEFaceEvaluation.
+   */
+  template <int stride_face_dof = VectorizedArrayType::size()>
+  void
+  evaluate_in_face(const ScalarNumber                     *face_dof_values,
+                   const EvaluationFlags::EvaluationFlags &evaluation_flags);
+
+  /**
+   * Integrate values and gradients in face for the selected face (lane) of the
+   * batch. Default stride into the face dofs is width of
+   * VectorizedArray<selected_floating_point_type> which is the default
+   * vectorization over faces for FEFaceEvaluation.
+   */
+  template <int stride_face_dof = VectorizedArrayType::size()>
+  void
+  integrate_in_face(ScalarNumber                           *face_dof_values,
+                    const EvaluationFlags::EvaluationFlags &integration_flags,
+                    const bool sum_into_values = false);
+
+  /**
+   * Return the normal vector. This class or the MappingInfo object passed to
+   * this function needs to be constructed with UpdateFlags containing
+   * `update_normal_vectors`.
+   */
+  Tensor<1, spacedim, Number>
+  normal_vector(const unsigned int point_index) const;
+
+private:
+  static constexpr std::size_t n_lanes_user_interface =
+    internal::VectorizedArrayTrait<Number>::width();
+  static constexpr std::size_t n_lanes_internal =
+    internal::VectorizedArrayTrait<VectorizedArrayType>::width();
+  static constexpr std::size_t stride =
+    internal::VectorizedArrayTrait<Number>::stride();
+
+  template <bool is_linear, std::size_t stride_view>
+  void
+  do_evaluate(
+    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
+
+  template <bool do_JxW, bool is_linear, std::size_t stride_view>
+  void
+  do_integrate(
+    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
+    const EvaluationFlags::EvaluationFlags            &integration_flags,
+    const bool                                         sum_into_values);
+
+  /**
+   * Actually does the evaluation templated on the chosen code path (linear or
+   * higher order).
+   */
+  template <bool is_linear, int stride_face_dof>
+  void
+  do_evaluate_in_face(const ScalarNumber                     *face_dof_values,
+                      const EvaluationFlags::EvaluationFlags &evaluation_flags);
+
+  /**
+   * Actually does the integration templated on the chosen code path (linear or
+   * higher order).
+   */
+  template <bool do_JxW, bool is_linear, int stride_face_dof>
+  void
+  do_integrate_in_face(
+    ScalarNumber                           *face_dof_values,
+    const EvaluationFlags::EvaluationFlags &integration_flags,
+    const bool                              sum_into_values);
+};
+
 // ----------------------- template and inline function ----------------------
 
 
@@ -1601,408 +2283,31 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::
 
 
 
-/**
- * This class provides an interface to the evaluation of interpolated solution
- * values and gradients on cells on arbitrary reference point positions. These
- * points can change from cell to cell, both with respect to their quantity as
- * well to the location. The two typical use cases are evaluations on
- * non-matching grids and particle simulations.
- *
- * The use of this class is similar to FEValues or FEEvaluation: The class is
- * first initialized to a cell by calling `FEPointEvaluation::reinit(cell,
- * unit_points)`, with the main difference to the other concepts that the
- * underlying points in reference coordinates need to be passed along. Then,
- * upon call to evaluate() or integrate(), the user can compute information at
- * the give points. Eventually, the access functions get_value() or
- * get_gradient() allow to query this information at a specific point index.
- *
- * The functionality is similar to creating an FEValues object with a
- * Quadrature object on the `unit_points` on every cell separately and then
- * calling FEValues::get_function_values or FEValues::get_function_gradients,
- * and for some elements and mappings this is what actually happens
- * internally. For specific combinations of Mapping and FiniteElement
- * realizations, however, there is a much more efficient implementation that
- * avoids the memory allocation and other expensive start-up cost of
- * FEValues. Currently, the functionality is specialized for mappings derived
- * from MappingQ and MappingCartesian and for finite elements with tensor
- * product structure that work with the
- * @ref matrixfree
- * module. In those cases, the cost implied
- * by this class is similar (or sometimes even somewhat lower) than using
- * `FEValues::reinit(cell)` followed by `FEValues::get_function_gradients`.
- */
-template <int n_components_,
-          int dim,
-          int spacedim    = dim,
-          typename Number = double>
-class FEPointEvaluation
-  : public FEPointEvaluationBase<n_components_, dim, spacedim, Number>
-{
-public:
-  static constexpr unsigned int dimension    = dim;
-  static constexpr unsigned int n_components = n_components_;
-
-  using number_type = Number;
-
-  using ScalarNumber =
-    typename internal::VectorizedArrayTrait<Number>::value_type;
-  using VectorizedArrayType = typename dealii::internal::VectorizedArrayTrait<
-    Number>::vectorized_value_type;
-  using ETT = typename internal::FEPointEvaluation::
-    EvaluatorTypeTraits<dim, n_components, Number>;
-  using value_type            = typename ETT::value_type;
-  using scalar_value_type     = typename ETT::scalar_value_type;
-  using vectorized_value_type = typename ETT::vectorized_value_type;
-  using gradient_type         = typename ETT::gradient_type;
-  using interface_vectorized_gradient_type =
-    typename ETT::interface_vectorized_gradient_type;
-
-  /**
-   * Constructor.
-   *
-   * @param mapping The Mapping class describing the actual geometry of a cell
-   * passed to the evaluate() function.
-   *
-   * @param fe The FiniteElement object that is used for the evaluation, which
-   * is typically the same on all cells to be evaluated.
-   *
-   * @param update_flags Specify the quantities to be computed by the mapping
-   * during the call of reinit(). During evaluate() or integrate(), this data
-   * is queried to produce the desired result (e.g., the gradient of a finite
-   * element solution).
-   *
-   * @param first_selected_component For multi-component FiniteElement
-   * objects, this parameter allows to select a range of `n_components`
-   * components starting from this parameter.
-   */
-  FEPointEvaluation(const Mapping<dim>       &mapping,
-                    const FiniteElement<dim> &fe,
-                    const UpdateFlags         update_flags,
-                    const unsigned int        first_selected_component = 0)
-    : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
-        mapping,
-        fe,
-        update_flags,
-        first_selected_component)
-  {}
-
-  /**
-   * Constructor to make the present class able to re-use the geometry
-   * data also used by other `FEPointEvaluation` objects.
-   *
-   * @param mapping_info The MappingInfo class describes the geometry-related
-   * data for evaluating finite-element solutions. This object enables to
-   * construct such an object on the outside, possibly re-using it between
-   * several objects or between several calls to the same cell and unit points.
-   *
-   * @param fe The FiniteElement object that is used for the evaluation, which
-   * is typically the same on all cells to be evaluated.
-   *
-   * @param first_selected_component For multi-component FiniteElement
-   * objects, this parameter allows to select a range of `n_components`
-   * components starting from this parameter.
-   */
-  FEPointEvaluation(
-    NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim>                        &fe,
-    const unsigned int first_selected_component = 0)
-    : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
-        mapping_info,
-        fe,
-        first_selected_component)
-  {}
-
-  /**
-   * Set up the mapping information for the given cell, e.g., by computing the
-   * Jacobian of the mapping for the given points if gradients of the functions
-   * are requested.
-   *
-   * @param[in] cell An iterator to the current cell
-   *
-   * @param[in] unit_points List of points in the reference locations of the
-   * current cell where the FiniteElement object should be
-   * evaluated/integrated in the evaluate() and integrate() functions.
-   */
-  void
-  reinit(const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-         const ArrayView<const Point<dim>> &unit_points);
-
-  /**
-   * Reinitialize the evaluator to point to the correct precomputed mapping of
-   * the single cell in the MappingInfo object.
-   */
-  void
-  reinit();
-
-  /**
-   * Reinitialize the evaluator to point to the correct precomputed mapping of
-   * the cell in the MappingInfo object.
-   */
-  void
-  reinit(const unsigned int cell_index);
+template <int n_components_, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
+  NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
+  const FiniteElement<dim>                        &fe,
+  const unsigned int                               first_selected_component)
+  : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
+      mapping_info,
+      fe,
+      first_selected_component)
+{}
 
 
-  /**
-   * This function interpolates the finite element solution, represented by
-   * `solution_values`, on the cell and `unit_points` passed to reinit().
-   *
-   * @param[in] solution_values This array is supposed to contain the unknown
-   * values on the element read out by
-   * `FEEvaluation::read_dof_values(global_vector)`.
-   *
-   * @param[in] evaluation_flags Flags specifying which quantities should be
-   * evaluated at the points.
-   */
-  template <std::size_t stride_view>
-  void
-  evaluate(
-    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
 
-  /**
-   * This function interpolates the finite element solution, represented by
-   * `solution_values`, on the cell and `unit_points` passed to reinit().
-   *
-   * @param[in] solution_values This array is supposed to contain the unknown
-   * values on the element as returned by `cell->get_dof_values(global_vector,
-   * solution_values)`.
-   *
-   * @param[in] evaluation_flags Flags specifying which quantities should be
-   * evaluated at the points.
-   */
-  void
-  evaluate(const ArrayView<const ScalarNumber>    &solution_values,
-           const EvaluationFlags::EvaluationFlags &evaluation_flags);
-
-  /**
-   * This function multiplies the quantities passed in by previous
-   * submit_value() or submit_gradient() calls by the value or gradient of the
-   * test functions, and performs summation over all given points multiplied be
-   * the Jacobian determinant times the quadrature weight (JxW).
-   *
-   * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used during
-   * `FEEvaluation::set_dof_values(global_vector)` or
-   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
-   *
-   * @param[in] integration_flags Flags specifying which quantities should be
-   * integrated at the points.
-   *
-   * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
-   *
-   */
-  template <std::size_t stride_view>
-  void
-  integrate(const StridedArrayView<ScalarNumber, stride_view> &solution_values,
-            const EvaluationFlags::EvaluationFlags &integration_flags,
-            const bool                              sum_into_values = false);
-
-  /**
-   * This function multiplies the quantities passed in by previous
-   * submit_value() or submit_gradient() calls by the value or gradient of the
-   * test functions, and performs summation over all given points multiplied be
-   * the Jacobian determinant times the quadrature weight (JxW).
-   *
-   * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used to during
-   * `cell->set_dof_values(solution_values, global_vector)` or
-   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
-   *
-   * @param[in] integration_flags Flags specifying which quantities should be
-   * integrated at the points.
-   *
-   * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
-   *
-   */
-  void
-  integrate(const ArrayView<ScalarNumber>          &solution_values,
-            const EvaluationFlags::EvaluationFlags &integration_flags,
-            const bool                              sum_into_values = false);
-
-  /**
-   * This function multiplies the quantities passed in by previous
-   * submit_value() or submit_gradient() calls by the value or gradient of the
-   * test functions, and performs summation over all given points. This is
-   * similar to the integration of a bilinear form in terms of the test
-   * function, with the difference that this formula does not include a `JxW`
-   * factor (in contrast to the integrate function of this class). This allows
-   * the class to naturally embed point information (e.g. particles) into a
-   * finite element formulation.
-   *
-   * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used during
-   * `FEEvaluation::set_dof_values(global_vector)` or
-   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
-   *
-   * @param[in] integration_flags Flags specifying which quantities should be
-   * integrated at the points.
-   *
-   * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
-   *
-   */
-  template <std::size_t stride_view>
-  void
-  test_and_sum(
-    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags            &integration_flags,
-    const bool                                         sum_into_values = false);
-
-  /**
-   * This function multiplies the quantities passed in by previous
-   * submit_value() or submit_gradient() calls by the value or gradient of the
-   * test functions, and performs summation over all given points. This is
-   * similar to the integration of a bilinear form in terms of the test
-   * function, with the difference that this formula does not include a `JxW`
-   * factor (in contrast to the integrate function of this class). This allows
-   * the class to naturally embed point information (e.g. particles) into a
-   * finite element formulation.
-   *
-   * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used during
-   * `cell->set_dof_values(solution_values, global_vector)` or
-   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
-   *
-   * @param[in] integration_flags Flags specifying which quantities should be
-   * integrated at the points.
-   *
-   * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
-   *
-   */
-  void
-  test_and_sum(const ArrayView<ScalarNumber>          &solution_values,
-               const EvaluationFlags::EvaluationFlags &integration_flags,
-               const bool                              sum_into_values = false);
-
-  /**
-   * Return the normal vector. This class or the MappingInfo object passed to
-   * this function needs to be constructed with UpdateFlags containing
-   * `update_normal_vectors`.
-   */
-  Tensor<1, spacedim, Number>
-  normal_vector(const unsigned int point_index) const;
-
-private:
-  static constexpr std::size_t n_lanes_user_interface =
-    internal::VectorizedArrayTrait<Number>::width();
-  static constexpr std::size_t n_lanes_internal =
-    internal::VectorizedArrayTrait<VectorizedArrayType>::width();
-  static constexpr std::size_t stride =
-    internal::VectorizedArrayTrait<Number>::stride();
-
-  /**
-   * Resizes necessary data fields, reads in and renumbers solution values.
-   * Interpolates onto face if face path is selected.
-   */
-  template <bool is_linear, std::size_t stride_view>
-  void
-  prepare_evaluate_fast(
-    const StridedArrayView<const ScalarNumber, stride_view> &solution_values);
-
-  /**
-   * Evaluates the actual interpolation on the cell or face for a quadrature
-   * batch.
-   */
-  template <bool is_linear, std::size_t stride_view>
-  void
-  compute_evaluate_fast(
-    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags,
-    const unsigned int                                       n_shapes,
-    const unsigned int                                       qb,
-    vectorized_value_type                                   &value,
-    interface_vectorized_gradient_type                      &gradient);
-
-  /**
-   * Fast path of the evaluate function.
-   */
-  template <bool is_linear, std::size_t stride_view>
-  void
-  evaluate_fast(
-    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
-
-  /**
-   * Slow path of the evaluate function using FEValues.
-   */
-  template <std::size_t stride_view>
-  void
-  evaluate_slow(
-    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
-
-  /**
-   * Integrates the product of the data passed in by submit_value() and
-   * submit_gradient() with the values or gradients of test functions on the
-   * cell or face for a given quadrature batch.
-   */
-  template <bool is_linear>
-  void
-  compute_integrate_fast(
-    const EvaluationFlags::EvaluationFlags  &integration_flags,
-    const unsigned int                       n_shapes,
-    const unsigned int                       qb,
-    const vectorized_value_type              value,
-    const interface_vectorized_gradient_type gradient,
-    vectorized_value_type                   *solution_values_vectorized_linear);
-
-  /**
-   * Addition across the lanes of VectorizedArray as accumulated by the
-   * compute_integrate_fast_function(), writing the sum into the result vector.
-   * Applies face contributions to cell contributions for face path.
-   */
-  template <bool is_linear, std::size_t stride_view>
-  void
-  finish_integrate_fast(
-    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
-    vectorized_value_type *solution_values_vectorized_linear,
-    const bool             sum_into_values);
-
-  /**
-   * Fast path of the integrate function.
-   */
-  template <bool do_JxW, bool is_linear, std::size_t stride_view>
-  void
-  integrate_fast(
-    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags            &integration_flags,
-    const bool                                         sum_into_values);
-
-  /**
-   * Slow path of the integrate function using FEValues.
-   */
-  template <bool do_JxW, std::size_t stride_view>
-  void
-  integrate_slow(
-    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags            &integration_flags,
-    const bool                                         sum_into_values);
-
-  /**
-   * Implementation of the integrate/test_and_sum function.
-   */
-  template <bool do_JxW, std::size_t stride_view>
-  void
-  do_integrate(
-    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags            &integration_flags,
-    const bool                                         sum_into_values);
-};
+template <int n_components_, int dim, int spacedim, typename Number>
+FEPointEvaluation<n_components_, dim, spacedim, Number>::FEPointEvaluation(
+  const Mapping<dim>       &mapping,
+  const FiniteElement<dim> &fe,
+  const UpdateFlags         update_flags,
+  const unsigned int        first_selected_component)
+  : FEPointEvaluationBase<n_components_, dim, spacedim, Number>(
+      mapping,
+      fe,
+      update_flags,
+      first_selected_component)
+{}
 
 
 
@@ -2763,286 +3068,6 @@ FEPointEvaluation<n_components_, dim, spacedim, Number>::normal_vector(
   else
     return -this->normal_ptr[point_index];
 }
-
-
-
-/**
- * This class provides an interface to the evaluation of interpolated solution
- * values and gradients on faces on arbitrary reference point positions. These
- * points can change from face to face, both with respect to their quantity as
- * well to the location. A typical use case is evaluations on non-matching
- * grids.
- *
- * The use of this class is similar to FEEvaluation: In the constructor, a
- * reference to a NonMatching::MappingInfo object is passed, where the
- * quadrature points in reference position is stored together with the mapping
- * information. The class is then reinitialized to a cell by calling
- * `FEFacePointEvaluation::reinit(face_index)` or
- * `FEFacePointEvaluation::reinit(cell_index, face_number)`. Then, upon call to
- * evaluate() or integrate(), the user can compute information at the given
- * points. Eventually, the access functions get_value() or get_gradient() allow
- * to query this information at a specific point index.
- */
-template <int n_components_,
-          int dim,
-          int spacedim    = dim,
-          typename Number = double>
-class FEFacePointEvaluation
-  : public FEPointEvaluationBase<n_components_, dim, spacedim, Number>
-{
-public:
-  static constexpr unsigned int dimension    = dim;
-  static constexpr unsigned int n_components = n_components_;
-
-  using number_type = Number;
-
-  using ScalarNumber =
-    typename internal::VectorizedArrayTrait<Number>::value_type;
-  using VectorizedArrayType = typename dealii::internal::VectorizedArrayTrait<
-    Number>::vectorized_value_type;
-  using ETT = typename internal::FEPointEvaluation::
-    EvaluatorTypeTraits<dim, n_components, Number>;
-  using value_type            = typename ETT::value_type;
-  using scalar_value_type     = typename ETT::scalar_value_type;
-  using vectorized_value_type = typename ETT::vectorized_value_type;
-  using gradient_type         = typename ETT::gradient_type;
-  using interface_vectorized_gradient_type =
-    typename ETT::interface_vectorized_gradient_type;
-
-  /**
-   * Constructor. Allows to select if interior or exterior face is selected.
-   */
-  FEFacePointEvaluation(
-    NonMatching::MappingInfo<dim, spacedim, Number> &mapping_info,
-    const FiniteElement<dim>                        &fe,
-    const bool                                       is_interior = true,
-    const unsigned int first_selected_component                  = 0);
-
-  /**
-   * Reinitialize the evaluator to point to the correct precomputed mapping of
-   * the face in the MappingInfo object. Used in element-centric loops (ECL).
-   */
-  void
-  reinit(const unsigned int cell_index, const unsigned int face_number);
-
-  /**
-   * Reinitialize the evaluator to point to the correct precomputed mapping of
-   * the face in the MappingInfo object. Used in face-centric loops (FCL).
-   */
-  void
-  reinit(const unsigned int face_index);
-
-  /**
-   * This function interpolates the finite element solution, represented by
-   * `solution_values`, on the cell and `unit_points` passed to reinit().
-   *
-   * @param[in] solution_values This array is supposed to contain the unknown
-   * values on the element read out by
-   * `FEEvaluation::read_dof_values(global_vector)`.
-   *
-   * @param[in] evaluation_flags Flags specifying which quantities should be
-   * evaluated at the points.
-   */
-  template <std::size_t stride_view>
-  void
-  evaluate(
-    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
-
-  /**
-   * This function interpolates the finite element solution, represented by
-   * `solution_values`, on the cell and `unit_points` passed to reinit().
-   *
-   * @param[in] solution_values This array is supposed to contain the unknown
-   * values on the element as returned by `cell->get_dof_values(global_vector,
-   * solution_values)`.
-   *
-   * @param[in] evaluation_flags Flags specifying which quantities should be
-   * evaluated at the points.
-   */
-  void
-  evaluate(const ArrayView<const ScalarNumber>    &solution_values,
-           const EvaluationFlags::EvaluationFlags &evaluation_flags);
-
-  /**
-   * This function multiplies the quantities passed in by previous
-   * submit_value() or submit_gradient() calls by the value or gradient of the
-   * test functions, and performs summation over all given points multiplied be
-   * the Jacobian determinant times the quadrature weight (JxW).
-   *
-   * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used during
-   * `FEEvaluation::set_dof_values(global_vector)` or
-   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
-   *
-   * @param[in] integration_flags Flags specifying which quantities should be
-   * integrated at the points.
-   *
-   * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
-   *
-   */
-  template <std::size_t stride_view>
-  void
-  integrate(const StridedArrayView<ScalarNumber, stride_view> &solution_values,
-            const EvaluationFlags::EvaluationFlags &integration_flags,
-            const bool                              sum_into_values = false);
-
-  /**
-   * This function multiplies the quantities passed in by previous
-   * submit_value() or submit_gradient() calls by the value or gradient of the
-   * test functions, and performs summation over all given points multiplied be
-   * the Jacobian determinant times the quadrature weight (JxW).
-   *
-   * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used to during
-   * `cell->set_dof_values(solution_values, global_vector)` or
-   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
-   *
-   * @param[in] integration_flags Flags specifying which quantities should be
-   * integrated at the points.
-   *
-   * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
-   *
-   */
-  void
-  integrate(const ArrayView<ScalarNumber>          &solution_values,
-            const EvaluationFlags::EvaluationFlags &integration_flags,
-            const bool                              sum_into_values = false);
-
-  /**
-   * This function multiplies the quantities passed in by previous
-   * submit_value() or submit_gradient() calls by the value or gradient of the
-   * test functions, and performs summation over all given points multiplied be
-   * the Jacobian determinant times the quadrature weight (JxW).
-   *
-   * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used during
-   * `FEEvaluation::set_dof_values(global_vector)` or
-   * `FEEvaluation::distribute_local_to_global(global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
-   *
-   * @param[in] integration_flags Flags specifying which quantities should be
-   * integrated at the points.
-   *
-   * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
-   *
-   */
-  template <std::size_t stride_view>
-  void
-  test_and_sum(
-    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags            &integration_flags,
-    const bool                                         sum_into_values = false);
-
-  /**
-   * This function multiplies the quantities passed in by previous
-   * submit_value() or submit_gradient() calls by the value or gradient of the
-   * test functions, and performs summation over all given points multiplied be
-   * the Jacobian determinant times the quadrature weight (JxW).
-   *
-   * @param[out] solution_values This array will contain the result of the
-   * integral, which can be used to during
-   * `cell->set_dof_values(solution_values, global_vector)` or
-   * `cell->distribute_local_to_global(solution_values, global_vector)`. Note
-   * that for multi-component systems where only some of the components are
-   * selected by the present class, the entries in `solution_values` not touched
-   * by this class will be set to zero.
-   *
-   * @param[in] integration_flags Flags specifying which quantities should be
-   * integrated at the points.
-   *
-   * @param[in] sum_into_values Flag specifying if the integrated values
-   * should be summed into the solution values. Defaults to false.
-   *
-   */
-  void
-  test_and_sum(const ArrayView<ScalarNumber>          &solution_values,
-               const EvaluationFlags::EvaluationFlags &integration_flags,
-               const bool                              sum_into_values = false);
-
-  /**
-   * Evaluate values and gradients in face for the selected face (lane) of the
-   * batch. Default stride into the face dofs is width of
-   * VectorizedArray<selected_floating_point_type> which is the default
-   * vectorization over faces for FEFaceEvaluation.
-   */
-  template <int stride_face_dof = VectorizedArrayType::size()>
-  void
-  evaluate_in_face(const ScalarNumber                     *face_dof_values,
-                   const EvaluationFlags::EvaluationFlags &evaluation_flags);
-
-  /**
-   * Integrate values and gradients in face for the selected face (lane) of the
-   * batch. Default stride into the face dofs is width of
-   * VectorizedArray<selected_floating_point_type> which is the default
-   * vectorization over faces for FEFaceEvaluation.
-   */
-  template <int stride_face_dof = VectorizedArrayType::size()>
-  void
-  integrate_in_face(ScalarNumber                           *face_dof_values,
-                    const EvaluationFlags::EvaluationFlags &integration_flags,
-                    const bool sum_into_values = false);
-
-  /**
-   * Return the normal vector. This class or the MappingInfo object passed to
-   * this function needs to be constructed with UpdateFlags containing
-   * `update_normal_vectors`.
-   */
-  Tensor<1, spacedim, Number>
-  normal_vector(const unsigned int point_index) const;
-
-private:
-  static constexpr std::size_t n_lanes_user_interface =
-    internal::VectorizedArrayTrait<Number>::width();
-  static constexpr std::size_t n_lanes_internal =
-    internal::VectorizedArrayTrait<VectorizedArrayType>::width();
-  static constexpr std::size_t stride =
-    internal::VectorizedArrayTrait<Number>::stride();
-
-  template <bool is_linear, std::size_t stride_view>
-  void
-  do_evaluate(
-    const StridedArrayView<const ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags                  &evaluation_flags);
-
-  template <bool do_JxW, bool is_linear, std::size_t stride_view>
-  void
-  do_integrate(
-    const StridedArrayView<ScalarNumber, stride_view> &solution_values,
-    const EvaluationFlags::EvaluationFlags            &integration_flags,
-    const bool                                         sum_into_values);
-
-  /**
-   * Actually does the evaluation templated on the chosen code path (linear or
-   * higher order).
-   */
-  template <bool is_linear, int stride_face_dof>
-  void
-  do_evaluate_in_face(const ScalarNumber                     *face_dof_values,
-                      const EvaluationFlags::EvaluationFlags &evaluation_flags);
-
-  /**
-   * Actually does the integration templated on the chosen code path (linear or
-   * higher order).
-   */
-  template <bool do_JxW, bool is_linear, int stride_face_dof>
-  void
-  do_integrate_in_face(
-    ScalarNumber                           *face_dof_values,
-    const EvaluationFlags::EvaluationFlags &integration_flags,
-    const bool                              sum_into_values);
-};
 
 
 

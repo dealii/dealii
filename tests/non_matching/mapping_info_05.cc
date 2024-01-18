@@ -20,8 +20,6 @@
 
 #include <deal.II/base/timer.h>
 
-#include <deal.II/distributed/tria.h>
-
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 
@@ -80,7 +78,7 @@ test_dg_ecl(const unsigned int degree, const bool curved_mesh)
 
   const unsigned int n_q_points = degree + 1;
 
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+  Triangulation<dim> tria;
 
   if (curved_mesh && dim > 1)
     GridGenerator::hyper_shell(tria, Point<dim>(), 0.5, 1, 6);
@@ -318,7 +316,7 @@ test_dg_ecl(const unsigned int degree, const bool curved_mesh)
                     if (mask[v] == false)
                       {
                         for (unsigned int i = 0;
-                             i < 2 * fe_eval_m.dofs_per_face;
+                             i < 2 * fe_eval_m.get_dofs_projected_to_face();
                              ++i)
                           fe_eval_m.get_scratch_data().begin()[i][v] = 0.;
                         continue;

@@ -2750,12 +2750,26 @@ public:
   boundary_id() const;
 
   /**
+   * Get the number of degrees of freedom of a single component which are
+   * projected onto a face.
+   */
+  unsigned int
+  get_dofs_per_component_projected_to_face();
+
+  /**
+   * Get the number of degrees of freedom accumulated over all
+   * components which are projected onto a face.
+   */
+  unsigned int
+  get_dofs_projected_to_face();
+
+  /**
    * The number of degrees of freedom of a single component on the cell for
    * the underlying evaluation object. Usually close to
    * static_dofs_per_component, but the number depends on the actual element
    * selected and is thus not static.
    */
-  const unsigned int dofs_per_component_on_cell;
+  const unsigned int dofs_per_component;
 
   /**
    * The number of degrees of freedom on the cell accumulated over all
@@ -2764,22 +2778,6 @@ public:
    * number depends on the actual element selected and is thus not static.
    */
   const unsigned int dofs_per_cell;
-
-  /**
-   * The number of degrees of freedom of a single component on the cell for
-   * the underlying evaluation object. Usually close to
-   * static_dofs_per_component, but the number depends on the actual element
-   * selected and is thus not static.
-   */
-  const unsigned int dofs_per_component_on_face;
-
-  /**
-   * The number of degrees of freedom on the cell accumulated over all
-   * components in the current evaluation object. Usually close to
-   * static_dofs_per_cell = static_dofs_per_component*n_components, but the
-   * number depends on the actual element selected and is thus not static.
-   */
-  const unsigned int dofs_per_face;
 
   /**
    * The number of quadrature points in use. If the number of quadrature
@@ -8310,10 +8308,8 @@ inline FEFaceEvaluation<dim,
               active_fe_index,
               active_quad_index,
               face_type)
-  , dofs_per_component_on_cell(this->data->dofs_per_component_on_cell)
+  , dofs_per_component(this->data->dofs_per_component_on_cell)
   , dofs_per_cell(this->data->dofs_per_component_on_cell * n_components_)
-  , dofs_per_component_on_face(this->data->dofs_per_component_on_face)
-  , dofs_per_face(this->data->dofs_per_component_on_face * n_components_)
   , n_q_points(this->n_quadrature_points)
 {}
 
@@ -9410,6 +9406,45 @@ FEFaceEvaluation<dim,
     return this->matrix_free->get_boundary_id(this->cell);
   else
     return numbers::internal_face_boundary_id;
+}
+
+
+
+template <int dim,
+          int fe_degree,
+          int n_q_points_1d,
+          int n_components_,
+          typename Number,
+          typename VectorizedArrayType>
+unsigned int
+FEFaceEvaluation<
+  dim,
+  fe_degree,
+  n_q_points_1d,
+  n_components_,
+  Number,
+  VectorizedArrayType>::get_dofs_per_component_projected_to_face()
+{
+  return this->data->dofs_per_component_on_face;
+}
+
+
+
+template <int dim,
+          int fe_degree,
+          int n_q_points_1d,
+          int n_components_,
+          typename Number,
+          typename VectorizedArrayType>
+unsigned int
+FEFaceEvaluation<dim,
+                 fe_degree,
+                 n_q_points_1d,
+                 n_components_,
+                 Number,
+                 VectorizedArrayType>::get_dofs_projected_to_face()
+{
+  return this->data->dofs_per_component_on_face * n_components_;
 }
 
 

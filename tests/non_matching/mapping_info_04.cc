@@ -20,8 +20,6 @@
 
 #include <deal.II/base/timer.h>
 
-#include <deal.II/distributed/tria.h>
-
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 
@@ -84,7 +82,7 @@ test_dg_fcl(const unsigned int degree, const bool curved_mesh)
 
   const unsigned int n_q_points = degree + 1;
 
-  parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
+  Triangulation<dim> tria;
 
   if (curved_mesh && dim > 1)
     GridGenerator::hyper_shell(tria, Point<dim>(), 0.5, 1, 6);

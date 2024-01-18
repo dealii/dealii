@@ -1577,8 +1577,10 @@ namespace NonMatching
         face_number.emplace_back(f_m, f_p);
 
         Assert(
-          cell_m->combined_face_orientation(f_m) == 1 &&
-            cell_p->combined_face_orientation(f_p) == 1,
+          cell_m->combined_face_orientation(f_m) ==
+              ReferenceCell::default_combined_face_orientation() &&
+            cell_p->combined_face_orientation(f_p) ==
+              ReferenceCell::default_combined_face_orientation(),
           ExcMessage(
             "Non standard face orientation is currently not implemented."));
 
