@@ -257,15 +257,17 @@ for (deal_II_dimension : DIMENSIONS)
   }
 
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
   {
+#if deal_II_dimension <= deal_II_space_dimension
     template Table<2, DoFTools::Coupling>
     DoFTools::dof_couplings_from_component_couplings(
-      const FiniteElement<deal_II_dimension> &fe,
-      const Table<2, DoFTools::Coupling>     &component_couplings);
+      const FiniteElement<deal_II_dimension, deal_II_space_dimension> &fe,
+      const Table<2, DoFTools::Coupling> &component_couplings);
 
     template std::vector<Table<2, DoFTools::Coupling>>
     DoFTools::dof_couplings_from_component_couplings(
-      const hp::FECollection<deal_II_dimension> &fe,
-      const Table<2, DoFTools::Coupling>        &component_couplings);
+      const hp::FECollection<deal_II_dimension, deal_II_space_dimension> &fe,
+      const Table<2, DoFTools::Coupling> &component_couplings);
+#endif
   }
