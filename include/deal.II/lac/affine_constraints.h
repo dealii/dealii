@@ -2629,6 +2629,7 @@ AffineConstraints<number>::distribute_local_to_global(
   const std::vector<size_type> &local_dof_indices,
   OutVector                    &global_vector) const
 {
+  Assert(global_vector.has_ghost_elements() == false, ExcGhostsPresent());
   Assert(local_vector.size() == local_dof_indices.size(),
          ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
   distribute_local_to_global(local_vector.begin(),

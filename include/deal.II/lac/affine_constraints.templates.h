@@ -2532,6 +2532,7 @@ AffineConstraints<number>::distribute_local_to_global(
   AssertDimension(local_vector.size(), local_dof_indices_row.size());
   AssertDimension(local_matrix.m(), local_dof_indices_row.size());
   AssertDimension(local_matrix.n(), local_dof_indices_col.size());
+  Assert(global_vector.has_ghost_elements() == false, ExcGhostsPresent());
 
   // diagonal checks if we have only one index set (if both are equal
   // diagonal should be set to true).
@@ -4238,6 +4239,7 @@ AffineConstraints<number>::distribute_local_to_global(
 
   AssertDimension(local_matrix.n(), local_dof_indices.size());
   AssertDimension(local_matrix.m(), local_dof_indices.size());
+  Assert(global_vector.has_ghost_elements() == false, ExcGhostsPresent());
   Assert(global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
   if (use_vectors == true)
     {
@@ -4395,6 +4397,7 @@ AffineConstraints<number>::distribute_local_to_global(
 
   AssertDimension(local_matrix.n(), local_dof_indices.size());
   AssertDimension(local_matrix.m(), local_dof_indices.size());
+  Assert(global_vector.has_ghost_elements() == false, ExcGhostsPresent());
   Assert(global_matrix.m() == global_matrix.n(), ExcNotQuadratic());
   Assert(global_matrix.n_block_rows() == global_matrix.n_block_cols(),
          ExcNotQuadratic());
