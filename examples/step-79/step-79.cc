@@ -332,9 +332,9 @@ namespace SAND
             if (face->at_boundary())
               {
                 const auto center = face->center();
-                if (std::fabs(center(1) - 1) < 1e-12)
+                if (std::fabs(center[1] - 1) < 1e-12)
                   {
-                    if ((std::fabs(center(0) - 3) < .3))
+                    if ((std::fabs(center[0] - 3) < .3))
                       face->set_boundary_id(BoundaryIds::down_force);
                     else
                       face->set_boundary_id(BoundaryIds::no_force);
@@ -374,14 +374,14 @@ namespace SAND
                 // boundary, and if it is whether one of its
                 // vertices might be the bottom left or bottom
                 // right vertex:
-                if (std::fabs(center(1) - 0) < 1e-12)
+                if (std::fabs(center[1] - 0) < 1e-12)
                   {
                     for (const auto vertex_number : cell->vertex_indices())
                       {
                         const auto vert = cell->vertex(vertex_number);
 
-                        if (std::fabs(vert(0) - 0) < 1e-12 &&
-                            std::fabs(vert(1) - 0) < 1e-12)
+                        if (std::fabs(vert[0] - 0) < 1e-12 &&
+                            std::fabs(vert[1] - 0) < 1e-12)
                           {
                             types::global_dof_index x_displacement =
                               cell->vertex_dof_index(vertex_number, 0);
@@ -398,8 +398,8 @@ namespace SAND
                             boundary_values[y_displacement_multiplier] = 0;
                           }
 
-                        else if (std::fabs(vert(0) - 6) < 1e-12 &&
-                                 std::fabs(vert(1) - 0) < 1e-12)
+                        else if (std::fabs(vert[0] - 6) < 1e-12 &&
+                                 std::fabs(vert[1] - 0) < 1e-12)
                           {
                             types::global_dof_index y_displacement =
                               cell->vertex_dof_index(vertex_number, 1);

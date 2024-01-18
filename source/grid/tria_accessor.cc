@@ -186,14 +186,14 @@ namespace
           C(array(1..2, [xs, ys]), optimized);
         */
 
-        const double x[4] = {accessor.vertex(0)(0),
-                             accessor.vertex(1)(0),
-                             accessor.vertex(2)(0),
-                             accessor.vertex(3)(0)};
-        const double y[4] = {accessor.vertex(0)(1),
-                             accessor.vertex(1)(1),
-                             accessor.vertex(2)(1),
-                             accessor.vertex(3)(1)};
+        const double x[4] = {accessor.vertex(0)[0],
+                             accessor.vertex(1)[0],
+                             accessor.vertex(2)[0],
+                             accessor.vertex(3)[0]};
+        const double y[4] = {accessor.vertex(0)[1],
+                             accessor.vertex(1)[1],
+                             accessor.vertex(2)[1],
+                             accessor.vertex(3)[1]};
         const double t1   = x[0] * x[1];
         const double t3   = x[0] * x[0];
         const double t5   = x[1] * x[1];
@@ -314,30 +314,30 @@ namespace
           z[] back to the standard ordering.
         */
 
-        const double x[8] = {accessor.vertex(0)(0),
-                             accessor.vertex(1)(0),
-                             accessor.vertex(5)(0),
-                             accessor.vertex(4)(0),
-                             accessor.vertex(2)(0),
-                             accessor.vertex(3)(0),
-                             accessor.vertex(7)(0),
-                             accessor.vertex(6)(0)};
-        const double y[8] = {accessor.vertex(0)(1),
-                             accessor.vertex(1)(1),
-                             accessor.vertex(5)(1),
-                             accessor.vertex(4)(1),
-                             accessor.vertex(2)(1),
-                             accessor.vertex(3)(1),
-                             accessor.vertex(7)(1),
-                             accessor.vertex(6)(1)};
-        const double z[8] = {accessor.vertex(0)(2),
-                             accessor.vertex(1)(2),
-                             accessor.vertex(5)(2),
-                             accessor.vertex(4)(2),
-                             accessor.vertex(2)(2),
-                             accessor.vertex(3)(2),
-                             accessor.vertex(7)(2),
-                             accessor.vertex(6)(2)};
+        const double x[8] = {accessor.vertex(0)[0],
+                             accessor.vertex(1)[0],
+                             accessor.vertex(5)[0],
+                             accessor.vertex(4)[0],
+                             accessor.vertex(2)[0],
+                             accessor.vertex(3)[0],
+                             accessor.vertex(7)[0],
+                             accessor.vertex(6)[0]};
+        const double y[8] = {accessor.vertex(0)[1],
+                             accessor.vertex(1)[1],
+                             accessor.vertex(5)[1],
+                             accessor.vertex(4)[1],
+                             accessor.vertex(2)[1],
+                             accessor.vertex(3)[1],
+                             accessor.vertex(7)[1],
+                             accessor.vertex(6)[1]};
+        const double z[8] = {accessor.vertex(0)[2],
+                             accessor.vertex(1)[2],
+                             accessor.vertex(5)[2],
+                             accessor.vertex(4)[2],
+                             accessor.vertex(2)[2],
+                             accessor.vertex(3)[2],
+                             accessor.vertex(7)[2],
+                             accessor.vertex(6)[2]};
 
         double s1, s2, s3, s4, s5, s6, s7, s8;
 

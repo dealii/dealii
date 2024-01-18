@@ -1377,8 +1377,8 @@ GridOut::write_xfig(const Triangulation<2> &tria,
             cell->vertex(GeometryInfo<dim>::ucd_to_deal[k % nv]);
           for (unsigned int d = 0; d < static_cast<unsigned int>(dim); ++d)
             {
-              int val = static_cast<int>(1200 * xfig_flags.scaling(d) *
-                                         (p(d) - xfig_flags.offset(d)));
+              int val = static_cast<int>(1200 * xfig_flags.scaling[d] *
+                                         (p[d] - xfig_flags.offset[d]));
               out << '\t' << ((d == 0) ? val : -val);
             }
           out << std::endl;
@@ -1423,8 +1423,8 @@ GridOut::write_xfig(const Triangulation<2> &tria,
                          ++d)
                       {
                         int val =
-                          static_cast<int>(1200 * xfig_flags.scaling(d) *
-                                           (p(d) - xfig_flags.offset(d)));
+                          static_cast<int>(1200 * xfig_flags.scaling[d] *
+                                           (p[d] - xfig_flags.offset[d]));
                         out << '\t' << ((d == 0) ? val : -val);
                       }
                     out << std::endl;
@@ -4232,7 +4232,7 @@ namespace internal
           boundary_points[0][0]            = 0;
           boundary_points[n_points - 1][0] = 1;
           for (unsigned int i = 1; i < n_points - 1; ++i)
-            boundary_points[i](0) = 1. * i / (n_points - 1);
+            boundary_points[i][0] = 1. * i / (n_points - 1);
 
           std::vector<double> dummy_weights(n_points, 1. / n_points);
           Quadrature<dim - 1> quadrature(boundary_points, dummy_weights);
@@ -4349,7 +4349,7 @@ namespace internal
           boundary_points[0][0]            = 0;
           boundary_points[n_points - 1][0] = 1;
           for (unsigned int i = 1; i < n_points - 1; ++i)
-            boundary_points[i](0) = 1. * i / (n_points - 1);
+            boundary_points[i][0] = 1. * i / (n_points - 1);
 
           std::vector<double> dummy_weights(n_points, 1. / n_points);
           Quadrature<1>       quadrature1d(boundary_points, dummy_weights);
@@ -4755,8 +4755,8 @@ namespace internal
                       // optimize away this
                       // little kludge
                       line_list.emplace_back(
-                        Point<2>(line->vertex(0)(0), line->vertex(0)(1)),
-                        Point<2>(line->vertex(1)(0), line->vertex(1)(1)),
+                        Point<2>(line->vertex(0)[0], line->vertex(0)[1]),
+                        Point<2>(line->vertex(1)[0], line->vertex(1)[1]),
                         line->user_flag_set(),
                         cell->level());
                   }
@@ -4777,7 +4777,7 @@ namespace internal
                   std::vector<Point<dim - 1>> boundary_points(n_points);
 
                   for (unsigned int i = 0; i < n_points; ++i)
-                    boundary_points[i](0) = 1. * (i + 1) / (n_points + 1);
+                    boundary_points[i][0] = 1. * (i + 1) / (n_points + 1);
 
                   Quadrature<dim - 1> quadrature(boundary_points);
                   Quadrature<dim>     q_projector(
@@ -4798,7 +4798,7 @@ namespace internal
                         if (face->at_boundary())
                           {
                             Point<dim> p0_dim(face->vertex(0));
-                            Point<2>   p0(p0_dim(0), p0_dim(1));
+                            Point<2>   p0(p0_dim[0], p0_dim[1]);
 
                             // loop over
                             // all pieces
@@ -4811,7 +4811,7 @@ namespace internal
                                 const Point<dim> p1_dim(
                                   mapping->transform_unit_to_real_cell(
                                     cell, q_projector.point(offset + i)));
-                                const Point<2> p1(p1_dim(0), p1_dim(1));
+                                const Point<2> p1(p1_dim[0], p1_dim[1]);
 
                                 line_list.emplace_back(p0,
                                                        p1,
@@ -4822,7 +4822,7 @@ namespace internal
 
                             // generate last piece
                             const Point<dim> p1_dim(face->vertex(1));
-                            const Point<2>   p1(p1_dim(0), p1_dim(1));
+                            const Point<2>   p1(p1_dim[0], p1_dim[1]);
                             line_list.emplace_back(p0,
                                                    p1,
                                                    face->user_flag_set(),
@@ -4914,9 +4914,9 @@ namespace internal
       // find out minimum and maximum x and
       // y coordinates to compute offsets
       // and scaling factors
-      double       x_min     = tria.begin_active()->vertex(0)(0);
+      double       x_min     = tria.begin_active()->vertex(0)[0];
       double       x_max     = x_min;
-      double       y_min     = tria.begin_active()->vertex(0)(1);
+      double       y_min     = tria.begin_active()->vertex(0)[1];
       double       y_max     = y_min;
       unsigned int max_level = line_list.begin()->level;
 
@@ -4924,17 +4924,17 @@ namespace internal
            line != line_list.end();
            ++line)
         {
-          x_min = std::min(x_min, line->first(0));
-          x_min = std::min(x_min, line->second(0));
+          x_min = std::min(x_min, line->first[0]);
+          x_min = std::min(x_min, line->second[0]);
 
-          x_max = std::max(x_max, line->first(0));
-          x_max = std::max(x_max, line->second(0));
+          x_max = std::max(x_max, line->first[0]);
+          x_max = std::max(x_max, line->second[0]);
 
-          y_min = std::min(y_min, line->first(1));
-          y_min = std::min(y_min, line->second(1));
+          y_min = std::min(y_min, line->first[1]);
+          y_min = std::min(y_min, line->second[1]);
 
-          y_max = std::max(y_max, line->first(1));
-          y_max = std::max(y_max, line->second(1));
+          y_max = std::max(y_max, line->first[1]);
+          y_max = std::max(y_max, line->second[1]);
 
           max_level = std::max(max_level, line->level);
         }
@@ -5054,8 +5054,8 @@ namespace internal
 
           for (const auto &cell : tria.active_cell_iterators())
             {
-              out << (cell->center()(0) - offset(0)) * scale << ' '
-                  << (cell->center()(1) - offset(1)) * scale << " m" << '\n'
+              out << (cell->center()[0] - offset[0]) * scale << ' '
+                  << (cell->center()[1] - offset[1]) * scale << " m" << '\n'
                   << "[ [(Helvetica) 12.0 0.0 true true (";
               if (eps_flags_2.write_cell_number_level)
                 out << cell;
@@ -5084,8 +5084,8 @@ namespace internal
                 {
                   treated_vertices.insert(cell->vertex_index(vertex_no));
 
-                  out << (cell->vertex(vertex_no)(0) - offset(0)) * scale << ' '
-                      << (cell->vertex(vertex_no)(1) - offset(1)) * scale
+                  out << (cell->vertex(vertex_no)[0] - offset[0]) * scale << ' '
+                      << (cell->vertex(vertex_no)[1] - offset[1]) * scale
                       << " m" << '\n'
                       << "[ [(Helvetica) 10.0 0.0 true true ("
                       << cell->vertex_index(vertex_no) << ")] "

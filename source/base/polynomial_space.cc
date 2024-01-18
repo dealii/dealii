@@ -134,7 +134,7 @@ PolynomialSpace<dim>::compute_value(const unsigned int i,
   // directions
   double result = 1.;
   for (unsigned int d = 0; d < dim; ++d)
-    result *= polynomials[ix[d]].value(p(d));
+    result *= polynomials[ix[d]].value(p[d]);
   return result;
 }
 
@@ -155,7 +155,7 @@ PolynomialSpace<dim>::compute_grad(const unsigned int i,
   std::vector<double> v(2);
   for (unsigned int d = 0; d < dim; ++d)
     {
-      polynomials[ix[d]].value(p(d), v);
+      polynomials[ix[d]].value(p[d], v);
       result[d] *= v[1];
       for (unsigned int d1 = 0; d1 < dim; ++d1)
         if (d1 != d)
@@ -182,7 +182,7 @@ PolynomialSpace<dim>::compute_grad_grad(const unsigned int i,
   std::vector<double> v(3);
   for (unsigned int d = 0; d < dim; ++d)
     {
-      polynomials[ix[d]].value(p(d), v);
+      polynomials[ix[d]].value(p[d], v);
       result[d][d] *= v[2];
       for (unsigned int d1 = 0; d1 < dim; ++d1)
         {
@@ -263,7 +263,7 @@ PolynomialSpace<dim>::evaluate(
     for (unsigned int i = 0; i < v.size()[1]; ++i)
       {
         v(d, i).resize(v_size, 0.);
-        polynomials[i].value(p(d), v(d, i));
+        polynomials[i].value(p[d], v(d, i));
       }
 
   if (update_values)

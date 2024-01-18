@@ -96,13 +96,13 @@ FE_RannacherTurek<dim>::initialize_support_points()
   for (unsigned int q = 0; q < face_quadrature.size(); ++q)
     {
       this->generalized_support_points[0 * face_quadrature.size() + q] =
-        dealii::Point<dim>(0, 1 - face_quadrature.point(q)(0));
+        dealii::Point<dim>(0, 1 - face_quadrature.point(q)[0]);
       this->generalized_support_points[1 * face_quadrature.size() + q] =
-        dealii::Point<dim>(1, 1 - face_quadrature.point(q)(0));
+        dealii::Point<dim>(1, 1 - face_quadrature.point(q)[0]);
       this->generalized_support_points[2 * face_quadrature.size() + q] =
-        dealii::Point<dim>(face_quadrature.point(q)(0), 0);
+        dealii::Point<dim>(face_quadrature.point(q)[0], 0);
       this->generalized_support_points[3 * face_quadrature.size() + q] =
-        dealii::Point<dim>(face_quadrature.point(q)(0), 1);
+        dealii::Point<dim>(face_quadrature.point(q)[0], 1);
     }
 }
 

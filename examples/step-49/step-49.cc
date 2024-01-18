@@ -209,8 +209,8 @@ void grid_3()
       for (const auto i : cell->vertex_indices())
         {
           Point<2> &v = cell->vertex(i);
-          if (std::abs(v(1) - 1.0) < 1e-5)
-            v(1) += 0.5;
+          if (std::abs(v[1] - 1.0) < 1e-5)
+            v[1] += 0.5;
         }
     }
 
@@ -315,7 +315,7 @@ struct Grid6Func
 
   Point<2> operator()(const Point<2> &in) const
   {
-    return {in(0), trans(in(1))};
+    return {in[0], trans(in[1])};
   }
 };
 

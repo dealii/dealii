@@ -172,7 +172,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_value(
 
   double value = 1.;
   for (unsigned int d = 0; d < dim; ++d)
-    value *= polynomials[indices[d]].value(p(d));
+    value *= polynomials[indices[d]].value(p[d]);
 
   return value;
 }
@@ -210,7 +210,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad(
     std::vector<double> tmp(2);
     for (unsigned int d = 0; d < dim; ++d)
       {
-        polynomials[indices[d]].value(p(d), tmp);
+        polynomials[indices[d]].value(p[d], tmp);
         v[d][0] = tmp[0];
         v[d][1] = tmp[1];
       }
@@ -256,7 +256,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_grad_grad(
     std::vector<double> tmp(3);
     for (unsigned int d = 0; d < dim; ++d)
       {
-        polynomials[indices[d]].value(p(d), tmp);
+        polynomials[indices[d]].value(p[d], tmp);
         v[d][0] = tmp[0];
         v[d][1] = tmp[1];
         v[d][2] = tmp[2];
@@ -707,7 +707,7 @@ AnisotropicPolynomials<dim>::compute_value(const unsigned int i,
 
   double value = 1.;
   for (unsigned int d = 0; d < dim; ++d)
-    value *= polynomials[d][indices[d]].value(p(d));
+    value *= polynomials[d][indices[d]].value(p[d]);
 
   return value;
 }
@@ -740,7 +740,7 @@ AnisotropicPolynomials<dim>::compute_grad(const unsigned int i,
   // coordinate direction
   ndarray<double, dim, 2> v;
   for (unsigned int d = 0; d < dim; ++d)
-    polynomials[d][indices[d]].value(p(d), 1, v[d].data());
+    polynomials[d][indices[d]].value(p[d], 1, v[d].data());
 
   Tensor<1, dim> grad;
   for (unsigned int d = 0; d < dim; ++d)
@@ -777,7 +777,7 @@ AnisotropicPolynomials<dim>::compute_grad_grad(const unsigned int i,
 
   ndarray<double, dim, 3> v;
   for (unsigned int d = 0; d < dim; ++d)
-    polynomials[d][indices[d]].value(p(d), 2, v[d].data());
+    polynomials[d][indices[d]].value(p[d], 2, v[d].data());
 
   Tensor<2, dim> grad_grad;
   for (unsigned int d1 = 0; d1 < dim; ++d1)

@@ -1927,7 +1927,7 @@ namespace NonMatching
 
     const Point<dim> vertex0 =
       box.vertex(GeometryInfo<dim>::face_to_cell_vertices(face_index, 0));
-    const double coordinate_value = vertex0(face_normal_direction);
+    const double coordinate_value = vertex0[face_normal_direction];
 
     const Functions::CoordinateRestriction<dim - 1> face_restriction(
       level_set, face_normal_direction, coordinate_value);

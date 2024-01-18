@@ -134,7 +134,7 @@ FE_Q<dim, spacedim>::get_name() const
       const QGaussLobatto<1> points_gl(this->degree + 1);
       bool                   gauss_lobatto = true;
       for (unsigned int j = 0; j <= this->degree; ++j)
-        if (points[j] != points_gl.point(j)(0))
+        if (points[j] != points_gl.point(j)[0])
           {
             gauss_lobatto = false;
             break;

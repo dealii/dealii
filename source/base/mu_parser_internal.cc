@@ -424,7 +424,7 @@ namespace internal
         init_muparser();
 
       for (unsigned int i = 0; i < dim; ++i)
-        data.vars[i] = p(i);
+        data.vars[i] = p[i];
       if (dim != this->n_vars)
         data.vars[dim] = time;
 
@@ -472,7 +472,7 @@ namespace internal
         init_muparser();
 
       for (unsigned int i = 0; i < dim; ++i)
-        data.vars[i] = p(i);
+        data.vars[i] = p[i];
       if (dim != this->n_vars)
         data.vars[dim] = time;
 

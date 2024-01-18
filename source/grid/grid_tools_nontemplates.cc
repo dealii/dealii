@@ -49,13 +49,13 @@ namespace GridTools
   {
     if (vertex_indices.size() == 3) // triangle
       {
-        const double x[3] = {all_vertices[vertex_indices[0]](0),
-                             all_vertices[vertex_indices[1]](0),
-                             all_vertices[vertex_indices[2]](0)};
+        const double x[3] = {all_vertices[vertex_indices[0]][0],
+                             all_vertices[vertex_indices[1]][0],
+                             all_vertices[vertex_indices[2]][0]};
 
-        const double y[3] = {all_vertices[vertex_indices[0]](1),
-                             all_vertices[vertex_indices[1]](1),
-                             all_vertices[vertex_indices[2]](1)};
+        const double y[3] = {all_vertices[vertex_indices[0]][1],
+                             all_vertices[vertex_indices[1]][1],
+                             all_vertices[vertex_indices[2]][1]};
 
         return 0.5 *
                ((x[0] - x[2]) * (y[1] - y[0]) - (x[1] - x[0]) * (y[0] - y[2]));
@@ -99,15 +99,15 @@ namespace GridTools
       additional optimization: divide by 2 only one time
     */
 
-    const double x[4] = {all_vertices[vertex_indices[0]](0),
-                         all_vertices[vertex_indices[1]](0),
-                         all_vertices[vertex_indices[2]](0),
-                         all_vertices[vertex_indices[3]](0)};
+    const double x[4] = {all_vertices[vertex_indices[0]][0],
+                         all_vertices[vertex_indices[1]][0],
+                         all_vertices[vertex_indices[2]][0],
+                         all_vertices[vertex_indices[3]][0]};
 
-    const double y[4] = {all_vertices[vertex_indices[0]](1),
-                         all_vertices[vertex_indices[1]](1),
-                         all_vertices[vertex_indices[2]](1),
-                         all_vertices[vertex_indices[3]](1)};
+    const double y[4] = {all_vertices[vertex_indices[0]][1],
+                         all_vertices[vertex_indices[1]][1],
+                         all_vertices[vertex_indices[2]][1],
+                         all_vertices[vertex_indices[3]][1]};
 
     return (-x[1] * y[0] + x[1] * y[3] + y[0] * x[2] + x[0] * y[1] -
             x[0] * y[2] - y[1] * x[3] - x[2] * y[3] + x[3] * y[2]) /
@@ -274,30 +274,30 @@ namespace GridTools
 
     AssertDimension(vertex_indices.size(), GeometryInfo<3>::vertices_per_cell);
 
-    const double x[8] = {all_vertices[vertex_indices[0]](0),
-                         all_vertices[vertex_indices[1]](0),
-                         all_vertices[vertex_indices[2]](0),
-                         all_vertices[vertex_indices[3]](0),
-                         all_vertices[vertex_indices[4]](0),
-                         all_vertices[vertex_indices[5]](0),
-                         all_vertices[vertex_indices[6]](0),
-                         all_vertices[vertex_indices[7]](0)};
-    const double y[8] = {all_vertices[vertex_indices[0]](1),
-                         all_vertices[vertex_indices[1]](1),
-                         all_vertices[vertex_indices[2]](1),
-                         all_vertices[vertex_indices[3]](1),
-                         all_vertices[vertex_indices[4]](1),
-                         all_vertices[vertex_indices[5]](1),
-                         all_vertices[vertex_indices[6]](1),
-                         all_vertices[vertex_indices[7]](1)};
-    const double z[8] = {all_vertices[vertex_indices[0]](2),
-                         all_vertices[vertex_indices[1]](2),
-                         all_vertices[vertex_indices[2]](2),
-                         all_vertices[vertex_indices[3]](2),
-                         all_vertices[vertex_indices[4]](2),
-                         all_vertices[vertex_indices[5]](2),
-                         all_vertices[vertex_indices[6]](2),
-                         all_vertices[vertex_indices[7]](2)};
+    const double x[8] = {all_vertices[vertex_indices[0]][0],
+                         all_vertices[vertex_indices[1]][0],
+                         all_vertices[vertex_indices[2]][0],
+                         all_vertices[vertex_indices[3]][0],
+                         all_vertices[vertex_indices[4]][0],
+                         all_vertices[vertex_indices[5]][0],
+                         all_vertices[vertex_indices[6]][0],
+                         all_vertices[vertex_indices[7]][0]};
+    const double y[8] = {all_vertices[vertex_indices[0]][1],
+                         all_vertices[vertex_indices[1]][1],
+                         all_vertices[vertex_indices[2]][1],
+                         all_vertices[vertex_indices[3]][1],
+                         all_vertices[vertex_indices[4]][1],
+                         all_vertices[vertex_indices[5]][1],
+                         all_vertices[vertex_indices[6]][1],
+                         all_vertices[vertex_indices[7]][1]};
+    const double z[8] = {all_vertices[vertex_indices[0]][2],
+                         all_vertices[vertex_indices[1]][2],
+                         all_vertices[vertex_indices[2]][2],
+                         all_vertices[vertex_indices[3]][2],
+                         all_vertices[vertex_indices[4]][2],
+                         all_vertices[vertex_indices[5]][2],
+                         all_vertices[vertex_indices[6]][2],
+                         all_vertices[vertex_indices[7]][2]};
 
     /*
       This is the same Maple script as in the barycenter method above

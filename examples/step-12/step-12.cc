@@ -101,7 +101,7 @@ namespace Step12
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
-        if (points[i](0) < 0.5)
+        if (points[i][0] < 0.5)
           values[i] = 1.;
         else
           values[i] = 0.;

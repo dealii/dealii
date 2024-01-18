@@ -169,28 +169,28 @@ namespace Step82
 
     if (dim == 2)
       {
-        return_value = 24.0 * Utilities::fixed_power<2>(p(1) * (1.0 - p(1))) +
-                       +24.0 * Utilities::fixed_power<2>(p(0) * (1.0 - p(0))) +
-                       2.0 * (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-                         (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1));
+        return_value = 24.0 * Utilities::fixed_power<2>(p[1] * (1.0 - p[1])) +
+                       +24.0 * Utilities::fixed_power<2>(p[0] * (1.0 - p[0])) +
+                       2.0 * (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+                         (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]);
       }
     else if (dim == 3)
       {
-        return_value = 24.0 * Utilities::fixed_power<2>(p(1) * (1.0 - p(1)) *
-                                                        p(2) * (1.0 - p(2))) +
-                       24.0 * Utilities::fixed_power<2>(p(0) * (1.0 - p(0)) *
-                                                        p(2) * (1.0 - p(2))) +
-                       24.0 * Utilities::fixed_power<2>(p(0) * (1.0 - p(0)) *
-                                                        p(1) * (1.0 - p(1))) +
-                       2.0 * (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-                         (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
-                         Utilities::fixed_power<2>(p(2) * (1.0 - p(2))) +
-                       2.0 * (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-                         (2.0 - 12.0 * p(2) + 12.0 * p(2) * p(2)) *
-                         Utilities::fixed_power<2>(p(1) * (1.0 - p(1))) +
-                       2.0 * (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
-                         (2.0 - 12.0 * p(2) + 12.0 * p(2) * p(2)) *
-                         Utilities::fixed_power<2>(p(0) * (1.0 - p(0)));
+        return_value = 24.0 * Utilities::fixed_power<2>(p[1] * (1.0 - p[1]) *
+                                                        p[2] * (1.0 - p[2])) +
+                       24.0 * Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) *
+                                                        p[2] * (1.0 - p[2])) +
+                       24.0 * Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) *
+                                                        p[1] * (1.0 - p[1])) +
+                       2.0 * (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+                         (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]) *
+                         Utilities::fixed_power<2>(p[2] * (1.0 - p[2])) +
+                       2.0 * (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+                         (2.0 - 12.0 * p[2] + 12.0 * p[2] * p[2]) *
+                         Utilities::fixed_power<2>(p[1] * (1.0 - p[1])) +
+                       2.0 * (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]) *
+                         (2.0 - 12.0 * p[2] + 12.0 * p[2] * p[2]) *
+                         Utilities::fixed_power<2>(p[0] * (1.0 - p[0]));
       }
     else
       Assert(false, ExcNotImplemented());
@@ -233,12 +233,12 @@ namespace Step82
     if (dim == 2)
       {
         return_value =
-          Utilities::fixed_power<2>(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)));
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]));
       }
     else if (dim == 3)
       {
         return_value = Utilities::fixed_power<2>(
-          p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)) * p(2) * (1.0 - p(2)));
+          p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]) * p[2] * (1.0 - p[2]));
       }
     else
       Assert(false, ExcNotImplemented());
@@ -258,28 +258,28 @@ namespace Step82
     if (dim == 2)
       {
         return_gradient[0] =
-          (2.0 * p(0) - 6.0 * Utilities::fixed_power<2>(p(0)) +
-           4.0 * Utilities::fixed_power<3>(p(0))) *
-          Utilities::fixed_power<2>(p(1) * (1.0 - p(1)));
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          Utilities::fixed_power<2>(p[1] * (1.0 - p[1]));
         return_gradient[1] =
-          (2.0 * p(1) - 6.0 * Utilities::fixed_power<2>(p(1)) +
-           4.0 * Utilities::fixed_power<3>(p(1))) *
-          Utilities::fixed_power<2>(p(0) * (1.0 - p(0)));
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1])) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]));
       }
     else if (dim == 3)
       {
         return_gradient[0] =
-          (2.0 * p(0) - 6.0 * Utilities::fixed_power<2>(p(0)) +
-           4.0 * Utilities::fixed_power<3>(p(0))) *
-          Utilities::fixed_power<2>(p(1) * (1.0 - p(1)) * p(2) * (1.0 - p(2)));
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          Utilities::fixed_power<2>(p[1] * (1.0 - p[1]) * p[2] * (1.0 - p[2]));
         return_gradient[1] =
-          (2.0 * p(1) - 6.0 * Utilities::fixed_power<2>(p(1)) +
-           4.0 * Utilities::fixed_power<3>(p(1))) *
-          Utilities::fixed_power<2>(p(0) * (1.0 - p(0)) * p(2) * (1.0 - p(2)));
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1])) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[2] * (1.0 - p[2]));
         return_gradient[2] =
-          (2.0 * p(2) - 6.0 * Utilities::fixed_power<2>(p(2)) +
-           4.0 * Utilities::fixed_power<3>(p(2))) *
-          Utilities::fixed_power<2>(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)));
+          (2.0 * p[2] - 6.0 * Utilities::fixed_power<2>(p[2]) +
+           4.0 * Utilities::fixed_power<3>(p[2])) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]));
       }
     else
       Assert(false, ExcNotImplemented());
@@ -298,45 +298,45 @@ namespace Step82
 
     if (dim == 2)
       {
-        return_hessian[0][0] = (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-                               Utilities::fixed_power<2>(p(1) * (1.0 - p(1)));
+        return_hessian[0][0] = (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+                               Utilities::fixed_power<2>(p[1] * (1.0 - p[1]));
         return_hessian[0][1] =
-          (2.0 * p(0) - 6.0 * Utilities::fixed_power<2>(p(0)) +
-           4.0 * Utilities::fixed_power<3>(p(0))) *
-          (2.0 * p(1) - 6.0 * Utilities::fixed_power<2>(p(1)) +
-           4.0 * Utilities::fixed_power<3>(p(1)));
-        return_hessian[1][1] = (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
-                               Utilities::fixed_power<2>(p(0) * (1.0 - p(0)));
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1]));
+        return_hessian[1][1] = (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]) *
+                               Utilities::fixed_power<2>(p[0] * (1.0 - p[0]));
       }
     else if (dim == 3)
       {
         return_hessian[0][0] =
-          (2.0 - 12.0 * p(0) + 12.0 * p(0) * p(0)) *
-          Utilities::fixed_power<2>(p(1) * (1.0 - p(1)) * p(2) * (1.0 - p(2)));
+          (2.0 - 12.0 * p[0] + 12.0 * p[0] * p[0]) *
+          Utilities::fixed_power<2>(p[1] * (1.0 - p[1]) * p[2] * (1.0 - p[2]));
         return_hessian[0][1] =
-          (2.0 * p(0) - 6.0 * Utilities::fixed_power<2>(p(0)) +
-           4.0 * Utilities::fixed_power<3>(p(0))) *
-          (2.0 * p(1) - 6.0 * Utilities::fixed_power<2>(p(1)) +
-           4.0 * Utilities::fixed_power<3>(p(1))) *
-          Utilities::fixed_power<2>(p(2) * (1.0 - p(2)));
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1])) *
+          Utilities::fixed_power<2>(p[2] * (1.0 - p[2]));
         return_hessian[0][2] =
-          (2.0 * p(0) - 6.0 * Utilities::fixed_power<2>(p(0)) +
-           4.0 * Utilities::fixed_power<3>(p(0))) *
-          (2.0 * p(2) - 6.0 * Utilities::fixed_power<2>(p(2)) +
-           4.0 * Utilities::fixed_power<3>(p(2))) *
-          Utilities::fixed_power<2>(p(1) * (1.0 - p(1)));
+          (2.0 * p[0] - 6.0 * Utilities::fixed_power<2>(p[0]) +
+           4.0 * Utilities::fixed_power<3>(p[0])) *
+          (2.0 * p[2] - 6.0 * Utilities::fixed_power<2>(p[2]) +
+           4.0 * Utilities::fixed_power<3>(p[2])) *
+          Utilities::fixed_power<2>(p[1] * (1.0 - p[1]));
         return_hessian[1][1] =
-          (2.0 - 12.0 * p(1) + 12.0 * p(1) * p(1)) *
-          Utilities::fixed_power<2>(p(0) * (1.0 - p(0)) * p(2) * (1.0 - p(2)));
+          (2.0 - 12.0 * p[1] + 12.0 * p[1] * p[1]) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[2] * (1.0 - p[2]));
         return_hessian[1][2] =
-          (2.0 * p(1) - 6.0 * Utilities::fixed_power<2>(p(1)) +
-           4.0 * Utilities::fixed_power<3>(p(1))) *
-          (2.0 * p(2) - 6.0 * Utilities::fixed_power<2>(p(2)) +
-           4.0 * Utilities::fixed_power<3>(p(2))) *
-          Utilities::fixed_power<2>(p(0) * (1.0 - p(0)));
+          (2.0 * p[1] - 6.0 * Utilities::fixed_power<2>(p[1]) +
+           4.0 * Utilities::fixed_power<3>(p[1])) *
+          (2.0 * p[2] - 6.0 * Utilities::fixed_power<2>(p[2]) +
+           4.0 * Utilities::fixed_power<3>(p[2])) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]));
         return_hessian[2][2] =
-          (2.0 - 12.0 * p(2) + 12.0 * p(2) * p(2)) *
-          Utilities::fixed_power<2>(p(0) * (1.0 - p(0)) * p(1) * (1.0 - p(1)));
+          (2.0 - 12.0 * p[2] + 12.0 * p[2] * p[2]) *
+          Utilities::fixed_power<2>(p[0] * (1.0 - p[0]) * p[1] * (1.0 - p[1]));
       }
     else
       Assert(false, ExcNotImplemented());

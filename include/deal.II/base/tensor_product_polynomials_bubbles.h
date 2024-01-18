@@ -343,10 +343,10 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
               // compute grad(4*\prod_{i=1}^d (x_i(1-x_i)))(p)
               for (unsigned j = 0; j < dim; ++j)
                 derivative_1[d] *=
-                  (d == j ? 4 * (1 - 2 * p(j)) : 4 * p(j) * (1 - p(j)));
+                  (d == j ? 4 * (1 - 2 * p[j]) : 4 * p[j] * (1 - p[j]));
               // and multiply with (2*x_i-1)^{r-1}
               for (unsigned int i = 0; i < q_degree - 1; ++i)
-                derivative_1[d] *= 2 * p(comp) - 1;
+                derivative_1[d] *= 2 * p[comp] - 1;
             }
 
           if (q_degree >= 2)
@@ -354,11 +354,11 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
               // add \prod_{i=1}^d 4*(x_i(1-x_i))(p)
               double value = 1.;
               for (unsigned int j = 0; j < dim; ++j)
-                value *= 4 * p(j) * (1 - p(j));
+                value *= 4 * p[j] * (1 - p[j]);
               // and multiply with grad(2*x_i-1)^{r-1}
               double tmp = value * 2 * (q_degree - 1);
               for (unsigned int i = 0; i < q_degree - 2; ++i)
-                tmp *= 2 * p(comp) - 1;
+                tmp *= 2 * p[comp] - 1;
               derivative_1[comp] += tmp;
             }
 
@@ -373,21 +373,21 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
           {
             for (unsigned int c = 0; c < dim; ++c)
               {
-                v[c][0] = 4 * p(c) * (1 - p(c));
-                v[c][1] = 4 * (1 - 2 * p(c));
+                v[c][0] = 4 * p[c] * (1 - p[c]);
+                v[c][1] = 4 * (1 - 2 * p[c]);
                 v[c][2] = -8;
               }
 
             double tmp = 1.;
             for (unsigned int i = 0; i < q_degree - 1; ++i)
-              tmp *= 2 * p(comp) - 1;
+              tmp *= 2 * p[comp] - 1;
             v[dim][0] = tmp;
 
             if (q_degree >= 2)
               {
                 double tmp = 2 * (q_degree - 1);
                 for (unsigned int i = 0; i < q_degree - 2; ++i)
-                  tmp *= 2 * p(comp) - 1;
+                  tmp *= 2 * p[comp] - 1;
                 v[dim][1] = tmp;
               }
             else
@@ -397,7 +397,7 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
               {
                 double tmp = 4 * (q_degree - 2) * (q_degree - 1);
                 for (unsigned int i = 0; i < q_degree - 3; ++i)
-                  tmp *= 2 * p(comp) - 1;
+                  tmp *= 2 * p[comp] - 1;
                 v[dim][2] = tmp;
               }
             else

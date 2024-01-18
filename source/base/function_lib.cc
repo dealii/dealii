@@ -129,7 +129,7 @@ namespace Functions
   Q1WedgeFunction<dim>::value(const Point<dim> &p, const unsigned int) const
   {
     Assert(dim >= 2, ExcInternalError());
-    return p(0) * p(1);
+    return p[0] * p[1];
   }
 
 
@@ -147,7 +147,7 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<dim> &p = points[i];
-        values[i]           = p(0) * p(1);
+        values[i]           = p[0] * p[1];
       }
   }
 
@@ -166,7 +166,7 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<dim> &p = points[i];
-        values[i](0)        = p(0) * p(1);
+        values[i](0)        = p[0] * p[1];
       }
   }
 
@@ -202,8 +202,8 @@ namespace Functions
   {
     Assert(dim >= 2, ExcInternalError());
     Tensor<1, dim> erg;
-    erg[0] = p(1);
-    erg[1] = p(0);
+    erg[0] = p[1];
+    erg[1] = p[0];
     return erg;
   }
 
@@ -221,8 +221,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        gradients[i][0] = points[i](1);
-        gradients[i][1] = points[i](0);
+        gradients[i][0] = points[i][1];
+        gradients[i][1] = points[i][0];
       }
   }
 
@@ -241,8 +241,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        gradients[i][0][0] = points[i](1);
-        gradients[i][0][1] = points[i](0);
+        gradients[i][0][0] = points[i][1];
+        gradients[i][0][1] = points[i][0];
       }
   }
 
@@ -263,11 +263,11 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          return 1. - p(0) * p(0) + offset;
+          return 1. - p[0] * p[0] + offset;
         case 2:
-          return (1. - p(0) * p(0)) * (1. - p(1) * p(1)) + offset;
+          return (1. - p[0] * p[0]) * (1. - p[1] * p[1]) + offset;
         case 3:
-          return (1. - p(0) * p(0)) * (1. - p(1) * p(1)) * (1. - p(2) * p(2)) +
+          return (1. - p[0] * p[0]) * (1. - p[1] * p[1]) * (1. - p[2] * p[2]) +
                  offset;
         default:
           Assert(false, ExcNotImplemented());
@@ -290,14 +290,14 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              values[i] = 1. - p(0) * p(0) + offset;
+              values[i] = 1. - p[0] * p[0] + offset;
               break;
             case 2:
-              values[i] = (1. - p(0) * p(0)) * (1. - p(1) * p(1)) + offset;
+              values[i] = (1. - p[0] * p[0]) * (1. - p[1] * p[1]) + offset;
               break;
             case 3:
               values[i] =
-                (1. - p(0) * p(0)) * (1. - p(1) * p(1)) * (1. - p(2) * p(2)) +
+                (1. - p[0] * p[0]) * (1. - p[1] * p[1]) * (1. - p[2] * p[2]) +
                 offset;
               break;
             default:
@@ -317,11 +317,11 @@ namespace Functions
         case 1:
           return -2.;
         case 2:
-          return -2. * ((1. - p(0) * p(0)) + (1. - p(1) * p(1)));
+          return -2. * ((1. - p[0] * p[0]) + (1. - p[1] * p[1]));
         case 3:
-          return -2. * ((1. - p(0) * p(0)) * (1. - p(1) * p(1)) +
-                        (1. - p(1) * p(1)) * (1. - p(2) * p(2)) +
-                        (1. - p(2) * p(2)) * (1. - p(0) * p(0)));
+          return -2. * ((1. - p[0] * p[0]) * (1. - p[1] * p[1]) +
+                        (1. - p[1] * p[1]) * (1. - p[2] * p[2]) +
+                        (1. - p[2] * p[2]) * (1. - p[0] * p[0]));
         default:
           Assert(false, ExcNotImplemented());
       }
@@ -346,12 +346,12 @@ namespace Functions
               values[i] = -2.;
               break;
             case 2:
-              values[i] = -2. * ((1. - p(0) * p(0)) + (1. - p(1) * p(1)));
+              values[i] = -2. * ((1. - p[0] * p[0]) + (1. - p[1] * p[1]));
               break;
             case 3:
-              values[i] = -2. * ((1. - p(0) * p(0)) * (1. - p(1) * p(1)) +
-                                 (1. - p(1) * p(1)) * (1. - p(2) * p(2)) +
-                                 (1. - p(2) * p(2)) * (1. - p(0) * p(0)));
+              values[i] = -2. * ((1. - p[0] * p[0]) * (1. - p[1] * p[1]) +
+                                 (1. - p[1] * p[1]) * (1. - p[2] * p[2]) +
+                                 (1. - p[2] * p[2]) * (1. - p[0] * p[0]));
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -367,16 +367,16 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          result[0] = -2. * p(0);
+          result[0] = -2. * p[0];
           break;
         case 2:
-          result[0] = -2. * p(0) * (1. - p(1) * p(1));
-          result[1] = -2. * p(1) * (1. - p(0) * p(0));
+          result[0] = -2. * p[0] * (1. - p[1] * p[1]);
+          result[1] = -2. * p[1] * (1. - p[0] * p[0]);
           break;
         case 3:
-          result[0] = -2. * p(0) * (1. - p(1) * p(1)) * (1. - p(2) * p(2));
-          result[1] = -2. * p(1) * (1. - p(0) * p(0)) * (1. - p(2) * p(2));
-          result[2] = -2. * p(2) * (1. - p(0) * p(0)) * (1. - p(1) * p(1));
+          result[0] = -2. * p[0] * (1. - p[1] * p[1]) * (1. - p[2] * p[2]);
+          result[1] = -2. * p[1] * (1. - p[0] * p[0]) * (1. - p[2] * p[2]);
+          result[2] = -2. * p[2] * (1. - p[0] * p[0]) * (1. - p[1] * p[1]);
           break;
         default:
           Assert(false, ExcNotImplemented());
@@ -399,19 +399,19 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              gradients[i][0] = -2. * p(0);
+              gradients[i][0] = -2. * p[0];
               break;
             case 2:
-              gradients[i][0] = -2. * p(0) * (1. - p(1) * p(1));
-              gradients[i][1] = -2. * p(1) * (1. - p(0) * p(0));
+              gradients[i][0] = -2. * p[0] * (1. - p[1] * p[1]);
+              gradients[i][1] = -2. * p[1] * (1. - p[0] * p[0]);
               break;
             case 3:
               gradients[i][0] =
-                -2. * p(0) * (1. - p(1) * p(1)) * (1. - p(2) * p(2));
+                -2. * p[0] * (1. - p[1] * p[1]) * (1. - p[2] * p[2]);
               gradients[i][1] =
-                -2. * p(1) * (1. - p(0) * p(0)) * (1. - p(2) * p(2));
+                -2. * p[1] * (1. - p[0] * p[0]) * (1. - p[2] * p[2]);
               gradients[i][2] =
-                -2. * p(2) * (1. - p(0) * p(0)) * (1. - p(1) * p(1));
+                -2. * p[2] * (1. - p[0] * p[0]) * (1. - p[1] * p[1]);
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -435,14 +435,14 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          return std::cos(numbers::PI_2 * p(0));
+          return std::cos(numbers::PI_2 * p[0]);
         case 2:
-          return std::cos(numbers::PI_2 * p(0)) *
-                 std::cos(numbers::PI_2 * p(1));
+          return std::cos(numbers::PI_2 * p[0]) *
+                 std::cos(numbers::PI_2 * p[1]);
         case 3:
-          return std::cos(numbers::PI_2 * p(0)) *
-                 std::cos(numbers::PI_2 * p(1)) *
-                 std::cos(numbers::PI_2 * p(2));
+          return std::cos(numbers::PI_2 * p[0]) *
+                 std::cos(numbers::PI_2 * p[1]) *
+                 std::cos(numbers::PI_2 * p[2]);
         default:
           Assert(false, ExcNotImplemented());
       }
@@ -489,16 +489,16 @@ namespace Functions
       {
         case 1:
           return -numbers::PI_2 * numbers::PI_2 *
-                 std::cos(numbers::PI_2 * p(0));
+                 std::cos(numbers::PI_2 * p[0]);
         case 2:
           return -2 * numbers::PI_2 * numbers::PI_2 *
-                 std::cos(numbers::PI_2 * p(0)) *
-                 std::cos(numbers::PI_2 * p(1));
+                 std::cos(numbers::PI_2 * p[0]) *
+                 std::cos(numbers::PI_2 * p[1]);
         case 3:
           return -3 * numbers::PI_2 * numbers::PI_2 *
-                 std::cos(numbers::PI_2 * p(0)) *
-                 std::cos(numbers::PI_2 * p(1)) *
-                 std::cos(numbers::PI_2 * p(2));
+                 std::cos(numbers::PI_2 * p[0]) *
+                 std::cos(numbers::PI_2 * p[1]) *
+                 std::cos(numbers::PI_2 * p[2]);
         default:
           Assert(false, ExcNotImplemented());
       }
@@ -526,24 +526,24 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          result[0] = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0));
+          result[0] = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]);
           break;
         case 2:
-          result[0] = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0)) *
-                      std::cos(numbers::PI_2 * p(1));
-          result[1] = -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                      std::sin(numbers::PI_2 * p(1));
+          result[0] = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]) *
+                      std::cos(numbers::PI_2 * p[1]);
+          result[1] = -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                      std::sin(numbers::PI_2 * p[1]);
           break;
         case 3:
-          result[0] = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0)) *
-                      std::cos(numbers::PI_2 * p(1)) *
-                      std::cos(numbers::PI_2 * p(2));
-          result[1] = -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                      std::sin(numbers::PI_2 * p(1)) *
-                      std::cos(numbers::PI_2 * p(2));
-          result[2] = -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                      std::cos(numbers::PI_2 * p(1)) *
-                      std::sin(numbers::PI_2 * p(2));
+          result[0] = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]) *
+                      std::cos(numbers::PI_2 * p[1]) *
+                      std::cos(numbers::PI_2 * p[2]);
+          result[1] = -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                      std::sin(numbers::PI_2 * p[1]) *
+                      std::cos(numbers::PI_2 * p[2]);
+          result[2] = -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                      std::cos(numbers::PI_2 * p[1]) *
+                      std::sin(numbers::PI_2 * p[2]);
           break;
         default:
           Assert(false, ExcNotImplemented());
@@ -566,26 +566,26 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              gradients[i][0] = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0));
+              gradients[i][0] = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]);
               break;
             case 2:
               gradients[i][0] = -numbers::PI_2 *
-                                std::sin(numbers::PI_2 * p(0)) *
-                                std::cos(numbers::PI_2 * p(1));
+                                std::sin(numbers::PI_2 * p[0]) *
+                                std::cos(numbers::PI_2 * p[1]);
               gradients[i][1] = -numbers::PI_2 *
-                                std::cos(numbers::PI_2 * p(0)) *
-                                std::sin(numbers::PI_2 * p(1));
+                                std::cos(numbers::PI_2 * p[0]) *
+                                std::sin(numbers::PI_2 * p[1]);
               break;
             case 3:
               gradients[i][0] =
-                -numbers::PI_2 * std::sin(numbers::PI_2 * p(0)) *
-                std::cos(numbers::PI_2 * p(1)) * std::cos(numbers::PI_2 * p(2));
+                -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]) *
+                std::cos(numbers::PI_2 * p[1]) * std::cos(numbers::PI_2 * p[2]);
               gradients[i][1] =
-                -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                std::sin(numbers::PI_2 * p(1)) * std::cos(numbers::PI_2 * p(2));
+                -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                std::sin(numbers::PI_2 * p[1]) * std::cos(numbers::PI_2 * p[2]);
               gradients[i][2] =
-                -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                std::cos(numbers::PI_2 * p(1)) * std::sin(numbers::PI_2 * p(2));
+                -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                std::cos(numbers::PI_2 * p[1]) * std::sin(numbers::PI_2 * p[2]);
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -603,14 +603,14 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          result[0][0] = -pi2 * std::cos(numbers::PI_2 * p(0));
+          result[0][0] = -pi2 * std::cos(numbers::PI_2 * p[0]);
           break;
         case 2:
           {
-            const double coco = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                std::cos(numbers::PI_2 * p(1));
-            const double sisi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                std::sin(numbers::PI_2 * p(1));
+            const double coco = -pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                std::cos(numbers::PI_2 * p[1]);
+            const double sisi = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                std::sin(numbers::PI_2 * p[1]);
             result[0][0] = coco;
             result[1][1] = coco;
             // for SymmetricTensor we assign [ij] and [ji] simultaneously:
@@ -619,18 +619,18 @@ namespace Functions
           break;
         case 3:
           {
-            const double cococo = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                  std::cos(numbers::PI_2 * p(1)) *
-                                  std::cos(numbers::PI_2 * p(2));
-            const double sisico = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                  std::sin(numbers::PI_2 * p(1)) *
-                                  std::cos(numbers::PI_2 * p(2));
-            const double sicosi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                  std::cos(numbers::PI_2 * p(1)) *
-                                  std::sin(numbers::PI_2 * p(2));
-            const double cosisi = pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                  std::sin(numbers::PI_2 * p(1)) *
-                                  std::sin(numbers::PI_2 * p(2));
+            const double cococo = -pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                  std::cos(numbers::PI_2 * p[1]) *
+                                  std::cos(numbers::PI_2 * p[2]);
+            const double sisico = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                  std::sin(numbers::PI_2 * p[1]) *
+                                  std::cos(numbers::PI_2 * p[2]);
+            const double sicosi = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                  std::cos(numbers::PI_2 * p[1]) *
+                                  std::sin(numbers::PI_2 * p[2]);
+            const double cosisi = pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                  std::sin(numbers::PI_2 * p[1]) *
+                                  std::sin(numbers::PI_2 * p[2]);
 
             result[0][0] = cococo;
             result[1][1] = cococo;
@@ -665,14 +665,14 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              hessians[i][0][0] = -pi2 * std::cos(numbers::PI_2 * p(0));
+              hessians[i][0][0] = -pi2 * std::cos(numbers::PI_2 * p[0]);
               break;
             case 2:
               {
-                const double coco = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                    std::cos(numbers::PI_2 * p(1));
-                const double sisi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                    std::sin(numbers::PI_2 * p(1));
+                const double coco = -pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                    std::cos(numbers::PI_2 * p[1]);
+                const double sisi = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                    std::sin(numbers::PI_2 * p[1]);
                 hessians[i][0][0] = coco;
                 hessians[i][1][1] = coco;
                 // for SymmetricTensor we assign [ij] and [ji] simultaneously:
@@ -681,18 +681,18 @@ namespace Functions
               break;
             case 3:
               {
-                const double cococo = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                      std::cos(numbers::PI_2 * p(1)) *
-                                      std::cos(numbers::PI_2 * p(2));
-                const double sisico = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                      std::sin(numbers::PI_2 * p(1)) *
-                                      std::cos(numbers::PI_2 * p(2));
-                const double sicosi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                      std::cos(numbers::PI_2 * p(1)) *
-                                      std::sin(numbers::PI_2 * p(2));
-                const double cosisi = pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                      std::sin(numbers::PI_2 * p(1)) *
-                                      std::sin(numbers::PI_2 * p(2));
+                const double cococo = -pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                      std::cos(numbers::PI_2 * p[1]) *
+                                      std::cos(numbers::PI_2 * p[2]);
+                const double sisico = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                      std::sin(numbers::PI_2 * p[1]) *
+                                      std::cos(numbers::PI_2 * p[2]);
+                const double sicosi = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                      std::cos(numbers::PI_2 * p[1]) *
+                                      std::sin(numbers::PI_2 * p[2]);
+                const double cosisi = pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                      std::sin(numbers::PI_2 * p[1]) *
+                                      std::sin(numbers::PI_2 * p[2]);
 
                 hessians[i][0][0] = cococo;
                 hessians[i][1][1] = cococo;
@@ -728,14 +728,14 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          return (-numbers::PI_2 * std::sin(numbers::PI_2 * p(0)));
+          return (-numbers::PI_2 * std::sin(numbers::PI_2 * p[0]));
         case 2:
-          return (-numbers::PI_2 * std::sin(numbers::PI_2 * p(d)) *
-                  std::cos(numbers::PI_2 * p(d1)));
+          return (-numbers::PI_2 * std::sin(numbers::PI_2 * p[d]) *
+                  std::cos(numbers::PI_2 * p[d1]));
         case 3:
-          return (-numbers::PI_2 * std::sin(numbers::PI_2 * p(d)) *
-                  std::cos(numbers::PI_2 * p(d1)) *
-                  std::cos(numbers::PI_2 * p(d2)));
+          return (-numbers::PI_2 * std::sin(numbers::PI_2 * p[d]) *
+                  std::cos(numbers::PI_2 * p[d1]) *
+                  std::cos(numbers::PI_2 * p[d2]));
         default:
           Assert(false, ExcNotImplemented());
       }
@@ -752,24 +752,24 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          result(0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0));
+          result(0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]);
           break;
         case 2:
-          result(0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0)) *
-                      std::cos(numbers::PI_2 * p(1));
-          result(1) = -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                      std::sin(numbers::PI_2 * p(1));
+          result(0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]) *
+                      std::cos(numbers::PI_2 * p[1]);
+          result(1) = -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                      std::sin(numbers::PI_2 * p[1]);
           break;
         case 3:
-          result(0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0)) *
-                      std::cos(numbers::PI_2 * p(1)) *
-                      std::cos(numbers::PI_2 * p(2));
-          result(1) = -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                      std::sin(numbers::PI_2 * p(1)) *
-                      std::cos(numbers::PI_2 * p(2));
-          result(2) = -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                      std::cos(numbers::PI_2 * p(1)) *
-                      std::sin(numbers::PI_2 * p(2));
+          result(0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]) *
+                      std::cos(numbers::PI_2 * p[1]) *
+                      std::cos(numbers::PI_2 * p[2]);
+          result(1) = -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                      std::sin(numbers::PI_2 * p[1]) *
+                      std::cos(numbers::PI_2 * p[2]);
+          result(2) = -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                      std::cos(numbers::PI_2 * p[1]) *
+                      std::sin(numbers::PI_2 * p[2]);
           break;
         default:
           Assert(false, ExcNotImplemented());
@@ -795,16 +795,16 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              values[i] = -numbers::PI_2 * std::sin(numbers::PI_2 * p(d));
+              values[i] = -numbers::PI_2 * std::sin(numbers::PI_2 * p[d]);
               break;
             case 2:
-              values[i] = -numbers::PI_2 * std::sin(numbers::PI_2 * p(d)) *
-                          std::cos(numbers::PI_2 * p(d1));
+              values[i] = -numbers::PI_2 * std::sin(numbers::PI_2 * p[d]) *
+                          std::cos(numbers::PI_2 * p[d1]);
               break;
             case 3:
-              values[i] = -numbers::PI_2 * std::sin(numbers::PI_2 * p(d)) *
-                          std::cos(numbers::PI_2 * p(d1)) *
-                          std::cos(numbers::PI_2 * p(d2));
+              values[i] = -numbers::PI_2 * std::sin(numbers::PI_2 * p[d]) *
+                          std::cos(numbers::PI_2 * p[d1]) *
+                          std::cos(numbers::PI_2 * p[d2]);
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -828,24 +828,24 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              values[i](0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0));
+              values[i](0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]);
               break;
             case 2:
-              values[i](0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0)) *
-                             std::cos(numbers::PI_2 * p(1));
-              values[i](1) = -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                             std::sin(numbers::PI_2 * p(1));
+              values[i](0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]) *
+                             std::cos(numbers::PI_2 * p[1]);
+              values[i](1) = -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                             std::sin(numbers::PI_2 * p[1]);
               break;
             case 3:
-              values[i](0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p(0)) *
-                             std::cos(numbers::PI_2 * p(1)) *
-                             std::cos(numbers::PI_2 * p(2));
-              values[i](1) = -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                             std::sin(numbers::PI_2 * p(1)) *
-                             std::cos(numbers::PI_2 * p(2));
-              values[i](2) = -numbers::PI_2 * std::cos(numbers::PI_2 * p(0)) *
-                             std::cos(numbers::PI_2 * p(1)) *
-                             std::sin(numbers::PI_2 * p(2));
+              values[i](0) = -numbers::PI_2 * std::sin(numbers::PI_2 * p[0]) *
+                             std::cos(numbers::PI_2 * p[1]) *
+                             std::cos(numbers::PI_2 * p[2]);
+              values[i](1) = -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                             std::sin(numbers::PI_2 * p[1]) *
+                             std::cos(numbers::PI_2 * p[2]);
+              values[i](2) = -numbers::PI_2 * std::cos(numbers::PI_2 * p[0]) *
+                             std::cos(numbers::PI_2 * p[1]) *
+                             std::sin(numbers::PI_2 * p[2]);
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -877,24 +877,24 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          result[0] = -pi2 * std::cos(numbers::PI_2 * p(0));
+          result[0] = -pi2 * std::cos(numbers::PI_2 * p[0]);
           break;
         case 2:
-          result[d] = -pi2 * std::cos(numbers::PI_2 * p(d)) *
-                      std::cos(numbers::PI_2 * p(d1));
-          result[d1] = pi2 * std::sin(numbers::PI_2 * p(d)) *
-                       std::sin(numbers::PI_2 * p(d1));
+          result[d] = -pi2 * std::cos(numbers::PI_2 * p[d]) *
+                      std::cos(numbers::PI_2 * p[d1]);
+          result[d1] = pi2 * std::sin(numbers::PI_2 * p[d]) *
+                       std::sin(numbers::PI_2 * p[d1]);
           break;
         case 3:
-          result[d] = -pi2 * std::cos(numbers::PI_2 * p(d)) *
-                      std::cos(numbers::PI_2 * p(d1)) *
-                      std::cos(numbers::PI_2 * p(d2));
-          result[d1] = pi2 * std::sin(numbers::PI_2 * p(d)) *
-                       std::sin(numbers::PI_2 * p(d1)) *
-                       std::cos(numbers::PI_2 * p(d2));
-          result[d2] = pi2 * std::sin(numbers::PI_2 * p(d)) *
-                       std::cos(numbers::PI_2 * p(d1)) *
-                       std::sin(numbers::PI_2 * p(d2));
+          result[d] = -pi2 * std::cos(numbers::PI_2 * p[d]) *
+                      std::cos(numbers::PI_2 * p[d1]) *
+                      std::cos(numbers::PI_2 * p[d2]);
+          result[d1] = pi2 * std::sin(numbers::PI_2 * p[d]) *
+                       std::sin(numbers::PI_2 * p[d1]) *
+                       std::cos(numbers::PI_2 * p[d2]);
+          result[d2] = pi2 * std::sin(numbers::PI_2 * p[d]) *
+                       std::cos(numbers::PI_2 * p[d1]) *
+                       std::sin(numbers::PI_2 * p[d2]);
           break;
         default:
           Assert(false, ExcNotImplemented());
@@ -924,24 +924,24 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              result[0] = -pi2 * std::cos(numbers::PI_2 * p(0));
+              result[0] = -pi2 * std::cos(numbers::PI_2 * p[0]);
               break;
             case 2:
-              result[d] = -pi2 * std::cos(numbers::PI_2 * p(d)) *
-                          std::cos(numbers::PI_2 * p(d1));
-              result[d1] = pi2 * std::sin(numbers::PI_2 * p(d)) *
-                           std::sin(numbers::PI_2 * p(d1));
+              result[d] = -pi2 * std::cos(numbers::PI_2 * p[d]) *
+                          std::cos(numbers::PI_2 * p[d1]);
+              result[d1] = pi2 * std::sin(numbers::PI_2 * p[d]) *
+                           std::sin(numbers::PI_2 * p[d1]);
               break;
             case 3:
-              result[d] = -pi2 * std::cos(numbers::PI_2 * p(d)) *
-                          std::cos(numbers::PI_2 * p(d1)) *
-                          std::cos(numbers::PI_2 * p(d2));
-              result[d1] = pi2 * std::sin(numbers::PI_2 * p(d)) *
-                           std::sin(numbers::PI_2 * p(d1)) *
-                           std::cos(numbers::PI_2 * p(d2));
-              result[d2] = pi2 * std::sin(numbers::PI_2 * p(d)) *
-                           std::cos(numbers::PI_2 * p(d1)) *
-                           std::sin(numbers::PI_2 * p(d2));
+              result[d] = -pi2 * std::cos(numbers::PI_2 * p[d]) *
+                          std::cos(numbers::PI_2 * p[d1]) *
+                          std::cos(numbers::PI_2 * p[d2]);
+              result[d1] = pi2 * std::sin(numbers::PI_2 * p[d]) *
+                           std::sin(numbers::PI_2 * p[d1]) *
+                           std::cos(numbers::PI_2 * p[d2]);
+              result[d2] = pi2 * std::sin(numbers::PI_2 * p[d]) *
+                           std::cos(numbers::PI_2 * p[d1]) *
+                           std::sin(numbers::PI_2 * p[d2]);
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -965,14 +965,14 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              gradients[i][0][0] = -pi2 * std::cos(numbers::PI_2 * p(0));
+              gradients[i][0][0] = -pi2 * std::cos(numbers::PI_2 * p[0]);
               break;
             case 2:
               {
-                const double coco = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                    std::cos(numbers::PI_2 * p(1));
-                const double sisi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                    std::sin(numbers::PI_2 * p(1));
+                const double coco = -pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                    std::cos(numbers::PI_2 * p[1]);
+                const double sisi = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                    std::sin(numbers::PI_2 * p[1]);
                 gradients[i][0][0] = coco;
                 gradients[i][1][1] = coco;
                 gradients[i][0][1] = sisi;
@@ -981,18 +981,18 @@ namespace Functions
               break;
             case 3:
               {
-                const double cococo = -pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                      std::cos(numbers::PI_2 * p(1)) *
-                                      std::cos(numbers::PI_2 * p(2));
-                const double sisico = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                      std::sin(numbers::PI_2 * p(1)) *
-                                      std::cos(numbers::PI_2 * p(2));
-                const double sicosi = pi2 * std::sin(numbers::PI_2 * p(0)) *
-                                      std::cos(numbers::PI_2 * p(1)) *
-                                      std::sin(numbers::PI_2 * p(2));
-                const double cosisi = pi2 * std::cos(numbers::PI_2 * p(0)) *
-                                      std::sin(numbers::PI_2 * p(1)) *
-                                      std::sin(numbers::PI_2 * p(2));
+                const double cococo = -pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                      std::cos(numbers::PI_2 * p[1]) *
+                                      std::cos(numbers::PI_2 * p[2]);
+                const double sisico = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                      std::sin(numbers::PI_2 * p[1]) *
+                                      std::cos(numbers::PI_2 * p[2]);
+                const double sicosi = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                      std::cos(numbers::PI_2 * p[1]) *
+                                      std::sin(numbers::PI_2 * p[2]);
+                const double cosisi = pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                      std::sin(numbers::PI_2 * p[1]) *
+                                      std::sin(numbers::PI_2 * p[2]);
 
                 gradients[i][0][0] = cococo;
                 gradients[i][1][1] = cococo;
@@ -1021,11 +1021,11 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          return std::exp(p(0));
+          return std::exp(p[0]);
         case 2:
-          return std::exp(p(0)) * std::exp(p(1));
+          return std::exp(p[0]) * std::exp(p[1]);
         case 3:
-          return std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+          return std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
         default:
           Assert(false, ExcNotImplemented());
       }
@@ -1047,13 +1047,13 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              values[i] = std::exp(p(0));
+              values[i] = std::exp(p[0]);
               break;
             case 2:
-              values[i] = std::exp(p(0)) * std::exp(p(1));
+              values[i] = std::exp(p[0]) * std::exp(p[1]);
               break;
             case 3:
-              values[i] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+              values[i] = std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -1068,11 +1068,11 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          return std::exp(p(0));
+          return std::exp(p[0]);
         case 2:
-          return 2 * std::exp(p(0)) * std::exp(p(1));
+          return 2 * std::exp(p[0]) * std::exp(p[1]);
         case 3:
-          return 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+          return 3 * std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
         default:
           Assert(false, ExcNotImplemented());
       }
@@ -1094,13 +1094,13 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              values[i] = std::exp(p(0));
+              values[i] = std::exp(p[0]);
               break;
             case 2:
-              values[i] = 2 * std::exp(p(0)) * std::exp(p(1));
+              values[i] = 2 * std::exp(p[0]) * std::exp(p[1]);
               break;
             case 3:
-              values[i] = 3 * std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+              values[i] = 3 * std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
               break;
             default:
               Assert(false, ExcNotImplemented());
@@ -1116,14 +1116,14 @@ namespace Functions
     switch (dim)
       {
         case 1:
-          result[0] = std::exp(p(0));
+          result[0] = std::exp(p[0]);
           break;
         case 2:
-          result[0] = std::exp(p(0)) * std::exp(p(1));
+          result[0] = std::exp(p[0]) * std::exp(p[1]);
           result[1] = result[0];
           break;
         case 3:
-          result[0] = std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+          result[0] = std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
           result[1] = result[0];
           result[2] = result[0];
           break;
@@ -1148,15 +1148,15 @@ namespace Functions
         switch (dim)
           {
             case 1:
-              gradients[i][0] = std::exp(p(0));
+              gradients[i][0] = std::exp(p[0]);
               break;
             case 2:
-              gradients[i][0] = std::exp(p(0)) * std::exp(p(1));
+              gradients[i][0] = std::exp(p[0]) * std::exp(p[1]);
               gradients[i][1] = gradients[i][0];
               break;
             case 3:
               gradients[i][0] =
-                std::exp(p(0)) * std::exp(p(1)) * std::exp(p(2));
+                std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
               gradients[i][1] = gradients[i][0];
               gradients[i][2] = gradients[i][0];
               break;
@@ -1172,8 +1172,8 @@ namespace Functions
   double
   LSingularityFunction::value(const Point<2> &p, const unsigned int) const
   {
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
 
     if ((x >= 0) && (y >= 0))
       return 0.;
@@ -1196,8 +1196,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        const double x = points[i](0);
-        const double y = points[i](1);
+        const double x = points[i][0];
+        const double y = points[i][1];
 
         if ((x >= 0) && (y >= 0))
           values[i] = 0.;
@@ -1225,8 +1225,8 @@ namespace Functions
       {
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
-        const double x = points[i](0);
-        const double y = points[i](1);
+        const double x = points[i][0];
+        const double y = points[i][1];
 
         if ((x >= 0) && (y >= 0))
           values[i](0) = 0.;
@@ -1268,8 +1268,8 @@ namespace Functions
   Tensor<1, 2>
   LSingularityFunction::gradient(const Point<2> &p, const unsigned int) const
   {
-    const double x   = p(0);
-    const double y   = p(1);
+    const double x   = p[0];
+    const double y   = p[1];
     const double phi = std::atan2(y, -x) + numbers::PI;
     const double r43 = std::pow(x * x + y * y, 2. / 3.);
 
@@ -1296,8 +1296,8 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<2> &p   = points[i];
-        const double    x   = p(0);
-        const double    y   = p(1);
+        const double    x   = p[0];
+        const double    y   = p[1];
         const double    phi = std::atan2(y, -x) + numbers::PI;
         const double    r43 = std::pow(x * x + y * y, 2. / 3.);
 
@@ -1325,8 +1325,8 @@ namespace Functions
         Assert(gradients[i].size() == 1,
                ExcDimensionMismatch(gradients[i].size(), 1));
         const Point<2> &p   = points[i];
-        const double    x   = p(0);
-        const double    y   = p(1);
+        const double    x   = p[0];
+        const double    y   = p[1];
         const double    phi = std::atan2(y, -x) + numbers::PI;
         const double    r43 = std::pow(x * x + y * y, 2. / 3.);
 
@@ -1352,13 +1352,13 @@ namespace Functions
   {
     AssertIndexRange(d, 2);
 
-    const double x   = p(0);
-    const double y   = p(1);
+    const double x   = p[0];
+    const double y   = p[1];
     const double phi = std::atan2(y, -x) + numbers::PI;
     const double r43 = std::pow(x * x + y * y, 2. / 3.);
 
     return 2. / 3. *
-           (std::sin(2. / 3. * phi) * p(d) +
+           (std::sin(2. / 3. * phi) * p[d] +
             (d == 0 ? (std::cos(2. / 3. * phi) * y) :
                       (-std::cos(2. / 3. * phi) * x))) /
            r43;
@@ -1376,13 +1376,13 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<2> &p   = points[i];
-        const double    x   = p(0);
-        const double    y   = p(1);
+        const double    x   = p[0];
+        const double    y   = p[1];
         const double    phi = std::atan2(y, -x) + numbers::PI;
         const double    r43 = std::pow(x * x + y * y, 2. / 3.);
 
         values[i] = 2. / 3. *
-                    (std::sin(2. / 3. * phi) * p(d) +
+                    (std::sin(2. / 3. * phi) * p[d] +
                      (d == 0 ? (std::cos(2. / 3. * phi) * y) :
                                (-std::cos(2. / 3. * phi) * x))) /
                     r43;
@@ -1402,8 +1402,8 @@ namespace Functions
       {
         AssertDimension(values[i].size(), 2);
         const Point<2> &p   = points[i];
-        const double    x   = p(0);
-        const double    y   = p(1);
+        const double    x   = p[0];
+        const double    y   = p[1];
         const double    phi = std::atan2(y, -x) + numbers::PI;
         const double    r43 = std::pow(x * x + y * y, 2. / 3.);
 
@@ -1473,8 +1473,8 @@ namespace Functions
   SlitSingularityFunction<dim>::value(const Point<dim> &p,
                                       const unsigned int) const
   {
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
 
     const double phi       = std::atan2(x, y) + numbers::PI;
     const double r_squared = x * x + y * y;
@@ -1495,8 +1495,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        const double x = points[i](0);
-        const double y = points[i](1);
+        const double x = points[i][0];
+        const double y = points[i][1];
 
         const double phi       = std::atan2(x, y) + numbers::PI;
         const double r_squared = x * x + y * y;
@@ -1520,8 +1520,8 @@ namespace Functions
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
 
-        const double x = points[i](0);
-        const double y = points[i](1);
+        const double x = points[i][0];
+        const double y = points[i][1];
 
         const double phi       = std::atan2(x, y) + numbers::PI;
         const double r_squared = x * x + y * y;
@@ -1560,8 +1560,8 @@ namespace Functions
   SlitSingularityFunction<dim>::gradient(const Point<dim> &p,
                                          const unsigned int) const
   {
-    const double x   = p(0);
-    const double y   = p(1);
+    const double x   = p[0];
+    const double y   = p[1];
     const double phi = std::atan2(x, y) + numbers::PI;
     const double r64 = std::pow(x * x + y * y, 3. / 4.);
 
@@ -1589,8 +1589,8 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<dim> &p   = points[i];
-        const double      x   = p(0);
-        const double      y   = p(1);
+        const double      x   = p[0];
+        const double      y   = p[1];
         const double      phi = std::atan2(x, y) + numbers::PI;
         const double      r64 = std::pow(x * x + y * y, 3. / 4.);
 
@@ -1620,8 +1620,8 @@ namespace Functions
                ExcDimensionMismatch(gradients[i].size(), 1));
 
         const Point<dim> &p   = points[i];
-        const double      x   = p(0);
-        const double      y   = p(1);
+        const double      x   = p[0];
+        const double      y   = p[1];
         const double      phi = std::atan2(x, y) + numbers::PI;
         const double      r64 = std::pow(x * x + y * y, 3. / 4.);
 
@@ -1643,8 +1643,8 @@ namespace Functions
   SlitHyperSingularityFunction::value(const Point<2> &p,
                                       const unsigned int) const
   {
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
 
     const double phi       = std::atan2(x, y) + numbers::PI;
     const double r_squared = x * x + y * y;
@@ -1663,8 +1663,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < points.size(); ++i)
       {
-        const double x = points[i](0);
-        const double y = points[i](1);
+        const double x = points[i][0];
+        const double y = points[i][1];
 
         const double phi       = std::atan2(x, y) + numbers::PI;
         const double r_squared = x * x + y * y;
@@ -1687,8 +1687,8 @@ namespace Functions
         Assert(values[i].size() == 1,
                ExcDimensionMismatch(values[i].size(), 1));
 
-        const double x = points[i](0);
-        const double y = points[i](1);
+        const double x = points[i][0];
+        const double y = points[i][1];
 
         const double phi       = std::atan2(x, y) + numbers::PI;
         const double r_squared = x * x + y * y;
@@ -1724,8 +1724,8 @@ namespace Functions
   SlitHyperSingularityFunction::gradient(const Point<2> &p,
                                          const unsigned int) const
   {
-    const double x   = p(0);
-    const double y   = p(1);
+    const double x   = p[0];
+    const double y   = p[1];
     const double phi = std::atan2(x, y) + numbers::PI;
     const double r78 = std::pow(x * x + y * y, 7. / 8.);
 
@@ -1753,8 +1753,8 @@ namespace Functions
     for (unsigned int i = 0; i < points.size(); ++i)
       {
         const Point<2> &p   = points[i];
-        const double    x   = p(0);
-        const double    y   = p(1);
+        const double    x   = p[0];
+        const double    y   = p[1];
         const double    phi = std::atan2(x, y) + numbers::PI;
         const double    r78 = std::pow(x * x + y * y, 7. / 8.);
 
@@ -1782,8 +1782,8 @@ namespace Functions
                ExcDimensionMismatch(gradients[i].size(), 1));
 
         const Point<2> &p   = points[i];
-        const double    x   = p(0);
-        const double    y   = p(1);
+        const double    x   = p[0];
+        const double    y   = p[1];
         const double    phi = std::atan2(x, y) + numbers::PI;
         const double    r78 = std::pow(x * x + y * y, 7. / 8.);
 
@@ -1810,7 +1810,7 @@ namespace Functions
           angle = 0;
           break;
         case 2:
-          angle = std::atan2(direction(0), direction(1));
+          angle = std::atan2(direction[0], direction[1]);
           break;
         case 3:
           Assert(false, ExcNotImplemented());
@@ -1825,7 +1825,7 @@ namespace Functions
   double
   JumpFunction<dim>::value(const Point<dim> &p, const unsigned int) const
   {
-    const double x = steepness * (-cosine * p(0) + sine * p(1));
+    const double x = steepness * (-cosine * p[0] + sine * p[1]);
     return -std::atan(x);
   }
 
@@ -1842,7 +1842,7 @@ namespace Functions
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
-        const double x = steepness * (-cosine * p[i](0) + sine * p[i](1));
+        const double x = steepness * (-cosine * p[i][0] + sine * p[i][1]);
         values[i]      = -std::atan(x);
       }
   }
@@ -1852,7 +1852,7 @@ namespace Functions
   double
   JumpFunction<dim>::laplacian(const Point<dim> &p, const unsigned int) const
   {
-    const double x = steepness * (-cosine * p(0) + sine * p(1));
+    const double x = steepness * (-cosine * p[0] + sine * p[1]);
     const double r = 1 + x * x;
     return 2 * steepness * steepness * x / (r * r);
   }
@@ -1871,7 +1871,7 @@ namespace Functions
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
-        const double x = steepness * (-cosine * p[i](0) + sine * p[i](1));
+        const double x = steepness * (-cosine * p[i][0] + sine * p[i][1]);
         const double r = 1 + x * x;
         values[i]      = f * x / (r * r);
       }
@@ -1883,7 +1883,7 @@ namespace Functions
   Tensor<1, dim>
   JumpFunction<dim>::gradient(const Point<dim> &p, const unsigned int) const
   {
-    const double   x = steepness * (-cosine * p(0) + sine * p(1));
+    const double   x = steepness * (-cosine * p[0] + sine * p[1]);
     const double   r = -steepness * (1 + x * x);
     Tensor<1, dim> erg;
     erg[0] = cosine * r;
@@ -1904,7 +1904,7 @@ namespace Functions
 
     for (unsigned int i = 0; i < p.size(); ++i)
       {
-        const double x  = steepness * (cosine * p[i](0) + sine * p[i](1));
+        const double x  = steepness * (cosine * p[i][0] + sine * p[i][1]);
         const double r  = -steepness * (1 + x * x);
         gradients[i][0] = cosine * r;
         gradients[i][1] = sine * r;
@@ -2316,8 +2316,8 @@ namespace Functions
   {
     Assert(dim == 2, ExcNotImplemented());
     const double r  = p.distance(center);
-    const double co = (r == 0.) ? 0. : (p(0) - center(0)) / r;
-    const double si = (r == 0.) ? 0. : (p(1) - center(1)) / r;
+    const double co = (r == 0.) ? 0. : (p[0] - center[0]) / r;
+    const double si = (r == 0.) ? 0. : (p[1] - center[1]) / r;
 
     const double dJn =
       (order == 0) ?
@@ -2344,8 +2344,8 @@ namespace Functions
       {
         const Point<dim> &p  = points[k];
         const double      r  = p.distance(center);
-        const double      co = (r == 0.) ? 0. : (p(0) - center(0)) / r;
-        const double      si = (r == 0.) ? 0. : (p(1) - center(1)) / r;
+        const double      co = (r == 0.) ? 0. : (p[0] - center[0]) / r;
+        const double      si = (r == 0.) ? 0. : (p[1] - center[1]) / r;
 
         const double dJn =
           (order == 0) ?
@@ -2960,8 +2960,8 @@ namespace Functions
   RayleighKotheVortex<dim>::vector_value(const Point<dim> &point,
                                          Vector<double>   &values) const
   {
-    const double pi_x = numbers::PI * point(0);
-    const double pi_y = numbers::PI * point(1);
+    const double pi_x = numbers::PI * point[0];
+    const double pi_y = numbers::PI * point[1];
     const double pi_t = numbers::PI / T * this->get_time();
 
     values[0] = -2 * std::cos(pi_t) *

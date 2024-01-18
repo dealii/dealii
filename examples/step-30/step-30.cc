@@ -81,7 +81,7 @@ namespace Step30
 
       for (unsigned int i = 0; i < values.size(); ++i)
         {
-          if (points[i](0) < 0.5)
+          if (points[i][0] < 0.5)
             values[i] = 1.;
           else
             values[i] = 0.;
@@ -111,15 +111,15 @@ namespace Step30
 
       for (unsigned int i = 0; i < points.size(); ++i)
         {
-          if (points[i](0) > 0)
+          if (points[i][0] > 0)
             {
-              values[i](0) = -points[i](1);
-              values[i](1) = points[i](0);
+              values[i][0] = -points[i][1];
+              values[i][1] = points[i][0];
             }
           else
             {
               values[i]    = Point<dim>();
-              values[i](0) = -points[i](1);
+              values[i][0] = -points[i][1];
             }
         }
     }
@@ -873,7 +873,7 @@ namespace Step30
           double                  sum_of_average_jumps = 0.;
           for (unsigned int i = 0; i < dim; ++i)
             {
-              average_jumps[i] = jump(i) / area(i);
+              average_jumps[i] = jump[i] / area[i];
               sum_of_average_jumps += average_jumps[i];
             }
 
@@ -946,10 +946,9 @@ namespace Step30
           {
             // Create the rectangular domain.
             Point<dim> p1, p2;
-            p1(0) = 0;
-            p1(0) = -1;
+            p1[0] = -1.;
             for (unsigned int i = 0; i < dim; ++i)
-              p2(i) = 1.;
+              p2[i] = 1.;
             // Adjust the number of cells in different directions to obtain
             // completely isotropic cells for the original mesh.
             std::vector<unsigned int> repetitions(dim, 1);

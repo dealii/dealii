@@ -79,11 +79,11 @@ FE_FaceQ<dim, spacedim>::FE_FaceQ(const unsigned int degree)
             {
               Point<codim> p;
 
-              p(0) = points[ix][0];
+              p[0] = points[ix][0];
               if (codim > 1)
-                p(1) = points[iy][0];
+                p[1] = points[iy][0];
               if (codim > 2)
-                p(2) = points[iz][0];
+                p[2] = points[iz][0];
 
               this->unit_face_support_points[0][k++] = p;
             }

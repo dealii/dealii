@@ -138,8 +138,8 @@ namespace internal
         for (const Point<2> &p : points)
           {
             Point<3> cell_point;
-            cell_point[xi_index]    = xi_scale * p(0) + xi_translation;
-            cell_point[eta_index]   = eta_scale * p(1) + eta_translation;
+            cell_point[xi_index]    = xi_scale * p[0] + xi_translation;
+            cell_point[eta_index]   = eta_scale * p[1] + eta_translation;
             cell_point[const_index] = const_value;
             q_points.push_back(cell_point);
           }
@@ -376,14 +376,14 @@ QProjector<2>::project_to_face(const ReferenceCell   &reference_cell,
         switch (face_no)
           {
             case 0:
-              q_points[p] = Point<dim>(quadrature.point(p)(0), 0);
+              q_points[p] = Point<dim>(quadrature.point(p)[0], 0);
               break;
             case 1:
               q_points[p] =
-                Point<dim>(1 - quadrature.point(p)(0), quadrature.point(p)(0));
+                Point<dim>(1 - quadrature.point(p)[0], quadrature.point(p)[0]);
               break;
             case 2:
-              q_points[p] = Point<dim>(0, 1 - quadrature.point(p)(0));
+              q_points[p] = Point<dim>(0, 1 - quadrature.point(p)[0]);
               break;
             default:
               Assert(false, ExcInternalError());
@@ -395,16 +395,16 @@ QProjector<2>::project_to_face(const ReferenceCell   &reference_cell,
         switch (face_no)
           {
             case 0:
-              q_points[p] = Point<dim>(0, quadrature.point(p)(0));
+              q_points[p] = Point<dim>(0, quadrature.point(p)[0]);
               break;
             case 1:
-              q_points[p] = Point<dim>(1, quadrature.point(p)(0));
+              q_points[p] = Point<dim>(1, quadrature.point(p)[0]);
               break;
             case 2:
-              q_points[p] = Point<dim>(quadrature.point(p)(0), 0);
+              q_points[p] = Point<dim>(quadrature.point(p)[0], 0);
               break;
             case 3:
-              q_points[p] = Point<dim>(quadrature.point(p)(0), 1);
+              q_points[p] = Point<dim>(quadrature.point(p)[0], 1);
               break;
             default:
               Assert(false, ExcInternalError());
@@ -519,11 +519,11 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
               switch (subface_no)
                 {
                   case 0:
-                    q_points[p] = Point<dim>(quadrature.point(p)(0) / 2, 0);
+                    q_points[p] = Point<dim>(quadrature.point(p)[0] / 2, 0);
                     break;
                   case 1:
                     q_points[p] =
-                      Point<dim>(0.5 + quadrature.point(p)(0) / 2, 0);
+                      Point<dim>(0.5 + quadrature.point(p)[0] / 2, 0);
                     break;
                   default:
                     Assert(false, ExcInternalError());
@@ -533,12 +533,12 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
               switch (subface_no)
                 {
                   case 0:
-                    q_points[p] = Point<dim>(1 - quadrature.point(p)(0) / 2,
-                                             quadrature.point(p)(0) / 2);
+                    q_points[p] = Point<dim>(1 - quadrature.point(p)[0] / 2,
+                                             quadrature.point(p)[0] / 2);
                     break;
                   case 1:
-                    q_points[p] = Point<dim>(0.5 - quadrature.point(p)(0) / 2,
-                                             0.5 + quadrature.point(p)(0) / 2);
+                    q_points[p] = Point<dim>(0.5 - quadrature.point(p)[0] / 2,
+                                             0.5 + quadrature.point(p)[0] / 2);
                     break;
                   default:
                     Assert(false, ExcInternalError());
@@ -548,11 +548,11 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
               switch (subface_no)
                 {
                   case 0:
-                    q_points[p] = Point<dim>(0, 1 - quadrature.point(p)(0) / 2);
+                    q_points[p] = Point<dim>(0, 1 - quadrature.point(p)[0] / 2);
                     break;
                   case 1:
                     q_points[p] =
-                      Point<dim>(0, 0.5 - quadrature.point(p)(0) / 2);
+                      Point<dim>(0, 0.5 - quadrature.point(p)[0] / 2);
                     break;
                   default:
                     Assert(false, ExcInternalError());
@@ -571,11 +571,11 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
               switch (subface_no)
                 {
                   case 0:
-                    q_points[p] = Point<dim>(0, quadrature.point(p)(0) / 2);
+                    q_points[p] = Point<dim>(0, quadrature.point(p)[0] / 2);
                     break;
                   case 1:
                     q_points[p] =
-                      Point<dim>(0, quadrature.point(p)(0) / 2 + 0.5);
+                      Point<dim>(0, quadrature.point(p)[0] / 2 + 0.5);
                     break;
                   default:
                     Assert(false, ExcInternalError());
@@ -585,11 +585,11 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
               switch (subface_no)
                 {
                   case 0:
-                    q_points[p] = Point<dim>(1, quadrature.point(p)(0) / 2);
+                    q_points[p] = Point<dim>(1, quadrature.point(p)[0] / 2);
                     break;
                   case 1:
                     q_points[p] =
-                      Point<dim>(1, quadrature.point(p)(0) / 2 + 0.5);
+                      Point<dim>(1, quadrature.point(p)[0] / 2 + 0.5);
                     break;
                   default:
                     Assert(false, ExcInternalError());
@@ -599,11 +599,11 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
               switch (subface_no)
                 {
                   case 0:
-                    q_points[p] = Point<dim>(quadrature.point(p)(0) / 2, 0);
+                    q_points[p] = Point<dim>(quadrature.point(p)[0] / 2, 0);
                     break;
                   case 1:
                     q_points[p] =
-                      Point<dim>(quadrature.point(p)(0) / 2 + 0.5, 0);
+                      Point<dim>(quadrature.point(p)[0] / 2 + 0.5, 0);
                     break;
                   default:
                     Assert(false, ExcInternalError());
@@ -613,11 +613,11 @@ QProjector<2>::project_to_subface(const ReferenceCell   &reference_cell,
               switch (subface_no)
                 {
                   case 0:
-                    q_points[p] = Point<dim>(quadrature.point(p)(0) / 2, 1);
+                    q_points[p] = Point<dim>(quadrature.point(p)[0] / 2, 1);
                     break;
                   case 1:
                     q_points[p] =
-                      Point<dim>(quadrature.point(p)(0) / 2 + 0.5, 1);
+                      Point<dim>(quadrature.point(p)[0] / 2 + 0.5, 1);
                     break;
                   default:
                     Assert(false, ExcInternalError());
@@ -1304,7 +1304,7 @@ QProjector<dim>::project_to_line(const ReferenceCell &reference_cell,
 
   for (unsigned int k = 0; k < n; ++k)
     {
-      const double alpha = quadrature.point(k)(0);
+      const double alpha = quadrature.point(k)[0];
       points[k]          = alpha * p2;
       points[k] += (1. - alpha) * p1;
       weights[k] = length * quadrature.weight(k);

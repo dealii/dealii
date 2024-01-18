@@ -126,14 +126,14 @@ PolynomialsRT_Bubbles<dim>::evaluate(
       //  monoval_i = x^i,
       //  monoval_plus = x^(k+1)
       for (unsigned int d = 0; d < dim; ++d)
-        monomials[my_degree + 1].value(unit_point(d),
+        monomials[my_degree + 1].value(unit_point[d],
                                        n_derivatives,
                                        monoval_plus[d]);
 
       for (unsigned int i = 0; i <= my_degree; ++i, ++start)
         {
           for (unsigned int d = 0; d < dim; ++d)
-            monomials[i].value(unit_point(d), n_derivatives, monoval_i[d]);
+            monomials[i].value(unit_point[d], n_derivatives, monoval_i[d]);
 
           if (values.size() != 0)
             {
@@ -216,10 +216,10 @@ PolynomialsRT_Bubbles<dim>::evaluate(
       //  monoval_* = x^*, monoval_jplus = x^(j+1)
       for (unsigned int d = 0; d < dim; ++d)
         {
-          monomials[my_degree + 1].value(unit_point(d),
+          monomials[my_degree + 1].value(unit_point[d],
                                          n_derivatives,
                                          monoval_plus[d]);
-          monomials[my_degree].value(unit_point(d), n_derivatives, monoval[d]);
+          monomials[my_degree].value(unit_point[d], n_derivatives, monoval[d]);
         }
 
       const unsigned int n_curls = (my_degree + 1) * (2 * my_degree + 1);
@@ -227,16 +227,16 @@ PolynomialsRT_Bubbles<dim>::evaluate(
       for (unsigned int i = 0; i <= my_degree; ++i)
         {
           for (unsigned int d = 0; d < dim; ++d)
-            monomials[i].value(unit_point(d), n_derivatives, monoval_i[d]);
+            monomials[i].value(unit_point[d], n_derivatives, monoval_i[d]);
 
           for (unsigned int j = 0; j <= my_degree; ++j)
             {
               for (unsigned int d = 0; d < dim; ++d)
                 {
-                  monomials[j].value(unit_point(d),
+                  monomials[j].value(unit_point[d],
                                      n_derivatives,
                                      monoval_j[d]);
-                  monomials[j + 1].value(unit_point(d),
+                  monomials[j + 1].value(unit_point[d],
                                          n_derivatives,
                                          monoval_jplus[d]);
                 }

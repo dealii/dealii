@@ -862,28 +862,28 @@ FE_Q_Hierarchical<dim>::initialize_generalized_support_points()
       for (unsigned int ix = 0; ix <= this->degree; ++ix)
         {
           if (ix == 0)
-            p(0) = 0.;
+            p[0] = 0.;
           else if (ix == 1)
-            p(0) = 1.;
+            p[0] = 1.;
           else
-            p(0) = .5;
+            p[0] = .5;
           if (dim > 1)
             {
               if (iy == 0)
-                p(1) = 0.;
+                p[1] = 0.;
               else if (iy == 1)
-                p(1) = 1.;
+                p[1] = 1.;
               else
-                p(1) = .5;
+                p[1] = .5;
             }
           if (dim > 2)
             {
               if (iz == 0)
-                p(2) = 0.;
+                p[2] = 0.;
               else if (iz == 1)
-                p(2) = 1.;
+                p[2] = 1.;
               else
-                p(2) = .5;
+                p[2] = .5;
             }
           this->generalized_support_points[index_map_inverse[k++]] = p;
         }
@@ -1933,28 +1933,28 @@ FE_Q_Hierarchical<dim>::initialize_generalized_face_support_points()
       for (unsigned int ix = 0; ix <= this->degree; ++ix)
         {
           if (ix == 0)
-            p(0) = 0.;
+            p[0] = 0.;
           else if (ix == 1)
-            p(0) = 1.;
+            p[0] = 1.;
           else
-            p(0) = .5;
+            p[0] = .5;
           if (codim > 1)
             {
               if (iy == 0)
-                p(1) = 0.;
+                p[1] = 0.;
               else if (iy == 1)
-                p(1) = 1.;
+                p[1] = 1.;
               else
-                p(1) = .5;
+                p[1] = .5;
             }
           if (codim > 2)
             {
               if (iz == 0)
-                p(2) = 0.;
+                p[2] = 0.;
               else if (iz == 1)
-                p(2) = 1.;
+                p[2] = 1.;
               else
-                p(2) = .5;
+                p[2] = .5;
             }
           this->generalized_face_support_points[face_no][face_renumber[k++]] =
             p;

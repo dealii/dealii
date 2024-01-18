@@ -68,8 +68,8 @@ namespace internal
       const Point<spacedim> &p)
     {
       Assert(spacedim == 1, ExcInternalError());
-      return Point<1>((p[0] - vertices[0](0)) /
-                      (vertices[1](0) - vertices[0](0)));
+      return Point<1>((p[0] - vertices[0][0]) /
+                      (vertices[1][0] - vertices[0][0]));
     }
 
 
@@ -86,18 +86,18 @@ namespace internal
       // For accuracy reasons, we do all arithmetic in extended precision
       // (long double). This has a noticeable effect on the hit rate for
       // borderline cases and thus makes the algorithm more robust.
-      const long double x = p(0);
-      const long double y = p(1);
+      const long double x = p[0];
+      const long double y = p[1];
 
-      const long double x0 = vertices[0](0);
-      const long double x1 = vertices[1](0);
-      const long double x2 = vertices[2](0);
-      const long double x3 = vertices[3](0);
+      const long double x0 = vertices[0][0];
+      const long double x1 = vertices[1][0];
+      const long double x2 = vertices[2][0];
+      const long double x3 = vertices[3][0];
 
-      const long double y0 = vertices[0](1);
-      const long double y1 = vertices[1](1);
-      const long double y2 = vertices[2](1);
-      const long double y3 = vertices[3](1);
+      const long double y0 = vertices[0][1];
+      const long double y1 = vertices[1][1];
+      const long double y2 = vertices[2][1];
+      const long double y3 = vertices[3][1];
 
       const long double a = (x1 - x3) * (y0 - y2) - (x0 - x2) * (y1 - y3);
       const long double b = -(x0 - x1 - x2 + x3) * y + (x - 2 * x1 + x3) * y0 -

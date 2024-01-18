@@ -1224,9 +1224,9 @@ namespace Step13
   {
     (void)component;
     AssertIndexRange(component, 1);
-    double q = p(0);
+    double q = p[0];
     for (unsigned int i = 1; i < dim; ++i)
-      q += std::sin(10 * p(i) + 5 * p(0) * p(0));
+      q += std::sin(10 * p[i] + 5 * p[0] * p[0]);
     const double exponential = std::exp(q);
     return exponential;
   }
@@ -1248,19 +1248,19 @@ namespace Step13
   {
     (void)component;
     AssertIndexRange(component, 1);
-    double q = p(0);
+    double q = p[0];
     for (unsigned int i = 1; i < dim; ++i)
-      q += std::sin(10 * p(i) + 5 * p(0) * p(0));
+      q += std::sin(10 * p[i] + 5 * p[0] * p[0]);
     const double u  = std::exp(q);
     double       t1 = 1, t2 = 0, t3 = 0;
     for (unsigned int i = 1; i < dim; ++i)
       {
-        t1 += std::cos(10 * p(i) + 5 * p(0) * p(0)) * 10 * p(0);
-        t2 += 10 * std::cos(10 * p(i) + 5 * p(0) * p(0)) -
-              100 * std::sin(10 * p(i) + 5 * p(0) * p(0)) * p(0) * p(0);
-        t3 += 100 * std::cos(10 * p(i) + 5 * p(0) * p(0)) *
-                std::cos(10 * p(i) + 5 * p(0) * p(0)) -
-              100 * std::sin(10 * p(i) + 5 * p(0) * p(0));
+        t1 += std::cos(10 * p[i] + 5 * p[0] * p[0]) * 10 * p[0];
+        t2 += 10 * std::cos(10 * p[i] + 5 * p[0] * p[0]) -
+              100 * std::sin(10 * p[i] + 5 * p[0] * p[0]) * p[0] * p[0];
+        t3 += 100 * std::cos(10 * p[i] + 5 * p[0] * p[0]) *
+                std::cos(10 * p[i] + 5 * p[0] * p[0]) -
+              100 * std::sin(10 * p[i] + 5 * p[0] * p[0]);
       };
     t1 = t1 * t1;
 

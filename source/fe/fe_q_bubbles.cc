@@ -155,7 +155,7 @@ namespace internal
                                                fine.JxW(q);
                         Point<dim> quad_tmp;
                         for (unsigned int k = 0; k < dim; ++k)
-                          quad_tmp(k) = fine.quadrature_point(q)(k);
+                          quad_tmp[k] = fine.quadrature_point(q)[k];
                         coarse_rhs_matrix(gdi, j) +=
                           fine.shape_value(i, q) * fe.shape_value(j, quad_tmp) *
                           fine.JxW(q);
@@ -282,16 +282,16 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
   // Decode the support points in one coordinate direction.
   for (unsigned int j = 0; j < dofs_per_cell; ++j)
     {
-      if ((dim > 1) ? (unit_support_points[j](1) == 0 &&
-                       ((dim > 2) ? unit_support_points[j](2) == 0 : true)) :
+      if ((dim > 1) ? (unit_support_points[j][1] == 0 &&
+                       ((dim > 2) ? unit_support_points[j][2] == 0 : true)) :
                       true)
         {
           if (index == 0)
-            points[index] = unit_support_points[j](0);
+            points[index] = unit_support_points[j][0];
           else if (index == 1)
-            points[n_points - 1] = unit_support_points[j](0);
+            points[n_points - 1] = unit_support_points[j][0];
           else
-            points[index - 1] = unit_support_points[j](0);
+            points[index - 1] = unit_support_points[j][0];
 
           ++index;
         }
@@ -325,7 +325,7 @@ FE_Q_Bubbles<dim, spacedim>::get_name() const
       const QGaussLobatto<1> points_gl(n_points);
       type = true;
       for (unsigned int j = 0; j < n_points; ++j)
-        if (points[j] != points_gl.point(j)(0))
+        if (points[j] != points_gl.point(j)[0])
           {
             type = false;
             break;

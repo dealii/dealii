@@ -626,7 +626,7 @@ constexpr DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
   Number sum = internal::NumberType<Number>::value(0.0);
   for (unsigned int i = 0; i < dim; ++i)
     {
-      const Number diff = static_cast<Number>(this->values[i]) - p(i);
+      const Number diff = static_cast<Number>(this->values[i]) - p[i];
       sum += numbers::NumberTraits<Number>::abs_square(diff);
     }
 

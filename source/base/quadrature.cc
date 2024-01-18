@@ -155,8 +155,8 @@ Quadrature<dim>::Quadrature(const SubQuadrature &q1, const Quadrature<1> &q2)
         // compose coordinates of new quadrature point by tensor product in the
         // last component
         for (unsigned int d = 0; d < dim - 1; ++d)
-          quadrature_points[present_index](d) = q1.point(i1)(d);
-        quadrature_points[present_index](dim - 1) = q2.point(i2)(0);
+          quadrature_points[present_index][d] = q1.point(i1)[d];
+        quadrature_points[present_index][dim - 1] = q2.point(i2)[0];
 
         weights[present_index] = q1.weight(i1) * q2.weight(i2);
 
@@ -197,7 +197,7 @@ Quadrature<1>::Quadrature(const SubQuadrature &, const Quadrature<1> &q2)
     {
       // compose coordinates of new quadrature point by tensor product in the
       // last component
-      quadrature_points[present_index](0) = q2.point(i2)(0);
+      quadrature_points[present_index][0] = q2.point(i2)[0];
 
       weights[present_index] = q2.weight(i2);
 
@@ -258,11 +258,11 @@ Quadrature<dim>::Quadrature(const Quadrature<dim != 1 ? 1 : 0> &q)
     for (unsigned int i1 = 0; i1 < n1; ++i1)
       for (unsigned int i0 = 0; i0 < n0; ++i0)
         {
-          quadrature_points[k](0) = q.point(i0)(0);
+          quadrature_points[k][0] = q.point(i0)[0];
           if (dim > 1)
-            quadrature_points[k](1) = q.point(i1)(0);
+            quadrature_points[k][1] = q.point(i1)[0];
           if (dim > 2)
-            quadrature_points[k](2) = q.point(i2)(0);
+            quadrature_points[k][2] = q.point(i2)[0];
           weights[k] = q.weight(i0);
           if (dim > 1)
             weights[k] *= q.weight(i1);
@@ -370,7 +370,7 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx)
   unsigned int k = 0;
   for (unsigned int k1 = 0; k1 < qx.size(); ++k1)
     {
-      this->quadrature_points[k](0) = qx.point(k1)(0);
+      this->quadrature_points[k][0] = qx.point(k1)[0];
       this->weights[k++]            = qx.weight(k1);
     }
   Assert(k == this->size(), ExcInternalError());
@@ -393,8 +393,8 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
   for (unsigned int k2 = 0; k2 < qy.size(); ++k2)
     for (unsigned int k1 = 0; k1 < qx.size(); ++k1)
       {
-        this->quadrature_points[k](0)     = qx.point(k1)(0);
-        this->quadrature_points[k](dim_1) = qy.point(k2)(0);
+        this->quadrature_points[k][0]     = qx.point(k1)[0];
+        this->quadrature_points[k][dim_1] = qy.point(k2)[0];
         this->weights[k++]                = qx.weight(k1) * qy.weight(k2);
       }
   Assert(k == this->size(), ExcInternalError());
@@ -424,9 +424,9 @@ QAnisotropic<dim>::QAnisotropic(const Quadrature<1> &qx,
     for (unsigned int k2 = 0; k2 < qy.size(); ++k2)
       for (unsigned int k1 = 0; k1 < qx.size(); ++k1)
         {
-          this->quadrature_points[k](0)     = qx.point(k1)(0);
-          this->quadrature_points[k](dim_1) = qy.point(k2)(0);
-          this->quadrature_points[k](dim_2) = qz.point(k3)(0);
+          this->quadrature_points[k][0]     = qx.point(k1)[0];
+          this->quadrature_points[k][dim_1] = qy.point(k2)[0];
+          this->quadrature_points[k][dim_2] = qz.point(k3)[0];
           this->weights[k++] = qx.weight(k1) * qy.weight(k2) * qz.weight(k3);
         }
   Assert(k == this->size(), ExcInternalError());
@@ -522,7 +522,7 @@ QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
              ++q_point)
           {
             this->quadrature_points[next_point] =
-              Point<1>(base_quadrature.point(q_point)(0) *
+              Point<1>(base_quadrature.point(q_point)[0] *
                          (intervals[copy + 1][0] - intervals[copy][0]) +
                        intervals[copy][0]);
             this->weights[next_point] =
@@ -564,7 +564,7 @@ QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
               {
                 Assert(this->quadrature_points[next_point - double_point_offset]
                            .distance(Point<1>(
-                             base_quadrature.point(q_point)(0) *
+                             base_quadrature.point(q_point)[0] *
                                (intervals[copy + 1][0] - intervals[copy][0]) +
                              intervals[copy][0])) < 1e-10 /*tolerance*/,
                        ExcInternalError());
@@ -577,7 +577,7 @@ QIterated<1>::QIterated(const Quadrature<1>         &base_quadrature,
               }
 
             this->quadrature_points[next_point] =
-              Point<1>(base_quadrature.point(q_point)(0) *
+              Point<1>(base_quadrature.point(q_point)[0] *
                          (intervals[copy + 1][0] - intervals[copy][0]) +
                        intervals[copy][0]);
 

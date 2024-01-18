@@ -169,8 +169,8 @@ namespace Step32
 
       const double s = (r - R0) / h;
       const double q =
-        (dim == 3) ? std::max(0.0, cos(numbers::PI * abs(p(2) / R1))) : 1.0;
-      const double phi = std::atan2(p(0), p(1));
+        (dim == 3) ? std::max(0.0, cos(numbers::PI * abs(p[2] / R1))) : 1.0;
+      const double phi = std::atan2(p[0], p[1]);
       const double tau = s + 0.2 * s * (1 - s) * std::sin(6 * phi) * q;
 
       return T0 * (1.0 - tau) + T1 * tau;

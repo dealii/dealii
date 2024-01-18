@@ -193,8 +193,8 @@ double
 PolynomialsAdini<dim>::compute_value(const unsigned int i,
                                      const Point<dim>  &p) const
 {
-  const double x = p(0);
-  const double y = p(1);
+  const double x = p[0];
+  const double y = p[1];
   return coef(0, i) + coef(1, i) * x + coef(2, i) * y + coef(3, i) * x * x +
          coef(4, i) * y * y + coef(5, i) * x * y + coef(6, i) * x * x * x +
          coef(7, i) * y * y * y + coef(8, i) * x * y * y +
@@ -209,8 +209,8 @@ Tensor<1, dim>
 PolynomialsAdini<dim>::compute_grad(const unsigned int i,
                                     const Point<dim>  &p) const
 {
-  const double   x = p(0);
-  const double   y = p(1);
+  const double   x = p[0];
+  const double   y = p[1];
   Tensor<1, dim> tensor;
   tensor[0] = dx(0, i) + dx(1, i) * x + dx(2, i) * y + dx(3, i) * x * x +
               dx(4, i) * y * y + dx(5, i) * x * y + dx(6, i) * x * x * x +
@@ -233,8 +233,8 @@ Tensor<2, dim>
 PolynomialsAdini<dim>::compute_grad_grad(const unsigned int i,
                                          const Point<dim>  &p) const
 {
-  const double   x = p(0);
-  const double   y = p(1);
+  const double   x = p[0];
+  const double   y = p[1];
   Tensor<2, dim> tensor;
   tensor[0][0] = dxx(0, i) + dxx(1, i) * x + dxx(2, i) * y + dxx(3, i) * x * x +
                  dxx(4, i) * y * y + dxx(5, i) * x * y + dxx(6, i) * x * x * x +

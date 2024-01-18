@@ -28,13 +28,13 @@ namespace internal
     AssertIndexRange(component_in_dim_plus_1, dim + 1);
 
     Point<dim + 1> output;
-    output(component_in_dim_plus_1) = coordinate_value;
+    output[component_in_dim_plus_1] = coordinate_value;
     for (int d = 0; d < dim; ++d)
       {
         const unsigned int component_to_write_to =
           dealii::internal::coordinate_to_one_dim_higher<dim>(
             component_in_dim_plus_1, d);
-        output(component_to_write_to) = point(d);
+        output[component_to_write_to] = point[d];
       }
 
     return output;
@@ -155,7 +155,7 @@ namespace Functions
                                const unsigned int component) const
   {
     const Point<dim + 1> full_point =
-      internal::create_higher_dim_point(point, open_direction, point_1D(0));
+      internal::create_higher_dim_point(point, open_direction, point_1D[0]);
     return function->value(full_point, component);
   }
 
@@ -167,7 +167,7 @@ namespace Functions
                                   const unsigned int component) const
   {
     const Point<dim + 1> full_point =
-      internal::create_higher_dim_point(point, open_direction, point_1D(0));
+      internal::create_higher_dim_point(point, open_direction, point_1D[0]);
     const Tensor<1, dim + 1> full_gradient =
       function->gradient(full_point, component);
 
@@ -186,7 +186,7 @@ namespace Functions
                                  const unsigned int component) const
   {
     const Point<dim + 1> full_point =
-      internal::create_higher_dim_point(point, open_direction, point_1D(0));
+      internal::create_higher_dim_point(point, open_direction, point_1D[0]);
     const Tensor<2, dim + 1> full_hessian =
       function->hessian(full_point, component);
 

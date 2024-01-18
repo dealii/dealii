@@ -890,7 +890,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   const QGaussLobatto<1> points_gl(this->degree + 1);
   bool                   gauss_lobatto = true;
   for (unsigned int j = 0; j <= this->degree; ++j)
-    if (points[j] != points_gl.point(j)(0))
+    if (points[j] != points_gl.point(j)[0])
       {
         gauss_lobatto = false;
         break;
@@ -907,7 +907,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   const QGauss<1> points_g(this->degree + 1);
   bool            gauss = true;
   for (unsigned int j = 0; j <= this->degree; ++j)
-    if (points[j] != points_g.point(j)(0))
+    if (points[j] != points_g.point(j)[0])
       {
         gauss = false;
         break;
@@ -924,7 +924,7 @@ FE_DGQArbitraryNodes<dim, spacedim>::get_name() const
   const QGaussLog<1> points_glog(this->degree + 1);
   bool               gauss_log = true;
   for (unsigned int j = 0; j <= this->degree; ++j)
-    if (points[j] != points_glog.point(j)(0))
+    if (points[j] != points_glog.point(j)[0])
       {
         gauss_log = false;
         break;

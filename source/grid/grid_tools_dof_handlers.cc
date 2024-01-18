@@ -2387,7 +2387,7 @@ namespace GridTools
     if (matrix.m() == spacedim)
       for (unsigned int i = 0; i < spacedim; ++i)
         for (unsigned int j = 0; j < spacedim; ++j)
-          distance(i) += matrix(i, j) * point1(j);
+          distance[i] += matrix(i, j) * point1[j];
     else
       distance = point1;
 
@@ -2399,7 +2399,7 @@ namespace GridTools
         if (i == direction)
           continue;
 
-        if (std::abs(distance(i)) > 1.e-10)
+        if (std::abs(distance[i]) > 1.e-10)
           return false;
       }
 

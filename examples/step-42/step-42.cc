@@ -372,14 +372,14 @@ namespace Step42
                                       const unsigned int component) const
     {
       if (component == 0)
-        return p(0);
+        return p[0];
       else if (component == 1)
-        return p(1);
+        return p[1];
       else if (component == 2)
         {
-          if ((p(0) - 0.5) * (p(0) - 0.5) + (p(1) - 0.5) * (p(1) - 0.5) < 0.36)
-            return (-std::sqrt(0.36 - (p(0) - 0.5) * (p(0) - 0.5) -
-                               (p(1) - 0.5) * (p(1) - 0.5)) +
+          if ((p[0] - 0.5) * (p[0] - 0.5) + (p[1] - 0.5) * (p[1] - 0.5) < 0.36)
+            return (-std::sqrt(0.36 - (p[0] - 0.5) * (p[0] - 0.5) -
+                               (p[1] - 0.5) * (p[1] - 0.5)) +
                     z_surface + 0.59);
           else
             return 1000;
@@ -550,13 +550,13 @@ namespace Step42
                                        const unsigned int component) const
     {
       if (component == 0)
-        return p(0);
+        return p[0];
       if (component == 1)
-        return p(1);
+        return p[1];
       else if (component == 2)
         {
-          if (p(0) >= 0.0 && p(0) <= 1.0 && p(1) >= 0.0 && p(1) <= 1.0)
-            return z_surface + 0.999 - input_obstacle.get_value(p(0), p(1));
+          if (p[0] >= 0.0 && p[0] <= 1.0 && p[1] >= 0.0 && p[1] <= 1.0)
+            return z_surface + 0.999 - input_obstacle.get_value(p[0], p[1]);
         }
 
       Assert(false, ExcNotImplemented());
@@ -881,7 +881,7 @@ namespace Step42
   // indicator one.
   Point<3> rotate_half_sphere(const Point<3> &in)
   {
-    return {in(2), in(1), -in(0)};
+    return {in[2], in[1], -in[0]};
   }
 
   template <int dim>
@@ -1267,7 +1267,7 @@ namespace Step42
                         obstacle->value(this_support_point, 2);
                       const double solution_here = solution(index_z);
                       const double undeformed_gap =
-                        obstacle_value - this_support_point(2);
+                        obstacle_value - this_support_point[2];
 
                       const double c = 100.0 * e_modulus;
                       if ((lambda(index_z) /

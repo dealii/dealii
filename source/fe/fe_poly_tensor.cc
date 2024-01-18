@@ -188,7 +188,7 @@ FE_PolyTensor<dim, spacedim>::FE_PolyTensor(
   , mapping_kind({MappingKind::mapping_none})
   , poly_space(polynomials.clone())
 {
-  cached_point(0) = -1;
+  cached_point[0] = -1;
   // Set up the table converting
   // components to base
   // components. Since we have only

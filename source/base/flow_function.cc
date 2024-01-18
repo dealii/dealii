@@ -217,7 +217,7 @@ namespace Functions
         // the radius.
         double r2 = 0;
         for (unsigned int d = 1; d < dim; ++d)
-          r2 += p(d) * p(d);
+          r2 += p[d] * p[d];
         r2 *= inv_sqr_radius;
 
         // x-velocity
@@ -226,7 +226,7 @@ namespace Functions
         for (unsigned int d = 1; d < dim; ++d)
           values[d][k] = 0.;
         // pressure
-        values[dim][k] = -2 * (dim - 1) * inv_sqr_radius * p(0) / Reynolds +
+        values[dim][k] = -2 * (dim - 1) * inv_sqr_radius * p[0] / Reynolds +
                          this->mean_pressure;
       }
   }
@@ -252,7 +252,7 @@ namespace Functions
         // x-velocity
         values[0][k][0] = 0.;
         for (unsigned int d = 1; d < dim; ++d)
-          values[0][k][d] = -2. * p(d) * inv_sqr_radius;
+          values[0][k][d] = -2. * p[d] * inv_sqr_radius;
         // other velocities
         for (unsigned int d = 1; d < dim; ++d)
           values[d][k] = 0.;
@@ -317,8 +317,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<dim> &p  = points[k];
-        const double      x  = numbers::PI / 2. * p(0);
-        const double      y  = numbers::PI / 2. * p(1);
+        const double      x  = numbers::PI / 2. * p[0];
+        const double      y  = numbers::PI / 2. * p[1];
         const double      cx = std::cos(x);
         const double      cy = std::cos(y);
         const double      sx = std::sin(x);
@@ -332,7 +332,7 @@ namespace Functions
           }
         else if (dim == 3)
           {
-            const double z  = numbers::PI / 2. * p(2);
+            const double z  = numbers::PI / 2. * p[2];
             const double cz = std::cos(z);
             const double sz = std::sin(z);
 
@@ -366,8 +366,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<dim> &p   = points[k];
-        const double      x   = numbers::PI / 2. * p(0);
-        const double      y   = numbers::PI / 2. * p(1);
+        const double      x   = numbers::PI / 2. * p[0];
+        const double      y   = numbers::PI / 2. * p[1];
         const double      c2x = std::cos(2 * x);
         const double      c2y = std::cos(2 * y);
         const double      s2x = std::sin(2 * x);
@@ -386,7 +386,7 @@ namespace Functions
           }
         else if (dim == 3)
           {
-            const double z   = numbers::PI / 2. * p(2);
+            const double z   = numbers::PI / 2. * p[2];
             const double c2z = std::cos(2 * z);
             const double s2z = std::sin(2 * z);
             const double cz2 = .5 + .5 * c2z; // cos^2 z
@@ -446,8 +446,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<dim> &p   = points[k];
-        const double      x   = numbers::PI / 2. * p(0);
-        const double      y   = numbers::PI / 2. * p(1);
+        const double      x   = numbers::PI / 2. * p[0];
+        const double      y   = numbers::PI / 2. * p[1];
         const double      c2x = std::cos(2 * x);
         const double      c2y = std::cos(2 * y);
         const double      s2x = std::sin(2 * x);
@@ -464,7 +464,7 @@ namespace Functions
           }
         else if (dim == 3)
           {
-            const double z   = numbers::PI * p(2);
+            const double z   = numbers::PI * p[2];
             const double c2z = std::cos(2 * z);
             const double s2z = std::sin(2 * z);
 
@@ -556,8 +556,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<2> &p = points[k];
-        const double    x = p(0);
-        const double    y = p(1);
+        const double    x = p[0];
+        const double    y = p[1];
 
         if ((x < 0) || (y < 0))
           {
@@ -596,8 +596,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<2> &p = points[k];
-        const double    x = p(0);
-        const double    y = p(1);
+        const double    x = p[0];
+        const double    y = p[1];
 
         if ((x < 0) || (y < 0))
           {
@@ -689,8 +689,8 @@ namespace Functions
     for (unsigned int k = 0; k < n; ++k)
       {
         const Point<2> &p   = points[k];
-        const double    x   = p(0);
-        const double    y   = 2. * numbers::PI * p(1);
+        const double    x   = p[0];
+        const double    y   = 2. * numbers::PI * p[1];
         const double    elx = std::exp(lbda * x);
 
         values[0][k] = 1. - elx * std::cos(y);
@@ -713,8 +713,8 @@ namespace Functions
 
     for (unsigned int i = 0; i < n; ++i)
       {
-        const double x = points[i](0);
-        const double y = points[i](1);
+        const double x = points[i][0];
+        const double y = points[i][1];
 
         const double elx = std::exp(lbda * x);
         const double cy  = std::cos(2 * numbers::PI * y);
@@ -748,8 +748,8 @@ namespace Functions
         for (unsigned int k = 0; k < n; ++k)
           {
             const Point<2> &p   = points[k];
-            const double    x   = p(0);
-            const double    y   = zp * p(1);
+            const double    x   = p[0];
+            const double    y   = zp * p[1];
             const double    elx = std::exp(lbda * x);
             const double    u   = 1. - elx * std::cos(y);
             const double    ux  = -lbda * elx * std::cos(y);

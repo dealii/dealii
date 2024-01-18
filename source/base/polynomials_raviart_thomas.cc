@@ -172,7 +172,7 @@ PolynomialsRaviartThomas<dim>::evaluate(
       // through all directions.
       Point<dim> p;
       for (unsigned int c = 0; c < dim; ++c)
-        p(c) = unit_point((c + d) % dim);
+        p[c] = unit_point[(c + d) % dim];
 
       polynomial_space.evaluate(p,
                                 p_values,

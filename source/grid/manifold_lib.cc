@@ -1113,13 +1113,13 @@ CylindricalManifold<dim, spacedim>::push_forward(
          ExcMessage("CylindricalManifold can only be used for spacedim==3!"));
 
   // Rotate the orthogonal direction by the given angle
-  const double sine_r   = std::sin(chart_point(1)) * chart_point(0);
-  const double cosine_r = std::cos(chart_point(1)) * chart_point(0);
+  const double sine_r   = std::sin(chart_point[1]) * chart_point[0];
+  const double cosine_r = std::cos(chart_point[1]) * chart_point[0];
   const Tensor<1, spacedim> intermediate =
     normal_direction * cosine_r + dxn * sine_r;
 
   // Finally, put everything together.
-  return point_on_axis + direction * chart_point(2) + intermediate;
+  return point_on_axis + direction * chart_point[2] + intermediate;
 }
 
 
@@ -1135,8 +1135,8 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
   Tensor<2, 3> derivatives;
 
   // Rotate the orthogonal direction by the given angle
-  const double              sine   = std::sin(chart_point(1));
-  const double              cosine = std::cos(chart_point(1));
+  const double              sine   = std::sin(chart_point[1]);
+  const double              cosine = std::cos(chart_point[1]);
   const Tensor<1, spacedim> intermediate =
     normal_direction * cosine + dxn * sine;
 
@@ -1517,9 +1517,9 @@ template <int dim>
 Point<3>
 TorusManifold<dim>::pull_back(const Point<3> &p) const
 {
-  double x     = p(0);
-  double z     = p(1);
-  double y     = p(2);
+  double x     = p[0];
+  double z     = p[1];
+  double y     = p[2];
   double phi   = std::atan2(y, x);
   double theta = std::atan2(z, std::sqrt(x * x + y * y) - R);
   double w =
@@ -1535,9 +1535,9 @@ template <int dim>
 Point<3>
 TorusManifold<dim>::push_forward(const Point<3> &chart_point) const
 {
-  double phi   = chart_point(0);
-  double theta = chart_point(1);
-  double w     = chart_point(2);
+  double phi   = chart_point[0];
+  double theta = chart_point[1];
+  double w     = chart_point[2];
 
   return {std::cos(phi) * R + r * w * std::cos(theta) * std::cos(phi),
           r * w * std::sin(theta),
@@ -1575,9 +1575,9 @@ TorusManifold<dim>::push_forward_gradient(const Point<3> &chart_point) const
 {
   DerivativeForm<1, spacedim, spacedim> DX;
 
-  double phi   = chart_point(0);
-  double theta = chart_point(1);
-  double w     = chart_point(2);
+  double phi   = chart_point[0];
+  double theta = chart_point[1];
+  double w     = chart_point[2];
 
   DX[0][0] = -std::sin(phi) * R - r * w * std::cos(theta) * std::sin(phi);
   DX[0][1] = -r * w * std::sin(theta) * std::cos(phi);

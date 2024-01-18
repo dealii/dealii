@@ -242,15 +242,15 @@ namespace
     Manifold<dim, spacedim>::push_forward(const Point<3> &chart_point) const
     {
       // Rotate the orthogonal direction by the given angle.
-      const double sine_r   = chart_point(0) * std::sin(chart_point(1));
-      const double cosine_r = chart_point(0) * std::cos(chart_point(1));
+      const double sine_r   = chart_point[0] * std::sin(chart_point[1]);
+      const double cosine_r = chart_point[0] * std::cos(chart_point[1]);
 
       const Tensor<1, spacedim> intermediate =
         normal_direction * cosine_r + dxn * sine_r;
 
       // Map the axial coordinate back to the pipe segment.
       const double lambda =
-        chart_point(2) * compute_z_expansion(cosine_r, sine_r, data);
+        chart_point[2] * compute_z_expansion(cosine_r, sine_r, data);
 
       // Finally, put everything together.
       return point_on_axis + direction * lambda + intermediate;
