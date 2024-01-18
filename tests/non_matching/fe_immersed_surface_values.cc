@@ -34,7 +34,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 using NonMatching::FEImmersedSurfaceValues;
 
 // Set up a triangulation with a single Cartesian cell and a finite element

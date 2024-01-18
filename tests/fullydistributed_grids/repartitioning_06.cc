@@ -37,7 +37,6 @@
 
 #include "../grid/tests.h"
 
-using namespace dealii;
 
 namespace dealii
 {

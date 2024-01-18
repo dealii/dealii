@@ -77,7 +77,6 @@ namespace LA
 
 namespace MPI_nonlinear_solver_selector_test
 {
-  using namespace dealii;
 
   using NLSolve = NonlinearSolverSelector<LA::MPI::Vector>;
 

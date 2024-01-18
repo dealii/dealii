@@ -66,7 +66,6 @@
 
 namespace Step8
 {
-  using namespace dealii;
 
   template <int dim>
   class ElasticProblem

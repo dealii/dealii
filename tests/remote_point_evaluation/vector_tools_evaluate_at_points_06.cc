@@ -42,7 +42,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim, int spacedim>
 std::shared_ptr<const Utilities::MPI::Partitioner>

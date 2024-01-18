@@ -72,7 +72,6 @@
 
 namespace Step7
 {
-  using namespace dealii;
 
 
   template <int dim>
@@ -696,7 +695,6 @@ main()
 
   try
     {
-      using namespace dealii;
       using namespace Step7;
 
       {

@@ -23,8 +23,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
-
 
 
 template <typename MeshType, typename Number>

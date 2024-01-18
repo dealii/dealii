@@ -75,7 +75,6 @@
 
 namespace Step68
 {
-  using namespace dealii;
 
   // @sect3{Velocity profile}
 
@@ -728,7 +727,6 @@ int
 main(int argc, char *argv[])
 {
   using namespace Step68;
-  using namespace dealii;
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   MPILogInitAll all;

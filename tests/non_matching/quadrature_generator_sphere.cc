@@ -26,7 +26,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 /**
  * Compute the volume and surface area of a ball/sphere by setting up a

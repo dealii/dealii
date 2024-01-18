@@ -43,7 +43,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 make_grid(Triangulation<2> &triangulation)

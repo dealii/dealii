@@ -52,7 +52,6 @@ test_hessians(const unsigned int                             degree,
               const dealii::FE_Poly<dim>                    &fe,
               const dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
 {
-  using namespace dealii;
   using VectorizedArrayType = VectorizedArray<double>;
 
   Triangulation<dim> tria;
@@ -323,7 +322,6 @@ test_hessians(const unsigned int                             degree,
 int
 main(int argc, char **argv)
 {
-  using namespace dealii;
   dealii::Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 
   initlog();

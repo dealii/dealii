@@ -152,7 +152,6 @@ namespace LA
 
 namespace Step70
 {
-  using namespace dealii;
 
   // @sect3{Run-time parameter handling}
 
@@ -1913,7 +1912,6 @@ int
 main(int argc, char *argv[])
 {
   using namespace Step70;
-  using namespace dealii;
 
   auto          init = Utilities::MPI::MPI_InitFinalize(argc, argv, 1);
   MPILogInitAll log(true);

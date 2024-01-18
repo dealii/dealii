@@ -29,7 +29,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 using namespace NonMatching::internal::QuadratureGeneratorImplementation;
 
 // Use RootFinder to find the roots of the incoming functions over the interval

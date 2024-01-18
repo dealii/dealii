@@ -104,7 +104,6 @@ namespace LA
 
 namespace Step55
 {
-  using namespace dealii;
 
   // @sect3{Linear solvers and preconditioners}
 
@@ -903,7 +902,6 @@ main(int argc, char *argv[])
   mpi_initlog();
   try
     {
-      using namespace dealii;
       using namespace Step55;
 
 

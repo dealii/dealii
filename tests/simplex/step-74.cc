@@ -66,7 +66,6 @@
 
 namespace Step74
 {
-  using namespace dealii;
 
   enum class Test_Case
   {
@@ -986,7 +985,6 @@ main()
 
   try
     {
-      using namespace dealii;
       using namespace Step74;
       Test_Case      test_case = Test_Case::l_singularity;
       SIPGLaplace<2> problem(test_case);

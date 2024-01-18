@@ -31,7 +31,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 /**
  * mpirun -np 4 ./constraints_01

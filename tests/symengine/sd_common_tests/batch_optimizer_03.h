@@ -34,7 +34,6 @@
 
 #include "utilities.h"
 
-using namespace dealii;
 namespace SD = Differentiation::SD;
 
 namespace Diff_Test

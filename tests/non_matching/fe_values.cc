@@ -31,7 +31,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Assert that the two incoming cells are the same. Throw an exception if not.
 template <int dim>

@@ -28,7 +28,6 @@
 
 namespace Step44
 {
-  using namespace dealii;
   namespace SD = Differentiation::SD;
 
   template <int dim>
@@ -320,7 +319,6 @@ main(int argc, char **argv)
   Utilities::MPI::MPI_InitFinalize mpi_initialization(
     argc, argv, testing_max_num_threads());
 
-  using namespace dealii;
   using namespace Step44;
   try
     {

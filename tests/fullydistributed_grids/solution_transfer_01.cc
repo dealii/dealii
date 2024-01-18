@@ -34,7 +34,6 @@
 
 #include "../grid/tests.h"
 
-using namespace dealii;
 
 template <int dim>
 class InterpolationFunction : public Function<dim>

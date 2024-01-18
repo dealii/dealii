@@ -65,8 +65,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 // @sect3{Global definitions}
 

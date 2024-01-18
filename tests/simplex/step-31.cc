@@ -67,7 +67,6 @@
 
 namespace Step31
 {
-  using namespace dealii;
   namespace EquationData
   {
     constexpr double eta     = 1;
@@ -1085,7 +1084,6 @@ main(int argc, char *argv[])
 {
   try
     {
-      using namespace dealii;
       using namespace Step31;
       Utilities::MPI::MPI_InitFinalize mpi_initialization(
         argc, argv, numbers::invalid_unsigned_int);

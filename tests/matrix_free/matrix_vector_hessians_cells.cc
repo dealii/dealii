@@ -48,7 +48,6 @@ test_hessians(const dealii::FE_Poly<dim>                    &fe,
               const dealii::Quadrature<dim>                 &quad,
               const dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
 {
-  using namespace dealii;
   using VectorizedArrayType = VectorizedArray<double>;
 
   Triangulation<dim> tria;
@@ -236,7 +235,6 @@ test_hessians(const dealii::FE_Poly<dim>                    &fe,
 void
 test_qiterated(dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
 {
-  using namespace dealii;
   deallog << "test_qiterated" << std::endl;
   for (unsigned int i = 1; i < 4; ++i)
     {
@@ -261,7 +259,6 @@ test_qiterated(dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
 void
 test_qgauss(dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
 {
-  using namespace dealii;
   deallog << "test_qgauss" << std::endl;
   for (unsigned int i = 1; i < 4; ++i)
     {
@@ -283,7 +280,6 @@ test_qgauss(dealii::EvaluationFlags::EvaluationFlags evaluation_flags)
 int
 main(int argc, char **argv)
 {
-  using namespace dealii;
   Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 
   initlog();

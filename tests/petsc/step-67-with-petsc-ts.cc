@@ -67,7 +67,6 @@
 
 namespace Euler_DG
 {
-  using namespace dealii;
 
   // Similarly to the other matrix-free tutorial programs, we collect all
   // parameters that control the execution of the program at the top of the
@@ -2396,7 +2395,6 @@ int
 main(int argc, char **argv)
 {
   using namespace Euler_DG;
-  using namespace dealii;
 
   initlog();
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

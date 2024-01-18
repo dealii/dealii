@@ -43,8 +43,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 template <int dim>
 class LegendreFunction : public Function<dim>

@@ -55,7 +55,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 const double PENALTY = 8;
 

@@ -63,8 +63,6 @@ print([i,j,k],fullratsimp(C3(i,j,k)))));
 #include "../tests.h"
 
 
-using namespace dealii;
-
 
 template <int dim>
 class PolyFunction : public Function<dim>

@@ -40,7 +40,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace SE = SymEngine;
 namespace SD = dealii::Differentiation::SD;
 

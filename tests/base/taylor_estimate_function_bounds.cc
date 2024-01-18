@@ -24,7 +24,6 @@
 
 namespace
 {
-  using namespace dealii;
 
   /**
    * Returns a bounding box with different side lengths, 2*h_i, in all

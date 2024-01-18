@@ -43,7 +43,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <typename MeshType>
 MPI_Comm

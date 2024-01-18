@@ -53,7 +53,6 @@
 
 namespace Step77
 {
-  using namespace dealii;
 
   template <int dim>
   class MinimalSurfaceProblem

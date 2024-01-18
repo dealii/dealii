@@ -24,7 +24,6 @@ const bool run_big = false;
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 test_data_type(const std::uint64_t n_bytes)

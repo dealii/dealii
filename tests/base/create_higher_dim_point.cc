@@ -20,7 +20,6 @@
 
 namespace
 {
-  using namespace dealii;
 
   // Test the function create_higher_dim_point by making sure that we
   // can construct the point (x, y, z),

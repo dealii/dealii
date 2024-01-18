@@ -30,7 +30,6 @@ main()
 {
   initlog();
 
-  using namespace dealii;
 
   Triangulation<2, 3> tria;
 

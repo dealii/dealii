@@ -32,7 +32,6 @@
 
 #include "../grid/tests.h"
 
-using namespace dealii;
 
 
 int
