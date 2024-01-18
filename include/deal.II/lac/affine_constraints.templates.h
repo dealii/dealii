@@ -24,6 +24,7 @@
 #include <deal.II/base/table.h>
 #include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/thread_management.h>
+#include <deal.II/base/trilinos_utilities.h>
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparse_matrix.h>
@@ -2651,6 +2652,33 @@ namespace internal
     output = vec;
   }
 #endif
+
+
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template <typename Number>
+  inline void
+  import_vector_with_ghost_elements(
+    const LinearAlgebra::TpetraWrappers::Vector<Number> &vec,
+    const IndexSet                                      &locally_owned_elements,
+    const IndexSet                                      &needed_elements,
+    LinearAlgebra::TpetraWrappers::Vector<Number>       &output,
+    const std::bool_constant<false> /*is_block_vector*/)
+  {
+    Assert(!vec.has_ghost_elements(), ExcGhostsPresent());
+    IndexSet parallel_partitioner = locally_owned_elements;
+    parallel_partitioner.add_indices(needed_elements);
+
+    const MPI_Comm mpi_comm = Utilities::Trilinos::teuchos_comm_to_mpi_comm(
+      vec.trilinos_rcp()->getMap()->getComm());
+
+    output.reinit(locally_owned_elements, needed_elements, mpi_comm);
+
+    output = vec;
+  }
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
+
+
 
 #ifdef DEAL_II_WITH_PETSC
   inline void

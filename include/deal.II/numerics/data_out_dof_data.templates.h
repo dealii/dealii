@@ -847,6 +847,21 @@ namespace internal
       }
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+      template <typename Number>
+      void
+      copy_locally_owned_data_from(
+        const LinearAlgebra::TpetraWrappers::Vector<Number> &src,
+        LinearAlgebra::distributed::Vector<Number>          &dst)
+      {
+        // ReadWriteVector does not work for ghosted
+        // TrilinosWrappers::MPI::Vector objects. Fall back to copy the
+        // entries manually.
+        for (const auto i : dst.locally_owned_elements())
+          dst[i] = src[i];
+      }
+#endif
+
       /**
        * Create a ghosted-copy of a block dof vector.
        */
