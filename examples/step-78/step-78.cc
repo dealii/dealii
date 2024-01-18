@@ -101,7 +101,7 @@ namespace BlackScholesSolver
   double Solution<dim>::value(const Point<dim>  &p,
                               const unsigned int component) const
   {
-    return -Utilities::fixed_power<2, double>(p(component)) -
+    return -Utilities::fixed_power<2, double>(p[component]) -
            Utilities::fixed_power<2, double>(this->get_time()) + 6;
   }
 
@@ -110,7 +110,7 @@ namespace BlackScholesSolver
   Tensor<1, dim> Solution<dim>::gradient(const Point<dim>  &p,
                                          const unsigned int component) const
   {
-    return Point<dim>(-2 * p(component));
+    return Point<dim>(-2 * p[component]);
   }
 
 
@@ -148,9 +148,9 @@ namespace BlackScholesSolver
                                        const unsigned int component) const
   {
 #ifdef MMS
-    return -Utilities::fixed_power<2, double>(p(component)) + 6;
+    return -Utilities::fixed_power<2, double>(p[component]) + 6;
 #else
-    return std::max(p(component) - strike_price, 0.);
+    return std::max(p[component] - strike_price, 0.);
 #endif
   }
 
@@ -208,10 +208,10 @@ namespace BlackScholesSolver
                                          const unsigned int component) const
   {
 #ifdef MMS
-    return -Utilities::fixed_power<2, double>(p(component)) -
+    return -Utilities::fixed_power<2, double>(p[component]) -
            Utilities::fixed_power<2, double>(this->get_time()) + 6;
 #else
-    return (p(component) - strike_price) *
+    return (p[component] - strike_price) *
            exp((-interest_rate) * (this->get_time()));
 #endif
   }
@@ -248,10 +248,10 @@ namespace BlackScholesSolver
   {
 #ifdef MMS
     return 2 * (this->get_time()) -
-           Utilities::fixed_power<2, double>(asset_volatility * p(component)) -
-           2 * interest_rate * Utilities::fixed_power<2, double>(p(component)) -
+           Utilities::fixed_power<2, double>(asset_volatility * p[component]) -
+           2 * interest_rate * Utilities::fixed_power<2, double>(p[component]) -
            interest_rate *
-             (-Utilities::fixed_power<2, double>(p(component)) -
+             (-Utilities::fixed_power<2, double>(p[component]) -
               Utilities::fixed_power<2, double>(this->get_time()) + 6);
 #else
     (void)p;

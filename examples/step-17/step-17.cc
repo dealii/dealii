@@ -187,8 +187,8 @@ namespace Step17
       Assert(dim >= 2, ExcInternalError());
 
       Point<dim> point_1, point_2;
-      point_1(0) = 0.5;
-      point_2(0) = -0.5;
+      point_1[0] = 0.5;
+      point_2[0] = -0.5;
 
       if (((p - point_1).norm_square() < 0.2 * 0.2) ||
           ((p - point_2).norm_square() < 0.2 * 0.2))

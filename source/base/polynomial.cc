@@ -66,8 +66,8 @@ namespace Polynomials
     for (unsigned int i = 0; i < supp.size(); ++i)
       if (i != center)
         {
-          lagrange_support_points.push_back(supp[i](0));
-          tmp_lagrange_weight *= supp[center](0) - supp[i](0);
+          lagrange_support_points.push_back(supp[i][0]);
+          tmp_lagrange_weight *= supp[center][0] - supp[i][0];
         }
 
     // check for underflow and overflow
@@ -571,7 +571,7 @@ namespace Polynomials
         std::vector<Point<1>> points(n + 1);
         const double          one_over_n = 1. / n;
         for (unsigned int k = 0; k <= n; ++k)
-          points[k](0) = static_cast<double>(k) * one_over_n;
+          points[k][0] = static_cast<double>(k) * one_over_n;
         return points;
       }
     } // namespace LagrangeEquidistantImplementation

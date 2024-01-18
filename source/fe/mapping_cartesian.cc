@@ -243,16 +243,16 @@ MappingCartesian<dim, spacedim>::update_cell_extents(
       switch (dim)
         {
           case 1:
-            data.cell_extents[0] = cell->vertex(1)(0) - start(0);
+            data.cell_extents[0] = cell->vertex(1)[0] - start[0];
             break;
           case 2:
-            data.cell_extents[0] = cell->vertex(1)(0) - start(0);
-            data.cell_extents[1] = cell->vertex(2)(1) - start(1);
+            data.cell_extents[0] = cell->vertex(1)[0] - start[0];
+            data.cell_extents[1] = cell->vertex(2)[1] - start[1];
             break;
           case 3:
-            data.cell_extents[0] = cell->vertex(1)(0) - start(0);
-            data.cell_extents[1] = cell->vertex(2)(1) - start(1);
-            data.cell_extents[2] = cell->vertex(4)(2) - start(2);
+            data.cell_extents[0] = cell->vertex(1)[0] - start[0];
+            data.cell_extents[1] = cell->vertex(2)[1] - start[1];
+            data.cell_extents[2] = cell->vertex(4)[2] - start[2];
             break;
           default:
             Assert(false, ExcNotImplemented());
@@ -356,8 +356,8 @@ MappingCartesian<dim, spacedim>::transform_quadrature_points(
     {
       quadrature_points[i] = start;
       for (unsigned int d = 0; d < dim; ++d)
-        quadrature_points[i](d) +=
-          data.cell_extents[d] * data.quadrature_points[i + offset](d);
+        quadrature_points[i][d] +=
+          data.cell_extents[d] * data.quadrature_points[i + offset][d];
     }
 }
 
@@ -1177,16 +1177,16 @@ MappingCartesian<dim, spacedim>::transform_unit_to_real_cell(
   switch (dim)
     {
       case 1:
-        length[0] = cell->vertex(1)(0) - start(0);
+        length[0] = cell->vertex(1)[0] - start[0];
         break;
       case 2:
-        length[0] = cell->vertex(1)(0) - start(0);
-        length[1] = cell->vertex(2)(1) - start(1);
+        length[0] = cell->vertex(1)[0] - start[0];
+        length[1] = cell->vertex(2)[1] - start[1];
         break;
       case 3:
-        length[0] = cell->vertex(1)(0) - start(0);
-        length[1] = cell->vertex(2)(1) - start(1);
-        length[2] = cell->vertex(4)(2) - start(2);
+        length[0] = cell->vertex(1)[0] - start[0];
+        length[1] = cell->vertex(2)[1] - start[1];
+        length[2] = cell->vertex(4)[2] - start[2];
         break;
       default:
         Assert(false, ExcNotImplemented());
@@ -1194,7 +1194,7 @@ MappingCartesian<dim, spacedim>::transform_unit_to_real_cell(
 
   Point<dim> p_real = cell->vertex(0);
   for (unsigned int d = 0; d < dim; ++d)
-    p_real(d) += length[d] * p(d);
+    p_real[d] += length[d] * p[d];
 
   return p_real;
 }
@@ -1218,16 +1218,16 @@ MappingCartesian<dim, spacedim>::transform_real_to_unit_cell(
   switch (dim)
     {
       case 1:
-        real(0) /= cell->vertex(1)(0) - start(0);
+        real[0] /= cell->vertex(1)[0] - start[0];
         break;
       case 2:
-        real(0) /= cell->vertex(1)(0) - start(0);
-        real(1) /= cell->vertex(2)(1) - start(1);
+        real[0] /= cell->vertex(1)[0] - start[0];
+        real[1] /= cell->vertex(2)[1] - start[1];
         break;
       case 3:
-        real(0) /= cell->vertex(1)(0) - start(0);
-        real(1) /= cell->vertex(2)(1) - start(1);
-        real(2) /= cell->vertex(4)(2) - start(2);
+        real[0] /= cell->vertex(1)[0] - start[0];
+        real[1] /= cell->vertex(2)[1] - start[1];
+        real[2] /= cell->vertex(4)[2] - start[2];
         break;
       default:
         Assert(false, ExcNotImplemented());

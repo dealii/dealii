@@ -531,8 +531,8 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
                   // the cell. only take the computed point if it lies
                   // inside the reference cell
                   const double eps = 1e-15;
-                  if (-eps <= point(1) && point(1) <= 1 + eps &&
-                      -eps <= point(0) && point(0) <= 1 + eps)
+                  if (-eps <= point[1] && point[1] <= 1 + eps &&
+                      -eps <= point[0] && point[0] <= 1 + eps)
                     {
                       return point;
                     }

@@ -91,7 +91,7 @@ namespace internal
         Assert(p.size() == k + 1, ExcDimensionMismatch(p.size(), k + 1));
         const double h = 1. / k;
         for (unsigned int i = 0; i < p.size(); ++i)
-          p[i](0) = i * h;
+          p[i][0] = i * h;
       }
 
       template <>
@@ -103,8 +103,8 @@ namespace internal
                ExcInternalError());
         for (unsigned int i = 0; i < p.size(); ++i)
           {
-            p[i](0) = points2d[start_index2d[k] + i][0];
-            p[i](1) = points2d[start_index2d[k] + i][1];
+            p[i][0] = points2d[start_index2d[k] + i][0];
+            p[i][1] = points2d[start_index2d[k] + i][1];
           }
       }
 
@@ -117,9 +117,9 @@ namespace internal
                ExcInternalError());
         for (unsigned int i = 0; i < p.size(); ++i)
           {
-            p[i](0) = points3d[start_index3d[k] + i][0];
-            p[i](1) = points3d[start_index3d[k] + i][1];
-            p[i](2) = points3d[start_index3d[k] + i][2];
+            p[i][0] = points3d[start_index3d[k] + i][0];
+            p[i][1] = points3d[start_index3d[k] + i][1];
+            p[i][2] = points3d[start_index3d[k] + i][2];
           }
       }
     } // namespace

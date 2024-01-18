@@ -340,7 +340,7 @@ PolynomialSpace<dim>::compute_derivative(const unsigned int i,
     std::vector<double> tmp(order + 1);
     for (unsigned int d = 0; d < dim; ++d)
       {
-        polynomials[indices[d]].value(p(d), tmp);
+        polynomials[indices[d]].value(p[d], tmp);
         for (unsigned int j = 0; j < order + 1; ++j)
           v[d][j] = tmp[j];
       }

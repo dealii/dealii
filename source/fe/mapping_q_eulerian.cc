@@ -182,7 +182,7 @@ MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
     {
       a[q] = fe_values.quadrature_point(q);
       for (unsigned int d = 0; d < spacedim; ++d)
-        a[q](d) += shift_vector[q](d);
+        a[q][d] += shift_vector[q][d];
     }
 
   return a;

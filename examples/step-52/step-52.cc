@@ -260,7 +260,7 @@ namespace Step52
     const double intensity = 10.;
     const double frequency = numbers::PI / 10.;
     const double b         = 5.;
-    const double x         = point(0);
+    const double x         = point[0];
 
     return intensity *
            (frequency * std::cos(frequency * time) * (b * x - x * x) +

@@ -364,7 +364,7 @@ namespace Step35
         {
           const double Um = 1.5;
           const double H  = 4.1;
-          return 4. * Um * p(1) * (H - p(1)) / (H * H);
+          return 4. * Um * p[1] * (H - p[1]) / (H * H);
         }
       else
         return 0.;
@@ -398,7 +398,7 @@ namespace Step35
     {
       (void)component;
       AssertIndexRange(component, 1);
-      return 25. - p(0);
+      return 25. - p[0];
     }
 
     template <int dim>
@@ -1156,7 +1156,7 @@ namespace Step35
       {
         scratch.fe_val.get_function_values(u_star[d], scratch.u_star_tmp);
         for (unsigned int q = 0; q < scratch.nqp; ++q)
-          scratch.u_star_local[q](d) = scratch.u_star_tmp[q];
+          scratch.u_star_local[q][d] = scratch.u_star_tmp[q];
       }
 
     for (unsigned int d = 0; d < dim; ++d)

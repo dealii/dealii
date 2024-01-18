@@ -212,11 +212,11 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         {
           // VTK format always specifies vertex coordinates with 3 components
           Point<3> x;
-          in >> x(0) >> x(1) >> x(2);
+          in >> x[0] >> x[1] >> x[2];
 
           vertices.emplace_back();
           for (unsigned int d = 0; d < spacedim; ++d)
-            vertices.back()(d) = x(d);
+            vertices.back()[d] = x[d];
         }
     }
 
@@ -683,7 +683,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
       vertices.emplace_back();
 
       for (unsigned int d = 0; d < spacedim; ++d)
-        vertices.back()(d) = x[d];
+        vertices.back()[d] = x[d];
 
       vertex_indices[vertex_index] = n_vertices;
 
@@ -950,7 +950,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
 
       // store vertex
       for (unsigned int d = 0; d < spacedim; ++d)
-        vertices[vertex](d) = x[d];
+        vertices[vertex][d] = x[d];
       // store mapping; note that
       // vertices_indices[i] is automatically
       // created upon first usage
@@ -2270,7 +2270,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &in)
               in >> vertex_number >> x[0] >> x[1] >> x[2];
 
             for (unsigned int d = 0; d < spacedim; ++d)
-              vertices[global_vertex](d) = x[d];
+              vertices[global_vertex][d] = x[d];
             // store mapping
             vertex_indices[vertex_number] = global_vertex;
 
@@ -3239,13 +3239,13 @@ GridIn<2>::read_tecplot(std::istream &in)
             Utilities::break_text_into_lines(line, 1);
           char *endptr;
           for (unsigned int i = 1; i < first_var.size() + 1; ++i)
-            vertices[i](0) = std::strtod(first_var[i - 1].c_str(), &endptr);
+            vertices[i][0] = std::strtod(first_var[i - 1].c_str(), &endptr);
 
           // if there are many points, the data
           // for this var might continue in the
           // next line(s)
           for (unsigned int j = first_var.size() + 1; j < n_vertices + 1; ++j)
-            in >> vertices[j](next_index);
+            in >> vertices[j][next_index];
           // now we got all values of the first
           // variable, so increase the counter
           next_index = 1;
@@ -3268,7 +3268,7 @@ GridIn<2>::read_tecplot(std::istream &in)
             {
               // we need this line, read it in
               for (unsigned int j = 1; j < n_vertices + 1; ++j)
-                in >> vertices[j](next_index);
+                in >> vertices[j][next_index];
               ++next_index;
             }
           else
@@ -3296,7 +3296,7 @@ GridIn<2>::read_tecplot(std::istream &in)
         Utilities::break_text_into_lines(line, 1);
       char *endptr;
       for (unsigned int d = 0; d < dim; ++d)
-        vertices[1](d) =
+        vertices[1][d] =
           std::strtod(first_vertex[tecplot2deal[d]].c_str(), &endptr);
 
       // read the remaining vertices from the
@@ -3310,7 +3310,7 @@ GridIn<2>::read_tecplot(std::istream &in)
           // of coordinates in the list of
           // variables
           for (unsigned int i = 0; i < dim; ++i)
-            vertices[v](i) = vars[tecplot2deal[i]];
+            vertices[v][i] = vars[tecplot2deal[i]];
         }
     }
 
@@ -4005,10 +4005,10 @@ GridIn<2>::debug_output_grid(const std::vector<CellData<2>> &cells,
                              const std::vector<Point<2>>    &vertices,
                              std::ostream                   &out)
 {
-  double min_x = vertices[cells[0].vertices[0]](0),
-         max_x = vertices[cells[0].vertices[0]](0),
-         min_y = vertices[cells[0].vertices[0]](1),
-         max_y = vertices[cells[0].vertices[0]](1);
+  double min_x = vertices[cells[0].vertices[0]][0],
+         max_x = vertices[cells[0].vertices[0]][0],
+         min_y = vertices[cells[0].vertices[0]][1],
+         max_y = vertices[cells[0].vertices[0]][1];
 
   for (unsigned int i = 0; i < cells.size(); ++i)
     {
@@ -4016,14 +4016,14 @@ GridIn<2>::debug_output_grid(const std::vector<CellData<2>> &cells,
         {
           const Point<2> &p = vertices[vertex];
 
-          if (p(0) < min_x)
-            min_x = p(0);
-          if (p(0) > max_x)
-            max_x = p(0);
-          if (p(1) < min_y)
-            min_y = p(1);
-          if (p(1) > max_y)
-            max_y = p(1);
+          if (p[0] < min_x)
+            min_x = p[0];
+          if (p[0] > max_x)
+            max_x = p[0];
+          if (p[1] < min_y)
+            min_y = p[1];
+          if (p[1] > max_y)
+            max_y = p[1];
         }
 
       out << "# cell " << i << std::endl;
@@ -4032,21 +4032,21 @@ GridIn<2>::debug_output_grid(const std::vector<CellData<2>> &cells,
         center += vertices[vertex];
       center /= 4;
 
-      out << "set label \"" << i << "\" at " << center(0) << ',' << center(1)
+      out << "set label \"" << i << "\" at " << center[0] << ',' << center[1]
           << " center" << std::endl;
 
       // first two line right direction
       for (unsigned int f = 0; f < 2; ++f)
-        out << "set arrow from " << vertices[cells[i].vertices[f]](0) << ','
-            << vertices[cells[i].vertices[f]](1) << " to "
-            << vertices[cells[i].vertices[(f + 1) % 4]](0) << ','
-            << vertices[cells[i].vertices[(f + 1) % 4]](1) << std::endl;
+        out << "set arrow from " << vertices[cells[i].vertices[f]][0] << ','
+            << vertices[cells[i].vertices[f]][1] << " to "
+            << vertices[cells[i].vertices[(f + 1) % 4]][0] << ','
+            << vertices[cells[i].vertices[(f + 1) % 4]][1] << std::endl;
       // other two lines reverse direction
       for (unsigned int f = 2; f < 4; ++f)
-        out << "set arrow from " << vertices[cells[i].vertices[(f + 1) % 4]](0)
-            << ',' << vertices[cells[i].vertices[(f + 1) % 4]](1) << " to "
-            << vertices[cells[i].vertices[f]](0) << ','
-            << vertices[cells[i].vertices[f]](1) << std::endl;
+        out << "set arrow from " << vertices[cells[i].vertices[(f + 1) % 4]][0]
+            << ',' << vertices[cells[i].vertices[(f + 1) % 4]][1] << " to "
+            << vertices[cells[i].vertices[f]][0] << ','
+            << vertices[cells[i].vertices[f]][1] << std::endl;
       out << std::endl;
     }
 

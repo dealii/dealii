@@ -157,11 +157,11 @@ namespace Step41
       (void)component;
       Assert(component == 0, ExcIndexRange(component, 0, 1));
 
-      if (p(0) < -0.5)
+      if (p[0] < -0.5)
         return -0.2;
-      else if (p(0) >= -0.5 && p(0) < 0.0)
+      else if (p[0] >= -0.5 && p[0] < 0.0)
         return -0.4;
-      else if (p(0) >= 0.0 && p(0) < 0.5)
+      else if (p[0] >= 0.0 && p[0] < 0.5)
         return -0.6;
       else
         return -0.8;

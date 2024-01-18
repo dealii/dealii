@@ -1208,9 +1208,9 @@ namespace VectorTools
           Point<dim> shifted_reference_point_2 =
             reference_quadrature_points[q_point];
 
-          shifted_reference_point_1(edge_coordinate_direction[face][line]) +=
+          shifted_reference_point_1[edge_coordinate_direction[face][line]] +=
             tol;
-          shifted_reference_point_2(edge_coordinate_direction[face][line]) -=
+          shifted_reference_point_2[edge_coordinate_direction[face][line]] -=
             tol;
           Tensor<1, dim> tangential =
             (0.5 *

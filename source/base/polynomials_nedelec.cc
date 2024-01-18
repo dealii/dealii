@@ -133,8 +133,8 @@ PolynomialsNedelec<dim>::evaluate(
           // shifted one step in positive direction
           Point<dim> p;
 
-          p(0) = unit_point(1);
-          p(1) = unit_point(0);
+          p[0] = unit_point[1];
+          p[1] = unit_point[0];
 
           std::vector<double>         p_values((values.empty()) ? 0 : n_basis);
           std::vector<Tensor<1, dim>> p_grads((grads.empty()) ? 0 : n_basis);
@@ -327,18 +327,18 @@ PolynomialsNedelec<dim>::evaluate(
           std::vector<Tensor<2, dim>> p2_grad_grads(
             (grad_grads.empty()) ? 0 : n_basis);
 
-          p1(0) = unit_point(1);
-          p1(1) = unit_point(2);
-          p1(2) = unit_point(0);
+          p1[0] = unit_point[1];
+          p1[1] = unit_point[2];
+          p1[2] = unit_point[0];
           polynomial_space.evaluate(p1,
                                     p1_values,
                                     p1_grads,
                                     p1_grad_grads,
                                     empty_vector_of_3rd_order_tensors,
                                     empty_vector_of_4th_order_tensors);
-          p2(0) = unit_point(2);
-          p2(1) = unit_point(0);
-          p2(2) = unit_point(1);
+          p2[0] = unit_point[2];
+          p2[1] = unit_point[0];
+          p2[2] = unit_point[1];
           polynomial_space.evaluate(p2,
                                     p2_values,
                                     p2_grads,

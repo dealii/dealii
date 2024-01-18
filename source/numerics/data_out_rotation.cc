@@ -148,8 +148,8 @@ DataOutRotation<dim, spacedim>::build_one_patch(
         {
           case 1:
             {
-              const double r1 = (*cell)->vertex(0)(0),
-                           r2 = (*cell)->vertex(1)(0);
+              const double r1 = (*cell)->vertex(0)[0],
+                           r2 = (*cell)->vertex(1)[0];
               Assert(r1 >= 0, ExcRadialVariableHasNegativeValues(r1));
               Assert(r2 >= 0, ExcRadialVariableHasNegativeValues(r2));
 
@@ -169,19 +169,19 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                   const Point<dim> v = (*cell)->vertex(vertex);
 
                   // make sure that the radial variable is nonnegative
-                  Assert(v(0) >= 0, ExcRadialVariableHasNegativeValues(v(0)));
+                  Assert(v[0] >= 0, ExcRadialVariableHasNegativeValues(v[0]));
 
                   // now set the vertices of the patch
                   my_patches[angle].vertices[vertex] =
-                    v(0) * angle_directions[angle];
-                  my_patches[angle].vertices[vertex][0] = v(1);
+                    v[0] * angle_directions[angle];
+                  my_patches[angle].vertices[vertex][0] = v[1];
 
                   my_patches[angle]
                     .vertices[vertex + GeometryInfo<dim>::vertices_per_cell] =
-                    v(0) * angle_directions[angle + 1];
+                    v[0] * angle_directions[angle + 1];
                   my_patches[angle]
                     .vertices[vertex + GeometryInfo<dim>::vertices_per_cell]
-                             [0] = v(1);
+                             [0] = v[1];
                 }
 
               break;

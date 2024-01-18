@@ -364,8 +364,8 @@ namespace GridTools
                       cell->vertex_dof_index(vertex_no, 0),
                       {},
                       (solve_for_absolute_positions ?
-                         map_iter->second(i) :
-                         map_iter->second(i) - vertex_point[i]));
+                         map_iter->second[i] :
+                         map_iter->second[i] - vertex_point[i]));
                   }
           }
       }
@@ -398,9 +398,9 @@ namespace GridTools
               cell->vertex_dof_index(vertex_no, 0);
             for (unsigned int i = 0; i < dim; ++i)
               if (solve_for_absolute_positions)
-                v(i) = us[i](dof_index);
+                v[i] = us[i](dof_index);
               else
-                v(i) += us[i](dof_index);
+                v[i] += us[i](dof_index);
 
             vertex_touched[cell->vertex_index(vertex_no)] = true;
           }
@@ -525,7 +525,7 @@ namespace GridTools
                   // first compute a random shift vector
                   Point<spacedim> shift_vector;
                   for (unsigned int d = 0; d < spacedim; ++d)
-                    shift_vector(d) = uniform_distribution(rng);
+                    shift_vector[d] = uniform_distribution(rng);
 
                   shift_vector *= factor * minimal_length[global_vertex_no] /
                                   std::sqrt(shift_vector.square());
@@ -562,7 +562,7 @@ namespace GridTools
                 // compute a random shift vector
                 Point<spacedim> shift_vector;
                 for (unsigned int d = 0; d < spacedim; ++d)
-                  shift_vector(d) = uniform_distribution(rng);
+                  shift_vector[d] = uniform_distribution(rng);
 
                 shift_vector *= factor * minimal_length[vertex] /
                                 std::sqrt(shift_vector.square());

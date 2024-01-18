@@ -1344,8 +1344,8 @@ namespace Step51
     for (const auto &cell : triangulation.cell_iterators())
       for (const auto &face : cell->face_iterators())
         if (face->at_boundary())
-          if ((std::fabs(face->center()(0) - (-1)) < 1e-12) ||
-              (std::fabs(face->center()(1) - (-1)) < 1e-12))
+          if ((std::fabs(face->center()[0] - (-1)) < 1e-12) ||
+              (std::fabs(face->center()[1] - (-1)) < 1e-12))
             face->set_boundary_id(1);
   }
 

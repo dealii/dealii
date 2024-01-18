@@ -788,18 +788,18 @@ namespace Step57
     f << "# y u_x u_y" << std::endl;
 
     Point<dim> p;
-    p(0) = 0.5;
-    p(1) = 0.5;
+    p[0] = 0.5;
+    p[1] = 0.5;
 
     f << std::scientific;
 
     for (unsigned int i = 0; i <= 100; ++i)
       {
-        p(dim - 1) = i / 100.0;
+        p[dim - 1] = i / 100.0;
 
         Vector<double> tmp_vector(dim + 1);
         VectorTools::point_value(dof_handler, present_solution, p, tmp_vector);
-        f << p(dim - 1);
+        f << p[dim - 1];
 
         for (int j = 0; j < dim; ++j)
           f << ' ' << tmp_vector(j);

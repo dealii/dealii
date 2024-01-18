@@ -555,7 +555,7 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
     std::vector<double> tmp(5);
     for (unsigned int d = 0; d < dim; ++d)
       {
-        polynomials[indices[d]].value(p(d), tmp);
+        polynomials[indices[d]].value(p[d], tmp);
         v[d][0] = tmp[0];
         v[d][1] = tmp[1];
         v[d][2] = tmp[2];
@@ -739,7 +739,7 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
 
   std::vector<std::vector<double>> v(dim, std::vector<double>(order + 1));
   for (unsigned int d = 0; d < dim; ++d)
-    polynomials[d][indices[d]].value(p(d), v[d]);
+    polynomials[d][indices[d]].value(p[d], v[d]);
 
   Tensor<order, dim> derivative;
   switch (order)

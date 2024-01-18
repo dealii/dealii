@@ -54,7 +54,7 @@ namespace GeometricUtilities
         {
           scoord[0] = position.norm();
           // azimuth angle \theta:
-          scoord[1] = std::atan2(position(1), position(0));
+          scoord[1] = std::atan2(position[1], position[0]);
           // correct to [0,2*pi)
           if (scoord[1] < 0.0)
             scoord[1] += 2.0 * numbers::PI;
@@ -65,7 +65,7 @@ namespace GeometricUtilities
         {
           // acos returns the angle in the range [0,\pi]
           if (scoord[0] > std::numeric_limits<double>::min())
-            scoord[2] = std::acos(position(2) / scoord[0]);
+            scoord[2] = std::acos(position[2] / scoord[0]);
           else
             scoord[2] = 0.0;
         }

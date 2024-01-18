@@ -116,8 +116,8 @@ namespace Step56
     Assert(component <= 2 + 1, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
 
     if (component == 0)
       return sin(PI * x);
@@ -136,9 +136,9 @@ namespace Step56
     Assert(component <= 3 + 1, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
-    const double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
 
     if (component == 0)
       return 2.0 * sin(PI * x);
@@ -160,8 +160,8 @@ namespace Step56
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
 
     Tensor<1, 2> return_value;
     if (component == 0)
@@ -190,9 +190,9 @@ namespace Step56
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
-    const double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
 
     Tensor<1, 3> return_value;
     if (component == 0)
@@ -243,8 +243,8 @@ namespace Step56
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
     if (component == 0)
       return PI * PI * sin(PI * x) + PI * cos(PI * x) * cos(PI * y);
     if (component == 1)
@@ -262,9 +262,9 @@ namespace Step56
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
-    double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
     if (component == 0)
       return 2 * PI * PI * sin(PI * x) +
              PI * cos(PI * x) * cos(PI * y) * sin(PI * z);

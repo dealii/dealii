@@ -163,23 +163,23 @@ namespace internal
                 *reinterpret_cast<Tensor<1, dim> *>(&derivative);
               if (i == 0)
                 {
-                  grad[0] = -2.5 + 3 * p(0);
-                  grad[1] = 1.5 - 3 * p(1);
+                  grad[0] = -2.5 + 3 * p[0];
+                  grad[1] = 1.5 - 3 * p[1];
                 }
               else if (i == 1)
                 {
-                  grad[0] = -0.5 + 3.0 * p(0);
-                  grad[1] = 1.5 - 3.0 * p(1);
+                  grad[0] = -0.5 + 3.0 * p[0];
+                  grad[1] = 1.5 - 3.0 * p[1];
                 }
               else if (i == 2)
                 {
-                  grad[0] = 1.5 - 3.0 * p(0);
-                  grad[1] = -2.5 + 3.0 * p(1);
+                  grad[0] = 1.5 - 3.0 * p[0];
+                  grad[1] = -2.5 + 3.0 * p[1];
                 }
               else if (i == 3)
                 {
-                  grad[0] = 1.5 - 3.0 * p(0);
-                  grad[1] = -0.5 + 3.0 * p(1);
+                  grad[0] = 1.5 - 3.0 * p[0];
+                  grad[1] = -0.5 + 3.0 * p[1];
                 }
               else
                 {

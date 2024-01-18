@@ -1541,9 +1541,9 @@ namespace DataOutBase
          * return false;
          */
 
-        return (one(0) < two(0) ||
-                (!(two(0) < one(0)) &&
-                 (one(1) < two(1) || (!(two(1) < one(1)) && one(2) < two(2)))));
+        return (one[0] < two[0] ||
+                (!(two[0] < one[0]) &&
+                 (one[1] < two[1] || (!(two[1] < one[1]) && one[2] < two[2]))));
       }
     };
 

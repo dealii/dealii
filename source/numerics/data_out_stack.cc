@@ -339,34 +339,34 @@ DataOutStack<dim, spacedim>::build_patches(const unsigned int nnnn_subdivisions)
         {
           case 1:
             patch->vertices[0] =
-              Point<dim + 1>(cell->vertex(0)(0), parameter - parameter_step);
+              Point<dim + 1>(cell->vertex(0)[0], parameter - parameter_step);
             patch->vertices[1] =
-              Point<dim + 1>(cell->vertex(1)(0), parameter - parameter_step);
-            patch->vertices[2] = Point<dim + 1>(cell->vertex(0)(0), parameter);
-            patch->vertices[3] = Point<dim + 1>(cell->vertex(1)(0), parameter);
+              Point<dim + 1>(cell->vertex(1)[0], parameter - parameter_step);
+            patch->vertices[2] = Point<dim + 1>(cell->vertex(0)[0], parameter);
+            patch->vertices[3] = Point<dim + 1>(cell->vertex(1)[0], parameter);
             break;
 
           case 2:
-            patch->vertices[0] = Point<dim + 1>(cell->vertex(0)(0),
-                                                cell->vertex(0)(1),
+            patch->vertices[0] = Point<dim + 1>(cell->vertex(0)[0],
+                                                cell->vertex(0)[1],
                                                 parameter - parameter_step);
-            patch->vertices[1] = Point<dim + 1>(cell->vertex(1)(0),
-                                                cell->vertex(1)(1),
+            patch->vertices[1] = Point<dim + 1>(cell->vertex(1)[0],
+                                                cell->vertex(1)[1],
                                                 parameter - parameter_step);
-            patch->vertices[2] = Point<dim + 1>(cell->vertex(2)(0),
-                                                cell->vertex(2)(1),
+            patch->vertices[2] = Point<dim + 1>(cell->vertex(2)[0],
+                                                cell->vertex(2)[1],
                                                 parameter - parameter_step);
-            patch->vertices[3] = Point<dim + 1>(cell->vertex(3)(0),
-                                                cell->vertex(3)(1),
+            patch->vertices[3] = Point<dim + 1>(cell->vertex(3)[0],
+                                                cell->vertex(3)[1],
                                                 parameter - parameter_step);
             patch->vertices[4] =
-              Point<dim + 1>(cell->vertex(0)(0), cell->vertex(0)(1), parameter);
+              Point<dim + 1>(cell->vertex(0)[0], cell->vertex(0)[1], parameter);
             patch->vertices[5] =
-              Point<dim + 1>(cell->vertex(1)(0), cell->vertex(1)(1), parameter);
+              Point<dim + 1>(cell->vertex(1)[0], cell->vertex(1)[1], parameter);
             patch->vertices[6] =
-              Point<dim + 1>(cell->vertex(2)(0), cell->vertex(2)(1), parameter);
+              Point<dim + 1>(cell->vertex(2)[0], cell->vertex(2)[1], parameter);
             patch->vertices[7] =
-              Point<dim + 1>(cell->vertex(3)(0), cell->vertex(3)(1), parameter);
+              Point<dim + 1>(cell->vertex(3)[0], cell->vertex(3)[1], parameter);
             break;
 
           default:

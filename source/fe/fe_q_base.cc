@@ -199,7 +199,7 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
       for (unsigned int j = 0; j < q_deg + 1; ++j)
         {
           Point<dim> p;
-          p[0] = constraint_points[i](0);
+          p[0] = constraint_points[i][0];
           fe.interface_constraints(i, face_index_map[j]) =
             fe.poly_space->compute_value(index_map_inverse[j], p);
 
@@ -257,7 +257,7 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
         const double                step = 1. / q_deg;
         std::vector<Point<dim - 2>> line_support_points(n);
         for (unsigned int i = 0; i < n; ++i)
-          line_support_points[i](0) = (i + 1) * step;
+          line_support_points[i][0] = (i + 1) * step;
         Quadrature<dim - 2> qline(line_support_points);
 
         // auxiliary points in 2d
@@ -357,8 +357,8 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
         for (unsigned int k = 0; k < dim - 1; ++k)
           {
             const int coord_int =
-              static_cast<int>(constraint_points[i](k) * interval + 0.25);
-            constraint_point(k) = 1. * coord_int / interval;
+              static_cast<int>(constraint_points[i][k] * interval + 0.25);
+            constraint_point[k] = 1. * coord_int / interval;
 
             // The following lines of code should eliminate the problems with
             // the constraints object which appeared for P>=4. The
@@ -380,9 +380,9 @@ struct FE_Q_Base<xdim, xspacedim>::Implementation
             //
             // For a different explanation of the problem, see the discussion
             // in the FiniteElement class for constraint matrices in 3d.
-            mirror[k] = (constraint_point(k) > 0.5);
+            mirror[k] = (constraint_point[k] > 0.5);
             if (mirror[k])
-              constraint_point(k) = 1.0 - constraint_point(k);
+              constraint_point[k] = 1.0 - constraint_point[k];
           }
 
         for (unsigned int j = 0; j < pnts; ++j)

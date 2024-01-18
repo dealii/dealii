@@ -1792,7 +1792,7 @@ namespace FETools
             std::vector<Point<dim>> q_points_coarse(q_points_fine.size());
             for (unsigned int i = 0; i < q_points_fine.size(); ++i)
               for (unsigned int j = 0; j < dim; ++j)
-                q_points_coarse[i](j) = q_points_fine[i](j);
+                q_points_coarse[i][j] = q_points_fine[i][j];
             const Quadrature<dim>   q_coarse(q_points_coarse,
                                            fine.get_JxW_values());
             FEValues<dim, spacedim> coarse(mapping,
@@ -2210,7 +2210,7 @@ namespace FETools
             std::vector<Point<dim>> q_points_coarse(q_points_fine.size());
             for (unsigned int q = 0; q < q_points_fine.size(); ++q)
               for (unsigned int j = 0; j < dim; ++j)
-                q_points_coarse[q](j) = q_points_fine[q](j);
+                q_points_coarse[q][j] = q_points_fine[q][j];
             Quadrature<dim> q_coarse(q_points_coarse, fine.get_JxW_values());
             FEValues<dim, spacedim> coarse(
               coarse_cell->reference_cell()

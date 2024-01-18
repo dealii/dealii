@@ -171,18 +171,18 @@ Mapping<dim, spacedim>::project_real_point_to_unit_point_on_face(
   if (dim == 2)
     {
       if (unit_normal_direction == 0)
-        return Point<dim - 1>{unit_cell_pt(1)};
+        return Point<dim - 1>{unit_cell_pt[1]};
       else if (unit_normal_direction == 1)
-        return Point<dim - 1>{unit_cell_pt(0)};
+        return Point<dim - 1>{unit_cell_pt[0]};
     }
   else if (dim == 3)
     {
       if (unit_normal_direction == 0)
-        return Point<dim - 1>{unit_cell_pt(1), unit_cell_pt(2)};
+        return Point<dim - 1>{unit_cell_pt[1], unit_cell_pt[2]};
       else if (unit_normal_direction == 1)
-        return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(2)};
+        return Point<dim - 1>{unit_cell_pt[0], unit_cell_pt[2]};
       else if (unit_normal_direction == 2)
-        return Point<dim - 1>{unit_cell_pt(0), unit_cell_pt(1)};
+        return Point<dim - 1>{unit_cell_pt[0], unit_cell_pt[1]};
     }
 
   // We should never get here

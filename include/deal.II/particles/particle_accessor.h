@@ -571,12 +571,12 @@ namespace Particles
 
     Point<spacedim> location;
     for (unsigned int i = 0; i < spacedim; ++i)
-      location(i) = *pdata++;
+      location[i] = *pdata++;
     set_location(location);
 
     Point<dim> reference_location;
     for (unsigned int i = 0; i < dim; ++i)
-      reference_location(i) = *pdata++;
+      reference_location[i] = *pdata++;
     set_reference_location(reference_location);
 
     // See if there are properties to load

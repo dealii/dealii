@@ -146,7 +146,7 @@ namespace Step16
                                MeshWorker::IntegrationInfo<dim> &info) const
   {
     AssertDimension(dinfo.n_matrices(), 1);
-    const double coefficient = (dinfo.cell->center()(0) > 0.) ? .1 : 1.;
+    const double coefficient = (dinfo.cell->center()[0] > 0.) ? .1 : 1.;
 
     LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
                                            info.fe_values(0),
