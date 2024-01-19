@@ -1494,20 +1494,16 @@ operator Tensor<1, dim, Tensor<rank_ - 1, dim, OtherNumber>>() const
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(const Tensor<rank_, dim, Number> &other)
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] = other.values[i];
-}
+  : values(other.values)
+{}
 
 
 
 template <int rank_, int dim, typename Number>
 constexpr DEAL_II_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(Tensor<rank_, dim, Number> &&other) noexcept
-{
-  for (unsigned int i = 0; i < dim; ++i)
-    values[i] = other.values[i];
-}
+  : values(std::move(other.values))
+{}
 #  endif
 
 
