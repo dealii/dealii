@@ -714,8 +714,8 @@ namespace Step30
       // We only need to consider cells which are flagged for refinement.
       if (cell->refine_flag_set())
         {
-          Point<dim> jump;
-          Point<dim> area;
+          std::array<double, dim> jump_in_coordinate_direction;
+          std::array<double, dim> face_area_in_coordinate_direction;
 
           for (const auto face_no : cell->face_indices())
             {
@@ -781,11 +781,12 @@ namespace Step30
                               // second coordinate direction and so on, so we
                               // accumulate these values into vectors with
                               // <code>dim</code> components.
-                              jump[face_no / 2] +=
+                              jump_in_coordinate_direction[face_no / 2] +=
                                 std::abs(u[x] - u_neighbor[x]) * JxW[x];
                               // We also sum up the scaled weights to obtain
                               // the measure of the face.
-                              area[face_no / 2] += JxW[x];
+                              face_area_in_coordinate_direction[face_no / 2] +=
+                                JxW[x];
                             }
                         }
                     }
@@ -815,9 +816,10 @@ namespace Step30
                                x < fe_v_face.n_quadrature_points;
                                ++x)
                             {
-                              jump[face_no / 2] +=
+                              jump_in_coordinate_direction[face_no / 2] +=
                                 std::abs(u[x] - u_neighbor[x]) * JxW[x];
-                              area[face_no / 2] += JxW[x];
+                              face_area_in_coordinate_direction[face_no / 2] +=
+                                JxW[x];
                             }
                         }
                       else // i.e. neighbor is coarser than cell
@@ -859,9 +861,10 @@ namespace Step30
                                x < fe_v_face.n_quadrature_points;
                                ++x)
                             {
-                              jump[face_no / 2] +=
+                              jump_in_coordinate_direction[face_no / 2] +=
                                 std::abs(u[x] - u_neighbor[x]) * JxW[x];
-                              area[face_no / 2] += JxW[x];
+                              face_area_in_coordinate_direction[face_no / 2] +=
+                                JxW[x];
                             }
                         }
                     }
@@ -873,7 +876,8 @@ namespace Step30
           double                  sum_of_average_jumps = 0.;
           for (unsigned int i = 0; i < dim; ++i)
             {
-              average_jumps[i] = jump[i] / area[i];
+              average_jumps[i] = jump_in_coordinate_direction[i] /
+                                 face_area_in_coordinate_direction[i];
               sum_of_average_jumps += average_jumps[i];
             }
 
