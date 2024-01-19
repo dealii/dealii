@@ -359,14 +359,14 @@ MatrixOut::build_patches(const Matrix      &matrix,
         // matrix, rather than perpendicular to it. this has the advantage that,
         // for example, the unit matrix is plotted as a straight ridge, rather
         // than as a series of bumps and valleys along the diagonal
-        patches[index].vertices[0](0) = j;
-        patches[index].vertices[0](1) = -static_cast<signed int>(i);
-        patches[index].vertices[1](0) = j;
-        patches[index].vertices[1](1) = -static_cast<signed int>(i + 1);
-        patches[index].vertices[2](0) = j + 1;
-        patches[index].vertices[2](1) = -static_cast<signed int>(i);
-        patches[index].vertices[3](0) = j + 1;
-        patches[index].vertices[3](1) = -static_cast<signed int>(i + 1);
+        patches[index].vertices[0][0] = j;
+        patches[index].vertices[0][1] = -static_cast<signed int>(i);
+        patches[index].vertices[1][0] = j;
+        patches[index].vertices[1][1] = -static_cast<signed int>(i + 1);
+        patches[index].vertices[2][0] = j + 1;
+        patches[index].vertices[2][1] = -static_cast<signed int>(i);
+        patches[index].vertices[3][0] = j + 1;
+        patches[index].vertices[3][1] = -static_cast<signed int>(i + 1);
         // next scale all the patch
         // coordinates by the block
         // size, to get original
