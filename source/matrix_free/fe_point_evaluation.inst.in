@@ -15,7 +15,7 @@
 
 
 
-for (deal_II_dimension, deal_II_space_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     template bool internal::FEPointEvaluation::is_fast_path_supported(
