@@ -68,7 +68,6 @@
 
 namespace Step20
 {
-  using namespace dealii;
 
   template <int dim>
   class MixedLaplaceProblem

@@ -27,7 +27,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 using namespace NonMatching::internal::QuadratureGeneratorImplementation;
 
 

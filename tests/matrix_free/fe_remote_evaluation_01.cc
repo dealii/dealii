@@ -29,7 +29,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 using Number = double;
 

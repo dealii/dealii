@@ -62,7 +62,6 @@
 
 // #define HEX
 
-using namespace dealii;
 
 template <int dim>
 struct ScratchData

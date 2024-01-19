@@ -33,8 +33,6 @@ template <int dim>
 void
 positive_negative_split_test()
 {
-  using namespace dealii;
-
   SymmetricTensor<2, dim> random_tensor;
   srand(time(0));
 

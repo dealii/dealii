@@ -70,7 +70,6 @@
 
 namespace StokesTests
 {
-  using namespace dealii;
 
   struct CopyDataFace
   {
@@ -869,7 +868,6 @@ main()
 {
   try
     {
-      using namespace dealii;
       using namespace StokesTests;
       const int dim = 2;
 

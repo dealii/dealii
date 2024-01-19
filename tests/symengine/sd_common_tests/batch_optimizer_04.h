@@ -22,7 +22,6 @@
 
 #include "serialization.h"
 
-using namespace dealii;
 namespace SD = Differentiation::SD;
 
 template <int dim,

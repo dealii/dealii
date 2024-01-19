@@ -70,7 +70,6 @@
 
 namespace Step12
 {
-  using namespace dealii;
 
   template <int dim>
   class BoundaryValues : public Function<dim>

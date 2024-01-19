@@ -28,7 +28,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Print the bounds of the incoming box to deallog.
 template <int dim>

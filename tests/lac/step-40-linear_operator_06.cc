@@ -64,7 +64,6 @@
 
 namespace Step40
 {
-  using namespace dealii;
 
   template <int dim>
   class LaplaceProblem

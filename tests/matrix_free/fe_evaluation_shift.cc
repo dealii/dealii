@@ -270,7 +270,6 @@ shift_1d_quadrature(const Quadrature<1> &quadrature_1D, const Number shift)
   return {points_shift, weights};
 }
 
-using namespace dealii;
 
 template <int dim,
           int fe_degree,

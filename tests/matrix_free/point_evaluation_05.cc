@@ -45,7 +45,6 @@ template <int dim>
 void
 test(const unsigned int degree)
 {
-  using namespace dealii;
   Triangulation<dim> tria;
 
   if (dim > 1)

@@ -34,7 +34,6 @@
 // Test MatrixFreeTools::ElementActivationAndDeactivationMatrixFree by comparing
 // the results with results obtained on fitted mesh.
 
-using namespace dealii;
 
 template <int dim>
 class Fu : public Function<dim>

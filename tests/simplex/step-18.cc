@@ -86,7 +86,6 @@ const unsigned int degree = 1;
 
 namespace Step18
 {
-  using namespace dealii;
 
   template <int dim>
   struct PointHistory
@@ -1022,7 +1021,6 @@ main(int argc, char **argv)
 
   try
     {
-      using namespace dealii;
       using namespace Step18;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);

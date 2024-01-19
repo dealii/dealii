@@ -66,7 +66,6 @@ const unsigned int degree = 1;
 
 namespace Step23
 {
-  using namespace dealii;
 
   template <int dim>
   class WaveEquation
@@ -442,7 +441,6 @@ main(int argc, char **argv)
 
   try
     {
-      using namespace dealii;
       using namespace Step23;
 
       WaveEquation<2> wave_equation_solver;

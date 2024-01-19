@@ -46,7 +46,6 @@
 // (x0, y0, z0, x1, y1, z1, ...) and solution1 should contain (u0, v0, w0, u1,
 // v1, w1, ...). Verify that they match when we interpolate.
 
-using namespace dealii;
 
 class Test : public Function<2>
 {

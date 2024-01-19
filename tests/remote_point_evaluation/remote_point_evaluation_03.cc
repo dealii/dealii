@@ -49,7 +49,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 
 using VectorType = LinearAlgebra::distributed::Vector<double>;

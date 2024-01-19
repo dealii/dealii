@@ -30,7 +30,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 // Set up a triangulation with 2 elements in a row: |-0-|-1-|, over
 // [0,2]x[0,1]^{dim-1}, and a level set  function with a cut in the plane

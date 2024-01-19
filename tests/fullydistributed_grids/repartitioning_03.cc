@@ -39,7 +39,6 @@
 
 #include "../grid/tests.h"
 
-using namespace dealii;
 
 template <int dim, int spacedim>
 void

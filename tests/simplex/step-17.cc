@@ -81,7 +81,6 @@
 
 namespace Step17
 {
-  using namespace dealii;
 
   template <int dim>
   class ElasticProblem
@@ -456,7 +455,6 @@ main(int argc, char **argv)
 
   try
     {
-      using namespace dealii;
       using namespace Step17;
 
       ElasticProblem<2> elastic_problem;

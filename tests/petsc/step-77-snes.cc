@@ -67,7 +67,6 @@ namespace Step77
 {
   // Before writing the main class to solve the problem, we define
   // shortcuts for the types we are going to use within this tutorial.
-  using namespace dealii;
   using VectorType         = PETScWrappers::MPI::Vector;
   using MatrixType         = PETScWrappers::MPI::SparseMatrix;
   using PreconditionerType = PETScWrappers::PreconditionLU;

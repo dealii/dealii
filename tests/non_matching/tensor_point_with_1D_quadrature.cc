@@ -26,7 +26,6 @@
 
 #include "quadrature_printing.h"
 
-using namespace dealii;
 using namespace NonMatching::internal::QuadratureGeneratorImplementation;
 
 

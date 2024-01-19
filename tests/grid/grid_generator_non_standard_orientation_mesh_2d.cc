@@ -30,7 +30,6 @@
 // STL
 #include <map>
 
-using namespace dealii;
 
 template <int dim>
 void

@@ -30,7 +30,6 @@
 // Check that Triangulation::get_boundary_ids() works for
 // simplices. This used to crash.
 
-using namespace dealii;
 
 template <int dim>
 void

@@ -30,7 +30,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 template <int dim>
 std::vector<std::vector<BoundingBox<dim>>>

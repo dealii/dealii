@@ -31,7 +31,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace SD = dealii::Differentiation::SD;
 
 void

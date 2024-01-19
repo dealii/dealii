@@ -56,7 +56,6 @@
 
 #include "./simplex_grids.h"
 
-using namespace dealii;
 
 
 double

@@ -41,7 +41,6 @@
 
 #include "./simplex_grids.h"
 
-using namespace dealii;
 
 template <int dim>
 class RightHandSideFunction : public Function<dim>

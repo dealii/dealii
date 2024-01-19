@@ -29,7 +29,6 @@
 #include "../grid/tests.h"
 #include "serialization.h"
 
-using namespace dealii;
 
 template <int dim>
 void

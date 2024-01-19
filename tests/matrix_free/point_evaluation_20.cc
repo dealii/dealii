@@ -61,7 +61,6 @@ template <int dim>
 void
 test()
 {
-  using namespace dealii;
   Triangulation<dim> tria;
 
   GridGenerator::subdivided_hyper_cube(tria, 2, 0, 1);

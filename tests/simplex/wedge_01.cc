@@ -28,7 +28,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 void
 test_3()

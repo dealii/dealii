@@ -22,7 +22,6 @@
 #include "../tests.h"
 
 
-using namespace dealii;
 using NonMatching::FEImmersedSurfaceValues;
 
 // Set up a triangulation that we can construct an

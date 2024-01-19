@@ -14,7 +14,6 @@
 // This previously crashed with a segmentation fault inside
 // DoFHandlerImplementation::Policy::Sequential::renumber_dofs().
 
-using namespace dealii;
 int
 main()
 {

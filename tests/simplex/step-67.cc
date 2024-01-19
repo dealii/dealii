@@ -93,7 +93,6 @@
 
 namespace Euler_DG
 {
-  using namespace dealii;
 
   // Similarly to the other matrix-free tutorial programs, we collect all
   // parameters that control the execution of the program at the top of the
@@ -2515,7 +2514,6 @@ int
 main(int argc, char **argv)
 {
   using namespace Euler_DG;
-  using namespace dealii;
 
   // tests.h enables floating point exceptions in debug mode, here we disable
   // them to avoid division by zero when some cell lanes might not be occupied

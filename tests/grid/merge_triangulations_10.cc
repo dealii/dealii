@@ -35,8 +35,6 @@ print_boundary_ids(const dealii::Triangulation<dim> &tria)
 int
 main()
 {
-  using namespace dealii;
-
   initlog();
 
   const unsigned int dim = 2;

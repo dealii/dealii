@@ -26,7 +26,6 @@
 
 namespace
 {
-  using namespace dealii;
 
   /*
    * A simple test-function which is constant in space, but varies

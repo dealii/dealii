@@ -36,7 +36,6 @@
 
 #include "../grid/tests.h"
 
-using namespace dealii;
 
 MPI_Comm
 create_sub_comm(const MPI_Comm comm, const unsigned int size)

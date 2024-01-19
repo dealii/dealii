@@ -30,7 +30,6 @@
 
 #include "quadrature_printing.h"
 
-using namespace dealii;
 
 template <int dim>
 class Test

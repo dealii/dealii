@@ -26,7 +26,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 
 using iota = std_cxx20::ranges::iota_view<unsigned int, unsigned int>;
 

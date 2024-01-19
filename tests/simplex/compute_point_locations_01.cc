@@ -30,7 +30,6 @@
 // Create a simplex mesh in the unit cube. Check points distribute to each cell
 // via GridTools::compute_point_locations
 
-using namespace dealii;
 
 template <int dim>
 void

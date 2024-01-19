@@ -30,7 +30,6 @@
 
 #include "../tests.h"
 
-using namespace dealii;
 namespace SE = SymEngine;
 
 int
