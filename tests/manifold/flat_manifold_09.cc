@@ -128,8 +128,8 @@ test()
 
 
   Point<dim> p;
-  p(0) = 0.45;
-  p(1) = 0.16;
+  p[0] = 0.45;
+  p[1] = 0.16;
   for (unsigned int step = 0; step < 10; ++step)
     {
       std::cout << "step " << step << std::endl;

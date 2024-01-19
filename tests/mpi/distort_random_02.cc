@@ -47,7 +47,7 @@ test1(const bool keep_boundary)
         const Point<dim> &p            = cell->center();
         bool              all_positive = true;
         for (unsigned int d = 0; d < dim; ++d)
-          if (p(d) <= 0.)
+          if (p[d] <= 0.)
             all_positive = false;
         if (all_positive)
           cell->set_refine_flag();

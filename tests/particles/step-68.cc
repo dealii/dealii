@@ -107,8 +107,8 @@ namespace Step68
     const double T = 4;
     const double t = this->get_time();
 
-    const double px = numbers::PI * point(0);
-    const double py = numbers::PI * point(1);
+    const double px = numbers::PI * point[0];
+    const double py = numbers::PI * point[1];
     const double pt = numbers::PI / T * t;
 
     values[0] = -2 * cos(pt) * pow(sin(px), 2) * sin(py) * cos(py);

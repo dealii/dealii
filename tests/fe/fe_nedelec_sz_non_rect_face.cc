@@ -113,9 +113,9 @@ namespace Maxwell
         const Point<dim> &p = points[i];
 
         /* quadratic: */
-        value_list[i](0) = p(0) * p(0);
-        value_list[i](1) = p(1) * p(1);
-        value_list[i](2) = p(2) * p(2);
+        value_list[i](0) = p[0] * p[0];
+        value_list[i](1) = p[1] * p[1];
+        value_list[i](2) = p[2] * p[2];
       }
   }
   // Additional functions to create Neumann conditions, zero in this case.

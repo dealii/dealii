@@ -30,7 +30,7 @@ test()
     Particles::Particle<dim> particle;
 
     Point<dim> position;
-    position(0) = 1.0;
+    position[0] = 1.0;
     particle.set_location(position);
 
     deallog << "Particle location: " << particle.get_location() << std::endl;

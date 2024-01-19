@@ -81,7 +81,7 @@ namespace TestGrids
                 const Point<dim> &p        = cell->center();
                 bool              negative = true;
                 for (unsigned int d = 0; d < dim; ++d)
-                  if (p(d) >= 0.)
+                  if (p[d] >= 0.)
                     negative = false;
                 if (negative)
                   cell->set_refine_flag();

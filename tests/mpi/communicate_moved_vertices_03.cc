@@ -64,7 +64,7 @@ test()
           if (!vertex_moved[global_vertex_no] &&
               locally_owned_vertices[global_vertex_no])
             {
-              cell->vertex(vertex_no)(0) += 1.e-1;
+              cell->vertex(vertex_no)[0] += 1.e-1;
               vertex_moved[global_vertex_no] = true;
             }
         }
@@ -77,7 +77,7 @@ test()
       for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
         {
           Point<dim> point = cell->vertex(vertex_no);
-          point(0) -= 1.e-1;
+          point[0] -= 1.e-1;
           non_artificial_vertices_new[cell->vertex_index(vertex_no)] = point;
         }
 

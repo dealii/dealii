@@ -64,7 +64,7 @@ test()
   for (unsigned int n_ref = 0; n_ref < 2; ++n_ref)
     {
       for (const auto &cell : triangulation.active_cell_iterators())
-        if (cell->is_locally_owned() && cell->center()(1) < 0.5)
+        if (cell->is_locally_owned() && cell->center()[1] < 0.5)
           cell->set_refine_flag();
 
       triangulation.prepare_coarsening_and_refinement();
@@ -85,7 +85,7 @@ test()
   for (const auto &cell : dof_handler.active_cell_iterators() |
                             IteratorFilters::LocallyOwnedCell())
     {
-      if (cell->center()(0) < 0.5)
+      if (cell->center()[0] < 0.5)
         cell->set_active_fe_index(0);
       else
         cell->set_active_fe_index(1);

@@ -76,7 +76,7 @@ double
 TemperatureInitialValues<dim>::value(const Point<dim> &p,
                                      const unsigned int) const
 {
-  return p(0) * T1 + p(1) * (T0 - T1); // simple
+  return p[0] * T1 + p[1] * (T0 - T1); // simple
 }
 
 

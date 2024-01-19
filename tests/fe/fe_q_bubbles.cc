@@ -82,8 +82,8 @@ BubbleFunction<dim>::value(const Point<dim> &p, const unsigned int) const
 {
   double return_value = 1.;
   for (unsigned int i = 0; i < dim; ++i)
-    return_value *= (1 - p(i) * p(i));
-  return_value *= std::pow(p(m_direction), m_degree - 1);
+    return_value *= (1 - p[i] * p[i]);
+  return_value *= std::pow(p[m_direction], m_degree - 1);
 
   return return_value;
 }
@@ -99,9 +99,9 @@ BubbleFunction<dim>::gradient(const Point<dim> &p, const unsigned int) const
       grad[d] = 1.;
       // compute grad(\prod_{i=1}^d (1-x_i^2))(p)
       for (unsigned j = 0; j < dim; ++j)
-        grad[d] *= (d == j ? -2 * p(j) : (1 - p(j) * p(j)));
+        grad[d] *= (d == j ? -2 * p[j] : (1 - p[j] * p[j]));
       // and multiply with x_i^{r-1}
-      grad[d] *= std::pow(p(m_direction), m_degree - 1);
+      grad[d] *= std::pow(p[m_direction], m_degree - 1);
     }
 
   if (m_degree >= 2)
@@ -109,10 +109,10 @@ BubbleFunction<dim>::gradient(const Point<dim> &p, const unsigned int) const
       // add \prod_{i=1}^d (1-x_i^2))(p)
       double value = 1.;
       for (unsigned int j = 0; j < dim; ++j)
-        value *= (1 - p(j) * p(j));
+        value *= (1 - p[j] * p[j]);
       // and multiply with grad(x_i^{r-1})
       grad[m_direction] +=
-        value * (m_degree - 1) * std::pow(p(m_direction), m_degree - 2);
+        value * (m_degree - 1) * std::pow(p[m_direction], m_degree - 2);
     }
 
   return grad;

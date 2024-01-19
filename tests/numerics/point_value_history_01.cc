@@ -137,7 +137,7 @@ TestPointValueHistory<dim>::run()
                  ++q_point)
               {
                 cell_pole(dof) += (fe_values.shape_value(dof, q_point) *
-                                   dof_locations[q_point](dof_component % dim));
+                                   dof_locations[q_point][dof_component % dim]);
               }
             solution(local_dof_indices[dof]) = 1; // start all solutions at 1
             poles(local_dof_indices[dof]) -= cell_pole(dof);

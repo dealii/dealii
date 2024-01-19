@@ -41,14 +41,14 @@ test()
   Assert(dim == 2 || dim == 3, ExcNotImplemented());
 
   std::vector<Point<dim>> vertices(GeometryInfo<dim>::vertices_per_cell);
-  vertices[0](0) = 0;
-  vertices[0](1) = 0;
-  vertices[1](0) = 2;
-  vertices[1](1) = 1;
-  vertices[2](0) = 3;
-  vertices[2](1) = 3;
-  vertices[3](0) = 0;
-  vertices[3](1) = 1;
+  vertices[0][0] = 0;
+  vertices[0][1] = 0;
+  vertices[1][0] = 2;
+  vertices[1][1] = 1;
+  vertices[2][0] = 3;
+  vertices[2][1] = 3;
+  vertices[3][0] = 0;
+  vertices[3][1] = 1;
   if (dim == 3)
     {
       // for the new numbering
@@ -60,9 +60,9 @@ test()
       // for the old numbering
       for (unsigned int i = 0; i < 4; ++i)
         {
-          std::swap(vertices[i](1), vertices[i](2));
+          std::swap(vertices[i][1], vertices[i][2]);
           vertices[i + 4]    = vertices[i];
-          vertices[i + 4](1) = 1;
+          vertices[i + 4][1] = 1;
         }
     }
 

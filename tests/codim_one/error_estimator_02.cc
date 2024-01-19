@@ -55,7 +55,7 @@ public:
   virtual double
   value(const Point<dim> &p, const unsigned int component) const
   {
-    return p(0) * p(0) + 2.0 * p(0) * p(1);
+    return p[0] * p[0] + 2.0 * p[0] * p[1];
   }
 
   virtual void
@@ -79,7 +79,7 @@ public:
   value(const Point<dim> &p, const unsigned int component) const
   {
     double val = 0.0;
-    if (std::abs(p(1) - 1.0) < 1e-5)
+    if (std::abs(p[1] - 1.0) < 1e-5)
       val = 2.0;
 
     deallog << "evaluate normal derivative at " << p << " with value " << val

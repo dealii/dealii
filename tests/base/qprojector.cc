@@ -30,17 +30,17 @@ check_line(Quadrature<1> &quadrature)
 {
   Point<dim> p1;
   Point<dim> p2;
-  p1(0) = 1.;
-  p2(0) = 7.;
+  p1[0] = 1.;
+  p2[0] = 7.;
   if (dim > 1)
     {
-      p1(1) = 3;
-      p2(1) = -5.;
+      p1[1] = 3;
+      p2[1] = -5.;
     }
   if (dim > 2)
     {
-      p1(2) = 0;
-      p2(2) = 10.;
+      p1[2] = 0;
+      p2[2] = 10.;
     }
   Quadrature<dim> q = QProjector<dim>::project_to_line(
     ReferenceCells::get_hypercube<dim>(), quadrature, p1, p2);

@@ -164,9 +164,9 @@ ExactSolution<dim>::value(const Point<dim>  &p,
   switch (component)
     {
       case 0:
-        val = cos(numbers::PI * p(0)) * sin(numbers::PI * p(1)) + bc_constant;
+        val = cos(numbers::PI * p[0]) * sin(numbers::PI * p[1]) + bc_constant;
       case 1:
-        val = -sin(numbers::PI * p(0)) * cos(numbers::PI * p(1)) + bc_constant;
+        val = -sin(numbers::PI * p[0]) * cos(numbers::PI * p[1]) + bc_constant;
     }
   return val;
 }
@@ -176,8 +176,8 @@ ExactSolution<dim>::vector_value(const Point<dim> &p,
                                  Vector<double>   &result) const
 {
   Assert(dim >= 2, ExcNotImplemented());
-  result(0) = cos(numbers::PI * p(0)) * sin(numbers::PI * p(1)) + bc_constant;
-  result(1) = -sin(numbers::PI * p(0)) * cos(numbers::PI * p(1)) + bc_constant;
+  result(0) = cos(numbers::PI * p[0]) * sin(numbers::PI * p[1]) + bc_constant;
+  result(1) = -sin(numbers::PI * p[0]) * cos(numbers::PI * p[1]) + bc_constant;
 }
 template <int dim>
 void
@@ -195,10 +195,10 @@ ExactSolution<dim>::value_list(const std::vector<Point<dim>> &points,
         {
           case 0:
             values[i] =
-              cos(numbers::PI * p(0)) * sin(numbers::PI * p(1)) + bc_constant;
+              cos(numbers::PI * p[0]) * sin(numbers::PI * p[1]) + bc_constant;
           case 1:
             values[i] =
-              -sin(numbers::PI * p(0)) * cos(numbers::PI * p(1)) + bc_constant;
+              -sin(numbers::PI * p[0]) * cos(numbers::PI * p[1]) + bc_constant;
         }
     }
 }
@@ -215,9 +215,9 @@ ExactSolution<dim>::vector_value_list(const std::vector<Point<dim>> &points,
     {
       const Point<dim> &p = points[i];
       values[i](0) =
-        cos(numbers::PI * p(0)) * sin(numbers::PI * p(1)) + bc_constant;
+        cos(numbers::PI * p[0]) * sin(numbers::PI * p[1]) + bc_constant;
       values[i](1) =
-        -sin(numbers::PI * p(0)) * cos(numbers::PI * p(1)) + bc_constant;
+        -sin(numbers::PI * p[0]) * cos(numbers::PI * p[1]) + bc_constant;
     }
 }
 // END EXACT SOLUTION MEMBERS
@@ -236,11 +236,11 @@ RightHandSide<dim>::vector_value(const Point<dim> &p,
   Assert(dim >= 2, ExcNotImplemented());
 
   // 2D solution
-  values(0) = (2 * numbers::PI * numbers::PI + 1) * cos(numbers::PI * p(0)) *
-                sin(numbers::PI * p(1)) +
+  values(0) = (2 * numbers::PI * numbers::PI + 1) * cos(numbers::PI * p[0]) *
+                sin(numbers::PI * p[1]) +
               bc_constant;
-  values(1) = -(2 * numbers::PI * numbers::PI + 1) * sin(numbers::PI * p(0)) *
-                cos(numbers::PI * p(1)) +
+  values(1) = -(2 * numbers::PI * numbers::PI + 1) * sin(numbers::PI * p[0]) *
+                cos(numbers::PI * p[1]) +
               bc_constant;
 }
 template <int dim>

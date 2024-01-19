@@ -38,7 +38,7 @@ scalar_product(const Polynomial<double> &p1, const Polynomial<double> &p2)
   double sum = 0.;
   for (unsigned int i = 0; i < gauss.size(); ++i)
     {
-      double x  = gauss.point(i)(0);
+      double x  = gauss.point(i)[0];
       double P1 = p1.value(x);
       double P2 = p2.value(x);
       sum += gauss.weight(i) * P1 * P2;

@@ -52,7 +52,7 @@ check()
   Point<dim> p(tria.begin_active()->center());
 
   for (unsigned int i = 0; i < dim; ++i)
-    orientation(i) = i;
+    orientation[i] = i;
 
   Vector<double> vector(dof.n_dofs());
 

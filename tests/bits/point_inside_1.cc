@@ -58,10 +58,10 @@ check()
   for (int i = 0; i < 11; ++i)
     {
       Point<dim> testpoint;
-      testpoint(0) = testcoord[i][0];
-      testpoint(1) = testcoord[i][1];
+      testpoint[0] = testcoord[i][0];
+      testpoint[1] = testcoord[i][1];
       if (dim == 3)
-        testpoint(2) = testcoord[i][2];
+        testpoint[2] = testcoord[i][2];
 
       bool res = cell->point_inside(testpoint);
       deallog << testpoint << " inside " << res << std::endl;

@@ -123,10 +123,10 @@ VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
   switch (component)
     {
       case 0:
-        val = cos(PI * p(0)) * sin(PI * p(1));
+        val = cos(PI * p[0]) * sin(PI * p[1]);
         break;
       case 1:
-        val = -sin(PI * p(0)) * cos(PI * p(1));
+        val = -sin(PI * p[0]) * cos(PI * p[1]);
         break;
     }
   return val;

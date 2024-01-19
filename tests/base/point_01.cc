@@ -32,7 +32,7 @@ check()
     p[i] = i;
 
   for (unsigned int i = 0; i < dim; ++i)
-    deallog << p(i) << ' ';
+    deallog << p[i] << ' ';
   deallog << std::endl;
 }
 

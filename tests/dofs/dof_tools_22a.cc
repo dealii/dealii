@@ -64,7 +64,7 @@ test()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    if (cell->center()(0) > 0.49)
+    if (cell->center()[0] > 0.49)
       cell->set_refine_flag();
 
   triangulation.prepare_coarsening_and_refinement();

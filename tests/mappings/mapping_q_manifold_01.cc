@@ -128,14 +128,14 @@ template <>
 double
 VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
 {
-  return (1 - p(0) * p(0)) * (1 - p(1) * p(1)) * (1 - p(2) * p(2));
+  return (1 - p[0] * p[0]) * (1 - p[1] * p[1]) * (1 - p[2] * p[2]);
 }
 
 template <>
 double
 VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
 {
-  return (1 - p(0) * p(0)) * (1 - p(1) * p(1));
+  return (1 - p[0] * p[0]) * (1 - p[1] * p[1]);
 }
 
 template <int dim>

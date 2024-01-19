@@ -41,8 +41,8 @@ bilinear(const Point<dim> &p)
   Point<dim> q = p;
   if (dim >= 2)
     {
-      q(0) = 16. * p(0) + 4. * p(1) - 10. * p(0) * p(1);
-      q(1) = 6. * p(1) + 4. * p(0) * p(1);
+      q[0] = 16. * p[0] + 4. * p[1] - 10. * p[0] * p[1];
+      q[1] = 6. * p[1] + 4. * p[0] * p[1];
     }
 
   return q;

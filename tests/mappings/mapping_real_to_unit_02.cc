@@ -66,8 +66,8 @@ test2()
       for (unsigned int j = 0; j < 19; ++j)
         {
           /// all points are inside
-          points[19 * i + j](0) = -0.7 + (i + 1) * .07;
-          points[19 * i + j](1) = -0.7 + (j + 1) * .07;
+          points[19 * i + j][0] = -0.7 + (i + 1) * .07;
+          points[19 * i + j][1] = -0.7 + (j + 1) * .07;
         }
   points[95] = p;
   fe_function.value_list(points, m); // <<<< this fails at point[95] but only if

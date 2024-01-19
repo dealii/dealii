@@ -967,7 +967,7 @@ namespace Step51
       for (const unsigned int face : GeometryInfo<dim>::face_indices())
         if (cell->face(face)->at_boundary())
           for (unsigned int d = 0; d < dim; ++d)
-            if ((std::fabs(cell->face(face)->center()(d) - (1)) < 1e-12))
+            if ((std::fabs(cell->face(face)->center()[d] - (1)) < 1e-12))
               cell->face(face)->set_boundary_id(1);
   }
 

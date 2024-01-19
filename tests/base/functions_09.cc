@@ -91,7 +91,7 @@ check()
 
   Point<dim> point;
   for (int i = 0; i < dim; ++i)
-    point(i) = i;
+    point[i] = i;
 
   deallog << "->value:" << std::endl;
   PrintTensor<rank, dim>::print_tensor(foo->value(point));
@@ -106,7 +106,7 @@ check()
   points.push_back(point);
 
   for (int i = 0; i < dim; ++i)
-    point(i) = dim - i;
+    point[i] = dim - i;
   points.push_back(point);
 
   std::vector<Tensor<rank, dim>>     tensors;

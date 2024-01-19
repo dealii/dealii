@@ -39,15 +39,15 @@ test()
 
   /*Make a square*/
   Point<dim> point_1, point_2;
-  point_1(0) = 0;
-  point_1(1) = 0;
-  point_2(0) = 1;
-  point_2(1) = 1;
+  point_1[0] = 0;
+  point_1[1] = 0;
+  point_2[0] = 1;
+  point_2[1] = 1;
   GridGenerator::hyper_rectangle(triangulation, point_1, point_2);
 
   Triangulation<dim> triangulation_temp;
-  point_1(0) = 1;
-  point_2(0) = 2;
+  point_1[0] = 1;
+  point_2[0] = 2;
   GridGenerator::hyper_rectangle(triangulation_temp, point_1, point_2);
   /*glue squares together*/
   GridGenerator::merge_triangulations(triangulation_temp,

@@ -62,7 +62,7 @@ template <int dim>
 double
 AutoSinExp<dim>::value(const Point<dim> &p, const unsigned int) const
 {
-  return std::sin(2 * p(0)) * std::exp(3 * p(1));
+  return std::sin(2 * p[0]) * std::exp(3 * p[1]);
 }
 
 
@@ -102,8 +102,8 @@ Tensor<1, dim>
 ExactSinExp<dim>::gradient(const Point<dim> &p, const unsigned int) const
 {
   Tensor<1, dim> grad;
-  grad[0] = 2 * std::cos(2 * p(0)) * std::exp(3 * p(1));
-  grad[1] = 3 * std::sin(2 * p(0)) * std::exp(3 * p(1));
+  grad[0] = 2 * std::cos(2 * p[0]) * std::exp(3 * p[1]);
+  grad[1] = 3 * std::sin(2 * p[0]) * std::exp(3 * p[1]);
   return grad;
 }
 

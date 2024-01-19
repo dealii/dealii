@@ -48,16 +48,16 @@ test()
                                                      n_properties_per_particle);
 
     Point<dim> position;
-    position(0) = 0.3;
+    position[0] = 0.3;
 
     if (dim > 1)
-      position(1) = 0.5;
+      position[1] = 0.5;
 
     Point<dim> reference_position;
-    reference_position(0) = 0.2;
+    reference_position[0] = 0.2;
 
     if (dim > 1)
-      reference_position(1) = 0.4;
+      reference_position[1] = 0.4;
 
     const types::particle_index index(7);
 

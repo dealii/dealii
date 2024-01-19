@@ -143,10 +143,10 @@ double
 TestDef1<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
   Point<2> center;
-  center(0)    = 0.5;
-  center(1)    = 0.5;
+  center[0]    = 0.5;
+  center[1]    = 0.5;
   double rad   = p.distance(center),
-         phi_p = atan2(p(0) - center(0), p(1) - center(1));
+         phi_p = atan2(p[0] - center[0], p[1] - center[1]);
 
   if (component == 0)
     return rad * (sin(phi + phi_p) - sin(phi_p));
@@ -197,7 +197,7 @@ template <int dim>
 double
 TestDef2<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
-  double x = p(0), y = p(1);
+  double x = p[0], y = p[1];
 
   if (component == 0)
     return scale * x;
@@ -249,7 +249,7 @@ template <int dim>
 double
 TestDef3<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
-  double y = p(1);
+  double y = p[1];
 
   if (component == 0)
     return scale * y;
@@ -308,7 +308,7 @@ template <int dim>
 double
 TestPoly<dim>::value(const Point<dim> &p, const unsigned int component) const
 {
-  double x = p(0), y = p(1);
+  double x = p[0], y = p[1];
 
   // Ugly hack, but should do the job ...
   if (component == 0)

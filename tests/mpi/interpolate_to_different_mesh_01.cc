@@ -53,7 +53,7 @@ public:
   double
   value(const Point<dim> &p, const unsigned int) const
   {
-    return 1 + p(0) * p(0);
+    return 1 + p[0] * p[0];
   }
 };
 

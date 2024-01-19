@@ -48,7 +48,7 @@ check()
                ++v)
             {
               const Point<dim>     vertex = face->vertex(v);
-              const Tensor<1, dim> tangent_1({-vertex(2), 0., vertex(0)});
+              const Tensor<1, dim> tangent_1({-vertex[2], 0., vertex[0]});
               const Tensor<1, dim> tangent_2 = vertex - Point<dim>(0, 3, 0);
 
               // get the normal vector and test it

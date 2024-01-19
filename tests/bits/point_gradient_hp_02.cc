@@ -67,7 +67,7 @@ public:
   {
     Tensor<1, dim> return_value;
     for (unsigned int i = 0; i < dim; ++i)
-      return_value[i] = 2 * (component + 1) * p(component);
+      return_value[i] = 2 * (component + 1) * p[component];
     return return_value;
   }
 

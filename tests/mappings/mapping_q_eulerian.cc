@@ -67,10 +67,10 @@ void
 ImposedDisplacement<2>::vector_value(const Point<2> &p,
                                      Vector<double> &value) const
 {
-  double radius = 1 + (sqrt(5) - 1) * p(0);
-  double angle  = 0.5 * numbers::PI * (1 - p(1));
-  value(0)      = radius * sin(angle) - p(0);
-  value(1)      = radius * cos(angle) - p(1);
+  double radius = 1 + (sqrt(5) - 1) * p[0];
+  double angle  = 0.5 * numbers::PI * (1 - p[1]);
+  value(0)      = radius * sin(angle) - p[0];
+  value(1)      = radius * cos(angle) - p[1];
 }
 
 

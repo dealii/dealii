@@ -523,8 +523,8 @@ namespace Step7
               for (const auto &face : cell->face_iterators())
                 {
                   const auto center = face->center();
-                  if ((std::fabs(center(0) - (-1.0)) < 1e-12) ||
-                      (std::fabs(center(1) - (-1.0)) < 1e-12))
+                  if ((std::fabs(center[0] - (-1.0)) < 1e-12) ||
+                      (std::fabs(center[1] - (-1.0)) < 1e-12))
                     face->set_boundary_id(1);
                 }
           }

@@ -46,10 +46,10 @@ public:
     double sinval = deformation;
     for (unsigned int d = 0; d < dim; ++d)
       sinval *= std::sin(frequency * dealii::numbers::PI *
-                         (chart_point(d) - left) / (right - left));
+                         (chart_point[d] - left) / (right - left));
     dealii::Point<dim> space_point;
     for (unsigned int d = 0; d < dim; ++d)
-      space_point(d) = chart_point(d) + sinval;
+      space_point[d] = chart_point[d] + sinval;
     return space_point;
   }
 
@@ -59,12 +59,12 @@ public:
     dealii::Point<dim> x = space_point;
     dealii::Point<dim> one;
     for (unsigned int d = 0; d < dim; ++d)
-      one(d) = 1.;
+      one[d] = 1.;
 
     // Newton iteration to solve the nonlinear equation given by the point
     dealii::Tensor<1, dim> sinvals;
     for (unsigned int d = 0; d < dim; ++d)
-      sinvals[d] = std::sin(frequency * dealii::numbers::PI * (x(d) - left) /
+      sinvals[d] = std::sin(frequency * dealii::numbers::PI * (x[d] - left) /
                             (right - left));
 
     double sinval = deformation;
@@ -82,7 +82,7 @@ public:
             double sinval_der = deformation * frequency / (right - left) *
                                 dealii::numbers::PI *
                                 std::cos(frequency * dealii::numbers::PI *
-                                         (x(d) - left) / (right - left));
+                                         (x[d] - left) / (right - left));
             for (unsigned int e = 0; e < dim; ++e)
               if (e != d)
                 sinval_der *= sinvals[e];
@@ -94,7 +94,7 @@ public:
 
         for (unsigned int d = 0; d < dim; ++d)
           sinvals[d] = std::sin(frequency * dealii::numbers::PI *
-                                (x(d) - left) / (right - left));
+                                (x[d] - left) / (right - left));
 
         sinval = deformation;
         for (unsigned int d = 0; d < dim; ++d)

@@ -68,7 +68,7 @@ test()
     {
       unsigned int subdomain = 0;
       for (unsigned int d = 0; d < 2; ++d)
-        if (cell->center()(d) > 0)
+        if (cell->center()[d] > 0)
           subdomain |= (1 << d);
       AssertThrow(subdomain < (1 << 2), ExcInternalError());
 

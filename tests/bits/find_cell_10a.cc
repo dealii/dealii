@@ -84,8 +84,8 @@ test()
   deallog.precision(16);
 
   Point<2> ePos;
-  ePos(0) = 0.0653630060373507487669897386695;
-  ePos(1) = 1125.59175030825804242340382189;
+  ePos[0] = 0.0653630060373507487669897386695;
+  ePos[1] = 1125.59175030825804242340382189;
 
   MappingQ<2>  mapping(1);
   MappingQ<2> &mapping2 = StaticMappingQ1<2>::mapping;

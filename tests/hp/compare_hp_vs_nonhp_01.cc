@@ -62,7 +62,7 @@ template <int dim>
 double
 ExactSolution<dim>::value(const Point<dim> &p, const unsigned int) const
 {
-  return p(0) * p(0);
+  return p[0] * p[0];
 }
 
 template <int dim>

@@ -52,11 +52,11 @@ public:
     Point<dim> middle = FlatManifold<dim>::get_new_point_on_line(line);
 
     for (int i = 0; i < dim; ++i)
-      middle(i) -= .5;
+      middle[i] -= .5;
     middle *=
       std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
     for (int i = 0; i < dim; ++i)
-      middle(i) += .5;
+      middle[i] += .5;
 
     return middle;
   }
@@ -69,11 +69,11 @@ public:
     Point<dim> middle = FlatManifold<dim>::get_new_point_on_quad(quad);
 
     for (int i = 0; i < dim; ++i)
-      middle(i) -= .5;
+      middle[i] -= .5;
     middle *=
       std::sqrt(static_cast<double>(dim)) / (std::sqrt(middle.square()) * 2);
     for (int i = 0; i < dim; ++i)
-      middle(i) += .5;
+      middle[i] += .5;
 
     return middle;
   }
@@ -108,7 +108,7 @@ CurvedLine<dim>::get_new_point_on_line(
   // 0 or 1, then the z-values of all
   // vertices of the line is like that
   if (dim >= 3)
-    if (((middle(2) == 0) || (middle(2) == 1))
+    if (((middle[2] == 0) || (middle[2] == 1))
         // find out, if the line is in the
         // interior of the top or bottom face
         // of the domain, or at the edge.
@@ -125,18 +125,18 @@ CurvedLine<dim>::get_new_point_on_line(
       return middle;
 
 
-  double x = middle(0), y = middle(1);
+  double x = middle[0], y = middle[1];
 
   if (y < x)
     if (y < 1 - x)
-      middle(1) = 0.04 * std::sin(6 * numbers::PI * middle(0));
+      middle[1] = 0.04 * std::sin(6 * numbers::PI * middle[0]);
     else
-      middle(0) = 1 + 0.04 * std::sin(6 * numbers::PI * middle(1));
+      middle[0] = 1 + 0.04 * std::sin(6 * numbers::PI * middle[1]);
 
   else if (y < 1 - x)
-    middle(0) = 0.04 * std::sin(6 * numbers::PI * middle(1));
+    middle[0] = 0.04 * std::sin(6 * numbers::PI * middle[1]);
   else
-    middle(1) = 1 + 0.04 * std::sin(6 * numbers::PI * middle(0));
+    middle[1] = 1 + 0.04 * std::sin(6 * numbers::PI * middle[0]);
 
   return middle;
 }
@@ -156,21 +156,21 @@ CurvedLine<dim>::get_new_point_on_quad(
   // z-value of the midpoint is either
   // 0 or 1, then the z-values of all
   // vertices of the quad is like that
-  if (dim == 3 && ((middle(dim - 1) == 0) || (middle(dim - 1) == 1)))
+  if (dim == 3 && ((middle[dim - 1] == 0) || (middle[dim - 1] == 1)))
     return middle;
 
-  double x = middle(0), y = middle(1);
+  double x = middle[0], y = middle[1];
 
   if (y < x)
     if (y < 1 - x)
-      middle(1) = 0.04 * std::sin(6 * numbers::PI * middle(0));
+      middle[1] = 0.04 * std::sin(6 * numbers::PI * middle[0]);
     else
-      middle(0) = 1 + 0.04 * std::sin(6 * numbers::PI * middle(1));
+      middle[0] = 1 + 0.04 * std::sin(6 * numbers::PI * middle[1]);
 
   else if (y < 1 - x)
-    middle(0) = 0.04 * std::sin(6 * numbers::PI * middle(1));
+    middle[0] = 0.04 * std::sin(6 * numbers::PI * middle[1]);
   else
-    middle(1) = 1 + 0.04 * std::sin(6 * numbers::PI * middle(0));
+    middle[1] = 1 + 0.04 * std::sin(6 * numbers::PI * middle[0]);
 
   return middle;
 }

@@ -176,7 +176,7 @@ namespace Step12
 
     for (unsigned int i = 0; i < values.size(); ++i)
       {
-        if (points[i](0) < 0.5)
+        if (points[i][0] < 0.5)
           values[i] = 1.;
         else
           values[i] = 0.;
@@ -191,8 +191,8 @@ namespace Step12
     Assert(dim >= 2, ExcNotImplemented());
 
     Point<dim> wind_field;
-    wind_field(0) = -p(1);
-    wind_field(1) = p(0);
+    wind_field[0] = -p[1];
+    wind_field[1] = p[0];
     wind_field /= wind_field.norm();
 
     return wind_field;

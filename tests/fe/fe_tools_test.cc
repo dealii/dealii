@@ -64,7 +64,7 @@ double
 TestFunction::value(const Point<2> &p, const unsigned int component) const
 {
   Assert(component == 0, ExcInternalError());
-  return std::sin(pi * p(0)) * std::cos(pi * p(1));
+  return std::sin(pi * p[0]) * std::cos(pi * p[1]);
 }
 
 

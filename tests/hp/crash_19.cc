@@ -66,7 +66,7 @@ public:
   virtual double
   value(const Point<dim> &p, const unsigned int) const
   {
-    return p(0);
+    return p[0];
   }
 };
 

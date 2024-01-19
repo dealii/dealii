@@ -24,7 +24,7 @@
 template <int dim>
 constexpr bool val =
   Point<dim>((Point<dim>::unit_vector(0) + Point<dim>::unit_vector(0)) -
-             2. * Point<dim>::unit_vector(0))(0) == 0.;
+             2. * Point<dim>::unit_vector(0))[0] == 0.;
 
 
 int

@@ -46,9 +46,9 @@ test()
 
     for (unsigned int i = 0; i < dim; ++i)
       {
-        particle_reference_locations[0](i) = 0.25;
-        particle_reference_locations[1](i) = 0.5;
-        particle_reference_locations[2](i) = 0.75;
+        particle_reference_locations[0][i] = 0.25;
+        particle_reference_locations[1][i] = 0.5;
+        particle_reference_locations[2][i] = 0.75;
       }
 
     Particles::Generators::regular_reference_locations(

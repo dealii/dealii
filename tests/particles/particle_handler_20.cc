@@ -54,7 +54,7 @@ test()
         if (Utilities::MPI::this_mpi_process(tr.get_communicator()) == 0)
           {
             for (unsigned int i = 0; i < dim; ++i)
-              position(i) = 0.410 + 0.01 * p;
+              position[i] = 0.410 + 0.01 * p;
 
             Particles::Particle<dim, spacedim> particle(
               position,

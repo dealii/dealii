@@ -106,7 +106,7 @@ make_mesh(Triangulation<dim> &tria)
     {
       unsigned int material = 0;
       for (unsigned int d = 0; d < dim; ++d)
-        if (cell->center()(d) > 0)
+        if (cell->center()[d] > 0)
           material |= (1 << d);
       AssertThrow(material < (1 << dim), ExcInternalError());
 

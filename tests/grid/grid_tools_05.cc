@@ -74,9 +74,9 @@ generate_grid(Triangulation<2> &triangulation)
   // Look for the two outermost faces:
   for (const unsigned int j : GeometryInfo<2>::face_indices())
     {
-      if (cell_1->face(j)->center()(1) > 2.9)
+      if (cell_1->face(j)->center()[1] > 2.9)
         face_1 = cell_1->face(j);
-      if (cell_2->face(j)->center()(1) < -2.9)
+      if (cell_2->face(j)->center()[1] < -2.9)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_id(42);
@@ -137,9 +137,9 @@ generate_grid(Triangulation<3> &triangulation)
   // Look for the two outermost faces:
   for (const unsigned int j : GeometryInfo<3>::face_indices())
     {
-      if (cell_1->face(j)->center()(2) > 2.9)
+      if (cell_1->face(j)->center()[2] > 2.9)
         face_1 = cell_1->face(j);
-      if (cell_2->face(j)->center()(2) < -2.9)
+      if (cell_2->face(j)->center()[2] < -2.9)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_id(42);

@@ -108,7 +108,7 @@ public:
   virtual double
   value(const Point<2> &p, const unsigned int) const
   {
-    return std::sin(3.14159 * p(0)) * std::sin(3.14159 * p(1));
+    return std::sin(3.14159 * p[0]) * std::sin(3.14159 * p[1]);
   }
 };
 

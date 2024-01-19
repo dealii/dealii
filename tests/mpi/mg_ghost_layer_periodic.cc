@@ -39,9 +39,9 @@ test()
   for (const auto &cell : tria.cell_iterators())
     for (const unsigned int face_index : GeometryInfo<dim>::face_indices())
       {
-        if (std::abs(cell->face(face_index)->center()(face_index / 2)) < 1e-12)
+        if (std::abs(cell->face(face_index)->center()[face_index / 2]) < 1e-12)
           cell->face(face_index)->set_all_boundary_ids(face_index);
-        if (std::abs(cell->face(face_index)->center()(face_index / 2) - 1.) <
+        if (std::abs(cell->face(face_index)->center()[face_index / 2] - 1.) <
             1e-12)
           cell->face(face_index)->set_all_boundary_ids(face_index);
       }

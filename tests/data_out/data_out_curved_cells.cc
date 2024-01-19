@@ -180,7 +180,7 @@ curved_grid(std::ostream &out)
                       m[i].set_inhomogeneity(face->dof_index(0),
                                              (face->center() *
                                               (r_i / face->center().norm() -
-                                               1))(i));
+                                               1))[i]);
                     }
                 else if (std::fabs(face->vertex(1).norm() - r_a) < eps)
                   for (unsigned int i = 0; i < 2; ++i)

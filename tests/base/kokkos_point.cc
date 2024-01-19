@@ -55,9 +55,9 @@ test_gpu()
       auto p_3 = Point<dim, Number>::unit_vector(0);
       check[3] = p_3.norm_square();
 
-      auto entry_1 = p_1(0);
+      auto entry_1 = p_1[0];
       check[4]     = entry_1;
-      p_1(0)       = Number{1.};
+      p_1[0]       = Number{1.};
       check[5]     = p_1.norm_square();
       auto p_4     = p_1 + Tensor<1, dim, Number>{};
       check[6]     = p_4.norm_square();

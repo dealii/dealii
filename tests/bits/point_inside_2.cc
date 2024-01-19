@@ -49,7 +49,7 @@ check()
 
   // Now get the cell
   const typename Triangulation<dim>::cell_iterator cell = triangulation.begin();
-  cell->vertex(0)(0)                                    = -1.;
+  cell->vertex(0)[0]                                    = -1.;
 
   // and test it.
   double testcoord[14][3] = {{0.5, 0.5, 0.5},
@@ -73,10 +73,10 @@ check()
   for (int i = 0; i < 14; ++i)
     {
       Point<dim> testpoint;
-      testpoint(0) = testcoord[i][0];
-      testpoint(1) = testcoord[i][1];
+      testpoint[0] = testcoord[i][0];
+      testpoint[1] = testcoord[i][1];
       if (dim == 3)
-        testpoint(2) = testcoord[i][2];
+        testpoint[2] = testcoord[i][2];
 
       bool res = cell->point_inside(testpoint);
       deallog << testpoint << "  \t inside " << res << " expected "

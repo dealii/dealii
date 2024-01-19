@@ -375,11 +375,11 @@ namespace Step40
         Vector<PetscScalar> value2(1);
 
         Point<2> point1;
-        point1(0) = 1. * i / n_points + eps;
-        point1(1) = 0.;
+        point1[0] = 1. * i / n_points + eps;
+        point1[1] = 0.;
         Point<2> point2;
-        point2(0) = 1. * i / n_points + eps;
-        point2(1) = 1.;
+        point2[0] = 1. * i / n_points + eps;
+        point2[1] = 1.;
 
         get_point_value(point1, 0, value1);
         get_point_value(point2, 0, value2);
@@ -424,21 +424,21 @@ namespace Step40
           Vector<PetscScalar> value4(1);
 
           Point<3> point1;
-          point1(0) = 1. * i / n_points + eps;
-          point1(1) = 1. * j / n_points + eps;
-          point1(2) = 0;
+          point1[0] = 1. * i / n_points + eps;
+          point1[1] = 1. * j / n_points + eps;
+          point1[2] = 0;
           Point<3> point2;
-          point2(0) = 1. * i / n_points + eps;
-          point2(1) = 1. * j / n_points + eps;
-          point2(2) = 1.;
+          point2[0] = 1. * i / n_points + eps;
+          point2[1] = 1. * j / n_points + eps;
+          point2[2] = 1.;
           Point<3> point3;
-          point3(0) = 1. * i / n_points + eps;
-          point3(1) = 0.;
-          point3(2) = 1. * j / n_points + eps;
+          point3[0] = 1. * i / n_points + eps;
+          point3[1] = 0.;
+          point3[2] = 1. * j / n_points + eps;
           Point<3> point4;
-          point4(0) = 1. * i / n_points + eps;
-          point4(1) = 1.;
-          point4(2) = 1. * j / n_points + eps;
+          point4[0] = 1. * i / n_points + eps;
+          point4[1] = 1.;
+          point4[2] = 1. * j / n_points + eps;
 
           get_point_value(point1, 0, value1);
           get_point_value(point2, 0, value2);
@@ -528,7 +528,7 @@ namespace Step40
             Point<dim> p1;
             Point<dim> p2;
             for (unsigned int i = 0; i < dim; ++i)
-              p2(i) = 1.0;
+              p2[i] = 1.0;
 
             GridGenerator::subdivided_hyper_rectangle(
               triangulation, reps, p1, p2, true);

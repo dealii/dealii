@@ -68,7 +68,7 @@ public:
   ComplexNumber
   value(const Position &x, const unsigned int) const
   {
-    return x(0) + x(1) - ComplexNumber(0.2, 0.7) * x(2);
+    return x[0] + x[1] - ComplexNumber(0.2, 0.7) * x[2];
   }
 };
 

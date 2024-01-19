@@ -71,7 +71,7 @@ DummyOperator<dim, fe_degree>::operator()(
 
       auto point = gpu_data->get_quadrature_point(cell, q_point);
       dst[pos] =
-        dim == 2 ? point(0) + point(1) : point(0) + point(1) + point(2);
+        dim == 2 ? point[0] + point[1] : point[0] + point[1] + point[2];
     });
 }
 
@@ -166,7 +166,7 @@ test()
               const unsigned int pos =
                 gpu_data_host.local_q_point_id(cell_id, n_q_points_per_cell, i);
               auto         p = gpu_data_host.get_quadrature_point(cell_id, i);
-              const double p_val = dim == 2 ? p(0) + p(1) : p(0) + p(1) + p(2);
+              const double p_val = dim == 2 ? p[0] + p[1] : p[0] + p[1] + p[2];
               AssertThrow(std::abs(coef[pos] - p_val) < 1e-12,
                           ExcInternalError());
             }

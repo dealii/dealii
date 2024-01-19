@@ -55,11 +55,11 @@ transform(const Point<dim> p)
       case 1:
         return p;
       case 2:
-        return Point<dim>(p(0) * (1 + p(1)), p(1) * (1 + p(0)));
+        return Point<dim>(p[0] * (1 + p[1]), p[1] * (1 + p[0]));
       case 3:
-        return Point<dim>(p(0) * (1 + p(1)) * (1 + p(2)),
-                          p(1) * (1 + p(0)) * (1 + p(2)),
-                          p(2) * (1 + p(0)) * (1 + p(1)));
+        return Point<dim>(p[0] * (1 + p[1]) * (1 + p[2]),
+                          p[1] * (1 + p[0]) * (1 + p[2]),
+                          p[2] * (1 + p[0]) * (1 + p[1]));
       default:
         AssertThrow(false, ExcNotImplemented());
         return Point<dim>();

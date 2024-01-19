@@ -101,7 +101,7 @@ public:
   double
   value(const Point<1> &point, const unsigned int component = 0) const override
   {
-    return C * std::pow(point(0) - x_0, 2) + y_0;
+    return C * std::pow(point[0] - x_0, 2) + y_0;
   };
 
   Tensor<1, 1>
@@ -109,7 +109,7 @@ public:
            const unsigned int component = 0) const override
   {
     Tensor<1, 1> grad;
-    grad[0] = 2 * C * (point(0) - x_0);
+    grad[0] = 2 * C * (point[0] - x_0);
 
     return grad;
   };

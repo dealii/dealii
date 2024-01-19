@@ -65,10 +65,10 @@ check_bdm()
   PolynomialsBDM<dim> p3(3);
   PolynomialsBDM<dim> p4(4);
 
-  x(0) = 2.;
-  x(1) = 3.;
+  x[0] = 2.;
+  x[1] = 3.;
   if (dim > 2)
-    x(2) = 4;
+    x[2] = 4;
 
   check_point(x, p1);
   check_point(x, p2);
@@ -87,10 +87,10 @@ check_rt()
   PolynomialsRaviartThomas<dim> p2(2);
   PolynomialsRaviartThomas<dim> p3(3);
 
-  x(0) = 2.;
-  x(1) = 3.;
+  x[0] = 2.;
+  x[1] = 3.;
   if (dim > 2)
-    x(2) = 4;
+    x[2] = 4;
 
   check_point(x, p0);
   check_point(x, p1);

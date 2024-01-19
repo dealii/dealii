@@ -70,7 +70,7 @@ TestFunction<dim>::vector_value_list(const std::vector<Point<dim>> &points,
       if (degree < 2)
         {
           for (unsigned int d = 0; d < dim; ++d)
-            values[k](d) = points[k](d) - d;
+            values[k](d) = points[k][d] - d;
         }
       else
         {
@@ -82,7 +82,7 @@ TestFunction<dim>::vector_value_list(const std::vector<Point<dim>> &points,
             {
               Point<dim> p = points[k];
               for (unsigned int dd = 0; dd < dim; ++dd)
-                p(dd) -= d;
+                p[dd] -= d;
               const double r2 = p.square();
               values[k](d)    = std::pow(r2, (int)degree / 2);
             }

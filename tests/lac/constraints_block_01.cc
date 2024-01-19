@@ -92,7 +92,7 @@ main()
        ++cell)
     {
       real_cell_center = cell->center();
-      if (real_cell_center(0) < 0.5 && real_cell_center(1) < 0.5)
+      if (real_cell_center[0] < 0.5 && real_cell_center[1] < 0.5)
         cell->set_material_id(0); // solid
       else
         cell->set_material_id(1); // fluid

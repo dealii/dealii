@@ -276,11 +276,11 @@ Step4<2>::check_periodicity(const unsigned int cycle) const
       Vector<double> value2(1);
 
       Point<2> point1;
-      point1(0) = 2 * (1. * i / n_points + eps) - 1;
-      point1(1) = -1.;
+      point1[0] = 2 * (1. * i / n_points + eps) - 1;
+      point1[1] = -1.;
       Point<2> point2;
-      point2(0) = 2 * (1. * i / n_points + eps) - 1;
-      point2(1) = 1.;
+      point2[0] = 2 * (1. * i / n_points + eps) - 1;
+      point2[1] = 1.;
 
       VectorTools::point_value(dof_handler, solution, point1, value1);
       VectorTools::point_value(dof_handler, solution, point2, value2);

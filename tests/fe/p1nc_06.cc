@@ -39,7 +39,7 @@ Point<dim>
 stretch(const Point<dim> &p)
 {
   Point<dim> q = p;
-  q(dim - 1) *= 2.;
+  q[dim - 1] *= 2.;
 
   return q;
 }

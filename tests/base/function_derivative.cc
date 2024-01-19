@@ -116,7 +116,7 @@ check_sine(unsigned int nquad)
 
   Point<dim> wave_vector;
   for (unsigned int d = 0; d < dim; ++d)
-    wave_vector(d) = d + 2.;
+    wave_vector[d] = d + 2.;
 
   Functions::FourierSineFunction<dim> f(wave_vector);
 
@@ -131,7 +131,7 @@ check_sine(unsigned int nquad)
     {
       deallog << "Direction " << d << std::endl;
       Point<dim> dir;
-      dir(d) = 1.;
+      dir[d] = 1.;
       deallog.push("Euler");
       FunctionDerivative<dim> df(f, dir, 1.e-4);
       check_derivative_order(gradients, df, quadrature, d, 2);

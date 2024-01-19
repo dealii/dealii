@@ -573,7 +573,7 @@ namespace Step22
                       fe_face_values.get_quadrature_points();
                     for (unsigned int i = 0; i < tmp_points.size(); ++i)
                       for (unsigned int c = 0; c < dim; ++c)
-                        local_quad_points_first.push_back(tmp_points[i](c));
+                        local_quad_points_first.push_back(tmp_points[i][c]);
                   }
                 else if (face->boundary_id() == 4)
                   {
@@ -582,7 +582,7 @@ namespace Step22
                       fe_face_values.get_quadrature_points();
                     for (unsigned int i = 0; i < tmp_points.size(); ++i)
                       for (unsigned int c = 0; c < dim; ++c)
-                        local_quad_points_second.push_back(tmp_points[i](c));
+                        local_quad_points_second.push_back(tmp_points[i][c]);
                   }
               }
           }
@@ -660,12 +660,12 @@ namespace Step22
           for (unsigned int c = 0; c < dim; ++c)
             {
               vector_point_1(c) = global_quad_points_first[i + c];
-              point_1(c)        = vector_point_1(c);
+              point_1[c]        = vector_point_1(c);
             }
           Vector<double> vector_point_2(dim);
           rot_matrix.Tvmult(vector_point_2, vector_point_1);
           for (unsigned int c = 0; c < dim; ++c)
-            point_2(c) = vector_point_2(c) + offset[c];
+            point_2[c] = vector_point_2(c) + offset[c];
 
           get_point_value(point_1, 0, value_1);
           get_point_value(point_2, 0, value_2);
@@ -712,14 +712,14 @@ namespace Step22
           for (unsigned int c = 0; c < dim; ++c)
             {
               vector_point_1(c) = global_quad_points_second[i + c];
-              point_1(c)        = vector_point_1(c);
+              point_1[c]        = vector_point_1(c);
             }
           Vector<double> vector_point_2(dim);
           for (unsigned int c = 0; c < dim; ++c)
             vector_point_1(c) -= offset[c];
           rot_matrix.vmult(vector_point_2, vector_point_1);
           for (unsigned int c = 0; c < dim; ++c)
-            point_2(c) = vector_point_2(c);
+            point_2[c] = vector_point_2(c);
 
           get_point_value(point_1, 0, value_1);
           get_point_value(point_2, 0, value_2);

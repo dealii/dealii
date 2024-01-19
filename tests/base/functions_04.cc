@@ -50,11 +50,11 @@ check_function(const Functions::FlowFunction<dim> &f,
       for (unsigned int ix = 0; ix < 2; ++ix)
         {
           if (dim > 0)
-            patches[0].vertices[vertex_number](0) = -1. + 2. * ix;
+            patches[0].vertices[vertex_number][0] = -1. + 2. * ix;
           if (dim > 1)
-            patches[0].vertices[vertex_number](1) = -1. + 2. * iy;
+            patches[0].vertices[vertex_number][1] = -1. + 2. * iy;
           if (dim > 2)
-            patches[0].vertices[vertex_number](2) = -1. + 2. * iz;
+            patches[0].vertices[vertex_number][2] = -1. + 2. * iz;
           ++vertex_number;
         }
   for (const unsigned int i : GeometryInfo<dim>::face_indices())
@@ -78,11 +78,11 @@ check_function(const Functions::FlowFunction<dim> &f,
       for (unsigned int ix = 0; ix <= sub; ++ix)
         {
           if (dim > 0)
-            points[vertex_number](0) = -1. + ix * h;
+            points[vertex_number][0] = -1. + ix * h;
           if (dim > 1)
-            points[vertex_number](1) = -1. + iy * h;
+            points[vertex_number][1] = -1. + iy * h;
           if (dim > 2)
-            points[vertex_number](2) = -1. + iz * h;
+            points[vertex_number][2] = -1. + iz * h;
           ++vertex_number;
         }
 

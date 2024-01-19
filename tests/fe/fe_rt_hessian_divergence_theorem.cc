@@ -159,8 +159,8 @@ test_hyper_cube(const double tolerance)
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
     {
       Point<dim> &point = cell->vertex(i);
-      if (std::abs(point(dim - 1) - 1.0) < 1e-5)
-        point(dim - 1) += 0.15;
+      if (std::abs(point[dim - 1] - 1.0) < 1e-5)
+        point[dim - 1] += 0.15;
     }
 
   FE_RaviartThomas<dim> fe(2);

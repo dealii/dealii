@@ -25,21 +25,21 @@ void
 dim_2_3(std::ostream &os)
 {
   std::vector<Point<3>> vertices(4);
-  vertices[0](0) = -1.;
-  vertices[0](1) = -1.;
-  vertices[0](0) = 0.;
+  vertices[0][0] = -1.;
+  vertices[0][1] = -1.;
+  vertices[0][0] = 0.;
 
-  vertices[1](0) = 1.;
-  vertices[1](1) = -1.5;
-  vertices[1](2) = 0.;
+  vertices[1][0] = 1.;
+  vertices[1][1] = -1.5;
+  vertices[1][2] = 0.;
 
-  vertices[2](0) = 1.5;
-  vertices[2](1) = 1.5;
-  vertices[2](2) = 0.;
+  vertices[2][0] = 1.5;
+  vertices[2][1] = 1.5;
+  vertices[2][2] = 0.;
 
-  vertices[3](0) = 2.;
-  vertices[3](1) = 0.5;
-  vertices[3](2) = 0.;
+  vertices[3][0] = 2.;
+  vertices[3][1] = 0.5;
+  vertices[3][2] = 0.;
 
   Triangulation<2, 3> tria;
   GridGenerator::general_cell<2, 3>(tria, vertices);
@@ -52,12 +52,12 @@ void
 dim_1_3(std::ostream &os)
 {
   std::vector<Point<3>> vertices(2);
-  vertices[0](0) = -1.;
-  vertices[0](1) = -1.;
-  vertices[0](2) = -1.;
-  vertices[1](0) = 1.;
-  vertices[1](1) = -1.5;
-  vertices[1](2) = -1.5;
+  vertices[0][0] = -1.;
+  vertices[0][1] = -1.;
+  vertices[0][2] = -1.;
+  vertices[1][0] = 1.;
+  vertices[1][1] = -1.5;
+  vertices[1][2] = -1.5;
 
   Triangulation<1, 3> tria;
   GridGenerator::general_cell<1, 3>(tria, vertices);
@@ -70,11 +70,11 @@ void
 dim_1_2(std::ostream &os)
 {
   std::vector<Point<2>> vertices(2);
-  vertices[0](0) = -1.;
-  vertices[0](1) = -1.;
+  vertices[0][0] = -1.;
+  vertices[0][1] = -1.;
 
-  vertices[1](0) = 1.;
-  vertices[1](1) = -1.5;
+  vertices[1][0] = 1.;
+  vertices[1][1] = -1.5;
 
   Triangulation<1, 2> tria;
   GridGenerator::general_cell<1, 2>(tria, vertices);

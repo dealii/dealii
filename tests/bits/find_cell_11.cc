@@ -51,8 +51,8 @@ test()
   GridGenerator::hyper_cube(tr);
 
   Point<2> p;
-  p(0) = -0.1;
-  p(1) = 0.5;
+  p[0] = -0.1;
+  p[1] = 0.5;
 
   MappingQ<2> mapping(1);
 

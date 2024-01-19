@@ -139,13 +139,13 @@ VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
   switch (component)
     {
       case 0:
-        val = -sin(PI * p(0)) * cos(PI * p(1)) * cos(PI * p(2));
+        val = -sin(PI * p[0]) * cos(PI * p[1]) * cos(PI * p[2]);
         break;
       case 1:
-        val = -cos(PI * p(0)) * sin(PI * p(1)) * cos(PI * p(2));
+        val = -cos(PI * p[0]) * sin(PI * p[1]) * cos(PI * p[2]);
         break;
       case 2:
-        val = 2 * cos(PI * p(0)) * cos(PI * p(1)) * sin(PI * p(2));
+        val = 2 * cos(PI * p[0]) * cos(PI * p[1]) * sin(PI * p[2]);
         break;
     }
   return val;
@@ -167,7 +167,7 @@ VectorFunction<3>::gradient(const Point<3>    &p,
 {
   const double PI = numbers::PI;
   Tensor<1, 3> val;
-  double       x = p(0), y = p(1), z = p(2);
+  double       x = p[0], y = p[1], z = p[2];
 
   switch (component)
     {

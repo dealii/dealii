@@ -72,7 +72,7 @@ VectorBoundaryValues<dim>::vector_value(const Point<dim> &p,
   Assert(values.size() == 2, ExcDimensionMismatch(values.size(), 2));
 
   for (unsigned int i = 0; i < 2; ++i)
-    values(i) = p(i) * p(i);
+    values(i) = p[i] * p[i];
 }
 
 
