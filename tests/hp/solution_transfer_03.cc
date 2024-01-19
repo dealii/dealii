@@ -91,7 +91,7 @@ main()
   data_out.write_vtu(deallog.get_file_stream());
 
 
-  // Interpoalte solution
+  // Interpolate solution
   SolutionTransfer<2, Vector<double>> solultion_trans(dof_handler);
   solultion_trans.prepare_for_coarsening_and_refinement(solution);
 

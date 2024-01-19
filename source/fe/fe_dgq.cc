@@ -274,78 +274,93 @@ FE_DGQ<dim, spacedim>::get_interpolation_matrix(
   const FiniteElement<dim, spacedim> &x_source_fe,
   FullMatrix<double>                 &interpolation_matrix) const
 {
-  // this is only implemented, if the
-  // source FE is also a
-  // DGQ element
-  using FE = FiniteElement<dim, spacedim>;
-  AssertThrow((dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe) !=
-               nullptr),
-              typename FE::ExcInterpolationNotImplemented());
-
-  // ok, source is a Q element, so
-  // we will be able to do the work
-  const FE_DGQ<dim, spacedim> &source_fe =
-    dynamic_cast<const FE_DGQ<dim, spacedim> &>(x_source_fe);
-
-  Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
-         ExcDimensionMismatch(interpolation_matrix.m(),
-                              this->n_dofs_per_cell()));
-  Assert(interpolation_matrix.n() == source_fe.n_dofs_per_cell(),
-         ExcDimensionMismatch(interpolation_matrix.n(),
-                              source_fe.n_dofs_per_cell()));
-
-
-  // compute the interpolation
-  // matrices in much the same way as
-  // we do for the embedding matrices
-  // from mother to child.
-  FullMatrix<double> cell_interpolation(this->n_dofs_per_cell(),
-                                        this->n_dofs_per_cell());
-  FullMatrix<double> source_interpolation(this->n_dofs_per_cell(),
-                                          source_fe.n_dofs_per_cell());
-  FullMatrix<double> tmp(this->n_dofs_per_cell(), source_fe.n_dofs_per_cell());
-  for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
+  // go through the list of elements we can interpolate from
+  if (const FE_DGQ<dim, spacedim> *source_fe =
+        dynamic_cast<const FE_DGQ<dim, spacedim> *>(&x_source_fe))
     {
-      // generate a point on this
-      // cell and evaluate the
-      // shape functions there
-      const Point<dim> p = this->unit_support_points[j];
+      Assert(interpolation_matrix.m() == this->n_dofs_per_cell(),
+             ExcDimensionMismatch(interpolation_matrix.m(),
+                                  this->n_dofs_per_cell()));
+      Assert(interpolation_matrix.n() == source_fe->n_dofs_per_cell(),
+             ExcDimensionMismatch(interpolation_matrix.n(),
+                                  source_fe->n_dofs_per_cell()));
+
+
+      // compute the interpolation
+      // matrices in much the same way as
+      // we do for the embedding matrices
+      // from mother to child.
+      FullMatrix<double> cell_interpolation(this->n_dofs_per_cell(),
+                                            this->n_dofs_per_cell());
+      FullMatrix<double> source_interpolation(this->n_dofs_per_cell(),
+                                              source_fe->n_dofs_per_cell());
+      FullMatrix<double> tmp(this->n_dofs_per_cell(),
+                             source_fe->n_dofs_per_cell());
+      for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
+        {
+          // generate a point on this
+          // cell and evaluate the
+          // shape functions there
+          const Point<dim> p = this->unit_support_points[j];
+          for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+            cell_interpolation(j, i) = this->poly_space->compute_value(i, p);
+
+          for (unsigned int i = 0; i < source_fe->n_dofs_per_cell(); ++i)
+            source_interpolation(j, i) =
+              source_fe->poly_space->compute_value(i, p);
+        }
+
+      // then compute the
+      // interpolation matrix matrix
+      // for this coordinate
+      // direction
+      cell_interpolation.gauss_jordan();
+      cell_interpolation.mmult(interpolation_matrix, source_interpolation);
+
+      // cut off very small values
       for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-        cell_interpolation(j, i) = this->poly_space->compute_value(i, p);
-
-      for (unsigned int i = 0; i < source_fe.n_dofs_per_cell(); ++i)
-        source_interpolation(j, i) = source_fe.poly_space->compute_value(i, p);
-    }
-
-  // then compute the
-  // interpolation matrix matrix
-  // for this coordinate
-  // direction
-  cell_interpolation.gauss_jordan();
-  cell_interpolation.mmult(interpolation_matrix, source_interpolation);
-
-  // cut off very small values
-  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-    for (unsigned int j = 0; j < source_fe.n_dofs_per_cell(); ++j)
-      if (std::fabs(interpolation_matrix(i, j)) < 1e-15)
-        interpolation_matrix(i, j) = 0.;
+        for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
+          if (std::fabs(interpolation_matrix(i, j)) < 1e-15)
+            interpolation_matrix(i, j) = 0.;
 
 #ifdef DEBUG
-  // make sure that the row sum of
-  // each of the matrices is 1 at
-  // this point. this must be so
-  // since the shape functions sum up
-  // to 1
-  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-    {
-      double sum = 0.;
-      for (unsigned int j = 0; j < source_fe.n_dofs_per_cell(); ++j)
-        sum += interpolation_matrix(i, j);
+      // make sure that the row sum of
+      // each of the matrices is 1 at
+      // this point. this must be so
+      // since the shape functions sum up
+      // to 1
+      for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
+        {
+          double sum = 0.;
+          for (unsigned int j = 0; j < source_fe->n_dofs_per_cell(); ++j)
+            sum += interpolation_matrix(i, j);
 
-      Assert(std::fabs(sum - 1) < 5e-14 * std::max(this->degree, 1U) * dim,
-             ExcInternalError());
-    }
+          Assert(std::fabs(sum - 1) < 5e-14 * std::max(this->degree, 1U) * dim,
+                 ExcInternalError());
+        }
 #endif
+    }
+  else if (dynamic_cast<const FE_Nothing<dim> *>(&x_source_fe))
+    {
+      // the element we want to interpolate from is an FE_Nothing. this
+      // element represents a function that is constant zero and has no
+      // degrees of freedom, so the interpolation is simply a multiplication
+      // with a n_dofs x 0 matrix. there is nothing to do here
+
+      // we would like to verify that the number of rows and columns of
+      // the matrix equals this->n_dofs_per_cell() and zero. unfortunately,
+      // whenever we do FullMatrix::reinit(m,0), it sets both rows and
+      // columns to zero, instead of m and zero. thus, only test the
+      // number of columns
+      Assert(interpolation_matrix.n() == x_source_fe.n_dofs_per_cell(),
+             ExcDimensionMismatch(interpolation_matrix.m(),
+                                  x_source_fe.n_dofs_per_cell()));
+    }
+  else
+    AssertThrow(
+      false,
+      (typename FiniteElement<dim,
+                              spacedim>::ExcInterpolationNotImplemented()));
 }
 
 

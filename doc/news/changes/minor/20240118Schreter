@@ -1,0 +1,4 @@
+Changed:
+FE_DGQ::get_interpolation_matrix() now also takes as a source element FENothing.
+<br>
+(Magdalena Schreter, Peter Munch, 2024/01/18)

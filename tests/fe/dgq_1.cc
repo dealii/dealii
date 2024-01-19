@@ -21,6 +21,7 @@
 // result doesn't change
 
 #include <deal.II/fe/fe_dgq.h>
+#include <deal.II/fe/fe_nothing.h>
 #include <deal.II/fe/fe_tools.h>
 
 #include <string>
@@ -56,6 +57,31 @@ test(const unsigned int degree1, const unsigned int degree2)
 }
 
 
+template <int dim>
+void
+test_fe_nothing()
+{
+  deallog << "FE_DGQ<" << dim << ">(1)"
+          << " to FE_Nothing<" << dim << ">()" << std::endl;
+
+  FE_DGQ<dim>     fe1(1);
+  FE_Nothing<dim> fe2;
+
+  FullMatrix<double> m;
+  fe1.get_interpolation_matrix(fe2, m);
+
+  for (unsigned int i = 0; i < m.m(); ++i)
+    {
+      for (unsigned int j = 0; j < m.n(); ++j)
+        deallog << m(i, j) << ' ';
+
+      deallog << std::endl;
+    }
+
+  deallog << std::endl;
+}
+
+
 int
 main()
 {
@@ -73,6 +99,10 @@ main()
   for (unsigned int degree1 = 0; degree1 <= 2; ++degree1)
     for (unsigned int degree2 = 0; degree2 <= 2; ++degree2)
       test<3>(degree1, degree2);
+
+  test_fe_nothing<1>();
+  test_fe_nothing<2>();
+  test_fe_nothing<3>();
 
   return 0;
 }
