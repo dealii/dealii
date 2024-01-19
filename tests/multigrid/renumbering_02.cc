@@ -59,7 +59,7 @@ check()
   mg_dof_handler.distribute_dofs(fe);
   mg_dof_handler.distribute_mg_dofs();
   Point<dim> a;
-  a(0) = 1;
+  a[0] = 1;
   for (unsigned int level = 0; level < tria.n_levels(); ++level)
     DoFRenumbering::downstream(mg_dof_handler, level, a);
 }

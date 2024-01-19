@@ -35,8 +35,8 @@ check_rect1(unsigned int n, bool color, bool log)
 
   for (unsigned int d = 0; d < dim; ++d)
     {
-      left(d)         = -1.;
-      right(d)        = d + 2;
+      left[d]         = -1.;
+      right[d]        = d + 2;
       subdivisions[d] = n * (d + 3);
     }
   Triangulation<dim> tria;

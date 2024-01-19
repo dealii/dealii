@@ -50,9 +50,9 @@ set_periodicity(parallel::distributed::Triangulation<dim> &triangulation,
   // Look for the two outermost faces:
   for (const unsigned int j : GeometryInfo<dim>::face_indices())
     {
-      if (cell_1->face(j)->center()(dim - 1) > 2.9)
+      if (cell_1->face(j)->center()[dim - 1] > 2.9)
         face_1 = cell_1->face(j);
-      if (cell_2->face(j)->center()(dim - 1) < -2.9)
+      if (cell_2->face(j)->center()[dim - 1] < -2.9)
         face_2 = cell_2->face(j);
     }
   face_1->set_boundary_id(42);
@@ -255,7 +255,7 @@ check(const unsigned int orientation, bool reverse)
   // now refine and check if the neighboring faces are correctly found
   typename Triangulation<dim>::active_cell_iterator cell;
   for (cell = triangulation.begin_active(); cell != triangulation.end(); ++cell)
-    if (cell->is_locally_owned() && cell->center()(dim - 1) > 0)
+    if (cell->is_locally_owned() && cell->center()[dim - 1] > 0)
       cell->set_refine_flag();
 
   triangulation.execute_coarsening_and_refinement();
@@ -284,15 +284,15 @@ check(const unsigned int orientation, bool reverse)
       const unsigned int face_no_2     = it->second.first.second;
       const Point<dim>   face_center_1 = cell_1->face(face_no_1)->center();
       const Point<dim>   face_center_2 = cell_2->face(face_no_2)->center();
-      Assert(std::min(std::abs(face_center_1(dim - 1) - 3.),
-                      std::abs(face_center_1(dim - 1) + 3.)) < 1.e-8,
+      Assert(std::min(std::abs(face_center_1[dim - 1] - 3.),
+                      std::abs(face_center_1[dim - 1] + 3.)) < 1.e-8,
              ExcInternalError());
-      Assert(std::min(std::abs(face_center_2(dim - 1) - 3.),
-                      std::abs(face_center_2(dim - 1) + 3.)) < 1.e-8,
+      Assert(std::min(std::abs(face_center_2[dim - 1] - 3.),
+                      std::abs(face_center_2[dim - 1] + 3.)) < 1.e-8,
              ExcInternalError());
       if (cell_1->level() == cell_2->level())
         for (unsigned int c = 0; c < dim - 1; ++c)
-          if (std::abs(face_center_1(c) - face_center_2(c)) > 1.e-8)
+          if (std::abs(face_center_1[c] - face_center_2[c]) > 1.e-8)
             {
               std::cout << "face_center_1: " << face_center_1 << std::endl;
               std::cout << "face_center_2: " << face_center_2 << std::endl;

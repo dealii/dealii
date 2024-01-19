@@ -86,9 +86,9 @@ double
 TestFunction<dim>::value(const Point<dim> &p,
                          const unsigned int /*component*/) const
 {
-  double val = base[0].value(p(0));
+  double val = base[0].value(p[0]);
   for (unsigned int i = 1; i < dim; ++i)
-    val *= base[i].value(p(i));
+    val *= base[i].value(p[i]);
   return val;
 }
 

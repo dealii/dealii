@@ -43,8 +43,8 @@ public:
   operator()(const Point<spacedim> p) const
   {
     Point<spacedim> q;
-    q[0] = std::cos(angle) * p(0) - std::sin(angle) * p(1);
-    q[1] = std::sin(angle) * p(0) + std::cos(angle) * p(1);
+    q[0] = std::cos(angle) * p[0] - std::sin(angle) * p[1];
+    q[1] = std::sin(angle) * p[0] + std::cos(angle) * p[1];
     for (unsigned d = 2; d < spacedim; ++d)
       q[d] = p[d];
     return q;

@@ -101,7 +101,7 @@ public:
     double result = 1.;
     for (unsigned int d = 0; d < dim; ++d)
       for (unsigned int k = 0; k < degree; ++k)
-        result *= p(d) + c;
+        result *= p[d] + c;
     return result;
   }
 
@@ -119,7 +119,7 @@ public:
         double            result = 1.;
         for (unsigned int d = 0; d < dim; ++d)
           for (unsigned int k = 0; k < degree; ++k)
-            result *= p(d) + c;
+            result *= p[d] + c;
         values[i] = result;
       }
   }
@@ -141,7 +141,7 @@ public:
             double result = 1.;
             for (unsigned int d = 0; d < dim; ++d)
               for (unsigned int k = 0; k < degree; ++k)
-                result *= p(d);
+                result *= p[d];
             values[i](c) = result;
           }
       }

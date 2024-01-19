@@ -138,10 +138,10 @@ public:
   value(const Point<dim> &p, const unsigned int /*component*/ = 0) const
   {
     if (dim == 2)
-      return -2. * M_PI * M_PI * std::sin(M_PI * p(0)) * std::sin(M_PI * p(1));
+      return -2. * M_PI * M_PI * std::sin(M_PI * p[0]) * std::sin(M_PI * p[1]);
     else /* if(dim == 3)*/
-      return -3. * M_PI * M_PI * std::sin(M_PI * p(0)) * std::sin(M_PI * p(1)) *
-             std::sin(M_PI * p(2));
+      return -3. * M_PI * M_PI * std::sin(M_PI * p[0]) * std::sin(M_PI * p[1]) *
+             std::sin(M_PI * p[2]);
   }
 };
 

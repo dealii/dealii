@@ -50,8 +50,8 @@ test()
 
     for (unsigned int i = 0; i < dim; ++i)
       {
-        position[0](i) = 0.125;
-        position[1](i) = 0.525;
+        position[0][i] = 0.125;
+        position[1][i] = 0.525;
       }
 
     Particles::Particle<dim, spacedim> particle1(position[0],

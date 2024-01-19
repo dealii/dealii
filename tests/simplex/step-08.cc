@@ -113,8 +113,8 @@ namespace Step8
     Assert(dim >= 2, ExcNotImplemented());
 
     Point<dim> point_1, point_2;
-    point_1(0) = 0.5;
-    point_2(0) = -0.5;
+    point_1[0] = 0.5;
+    point_2[0] = -0.5;
 
     for (unsigned int point_n = 0; point_n < points.size(); ++point_n)
       {

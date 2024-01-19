@@ -46,7 +46,7 @@ test()
     std::vector<Point<dim>> particle_reference_locations(1, Point<dim>());
 
     for (unsigned int i = 0; i < dim; ++i)
-      particle_reference_locations[0](i) = 0.5;
+      particle_reference_locations[0][i] = 0.5;
 
     Particles::Generators::regular_reference_locations(
       tr, particle_reference_locations, particle_handler);

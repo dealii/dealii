@@ -49,21 +49,21 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
     auto endc = tria.end();
     for (; cell != endc; ++cell)
       for (const unsigned int face_number : GeometryInfo<dim>::face_indices())
-        if (std::fabs(cell->face(face_number)->center()(0) - left) < 1e-12)
+        if (std::fabs(cell->face(face_number)->center()[0] - left) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(1);
-        else if (std::fabs(cell->face(face_number)->center()(0) - right) <
+        else if (std::fabs(cell->face(face_number)->center()[0] - right) <
                  1e-12)
           cell->face(face_number)->set_all_boundary_ids(2);
         else if (dim >= 2 &&
-                 std::fabs(cell->face(face_number)->center()(1) - left) < 1e-12)
+                 std::fabs(cell->face(face_number)->center()[1] - left) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(3);
-        else if (dim >= 2 && std::fabs(cell->face(face_number)->center()(1) -
+        else if (dim >= 2 && std::fabs(cell->face(face_number)->center()[1] -
                                        right) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(4);
         else if (dim >= 3 &&
-                 std::fabs(cell->face(face_number)->center()(2) - left) < 1e-12)
+                 std::fabs(cell->face(face_number)->center()[2] - left) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(5);
-        else if (dim >= 3 && std::fabs(cell->face(face_number)->center()(2) -
+        else if (dim >= 3 && std::fabs(cell->face(face_number)->center()[2] -
                                        right) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(6);
 

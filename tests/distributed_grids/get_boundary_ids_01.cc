@@ -33,13 +33,13 @@ test()
     if (cell->is_locally_owned())
       for (const unsigned int face : GeometryInfo<dim>::face_indices())
         {
-          if (std::fabs(cell->face(face)->center()(0) - 0.0) < 1e-12)
+          if (std::fabs(cell->face(face)->center()[0] - 0.0) < 1e-12)
             cell->face(face)->set_all_boundary_ids(1);
-          if (std::fabs(cell->face(face)->center()(0) - 1.0) < 1e-12)
+          if (std::fabs(cell->face(face)->center()[0] - 1.0) < 1e-12)
             cell->face(face)->set_all_boundary_ids(2);
-          if (std::fabs(cell->face(face)->center()(1) - 0.0) < 1e-12)
+          if (std::fabs(cell->face(face)->center()[1] - 0.0) < 1e-12)
             cell->face(face)->set_all_boundary_ids(3);
-          if (std::fabs(cell->face(face)->center()(1) - 1.0) < 1e-12)
+          if (std::fabs(cell->face(face)->center()[1] - 1.0) < 1e-12)
             cell->face(face)->set_all_boundary_ids(4);
         }
 

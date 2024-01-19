@@ -42,7 +42,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
 
       for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
         for (unsigned int d = 0; d < spacedim; ++d)
-          patch.vertices[v](d) =
+          patch.vertices[v][d] =
             p + cell_coordinates[d][v] + ((d >= dim) ? v : 0);
 
       unsigned int n1 = (dim > 0) ? nsubp : 1;
@@ -93,7 +93,7 @@ create_continuous_patches(std::vector<DataOutBase::Patch<dim, dim>> &patches,
 
   Point<dim> midpoint;
   for (unsigned int d = 0; d < dim; ++d)
-    midpoint(d) = n_cells / 2.;
+    midpoint[d] = n_cells / 2.;
 
   Functions::CutOffFunctionCinfty<dim> function(2., midpoint);
 
@@ -108,22 +108,22 @@ create_continuous_patches(std::vector<DataOutBase::Patch<dim, dim>> &patches,
             {
               Point<dim> p = trapez.point(k);
               if (dim >= 1)
-                p(0) += i1;
+                p[0] += i1;
               if (dim >= 2)
-                p(1) += i2;
+                p[1] += i2;
               if (dim >= 3)
-                p(2) += i3;
+                p[2] += i3;
               patch.vertices[k] = p;
             }
           std::vector<Point<dim>> points = trapezsub.get_points();
           for (unsigned int k = 0; k < points.size(); ++k)
             {
               if (dim >= 1)
-                points[k](0) += i1;
+                points[k][0] += i1;
               if (dim >= 2)
-                points[k](1) += i2;
+                points[k][1] += i2;
               if (dim >= 3)
-                points[k](2) += i3;
+                points[k][2] += i3;
             }
           std::vector<double> values(points.size());
           function.value_list(points, values);

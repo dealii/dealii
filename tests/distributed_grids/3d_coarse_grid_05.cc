@@ -58,22 +58,22 @@ create_disconnected_mesh(Triangulation<dim> &tria)
           vertices[0] = vertices[1] = p1;
           vertices[2] = vertices[3] = p2;
 
-          vertices[1](0) = p2(0);
-          vertices[2](0) = p1(0);
+          vertices[1][0] = p2[0];
+          vertices[2][0] = p1[0];
           break;
         case 3:
           vertices[0] = vertices[1] = vertices[2] = vertices[3] = p1;
           vertices[4] = vertices[5] = vertices[6] = vertices[7] = p2;
 
-          vertices[1](0) = p2(0);
-          vertices[2](1) = p2(1);
-          vertices[3](0) = p2(0);
-          vertices[3](1) = p2(1);
+          vertices[1][0] = p2[0];
+          vertices[2][1] = p2[1];
+          vertices[3][0] = p2[0];
+          vertices[3][1] = p2[1];
 
-          vertices[4](0) = p1(0);
-          vertices[4](1) = p1(1);
-          vertices[5](1) = p1(1);
-          vertices[6](0) = p1(0);
+          vertices[4][0] = p1[0];
+          vertices[4][1] = p1[1];
+          vertices[5][1] = p1[1];
+          vertices[6][0] = p1[0];
 
           break;
         default:
@@ -104,8 +104,8 @@ create_disconnected_mesh(Triangulation<dim> &tria)
           vertices[GeometryInfo<dim>::vertices_per_cell + 2] =
             vertices[GeometryInfo<dim>::vertices_per_cell + 3] = p2;
 
-          vertices[GeometryInfo<dim>::vertices_per_cell + 1](0) = p2(0);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 2](0) = p1(0);
+          vertices[GeometryInfo<dim>::vertices_per_cell + 1][0] = p2[0];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 2][0] = p1[0];
           break;
         case 3:
           vertices[GeometryInfo<dim>::vertices_per_cell + 0] =
@@ -117,15 +117,15 @@ create_disconnected_mesh(Triangulation<dim> &tria)
               vertices[GeometryInfo<dim>::vertices_per_cell + 6] =
                 vertices[GeometryInfo<dim>::vertices_per_cell + 7] = p2;
 
-          vertices[GeometryInfo<dim>::vertices_per_cell + 1](0) = p2(0);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 2](1) = p2(1);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 3](0) = p2(0);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 3](1) = p2(1);
+          vertices[GeometryInfo<dim>::vertices_per_cell + 1][0] = p2[0];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 2][1] = p2[1];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 3][0] = p2[0];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 3][1] = p2[1];
 
-          vertices[GeometryInfo<dim>::vertices_per_cell + 4](0) = p1(0);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 4](1) = p1(1);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 5](1) = p1(1);
-          vertices[GeometryInfo<dim>::vertices_per_cell + 6](0) = p1(0);
+          vertices[GeometryInfo<dim>::vertices_per_cell + 4][0] = p1[0];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 4][1] = p1[1];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 5][1] = p1[1];
+          vertices[GeometryInfo<dim>::vertices_per_cell + 6][0] = p1[0];
 
           break;
         default:

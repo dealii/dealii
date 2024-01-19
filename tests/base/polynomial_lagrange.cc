@@ -33,7 +33,7 @@ check_interpolation(const std::vector<Polynomial<double>> &p,
       for (unsigned int k = 0; k < x.size(); ++k)
         {
           deallog << '.';
-          const double y = p[i].value(x[k](0));
+          const double y = p[i].value(x[k][0]);
           if (i == k)
             {
               if (std::fabs(y - 1.) > 2.e-10)
@@ -71,7 +71,7 @@ check_lge(unsigned int n)
   std::vector<Point<1>> x(n + 1);
   const double          h = 1. / n;
   for (unsigned int i = 0; i <= n; ++i)
-    x[i](0) = h * i;
+    x[i][0] = h * i;
   check_interpolation(p, x);
 }
 

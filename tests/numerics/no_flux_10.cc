@@ -72,8 +72,8 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
           continue;
 
         double radius = cell->face(f)->center().norm() - center.norm();
-        if (std::fabs(cell->face(f)->center()(2) -
-                      sqrt(3.) * cell->face(f)->center()(0)) <
+        if (std::fabs(cell->face(f)->center()[2] -
+                      sqrt(3.) * cell->face(f)->center()[0]) <
             eps) // z = sqrt(3)x set boundary 2
           {
             cell->face(f)->set_boundary_id(2);
@@ -83,8 +83,8 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
                   cell->face(f)->line(j)->set_boundary_id(2);
           }
-        else if (std::fabs(cell->face(f)->center()(2) +
-                           sqrt(3.) * cell->face(f)->center()(0)) <
+        else if (std::fabs(cell->face(f)->center()[2] +
+                           sqrt(3.) * cell->face(f)->center()[0]) <
                  eps) // z = -sqrt(3)x set boundary 3
           {
             cell->face(f)->set_boundary_id(3);
@@ -94,8 +94,8 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
                   cell->face(f)->line(j)->set_boundary_id(3);
           }
-        else if (std::fabs(cell->face(f)->center()(2) -
-                           sqrt(3.) * cell->face(f)->center()(1)) <
+        else if (std::fabs(cell->face(f)->center()[2] -
+                           sqrt(3.) * cell->face(f)->center()[1]) <
                  eps) // z = sqrt(3)y set boundary 4
           {
             cell->face(f)->set_boundary_id(4);
@@ -105,8 +105,8 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
                   cell->face(f)->line(j)->set_boundary_id(4);
           }
-        else if (std::fabs(cell->face(f)->center()(2) +
-                           sqrt(3.) * cell->face(f)->center()(1)) <
+        else if (std::fabs(cell->face(f)->center()[2] +
+                           sqrt(3.) * cell->face(f)->center()[1]) <
                  eps) // z = -sqrt(3)y set boundary 5
           {
             cell->face(f)->set_boundary_id(5);

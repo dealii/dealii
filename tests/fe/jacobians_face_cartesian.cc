@@ -45,7 +45,7 @@ test()
   // Jacobian contains many nonzero entries
   Point<dim - 1> quad_p;
   for (int d = 0; d < dim - 1; ++d)
-    quad_p(d) = 0.42 + 0.11 * d;
+    quad_p[d] = 0.42 + 0.11 * d;
   Quadrature<dim - 1> quad(quad_p);
 
   {

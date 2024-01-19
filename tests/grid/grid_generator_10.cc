@@ -56,9 +56,9 @@ my_cylinder(Triangulation<3> &tria,
   // Turn cylinder such that y->x
   for (unsigned int i = 0; i < 16; ++i)
     {
-      const double h = vertices[i](1);
-      vertices[i](1) = -vertices[i](0);
-      vertices[i](0) = h;
+      const double h = vertices[i][1];
+      vertices[i][1] = -vertices[i][0];
+      vertices[i][0] = h;
     }
 
   int cell_vertices[5][8] = {{0, 1, 8, 9, 2, 3, 10, 11},

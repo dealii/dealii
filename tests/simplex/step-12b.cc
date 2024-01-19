@@ -130,8 +130,8 @@ Beta<dim>::value_list(const std::vector<Point<dim>> &points,
       const Point<dim> &p    = points[i];
       Point<dim>       &beta = values[i];
 
-      beta(0) = -p(1);
-      beta(1) = p(0);
+      beta[0] = -p[1];
+      beta[1] = p[0];
 
       if (beta.norm() > 1e-10)
         beta /= std::sqrt(beta.square());
@@ -150,7 +150,7 @@ BoundaryValues<dim>::value_list(const std::vector<Point<dim>> &points,
 
   for (unsigned int i = 0; i < std::min(values.size(), points.size()); ++i)
     {
-      if (points[i](0) < 0.5)
+      if (points[i][0] < 0.5)
         values[i] = 1.;
       else
         values[i] = 0.;

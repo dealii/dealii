@@ -415,12 +415,12 @@ namespace dealii
 #ifdef DEBUG
       // all vertices should be in a plane
       for (const auto &vertex : vertices)
-        Assert(midpoint(coordinate) == vertex(coordinate), ExcInternalError());
+        Assert(midpoint[coordinate] == vertex[coordinate], ExcInternalError());
 #endif
 
       // add another vertex as tip of triangle/pyramid
       Point<spacedim> tip = midpoint;
-      tip(coordinate) += (face_no % 2 == 1) ? 1. : -1.;
+      tip[coordinate] += (face_no % 2 == 1) ? 1. : -1.;
       vertices.push_back(tip);
 
       CellData<dim> simplex(vertices.size());

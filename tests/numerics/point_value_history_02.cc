@@ -237,7 +237,7 @@ TestPointValueHistory<dim>::run()
               finite_element.system_to_component_index(dof).first;
 
             poles(local_dof_indices[dof]) =
-              -dof_locations[dof](dof_component % dim);
+              -dof_locations[dof][dof_component % dim];
 
             if (dof_component == dim) // components start numbering at 0
               poles(local_dof_indices[dof]) =

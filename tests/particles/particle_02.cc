@@ -28,12 +28,12 @@ test()
 {
   {
     Point<2> position;
-    position(0) = 0.3;
-    position(1) = 0.5;
+    position[0] = 0.3;
+    position[1] = 0.5;
 
     Point<2> reference_position;
-    reference_position(0) = 0.2;
-    reference_position(1) = 0.4;
+    reference_position[0] = 0.2;
+    reference_position[1] = 0.4;
 
     const types::particle_index index(7);
 

@@ -59,7 +59,7 @@ public:
   {
     double return_value = 0.;
     for (unsigned int d = 0; d < dim; ++d)
-      return_value += std::pow(std::abs(.5 - p(d)), degree);
+      return_value += std::pow(std::abs(.5 - p[d]), degree);
 
     return return_value;
   }

@@ -98,7 +98,7 @@ Test<dim>::setup_discrete_level_set()
   Tensor<1, dim> plane_normal;
   for (unsigned int i = 1; i < dim; i++)
     {
-      point_on_zero_contour(i) = 0.25;
+      point_on_zero_contour[i] = 0.25;
       plane_normal[i]          = 1;
     }
 

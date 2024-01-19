@@ -34,7 +34,7 @@ check3d()
   Point<3> p(point);
 
   for (unsigned int i = 0; i < 3; ++i)
-    deallog << p(i) << ' ';
+    deallog << p[i] << ' ';
   deallog << std::endl;
 }
 
@@ -46,7 +46,7 @@ check2d()
   Point<2> p(point);
 
   for (unsigned int i = 0; i < 2; ++i)
-    deallog << p(i) << ' ';
+    deallog << p[i] << ' ';
   deallog << std::endl;
 }
 
@@ -57,7 +57,7 @@ check1d()
 
   Point<1> p(point);
 
-  deallog << p(0) << ' ';
+  deallog << p[0] << ' ';
   deallog << std::endl;
 }
 

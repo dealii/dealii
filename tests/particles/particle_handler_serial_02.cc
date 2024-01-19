@@ -44,18 +44,18 @@ test()
 
 
     Point<spacedim> position;
-    position(0) = 0.3;
+    position[0] = 0.3;
     if (spacedim > 1)
-      position(1) = 0.5;
+      position[1] = 0.5;
     if (spacedim > 2)
-      position(2) = 0.7;
+      position[2] = 0.7;
 
     Point<dim> reference_position;
-    reference_position(0) = 0.2;
+    reference_position[0] = 0.2;
     if (dim > 1)
-      reference_position(1) = 0.4;
+      reference_position[1] = 0.4;
     if (dim > 2)
-      reference_position(2) = 0.6;
+      reference_position[2] = 0.6;
 
     Particles::Particle<dim, spacedim> particle(position,
                                                 reference_position,
@@ -71,7 +71,7 @@ test()
     particle_handler.insert_particle(particle, cell_position.first);
     particle_handler.insert_particle(particle, cell_position.first);
 
-    position(0) = 0.7;
+    position[0] = 0.7;
     Particles::Particle<dim, spacedim> particle2(position,
                                                  reference_position,
                                                  9);

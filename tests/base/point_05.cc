@@ -42,19 +42,19 @@ check()
 
 
     for (unsigned int i = 0; i < dim; ++i)
-      deallog << p_float(i) << ' ';
+      deallog << p_float[i] << ' ';
     deallog << std::endl;
 
     for (unsigned int i = 0; i < dim; ++i)
-      deallog << p_double(i) << ' ';
+      deallog << p_double[i] << ' ';
     deallog << std::endl;
 
     for (unsigned int i = 0; i < dim; ++i)
-      deallog << p_complex_float(i) << ' ';
+      deallog << p_complex_float[i] << ' ';
     deallog << std::endl;
 
     for (unsigned int i = 0; i < dim; ++i)
-      deallog << p_complex_double(i) << ' ';
+      deallog << p_complex_double[i] << ' ';
     deallog << std::endl;
   }
 
@@ -70,15 +70,15 @@ check()
     p_complex_double = p_double;
 
     for (unsigned int i = 0; i < dim; ++i)
-      deallog << p_double(i) << ' ';
+      deallog << p_double[i] << ' ';
     deallog << std::endl;
 
     for (unsigned int i = 0; i < dim; ++i)
-      deallog << p_complex_float(i) << ' ';
+      deallog << p_complex_float[i] << ' ';
     deallog << std::endl;
 
     for (unsigned int i = 0; i < dim; ++i)
-      deallog << p_complex_double(i) << ' ';
+      deallog << p_complex_double[i] << ' ';
     deallog << std::endl;
   }
 }

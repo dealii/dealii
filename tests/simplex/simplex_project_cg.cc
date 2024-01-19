@@ -57,7 +57,7 @@ public:
   {
     double u = 1.0;
     for (int d = 0; d < dim; ++d)
-      u *= std::sin(numbers::PI * p(d));
+      u *= std::sin(numbers::PI * p[d]);
 
     return u;
   }
@@ -72,7 +72,7 @@ public:
   {
     double u = 1.0;
     for (int d = 0; d < dim; ++d)
-      u *= std::sin(numbers::PI * p(d));
+      u *= std::sin(numbers::PI * p[d]);
 
     return (1 + 0.0 * dim * numbers::PI * numbers::PI) * u;
   }

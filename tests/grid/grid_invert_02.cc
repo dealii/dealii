@@ -36,13 +36,13 @@ test()
 {
   const static int        dim = 2;
   std::vector<Point<dim>> vertices(6);
-  vertices[1](1) = 1;
-  vertices[2](0) = 1;
-  vertices[3](0) = 1;
-  vertices[3](1) = 1;
-  vertices[4](0) = 2;
-  vertices[5](0) = 2;
-  vertices[5](1) = 1;
+  vertices[1][1] = 1;
+  vertices[2][0] = 1;
+  vertices[3][0] = 1;
+  vertices[3][1] = 1;
+  vertices[4][0] = 2;
+  vertices[5][0] = 2;
+  vertices[5][1] = 1;
 
   std::vector<CellData<dim>> cells(2);
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())

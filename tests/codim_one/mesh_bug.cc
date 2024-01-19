@@ -45,7 +45,7 @@ main()
   const std::vector<Point<3>> &vertices = tria.get_vertices();
 
   for (unsigned int i = 0; i < vertices.size(); ++i)
-    if (vertices[i](2) > 1e-7)
+    if (vertices[i][2] > 1e-7)
       std::cout << "Error!" << std::endl;
 
 

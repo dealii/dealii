@@ -85,11 +85,11 @@ check_cells(std::vector<Quadrature<dim> *> &quadratures)
               switch (dim)
                 {
                   case 3:
-                    f *= std::pow(static_cast<double>(points[x](2)), i * 1.0);
+                    f *= std::pow(static_cast<double>(points[x][2]), i * 1.0);
                   case 2:
-                    f *= std::pow(static_cast<double>(points[x](1)), i * 1.0);
+                    f *= std::pow(static_cast<double>(points[x][1]), i * 1.0);
                   case 1:
-                    f *= std::pow(static_cast<double>(points[x](0)), i * 1.0);
+                    f *= std::pow(static_cast<double>(points[x][0]), i * 1.0);
                 }
               quadrature_int += f * weights[x];
             }
@@ -110,7 +110,7 @@ check_cells(std::vector<Quadrature<dim> *> &quadratures)
           bool in_order = true;
           for (unsigned int x = 1; x < quadrature.size(); ++x)
             {
-              if (points[x](0) <= points[x - 1](0))
+              if (points[x][0] <= points[x - 1][0])
                 in_order = false;
             }
           if (!in_order)
@@ -163,11 +163,11 @@ check_faces(const std::vector<Quadrature<dim - 1> *> &quadratures,
               switch (dim)
                 {
                   case 3:
-                    f *= std::pow((long double)points[x](2), i * 1.0L);
+                    f *= std::pow((long double)points[x][2], i * 1.0L);
                   case 2:
-                    f *= std::pow((long double)points[x](1), i * 1.0L);
+                    f *= std::pow((long double)points[x][1], i * 1.0L);
                   case 1:
-                    f *= std::pow((long double)points[x](0), i * 1.0L);
+                    f *= std::pow((long double)points[x][0], i * 1.0L);
                 }
               quadrature_int += f * weights[x];
             }

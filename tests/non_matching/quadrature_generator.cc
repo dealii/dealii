@@ -92,7 +92,7 @@ test_vertical_cuts_through_center()
   Point<dim> center;
   for (int d = 0; d < dim; ++d)
     {
-      center(d) = .5;
+      center[d] = .5;
     }
   for (int direction = 0; direction < dim; ++direction)
     {
@@ -174,7 +174,7 @@ test_epsilon_cut_at_bottom_corner()
   for (int i = 0; i < dim; ++i)
     {
       normal[i] = 1;
-      center(i) += epsilon;
+      center[i] += epsilon;
     }
   const Functions::SignedDistance::Plane<dim> level_set(center, normal);
 
@@ -229,7 +229,7 @@ public:
     : Functions::ConstantFunction<dim>(1)
   {
     for (int d = 0; d < dim; ++d)
-      unit_box_center(d) = .5;
+      unit_box_center[d] = .5;
   }
 
   SymmetricTensor<2, dim>

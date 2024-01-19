@@ -642,11 +642,11 @@ namespace Step22
         Vector<double> value2(3);
 
         Point<2> point1;
-        point1(0) = 0;
-        point1(1) = .5 * (1. + 1. * i / n_points + eps);
+        point1[0] = 0;
+        point1[1] = .5 * (1. + 1. * i / n_points + eps);
         Point<2> point2;
-        point2(0) = .5 * (1. + 1. * i / n_points + eps);
-        point2(1) = 0.;
+        point2[0] = .5 * (1. + 1. * i / n_points + eps);
+        point2[1] = 0.;
 
         get_point_value(point1, 0, value1);
         get_point_value(point2, 0, value2);

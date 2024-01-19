@@ -113,7 +113,7 @@ check_quadrature(double *exact_monomials)
           long double f = 1.;
           for (unsigned int x = 0; x < quadrature.size(); ++x)
             {
-              f = std::pow(static_cast<long double>(points[x](0)), i * 1.0L);
+              f = std::pow(static_cast<long double>(points[x][0]), i * 1.0L);
               quadrature_int += f * static_cast<long double>(weights[x]);
             }
           err = std::fabs(quadrature_int - exact_monomials[i]);
@@ -150,7 +150,7 @@ check_GRC_right(double *exact_monomials)
           long double f = 1.;
           for (unsigned int x = 0; x < quadrature.size(); ++x)
             {
-              f = std::pow(static_cast<long double>(points[x](0)), i * 1.0L);
+              f = std::pow(static_cast<long double>(points[x][0]), i * 1.0L);
               quadrature_int += f * static_cast<long double>(weights[x]);
             }
           err = std::fabs(quadrature_int - exact_monomials[i]);

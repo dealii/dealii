@@ -157,8 +157,8 @@ namespace StokesTests
   Solution<2>::value(const Point<2> &p, const unsigned int component) const
   {
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
     // zero on BD's
     if (component == 0)
       return PI * sin(PI * x) * sin(PI * x) * sin(2.0 * PI * y);
@@ -177,9 +177,9 @@ namespace StokesTests
     Assert(component <= 3 + 1, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
-    const double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
 
     if (component == 0)
       return 2. * PI * sin(PI * x) * sin(PI * x) * sin(2.0 * PI * y) *
@@ -204,8 +204,8 @@ namespace StokesTests
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
+    const double x = p[0];
+    const double y = p[1];
 
     Tensor<1, 2> return_value;
     if (component == 0)
@@ -236,9 +236,9 @@ namespace StokesTests
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    const double x = p(0);
-    const double y = p(1);
-    const double z = p(2);
+    const double x = p[0];
+    const double y = p[1];
+    const double z = p[2];
 
     Tensor<1, 3> return_value;
     if (component == 0)
@@ -300,8 +300,8 @@ namespace StokesTests
     Assert(component <= 2, ExcIndexRange(component, 0, 2 + 1));
 
     using numbers::PI;
-    double x  = p(0);
-    double y  = p(1);
+    double x  = p[0];
+    double y  = p[1];
     double nu = 1.0;
 
     // RHS for 0 BD's
@@ -327,9 +327,9 @@ namespace StokesTests
     Assert(component <= 3, ExcIndexRange(component, 0, 3 + 1));
 
     using numbers::PI;
-    double x = p(0);
-    double y = p(1);
-    double z = p(2);
+    double x = p[0];
+    double y = p[1];
+    double z = p[2];
 
     if (component == 0)
       return 4. * PI * PI * PI *

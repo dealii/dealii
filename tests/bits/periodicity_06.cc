@@ -128,8 +128,8 @@ public:
   value(const Point<dim> &p, const unsigned int component = 0) const override
   {
     if (dim == 3)
-      return std::sin(p(0) + 1.) * std::sin(p(1) + 2.) * std::sin(p(2) + 3.);
-    return std::sin(p(0) + 1.) * std::sin(p(1) + 2.);
+      return std::sin(p[0] + 1.) * std::sin(p[1] + 2.) * std::sin(p[2] + 3.);
+    return std::sin(p[0] + 1.) * std::sin(p[1] + 2.);
   }
 };
 
@@ -164,11 +164,11 @@ check_periodicity(const DoFHandler<2> &dof_handler,
       Vector<double> value2(1);
 
       Point<2> point1;
-      point1(0) = -numbers::PI + 2. * i / n_points + eps;
-      point1(1) = -numbers::PI;
+      point1[0] = -numbers::PI + 2. * i / n_points + eps;
+      point1[1] = -numbers::PI;
       Point<2> point2;
-      point2(0) = -numbers::PI + 2. * i / n_points + eps;
-      point2(1) = numbers::PI;
+      point2[0] = -numbers::PI + 2. * i / n_points + eps;
+      point2[1] = numbers::PI;
 
       VectorTools::point_value(dof_handler, solution, point1, value1);
       VectorTools::point_value(dof_handler, solution, point2, value2);
@@ -193,11 +193,11 @@ check_periodicity(const DoFHandler<2> &dof_handler,
       Vector<double> value2(1);
 
       Point<2> point1;
-      point1(1) = -numbers::PI + 2. * i / n_points + eps;
-      point1(0) = -numbers::PI;
+      point1[1] = -numbers::PI + 2. * i / n_points + eps;
+      point1[0] = -numbers::PI;
       Point<2> point2;
-      point2(1) = -numbers::PI + 2. * i / n_points + eps;
-      point2(0) = numbers::PI;
+      point2[1] = -numbers::PI + 2. * i / n_points + eps;
+      point2[0] = numbers::PI;
 
       VectorTools::point_value(dof_handler, solution, point1, value1);
       VectorTools::point_value(dof_handler, solution, point2, value2);

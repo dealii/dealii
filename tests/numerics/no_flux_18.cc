@@ -495,7 +495,7 @@ namespace StokesClass
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
                   {
-                    p(d) = velocity.quadrature_point(q)(d)[i];
+                    p[d] = velocity.quadrature_point(q)[d][i];
                   }
                 return_value[i] = 2.0 * viscosity_function.value(p);
               }
@@ -629,7 +629,7 @@ namespace StokesClass
               {
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
-                  p(d) = pressure.quadrature_point(q)(d)[i];
+                  p[d] = pressure.quadrature_point(q)[d][i];
                 return_value[i] = 1.0 / viscosity_function.value(p);
               }
             one_over_viscosity(cell, q) = return_value;
@@ -809,7 +809,7 @@ namespace StokesClass
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
                   {
-                    p(d) = velocity.quadrature_point(q)(d)[i];
+                    p[d] = velocity.quadrature_point(q)[d][i];
                   }
                 return_value[i] = 2.0 * viscosity_function.value(p);
               }
@@ -1251,7 +1251,7 @@ namespace StokesClass
               {
                 Point<dim> p;
                 for (unsigned int d = 0; d < dim; ++d)
-                  p(d) = velocity.quadrature_point(q)(d)[i];
+                  p[d] = velocity.quadrature_point(q)[d][i];
 
                 Vector<double> rhs_temp(dim + 1);
                 right_hand_side.vector_value(p, rhs_temp);

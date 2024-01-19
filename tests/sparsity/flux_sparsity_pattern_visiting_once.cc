@@ -53,7 +53,7 @@ is_face_on_OY(const typename DoFHandler<dim>::active_cell_iterator &cell,
   deallog
     << "This sentence should appear once when the corresponding face is visited only once on cell "
     << cell->index() << std::endl;
-  return (std::abs(cell->face(face_index)->center()(0)) < 0.01);
+  return (std::abs(cell->face(face_index)->center()[0]) < 0.01);
 }
 
 template <int dim>

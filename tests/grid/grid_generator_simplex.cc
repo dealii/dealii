@@ -32,10 +32,10 @@ dim_2(std::ostream &os)
   Triangulation<d>   tr;
 
   std::vector<Point<d>> vertices(d + 1);
-  vertices[1](0) = 0.5;
-  vertices[1](1) = .85;
-  vertices[2](0) = -0.5;
-  vertices[2](1) = .85;
+  vertices[1][0] = 0.5;
+  vertices[1][1] = .85;
+  vertices[2][0] = -0.5;
+  vertices[2][1] = .85;
   GridGenerator::simplex(tr, vertices);
 
   GridOut gout;
@@ -49,18 +49,18 @@ dim_3(std::ostream &os)
   Triangulation<d>   tr;
 
   std::vector<Point<d>> vertices(d + 1);
-  vertices[0](0) = 1.;
-  vertices[0](1) = 0.;
-  vertices[0](2) = .7;
-  vertices[1](0) = -1.;
-  vertices[1](1) = 0.;
-  vertices[1](2) = .7;
-  vertices[2](0) = 0.;
-  vertices[2](1) = 1.;
-  vertices[2](2) = -.7;
-  vertices[3](0) = 0.;
-  vertices[3](1) = -1.;
-  vertices[3](2) = -.7;
+  vertices[0][0] = 1.;
+  vertices[0][1] = 0.;
+  vertices[0][2] = .7;
+  vertices[1][0] = -1.;
+  vertices[1][1] = 0.;
+  vertices[1][2] = .7;
+  vertices[2][0] = 0.;
+  vertices[2][1] = 1.;
+  vertices[2][2] = -.7;
+  vertices[3][0] = 0.;
+  vertices[3][1] = -1.;
+  vertices[3][2] = -.7;
   GridGenerator::simplex(tr, vertices);
 
   GridOut gout;

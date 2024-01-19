@@ -48,7 +48,7 @@ create_and_output_quadrature_for_each_direction()
   Point<dim - 1> point;
   for (int i = 0; i < dim - 1; ++i)
     {
-      point(i) = 10 * (i + 1);
+      point[i] = 10 * (i + 1);
     }
   // Both points in the 1D-quadrature have weight 1/2 so
   // this should also be the weight of the points in the final

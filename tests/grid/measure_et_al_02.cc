@@ -48,16 +48,16 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
         {
           GridGenerator::hyper_cube(tria, 1., 3.);
           Point<2> &v0 = tria.begin_active()->vertex(0);
-          v0(0)        = 0.;
+          v0[0]        = 0.;
           break;
         }
       case 2:
         {
           GridGenerator::hyper_cube(tria, 1., 3.);
           Point<2> &v0 = tria.begin_active()->vertex(0);
-          v0(0)        = 0.;
+          v0[0]        = 0.;
           Point<2> &v3 = tria.begin_active()->vertex(3);
-          v3(0)        = 4.;
+          v3[0]        = 4.;
           break;
         }
       default:
@@ -80,7 +80,7 @@ create_triangulation(const unsigned int case_no, Triangulation<3> &tria)
         {
           GridGenerator::hyper_cube(tria, 1., 3.);
           Point<3> &v0 = tria.begin_active()->vertex(0);
-          v0(0)        = 0.;
+          v0[0]        = 0.;
           break;
         }
       default:

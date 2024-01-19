@@ -66,10 +66,10 @@ VectorFunction<2>::value(const Point<2> &p, const unsigned int component) const
   switch (component)
     {
       case 0:
-        val = pow(p(0), 3);
+        val = pow(p[0], 3);
         break;
       case 1:
-        val = pow(p(1), 2) * p(0);
+        val = pow(p[1], 2) * p[0];
         break;
     }
   return val;
@@ -86,13 +86,13 @@ VectorFunction<3>::value(const Point<3> &p, const unsigned int component) const
   switch (component)
     {
       case 0:
-        val = pow(p(0), 3);
+        val = pow(p[0], 3);
         break;
       case 1:
-        val = pow(p(1), 2) * p(0);
+        val = pow(p[1], 2) * p[0];
         break;
       case 2:
-        val = p(2) * p(1) * p(0);
+        val = p[2] * p[1] * p[0];
         break;
     }
   return val;

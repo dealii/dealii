@@ -62,8 +62,8 @@ generate_grid(Triangulation<dim, spacedim> &tria)
   // Define a rectangular shape
   for (unsigned int d = 0; d < dim; ++d)
     {
-      p1(d) = 0;
-      p2(d) = (d == 0) ? 2.0 : 1.0;
+      p1[d] = 0;
+      p2[d] = (d == 0) ? 2.0 : 1.0;
       sub_div.push_back((d == 0) ? 2 : 1);
     }
   GridGenerator::subdivided_hyper_rectangle(tria, sub_div, p1, p2, true);

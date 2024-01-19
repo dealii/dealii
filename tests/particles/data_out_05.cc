@@ -54,7 +54,7 @@ test()
 
     for (unsigned int i = 0; i < dim; ++i)
       {
-        position[0](i) = 0.125;
+        position[0][i] = 0.125;
       }
 
     for (unsigned int i = 0; i < spacedim; ++i)

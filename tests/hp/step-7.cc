@@ -500,8 +500,8 @@ HelmholtzProblem<dim>::run()
                                                      endc = triangulation.end();
           for (; cell != endc; ++cell)
             for (const unsigned int face : GeometryInfo<dim>::face_indices())
-              if ((cell->face(face)->center()(0) == -1) ||
-                  (cell->face(face)->center()(1) == -1))
+              if ((cell->face(face)->center()[0] == -1) ||
+                  (cell->face(face)->center()[1] == -1))
                 cell->face(face)->set_boundary_id(1);
         }
       else

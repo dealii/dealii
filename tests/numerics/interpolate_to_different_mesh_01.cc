@@ -43,7 +43,7 @@ public:
   virtual double
   value(const Point<spacedim> &p, const unsigned int component = 0) const
   {
-    return p(0) * p(0);
+    return p[0] * p[0];
   }
 };
 

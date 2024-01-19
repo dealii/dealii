@@ -63,8 +63,8 @@ test()
 
         for (unsigned int i = 0; i < dim; ++i)
           {
-            position[0](i) = 0.125;
-            position[1](i) = 0.525;
+            position[0][i] = 0.125;
+            position[1][i] = 0.525;
           }
 
         Particles::Particle<dim, spacedim> particle1(position[0],
@@ -108,7 +108,7 @@ test()
     // move particle 2 out of the domain. Note that we need to change the
     // coordinate dim-1 despite having a spacedim point.
     Point<spacedim> shift;
-    shift(dim - 1) = 0.5;
+    shift[dim - 1] = 0.5;
     for (auto &particle : particle_handler)
       particle.set_location(particle.get_location() + shift);
 

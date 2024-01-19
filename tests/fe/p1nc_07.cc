@@ -41,8 +41,8 @@ affine(const Point<dim> &p)
   Point<dim> q = p;
   if (dim >= 2)
     {
-      q(0) = 2. * p(0) + p(1);
-      q(1) = p(0) + 3. * p(1);
+      q[0] = 2. * p[0] + p[1];
+      q[1] = p[0] + 3. * p[1];
     }
 
   return q;
