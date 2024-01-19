@@ -155,6 +155,17 @@
 #cmakedefine DEAL_II_HAVE_CXX20
 #cmakedefine DEAL_II_HAVE_CXX23
 
+#cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
+#cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
+#cmakedefine DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
+#cmakedefine DEAL_II_CXX14_CONSTEXPR_BUG
+
+// The following three are defined for backwards compatibility with older
+// deal.II versions:
+#define DEAL_II_WITH_CXX11
+#define DEAL_II_WITH_CXX14
+#define DEAL_II_WITH_CXX17
+
 /**
  * If we have C++20 available, we can have concepts and requires
  * clauses. We want to avoid using too many `#ifdef` statements, so
@@ -167,10 +178,33 @@
 #  define DEAL_II_CXX20_REQUIRES(condition)
 #endif
 
-#cmakedefine DEAL_II_HAVE_FP_EXCEPTIONS
-#cmakedefine DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
-#cmakedefine DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
-#cmakedefine DEAL_II_CXX14_CONSTEXPR_BUG
+/**
+ * Provide support for the C++23 [[assume]] attribute. To mimic the
+ * attribute for older standards we rely on compiler intrinsics when
+ * available.
+ */
+#if defined(__clang__)
+#  define DEAL_II_ASSUME(expr) __builtin_assume(static_cast<bool>(expr))
+#elif defined(__GNUC__) && !defined(__ICC) && __GNUC__ >= 13
+#  define DEAL_II_ASSUME(expr)                                         \
+    do                                                                 \
+      {                                                                \
+        _Pragma("GCC diagnostic push")                                 \
+          _Pragma("GCC diagnostic ignored \"-Wimplicit-fallthrough\"") \
+            [[assume(expr)]];                                          \
+        _Pragma("GCC diagnostic pop")                                  \
+      }                                                                \
+    while (false)
+#elif defined(_MSC_VER) || defined(__ICC)
+#  define DEAL_II_ASSUME(expr) __assume(expr);
+#else
+/* no way with GCC to express this without evaluating 'expr' */
+#  define DEAL_II_ASSUME(expr) \
+    do                         \
+      {                        \
+      }                        \
+    while (false)
+#endif
 
 /**
  * Macro indicating that the current feature will be removed in a future
@@ -206,11 +240,6 @@
 
 #cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
-
-// The following three are defined for backwards compatibility with older deal.II versions:
-#define DEAL_II_WITH_CXX11
-#define DEAL_II_WITH_CXX14
-#define DEAL_II_WITH_CXX17
 
 
 /***********************************************************************
