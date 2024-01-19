@@ -1637,7 +1637,7 @@ namespace deal_II_exceptions
 #    endif /*ifdef KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #  endif   /*KOKKOS_ACTIVE_EXECUTION_MEMORY_SPACE_HOST*/
 #else      /*ifdef DEBUG*/
-#  define Assert(cond, exc) DEAL_II_ASSUME(cond)
+#  define Assert(cond, exc) DEAL_II_CXX23_ASSUME(cond)
 #endif /*ifdef DEBUG*/
 
 
@@ -1689,7 +1689,7 @@ namespace deal_II_exceptions
       while (false)
 #  endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 #else
-#  define AssertNothrow(cond, exc) DEAL_II_ASSUME(cond)
+#  define AssertNothrow(cond, exc) DEAL_II_CXX23_ASSUME(cond)
 #endif
 
 /**

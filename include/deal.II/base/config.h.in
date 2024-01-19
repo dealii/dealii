@@ -184,9 +184,9 @@
  * available.
  */
 #if defined(__clang__)
-#  define DEAL_II_ASSUME(expr) __builtin_assume(static_cast<bool>(expr))
+#  define DEAL_II_CXX23_ASSUME(expr) __builtin_assume(static_cast<bool>(expr))
 #elif defined(__GNUC__) && !defined(__ICC) && __GNUC__ >= 13
-#  define DEAL_II_ASSUME(expr)                                         \
+#  define DEAL_II_CXX23_ASSUME(expr)                                   \
     do                                                                 \
       {                                                                \
         _Pragma("GCC diagnostic push")                                 \
@@ -196,13 +196,13 @@
       }                                                                \
     while (false)
 #elif defined(_MSC_VER) || defined(__ICC)
-#  define DEAL_II_ASSUME(expr) __assume(expr);
+#  define DEAL_II_CXX23_ASSUME(expr) __assume(expr);
 #else
 /* no way with GCC to express this without evaluating 'expr' */
-#  define DEAL_II_ASSUME(expr) \
-    do                         \
-      {                        \
-      }                        \
+#  define DEAL_II_CXX23_ASSUME(expr) \
+    do                               \
+      {                              \
+      }                              \
     while (false)
 #endif
 
