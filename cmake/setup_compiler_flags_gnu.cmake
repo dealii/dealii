@@ -96,7 +96,7 @@ enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-literal-suffix")
 #
 enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-psabi")
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
   # Enable warnings for conversion from real types to integer types.
   # The warning is too noisy in gcc and therefore only enabled for clang.
   enable_if_supported(DEAL_II_WARNING_FLAGS "-Wfloat-conversion")
