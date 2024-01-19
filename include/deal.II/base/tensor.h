@@ -1871,6 +1871,7 @@ Tensor<rank_, dim, Number>::unroll(const Iterator begin,
       // For rank-1 tensors, we can simply copy the current elements from
       // our linear array into the output range, and then return the
       // iterator moved forward by 'dim' elements:
+      (void)end;
       Assert(std::distance(begin, end) >= dim,
              ExcMessage(
                "The provided iterator range must contain at least 'dim' "
