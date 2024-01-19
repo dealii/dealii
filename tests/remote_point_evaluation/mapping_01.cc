@@ -57,7 +57,11 @@ test(const bool enforce_unique_map)
     for (unsigned int i = 0; i <= 4; ++i)
       evaluation_points.emplace_back(i * 0.25, j * 0.25);
 
-  Utilities::MPI::RemotePointEvaluation<dim> eval(1e-6, enforce_unique_map);
+  typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData
+    additional_data;
+  additional_data.enforce_unique_mapping = enforce_unique_map;
+  additional_data.tolerance              = 1e-6;
+  Utilities::MPI::RemotePointEvaluation<dim> eval(additional_data);
 
   const auto result_avg =
     VectorTools::point_values<1>(mapping,

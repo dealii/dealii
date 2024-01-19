@@ -41,7 +41,11 @@ do_test(const bool                     enforce_unique_map,
 
   MappingQ1<dim> mapping;
 
-  Utilities::MPI::RemotePointEvaluation<dim> eval(1.e-6, enforce_unique_map);
+  typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData
+    additional_data;
+  additional_data.enforce_unique_mapping = enforce_unique_map;
+
+  Utilities::MPI::RemotePointEvaluation<dim> eval(additional_data);
 
   eval.reinit(evaluation_points, tria, mapping);
 
