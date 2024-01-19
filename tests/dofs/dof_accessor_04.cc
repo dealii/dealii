@@ -14,23 +14,27 @@
 // ---------------------------------------------------------------------
 
 // Test DoFCellAccessor::distribute_local_to_global(
-// local_matrix, local_vector, global_matrix, global_vector) 
+// local_matrix, local_vector, global_matrix, global_vector)
 
-#include <deal.II/grid/tria.h>
-#include <deal.II/grid/grid_generator.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/tria.h>
+
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include <iostream>
+#include "../tests.h"
 
-int main()
+int
+main()
 {
-  using namespace dealii;
+  initlog();
 
   // create the triangulation
   Triangulation<2> tria;
@@ -50,37 +54,48 @@ int main()
   sp.copy_from(dsp);
 
   SparseMatrix<double> global_matrix(sp);
-  Vector<double> global_vector(dof_handler.n_dofs());
+  Vector<double>       global_vector(dof_handler.n_dofs());
 
   // create local matrix and local vector
   FullMatrix<double> local_matrix(fe.dofs_per_cell, fe.dofs_per_cell);
-  Vector<double> local_vector(fe.dofs_per_cell);
+  Vector<double>     local_vector(fe.dofs_per_cell);
   for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-  {
-    local_vector(i) = i + 1;
-    for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-      local_matrix(i, j) = i * fe.dofs_per_cell + j + 1;
-  }
+    {
+      local_vector(i) = i + 1;
+      for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+        local_matrix(i, j) = i * fe.dofs_per_cell + j + 1;
+    }
 
   // call function distribute_local_to_global()
   auto cell = dof_handler.begin_active();
-  cell->distribute_local_to_global(local_matrix, local_vector, global_matrix, global_vector);
+  cell->distribute_local_to_global(local_matrix,
+                                   local_vector,
+                                   global_matrix,
+                                   global_vector);
 
-  // output the local matrix and local vector
-  std::cout << "local matrix:" << std::endl;
-  local_matrix.print_formatted(std::cout, 0, false);
+  // check if each entry of the local matrix/vector has
+  // found its position in the global matrix/vector
+  bool passed = true;
+  for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
+    {
+      if (global_vector(i) != local_vector(i))
+        passed = false;
 
-  std::cout << "local vector:" << std::endl;
-  local_vector.print(std::cout, 0, false);
-  
-  std::cout << std::endl;
+      for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
+        if (global_matrix(i, j) != local_matrix(i, j))
+          {
+            passed = false;
+            break;
+          }
 
-  // output the global matrix and global vector
-  std::cout << "global matrix:" << std::endl;
-  global_matrix.print_formatted(std::cout, 0, false);
+      if (passed == false)
+        break;
+    }
 
-  std::cout << "global vector:" << std::endl;
-  global_vector.print(std::cout, 0, false);
+  if (passed)
+    deallog << "PASSED" << std::endl;
+  else
+    deallog << "NOT PASSED" << std::endl;
 
   return 0;
 }
