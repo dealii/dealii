@@ -247,14 +247,16 @@ namespace LinearAlgebra
             vector->getMap()->getLocalElement(row);
 
 
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
           Assert(
             local_row != Teuchos::OrdinalTraits<int>::invalid(),
-#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
             ExcAccessToNonLocalElement(row,
                                        vector->getMap()->getLocalNumElements(),
                                        vector->getMap()->getMinLocalIndex(),
                                        vector->getMap()->getMaxLocalIndex()));
 #  else
+          Assert(
+            local_row != Teuchos::OrdinalTraits<int>::invalid(),
             ExcAccessToNonLocalElement(row,
                                        vector->getMap()->getNodeNumElements(),
                                        vector->getMap()->getMinLocalIndex(),

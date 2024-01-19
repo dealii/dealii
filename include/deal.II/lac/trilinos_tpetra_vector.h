@@ -1001,10 +1001,12 @@ namespace LinearAlgebra
 #  endif
 
           if (local_row != Teuchos::OrdinalTraits<int>::invalid())
-            if (nonlocal)
-              vector_1d_nonlocal(local_row) += values[i];
-            else
-              vector_1d_local(local_row) += values[i];
+            {
+              if (nonlocal)
+                vector_1d_nonlocal(local_row) += values[i];
+              else
+                vector_1d_local(local_row) += values[i];
+            }
         }
 
 #  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)

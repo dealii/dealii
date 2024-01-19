@@ -831,6 +831,8 @@ namespace LinearAlgebra
 
       return static_cast<size_t>(local_col_index) != col_indices.size();
 #  else
+      (void)i;
+      (void)j;
       Assert(false, ExcNotImplemented());
       return false;
 #  endif
