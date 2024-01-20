@@ -1557,7 +1557,8 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
                   internal::FE_Q_Base::increment_indices<dim>(j_indices,
                                                               dofs1d);
                 }
-              Assert(std::fabs(sum_check - 1) <
+              (void)sum_check;
+              Assert(std::fabs(sum_check - 1.0) <
                        std::max(eps,
                                 5e-16 * std::sqrt(this->n_dofs_per_cell())),
                      ExcInternalError("The entries in a row of the local "
