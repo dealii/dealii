@@ -1313,7 +1313,7 @@ template <typename ArrayLike, std::size_t... indices>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
                                    std::index_sequence<indices...>)
-  : values{{Tensor<rank_ - 1, dim, Number>(initializer[indices])...}}
+  : values{{value_type(initializer[indices])...}}
 {
   static_assert(sizeof...(indices) == dim,
                 "dim should match the number of indices");
