@@ -1431,6 +1431,7 @@ namespace GridGenerator
                 cell->face(5)->set_all_boundary_ids(1);
                 ++count;
               }
+          (void)count;
           Assert(count == 48, ExcInternalError());
         }
       else
