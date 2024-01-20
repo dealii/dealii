@@ -13,8 +13,11 @@
 //
 // ---------------------------------------------------------------------
 
-// Test DoFCellAccessor::distribute_local_to_global(
-// local_matrix, local_vector, global_matrix, global_vector)
+
+// Test DoFCellAccessor::distribute_local_to_global(local_matrix,
+//                                                  local_vector,
+//                                                  global_matrix,
+//                                                  global_vector)
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -73,29 +76,18 @@ main()
                                    global_matrix,
                                    global_vector);
 
-  // check if each entry of the local matrix/vector has
-  // found its position in the global matrix/vector
-  bool passed = true;
-  for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-    {
-      if (global_vector(i) != local_vector(i))
-        passed = false;
+  // output the local matrix and the local vector
+  deallog << "local matrix:" << std::endl;
+  local_matrix.print_formatted(deallog.get_file_stream(), 0, false, 3);
+  deallog << "local vector:" << std::endl;
+  local_vector.print(deallog.get_file_stream(), 0, false, 3);
+  deallog << std::endl;
 
-      for (unsigned int j = 0; j < fe.dofs_per_cell; ++j)
-        if (global_matrix(i, j) != local_matrix(i, j))
-          {
-            passed = false;
-            break;
-          }
-
-      if (passed == false)
-        break;
-    }
-
-  if (passed)
-    deallog << "PASSED" << std::endl;
-  else
-    deallog << "NOT PASSED" << std::endl;
+  // output the global matrix and the global vector
+  deallog << "global matrix:" << std::endl;
+  global_matrix.print_formatted(deallog.get_file_stream(), 0, false, 3);
+  deallog << "global vector:" << std::endl;
+  global_vector.print(deallog.get_file_stream(), 0, false, 3);
 
   return 0;
 }
