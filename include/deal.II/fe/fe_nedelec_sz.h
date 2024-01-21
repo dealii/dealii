@@ -63,13 +63,22 @@ DEAL_II_NAMESPACE_OPEN
  * vertices are decided such that the second has a higher global vertex
  * numbering than the fourth.
  *
- * Note that this element does not support non-conforming meshes at this time.
+ * To overcome the sign conflict in the case of non-conforming meshes, hanging
+ * edges (and faces in 3D) must be addressed. This element chooses the
+ * orientation of hanging edges (and faces) based on the parent cell. Moreover,
+ * the associated constraint matrix that restricts the additional DoFs
+ * originating from the hanging edges and faces must be adapted to account for
+ * the orientation of the edges and faces.
  *
  * Further details on this element, including some benchmarking, can be
  * in the paper R. Kynch, P. Ledger: <b>Resolving the sign conflict
  * problem for hp-hexahedral N&eacute;d&eacute;lec elements with application to
  * eddy current problems</b>, Computers & Structures 181, 41-54, 2017 (see
  * https://doi.org/10.1016/j.compstruc.2016.05.021).
+ * For details on the implementation of the hanging node constraints, see the
+ * paper S. Kinnewig, T. Wick, S. Beuchler: <b>Algorithmic realization of the
+ * solution to the sign conflict problem for hanging nodes on hp-hexahedral
+ * Nédélec elements</b>, preprint, 2023 (https://arxiv.org/abs/2306.01416).
  */
 template <int dim, int spacedim = dim>
 class FE_NedelecSZ : public FiniteElement<dim, dim>
