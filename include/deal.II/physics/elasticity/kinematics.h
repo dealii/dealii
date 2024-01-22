@@ -388,7 +388,7 @@ Physics::Elasticity::Kinematics::w(const Tensor<2, dim, Number> &F,
 {
   // This could be implemented as w = l-d, but that would mean computing "l"
   // a second time.
-  const Tensor<2, dim> grad_v = l(F, dF_dt);
+  const auto grad_v = l(F, dF_dt);
   return internal::NumberType<Number>::value(0.5) *
          (grad_v - transpose(grad_v));
 }
