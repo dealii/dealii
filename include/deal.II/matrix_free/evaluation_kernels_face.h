@@ -1522,14 +1522,17 @@ namespace internal
     }
 
     template <int fe_degree>
-    static void
-    project_to_face(const unsigned int                     n_components,
-                    const EvaluationFlags::EvaluationFlags evaluation_flag,
-                    const Number                          *values_dofs,
-                    FEEvaluationData<dim, Number, true>   &fe_eval,
-                    const bool                             use_vectorization,
-                    Number                                *temp,
-                    Number                                *scratch_data)
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+      static void
+      project_to_face(const unsigned int                     n_components,
+                      const EvaluationFlags::EvaluationFlags evaluation_flag,
+                      const Number                          *values_dofs,
+                      FEEvaluationData<dim, Number, true>   &fe_eval,
+                      const bool                             use_vectorization,
+                      Number                                *temp,
+                      Number                                *scratch_data)
     {
       const auto &shape_info = fe_eval.get_shape_info();
 
@@ -1579,12 +1582,15 @@ namespace internal
 
 
     template <int fe_degree, int n_q_points_1d>
-    static void
-    evaluate_in_face(const unsigned int                     n_components,
-                     const EvaluationFlags::EvaluationFlags evaluation_flag,
-                     FEEvaluationData<dim, Number, true>   &fe_eval,
-                     Number                                *temp,
-                     Number                                *scratch_data)
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+      static void
+      evaluate_in_face(const unsigned int                     n_components,
+                       const EvaluationFlags::EvaluationFlags evaluation_flag,
+                       FEEvaluationData<dim, Number, true>   &fe_eval,
+                       Number                                *temp,
+                       Number                                *scratch_data)
     {
       const auto &shape_info = fe_eval.get_shape_info();
       const auto &shape_data = shape_info.data.front();
@@ -1643,6 +1649,9 @@ namespace internal
                                                        subface_index);
     }
 
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
     static void
     adjust_quadrature_for_face_orientation(
       const unsigned int                     n_components,
@@ -1932,6 +1941,9 @@ namespace internal
       return true;
     }
 
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
     static void
     adjust_quadrature_for_face_orientation(
       const unsigned int                     n_components,
@@ -1984,12 +1996,15 @@ namespace internal
     }
 
     template <int fe_degree, int n_q_points_1d>
-    static void
-    integrate_in_face(const unsigned int                     n_components,
-                      const EvaluationFlags::EvaluationFlags integration_flag,
-                      FEEvaluationData<dim, Number, true>   &fe_eval,
-                      Number                                *temp,
-                      Number                                *scratch_data)
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+      static void
+      integrate_in_face(const unsigned int                     n_components,
+                        const EvaluationFlags::EvaluationFlags integration_flag,
+                        FEEvaluationData<dim, Number, true>   &fe_eval,
+                        Number                                *temp,
+                        Number                                *scratch_data)
     {
       const auto &shape_info = fe_eval.get_shape_info();
       const auto &shape_data = shape_info.data.front();
@@ -2050,15 +2065,18 @@ namespace internal
     }
 
     template <int fe_degree>
-    static void
-    collect_from_face(const unsigned int                     n_components,
-                      const EvaluationFlags::EvaluationFlags integration_flag,
-                      Number                                *values_dofs,
-                      FEEvaluationData<dim, Number, true>   &fe_eval,
-                      const bool                             use_vectorization,
-                      const Number                          *temp,
-                      Number                                *scratch_data,
-                      const bool                             sum_into_values)
+#ifndef DEBUG
+    DEAL_II_ALWAYS_INLINE
+#endif
+      static void
+      collect_from_face(const unsigned int                     n_components,
+                        const EvaluationFlags::EvaluationFlags integration_flag,
+                        Number                                *values_dofs,
+                        FEEvaluationData<dim, Number, true>   &fe_eval,
+                        const bool    use_vectorization,
+                        const Number *temp,
+                        Number       *scratch_data,
+                        const bool    sum_into_values)
     {
       const auto &shape_info = fe_eval.get_shape_info();
       const auto &shape_data = shape_info.data.front();
