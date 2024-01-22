@@ -183,31 +183,22 @@
  * attribute for older standards we rely on compiler intrinsics when
  * available.
  */
-#ifdef DEAL_II_EXPERIMENTAL_ASSUME
-#  error "Test"
-#  if defined(__clang__)
-#    define DEAL_II_CXX23_ASSUME(expr) __builtin_assume(static_cast<bool>(expr))
-#  elif defined(__GNUC__) && !defined(__ICC) && __GNUC__ >= 13
-#    define DEAL_II_CXX23_ASSUME(expr)                                   \
-      do                                                                 \
-        {                                                                \
-          _Pragma("GCC diagnostic push")                                 \
-            _Pragma("GCC diagnostic ignored \"-Wimplicit-fallthrough\"") \
-              [[assume(expr)]];                                          \
-          _Pragma("GCC diagnostic pop")                                  \
-        }                                                                \
-      while (false)
-#  elif defined(_MSC_VER) || defined(__ICC)
-#    define DEAL_II_CXX23_ASSUME(expr) __assume(expr);
-#  else
-/* no way with GCC to express this without evaluating 'expr' */
-#    define DEAL_II_CXX23_ASSUME(expr) \
-      do                               \
-        {                              \
-        }                              \
-      while (false)
-#  endif
+#if defined(__clang__)
+#  define DEAL_II_CXX23_ASSUME(expr) __builtin_assume(static_cast<bool>(expr))
+#elif defined(__GNUC__) && !defined(__ICC) && __GNUC__ >= 13
+#  define DEAL_II_CXX23_ASSUME(expr)                                   \
+    do                                                                 \
+      {                                                                \
+        _Pragma("GCC diagnostic push")                                 \
+          _Pragma("GCC diagnostic ignored \"-Wimplicit-fallthrough\"") \
+            [[assume(expr)]];                                          \
+        _Pragma("GCC diagnostic pop")                                  \
+      }                                                                \
+    while (false)
+#elif defined(_MSC_VER) || defined(__ICC)
+#  define DEAL_II_CXX23_ASSUME(expr) __assume(expr);
 #else
+/* no way with GCC to express this without evaluating 'expr' */
 #  define DEAL_II_CXX23_ASSUME(expr) \
     do                               \
       {                              \
