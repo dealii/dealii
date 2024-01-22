@@ -33,10 +33,9 @@ void
 test()
 {
   Triangulation<dim> tria(typename Triangulation<dim>::MeshSmoothing(
-    Triangulation<dim>::smoothing_on_refinement |
     Triangulation<dim>::smoothing_on_coarsening));
 
-  GridGenerator::hyper_cube(tria, -1.0, +1.0);
+  GridGenerator::hyper_cube(tria);
   tria.refine_global(1);
 
   const auto trias =
