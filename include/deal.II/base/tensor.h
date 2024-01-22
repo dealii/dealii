@@ -1872,7 +1872,7 @@ Tensor<rank_, dim, Number>::unroll(const Iterator begin,
              ExcMessage(
                "The provided iterator range must contain at least 'dim' "
                "elements."));
-      std::copy(&values[0], &values[dim], begin);
+      std::copy(std::begin(values), std::end(values), begin);
     }
 }
 
