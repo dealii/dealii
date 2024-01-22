@@ -176,12 +176,6 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
   # mode.
   #
   enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-Wno-unused-local-typedefs")
-
-  #
-  # We are using __builtin_assume in Assert in Release mode and the compiler is
-  # warning about ignored side effects which we don't care about.
-  #
-  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-Wno-assume")
 endif()
 
 
