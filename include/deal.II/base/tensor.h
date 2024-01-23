@@ -1313,7 +1313,27 @@ template <typename ArrayLike, std::size_t... indices>
 constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 Tensor<rank_, dim, Number>::Tensor(const ArrayLike &initializer,
                                    std::index_sequence<indices...>)
-  : values{{value_type(initializer[indices])...}}
+  // Extract from the 'initializer' a sequence of elements via template
+  // pack evaluation. This could be as easy as
+  //     values{{ (initializer[indices])... }}
+  // but of course in practice it is not. The challenge is that if rank>1,
+  // we want to pass the elements initializer[indices] down to the next
+  // lower rank tensor for evaluation unchanged. But at the rank==1 level,
+  // we need to convert to the scalar type 'Number'. This would all be
+  // relatively straightforward if we could rely on automatic type
+  // conversion, but for some autodifferentiation types, the conversion
+  // from the AD to double (i.e., the extraction of a scalar value) is
+  // not implicit, and we need to call internal::NumberType<Number>::value() --
+  // but as mentioned, we can only do that for rank==1.
+  //
+  // We can achieve all of this by dispatching to a lambda function within
+  // which we can use a 'if constexpr'.
+  : values{{([&initializer]() -> value_type {
+    if constexpr (rank_ == 1)
+      return internal::NumberType<Number>::value(initializer[indices]);
+    else
+      return value_type(initializer[indices]);
+  }())...}}
 {
   static_assert(sizeof...(indices) == dim,
                 "dim should match the number of indices");
