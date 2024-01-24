@@ -1505,8 +1505,6 @@ namespace NonMatching
         const auto dof_handler_cell =
           cell->as_dof_handler_iterator(*dof_handler);
 
-        const FE_Q<dim> fe_q1(1);
-
         // Save the element and the local dof values, since this is what we need
         // to evaluate the function.
 
@@ -1519,6 +1517,8 @@ namespace NonMatching
             element = &dof_handler_cell->get_fe();
 
             const FiniteElement<dim> *fe = &dof_handler_cell->get_fe();
+
+            const FE_Q<dim> fe_q1(1);
 
             if (const FE_Q_iso_Q1<dim> *fe_q_iso_q1 =
                   dynamic_cast<const FE_Q_iso_Q1<dim> *>(
@@ -1621,13 +1621,18 @@ namespace NonMatching
         if (!poly.empty() && component == 0)
           {
             // TODO: this could be extended to a component that is not zero
-            return dealii::internal::evaluate_tensor_product_value(
-              poly,
-              this->is_fe_q_iso_q1() ? local_dof_values_subcell :
-                                       local_dof_values,
-              this->is_fe_q_iso_q1() ? subcell_box.real_to_unit(point) : point,
-              polynomials_are_hat_functions,
-              this->is_fe_q_iso_q1() ? std::vector<unsigned int>() : renumber);
+            return this->is_fe_q_iso_q1() ?
+                     dealii::internal::evaluate_tensor_product_value(
+                       poly,
+                       local_dof_values_subcell,
+                       subcell_box.real_to_unit(point),
+                       polynomials_are_hat_functions) :
+                     dealii::internal::evaluate_tensor_product_value(
+                       poly,
+                       local_dof_values,
+                       point,
+                       polynomials_are_hat_functions,
+                       renumber);
           }
         else
           {
@@ -1654,15 +1659,20 @@ namespace NonMatching
         if (!poly.empty() && component == 0)
           {
             // TODO: this could be extended to a component that is not zero
-            return dealii::internal::evaluate_tensor_product_value_and_gradient(
-                     poly,
-                     this->is_fe_q_iso_q1() ? local_dof_values_subcell :
-                                              local_dof_values,
-                     this->is_fe_q_iso_q1() ? subcell_box.real_to_unit(point) :
-                                              point,
-                     polynomials_are_hat_functions,
-                     this->is_fe_q_iso_q1() ? std::vector<unsigned int>() :
-                                              renumber)
+            return (this->is_fe_q_iso_q1() ?
+                      dealii::internal::
+                        evaluate_tensor_product_value_and_gradient(
+                          poly,
+                          local_dof_values_subcell,
+                          subcell_box.real_to_unit(point),
+                          polynomials_are_hat_functions) :
+                      dealii::internal::
+                        evaluate_tensor_product_value_and_gradient(
+                          poly,
+                          local_dof_values,
+                          point,
+                          polynomials_are_hat_functions,
+                          renumber))
               .second;
           }
         else
@@ -1690,12 +1700,13 @@ namespace NonMatching
         if (!poly.empty() && component == 0)
           {
             // TODO: this could be extended to a component that is not zero
-            return dealii::internal::evaluate_tensor_product_hessian(
-              poly,
-              this->is_fe_q_iso_q1() ? local_dof_values_subcell :
-                                       local_dof_values,
-              this->is_fe_q_iso_q1() ? subcell_box.real_to_unit(point) : point,
-              this->is_fe_q_iso_q1() ? std::vector<unsigned int>() : renumber);
+            return this->is_fe_q_iso_q1() ?
+                     dealii::internal::evaluate_tensor_product_hessian(
+                       poly,
+                       local_dof_values_subcell,
+                       subcell_box.real_to_unit(point)) :
+                     dealii::internal::evaluate_tensor_product_hessian(
+                       poly, local_dof_values, point, renumber);
           }
         else
           {
