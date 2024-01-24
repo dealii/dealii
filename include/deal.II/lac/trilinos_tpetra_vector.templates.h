@@ -338,7 +338,7 @@ namespace LinearAlgebra
       // can optimize this somehow.
       vector->putScalar(/*s=*/0.0);
 
-      if (nonlocal_vector.is_null())
+      if (!nonlocal_vector.is_null())
         nonlocal_vector->putScalar(/*s=*/0.0);
 
       return *this;
