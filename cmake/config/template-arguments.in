@@ -64,6 +64,7 @@ ALL_SCALAR_TYPES := {
 // Since many of our MPI calls use std::vector we cannot include bool here
 MPI_SCALARS     := { int;
                      long int;
+                     long long int;
                      unsigned int;
                      unsigned long int;
                      unsigned long long int;
@@ -76,6 +77,7 @@ MPI_SCALARS     := { int;
 // complex types and long double are typically not directly supported on GPUs
 MPI_DEVICE_SCALARS := { int;
                         long int;
+                        long long int;
                         unsigned int;
                         unsigned long int;
                         unsigned long long int;
