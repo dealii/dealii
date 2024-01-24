@@ -279,7 +279,8 @@ namespace parallel
        *
        * Multiple calling of this function is NOT allowed. Interpolating
        * several functions can be performed in one step by using
-       * <tt>interpolate (all_in, all_out)</tt>
+       * <tt>prepare_for_coarsening_and_refinement(all_in)</tt> and
+       * <tt>interpolate(all_out)</tt>.
        */
       void
       interpolate(VectorType &out);
