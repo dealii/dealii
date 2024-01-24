@@ -105,7 +105,7 @@ public:
    * @param data The actual VectorizedArray.
    * @param lane A pointer to the current lane.
    */
-  VectorizedArrayIterator(T &data, const std::size_t lane)
+  constexpr VectorizedArrayIterator(T &data, const std::size_t lane)
     : data(&data)
     , lane(lane)
   {}
@@ -113,7 +113,7 @@ public:
   /**
    * Compare for equality.
    */
-  bool
+  constexpr bool
   operator==(const VectorizedArrayIterator<T> &other) const
   {
     Assert(this->data == other.data,
@@ -125,7 +125,7 @@ public:
   /**
    * Compare for inequality.
    */
-  bool
+  constexpr bool
   operator!=(const VectorizedArrayIterator<T> &other) const
   {
     Assert(this->data == other.data,
@@ -137,14 +137,14 @@ public:
   /**
    * Copy assignment.
    */
-  VectorizedArrayIterator<T> &
+  constexpr VectorizedArrayIterator<T> &
   operator=(const VectorizedArrayIterator<T> &other) = default;
 
   /**
    * Dereferencing operator (const version): returns the value of the current
    * lane.
    */
-  const typename T::value_type &
+  constexpr const typename T::value_type &
   operator*() const
   {
     AssertIndexRange(lane, T::size());
@@ -157,7 +157,8 @@ public:
    * current lane.
    */
   template <typename U = T>
-  std::enable_if_t<!std::is_same_v<U, const U>, typename T::value_type> &
+  constexpr std::enable_if_t<!std::is_same_v<U, const U>,
+                             typename T::value_type> &
   operator*()
   {
     AssertIndexRange(lane, T::size());
@@ -169,7 +170,7 @@ public:
    * the iterator to the next lane and returns a reference to
    * <tt>*this</tt>.
    */
-  VectorizedArrayIterator<T> &
+  constexpr VectorizedArrayIterator<T> &
   operator++()
   {
     AssertIndexRange(lane + 1, T::size() + 1);
@@ -181,7 +182,7 @@ public:
    * This operator advances the iterator by @p offset lanes and returns a
    * reference to <tt>*this</tt>.
    */
-  VectorizedArrayIterator<T> &
+  constexpr VectorizedArrayIterator<T> &
   operator+=(const std::size_t offset)
   {
     AssertIndexRange(lane + offset, T::size() + 1);
@@ -194,7 +195,7 @@ public:
    * the iterator to the previous lane and returns a reference to
    * <tt>*this</tt>.
    */
-  VectorizedArrayIterator<T> &
+  constexpr VectorizedArrayIterator<T> &
   operator--()
   {
     Assert(
@@ -208,7 +209,7 @@ public:
   /**
    * Create new iterator, which is shifted by @p offset.
    */
-  VectorizedArrayIterator<T>
+  constexpr VectorizedArrayIterator<T>
   operator+(const std::size_t &offset) const
   {
     AssertIndexRange(lane + offset, T::size() + 1);
@@ -218,7 +219,7 @@ public:
   /**
    * Compute distance between this iterator and iterator @p other.
    */
-  std::ptrdiff_t
+  constexpr std::ptrdiff_t
   operator-(const VectorizedArrayIterator<T> &other) const
   {
     return static_cast<std::ptrdiff_t>(lane) -
@@ -255,31 +256,29 @@ public:
   /**
    * Default constructor.
    */
-  VectorizedArrayBase() = default;
+  constexpr VectorizedArrayBase() = default;
 
   /**
    * Construct an array with the given initializer list.
+   *
+   * The initializer list must have at most as many elements as the
+   * vector length. Elements not listed in the initializer list are
+   * zero-initialized.
    */
   template <typename U>
-  VectorizedArrayBase(const std::initializer_list<U> &list)
+  constexpr VectorizedArrayBase(const std::initializer_list<U> &list)
   {
-    auto i0 = this->begin();
-    auto i1 = list.begin();
+    const unsigned int n_initializers = list.size();
+    Assert(n_initializers <= size(),
+           ExcMessage("The initializer list must have at most "
+                      "as many elements as the vector length."));
 
-    for (; i1 != list.end(); ++i0, ++i1)
-      {
-        Assert(
-          i0 != this->end(),
-          ExcMessage(
-            "Initializer list exceeds size of this VectorizedArray object."));
+    // Copy what's in the list.
+    std::copy_n(list.begin(), n_initializers, this->begin());
 
-        *i0 = *i1;
-      }
-
-    for (; i0 != this->end(); ++i0)
-      {
-        *i0 = 0.0;
-      }
+    // Then add zero padding where necessary.
+    if (n_initializers < size())
+      std::fill(this->begin() + n_initializers, this->end(), 0.0);
   }
 
   /**
@@ -294,7 +293,7 @@ public:
   /**
    * @return An iterator pointing to the beginning of the underlying data.
    */
-  VectorizedArrayIterator<T>
+  constexpr VectorizedArrayIterator<T>
   begin()
   {
     return VectorizedArrayIterator<T>(static_cast<T &>(*this), 0);
@@ -304,7 +303,7 @@ public:
    * @return An iterator pointing to the beginning of the underlying data (`const`
    * version).
    */
-  VectorizedArrayIterator<const T>
+  constexpr VectorizedArrayIterator<const T>
   begin() const
   {
     return VectorizedArrayIterator<const T>(static_cast<const T &>(*this), 0);
@@ -313,7 +312,7 @@ public:
   /**
    * @return An iterator pointing to the end of the underlying data.
    */
-  VectorizedArrayIterator<T>
+  constexpr VectorizedArrayIterator<T>
   end()
   {
     return VectorizedArrayIterator<T>(static_cast<T &>(*this), width);
@@ -323,7 +322,7 @@ public:
    * @return An iterator pointing to the end of the underlying data (`const`
    * version).
    */
-  VectorizedArrayIterator<const T>
+  constexpr VectorizedArrayIterator<const T>
   end() const
   {
     return VectorizedArrayIterator<const T>(static_cast<const T &>(*this),
