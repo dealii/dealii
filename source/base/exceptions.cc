@@ -183,14 +183,21 @@ ExceptionBase::print_exc_data(std::ostream &out) const
   // print a header for the exception
   out << "An error occurred in line <" << line << "> of file <" << file
       << "> in function" << std::endl
-      << "    " << function << std::endl
-      << "The violated condition was: " << std::endl
-      << "    " << cond << std::endl;
+      << "    " << function << std::endl;
 
-  // print the way the additional information message was generated.
-  // this is useful if the names of local variables appear in the
-  // generation of the error message, because it allows the identification
-  // of parts of the error text with what variables may have cause this
+  // If the exception stores a string representation of the violated
+  // condition, then output it. Not all exceptions do (e.g., when
+  // creating an exception inside DEAL_II_NOT_IMPLEMENTED()), so
+  // we have to check whether there is anything to print.
+  if (cond != nullptr)
+    out << "The violated condition was: " << std::endl
+        << "    " << cond << std::endl;
+
+  // If a string representation of the exception itself is available,
+  // consider printing it as well. This is useful if the names of
+  // local variables appear in the generation of the error message,
+  // because it allows the identification of parts of the error text
+  // with what variables may have cause this.
   //
   // On the other hand, this is almost never the case for ExcMessage
   // exceptions which would simply print the same text twice: once for
@@ -198,8 +205,15 @@ ExceptionBase::print_exc_data(std::ostream &out) const
   // information. Furthermore, the former of these two is often spread
   // between numerous "..."-enclosed strings that the preprocessor
   // collates into a single string, making it awkward to read. Consequently,
-  // elide this text if the message was generated via an ExcMessage object
-  if (std::strstr(cond, "dealii::ExcMessage") != nullptr)
+  // elide this text if the message was generated via an ExcMessage object.
+  //
+  // There are cases where the exception generation mechanism suppresses
+  // the string representation of the exception because it does not add
+  // anything -- e.g., DEAL_II_NOT_IMPLEMENTED does this. In those cases,
+  // also suppress the output.
+  if ((exc != nullptr) &&
+      ((cond == nullptr) ||
+       (std::strstr(cond, "dealii::ExcMessage") != nullptr)))
     out << "The name and call sequence of the exception was:" << std::endl
         << "    " << exc << std::endl;
 
