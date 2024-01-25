@@ -271,7 +271,7 @@ namespace StokesClass
       // iterations of our two-stage outer GMRES iteration)
       if (do_solve_A == true)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
       else
         {
@@ -559,7 +559,7 @@ namespace StokesClass
   void
   StokesOperator<dim, degree_v, number>::compute_diagonal()
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 

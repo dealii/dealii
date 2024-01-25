@@ -1040,7 +1040,7 @@ FERemoteEvaluation<dim, n_components, value_type>::gather_evaluate(
                                                        evaluation_flags);
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 template <int dim, int n_components, typename value_type>

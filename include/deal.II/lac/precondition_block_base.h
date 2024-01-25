@@ -356,7 +356,7 @@ PreconditionBlockBase<number>::reinit(unsigned int n,
             var_inverse_svd[0].reinit(b, b);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       if (store_diagonals())
@@ -400,7 +400,7 @@ PreconditionBlockBase<number>::reinit(unsigned int n,
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -437,7 +437,7 @@ PreconditionBlockBase<number>::inverse_vmult(size_type              i,
         var_inverse_svd[ii].vmult(dst, src);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -466,7 +466,7 @@ PreconditionBlockBase<number>::inverse_Tvmult(size_type              i,
         var_inverse_svd[ii].Tvmult(dst, src);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -657,7 +657,7 @@ PreconditionBlockBase<number>::log_statistics() const
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

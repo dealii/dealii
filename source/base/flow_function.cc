@@ -180,7 +180,7 @@ namespace Functions
   std::size_t
   FlowFunction<dim>::memory_consumption() const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return 0;
   }
 
@@ -343,7 +343,7 @@ namespace Functions
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -409,7 +409,7 @@ namespace Functions
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -480,7 +480,7 @@ namespace Functions
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }

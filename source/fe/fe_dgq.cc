@@ -261,7 +261,7 @@ FE_DGQ<dim, spacedim>::rotate_indices(std::vector<unsigned int> &numbers,
                   }
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -737,7 +737,7 @@ FE_DGQ<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -827,7 +827,7 @@ FE_DGQ<dim, spacedim>::has_support_on_face(const unsigned int shape_index,
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return true;
 }

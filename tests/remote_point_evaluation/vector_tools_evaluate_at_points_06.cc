@@ -127,7 +127,7 @@ test()
                      evaluation_point_results_2[i]) > 1e-10 ||
             std::abs(evaluation_point_results_1[i] -
                      evaluation_point_results_3[i]) > 1e-10)
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
   deallog << "OK!" << std::endl;

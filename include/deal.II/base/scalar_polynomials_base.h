@@ -279,7 +279,7 @@ ScalarPolynomialsBase<dim>::compute_derivative(const unsigned int i,
       auto derivative = compute_4th_derivative(i, p);
       return *reinterpret_cast<Tensor<order, dim> *>(&derivative);
     }
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   Tensor<order, dim> empty;
   return empty;
 }

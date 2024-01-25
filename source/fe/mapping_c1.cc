@@ -160,7 +160,7 @@ MappingC1<dim, spacedim>::add_line_support_points(
   const typename Triangulation<dim>::cell_iterator &,
   std::vector<Point<dim>> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -195,7 +195,7 @@ MappingC1<dim, spacedim>::add_quad_support_points(
   const typename Triangulation<dim>::cell_iterator &,
   std::vector<Point<dim>> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

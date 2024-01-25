@@ -115,7 +115,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
     {
       // would this function make any sense after all? who would want to
       // output/compute in four space dimensions?
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return;
     }
 
@@ -188,7 +188,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       // then fill in data
@@ -326,7 +326,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                             break;
 
                           default:
-                            Assert(false, ExcNotImplemented());
+                            DEAL_II_NOT_IMPLEMENTED();
                         }
                     }
                 }
@@ -359,7 +359,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                         break;
 
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
                 }
               else
@@ -400,7 +400,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                             break;
 
                           default:
-                            Assert(false, ExcNotImplemented());
+                            DEAL_II_NOT_IMPLEMENTED();
                         }
                     }
                 }
@@ -444,7 +444,7 @@ DataOutRotation<dim, spacedim>::build_one_patch(
                     break;
 
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                 }
             }
         }

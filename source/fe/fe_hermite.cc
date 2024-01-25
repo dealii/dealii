@@ -584,12 +584,12 @@ FE_Hermite<dim, spacedim>::hp_vertex_dof_identities(
   else if (const FE_Hermite<dim, spacedim> *fe_herm_other =
              dynamic_cast<const FE_Hermite<dim, spacedim> *>(&fe_other))
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
 }
@@ -733,7 +733,7 @@ FE_Hermite<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 

@@ -32,5 +32,5 @@ main()
   else if (typeid(PetscScalar) == typeid(float))
     deallog << "float" << std::endl;
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }

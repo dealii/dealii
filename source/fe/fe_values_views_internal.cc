@@ -914,7 +914,7 @@ namespace FEValuesViews
                 if (shape_function_data[shape_function]
                       .is_nonzero_shape_function_component[d])
                   {
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
 
                     // the following implementation needs to be looked over -- I
                     // think it can't be right, because we are in a case where
@@ -1084,7 +1084,7 @@ namespace FEValuesViews
                 if (shape_function_data[shape_function]
                       .is_nonzero_shape_function_component[d])
                   {
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                   }
             }
         }
@@ -1154,7 +1154,7 @@ namespace FEValuesViews
                 if (shape_function_data[shape_function]
                       .is_nonzero_shape_function_component[d])
                   {
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                   }
             }
         }

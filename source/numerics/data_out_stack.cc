@@ -370,7 +370,7 @@ DataOutStack<dim, spacedim>::build_patches(const unsigned int nnnn_subdivisions)
             break;
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
 

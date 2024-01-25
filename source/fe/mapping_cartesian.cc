@@ -255,7 +255,7 @@ MappingCartesian<dim, spacedim>::update_cell_extents(
             data.cell_extents[2] = cell->vertex(4)[2] - start[2];
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -811,7 +811,7 @@ MappingCartesian<dim, spacedim>::transform(
           return;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -921,7 +921,7 @@ MappingCartesian<dim, spacedim>::transform(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1031,7 +1031,7 @@ MappingCartesian<dim, spacedim>::transform(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1070,7 +1070,7 @@ MappingCartesian<dim, spacedim>::transform(
           return;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1158,7 +1158,7 @@ MappingCartesian<dim, spacedim>::transform(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1189,7 +1189,7 @@ MappingCartesian<dim, spacedim>::transform_unit_to_real_cell(
         length[2] = cell->vertex(4)[2] - start[2];
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   Point<dim> p_real = cell->vertex(0);
@@ -1210,7 +1210,7 @@ MappingCartesian<dim, spacedim>::transform_real_to_unit_cell(
   Assert(is_cartesian(cell), ExcCellNotCartesian());
 
   if (dim != spacedim)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   const Point<dim> &start = cell->vertex(0);
   Point<dim>        real  = p;
   real -= start;
@@ -1230,7 +1230,7 @@ MappingCartesian<dim, spacedim>::transform_real_to_unit_cell(
         real[2] /= cell->vertex(4)[2] - start[2];
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return real;
 }

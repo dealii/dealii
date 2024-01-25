@@ -56,7 +56,7 @@ namespace MeshWorker
     const unsigned int,
     const unsigned int) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -74,7 +74,7 @@ namespace MeshWorker
     const unsigned int,
     const unsigned int) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 

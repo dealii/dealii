@@ -173,7 +173,7 @@ PolynomialsABF<dim>::n_polynomials(const unsigned int k)
         return 3 * (k + 3) * (k + 1) * (k + 1);
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return 0;

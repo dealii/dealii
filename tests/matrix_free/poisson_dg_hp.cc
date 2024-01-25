@@ -80,7 +80,7 @@ get_penalty_parameter(const unsigned int i,
         return 64.0;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return 0.0;
 }

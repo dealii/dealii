@@ -1279,7 +1279,7 @@ namespace
   {
     // this function catches all the cases not
     // explicitly handled above
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return {};
   }
 
@@ -1396,7 +1396,7 @@ namespace
         return 0.5 * cross_product_3d(v01, v02).norm();
       }
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return 0.0;
   }
 
@@ -1408,7 +1408,7 @@ namespace
   {
     // catch-all for all cases not explicitly
     // listed above
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return std::numeric_limits<double>::quiet_NaN();
   }
 
@@ -1568,7 +1568,7 @@ double
 TriaAccessor<structdim, dim, spacedim>::extent_in_direction(
   const unsigned int /*axis*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return std::numeric_limits<double>::signaling_NaN();
 }
 
@@ -1736,7 +1736,7 @@ bool
 TriaAccessor<0, 1, spacedim>::user_flag_set() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return true;
 }
 
@@ -1747,7 +1747,7 @@ void
 TriaAccessor<0, 1, spacedim>::set_user_flag() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1757,7 +1757,7 @@ void
 TriaAccessor<0, 1, spacedim>::clear_user_flag() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1793,7 +1793,7 @@ void
 TriaAccessor<0, 1, spacedim>::clear_user_data() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1803,7 +1803,7 @@ void
 TriaAccessor<0, 1, spacedim>::set_user_pointer(void *) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1813,7 +1813,7 @@ void
 TriaAccessor<0, 1, spacedim>::clear_user_pointer() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1823,7 +1823,7 @@ void *
 TriaAccessor<0, 1, spacedim>::user_pointer() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return nullptr;
 }
 
@@ -1860,7 +1860,7 @@ void
 TriaAccessor<0, 1, spacedim>::set_user_index(const unsigned int) const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1870,7 +1870,7 @@ void
 TriaAccessor<0, 1, spacedim>::clear_user_index() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1880,7 +1880,7 @@ unsigned int
 TriaAccessor<0, 1, spacedim>::user_index() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
@@ -3109,7 +3109,7 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
             }
 
           // if no reference cell type matches
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return TriaIterator<CellAccessor<dim, spacedim>>();
         }
 
@@ -3459,13 +3459,13 @@ CellAccessor<dim, spacedim>::neighbor_child_on_subface(
             }
 
           // if no reference cell type matches
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return TriaIterator<CellAccessor<dim, spacedim>>();
         }
 
       default:
         // if 1d or more than 3d
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return TriaIterator<CellAccessor<dim, spacedim>>();
     }
 }

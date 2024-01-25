@@ -656,7 +656,7 @@ namespace LinearAlgebra
     SparsityPattern<MemorySpace>::operator=(
       const SparsityPattern<MemorySpace> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return *this;
     }
 
@@ -833,7 +833,7 @@ namespace LinearAlgebra
 #  else
       (void)i;
       (void)j;
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return false;
 #  endif
     }
@@ -1070,7 +1070,7 @@ namespace LinearAlgebra
     std::size_t
     SparsityPattern<MemorySpace>::memory_consumption() const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return 0;
     }
 

@@ -407,7 +407,7 @@ namespace FETools
       const AffineConstraints<PETScWrappers::MPI::BlockVector::value_type> &,
       PETScWrappers::MPI::BlockVector &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 #endif
 

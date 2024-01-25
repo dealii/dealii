@@ -270,7 +270,7 @@ namespace Functions
           return (1. - p[0] * p[0]) * (1. - p[1] * p[1]) * (1. - p[2] * p[2]) +
                  offset;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return 0.;
   }
@@ -301,7 +301,7 @@ namespace Functions
                 offset;
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -323,7 +323,7 @@ namespace Functions
                         (1. - p[1] * p[1]) * (1. - p[2] * p[2]) +
                         (1. - p[2] * p[2]) * (1. - p[0] * p[0]));
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return 0.;
   }
@@ -354,7 +354,7 @@ namespace Functions
                                  (1. - p[2] * p[2]) * (1. - p[0] * p[0]));
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -379,7 +379,7 @@ namespace Functions
           result[2] = -2. * p[2] * (1. - p[0] * p[0]) * (1. - p[1] * p[1]);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return result;
   }
@@ -414,7 +414,7 @@ namespace Functions
                 -2. * p[2] * (1. - p[0] * p[0]) * (1. - p[1] * p[1]);
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -444,7 +444,7 @@ namespace Functions
                  std::cos(numbers::PI_2 * p[1]) *
                  std::cos(numbers::PI_2 * p[2]);
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return 0.;
   }
@@ -500,7 +500,7 @@ namespace Functions
                  std::cos(numbers::PI_2 * p[1]) *
                  std::cos(numbers::PI_2 * p[2]);
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return 0.;
   }
@@ -546,7 +546,7 @@ namespace Functions
                       std::sin(numbers::PI_2 * p[2]);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return result;
   }
@@ -588,7 +588,7 @@ namespace Functions
                 std::cos(numbers::PI_2 * p[1]) * std::sin(numbers::PI_2 * p[2]);
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -642,7 +642,7 @@ namespace Functions
           }
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return result;
   }
@@ -704,7 +704,7 @@ namespace Functions
               }
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -737,7 +737,7 @@ namespace Functions
                   std::cos(numbers::PI_2 * p[d1]) *
                   std::cos(numbers::PI_2 * p[d2]));
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return 0.;
   }
@@ -772,7 +772,7 @@ namespace Functions
                       std::sin(numbers::PI_2 * p[2]);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 
@@ -807,7 +807,7 @@ namespace Functions
                           std::cos(numbers::PI_2 * p[d2]);
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -848,7 +848,7 @@ namespace Functions
                              std::sin(numbers::PI_2 * p[2]);
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -897,7 +897,7 @@ namespace Functions
                        std::sin(numbers::PI_2 * p[d2]);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return result;
   }
@@ -944,7 +944,7 @@ namespace Functions
                            std::sin(numbers::PI_2 * p[d2]);
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -1006,7 +1006,7 @@ namespace Functions
               }
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -1027,7 +1027,7 @@ namespace Functions
         case 3:
           return std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return 0.;
   }
@@ -1056,7 +1056,7 @@ namespace Functions
               values[i] = std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -1074,7 +1074,7 @@ namespace Functions
         case 3:
           return 3 * std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return 0.;
   }
@@ -1103,7 +1103,7 @@ namespace Functions
               values[i] = 3 * std::exp(p[0]) * std::exp(p[1]) * std::exp(p[2]);
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -1128,7 +1128,7 @@ namespace Functions
           result[2] = result[0];
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return result;
   }
@@ -1161,7 +1161,7 @@ namespace Functions
               gradients[i][2] = gradients[i][0];
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -1443,7 +1443,7 @@ namespace Functions
   LSingularityGradFunction::gradient(const Point<2> & /*p*/,
                                      const unsigned int /*component*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return {};
   }
 
@@ -1454,7 +1454,7 @@ namespace Functions
     std::vector<Tensor<1, 2>> & /*gradients*/,
     const unsigned int /*component*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -1463,7 +1463,7 @@ namespace Functions
     const std::vector<Point<2>> & /*points*/,
     std::vector<std::vector<Tensor<1, 2>>> & /*gradients*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
   //--------------------------------------------------------------------
@@ -1813,7 +1813,7 @@ namespace Functions
           angle = std::atan2(direction[0], direction[1]);
           break;
         case 3:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     sine   = std::sin(angle);
     cosine = std::cos(angle);

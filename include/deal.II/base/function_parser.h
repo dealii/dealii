@@ -385,7 +385,7 @@ FunctionParser<dim>::default_variable_names()
       case 3:
         return "x,y,z";
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return "";
 }

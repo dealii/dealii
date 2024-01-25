@@ -694,7 +694,7 @@ LaplaceProblem<dim>::estimate_smoothness(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   const unsigned      n_fourier_modes = k_vectors.size();

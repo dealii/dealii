@@ -142,7 +142,7 @@ FE_NedelecSZ<dim, spacedim>::FE_NedelecSZ(const unsigned int order)
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -168,7 +168,7 @@ FE_NedelecSZ<dim, spacedim>::shape_value_component(
   const unsigned int /*component*/) const
 {
   // Not implemented yet:
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0.;
 }
 
@@ -192,7 +192,7 @@ FE_NedelecSZ<dim, spacedim>::shape_grad_component(
   const Point<dim> & /*p*/,
   const unsigned int /*component*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return Tensor<1, dim>();
 }
 
@@ -216,7 +216,7 @@ FE_NedelecSZ<dim, spacedim>::shape_grad_grad_component(
   const Point<dim> & /*p*/,
   const unsigned int /*component*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return Tensor<2, dim>();
 }
 
@@ -1558,7 +1558,7 @@ FE_NedelecSZ<dim, spacedim>::get_data(
         }
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
     }
   return data_ptr;
@@ -2257,7 +2257,7 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
         }
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -3305,7 +3305,7 @@ FE_NedelecSZ<dim, spacedim>::fill_fe_subface_values(
   dealii::internal::FEValuesImplementation::FiniteElementRelatedData<dim, dim>
     & /*data*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3399,7 +3399,7 @@ FE_NedelecSZ<dim, spacedim>::compute_num_dofs(const unsigned int degree) const
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 0;
         }
     }

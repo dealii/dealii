@@ -1101,7 +1101,7 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
       case ReferenceCells::Hexahedron:
         return {&GeometryInfo<3>::vertex_to_face[vertex][0], 3};
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return {};
@@ -1147,7 +1147,7 @@ ReferenceCell::get_dimension() const
       case ReferenceCells::Hexahedron:
         return 3;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1187,7 +1187,7 @@ ReferenceCell::n_vertices() const
       case ReferenceCells::Hexahedron:
         return 8;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1217,7 +1217,7 @@ ReferenceCell::n_lines() const
       case ReferenceCells::Hexahedron:
         return 12;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1337,10 +1337,10 @@ ReferenceCell::vertex(const unsigned int v) const
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return Point<dim>();
 }
 
@@ -1367,7 +1367,7 @@ ReferenceCell::n_faces() const
       case ReferenceCells::Hexahedron:
         return 6;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1401,14 +1401,14 @@ ReferenceCell::n_isotropic_children() const
       case ReferenceCells::Pyramid:
         // We haven't yet decided how to refine pyramids. Update this when we
         // have
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return numbers::invalid_unsigned_int;
       case ReferenceCells::Wedge:
         return 8;
       case ReferenceCells::Hexahedron:
         return 8;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1469,7 +1469,7 @@ ReferenceCell::face_reference_cell(const unsigned int face_no) const
       case ReferenceCells::Hexahedron:
         return ReferenceCells::Quadrilateral;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return ReferenceCells::Invalid;
@@ -1512,7 +1512,7 @@ ReferenceCell::child_cell_on_face(
       case ReferenceCells::Vertex:
       case ReferenceCells::Line:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           break;
         }
       case ReferenceCells::Triangle:
@@ -1539,7 +1539,7 @@ ReferenceCell::child_cell_on_face(
       case ReferenceCells::Pyramid:
       case ReferenceCells::Wedge:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           break;
         }
       case ReferenceCells::Hexahedron:
@@ -1556,7 +1556,7 @@ ReferenceCell::child_cell_on_face(
             face_rotation);
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1577,7 +1577,7 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
     {
       case ReferenceCells::Vertex:
       case ReferenceCells::Line:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         break;
       case ReferenceCells::Triangle:
         {
@@ -1618,7 +1618,7 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
             vertex);
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return {};
@@ -1639,7 +1639,7 @@ ReferenceCell::standard_line_to_face_and_line_index(
       case ReferenceCells::Triangle:
       case ReferenceCells::Quadrilateral:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           break;
         }
       case ReferenceCells::Tetrahedron:
@@ -1681,7 +1681,7 @@ ReferenceCell::standard_line_to_face_and_line_index(
           return GeometryInfo<3>::standard_hex_line_to_quad_line_index(line);
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return {};
@@ -1763,7 +1763,7 @@ ReferenceCell::line_to_cell_vertices(const unsigned int line,
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1785,7 +1785,7 @@ ReferenceCell::face_to_cell_lines(
     {
       case ReferenceCells::Vertex:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           break;
         }
       case ReferenceCells::Line:
@@ -1849,7 +1849,7 @@ ReferenceCell::face_to_cell_lines(
             face, line, face_orientation, face_flip, face_rotation);
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1878,7 +1878,7 @@ ReferenceCell::face_to_cell_vertices(
     {
       case ReferenceCells::Vertex:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           break;
         }
       case ReferenceCells::Line:
@@ -1950,7 +1950,7 @@ ReferenceCell::face_to_cell_vertices(
             face, vertex, face_orientation, face_flip, face_rotation);
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1982,7 +1982,7 @@ ReferenceCell::standard_to_real_face_vertex(
     {
       case ReferenceCells::Vertex:
       case ReferenceCells::Line:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         break;
       case ReferenceCells::Triangle:
       case ReferenceCells::Quadrilateral:
@@ -2004,10 +2004,10 @@ ReferenceCell::standard_to_real_face_vertex(
       case ReferenceCells::Hexahedron:
         return quadrilateral_vertex_permutations[face_orientation][vertex];
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
 }
 
@@ -2036,7 +2036,7 @@ ReferenceCell::standard_to_real_face_line(
       case ReferenceCells::Line:
       case ReferenceCells::Triangle:
       case ReferenceCells::Quadrilateral:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         break;
       case ReferenceCells::Tetrahedron:
         return triangle_table[combined_face_orientation][line];
@@ -2082,7 +2082,7 @@ ReferenceCell::standard_to_real_face_line(
           return table[combined_face_orientation][line];
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -2107,7 +2107,7 @@ namespace ReferenceCells
         case 3:
           return ReferenceCells::Tetrahedron;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return ReferenceCells::Invalid;
   }
@@ -2129,7 +2129,7 @@ namespace ReferenceCells
         case 3:
           return ReferenceCells::Hexahedron;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return ReferenceCells::Invalid;
   }
@@ -2258,7 +2258,7 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
                  .d_linear_shape_function<1>(Point<1>(xi[std::min(2, dim - 1)]),
                                              i / 3);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return 0.0;
@@ -2293,7 +2293,7 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim>  &xi,
               Assert(false, ExcInternalError());
           }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return Point<dim>(+0.0, +0.0, +0.0);
@@ -2323,7 +2323,7 @@ ReferenceCell::volume() const
       case ReferenceCells::Hexahedron:
         return 1;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return 0.0;
@@ -2356,7 +2356,7 @@ ReferenceCell::barycenter() const
       case ReferenceCells::Hexahedron:
         return Point<dim>(1. / 2., 1. / 2., 1. / 2.);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return Point<dim>();
@@ -2465,7 +2465,7 @@ ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
           return true;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return false;
@@ -2545,7 +2545,7 @@ ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
           return table[face_no][i];
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -2578,7 +2578,7 @@ ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
                               unit_tangential_vectors<dim>(face_no, 1));
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return {};
 }
@@ -2865,7 +2865,7 @@ ReferenceCell::get_combined_orientation(
           return 6;
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
@@ -2922,7 +2922,7 @@ ReferenceCell::permute_by_combined_orientation(
             case 0:
               return {vertices[1], vertices[0]};
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         break;
       case ReferenceCells::Triangle:
@@ -2941,7 +2941,7 @@ ReferenceCell::permute_by_combined_orientation(
             case 4:
               return {vertices[1], vertices[0], vertices[2]};
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         break;
       case ReferenceCells::Quadrilateral:
@@ -2964,7 +2964,7 @@ ReferenceCell::permute_by_combined_orientation(
             case 6:
               return {vertices[1], vertices[0], vertices[3], vertices[2]};
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         break;
       default:

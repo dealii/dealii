@@ -203,7 +203,7 @@ FE_Nedelec<dim>::FE_Nedelec(const unsigned int order)
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   // We need to initialize the dof permutation table and the one for the sign
@@ -266,7 +266,7 @@ template <>
 void
 FE_Nedelec<1>::initialize_support_points(const unsigned int)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -2049,7 +2049,7 @@ FE_Nedelec<dim>::initialize_restriction()
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -2139,7 +2139,7 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
 
             default:
               {
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
                 return false;
               }
           }
@@ -2318,14 +2318,14 @@ FE_Nedelec<dim>::has_support_on_face(const unsigned int shape_index,
 
             default:
               {
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
                 return false;
               }
           }
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return false;
         }
     }
@@ -2363,7 +2363,7 @@ FE_Nedelec<dim>::compare_for_domination(const FiniteElement<dim> &fe_other,
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -2420,7 +2420,7 @@ FE_Nedelec<dim>::hp_line_dof_identities(
 
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -2467,7 +2467,7 @@ FE_Nedelec<dim>::hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
 
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -2565,7 +2565,7 @@ FE_Nedelec<1>::get_subface_interpolation_matrix(const FiniteElement<1, 1> &,
                                                 FullMatrix<double> &,
                                                 const unsigned int) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3021,7 +3021,7 @@ FE_Nedelec<dim>::get_subface_interpolation_matrix(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -4090,7 +4090,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -4116,7 +4116,7 @@ template <int dim>
 std::size_t
 FE_Nedelec<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
@@ -4173,7 +4173,7 @@ FE_Nedelec<dim>::get_embedding_dofs(const unsigned int sub_degree) const
           return embedding_dofs;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return std::vector<unsigned int>();
     }
 }

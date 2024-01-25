@@ -64,7 +64,7 @@ public:
           v(2) = p[2];
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 };

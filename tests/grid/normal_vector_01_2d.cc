@@ -50,7 +50,7 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     };
 }
 

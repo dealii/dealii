@@ -425,7 +425,7 @@ namespace Step7
 
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
       }
   }
@@ -549,7 +549,7 @@ namespace Step7
           vtk_filename = "solution-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     switch (fe->degree)
@@ -562,7 +562,7 @@ namespace Step7
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     vtk_filename += ".vtk";
@@ -611,7 +611,7 @@ namespace Step7
           error_filename += "-adaptive";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     switch (fe->degree)
@@ -623,7 +623,7 @@ namespace Step7
           error_filename += "-q2";
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     error_filename += ".tex";
@@ -664,7 +664,7 @@ namespace Step7
               conv_filename += "-adaptive";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         switch (fe->degree)
           {
@@ -675,7 +675,7 @@ namespace Step7
               conv_filename += "-q2";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         conv_filename += ".tex";
 

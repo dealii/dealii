@@ -102,7 +102,7 @@ template <typename PolynomialType, int dim, int spacedim>
 std::size_t
 FE_DGVector<PolynomialType, dim, spacedim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

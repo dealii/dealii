@@ -94,7 +94,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::invert_diagblocks()
 {
   if (this->same_diagonal())
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
   else
     {
@@ -169,7 +169,7 @@ RelaxationBlock<MatrixType, InverseNumberType, VectorType>::block_kernel(
                 this->additional_data->threshold);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }

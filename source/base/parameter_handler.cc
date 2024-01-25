@@ -1370,7 +1370,7 @@ ParameterHandler::print_parameters(std::ostream     &out,
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
   // dive recursively into the subsections
@@ -1682,7 +1682,7 @@ ParameterHandler::recursively_print_parameters(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -1740,7 +1740,7 @@ ParameterHandler::recursively_print_parameters(
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
 
         // then the contents of the subsection
@@ -1780,7 +1780,7 @@ ParameterHandler::recursively_print_parameters(
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
       }
 }

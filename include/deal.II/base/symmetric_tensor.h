@@ -2084,7 +2084,7 @@ namespace internal
     component_to_unrolled_index(const TableIndices<rank_> &indices)
     {
       (void)indices;
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return numbers::invalid_unsigned_int;
     }
   } // namespace SymmetricTensorImplementation
@@ -2150,7 +2150,7 @@ namespace internal
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // The code should never reach here.
@@ -2198,7 +2198,7 @@ namespace internal
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // The code should never reach here.
@@ -2569,7 +2569,7 @@ namespace internal
                       0,
                       dealii::SymmetricTensor<rank_, dim, double>::
                         n_independent_components));
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return TableIndices<rank_>();
     }
 
@@ -2742,7 +2742,7 @@ determinant(const SymmetricTensor<2, dim, Number> &t)
                   t.data[2] * t.data[3] * t.data[3]);
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return internal::NumberType<Number>::value(0.0);
     }
 }

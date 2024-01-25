@@ -1435,7 +1435,7 @@ namespace GridGenerator
           Assert(count == 48, ExcInternalError());
         }
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -1578,7 +1578,7 @@ namespace GridGenerator
 
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // Prepare cell data
@@ -1723,7 +1723,7 @@ namespace GridGenerator
           cells[3].material_id = 0;
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     tria.create_triangulation(points, cells, SubCellData());
   }
@@ -2148,7 +2148,7 @@ namespace GridGenerator
                 const Point<3> (& /*corners*/)[3],
                 const bool /*colorize*/)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
   template <>
@@ -2157,7 +2157,7 @@ namespace GridGenerator
                 const Point<1> (& /*corners*/)[1],
                 const bool /*colorize*/)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
   // Implementation for 2d only
@@ -2367,7 +2367,7 @@ namespace GridGenerator
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // Prepare cell data
@@ -2448,7 +2448,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // Create triangulation
@@ -2557,7 +2557,7 @@ namespace GridGenerator
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // next create the cells
@@ -2620,7 +2620,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     tria.create_triangulation(points, cells, SubCellData());
@@ -2773,7 +2773,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // next create the cells
@@ -2841,7 +2841,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     tria.create_triangulation(points, cells, SubCellData());
@@ -2926,7 +2926,7 @@ namespace GridGenerator
 
     // set boundary indicator
     if (colorize)
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3184,7 +3184,7 @@ namespace GridGenerator
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // next create the cells
@@ -3242,7 +3242,7 @@ namespace GridGenerator
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     tria.create_triangulation(points, cells, SubCellData());
@@ -3266,7 +3266,7 @@ namespace GridGenerator
                     const unsigned int /*n_slices*/,
                     const bool /*colorize*/)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3279,7 +3279,7 @@ namespace GridGenerator
                         const double /*skewness*/,
                         const bool /*colorize*/)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3904,7 +3904,7 @@ namespace GridGenerator
   void
   hyper_cube_slit(Triangulation<1> &, const double, const double, const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3917,7 +3917,7 @@ namespace GridGenerator
                       const double,
                       const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3926,7 +3926,7 @@ namespace GridGenerator
   void
   hyper_L(Triangulation<1> &, const double, const double, const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3935,7 +3935,7 @@ namespace GridGenerator
   void
   hyper_ball(Triangulation<1> &, const Point<1> &, const double, const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3944,7 +3944,7 @@ namespace GridGenerator
   void
   hyper_ball_balanced(Triangulation<1> &, const Point<1> &, const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3953,7 +3953,7 @@ namespace GridGenerator
   void
   cylinder(Triangulation<1> &, const double, const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3964,7 +3964,7 @@ namespace GridGenerator
                       const double,
                       const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3973,7 +3973,7 @@ namespace GridGenerator
   void
   truncated_cone(Triangulation<1> &, const double, const double, const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -3987,7 +3987,7 @@ namespace GridGenerator
               const unsigned int,
               const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
   template <>
@@ -3999,7 +3999,7 @@ namespace GridGenerator
                  const unsigned int,
                  const unsigned int)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -4007,7 +4007,7 @@ namespace GridGenerator
   void
   quarter_hyper_ball(Triangulation<1> &, const Point<1> &, const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -4015,7 +4015,7 @@ namespace GridGenerator
   void
   half_hyper_ball(Triangulation<1> &, const Point<1> &, const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -4028,7 +4028,7 @@ namespace GridGenerator
                    const unsigned int,
                    const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
   template <>
@@ -4040,7 +4040,7 @@ namespace GridGenerator
                       const unsigned int,
                       const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
   template <>
@@ -4504,7 +4504,7 @@ namespace GridGenerator
                       const double,
                       const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -4519,7 +4519,7 @@ namespace GridGenerator
                  const unsigned int,
                  const unsigned int)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -5043,7 +5043,7 @@ namespace GridGenerator
 
     if (colorize)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
   }
 
@@ -7258,7 +7258,7 @@ namespace GridGenerator
                                    const unsigned int,
                                    const bool)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -8123,7 +8123,7 @@ namespace GridGenerator
             }
           else
             {
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
             }
         };
 
@@ -8173,7 +8173,7 @@ namespace GridGenerator
                        manifold_id_cell);
           }
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
 
         // Set up sub-cell data.
         for (const auto f : cell->face_indices())
@@ -8202,7 +8202,7 @@ namespace GridGenerator
                   add_cell(1, edge_vertices, bid, mid);
               }
             else
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
 
         // set manifold ids of edges that were already present in the

@@ -301,7 +301,7 @@ namespace Step8
           solution_names.emplace_back("z_displacement");
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     data_out.add_data_vector(solution, solution_names);

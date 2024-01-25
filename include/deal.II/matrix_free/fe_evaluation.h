@@ -4747,7 +4747,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                   (jac[1][1] * jac[2][2]);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
           for (unsigned int d = 0; d < dim; ++d)
             for (unsigned int e = d + 1; e < dim; ++e)
@@ -6190,7 +6190,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::
         symmetrized[5] *= half;
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return SymmetricTensor<2, dim, VectorizedArrayType>(symmetrized);
 }
@@ -6222,7 +6222,7 @@ inline DEAL_II_ALWAYS_INLINE
         curl[2] = grad[1][0] - grad[0][1];
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return curl;
 }
@@ -6731,7 +6731,7 @@ FEEvaluationAccess<dim, dim, Number, is_face, VectorizedArrayType>::submit_curl(
         grad[0][1] = -curl[2];
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   submit_gradient(grad, q_point);
 }

@@ -161,7 +161,7 @@ MappingManifold<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
   const Point<spacedim> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -685,7 +685,7 @@ namespace internal
                           cross_product_3d(data.aux[0][i], data.aux[1][i]);
                         break;
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
               }
             else //(dim < spacedim)
@@ -732,7 +732,7 @@ namespace internal
                           }
 
                         default:
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_NOT_IMPLEMENTED();
                       }
                   }
               }
@@ -886,7 +886,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -987,7 +987,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -1156,7 +1156,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -1195,7 +1195,7 @@ namespace internal
                 return;
               }
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
     } // namespace
@@ -1331,7 +1331,7 @@ MappingManifold<dim, spacedim>::transform(
           input, mapping_kind, mapping_data, output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1380,7 +1380,7 @@ MappingManifold<dim, spacedim>::transform(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1403,7 +1403,7 @@ MappingManifold<dim, spacedim>::transform(
           input, mapping_kind, mapping_data, output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

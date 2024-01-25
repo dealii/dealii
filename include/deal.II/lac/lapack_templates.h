@@ -1409,7 +1409,7 @@ axpy(const dealii::types::blas_int *,
      number3 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1528,7 +1528,7 @@ geev(const char *,
      const dealii::types::blas_int *,
      dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1728,7 +1728,7 @@ geevx(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -2068,7 +2068,7 @@ gelsd(const dealii::types::blas_int *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -2257,7 +2257,7 @@ gemm(const char *,
      number5 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -2432,7 +2432,7 @@ gemv(const char *,
      number5 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -2584,7 +2584,7 @@ geqrf(const dealii::types::blas_int *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -2718,7 +2718,7 @@ gesdd(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -2908,7 +2908,7 @@ gesvd(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3086,7 +3086,7 @@ getrf(const dealii::types::blas_int *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3193,7 +3193,7 @@ getri(const dealii::types::blas_int *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3310,7 +3310,7 @@ getrs(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3439,7 +3439,7 @@ template <typename number1>
 inline number1
 lamch(const char *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return number1();
 }
 
@@ -3484,7 +3484,7 @@ lange(const char *,
       const dealii::types::blas_int *,
       number2 *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return number1();
 }
 
@@ -3595,7 +3595,7 @@ lansy(const char *,
       const dealii::types::blas_int *,
       number2 *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return number1();
 }
 
@@ -3710,7 +3710,7 @@ lascl(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3855,7 +3855,7 @@ orgqr(const dealii::types::blas_int *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3939,7 +3939,7 @@ ormqr(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -4035,7 +4035,7 @@ pocon(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -4168,7 +4168,7 @@ potrf(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -4265,7 +4265,7 @@ potri(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -4365,7 +4365,7 @@ potrs(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -4492,7 +4492,7 @@ stev(const char *,
      number4 *,
      dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -4563,7 +4563,7 @@ syev(const char *,
      const dealii::types::blas_int *,
      dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -4658,7 +4658,7 @@ syevr(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -4862,7 +4862,7 @@ syevx(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -5027,7 +5027,7 @@ sygv(const dealii::types::blas_int *,
      const dealii::types::blas_int *,
      dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -5137,7 +5137,7 @@ sygvx(const dealii::types::blas_int *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -5312,7 +5312,7 @@ syr(const char *,
     number3 *,
     const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -5383,7 +5383,7 @@ syrk(const char *,
      number4 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -5529,7 +5529,7 @@ trcon(const char *,
       dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -5673,7 +5673,7 @@ trmv(const char *,
      number2 *,
      const dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -5799,7 +5799,7 @@ trtrs(const char *,
       const dealii::types::blas_int *,
       dealii::types::blas_int *)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

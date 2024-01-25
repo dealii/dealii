@@ -793,7 +793,7 @@ namespace internal
               P8EST_QUADRANT_INIT(&p4est_children[c]);
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
 
 
@@ -813,7 +813,7 @@ namespace internal
             P8EST_QUADRANT_INIT(&quad);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       functions<dim>::quadrant_set_morton(&quad,
                                           /*level=*/0,

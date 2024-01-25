@@ -503,7 +503,7 @@ namespace DerivativeApproximation
       // needs to be employed. maybe some
       // steps of the power method would
       // suffice?
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return 0;
     }
 

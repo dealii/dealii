@@ -449,7 +449,7 @@ namespace internal
         }
       else
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
     }
   };
@@ -1689,7 +1689,7 @@ namespace internal
                 }
               else
                 {
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
                 }
             }
 

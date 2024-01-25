@@ -865,7 +865,7 @@ DataOut<dim, spacedim>::build_one_patch(
                                   }
 
                                 default:
-                                  Assert(false, ExcNotImplemented());
+                                  DEAL_II_NOT_IMPLEMENTED();
                               }
                           }
                       }
@@ -948,7 +948,7 @@ DataOut<dim, spacedim>::build_one_patch(
                                   }
 
                                 default:
-                                  Assert(false, ExcNotImplemented());
+                                  DEAL_II_NOT_IMPLEMENTED();
                               }
                           }
                       }

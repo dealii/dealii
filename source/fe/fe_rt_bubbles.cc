@@ -237,7 +237,7 @@ FE_RT_Bubbles<dim>::initialize_support_points(const unsigned int deg)
                                                   ((d == 2) ? low : high));
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       for (unsigned int k = 0; k < quadrature->size(); ++k)

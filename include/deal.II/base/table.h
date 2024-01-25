@@ -2533,7 +2533,7 @@ namespace internal
     void
     fill_Fortran_style(InputIterator, TableBase<N, T> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
   } // namespace TableImplementation
 } // namespace internal

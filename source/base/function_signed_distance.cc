@@ -160,7 +160,7 @@ namespace Functions
       else if (dim == 2)
         return compute_signed_distance_ellipse(point);
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
       return 0.0;
     }

@@ -88,7 +88,7 @@ test()
         coarsen_centers.push_back(Point<dim>(5. / 8., 5. / 8., 5. / 8.));
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     unsigned int index = 0;
     for (typename Triangulation<dim>::active_cell_iterator cell =

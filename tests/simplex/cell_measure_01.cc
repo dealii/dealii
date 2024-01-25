@@ -83,7 +83,7 @@ template <int dim>
 void
 test()
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 template <>

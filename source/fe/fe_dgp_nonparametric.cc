@@ -545,7 +545,7 @@ FE_DGPNonparametric<dim, spacedim>::hp_vertex_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -564,7 +564,7 @@ FE_DGPNonparametric<dim, spacedim>::hp_line_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -584,7 +584,7 @@ FE_DGPNonparametric<dim, spacedim>::hp_quad_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -631,7 +631,7 @@ FE_DGPNonparametric<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -652,7 +652,7 @@ template <int dim, int spacedim>
 std::size_t
 FE_DGPNonparametric<dim, spacedim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

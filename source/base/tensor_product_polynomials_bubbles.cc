@@ -99,7 +99,7 @@ double
 TensorProductPolynomialsBubbles<0>::compute_value(const unsigned int,
                                                   const Point<0> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0.;
 }
 

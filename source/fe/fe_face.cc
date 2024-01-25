@@ -356,7 +356,7 @@ FE_FaceQ<dim, spacedim>::hp_line_dof_identities(
         }
       else
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return std::vector<std::pair<unsigned int, unsigned int>>();
         }
     }
@@ -435,7 +435,7 @@ FE_FaceQ<dim, spacedim>::hp_quad_dof_identities(
         }
       else
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return std::vector<std::pair<unsigned int, unsigned int>>();
         }
     }
@@ -476,7 +476,7 @@ FE_FaceQ<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -861,7 +861,7 @@ FE_FaceP<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 

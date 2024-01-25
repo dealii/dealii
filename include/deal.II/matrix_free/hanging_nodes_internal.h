@@ -682,10 +682,10 @@ namespace internal
               case 2:
                 return n_dofs_1d * n_dofs_1d * offset + n_dofs_1d * i + j;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
 
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
         return 0;
       };
@@ -768,7 +768,7 @@ namespace internal
                     }
                   else
                     {
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
                     }
 
                   // update DoF map

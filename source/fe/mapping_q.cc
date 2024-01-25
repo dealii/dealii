@@ -462,7 +462,7 @@ MappingQ<1, 3>::transform_real_to_unit_cell_internal(
   const Point<3> &,
   const Point<1> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -1370,7 +1370,7 @@ MappingQ<dim, spacedim>::transform(
                                                               output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1422,7 +1422,7 @@ MappingQ<dim, spacedim>::transform(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1447,7 +1447,7 @@ MappingQ<dim, spacedim>::transform(
                                                              output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1719,7 +1719,7 @@ MappingQ<dim, spacedim>::compute_mapping_support_points(
               break;
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
               break;
           }
     }

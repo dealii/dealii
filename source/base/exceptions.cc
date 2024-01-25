@@ -187,7 +187,7 @@ ExceptionBase::print_exc_data(std::ostream &out) const
 
   // If the exception stores a string representation of the violated
   // condition, then output it. Not all exceptions do (e.g., when
-  // creating an exception inside DEAL_II_NOT_IMPLEMENTED()), so
+  // creating an exception inside DEAL_II_NOT_IMPLEMENTED();), so
   // we have to check whether there is anything to print.
   if (cond != nullptr)
     out << "The violated condition was: " << std::endl

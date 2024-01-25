@@ -106,7 +106,7 @@ namespace LocalIntegrators
             result[2] = h0[2][0] + h1[2][1] - h2[0][0] - h2[1][1];
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       return result;
     }
@@ -145,7 +145,7 @@ namespace LocalIntegrators
               normal[1] * (g1[0] - g2[1]) + normal[0] * (g0[2] - g2[0]);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       return result;
     }

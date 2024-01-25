@@ -512,7 +512,7 @@ namespace internal
           }
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return std::numeric_limits<double>::lowest();
           }
       }
@@ -556,7 +556,7 @@ namespace internal
           }
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return std::numeric_limits<double>::lowest();
           }
       }
@@ -602,7 +602,7 @@ namespace internal
           }
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return std::numeric_limits<double>::lowest();
           }
       }
@@ -637,7 +637,7 @@ namespace internal
           }
         default:
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return std::numeric_limits<double>::lowest();
           }
       }

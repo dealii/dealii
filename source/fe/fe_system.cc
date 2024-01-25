@@ -1718,7 +1718,7 @@ FESystem<dim, spacedim>::build_interface_constraints()
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
 
         // now that we gathered all information: use it to build the
@@ -2356,7 +2356,7 @@ FESystem<dim, spacedim>::hp_object_dof_identities(
                   base.hp_quad_dof_identities(base_other, face_no);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
 
           for (const auto &base_identity : base_identities)
@@ -2404,7 +2404,7 @@ FESystem<dim, spacedim>::hp_object_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -2484,7 +2484,7 @@ FESystem<dim, spacedim>::compare_for_domination(
       return domination;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 

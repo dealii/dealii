@@ -28,7 +28,7 @@ print_type(const Tensor<2, dim, number> &)
   else if (std::is_same_v<number, double>)
     deallog << " Tensor<2, " << dim << ", double>" << std::endl;
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 template <int dim, typename number>

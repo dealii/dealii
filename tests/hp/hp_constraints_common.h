@@ -310,7 +310,7 @@ test_with_2d_deformed_refined_mesh(const hp::FECollection<dim> &fe)
             (std::next((++(triangulation.begin_active()))))->set_refine_flag();
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       triangulation.execute_coarsening_and_refinement();
 

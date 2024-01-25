@@ -544,7 +544,7 @@ namespace NavierStokes_DG
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 #else
     (void)subcommunicator;

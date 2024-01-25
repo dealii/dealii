@@ -1406,7 +1406,7 @@ namespace DoFRenumbering
                                                   renumbering);
           }
 #else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 #endif
       }
     else

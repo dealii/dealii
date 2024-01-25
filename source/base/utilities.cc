@@ -876,7 +876,7 @@ namespace Utilities
           return std::make_pair(i, 7U);
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return std::make_pair(-1, numbers::invalid_unsigned_int);
           }
       }

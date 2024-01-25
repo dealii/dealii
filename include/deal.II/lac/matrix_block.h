@@ -869,7 +869,7 @@ MatrixBlockVector<MatrixType>::clear(bool really_clean)
 {
   if (really_clean)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
   else
     {
@@ -1121,7 +1121,7 @@ MGMatrixBlockVector<MatrixType>::clear(bool really_clean)
 {
   if (really_clean)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
   else
     {

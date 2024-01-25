@@ -38,5 +38,5 @@ main(int argc, char **argv)
   else if (typeid(TrilinosScalar) == typeid(float))
     deallog << "float" << std::endl;
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }

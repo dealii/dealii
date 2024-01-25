@@ -252,7 +252,7 @@ template <int dim>
 void
 FE_DGPMonomial<dim>::initialize_restriction()
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -351,7 +351,7 @@ FE_DGPMonomial<dim>::hp_vertex_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -369,7 +369,7 @@ FE_DGPMonomial<dim>::hp_line_dof_identities(
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -387,7 +387,7 @@ FE_DGPMonomial<dim>::hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
     return std::vector<std::pair<unsigned int, unsigned int>>();
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -433,7 +433,7 @@ FE_DGPMonomial<dim>::compare_for_domination(const FiniteElement<dim> &fe_other,
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -504,7 +504,7 @@ template <int dim>
 std::size_t
 FE_DGPMonomial<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

@@ -268,7 +268,7 @@ FE_Q<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::neither_element_dominates;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 

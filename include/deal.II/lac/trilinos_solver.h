@@ -1145,7 +1145,7 @@ namespace TrilinosWrappers
                      Teuchos::SerialDenseMatrix<int, value_type> &,
                      const bool = false)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
       virtual int
@@ -1153,7 +1153,7 @@ namespace TrilinosWrappers
         Teuchos::SerialDenseMatrix<int, value_type> &,
         const typename Teuchos::ScalarTraits<value_type>::magnitudeType &)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
 #      endif

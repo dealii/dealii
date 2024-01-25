@@ -844,7 +844,7 @@ PolynomialsRT_Bubbles<dim>::n_polynomials(const unsigned int k)
   if (dim == 1 || dim == 2 || dim == 3)
     return dim * Utilities::fixed_power<dim>(k + 1);
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

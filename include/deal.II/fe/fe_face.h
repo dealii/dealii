@@ -375,7 +375,7 @@ protected:
     if (data_ptr->update_each & update_gradients ||
         data_ptr->update_each & update_hessians)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
     return data_ptr;

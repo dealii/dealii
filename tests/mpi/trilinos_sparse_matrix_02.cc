@@ -55,7 +55,7 @@ test()
         locally_owned.add_range(2, n_rows);
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
   TrilinosWrappers::SparsityPattern sp(locally_owned,
                                        locally_owned,

@@ -3001,7 +3001,7 @@ template <int dim>
 inline Point<dim>
 GeometryInfo<dim>::unit_cell_vertex(const unsigned int)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return {};
 }
@@ -3049,7 +3049,7 @@ template <int dim>
 inline unsigned int
 GeometryInfo<dim>::child_cell_from_point(const Point<dim> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return 0;
 }
@@ -3188,7 +3188,7 @@ GeometryInfo<dim>::cell_to_child_coordinates(
   const RefinementCase<dim> /*refine_case*/)
 
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -3324,7 +3324,7 @@ GeometryInfo<dim>::child_to_cell_coordinates(
   const unsigned int /*child_index*/,
   const RefinementCase<dim> /*refine_case*/)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -3334,7 +3334,7 @@ template <int dim>
 inline bool
 GeometryInfo<dim>::is_inside_unit_cell(const Point<dim> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return false;
 }
 
@@ -3370,7 +3370,7 @@ template <int dim>
 inline bool
 GeometryInfo<dim>::is_inside_unit_cell(const Point<dim> &, const double)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return false;
 }
 
@@ -3457,7 +3457,7 @@ template <>
 inline unsigned int
 GeometryInfo<4>::line_to_cell_vertices(const unsigned int, const unsigned int)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
 }
 
@@ -3543,7 +3543,7 @@ template <int dim>
 inline unsigned int
 GeometryInfo<dim>::n_subfaces(const internal::SubfaceCase<dim> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
@@ -3580,7 +3580,7 @@ inline double
 GeometryInfo<dim>::subface_ratio(const internal::SubfaceCase<dim> &,
                                  const unsigned int)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0.;
 }
 
@@ -3699,7 +3699,7 @@ RefinementCase<dim - 1> inline GeometryInfo<dim>::face_refinement_case(
   const bool,
   const bool)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return RefinementCase<dim - 1>::no_refinement;
 }
 
@@ -3837,7 +3837,7 @@ inline RefinementCase<1>
 GeometryInfo<dim>::line_refinement_case(const RefinementCase<dim> &,
                                         const unsigned int)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return RefinementCase<1>::no_refinement;
 }
 
@@ -3915,7 +3915,7 @@ GeometryInfo<dim>::min_cell_refinement_case_for_face_refinement(
   const bool,
   const bool)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return RefinementCase<dim>::no_refinement;
 }
@@ -4021,7 +4021,7 @@ inline RefinementCase<dim>
 GeometryInfo<dim>::min_cell_refinement_case_for_line_refinement(
   const unsigned int)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return RefinementCase<dim>::no_refinement;
 }
@@ -4202,7 +4202,7 @@ GeometryInfo<dim>::standard_to_real_face_line(const unsigned int line,
                                               const bool,
                                               const bool)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return line;
 }
 
@@ -4223,7 +4223,7 @@ inline unsigned int
 GeometryInfo<dim>::standard_to_real_line_vertex(const unsigned int vertex,
                                                 const bool)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return vertex;
 }
 
@@ -4244,7 +4244,7 @@ inline std::array<unsigned int, 2>
 GeometryInfo<dim>::standard_quad_vertex_to_line_vertex_index(
   const unsigned int vertex)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   (void)vertex;
   return {{0, 0}};
 }
@@ -4285,7 +4285,7 @@ template <int dim>
 inline std::array<unsigned int, 2>
 GeometryInfo<dim>::standard_hex_line_to_quad_line_index(const unsigned int line)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   (void)line;
   return {{0, 0}};
 }
@@ -4312,7 +4312,7 @@ inline std::array<unsigned int, 2>
 GeometryInfo<dim>::standard_hex_vertex_to_quad_vertex_index(
   const unsigned int vertex)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   (void)vertex;
   return {{0, 0}};
 }
@@ -4380,7 +4380,7 @@ GeometryInfo<dim>::real_to_standard_face_line(const unsigned int line,
                                               const bool,
                                               const bool)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return line;
 }
 
@@ -4678,7 +4678,7 @@ GeometryInfo<4>::child_cell_on_face(const RefinementCase<4> &,
                                     const bool,
                                     const RefinementCase<3> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
 }
 
@@ -4733,7 +4733,7 @@ GeometryInfo<0>::face_to_cell_lines(const unsigned int,
                                     const bool,
                                     const bool)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
 }
 
@@ -4747,7 +4747,7 @@ GeometryInfo<dim>::face_to_cell_lines(const unsigned int,
                                       const bool,
                                       const bool)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
 }
 
@@ -4778,7 +4778,7 @@ GeometryInfo<0>::face_to_cell_vertices(const unsigned int,
                                        const bool,
                                        const bool)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
 }
 
@@ -4883,7 +4883,7 @@ GeometryInfo<dim>::d_linear_shape_function(const Point<dim>  &xi,
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return -1e9;
 }
@@ -4977,7 +4977,7 @@ inline Tensor<1, dim>
 GeometryInfo<dim>::d_linear_shape_function_gradient(const Point<dim> &,
                                                     const unsigned int)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return Tensor<1, dim>();
 }
 

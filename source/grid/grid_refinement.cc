@@ -436,7 +436,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction(
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         break;
     }
 }

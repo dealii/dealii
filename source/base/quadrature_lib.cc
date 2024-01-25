@@ -217,7 +217,7 @@ namespace internal
             q_points[7] = 0.977520613561287499;
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             break;
         }
       return q_points;
@@ -624,7 +624,7 @@ QGaussLog<1>::get_quadrature_points(const unsigned int n)
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         break;
     }
 
@@ -756,7 +756,7 @@ QGaussLog<1>::get_quadrature_weights(const unsigned int n)
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         break;
     }
 
@@ -1903,7 +1903,7 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
                 }
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         break;
       case 2:
@@ -2160,7 +2160,7 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
                 }
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         break;
       case 6:
@@ -2251,7 +2251,7 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
           }
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   Assert(b_point_permutations.size() == b_weights.size(), ExcInternalError());
@@ -2342,7 +2342,7 @@ QIteratedSimplex<dim>::QIteratedSimplex(const Quadrature<dim> &base_quad,
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

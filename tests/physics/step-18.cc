@@ -531,7 +531,7 @@ namespace Step18
           solution_names.push_back("delta_z");
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     data_out.add_data_vector(incremental_displacement, solution_names);
     Vector<double> norm_of_stress(triangulation.n_active_cells());

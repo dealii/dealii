@@ -113,7 +113,7 @@ namespace internal
                          (vertices[2] - vertices[5]).norm(),
                          (vertices[3] - vertices[4]).norm()});
 
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return -1e10;
     }
   } // namespace TriaAccessorImplementation
@@ -935,7 +935,7 @@ namespace internal
       {
         // it seems like we don't need this
         // one
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
 
@@ -1572,7 +1572,7 @@ TriaAccessor<structdim, dim, spacedim>::isotropic_child_index(
         }
 
       case 3:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return -1;
 }
@@ -1694,7 +1694,7 @@ TriaAccessor<structdim, dim, spacedim>::isotropic_child(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   // we don't get here but have to return
   // something...
@@ -2099,7 +2099,7 @@ TriaAccessor<structdim, dim, spacedim>::set_all_boundary_ids(
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -2176,7 +2176,7 @@ TriaAccessor<structdim, dim, spacedim>::set_all_manifold_ids(
           this->line(i)->set_manifold_id(manifold_ind);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -2302,7 +2302,7 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return std::pair<Point<spacedim>, double>();
     }
 
@@ -2365,7 +2365,7 @@ TriaAccessor<structdim, dim, spacedim>::minimum_vertex_distance() const
           return std::sqrt(min);
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return -1e10;
     }
 }
@@ -3009,7 +3009,7 @@ template <int spacedim>
 inline void
 TriaAccessor<0, 1, spacedim>::operator++() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3017,7 +3017,7 @@ template <int spacedim>
 inline void
 TriaAccessor<0, 1, spacedim>::operator--() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

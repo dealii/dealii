@@ -913,7 +913,7 @@ FiniteElement<dim, spacedim>::interface_constraints_size() const
                   4 * this->n_dofs_per_quad(face_no),
                 this->n_dofs_per_face(face_no)};
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return {numbers::invalid_unsigned_int, numbers::invalid_unsigned_int};
 }
@@ -976,7 +976,7 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FiniteElement<dim, spacedim>::hp_vertex_dof_identities(
   const FiniteElement<dim, spacedim> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return std::vector<std::pair<unsigned int, unsigned int>>();
 }
 
@@ -987,7 +987,7 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FiniteElement<dim, spacedim>::hp_line_dof_identities(
   const FiniteElement<dim, spacedim> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return std::vector<std::pair<unsigned int, unsigned int>>();
 }
 
@@ -999,7 +999,7 @@ FiniteElement<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &,
   const unsigned int) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return std::vector<std::pair<unsigned int, unsigned int>>();
 }
 
@@ -1011,7 +1011,7 @@ FiniteElement<dim, spacedim>::compare_for_domination(
   const FiniteElement<dim, spacedim> &,
   const unsigned int) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -1212,7 +1212,7 @@ template <int dim, int spacedim>
 std::pair<Table<2, bool>, std::vector<unsigned int>>
 FiniteElement<dim, spacedim>::get_constant_modes() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return std::pair<Table<2, bool>, std::vector<unsigned int>>(
     Table<2, bool>(this->n_components(), this->n_dofs_per_cell()),
     std::vector<unsigned int>(this->n_components()));
@@ -1233,7 +1233,7 @@ FiniteElement<dim, spacedim>::
                     "the glossary for a definition of generalized support "
                     "points). Consequently, the current function can not "
                     "be defined and is not implemented by the element."));
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

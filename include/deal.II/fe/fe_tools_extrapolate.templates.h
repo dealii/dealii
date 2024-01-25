@@ -57,7 +57,7 @@ namespace FETools
     public:
       ExtrapolateImplementation()
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       };
 
       template <class InVector>
@@ -66,7 +66,7 @@ namespace FETools
                            const DoFHandler<dim, spacedim> & /*dof2*/,
                            OutVector & /*u2*/)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
     };
 
@@ -1571,7 +1571,7 @@ namespace FETools
     void
     reinit_ghosted(const DH & /*dh*/, VectorType & /*vector*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 #ifdef DEAL_II_WITH_PETSC

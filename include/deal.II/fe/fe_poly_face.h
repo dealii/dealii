@@ -161,7 +161,7 @@ protected:
     if (data.update_each & update_gradients ||
         data.update_each & update_hessians)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
     return data_ptr;

@@ -583,7 +583,7 @@ GridOut::default_suffix(const OutputFormat output_format)
       case vtu:
         return ".vtu";
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return "";
     }
 }
@@ -758,21 +758,21 @@ template <>
 void
 GridOut::write_dx(const Triangulation<1> &, std::ostream &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 template <>
 void
 GridOut::write_dx(const Triangulation<1, 2> &, std::ostream &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 template <>
 void
 GridOut::write_dx(const Triangulation<1, 3> &, std::ostream &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -1096,7 +1096,7 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
           else if (cell->reference_cell() == ReferenceCells::get_simplex<dim>())
             out << cell->vertex_index(vertex) + 1 << ' ';
           else
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       out << '\n';
     }
@@ -1195,7 +1195,7 @@ GridOut::write_ucd(const Triangulation<dim, spacedim> &tria,
             out << "hex     ";
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       // it follows a list of the
@@ -1245,7 +1245,7 @@ GridOut::write_xfig(const Triangulation<dim, spacedim> &,
                     std::ostream &,
                     const Mapping<dim, spacedim> *) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -2973,7 +2973,7 @@ void
 GridOut::write_mathgl(const Triangulation<1> &, std::ostream &) const
 {
   // 1d specialization not done yet
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3032,7 +3032,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
         out << "\nrotate 60 40";
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   out << '\n';
 
@@ -3056,7 +3056,7 @@ GridOut::write_mathgl(const Triangulation<dim, spacedim> &tria,
           << '\n';
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   // (iv) write a list of vertices of cells
@@ -3414,7 +3414,7 @@ GridOut::write_vtk(const Triangulation<dim, spacedim> &tria,
                 out << cell->vertex_index(permutation_table[i]);
               }
             else
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         out << '\n';
       }
@@ -4077,7 +4077,7 @@ GridOut::write_ucd_faces(const Triangulation<dim, spacedim> &tria,
               out << "quad    ";
               break;
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         // note: vertex numbers are 1-base
         for (unsigned int vertex = 0;
@@ -4482,7 +4482,7 @@ namespace internal
                   out << '\n'; // end of second line
                 }
               else
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
           else // need to handle curved boundaries
             {
@@ -4634,7 +4634,7 @@ namespace internal
               const GridOutFlags::Eps<2> &,
               const GridOutFlags::Eps<3> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
     void
@@ -4644,7 +4644,7 @@ namespace internal
               const GridOutFlags::Eps<2> &,
               const GridOutFlags::Eps<3> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
     void
@@ -4654,7 +4654,7 @@ namespace internal
               const GridOutFlags::Eps<2> &,
               const GridOutFlags::Eps<3> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
     void
@@ -4664,7 +4664,7 @@ namespace internal
               const GridOutFlags::Eps<2> &,
               const GridOutFlags::Eps<3> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -4906,7 +4906,7 @@ namespace internal
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
 

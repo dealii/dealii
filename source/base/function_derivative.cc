@@ -111,7 +111,7 @@ FunctionDerivative<dim>::value(const Point<dim>  &p,
                 f.value(p - 2 * incr[0], component)) /
                (12 * h);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return 0.;
 }
@@ -154,7 +154,7 @@ FunctionDerivative<dim>::vector_value(const Point<dim> &p,
         result /= (12. * h);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -220,7 +220,7 @@ FunctionDerivative<dim>::value_list(const std::vector<Point<dim>> &points,
           values[i] = (values[i] - 8. * aux[i]) / (12 * h);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

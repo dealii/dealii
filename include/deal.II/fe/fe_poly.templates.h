@@ -600,7 +600,7 @@ FE_Poly<dim, spacedim>::get_poly_space_numbering() const
   if (space_tensor_prod_const != nullptr)
     return space_tensor_prod_const->get_numbering();
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return std::vector<unsigned int>();
 }
 

@@ -58,7 +58,7 @@ PolynomialsRannacherTurek<dim>::compute_value(const unsigned int i,
               1.5 * (p[0] * p[0] - p[1] * p[1]));
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
@@ -94,7 +94,7 @@ PolynomialsRannacherTurek<dim>::compute_grad(const unsigned int i,
         }
       else
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
 
       return grad;
@@ -102,7 +102,7 @@ PolynomialsRannacherTurek<dim>::compute_grad(const unsigned int i,
 
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
 }
@@ -151,7 +151,7 @@ PolynomialsRannacherTurek<dim>::compute_grad_grad(
 
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
 }

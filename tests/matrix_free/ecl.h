@@ -67,7 +67,7 @@ test(const unsigned int geometry      = 0,
   else if (geometry == 2)
     GridGenerator::hyper_ball(tria);
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
   tria.reset_all_manifolds();
 

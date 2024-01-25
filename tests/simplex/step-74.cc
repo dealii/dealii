@@ -915,7 +915,7 @@ namespace Step74
               }
             default:
               {
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
               }
           }
         deallog << "  Number of active cells       : "

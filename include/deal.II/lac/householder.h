@@ -343,7 +343,7 @@ template <typename VectorType>
 void
 Householder<number>::Tvmult(VectorType &, const VectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

@@ -55,7 +55,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
     return dpo;
@@ -74,7 +74,7 @@ namespace
     else if (degree == 2)
       n_dofs = 18;
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCells::Wedge);
   }
@@ -256,7 +256,7 @@ FE_WedgeP<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 

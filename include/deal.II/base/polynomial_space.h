@@ -445,7 +445,7 @@ PolynomialSpace<dim>::compute_derivative(const unsigned int i,
         }
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return derivative;
         }
     }

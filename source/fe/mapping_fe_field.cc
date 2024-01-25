@@ -74,7 +74,7 @@ std::size_t
 MappingFEField<dim, spacedim, VectorType>::InternalData::memory_consumption()
   const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
@@ -412,7 +412,7 @@ MappingFEField<dim, spacedim, VectorType>::get_vertices(
             for (const unsigned int v : cell->vertex_indices())
               vertices[v][comp] += fe_values.shape_value(i, v) * value;
           else
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -1314,7 +1314,7 @@ namespace internal
                           cross_product_3d(data.aux[0][i], data.aux[1][i]);
                         break;
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
               }
             else //(dim < spacedim)
@@ -2016,7 +2016,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -2055,7 +2055,7 @@ namespace internal
                 return;
               }
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
     } // namespace
@@ -2162,7 +2162,7 @@ MappingFEField<dim, spacedim, VectorType>::transform(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

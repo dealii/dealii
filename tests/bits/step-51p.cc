@@ -207,7 +207,7 @@ namespace Step51
           convection[2] = 1;
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return convection;
   }

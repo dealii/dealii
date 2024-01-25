@@ -1876,7 +1876,7 @@ DoFAccessor<0, 1, spacedim, level_dof_access>::set_dof_index(
   const types::global_dof_index /*index*/,
   const types::fe_index /*fe_index*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -2002,7 +2002,7 @@ inline bool
 DoFAccessor<0, 1, spacedim, level_dof_access>::fe_index_is_active(
   const types::fe_index /*fe_index*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return false;
 }
 
@@ -2058,7 +2058,7 @@ inline typename dealii::internal::DoFHandlerImplementation::
   DoFAccessor<0, 1, spacedim, level_dof_access>::line(
     const unsigned int /*c*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return typename dealii::internal::DoFHandlerImplementation::
     Iterators<1, spacedim, level_dof_access>::line_iterator();
 }
@@ -2071,7 +2071,7 @@ inline typename dealii::internal::DoFHandlerImplementation::
   DoFAccessor<0, 1, spacedim, level_dof_access>::quad(
     const unsigned int /*c*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return typename dealii::internal::DoFHandlerImplementation::
     Iterators<1, spacedim, level_dof_access>::quad_iterator();
 }

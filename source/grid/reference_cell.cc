@@ -109,7 +109,7 @@ ReferenceCell::to_string() const
       case ReferenceCells::Invalid:
         return "Invalid";
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return "Invalid";
@@ -136,7 +136,7 @@ ReferenceCell::get_default_mapping(const unsigned int degree) const
       FE_WedgeP<dim, spacedim>(degree));
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
   return std::make_unique<MappingQ<dim, spacedim>>(degree);
@@ -174,7 +174,7 @@ ReferenceCell::get_default_linear_mapping() const
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
   return StaticMappingQ1<dim, spacedim>::mapping; // never reached
@@ -197,7 +197,7 @@ ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1d) const
   else if (*this == ReferenceCells::Wedge)
     return QGaussWedge<dim>(n_points_1d);
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
   return Quadrature<dim>(); // never reached
 }
@@ -242,7 +242,7 @@ ReferenceCell::get_nodal_type_quadrature() const
       return quadrature;
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
   static const Quadrature<dim> dummy;
   return dummy; // never reached
@@ -285,7 +285,7 @@ ReferenceCell::exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const
           return exodus_to_deal[vertex_n];
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -332,7 +332,7 @@ ReferenceCell::exodusii_face_to_deal_face(const unsigned int face_n) const
           return exodus_to_deal[face_n];
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -369,7 +369,7 @@ ReferenceCell::unv_vertex_to_deal_vertex(const unsigned int vertex_n) const
       return unv_to_deal[vertex_n];
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return numbers::invalid_unsigned_int;
 }
@@ -400,7 +400,7 @@ ReferenceCell::vtk_linear_type() const
       case ReferenceCells::Invalid:
         return VTKCellType::VTK_INVALID;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return VTKCellType::VTK_INVALID;
@@ -432,7 +432,7 @@ ReferenceCell::vtk_quadratic_type() const
       case ReferenceCells::Invalid:
         return VTKCellType::VTK_INVALID;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return VTKCellType::VTK_INVALID;
@@ -464,7 +464,7 @@ ReferenceCell::vtk_lagrange_type() const
       case ReferenceCells::Invalid:
         return VTKCellType::VTK_INVALID;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return VTKCellType::VTK_INVALID;
@@ -479,7 +479,7 @@ ReferenceCell::vtk_lexicographic_to_node_index<0>(
   const std::array<unsigned, 0> &,
   const bool) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
@@ -492,7 +492,7 @@ ReferenceCell::vtk_lexicographic_to_node_index<1>(
   const std::array<unsigned, 1> &,
   const bool) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 
@@ -712,11 +712,11 @@ ReferenceCell::vtk_vertex_to_deal_vertex(const unsigned int vertex_index) const
         }
       case ReferenceCells::Invalid:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return numbers::invalid_unsigned_int;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -800,7 +800,7 @@ ReferenceCell::gmsh_element_type() const
         return 5;
       case ReferenceCells::Invalid:
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return numbers::invalid_unsigned_int;
@@ -1115,7 +1115,7 @@ ReferenceCell::closest_point(const Point<dim> &p) const
             }
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   // We should be within 4 * eps of the cell by this point. The roundoff error

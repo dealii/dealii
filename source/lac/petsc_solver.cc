@@ -195,7 +195,7 @@ namespace PETScWrappers
           break;
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     PetscFunctionReturn(PETSC_SUCCESS);

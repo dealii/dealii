@@ -4766,7 +4766,7 @@ AffineConstraints<number>::add_entries_local_to_global(
     }
 
   // TODO: implement this
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

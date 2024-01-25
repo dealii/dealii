@@ -112,7 +112,7 @@ namespace internal
               &fe_poly_ptr->get_poly_space()))
         return polyspace->get_underlying_polynomials();
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
   } // namespace FEPointEvaluation

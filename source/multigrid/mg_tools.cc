@@ -59,7 +59,7 @@ namespace MGTools
                             std::vector<unsigned int> &,
                             const DoFTools::Coupling)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -72,7 +72,7 @@ namespace MGTools
                             const Table<2, DoFTools::Coupling> &,
                             const Table<2, DoFTools::Coupling> &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -84,7 +84,7 @@ namespace MGTools
                             std::vector<unsigned int> &,
                             const DoFTools::Coupling)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -96,7 +96,7 @@ namespace MGTools
                             const Table<2, DoFTools::Coupling> &,
                             const Table<2, DoFTools::Coupling> &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 

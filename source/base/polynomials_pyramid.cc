@@ -31,7 +31,7 @@ namespace
           return 5;
       }
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
     return 0;
   }
@@ -153,7 +153,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
         }
       else
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -171,7 +171,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad_grad(
   (void)i;
   (void)p;
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return Tensor<2, dim>();
 }
 
@@ -223,7 +223,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_2nd_derivative(
   (void)i;
   (void)p;
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return {};
 }
@@ -239,7 +239,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_3rd_derivative(
   (void)i;
   (void)p;
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return {};
 }
@@ -255,7 +255,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_4th_derivative(
   (void)i;
   (void)p;
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   return {};
 }

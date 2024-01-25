@@ -104,7 +104,7 @@ check_solve(SolverType               &solver,
                                   51);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   deallog << "Eigenvalues:";

@@ -637,7 +637,7 @@ namespace TrilinosWrappers
   SparsityPattern &
   SparsityPattern::operator=(const SparsityPattern &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return *this;
   }
 
@@ -1003,7 +1003,7 @@ namespace TrilinosWrappers
   void
   SparsityPattern::write_ascii()
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 
@@ -1072,7 +1072,7 @@ namespace TrilinosWrappers
   std::size_t
   SparsityPattern::memory_consumption() const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return 0;
   }
 

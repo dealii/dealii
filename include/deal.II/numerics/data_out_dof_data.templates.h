@@ -97,7 +97,7 @@ namespace internal
     {
       (void)n_subdivisions;
 
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
       return {};
     }
@@ -353,7 +353,7 @@ namespace internal
                       else if (reference_cell == ReferenceCells::Pyramid)
                         quadrature.push_back(*quadrature_pyramid);
                       else
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
 
                   x_fe_values[i] =
@@ -1532,7 +1532,7 @@ namespace internal
         const ComponentExtractor /*extract_component*/,
         std::vector<Tensor<1, spacedim>> & /*patch_gradients*/) const override
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
       /**
@@ -1547,7 +1547,7 @@ namespace internal
         std::vector<std::vector<Tensor<1, spacedim>>>
           & /*patch_gradients_system*/) const override
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
 
@@ -1561,7 +1561,7 @@ namespace internal
         const ComponentExtractor /*extract_component*/,
         std::vector<Tensor<2, spacedim>> & /*patch_hessians*/) const override
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
       /**
@@ -1576,7 +1576,7 @@ namespace internal
         std::vector<std::vector<Tensor<2, spacedim>>>
           & /*patch_hessians_system*/) const override
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
       /**
@@ -1636,7 +1636,7 @@ namespace internal
       const unsigned int       cell_number,
       const ComponentExtractor extract_component) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
       (void)cell_number;
       (void)extract_component;
@@ -2375,7 +2375,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
   // note that we do not have to traverse the list of cell data here because
@@ -2454,7 +2454,7 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_fes() const
               std::make_shared<dealii::hp::FECollection<dim, spacedim>>(
                 FE_PyramidDGP<dim, spacedim>(1)));
           else
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   return finite_elements;

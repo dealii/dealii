@@ -337,7 +337,7 @@ namespace VectorTools
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -508,7 +508,7 @@ namespace VectorTools
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -1209,7 +1209,7 @@ namespace VectorTools
                               cross_product_3d(normals[0], normals[dim - 2]);
                             break;
                           default:
-                            Assert(false, ExcNotImplemented());
+                            DEAL_II_NOT_IMPLEMENTED();
                         }
 
                       Assert(

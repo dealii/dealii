@@ -143,7 +143,7 @@ namespace LAPACKSupport
           return "Hessenberg";
       }
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return "invalid";
   }
 

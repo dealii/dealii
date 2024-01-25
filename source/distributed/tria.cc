@@ -247,7 +247,7 @@ namespace
                     }
 
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                 }
             }
           else
@@ -419,7 +419,7 @@ namespace
                 P8EST_QUADRANT_INIT(&p4est_child[c]);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
 
 
@@ -487,7 +487,7 @@ namespace
                     P8EST_QUADRANT_INIT(&p4est_child[c]);
                     break;
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                 }
 
 
@@ -1345,7 +1345,7 @@ namespace
                 P8EST_QUADRANT_INIT(&p4est_child[c]);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         internal::p4est::functions<dim>::quadrant_childrenv(&p4est_cell,
                                                             p4est_child);
@@ -1635,7 +1635,7 @@ namespace
                 P8EST_QUADRANT_INIT(&p4est_child[c]);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
 
         dealii::internal::p4est::functions<dim>::quadrant_childrenv(
@@ -1676,7 +1676,7 @@ namespace
                 P8EST_QUADRANT_INIT(&p4est_child[c]);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
 
         dealii::internal::p4est::functions<dim>::quadrant_childrenv(
@@ -4133,7 +4133,7 @@ namespace parallel
           smooth_grid,
           false)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -4165,7 +4165,7 @@ namespace parallel
       compute_level_vertices_with_ghost_neighbors(
         const unsigned int /*level*/) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
       return std::map<unsigned int, std::set<dealii::types::subdomain_id>>();
     }
@@ -4177,7 +4177,7 @@ namespace parallel
     std::vector<bool> Triangulation<1, spacedim>::
       mark_locally_active_vertices_on_level(const unsigned int) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<bool>();
     }
 
@@ -4188,7 +4188,7 @@ namespace parallel
     unsigned int Triangulation<1, spacedim>::
       coarse_cell_id_to_coarse_cell_index(const types::coarse_cell_id) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return 0;
     }
 
@@ -4200,7 +4200,7 @@ namespace parallel
       Triangulation<1, spacedim>::coarse_cell_index_to_coarse_cell_id(
         const unsigned int) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return 0;
     }
 
@@ -4210,7 +4210,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
     void Triangulation<1, spacedim>::load(const std::string &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -4219,7 +4219,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
     void Triangulation<1, spacedim>::load(const std::string &, const bool)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -4228,7 +4228,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
     void Triangulation<1, spacedim>::save(const std::string &) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -4237,7 +4237,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
     bool Triangulation<1, spacedim>::is_multilevel_hierarchy_constructed() const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return false;
     }
 
@@ -4247,7 +4247,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
     bool Triangulation<1, spacedim>::are_vertices_communicated_to_p4est() const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return false;
     }
 
@@ -4257,7 +4257,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<1, spacedim>))
     void Triangulation<1, spacedim>::update_cell_relations()
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
   } // namespace distributed

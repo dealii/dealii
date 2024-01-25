@@ -42,7 +42,7 @@ namespace internal
                          const unsigned int,
                          std::array<unsigned int, dim> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
     inline void

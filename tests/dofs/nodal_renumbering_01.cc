@@ -64,7 +64,7 @@ public:
         case 1:
           return std::cos(p[0]) * std::cos(3.0 * p[1]) + 2.0;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return 0.0;
   }

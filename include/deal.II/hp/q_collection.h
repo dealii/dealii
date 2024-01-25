@@ -163,7 +163,7 @@ namespace hp
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
   }
 
