@@ -104,11 +104,6 @@ test_tensor()
   // const Tensor<2,dim,ADNumberType> F =
   // Physics::Elasticity::Kinematics::F(grad_u);
 
-  // Values computed from the AD energy function
-  ScalarNumberType             psi;
-  Vector<ScalarNumberType>     Dpsi;
-  FullMatrix<ScalarNumberType> D2psi;
-
   // Function and its derivatives
   using func_ad = FunctionsTestTensor<dim, ADNumberType>;
 
@@ -130,29 +125,25 @@ test_tensor()
     ad_helper.start_recording_operations(tape_no /*material_id*/,
                                          true /*overwrite_tape*/,
                                          true /*keep*/);
-  if (is_recording == true)
-    {
-      ad_helper.register_independent_variable(t, t_dof);
+  Assert(is_recording == true, ExcInternalError());
+  {
+    ad_helper.register_independent_variable(t, t_dof);
 
-      const Tensor<2, dim, ADNumberType> t_ad =
-        ad_helper.get_sensitive_variables(t_dof);
+    const Tensor<2, dim, ADNumberType> t_ad =
+      ad_helper.get_sensitive_variables(t_dof);
 
-      const ADNumberType psi(func_ad::psi(t_ad));
+    const ADNumberType psi(func_ad::psi(t_ad));
 
-      ad_helper.register_dependent_variable(psi);
-      ad_helper.stop_recording_operations(false /*write_tapes_to_file*/);
+    ad_helper.register_dependent_variable(psi);
+    ad_helper.stop_recording_operations(false /*write_tapes_to_file*/);
 
-      std::cout << "Recorded data..." << std::endl;
-      std::cout << "independent variable values: " << std::flush;
-      ad_helper.print_values(std::cout);
-      std::cout << "t_ad: " << t_ad << std::endl;
-      std::cout << "psi: " << psi << std::endl;
-      std::cout << std::endl;
-    }
-  else
-    {
-      Assert(is_recording == true, ExcInternalError());
-    }
+    std::cout << "Recorded data..." << std::endl;
+    std::cout << "independent variable values: " << std::flush;
+    ad_helper.print_values(std::cout);
+    std::cout << "t_ad: " << t_ad << std::endl;
+    std::cout << "psi: " << psi << std::endl;
+    std::cout << std::endl;
+  }
 
   // Do some work :-)
   // Set a new evaluation point
@@ -171,6 +162,11 @@ test_tensor()
 
   // Compute the function value, gradient and hessian for the new evaluation
   // point
+  // Values computed from the AD energy function
+  ScalarNumberType             psi;
+  Vector<ScalarNumberType>     Dpsi;
+  FullMatrix<ScalarNumberType> D2psi;
+
   psi = ad_helper.compute_value();
   ad_helper.compute_gradient(Dpsi);
   if (AD::ADNumberTraits<ADNumberType>::n_supported_derivative_levels >= 2)
