@@ -41,7 +41,7 @@
 
 template <int dim>
 void
-test()
+test(const bool enable_fe_cache)
 {
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
 
@@ -75,7 +75,7 @@ test()
 
 
   const parallel::CellWeights<dim> cell_weights(
-    dh, parallel::CellWeights<dim>::ndofs_weighting({1, 1}));
+    dh, parallel::CellWeights<dim>::ndofs_weighting({1, 1}), enable_fe_cache);
 
   tria.repartition();
 
@@ -127,10 +127,13 @@ main(int argc, char *argv[])
 
   deal_II_exceptions::disable_abort_on_exception();
 
-  deallog.push("2d");
-  test<2>();
-  deallog.pop();
-  deallog.push("3d");
-  test<3>();
-  deallog.pop();
+  for (const bool enable_fe_cache : {false, true})
+    {
+      deallog.push("2d");
+      test<2>(enable_fe_cache);
+      deallog.pop();
+      deallog.push("3d");
+      test<3>(enable_fe_cache);
+      deallog.pop();
+    }
 }

@@ -979,6 +979,11 @@ namespace Step75
     // the form that $a (n_\text{dofs})^b$ with a provided pair of parameters
     // $(a,b)$. We register such a function in the following.
     //
+    // Since we are only using information about the number of degrees of
+    // freedom per cell, which is a quantity unique to every finite element, we
+    // can compute the weights in advance. A cache can be set up automatically
+    // with the `enable_fe_cache` parameter.
+    //
     // For load balancing, efficient solvers like the one we use should scale
     // linearly with the number of degrees of freedom owned. We set the
     // parameters for cell weighting correspondingly: A weighting factor of $1$
@@ -987,7 +992,8 @@ namespace Step75
     cell_weights = std::make_unique<parallel::CellWeights<dim>>(
       dof_handler,
       parallel::CellWeights<dim>::ndofs_weighting(
-        {prm.weighting_factor, prm.weighting_exponent}));
+        {prm.weighting_factor, prm.weighting_exponent}),
+      /*enable_fe_cache=*/true);
 
     // In h-adaptive applications, we ensure a 2:1 mesh balance by limiting the
     // difference of refinement levels of neighboring cells to one. With the
