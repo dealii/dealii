@@ -407,6 +407,10 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       set(_test_full      ${_category}/${_test_name}) # full test name
       set(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
 
+      if("${_n_cpu}" STREQUAL "0" AND "${_n_threads}" STREQUAL "0")
+        string(APPEND _test_directory "/serial")
+      endif()
+
       if(NOT "${_n_cpu}" STREQUAL "0")
         string(APPEND _test_target   ".mpirun${_n_cpu}")
         string(APPEND _test_full     ".mpirun=${_n_cpu}")
