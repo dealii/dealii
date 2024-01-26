@@ -71,6 +71,7 @@
 #   NUMDIFF_EXECUTABLE
 #     - Complete path to the numdiff binary.
 #
+#
 #   TEST_TIME_LIMIT
 #     - Specifies the maximal wall clock time in seconds a test is allowed
 #       to run.
@@ -91,6 +92,7 @@
 #       additional threads. The special value 0 enforces no limit. Defaults
 #       to 0.
 #
+#
 #   ENABLE_PERFORMANCE_TESTS
 #     - If defined and set to true the execution of performance tests will
 #       be enabled.
@@ -105,6 +107,21 @@
 # Usage:
 #     deal_ii_add_test(category test_name comparison_file)
 #
+
+if(POLICY CMP0112)
+  #
+  # Ensure that target file component expressions do not add (implicit)
+  # target dependencies. This is necessary for us to fully decouple
+  # "test_dependency/*" targets (that compile and link an executable)
+  # from "category/test" targets (that run the test and compare the
+  # result).
+  #
+  # Note that this policy change is scoped. Meaning it only applies to this
+  # file when "include()"ed.
+  #
+  cmake_policy(SET CMP0112 NEW)
+endif()
+
 
 #
 # A small helper macro that is used below:
@@ -360,7 +377,11 @@ function(deal_ii_add_test _category _test_name _comparison_file)
 
       set(_target ${_category}.${_test_name}.${_build_lowercase}) # target name
       set(_target_short ${_test_name}.${_build_lowercase}) # short target name
-      set(_run_args "$<TARGET_FILE:${_target}>") # the command to issue
+      #
+      # Workaround: $<TARGET_FILE:..> might still add an implicit
+      # dependency. Thus, use FILE_DIR and FILE_NAME to compose the name.
+      #
+      set(_run_args "$<TARGET_FILE_DIR:${_target}>/$<TARGET_FILE_NAME:${_target}>")
 
       #
       # If the variable ${category_test_RUNARGS_PREFIX) is nonempty prepend
@@ -387,8 +408,12 @@ function(deal_ii_add_test _category _test_name _comparison_file)
             )
         endif()
         set(_target_short ${_target})
+        #
+        # Workaround: $<TARGET_FILE:..> might still add an implicit
+        # dependency. Thus, use FILE_DIR and FILE_NAME to compose the name.
+        #
         set(_run_args
-          "$<TARGET_FILE:${_target}>"
+          "$<TARGET_FILE_DIR:${_target}>/$<TARGET_FILE_NAME:${_target}>"
           "${_source_file}"
           )
       endif()
@@ -548,6 +573,14 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       # Add a top level target to run and compare the test:
       #
 
+      set(_target_dependency)
+      if(NOT _shared_target)
+        # In case of a "non shared" target we do not create a separate
+        # test_dependency/executable test. We thus need to let the test
+        # depend on the target explicitly.
+        set(_target_dependency ${_target})
+      endif()
+
       add_custom_command(OUTPUT ${_test_directory}/output
         COMMAND ${BASH} ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.sh
           run "${_test_full}" TEST_N_THREADS=${_n_threads} ${_run_args}
@@ -557,7 +590,7 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         WORKING_DIRECTORY
           ${_test_directory}
         DEPENDS
-          ${_target}
+          ${_target_dependency}
           ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/normalize.pl
         VERBATIM
         )

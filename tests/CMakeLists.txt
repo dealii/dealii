@@ -76,7 +76,8 @@ endif()
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake "")
 
 #
-# Always undefine the following variables in the setup_tests target:
+# Ensure that the following variables are set correctly in the test
+# subprojects:
 #
 foreach(_var
     DIFF_DIR NUMDIFF_DIR TEST_PICKUP_REGEX TEST_TIME_LIMIT
