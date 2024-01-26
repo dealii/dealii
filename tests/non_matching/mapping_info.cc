@@ -182,10 +182,10 @@ test(const bool filtered_compression)
   FEPointEvaluation<1, dim, dim, double> fe_point_cell(mapping_info_cell, fe_q);
   FEPointEvaluation<1, dim, dim, double> fe_point_surface(mapping_info_surface,
                                                           fe_q);
-  FEPointEvaluation<1, dim, dim, double> fe_point_faces_m(mapping_info_faces,
-                                                          fe_q);
-  FEPointEvaluation<1, dim, dim, double> fe_point_faces_p(mapping_info_faces,
-                                                          fe_q);
+  FEFacePointEvaluation<1, dim, dim, double> fe_point_faces_m(
+    mapping_info_faces, fe_q);
+  FEFacePointEvaluation<1, dim, dim, double> fe_point_faces_p(
+    mapping_info_faces, fe_q);
 
   std::vector<double> solution_values_in(fe_q.dofs_per_cell);
   std::vector<double> solution_values_neighbor_in(fe_q.dofs_per_cell);

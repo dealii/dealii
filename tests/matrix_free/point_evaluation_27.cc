@@ -79,8 +79,8 @@ test(const FiniteElement<dim> &fe)
     std::vector<Quadrature<dim - 1>>(4, QGauss<dim - 1>(7)));
   dealii::NonMatching::MappingInfo<dim> mapping_info(mapping, update_values);
   mapping_info.reinit_faces(tria.active_cell_iterators(), quad_vec);
-  FEPointEvaluation<dim - first_selected_component, dim, dim, Number>
-    fe_point_eval(mapping_info, fe, first_selected_component);
+  FEFacePointEvaluation<dim - first_selected_component, dim, dim, Number>
+    fe_point_eval(mapping_info, fe, true, first_selected_component);
 
   std::vector<Number> buffer(fe.dofs_per_cell);
 

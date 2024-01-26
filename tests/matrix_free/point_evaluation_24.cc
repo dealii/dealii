@@ -104,7 +104,7 @@ test(const unsigned int degree)
 
   mapping_info.reinit_faces(tria.active_cell_iterators(), quad_vec_faces);
 
-  FEPointEvaluation<dim, dim> evaluator(mapping_info, fe);
+  FEFacePointEvaluation<dim, dim> evaluator(mapping_info, fe);
 
   VectorTools::interpolate(mapping, dof_handler, MyFunction<dim>(), vector);
 

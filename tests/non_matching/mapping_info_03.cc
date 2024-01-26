@@ -78,7 +78,7 @@ test()
     // 2) reinit mapping info
     mapping_info.reinit_faces(tria.active_cell_iterators(), quad_vec);
 
-    FEPointEvaluation<n_components, dim, spacedim, Number> fe_point_eval(
+    FEFacePointEvaluation<n_components, dim, spacedim, Number> fe_point_eval(
       mapping_info, fe);
 
     // 3) print JxW
