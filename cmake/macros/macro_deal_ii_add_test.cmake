@@ -65,7 +65,7 @@
 #
 # The following variables must be set:
 #
-#  BASH
+#   BASH
 #     - Complete path to the bash shell.
 #
 #   NUMDIFF_EXECUTABLE
@@ -92,8 +92,7 @@
 #       to 0.
 #
 #   ENABLE_PERFORMANCE_TESTS
-#     - If defined and set to true the execution of performance tests will
-#       be enabled.
+#     - If set to true the execution of performance tests will be enabled.
 #
 #   TESTING_ENVIRONMENT
 #     - Specifies the performance test testing environment. Valid options

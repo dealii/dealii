@@ -20,9 +20,9 @@
 # If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
 #
-# Furthermore, the macro sets up (if necessary) deal.II, perl, numdiff,
-# and the following variables, that can be overwritten by environment or
-# command line:
+# Furthermore, the macro sets up (if necessary) deal.II, bash, perl,
+# numdiff, and the following variables, that can be overwritten by
+# environment or command line:
 #
 #     TEST_LIBRARIES
 #     TEST_LIBRARIES_DEBUG
