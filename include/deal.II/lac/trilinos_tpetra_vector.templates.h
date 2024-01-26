@@ -63,9 +63,17 @@ namespace LinearAlgebra
       : Subscriptor()
       , compressed(V.compressed)
       , has_ghost(V.has_ghost)
-      , vector(V.vector)
-      , nonlocal_vector(V.nonlocal_vector)
-    {}
+      , vector(Utilities::Trilinos::internal::make_rcp<VectorType>(
+          V.vector->getMap()))
+    {
+      Tpetra::deep_copy(*vector, *V.vector);
+      if (!V.nonlocal_vector.is_null())
+        {
+          nonlocal_vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
+            V.nonlocal_vector->getMap());
+          Tpetra::deep_copy(*nonlocal_vector, *V.nonlocal_vector);
+        }
+    }
 
 
 
