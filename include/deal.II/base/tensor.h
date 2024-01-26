@@ -39,6 +39,7 @@
 #endif
 
 
+#include <array>
 #include <cmath>
 #include <ostream>
 #include <type_traits>
