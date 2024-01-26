@@ -826,31 +826,10 @@ namespace LinearAlgebra
 
 
     template <typename Number>
-    ::dealii::IndexSet
+    IndexSet
     Vector<Number>::locally_owned_elements() const
     {
-      IndexSet is(size());
-
-      // easy case: local range is contiguous
-      if (vector->getMap()->isContiguous())
-        {
-          is.add_range(vector->getMap()->getMinGlobalIndex(),
-                       vector->getMap()->getMaxGlobalIndex() + 1);
-        }
-      else if (vector->getLocalLength() > 0)
-        {
-          const size_type n_indices = vector->getLocalLength();
-          std::vector<types::global_dof_index> vector_indices;
-          vector_indices.reserve(n_indices);
-          for (unsigned int i = 0; i < n_indices; ++i)
-            vector_indices.push_back(vector->getMap()->getGlobalElement(i));
-
-          is.add_indices(vector_indices.data(),
-                         vector_indices.data() + n_indices);
-        }
-      is.compress();
-
-      return is;
+      return IndexSet(vector->getMap());
     }
 
 
