@@ -221,8 +221,6 @@ namespace parallel
       /**
        * Coarsen and refine the mesh according to refinement and coarsening
        * flags set.
-       *
-       * @note Not implemented yet.
        */
       virtual void
       execute_coarsening_and_refinement() override;
