@@ -454,7 +454,7 @@ TensorProductPolynomialsBubbles<dim>::compute_derivative(
         }
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return derivative;
         }
     }

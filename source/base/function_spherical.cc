@@ -184,7 +184,7 @@ namespace Functions
                            const unsigned int /*component*/) const
 
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return {};
   }
 
@@ -239,7 +239,7 @@ namespace Functions
   Spherical<dim>::hessian(const Point<dim> & /*p*/,
                           const unsigned int /*component*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return {};
   }
 

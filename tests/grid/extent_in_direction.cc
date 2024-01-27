@@ -38,7 +38,7 @@ create_triangulation(const unsigned int case_no, Triangulation<1> &tria)
         GridGenerator::hyper_cube(tria, 1., 4.);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     };
 }
 
@@ -62,7 +62,7 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     };
 }
 
@@ -83,7 +83,7 @@ create_triangulation(const unsigned int case_no, Triangulation<3> &tria)
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     };
 }
 

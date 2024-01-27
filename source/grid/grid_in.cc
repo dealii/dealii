@@ -1769,7 +1769,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                 Assert(false, ExcInternalError());
             }
           else
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       // Then also read the "geometric entity indices". There need to
@@ -1828,7 +1828,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                     Assert(false, ExcInternalError());
                 }
               else
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
     }
@@ -3391,7 +3391,7 @@ template <int dim, int spacedim>
 void
 GridIn<dim, spacedim>::read_tecplot(std::istream &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -3600,7 +3600,7 @@ namespace
     else if (type_name_2 == "HEX" || type_name_2 == "HEXAHEDRON")
       return ReferenceCells::Hexahedron;
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return ReferenceCells::Invalid;
   }
 
@@ -3994,7 +3994,7 @@ GridIn<dim, spacedim>::debug_output_grid(
   const std::vector<Point<spacedim>> & /*vertices*/,
   std::ostream & /*out*/)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -4270,7 +4270,7 @@ GridIn<dim, spacedim>::default_suffix(const Format format)
       case tecplot:
         return ".dat";
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return ".unknown_format";
     }
 }

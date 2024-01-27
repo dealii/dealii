@@ -2247,7 +2247,7 @@ namespace TrilinosWrappers
   void
   SparseMatrix::write_ascii()
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 

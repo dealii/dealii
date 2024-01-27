@@ -379,7 +379,7 @@ ElasticProblem<dim>::output_results(const unsigned int cycle) const
         solution_names.push_back("z_displacement");
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   data_out.add_data_vector(solution, solution_names);

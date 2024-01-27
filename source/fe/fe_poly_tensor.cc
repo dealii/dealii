@@ -613,7 +613,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
@@ -756,7 +756,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
@@ -1030,7 +1030,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
@@ -1041,7 +1041,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_values(
             (mapping_kind == mapping_raviart_thomas) ||
             (mapping_kind == mapping_nedelec))))
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -1252,7 +1252,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
@@ -1420,7 +1420,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
@@ -1718,14 +1718,14 @@ FE_PolyTensor<dim, spacedim>::fill_fe_face_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
       // third derivatives are not implemented
       if (fe_data.update_each & update_3rd_derivatives)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -1940,7 +1940,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
@@ -2094,7 +2094,7 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
@@ -2391,14 +2391,14 @@ FE_PolyTensor<dim, spacedim>::fill_fe_subface_values(
                 }
 
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
 
       // third derivatives are not implemented
       if (fe_data.update_each & update_3rd_derivatives)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
         }
     }
 }
@@ -2497,7 +2497,7 @@ FE_PolyTensor<dim, spacedim>::requires_update_flags(
 
           default:
             {
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
             }
         }
     }

@@ -164,7 +164,7 @@ test()
         if (std::abs(evaluation_points[i][0] - evaluation_point_results[i]) >
               1e-10 ||
             std::abs(evaluation_point_gradient_results[i][0] - 1.0) > 1e-10)
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
   deallog << "OK!" << std::endl;

@@ -269,7 +269,7 @@ namespace GridGenerator
                 const std::pair<Point<spacedim>, double> &,
                 const double)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 

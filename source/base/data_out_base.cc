@@ -96,7 +96,7 @@ namespace
         case (DataOutBase::CompressionLevel::default_compression):
           return Z_DEFAULT_COMPRESSION;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return Z_NO_COMPRESSION;
       }
   }
@@ -120,7 +120,7 @@ namespace
         case (DataOutBase::CompressionLevel::default_compression):
           return boost::iostreams::zlib::default_compression;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return boost::iostreams::zlib::no_compression;
       }
   }
@@ -626,7 +626,7 @@ namespace DataOutBase
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 
@@ -757,7 +757,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
     return vtk_cell_id;
@@ -814,7 +814,7 @@ namespace
               break;
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
         Point<spacedim> node;
         for (unsigned int d = 0; d < spacedim; ++d)
@@ -1514,7 +1514,7 @@ namespace
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     stream << '\n';
   }
@@ -1586,7 +1586,7 @@ namespace
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     stream << '\n';
   }
@@ -1714,7 +1714,7 @@ namespace
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     stream << '\n';
   }
@@ -2525,7 +2525,7 @@ namespace DataOutBase
         case svg:
           return ".svg";
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return "";
       }
   }
@@ -2701,7 +2701,7 @@ namespace DataOutBase
                     break;
                   }
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
               }
 
             // Update the number of the first vertex of this patch
@@ -2809,7 +2809,7 @@ namespace DataOutBase
                     break;
                   }
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
               }
 
             // Having so set up the 'connectivity' data structure,
@@ -3928,13 +3928,13 @@ namespace DataOutBase
                   }
                 else
                   // No other reference cells are currently implemented
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
 
                 break;
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
     // make sure everything now gets to disk
@@ -4428,7 +4428,7 @@ namespace DataOutBase
                       heights[i] = points[i][2];
                     break;
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                 }
 
 
@@ -4854,7 +4854,7 @@ namespace DataOutBase
             out << "\"x\", \"y\", \"z\"";
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       for (unsigned int data_set = 0; data_set < n_data_sets; ++data_set)
@@ -5636,7 +5636,7 @@ namespace DataOutBase
                         }
 
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
                 }
               else // use higher-order output
@@ -5724,7 +5724,7 @@ namespace DataOutBase
                           break;
                         }
                       default:
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                     }
                 }
 
@@ -6379,7 +6379,7 @@ namespace DataOutBase
     const SvgFlags &,
     std::ostream &)
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
   template <int spacedim>
@@ -8843,7 +8843,7 @@ DataOutInterface<dim, spacedim>::write(
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -8891,7 +8891,7 @@ DataOutInterface<dim, spacedim>::set_flags(const FlagType &flags)
     deal_II_intermediate_flags =
       *reinterpret_cast<const DataOutBase::Deal_II_IntermediateFlags *>(&flags);
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 

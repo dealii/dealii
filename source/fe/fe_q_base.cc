@@ -487,7 +487,7 @@ FE_Q_Base<dim, spacedim>::initialize(const std::vector<Point<1>> &points)
         tensor_const_poly_space_ptr->set_numbering(renumber);
         return;
       }
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }();
 
   // Finally fill in support points on cell and face and initialize
@@ -782,7 +782,7 @@ FE_Q_Base<dim, spacedim>::hp_vertex_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
 }
@@ -877,7 +877,7 @@ FE_Q_Base<dim, spacedim>::hp_line_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
 }
@@ -947,7 +947,7 @@ FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -1658,7 +1658,7 @@ FE_Q_Base<dim, spacedim>::has_support_on_face(
           return false;
         }
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   else if (shape_index < this->get_first_hex_index())
     // dof is on a quad
@@ -1678,13 +1678,13 @@ FE_Q_Base<dim, spacedim>::has_support_on_face(
       if (dim == 3)
         return (quad_index == face_index);
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   else
     // dof on hex
     {
       // can only happen in 3d, but this case has already been covered above
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return false;
     }
 

@@ -6311,7 +6311,7 @@ namespace internal
                 }
               else
                 {
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
                 }
 
               for (const unsigned int line : quad->line_indices())
@@ -6482,7 +6482,7 @@ namespace internal
                        line_indices[quad_lines[i][2]],
                        line_indices[quad_lines[i][3]]});
                   else
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
 
                   new_quad->set_used_flag();
                   new_quad->clear_user_flag();
@@ -6593,7 +6593,7 @@ namespace internal
                     n_new_hexes = 8;
                   }
                 else
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
 
                 std::array<raw_line_iterator, 6> new_lines;
                 for (unsigned int i = 0; i < n_new_lines; ++i)
@@ -6832,7 +6832,7 @@ namespace internal
                         AssertDimension(k, 13);
                       }
                     else
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 
                     boost::container::small_vector<unsigned int, 30>
                       relevant_line_indices(relevant_lines.size());
@@ -6928,7 +6928,7 @@ namespace internal
                              relevant_line_indices[new_quad_lines[q][2]],
                              relevant_line_indices[new_quad_lines[q][3]]});
                         else
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_NOT_IMPLEMENTED();
 
                         // On hexes, we must only determine a single line
                         // according to the representative_lines array above
@@ -7020,7 +7020,7 @@ namespace internal
                       }
                     else
                       {
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                       }
 
                     static constexpr dealii::ndarray<unsigned int, 8, 6>
@@ -7155,7 +7155,7 @@ namespace internal
                              quad_indices[cell_quads[c][4]],
                              quad_indices[cell_quads[c][5]]});
                         else
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_NOT_IMPLEMENTED();
                       }
 
                     // for hexes, we can simply inherit the orientation values
@@ -12711,7 +12711,7 @@ void Triangulation<dim, spacedim>::create_triangulation(
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
 
@@ -13233,7 +13233,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
   }
 } // namespace
@@ -13273,7 +13273,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
   }
 } // namespace
@@ -13313,7 +13313,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
   }
 } // namespace
@@ -13352,7 +13352,7 @@ void Triangulation<dim, spacedim>::save_user_flags(std::ostream &out) const
     save_user_flags_hex(out);
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -13383,7 +13383,7 @@ void Triangulation<dim, spacedim>::save_user_flags(std::vector<bool> &v) const
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -13401,7 +13401,7 @@ void Triangulation<dim, spacedim>::load_user_flags(std::istream &in)
     load_user_flags_hex(in);
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -13438,7 +13438,7 @@ void Triangulation<dim, spacedim>::load_user_flags(const std::vector<bool> &v)
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -13735,7 +13735,7 @@ void Triangulation<dim, spacedim>::save_user_indices(
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -13773,7 +13773,7 @@ void Triangulation<dim, spacedim>::load_user_indices(
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 template <int dim, int spacedim>
@@ -14013,7 +14013,7 @@ void Triangulation<dim, spacedim>::save_user_pointers(
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -14051,7 +14051,7 @@ void Triangulation<dim, spacedim>::load_user_pointers(
     }
 
   if (dim >= 4)
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -14174,7 +14174,7 @@ typename Triangulation<dim, spacedim>::raw_cell_iterator
       case 3:
         return begin_raw_hex(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return raw_cell_iterator();
     }
 }
@@ -14216,7 +14216,7 @@ typename Triangulation<dim, spacedim>::active_cell_iterator
       case 3:
         return begin_active_hex(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return active_cell_iterator();
     }
 }
@@ -14491,7 +14491,7 @@ typename Triangulation<dim, spacedim>::face_iterator
       case 3:
         return begin_quad();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return face_iterator();
     }
 }
@@ -14513,7 +14513,7 @@ typename Triangulation<dim, spacedim>::active_face_iterator
       case 3:
         return begin_active_quad();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return active_face_iterator();
     }
 }
@@ -14535,7 +14535,7 @@ typename Triangulation<dim, spacedim>::face_iterator
       case 3:
         return end_quad();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return raw_face_iterator();
     }
 }
@@ -14742,7 +14742,7 @@ typename Triangulation<dim, spacedim>::raw_quad_iterator
 
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return raw_hex_iterator();
     }
 }
@@ -14840,7 +14840,7 @@ typename Triangulation<dim, spacedim>::raw_hex_iterator
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return raw_hex_iterator();
     }
 }
@@ -14992,7 +14992,7 @@ unsigned int Triangulation<dim, spacedim>::n_faces() const
       case 3:
         return n_quads();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return 0;
 }
@@ -15011,7 +15011,7 @@ unsigned int Triangulation<dim, spacedim>::n_raw_faces() const
       case 3:
         return n_raw_quads();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return 0;
 }
@@ -15030,7 +15030,7 @@ unsigned int Triangulation<dim, spacedim>::n_active_faces() const
       case 3:
         return n_active_quads();
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return 0;
 }
@@ -15050,7 +15050,7 @@ unsigned int Triangulation<dim, spacedim>::n_raw_cells(
       case 3:
         return n_raw_hexs(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return 0;
 }
@@ -15071,7 +15071,7 @@ unsigned int Triangulation<dim, spacedim>::n_cells(
       case 3:
         return n_hexs(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return 0;
 }
@@ -15092,7 +15092,7 @@ unsigned int Triangulation<dim, spacedim>::n_active_cells(
       case 3:
         return n_active_hexs(level);
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return 0;
 }
@@ -15150,7 +15150,7 @@ unsigned int Triangulation<dim, spacedim>::n_raw_lines() const
 {
   if (dim == 1)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return 0;
     }
 
@@ -15388,7 +15388,7 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::n_raw_quads() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

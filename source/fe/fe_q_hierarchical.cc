@@ -252,7 +252,7 @@ FE_Q_Hierarchical<dim>::hp_vertex_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -290,7 +290,7 @@ FE_Q_Hierarchical<dim>::hp_line_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -334,7 +334,7 @@ FE_Q_Hierarchical<dim>::hp_quad_dof_identities(
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<std::pair<unsigned int, unsigned int>>();
     }
 }
@@ -381,7 +381,7 @@ FE_Q_Hierarchical<dim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 
@@ -667,7 +667,7 @@ FE_Q_Hierarchical<dim>::initialize_constraints(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -806,7 +806,7 @@ FE_Q_Hierarchical<dim>::initialize_embedding_and_restriction(
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 }
 
@@ -2152,7 +2152,7 @@ FE_Q_Hierarchical<dim>::hierarchic_to_fe_q_hierarchical_numbering(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return h2l;
 }
@@ -2271,7 +2271,7 @@ FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
       if (dim == 3)
         return (quad_index == face_index);
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   else
     // dof on hex
@@ -2279,7 +2279,7 @@ FE_Q_Hierarchical<dim>::has_support_on_face(const unsigned int shape_index,
       // can only happen in 3d, but
       // this case has already been
       // covered above
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return false;
     }
 
@@ -2423,7 +2423,7 @@ FE_Q_Hierarchical<dim>::get_embedding_dofs(const unsigned int sub_degree) const
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return std::vector<unsigned int>();
     }
 }
@@ -2451,7 +2451,7 @@ template <int dim>
 std::size_t
 FE_Q_Hierarchical<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

@@ -1154,7 +1154,7 @@ namespace VectorTools
               dof_is_of_interest = true;
             }
           else
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
 
           if (dof_is_of_interest)
             {
@@ -1590,7 +1590,7 @@ namespace VectorTools
                           dof_is_of_interest = true;
                         }
                       else
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
 
                       if (dof_is_of_interest)
                         {
@@ -1780,7 +1780,7 @@ namespace VectorTools
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -2081,7 +2081,7 @@ namespace VectorTools
               break;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
 
@@ -2233,7 +2233,7 @@ namespace VectorTools
       const std::vector<DerivativeForm<1, dim, dim>> &,
       AffineConstraints<number> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
     // This function computes the projection of the boundary function on the
@@ -2339,7 +2339,7 @@ namespace VectorTools
       std::vector<number> &,
       std::vector<types::global_dof_index> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
   } // namespace internals
 
@@ -2512,7 +2512,7 @@ namespace VectorTools
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 
@@ -2670,7 +2670,7 @@ namespace VectorTools
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 } // namespace VectorTools

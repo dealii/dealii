@@ -50,7 +50,7 @@ omatcopy(char,
          number3 *,
          dealii::types::blas_int)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

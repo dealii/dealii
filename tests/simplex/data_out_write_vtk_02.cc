@@ -91,7 +91,7 @@ test(const FiniteElement<dim, spacedim> &fe_0,
       else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
         cell->set_active_fe_index(1);
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   dof_handler.distribute_dofs(fe);

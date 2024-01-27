@@ -967,7 +967,7 @@ namespace DynamicSparsityPatternIterators
     (void)other;
     Assert(accessor.sparsity_pattern == other.accessor.sparsity_pattern,
            ExcInternalError());
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
     return 0;
   }

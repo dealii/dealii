@@ -1808,7 +1808,7 @@ namespace CUDAWrappers
     LinearAlgebra::CUDAWrappers::Vector<Number> & /*dst*/,
     const LinearAlgebra::CUDAWrappers::Vector<Number> & /*src*/) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
   }
 
 

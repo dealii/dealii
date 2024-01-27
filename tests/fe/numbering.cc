@@ -220,7 +220,7 @@ check(const FE_Q<dim> &fe)
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   // now check with data from the

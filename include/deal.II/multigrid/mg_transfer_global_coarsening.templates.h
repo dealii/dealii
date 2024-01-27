@@ -2716,7 +2716,7 @@ namespace MGTransferGlobalCoarseningTools
       coarse_grid_triangulations(fine_triangulation_in.n_global_levels());
 
 #ifndef DEAL_II_WITH_P4EST
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     (void)policy;
     (void)keep_fine_triangulation;
     (void)repartition_fine_triangulation;
@@ -3809,7 +3809,7 @@ MGTransferMF<dim, Number>::get_dof_handler_fine() const
     }
   else
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {nullptr, numbers::invalid_unsigned_int};
     }
 }

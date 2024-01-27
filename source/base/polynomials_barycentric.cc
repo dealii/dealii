@@ -144,7 +144,7 @@ BarycentricPolynomials<dim>::get_fe_p_basis(const unsigned int degree)
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   return BarycentricPolynomials<dim>(polys);

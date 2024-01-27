@@ -93,7 +93,7 @@ main()
       else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
         cell->set_active_fe_index(1);
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   const hp::MappingCollection<2> mapping(MappingFE<2>(FE_SimplexP<2>(1)),

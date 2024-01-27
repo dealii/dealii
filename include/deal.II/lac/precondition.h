@@ -3603,7 +3603,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
               data.eig_cg_n_iterations));
         }
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
       // read the eigenvalues from the attached eigenvalue tracker
       if (eigenvalue_tracker.values.empty())

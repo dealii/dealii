@@ -186,7 +186,7 @@ PolarManifold<dim, spacedim>::push_forward(
             break;
           }
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   return p + center;
 }
@@ -225,7 +225,7 @@ PolarManifold<dim, spacedim>::pull_back(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return p;
 }
@@ -273,7 +273,7 @@ PolarManifold<dim, spacedim>::push_forward_gradient(
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   return DX;
 }
@@ -618,7 +618,7 @@ namespace internal
         const ArrayView<const double> & /*weights*/,
         const Point<spacedim> & /*candidate_point*/)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return {};
       }
 
@@ -1221,7 +1221,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 EllipticalManifold<dim, spacedim>::push_forward(const Point<spacedim> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -1249,7 +1249,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 EllipticalManifold<dim, spacedim>::pull_back(const Point<spacedim> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -1292,7 +1292,7 @@ DerivativeForm<1, spacedim, spacedim>
 EllipticalManifold<dim, spacedim>::push_forward_gradient(
   const Point<spacedim> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 

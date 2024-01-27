@@ -425,7 +425,7 @@ namespace internal
       VectorizedArrayType *,
       std::bool_constant<false>) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -674,7 +674,7 @@ namespace internal
       VectorizedArrayType *,
       std::bool_constant<false>) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 
@@ -910,7 +910,7 @@ namespace internal
       VectorizedArrayType *,
       std::bool_constant<false>) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
 

@@ -537,7 +537,7 @@ namespace internal
       // we get here from FlatManifold<2,3>::normal_vector, but
       // the implementation below is bogus for this case anyway
       // (see the assert at the beginning of that function).
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
 
@@ -775,7 +775,7 @@ FlatManifold<1, 2>::get_normals_at_vertices(
   const Triangulation<1, 2>::face_iterator &,
   Manifold<1, 2>::FaceVertexNormals &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -786,7 +786,7 @@ FlatManifold<1, 3>::get_normals_at_vertices(
   const Triangulation<1, 3>::face_iterator &,
   Manifold<1, 3>::FaceVertexNormals &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -812,7 +812,7 @@ FlatManifold<2, 3>::get_normals_at_vertices(
   const Triangulation<2, 3>::face_iterator & /*face*/,
   Manifold<2, 3>::FaceVertexNormals & /*face_vertex_normals*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -850,7 +850,7 @@ Tensor<1, 1>
 FlatManifold<1, 1>::normal_vector(const Triangulation<1, 1>::face_iterator &,
                                   const Point<1> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -861,7 +861,7 @@ Tensor<1, 2>
 FlatManifold<1, 2>::normal_vector(const Triangulation<1, 2>::face_iterator &,
                                   const Point<2> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -872,7 +872,7 @@ Tensor<1, 3>
 FlatManifold<1, 3>::normal_vector(const Triangulation<1, 3>::face_iterator &,
                                   const Point<3> &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 

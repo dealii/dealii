@@ -524,7 +524,7 @@ namespace PETScWrappers
             string_type = "None";
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       return string_type;
     }

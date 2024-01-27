@@ -272,7 +272,7 @@ PreconditionSelector<MatrixType, VectorType>::vmult(VectorType       &dst,
           A->precondition_SSOR(dst, src, omega);
         }
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -304,7 +304,7 @@ PreconditionSelector<MatrixType, VectorType>::Tvmult(
           A->precondition_SSOR(dst, src, omega); // Symmetric operation
         }
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

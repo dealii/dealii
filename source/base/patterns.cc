@@ -97,7 +97,7 @@ namespace Patterns
               return u;
             }
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
       return "";
     }
@@ -179,7 +179,7 @@ namespace Patterns
     if (p != nullptr)
       return p;
 
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
     return p;
   }

@@ -93,7 +93,7 @@ test(const unsigned int v, const unsigned int degree)
                                             QGaussSimplex<dim - 1>(degree + 1)};
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
   MappingFE<dim> mapping(*fe_mapping);
 
@@ -219,7 +219,7 @@ main(int argc, char **argv)
       else if (i == 2)
         deallog.push("PYRAMID");
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
       if (i == 0) // 2D makes only sense for simplex
         {

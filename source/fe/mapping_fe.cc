@@ -1420,7 +1420,7 @@ namespace internal
                               cross_product_3d(data.aux[0][i], data.aux[1][i]);
                             break;
                           default:
-                            Assert(false, ExcNotImplemented());
+                            DEAL_II_NOT_IMPLEMENTED();
                         }
                   }
                 else //(dim < spacedim)
@@ -1478,7 +1478,7 @@ namespace internal
                           cell->subface_case(face_no), subface_no);
                        output_data.JxW_values[i] *= area_ratio;
 #else
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 #endif
                     }
                 }
@@ -1763,7 +1763,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -1865,7 +1865,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -2035,7 +2035,7 @@ namespace internal
               }
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
 
@@ -2075,7 +2075,7 @@ namespace internal
                 return;
               }
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
           }
       }
     } // namespace
@@ -2142,7 +2142,7 @@ MappingFE<dim, spacedim>::transform(
                                                                output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -2191,7 +2191,7 @@ MappingFE<dim, spacedim>::transform(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -2216,7 +2216,7 @@ MappingFE<dim, spacedim>::transform(
                                                               output);
         return;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

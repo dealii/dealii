@@ -2763,7 +2763,7 @@ namespace FEValuesViews
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         divergence_type return_value;
         return return_value;
       }
@@ -2869,7 +2869,7 @@ namespace FEValuesViews
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         divergence_type return_value;
         return return_value;
       }
@@ -2924,7 +2924,7 @@ namespace FEValuesViews
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         gradient_type return_value;
         return return_value;
       }

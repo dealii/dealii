@@ -218,7 +218,7 @@ namespace internal
               break;
 
             default:
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
               max_couplings = 0;
           }
         return std::min(max_couplings, dof_handler.n_dofs());
@@ -249,7 +249,7 @@ namespace internal
             27 * dof_handler.fe_collection.max_dofs_per_hex();
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             max_couplings = 0;
           }
 
@@ -2580,7 +2580,7 @@ unsigned int DoFHandler<dim, spacedim>::max_couplings_between_boundary_dofs()
                 28 * this->fe_collection.max_dofs_per_line() +
                 8 * this->fe_collection.max_dofs_per_quad());
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return 0;
     }
 }

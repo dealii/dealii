@@ -152,7 +152,7 @@ PreconditionBlock<MatrixType, inverse_type>::invert_permuted_diagblocks()
             this->inverse_svd(0).compute_inverse_svd(0.);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   else
@@ -207,7 +207,7 @@ PreconditionBlock<MatrixType, inverse_type>::invert_permuted_diagblocks()
                 this->inverse_svd(cell).compute_inverse_svd(0.);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
     }
@@ -459,7 +459,7 @@ PreconditionBlock<MatrixType, inverse_type>::invert_diagblocks()
             this->inverse_svd(0).compute_inverse_svd(1.e-12);
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   else
@@ -502,7 +502,7 @@ PreconditionBlock<MatrixType, inverse_type>::invert_diagblocks()
                 this->inverse_svd(cell).compute_inverse_svd(1.e-12);
                 break;
               default:
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
             }
         }
     }

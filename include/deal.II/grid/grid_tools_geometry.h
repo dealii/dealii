@@ -874,7 +874,7 @@ namespace GridTools
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return projected_point;
       }
 

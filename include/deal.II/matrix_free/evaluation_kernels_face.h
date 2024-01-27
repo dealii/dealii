@@ -134,7 +134,7 @@ namespace internal
                   values_quad[0] = values_dofs[0];
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
               }
             // Note: we always keep storage of values, 1st and 2nd derivatives
             // in an array
@@ -333,7 +333,7 @@ namespace internal
                   values_dofs[0] = values_quad[0];
                   break;
                 default:
-                  Assert(false, ExcNotImplemented());
+                  DEAL_II_NOT_IMPLEMENTED();
               }
             values_dofs += 3 * n_dofs;
             values_quad += n_q_points;
@@ -558,7 +558,7 @@ namespace internal
       // TODO: This is currently not implemented, but the test
       // matrix_vector_rt_face_03 apparently works without it -> check
       // if (subface_index < GeometryInfo<dim - 1>::max_children_per_cell)
-      //  Assert(false, ExcNotImplemented());
+      //  DEAL_II_NOT_IMPLEMENTED();
 
       using Eval = EvaluatorTensorProduct<evaluate_evenodd,
                                           dim - 1,
@@ -2748,7 +2748,7 @@ namespace internal
                   }
                 else
                   {
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                   }
               }
             else if (n_face_orientations == n_lanes)

@@ -38,7 +38,7 @@ template <int dim>
 void
 create_triangulation(const unsigned int, Triangulation<dim> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -101,7 +101,7 @@ create_triangulation(const unsigned int case_no, Triangulation<2> &tria)
           //   *------------>x
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     };
 }
 
@@ -170,7 +170,7 @@ create_triangulation(const unsigned int case_no, Triangulation<3> &tria)
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     };
 }
 

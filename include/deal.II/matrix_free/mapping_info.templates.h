@@ -2301,7 +2301,7 @@ namespace internal
                     boundary_form = cross_product_3d(tangential_vectors[0],
                                                      tangential_vectors[1]);
                   else
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
 
                   const VectorizedDouble JxW =
                     boundary_form.norm() *
@@ -3215,7 +3215,7 @@ namespace internal
                           }
                       if (update_flags & update_jacobian_grads)
                         {
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_NOT_IMPLEMENTED();
                         }
                       if (update_flags & update_normal_vectors)
                         for (unsigned int d = 0; d < dim; ++d)
@@ -3268,7 +3268,7 @@ namespace internal
                           }
                       if (update_flags & update_jacobian_grads)
                         {
-                          Assert(false, ExcNotImplemented());
+                          DEAL_II_NOT_IMPLEMENTED();
                         }
                       if (update_flags & update_normal_vectors)
                         for (unsigned int q = 0; q < fe_val.n_quadrature_points;

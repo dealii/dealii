@@ -518,7 +518,7 @@ namespace GridTools
     if (dim == 1)
       return 0;
     if (dim == 2 && spacedim == 3)
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     std::size_t n_negative_cells = 0;
     std::size_t cell_no          = 0;
@@ -1378,7 +1378,7 @@ namespace GridTools
                                 throw ExcMeshNotOrientable();
                             }
                           else
-                            Assert(false, ExcNotImplemented());
+                            DEAL_II_NOT_IMPLEMENTED();
                         }
                     }
                 }
@@ -1472,7 +1472,7 @@ namespace GridTools
             }
 
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
 
       // now rotate raw_cells[cell_index] in such a way that its orientation
@@ -1536,7 +1536,7 @@ namespace GridTools
 
           default:
             {
-              Assert(false, ExcNotImplemented());
+              DEAL_II_NOT_IMPLEMENTED();
             }
         }
     }

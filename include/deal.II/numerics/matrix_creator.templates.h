@@ -119,7 +119,7 @@ namespace MatrixCreator
         Scratch &
         operator=(const Scratch &)
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return *this;
         }
 
@@ -1101,11 +1101,11 @@ namespace MatrixCreator
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv) &&
                         fe_is_primitive)
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hcurl))
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv))
@@ -1307,7 +1307,7 @@ namespace MatrixCreator
       const Function<3, float> *const /*coefficient*/,
       const std::vector<unsigned int> & /*component_mapping*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
     template <>
@@ -1324,7 +1324,7 @@ namespace MatrixCreator
       const Function<3, double> *const /*coefficient*/,
       const std::vector<unsigned int> & /*component_mapping*/)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
   } // namespace internal
@@ -1350,7 +1350,7 @@ namespace MatrixCreator
     // dofs?
     if (dim == 1)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return;
       }
 
@@ -1552,11 +1552,11 @@ namespace MatrixCreator
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv) &&
                         fe_is_primitive)
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hcurl))
-                      Assert(false, ExcNotImplemented());
+                      DEAL_II_NOT_IMPLEMENTED();
 
                     if (!base.conforms(FiniteElementData<dim>::H1) &&
                         base.conforms(FiniteElementData<dim>::Hdiv))
@@ -1825,7 +1825,7 @@ namespace MatrixCreator
     // dofs?
     if (dim == 1)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return;
       }
 

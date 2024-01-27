@@ -244,7 +244,7 @@ PolynomialsBernardiRaugel<dim>::n_polynomials(const unsigned int k)
            GeometryInfo<dim>::faces_per_cell;
   // 2*4+4=12 polynomials in 2d and 3*8+6=30 polynomials in 3d
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

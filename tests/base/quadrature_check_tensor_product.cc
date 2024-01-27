@@ -28,7 +28,7 @@ void
 check_tensor_product(const std::vector<Quadrature<dim>> &quadratures,
                      const std::vector<std::string>     &quadrature_names)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 template <>

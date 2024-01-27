@@ -1091,7 +1091,7 @@ namespace TrilinosWrappers
                 "solve_with_jacobian_and_track_n_linear_iterations function "
                 "has been attached to the NOXSolver object."));
 
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             ret_code = 1;
           }
 

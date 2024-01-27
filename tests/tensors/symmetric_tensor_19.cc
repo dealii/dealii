@@ -107,7 +107,7 @@ test()
         break;
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   check(A);
 }

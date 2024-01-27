@@ -424,7 +424,7 @@ namespace LinearAlgebra
       else if (operation == VectorOperation::add)
         tpetra_operation = Tpetra::ADD;
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
       vector->doExport(source_vector, *tpetra_export, tpetra_operation);
     }
@@ -862,7 +862,7 @@ namespace LinearAlgebra
           else if (operation == VectorOperation::add)
             tpetra_operation = Tpetra::ADD;
           else
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
 
           Teuchos::RCP<const ExportType> exporter =
             Tpetra::createExport(nonlocal_vector->getMap(), vector->getMap());

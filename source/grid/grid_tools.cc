@@ -304,7 +304,7 @@ namespace GridTools
                     const bool solve_for_absolute_positions)
   {
     if (dim == 1)
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     // first provide everything that is needed for solving a Laplace
     // equation.
@@ -2200,7 +2200,7 @@ namespace GridTools
         const std::vector<CellId> &,
         std::vector<types::subdomain_id> &)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
     } // anonymous namespace
   }   // namespace internal
@@ -2219,7 +2219,7 @@ namespace GridTools
           const parallel::fullydistributed::Triangulation<dim, spacedim> *>(
           &triangulation) != nullptr)
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
     else if (const parallel::distributed::Triangulation<dim, spacedim>
                *parallel_tria = dynamic_cast<
@@ -3128,7 +3128,7 @@ namespace GridTools
           }
         else
           {
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
           }
 
         if (angle_fraction > limit_angle_fraction)
@@ -3221,7 +3221,7 @@ namespace GridTools
               }
             else
               {
-                Assert(false, ExcNotImplemented());
+                DEAL_II_NOT_IMPLEMENTED();
               }
           }
       }

@@ -1847,7 +1847,7 @@ SparseMatrix<number>::SSOR(Vector<somenumber> &dst, const number omega) const
 {
   // TODO: Is this called anywhere? If so, multiplication with omega(2-omega)D
   // is missing
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 
   Assert(cols != nullptr, ExcNeedsSparsityPattern());
   Assert(val != nullptr, ExcNotInitialized());

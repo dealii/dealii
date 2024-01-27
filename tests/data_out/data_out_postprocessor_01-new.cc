@@ -111,7 +111,7 @@ public:
         case 1:
           return std::cos(p.norm());
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 0;
       }
   }

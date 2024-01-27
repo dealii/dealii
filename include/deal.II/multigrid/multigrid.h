@@ -966,7 +966,7 @@ PreconditionMG<dim, VectorType, TransferType>::Tvmult(
   OtherVectorType &,
   const OtherVectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -977,7 +977,7 @@ PreconditionMG<dim, VectorType, TransferType>::Tvmult_add(
   OtherVectorType &,
   const OtherVectorType &) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

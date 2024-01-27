@@ -645,7 +645,7 @@ template <int dim>
 std::size_t
 FE_ABF<dim>::memory_consumption() const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

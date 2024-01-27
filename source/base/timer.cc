@@ -522,7 +522,7 @@ TimerOutput::get_summary_data(const OutputData kind) const
             output[section.first] = section.second.n_calls;
             break;
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
         }
     }
   return output;

@@ -220,7 +220,7 @@ namespace OpenCASCADE
                                  const ArrayView<const Point<spacedim>> &,
                                  const Point<spacedim> &)
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return {};
     }
 

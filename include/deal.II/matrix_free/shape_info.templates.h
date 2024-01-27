@@ -133,7 +133,7 @@ namespace internal
           // FE_Nothing case -> nothing to do here
         }
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
       // Finally store the renumbering into the respective field
       if (fe_in.n_components() == 1)

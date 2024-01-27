@@ -1474,7 +1474,7 @@ PolynomialsNedelec<dim>::evaluate(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -1496,7 +1496,7 @@ PolynomialsNedelec<dim>::n_polynomials(const unsigned int k)
 
       default:
         {
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
           return 0;
         }
     }

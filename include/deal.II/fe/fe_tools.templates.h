@@ -1061,7 +1061,7 @@ namespace FETools
   std::unique_ptr<FiniteElement<FE::dimension, FE::space_dimension>>
   FEFactory<FE>::get(const Quadrature<1> &) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return nullptr;
   }
 
@@ -3204,7 +3204,7 @@ namespace FETools
           }
 
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     return h2l;

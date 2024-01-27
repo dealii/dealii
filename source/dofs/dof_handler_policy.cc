@@ -125,7 +125,7 @@ namespace internal
                     }
 
                   default:
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                 }
 
 #ifdef DEBUG
@@ -3225,7 +3225,7 @@ namespace internal
       {
 #ifndef DEAL_II_WITH_MPI
         (void)new_numbers;
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return NumberCache();
 #else
         // Similar to distribute_dofs() we need to have a special treatment in
@@ -3386,7 +3386,7 @@ namespace internal
         const std::vector<types::global_dof_index> & /*new_numbers*/) const
       {
         // multigrid is not currently implemented for shared triangulations
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
         return {};
       }
@@ -3503,7 +3503,7 @@ namespace internal
         {
 #  ifndef DEAL_II_WITH_MPI
           (void)dof_handler;
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
 #  else
 
           // define functions that pack data on cells that are ghost cells
@@ -3605,7 +3605,7 @@ namespace internal
       ParallelDistributed<dim, spacedim>::distribute_dofs() const
       {
 #ifndef DEAL_II_WITH_MPI
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return NumberCache();
 #else
 
@@ -3813,7 +3813,7 @@ namespace internal
       ParallelDistributed<dim, spacedim>::distribute_mg_dofs() const
       {
 #ifndef DEAL_II_WITH_MPI
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return std::vector<NumberCache>();
 #else
 
@@ -3995,7 +3995,7 @@ namespace internal
                ExcInternalError());
 
 #ifndef DEAL_II_WITH_MPI
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return NumberCache();
 #else
 
@@ -4129,7 +4129,7 @@ namespace internal
         (void)level;
         (void)new_numbers;
 
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return NumberCache();
 #else
 

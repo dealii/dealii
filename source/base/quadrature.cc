@@ -485,7 +485,7 @@ template <>
 QIterated<0>::QIterated(const Quadrature<1> &, const std::vector<Point<1>> &)
   : Quadrature<0>()
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -494,7 +494,7 @@ template <>
 QIterated<0>::QIterated(const Quadrature<1> &, const unsigned int)
   : Quadrature<0>()
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

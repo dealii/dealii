@@ -246,7 +246,7 @@ test(const unsigned int poly_degree)
           exact[3] = std::complex<double>(3. * pi, 1. - 6. * pi2) / (36. * pi3);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         break;
     }
 

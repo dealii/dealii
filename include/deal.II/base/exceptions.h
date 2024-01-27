@@ -1762,6 +1762,33 @@ namespace deal_II_exceptions
 #endif /*ifdef DEAL_II_HAVE_BUILTIN_EXPECT*/
 
 
+/**
+ * `DEAL_II_NOT_IMPLEMENTED` is a macro (that looks like a function call
+ * when used as in `DEAL_II_NOT_IMPLEMENTED();`) that is used to raise an
+ * error in places where a piece of code is not yet implemented. If a code
+ * runs into such a place, it will be aborted with an error message that
+ * explains the situation, along with a backtrace of how the code ended
+ * up in this place.
+ *
+ * Alternatively, if
+ * deal_II_exceptions::internals::ExceptionHandling::abort_or_throw_on_exception
+ * is set to ExceptionHandling::throw_on_exception, then the corresponding
+ * error is thrown as a C++ exception that can be caught (though in
+ * many cases codes will then find it difficult to do what they wanted
+ * to do).
+ */
+#define DEAL_II_NOT_IMPLEMENTED()                                \
+  ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
+    ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
+      abort_or_throw_on_exception,                               \
+    __FILE__,                                                    \
+    __LINE__,                                                    \
+    __PRETTY_FUNCTION__,                                         \
+    nullptr,                                                     \
+    nullptr,                                                     \
+    ExcNotImplemented())
+
+
 namespace deal_II_exceptions
 {
   namespace internals

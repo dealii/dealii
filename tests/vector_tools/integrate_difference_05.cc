@@ -75,7 +75,7 @@ public:
           values[5] = 2 * (p[2] + p[0] * p[1]);
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
   }
 };
@@ -147,7 +147,7 @@ test()
         true_value = std::sqrt(29.0 / 3.0);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
   test<dim>(VectorTools::Hdiv_seminorm, true_value);

@@ -494,7 +494,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     bool Triangulation<dim, spacedim>::with_artificial_cells() const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return true;
     }
 
@@ -515,7 +515,7 @@ namespace parallel
     const std::vector<unsigned int>
       &Triangulation<dim, spacedim>::get_true_subdomain_ids_of_cells() const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return true_subdomain_ids_of_cells;
     }
 
@@ -527,7 +527,7 @@ namespace parallel
       &Triangulation<dim, spacedim>::get_true_level_subdomain_ids_of_cells(
         const unsigned int) const
     {
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
       return true_level_subdomain_ids_of_cells;
     }
   } // namespace shared

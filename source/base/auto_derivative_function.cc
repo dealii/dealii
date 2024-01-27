@@ -116,7 +116,7 @@ AutoDerivativeFunction<dim>::gradient(const Point<dim>  &p,
           break;
         }
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return grad;
 }
@@ -194,7 +194,7 @@ AutoDerivativeFunction<dim>::vector_gradient(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -257,7 +257,7 @@ AutoDerivativeFunction<dim>::gradient_list(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -326,7 +326,7 @@ AutoDerivativeFunction<dim>::vector_gradient_list(
         }
 
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -346,7 +346,7 @@ AutoDerivativeFunction<dim>::get_formula_of_order(const unsigned int ord)
       case 4:
         return FourthOrder;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
   return Euler;
 }

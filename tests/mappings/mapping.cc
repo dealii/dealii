@@ -220,7 +220,7 @@ create_triangulations(std::vector<Triangulation<dim> *> &,
                       std::vector<Manifold<dim> *> &,
                       std::vector<double> &)
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
 }
 
 

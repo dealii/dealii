@@ -114,7 +114,7 @@ public:
   Number
   el(unsigned int, unsigned int) const
   {
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
     return 0;
   }
 

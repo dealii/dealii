@@ -1049,7 +1049,7 @@ namespace internal
                       }
                     else
                       {
-                        Assert(false, ExcNotImplemented());
+                        DEAL_II_NOT_IMPLEMENTED();
                       }
 
                     ++ki;
@@ -1159,7 +1159,7 @@ namespace internal
                   }
                 else
                   {
-                    Assert(false, ExcNotImplemented());
+                    DEAL_II_NOT_IMPLEMENTED();
                   }
 
                 if (++ki == ghost_indices_subset_data.second[ko].second)

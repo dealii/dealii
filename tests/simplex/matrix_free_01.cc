@@ -163,7 +163,7 @@ test(const unsigned int v, const unsigned int degree, const bool do_helmholtz)
       fe_mapping = std::make_shared<FE_PyramidP<dim>>(1);
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 
   MappingFE<dim> mapping(*fe_mapping);
 
@@ -326,7 +326,7 @@ main(int argc, char **argv)
       else if (i == 2)
         deallog.push("PYRAMID");
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
 
       if (i == 0) // 2D makes only sense for simplex
         {

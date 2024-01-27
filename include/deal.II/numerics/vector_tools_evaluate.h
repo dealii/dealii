@@ -376,7 +376,7 @@ namespace VectorTools
           case EvaluationFlags::insert:
             return values[0];
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return values[0];
         }
     }
@@ -403,7 +403,7 @@ namespace VectorTools
           case EvaluationFlags::insert:
             return values[0];
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return values[0];
         }
     }
@@ -439,7 +439,7 @@ namespace VectorTools
           case EvaluationFlags::insert:
             return values[0];
           default:
-            Assert(false, ExcNotImplemented());
+            DEAL_II_NOT_IMPLEMENTED();
             return values[0];
         }
     }

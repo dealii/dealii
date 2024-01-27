@@ -48,7 +48,7 @@ namespace
       }
     else
       {
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
     return dpo;
@@ -65,7 +65,7 @@ namespace
     if (degree == 1)
       n_dofs = 5;
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCells::Pyramid);
   }
@@ -114,7 +114,7 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
         }
     }
   else
-    Assert(false, ExcNotImplemented());
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
@@ -235,7 +235,7 @@ FE_PyramidP<dim, spacedim>::compare_for_domination(
         return FiniteElementDomination::no_requirements;
     }
 
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return FiniteElementDomination::neither_element_dominates;
 }
 

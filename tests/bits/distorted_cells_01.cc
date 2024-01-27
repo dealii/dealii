@@ -56,7 +56,7 @@ check(const unsigned int testcase)
         std::swap(vertices[0], vertices[1]);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 
 

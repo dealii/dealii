@@ -45,7 +45,7 @@ PolynomialsBDM<dim>::PolynomialsBDM(const unsigned int k)
           monomials[i] = Polynomials::Monomial<double>(i);
         break;
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 
@@ -367,7 +367,7 @@ PolynomialsBDM<dim>::n_polynomials(const unsigned int k)
     return (k + 1) * (k + 2) + 2;
   if (dim == 3)
     return ((k + 1) * (k + 2) * (k + 3)) / 2 + 3 * (k + 1);
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0;
 }
 

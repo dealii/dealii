@@ -278,7 +278,7 @@ namespace Step36
         else if (cell->material_id() == pou_material_id)
           cell->set_active_fe_index(pou_fe_index);
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     GridTools::partition_triangulation(n_mpi_processes, triangulation);

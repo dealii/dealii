@@ -181,7 +181,7 @@ diffusionMechanics<dim>::set_active_fe_indices()
       else if (cell_is_in_omega2_domain(cell))
         cell->set_active_fe_index(1);
       else
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
     }
 }
 

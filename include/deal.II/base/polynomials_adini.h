@@ -181,7 +181,7 @@ inline Tensor<1, dim>
 PolynomialsAdini<dim>::compute_1st_derivative(const unsigned int /*i*/,
                                               const Point<dim> & /*p*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -192,7 +192,7 @@ inline Tensor<2, dim>
 PolynomialsAdini<dim>::compute_2nd_derivative(const unsigned int /*i*/,
                                               const Point<dim> & /*p*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -203,7 +203,7 @@ inline Tensor<3, dim>
 PolynomialsAdini<dim>::compute_3rd_derivative(const unsigned int /*i*/,
                                               const Point<dim> & /*p*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 
@@ -214,7 +214,7 @@ inline Tensor<4, dim>
 PolynomialsAdini<dim>::compute_4th_derivative(const unsigned int /*i*/,
                                               const Point<dim> & /*p*/) const
 {
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return {};
 }
 

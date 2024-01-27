@@ -111,7 +111,7 @@ namespace FE_P_BubblesImplementation
             return points;
           }
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     return points;
   }

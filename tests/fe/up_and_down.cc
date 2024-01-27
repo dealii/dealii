@@ -55,7 +55,7 @@ transform(const Point<dim> p)
                           p[1] * (1 + p[0]) * (1 + p[2]),
                           p[2] * (1 + p[0]) * (1 + p[1]));
       default:
-        Assert(false, ExcNotImplemented());
+        DEAL_II_NOT_IMPLEMENTED();
         return Point<dim>();
     };
 }

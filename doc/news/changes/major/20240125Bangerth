@@ -1,0 +1,9 @@
+New: There is now a function-like macro `DEAL_II_NOT_IMPLEMENTED();`
+that can be used to indicate places where something is not
+implemented. If a code runs into a place where it appears, the program
+is aborted (or, as documented, an exception is thrown). In contrast to
+the old way of indicating such a thing (namely, writing
+`Assert(false, ExcNotImplemented());`, the error is raised even in
+release mode.
+<br>
+(Wolfgang Bangerth, 2024/01/24)

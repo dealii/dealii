@@ -236,7 +236,7 @@ MatrixFreeTest<dim, fe_degree, Number, VectorType, n_q_points_1d>::el(
   const unsigned int col) const
 {
   (void)col;
-  Assert(false, ExcNotImplemented());
+  DEAL_II_NOT_IMPLEMENTED();
   return 0.;
 }
 
