@@ -22,6 +22,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/template_constraints.h>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 
