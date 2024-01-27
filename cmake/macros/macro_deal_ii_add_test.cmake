@@ -65,7 +65,7 @@
 #
 # The following variables must be set:
 #
-#  BASH
+#   BASH
 #     - Complete path to the bash shell.
 #
 #   NUMDIFF_EXECUTABLE
@@ -92,8 +92,7 @@
 #       to 0.
 #
 #   ENABLE_PERFORMANCE_TESTS
-#     - If defined and set to true the execution of performance tests will
-#       be enabled.
+#     - If set to true the execution of performance tests will be enabled.
 #
 #   TESTING_ENVIRONMENT
 #     - Specifies the performance test testing environment. Valid options
@@ -407,6 +406,10 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       set(_test_target    ${_category}.${_test_name}) # diff/run target name
       set(_test_full      ${_category}/${_test_name}) # full test name
       set(_test_directory ${CMAKE_CURRENT_BINARY_DIR}/${_test_name}.${_build_lowercase}) # directory to run the test in
+
+      if("${_n_cpu}" STREQUAL "0" AND "${_n_threads}" STREQUAL "0")
+        string(APPEND _test_directory "/serial")
+      endif()
 
       if(NOT "${_n_cpu}" STREQUAL "0")
         string(APPEND _test_target   ".mpirun${_n_cpu}")
