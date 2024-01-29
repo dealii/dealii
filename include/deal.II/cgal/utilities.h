@@ -610,9 +610,10 @@ namespace CGALWrappers
   resort_dealii_vertices_to_cgal_order(const unsigned int            structdim,
                                        std::vector<Point<spacedim>> &vertices)
   {
-    if (ReferenceCell::n_vertices_to_type(structdim, vertices.size()) ==
-        ReferenceCells::Quadrilateral)
-      std::swap(vertices[2], vertices[3]);
+    if constexpr (spacedim == 2)
+      if (ReferenceCell::n_vertices_to_type(structdim, vertices.size()) ==
+          ReferenceCells::Quadrilateral)
+        std::swap(vertices[2], vertices[3]);
   }
 
 
