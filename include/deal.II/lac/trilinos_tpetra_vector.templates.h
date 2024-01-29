@@ -289,7 +289,43 @@ namespace LinearAlgebra
       //  - Third case: the vectors have different size.
       if (vector->getMap()->isSameAs(*V.vector->getMap()))
         {
-          *vector = Tpetra::createCopy(*V.vector);
+          // Create a read-only Kokkos view from the source vector
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+          auto source_vector_2d =
+            V.vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadOnly);
+#  else
+          auto source_vector_2d =
+            V.vector->template getLocalView<Kokkos::HostSpace>();
+#  endif
+          auto source_vector_1d =
+            Kokkos::subview(source_vector_2d, Kokkos::ALL(), 0);
+
+          // Create a read/write Kokkos view from the target vector
+#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+          auto target_vector_2d =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWrite);
+#  else
+          vector->template sync<Kokkos::HostSpace>();
+          auto target_vector_2d =
+            vector->template getLocalView<Kokkos::HostSpace>();
+#  endif
+          auto target_vector_1d =
+            Kokkos::subview(target_vector_2d, Kokkos::ALL(), 0);
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+          vector->template modify<Kokkos::HostSpace>();
+#  endif
+
+          // Copy the data
+          Kokkos::deep_copy(target_vector_1d, source_vector_1d);
+
+#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
+          vector->template sync<typename Tpetra::Vector<
+            Number,
+            int,
+            types::signed_global_dof_index>::device_type::memory_space>();
+#  endif
         }
       else if (size() == V.size())
         {
