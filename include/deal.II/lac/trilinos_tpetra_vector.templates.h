@@ -289,7 +289,7 @@ namespace LinearAlgebra
       //  - Third case: the vectors have different size.
       if (vector->getMap()->isSameAs(*V.vector->getMap()))
         {
-          *vector = *V.vector;
+          *vector = Tpetra::createCopy(*V.vector);
         }
       else if (size() == V.size())
         {
@@ -317,9 +317,9 @@ namespace LinearAlgebra
       else
         {
           vector.reset();
-          vector = Utilities::Trilinos::internal::make_rcp<VectorType>(
-            V.vector->getMap());
-          Tpetra::deep_copy(*vector, *V.vector);
+          vector =
+            Utilities::Trilinos::internal::make_rcp<VectorType>(*V.vector,
+                                                                Teuchos::Copy);
 
           compressed             = V.compressed;
           has_ghost              = V.has_ghost;
