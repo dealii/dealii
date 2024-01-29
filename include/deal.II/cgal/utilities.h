@@ -610,6 +610,11 @@ namespace CGALWrappers
   resort_dealii_vertices_to_cgal_order(const unsigned int            structdim,
                                        std::vector<Point<spacedim>> &vertices)
   {
+    // Mark the two arguments as "used" because some compilers complain about
+    // arguments used only within an 'if constexpr' block.
+    (void)structdim;
+    (void)vertices;
+
     if constexpr (spacedim == 2)
       if (ReferenceCell::n_vertices_to_type(structdim, vertices.size()) ==
           ReferenceCells::Quadrilateral)
