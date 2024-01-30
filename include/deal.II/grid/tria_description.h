@@ -592,7 +592,14 @@ namespace TriangulationDescription
      * that may be partitioned differently than the desired partitioning.
      *
      * If the setup of multigrid levels is requested by the @p settings argument,
-     * they are partitioned according to a first-child policy.
+     * they are partitioned according to a first-child policy. In other words,
+     * a process owns a (non-active) cell if it owns its first child. If that
+     * first child is not active itself, the policy is applied recursively.
+     *
+     * The partitioning of cells is determined based on the elements of the
+     * `partition` vector. While that vector stores elements of type `double`,
+     * actual values must be integers and be within the range of process
+     * ranks of the relevant communicator.
      *
      * @note The communicator is extracted from the vector @p partition.
      *
@@ -615,7 +622,10 @@ namespace TriangulationDescription
 
     /**
      * Similar to the above function but allowing the user to prescribe the
-     * partitioning of the multigrid levels.
+     * partitioning of the multigrid levels. As with the other function,
+     * while both the global and level-wise partition vectors store elements
+     * with data type `double`, actual elements must be integers and equal
+     * possible process ranks within the relevant communicator.
      */
     template <int dim, int spacedim>
     Description<dim, spacedim>
