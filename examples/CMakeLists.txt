@@ -37,6 +37,12 @@ if(DEAL_II_COMPONENT_EXAMPLES)
     #
     # Special files:
     #
+    PATTERN "box_2D_mixed.geo"                  # step-3 (mixed)
+    PATTERN "box_2D_mixed.msh"                  # step-3 (mixed)
+    PATTERN "box_2D_quad.geo"                   # step-3 (mixed)
+    PATTERN "box_2D_quad.msh"                   # step-3 (mixed)
+    PATTERN "box_2D_tri.geo"                    # step-3 (simplex, mixed)
+    PATTERN "box_2D_tri.msh"                    # step-3 (simplex, mixed)
     PATTERN "output.reference.dat"              # step-39
     PATTERN "postprocess.pl"                    # step-39
     PATTERN "obstacle.pbm"                      # step-42

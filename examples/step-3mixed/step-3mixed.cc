@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
  *
- * Copyright (C) 1999 - 2023 by the deal.II authors
+ * Copyright (C) 1999 - 2021 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -12,121 +12,11 @@
  * the top level directory of deal.II.
  *
  * ---------------------------------------------------------------------
+
  *
- * <br>
- *
- * <i>
- * This program was contributed by Peter Munch. This work and the required
- * generalizations of the internal data structures of deal.II form part of the
- * project "Virtual Materials Design" funded by the Helmholtz Association of
- * German Research Centres.
- * </i>
- *
- *
- * <a name="Intro"></a>
- * <h1>Introduction</h1>
- *
- * <h3>Motivation</h3>
- *
- * The motivation for using simplex meshes (as done in step-3simplex) is
- * straightforward: many freely available mesh-generation tools are very good in
- * creating good-quality meshes in such a format, while they struggle with
- * hex-only meshes. Hex-only meshes, on the other hand, are characterized with
- * better numerical properties (e.g., less degrees of freedom for the same
- * degree of accuracy and possibly better performance since the tensor-product
- * structure can be exploited) and are, as a consequence, the natural choice for
- * rather simple geometries and for meshes described by a coarse mesh with a few
- * cells (like a hyperball) and obtained in their final form through iterative
- * local refinement.
- *
- * Mixed meshes try to combine the best of both worlds by partitioning the
- * geometry in parts that can be easily meshed by hypercube cells
- * (quadrilaterals in 2d, hexahedrons in 3d) and in parts that can not be meshed
- * easily, requiring simplices (triangles in 2d, tetrahedrons in 3d). Since one
- * assumes that the region requiring simplices is rather small compared to the
- * rest of the domain where more efficient and accurate methods can be applied,
- * one can expect that the overall efficiency is hardly impacted by such an
- * approach.
- *
- * One should note that in 3d, one also needs a transition region between
- * hypercube and simplex regions. Here, one can use wedges/prisms and/or
- * pyramids.
- *
- *
- * <h3>Working with mixed meshes</h3>
- *
- * <i>
- * In the following, we concentrate, for the sake of simplicity, on 2d meshes:
- * they can only contain triangles and quadrilaterals. However, as detailed in
- * the outlook, an extension of the presented approach to the 3d case is
- * straightforward.
- * </i>
- *
- * The complexity of working with mixed meshes in 2d results from the fact
- * that it contains of two
- * types of geometrical objects: quadrilaterals and triangles. How to deal with
- * quadrilaterals, we have discussed in step-3: we selected an appropriate
- * finite element, quadrature rule and mapping object, e.g., FE_Q, QGauss, and
- * MappingFE (initialized with FE_Q). For simplex meshes, we selected in
- * step-3simplex FE_SimplexP, QGaussSimplex, and MappingFE (initialized with
- * FE_SimplexP).
- *
- * For mixed meshes, we need multiple finite elements, quadrature rules, and
- * mapping objects (one set for triangles and one set for quadrilaterals) in the
- * same program. To ease the work with the multitude of objects (in particular
- * in 3d, we need at least four of each), you can collect the objects and group
- * them together in hp::FECollection, hp::QCollection, and
- * hp::MappingCollection.
- *
- * Just like in the context of finite elements, quadrature rules, and mapping
- * objects, we need multiple FEValues objects: the collection of FEValues is
- * called hp::FEValues. It returns the FEValues object needed for the current
- * cell via the method hp::FEValues::get_present_fe_values().
- *
- * For hp::FEValues, to be able to select the right finite element/quadrature
- * rule/mapping object set, it queries the active FE index of the given cell
- * during hp::FEValues::reinit(). The indices have to be set - as shown below -
- * before calling DoFHandler::distribute_dofs() by the user.
- *
- * <i>
- * The namespace name of hp::FECollection, hp::QCollection,
- * hp::MappingCollection, and hp::FEValues indicates that these classes have not
- * been written for mixed meshes in the first place, but for problems where each
- * (hypercube) cell could have a different type of finite element assigned - in
- * the simplest case, all cells have the same element type but different
- * polynomial degrees p (the reason for the letter "p" in "hp"). An extension of
- * this infrastructure to work not only on different element types but also on
- * different geometrical objects was a natural choice. For further details on
- * hp-methods, see step-27.
- * </i>
- *
- * <h3>Mesh generation</h3>
- *
- * Just like in step-3simplex, we read an externally generated mesh. For this
- * tutorial, we have created the mesh (square with width and height of one;
- * quadrilaterals on the left half and triangles on the right half) with Gmsh
- * with the following journal file "box_2D_mixed.geo":
- *
- * @code
- * Rectangle(1) = {0.0, 0, 0, 0.5, 1, 0};
- * Rectangle(2) = {0.5, 0, 0, 0.5, 1, 0};
- * Recombine Surface{1};
- * Physical Surface("All") = {1, 2};
- * Mesh 2;
- * Coherence Mesh;
- * Save "box_2D_mixed.msh";
- * @endcode
- *
- * The journal file can be processed by Gmsh generating the actual mesh with the
- * ending ".msh":
- *
- * @code
- * gmsh box_2D_mixed.geo
- * @endcode
- *
- * We have included in the tutorial folder both the journal file and the mesh
- * file in the event that one does not have access to Gmsh.
- *
+ * Authors: Wolfgang Bangerth, 1999,
+ *          Guido Kanschat, 2011,
+ *          Peter Munch, 2021
  */
 
 
@@ -134,35 +24,27 @@
 
 // Include files, as used in step-3:
 #include <deal.II/base/function.h>
-
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
-
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
-
 #include <deal.II/grid/tria.h>
-
+#include <deal.II/lac/vector.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/vector.h>
-
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/vector_tools.h>
-
 #include <fstream>
 #include <iostream>
 
 // Include files, as added in step-3simplex:
 #include <deal.II/base/quadrature_lib.h>
-
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/mapping_fe.h>
-
 #include <deal.II/grid/grid_in.h>
 
 // Include files that we need in this tutorial to be able to deal with
@@ -241,7 +123,7 @@ void Step3::make_grid()
 // @sect4{Step3::setup_system}
 //
 // In contrast to step-3 and step-3simplex, we need here a preprocessing step
-// that assigns an active FE index to each cell consistently according to the
+// that assigns an active_fe_index to each cell consistently according to the
 // indices in the collections and the cell type.
 void Step3::setup_system()
 {
@@ -278,7 +160,7 @@ void Step3::setup_system()
 //    cell - a reference to the right FEValues object (constructed
 //    with the correct mapping object, finite element, and quadrature rule),
 //    which can be used as usual to compute the cell integrals.
-//  - The cell-local @ref GlossStiffnessMatrix "stiffness matrix" and the right-hand-side vector have
+//  - The cell-local stiffness matrix and the right-hand-side vector have
 //    different sizes depending on the cell type (6 DoFs vs. 9 DoFs) so that
 //    they might need to be resized for each cell.
 //
@@ -403,58 +285,3 @@ int main()
 
   return 0;
 }
-
-/**
- * <h1>Results</h1>
- *
- * The following figures show the mesh and the result obtained by executing this
- * program:
- *
- * <table align="center" class="doxtable" style="width:65%">
- *   <tr>
- *     <td>
- *         @image html step_3_mixed_0.png
- *     </td>
- *     <td>
- *         @image html step_3_mixed_1.png
- *     </td>
- *   </tr>
- * </table>
- *
- * Not surprisingly, the result looks as expected.
- *
- *
- * <h3>Possibilities for extensions</h3>
- *
- * In this tutorial, we presented how to use the deal.II simplex infrastructure
- * to solve a simple Poisson problem on a mixed mesh in 2d. In this scope, we
- * could only present a small section of the capabilities. In the following, we
- * point out further capabilities briefly.
- *
- *
- * <h4>Pure hypercube and simplex meshes</h4>
- *
- * In this tutorial, we worked on a mesh consisting both of quadrilaterals and
- * triangles. However, the program and the underlying concepts also work if the
- * mesh only contains either quadrilaterals or triangles. Interested users can
- * try this out: we have provided appropriate journal files and meshes for such
- * cases.
- *
- *
- * <h4>3d meshes</h4>
- *
- * In 3d, meshes might also consist of wedges/prisms and pyramids. Therefore,
- * the above introduced collections might consist of four components.
- *
- * For wedge/prism and pyramid cell types, following finite-element and
- * quadrature-rule classes are available:
- *  - wedge: FE_WedgeP, FE_WedgeDGP, QGaussWedge, MappingFE
- *  - pyramid: FE_PyramidP, FE_PyramidDGP, QGaussPyramid, MappingFE
- *
- * <h4>Parallelization, face integrals, discontinuous Galerkin methods, and
- * matrix-free operator evaluation</h4>
- *
- * Regarding these aspects, the same comments are valid that are described in
- * step-3simplex for pure simplex meshes.
- *
- */

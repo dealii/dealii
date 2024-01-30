@@ -1,0 +1,102 @@
+<h1>Results</h1>
+
+The following figures show the mesh and the result obtained by executing this
+program:
+
+<table align="center" class="doxtable" style="width:65%">
+  <tr>
+    <td>
+        @image html step_3_simplex_0.png
+    </td>
+    <td>
+        @image html step_3_simplex_1.png
+    </td>
+  </tr>
+</table>
+
+Not surprisingly, the result looks as expected.
+
+
+<h3>Possibilities for extensions</h3>
+
+In this tutorial, we presented how to use the deal.II simplex infrastructure
+to solve a simple Poisson problem on a simplex mesh in 2D. In this scope, we
+could only present a small section of the capabilities. In the following, we
+point out further capabilities briefly.
+
+
+<h4>3D meshes and codim-1 meshes in 3D</h4>
+
+An extension to 3D is quite straightforward. Both FE_SimplexP and QGaussSimplex
+are implemented in a dimensional-independent way so that simply replacing
+everywhere dim=2 with dim=3 should work out of the box.
+
+Furthermore, embedding of a 2D mesh consisting of triangles in 3D space is
+possible.
+
+
+<h4>Mixed meshes</h4>
+
+In step-3, we considered meshes only consisting of quadrilaterals. In this
+tutorial, we took a look at the case that the mesh only consists of triangles.
+In the general case (also known as mixed mesh), the mesh consists of both
+cell types. In 3D, meshes might even consist of more cell types, like
+wedges/prisms and pyramids. We consider such meshes in the tutorial step-3mixed.
+
+
+<h4>Alternative finite elements, quadrature rules, and mapping objects</h4>
+
+In this tutorial, we used the most basic finite-element, quadrature-rule, and
+mapping classes. However, more classes are compatible with simplices. The
+following list gives an overview of these classes:
+- finite elements: FE_SimplexP, FE_SimplexDGP, FE_SimplexP_Bubbles
+- quadrature rules: QGaussSimplex, QWitherdenVincentSimplex, QDuffy
+- mapping objects: MappingFE, MappingFEField
+
+It should be also pointed out that FESystems can also handle simplex finite
+elements which is crucial to solve vector-valued problems, as needed, e.g., to
+solve elasticity and fluid problems (see also step-17).
+
+
+<h4>Alternative mesh generation approaches</h4>
+
+In this tutorial, we have created the mesh externally and read it with the
+help of GridIn. Since we believe that the main motivation to work on simplex
+meshes is that one has a complex geometry that can only be meshed with
+an external tool with simplices, deal.II does not have too many functions in the
+GridGenerator namespace, targeting simplex meshes. However, we would like to
+point out the following functions:
+ - GridGenerator::subdivided_hyper_cube_with_simplices() and
+   GridGenerator::subdivided_hyper_rectangle_with_simplices(), which fill a
+   hypercube and a hyperrectangle domain with simplices
+ - GridGenerator::convert_hypercube_to_simplex_mesh(), which converts meshes
+   consisting of hypercube cells to simplex meshes by replacing one
+   quadrilateral with 4 triangles and one hexahedron with 24 tetrahedrons
+
+
+<h4>hp-adaptivity</h4>
+
+Here, we considered a mesh without refinements and with all cells assigned the
+same type of element with the same polynomial degree. However, one is not
+restricted to this. For further details on hp-methods, see step-27.
+
+
+<h4>Parallelization</h4>
+
+To parallelize the code, one needs to replace the Triangulation object either
+with parallel::shared::Triangulation or
+parallel::fullydistributed::Triangulation and make some minor adjustments, as
+discussed in step-6.
+
+
+<h4>Face integrals and discontinuous Galerkin methods</h4>
+
+The classes FEFaceValues and FEInterfaceValues are also compatible with simplex
+meshes.
+
+
+<h4>Matrix-free operator evaluation</h4>
+
+In this tutorial, we showed a matrix-based approach. However, one could also
+rewrite the code using MatrixFree, FEEvaluation, and FEFaceEvaluation, which
+are also compatible with simplex meshes.
