@@ -77,7 +77,7 @@ namespace Step9
   // coefficients in previous examples, but there is another possibility in
   // the library, namely a base class that describes tensor valued
   // functions. This is more convenient than overriding Function::value() with
-  // a method that knows about multiple function components: at the end of the
+  // a method that knows about multiple function components: At the end of the
   // day we need a Tensor, so we may as well just use a class that returns a
   // Tensor.
   template <int dim>
@@ -85,52 +85,9 @@ namespace Step9
   {
   public:
     virtual Tensor<1, dim> value(const Point<dim> &p) const override;
-
-    // In previous examples, we have used assertions that throw exceptions in
-    // several places. However, we have never seen how such exceptions are
-    // declared. This can be done as follows:
-    DeclException2(ExcDimensionMismatch,
-                   unsigned int,
-                   unsigned int,
-                   << "The vector has size " << arg1 << " but should have "
-                   << arg2 << " elements.");
-    // The syntax may look a little strange, but is reasonable. The format is
-    // basically as follows: use the name of one of the macros
-    // <code>DeclExceptionN</code>, where <code>N</code> denotes the number of
-    // additional parameters which the exception object shall take. In this
-    // case, as we want to throw the exception when the sizes of two vectors
-    // differ, we need two arguments, so we use
-    // <code>DeclException2</code>. The first parameter then describes the
-    // name of the exception, while the following declare the data types of
-    // the parameters. The last argument is a sequence of output directives
-    // that will be piped into the <code>std::cerr</code> object, thus the
-    // strange format with the leading <code>@<@<</code> operator and the
-    // like. Note that we can access the parameters which are passed to the
-    // exception upon construction (i.e. within the <code>Assert</code> call)
-    // by using the names <code>arg1</code> through <code>argN</code>, where
-    // <code>N</code> is the number of arguments as defined by the use of the
-    // respective macro <code>DeclExceptionN</code>.
-    //
-    // To learn how the preprocessor expands this macro into actual code,
-    // please refer to the documentation of the exception classes. In brief,
-    // this macro call declares and defines a class
-    // <code>ExcDimensionMismatch</code> inheriting from ExceptionBase which
-    // implements all necessary error output functions.
-    //
-    // @note This exception is similarly used inside the
-    // <code>AssertDimension</code> macro, which is a handy wrapper to the
-    // check the dimensions of two given objects.
   };
 
-  // The following two functions implement the interface described above. The
-  // first simply implements the function as described in the introduction,
-  // while the second uses the same trick to avoid calling a virtual function
-  // as has already been introduced in the previous example program. Note the
-  // check for the right sizes of the arguments in the second function, which
-  // should always be present in such functions; it is our experience that
-  // many if not most programming errors result from incorrectly initialized
-  // arrays, incompatible parameters to functions and the like; using
-  // assertion as in this case can eliminate many of these problems.
+
   template <int dim>
   Tensor<1, dim> AdvectionField<dim>::value(const Point<dim> &p) const
   {
@@ -406,6 +363,41 @@ namespace Step9
   // the result into its final location, we do not need a copy-local-to-global
   // function and will instead give the WorkStream::run() function an empty
   // function object -- the equivalent to a NULL function pointer.
+  //
+  // There is one more part to this class.
+  // In previous examples, we have used assertions that throw exceptions in
+  // several places (see, for example, step-5 and step-8). However, you have
+  // never seen how such exceptions are declared. The code below shows how
+  // to do that, using the `DeclException2` macro.
+  //
+  // The syntax may look a little strange, but is reasonable. The format is
+  // basically as follows: Use the name of one of the macros
+  // <code>DeclExceptionN</code>, where <code>N</code> denotes the number of
+  // additional parameters which the exception object should take. In this
+  // case, as we want to throw the exception when the sizes of two vectors
+  // differ, we need two arguments, so we use
+  // <code>DeclException2</code>. The first parameter then describes the
+  // name of the exception, while the following declare the data types of
+  // the parameters. The last argument is a sequence of output directives
+  // that will be piped into the <code>std::cerr</code> object, thus the
+  // strange format with the leading `<<` operator and the
+  // like. Note that we can access the parameters which are passed to the
+  // exception upon construction (i.e. within the <code>Assert</code> call)
+  // by using the names <code>arg1</code> through <code>argN</code>, where
+  // <code>N</code> is the number of arguments as defined by the use of the
+  // respective macro <code>DeclExceptionN</code>.
+  //
+  // To learn how the preprocessor expands this macro into actual code,
+  // please refer to the documentation of the exception classes. In brief,
+  // this macro call declares and defines a class
+  // <code>ExcDimensionMismatch</code> inheriting from ExceptionBase which
+  // implements all necessary error output functions.
+  //
+  // @note This exception we declare here is similar to the used inside the
+  // <code>AssertDimension</code> macro, which is a handy wrapper for
+  // checking that the dimensions of two given objects are equal, and that
+  // you have already seen in step-8.
+
   class GradientEstimation
   {
   public:
@@ -938,7 +930,8 @@ namespace Step9
   // other function, but there is a bit of setup at the top.
   //
   // Before starting with the work, we check that the vector into
-  // which the results are written has the right size. Programming
+  // which the results are written has the right size, using the `Assert`
+  // macro and the exception class we declared above. Programming
   // mistakes in which one forgets to size arguments correctly at the
   // calling site are quite common. Because the resulting damage from
   // not catching such errors is often subtle (e.g., corruption of
