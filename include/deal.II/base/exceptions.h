@@ -1776,6 +1776,8 @@ namespace deal_II_exceptions
  * error is thrown as a C++ exception that can be caught (though in
  * many cases codes will then find it difficult to do what they wanted
  * to do).
+ *
+ * This macro is first used in step-8 of the tutorial.
  */
 #define DEAL_II_NOT_IMPLEMENTED()                                \
   ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \

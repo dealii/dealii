@@ -116,7 +116,16 @@ namespace Step8
   //
   // To prevent cases where the return vector has not previously been set to
   // the right size we test for this case and otherwise throw an exception at
-  // the beginning of the function. Note that enforcing that output arguments
+  // the beginning of the function. This could be done by writing
+  // `Assert (values.size() == points.size(), some exception text)`, but
+  // because checking for the equality in the sizes of two objects is
+  // such a common operation, there is a short-cut: `AssertDimension`.
+  // The operation behind this command is that it compares the two given
+  // sizes and, if they are not equal, aborts the program with a suitable
+  // error message that we don't have to write from scratch in all of the
+  // places where we want to have this kind of check. (As for the other
+  // `Assert` variations, the check is removed in optimized mode.)
+  // Note that enforcing that output arguments
   // already have the correct size is a convention in deal.II, and enforced
   // almost everywhere. The reason is that we would otherwise have to check at
   // the beginning of the function and possibly change the size of the output
@@ -125,7 +134,7 @@ namespace Step8
   // subsequent calls would only have to do redundant checks). In addition,
   // checking and possibly resizing the vector is an operation that can not be
   // removed if we can't rely on the assumption that the vector already has
-  // the correct size; this is in contract to the Assert call that is
+  // the correct size; this is in contrast to the call to `Assert` that is
   // completely removed if the program is compiled in optimized mode.
   //
   // Likewise, if by some accident someone tried to compile and run the
@@ -498,11 +507,19 @@ namespace Step8
   // if in debug mode.
   //
   // After listing the 1d, 2d, and 3d case, it is good style to let the
-  // program die if we run upon a case which we did not consider. Remember
-  // that the Assert macro generates an exception if the condition in the
-  // first parameter is not satisfied. Of course, the condition
-  // <code>false</code> can never be satisfied, so the program will always
-  // abort whenever it gets to the default statement:
+  // program die if we run into a case which we did not consider. You have
+  // previously already seen the use of the `Assert` macro that generates
+  // aborts the program with an error message if a condition is not satisfied
+  // (see step-5, for example). We could use this in the `default` case
+  // below, in the form `Assert(false, ExcNotImplemented())` -- in other words,
+  // the "condition" here is always `false`, and so the assertion always fails
+  // and always aborts the program whenever it gets to the default statement.
+  // This is perhaps more difficult to read than necessary, and consequently
+  // there is a short-cut: `DEAL_II_NOT_IMPLEMENTED()`. It does the same
+  // as the form above (with the minor difference that it also aborts the
+  // program in release mode). It is written in all-caps because that makes
+  // it stand out visually (and also because it is not actually a function,
+  // but a macro).
   template <int dim>
   void ElasticProblem<dim>::output_results(const unsigned int cycle) const
   {
@@ -525,7 +542,7 @@ namespace Step8
           solution_names.emplace_back("z_displacement");
           break;
         default:
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
 
     // After setting up the names for the different components of the
